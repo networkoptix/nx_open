@@ -19,7 +19,7 @@ public:
 
     virtual int getMaxFps() override; 
     virtual bool isResourceAccessible() override;
-    virtual QString manufacture() const override;
+    virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
     virtual bool setHostAddress(const QString &ip, QnDomain domain) override;

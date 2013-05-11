@@ -4,6 +4,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 
+#include <client/client_globals.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource_managment/resource_criterion.h>
 
@@ -272,6 +274,13 @@ private:
     bool m_centralItemRequired;
 };
 
+class QnPreviewActionCondition: public QnExportActionCondition {
+public:
+    QnPreviewActionCondition(QObject *parent = NULL): QnExportActionCondition(true, parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 class QnPanicActionCondition: public QnActionCondition {
 public:
     QnPanicActionCondition(QObject *parent = NULL):
@@ -335,6 +344,39 @@ public:
     QnCreateZoomWindowActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
+class QnTreeNodeTypeCondition: public QnActionCondition {
+public:
+    QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent = NULL): QnActionCondition(parent), m_nodeType(nodeType) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    Qn::NodeType m_nodeType;
+};
+
+class QnOpenInCurrentLayoutActionCondition: public QnActionCondition {
+public:
+    QnOpenInCurrentLayoutActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnOpenInNewEntityActionCondition: public QnActionCondition {
+public: 
+    QnOpenInNewEntityActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+};
+
+class QnSetAsBackgroundActionCondition: public QnActionCondition {
+public:
+    QnSetAsBackgroundActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
 #endif // QN_ACTION_CONDITIONS_H

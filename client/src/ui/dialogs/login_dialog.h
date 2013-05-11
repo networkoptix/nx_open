@@ -3,7 +3,7 @@
 
 #include <QtGui/QDialog>
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/network/networkoptixmodulefinder.h>
 #include <utils/network/foundenterprisecontrollersmodel.h>
 
@@ -27,6 +27,8 @@ namespace Ui {
 
 class QnLoginDialog : public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
+
+    typedef QDialog base_type;
 public:
     explicit QnLoginDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnLoginDialog();
@@ -37,12 +39,17 @@ public:
 
     bool restartPending() const;
 
+    bool rememberPassword() const;
+    void setStoredPassword(const QString &password);
+
+
 public slots:
     virtual void accept() override;
     virtual void reject() override;
 
 protected:
     virtual void changeEvent(QEvent *event) override;
+    virtual void showEvent(QShowEvent *event) override;
 
     /**
      * Reset connections model to its initial state. Select last used connection.

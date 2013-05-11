@@ -249,7 +249,7 @@ PollSet::EventType PollSet::const_iterator::eventType() const
     return m_impl->currentSocketREvent;
 }
 
-void* PollSet::const_iterator::userData() const
+void* PollSet::const_iterator::userData()
 {
     return m_impl->currentSocket.userData;
 }

@@ -114,7 +114,7 @@ bool QnPlDlinkResource::isResourceAccessible()
     return true;
 }
 
-QString QnPlDlinkResource::manufacture() const
+QString QnPlDlinkResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }

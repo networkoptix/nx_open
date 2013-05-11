@@ -12,7 +12,6 @@
 
 #include <api/media_server_connection.h>
 #include <api/media_server_statistics_manager.h>
-#include <api/media_server_statistics_data.h>
 
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>
@@ -29,10 +28,6 @@
 #include <ui/style/statistics_colors.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
-
-/** Data update period. For the best result should be equal to mediaServerStatisticsManager's */
-//TODO: #GDM extract this one from server's response (updatePeriod element).
-#define REQUEST_TIME 2000
 
 namespace {
     /** Convert angle from radians to degrees */
@@ -55,9 +50,8 @@ namespace {
         case NETWORK_OUT:
             return colors.networkOutByKey(key);
         default:
-            break;
+            return QColor(Qt::white);
         }
-        return QColor(Qt::white);
     }
 
     qreal maxValue(const QLinkedList<qreal> &values) {
@@ -75,7 +69,7 @@ namespace {
 
         QLinkedList<qreal> result;
         for(QLinkedList<qreal>::const_iterator pos = values.begin(); pos != values.end(); pos++) {
-            if (qFuzzyCompare(*pos, -1))
+            if (*pos < 0)
                 result << *pos;
             else
                 result << *pos/upperBound;
@@ -110,14 +104,13 @@ namespace {
     QPainterPath createChartPath(const QLinkedList<qreal> &values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
         QPainterPath path;
         qreal maxValue = -1;
-        //qreal value;
         qreal lastValue = 0;
         const qreal x_step2 = x_step*.5;
         
         qreal x1, y1;
         x1 = -x_step * elapsedStep;
 
-        qreal angle = elapsedStep >= 0.5 
+        qreal baseAngle = elapsedStep >= 0.5
             ? radiansToDegrees(qAcos(2 * (1 - elapsedStep))) 
             : radiansToDegrees(qAcos(2 * elapsedStep));
 
@@ -140,82 +133,55 @@ namespace {
                 continue;
             }
 
-            qreal y2 = value * scale;
-
-
-            /* Note that we're using 89 degrees for arc length for a reason.
-             * When using full 90 degrees, arcs are connected, but Qt still
-             * inserts an empty line segment to join consecutive arcs. 
-             * Path triangulator then chokes when trying to calculate a normal
-             * for this line segment, producing NaNs in its output.
-             * These NaNs are then fed to GPU, resulting in artifacts. */
-
-            // TODO: #GDM This logic seems overly complicated to me.
-            //            I'm sure we can do the same with a code that is at least three times shorter.
-
             /* Drawing only second part of the arc, cut at the beginning */
-            if (x1 + x_step2 < 0.0) {
-                if (y2 > y1) {
-                    path.arcMoveTo(x1 + x_step2, y1, x_step, (y2 - y1), 180 + angle);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180 + angle, 90 - angle);
-                } else if (y2 < y1) {
-                    path.arcMoveTo(x1 + x_step2, y2, x_step, (y1 - y2), 180 - angle);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180 - angle, -90 + angle);
-                } else { // y2 == y1
-                    path.moveTo(0.0, y1);
-                    path.lineTo(x1 + x_step, y2);
-                }
-            }
+            bool c1 = x1 + x_step2 < 0.0;
+
             /* Drawing both parts of the arc, cut at the beginning */
-            else if (x1 < 0.0) {
-                if (y2 > y1) {
-                    path.arcMoveTo(x1 - x_step2, y1, x_step, (y2 - y1), angle);
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), angle, -angle);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 89);
-                } else if (y2 < y1) {
-                    path.arcMoveTo(x1 - x_step2, y2, x_step, (y1 - y2), -angle);
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -angle, angle);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -89);
-                } else { // y2 == y1
-                    path.moveTo(0.0, y1);
-                    path.lineTo(x1 + x_step, y2);
-                }
-            }
+            bool c2 = !c1 && x1 < 0.0;
+
             /* Drawing both parts of the arc as usual */
-            else if (!last) { 
-                if (y2 > y1) {
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -89);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 89);
-                } else if (y2 < y1) {
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 89);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -89);
-                } else { // y2 == y1
-                    path.lineTo(x1 + x_step, y2);
-                }
-            }
+            bool c3 = !c1 && !c2 && !last;
+
             /* Drawing both parts of the arc, cut at the end */
-            else if (elapsedStep >= 0.5) {
-                if (y2 > y1) {
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -89);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, angle);
-                } else if (y2 < y1) {
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 89);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -angle);
-                } else { // y2 == y1
-                    path.lineTo(x1 + x_step * elapsedStep, y2);
-                }
-            } 
+            bool c4 = !c1 && !c2 && !c3 && elapsedStep >= 0.5;
+
             /* Drawing only first part of the arc, cut at the end */
-            else {
-                if (y2 > y1) {
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90 + angle);
-                } else if (y2 < y1) {
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90 - angle);
-                } else { // y2 == y1
+            bool c5 = !c1 && !c2 && !c3 && !c4;
+
+            qreal y2 = value * scale;
+            if (y2 != y1) {
+                qreal h = qAbs(y2 - y1);
+                qreal angle = (y2 > y1) ? baseAngle : -baseAngle;
+
+                /* Note that we're using 89 degrees for arc length for a reason.
+                 * When using full 90 degrees, arcs are connected, but Qt still
+                 * inserts an empty line segment to join consecutive arcs.
+                 * Path triangulator then chokes when trying to calculate a normal
+                 * for this line segment, producing NaNs in its output.
+                 * These NaNs are then fed to GPU, resulting in artifacts. */
+                qreal a89 = (y2 > y1) ? 89 : -89;
+                qreal a90 = (y2 > y1) ? 90 : -90;
+                qreal y = qMin(y1, y2);
+
+                if (c1)
+                    path.arcMoveTo(x1 + x_step2, y, x_step, h, 180 + angle);
+                if (c2)
+                    path.arcMoveTo(x1 - x_step2, y, x_step, h, angle);
+                if (c2 || c3 || c4)
+                    path.arcTo(x1 - x_step2, y, x_step, h, c2 ? angle : a90, c2 ? -angle : -a89);
+                if (c1 || c2 || c3 || c4)
+                    path.arcTo(x1 + x_step2, y, x_step, h, c1 ? 180 + angle : 180, c1 ? a90 - angle : c4 ? angle : a89);
+                if (c5)
+                    path.arcTo(x1 - x_step2, y, x_step, h, a90, angle - a90);
+            } else {
+                if (c1 || c2)
+                    path.moveTo(0.0, y1);
+                if (c1 || c2 || c3)
+                    path.lineTo(x1 + x_step, y2);
+                if (c4 || c5)
                     path.lineTo(x1 + x_step * elapsedStep, y2);
-                }
             }
-            
+
             if(last) {
                 /* Value that will be shown */
                 *currentValue = (lastValue * (1.0 - elapsedStep) + value * elapsedStep);
@@ -253,10 +219,14 @@ namespace {
     typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
     Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage)
 
-    const int legendImgSize = 20;
+    const int legendImageSize = 20;
     const int legendFontSize = 20;
     const int itemSpacing = 2;
+
+    const char *buttonBarPropertyName = "_qn_buttonBarPropertyName";
+
 } // anonymous namespace
+
 
 // -------------------------------------------------------------------------- //
 // LegendButtonWidget
@@ -276,27 +246,22 @@ public:
         setIcon(qnSkin->icon("item/check.png"));
     }
 
-    ~LegendButtonWidget() {
-
-    }
-
+    virtual ~LegendButtonWidget() {}
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
         switch (which) {
         case Qt::MinimumSize:
-            return QSizeF(legendImgSize, legendImgSize + itemSpacing);
-        case Qt::PreferredSize:
-            {
-                QFont font;
-                font.setPixelSize(legendFontSize);
-                return QSizeF(legendImgSize + QFontMetrics(font).width(m_key) + itemSpacing*2, legendImgSize + itemSpacing);
-            }
-        case Qt::MaximumSize:
-            {
-                QSizeF hint = base_type::sizeHint(which, constraint);
-                return QSizeF(hint.width(), legendImgSize + itemSpacing);
-            }
+            return QSizeF(legendImageSize, legendImageSize + itemSpacing);
+        case Qt::PreferredSize: {
+            QFont font;
+            font.setPixelSize(legendFontSize);
+            return QSizeF(legendImageSize + QFontMetrics(font).width(m_key) + itemSpacing*2, legendImageSize + itemSpacing);
+        }
+        case Qt::MaximumSize: {
+            QSizeF hint = base_type::sizeHint(which, constraint);
+            return QSizeF(hint.width(), legendImageSize + itemSpacing);
+        }
         default:
             break;
         }
@@ -311,10 +276,11 @@ protected:
         qreal opacity = painter->opacity();
         painter->setOpacity(opacity * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
 
-        QRectF imgRect = QRectF(0, 0, legendImgSize, legendImgSize);
-        int textOffset = legendImgSize + itemSpacing;
+        QRectF imgRect = QRectF(0, 0, legendImageSize, legendImageSize);
+        int textOffset = legendImageSize + itemSpacing;
         QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
         {
+            //TODO: #GDM Text drawing is very slow. #Elric says it is fast in Qt5
             QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
@@ -331,15 +297,16 @@ protected:
         base_type::paint(painter, startState, endState, progress, widget, imgRect);
         painter->setOpacity(opacity);
     }
+
 private:
     QnStatisticsDeviceType m_deviceType;
     QString m_key;
 };
 
+
 // -------------------------------------------------------------------------- //
 // StatisticsOverlayWidget
 // -------------------------------------------------------------------------- //
-
 class StatisticsOverlayWidget: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 public:
@@ -349,23 +316,19 @@ public:
     {
     }
 
-    ~StatisticsOverlayWidget() {
-    }
+    virtual ~StatisticsOverlayWidget() {}
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
         return base_type::sizeHint(which == Qt::MinimumSize ? which : Qt::MaximumSize, constraint);
     }
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override {
-        Q_UNUSED(widget)
-
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *) override {
         QnScopedPainterFontRollback fontRollback(painter);
         Q_UNUSED(fontRollback)
         QFont font(this->font());
         font.setPixelSize(legendFontSize);
         painter->setFont(font);
-
 
         QRectF rect = option->rect;
 
@@ -390,12 +353,12 @@ protected:
         QRectF inner(offsetX, offsetTop, ow, oh);
 
         qreal elapsed_step = m_widget->m_renderStatus == Qn::CannotRender ? 0 :
-                (qreal)qBound((qreal)0, (qreal)m_widget->m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
+                (qreal)qBound((qreal)0, (qreal)m_widget->m_elapsedTimer.elapsed(), m_widget->m_updatePeriod) / m_widget->m_updatePeriod;
 
-        const qreal x_step = (qreal)ow*1.0/(m_widget->m_storageLimit - 2);
+        const qreal x_step = (qreal)ow*1.0/(m_widget->m_pointsLimit - 2); // one point is cut from the beginning and one from the end
         const qreal y_step = oh * 0.025;
 
-        /** Draw grid */
+        /* Draw grid */
         {
             QPen grid;
             grid.setColor(qnGlobals->statisticsColors().grid);
@@ -416,10 +379,12 @@ protected:
         QMap<QString, qreal> displayValues;
         qreal maxNetworkValue = 0.0;
         foreach(QString key, m_widget->m_sortedKeys) {
-            if (!m_widget->m_checkedFlagByKey.value(key, true))
+            QnStatisticsData &stats = m_widget->m_history[key];
+
+            LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
+            if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
                 continue;
 
-            QnStatisticsData &stats = m_widget->m_history[key];
             if (stats.deviceType == NETWORK_IN || stats.deviceType == NETWORK_OUT)
                 maxNetworkValue = qMax(maxNetworkValue, maxValue(stats.values));
         }
@@ -427,7 +392,7 @@ protected:
         while (maxNetworkValue > networkUpperBound)
             networkUpperBound *= 2;
 
-        /** Draw graph lines */
+        /* Draw graph lines */
         {
             QnScopedPainterTransformRollback transformRollback(painter);
             Q_UNUSED(transformRollback)
@@ -443,10 +408,12 @@ protected:
             graphPen.setCapStyle(Qt::FlatCap);
 
             foreach(QString key, m_widget->m_sortedKeys) {
-                if (!m_widget->m_checkedFlagByKey.value(key, true))
+                QnStatisticsData &stats = m_widget->m_history[key];
+                LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
+
+                if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
                     continue;
 
-                QnStatisticsData &stats = m_widget->m_history[key];
                 QLinkedList<qreal> values = stats.values;
                 if (stats.deviceType == NETWORK_IN || stats.deviceType == NETWORK_OUT)
                     values = scaledNetworkValues(values, networkUpperBound);
@@ -459,7 +426,7 @@ protected:
             }
         }
 
-        /** Draw frame and legend */
+        /* Draw frame and numeric values */
         {
             QnScopedPainterPenRollback penRollback(painter);
             Q_UNUSED(penRollback)
@@ -480,7 +447,10 @@ protected:
                 qreal xRight = offsetX + ow + itemSpacing*2;
                 qreal xLeft  = itemSpacing;
                 foreach(QString key, m_widget->m_sortedKeys) {
-                    if (!m_widget->m_checkedFlagByKey.value(key, true))
+                    QnStatisticsData &stats = m_widget->m_history[key];
+                    LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
+
+                    if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
                         continue;
 
                     qreal interValue = displayValues[key];
@@ -488,7 +458,7 @@ protected:
                         continue;
                     qreal y = offsetTop + qMax(offsetTop, oh * (1.0 - interValue));
 
-                    QnStatisticsData &stats = m_widget->m_history[key];
+
                     main_pen.setColor(getDeviceColor(stats.deviceType, key));
                     painter->setPen(main_pen);
 
@@ -509,29 +479,33 @@ protected:
             }
         }
     }
+
 private:
     QnServerResourceWidget* m_widget;
 };
 
+
 // -------------------------------------------------------------------------- //
 // QnServerResourceWidget
 // -------------------------------------------------------------------------- //
-
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
     m_manager(context->instance<QnMediaServerStatisticsManager>()),
     m_lastHistoryId(-1),
     m_counter(0),
     m_renderStatus(Qn::NothingRendered),
-    m_maxMaskUsed(1),
     m_infoOpacity(0.0)
 {
+    for (int i = 0; i < ButtonBarCount; i++)
+        m_maxMaskUsed[i] = 1;
+
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
 
-    m_storageLimit = m_manager->storageLimit();
+    m_pointsLimit = m_manager->pointsLimit();
     m_manager->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
+    m_updatePeriod = m_manager->updatePeriod(m_resource);
 
     /* Note that this slot is already connected to nameChanged signal in 
      * base class's constructor.*/
@@ -555,19 +529,20 @@ QnMediaServerResourcePtr QnServerResourceWidget::resource() const {
     return m_resource;
 }
 
-int QnServerResourceWidget::helpTopicAt(const QPointF &pos) const {
-    Q_UNUSED(pos)
+int QnServerResourceWidget::helpTopicAt(const QPointF &) const {
     return Qn::MainWindow_MonitoringItem_Help;
 }
 
-Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) {
-    Q_UNUSED(channel);
+Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
+    Q_UNUSED(channel)
+    Q_UNUSED(channelRect)
 
-    drawStatistics(rect, painter);
+    drawStatistics(paintRect, painter);
 
     return m_renderStatus;
 }
 
+// TODO: #GDM this method draws background only, why 'drawStatistics'?
 void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painter) {
     qreal width = rect.width();
     qreal height = rect.height();
@@ -583,7 +558,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
     QRectF inner(offset, offset, ow, oh);
 
-    /** Draw background */
+    /* Draw background */
     if(!m_backgroundGradientPainter)
         m_backgroundGradientPainter = qn_serverResourceWidget_backgroundGradientPainterStorage()->get(QGLContext::currentContext());
 
@@ -609,6 +584,90 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     painter->endNativePainting();
 }
 
+void QnServerResourceWidget::addOverlays() {
+
+
+
+    StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this, this);
+    statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
+
+    QGraphicsLinearLayout *mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    mainOverlayLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+    mainOverlayLayout->setSpacing(0.5);
+    mainOverlayLayout->addItem(statisticsOverlayWidget);
+
+    for (int i = 0; i < ButtonBarCount; i++) {
+        m_legendButtonBar[i] = new QnImageButtonBar(this, 0, Qt::Horizontal);
+        connect(m_legendButtonBar[i], SIGNAL(checkedButtonsChanged()), this, SLOT(at_legend_checkedButtonsChanged()));
+        m_legendButtonBar[i]->setOpacity(m_infoOpacity);
+        m_legendButtonBar[i]->setProperty(buttonBarPropertyName, i);
+
+        QGraphicsLinearLayout *legendOverlayHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+        legendOverlayHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+        legendOverlayHLayout->addStretch();
+        legendOverlayHLayout->addItem(m_legendButtonBar[i]);
+        legendOverlayHLayout->addStretch();
+        mainOverlayLayout->addItem(legendOverlayHLayout);
+    }
+
+    QnViewportBoundWidget *mainOverlayWidget = new QnViewportBoundWidget(this);
+    mainOverlayWidget->setLayout(mainOverlayLayout);
+    mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
+    mainOverlayWidget->setOpacity(1.0);
+    addOverlayWidget(mainOverlayWidget, UserVisible, true);
+}
+
+LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const QnStatisticsDeviceType deviceType) const {
+    switch(deviceType) {
+    case NETWORK_IN:
+        return NetworkInButtonBar;
+    case NETWORK_OUT:
+        return NetworkOutButtonBar;
+    default:
+        break;
+    }
+    return CommonButtonBar;
+}
+
+void QnServerResourceWidget::updateLegend() {
+    int visibleMask[ButtonBarCount];
+    int checkedMask[ButtonBarCount];
+    for (int i = 0; i < ButtonBarCount; i++) {
+        visibleMask[i] = 0;
+        checkedMask[i] = 0;
+    }
+
+    foreach (QString key, m_sortedKeys) {
+        QnStatisticsData &stats = m_history[key];
+
+        LegendButtonBar bar = buttonBarByDeviceType(stats.deviceType);
+        int mask;
+        if (!m_buttonMaskByKey[bar].contains(key)) {
+            mask = m_maxMaskUsed[bar];
+            m_maxMaskUsed[bar] *= 2;
+            m_buttonMaskByKey[bar][key] = mask;
+        } else {
+            mask = m_buttonMaskByKey[bar][key];
+        }
+        visibleMask[bar] |= mask;
+
+        if (!m_legendButtonBar[bar]->button(mask)) {
+            m_legendButtonBar[bar]->addButton(mask, new LegendButtonWidget(stats.deviceType, key));
+        }
+
+        bool checked =  m_checkedFlagByKey[bar].value(key, true);
+        if (checked)
+            checkedMask[bar] |= mask;
+    }
+
+    for (int i = 0; i < ButtonBarCount; i++) {
+        m_legendButtonBar[i]->setCheckedButtons(checkedMask[i]);
+        m_legendButtonBar[i]->setVisibleButtons(visibleMask[i]);
+    }
+
+}
+
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -629,6 +688,8 @@ QVariant QnServerResourceWidget::itemChange(GraphicsItemChange change, const QVa
 }
 
 void QnServerResourceWidget::at_statistics_received() {
+    m_updatePeriod = m_manager->updatePeriod(m_resource);
+
     qint64 id = m_manager->historyId(m_resource);
     if (id < 0) {
         m_renderStatus = Qn::CannotRender;
@@ -667,73 +728,20 @@ void QnServerResourceWidget::at_statistics_received() {
     m_counter++;
 }
 
-void QnServerResourceWidget::addOverlays() {
-    m_legendButtonBar = new QnImageButtonBar(this, 0, Qt::Horizontal);
-    connect(m_legendButtonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_legend_checkedButtonsChanged()));
-
-    QGraphicsLinearLayout *legendOverlayHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    legendOverlayHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    legendOverlayHLayout->addStretch();
-    legendOverlayHLayout->addItem(m_legendButtonBar);
-    m_legendButtonBar->setOpacity(m_infoOpacity);
-    legendOverlayHLayout->addStretch();
-
-    StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this, this);
-    statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
-
-    QGraphicsLinearLayout *mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    mainOverlayLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
-    mainOverlayLayout->setSpacing(0.5);
-    mainOverlayLayout->addItem(statisticsOverlayWidget);
-    mainOverlayLayout->addItem(legendOverlayHLayout);
-
-    QnViewportBoundWidget *mainOverlayWidget = new QnViewportBoundWidget(this);
-    mainOverlayWidget->setLayout(mainOverlayLayout);
-    mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
-    mainOverlayWidget->setOpacity(1.0);
-    addOverlayWidget(mainOverlayWidget, UserVisible, true);
-}
-
-void QnServerResourceWidget::updateLegend() {
-
-    int visibleMask = 0;
-    int checkedMask = 0;
-
-    foreach (QString key, m_sortedKeys) {
-        int mask;
-        if (!m_buttonMaskByKey.contains(key)) {
-            mask = m_maxMaskUsed;
-            m_maxMaskUsed *= 2;
-            m_buttonMaskByKey[key] = mask;
-        } else {
-            mask = m_buttonMaskByKey[key];
-        }
-        visibleMask |= mask;
-
-        if (!m_legendButtonBar->button(mask)) {
-            QnStatisticsData &stats = m_history[key];
-            m_legendButtonBar->addButton(mask, new LegendButtonWidget(stats.deviceType, key));
-        }
-
-        bool checked =  m_checkedFlagByKey.value(key, true);
-        if (checked)
-            checkedMask |= mask;
-    }
-    m_legendButtonBar->setCheckedButtons(checkedMask);
-    m_legendButtonBar->setVisibleButtons(visibleMask);
-}
-
 void QnServerResourceWidget::at_legend_checkedButtonsChanged() {
-    int checkedMask = m_legendButtonBar->checkedButtons();
+    LegendButtonBar bar = (LegendButtonBar)sender()->property(buttonBarPropertyName).toInt();
+
+    int checkedMask = m_legendButtonBar[bar]->checkedButtons();
     foreach (QString key, m_sortedKeys) {
-        if (!m_buttonMaskByKey.contains(key))
+        if (!m_buttonMaskByKey[bar].contains(key))
             continue;
-        int mask = m_buttonMaskByKey[key];
-        m_checkedFlagByKey[key] = ((checkedMask & mask) > 0);
+        int mask = m_buttonMaskByKey[bar][key];
+        m_checkedFlagByKey[bar][key] = ((checkedMask & mask) > 0);
     }
 }
 
 void QnServerResourceWidget::at_headerOverlayWidget_opacityChanged(const QVariant &value) {
     m_infoOpacity = value.toDouble();
-    m_legendButtonBar->setOpacity(m_infoOpacity);
+    for (int i = 0; i < ButtonBarCount; i++)
+        m_legendButtonBar[i]->setOpacity(m_infoOpacity);
 }

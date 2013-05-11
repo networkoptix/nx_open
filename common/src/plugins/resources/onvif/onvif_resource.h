@@ -20,8 +20,6 @@
 #include "core/resource/interface/abstract_ptz_controller.h"
 #include "onvif_ptz_controller.h"
 #include "utils/common/timermanager.h"
-#include "utils/common/systemtimer.h"
-
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -79,6 +77,7 @@ public:
         G726,
         G711,
         AAC,
+        AMR,
         SIZE_OF_AUDIO_CODECS
     };
 
@@ -106,7 +105,8 @@ public:
 
 
     virtual bool isResourceAccessible() override;
-    virtual QString manufacture() const override;
+    virtual QString getDriverName() const override;
+    virtual QString getVendorName() const override;
 
     virtual int getMaxFps() override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
@@ -192,6 +192,9 @@ public:
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool secondaryResolutionIsLarge() const;
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;
+
+    void setVendorName( const QString& vendorName );
+
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -270,6 +273,8 @@ protected:
     virtual void stopInputPortMonitoring() override;
     virtual bool isInputPortMonitored() const override;
 
+    qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
+    int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
 private slots:
     void onRenewSubscriptionTimer();
 
@@ -418,6 +423,7 @@ private:
     quint64 m_renewSubscriptionTaskID;
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
+    QString m_vendorName;
 	
     bool createPullPointSubscription();
     bool pullMessages();

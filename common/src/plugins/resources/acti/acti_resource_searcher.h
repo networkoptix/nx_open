@@ -26,11 +26,13 @@ public:
 
     virtual QnResourceList findResources(void) override;
 protected:
-    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result) override;
-private slots:
-    void at_replyReceived(QNetworkReply* reply);
-private:
-    QByteArray getDeviceXml(const QUrl& url);
+    virtual void processPacket(
+        const QHostAddress& discoveryAddr,
+        const QString& host,
+        const UpnpDeviceInfo& devInfo,
+        const QByteArray& xmlDevInfo,
+        QnResourceList& result) override;
+
 private:
     struct CasheInfo
     {
@@ -38,10 +40,23 @@ private:
         QByteArray xml;
     };
 
+    struct CashedDevInfo
+    {
+        QElapsedTimer timer;
+        UpnpDeviceInfo info;
+    };
+
     QMap<QString, CasheInfo> m_cachedXml;
+    QMap<QString, CashedDevInfo> m_cashedDevInfo;
+
     QSet<QString >m_httpInProgress;
     QNetworkAccessManager *m_manager;
     QMutex m_mutex;
+
+    QByteArray getDeviceXml(const QUrl& url);
+
+private slots:
+    void at_replyReceived(QNetworkReply* reply);
 };
 
 #endif // _ACTI_RESOURCE_SEARCHER_H__

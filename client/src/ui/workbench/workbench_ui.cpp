@@ -13,15 +13,12 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMenu>
 
-#include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
-#include <utils/common/checked_cast.h>
-
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
 
 #include <camera/resource_display.h>
+#include <camera/video_camera.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -64,7 +61,11 @@
 #include <ui/workaround/system_menu_event.h>
 #include <ui/screen_recording/screen_recorder.h>
 
-#include "camera/video_camera.h"
+#include <utils/common/event_processors.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/common/checked_cast.h>
+#include <client/client_settings.h>
+
 #include "openal/qtvaudiodevice.h"
 #include "core/resource_managment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
@@ -689,11 +690,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Init fields. */
     setFlags(HideWhenNormal | HideWhenZoomed | AdjustMargins);
 
-    setSliderOpened(true, false);
     setSliderVisible(false, false);
-    setTreeOpened(true, false);
     setTreeVisible(true, false);
-    setTitleOpened(true, false);
     setTitleVisible(true, false);
     setTitleUsed(false);
     setHelpOpened(false, false);
@@ -702,8 +700,12 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setCalendarVisible(false);
     updateControlsVisibility(false);
 
-    /* Tree is pinned by default. */
-    m_treePinButton->setChecked(true);
+    //TODO: #GDM think about a refactoring
+    bool treeOpened = qnSettings->isTreeOpened(); //quite a hack because m_treePinButton sets tree opened if it is pinned
+    m_treePinButton->setChecked(qnSettings->isTreePinned());
+    setTreeOpened(treeOpened, false);
+    setTitleOpened(qnSettings->isTitleOpened(), false);
+    setSliderOpened(qnSettings->isSliderOpened(), false);
 
     /* Set up title D&D. */
     DropInstrument *dropInstrument = new DropInstrument(true, context(), this);
@@ -742,13 +744,21 @@ Qn::ActionScope QnWorkbenchUi::currentScope() const {
     }
 }
 
+QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const {
+    /* Get items. */
+    switch(scope) {
+    case Qn::TitleBarScope:
+        return m_tabBarWidget->currentParameters(scope);
+    case Qn::TreeScope:
+        return m_treeWidget->currentParameters(scope);
+    default:
+        return QnActionParameters(currentTarget(scope));
+    }
+}
+
 QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     /* Get items. */
     switch(scope) {
-    case Qn::TitleBarScope: 
-        return m_tabBarWidget->currentTarget(scope);
-    case Qn::TreeScope:
-        return m_treeWidget->currentTarget(scope);
     case Qn::SliderScope:
         return QVariant::fromValue(navigator()->currentWidget());
     case Qn::SceneScope:
@@ -774,6 +784,8 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate) {
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     action(Qn::ToggleTreeAction)->setChecked(opened);
     Q_UNUSED(rollback)
+
+    qnSettings->setTreeOpened(opened);
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate) {
@@ -792,6 +804,8 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate) {
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     action(Qn::ToggleSliderAction)->setChecked(opened);
     Q_UNUSED(rollback)
+
+    qnSettings->setSliderOpened(opened);
 }
 
 void QnWorkbenchUi::setTitleOpened(bool opened, bool animate) {
@@ -800,6 +814,8 @@ void QnWorkbenchUi::setTitleOpened(bool opened, bool animate) {
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     action(Qn::ToggleTitleBarAction)->setChecked(opened);
     Q_UNUSED(rollback)
+
+    qnSettings->setTitleOpened(opened);
 
     if(!m_titleUsed)
         return;
@@ -1894,6 +1910,8 @@ void QnWorkbenchUi::at_pinTreeAction_toggled(bool checked) {
         setTreeOpened(true);
 
     updateViewportMargins();
+
+    qnSettings->setTreePinned(checked);
 }
 
 void QnWorkbenchUi::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {

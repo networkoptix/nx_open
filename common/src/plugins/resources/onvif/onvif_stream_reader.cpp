@@ -87,7 +87,7 @@ void QnOnvifStreamReader::openStream()
 
     m_multiCodec.setRequest(streamUrl);
     m_multiCodec.openStream();
-    if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
+    if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())
         m_resource->setStatus(QnResource::Unauthorized);
 }
 
@@ -319,7 +319,7 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
         qCritical() << "QnOnvifStreamReader::fetchUpdateVideoEncoder: can't get video encoders from camera (" 
             << (isPrimary? "primary": "secondary") << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
             << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
-        if (soapWrapper.isNotAuthenticated()) {
+        if (soapWrapper.isNotAuthenticated() && canChangeStatus()) {
             m_onvifRes->setStatus(QnResource::Unauthorized);
         }
         return false;
@@ -640,6 +640,9 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrima
             break;
         case QnPlOnvifResource::AAC:
             encoder.Encoding = onvifXsd__AudioEncoding__AAC;
+            break;
+        case QnPlOnvifResource::AMR:
+            encoder.Encoding = onvifXsd__AudioEncoding__AMR;
             break;
         default:
             qWarning() << "QnOnvifStreamReader::updateAudioEncoder: codec type is unknown: " << codec

@@ -272,7 +272,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (needStopLow)
             recorderLowRes->stop();
         */
-        camera->stopIfNoActivity();
+        camera->updateActivity();
         /*
         if (needStopHi)
             recorderHiRes->clearUnprocessedData();
@@ -394,8 +394,9 @@ void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
 
     if((status == QnResource::Offline || status == QnResource::Unauthorized) && m_onlineCameras.contains(camera)) 
     {
-        if (QnLiveStreamProvider::hasRunningLiveProvider(resource.dynamicCast<QnNetworkResource>()))
+        if (QnLiveStreamProvider::hasRunningLiveProvider(resource.dynamicCast<QnNetworkResource>())) {
             emit cameraDisconnected(camera, qnSyncTime->currentUSecsSinceEpoch());
+        }
         m_onlineCameras.remove(camera);
     }
 }

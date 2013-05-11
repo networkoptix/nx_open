@@ -39,9 +39,16 @@ public:
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
 
-    // like arecont or iqinvision
-    virtual QString manufacture() const = 0; // TODO: #Elric rename to manufacturer()
-    virtual QString oemName() const;
+    //!Returns driver (built-in or external) name, used to manage camera
+    /*!
+        This can be "axis", "dlink", "onvif", etc.
+    */
+    virtual QString getDriverName() const = 0;
+    //!Returns camera's vendor name
+    /*!
+        For onvif camera it returns real vendor name, not "onvif"
+    */
+    virtual QString getVendorName() const;
 
 
     virtual int getMaxFps(); // in fact this is const function;
@@ -103,6 +110,8 @@ public:
     virtual void setGroupName(const QString& value);
     virtual QString getGroupId() const;
     virtual void setGroupId(const QString& value);
+
+    bool isGroupPlayOnly() const;
 
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource signals/slots

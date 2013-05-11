@@ -59,7 +59,7 @@ void QnWorkbenchPtzMapperWatcher::sendRequest(const QnMediaServerResourcePtr &se
     //if(m_requests.contains(camera)) // TODO: #Elric remove once TODO above is resolved.
         //return; /* No duplicate requests. */
 
-    int handle = server->apiConnection()->asyncPtzGetSpaceMapper(camera, this, SLOT(at_replyReceived(int, const QnPtzSpaceMapper &, int)));
+    int handle = server->apiConnection()->ptzGetSpaceMapperAsync(camera, this, SLOT(at_replyReceived(int, const QnPtzSpaceMapper &, int)));
     m_requests.insert(camera);
     m_resourceByHandle.insert(handle, camera);
 }

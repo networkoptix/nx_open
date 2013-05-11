@@ -30,7 +30,7 @@ bool QnPlVmax480Resource::isResourceAccessible()
     return true;
 }
 
-QString QnPlVmax480Resource::manufacture() const 
+QString QnPlVmax480Resource::getDriverName() const 
 {
     return QLatin1String(MANUFACTURE);
 }
@@ -121,8 +121,10 @@ bool QnPlVmax480Resource::initInternal()
         if (!m_chunkReader) {
             m_chunkReader = new QnVMax480ChunkReader(toSharedPointer());
             connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)));
+            m_chunkReader->start();
         }
-        m_chunkReader->start();
+        if (!m_chunkReader->isRunning())
+            m_chunkReader->start();
     }
 
     return true;
@@ -178,10 +180,16 @@ void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
 
 QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
 {
-    QString suffix = QString(QLatin1String("channel=%1")).arg(channel+1);
-    QString url = getUrl();
-    url = url.left(url.indexOf(L'?')+1) + suffix;
-    return qnResPool->getResourceByUrl(url).dynamicCast<QnPhysicalCameraResource>();
+    QUrl url(getUrl());
+    QList<QPair<QString, QString> > items = url.queryItems();
+    for (int i = 0; i < items.size(); ++i)
+    {
+        if (items[i].first == lit("channel"))
+            items[i].second = QString::number(channel+1);
+    }
+    url.setQueryItems(items);
+    QString urlStr = url.toString();
+    return qnResPool->getResourceByUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
 }
 
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)

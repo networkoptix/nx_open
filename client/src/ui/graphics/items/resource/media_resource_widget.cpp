@@ -9,7 +9,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
@@ -57,9 +57,10 @@ namespace {
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
+    m_display(NULL),
+    m_renderer(NULL),
     m_motionSensitivityValid(false),
-    m_binaryMotionMaskValid(false),
-    m_zoomRect(0.0, 0.0, 1.0, 1.0)
+    m_binaryMotionMaskValid(false)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource) 
@@ -79,7 +80,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     QGraphicsView *view = QnWorkbenchContextAware::display()->view();
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
     m_renderer = new QnResourceWidgetRenderer(channelCount(), NULL, viewport ? viewport->context() : NULL);
-    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
+    connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
     m_display->addRenderer(m_renderer);
 
     /* Set up static text. */
@@ -135,10 +136,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     }
 
     connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateButtonsVisibility()));
+    connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateAspectRatio()));
 
-    updateButtonsVisibility();
     at_camDisplay_liveChanged();
+    updateButtonsVisibility();
     updateIconButton();
+    updateAspectRatio();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -153,19 +156,6 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
     return m_resource;
-}
-
-const QRectF &QnMediaResourceWidget::zoomRect() const {
-    return m_zoomRect;
-}
-
-void QnMediaResourceWidget::setZoomRect(const QRectF &zoomRect) {
-    if(qFuzzyCompare(m_zoomRect, zoomRect))
-        return;
-
-    m_zoomRect = zoomRect;
-
-    emit zoomRectChanged();
 }
 
 QPoint QnMediaResourceWidget::mapToMotionGrid(const QPointF &itemPos) {
@@ -364,7 +354,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         updateInfoTextLater();
 }
 
-Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) {
+Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
     painter->beginNativePainting();
 
     qreal opacity = effectiveOpacity();
@@ -374,13 +364,14 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    Qn::RenderStatus result = m_renderer->paint(channel, m_zoomRect, rect, effectiveOpacity());
+    QRectF sourceRect = toSubRect(channelRect, paintRect);
+    Qn::RenderStatus result = m_renderer->paint(channel, sourceRect, paintRect, effectiveOpacity());
     
     /* There is no need to restore blending state before invoking endNativePainting. */
     painter->endNativePainting();
 
     if(result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
-        painter->fillRect(rect, Qt::black);
+        painter->fillRect(paintRect, Qt::black);
 
     return result;
 }
@@ -603,6 +594,8 @@ void QnMediaResourceWidget::channelLayoutChangedNotify() {
         m_binaryMotionMask.push_back(static_cast<__m128i *>(qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, 32)));
         memset(m_binaryMotionMask.back(), 0, MD_WIDTH * MD_HEIGHT / 8);
     }
+
+    updateAspectRatio();
 }
 
 void QnMediaResourceWidget::channelScreenSizeChangedNotify() {
@@ -711,8 +704,9 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
     if (resource->hasFlags(QnResource::SINGLE_SHOT)) {
         if (resource->getStatus() == QnResource::Offline)
             return NoDataOverlay;
-        else
-            return EmptyOverlay;
+        if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
+            return NoDataOverlay;
+        return EmptyOverlay;
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
         return NoDataOverlay;
     } else if (m_camera && m_camera->isAnalog() && m_camera->isScheduleDisabled()) {
@@ -727,7 +721,7 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
         if (m_display->camDisplay()->isEOFReached())
             return NoDataOverlay;
         QnCachingTimePeriodLoader *loader = context()->navigator()->loader(m_resource);
-        if (loader && loader->periods(Qn::RecordingRole).containTime(m_display->camDisplay()->getExternalTime() / 1000))
+        if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateChannelOverlay(channel, QnResource::Online);
         else
             return NoDataOverlay;
@@ -742,8 +736,20 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
     invalidateMotionSensitivity();
 }
 
-void QnMediaResourceWidget::at_renderer_sourceSizeChanged(const QSize &size) {
-    setAspectRatio(QnGeometry::aspectRatio(size) * QnGeometry::aspectRatio(channelLayout()->size()));
+void QnMediaResourceWidget::updateAspectRatio() {
+    if(!m_renderer)
+        return; /* Not yet initialized. */
+
+    QSize sourceSize = m_renderer->sourceSize();
+    if(sourceSize.isEmpty()) {
+        setAspectRatio(-1);
+    } else {
+        setAspectRatio(
+            QnGeometry::aspectRatio(m_renderer->sourceSize()) * 
+            QnGeometry::aspectRatio(channelLayout()->size()) *
+            QnGeometry::aspectRatio(zoomRect())
+        );
+    }
 }
 
 void QnMediaResourceWidget::at_camDisplay_liveChanged() {
@@ -757,7 +763,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton, false);
+        buttonBar()->setButtonsChecked(PtzButton | ZoomWindowButton, false);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
@@ -767,11 +773,14 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     setOption(DisplayCrosshair, ptzEnabled);
 
     if(checked) {
-        buttonBar()->setButtonsChecked(MotionSearchButton, false);
+        buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     setOption(ControlZoomWindow, checked);
+
+    if(checked)
+        buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
 }

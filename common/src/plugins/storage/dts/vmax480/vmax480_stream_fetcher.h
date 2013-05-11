@@ -23,6 +23,7 @@ public:
     virtual void onGotDayInfo(int dayNum, const QByteArray& data)  { Q_UNUSED(dayNum) Q_UNUSED(data) }
 
     virtual QnTimePeriodList chunks() { return QnTimePeriodList(); }
+    virtual bool isStopping() const { return false; }
 };
 
 
@@ -40,7 +41,6 @@ public:
 
     QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
 
-    void reconnect();
 public:
     VMaxStreamFetcher(QnResource* dev, bool isLive);
     virtual ~VMaxStreamFetcher();
@@ -55,6 +55,7 @@ public:
     void inUse();
     void notInUse();
     int usageCount() const { return m_usageCount; }
+    bool isEOF() const;
 public:
     bool vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, int speed);
     bool vmaxPlayRange(QnVmax480DataConsumer* consumer, const QList<qint64>& pointsUsec);
@@ -76,6 +77,7 @@ private:
     qint64 findRoundTime(qint64 timeUsec, bool* dataFound) const;
     void updatePlaybackMask();
     void initPacketTime();
+    void checkEOF(qint64 timestamp);
 private:
     static const int OPEN_ALL = 0xffff;
 
@@ -95,7 +97,7 @@ private:
 
     static QMutex m_instMutex;
     static QMap<QByteArray, VMaxStreamFetcher*> m_instances;
-    int m_sequence;
+    quint8 m_sequence;
     qint64 m_lastChannelTime[256];
     qint64 m_lastMediaTime;
     qint64 m_emptyPacketTime;
@@ -107,6 +109,8 @@ private:
     bool m_isPlaying;
     bool m_keepAllChannels;
     QnPlaybackMaskHelper m_playbackMaskHelper;
+    qint64 m_lastConnectTimeUsec;
+    bool m_eofReached;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

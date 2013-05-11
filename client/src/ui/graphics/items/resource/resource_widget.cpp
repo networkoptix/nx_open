@@ -136,7 +136,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_overlayVisible(0),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
-    m_overlayRotation(Qn::Angle0)
+    m_overlayRotation(Qn::Angle0),
+    m_zoomRect(0.0, 0.0, 1.0, 1.0)
 {
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
@@ -239,7 +240,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setLayout(headerOverlayLayout);
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
-    addOverlayWidget(m_headerOverlayWidget, AutoVisible, true);
+    addOverlayWidget(m_headerOverlayWidget, AutoVisible, true, true, true);
 
 
     /* Footer overlay. */
@@ -275,7 +276,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_footerOverlayWidget->setLayout(footerOverlayLayout);
     m_footerOverlayWidget->setAcceptedMouseButtons(0);
     m_footerOverlayWidget->setOpacity(0.0);
-    addOverlayWidget(m_footerOverlayWidget, AutoVisible, true);
+    addOverlayWidget(m_footerOverlayWidget, AutoVisible, true, true, true);
 
 
     /* Initialize resource. */
@@ -311,6 +312,19 @@ QnResourceWidget::~QnResourceWidget() {
 
 QnResourcePtr QnResourceWidget::resource() const {
     return m_resource;
+}
+
+const QRectF &QnResourceWidget::zoomRect() const {
+    return m_zoomRect;
+}
+
+void QnResourceWidget::setZoomRect(const QRectF &zoomRect) {
+    if(qFuzzyCompare(m_zoomRect, zoomRect))
+        return;
+
+    m_zoomRect = zoomRect;
+
+    emit zoomRectChanged();
 }
 
 void QnResourceWidget::setFrameWidth(qreal frameWidth) {
@@ -455,12 +469,14 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    if (m_channelsLayout->channelCount() == 1)
-        return QRectF(QPointF(0.0, 0.0), size());
+    QRectF rect = unsubRect(this->rect(), zoomRect());
 
-    QSizeF channelSize = cwiseDiv(this->size(), m_channelsLayout->size());
+    if (m_channelsLayout->channelCount() == 1)
+        return rect;
+
+    QSizeF channelSize = cwiseDiv(rect.size(), m_channelsLayout->size());
     return QRectF(
-        cwiseMul(m_channelsLayout->position(channel), channelSize),
+        rect.topLeft() + cwiseMul(m_channelsLayout->position(channel), channelSize),
         channelSize
     );
 }
@@ -634,7 +650,14 @@ int QnResourceWidget::channelCount() const {
     return m_channelsLayout->channelCount();
 }
 
-void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility, bool autoRotate, bool bindToViewport) {
+int QnResourceWidget::overlayWidgetIndex(QGraphicsWidget *widget) const {
+    for(int i = 0; i < m_overlayWidgets.size(); i++)
+        if(m_overlayWidgets[i].widget == widget)
+            return i;
+    return -1;
+}
+
+void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility, bool autoRotate, bool bindToViewport, bool placeOverControls) {
     if(!widget) {
         qnNullWarning(widget);
         return;
@@ -650,7 +673,8 @@ void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibili
         boundWidget->setLayout(boundLayout);
         boundWidget->setAcceptedMouseButtons(0);
     }
-    (boundWidget ? boundWidget : widget)->setParentItem(this);
+    QGraphicsWidget *childWidget = boundWidget ? boundWidget : widget;
+    childWidget->setParentItem(this);
 
     QnFixedRotationTransform *rotationTransform = NULL;
     if(autoRotate) {
@@ -662,44 +686,53 @@ void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibili
     OverlayWidget overlay;
     overlay.visibility = visibility;
     overlay.widget = widget;
+    overlay.childWidget = childWidget;
     overlay.boundWidget = boundWidget;
     overlay.rotationTransform = rotationTransform;
 
-    m_overlayWidgets.push_back(overlay);
+    if(placeOverControls) {
+        m_overlayWidgets.push_back(overlay);
+    } else {
+        int index = overlayWidgetIndex(m_headerOverlayWidget);
+        if(index == -1) {
+            m_overlayWidgets.push_back(overlay);
+        } else {
+            m_overlayWidgets.insert(index, overlay);
+            overlay.childWidget->stackBefore(m_overlayWidgets[index + 1].childWidget);
+        }
+    }
 
     updateOverlayWidgetsGeometry();
 }
 
 void QnResourceWidget::removeOverlayWidget(QGraphicsWidget *widget) {
+    int index = overlayWidgetIndex(widget);
+    if(index == -1)
+        return;
 
-    for(int i = 0; i < m_overlayWidgets.size(); i++) {
-        const OverlayWidget &overlay = m_overlayWidgets[i];
-        if(overlay.widget == widget) {
-            overlay.widget->setParentItem(NULL);
-            if(overlay.boundWidget && overlay.boundWidget != overlay.widget)
-                delete overlay.boundWidget;
+    const OverlayWidget &overlay = m_overlayWidgets[index];
+    overlay.widget->setParentItem(NULL);
+    if(overlay.boundWidget && overlay.boundWidget != overlay.widget)
+        delete overlay.boundWidget;
 
-            m_overlayWidgets.removeAt(i);
-            return;
-        }
-    }
+    m_overlayWidgets.removeAt(index);
 }
 
 QnResourceWidget::OverlayVisibility QnResourceWidget::overlayWidgetVisibility(QGraphicsWidget *widget) const {
-    for(int i = 0; i < m_overlayWidgets.size(); i++)
-        if(m_overlayWidgets[i].widget == widget)
-            return m_overlayWidgets[i].visibility;
-    return Invisible;
+    int index = overlayWidgetIndex(widget);
+    return index == -1 ? Invisible : m_overlayWidgets[index].visibility;
 }
 
 void QnResourceWidget::setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility) {
-    for(int i = 0; i < m_overlayWidgets.size(); i++) {
-        if(m_overlayWidgets[i].widget == widget) {
-            m_overlayWidgets[i].visibility = visibility;
-            updateOverlayWidgetsVisibility();
-            return;
-        }
-    }
+    int index = overlayWidgetIndex(widget);
+    if(index == -1)
+        return;
+
+    if(m_overlayWidgets[index].visibility == visibility)
+        return;
+
+    m_overlayWidgets[index].visibility = visibility;
+    updateOverlayWidgetsVisibility();
 }
 
 bool QnResourceWidget::isOverlayVisible() const {
@@ -734,9 +767,17 @@ void QnResourceWidget::updateOverlayWidgetsGeometry() {
 void QnResourceWidget::updateOverlayWidgetsVisibility(bool animate) {
     foreach(const OverlayWidget &overlay, m_overlayWidgets) {
         if(overlay.visibility == UserVisible)
-            break;
+            continue;
 
-        qreal opacity = overlay.visibility == Invisible ? 0.0 : (m_overlayVisible ? 1.0 : 0.0);
+        qreal opacity;
+        if(overlay.visibility == Invisible) {
+            opacity = 0.0;
+        } else if(overlay.visibility == Visible) {
+            opacity = 1.0;
+        } else {
+            opacity = m_overlayVisible ? 1.0 : 0.0;
+        }
+
         if(animate) {
             opacityAnimator(overlay.widget, 1.0)->animateTo(opacity);
         } else {
@@ -750,16 +791,6 @@ void QnResourceWidget::updateOverlayWidgetsVisibility(bool animate) {
 // Painting
 // -------------------------------------------------------------------------- //
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
-    if (painter->paintEngine() == NULL) {
-        qnWarning("No OpenGL-compatible paint engine was found.");
-        return;
-    }
-
-    if (painter->paintEngine()->type() != QPaintEngine::OpenGL2 && painter->paintEngine()->type() != QPaintEngine::OpenGL) {
-        qnWarning("Painting with the paint engine of type '%1' is not supported", static_cast<int>(painter->paintEngine()->type()));
-        return;
-    }
-
     if(m_pausedPainter.isNull()) {
         m_pausedPainter = qn_resourceWidget_pausedPainterStorage()->get(QGLContext::currentContext());
         m_loadingProgressPainter = qn_resourceWidget_loadingProgressPainterStorage()->get(QGLContext::currentContext());
@@ -776,8 +807,12 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     for(int i = 0; i < channelCount(); i++) {
         /* Draw content. */
-        QRectF rect = channelRect(i);
-        Qn::RenderStatus renderStatus = paintChannelBackground(painter, i, rect);
+        QRectF channelRect = this->channelRect(i);
+        QRectF paintRect = rect().intersected(channelRect);
+        if(paintRect.isEmpty())
+            continue;
+
+        Qn::RenderStatus renderStatus = paintChannelBackground(painter, i, channelRect, paintRect);
 
         /* Update channel state. */
         m_channelState[i].renderStatus = renderStatus;
@@ -792,14 +827,14 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         
         qreal opacity = painter->opacity();
         painter->setOpacity(opacity * overlayOpacity);
-        paintOverlay(painter, rect, m_channelState[i].overlay);
+        paintOverlay(painter, paintRect, m_channelState[i].overlay);
         painter->setOpacity(opacity);
 
         /* Draw foreground. */
-        paintChannelForeground(painter, i, rect);
+        paintChannelForeground(painter, i, paintRect);
 
         /* Draw selected / not selected overlay. */
-        paintSelection(painter, rect);
+        paintSelection(painter, paintRect);
     }
 }
 

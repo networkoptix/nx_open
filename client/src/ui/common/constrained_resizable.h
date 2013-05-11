@@ -42,16 +42,16 @@ public:
      */
     virtual QSizeF constrainedSize(const QSizeF constraint) const = 0;
 
-    static QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QSizeF &constrainedSize) {
+    static QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QPointF &pinPoint, const QSizeF &constrainedSize) {
         if(qFuzzyCompare(constrainedSize, geometry.size()))
             return geometry;
 
         if(pinCorner == Qn::NoCorner)
-            return QRectF(geometry.topLeft(), constrainedSize);
+            return QnGeometry::scaled(geometry, constrainedSize, pinPoint, Qt::IgnoreAspectRatio);
 
-        QPointF pinPoint = QnGeometry::corner(geometry, pinCorner);
+        QPointF pinCornerPoint = QnGeometry::corner(geometry, pinCorner);
         QRectF result(
-            pinPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(pinPoint - geometry.topLeft(), geometry.size()), constrainedSize),
+            pinCornerPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(pinCornerPoint - geometry.topLeft(), geometry.size()), constrainedSize),
             constrainedSize
         );
 
@@ -75,8 +75,8 @@ public:
     }
 
 protected:
-    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const override {
-        return constrainedGeometry(geometry, pinCorner, constrainedSize(geometry.size()));
+    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QPointF &pinPoint = QPointF()) const override {
+        return constrainedGeometry(geometry, pinCorner, pinPoint, constrainedSize(geometry.size()));
     }
 };
 

@@ -41,6 +41,7 @@ private:
     QTime m_waitTimer;
     VMaxStreamFetcher* m_streamFetcher;
     QnResource* m_res;
+    bool m_gotAllData;
 };
 
 #endif // __VMAX480_CHUNK_READER_H__

@@ -46,10 +46,16 @@ public:
         return m_hasDbChanges;
     }
 
-    /** Checks if user changed controls but not applied them to the schedule */
-    bool hasControlsChanges() const {
-        return m_hasControlsChanges;
+    /** Checks if user changed schedule controls but not applied them */
+    bool hasScheduleControlsChanges() const {
+        return m_hasScheduleControlsChanges;
     }
+
+    /** Checks if user changed motion controls but not applied them */
+    bool hasMotionControlsChanges() const {
+        return m_hasMotionControlsChanges;
+    }
+
 
 
     QnMediaServerConnectionPtr getServerConnection() const;
@@ -95,7 +101,8 @@ private slots:
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
-    void at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params);
+    void at_motionRegionListChanged();
+    void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
     void at_pingButton_clicked();
     void at_analogViewCheckBox_clicked();
 
@@ -136,8 +143,11 @@ private:
     /** Indicates that schedule was changed */
     bool m_hasScheduleChanges;
 
-    /** Indicates that the user changed controls but not applied them to the schedule */
-    bool m_hasControlsChanges;
+    /** Indicates that the user changed schedule controls but not applied them */
+    bool m_hasScheduleControlsChanges;
+
+    /** Indicates that the user changed motion sensitivity controls but not applied them */
+    bool m_hasMotionControlsChanges;
 
     bool m_readOnly;
 

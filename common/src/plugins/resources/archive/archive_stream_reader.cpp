@@ -239,7 +239,7 @@ bool QnArchiveStreamReader::init()
     }
 
     if (!m_delegate->open(m_resource)) {
-        if (requiredJumpTime != AV_NOPTS_VALUE)
+        if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
             emit jumpOccured(requiredJumpTime); 
         return false;
     }
@@ -742,10 +742,13 @@ begin_label:
 
 
     // Do not display archive in a future
-    if (videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) && videoData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+    if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_UnsyncTime)) 
     {
-        m_outOfPlaybackMask = true;
-        return createEmptyPacket(reverseMode); // EOF reached
+        if (videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) && videoData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+        {
+            m_outOfPlaybackMask = true;
+            return createEmptyPacket(reverseMode); // EOF reached
+        }
     }
 
     // ensure Pos At playback mask

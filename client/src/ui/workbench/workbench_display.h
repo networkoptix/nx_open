@@ -366,6 +366,7 @@ protected slots:
     void at_layout_itemRemoved(QnWorkbenchItem *item);
     void at_layout_zoomLinkAdded(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
     void at_layout_zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
+    void at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect);
 
     void at_context_permissionsChanged(const QnResourcePtr &resource);
 

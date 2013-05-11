@@ -64,6 +64,12 @@ public:
         POPUP_FRAME_IMPORTANT,
         POPUP_FRAME_WARNING,
 
+        /** Maximum size of the layout background - in cells */
+        LAYOUT_BACKGROUND_MAX_SIZE,
+
+        /** Recommended area of the layout background - in square cells */
+        LAYOUT_BACKGROUND_RECOMMENDED_AREA,
+
         VARIABLE_COUNT
     };
 
@@ -110,6 +116,9 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   popupFrameNotification,         POPUP_FRAME_NOTIFICATION,               QColor(64, 130, 180, 128))
         QN_DECLARE_R_PROPERTY(QColor,   popupFrameImportant,            POPUP_FRAME_IMPORTANT,                  QColor(255, 128, 0, 128))
         QN_DECLARE_R_PROPERTY(QColor,   popupFrameWarning,              POPUP_FRAME_WARNING,                    QColor(255, 0, 0, 128))
+
+        QN_DECLARE_R_PROPERTY(QSize,    layoutBackgroundMaxSize,        LAYOUT_BACKGROUND_MAX_SIZE,             QSize(64, 64))
+        QN_DECLARE_R_PROPERTY(int,      layoutBackgroundRecommendedArea,LAYOUT_BACKGROUND_RECOMMENDED_AREA,     40*40)
     QN_END_PROPERTY_STORAGE()
 };
 

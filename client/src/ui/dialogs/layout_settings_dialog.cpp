@@ -12,15 +12,11 @@
 
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/style/globals.h>
 
 #include <utils/threaded_image_loader.h>
 
 namespace {
-    //limits
-    const int widthLimit = 64;      // in cells
-    const int heightLimit = 64;     // in cells
-    const int areaLimit = 100;      // in cells
-
     const int labelFrameWidth = 4;  // in pixels
 }
 
@@ -80,8 +76,8 @@ private:
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
-    m_cache(new QnAppServerFileCache(this)),
-    m_cellAspectRatio((qreal)16/9),
+    m_cache(new QnAppServerImageCache(this)),
+    m_cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio()),
     m_estimatePending(false),
     m_cropImage(false)
 {
@@ -97,8 +93,8 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     imageLabel->installEventFilter(this);
 
     ui->userCanEditCheckBox->setVisible(false);
-    ui->widthSpinBox->setMaximum(widthLimit);
-    ui->heightSpinBox->setMaximum(heightLimit);
+    ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
+    ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
 
     setProgress(false);
 
@@ -109,8 +105,8 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
     connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(at_opacitySpinBox_valueChanged(int)));
 
-    connect(m_cache, SIGNAL(imageLoaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
-    connect(m_cache, SIGNAL(imageStored(QString, bool)), this, SLOT(at_imageStored(QString, bool)));
+    connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    connect(m_cache, SIGNAL(fileUploaded(QString, bool)), this, SLOT(at_imageStored(QString, bool)));
 
     updateControls();
 }
@@ -144,7 +140,7 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
     m_cachedFilename = layout->backgroundImageFilename();
     if (!m_cachedFilename.isEmpty()) {
         m_newFilePath = m_cache->getFullPath(m_cachedFilename);
-        m_cache->loadImage(m_cachedFilename);
+        m_cache->downloadFile(m_cachedFilename);
         ui->widthSpinBox->setValue(layout->backgroundSize().width());
         ui->heightSpinBox->setValue(layout->backgroundSize().height());
         ui->opacitySpinBox->setValue(layout->backgroundOpacity() * 100);
@@ -327,15 +323,15 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     int w, h;
     qreal targetAspectRatio = aspectRatio / m_cellAspectRatio;
     if (targetAspectRatio >= 1.0) { // width is greater than height
-        w = widthLimit;
+        w = qnGlobals->layoutBackgroundMaxSize().width();
         h = qRound((qreal)w / targetAspectRatio);
     } else {
-        h = heightLimit;
+        h = qnGlobals->layoutBackgroundMaxSize().height();
         w = qRound((qreal)h * targetAspectRatio);
     }
 
-    // limit w*h <= areaLimit; minor variations are available, e.g. 17*6 ~~= 100;
-    qreal areaCoef = qSqrt((qreal)w * h / areaLimit);
+    // limit w*h <= recommended area; minor variations are allowed, e.g. 17*6 ~~= 100;
+    qreal areaCoef = qSqrt((qreal)w * h / qnGlobals->layoutBackgroundRecommendedArea());
     if (areaCoef > 1.0) {
         w = qRound((qreal)w / areaCoef);
         h = qRound((qreal)h / areaCoef);

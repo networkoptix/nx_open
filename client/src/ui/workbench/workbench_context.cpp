@@ -1,7 +1,7 @@
 #include "workbench_context.h"
 
 #include <utils/common/warnings.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include <api/media_server_statistics_manager.h>
 

@@ -70,8 +70,9 @@ public:
     // TODO: #Elric Refactoring needed.
     enum OverlayVisibility {
         Invisible,
-        UserVisible,
+        Visible,
         AutoVisible,
+        UserVisible,
     };
 
     /**
@@ -100,10 +101,16 @@ public:
         return m_item.data();
     }
 
+    /**
+     * \returns                         Layout of channels in this widget. Never returns NULL.
+     */
     const QnResourceVideoLayout *channelLayout() const {
         return m_channelsLayout;
     }
     
+    const QRectF &zoomRect() const;
+    void setZoomRect(const QRectF &zoomRect);
+
     /**
      * \returns                         Frame opacity of this widget.
      */
@@ -256,7 +263,7 @@ public:
     bool isOverlayVisible() const;
     Q_SLOT void setOverlayVisible(bool visible = true, bool animate = true);
 
-    void addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility = UserVisible, bool autoRotate = false, bool bindToViewport = false);
+    void addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility = UserVisible, bool autoRotate = false, bool bindToViewport = false, bool placeOverControls = false);
     void removeOverlayWidget(QGraphicsWidget *widget);
     OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
     void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility);
@@ -267,6 +274,7 @@ signals:
     void aspectRatioChanged();
     void aboutToBeDestroyed();
     void optionsChanged();
+    void zoomRectChanged();
     void rotationStartRequested();
     void rotationStopRequested();
 
@@ -293,7 +301,7 @@ protected:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) = 0;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) = 0;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
     virtual void paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay);
     
@@ -319,6 +327,7 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
+    int overlayWidgetIndex(QGraphicsWidget *widget) const;
     void updateOverlayWidgetsGeometry();
     void updateOverlayWidgetsVisibility(bool animate = true);
 
@@ -377,6 +386,7 @@ private:
     struct OverlayWidget {
         OverlayVisibility visibility;
         QGraphicsWidget *widget;
+        QGraphicsWidget *childWidget;
         QnViewportBoundWidget *boundWidget;
         QnFixedRotationTransform *rotationTransform;
     };
@@ -457,6 +467,8 @@ private:
 
     /** Fixed rotation angle in degrees. Used to rotate static text and images. */
     Qn::FixedRotation m_overlayRotation;
+
+    QRectF m_zoomRect;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

@@ -137,16 +137,47 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
 
     QnResourceList result;
 
-    QByteArray uuidStr("ACTI");
-    uuidStr += url.host().toUtf8();
-    readDeviceXml(uuidStr, QString(QLatin1String("http://%1:%2/devicedesc.xml")).arg(url.host()).arg(ACTI_DEVICEXML_PORT), url.host(), result);
-    foreach(QnResourcePtr res, result)
-        res.dynamicCast<QnNetworkResource>()->setAuth(auth);
+    QnActiResourcePtr actiRes(new QnActiResource);
+    actiRes->setUrl(url.toString());
+    actiRes->setAuth(auth);
+
+    QString devUrl = QString(lit("http://%1:%2")).arg(url.host()).arg(url.port(80));
+    CashedDevInfo devInfo = m_cashedDevInfo.value(devUrl);
+
+    if (devInfo.info.presentationUrl.isEmpty() || devInfo.timer.elapsed() > CACHE_UPDATE_TIME)
+    {
+        CLHttpStatus status;
+        QByteArray serverReport = actiRes->makeActiRequest(QLatin1String("system"), QLatin1String("SERVER_REPORT"), status, true);
+        if (status != CL_HTTP_SUCCESS)
+            return result;
+        QMap<QByteArray, QByteArray> report = actiRes->parseReport(serverReport);
+        if (report.isEmpty())
+            return result;
+
+        devInfo.info.presentationUrl = devUrl;
+        devInfo.info.friendlyName = QString::fromUtf8(report.value("company name"));
+        devInfo.info.manufacturer = manufacture();
+        QByteArray model = report.value("production id").split('-')[0];
+        devInfo.info.modelName = QString::fromUtf8(actiRes->unquoteStr(model));
+        devInfo.info.serialNumber = QString::fromUtf8(report.value("mac address"));
+
+        if (devInfo.info.modelName.isEmpty() || devInfo.info.serialNumber.isEmpty())
+            return result;
+
+        devInfo.timer.restart();
+        m_cashedDevInfo[devUrl] = devInfo;
+    }
+	processPacket(QHostAddress(), url.host(), devInfo.info, QByteArray(), result);
 
     return result;
 }
 
-void QnActiResourceSearcher::processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result)
+void QnActiResourceSearcher::processPacket(
+    const QHostAddress& discoveryAddr,
+    const QString& host,
+    const UpnpDeviceInfo& devInfo,
+    const QByteArray& /*xmlDevInfo*/,
+    QnResourceList& result)
 {
     Q_UNUSED(discoveryAddr)
     Q_UNUSED(host)
@@ -163,7 +194,9 @@ void QnActiResourceSearcher::processPacket(const QHostAddress& discoveryAddr, co
     resource->setName(QString(QLatin1String("ACTi-")) + devInfo.modelName);
     resource->setModel(devInfo.modelName);
     resource->setUrl(devInfo.presentationUrl);
-    resource->setPhysicalId(QString(QLatin1String("ACTI_%1")).arg(devInfo.serialNumber));
+    QString sn = devInfo.serialNumber;
+    sn = sn.replace(QLatin1String(":"), QLatin1String("_"));
+    resource->setPhysicalId(QString(QLatin1String("ACTI_%1")).arg(sn));
     QAuthenticator auth;
     
     auth.setUser(DEFAULT_LOGIN);

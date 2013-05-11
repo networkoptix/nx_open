@@ -6,7 +6,6 @@
 #include "onvif_helper.h"
 //#include "onvif/Onvif.nsmap"
 #include "onvif/wsaapi.h"
-#include "onvif/soapwsddProxy.h"
 
 //#include "onvif_ws_searcher_helper.h"
 //#include "../digitalwatchdog/digital_watchdog_resource.h"
@@ -22,7 +21,8 @@
 //#include "../sony/sony_resource.h"
 #include "utils/common/string.h"
 
-static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
+//static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
+static const int SOAP_DISCOVERY_TIMEOUT = 0; // "+" in seconds, "-" in mseconds
 static const int SOAP_HELLO_CHECK_TIMEOUT = -1; // "+" in seconds, "-" in mseconds
 static const int CHECK_HELLO_RETRY_COUNT = 50;
 
@@ -47,13 +47,27 @@ const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
 
 OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd():
     m_onvifFetcher(OnvifResourceInformationFetcher::instance()),
-    m_shouldStop(false)
+    m_shouldStop(false),
+    m_isFirstSearch(true)
     /*,
     m_s
     m_recvSocketList(),
     m_mutex()*/
 {
     //updateInterfacesListenSockets();
+}
+
+OnvifResourceSearcherWsdd::~OnvifResourceSearcherWsdd()
+{
+    for( std::map<QString, ProbeContext*>::iterator
+        it = m_ifaceToSock.begin();
+        it != m_ifaceToSock.end();
+        ++it )
+    {
+        delete it->second->sock;
+        delete it->second;
+    }
+    m_ifaceToSock.clear();
 }
 
 OnvifResourceSearcherWsdd& OnvifResourceSearcherWsdd::instance()
@@ -284,23 +298,51 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
     }
 }*/
 
-void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
+void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
 {
+#if 0
     foreach(QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
         if (m_shouldStop)
             return;
 
-        findEndpointsImpl(result, &iface, 0);
+        findEndpointsImpl( result, iface );
     }
+#else
+    const QList<QnInterfaceAndAddr>& intfList = getAllIPv4Interfaces();
+    foreach(QnInterfaceAndAddr iface, intfList)
+    {
+        if (m_shouldStop)
+            return;
+
+        if( !sendProbe( iface ) )
+            continue;
+    }
+
+    if( m_isFirstSearch )
+    {
+        m_isFirstSearch = false;
+#ifdef _WIN32
+        ::Sleep( 1000 );
+#else
+        ::sleep( 1 );
+#endif
+    }
+
+    foreach(QnInterfaceAndAddr iface, intfList)
+    {
+        readProbeMatches( iface, result );
+    }
+#endif
 }
 
-void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
+void OnvifResourceSearcherWsdd::findResources(QnResourceList& result)
 {
     EndpointInfoHash endpoints;
 
     //updateInterfacesListenSockets();
     //findHelloEndpoints(endpoints);
+
 
     findEndpoints(endpoints);
 
@@ -577,40 +619,44 @@ void OnvifResourceSearcherWsdd::printProbeMatches(const T* source, const SOAP_EN
     }
 }
 
-void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, const QnInterfaceAndAddr* iface, const QHostAddress* camAddr) const
+#if 0
+void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, const QnInterfaceAndAddr& iface ) const
 {
-    Q_ASSERT(iface != 0 || camAddr != 0);
-
-    if (m_shouldStop)
+    if( m_shouldStop )
         return;
 
-    UDPSocket socket;
-
-    if (iface) 
+    std::pair<std::map<QString, UDPSocket*>::iterator, bool> p = m_ifaceToSock.insert( std::make_pair( iface.address.toString(), (UDPSocket*)NULL ) );
+    if( p.second )
     {
-        if (!socket.bindToInterface(*iface))
+        p.first->second. = new UDPSocket();
+        if( !p.first->second->bindToInterface(iface) || !p.first->second->setNonBlockingMode( true ) )
+        {
+            delete p.first->second;
+            m_ifaceToSock.erase( p.first );
             return;
-    } 
-    else 
-    {
-        return;
+        }
     }
-    socket.setReadTimeOut(SOAP_DISCOVERY_TIMEOUT * 1000);
+    UDPSocket* socket = p.first->second;
 
-    QStringList addrPrefixes = getAddrPrefixes(iface ? iface->address.toString() : camAddr->toString());
+    //UDPSocket socket;
+    //if (!socket.bindToInterface(iface))
+    //    return;
+    //socket.setReadTimeOut(SOAP_DISCOVERY_TIMEOUT * 1000);
+
+    QStringList addrPrefixes = getAddrPrefixes(iface.address.toString());
     wsddProxy soapWsddProxy(SOAP_IO_UDP);
     soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
     soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
-    soapWsddProxy.soap->connect_timeout = SOAP_DISCOVERY_TIMEOUT;
-    soapWsddProxy.soap->accept_timeout = SOAP_DISCOVERY_TIMEOUT;
-    soapWsddProxy.soap->user = &socket;
+    //soapWsddProxy.soap->connect_timeout = SOAP_DISCOVERY_TIMEOUT;
+    //soapWsddProxy.soap->accept_timeout = SOAP_DISCOVERY_TIMEOUT;
+    soapWsddProxy.soap->user = socket;
     soapWsddProxy.soap->fconnect = nullGsoapFconnect;
     soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
-    soapWsddProxy.soap->fsend = iface? gsoapFsendSmall : gsoapFsendSmallUnicast;
+    soapWsddProxy.soap->fsend = gsoapFsendSmall;
     soapWsddProxy.soap->frecv = gsoapFrecv;
     soapWsddProxy.soap->fopen = NULL;
-    soapWsddProxy.soap->socket = socket.handle();
-    soapWsddProxy.soap->master = socket.handle();
+    soapWsddProxy.soap->socket = socket->handle();
+    soapWsddProxy.soap->master = socket->handle();
 
     wsdd__ProbeType wsddProbe;
     wsa__EndpointReferenceType replyTo;
@@ -624,7 +670,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
     soapWsddProxy.soap_header(NULL, messageID, NULL, NULL, &replyTo, NULL,
         const_cast<char*>(WSDD_ADDRESS), const_cast<char*>(WSDD_ACTION), NULL);
 
-    QString targetAddr = iface? QString::fromLatin1(WSDD_GSOAP_MULTICAST_ADDRESS) : camAddr->toString();
+    QString targetAddr = QString::fromLatin1(WSDD_GSOAP_MULTICAST_ADDRESS);
     int soapRes = soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &wsddProbe);
     soapRes = soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &wsddProbe);
 
@@ -632,7 +678,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
     {
         qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: (Send) SOAP failed. GSoap error code: "
             << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
-            << ". Interface: " << (iface ? iface->address.toString() : camAddr->toString());
+            << ". Interface: " << (iface.address.toString());
         soap_destroy(soapWsddProxy.soap);
         soap_end(soapWsddProxy.soap);
         return;
@@ -661,7 +707,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
             {
                 qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
                     << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
-                    << ". Interface: " << (iface ? iface->address.toString() : camAddr->toString());
+                    << ". Interface: " << (iface.address.toString());
             }
             soap_destroy(soapWsddProxy.soap);
             soap_end(soapWsddProxy.soap);
@@ -671,7 +717,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
         if (wsddProbeMatches.wsdd__ProbeMatches)
         {
             addEndpointToHash(result, wsddProbeMatches.wsdd__ProbeMatches->ProbeMatch, soapWsddProxy.soap->header, addrPrefixes,
-                iface ? iface->address.toString() : camAddr->toString());
+                iface.address.toString());
 
             if (cl_log.logLevel() >= cl_logDEBUG1)
             {
@@ -685,13 +731,140 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
 
     soapWsddProxy.soap->socket = SOAP_INVALID_SOCKET;
     soapWsddProxy.soap->master = SOAP_INVALID_SOCKET;
-    socket.close();
+    //socket.close();
+}
+#endif
+
+bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
+{
+    std::pair<std::map<QString, ProbeContext*>::iterator, bool> p = m_ifaceToSock.insert( std::make_pair( iface.address.toString(), (ProbeContext*)NULL ) );
+    ProbeContext*& ctx = p.first->second;
+    if( p.second )
+    {
+        ctx = new ProbeContext();
+        ctx->sock = new UDPSocket();
+        if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
+        {
+            delete ctx->sock;
+            delete ctx;
+            m_ifaceToSock.erase( p.first );
+            return false;
+        }
+
+        ctx->soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
+        ctx->soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
+        //ctx->soapWsddProxy.soap->connect_timeout = SOAP_DISCOVERY_TIMEOUT;
+        //ctx->soapWsddProxy.soap->accept_timeout = SOAP_DISCOVERY_TIMEOUT;
+        ctx->soapWsddProxy.soap->user = ctx->sock;
+        ctx->soapWsddProxy.soap->fconnect = nullGsoapFconnect;
+        ctx->soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
+        ctx->soapWsddProxy.soap->fsend = gsoapFsendSmall;
+        ctx->soapWsddProxy.soap->frecv = gsoapFrecv;
+        ctx->soapWsddProxy.soap->fopen = NULL;
+        ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
+        ctx->soapWsddProxy.soap->master = ctx->sock->handle();
+    }
+
+    //UDPSocket socket;
+    //if (!socket.bindToInterface(iface))
+    //    return;
+    //socket.setReadTimeOut(SOAP_DISCOVERY_TIMEOUT * 1000);
+
+    fillWsddStructs( ctx->wsddProbe, ctx->replyTo );
+
+    char* messageID = const_cast<char*>(soap_wsa_rand_uuid(ctx->soapWsddProxy.soap));
+    //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << iface.address.toString();
+
+    //String should not be changed (possibly, declaration of char* instead of const char*,- gsoap bug
+    //So const_cast should be safety
+    ctx->soapWsddProxy.soap_header(NULL, messageID, NULL, NULL, &ctx->replyTo, NULL,
+        const_cast<char*>(WSDD_ADDRESS), const_cast<char*>(WSDD_ACTION), NULL);
+
+    QString targetAddr = QString::fromLatin1(WSDD_GSOAP_MULTICAST_ADDRESS);
+    int soapRes = ctx->soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &ctx->wsddProbe);
+    soapRes = ctx->soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &ctx->wsddProbe);
+
+    if( soapRes != SOAP_OK ) 
+    {
+        qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: (Send) SOAP failed. GSoap error code: "
+            << soapRes << SoapErrorHelper::fetchDescription(ctx->soapWsddProxy.soap_fault())
+            << ". Interface: " << (iface.address.toString());
+    }
+
+    soap_destroy(ctx->soapWsddProxy.soap);
+    soap_end(ctx->soapWsddProxy.soap);
+
+    if( soapRes == SOAP_OK )
+        return true;
+
+    //removing socket for it to be recreated on next sendProbe call
+    delete ctx->sock;
+    delete ctx;
+    m_ifaceToSock.erase( p.first );
+    return false;
 }
 
-CameraInfo OnvifResourceSearcherWsdd::findCamera(const QHostAddress& camAddr) const
+bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& iface, EndpointInfoHash& result )
 {
-    EndpointInfoHash result;
-    findEndpointsImpl(result, 0, &camAddr);
+    std::map<QString, ProbeContext*>::iterator it = m_ifaceToSock.find( iface.address.toString() );
+    if( it == m_ifaceToSock.end() )
+        return false;
+    ProbeContext& ctx = *it->second;
 
-    return result.size() == 1 ? CameraInfo(result.begin().key(), result.begin().value()) : CameraInfo();
+    //Receiving all ProbeMatches. Timeout = 500 ms, as written in ONVIF spec
+    for( ;; )
+    {
+        if (m_shouldStop)
+        {
+            soap_destroy(ctx.soapWsddProxy.soap);
+            soap_end(ctx.soapWsddProxy.soap);
+            return false;
+        }
+
+        __wsdd__ProbeMatches wsddProbeMatches;
+        wsddProbeMatches.wsdd__ProbeMatches = NULL;
+
+        int soapRes = ctx.soapWsddProxy.recv_ProbeMatches(wsddProbeMatches);
+        if (soapRes != SOAP_OK) 
+        {
+            if (soapRes == SOAP_EOF) 
+            {
+                //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
+            } 
+            else 
+            {
+                qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
+                    << soapRes << SoapErrorHelper::fetchDescription(ctx.soapWsddProxy.soap_fault())
+                    << ". Interface: " << (iface.address.toString());
+            }
+            soap_destroy(ctx.soapWsddProxy.soap);
+            soap_end(ctx.soapWsddProxy.soap);
+            if( soapRes != SOAP_EOF )
+            {
+                //removing socket for it to be recreated on next sendProbe call
+                delete ctx.sock;
+                delete it->second;
+                m_ifaceToSock.erase( it );
+            }
+            return true;
+        }
+
+        if (wsddProbeMatches.wsdd__ProbeMatches)
+        {
+            addEndpointToHash(
+                result,
+                wsddProbeMatches.wsdd__ProbeMatches->ProbeMatch,
+                ctx.soapWsddProxy.soap->header,
+                getAddrPrefixes(iface.address.toString()),
+                iface.address.toString());
+
+            if (cl_log.logLevel() >= cl_logDEBUG1)
+            {
+                printProbeMatches(wsddProbeMatches.wsdd__ProbeMatches->ProbeMatch, ctx.soapWsddProxy.soap->header);
+            }
+        }
+
+        soap_destroy(ctx.soapWsddProxy.soap);
+        soap_end(ctx.soapWsddProxy.soap);
+    }
 }

@@ -17,19 +17,6 @@
 #include "api/app_server_connection.h"
 #include "business/business_strings_helper.h"
 
-namespace BusinessActionParameters {
-    static QLatin1String emailAddress("emailAddress");
-
-    QString getEmailAddress(const QnBusinessParams &params) {
-        return params.value(emailAddress, QString()).toString();
-    }
-
-    void setEmailAddress(QnBusinessParams* params, const QString &value) {
-        (*params)[emailAddress] = value;
-    }
-
-}
-
 QnSendMailBusinessAction::QnSendMailBusinessAction(const QnBusinessParams &runtimeParams):
     base_type(BusinessActionType::SendMail, runtimeParams)
 {

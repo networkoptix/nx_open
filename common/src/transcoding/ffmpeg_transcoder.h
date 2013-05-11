@@ -24,6 +24,9 @@ public:
 
     virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) override;
 
+    //!Implementation of QnTranscoder::addTag
+    virtual bool addTag( const QString& name, const QString& value ) override;
+
 protected:
     virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray* const result) override;
 

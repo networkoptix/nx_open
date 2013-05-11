@@ -1,7 +1,7 @@
 #include "sendmail_business_action_widget.h"
 #include "ui_sendmail_business_action_widget.h"
 
-#include <business/actions/sendmail_business_action.h>
+#include <business/business_action_parameters.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/resource_selection_dialog.h>
@@ -9,9 +9,9 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
-QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent, QnWorkbenchContext *context) :
+QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnSendmailBusinessActionWidget)
 {
     ui->setupUi(this);
@@ -32,7 +32,7 @@ void QnSendmailBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMode
     Q_UNUSED(guard)
 
     if (fields & QnBusiness::ActionParamsField) {
-        QString email = BusinessActionParameters::getEmailAddress(model->actionParams());
+        QString email = QnBusinessActionParameters::getEmailAddress(model->actionParams());
         if (ui->emailLineEdit->text() != email)
             ui->emailLineEdit->setText(email);
     }
@@ -43,7 +43,7 @@ void QnSendmailBusinessActionWidget::paramsChanged() {
         return;
 
     QnBusinessParams params;
-    BusinessActionParameters::setEmailAddress(&params, ui->emailLineEdit->text());
+    QnBusinessActionParameters::setEmailAddress(&params, ui->emailLineEdit->text());
     model()->setActionParams(params);
 }
 

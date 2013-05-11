@@ -7,7 +7,6 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/qnid.h>
 
-// TODO: #Elric have  prefix => namespace not needed
 namespace BusinessActionType
 {
     enum Value
@@ -27,9 +26,20 @@ namespace BusinessActionType
         /*!
             parameters:\n
                 - relayOutputID (string, required)          - id of output to trigger
-                - relayAutoResetTimeout (uint, optional)    - timeout (in seconds) to reset camera state back
+                - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back
         */
         CameraOutput,
+        CameraOutputInstant,
+
+        /*!
+            parameters:\n
+                - soundSource (int, required)               - enumeration describing source of the sound (resources, EC, TTS)
+                - soundUrl (string, required)               - url of sound, can contain:
+                                                                * path to sound on the EC
+                                                                * path to the resource
+                                                                * text that will be provided to TTS engine
+        */
+        PlaySound,
 
         Alert,              // write a record to the server's log
         Bookmark,           // mark part of camera archive as undeleted
@@ -79,8 +89,8 @@ public:
 
     /*
     * Resource depend of action type.
-    * For actions: CameraOutput, Bookmark, CameraRecording, PanicRecording resource MUST be camera
-    * For actions: SendMail, Alert, ShowPopup resource is not used
+    * see: BusinessActionType::requiresCameraResource()
+    * see: BusinessActionType::requiresUserResource()
     */
     void setResources(const QnResourceList& resources);
 
@@ -101,7 +111,7 @@ public:
     void setReceivedFromRemoteHost(bool value);
     bool isReceivedFromRemoteHost() const;
 
-    // TODO: #GDM not clear what is this. Comments?
+    /** How much times action was instantiated during the aggregation period. */
     void setAggregationCount(int value);
     int getAggregationCount() const;
 
@@ -118,7 +128,7 @@ protected:
     QnResourceList m_resources;
     QnBusinessParams m_params;
     QnBusinessParams m_runtimeParams;
-    QnId m_businessRuleId; // business rule, that generated this action
+    QnId m_businessRuleId; // business rule that generated this action
     int m_aggregationCount;
 };
 

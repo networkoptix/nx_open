@@ -7,7 +7,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
 #include <utils/gl/glcontext.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include "decodedpicturetoopengluploader.h"
 #include "decodedpicturetoopengluploadercontextpool.h"
@@ -162,15 +162,17 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     RenderingTools& ctx = m_channelRenderers[image->channel];
     if( !ctx.uploader )
         return;
+
     ctx.uploader->uploadDecodedPicture( image );
     ++ctx.framesSinceJump;
 
     QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
+    if(m_sourceSize == sourceSize) 
+        return;
+
+    m_sourceSize = sourceSize;
     
-    if(m_sourceSize != sourceSize) {
-        m_sourceSize = sourceSize;
-        emit sourceSizeChanged(sourceSize);
-    }
+    emit sourceSizeChanged();
 }
 
 void QnResourceWidgetRenderer::discardAllFramesPostedToDisplay(int channel)

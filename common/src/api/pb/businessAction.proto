@@ -7,17 +7,16 @@ option java_outer_classname = "BusinessActionProtos";
 
 enum BusinessActionType
 {
-    // media server based actions
-    NotDefinedAction = 0;
-    CameraOutput     = 1;    // set camera output signal
-    Bookmark         = 2;    // mark part of camera archive as undeleted
-    CameraRecording  = 3;    // start camera recording
-    PanicRecording   = 4;    // activate panic recording mode
-
-    // these actions can be executed from any endpoint. Actually these actions call specified function at EC
-    SendMail         = 5;
-    Alert            = 6;
-    ShowPopup        = 7;
+    NotDefinedAction    = 0;
+    CameraOutput        = 1;    // set camera output signal
+    Bookmark            = 2;    // mark part of camera archive as undeleted
+    CameraRecording     = 3;    // start camera recording
+    PanicRecording      = 4;    // activate panic recording mode
+    SendMail            = 5;    // send mail from the EC
+    Alert               = 6;    // NOT_IMPLEMENTED
+    ShowPopup           = 7;    // show popup on the client
+    CameraOutputInstant = 8;    // same as Camera Output but has not toggle state
+    PlaySound           = 9;    // play sound on the client
 }
 
 message BusinessAction {

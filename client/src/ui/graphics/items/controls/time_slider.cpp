@@ -4,6 +4,8 @@
 #include <cmath>
 #include <limits>
 
+#include <boost/array.hpp>
+
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
@@ -147,6 +149,8 @@ namespace {
 
     const qreal lineCommentTopMargin = -0.20;
     const qreal lineCommentBottomMargin = 0.05;
+    const qreal lineBarMinChunkSize = 0.51;
+    const qreal lineBarMinMotionFraction = 0.5;
 
 
     /* Thumbnails bar. */
@@ -216,11 +220,11 @@ namespace {
         }
     }
 
-    bool checkLinePeriod(int line, Qn::TimePeriodRole type) {
+    bool checkLinePeriod(int line, Qn::TimePeriodContent type) {
         if(!checkLine(line))
             return false;
 
-        if(type < 0 || type >= Qn::TimePeriodRoleCount) {
+        if(type < 0 || type >= Qn::TimePeriodContentCount) {
             qnWarning("Invalid time period type '%1'.", static_cast<int>(type));
             return false;
         } else {
@@ -283,6 +287,133 @@ namespace {
 } // anonymous namespace
 
 
+// -------------------------------------------------------------------------- //
+// QnTimeSliderChunkPainter
+// -------------------------------------------------------------------------- //
+// TODO: #Elric
+// An even better solution that will remove all blinking 
+// (we still have it with recorded chunks trapped between two motion chunks)
+// would be to draw it pixel-by-pixel, counting the motion/recording percentage
+// in each pixel. This approach can be made to work just as fast as the current one.
+class QnTimeSliderChunkPainter {
+public:
+    QnTimeSliderChunkPainter(QnTimeSlider *slider, QPainter *painter): 
+        m_slider(slider), 
+        m_painter(painter) 
+    {
+        assert(m_painter && m_slider);
+
+        m_pastColor[Qn::RecordingContent]           = pastRecordingColor;
+        m_pastColor[Qn::MotionContent]              = pastMotionColor;
+        m_pastColor[Qn::TimePeriodContentCount]     = pastBackgroundColor;
+
+        m_futureColor[Qn::RecordingContent]         = futureRecordingColor;
+        m_futureColor[Qn::MotionContent]            = futureMotionColor;
+        m_futureColor[Qn::TimePeriodContentCount]   = futureBackgroundColor;
+
+        m_position = m_centralPosition = m_minChunkLength = 0;
+    }
+
+    void start(qint64 startPos, qint64 centralPos, qint64 minChunkLength, const QRectF &rect) {
+        m_position = startPos;
+        m_centralPosition = centralPos;
+        m_centralCoordinate = m_slider->quickPositionFromValue(m_centralPosition);
+        m_minChunkLength = minChunkLength;
+        m_rect = rect;
+
+        qFill(m_weights, 0);
+    }
+
+    void paintChunk(qint64 length, Qn::TimePeriodContent content) {
+        if(m_pendingLength > 0 && m_pendingLength + length > m_minChunkLength) {
+            qint64 delta = m_minChunkLength - m_pendingLength;
+            length -= delta;
+
+            storeChunk(delta, content);
+            flushChunk();
+        }
+
+        storeChunk(length, content);
+        if(m_pendingLength >= m_minChunkLength)
+            flushChunk();
+    }
+
+    void stop() {
+        if(m_pendingLength > 0)
+            flushChunk();
+    }
+
+private:
+    void storeChunk(qint64 length, Qn::TimePeriodContent content) {
+        if(m_pendingLength == 0)
+            m_pendingPosition = m_position;
+
+        m_weights[content] += length;
+        m_pendingLength += length;
+        m_position += length;
+    }
+
+    void flushChunk() {
+        qint64 leftPosition = m_pendingPosition;
+        qint64 rightPosition = m_pendingPosition + m_pendingLength;
+
+        qreal l = m_slider->quickPositionFromValue(leftPosition);
+        qreal r = m_slider->quickPositionFromValue(rightPosition);
+
+        if(rightPosition <= m_centralPosition) {
+            m_painter->fillRect(QRectF(l, m_rect.top(), r - l, m_rect.height()), currentColor(m_pastColor));
+        } else if(leftPosition >= m_centralPosition) {
+            m_painter->fillRect(QRectF(l, m_rect.top(), r - l, m_rect.height()), currentColor(m_futureColor));
+        } else {
+            m_painter->fillRect(QRectF(l, m_rect.top(), m_centralCoordinate - l, m_rect.height()), currentColor(m_pastColor));
+            m_painter->fillRect(QRectF(m_centralCoordinate, m_rect.top(), r - m_centralCoordinate, m_rect.height()), currentColor(m_futureColor));
+        }
+
+        m_pendingPosition = rightPosition;
+        m_pendingLength = 0;
+
+        qFill(m_weights, 0);
+    }
+
+    QColor currentColor(const boost::array<QColor, Qn::TimePeriodContentCount + 1> &colors) const {
+        qreal rc = m_weights[Qn::RecordingContent];
+        qreal mc = m_weights[Qn::MotionContent];
+        qreal bc = m_weights[Qn::TimePeriodContentCount];
+        qreal sum = m_pendingLength;
+
+        if(m_weights[Qn::MotionContent] != 0) {
+            /* Make sure motion is noticable even if there isn't much of it. 
+             * Note that these adjustments don't change sum. */
+            rc = rc * (1.0 - lineBarMinMotionFraction);
+            mc = sum * lineBarMinMotionFraction + mc * (1.0 - lineBarMinMotionFraction);
+            bc = bc * (1.0 - lineBarMinMotionFraction);
+        }
+
+        return linearCombine(rc / sum, colors[Qn::RecordingContent], 1.0, linearCombine(mc / sum, colors[Qn::MotionContent], bc / sum, colors[Qn::TimePeriodContentCount]));
+    }
+
+private:
+    QnTimeSlider *m_slider;
+    QPainter *m_painter;
+    
+    qint64 m_centralPosition;
+    qreal m_centralCoordinate;
+    qint64 m_minChunkLength;
+    QRectF m_rect;
+    
+    qint64 m_position;
+    qint64 m_pendingLength;
+    qint64 m_pendingPosition;
+
+    boost::array<qint64, Qn::TimePeriodContentCount + 1> m_weights;
+    boost::array<QColor, Qn::TimePeriodContentCount + 1> m_pastColor;
+    boost::array<QColor, Qn::TimePeriodContentCount + 1> m_futureColor;
+};
+
+
+// -------------------------------------------------------------------------- //
+// QnTimeSlider
+// -------------------------------------------------------------------------- //
 QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     base_type(parent),
     m_windowStart(0),
@@ -496,14 +627,14 @@ QString QnTimeSlider::lineComment(int line) {
     return m_lineData[line].comment;
 }
 
-QnTimePeriodList QnTimeSlider::timePeriods(int line, Qn::TimePeriodRole type) const {
+QnTimePeriodList QnTimeSlider::timePeriods(int line, Qn::TimePeriodContent type) const {
     if(!checkLinePeriod(line, type))
         return QnTimePeriodList();
     
     return m_lineData[line].timeStorage.periods(type);
 }
 
-void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodRole type, const QnTimePeriodList &timePeriods) {
+void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods) {
     if(!checkLinePeriod(line, type))
         return;
 
@@ -1132,16 +1263,16 @@ void QnTimeSlider::updateAggregationValue() {
     if (m_lineData.isEmpty())
         return;
 
-    /* Aggregate to half-pixels. */
-    qreal aggregationMSecs = m_msecsPerPixel / 2.0;
-    // calculate only once presuming current value is the same on all lines
+    /* Aggregate to 1/16-pixels. */
+    qreal aggregationMSecs = qMax(m_msecsPerPixel / 16.0, 1.0);
+    
+    /* Calculate only once presuming current value is the same on all lines. */
     qreal oldAggregationMSecs = m_lineData[0].timeStorage.aggregationMSecs();
     if(oldAggregationMSecs / 2.0 < aggregationMSecs && aggregationMSecs < oldAggregationMSecs * 2.0)
         return;
 
-    for(int line = 0; line < m_lineCount; line++){
+    for(int line = 0; line < m_lineCount; line++)
         m_lineData[line].timeStorage.setAggregationMSecs(aggregationMSecs);
-    }
 }
 
 void QnTimeSlider::updateTotalLineStretch() {
@@ -1309,8 +1440,8 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
             drawPeriodsBar(
                 painter, 
-                m_lineData[line].timeStorage.aggregated(Qn::RecordingRole),  
-                m_lineData[line].timeStorage.aggregated(Qn::MotionRole), 
+                m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),  
+                m_lineData[line].timeStorage.aggregated(Qn::MotionContent), 
                 lineRect
             );
 
@@ -1425,7 +1556,6 @@ void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color
 void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QRectF &rect) {
     qint64 minimumValue = this->windowStart();
     qint64 maximumValue = this->windowEnd();
-    qreal centralPos = quickPositionFromValue(this->sliderPosition());
 
     /* The code here may look complicated, but it takes care of not rendering
      * different motion periods several times over the same location. 
@@ -1433,13 +1563,11 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
 
     /* Note that constness of period lists is important here as requesting
      * iterators from a non-const object will result in detach. */
-    const QnTimePeriodList periods[Qn::TimePeriodRoleCount] = {recorded, motion};
-    const QColor pastColor[Qn::TimePeriodRoleCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
-    const QColor futureColor[Qn::TimePeriodRoleCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
+    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, motion};
 
-    QnTimePeriodList::const_iterator pos[Qn::TimePeriodRoleCount];
-    QnTimePeriodList::const_iterator end[Qn::TimePeriodRoleCount];
-    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
+    QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
+    QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
+    for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
          pos[i] = periods[i].findNearestPeriod(minimumValue, false);
          end[i] = periods[i].findNearestPeriod(maximumValue, true);
          if(end[i] != periods[i].end() && end[i]->contains(maximumValue))
@@ -1447,14 +1575,16 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
     }
 
     qint64 value = minimumValue;
-
-    bool inside[Qn::TimePeriodRoleCount];
-    for(int i = 0; i < Qn::TimePeriodRoleCount; i++)
+    bool inside[Qn::TimePeriodContentCount];
+    for(int i = 0; i < Qn::TimePeriodContentCount; i++)
         inside[i] = pos[i] == end[i] ? false : pos[i]->contains(value);
 
+    QnTimeSliderChunkPainter chunkPainter(this, painter);
+    chunkPainter.start(value, this->sliderPosition(), m_msecsPerPixel * lineBarMinChunkSize, rect);
+
     while(value != maximumValue) {
-        qint64 nextValue[Qn::TimePeriodRoleCount] = {maximumValue, maximumValue};
-        for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
+        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
+        for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
             if(pos[i] == end[i]) 
                 continue;
             
@@ -1469,27 +1599,18 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
 
         qint64 bestValue = qMin(nextValue[0], nextValue[1]);
         
-        int bestIndex;
-        if(inside[Qn::MotionRole]) {
-            bestIndex = Qn::MotionRole;
-        } else if(inside[Qn::RecordingRole]) {
-            bestIndex = Qn::RecordingRole;
+        Qn::TimePeriodContent content;
+        if(inside[Qn::MotionContent]) {
+            content = Qn::MotionContent;
+        } else if(inside[Qn::RecordingContent]) {
+            content = Qn::RecordingContent;
         } else {
-            bestIndex = Qn::TimePeriodRoleCount;
+            content = Qn::TimePeriodContentCount;
         }
 
-        qreal leftPos = quickPositionFromValue(value);
-        qreal rightPos = quickPositionFromValue(bestValue);
-        if(rightPos <= centralPos) {
-            painter->fillRect(QRectF(leftPos, rect.top(), rightPos - leftPos, rect.height()), pastColor[bestIndex]);
-        } else if(leftPos >= centralPos) {
-            painter->fillRect(QRectF(leftPos, rect.top(), rightPos - leftPos, rect.height()), futureColor[bestIndex]);
-        } else {
-            painter->fillRect(QRectF(leftPos, rect.top(), centralPos - leftPos, rect.height()), pastColor[bestIndex]);
-            painter->fillRect(QRectF(centralPos, rect.top(), rightPos - centralPos, rect.height()), futureColor[bestIndex]);
-        }
-        
-        for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
+        chunkPainter.paintChunk(bestValue - value, content);
+
+        for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
             if(bestValue != nextValue[i])
                 continue;
 
@@ -1500,6 +1621,8 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
 
         value = bestValue;
     }
+
+    chunkPainter.stop();
 }
 
 void QnTimeSlider::drawSolidBackground(QPainter *painter, const QRectF &rect) {
@@ -1711,9 +1834,6 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
     QRectF rect;
     drawCroppedImage(painter, targetRect, boundingRect, image, image.rect(), &rect);
 
-    //QPixmap pixmap = QPixmap::fromImage(image);
-    //drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect(), &rect);
-
     if(!rect.isEmpty()) {
         qreal a = data.selection;
         qreal width = 1.0 + a * 2.0;
@@ -1733,6 +1853,7 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
     }
     painter->setOpacity(opacity);
 }
+
 
 // -------------------------------------------------------------------------- //
 // Handlers

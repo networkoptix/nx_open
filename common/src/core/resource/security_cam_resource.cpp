@@ -19,6 +19,12 @@ QnSecurityCamResource::QnSecurityCamResource():
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 }
 
+bool QnSecurityCamResource::isGroupPlayOnly() const
+{
+    return hasParam(lit("groupplay"));
+
+};
+
 QnSecurityCamResource::~QnSecurityCamResource()
 {
 }
@@ -44,9 +50,9 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     }
 }
 
-QString QnSecurityCamResource::oemName() const
+QString QnSecurityCamResource::getVendorName() const
 {
-    return manufacture();
+    return getDriverName();
 }
 
 int QnSecurityCamResource::getMaxFps()

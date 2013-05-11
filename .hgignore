@@ -179,9 +179,24 @@ android-client/**/bin/**
 android-client/**/*.prefs
 android-client/**/gen/*
 
+ios-client/build
+ios-client/dist
+ios-client/target
+
 launcher/x86
 launcher/x64
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
 android-client/android-dw/**
+
+
+axiscamplugin/x86
+axiscamplugin/x64
+axiscamplugin/docs/
 appserver/hostedfiles/*
+
+genericrtspplugin/x86
+genericrtspplugin/x64
+
+
+nx_sdk/nx_sdk 

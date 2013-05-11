@@ -14,13 +14,10 @@
     extern const QMetaObject &getStaticMetaObject();                            \
 
 
-namespace QnCommonGlobals {}
-namespace Qn { using namespace QnCommonGlobals; }
-
 #ifdef Q_MOC_RUN
-class QnCommonGlobals
+class Qn
 #else
-namespace QnCommonGlobals
+namespace Qn
 #endif
 {
 #ifdef Q_MOC_RUN
@@ -123,6 +120,27 @@ public:
     };
     Q_DECLARE_FLAGS(MotionTypes, MotionType);
 
-} // namespace QnCommonGlobals
+
+    enum TimePeriodType {
+        NullTimePeriod      = 0x1,  /**< No period. */
+        EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
+        NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
+    };
+    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
+
+    enum TimePeriodContent {
+        RecordingContent,
+        MotionContent,
+        TimePeriodContentCount
+    };
+
+} // namespace Qn
+
+
+Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
+Q_DECLARE_METATYPE(Qn::TimePeriodType);
+Q_DECLARE_METATYPE(Qn::TimePeriodContent);
+
 
 #endif // QN_COMMON_GLOBALS_H

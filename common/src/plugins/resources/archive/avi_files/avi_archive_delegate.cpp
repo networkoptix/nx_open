@@ -191,6 +191,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 data = QnAbstractMediaDataPtr(videoData);
                 packetTimestamp(videoData, packet);
                 break;
+
             case AVMEDIA_TYPE_AUDIO:
                 if (packet.stream_index != m_audioStreamIndex || stream->codec->channels < 1 /*|| m_indexToChannel[packet.stream_index] == -1*/) {
                     av_free_packet(&packet);
@@ -205,6 +206,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 audioData->channelNumber = m_indexToChannel[packet.stream_index];
                 packetTimestamp(audioData, packet);
                 break;
+
             default:
                 av_free_packet(&packet);
                 continue;
@@ -324,6 +326,12 @@ const char* QnAviArchiveDelegate::getTagValue(QnAviArchiveDelegate::Tag tag)
 {
     QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
     AVDictionaryEntry* entry = av_dict_get(m_formatContext->metadata, getTagName(tag, format), 0, 0);
+    return entry ? entry->value : 0;
+}
+
+const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
+{
+    AVDictionaryEntry* entry = av_dict_get(m_formatContext->metadata, tagName, 0, 0);
     return entry ? entry->value : 0;
 }
 

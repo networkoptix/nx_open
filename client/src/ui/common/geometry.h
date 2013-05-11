@@ -208,6 +208,10 @@ public:
      */
     static QRectF expanded(qreal aspectRatio, const QRectF &minRect, Qt::AspectRatioMode mode, Qt::Alignment alignment = Qt::AlignCenter);
 
+    static QRectF expanded(qreal aspectRatio, const QSizeF &minSize, const QPointF &center, Qt::AspectRatioMode mode);
+
+    static QRectF scaled(const QRectF &rect, const QSizeF &size, const QPointF &fixedPoint, Qt::AspectRatioMode mode);
+
     static QRectF aligned(const QSizeF &size, const QRectF &rect, Qt::Alignment alignment = Qt::AlignCenter);
 
     static QRect aligned(const QSize &size, const QRect &rect, Qt::Alignment alignment = Qt::AlignCenter);
@@ -309,8 +313,9 @@ public:
 
     static QRectF movedInto(const QRectF &rect, const QRectF &target);
 
-    // TODO: #Elric rename into something more sane
-    static QRectF transformed(const QRectF &transform, const QRectF &rect);
+    static QRectF subRect(const QRectF &rect, const QRectF &relativeSubRect);
+    static QRectF unsubRect(const QRectF &rect, const QRectF &relativeSubRect);
+    static QRectF toSubRect(const QRectF &rect, const QRectF &absoluteSubRect);
 
     static QPointF corner(const QRectF &rect, Qn::Corner corner);
 

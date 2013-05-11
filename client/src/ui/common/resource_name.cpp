@@ -3,7 +3,7 @@
 #include <QHostAddress>
 
 #include <core/resource/resource.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 QString extractHost(const QString &url) {
     /* Try it as a host address first. */

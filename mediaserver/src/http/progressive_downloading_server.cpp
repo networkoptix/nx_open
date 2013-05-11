@@ -106,7 +106,12 @@ protected:
         if( m_standFrameDuration )
             doRealtimeDelay( data );
 
+
         QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+
+        if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
+            return true;
+
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
         {
             if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
@@ -368,8 +373,12 @@ void QnProgressiveDownloadingConsumer::run()
     {
         parseRequest();
         d->responseBody.clear();
-        QFileInfo fi(getDecodedUrl().path());
-        d->streamingFormat = fi.completeSuffix().toLocal8Bit();
+
+        //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
+        const QString& requestedResourcePath = QFileInfo(getDecodedUrl().path()).fileName();
+        const int nameFormatSepPos = requestedResourcePath.lastIndexOf( QLatin1Char('.') );
+        const QString& resUniqueID = requestedResourcePath.mid(0, nameFormatSepPos);
+        d->streamingFormat = nameFormatSepPos == -1 ? QByteArray() : requestedResourcePath.mid( nameFormatSepPos+1 ).toLocal8Bit();
         QByteArray mimeType = getMimeType(d->streamingFormat);
         if (mimeType.isEmpty())
         {
@@ -428,10 +437,10 @@ void QnProgressiveDownloadingConsumer::run()
 
 
 
-        QnResourcePtr resource = qnResPool->getResourceByUniqId(fi.baseName());
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(resUniqueID);
         if (resource == 0)
         {
-            d->responseBody = QByteArray("Resource with unicId ") + QByteArray(fi.baseName().toLocal8Bit()) + QByteArray(" not found ");
+            d->responseBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLocal8Bit()) + QByteArray(" not found ");
             sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
             return;
         }
@@ -496,32 +505,54 @@ void QnProgressiveDownloadingConsumer::run()
 
             if (isUTCRequest)
             {
-                QnServerArchiveDelegate serverArchive;
-                serverArchive.open(resource);
-                serverArchive.seek(timeMs, true);
-                qint64 timestamp = AV_NOPTS_VALUE;
-                for (int i = 0; i < 20; ++i) 
-                {
-                    QnAbstractMediaDataPtr data = serverArchive.getNextData();
-                    if (data && (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO))
+                QnAbstractArchiveDelegate* archive = 0;
+                QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
+                if (camRes) {
+                    archive = camRes->createArchiveDelegate();
+                    if (!archive)
+                        archive = new QnServerArchiveDelegate(); // default value
+                }
+                if (archive) {
+                    archive->open(resource);
+                    archive->seek(timeMs, true);
+                    qint64 timestamp = AV_NOPTS_VALUE;
+					int counter = 0;
+                    while (counter < 20)
                     {
-                        timestamp = data->timestamp;
-                        break;
+                        QnAbstractMediaDataPtr data = archive->getNextData();
+                        if (data)
+                        {
+							if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO) 
+							{
+								timestamp = data->timestamp;
+								break;
+							}
+							else if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
+								continue; // ignore filler packet
+							counter++;
+                        }
+						else {
+							counter++;
+						}
                     }
-                }
 
-                QByteArray ts("\"now\"");
-                QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
-                if (timestamp != (qint64)AV_NOPTS_VALUE)
-                {
-                    if (utcFormatOK)
-                        ts = QByteArray::number(timestamp/1000);
-                    else
-                        ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLocal8Bit() + QByteArray("\"");
+                    QByteArray ts("\"now\"");
+                    QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
+                    if (timestamp != (qint64)AV_NOPTS_VALUE)
+                    {
+                        if (utcFormatOK)
+                            ts = QByteArray::number(timestamp/1000);
+                        else
+                            ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLocal8Bit() + QByteArray("\"");
+                    }
+                    d->responseBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
+                    sendResponse("HTTP", CODE_OK, "application/json");
                 }
-                d->responseBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
-                sendResponse("HTTP", CODE_OK, "application/json");
+                else {
+                    sendResponse("HTTP", CODE_INTERNAL_ERROR, "application/json");
 
+                }
+                delete archive;
                 return;
             }
 

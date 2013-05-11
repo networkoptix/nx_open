@@ -1410,10 +1410,8 @@ void QnWorkbenchDisplay::at_layout_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbenchDisplay::at_layout_itemRemoved(QnWorkbenchItem *item) {
-    if(removeItemInternal(item, true, false)) {
+    if(removeItemInternal(item, true, false))
         synchronizeSceneBounds();
-        fitInView();
-    }
 }
 
 void QnWorkbenchDisplay::at_layout_zoomLinkAdded(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
@@ -1422,6 +1420,19 @@ void QnWorkbenchDisplay::at_layout_zoomLinkAdded(QnWorkbenchItem *item, QnWorkbe
 
 void QnWorkbenchDisplay::at_layout_zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
     removeZoomLinkInternal(item, zoomTargetItem);
+}
+
+void QnWorkbenchDisplay::at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect) {
+    QRect backgroundBoundingRect = gridBackgroundItem() ? gridBackgroundItem()->sceneBoundingRect() : QRect();
+
+    QRect oldBoundingRect = (backgroundBoundingRect.isNull())
+            ? oldRect
+            : oldRect.united(backgroundBoundingRect);
+    QRect newBoundingRect = (backgroundBoundingRect.isNull())
+            ? newRect
+            : newRect.united(backgroundBoundingRect);
+    if (oldBoundingRect != newBoundingRect)
+        fitInView();
 }
 
 void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item) {
@@ -1570,7 +1581,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)), this,      SLOT(at_layout_zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)));
     connect(layout,             SIGNAL(zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)), this,    SLOT(at_layout_zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)));
-    connect(layout,             SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
+    connect(layout,             SIGNAL(boundingRectChanged(QRect, QRect)),      this,                   SLOT(at_layout_boundingRectChanged(QRect, QRect)));
     if (layout->resource()) {
         connect(layout->resource(), SIGNAL(backgroundImageChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
         connect(layout->resource(), SIGNAL(backgroundSizeChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));

@@ -34,7 +34,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_anyCameraChanges(false),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
-    m_hasControlsChanges(false),
+    m_hasScheduleControlsChanges(false),
+    m_hasMotionControlsChanges(false),
     m_readOnly(false),
     m_motionWidget(NULL),
     m_inUpdateMaxFps(false),
@@ -215,8 +216,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
         }
 #endif
 
-        qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >"); // TODO: #Elric evil!
-        serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QList<QPair<QString, QVariant> >&)) );
+        serverConnection->getParamsAsync(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
     }
 }
 
@@ -359,7 +359,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
         QUrl url = QUrl::fromUserInput(m_camera->getUrl());
-        if (url.isValid() && url.port() != 80)
+        if (url.isValid() && url.port() != 80 && url.port() > 0)
             webPageAddress += QLatin1Char(':') + QString::number(url.port());
 
         ui->nameEdit->setText(m_camera->getName());
@@ -425,7 +425,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
+    m_hasMotionControlsChanges = false;
 
     if (m_camera)
         updateMaxFPS();
@@ -524,6 +525,7 @@ void QnSingleCameraSettingsWidget::connectToMotionWidget() {
     assert(m_motionWidget);
 
     connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dbDataChanged()), Qt::UniqueConnection);
+    connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_motionRegionListChanged()), Qt::UniqueConnection);
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
@@ -547,6 +549,7 @@ void QnSingleCameraSettingsWidget::updateMotionAvailability() {
 void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity() {
     if(m_motionWidget)
         m_motionWidget->setMotionSensitivity(ui->sensitivitySlider->value());
+    m_hasMotionControlsChanges = true;
 }
 
 void QnSingleCameraSettingsWidget::updateLicenseText() {
@@ -618,15 +621,15 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
     updateMotionAvailability();
 }
 
-void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params)
+void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle)
 {
     if (!m_widgetsRecreator) {
         qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: widgets creator ptr is null, camera id: "
             << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
         return;
     }
-    if (httpStatusCode != 0) {
-        qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: http status code is not OK: " << httpStatusCode
+    if (status != 0) {
+        qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: http status code is not OK: " << status
             << ". Camera id: " << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
         return;
     }
@@ -719,6 +722,11 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
 void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
     if (m_motionWidget)
         m_motionWidget->clearMotion();
+    m_hasMotionControlsChanges = false;
+}
+
+void QnSingleCameraSettingsWidget::at_motionRegionListChanged() {
+    m_hasMotionControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
@@ -762,7 +770,7 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
     at_cameraDataChanged();
 
     m_hasScheduleChanges = true;
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
@@ -773,11 +781,11 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChan
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged() {
-    m_hasControlsChanges = true;
+    m_hasScheduleControlsChanges = true;
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied() {
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged(int state) {

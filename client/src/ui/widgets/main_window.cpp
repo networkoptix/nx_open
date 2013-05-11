@@ -5,6 +5,7 @@
 #include <QtGui/QBoxLayout>
 #include <QtGui/QFileDialog>
 #include <QtGui/QToolButton>
+#include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
 #include <QtGui/QFileOpenEvent>
@@ -45,7 +46,7 @@
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "file_processor.h"
-#include "utils/settings.h"
+#include "client/client_settings.h"
 
 #include "resource_browser_widget.h"
 #include "dwm.h"
@@ -187,8 +188,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::FullscreenAction));
     addAction(action(Qn::AboutAction));
     addAction(action(Qn::SystemSettingsAction));
-    addAction(action(Qn::BusinessEventsAction));
-    addAction(action(Qn::BusinessEventsLogAction));
+//    addAction(action(Qn::BusinessEventsAction));
     addAction(action(Qn::OpenFileAction));
     addAction(action(Qn::ConnectToServerAction));
     addAction(action(Qn::OpenNewTabAction));

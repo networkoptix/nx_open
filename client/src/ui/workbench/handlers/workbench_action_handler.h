@@ -11,8 +11,7 @@
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
-#include <utils/settings.h>
-#include "ui/dialogs/event_log_dialog.h"
+#include <client/client_settings.h>
 
 class QAction;
 class QMenu;
@@ -233,6 +232,7 @@ protected slots:
     void at_debugIncrementCounterAction_triggered();
     void at_debugDecrementCounterAction_triggered();
     void at_debugShowResourcePoolAction_triggered();
+    void at_debugCalibratePtzAction_triggered();
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
@@ -267,6 +267,7 @@ protected slots:
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
     void at_businessEventsLogAction_triggered();
+    void at_webClientAction_triggered();
     void at_getMoreLicensesAction_triggered();
     void at_openServerSettingsAction_triggered();
     void at_openPopupSettingsAction_triggered();
@@ -285,6 +286,7 @@ protected slots:
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
+    void at_serverLogsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
     void at_thumbnailsSearchAction_triggered();
@@ -365,6 +367,7 @@ protected slots:
 
     void at_serverSettings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
 
+    void at_notificationSoundDownloaded(const QString& filename, bool ok);
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 

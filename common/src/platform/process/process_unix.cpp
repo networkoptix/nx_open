@@ -41,7 +41,7 @@ private:
         if(process->state() == QProcess::NotRunning)
             return; /* Cannot initialize yet. */
 
-        if(pid = process->pid()) {
+        if((pid = process->pid())) {
             initialized = true;
             valid = true;
         } else {
@@ -124,11 +124,11 @@ QnLinuxProcess::~QnLinuxProcess() {
     return;
 }
 
-qint64 QnLinuxProcess::pid() const override { 
+qint64 QnLinuxProcess::pid() const {
     return d_func()->pid;
 }
 
-QnPlatformProcess::Priority QnLinuxProcess::priority() const override {
+QnPlatformProcess::Priority QnLinuxProcess::priority() const {
     Q_D(const QnLinuxProcess);
     if(!d->valid)
         return InvalidPriority;
@@ -142,7 +142,7 @@ QnPlatformProcess::Priority QnLinuxProcess::priority() const override {
     }
 }
 
-void QnLinuxProcess::setPriority(Priority priority) override { 
+void QnLinuxProcess::setPriority(Priority priority) {
     Q_D(QnLinuxProcess);
     if(!d->valid) {
         qnWarning("Process is not valid, could not set priority.");
@@ -150,7 +150,7 @@ void QnLinuxProcess::setPriority(Priority priority) override {
     }
 
     int systemPriority = d->qnToSystemPriority(priority);
-    if(systemPriority == InvalidNiceValue) {
+    if(systemPriority == (int)InvalidNiceValue) {
         qnWarning("Invalid process priority value '%1'.", static_cast<int>(priority));
         return;
     }

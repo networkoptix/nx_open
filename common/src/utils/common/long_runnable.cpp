@@ -179,7 +179,6 @@ void QnLongRunnable::start(Priority priority) {
 
     m_needStop = false;
     QThread::start(priority);
-    assert(isRunning());
 }
 
 void QnLongRunnable::pleaseStop() {

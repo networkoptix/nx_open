@@ -271,13 +271,13 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
 }
 
 Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters &parameters) {
-    if(!parameters.hasArgument(Qn::TimePeriodParameter))
+    if(!parameters.hasArgument(Qn::TimePeriodRole))
         return Qn::InvisibleAction;
 
     if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
         return m_nonMatchingVisibility;
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     if(!(m_periodTypes & period.type())) {
         return m_nonMatchingVisibility;
     } else {
@@ -286,10 +286,10 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
 }
 
 Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &parameters) {
-    if(!parameters.hasArgument(Qn::TimePeriodParameter))
+    if(!parameters.hasArgument(Qn::TimePeriodRole))
         return Qn::InvisibleAction;
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     if(!(Qn::NormalTimePeriod & period.type()))
         return Qn::DisabledAction;
 
@@ -300,18 +300,29 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     if (m_centralItemRequired) {
         QnResourcePtr resource = parameters.resource();
         if(resource->flags() & QnResource::sync) {
-            QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+            QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
             if(!periods.intersects(period))
                 return Qn::DisabledAction;
         }
     }
     // Export layout
     else {
-        QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::AllTimePeriodsParameter);
+        QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
         if(!periods.intersects(period))
             return Qn::DisabledAction;
     }
     return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &parameters) {
+    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    if(!camera)
+        return Qn::InvisibleAction;
+#if 0
+    if(camera->isGroupPlayOnly())
+        return Qn::InvisibleAction;
+#endif
+    return QnExportActionCondition::check(parameters);
 }
 
 Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
@@ -389,8 +400,61 @@ Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWi
     if(display()->zoomTargetWidget(widget))
         return Qn::InvisibleAction;
 
-    if(widget->display()->videoLayout() && widget->display()->videoLayout()->channelCount() > 1)
-        return Qn::InvisibleAction;
+    /*if(widget->display()->videoLayout() && widget->display()->videoLayout()->channelCount() > 1)
+        return Qn::InvisibleAction;*/
     
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &parameters) {
+    int nodeType = parameters.argument(Qn::NodeTypeRole).toInt();
+    return (nodeType == m_nodeType) ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources) {
+    QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
+    bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+
+    foreach (const QnResourcePtr &resource, resources) {
+        //TODO: #GDM refactor duplicated code
+        bool isServer = resource->hasFlags(QnResource::server);
+        bool isMediaResource = resource->hasFlags(QnResource::media);
+        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+        bool allowed = isServer || isMediaResource;
+        bool forbidden = isExportedLayout && (isServer || isLocalResource);
+        if(allowed && !forbidden)
+            return Qn::EnabledAction;
+    }
+    return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources)
+        if(resource->hasFlags(QnResource::media) || resource->hasFlags(QnResource::server))
+            return Qn::EnabledAction;
+
+    return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
+    foreach(const QnLayoutItemIndex &index, layoutItems) {
+        QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
+        if(qFuzzyCompare(itemData.zoomRect, QRectF(0.0, 0.0, 1.0, 1.0)))
+            return QnActionCondition::check(layoutItems);
+    }
+
+    return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnResourceList &resources) {
+    if(resources.size() != 1)
+        return Qn::InvisibleAction;
+    QnResourcePtr resource = resources[0];
+    if (!resource->hasFlags(QnResource::url | QnResource::local | QnResource::still_image))
+        return Qn::InvisibleAction;
+
+    QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
+    if (layout->locked())
+        return Qn::DisabledAction;
     return Qn::EnabledAction;
 }

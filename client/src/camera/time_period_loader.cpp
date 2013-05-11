@@ -121,7 +121,7 @@ void QnTimePeriodLoader::discardCachedData() {
 
 int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
 {
-    return m_connection->asyncRecordedTimePeriods(
+    return m_connection->getTimePeriodsAsync(
         QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
         periodToLoad.startTimeMs, 
         periodToLoad.startTimeMs + periodToLoad.durationMs, 

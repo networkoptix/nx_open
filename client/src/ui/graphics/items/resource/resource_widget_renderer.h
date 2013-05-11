@@ -75,7 +75,7 @@ signals:
      * 
      * \param newSourceSize             New source size.
      */
-    void sourceSizeChanged(const QSize &newSourceSize);
+    void sourceSizeChanged();
 
 private:
     struct RenderingTools

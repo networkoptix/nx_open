@@ -13,7 +13,7 @@ static const QSize TO_LOWQ_SCREEN_SIZE(320/1.4,240/1.4);      // put item to LQ 
 static const int TIMER_TICK_INTERVAL = 500; // at ms
 static const int TOHQ_ADDITIONAL_TRY = 10*60*1000 / TIMER_TICK_INTERVAL; // every 10 min
 static const double FPS_EPS = 0.0001;
-static const double LQ_HQ_THRESHOLD = 1.3;
+static const double LQ_HQ_THRESHOLD = 1.34;
 
 QnRedAssController* QnRedAssController::instance()
 {
@@ -211,8 +211,6 @@ bool QnRedAssController::isSmallItem2(QnCamDisplay* display)
 bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
 {
     return !isSmallItem(display);
-    //QSize sz = display->getScreenSize();
-    //return sz.height() > TO_LOWQ_SCREEN_SIZE.height() * 1.25;
 }
 
 bool QnRedAssController::isNotSmallItem2(QnCamDisplay* display)

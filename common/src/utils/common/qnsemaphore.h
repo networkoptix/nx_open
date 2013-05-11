@@ -5,6 +5,7 @@
 
 class QnSemaphorePrivate;
 
+// TODO: #Elric rename file
 class QnSemaphore
 {
 public:

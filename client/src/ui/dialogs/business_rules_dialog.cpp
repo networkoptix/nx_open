@@ -25,17 +25,18 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include <client_message_processor.h>
 
-QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
+QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
     m_advancedAction(NULL),
-    m_loadingHandle(-1)
+    m_loadingHandle(-1),
+    m_advancedMode(false)
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
@@ -46,7 +47,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 
     createActions();
 
-    m_rulesViewModel = new QnBusinessRulesViewModel(this, this->context());
+    m_rulesViewModel = new QnBusinessRulesViewModel(this);
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -80,9 +81,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(at_saveAllButton_clicked()));
     connect(ui->addRuleButton,                              SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
     connect(ui->deleteRuleButton,                           SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
-    connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(updateAdvancedAction()));
+    connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
 
-    connect(context,  SIGNAL(userChanged(const QnUserResourcePtr &)),          this, SLOT(at_context_userChanged()));
+    connect(context(),  SIGNAL(userChanged(const QnUserResourcePtr &)),          this, SLOT(at_context_userChanged()));
 
     connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
@@ -90,7 +91,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
             this, SLOT(at_message_ruleDeleted(int)));
 
     at_context_userChanged();
-    updateControlButtons();
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog()
@@ -179,7 +179,6 @@ void QnBusinessRulesDialog::at_context_userChanged() {
         m_loadingHandle = QnAppServerConnectionFactory::createConnection()->getBusinessRulesAsync(
                     this, SLOT(at_resources_received(int,QByteArray,QnBusinessEventRules,int)));
     }
-
     updateControlButtons();
 }
 
@@ -289,10 +288,13 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
         updateControlButtons();
 }
 
+void QnBusinessRulesDialog::toggleAdvancedMode() {
+    setAdvancedMode(!advancedMode());
+}
+
 void QnBusinessRulesDialog::updateAdvancedAction() {
-    bool isAdvancedVisible = !m_currentDetailsWidget->isVisible() && m_currentDetailsWidget->model();
-    m_currentDetailsWidget->setVisible(isAdvancedVisible);
-    m_advancedAction->setText(isAdvancedVisible ? tr("Hide Advanced") : tr("Show Advanced"));
+    m_currentDetailsWidget->setVisible(advancedMode());
+    m_advancedAction->setText(advancedMode() ? tr("Hide Advanced") : tr("Show Advanced"));
 }
 
 void QnBusinessRulesDialog::createActions() {
@@ -303,7 +305,8 @@ void QnBusinessRulesDialog::createActions() {
     connect(deleteAct, SIGNAL(triggered()), this, SLOT(at_deleteButton_clicked()));
 
     m_advancedAction = new QAction(this);
-    connect(m_advancedAction, SIGNAL(triggered()), this, SLOT(at_advancedButton_clicked()));
+    connect(m_advancedAction, SIGNAL(triggered()), this, SLOT(toggleAdvancedMode()));
+    updateAdvancedAction();
 
     QAction* scheduleAct = new QAction(tr("&Schedule..."), this);
     connect(scheduleAct, SIGNAL(triggered()), m_currentDetailsWidget, SLOT(at_scheduleButton_clicked()));
@@ -388,5 +391,20 @@ void QnBusinessRulesDialog::updateControlButtons() {
     m_advancedAction->setEnabled(loaded && m_currentDetailsWidget->model());
     ui->addRuleButton->setEnabled(hasRights && loaded);
 
+    setAdvancedMode(hasRights && loaded && advancedMode());
+}
+
+bool QnBusinessRulesDialog::advancedMode() const {
+    return m_advancedMode;
+}
+
+void QnBusinessRulesDialog::setAdvancedMode(bool value) {
+    if (m_advancedMode == value)
+        return;
+
+    if (value && !m_currentDetailsWidget->model())
+        return; // advanced options cannot be displayed
+
+    m_advancedMode = value;
     updateAdvancedAction();
 }

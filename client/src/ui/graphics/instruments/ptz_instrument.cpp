@@ -201,8 +201,6 @@ public:
         if(qFuzzyCompare(size, m_size))
             return;
 
-        qDebug() << size;
-
         m_size = size;
 
         invalidatePath();
@@ -614,7 +612,7 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     connect(overlay->zoomOutButton(),   SIGNAL(pressed()),  this, SLOT(at_zoomOutButton_pressed()));
     connect(overlay->zoomOutButton(),   SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
 
-    widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false);
+    widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false, false);
 
     return overlay;
 }
@@ -628,6 +626,7 @@ void PtzInstrument::ensureSelectionItem() {
     selectionItem()->setPen(ptzItemBorderColor);
     selectionItem()->setBrush(ptzItemBaseColor);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
+    selectionItem()->setOptions(FixedArSelectionItem::DrawCentralElement | FixedArSelectionItem::DrawSideElements);
 
     if(scene())
         scene()->addItem(selectionItem());

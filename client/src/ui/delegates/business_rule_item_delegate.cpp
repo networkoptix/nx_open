@@ -11,6 +11,10 @@
 
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/models/business_rules_view_model.h>
+#include <ui/models/notification_sound_model.h>
+#include <ui/workbench/workbench_context.h>
+
+#include <utils/app_server_notification_cache.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //---------------- QnSelectResourcesDialogButton ------------------------------------//
@@ -71,8 +75,9 @@ void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event) {
 //---------------- QnBusinessRuleItemDelegate ---------------------------------------//
 ///////////////////////////////////////////////////////////////////////////////////////
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject *parent):
-    base_type(parent) {
-
+    base_type(parent),
+    QnWorkbenchContextAware(parent)
+{
 }
 
 QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate() {
@@ -126,6 +131,11 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                     comboBox->addItem(tr("For Administrators Only"), 1);
                     connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     return comboBox;
+                } else if (actionType == BusinessActionType::PlaySound) {
+                    QComboBox* comboBox = new QComboBox(parent);
+                    comboBox->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
+                    connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
+                    return comboBox;
                 }
 
                 QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
@@ -134,7 +144,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 if (actionType == BusinessActionType::CameraRecording) {
                     btn->setDialogDelegate(new QnRecordingEnabledDelegate(btn));
                 }
-                else if (actionType == BusinessActionType::CameraOutput) {
+                else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant) {
                     btn->setDialogDelegate(new QnOutputEnabledDelegate(btn));
                 }
                 else if (actionType == BusinessActionType::SendMail) {
@@ -197,6 +207,15 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
                     return;
                 }
 
+                if (actionType == BusinessActionType::PlaySound) {
+                    if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+                        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+                        comboBox->setCurrentIndex(soundModel->rowByFilename(index.data(Qt::EditRole).toString()));
+                    }
+                    return;
+                }
+
+
                 if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
                     btn->setResources(index.data(QnBusiness::ActionResourcesRole).value<QnResourceList>());
                     btn->setText(index.data(QnBusiness::ShortTextRole).toString());
@@ -236,9 +255,11 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
             {
                 BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
 
-                if (actionType == BusinessActionType::ShowPopup) {
+                if (actionType == BusinessActionType::ShowPopup || actionType == BusinessActionType::PlaySound) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-                        model->setData(index, comboBox->itemData(comboBox->currentIndex()));
+                        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+                        QString filename = soundModel->filenameByRow(comboBox->currentIndex());
+                        model->setData(index, filename);
                     }
                     return;
                 }

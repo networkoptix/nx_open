@@ -1,3 +1,35 @@
+----------------------------------------------- 1.5.1 -----------------------------------------------
+
+NEW CAMERAS AND RECORDERS SUPPORTED:
+ - More D-Link cameras
+ - Arecont AV3256PM
+ 
+IMPROVEMENTS: 
+ - Live view is smoother
+ - Second stream quality is improved for some onvif cameras 
+ - IOs Client support improved on the server side
+ - DW cameras can have different HTTP port (had to be 80)   
+ - Linux Media Server is more stable if record  80+ cameras and view more than 60
+ - Camera discovery is much faster
+ - Linux: improved external storages (NAS) support
+ - ONVIF is slightly improved
+ - VMAX fixes and improvements:
+   - Improved VMAX channels playback in Web-client and Android (fixed IE freezes as well)
+   - VMAX playback improved 
+   - VMAX could hang sometimes during navigation. Fixed
+   - VMAX having HTTP port other than 80 is supported
+   - VMAX channels now can go offline if cameras are not plugged into them
+   - Preview Search is disabled for VMAX in order to save connection pool
+
+BUGS FIXED:   
+ - Multi-video Export. Exported file could not play if one item had no data. Fixed
+ - Resolution was switching constantly sometimes during playback if first and second streams from a camera had different aspect ratios. Fixed
+ - Sometimes cameras were displaying video and NO SIGNAL at the same time. Fixed
+ - If change admin password camera statuses could not be changed. Fixed
+ - Motion was displayed incorrectly during Smart Search if time zone had been changed. Fixed
+ - Some analog encoders were discovered as digital cameras. Fixed
+ - Linux upgrade improved - libgl-mesa-dev is not needed if upgrading Media Server
+ 
 ----------------------------------------------- 1.5 -----------------------------------------------
 
 NEW CAMERAS AND RECORDERS SUPPORTED:
@@ -39,7 +71,7 @@ NEW CAMERAS AND RECORDERS SUPPORTED:
      - EC Connection Lost – results in notifications only
      - Licenses are not configured – received by Admin only
      - E-mail is not set – Admin is notified when users do not provide their email addresses
-     - Storages are not configured properly (Admin is notified)
+     - Storages are not configured properly (results in notifications only for Admin)
    - Actions:
      - Camera Recording (camera(s) must be specified). Camera(s) must have recording enabled.
      - Panic Recording
@@ -102,8 +134,8 @@ BUGS FIXED:
  - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously 
  - If more than 64 cameras are being recorded and in the same time opened for viewing, Linux Media Server could crash. Fixed
  - Arecont Vision panoramic cameras now work at full resolutuion. It used to work in quarter resolution if medium or low quality was pulled
- - Areconnt Vision Spartan 6 integration is improved
- - Areconnt FPS jumping issue is fixed
+ - Resolved all issues with Arecont Spartan-6
+ - Arecont FPS jumping issue is fixed
  - If an error is returned from EC, the client displayed EC password in the error message. Fixed
  
 ----------------------------------------------- 1.4 Patch -----------------------------------------------

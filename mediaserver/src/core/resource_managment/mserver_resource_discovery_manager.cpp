@@ -19,8 +19,9 @@
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 
-QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager():
-    QnResourceDiscoveryManager(),
+QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager( const CameraDriverRestrictionList& cameraDriverRestrictionList )
+:
+    QnResourceDiscoveryManager( &cameraDriverRestrictionList ),
     m_foundSmth(false)
 {
     netStateTime.restart();

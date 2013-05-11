@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>540</height>
+    <height>538</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
        <property name="title">
         <string>Connect to Enterprise Controller</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,0">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
@@ -282,6 +282,16 @@
           </item>
          </layout>
         </item>
+        <item>
+         <widget class="QCheckBox" name="rememberPasswordCheckBox">
+          <property name="text">
+           <string>&amp;Remember password</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -308,7 +318,11 @@
   <tabstop>loginLineEdit</tabstop>
   <tabstop>passwordLineEdit</tabstop>
   <tabstop>testButton</tabstop>
+  <tabstop>rememberPasswordCheckBox</tabstop>
   <tabstop>buttonBox</tabstop>
+  <tabstop>connectionsComboBox</tabstop>
+  <tabstop>saveButton</tabstop>
+  <tabstop>deleteButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

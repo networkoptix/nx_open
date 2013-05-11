@@ -24,6 +24,9 @@
 #include "soap/soapserver.h"
 #include "soapStub.h"
 
+//!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
+#define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
 static const float MAX_EPS = 0.01f;
@@ -160,7 +163,7 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
 
     // if some option doesn't have H264 it "less"
     if (!s1.isH264 && s2.isH264)
-        return true;
+        return false;
     else if (s1.isH264 && !s2.isH264)
         return true;
 
@@ -224,6 +227,28 @@ QnPlOnvifResource::QnPlOnvifResource()
 
 QnPlOnvifResource::~QnPlOnvifResource()
 {
+    {
+        QMutexLocker lk( &m_subscriptionMutex );
+        while( !m_triggerOutputTasks.empty() )
+        {
+            const quint64 timerID = m_triggerOutputTasks.begin()->first;
+            const TriggerOutputTask outputTask = m_triggerOutputTasks.begin()->second;
+            m_triggerOutputTasks.erase( m_triggerOutputTasks.begin() );
+            lk.unlock();
+            if( !outputTask.active )
+            {
+                //returning port to inactive state
+                setRelayOutputStateNonSafe(
+                    outputTask.outputID,
+                    outputTask.active,
+                    0 );
+            }
+
+            TimerManager::instance()->joinAndDeleteTimer( timerID );    //garantees that no onTimer(timerID) is running on return
+            lk.relock();
+        }
+    }
+
     stopInputPortMonitoring();
 
     delete m_onvifAdditionalSettings;
@@ -233,18 +258,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
         delete m_eventCapabilities;
         m_eventCapabilities = NULL;
     }
-
-    QMutexLocker lk( &m_subscriptionMutex );
-    while( !m_triggerOutputTasks.empty() )
-    {
-        const quint64 timerID = m_triggerOutputTasks.begin()->first;
-        m_triggerOutputTasks.erase( m_triggerOutputTasks.begin() );
-        lk.unlock();
-        TimerManager::instance()->joinAndDeleteTimer( timerID );    //garantees that no onTimer(timerID) is running on return
-        lk.relock();
-    }
 }
-
 
 const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     const QString& senderIpAddress)
@@ -328,9 +342,14 @@ bool QnPlOnvifResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QString QnPlOnvifResource::manufacture() const
+QString QnPlOnvifResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
+}
+
+QString QnPlOnvifResource::getVendorName() const
+{
+    return m_vendorName;
 }
 
 bool QnPlOnvifResource::hasDualStreaming() const
@@ -471,6 +490,15 @@ bool QnPlOnvifResource::initInternal()
     {
         setCameraCapability( Qn::RelayOutputCapability, true );
         setCameraCapability( Qn::RelayInputCapability, true );    //TODO it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
+
+        //resetting all ports states to inactive
+        for( std::vector<QnPlOnvifResource::RelayOutputInfo>::size_type
+            i = 0;
+            i < relayOutputs.size();
+            ++i )
+        {
+            setRelayOutputStateNonSafe( QString::fromStdString(relayOutputs[i].token), false, 0 );
+        }
     }
 
     if (m_appStopping)
@@ -504,6 +532,11 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
 int QnPlOnvifResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
 {
     return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(q, resolution, fps));
+}
+
+void QnPlOnvifResource::setVendorName( const QString& vendorName )
+{
+    m_vendorName = vendorName;
 }
 
 int QnPlOnvifResource::strictBitrate(int bitrate) const
@@ -1334,6 +1367,45 @@ bool QnPlOnvifResource::isH264Allowed() const
     //return !blockH264;
 }
 
+qreal QnPlOnvifResource::getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const
+{
+    int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
+    QSize secondaryRes = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, aspectRatio, maxSquare, resList);
+    if (secondaryRes == EMPTY_RESOLUTION_PAIR)
+        secondaryRes = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0, maxSquare, resList);
+
+    qreal secResSquare = SECONDARY_STREAM_DEFAULT_RESOLUTION.width() * SECONDARY_STREAM_DEFAULT_RESOLUTION.height();
+    qreal findResSquare = secondaryRes.width() * secondaryRes.height();
+    if (findResSquare > secResSquare)
+        return findResSquare / secResSquare;
+    else
+        return secResSquare / findResSquare;
+}
+
+int QnPlOnvifResource::getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const
+{
+    if (optList.size() < 2 || optList[0].resolutions.isEmpty())
+        return 1; // default value
+
+    qreal bestResCoeff = INT_MAX;
+    int bestResIndex = 1;
+    bool bestIsH264 = false;
+
+    qreal aspectRation = (qreal) optList[0].resolutions[0].width() / (qreal) optList[0].resolutions[0].height();
+
+    for (int i = 1; i < optList.size(); ++i)
+    {
+        qreal resCoeff = getBestSecondaryCoeff(optList[i].resolutions, aspectRation);
+        if (resCoeff < bestResCoeff || resCoeff == bestResCoeff && optList[i].isH264) {
+            bestResCoeff = resCoeff;
+            bestResIndex = i;
+            bestIsH264 = optList[i].isH264;
+        }
+    }
+
+    return bestResIndex;
+}
+
 bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
     VideoConfigsReq confRequest;
@@ -1440,7 +1512,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     bool dualStreamingAllowed = optionsList.size() >= 2;
     if (dualStreamingAllowed)
     {
-        int secondaryIndex = 1;
+        int secondaryIndex = getSecondaryIndex(optionsList);
         QMutexLocker lock(&m_mutex);
 
         m_secondaryVideoEncoderId = optionsList[secondaryIndex].id;
@@ -1522,6 +1594,12 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWra
                 case onvifXsd__AudioEncoding__AAC:
                     if (codec < AAC) {
                         codec = AAC;
+                        options = curOpts;
+                    }
+                    break;
+                case onvifXsd__AudioEncoding__AMR:
+                    if (codec < AMR) {
+                        codec = AMR;
                         options = curOpts;
                     }
                     break;
@@ -2695,7 +2773,13 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
         return false;
     }
 
+#ifdef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+    const bool isBistableModeRequired = true;
+#else
     const bool isBistableModeRequired = autoResetTimeoutMS == 0;
+#endif
+
+#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
     std::string requiredDelayTime;
     if( autoResetTimeoutMS > 0 )
     {
@@ -2703,13 +2787,18 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
         ss<<"PT"<<(autoResetTimeoutMS < 1000 ? 1 : autoResetTimeoutMS/1000)<<"S";
         requiredDelayTime = ss.str();
     }
+#endif
     if( (relayOutputInfo.isBistable != isBistableModeRequired) || 
+#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
         (!isBistableModeRequired && relayOutputInfo.delayTime != requiredDelayTime) ||
+#endif
         relayOutputInfo.activeByDefault )
     {
         //switching output to required mode
         relayOutputInfo.isBistable = isBistableModeRequired;
+#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
         relayOutputInfo.delayTime = requiredDelayTime;
+#endif
         relayOutputInfo.activeByDefault = false;
         if( !setRelayOutputSettings( relayOutputInfo ) )
         {
@@ -2742,6 +2831,15 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
             arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
+
+#ifdef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+    if( autoResetTimeoutMS > 0 )
+    {
+        //adding task to reset port state
+        const quint64 timerID = TimerManager::instance()->addTimer( this, autoResetTimeoutMS );
+        m_triggerOutputTasks.insert( std::make_pair( timerID, TriggerOutputTask( outputID, !active, 0 ) ) );
+    }
+#endif
 
     cl_log.log( QString::fromAscii("Successfully set relay %1 output state to %2. endpoint %3").
         arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
