@@ -1090,9 +1090,8 @@ void QnApiPbSerializer::serializeBusinessActionList(QSqlQuery& actionsQuery, QBy
         ba->set_aggregationcount(actionsQuery.value(aggregationCntIdx).toInt());
     }
 
-    std::string str;
-    pb_businessActionList.SerializeToString(&str);
-    data = QByteArray(str.data(), (int) str.length());
+    data.resize(pb_businessActionList.ByteSize());
+    pb_businessActionList.SerializeToArray(data.data(), data.size());
 }
 
 void QnApiPbSerializer::serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data)
