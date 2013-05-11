@@ -13,7 +13,7 @@ public:
         eventTypeParam,
         eventTimestampParam,
         eventResourceParam,
-        actionResourceIdParam,
+        actionResourceParam,
         
         // event specific params. share same values for different types
         inputPortIdParam,

@@ -53,11 +53,11 @@ void QnBusinessEventParameters::setEventResourceId(int value) {
 }
 
 int QnBusinessEventParameters::getActionResourceId() const {
-    return m_params[actionResourceIdParam].toInt();
+    return m_params[actionResourceParam].toInt();
 }
 
 void QnBusinessEventParameters::setActionResourceId(int value) {
-    m_params[actionResourceIdParam] = value;
+    m_params[actionResourceParam] = value;
 }
 
 
