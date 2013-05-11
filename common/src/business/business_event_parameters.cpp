@@ -8,13 +8,16 @@ static QLatin1String PARAM_NAMES[] =
     QLatin1String("eventTimestamp"),
     QLatin1String("eventResourceId"),
     QLatin1String("actionResourceId"),
+    QLatin1String("paramsKey"),
+
+    QLatin1String("inputPortId"),
+
     QLatin1String("reasonCode"),
     QLatin1String("reasonText"),
+
     QLatin1String("source"),
     QLatin1String("conflicts"),
-    QLatin1String("paramsKey"),
-    QLatin1String("inputPortId"),
-    QLatin1String("storageUrl")
+
 };
 
 static const char DELIMITER('$');
@@ -109,16 +112,6 @@ void QnBusinessEventParameters::setInputPortId(const QString &value) {
     m_params[inputPortIdParam] = value;
 }
 
-QString QnBusinessEventParameters::getStorageResourceUrl() const
-{
-    return m_params[storageUrlParam].toString();
-}
-
-void QnBusinessEventParameters::setStorageResourceUrl(QString value)
-{
-    m_params[storageUrlParam] = value;
-}
-
 
 QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArray& value)
 {
@@ -128,14 +121,14 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
         return result;
 
     int i = 0;
-    int prevPos = value.indexOf(DELIMITER);
+    int prevPos = -1;
     while (prevPos < value.size() && i < CountParam)
     {
-        int nextPos = value.indexOf(prevPos, DELIMITER);
+        int nextPos = value.indexOf(DELIMITER, prevPos+1);
         if (nextPos == -1)
             nextPos = value.size();
 
-        QByteArray field = QByteArray::fromRawData(value.data() + prevPos, nextPos - prevPos);
+        QByteArray field(value.data() + prevPos + 1, nextPos - prevPos - 1);
         result.m_params[i++] = QVariant(field);
         prevPos = nextPos;
     }

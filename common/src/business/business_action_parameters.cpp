@@ -138,14 +138,14 @@ QnBusinessActionParameters QnBusinessActionParameters::deserialize(const QByteAr
         return result;
 
     int i = 0;
-    int prevPos = value.indexOf(DELIMITER);
+    int prevPos = -1;
     while (prevPos < value.size() && i < CountParam)
     {
-        int nextPos = value.indexOf(prevPos, DELIMITER);
+        int nextPos = value.indexOf(DELIMITER, prevPos+1);
         if (nextPos == -1)
             nextPos = value.size();
 
-        QByteArray field = QByteArray::fromRawData(value.data() + prevPos, nextPos - prevPos);
+        QByteArray field(value.data() + prevPos + 1, nextPos - prevPos - 1);
         result.m_params[i++] = QVariant(field);
         prevPos = nextPos;
     }

@@ -9,17 +9,21 @@ public:
 
     enum Params 
     {
+        // base for any event type
         eventTypeParam,
         eventTimestampParam,
         eventResourceParam,
         actionResourceIdParam,
+        keyParam,
+        
+        // event specific params. share same values for different types
+        inputPortIdParam,
+
         reasonCodeParam,
         reasonTextParam,
+        
         sourceParam,
         conflictsParam,
-        keyParam,
-        inputPortIdParam,
-        storageUrlParam,
 
         CountParam
     };
@@ -56,8 +60,6 @@ public:
     QString getInputPortId() const;
     void setInputPortId(const QString &value);
 
-    QString getStorageResourceUrl() const;
-    void setStorageResourceUrl(QString value);
 
     // convert/serialize/deserialize functions
 
