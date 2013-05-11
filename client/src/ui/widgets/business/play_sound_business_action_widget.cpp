@@ -21,7 +21,7 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
 {
     ui->setupUi(this);
 
-    connect(ui->pathComboBox, SIGNAL(editTextChanged(QString)), this, SLOT(paramsChanged()));
+    connect(ui->pathComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
     connect(ui->playButton, SIGNAL(clicked()), this, SLOT(at_playButton_clicked()));
     connect(ui->manageButton, SIGNAL(clicked()), this, SLOT(at_manageButton_clicked()));
 
