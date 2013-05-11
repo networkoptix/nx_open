@@ -15,7 +15,7 @@ public:
         eventResourceParam,
         actionResourceParam,
         
-        // event specific params. share same values for different types
+        // event specific params.
         inputPortIdParam,
 
         reasonCodeParam,
