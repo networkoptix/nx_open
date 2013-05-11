@@ -11,6 +11,7 @@
 
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/models/business_rules_view_model.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
 
@@ -74,12 +75,8 @@ void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event) {
 ///////////////////////////////////////////////////////////////////////////////////////
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject *parent):
     base_type(parent),
-    m_soundCache(new QnAppServerNotificationCache(this))
+    QnWorkbenchContextAware(parent)
 {
-    connect(m_soundCache, SIGNAL(fileListReceived(QStringList,bool)), this, SLOT(at_fileListReceived(QStringList,bool)));
-    connect(m_soundCache, SIGNAL(fileDownloaded(QString,bool)), this, SLOT(at_fileDownloaded(QString,bool)), Qt::QueuedConnection);
-
-    m_soundCache->getFileList();
 }
 
 QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate() {
@@ -135,7 +132,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                     return comboBox;
                 } else if (actionType == BusinessActionType::PlaySound) {
                     QComboBox* comboBox = new QComboBox(parent);
-                    comboBox->addItem(tr("Downloading sound..."), QString());
+                    comboBox->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
                     connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     return comboBox;
                 }

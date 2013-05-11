@@ -4,6 +4,7 @@
 #include <QtCore/QFileInfo>
 
 #include <transcoding/file_transcoder.h>
+#include <utils/media/audio_player.h>
 
 namespace {
     const QLatin1String folder("notifications");
@@ -12,12 +13,22 @@ namespace {
 }
 
 QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
-    base_type(folder, parent)
+    base_type(folder, parent),
+    m_model(new QStandardItemModel(this))
 {
+    connect(this, SIGNAL(fileListReceived(QStringList,bool)),   this, SLOT(at_fileListReceived(QStringList,bool)));
+    connect(this, SIGNAL(fileDownloaded(QString,bool)),         this, SLOT(at_fileAdded(QString,bool)));
+    connect(this, SIGNAL(fileUploaded(QString,bool)),           this, SLOT(at_fileAdded(QString, bool)));
+
+    getFileList();
 }
 
 QnAppServerNotificationCache::~QnAppServerNotificationCache() {
 
+}
+
+QStandardItemModel* QnAppServerNotificationCache::persistentGuiModel() const {
+    return m_model;
 }
 
 QString QnAppServerNotificationCache::titleTag() {
@@ -50,9 +61,25 @@ void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {
 }
 
 void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filenames, bool ok) {
+    if (!ok)
+        return;
 
+    m_model->clear();
+    foreach (QString filename, filenames) {
+        downloadFile(filename);
+    }
 }
 
-void QnAppServerNotificationCache::at_fileDownloaded(const QString &filename, bool ok) {
+void QnAppServerNotificationCache::at_fileAdded(const QString &filename, bool ok) {
+    if (!ok)
+        return;
 
+    QString title = AudioPlayer::getTagValue(getFullPath(filename), titleTagValue);
+    if (title.isEmpty())
+        title = filename;
+
+    QStandardItem* item = new QStandardItem(title);
+    item->setData(filename);
+    m_model->appendRow(item);
 }
+
