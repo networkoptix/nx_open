@@ -42,7 +42,7 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
             if (params[i].first == "to")
                 period.durationMs = params[i].second.toLongLong() - period.startTimeMs;
             else if (params[i].first == "res_id") {
-                res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getNetResourceByPhysicalId(params[i].second));
+                res = qSharedPointerDynamicCast<QnVirtualCameraResource> (qnResPool->getNetResourceByPhysicalId(params[i].second));
                 if (!res)
                     errStr = QString("Camera resource %1 not found").arg(params[i].second);
             }
@@ -70,6 +70,7 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
         return CODE_INVALID_PARAMETER;
     }
 
+    /*
     QList<QnAbstractBusinessActionPtr> actions = qnEventsDB->getActions(
         period, 
         res ? res->getId() : QnId(), 
@@ -78,6 +79,16 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
         businessRuleId);
     QnApiPbSerializer serializer;
     serializer.serializeBusinessActionList(actions, result);
+    */
+    qnEventsDB->getAndSerializeActions(
+        result,
+        period, 
+        res ? res->getId() : QnId(), 
+        eventType, 
+        actionType,
+        businessRuleId);
+
+
     contentType = "application/octet-stream";
     return CODE_OK;
 }

@@ -6,6 +6,10 @@
 #include "business/events/abstract_business_event.h"
 #include "recording/time_period.h"
 
+namespace pb {
+    class BusinessActionList;
+}
+
 class QnEventsDB
 {
 public:
@@ -18,6 +22,15 @@ public:
         const BusinessEventType::Value& eventType = BusinessEventType::NotDefined, 
         const BusinessActionType::Value& actionType = BusinessActionType::NotDefined,
         const QnId& businessRuleId = QnId()) const;
+
+    void QnEventsDB::getAndSerializeActions(
+        QByteArray& result,
+        const QnTimePeriod& period,
+        const QnId& cameraId, 
+        const BusinessEventType::Value& eventType, 
+        const BusinessActionType::Value& actionType,
+        const QnId& businessRuleId) const;
+
 
     static QnEventsDB* instance();
     static void init();

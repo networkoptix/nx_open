@@ -17,6 +17,8 @@
 #include "core/resource_managment/resource_pool.h"
 #include <business/business_action_factory.h>
 
+#include <QSqlRecord>
+
 /* Prohibit the usage of std::string-QString conversion functions that do not 
  * explicitly state the encoding used for conversion. 
  * 
@@ -1054,6 +1056,38 @@ void QnApiPbSerializer::serializeBusinessActionList(const QnAbstractBusinessActi
         ba->set_togglestate((pb::ToggleStateType) actions[i]->getToggleState());
         ba->set_aggregationcount(actions[i]->getAggregationCount());
 
+    }
+
+    std::string str;
+    pb_businessActionList.SerializeToString(&str);
+    data = QByteArray(str.data(), (int) str.length());
+}
+
+void QnApiPbSerializer::serializeBusinessActionList(QSqlQuery& actionsQuery, QByteArray& data)
+{
+    pb::BusinessActionList pb_businessActionList;
+
+    QSqlRecord rec = actionsQuery.record();
+    int actionTypeIdx = rec.indexOf(lit("action_type"));
+    int actionParamIdx = rec.indexOf(lit("action_params"));
+    int runtimeParamIdx = rec.indexOf(lit("runtime_params"));
+    int businessRuleIdx = rec.indexOf(lit("business_rule_id"));
+    int toggleStateIdx = rec.indexOf(lit("toggle_state"));
+    int aggregationCntIdx = rec.indexOf(lit("aggregation_count"));
+
+
+    while (actionsQuery.next()) 
+    {
+        pb::BusinessAction* ba = pb_businessActionList.add_businessaction();
+
+        ba->set_actiontype((pb::BusinessActionType) actionsQuery.value(actionTypeIdx).toInt());
+
+        ba->set_actionparams(actionsQuery.value(actionParamIdx).toByteArray());
+        ba->set_runtimeparams(actionsQuery.value(runtimeParamIdx).toByteArray());
+
+        ba->set_businessruleid(actionsQuery.value(businessRuleIdx).toInt());
+        ba->set_togglestate( (pb::ToggleStateType) actionsQuery.value(toggleStateIdx).toInt());
+        ba->set_aggregationcount(actionsQuery.value(aggregationCntIdx).toInt());
     }
 
     std::string str;

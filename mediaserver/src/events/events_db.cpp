@@ -4,6 +4,7 @@
 #include "utils/common/util.h"
 #include "serverutil.h"
 #include "business/business_action_factory.h"
+#include "api/serializer/pb_serializer.h"
 
 static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
 static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; // 30 days
@@ -148,6 +149,46 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
 
     return result;
+}
+
+void QnEventsDB::getAndSerializeActions(
+    QByteArray& result,
+    const QnTimePeriod& period,
+    const QnId& cameraId, 
+    const BusinessEventType::Value& eventType, 
+    const BusinessActionType::Value& actionType,
+    const QnId& businessRuleId) const
+
+{
+    QTime t;
+    t.restart();
+
+    QMutexLocker lock(&m_mutex);
+
+    QString request(lit("SELECT * FROM runtime_actions where"));
+    if (period.durationMs != -1) {
+        request += QString(lit(" timestamp between '%1' and '%2'")).arg(toSQLDate(period.startTimeMs)).arg(toSQLDate(period.endTimeMs()));
+    }
+    else {
+        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs);
+    }
+    if (cameraId.isValid())
+        request += QString(lit(" and event_resource_id = %1 ")).arg(cameraId.toInt());
+    if (eventType != BusinessEventType::NotDefined)
+        request += QString(lit( " and event_type = %1 ")).arg((int) eventType);
+    if (actionType != BusinessActionType::NotDefined)
+        request += QString(lit( " and action_type = %1 ")).arg((int) actionType);
+    if (businessRuleId.isValid())
+        request += QString(lit( " and  business_rule_id = %1 ")).arg(businessRuleId.toInt());
+
+    QSqlQuery query(request);
+    if (!query.exec())
+        return;
+
+    QnApiPbSerializer serializer;
+    serializer.serializeBusinessActionList(query, result);
+
+    qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
 }
 
 void QnEventsDB::migrate()
