@@ -12,6 +12,11 @@ QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRule
 
 }
 
+QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
+{
+
+}
+
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
     if (QnBusinessRuleProcessor::executeActionInternal(action, res))

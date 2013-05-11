@@ -12,6 +12,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 #include <client/client_settings.h>
+#include "ui/dialogs/event_log_dialog.h"
 
 class QAction;
 class QMenu;
