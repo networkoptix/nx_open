@@ -150,7 +150,6 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     return result;
 }
 
-/*
 void QnEventsDB::migrate()
 {
     QList<QnAbstractBusinessActionPtr> result;
@@ -178,14 +177,12 @@ void QnEventsDB::migrate()
         BusinessActionType::Value actionType = (BusinessActionType::Value) query.value(actionTypeIdx).toInt();
         
         QByteArray data = query.value(actionParamIdx).toByteArray();
-        if (data.size() > 4) {
-            int gg = 4;
-        }
-        QnBusinessParams bParams = deserializeBusinessParams(data);
 
-        QnBusinessActionParameters actionParams = QnBusinessActionParameters::fromBusinessParams(bParams);
+        QnBusinessActionParameters actionParams = QnBusinessActionParameters::deserialize(data);
 
-        QnBusinessParams runtimeParams = deserializeBusinessParams(query.value(runtimeParamIdx).toByteArray());
+        QnBusinessParams bParams = deserializeBusinessParams(query.value(runtimeParamIdx).toByteArray());
+        QnBusinessEventParameters runtimeParams = QnBusinessEventParameters::fromBusinessParams(bParams);
+
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
         action->setBusinessRuleId(query.value(businessRuleIdx).toInt());
@@ -201,14 +198,13 @@ void QnEventsDB::migrate()
     for (int i = 0; i < result.size(); ++i)
     {
         QSqlQuery query2;
-        query2.prepare("UPDATE runtime_actions set action_params=:action_params WHERE id =:id");
-        query2.bindValue(":action_params", result[i]->getParams().serialize());
+        query2.prepare("UPDATE runtime_actions set event_params=:event_params WHERE id =:id");
+        query2.bindValue(":event_params", result[i]->getRuntimeParams().serialize());
         query2.bindValue(":id", idList[i]);
         query2.exec();
     }
 
 }
-*/
 
 
 void QnEventsDB::init()

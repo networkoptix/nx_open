@@ -23,7 +23,7 @@ public:
     static void init();
     static void fini();
 
-    //static void migrate();
+    static void migrate();
 protected:
     QnEventsDB();
 private:
