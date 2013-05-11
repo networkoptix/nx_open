@@ -74,7 +74,7 @@ QString QnEventLogModel::columnTitle(Column column) {
     }
 }
 
-QStandardItem *QnEventLogModel::createItem(Column column, const QnAbstractBusinessActionPtr &action) {
+QStandardItem *QnEventLogModel::createItem(Column column, const QnAbstractBusinessActionPtr &action) const{
     QStandardItem *item = new QStandardItem();
 
     qint64 timestampUsec;
@@ -154,6 +154,154 @@ void QnEventLogModel::clear()
     QStandardItemModel::clear();
 }
 
+QVariant QnEventLogModel::fontData(const Column& column, const QnAbstractBusinessActionPtr &action) const
+{
+    if (column == DescriptionColumn) {
+        BusinessEventType::Value eventType = (BusinessEventType::Value) QnBusinessEventRuntime::getEventType(action->getRuntimeParams());
+        if (eventType == BusinessEventType::Camera_Motion)
+            return m_linkFont;
+    }
+
+    return QVariant();
+}
+
+QVariant QnEventLogModel::foregroundData(const Column& column, const QnAbstractBusinessActionPtr &action) const
+{
+    if (column == DescriptionColumn) {
+        BusinessEventType::Value eventType = (BusinessEventType::Value) QnBusinessEventRuntime::getEventType(action->getRuntimeParams());
+        if (eventType == BusinessEventType::Camera_Motion)
+            return m_linkBrush;
+    }
+
+    return QVariant();
+}
+
+QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnAbstractBusinessActionPtr &action) const
+{
+    if (column == DescriptionColumn) {
+        BusinessEventType::Value eventType = (BusinessEventType::Value) QnBusinessEventRuntime::getEventType(action->getRuntimeParams());
+        if (eventType == BusinessEventType::Camera_Motion)
+            return Qt::PointingHandCursor;
+    }
+
+    return QVariant();
+}
+
+
+QVariant QnEventLogModel::iconData(const Column& column, const QnAbstractBusinessActionPtr &action) const
+{
+
+    switch(column) {
+        case EventCameraColumn: 
+        {
+            QnId eventResId = QnBusinessEventRuntime::getEventResourceId(action->getRuntimeParams());
+            QnResourcePtr eventResource = qnResPool->getResourceById(eventResId);
+            if (eventResource)
+                return qnResIconCache->icon(eventResource->flags(), eventResource->getStatus());
+            break;
+        }
+        case ActionCameraColumn: 
+        {
+            QnId actionResId = QnBusinessActionRuntime::getActionResourceId(action->getRuntimeParams());
+            QnResourcePtr actionResource = qnResPool->getResourceById(actionResId);
+            if (actionResource)
+                return qnResIconCache->icon(actionResource->flags(), actionResource->getStatus());
+            break;
+        }
+    }
+    return QVariant();
+}
+
+QVariant QnEventLogModel::textData(const Column& column,const QnAbstractBusinessActionPtr &action) const
+{
+    switch(column) 
+    {
+        case DateTimeColumn: {
+            qint64 timestampUsec = QnBusinessEventRuntime::getEventTimestamp(action->getRuntimeParams());
+            QDateTime dt = QDateTime::fromMSecsSinceEpoch(timestampUsec/1000);
+            return dt.toString(Qt::SystemLocaleShortDate);
+            break;
+        }
+        case EventColumn: {
+            BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(action->getRuntimeParams());
+            return BusinessEventType::toString(eventType);
+            break;
+        }
+        case EventCameraColumn: {
+            QnId eventResId = QnBusinessEventRuntime::getEventResourceId(action->getRuntimeParams());
+            QnResourcePtr eventResource = qnResPool->getResourceById(eventResId);
+            if (eventResource)
+                return eventResource->getName();
+            break;
+        }
+        case ActionColumn:
+            return BusinessActionType::toString(action->actionType());
+            break;
+        case ActionCameraColumn: {
+            QnId actionResId = QnBusinessActionRuntime::getActionResourceId(action->getRuntimeParams());
+            QnResourcePtr actionResource = qnResPool->getResourceById(actionResId);
+            if (actionResource)
+                return actionResource->getName();
+            break;
+            }
+        case DescriptionColumn: {
+            BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(action->getRuntimeParams());
+            switch (eventType) {
+            case BusinessEventType::Camera_Disconnect:
+            case BusinessEventType::Camera_Input:
+                break;
+            case BusinessEventType::Camera_Motion:
+                return lit("Click me to see video");
+                break;
+            case BusinessEventType::Storage_Failure:
+            case BusinessEventType::Network_Issue:
+            case BusinessEventType::MediaServer_Failure:
+                return QnBusinessStringsHelper::eventReason(action.data());
+                break;
+            case BusinessEventType::Camera_Ip_Conflict:
+            case BusinessEventType::MediaServer_Conflict:
+                return QnBusinessStringsHelper::conflictString(action->getRuntimeParams());
+                break;
+            }
+        }
+    }    
+    return QVariant();
+}
+
+QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
+{
+    const Column& column = m_columns[index.column()];
+    const QnAbstractBusinessActionPtr &action = m_events[index.row()];
+    
+    switch(role)
+    {
+        case Qt::DisplayRole:
+            return textData(column, action);
+        case Qt::DecorationRole:
+            return iconData(column, action);
+        case Qt::FontRole:
+            return fontData(column, action);
+        case Qt::ForegroundRole:
+            return foregroundData(column, action);
+        case Qn::ItemMouseCursorRole:
+            return mouseCursorData(column, action);
+    }
+
+    return QVariant();
+}
+
+/*
+QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
+{
+    QStandardItem* i = item(index.row(), index.column());
+    if (i == 0) {
+        i = createItem(m_columns[index.column()], m_events[index.row()]);
+        const_cast<QnEventLogModel*>(this)->setItem(index.row(), index.column(), i);
+    }
+    return i->data(role);
+}
+*/
+
 void QnEventLogModel::rebuild() 
 {
     QTime t;
@@ -168,7 +316,9 @@ void QnEventLogModel::rebuild()
     for(int c = 0; c < m_columns.size(); c++)
         setHeaderData(c, Qt::Horizontal, columnTitle(m_columns[c]));
 
-    /* Fill data. */
+    setRowCount(m_events.size());
+    /*
+    // Fill data.
     for(int r = 0; r < m_events.size(); r++) {
         QList<QStandardItem *> items;
         for(int c = 0; c < m_columns.size(); c++)
@@ -176,6 +326,7 @@ void QnEventLogModel::rebuild()
 
         appendRow(items);
     }
+    */
 
     qDebug() << Q_FUNC_INFO << "time=" << t.elapsed();
 }

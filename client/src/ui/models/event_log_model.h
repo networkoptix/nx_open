@@ -36,11 +36,18 @@ public:
     QnAbstractBusinessActionPtr getEvent(const QModelIndex &index) const;
     void rebuild();
     void clear();
+
+    virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override;
 private:
 
     static QString columnTitle(Column column);
-    QStandardItem *createItem(Column column, const QnAbstractBusinessActionPtr &license);
-
+    QStandardItem *createItem(Column column, const QnAbstractBusinessActionPtr &action) const;
+    
+    QVariant textData(const Column& column,const QnAbstractBusinessActionPtr &action) const;
+    QVariant iconData(const Column& column, const QnAbstractBusinessActionPtr &action) const;
+    QVariant fontData(const Column& column, const QnAbstractBusinessActionPtr &action) const;
+    QVariant foregroundData(const Column& column, const QnAbstractBusinessActionPtr &action) const;
+    QVariant mouseCursorData(const Column& column, const QnAbstractBusinessActionPtr &action) const;
 private:
     QList<Column> m_columns;
     QnAbstractBusinessActionList m_events;
