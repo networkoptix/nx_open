@@ -17,13 +17,13 @@
 #include "api/app_server_connection.h"
 #include "business/business_strings_helper.h"
 
-QnSendMailBusinessAction::QnSendMailBusinessAction(const QnBusinessParams &runtimeParams):
+QnSendMailBusinessAction::QnSendMailBusinessAction(const QnBusinessEventParameters &runtimeParams):
     base_type(BusinessActionType::SendMail, runtimeParams)
 {
 }
 
 QString QnSendMailBusinessAction::getSubject() const {
-    BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(m_runtimeParams);
+    BusinessEventType::Value eventType = m_runtimeParams.getEventType();
     QString resourceName = QnBusinessStringsHelper::resourceName(m_runtimeParams);
 
     if (eventType >= BusinessEventType::UserDefined)

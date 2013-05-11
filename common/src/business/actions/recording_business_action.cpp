@@ -5,7 +5,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
-QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessParams &runtimeParams):
+QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessEventParameters &runtimeParams):
     base_type(BusinessActionType::CameraRecording, runtimeParams)
 {
 }

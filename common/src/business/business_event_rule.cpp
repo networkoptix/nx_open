@@ -44,11 +44,11 @@ void QnBusinessEventRule::setEventResources(const QnResourceList &value) {
     m_eventResources = value;
 }
 
-QnBusinessParams QnBusinessEventRule::eventParams() const {
+QnBusinessEventParameters QnBusinessEventRule::eventParams() const {
     return m_eventParams;
 }
 
-void QnBusinessEventRule::setEventParams(const QnBusinessParams &params)
+void QnBusinessEventRule::setEventParams(const QnBusinessEventParameters &params)
 {
     m_eventParams = params;
 }

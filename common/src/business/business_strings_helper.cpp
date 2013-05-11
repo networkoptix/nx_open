@@ -8,11 +8,11 @@
 #include "api/app_server_connection.h"
 #include "events/conflict_business_event.h"
 
-QString QnBusinessStringsHelper::reasonString(const QnBusinessParams &params) 
+QString QnBusinessStringsHelper::reasonString(const QnBusinessEventParameters &params) 
 {
-    BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
-    QnBusiness::EventReason reasonCode = QnBusinessEventRuntime::getReasonCode(params);
-    QString reasonText = QnBusinessEventRuntime::getReasonText(params);
+    BusinessEventType::Value eventType = params.getEventType();
+    QnBusiness::EventReason reasonCode = params.getReasonCode();
+    QString reasonText = params.getReasonText();
 
     QString result;
     switch (reasonCode) {
@@ -58,9 +58,9 @@ QString QnBusinessStringsHelper::reasonString(const QnBusinessParams &params)
 
 }
 
-QString QnBusinessStringsHelper::timestampString(const QnBusinessParams &params, int aggregationCount) 
+QString QnBusinessStringsHelper::timestampString(const QnBusinessEventParameters &params, int aggregationCount) 
 {
-    quint64 ts = QnBusinessEventRuntime::getEventTimestamp(params);
+    quint64 ts = params.getEventTimestamp();
 
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
 
@@ -78,26 +78,26 @@ QString QnBusinessStringsHelper::timestampString(const QnBusinessParams &params,
     return result;
 }
 
-QString QnBusinessStringsHelper::resourceUrl(const QnBusinessParams &params) 
+QString QnBusinessStringsHelper::resourceUrl(const QnBusinessEventParameters &params) 
 {
-    int id = QnBusinessEventRuntime::getEventResourceId(params);
+    int id = params.getEventResourceId();
     QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
     return res ? QString(QLatin1String("%1 (%2)")).arg(res->getName()).arg(res->getUrl()) : QString();
 }
 
-QString QnBusinessStringsHelper::resourceName(const QnBusinessParams &params) 
+QString QnBusinessStringsHelper::resourceName(const QnBusinessEventParameters &params) 
 {
-    int id = QnBusinessEventRuntime::getEventResourceId(params);
+    int id = params.getEventResourceId();
     QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
     return res ? res->getName() : QString();
 }
 
 QString QnBusinessStringsHelper::eventReason(const QnAbstractBusinessAction* action)
 {
-    const QnBusinessParams params = action->getRuntimeParams();
-    QnBusiness::EventReason reasonCode = QnBusinessEventRuntime::getReasonCode(params);
-    BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
-    QString reasonText = QnBusinessEventRuntime::getReasonText(params);
+    const QnBusinessEventParameters params = action->getRuntimeParams();
+    QnBusiness::EventReason reasonCode = params.getReasonCode();
+    BusinessEventType::Value eventType = params.getEventType();
+    QString reasonText = params.getReasonText();
 
     QString result;
 
@@ -143,7 +143,7 @@ QString QnBusinessStringsHelper::eventReason(const QnAbstractBusinessAction* act
 
 QString QnBusinessStringsHelper::longEventDescription(const QnAbstractBusinessAction* action, const QnBusinessAggregationInfo& aggregationInfo)
 {
-    BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(action->getRuntimeParams());
+    BusinessEventType::Value eventType = action->getRuntimeParams().getEventType();
     QString resourceName = resourceUrl(action->getRuntimeParams());
     QString serverName = QObject::tr("%1 Server").arg(QLatin1String(VER_COMPANYNAME_STR));
     int issueCount = qMax(aggregationInfo.totalCount(), 1);
@@ -221,9 +221,9 @@ QString QnBusinessStringsHelper::longEventDescription(const QnAbstractBusinessAc
     return messageBody;
 }
 
-QString QnBusinessStringsHelper::motionUrl(const QnBusinessParams &params)
+QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params)
 {
-    int id = QnBusinessEventRuntime::getEventResourceId(params);
+    int id = params.getEventResourceId();
     QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
     if (!res)
         return QString();
@@ -233,7 +233,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessParams &params)
 
     QUrl apPServerUrl = QnAppServerConnectionFactory::defaultUrl();
     QUrl mserverUrl = mserverRes->getUrl();
-    quint64 ts = QnBusinessEventRuntime::getEventTimestamp(params);
+    quint64 ts = params.getEventTimestamp();
     QByteArray rnd = QByteArray::number(rand()).toHex();
 
     QString result(lit("https://%1:%2/proxy/http/%3:%4/media/%5.webm?rand=%6&resolution=240p&pos=%7"));
@@ -243,10 +243,10 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessParams &params)
     return result;
 }
 
-QString QnBusinessStringsHelper::conflictString(const QnBusinessParams &params)
+QString QnBusinessStringsHelper::conflictString(const QnBusinessEventParameters &params)
 {
-    QString source = QnBusinessEventRuntime::getSource(params);
-    QStringList conflicts = QnBusinessEventRuntime::getConflicts(params);
+    QString source = params.getSource();
+    QStringList conflicts = params.getConflicts();
 
     QString result = source;
     result += QObject::tr("conflicted with:");
@@ -256,7 +256,7 @@ QString QnBusinessStringsHelper::conflictString(const QnBusinessParams &params)
     return result;
 }
 
-QString QnBusinessStringsHelper::eventTextString(BusinessEventType::Value eventType, const QnBusinessParams &params) 
+QString QnBusinessStringsHelper::eventTextString(BusinessEventType::Value eventType, const QnBusinessEventParameters &params) 
 {
     QString result;
     switch (eventType) {
@@ -271,7 +271,7 @@ QString QnBusinessStringsHelper::eventTextString(BusinessEventType::Value eventT
     case BusinessEventType::Camera_Input:
         {
             result += QObject::tr("Input port: %1")
-                .arg(QnBusinessEventRuntime::getInputPortId(params));
+                .arg(params.getInputPortId());
             result += QLatin1Char('\n');
         }
         break;

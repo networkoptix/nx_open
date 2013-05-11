@@ -6,7 +6,9 @@
 #include <business/business_logic_common.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/qnid.h>
+
 #include "../business_action_parameters.h"
+#include "business/business_event_parameters.h"
 
 namespace BusinessActionType
 {
@@ -69,12 +71,6 @@ class QnAbstractBusinessAction;
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 typedef QList<QnAbstractBusinessActionPtr> QnAbstractBusinessActionList;
 
-
-namespace QnBusinessActionRuntime {
-    int getActionResourceId(const QnBusinessParams &params);
-    void setActionResourceId(QnBusinessParams* params, int value);
-}
-
 /*
 * Base class for business actions
 */
@@ -82,7 +78,7 @@ namespace QnBusinessActionRuntime {
 class QnAbstractBusinessAction
 {
 protected:
-    explicit QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams& runtimeParams);
+    explicit QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams);
 
 public:
     virtual ~QnAbstractBusinessAction();
@@ -100,8 +96,8 @@ public:
     void setParams(const QnBusinessActionParameters& params);
     const QnBusinessActionParameters& getParams() const;
 
-    void setRuntimeParams(const QnBusinessParams& params);
-    const QnBusinessParams& getRuntimeParams() const;
+    void setRuntimeParams(const QnBusinessEventParameters& params);
+    const QnBusinessEventParameters& getRuntimeParams() const;
 
     void setBusinessRuleId(const QnId& value);
     QnId getBusinessRuleId() const;
@@ -128,7 +124,7 @@ protected:
     bool m_receivedFromRemoteHost;
     QnResourceList m_resources;
     QnBusinessActionParameters m_params;
-    QnBusinessParams m_runtimeParams;
+    QnBusinessEventParameters m_runtimeParams;
     QnId m_businessRuleId; // business rule that generated this action
     int m_aggregationCount;
 };

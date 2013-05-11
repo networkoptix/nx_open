@@ -7,12 +7,12 @@
 
 
 QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, int eventResourceId):
-    base_type(BusinessActionType::ShowPopup, QnBusinessParams())
+    base_type(BusinessActionType::ShowPopup, QnBusinessEventParameters())
 {
-    QnBusinessParams runtimeParams;
-    QnBusinessEventRuntime::setEventType(&runtimeParams, BusinessEventType::Value(BusinessEventType::SystemHealthMessage + message));
-    QnBusinessEventRuntime::setEventTimestamp(&runtimeParams, qnSyncTime->currentUSecsSinceEpoch());
-    QnBusinessEventRuntime::setEventResourceId(&runtimeParams, eventResourceId);
+    QnBusinessEventParameters runtimeParams;
+    runtimeParams.setEventType(BusinessEventType::Value(BusinessEventType::SystemHealthMessage + message));
+    runtimeParams.setEventTimestamp(qnSyncTime->currentUSecsSinceEpoch());
+    runtimeParams.setEventResourceId(eventResourceId);
     setRuntimeParams(runtimeParams);
 
     QnBusinessActionParameters actionParams;

@@ -10,7 +10,7 @@ class QnRecordingBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    explicit QnRecordingBusinessAction(const QnBusinessParams &runtimeParams);
+    explicit QnRecordingBusinessAction(const QnBusinessEventParameters &runtimeParams);
 
     int getFps() const;
     QnStreamQuality getStreamQuality() const;

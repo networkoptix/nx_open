@@ -57,18 +57,18 @@ bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePt
     insQuery.prepare("INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params, business_rule_id, toggle_state, aggregation_count, event_type, event_resource_id, action_resource_id) "
         "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_id, :toggle_state, :aggregation_count, :event_type, :event_resource_id, :action_resource_id);");
 
-    qint64 timestampUsec = QnBusinessEventRuntime::getEventTimestamp(action->getRuntimeParams());
-    int eventResId = QnBusinessEventRuntime::getEventResourceId(action->getRuntimeParams());
+    qint64 timestampUsec = action->getRuntimeParams().getEventTimestamp();
+    int eventResId = action->getRuntimeParams().getEventResourceId();
     
-    QnBusinessParams actionRuntime = action->getRuntimeParams();
+    QnBusinessEventParameters actionRuntime = action->getRuntimeParams();
     if (actionRes)
-        QnBusinessActionRuntime::setActionResourceId(&actionRuntime, actionRes->getId().toInt());
-    int eventType = (int) QnBusinessEventRuntime::getEventType(actionRuntime);
+        actionRuntime.setActionResourceId(actionRes->getId().toInt());
+    int eventType = (int) actionRuntime.getEventType();
 
     insQuery.bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch(timestampUsec/1000));
     insQuery.bindValue(":action_type", (int) action->actionType());
     insQuery.bindValue(":action_params", action->getParams().serialize());
-    insQuery.bindValue(":runtime_params", serializeBusinessParams(action->getRuntimeParams()));
+    insQuery.bindValue(":runtime_params", action->getRuntimeParams().serialize());
     insQuery.bindValue(":business_rule_id", action->getBusinessRuleId().toInt());
     insQuery.bindValue(":toggle_state", (int) action->getToggleState());
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
@@ -135,7 +135,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     {
         BusinessActionType::Value actionType = (BusinessActionType::Value) query.value(actionTypeIdx).toInt();
         QnBusinessActionParameters actionParams = QnBusinessActionParameters::deserialize(query.value(actionParamIdx).toByteArray());
-        QnBusinessParams runtimeParams = deserializeBusinessParams(query.value(runtimeParamIdx).toByteArray());
+        QnBusinessEventParameters runtimeParams = QnBusinessEventParameters::deserialize(query.value(runtimeParamIdx).toByteArray());
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
         action->setBusinessRuleId(query.value(businessRuleIdx).toInt());

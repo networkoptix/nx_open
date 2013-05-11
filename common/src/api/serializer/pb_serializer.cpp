@@ -510,7 +510,7 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     pb_businessRule.set_eventtype((pb::BusinessEventType) serializeBusinessEventType(businessRulePtr->eventType()));
     foreach(QnResourcePtr res, businessRulePtr->eventResources())
         pb_businessRule.add_eventresource(res->getId().toInt());
-    pb_businessRule.set_eventcondition(serializeBusinessParams(businessRulePtr->eventParams()));
+    pb_businessRule.set_eventcondition(serializeBusinessParams(businessRulePtr->eventParams().toBusinessParams()));
     pb_businessRule.set_eventstate((pb::ToggleStateType)businessRulePtr->eventState());
 
     pb_businessRule.set_actiontype((pb::BusinessActionType) serializeBusinessActionType(businessRulePtr->actionType()));
@@ -1026,7 +1026,7 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
             pb_businessAction.add_actionresource(res->getId());
     }
     pb_businessAction.set_actionparams(action->getParams().serialize());
-    pb_businessAction.set_runtimeparams(serializeBusinessParams(action->getRuntimeParams()));
+    pb_businessAction.set_runtimeparams(action->getRuntimeParams().serialize());
     pb_businessAction.set_businessruleid(action->getBusinessRuleId().toInt());
     pb_businessAction.set_togglestate((pb::ToggleStateType) action->getToggleState());
     pb_businessAction.set_aggregationcount(action->getAggregationCount());
@@ -1049,7 +1049,7 @@ void QnApiPbSerializer::serializeBusinessActionList(const QnAbstractBusinessActi
                 ba->add_actionresource(res->getId());
         }
         ba->set_actionparams(actions[i]->getParams().serialize());
-        ba->set_runtimeparams(serializeBusinessParams(actions[i]->getRuntimeParams()));
+        ba->set_runtimeparams(actions[i]->getRuntimeParams().serialize());
         ba->set_businessruleid(actions[i]->getBusinessRuleId().toInt());
         ba->set_togglestate((pb::ToggleStateType) actions[i]->getToggleState());
         ba->set_aggregationcount(actions[i]->getAggregationCount());
@@ -1191,7 +1191,8 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
             qWarning() << "NULL event resource while reading rule" << pb_businessRule.id();
     }
     businessRule->setEventResources(eventResources);
-    businessRule->setEventParams(deserializeBusinessParams(pb_businessRule.eventcondition().c_str()));
+    QnBusinessParams bParams = deserializeBusinessParams(pb_businessRule.eventcondition().c_str());
+    businessRule->setEventParams(QnBusinessEventParameters::fromBusinessParams(bParams));
     businessRule->setEventState((ToggleState::Value)pb_businessRule.eventstate());
 
     businessRule->setActionType(parsePbBusinessActionType(pb_businessRule.actiontype()));
@@ -1204,7 +1205,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
             qWarning() << "NULL action resource while reading rule" << pb_businessRule.id();
     }
     businessRule->setActionResources(actionResources);
-    QnBusinessParams bParams = deserializeBusinessParams(pb_businessRule.actionparams().c_str());
+    bParams = deserializeBusinessParams(pb_businessRule.actionparams().c_str());
     businessRule->setActionParams(QnBusinessActionParameters::fromBusinessParams(bParams));
 
     businessRule->setAggregationPeriod(pb_businessRule.aggregationperiod());
@@ -1215,9 +1216,9 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
 
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction)
 {
-    QnBusinessParams runtimeParams;
+    QnBusinessEventParameters runtimeParams;
     if (pb_businessAction.has_runtimeparams())
-        runtimeParams = deserializeBusinessParams(pb_businessAction.runtimeparams().c_str());
+        runtimeParams = QnBusinessEventParameters::deserialize(pb_businessAction.runtimeparams().c_str());
     businessAction = QnBusinessActionFactory::createAction(
                 parsePbBusinessActionType(pb_businessAction.actiontype()),
                 runtimeParams);
@@ -1239,9 +1240,9 @@ void parseBusinessActionList(QnAbstractBusinessActionList& businessActionList, c
     {
         const pb::BusinessAction& pb_businessAction = pb_businessActionList.businessaction(i);
 
-        QnBusinessParams runtimeParams;
+        QnBusinessEventParameters runtimeParams;
         if (pb_businessAction.has_runtimeparams())
-            runtimeParams = deserializeBusinessParams(pb_businessAction.runtimeparams().c_str());
+            runtimeParams = QnBusinessEventParameters::deserialize(pb_businessAction.runtimeparams().c_str());
         QnAbstractBusinessActionPtr businessAction = QnBusinessActionFactory::createAction(
             parsePbBusinessActionType(pb_businessAction.actiontype()),
             runtimeParams);

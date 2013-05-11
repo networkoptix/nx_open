@@ -44,7 +44,7 @@ public:
         m_info.clear();
     }
 
-    void append(const QnBusinessParams& runtimeParams) {
+    void append(const QnBusinessEventParameters& runtimeParams) {
         m_info.append(runtimeParams);
     }
 

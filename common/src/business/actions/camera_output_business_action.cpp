@@ -5,7 +5,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
-QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(bool instant, const QnBusinessParams &runtimeParams):
+QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(bool instant, const QnBusinessEventParameters &runtimeParams):
     base_type(instant
               ? BusinessActionType::CameraOutputInstant
               : BusinessActionType::CameraOutput, runtimeParams)

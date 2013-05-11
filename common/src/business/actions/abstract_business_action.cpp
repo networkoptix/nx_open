@@ -81,21 +81,7 @@ namespace BusinessActionType {
     }
 }
 
-namespace QnBusinessActionRuntime {
-
-    static QLatin1String resourceIdStr("actionResourceId");
-
-    int getActionResourceId(const QnBusinessParams &params) {
-        return params.value(resourceIdStr).toInt();
-    }
-
-    void setActionResourceId(QnBusinessParams* params, int value) {
-        (*params)[resourceIdStr] = value;
-    }
-
-}
-
-QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams& runtimeParams):
+QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams):
     m_actionType(actionType),
     m_toggleState(ToggleState::NotDefined), 
     m_receivedFromRemoteHost(false),
@@ -124,11 +110,11 @@ const QnBusinessActionParameters& QnAbstractBusinessAction::getParams() const {
     return m_params;
 }
 
-void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessParams& params) {
+void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessEventParameters& params) {
     m_runtimeParams = params;
 }
 
-const QnBusinessParams& QnAbstractBusinessAction::getRuntimeParams() const {
+const QnBusinessEventParameters& QnAbstractBusinessAction::getRuntimeParams() const {
     return m_runtimeParams;
 }
 

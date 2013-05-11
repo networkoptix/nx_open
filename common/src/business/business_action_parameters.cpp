@@ -16,7 +16,7 @@ static QLatin1String PARAM_NAMES[] =
     QLatin1String("relayOutputID"),
     QLatin1String("relayAutoResetTimeout"),
     QLatin1String("inputPortId"),
-    QLatin1String("paramsKey")
+    QLatin1String("paramsKey"),
 };
 
 static const char DELIMITER('$');
@@ -139,7 +139,7 @@ QnBusinessActionParameters QnBusinessActionParameters::deserialize(const QByteAr
 
     int i = 0;
     int prevPos = value.indexOf(DELIMITER);
-    while (prevPos < value.size())
+    while (prevPos < value.size() && i < CountParam)
     {
         int nextPos = value.indexOf(prevPos, DELIMITER);
         if (nextPos == -1)

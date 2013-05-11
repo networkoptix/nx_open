@@ -30,8 +30,8 @@ public:
     QnResourceList eventResources() const;
     void setEventResources(const QnResourceList &value);
 
-    QnBusinessParams eventParams() const;
-    void setEventParams(const QnBusinessParams& params);
+    QnBusinessEventParameters eventParams() const;
+    void setEventParams(const QnBusinessEventParameters& params);
 
     ToggleState::Value eventState() const;
     void setEventState(ToggleState::Value state);
@@ -67,7 +67,7 @@ private:
 
     BusinessEventType::Value m_eventType;
     QnResourceList m_eventResources;
-    QnBusinessParams m_eventParams;
+    QnBusinessEventParameters m_eventParams;
     ToggleState::Value m_eventState;
 
     BusinessActionType::Value m_actionType;

@@ -265,8 +265,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     m_eventResources.clear();
     m_eventResources.append(businessRule->eventResources());
 
-    foreach (QString key, businessRule->eventParams().keys())
-        m_eventParams[key] = businessRule->eventParams()[key];
+    m_eventParams = businessRule->eventParams();
 
     m_eventState = businessRule->eventState();
 
@@ -388,17 +387,18 @@ void QnBusinessRuleViewModel::setEventResources(const QnResourceList &value) {
     emit dataChanged(this, QnBusiness::EventResourcesField | QnBusiness::ModifiedField);
 }
 
-QnBusinessParams QnBusinessRuleViewModel::eventParams() const {
+QnBusinessEventParameters QnBusinessRuleViewModel::eventParams() const {
     return m_eventParams;
 }
 
-void QnBusinessRuleViewModel::setEventParams(const QnBusinessParams &params)
+void QnBusinessRuleViewModel::setEventParams(const QnBusinessEventParameters &params)
 {
     bool hasChanges = false;
-    foreach(const QString &key, params.keys()) {
-        if (m_eventParams[key] == params[key])
+    for (int i = 0; i < (int) params.CountParam; ++i)
+    {
+        if (m_eventParams[i] == params[i])
             continue;
-        m_eventParams[key] = params[key];
+        m_eventParams[i] = params[i];
         hasChanges = true;
     }
 

@@ -81,6 +81,8 @@ public:
     QString getInputPortId() const;
     void setInputPortId(const QString &value);
 
+    // convert/serialize/deserialize functions
+
     static QnBusinessActionParameters deserialize(const QByteArray& value);
     QByteArray serialize() const;
 

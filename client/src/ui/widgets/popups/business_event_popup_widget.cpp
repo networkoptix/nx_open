@@ -109,7 +109,7 @@ void QnBusinessEventPopupWidget::updateTreeSize() {
 
 bool QnBusinessEventPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     if (m_eventType == BusinessEventType::NotDefined) //not initialized
-        initWidget(QnBusinessEventRuntime::getEventType(businessAction->getRuntimeParams()));
+        initWidget(businessAction->getRuntimeParams().getEventType());
     if (!updateTreeModel(businessAction))
         return false;
 
@@ -220,17 +220,17 @@ bool QnBusinessEventPopupWidget::updateTreeModel(const QnAbstractBusinessActionP
     return true;
 }
 
-QString QnBusinessEventPopupWidget::getEventTime(const QnBusinessParams &eventParams) {
-    qint64 eventTimestamp = QnBusinessEventRuntime::getEventTimestamp(eventParams);
+QString QnBusinessEventPopupWidget::getEventTime(const QnBusinessEventParameters &eventParams) {
+    qint64 eventTimestamp = eventParams.getEventTimestamp();
     if (eventTimestamp == 0)
         eventTimestamp = qnSyncTime->currentUSecsSinceEpoch();
 
     return QDateTime::fromMSecsSinceEpoch(eventTimestamp/1000).toString(QLatin1String("hh:mm:ss"));
 }
 
-QStandardItem* QnBusinessEventPopupWidget::findOrCreateItem(const QnBusinessParams& eventParams) {
-    int resourceId = QnBusinessEventRuntime::getEventResourceId(eventParams);
-    int eventReasonCode = QnBusinessEventRuntime::getReasonCode(eventParams);
+QStandardItem* QnBusinessEventPopupWidget::findOrCreateItem(const QnBusinessEventParameters& eventParams) {
+    int resourceId = eventParams.getEventResourceId();
+    int eventReasonCode = eventParams.getReasonCode();
 
     QStandardItem *root = m_model->invisibleRootItem();
     for (int i = 0; i < root->rowCount(); i++) {
@@ -250,16 +250,16 @@ QStandardItem* QnBusinessEventPopupWidget::findOrCreateItem(const QnBusinessPara
     QStandardItem *item = new QStandardItem();
     item->setText(getResourceName(resource));
     item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-    item->setData(QnBusinessEventRuntime::getEventResourceId(eventParams), ResourceIdRole);
+    item->setData(eventParams.getEventResourceId(), ResourceIdRole);
     item->setData(0, EventCountRole);
     item->setData(getEventTime(eventParams), EventTimeRole);
     item->setData(eventReasonCode, EventReasonRole);
-    item->setData(QnBusinessEventRuntime::getReasonText(eventParams), EventReasonTextRole);
+    item->setData(eventParams.getReasonText(), EventReasonTextRole);
     root->appendRow(item);
     return item;
 }
 
-QStandardItem* QnBusinessEventPopupWidget::updateSimpleTree(const QnBusinessParams& eventParams) {
+QStandardItem* QnBusinessEventPopupWidget::updateSimpleTree(const QnBusinessEventParameters& eventParams) {
     QStandardItem *item = findOrCreateItem(eventParams);
     if (!item)
         return NULL;
@@ -279,14 +279,14 @@ QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnAbstractBusi
     return item;
 }
 
-QStandardItem* QnBusinessEventPopupWidget::updateConflictTree(const QnBusinessParams& eventParams) {
+QStandardItem* QnBusinessEventPopupWidget::updateConflictTree(const QnBusinessEventParameters& eventParams) {
 
     QStandardItem *item = findOrCreateItem(eventParams);
     if (!item)
         return NULL;
 
-    QString source = QnBusinessEventRuntime::getSource(eventParams);
-    QStringList newConflicts = QnBusinessEventRuntime::getConflicts(eventParams);
+    QString source = eventParams.getSource();
+    QStringList newConflicts = eventParams.getConflicts();
 
     QStringList conflicts = item->data(ConflictsRole).value<QStringList>();
     foreach(QString entity, newConflicts) {
