@@ -637,7 +637,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::BusinessEventsLogAction).
         flags(Qn::Main).
-        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Log...")).
         shortcut(tr("Ctrl+L")).
         autoRepeat(false);

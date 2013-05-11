@@ -7,6 +7,11 @@
 #include "api/app_server_connection.h"
 #include "core/resource_managment/resource_pool.h"
 
+QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRuleProcessor()
+{
+
+}
+
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
     if (QnBusinessRuleProcessor::executeActionInternal(action, res))

@@ -24,7 +24,8 @@
 
 #include "api_fwd.h"
 #include "media_server_cameras_data.h"
-
+#include "business/actions/abstract_business_action.h"
+#include "business/events/abstract_business_event.h"
 
 class QnPtzSpaceMapper;
 class QnEnumNameMapper;
@@ -68,6 +69,7 @@ signals:
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
     void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
+    void finished(int status, const QnAbstractBusinessActionList &reply, int handle);
 
 private:
     template<class T>
