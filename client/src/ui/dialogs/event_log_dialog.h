@@ -35,7 +35,7 @@ public:
                QnId businessRuleId);
 private slots:
     void updateData();
-    void at_gotEvents(int requestNum, int httpStatus, const QnAbstractBusinessActionList& events);
+    void at_gotEvents(int httpStatus, const QnAbstractBusinessActionList& events, int requestNum);
     void onItemClicked(QListWidgetItem * item);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;

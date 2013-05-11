@@ -362,7 +362,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case eventLogObject: {
         QnApiPbSerializer serializer;
         QnAbstractBusinessActionList events;
-        serializer.deserializeBusinessActionList(events, response.data);
+        if (response.status == 0)
+            serializer.deserializeBusinessActionList(events, response.data);
         emitFinished(response.status, events, handle);
 		break;
     }
