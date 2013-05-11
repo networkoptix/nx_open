@@ -14,7 +14,6 @@ public:
         eventTimestampParam,
         eventResourceParam,
         actionResourceIdParam,
-        keyParam,
         
         // event specific params. share same values for different types
         inputPortIdParam,
@@ -54,9 +53,6 @@ public:
     QStringList getConflicts() const;
     void setConflicts(QStringList value);
 
-    QString getParamsKey() const;
-    void setParamsKey(QString value);
-
     QString getInputPortId() const;
     void setInputPortId(const QString &value);
 
@@ -71,6 +67,8 @@ public:
 
     QVariant& operator[](int index);
     const QVariant& operator[](int index) const;
+
+    QString getParamsKey() const;
 
 private:
     static int getParamIndex(const QString& key);

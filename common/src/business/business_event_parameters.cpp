@@ -8,7 +8,6 @@ static QLatin1String PARAM_NAMES[] =
     QLatin1String("eventTimestamp"),
     QLatin1String("eventResourceId"),
     QLatin1String("actionResourceId"),
-    QLatin1String("paramsKey"),
 
     QLatin1String("inputPortId"),
 
@@ -93,15 +92,6 @@ QStringList QnBusinessEventParameters::getConflicts() const {
 
 void QnBusinessEventParameters::setConflicts(QStringList value) {
     m_params[conflictsParam] = QVariant::fromValue(value);
-}
-
-
-QString QnBusinessEventParameters::getParamsKey() const {
-    return m_params[keyParam].toString();
-}
-
-void QnBusinessEventParameters::setParamsKey(QString value) {
-    m_params[keyParam] = value;
 }
 
 QString QnBusinessEventParameters::getInputPortId() const {
@@ -200,4 +190,25 @@ QVariant& QnBusinessEventParameters::operator[](int index)
 const QVariant& QnBusinessEventParameters::operator[](int index) const
 {
     return m_params[index];
+}
+
+QString QnBusinessEventParameters::getParamsKey() const
+{
+    QString paramKey(QString::number(getEventType()));
+
+    switch (getEventType())
+    {
+        case BusinessEventType::MediaServer_Failure:
+        case BusinessEventType::Network_Issue:
+        case BusinessEventType::Storage_Failure:
+            paramKey += QLatin1String("_") + m_params[reasonCodeParam].toString();
+            if (getReasonCode() == QnBusiness::StorageIssueIoError || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpeed)
+                paramKey += QLatin1String("_") + getReasonText();
+            break;
+        case BusinessEventType::Camera_Input:
+            paramKey += QLatin1String("_") + m_params[inputPortIdParam].toString();
+            break;
+    }
+
+    return paramKey;
 }

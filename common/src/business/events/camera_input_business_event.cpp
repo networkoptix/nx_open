@@ -54,7 +54,6 @@ bool QnCameraInputEvent::isResourcesListValid(const QnResourceList &resources) {
 QnBusinessEventParameters QnCameraInputEvent::getRuntimeParams() const {
     QnBusinessEventParameters params = base_type::getRuntimeParams();
     params.setInputPortId(m_inputPortID);
-    params.setParamsKey(m_inputPortID);
     return params;
 }
 
