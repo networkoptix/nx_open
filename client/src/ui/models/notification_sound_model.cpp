@@ -19,6 +19,15 @@ void QnNotificationSoundModel::loadList(const QStringList &filenames) {
     emit listLoaded();
 }
 
+void QnNotificationSoundModel::addUploading(const QString &filename) {
+    QList<QStandardItem *> row;
+    row << new QStandardItem(tr("Uploading sound..."))
+        << new QStandardItem(filename);
+    //TODO: #GDM append columns: duration, date added (?)
+    appendRow(row);
+    emit itemAdded(filename);
+}
+
 void QnNotificationSoundModel::updateTitle(const QString &filename, const QString &title) {
     QList<QStandardItem*> items = findItems(filename, Qt::MatchExactly, FilenameColumn);
     if (items.size() == 0) {

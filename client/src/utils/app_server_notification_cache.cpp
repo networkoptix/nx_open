@@ -56,7 +56,9 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
 }
 
 void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {
-    uploadFile(QFileInfo(filePath).fileName());
+    QString filename = QFileInfo(filePath).fileName();
+    m_model->addUploading(filename);
+    uploadFile(filename);
 }
 
 void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filenames, bool ok) {

@@ -18,20 +18,22 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QComboBox" name="pathComboBox">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
+    <widget class="QComboBox" name="pathComboBox"/>
    </item>
    <item>
-    <widget class="QToolButton" name="playButton">
+    <widget class="QPushButton" name="playButton">
      <property name="text">
       <string/>
      </property>
      <property name="icon">
       <iconset resource="../../../../x86/build/client-custom.qrc">
        <normaloff>:/skin/slider/navigation/play.png</normaloff>:/skin/slider/navigation/play.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
      </property>
     </widget>
    </item>
