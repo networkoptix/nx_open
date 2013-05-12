@@ -239,8 +239,8 @@ void QnEventsDB::migrate()
     for (int i = 0; i < result.size(); ++i)
     {
         QSqlQuery query2;
-        query2.prepare("UPDATE runtime_actions set event_params=:event_params WHERE id =:id");
-        query2.bindValue(":event_params", result[i]->getRuntimeParams().serialize());
+        query2.prepare("UPDATE runtime_actions set runtime_params=:runtime_params WHERE id =:id");
+        query2.bindValue(":runtime_params", result[i]->getRuntimeParams().serialize());
         query2.bindValue(":id", idList[i]);
         query2.exec();
     }
