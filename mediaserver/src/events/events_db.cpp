@@ -199,9 +199,8 @@ void QnEventsDB::getAndSerializeActions(
     int aggregationCntIdx = rec.indexOf(lit("aggregation_count"));
 
 
-    int tmp = 0;
-    result.append((const char *) &tmp, sizeof(int));
-    int sizeField;
+    int sizeField = 0;
+    result.append((const char *) &sizeField, sizeof(int));
 
     while (actionsQuery.next()) 
     {
