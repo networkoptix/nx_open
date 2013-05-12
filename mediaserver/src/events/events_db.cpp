@@ -151,6 +151,80 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     return result;
 }
 
+inline void appendIntToBA(QByteArray& ba, int value)
+{
+    ba.append((const char*) &value, sizeof(int));
+}
+
+void QnEventsDB::getAndSerializeActions(
+                                        QByteArray& result,
+                                        const QnTimePeriod& period,
+                                        const QnId& cameraId, 
+                                        const BusinessEventType::Value& eventType, 
+                                        const BusinessActionType::Value& actionType,
+                                        const QnId& businessRuleId) const
+
+{
+    QTime t;
+    t.restart();
+
+    QMutexLocker lock(&m_mutex);
+
+    QString request(lit("SELECT * FROM runtime_actions where"));
+    if (period.durationMs != -1) {
+        request += QString(lit(" timestamp between '%1' and '%2'")).arg(toSQLDate(period.startTimeMs)).arg(toSQLDate(period.endTimeMs()));
+    }
+    else {
+        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs);
+    }
+    if (cameraId.isValid())
+        request += QString(lit(" and event_resource_id = %1 ")).arg(cameraId.toInt());
+    if (eventType != BusinessEventType::NotDefined)
+        request += QString(lit( " and event_type = %1 ")).arg((int) eventType);
+    if (actionType != BusinessActionType::NotDefined)
+        request += QString(lit( " and action_type = %1 ")).arg((int) actionType);
+    if (businessRuleId.isValid())
+        request += QString(lit( " and  business_rule_id = %1 ")).arg(businessRuleId.toInt());
+
+    QSqlQuery actionsQuery(request);
+    if (!actionsQuery.exec())
+        return;
+
+    QSqlRecord rec = actionsQuery.record();
+    int actionTypeIdx = rec.indexOf(lit("action_type"));
+    int actionParamIdx = rec.indexOf(lit("action_params"));
+    int runtimeParamIdx = rec.indexOf(lit("runtime_params"));
+    int businessRuleIdx = rec.indexOf(lit("business_rule_id"));
+    int toggleStateIdx = rec.indexOf(lit("toggle_state"));
+    int aggregationCntIdx = rec.indexOf(lit("aggregation_count"));
+
+
+    int tmp = 0;
+    result.append((const char *) &tmp, sizeof(int));
+    int sizeField;
+
+    while (actionsQuery.next()) 
+    {
+        appendIntToBA(result, actionsQuery.value(actionTypeIdx).toInt());
+        appendIntToBA(result, actionsQuery.value(businessRuleIdx).toInt());
+        appendIntToBA(result, actionsQuery.value(aggregationCntIdx).toInt());
+        //appendIntToBA(result, actionsQuery.value(toggleStateIdx).toInt());
+        QByteArray runtimeParams = actionsQuery.value(runtimeParamIdx).toByteArray();
+        appendIntToBA(result, runtimeParams.size());
+        result.append(runtimeParams);
+
+        ++sizeField;
+
+        //ba->set_actionparams(actionsQuery.value(actionParamIdx).toByteArray());
+        //ba->set_runtimeparams(actionsQuery.value(runtimeParamIdx).toByteArray());
+    }
+    memcpy(result.data(), &sizeField, sizeof(int));
+
+    qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
+}
+
+
+/*
 void QnEventsDB::getAndSerializeActions(
     QByteArray& result,
     const QnTimePeriod& period,
@@ -190,6 +264,7 @@ void QnEventsDB::getAndSerializeActions(
 
     qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
 }
+*/
 
 void QnEventsDB::migrate()
 {

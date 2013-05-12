@@ -103,6 +103,34 @@ void QnBusinessEventParameters::setInputPortId(const QString &value) {
 }
 
 
+inline int toInt(const QByteArray& ba)
+{
+    const char* curPtr = ba.data();
+    const char* end = curPtr + ba.size();
+    int result = 0;
+    for(; curPtr < end; ++curPtr)
+    {
+        if (*curPtr < '0' || *curPtr > '9')
+            return result;
+        result = result*10 + (*curPtr - '0');
+    }
+    return result;
+}
+
+inline qint64 toInt64(const QByteArray& ba)
+{
+    const char* curPtr = ba.data();
+    const char* end = curPtr + ba.size();
+    qint64 result = 0ll;
+    for(; curPtr < end; ++curPtr)
+    {
+        if (*curPtr < '0' || *curPtr > '9')
+            return result;
+        result = result*10 + (*curPtr - '0');
+    }
+    return result;
+}
+
 QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArray& value)
 {
     QnBusinessEventParameters result;
@@ -118,22 +146,22 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
         if (nextPos == -1)
             nextPos = value.size();
 
-        QByteArray field(value.data() + prevPos + 1, nextPos - prevPos - 1);
+        QByteArray field = QByteArray::fromRawData(value.data() + prevPos + 1, nextPos - prevPos - 1);
         if (!field.isEmpty())
         {
             switch ((Params) i)
             {
                 case eventTypeParam:
-                    result.m_eventType = (BusinessEventType::Value) field.toInt();
+                    result.m_eventType = (BusinessEventType::Value) toInt(field);
                     break;
                 case eventTimestampParam:
-                    result.m_timestamp = field.toLongLong();
+                    result.m_timestamp = toInt64(field);
                     break;
                 case eventResourceParam:
-                    result.m_resourceId = field.toInt();
+                    result.m_resourceId = toInt(field);
                     break;
                 case actionResourceParam:
-                    result.m_actionResourceId = field.toInt();
+                    result.m_actionResourceId = toInt(field);
                     break;
 
                 // event specific params.
@@ -142,7 +170,7 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
                     break;
 
                 case reasonCodeParam:
-                    result.m_reasonCode = (QnBusiness::EventReason) field.toInt();
+                    result.m_reasonCode = (QnBusiness::EventReason) toInt(field);
                     break;
                 case reasonTextParam:
                     result.m_reasonText = QString::fromUtf8(field);

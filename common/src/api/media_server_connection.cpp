@@ -19,6 +19,7 @@
 
 #include <api/serializer/serializer.h>
 #include "serializer/pb_serializer.h"
+#include "event_log/events_serializer.h"
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject, 
@@ -363,7 +364,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         QnApiPbSerializer serializer;
         QnLightBusinessActionVector events;
         if (response.status == 0)
-            serializer.deserializeBusinessActionVector(events, response.data);
+            QnEventSerializer::deserialize(events, response.data);
         emitFinished(response.status, events, handle);
 		break;
     }
