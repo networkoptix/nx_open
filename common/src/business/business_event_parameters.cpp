@@ -132,15 +132,16 @@ QByteArray QnBusinessEventParameters::serialize() const
 
     static QnBusinessEventParameters m_defaultParams;
 
-    QByteArray tmp;
-    tmp = m_params[0].toString().toAscii();
     for (int i = 0; i < m_params.size(); ++i) {
-        tmp += DELIMITER;
-        tmp += m_params[i].toString().toAscii();
         if (m_params[i] != m_defaultParams[i])
-            result = tmp;
+            result += m_params[i].toString().toAscii();
+        result += DELIMITER;
     }
-    return result;
+
+    int resLen = result.size();
+    for (; resLen > 0 && result.data()[resLen-1] == DELIMITER; --resLen);
+
+    return result.left(resLen);
 }
 
 QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
