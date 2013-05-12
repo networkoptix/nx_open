@@ -12,6 +12,7 @@
 
 namespace BusinessActionType
 {
+
     enum Value
     {
         CameraRecording,    // start camera recording
@@ -143,8 +144,8 @@ public:
     BusinessActionType::Value actionType() const { return m_actionType; }
     void setActionType(BusinessActionType::Value type) { m_actionType = type; }
 
-    void setParams(const QnBusinessActionParameters& params) { m_params = params;}
-    const QnBusinessActionParameters& getParams() const { return m_params; }
+    //void setParams(const QnBusinessActionParameters& params) { m_params = params;}
+    //const QnBusinessActionParameters& getParams() const { return m_params; }
 
     void setRuntimeParams(const QnBusinessEventParameters& params) {m_runtimeParams = params;}
     const QnBusinessEventParameters& getRuntimeParams() const {return m_runtimeParams; }
@@ -156,7 +157,7 @@ public:
     int getAggregationCount() const { return m_aggregationCount; }
 protected:
     BusinessActionType::Value m_actionType;
-    QnBusinessActionParameters m_params;
+    //QnBusinessActionParameters m_params;
     QnBusinessEventParameters m_runtimeParams;
     QnId m_businessRuleId; 
     int m_aggregationCount;

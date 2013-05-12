@@ -1320,7 +1320,7 @@ void parseBusinessActionVector(QnLightBusinessActionVector& businessActionVector
         const pb::BusinessAction& pb_businessAction = pb_businessActionList.businessaction(i);
 
         QnLightBusinessAction& businessAction = businessActionVector[i];
-        businessAction.setActionType(parsePbBusinessActionType(pb_businessAction.actiontype()));
+        businessAction.setActionType((BusinessActionType::Value) pb_businessAction.actiontype());
         if (pb_businessAction.has_runtimeparams()) 
             businessAction.setRuntimeParams(QnBusinessEventParameters::deserialize(pb_businessAction.runtimeparams().c_str()));
 
@@ -1329,7 +1329,7 @@ void parseBusinessActionVector(QnLightBusinessActionVector& businessActionVector
         //    resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
         //businessAction.setResources(resources);
 
-        businessAction.setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
+        //businessAction.setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
         businessAction.setBusinessRuleId(pb_businessAction.businessruleid());
         //businessAction.setToggleState((ToggleState::Value) pb_businessAction.togglestate());
         businessAction.setAggregationCount(pb_businessAction.aggregationcount());

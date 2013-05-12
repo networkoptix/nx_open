@@ -2,6 +2,7 @@
 #define BUSINESS_EVENT_PARAMETERS_H
 
 #include <business/business_logic_common.h>
+#include "utils/common/qnid.h"
 
 class QnBusinessEventParameters
 {
@@ -65,15 +66,25 @@ public:
     QnBusinessParams toBusinessParams() const;
     static QnBusinessEventParameters fromBusinessParams(const QnBusinessParams& bParams);
 
-    QVariant& operator[](int index);
-    const QVariant& operator[](int index) const;
+    //QVariant& operator[](int index);
+    //const QVariant& operator[](int index) const;
+    bool operator==(const QnBusinessEventParameters& other) const;
 
     QString getParamsKey() const;
 
 private:
     static int getParamIndex(const QString& key);
 private:
-    QVector<QVariant> m_params;
+    BusinessEventType::Value m_eventType;
+    qint64 m_timestamp;
+    QnId m_resourceId;
+    QnId m_actionResourceId;
+
+    QString m_inputPort;
+    QnBusiness::EventReason m_reasonCode;
+    QString m_reasonText;
+    QString m_source;
+    QStringList m_conflicts;
 };
 
 #endif // BUSINESS_EVENT_PARAMETERS_H

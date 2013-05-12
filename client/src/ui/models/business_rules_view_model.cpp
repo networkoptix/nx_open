@@ -393,14 +393,17 @@ QnBusinessEventParameters QnBusinessRuleViewModel::eventParams() const {
 
 void QnBusinessRuleViewModel::setEventParams(const QnBusinessEventParameters &params)
 {
+    bool hasChanges = !(m_eventParams == params);
+    /*
     bool hasChanges = false;
     for (int i = 0; i < (int) params.CountParam; ++i)
     {
-        if (m_eventParams[i] == params[i])
-            continue;
+        //if (m_eventParams[i] == params[i])
+        //    continue;
         m_eventParams[i] = params[i];
         hasChanges = true;
     }
+    */
 
     if (!hasChanges)
         return;

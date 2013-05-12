@@ -21,85 +21,85 @@ static QLatin1String PARAM_NAMES[] =
 
 static const char DELIMITER('$');
 
-QnBusinessEventParameters::QnBusinessEventParameters()
+QnBusinessEventParameters::QnBusinessEventParameters():
+    m_eventType(BusinessEventType::NotDefined),
+    m_timestamp(0),
+    m_reasonCode(QnBusiness::NoReason)
 {
-    m_params.resize(int (CountParam));
 
-    m_params[eventTypeParam] = (int) BusinessEventType::NotDefined;
 }
 
 BusinessEventType::Value QnBusinessEventParameters::getEventType()  const {
-    return  (BusinessEventType::Value) m_params[eventTypeParam].toInt();
+    return  m_eventType;
 }
 
 void QnBusinessEventParameters::setEventType(BusinessEventType::Value value) {
-    m_params[eventTypeParam] = (int) value;
+    m_eventType = value;
 }
 
 qint64 QnBusinessEventParameters::getEventTimestamp()  const {
-    return m_params[eventTimestampParam].toLongLong();
+    return m_timestamp;
 }
 
 void QnBusinessEventParameters::setEventTimestamp(qint64 value) {
-    m_params[eventTimestampParam] = value;
+    m_timestamp = value;
 }
 
 int QnBusinessEventParameters::getEventResourceId() const {
-    return m_params[eventResourceParam].toInt();
+    return m_resourceId;
 }
 
 void QnBusinessEventParameters::setEventResourceId(int value) {
-    m_params[eventResourceParam] = value;
+    m_resourceId = value;
 }
 
 int QnBusinessEventParameters::getActionResourceId() const {
-    return m_params[actionResourceParam].toInt();
+    return m_actionResourceId;
 }
 
 void QnBusinessEventParameters::setActionResourceId(int value) {
-    m_params[actionResourceParam] = value;
+    m_actionResourceId = value;
 }
-
 
 
 QnBusiness::EventReason QnBusinessEventParameters::getReasonCode() const{
-    return (QnBusiness::EventReason) m_params[reasonCodeParam].toInt();
+    return (QnBusiness::EventReason) m_reasonCode;
 }
 
 void QnBusinessEventParameters::setReasonCode(QnBusiness::EventReason value) {
-    m_params[reasonCodeParam] = (int) value;
+    m_reasonCode =  value;
 }
 
 QString QnBusinessEventParameters::getReasonText() const {
-    return m_params[reasonTextParam].toString();
+    return m_reasonText;
 }
 
 void QnBusinessEventParameters::setReasonText(const QString& value) {
-    m_params[reasonTextParam] = value;
+    m_reasonText = value;
 }
 
 QString QnBusinessEventParameters::getSource() const {
-    return m_params[sourceParam].toString();
+    return m_source;
 }
 
 void QnBusinessEventParameters::setSource(QString value) {
-    m_params[sourceParam] = value;
+    m_source = value;
 }
 
 QStringList QnBusinessEventParameters::getConflicts() const {
-    return m_params[conflictsParam].value<QStringList>();
+    return m_conflicts;
 }
 
 void QnBusinessEventParameters::setConflicts(QStringList value) {
-    m_params[conflictsParam] = QVariant::fromValue(value);
+    m_conflicts = value;
 }
 
 QString QnBusinessEventParameters::getInputPortId() const {
-    return m_params[inputPortIdParam].toString();
+    return m_inputPort;
 }
 
 void QnBusinessEventParameters::setInputPortId(const QString &value) {
-    m_params[inputPortIdParam] = value;
+    m_inputPort = value;
 }
 
 
@@ -119,11 +119,76 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
             nextPos = value.size();
 
         QByteArray field(value.data() + prevPos + 1, nextPos - prevPos - 1);
-        result.m_params[i++] = QVariant(field);
+        if (!field.isEmpty())
+        {
+            switch ((Params) i)
+            {
+                case eventTypeParam:
+                    result.m_eventType = (BusinessEventType::Value) field.toInt();
+                    break;
+                case eventTimestampParam:
+                    result.m_timestamp = field.toLongLong();
+                    break;
+                case eventResourceParam:
+                    result.m_resourceId = field.toInt();
+                    break;
+                case actionResourceParam:
+                    result.m_actionResourceId = field.toInt();
+                    break;
+
+                // event specific params.
+                case inputPortIdParam:
+                    result.m_inputPort = QString::fromUtf8(field);
+                    break;
+
+                case reasonCodeParam:
+                    result.m_reasonCode = (QnBusiness::EventReason) field.toInt();
+                    break;
+                case reasonTextParam:
+                    result.m_reasonText = QString::fromUtf8(field);
+                    break;
+
+                case sourceParam:
+                    result.m_source = QString::fromUtf8(field);
+                    break;
+                case conflictsParam:
+                    result.m_conflicts = QString::fromUtf8(field).split(L'\n');
+                    break;
+            }
+        }
+
+        //result.m_params[i++] = QVariant(field);
+        ++i;
         prevPos = nextPos;
     }
 
     return result;
+}
+
+void serializeIntParam(QByteArray& result, qint64 value, qint64 defaultValue)
+{
+    if (value != defaultValue)
+        result += QByteArray::number(value);
+    result += DELIMITER;
+}
+
+void serializeStringParam(QByteArray& result, const QString& value, const QString& defaultValue)
+{
+    if (value != defaultValue)
+        result += value.toUtf8();
+    result += DELIMITER;
+}
+
+void serializeStringListParam(QByteArray& result, const QStringList& value)
+{
+    if (!value.isEmpty()) {
+        for (int i = 0; i < value.size(); ++i) {
+            if (i > 0)
+                result += '\n';
+            result += value[i];
+        }
+    }
+    result += DELIMITER;
 }
 
 QByteArray QnBusinessEventParameters::serialize() const
@@ -132,11 +197,24 @@ QByteArray QnBusinessEventParameters::serialize() const
 
     static QnBusinessEventParameters m_defaultParams;
 
-    for (int i = 0; i < m_params.size(); ++i) {
+    serializeIntParam(result, m_eventType, m_defaultParams.m_eventType);
+    serializeIntParam(result, m_timestamp, m_defaultParams.m_timestamp);
+    serializeIntParam(result, m_resourceId, m_defaultParams.m_resourceId);
+    serializeIntParam(result, m_actionResourceId, m_defaultParams.m_actionResourceId);
+    serializeStringParam(result, m_inputPort, m_defaultParams.m_inputPort);
+    serializeIntParam(result, m_reasonCode, m_defaultParams.m_reasonCode);
+    serializeStringParam(result, m_reasonText, m_defaultParams.m_reasonText);
+    serializeStringParam(result, m_source, m_defaultParams.m_source);
+    serializeStringListParam(result, m_conflicts);
+
+    /*
+    for (int i = 0; i < m_params.size(); ++i) 
+    {
         if (m_params[i] != m_defaultParams[i])
             result += m_params[i].toString().toAscii();
         result += DELIMITER;
     }
+    */
 
     int resLen = result.size();
     for (; resLen > 0 && result.data()[resLen-1] == DELIMITER; --resLen);
@@ -146,14 +224,43 @@ QByteArray QnBusinessEventParameters::serialize() const
 
 QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
 {
-    QnBusinessEventParameters empty;
-
+    static QnBusinessEventParameters m_defaultParams;
     QnBusinessParams result;
+
+    if (m_eventType != m_defaultParams.m_eventType)
+        result.insert(PARAM_NAMES[eventTypeParam], m_eventType);
+
+    if (m_timestamp != m_defaultParams.m_timestamp)
+        result.insert(PARAM_NAMES[eventTimestampParam], m_timestamp);
+
+    if (m_resourceId != m_defaultParams.m_resourceId)
+        result.insert(PARAM_NAMES[eventResourceParam], m_resourceId.toInt());
+
+    if (m_actionResourceId != m_defaultParams.m_actionResourceId)
+        result.insert(PARAM_NAMES[actionResourceParam], m_actionResourceId.toInt());
+
+    if (m_inputPort != m_defaultParams.m_inputPort)
+        result.insert(PARAM_NAMES[inputPortIdParam], m_inputPort);
+
+    if (m_reasonCode != m_defaultParams.m_reasonCode)
+        result.insert(PARAM_NAMES[reasonCodeParam], m_reasonCode);
+
+    if (m_reasonText != m_defaultParams.m_reasonText)
+        result.insert(PARAM_NAMES[reasonTextParam], m_reasonText);
+
+    if (m_source != m_defaultParams.m_source)
+        result.insert(PARAM_NAMES[sourceParam], m_source);
+
+    if (m_conflicts != m_defaultParams.m_conflicts)
+        result.insert(PARAM_NAMES[conflictsParam], m_conflicts);
+
+    /*
     for (int i = 0; i < (int) CountParam; ++i)
     {
         if (m_params[i] != empty.m_params[i])
             result.insert(PARAM_NAMES[i], m_params[i]);
     }
+    */
 
     return result;
 }
@@ -176,13 +283,75 @@ QnBusinessEventParameters QnBusinessEventParameters::fromBusinessParams(const Qn
     for (QnBusinessParams::const_iterator itr = bParams.begin(); itr != bParams.end(); ++itr)
     {
         int paramIndex = getParamIndex(itr.key());
-        if (paramIndex >= 0)
-            result.m_params[paramIndex] = itr.value();
+        if (paramIndex >= 0) {
+            //result.m_params[paramIndex] = itr.value();
+            switch (Params( paramIndex))
+            {
+            case eventTypeParam:
+                result.m_eventType = (BusinessEventType::Value) itr.value().toInt();
+                break;
+            case eventTimestampParam:
+                result.m_timestamp = itr.value().toLongLong();
+                break;
+            case eventResourceParam:
+                result.m_resourceId = itr.value().toInt();
+                break;
+            case actionResourceParam:
+                result.m_actionResourceId = itr.value().toInt();
+                break;
+
+                // event specific params.
+            case inputPortIdParam:
+                result.m_inputPort = itr.value().toString();
+                break;
+
+            case reasonCodeParam:
+                result.m_reasonCode = (QnBusiness::EventReason) itr.value().toInt();
+                break;
+            case reasonTextParam:
+                result.m_reasonText = itr.value().toString();
+                break;
+
+            case sourceParam:
+                result.m_source = itr.value().toString();
+                break;
+            case conflictsParam:
+                result.m_conflicts = itr.value().toStringList();
+                break;
+            }
+        }
     }
 
     return result;
 }
 
+bool QnBusinessEventParameters::operator==(const QnBusinessEventParameters& other) const
+{
+    if (m_eventType != other.m_eventType)
+        return false;
+    if (m_timestamp != other.m_timestamp)
+        return false;
+    if (m_resourceId != other.m_resourceId)
+        return false;
+    if (m_actionResourceId != other.m_actionResourceId)
+        return false;
+
+    if (m_inputPort != other.m_inputPort)
+        return false;
+
+    if (m_reasonCode != other.m_reasonCode)
+        return false;
+    if (m_reasonText != other.m_reasonText)
+        return false;
+    if (m_source != other.m_source)
+        return false;
+    if (m_conflicts != other.m_conflicts)
+        return false;
+
+    return true;
+}
+
+/*
 QVariant& QnBusinessEventParameters::operator[](int index)
 {
     return m_params[index];
@@ -192,6 +361,7 @@ const QVariant& QnBusinessEventParameters::operator[](int index) const
 {
     return m_params[index];
 }
+*/
 
 QString QnBusinessEventParameters::getParamsKey() const
 {
@@ -202,12 +372,12 @@ QString QnBusinessEventParameters::getParamsKey() const
         case BusinessEventType::MediaServer_Failure:
         case BusinessEventType::Network_Issue:
         case BusinessEventType::Storage_Failure:
-            paramKey += QLatin1String("_") + m_params[reasonCodeParam].toString();
+            paramKey += QLatin1String("_") + QString::number(getReasonCode());
             if (getReasonCode() == QnBusiness::StorageIssueIoError || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpeed)
                 paramKey += QLatin1String("_") + getReasonText();
             break;
         case BusinessEventType::Camera_Input:
-            paramKey += QLatin1String("_") + m_params[inputPortIdParam].toString();
+            paramKey += QLatin1String("_") + getInputPortId();
             break;
     }
 
