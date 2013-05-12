@@ -155,6 +155,8 @@ public:
 
     void setAggregationCount(int value) { m_aggregationCount = value; }
     int getAggregationCount() const { return m_aggregationCount; }
+
+    qint64 timestamp() const { return m_runtimeParams.getEventTimestamp(); }
 protected:
     BusinessActionType::Value m_actionType;
     //QnBusinessActionParameters m_params;
@@ -164,12 +166,13 @@ protected:
 };
 
 typedef std::vector<QnLightBusinessAction> QnLightBusinessActionVector;
+typedef QSharedPointer<QnLightBusinessActionVector> QnLightBusinessActionVectorPtr;
 
 
 Q_DECLARE_METATYPE(BusinessActionType::Value)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionList)
-Q_DECLARE_METATYPE(QnLightBusinessActionVector)
+Q_DECLARE_METATYPE(QnLightBusinessActionVectorPtr)
 
 
 #endif // __ABSTRACT_BUSINESS_ACTION_H_

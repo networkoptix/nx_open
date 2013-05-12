@@ -26,9 +26,9 @@ public:
     QnEventLogModel(QObject *parent = NULL);
     virtual ~QnEventLogModel();
 
-    const QnLightBusinessActionVector &events() const;
-    void setEvents(const QnLightBusinessActionVector &events);
-    void addEvents(const QnLightBusinessActionVector &events);
+    const QnLightBusinessActionVectorPtr &events() const;
+    void setEvents(const QnLightBusinessActionVectorPtr &events);
+    void addEvents(const QnLightBusinessActionVectorPtr &events);
 
     QList<Column> columns() const;
     void setColumns(const QList<Column> &columns);
@@ -49,7 +49,7 @@ private:
     QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action) const;
 private:
     QList<Column> m_columns;
-    QnLightBusinessActionVector m_events;
+    QnLightBusinessActionVectorPtr m_events;
     QBrush m_linkBrush;
     QFont m_linkFont;
 };

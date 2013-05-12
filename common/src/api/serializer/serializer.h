@@ -71,7 +71,7 @@ public:
     virtual void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) = 0;
     virtual void deserializeBusinessRules(QnBusinessEventRules&, const QByteArray& data) = 0;
     virtual void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) = 0;
-    virtual void deserializeBusinessActionVector(QnLightBusinessActionVector& businessActionList, const QByteArray& data) = 0;
+    virtual void deserializeBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionList, const QByteArray& data) = 0;
     virtual void deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data) = 0;
     virtual void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data) = 0;
 

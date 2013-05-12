@@ -43,7 +43,7 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
-void parseBusinessActionVector(QnLightBusinessActionVector& businessActionList, const pb::BusinessActionList& pb_businessActionList);
+void parseBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionList, const pb::BusinessActionList& pb_businessActionList);
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
@@ -825,7 +825,7 @@ void QnApiPbSerializer::deserializeBusinessAction(QnAbstractBusinessActionPtr& b
     parseBusinessAction(businessAction, pb_businessAction);
 }
 
-void QnApiPbSerializer::deserializeBusinessActionVector(QnLightBusinessActionVector& businessActionList, const QByteArray& data)
+void QnApiPbSerializer::deserializeBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionList, const QByteArray& data)
 {
     QTime t;
     t.restart();
@@ -1312,8 +1312,10 @@ void parseBusinessActionList(QnAbstractBusinessActionList& businessActionList, c
     }
 }
 
-void parseBusinessActionVector(QnLightBusinessActionVector& businessActionVector, const pb::BusinessActionList& pb_businessActionList)
+void parseBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionVectorPtr, const pb::BusinessActionList& pb_businessActionList)
 {
+    QnLightBusinessActionVector& businessActionVector = *(businessActionVectorPtr.data());
+
     businessActionVector.resize(pb_businessActionList.businessaction_size());
     for (int i = 0; i < pb_businessActionList.businessaction_size(); ++i)
     {

@@ -23,7 +23,7 @@ public:
     void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) override;
     void deserializeBusinessRules(QnBusinessEventRules& businessRules, const QByteArray& data) override;
     void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) override;
-    void deserializeBusinessActionVector(QnLightBusinessActionVector &businessActionList, const QByteArray& data) override;
+    void deserializeBusinessActionVector(QnLightBusinessActionVectorPtr &businessActionList, const QByteArray& data) override;
     void deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data);
     void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data);
 

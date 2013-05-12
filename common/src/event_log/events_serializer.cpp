@@ -7,10 +7,12 @@ inline int readInt(quint8* &curPtr)
     return val;
 }
 
-void QnEventSerializer::deserialize(QnLightBusinessActionVector& events, const QByteArray& data)
+void QnEventSerializer::deserialize(QnLightBusinessActionVectorPtr& eventsPtr, const QByteArray& data)
 {
     QTime t;
     t.restart();
+
+    QnLightBusinessActionVector& events = *(eventsPtr.data());
 
     if (data.size() < 4)
         return;

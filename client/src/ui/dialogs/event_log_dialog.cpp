@@ -102,13 +102,13 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                 eventType,
                 actionType,
                 businessRuleId, 
-                this, SLOT(at_gotEvents(int, const QnLightBusinessActionVector&, int)));
+                this, SLOT(at_gotEvents(int, const QnLightBusinessActionVectorPtr&, int)));
         }
     }
 
 }
 
-void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionVector& events, int requestNum)
+void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum)
 {
     if (!m_requests.contains(requestNum))
         return;

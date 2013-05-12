@@ -15,6 +15,7 @@ QnEventLogModel::QnEventLogModel(QObject *parent):
     base_type(parent),
     m_linkBrush(QPalette().link())
 {
+    m_events = QnLightBusinessActionVectorPtr(new QnLightBusinessActionVector());
     m_linkFont.setUnderline(true);
     rebuild();
 }
@@ -23,18 +24,57 @@ QnEventLogModel::~QnEventLogModel() {
     return;
 }
 
-const QnLightBusinessActionVector &QnEventLogModel::events() const {
+const QnLightBusinessActionVectorPtr &QnEventLogModel::events() const {
     return m_events;
 }
 
-void QnEventLogModel::setEvents(const QnLightBusinessActionVector& events) {
+void QnEventLogModel::setEvents(const QnLightBusinessActionVectorPtr& events) {
     m_events = events;
     rebuild();
 }
 
-void QnEventLogModel::addEvents(const QnLightBusinessActionVector &events) {
-    //m_events += events;
-    m_events = events;
+void QnEventLogModel::addEvents(const QnLightBusinessActionVectorPtr &events2)
+{
+    if (events2 == 0 || events2->empty()) {
+        return;
+    }
+    else if (m_events == 0 || m_events->empty())
+    {
+        m_events = events2;
+        return;
+    }
+
+    // merge
+
+    QnLightBusinessActionVectorPtr events1 = m_events;
+    m_events = QnLightBusinessActionVectorPtr(new QnLightBusinessActionVector);
+    m_events->resize(events1->size() + events2->size());
+    
+    int idx1 = 0, idx2 = 0;
+
+    QnLightBusinessActionVector& v1  = *events1.data();
+    QnLightBusinessAction* ptr1 = &v1[0];
+
+    QnLightBusinessActionVector& v2  = *events2.data();
+    QnLightBusinessAction* ptr2 = &v2[0];
+
+    QnLightBusinessActionVector& vDst = *m_events.data();
+    QnLightBusinessAction* dst  = &vDst[0];
+
+
+    while (idx1 < events1->size() && idx2 < events2->size())
+    {
+        if (ptr1[idx1].timestamp() <= ptr2[idx2].timestamp())
+            *dst++ = ptr1[idx1++];
+        else
+            *dst++ = ptr2[idx2++];
+    }
+
+    while (idx1 < events1->size())
+        *dst++ = ptr1[idx1++];
+
+    while (idx2 < events2->size())
+        *dst++ = ptr2[idx2++];
 }
 
 QList<QnEventLogModel::Column> QnEventLogModel::columns() const {
@@ -194,7 +234,7 @@ QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAct
 QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
 {
     const Column& column = m_columns[index.column()];
-    const QnLightBusinessAction& action = m_events[index.row()];
+    const QnLightBusinessAction& action = m_events->at(index.row());
     
     switch(role)
     {
@@ -239,7 +279,7 @@ void QnEventLogModel::rebuild()
     for(int c = 0; c < m_columns.size(); c++)
         setHeaderData(c, Qt::Horizontal, columnTitle(m_columns[c]));
 
-    setRowCount(m_events.size());
+    setRowCount(m_events ? m_events->size() : 0);
     /*
     // Fill data.
     for(int r = 0; r < m_events.size(); r++) {

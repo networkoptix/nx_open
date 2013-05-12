@@ -6,7 +6,7 @@
 class QnEventSerializer
 {
 public:
-    static void deserialize(QnLightBusinessActionVector& events, const QByteArray& data);
+    static void deserialize(QnLightBusinessActionVectorPtr& events, const QByteArray& data);
 };
 
 #endif // __EVENTS_SERIALIZER_H__
