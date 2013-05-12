@@ -9,7 +9,7 @@
 class QnBusinessStringsHelper: QObject
 {
 public:
-    static QString eventReason(const QnAbstractBusinessAction* action);
+    static QString eventReason(const QnBusinessEventParameters& params);
     static QString longEventDescription(const QnAbstractBusinessAction* action, const QnBusinessAggregationInfo& aggregationInfo);
 
     static QString resourceUrl(const QnBusinessEventParameters &params);

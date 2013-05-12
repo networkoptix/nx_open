@@ -69,7 +69,8 @@ namespace BusinessActionType
 
 class QnAbstractBusinessAction;
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
-typedef QList<QnAbstractBusinessActionPtr> QnAbstractBusinessActionList;
+
+
 
 /*
 * Base class for business actions
@@ -78,6 +79,7 @@ typedef QList<QnAbstractBusinessActionPtr> QnAbstractBusinessActionList;
 class QnAbstractBusinessAction
 {
 protected:
+
     explicit QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams);
 
 public:
@@ -129,9 +131,44 @@ protected:
     int m_aggregationCount;
 };
 
+typedef QList<QnAbstractBusinessActionPtr> QnAbstractBusinessActionList;
+
+class QnLightBusinessAction
+{
+public:
+    QnLightBusinessAction(): m_actionType(BusinessActionType::NotDefined) {}
+
+    virtual ~QnLightBusinessAction() {}
+    
+    BusinessActionType::Value actionType() const { return m_actionType; }
+    void setActionType(BusinessActionType::Value type) { m_actionType = type; }
+
+    void setParams(const QnBusinessActionParameters& params) { m_params = params;}
+    const QnBusinessActionParameters& getParams() const { return m_params; }
+
+    void setRuntimeParams(const QnBusinessEventParameters& params) {m_runtimeParams = params;}
+    const QnBusinessEventParameters& getRuntimeParams() const {return m_runtimeParams; }
+
+    void setBusinessRuleId(const QnId& value) {m_businessRuleId = value; }
+    QnId getBusinessRuleId() const { return m_businessRuleId; }
+
+    void setAggregationCount(int value) { m_aggregationCount = value; }
+    int getAggregationCount() const { return m_aggregationCount; }
+protected:
+    BusinessActionType::Value m_actionType;
+    QnBusinessActionParameters m_params;
+    QnBusinessEventParameters m_runtimeParams;
+    QnId m_businessRuleId; 
+    int m_aggregationCount;
+};
+
+typedef std::vector<QnLightBusinessAction> QnLightBusinessActionVector;
+
+
 Q_DECLARE_METATYPE(BusinessActionType::Value)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionList)
+Q_DECLARE_METATYPE(QnLightBusinessActionVector)
 
 
 #endif // __ABSTRACT_BUSINESS_ACTION_H_

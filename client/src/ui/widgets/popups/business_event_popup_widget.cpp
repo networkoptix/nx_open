@@ -272,7 +272,7 @@ QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnAbstractBusi
     QStandardItem *item = findOrCreateItem(businessAction->getRuntimeParams());
     if (item) {
         item->removeRows(0, item->rowCount()); //TODO: #GDM fix removing rows
-        QString reason = QnBusinessStringsHelper::eventReason(businessAction.data());
+        QString reason = QnBusinessStringsHelper::eventReason(businessAction.data()->getRuntimeParams());
         if (!reason.isEmpty())
             item->appendRow(new QStandardItem(reason));
     }

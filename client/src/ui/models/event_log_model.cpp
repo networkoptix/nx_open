@@ -23,21 +23,18 @@ QnEventLogModel::~QnEventLogModel() {
     return;
 }
 
-const QnAbstractBusinessActionList &QnEventLogModel::events() const {
+const QnLightBusinessActionVector &QnEventLogModel::events() const {
     return m_events;
 }
 
-void QnEventLogModel::setEvents(const QnAbstractBusinessActionList &events) {
-    if(m_events == events)
-        return;
-
+void QnEventLogModel::setEvents(const QnLightBusinessActionVector& events) {
     m_events = events;
-
     rebuild();
 }
 
-void QnEventLogModel::addEvents(const QnAbstractBusinessActionList &events) {
-    m_events += events;
+void QnEventLogModel::addEvents(const QnLightBusinessActionVector &events) {
+    //m_events += events;
+    m_events = events;
 }
 
 QList<QnEventLogModel::Column> QnEventLogModel::columns() const {
@@ -80,10 +77,10 @@ void QnEventLogModel::clear()
     QStandardItemModel::clear();
 }
 
-QVariant QnEventLogModel::fontData(const Column& column, const QnAbstractBusinessActionPtr &action) const
+QVariant QnEventLogModel::fontData(const Column& column, const QnLightBusinessAction &action) const
 {
     if (column == DescriptionColumn) {
-        BusinessEventType::Value eventType = action->getRuntimeParams().getEventType();
+        BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
         if (eventType == BusinessEventType::Camera_Motion)
             return m_linkFont;
     }
@@ -91,10 +88,10 @@ QVariant QnEventLogModel::fontData(const Column& column, const QnAbstractBusines
     return QVariant();
 }
 
-QVariant QnEventLogModel::foregroundData(const Column& column, const QnAbstractBusinessActionPtr &action) const
+QVariant QnEventLogModel::foregroundData(const Column& column, const QnLightBusinessAction &action) const
 {
     if (column == DescriptionColumn) {
-        BusinessEventType::Value eventType = action->getRuntimeParams().getEventType();
+        BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
         if (eventType == BusinessEventType::Camera_Motion)
             return m_linkBrush;
     }
@@ -102,10 +99,10 @@ QVariant QnEventLogModel::foregroundData(const Column& column, const QnAbstractB
     return QVariant();
 }
 
-QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnAbstractBusinessActionPtr &action) const
+QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnLightBusinessAction &action) const
 {
     if (column == DescriptionColumn) {
-        BusinessEventType::Value eventType = action->getRuntimeParams().getEventType();
+        BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
         if (eventType == BusinessEventType::Camera_Motion)
             return Qt::PointingHandCursor;
     }
@@ -114,13 +111,13 @@ QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnAbstract
 }
 
 
-QVariant QnEventLogModel::iconData(const Column& column, const QnAbstractBusinessActionPtr &action) const
+QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAction &action) const
 {
 
     switch(column) {
         case EventCameraColumn: 
         {
-            QnId eventResId = action->getRuntimeParams().getEventResourceId();
+            QnId eventResId = action.getRuntimeParams().getEventResourceId();
             QnResourcePtr eventResource = qnResPool->getResourceById(eventResId);
             if (eventResource)
                 return qnResIconCache->icon(eventResource->flags(), eventResource->getStatus());
@@ -128,7 +125,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnAbstractBusines
         }
         case ActionCameraColumn: 
         {
-            QnId actionResId = action->getRuntimeParams().getActionResourceId();
+            QnId actionResId = action.getRuntimeParams().getActionResourceId();
             QnResourcePtr actionResource = qnResPool->getResourceById(actionResId);
             if (actionResource)
                 return qnResIconCache->icon(actionResource->flags(), actionResource->getStatus());
@@ -138,40 +135,40 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnAbstractBusines
     return QVariant();
 }
 
-QVariant QnEventLogModel::textData(const Column& column,const QnAbstractBusinessActionPtr &action) const
+QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAction& action) const
 {
     switch(column) 
     {
         case DateTimeColumn: {
-            qint64 timestampUsec = action->getRuntimeParams().getEventTimestamp();
+            qint64 timestampUsec = action.getRuntimeParams().getEventTimestamp();
             QDateTime dt = QDateTime::fromMSecsSinceEpoch(timestampUsec/1000);
             return dt.toString(Qt::SystemLocaleShortDate);
             break;
         }
         case EventColumn: {
-            BusinessEventType::Value eventType = action->getRuntimeParams().getEventType();
+            BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
             return BusinessEventType::toString(eventType);
             break;
         }
         case EventCameraColumn: {
-            QnId eventResId = action->getRuntimeParams().getEventResourceId();
+            QnId eventResId = action.getRuntimeParams().getEventResourceId();
             QnResourcePtr eventResource = qnResPool->getResourceById(eventResId);
             if (eventResource)
                 return eventResource->getName();
             break;
         }
         case ActionColumn:
-            return BusinessActionType::toString(action->actionType());
+            return BusinessActionType::toString(action.actionType());
             break;
         case ActionCameraColumn: {
-            QnId actionResId = action->getRuntimeParams().getActionResourceId();
+            QnId actionResId = action.getRuntimeParams().getActionResourceId();
             QnResourcePtr actionResource = qnResPool->getResourceById(actionResId);
             if (actionResource)
                 return actionResource->getName();
             break;
             }
         case DescriptionColumn: {
-            BusinessEventType::Value eventType = action->getRuntimeParams().getEventType();
+            BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
             switch (eventType) {
             case BusinessEventType::Camera_Disconnect:
             case BusinessEventType::Camera_Input:
@@ -182,11 +179,11 @@ QVariant QnEventLogModel::textData(const Column& column,const QnAbstractBusiness
             case BusinessEventType::Storage_Failure:
             case BusinessEventType::Network_Issue:
             case BusinessEventType::MediaServer_Failure:
-                return QnBusinessStringsHelper::eventReason(action.data());
+                return QnBusinessStringsHelper::eventReason(action.getRuntimeParams());
                 break;
             case BusinessEventType::Camera_Ip_Conflict:
             case BusinessEventType::MediaServer_Conflict:
-                return QnBusinessStringsHelper::conflictString(action->getRuntimeParams());
+                return QnBusinessStringsHelper::conflictString(action.getRuntimeParams());
                 break;
             }
         }
@@ -197,7 +194,7 @@ QVariant QnEventLogModel::textData(const Column& column,const QnAbstractBusiness
 QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
 {
     const Column& column = m_columns[index.column()];
-    const QnAbstractBusinessActionPtr &action = m_events[index.row()];
+    const QnLightBusinessAction& action = m_events[index.row()];
     
     switch(role)
     {
@@ -257,11 +254,13 @@ void QnEventLogModel::rebuild()
     qDebug() << Q_FUNC_INFO << "time=" << t.elapsed();
 }
 
-QnAbstractBusinessActionPtr QnEventLogModel::getEvent(const QModelIndex &index) const {
+/*
+QnLightBusinessAction QnEventLogModel::getEvent(const QModelIndex &index) const {
     bool ok = false;
     int r = index.sibling(index.row(), 0).data(Qt::UserRole).toInt(&ok);
     if(!ok || r < 0 || r >= m_events.size())
-        return QnAbstractBusinessActionPtr();
+        return QnLightBusinessActionPtr();
 
     return m_events[r];
 }
+*/

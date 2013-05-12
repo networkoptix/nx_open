@@ -92,9 +92,8 @@ QString QnBusinessStringsHelper::resourceName(const QnBusinessEventParameters &p
     return res ? res->getName() : QString();
 }
 
-QString QnBusinessStringsHelper::eventReason(const QnAbstractBusinessAction* action)
+QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& params)
 {
-    const QnBusinessEventParameters params = action->getRuntimeParams();
     QnBusiness::EventReason reasonCode = params.getReasonCode();
     BusinessEventType::Value eventType = params.getEventType();
     QString reasonText = params.getReasonText();

@@ -26,14 +26,14 @@ public:
     QnEventLogModel(QObject *parent = NULL);
     virtual ~QnEventLogModel();
 
-    const QnAbstractBusinessActionList &events() const;
-    void setEvents(const QnAbstractBusinessActionList &licenses);
-    void addEvents(const QnAbstractBusinessActionList &events);
+    const QnLightBusinessActionVector &events() const;
+    void setEvents(const QnLightBusinessActionVector &events);
+    void addEvents(const QnLightBusinessActionVector &events);
 
     QList<Column> columns() const;
     void setColumns(const QList<Column> &columns);
 
-    QnAbstractBusinessActionPtr getEvent(const QModelIndex &index) const;
+    //QnLightBusinessActionPtr getEvent(const QModelIndex &index) const;
     void rebuild();
     void clear();
 
@@ -42,14 +42,14 @@ private:
 
     static QString columnTitle(Column column);
     
-    QVariant textData(const Column& column,const QnAbstractBusinessActionPtr &action) const;
-    QVariant iconData(const Column& column, const QnAbstractBusinessActionPtr &action) const;
-    QVariant fontData(const Column& column, const QnAbstractBusinessActionPtr &action) const;
-    QVariant foregroundData(const Column& column, const QnAbstractBusinessActionPtr &action) const;
-    QVariant mouseCursorData(const Column& column, const QnAbstractBusinessActionPtr &action) const;
+    QVariant textData(const Column& column,const QnLightBusinessAction &action) const;
+    QVariant iconData(const Column& column, const QnLightBusinessAction &action) const;
+    QVariant fontData(const Column& column, const QnLightBusinessAction &action) const;
+    QVariant foregroundData(const Column& column, const QnLightBusinessAction &action) const;
+    QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action) const;
 private:
     QList<Column> m_columns;
-    QnAbstractBusinessActionList m_events;
+    QnLightBusinessActionVector m_events;
     QBrush m_linkBrush;
     QFont m_linkFont;
 };

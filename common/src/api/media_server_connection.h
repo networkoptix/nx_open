@@ -69,7 +69,7 @@ signals:
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
     void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
-    void finished(int status, const QnAbstractBusinessActionList &reply, int handle);
+    void finished(int status, const QnLightBusinessActionVector &reply, int handle);
 
 private:
     template<class T>
