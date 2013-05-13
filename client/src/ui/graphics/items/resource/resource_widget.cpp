@@ -531,14 +531,6 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
     return result;
 }
 
-QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const {
-    if(section & Qn::ResizeSections) {
-        return QnCursorCache::instance()->cursor(Qn::calculateHoverCursorShape(section), rotation(), 5.0);
-    } else {
-        return base_type::windowCursorAt(section);
-    }
-}
-
 int QnResourceWidget::helpTopicAt(const QPointF &) const {
     return -1;
 }

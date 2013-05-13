@@ -37,8 +37,8 @@ class ZoomOverlayWidget;
 // -------------------------------------------------------------------------- //
 // ZoomWindowWidget
 // -------------------------------------------------------------------------- //
-class ZoomWindowWidget: public QnClickableWidget, public ConstrainedGeometrically {
-    typedef QnClickableWidget base_type;
+class ZoomWindowWidget: public Instrumented<QnClickableWidget>, public ConstrainedGeometrically {
+    typedef Instrumented<QnClickableWidget> base_type;
 public:
     ZoomWindowWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags)
@@ -47,8 +47,8 @@ public:
 
         setAcceptedMouseButtons(Qt::LeftButton);
         setClickableButtons(Qt::LeftButton);
-        setHandlingFlag(ItemHandlesResizing, true);
-        setHandlingFlag(ItemHandlesMovement, true);
+        setHandlingFlag(ItemHandlesResizing, false);
+        setHandlingFlag(ItemHandlesMovement, false);
 
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
