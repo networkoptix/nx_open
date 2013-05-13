@@ -39,6 +39,9 @@ private slots:
     void onItemClicked(QListWidgetItem * item);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
+    QnLightBusinessActionVectorPtr mergeEvents(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
+    QnLightBusinessActionVectorPtr merge2(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
+    QnLightBusinessActionVectorPtr mergeN(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  
@@ -46,6 +49,8 @@ private:
     QnEventLogModel *m_model;
     QSet<int> m_requests;
     QnWorkbenchContext* m_context;
+
+    QList <QnLightBusinessActionVectorPtr> m_allEvents;
 };
 
 #endif // __EVENT_LOG_DIALOG_H____

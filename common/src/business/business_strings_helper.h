@@ -15,7 +15,7 @@ public:
     static QString resourceUrl(const QnBusinessEventParameters &params);
     static QString resourceName(const QnBusinessEventParameters &params);
 
-    static QString conflictString(const QnBusinessEventParameters &params);
+    static QString conflictString(const QnBusinessEventParameters &params, QLatin1Char delim = QLatin1Char('\n'));
     static QString motionUrl(const QnBusinessEventParameters &params);
 private:
     static QString eventTextString(BusinessEventType::Value eventType, const QnBusinessEventParameters &params);

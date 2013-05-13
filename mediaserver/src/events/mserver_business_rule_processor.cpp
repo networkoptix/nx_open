@@ -19,26 +19,30 @@ QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
 
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (QnBusinessRuleProcessor::executeActionInternal(action, res))
-        return true;
-
-    switch(action->actionType())
-    {
-    case BusinessActionType::Bookmark:
-        // TODO: implement me
-        break;
-    case BusinessActionType::CameraOutput:
-    case BusinessActionType::CameraOutputInstant:
-        return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
-        break;
-    case BusinessActionType::CameraRecording:
-        return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
-    case BusinessActionType::PanicRecording:
-        return executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
-    default:
-        break;
+    bool result = QnBusinessRuleProcessor::executeActionInternal(action, res);
+    if (!result) {
+        switch(action->actionType())
+        {
+        case BusinessActionType::Bookmark:
+            // TODO: implement me
+            break;
+        case BusinessActionType::CameraOutput:
+        case BusinessActionType::CameraOutputInstant:
+            return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
+            break;
+        case BusinessActionType::CameraRecording:
+            return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
+        case BusinessActionType::PanicRecording:
+            return executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
+        default:
+            break;
+        }
     }
-    return false;
+    
+    if (result)
+        QnEventsDB::instance()->saveActionToDB(action, res);
+
+    return result;
 }
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)

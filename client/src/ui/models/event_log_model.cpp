@@ -33,6 +33,7 @@ void QnEventLogModel::setEvents(const QnLightBusinessActionVectorPtr& events) {
     rebuild();
 }
 
+/*
 void QnEventLogModel::addEvents(const QnLightBusinessActionVectorPtr &events2)
 {
     if (events2 == 0 || events2->empty()) {
@@ -76,6 +77,7 @@ void QnEventLogModel::addEvents(const QnLightBusinessActionVectorPtr &events2)
     while (idx2 < events2->size())
         *dst++ = ptr2[idx2++];
 }
+*/
 
 QList<QnEventLogModel::Column> QnEventLogModel::columns() const {
     return m_columns;
@@ -223,7 +225,7 @@ QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAct
                 break;
             case BusinessEventType::Camera_Ip_Conflict:
             case BusinessEventType::MediaServer_Conflict:
-                return QnBusinessStringsHelper::conflictString(action.getRuntimeParams());
+                return QnBusinessStringsHelper::conflictString(action.getRuntimeParams(), QLatin1Char(' '));
                 break;
             }
         }

@@ -20,6 +20,7 @@ public:
         ActionColumn,
         ActionCameraColumn,
         DescriptionColumn,
+        
         ColumnCount
     };
 
@@ -28,7 +29,7 @@ public:
 
     const QnLightBusinessActionVectorPtr &events() const;
     void setEvents(const QnLightBusinessActionVectorPtr &events);
-    void addEvents(const QnLightBusinessActionVectorPtr &events);
+    //void addEvents(const QnLightBusinessActionVectorPtr &events);
 
     QList<Column> columns() const;
     void setColumns(const QList<Column> &columns);

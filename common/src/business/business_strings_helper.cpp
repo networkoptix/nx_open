@@ -242,16 +242,17 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     return result;
 }
 
-QString QnBusinessStringsHelper::conflictString(const QnBusinessEventParameters &params)
+QString QnBusinessStringsHelper::conflictString(const QnBusinessEventParameters &params, QLatin1Char delim)
 {
     QString source = params.getSource();
     QStringList conflicts = params.getConflicts();
 
     QString result = source;
     result += QObject::tr("conflicted with:");
-    result += QLatin1Char('\n');
-    foreach(const QString& entity, conflicts)
-        result += entity + QLatin1Char('\n');
+    foreach(const QString& entity, conflicts) {
+        result += delim;
+        result += entity;
+    }
     return result;
 }
 

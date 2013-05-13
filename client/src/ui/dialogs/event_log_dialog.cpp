@@ -67,6 +67,9 @@ void QnEventLogDialog::updateData()
           eventType, actionType,
           QnId() // todo: add businessRuleID here
           );
+
+    ui->gridEvents->setDisabled(true);
+    ui->groupBox->setCursor(Qt::WaitCursor);
 }
 
 QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
@@ -88,8 +91,9 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                              BusinessActionType::Value actionType,
                              QnId businessRuleId)
 {
-    m_model->clear();
     m_requests.clear();
+    m_allEvents.clear();
+    
 
     QList<QnMediaServerResourcePtr> mediaServerList = getServerList();
     foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
@@ -108,14 +112,41 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 
 }
 
+QnLightBusinessActionVectorPtr QnEventLogDialog::merge2(const QList <QnLightBusinessActionVectorPtr>& eventsList) const
+{
+    return QnLightBusinessActionVectorPtr();
+}
+
+QnLightBusinessActionVectorPtr QnEventLogDialog::mergeN(const QList <QnLightBusinessActionVectorPtr>& eventsList) const
+{
+    return QnLightBusinessActionVectorPtr();
+}
+
+QnLightBusinessActionVectorPtr QnEventLogDialog::mergeEvents(const QList <QnLightBusinessActionVectorPtr>& eventsList) const
+{
+    if (eventsList.empty())
+        return QnLightBusinessActionVectorPtr();
+    else if (eventsList.size() == 1)
+        return eventsList[0];
+    else if (eventsList.size() == 2)
+        return merge2(eventsList);
+    else
+        return mergeN(eventsList);
+}
+
 void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum)
 {
     if (!m_requests.contains(requestNum))
         return;
     m_requests.remove(requestNum);
-    m_model->addEvents(events);
-    if (m_requests.isEmpty())
-        m_model->rebuild();
+    if (!events->empty())
+        m_allEvents << events;
+    if (m_requests.isEmpty()) {
+        m_model->setEvents(mergeEvents(m_allEvents));
+        m_allEvents.clear();
+        ui->gridEvents->setDisabled(false);
+        ui->groupBox->setCursor(Qt::ArrowCursor);
+    }
 }
 
 void QnEventLogDialog::onItemClicked(QListWidgetItem * item)
