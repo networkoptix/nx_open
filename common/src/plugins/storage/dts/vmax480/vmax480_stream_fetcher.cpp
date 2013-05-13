@@ -281,7 +281,7 @@ int sign(int value)
 void VMaxStreamFetcher::checkEOF(qint64 timestamp)
 {
     qint64 endTimeMs = m_playbackMaskHelper.endTimeMs();
-    if (!m_isLive && endTimeMs != AV_NOPTS_VALUE && timestamp > (endTimeMs - 60 * 1000) * 1000ll && m_lastSpeed >= 0)
+    if (!m_isLive && endTimeMs != (qint64)AV_NOPTS_VALUE && timestamp > (endTimeMs - 60 * 1000) * 1000ll && m_lastSpeed >= 0)
         m_eofReached = true;
 }
 
