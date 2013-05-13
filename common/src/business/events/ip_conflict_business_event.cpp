@@ -3,8 +3,8 @@
 QnIPConflictBusinessEvent::QnIPConflictBusinessEvent(
         const QnResourcePtr& resource, 
         const QHostAddress& address, 
-        const QList<QByteArray>& macAddrList,
+        const QStringList& macAddrList,
         qint64 timeStamp):
-        base_type(BusinessEventType::Camera_Ip_Conflict, resource, timeStamp, address.toString().toUtf8(), macAddrList)
+        base_type(BusinessEventType::Camera_Ip_Conflict, resource, timeStamp, address.toString(), macAddrList)
 {
 }

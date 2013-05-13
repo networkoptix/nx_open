@@ -48,11 +48,11 @@ public:
     QString getReasonText() const;
     void setReasonText(const QString& value);
 
-    QByteArray getSource() const;
-    void setSource(const QByteArray& value);
+    QString getSource() const;
+    void setSource(const QString& value);
 
-    QList<QByteArray> getConflicts() const;
-    void setConflicts(const QList<QByteArray>& value);
+    QStringList getConflicts() const;
+    void setConflicts(const QStringList& value);
 
     QString getInputPortId() const;
     void setInputPortId(const QString &value);
@@ -83,8 +83,8 @@ private:
     QString m_inputPort;
     QnBusiness::EventReason m_reasonCode;
     QString m_reasonText;
-    QByteArray m_source;
-    QList<QByteArray> m_conflicts;
+    QString m_source;
+    QStringList m_conflicts;
 };
 
 #endif // BUSINESS_EVENT_PARAMETERS_H
