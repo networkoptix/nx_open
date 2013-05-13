@@ -163,11 +163,20 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to YUV format
     m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
+
+    //adding stride to source data
+    //TODO: #ak it is possible to remove this copying and optimize loading by using ffmpeg to load picture files
+    const unsigned int requiredImgXStride = qPower2Ceil( (unsigned int)image.width()*4, X_STRIDE_FOR_SSE_CONVERT_UTILS );
+    quint8* alignedImgBuffer = (quint8*)qMallocAligned( requiredImgXStride*image.height(), X_STRIDE_FOR_SSE_CONVERT_UTILS );
+    //copying image data to aligned buffer
+    for( int y = 0; y < image.height(); ++y )
+        memcpy( alignedImgBuffer + requiredImgXStride*y, image.constScanLine(y), image.width()*image.depth()/8 );
+
 #ifdef USE_YUVA420
     m_imgAsFrame->reallocate( image.width(), image.height(), PIX_FMT_YUVA420P );
     bgra_to_yva12_sse2_intr(
-        image.bits(),
-        image.bytesPerLine(),
+        alignedImgBuffer,
+        requiredImgXStride,
         m_imgAsFrame->data[0],
         m_imgAsFrame->data[1],
         m_imgAsFrame->data[2],
@@ -181,8 +190,8 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 #else
     m_imgAsFrame->reallocate( image.width(), image.height(), PIX_FMT_YUV420P );
     bgra_to_yv12_sse2_intr(
-        image.bits(),
-        image.bytesPerLine(),
+        alignedImgBuffer,
+        requiredImgXStride,
         m_imgAsFrame->data[0],
         m_imgAsFrame->data[1],
         m_imgAsFrame->data[2],
@@ -192,6 +201,8 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
         image.height(),
         false );
 #endif
+
+    qFreeAligned( alignedImgBuffer );
 
     //image has to be uploaded before next paint
     m_imgUploaded = false;
@@ -222,7 +233,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
         //uploading image to opengl texture
         m_imgUploader->uploadDecodedPicture( m_imgAsFrame );
         m_imgUploaded = true;
-    }   
+    }
 
     painter->beginNativePainting();
 
@@ -234,7 +245,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     m_imgUploader->setOpacity( painter->opacity() );
     m_renderer->paint(
-        QRect(0, 0, 1, 1),
+        QRectF(0, 0, 1, 1),
         m_rect );
     painter->endNativePainting();
 #else

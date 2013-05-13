@@ -18,13 +18,9 @@ public:
 
 
     void storeImage(const QString &filePath, bool cropImageToMonitorAspectRatio = false);
-signals:
-    
 private slots:
     void at_imageConverted(const QString &filePath);
 
-public slots:
-    
 };
 
 #endif // APP_SERVER_IMAGE_CACHE_H

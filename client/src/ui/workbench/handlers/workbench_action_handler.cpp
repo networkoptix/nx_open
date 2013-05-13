@@ -3576,8 +3576,15 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
         layout->setBackgroundOpacity(0.7);
 
     if (shouldUpdateSize) {
-        int widthLimit = 64; //TODO: #GDM common source in globals?
-        int heightLimit = 64;   //TODO: #GDM use real placed items
+        QRect bounds;
+        QList<QnWorkbenchItem *> items = workbench()->currentLayout()->items().toList();
+        foreach(QnWorkbenchItem *item, items)
+            bounds = bounds.united(item->geometry());
+        if (bounds.isNull())
+            bounds = QRect(0, 0, 1, 1); // paranoya security check
+
+        int minWidth = bounds.width();
+        int minHeight = bounds.height();
 
         qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
         if (layout->cellAspectRatio() > 0) {
@@ -3591,11 +3598,20 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
         int w, h;
         qreal targetAspectRatio = aspectRatio / cellAspectRatio;
         if (targetAspectRatio >= 1.0) { // width is greater than height
-            w = widthLimit;
-            h = qRound((qreal)w / targetAspectRatio);
-        } else {
-            h = heightLimit;
+            h = minHeight;
             w = qRound((qreal)h * targetAspectRatio);
+            if (w > qnGlobals->layoutBackgroundMaxSize().width()) {
+                w = qnGlobals->layoutBackgroundMaxSize().width();
+                h = qRound((qreal)w / targetAspectRatio);
+            }
+
+        } else {
+            w = minWidth;
+            h = qRound((qreal)w / targetAspectRatio);
+            if (h > qnGlobals->layoutBackgroundMaxSize().height()) {
+                h = qnGlobals->layoutBackgroundMaxSize().height();
+                w = qRound((qreal)h * targetAspectRatio);
+            }
         }
         layout->setBackgroundSize(QSize(w, h));
     }

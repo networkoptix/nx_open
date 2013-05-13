@@ -89,6 +89,8 @@ public:
     int resultCode() const;
 
 public slots:
+    //!Overrides QnLongRunnable::pleaseStop
+    virtual void pleaseStop() override;
     //!Start transcoding
     /*!
         This method returns immediately. On transcoding end \a done signal is emmitted
@@ -99,7 +101,7 @@ public slots:
 
 signals:
     //!Emitted on transcoding finish (successfully or failed). For result see \a resultCode method
-    void done();
+    void done(const QString &destFilePath);
 
 protected:
     virtual void run() override;
@@ -123,6 +125,7 @@ private:
     unsigned int m_transcodeDurationLimit;
     unsigned int m_transcodedDataDuration;
     QString m_srcFilePath;
+    QString m_dstFilePath;
 
     /*!
         Takes ownership of \a src

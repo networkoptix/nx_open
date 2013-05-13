@@ -30,6 +30,16 @@ void QnCustomFileDialog::addCheckbox(const QString &text, bool *value, QnCheckbo
     }
 }
 
+void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxValue, int *value) {
+    QSpinBox* spinbox = new QSpinBox(this);
+    spinbox->setPrefix(text);
+    spinbox->setMinimum(minValue);
+    spinbox->setMaximum(maxValue);
+    spinbox->setValue(*value);
+    m_spinboxes.insert(spinbox, value);
+    addWidget(spinbox);
+}
+
 void QnCustomFileDialog::addWidget(QWidget *widget) {
     QGridLayout * gl = dynamic_cast<QGridLayout*>(layout());
     if (gl)
@@ -43,5 +53,9 @@ void QnCustomFileDialog::addWidget(QWidget *widget) {
 void QnCustomFileDialog::at_accepted() {
     foreach(QCheckBox* key, m_checkboxes.keys()) {
         *m_checkboxes[key] = key->isChecked();
+    }
+
+    foreach(QSpinBox* key, m_spinboxes.keys()) {
+        *m_spinboxes[key] = key->value();
     }
 }

@@ -1,25 +1,29 @@
 #include "business_rules_view_model.h"
 
+#include <QtCore/QFileInfo>
+
+#include <client/client_settings.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
 #include <business/business_action_parameters.h>
-
 #include <business/events/abstract_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
-
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/recording_business_action.h>
 
 #include <ui/common/resource_name.h>
+#include <ui/models/notification_sound_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <client/client_settings.h>
+#include <utils/app_server_notification_cache.h>
 #include <utils/common/email.h>
+#include <utils/media/audio_player.h>
 
 namespace {
 
@@ -69,6 +73,7 @@ namespace {
 
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     m_id(0),
     m_modified(false),
     m_eventType(BusinessEventType::Camera_Disconnect),
@@ -80,6 +85,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_eventStatesModel(new QStandardItemModel(this)),
     m_actionTypesModel(new QStandardItemModel(this))
 {
+
     for (int i = 0; i < BusinessEventType::Count; i++) {
         BusinessEventType::Value val = (BusinessEventType::Value)i;
 
@@ -164,6 +170,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                     return QnBusinessActionParameters::getEmailAddress(m_actionParams);
                 if (m_actionType == BusinessActionType::ShowPopup)
                     return (int)QnBusinessActionParameters::getUserGroup(m_actionParams);
+                if (m_actionType == BusinessActionType::PlaySound)
+                    return QnBusinessActionParameters::getSoundUrl(m_actionParams);
             }
             break;
 
@@ -234,7 +242,11 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
                 QnBusinessActionParameters::setUserGroup(&params, (QnBusinessActionParameters::UserGroup)value.toInt());
                 setActionParams(params);
             }
-            else
+            else if (m_actionType == BusinessActionType::PlaySound) {
+                QnBusinessParams params;
+                QnBusinessActionParameters::setSoundUrl(&params, value.toString());
+                setActionParams(params);
+            } else
                 setActionResources(value.value<QnResourceList>());
             return true;
         default:
@@ -633,6 +645,7 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                 } else {
                     return qnResIconCache->icon(QnResourceIconCache::Camera);
                 }
+                //TODO: #GDM special icon for sound action
             }
         default:
             break;
@@ -679,6 +692,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                     return any;
                 } else if (m_actionType == BusinessActionType::CameraRecording) {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
+                } else if (m_actionType == BusinessActionType::PlaySound) {
+                    return !QnBusinessActionParameters::getSoundUrl(m_actionParams).isEmpty();
                 }
 
                 QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>();
@@ -792,6 +807,10 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         if (cameras.size() == 1)
             return getResourceName(cameras.first());
         return tr("%n Camera(s)", "", cameras.size());
+    } else if (m_actionType == BusinessActionType::PlaySound) {
+        QString filename = QnBusinessActionParameters::getSoundUrl(m_actionParams);
+        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+        return soundModel->titleByFilename(filename);
     }
 
     QnResourceList resources = m_actionResources;
@@ -813,9 +832,9 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
 ////// ----------------- QnBusinessRulesViewModel ----------------------////////
 ////////////////////////////////////////////////////////////////////////////////
 
-QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent, QnWorkbenchContext *context) :
+QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent, context)
+    QnWorkbenchContextAware(parent)
 {
     m_fieldsByColumn[QnBusiness::ModifiedColumn] = QnBusiness::ModifiedField;
     m_fieldsByColumn[QnBusiness::DisabledColumn] = QnBusiness::DisabledField;
@@ -824,6 +843,12 @@ QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent, QnWorkbenchC
     m_fieldsByColumn[QnBusiness::SpacerColumn] = 0;
     m_fieldsByColumn[QnBusiness::ActionColumn] = QnBusiness::ActionTypeField;
     m_fieldsByColumn[QnBusiness::TargetColumn] = QnBusiness::ActionTypeField | QnBusiness::ActionParamsField | QnBusiness::ActionResourcesField;
+
+    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    connect(soundModel, SIGNAL(listLoaded()), this, SLOT(at_soundModel_listChanged()));
+    connect(soundModel, SIGNAL(listUnloaded()), this, SLOT(at_soundModel_listChanged()));
+    connect(soundModel, SIGNAL(itemChanged(QString)), this, SLOT(at_soundModel_itemChanged(QString)));
+    connect(soundModel, SIGNAL(itemRemoved(QString)), this, SLOT(at_soundModel_itemChanged(QString)));
 }
 
 QnBusinessRulesViewModel::~QnBusinessRulesViewModel() {
@@ -917,7 +942,8 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
                 BusinessActionType::Value actionType = m_rules[index.row()]->actionType();
                 if (BusinessActionType::requiresCameraResource(actionType)
                         || BusinessActionType::requiresUserResource(actionType)
-                        || actionType == BusinessActionType::ShowPopup)
+                        || actionType == BusinessActionType::ShowPopup
+                        || actionType == BusinessActionType::PlaySound)
                     flags |= Qt::ItemIsEditable;
             }
             break;
@@ -1014,4 +1040,24 @@ void QnBusinessRulesViewModel::at_rule_dataChanged(QnBusinessRuleViewModel *sour
 
     QModelIndex index = this->index(row, leftMostColumn, QModelIndex());
     emit dataChanged(index, index.sibling(index.row(), rightMostColumn));
+}
+
+void QnBusinessRulesViewModel::at_soundModel_listChanged() {
+    for (int i = 0; i < m_rules.size(); i++) {
+        if (m_rules[i]->actionType() != BusinessActionType::PlaySound)
+            continue;
+        QModelIndex index = this->index(i, QnBusiness::TargetColumn, QModelIndex());
+        emit dataChanged(index, index);
+    }
+}
+
+void QnBusinessRulesViewModel::at_soundModel_itemChanged(const QString &filename) {
+    for (int i = 0; i < m_rules.size(); i++) {
+        if (m_rules[i]->actionType() != BusinessActionType::PlaySound)
+            continue;
+        if (QnBusinessActionParameters::getSoundUrl(m_rules[i]->actionParams()) != filename)
+            continue;
+        QModelIndex index = this->index(i, QnBusiness::TargetColumn, QModelIndex());
+        emit dataChanged(index, index);
+    }
 }

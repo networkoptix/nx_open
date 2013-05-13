@@ -41,11 +41,6 @@ AudioPlayer::AudioPlayer( const QString& filePath )
 AudioPlayer::~AudioPlayer()
 {
     pleaseStop();
-    {
-        QMutexLocker lk( &m_mutex );
-        m_adaptiveSleep.breakSleep();
-        m_cond.wakeAll();
-    }
     stop();
 
     close();
@@ -92,6 +87,17 @@ QString AudioPlayer::getTagValue( const QString& filePath, const QString& tagNam
     return audioPlayer->getTagValue( tagName );
 }
 
+static const int AUDIO_BUF_SIZE = 4000;
+
+void AudioPlayer::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+
+    QMutexLocker lk( &m_mutex );
+    m_adaptiveSleep.breakSleep();
+    m_cond.wakeAll();
+}
+
 bool AudioPlayer::open( const QString& filePath )
 {
     QMutexLocker lk( &m_mutex );
@@ -110,7 +116,6 @@ bool AudioPlayer::open( const QString& filePath )
     m_mediaFileReader = mediaFileReader.release();
     m_mediaFileReader->setAudioChannel( 0 );
 
-    static const int AUDIO_BUF_SIZE = 4000;
     m_renderer = new QnAudioStreamDisplay( AUDIO_BUF_SIZE, AUDIO_BUF_SIZE / 2 );
 
     m_filePath = filePath;
@@ -162,6 +167,9 @@ void AudioPlayer::run()
         if( !dataPacket )
         {
             m_renderer->playCurrentBuffer();
+
+            //TODO: #ak IMPL block till playback is finished
+            sleep( AUDIO_BUF_SIZE / 2 );
 
             //end of file reached
             emit done();

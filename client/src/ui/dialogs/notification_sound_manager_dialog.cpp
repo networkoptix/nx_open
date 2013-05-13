@@ -4,88 +4,41 @@
 #include <QtCore/QFileInfo>
 #include <QtGui/QFileDialog>
 
+#include <ui/dialogs/custom_file_dialog.h>
+#include <ui/models/notification_sound_model.h>
+#include <ui/workbench/workbench_context.h>
+
 #include <utils/app_server_notification_cache.h>
 #include <utils/media/audio_player.h>
 
 QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::QnNotificationSoundManagerDialog),
-    m_cache(new QnAppServerNotificationCache(this)),
-    m_loadingCounter(0),
-    m_total(0)
+    QnWorkbenchContextAware(parent),
+    ui(new Ui::QnNotificationSoundManagerDialog)
 {
     ui->setupUi(this);
     ui->removeButton->setVisible(false);
 
-    connect(m_cache, SIGNAL(fileListReceived(QStringList,bool)), this, SLOT(at_fileListReceived(QStringList,bool)));
-    connect(m_cache, SIGNAL(fileDownloaded(QString,bool)), this, SLOT(at_fileDownloaded(QString,bool)), Qt::QueuedConnection);
-    connect(m_cache, SIGNAL(fileUploaded(QString,bool)), this, SLOT(at_fileUploaded(QString, bool)));
+    ui->listView->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
 
     connect(ui->playButton, SIGNAL(clicked()), this, SLOT(at_playButton_clicked()));
     connect(ui->addButton, SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
-
-    m_cache->getFileList();
-    m_loadingCounter = ui->progressBar->maximum();
-    updateLoadingStatus();
 }
 
 QnNotificationSoundManagerDialog::~QnNotificationSoundManagerDialog()
 {
 }
 
-
-void QnNotificationSoundManagerDialog::updateLoadingStatus() {
-    int pageIndex = (m_loadingCounter == 0) ? 0 : 1;
-    ui->stackedWidget->setCurrentIndex(pageIndex);
-
-    if (m_loadingCounter > 0) {
-        ui->statusLabel->setText(tr("Loading..."));
-        ui->progressBar->setValue( (m_total - m_loadingCounter)*ui->progressBar->maximum() / m_total);
-    }
-}
-
-void QnNotificationSoundManagerDialog::at_fileListReceived(const QStringList &filenames, bool ok) {
-    if (!ok)
-        //TODO: #GDM show warning message
-        return;
-
-    m_total = filenames.size();
-    m_loadingCounter = m_total;
-    updateLoadingStatus();
-
-    foreach(QString filename, filenames) {
-        m_cache->downloadFile(filename);
-    }
-}
-
-void QnNotificationSoundManagerDialog::at_fileDownloaded(const QString &filename, bool ok) {
-    m_loadingCounter--;
-    updateLoadingStatus();
-
-    if (!ok)
-        //TODO: #GDM show warning message
-        return;
-
-    //TODO: #GDM extractMetadata
-    QString title = filename;
-    ui->listWidget->addItem(new QListWidgetItem(title));
-}
-
-void QnNotificationSoundManagerDialog::at_fileUploaded(const QString &filename, bool ok) {
-    if (!ok)
-        return;
-
-    //TODO: #GDM extractMetadata
-    QString title = filename;
-    ui->listWidget->addItem(new QListWidgetItem(title));
-}
-
 void QnNotificationSoundManagerDialog::at_playButton_clicked() {
-    if (!ui->listWidget->currentItem())
+    if (!ui->listView->currentIndex().isValid())
         return;
 
-    QString soundUrl = ui->listWidget->currentItem()->text();
-    QString filePath = m_cache->getFullPath(soundUrl);
+    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    QString filename = soundModel->filenameByRow(ui->listView->currentIndex().row());
+    if (filename.isEmpty())
+        return;
+
+    QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
     if (!QFileInfo(filePath).exists())
         return;
 
@@ -93,18 +46,26 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
 }
 
 void QnNotificationSoundManagerDialog::at_addButton_clicked() {
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file...")));
+    dialog->setFileMode(QFileDialog::ExistingFile);
 
     QString supportedFormats = tr("Sound files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
+    dialog->setNameFilter(supportedFormats);
 
-    QString filename = QFileDialog::getOpenFileName(
-                this,
-                //tr("Select file..."),
-                QString(),
-                QString(),
-                supportedFormats);
-    if (filename.isEmpty())
+    int cropSoundSecs = 5;
+
+    dialog->addSpinBox(tr("Cut to first secs"), 1, 10, &cropSoundSecs);
+    if(!dialog->exec())
         return;
-    m_cache->storeSound(filename);
+
+    QStringList files = dialog->selectedFiles();
+    if (files.size() < 0)
+        return;
+
+    QString filename = files[0];
+
+    context()->instance<QnAppServerNotificationCache>()->storeSound(filename, cropSoundSecs*1000);
+
 
 }

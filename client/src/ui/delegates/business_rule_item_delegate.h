@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnSelectResourcesDialogButton: public QPushButton {
     Q_OBJECT
@@ -39,7 +40,7 @@ private:
     Qn::NodeType m_nodeType;
 };
 
-class QnBusinessRuleItemDelegate: public QStyledItemDelegate {
+class QnBusinessRuleItemDelegate: public QStyledItemDelegate, public QnWorkbenchContextAware {
     Q_OBJECT
 
     typedef QStyledItemDelegate base_type;
@@ -55,7 +56,6 @@ protected:
 
 private slots:
     void at_editor_commit();
-
 };
 
 #endif // BUSINESS_RULE_ITEM_DELEGATE_H

@@ -273,7 +273,6 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
         sigar_net_interface_config_t config;
         if (INVOKE(sigar_net_interface_config_get(d->sigar, interfaceName.toLatin1().constData(), &config) != SIGAR_OK))
             continue;
-        qDebug() << config.name << config.flags;
         if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) == 0)
             continue;
 

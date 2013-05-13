@@ -30,10 +30,6 @@ FileTranscoder::FileTranscoder()
 FileTranscoder::~FileTranscoder()
 {
     pleaseStop();
-    {
-        QMutexLocker lk( &m_mutex );
-        m_cond.wakeAll();
-    }
     stop();
 }
 
@@ -46,6 +42,7 @@ bool FileTranscoder::setSourceFile( const QString& filePath )
 
 bool FileTranscoder::setDestFile( const QString& filePath )
 {
+    m_dstFilePath = filePath;
     setDest( new QFile(filePath) );
     return true;
 }
@@ -88,6 +85,14 @@ int FileTranscoder::resultCode() const
     return m_resultCode;
 }
 
+void FileTranscoder::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+
+    QMutexLocker lk( &m_mutex );
+    m_cond.wakeAll();
+}
+
 bool FileTranscoder::startAsync()
 {
     QMutexLocker lk( &m_mutex );
@@ -122,9 +127,14 @@ bool FileTranscoder::doSyncTranscode()
     return m_resultCode == 0;
 }
 
+static const qint64 USEC_IN_MSEC = 1000;
+
 void FileTranscoder::run()
 {
     QnByteArray outPacket( 1, 0 );
+
+    qint64 prevSrcPacketTimestamp = -1;
+    qint64 srcUSecRead = 0;
 
     QMutexLocker lk( &m_mutex );
     while( !needToStop() )
@@ -144,26 +154,32 @@ void FileTranscoder::run()
             //end of file reached
             m_dest->waitForBytesWritten( -1 );
             m_state = sReady;
+            prevSrcPacketTimestamp = -1;
+            srcUSecRead = 0;
             m_cond.wakeAll();
             closeFiles();
-            emit done();
+            emit done(m_dstFilePath);
             continue;
         }
 
-        if( m_transcodeDurationLimit > 0 )
-        {
-            //TODO/IMPL checking transcode data length limit
-        }
+        //calculating read source data length
+        if( prevSrcPacketTimestamp == -1 )
+            prevSrcPacketTimestamp = dataPacket->timestamp;
+        srcUSecRead += dataPacket->timestamp - prevSrcPacketTimestamp;
+        prevSrcPacketTimestamp = dataPacket->timestamp;
 
         //transcoding
         m_resultCode = m_transcoder.transcodePacket( dataPacket, &outPacket );
-        if( m_resultCode )
+        if( m_resultCode ||
+            (m_transcodeDurationLimit > 0 && (srcUSecRead / USEC_IN_MSEC) >= m_transcodeDurationLimit) )   //checking transcode data length limit
         {
             m_dest->waitForBytesWritten( -1 );
             m_state = sReady;
+            prevSrcPacketTimestamp = -1;
+            srcUSecRead = 0;
             m_cond.wakeAll();
             closeFiles();
-            emit done();
+            emit done(m_dstFilePath);
             continue;
         }
 
@@ -176,9 +192,11 @@ void FileTranscoder::run()
                 //write error occured. Interrupting transcoding
                 m_resultCode = bytesWritten;
                 m_state = sReady;
+                prevSrcPacketTimestamp = -1;
+                srcUSecRead = 0;
                 m_cond.wakeAll();
                 closeFiles();
-                emit done();
+                emit done(m_dstFilePath);
                 break;
             }
             curPos += bytesWritten;
@@ -189,9 +207,11 @@ void FileTranscoder::run()
                 {
                     m_resultCode = bytesWritten;
                     m_state = sReady;
+                    prevSrcPacketTimestamp = -1;
+                    srcUSecRead = 0;
                     m_cond.wakeAll();
                     closeFiles();
-                    emit done();
+                    emit done(m_dstFilePath);
                     break;
                 }
             }

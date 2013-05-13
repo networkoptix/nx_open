@@ -24,6 +24,9 @@
 #include "soap/soapserver.h"
 #include "soapStub.h"
 
+//!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
+#define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
 static const float MAX_EPS = 0.01f;
@@ -224,6 +227,28 @@ QnPlOnvifResource::QnPlOnvifResource()
 
 QnPlOnvifResource::~QnPlOnvifResource()
 {
+    {
+        QMutexLocker lk( &m_subscriptionMutex );
+        while( !m_triggerOutputTasks.empty() )
+        {
+            const quint64 timerID = m_triggerOutputTasks.begin()->first;
+            const TriggerOutputTask outputTask = m_triggerOutputTasks.begin()->second;
+            m_triggerOutputTasks.erase( m_triggerOutputTasks.begin() );
+            lk.unlock();
+            if( !outputTask.active )
+            {
+                //returning port to inactive state
+                setRelayOutputStateNonSafe(
+                    outputTask.outputID,
+                    outputTask.active,
+                    0 );
+            }
+
+            TimerManager::instance()->joinAndDeleteTimer( timerID );    //garantees that no onTimer(timerID) is running on return
+            lk.relock();
+        }
+    }
+
     stopInputPortMonitoring();
 
     delete m_onvifAdditionalSettings;
@@ -233,18 +258,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
         delete m_eventCapabilities;
         m_eventCapabilities = NULL;
     }
-
-    QMutexLocker lk( &m_subscriptionMutex );
-    while( !m_triggerOutputTasks.empty() )
-    {
-        const quint64 timerID = m_triggerOutputTasks.begin()->first;
-        m_triggerOutputTasks.erase( m_triggerOutputTasks.begin() );
-        lk.unlock();
-        TimerManager::instance()->joinAndDeleteTimer( timerID );    //garantees that no onTimer(timerID) is running on return
-        lk.relock();
-    }
 }
-
 
 const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     const QString& senderIpAddress)
@@ -476,6 +490,15 @@ bool QnPlOnvifResource::initInternal()
     {
         setCameraCapability( Qn::RelayOutputCapability, true );
         setCameraCapability( Qn::RelayInputCapability, true );    //TODO it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
+
+        //resetting all ports states to inactive
+        for( std::vector<QnPlOnvifResource::RelayOutputInfo>::size_type
+            i = 0;
+            i < relayOutputs.size();
+            ++i )
+        {
+            setRelayOutputStateNonSafe( QString::fromStdString(relayOutputs[i].token), false, 0 );
+        }
     }
 
     if (m_appStopping)
@@ -2750,7 +2773,13 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
         return false;
     }
 
+#ifdef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+    const bool isBistableModeRequired = true;
+#else
     const bool isBistableModeRequired = autoResetTimeoutMS == 0;
+#endif
+
+#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
     std::string requiredDelayTime;
     if( autoResetTimeoutMS > 0 )
     {
@@ -2758,13 +2787,18 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
         ss<<"PT"<<(autoResetTimeoutMS < 1000 ? 1 : autoResetTimeoutMS/1000)<<"S";
         requiredDelayTime = ss.str();
     }
+#endif
     if( (relayOutputInfo.isBistable != isBistableModeRequired) || 
+#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
         (!isBistableModeRequired && relayOutputInfo.delayTime != requiredDelayTime) ||
+#endif
         relayOutputInfo.activeByDefault )
     {
         //switching output to required mode
         relayOutputInfo.isBistable = isBistableModeRequired;
+#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
         relayOutputInfo.delayTime = requiredDelayTime;
+#endif
         relayOutputInfo.activeByDefault = false;
         if( !setRelayOutputSettings( relayOutputInfo ) )
         {
@@ -2797,6 +2831,15 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
             arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
+
+#ifdef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+    if( autoResetTimeoutMS > 0 )
+    {
+        //adding task to reset port state
+        const quint64 timerID = TimerManager::instance()->addTimer( this, autoResetTimeoutMS );
+        m_triggerOutputTasks.insert( std::make_pair( timerID, TriggerOutputTask( outputID, !active, 0 ) ) );
+    }
+#endif
 
     cl_log.log( QString::fromAscii("Successfully set relay %1 output state to %2. endpoint %3").
         arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );

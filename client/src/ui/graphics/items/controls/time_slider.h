@@ -19,6 +19,7 @@ class QTimer;
 
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
+class QnTimeSliderChunkPainter;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
@@ -303,6 +304,8 @@ private:
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
+
+    friend class QnTimeSliderChunkPainter;
 
     qint64 m_windowStart, m_windowEnd;
     qint64 m_minimalWindow;

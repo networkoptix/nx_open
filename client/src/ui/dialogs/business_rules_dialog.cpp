@@ -47,7 +47,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     createActions();
 
-    m_rulesViewModel = new QnBusinessRulesViewModel(this, this->context());
+    m_rulesViewModel = new QnBusinessRulesViewModel(this);
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -60,7 +60,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     ui->tableView->installEventFilter(this);
 
-    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate());
+    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
 
     connect(m_rulesViewModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_model_dataChanged(QModelIndex,QModelIndex)));
