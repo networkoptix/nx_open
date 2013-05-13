@@ -55,7 +55,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
 
     int cropSoundSecs = 5;
 
-    dialog->addSpinBox(tr("Cut to first secs"), 1, 10, &cropSoundSecs);
+    dialog->addSpinBox(tr("Clip sound up to %n seconds"), 1, 10, &cropSoundSecs);
     if(!dialog->exec())
         return;
 

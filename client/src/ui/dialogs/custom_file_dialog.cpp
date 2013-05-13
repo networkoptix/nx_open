@@ -38,9 +38,13 @@ void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxVa
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QLabel* label = new QLabel(widget);
-    label->setText(text);
-    layout->addWidget(label);
+    int index = text.indexOf(QLatin1String("%n"));
+    QString prefix = text.mid(0, index).trimmed();
+    QString postfix = index >= 0 ? text.mid(index + 2).trimmed() : QString();
+
+    QLabel* labelPrefix = new QLabel(widget);
+    labelPrefix->setText(prefix);
+    layout->addWidget(labelPrefix);
 
     QSpinBox* spinbox = new QSpinBox(widget);
     spinbox->setMinimum(minValue);
@@ -48,6 +52,13 @@ void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxVa
     spinbox->setValue(*value);
     m_spinboxes.insert(spinbox, value);
     layout->addWidget(spinbox);
+
+    if (!postfix.isEmpty()) {
+        QLabel* labelPostfix = new QLabel(widget);
+        labelPostfix->setText(postfix);
+        layout->addWidget(labelPostfix);
+    }
+
     layout->addStretch();
 
     widget->setLayout(layout);
