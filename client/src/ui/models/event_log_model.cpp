@@ -131,6 +131,17 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAc
     return QVariant();
 }
 
+QVariant QnEventLogModel::resourceData(const Column& column, const QnLightBusinessAction &action) const
+{
+    switch(column) {
+        case EventCameraColumn: 
+            return action.getRuntimeParams().getEventResourceId();
+        case ActionCameraColumn: 
+            return action.getRuntimeParams().getActionResourceId();
+    }
+    return QVariant();
+}
+
 QString QnEventLogModel::formatUrl(const QString& url) const
 {
     if (url.indexOf(QLatin1String("://")) == -1)
@@ -224,6 +235,8 @@ QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
             return foregroundData(column, action);
         case Qn::ItemMouseCursorRole:
             return mouseCursorData(column, action);
+        case Qn::ResourceRole:
+            return resourceData(column, action);
     }
 
     return QVariant();

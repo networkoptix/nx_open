@@ -5,6 +5,8 @@
 #include "core/resource_managment/resource_pool.h"
 #include "ui/workbench/workbench_context.h"
 #include "business/events/abstract_business_event.h"
+#include "ui/actions/action_manager.h"
+#include "ui/actions/actions.h"
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -45,6 +47,11 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     connect(ui->eventComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateData()) );
     connect(ui->actionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateData()) );
+
+    //connect(ui->gridEvents->selectionModel(), SIGNAL(currentChanged(const QModelIndex&,const QModelIndex&)), this, SLOT(at_gridCelLSelected(const QModelIndex&)) );
+
+    connect(ui->gridEvents, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT(at_customContextMenuRequested(const QPoint &)) );
+
 
     updateData();
 }
@@ -222,4 +229,23 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
 
 void QnEventLogDialog::onItemClicked(QListWidgetItem * item)
 {
+}
+
+void QnEventLogDialog::at_customContextMenuRequested(const QPoint& screenPos)
+{
+    QModelIndex idx = ui->gridEvents->currentIndex();
+    QnId resId = m_model->data(ui->gridEvents->currentIndex(), Qn::ResourceRole).toInt();
+    if (!resId.isValid())
+        return;
+    QnResourcePtr resource = qnResPool->getResourceById(resId);
+    if (!resource)
+        return;
+
+    QnActionManager *manager = m_context->menu();
+    const QnActionParameters parameters(resource);
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::ActionScope::TreeScope, parameters));
+    if (menu) {
+        //manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
+        QAction *action = menu->exec(screenPos + pos());
+    }
 }

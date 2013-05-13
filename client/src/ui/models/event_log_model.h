@@ -48,6 +48,7 @@ private:
     QVariant fontData(const Column& column, const QnLightBusinessAction &action) const;
     QVariant foregroundData(const Column& column, const QnLightBusinessAction &action) const;
     QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action) const;
+    QVariant resourceData(const Column& column, const QnLightBusinessAction &action) const;
     QString formatUrl(const QString& url) const;
 private:
     QList<Column> m_columns;

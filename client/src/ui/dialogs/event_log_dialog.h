@@ -37,6 +37,7 @@ private slots:
     void updateData();
     void at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum);
     void onItemClicked(QListWidgetItem * item);
+    void at_customContextMenuRequested(const QPoint& screenPos);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     QnLightBusinessActionVectorPtr mergeEvents(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
