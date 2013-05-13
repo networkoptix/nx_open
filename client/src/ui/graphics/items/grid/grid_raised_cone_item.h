@@ -2,19 +2,19 @@
 #define GRID_RAISED_CONE_ITEM_H
 
 #include <QObject>
-#include <QGraphicsObject>
+#include <QGraphicsWidget>
 
 class QnGridRaisedConeItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit QnGridRaisedConeItem(QGraphicsItem *parent = NULL);
+    explicit QnGridRaisedConeItem(QGraphicsWidget *parent = NULL);
     virtual ~QnGridRaisedConeItem();
 
     virtual QRectF boundingRect() const override;
 
-    QGraphicsWidget* raisedWidget() const;
-    void setRaisedWidget(QGraphicsWidget* widget, QRectF oldGeometry);
+    /** Adjust source geometry */
+    void adjustGeometry(QRectF oldGeometry);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -29,5 +29,10 @@ private:
     QRect m_sourceGeometry;
     qreal m_rotation;
 };
+
+/** Returns the separate raised cone item for each widget. Auto-creates if none. Deletes automatically. */
+QnGridRaisedConeItem* raisedConeItem(QGraphicsWidget* widget);
+
+Q_DECLARE_METATYPE(QnGridRaisedConeItem *)
 
 #endif // GRID_RAISED_CONE_ITEM_H

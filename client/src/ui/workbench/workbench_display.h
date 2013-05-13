@@ -42,7 +42,6 @@ class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
 class QnGridBackgroundItem;
-class QnGridRaisedConeItem;
 class QnWorkbenchContext;
 class QnWorkbenchStreamSynchronizer;
 class QnToggle;
@@ -171,11 +170,6 @@ public:
     QnGridBackgroundItem *gridBackgroundItem() const;
 
     /**
-     * \returns                         Grid item for highlighting source cone for raised items.
-     */
-    QnGridRaisedConeItem *gridRaisedConeItem() const;
-
-    /**
      * \param item                      Item to get widget for.
      * \returns                         Widget for the given item.
      */
@@ -291,6 +285,7 @@ public:
 
     QnResourceWidget *zoomTargetWidget(QnResourceWidget *widget) const;
 
+    void assertRaisedConeItem(QnResourceWidget *widget);
 
 public slots:
     void fitInView(bool animate = true);
@@ -439,9 +434,6 @@ private:
 
     /** Grid background item. */
     QWeakPointer<QnGridBackgroundItem> m_gridBackgroundItem;
-
-    /** Grid background item. */
-    QWeakPointer<QnGridRaisedConeItem> m_gridRaisedConeItem;
 
     /** Current frame opacity for widgets. */
     qreal m_frameOpacity;

@@ -4,6 +4,8 @@
 
 namespace {
 
+    const char *raisedConeItemPropertyName = "_qn_raisedConeItem";
+
     struct PathHelper {
         /** Absolute offset value that will be used on the rect */
         qreal offset;
@@ -12,6 +14,9 @@ namespace {
         QPointF center;
     };
 
+    /**
+     * @brief rotated       Rotates the point around the center by degrees angle
+     */
     QPointF rotated(const QPointF &point, const QPointF& center, qreal degrees) {
         if (qFuzzyIsNull(degrees))
             return point;
@@ -71,11 +76,30 @@ namespace {
 
 }
 
-QnGridRaisedConeItem::QnGridRaisedConeItem(QGraphicsItem *parent) :
-    QGraphicsObject(parent),
-    m_raisedWidget(NULL),
+QnGridRaisedConeItem* raisedConeItem(QGraphicsWidget* widget) {
+    if(widget == NULL)
+        return NULL;
+
+    QnGridRaisedConeItem *item = widget->property(raisedConeItemPropertyName).value<QnGridRaisedConeItem *>();
+    if(item)
+        return item;
+
+
+    item = new QnGridRaisedConeItem(widget);
+    widget->setProperty(raisedConeItemPropertyName, QVariant::fromValue<QnGridRaisedConeItem *>(item));
+
+    return item;
+}
+
+
+QnGridRaisedConeItem::QnGridRaisedConeItem(QGraphicsWidget *parent) :
+    QGraphicsObject(NULL),
+    m_raisedWidget(parent),
     m_rotation(0)
 {
+    connect(m_raisedWidget, SIGNAL(geometryChanged()), this, SLOT(updateGeometry()));
+    connect(m_raisedWidget, SIGNAL(rotationChanged()), this, SLOT(updateGeometry()));
+    connect(m_raisedWidget, SIGNAL(destroyed()),       this, SLOT(deleteLater()));
 }
 
 QnGridRaisedConeItem::~QnGridRaisedConeItem() {
@@ -98,30 +122,13 @@ QRectF QnGridRaisedConeItem::boundingRect() const {
 }
 
 
-QGraphicsWidget* QnGridRaisedConeItem::raisedWidget() const {
-    return m_raisedWidget;
-}
-
-void QnGridRaisedConeItem::setRaisedWidget(QGraphicsWidget *widget, QRectF oldGeometry) {
-    if (m_raisedWidget != NULL)
-        disconnect(m_raisedWidget, 0, this, 0);
-
-    m_raisedWidget = widget;
-    setVisible(m_raisedWidget != NULL);
-    if(m_raisedWidget == NULL)
-        return;
-
-    connect(m_raisedWidget, SIGNAL(geometryChanged()), this, SLOT(updateGeometry()));
-    connect(m_raisedWidget, SIGNAL(rotationChanged()), this, SLOT(updateGeometry()));
-
+void QnGridRaisedConeItem::adjustGeometry(QRectF oldGeometry) {
     m_sourceRect = oldGeometry;
     updateGeometry();
 }
 
 
 void QnGridRaisedConeItem::updateGeometry() {
-    if(m_raisedWidget == NULL)
-        return;
     prepareGeometryChange();
 
     m_targetRect = m_raisedWidget->geometry();
@@ -132,8 +139,6 @@ void QnGridRaisedConeItem::updateGeometry() {
 void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(option)
     Q_UNUSED(widget)
-    if(m_raisedWidget == NULL)
-        return;
 
     PathHelper sourceHelper;
     sourceHelper.offset = qMin(m_sourceRect.height(), m_sourceRect.width()) * 0.2;
@@ -171,6 +176,7 @@ void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
                                      m_rotation,
                                      -1, -1), Qt::green);
 
+    // translate the whole painter is much easier than translate all 8 points of the path --gdm
     QPointF offset = m_sourceRect.center();
     painter->translate(offset);
     painter->rotate(m_rotation);

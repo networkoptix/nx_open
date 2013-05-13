@@ -314,9 +314,6 @@ void QnWorkbenchDisplay::deinitSceneView() {
 
     if (gridBackgroundItem())
         delete gridBackgroundItem();
-
-    if (gridRaisedConeItem())
-        delete gridRaisedConeItem();
 }
 
 void QnWorkbenchDisplay::initSceneView() {
@@ -414,11 +411,6 @@ void QnWorkbenchDisplay::initSceneView() {
     gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
 
-    m_gridRaisedConeItem = new QnGridRaisedConeItem();
-    m_scene->addItem(gridRaisedConeItem());
-    setLayer(gridRaisedConeItem(), Qn::RaisedConeLayer);
-    gridRaisedConeItem()->setOpacity(0.3);
-
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),            SIGNAL(currentLayoutAboutToBeChanged()),        this,                   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
@@ -449,10 +441,6 @@ QnGridItem *QnWorkbenchDisplay::gridItem() const {
 
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
-}
-
-QnGridRaisedConeItem* QnWorkbenchDisplay::gridRaisedConeItem() const {
-    return m_gridRaisedConeItem.data();
 }
 
 // -------------------------------------------------------------------------- //
@@ -529,6 +517,16 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
     return m_zoomTargetWidgetByWidget.value(widget);
 }
 
+void QnWorkbenchDisplay::assertRaisedConeItem(QnResourceWidget *widget) {
+    QnGridRaisedConeItem* item = raisedConeItem(widget);
+    if (item->scene() == m_scene)
+        return;
+    m_scene->addItem(item);
+    setLayer(item, Qn::RaisedConeLayer);
+    item->setOpacity(0.0);
+    opacityAnimator(item)->setTimeLimit(2000);
+}
+
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) {
     if(role < 0 || role >= Qn::ItemRoleCount) {
         qnWarning("Invalid item role '%1'.", static_cast<int>(role));
@@ -547,15 +545,14 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(oldWidget != NULL) {
             synchronize(oldWidget, true);
             oldWidget->setOpacity(1.0);
+            opacityAnimator(raisedConeItem(oldWidget), 0.5)->animateTo(0.0);
         }
 
         if(newWidget != NULL) {
             bringToFront(newWidget);
             synchronize(newWidget, true);
             newWidget->setOpacity(0.7);
-        } else
-            gridRaisedConeItem()->setRaisedWidget(NULL, QRectF());
-
+        }
         break;
     }
     case Qn::ZoomedRole: {
@@ -1206,8 +1203,10 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
-        gridRaisedConeItem()->setRaisedWidget(widget,
-                                              expanded(widget->aspectRatio(), enclosingGeometry, Qt::KeepAspectRatio));
+        assertRaisedConeItem(widget);
+
+        raisedConeItem(widget)->adjustGeometry(expanded(widget->aspectRatio(), enclosingGeometry, Qt::KeepAspectRatio));
+        opacityAnimator(raisedConeItem(widget), 0.5)->animateTo(0.3);
 
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 
