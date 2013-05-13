@@ -16,7 +16,7 @@ class QnImageButtonBar: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 
 public:
-    QnImageButtonBar(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0, Qt::Orientation orientation = Qt::Horizontal);
+    QnImageButtonBar(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnImageButtonBar();
 
     void addButton(int mask, QnImageButtonWidget *button);

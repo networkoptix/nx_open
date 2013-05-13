@@ -5,7 +5,7 @@
 
 const char* QnDwDvrResource::MANUFACTURE = "Digital watchdog";
 
-QString QnDwDvrResource::getDriverName() const
+QString QnDwDvrResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);
 }

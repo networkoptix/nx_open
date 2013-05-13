@@ -18,7 +18,7 @@ public:
 
     virtual bool isResourceAccessible();
     virtual bool updateMACAddress();
-    virtual QString getDriverName() const override;
+    virtual QString manufacture() const;
     virtual void setIframeDistance(int frames, int timems);
 
     virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;

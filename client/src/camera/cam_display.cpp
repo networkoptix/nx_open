@@ -22,7 +22,7 @@
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame delayed for interval, mark stream as slow
-static const int LIVE_MEDIA_LEN_THRESHOLD = 300*1000ll;   // do not sleep in live mode if queue is large
+static const int LIVE_MEDIA_LEN_THRESHOLD = 250*1000ll;   // do not sleep in live mode if queue is large
 
 static void updateActivity()
 {
@@ -97,7 +97,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_jumpTime(DATETIME_NOW),
     m_lightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full),
     m_lastFrameDisplayed(QnVideoStreamDisplay::Status_Displayed),
-    m_realTimeHurryUp(false),
+    m_realTimeHurryUp(0),
     m_delayedFrameCount(0),
     m_extTimeSrc(0),
     m_useMtDecoding(false),
@@ -120,8 +120,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_archiveReader(reader),
     m_fullScreen(false),
     m_prevLQ(-1),
-    m_doNotChangeDisplayTime(false),
-    m_firstLivePacket(true)
+    m_doNotChangeDisplayTime(false)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -380,31 +379,21 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             }
         }
 
-        if (m_firstLivePacket) {
-            m_delay.afterdelay();
-            m_delay.addQuant(LIVE_MEDIA_LEN_THRESHOLD/2); // realtime buffering for more smooth playback
-            m_firstLivePacket = false;
-        }
 
         QnAbstractMediaDataPtr lastFrame = m_dataQueue.last().dynamicCast<QnAbstractMediaData>();
-        if (lastFrame && lastFrame->dataType == QnAbstractMediaData::VIDEO) 
+        if (lastFrame && lastFrame->dataType == QnAbstractMediaData::VIDEO && lastFrame->timestamp - m_lastVideoPacketTime > LIVE_MEDIA_LEN_THRESHOLD) {
+            sleep = false;
+            m_realTimeHurryUp = 5;
+        }
+        else if (m_realTimeHurryUp)
         {
-            qint64 queueLen = lastFrame->timestamp - m_lastVideoPacketTime;
-            //qDebug() << "queueLen" << queueLen/1000 << "ms";
-            if (queueLen > LIVE_MEDIA_LEN_THRESHOLD) {
+            m_realTimeHurryUp--;
+            if (m_realTimeHurryUp)
                 sleep = false;
-                m_realTimeHurryUp = true;
-            }
-            else if (m_realTimeHurryUp)
-            {
-                if (queueLen > LIVE_MEDIA_LEN_THRESHOLD/2)
-                    sleep = false;
-                else {
-                    m_realTimeHurryUp = false;
-                    m_delay.afterdelay();
-                    m_delay.addQuant(-needToSleep);
-                    m_realTimeHurryUp = false;
-                }
+            else {
+                m_delay.afterdelay();
+                m_delay.addQuant(-needToSleep);
+                m_realTimeHurryUp = false;
             }
         }
     }
@@ -542,8 +531,6 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             }
 
             m_lastFrameDisplayed = m_display[channel]->display(vd, draw, scaleFactor);
-            if (m_isStillImage && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Skipped)
-                m_eofSignalSended = true;
         }
 
         if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
@@ -1420,7 +1407,7 @@ void QnCamDisplay::setMTDecoding(bool value)
         }
         //if (value)
         //    setSpeed(m_speed); // decoder now faster. reinit speed statistics
-        m_realTimeHurryUp = true;
+        m_realTimeHurryUp = 5;
     }
 }
 
@@ -1430,7 +1417,6 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
         return;
     m_isRealTimeSource = value;
     if (m_isRealTimeSource) {
-        m_firstLivePacket = true;
         QnResourceConsumer* archive = dynamic_cast<QnResourceConsumer*>(sender());
         if (archive) {
             QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(archive->getResource());

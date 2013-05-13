@@ -187,7 +187,7 @@ void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {
         return;
     }
 
-    int channelCount = videoLayout()->channelCount();
+    int channelCount = videoLayout()->numberOfChannels();
     for(int i = 0; i < channelCount; i++)
         m_camera->getCamDisplay()->addVideoChannel(i, renderer, true);
 

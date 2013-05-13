@@ -91,9 +91,8 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
 
     }
     else if (m_rebuildArchive == Rebuild_All || 
-             (m_rebuildArchive == Rebuild_HQ && m_role == QnResource::Role_LiveVideo) ||
-             (m_rebuildArchive == Rebuild_LQ && m_role == QnResource::Role_SecondaryLiveVideo)
-            )
+             m_rebuildArchive == Rebuild_HQ && m_role == QnResource::Role_LiveVideo ||
+             m_rebuildArchive == Rebuild_LQ && m_role == QnResource::Role_SecondaryLiveVideo)
     {
         doRebuildArchive();
     }
@@ -285,7 +284,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(QnStorageResourcePtr s
     QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
     avi->setStorage(storage);
     avi->setFastStreamFind(true);
-    if (avi->open(res) && avi->findStreams() && avi->endTime() != (qint64)AV_NOPTS_VALUE) {
+    if (avi->open(res) && avi->findStreams() && avi->endTime() != AV_NOPTS_VALUE) {
         qint64 startTimeMs = avi->startTime()/1000;
         qint64 endTimeMs = avi->endTime()/1000;
         int fileIndex = QFileInfo(fileName).baseName().toInt();

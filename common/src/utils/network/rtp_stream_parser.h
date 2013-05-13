@@ -58,7 +58,7 @@ class QnRtspAudioLayout: public QnResourceAudioLayout
 {
 public:
     QnRtspAudioLayout(): QnResourceAudioLayout() {}
-    virtual int channelCount() const override { return 1; }
+    virtual int numberOfChannels() const override { return 1; }
     virtual AudioTrack getAudioTrackInfo(int /*index*/) const override { return m_audioTrack; }
     void setAudioTrackInfo(const AudioTrack& info) { m_audioTrack = info; }
 private:

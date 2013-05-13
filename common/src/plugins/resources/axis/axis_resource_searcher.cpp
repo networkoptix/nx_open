@@ -119,7 +119,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     return result;
 }
 
-QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress)
+QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
 {
 
     QString smac;

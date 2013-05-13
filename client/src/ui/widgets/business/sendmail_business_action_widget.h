@@ -16,7 +16,7 @@ class QnSendmailBusinessActionWidget : public QnAbstractBusinessParamsWidget, pu
     typedef QnAbstractBusinessParamsWidget base_type;
     
 public:
-    explicit QnSendmailBusinessActionWidget(QWidget *parent = 0);
+    explicit QnSendmailBusinessActionWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnSendmailBusinessActionWidget();
     
 protected slots:

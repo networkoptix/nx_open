@@ -1,13 +1,10 @@
 #ifndef __MDNS_LISTENER_H
 #define __MDNS_LISTENER_H
 
-#include <list>
-
 #include <QTime>
 #include <QList>
 #include <QMap>
 #include "utils/network/socket.h"
-
 
 class QnMdnsListener
 {
@@ -47,8 +44,7 @@ private:
     QList<UDPSocket*> m_socketList;
     UDPSocket* m_receiveSocket;
     QTime m_socketLifeTime;
-    //!list<pair<consumer id, consumer data> >. List is required to garantee, that consumers receive data in order they were registered
-    std::list<std::pair<long, ConsumerDataList> > m_data;
+    ConsumersMap m_data;
     QStringList m_localAddressList;
 };
 

@@ -1,7 +1,10 @@
 #include "platform_notifier.h"
 
-#include "notifier_win.h"
-#include "generic_notifier.h"
+#ifdef Q_OS_WIN
+#   include "notifier_win.h"
+#else
+#   include "generic_notifier.h"
+#endif
 
 QnPlatformNotifier *QnPlatformNotifier::newInstance(QObject *parent) {
 #ifdef Q_OS_WIN

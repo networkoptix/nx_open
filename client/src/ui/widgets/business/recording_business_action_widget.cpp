@@ -1,9 +1,9 @@
 #include "recording_business_action_widget.h"
 #include "ui_recording_business_action_widget.h"
 
-#include <business/business_action_parameters.h>
-
 #include <core/resource/camera_resource.h>
+
+#include <business/actions/recording_business_action.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -58,14 +58,16 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     if (fields & QnBusiness::ActionParamsField) {
 
-        QnBusinessActionParameters params = model->actionParams();
+        QnBusinessParams params = model->actionParams();
 
-        int quality = ui->qualityComboBox->findData((int) params.getStreamQuality());
+        int quality = ui->qualityComboBox->findData((int) BusinessActionParameters::getStreamQuality(params));
         if (quality >= 0)
             ui->qualityComboBox->setCurrentIndex(quality);
 
-        ui->fpsSpinBox->setValue(params.getFps());
-        ui->afterSpinBox->setValue(params.getRecordAfter());
+        ui->fpsSpinBox->setValue(BusinessActionParameters::getFps(params));
+//        ui->durationSpinBox->setValue(BusinessActionParameters::getRecordDuration(params));
+//        ui->beforeSpinBox->setValue(BusinessActionParameters::getRecordBefore(params));
+        ui->afterSpinBox->setValue(BusinessActionParameters::getRecordAfter(params));
     }
 }
 
@@ -73,10 +75,13 @@ void QnRecordingBusinessActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnBusinessActionParameters params;
+    QnBusinessParams params;
 
-    params.setFps(ui->fpsSpinBox->value());
-    params.setRecordAfter(ui->afterSpinBox->value());
-    params.setStreamQuality((QnStreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
+    BusinessActionParameters::setFps(&params, ui->fpsSpinBox->value());
+//    BusinessActionParameters::setRecordDuration(&params, ui->durationSpinBox->value());
+//    BusinessActionParameters::setRecordBefore(&params, ui->beforeSpinBox->value());
+    BusinessActionParameters::setRecordAfter(&params, ui->afterSpinBox->value());
+    BusinessActionParameters::setStreamQuality(&params,
+        (QnStreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
     model()->setActionParams(params);
 }

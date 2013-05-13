@@ -234,10 +234,10 @@ PollSet::EventType PollSet::const_iterator::eventType() const
     return (PollSet::EventType)revents;
 }
 
-void* PollSet::const_iterator::userData()
+void* PollSet::const_iterator::userData() const
 {
     //TODO: #AK gcc warning: invalid conversion from 'const void*' to 'void*' [-fpermissive]
-    return static_cast<PollSetImpl::MonitoredEventMap::pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.userData( eventType() );
+    return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.userData( eventType() );
 }
 
 bool PollSet::const_iterator::operator==( const const_iterator& right ) const

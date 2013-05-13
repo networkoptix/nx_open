@@ -28,28 +28,18 @@ QnMdnsListener::~QnMdnsListener()
 
 void QnMdnsListener::registerConsumer(long handle)
 {
-    m_data.push_back( std::make_pair( handle, ConsumerDataList() ) );
+    m_data.insert(handle, ConsumerDataList());
 }
 
 QnMdnsListener::ConsumerDataList QnMdnsListener::getData(long handle)
 {
-    std::list<std::pair<long, ConsumerDataList> >::iterator itr;
-    const std::list<std::pair<long, ConsumerDataList> >::iterator itEnd = m_data.end();
-    for( itr = m_data.begin();
-        itr != itEnd;
-        ++itr )
-    {
-        if( itr->first == handle )
-            break;
-    }
-
-    //ConsumersMap::iterator itr = m_data.find(handle);
+    ConsumersMap::iterator itr = m_data.find(handle);
     if (itr == m_data.end())
         return QnMdnsListener::ConsumerDataList();
     if (itr == m_data.begin())
         readDataFromSocket();
-    ConsumerDataList rez = itr->second;
-    itr->second.clear();
+    ConsumerDataList rez = *itr;
+    itr.value().clear();
     return rez;
 }
 
@@ -107,14 +97,9 @@ void QnMdnsListener::readSocketInternal(UDPSocket* socket, QString localAddress)
                 continue; // ignore own packets
             if (localAddress.isEmpty())
                 localAddress = getBestLocalAddress(remoteAddress);
-
-            const std::list<std::pair<long, ConsumerDataList> >::iterator itEnd = m_data.end();
-            for( std::list<std::pair<long, ConsumerDataList> >::iterator
-                it = m_data.begin();
-                it != itEnd;
-                ++it )
+            for (ConsumersMap::iterator itr = m_data.begin(); itr != m_data.end(); ++itr) 
             {
-                it->second.append(ConsumerData(responseData, localAddress, remoteAddress));
+                itr.value().append(ConsumerData(responseData, localAddress, remoteAddress));
             }
         }
     }

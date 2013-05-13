@@ -6,8 +6,8 @@
 #include <QTransform>
 
 /**
- * This instrument listens to view transformation and size changes and notifies 
- * about them via <tt>transformChanged</tt> and <tt>sizeChanged</tt> signals.
+ * This instrument listens to view transformation changes and notifies about
+ * them via <tt>transformChanged</tt> signal.
  */
 class TransformListenerInstrument: public Instrument {
     Q_OBJECT;
@@ -16,14 +16,12 @@ public:
 
 signals:
     void transformChanged(QGraphicsView *view);
-    void sizeChanged(QGraphicsView *view);
 
 protected:
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
-    virtual bool resizeEvent(QWidget *viewport, QResizeEvent *event) override;
 
 private:
-    QHash<QGraphicsView *, QTransform> m_transforms;
+    QHash<QGraphicsView *, QTransform> mTransforms;
 };
 
 #endif // QN_TRANSFORM_LISTENER_INSTRUMENT_H

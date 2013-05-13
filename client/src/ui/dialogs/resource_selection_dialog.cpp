@@ -21,7 +21,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent, Qn::NodeTy
     ui->setupUi(this);
 
     m_flat = rootNodeType == Qn::UsersNode; //TODO: #GDM servers?
-    m_resourceModel = new QnResourcePoolModel(rootNodeType, m_flat, this);
+    m_resourceModel = new QnResourcePoolModel(this, rootNodeType, m_flat);
 
     switch (rootNodeType) {
     case Qn::UsersNode:

@@ -4,6 +4,14 @@
 #include "instant_business_event.h"
 #include "core/resource/resource_fwd.h"
 
+namespace QnBusinessEventRuntime {
+    QString getSource(const QnBusinessParams &params);
+    void setSource(QnBusinessParams* params, QString value);
+
+    QStringList getConflicts(const QnBusinessParams &params);
+    void setConflicts(QnBusinessParams* params, QStringList value);
+}
+
 class QnConflictBusinessEvent : public QnInstantBusinessEvent
 {
     typedef QnInstantBusinessEvent base_type;
@@ -14,7 +22,7 @@ public:
                                      const QString& source = QString(),
                                      const QStringList& conflicts = QStringList());
     
-    virtual QnBusinessEventParameters getRuntimeParams() const override;
+    virtual QnBusinessParams getRuntimeParams() const override;
 protected:
     QString m_source;
     QStringList m_conflicts;

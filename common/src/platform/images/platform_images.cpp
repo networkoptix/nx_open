@@ -1,8 +1,12 @@
 #include "platform_images.h"
 
-#include "images_win.h"
-#include "images_unix.h"
-#include "generic_images.h"
+#if defined Q_OS_WIN
+#   include "images_win.h"
+#elif defined Q_WS_X11
+#   include "images_unix.h"
+#else
+#   include "generic_images.h"
+#endif
 
 QnPlatformImages *QnPlatformImages::newInstance(QObject *parent) {
 #if defined Q_OS_WIN

@@ -716,12 +716,6 @@
 								</RegistryKey>
 							</Component>
 
-							<Directory Id="SqlDrivers" Name="sqldrivers">
-								<Component Id="SqlDrivers" Guid="{74793EF7-61C1-4e9c-81D6-A120E84D984F}">
-									<File Id="qsqlite$(var.suffix)4.dll" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\sqldrivers\qsqlite$(var.suffix)4.dll" />
-								</Component>
-							</Directory>
-
 							<Component Id="ServerFFmpegLibraries" Guid="{692DCCAD-138B-4763-822E-8BC8712F5007}">
 								<File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
 								<File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
@@ -812,7 +806,7 @@
 										<RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
 									</RegistryKey>
 								</Component>								
-
+								
 								<Component Id="clientShortcutDesktop" Guid="{56799FF5-5B77-442e-9A39-3F27F0FC8307}">
 									<Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
 
@@ -831,9 +825,9 @@
 
 								<Directory Id="ImageFormats" Name="imageformats">
 									<Component Id="ImageFormats" Guid="{74793EF7-61C1-4e9c-81D6-A120E85D984F}">
-										<File Id="qgif$(var.suffix)4.dll" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
-										<File Id="qjpeg$(var.suffix)4.dll" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
-										<File Id="qtiff$(var.suffix)4.dll" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
+										<File Id="qgif4.dll" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
+										<File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
+										<File Id="qtiff4.dll" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
 									</Component>
 								</Directory>							
 

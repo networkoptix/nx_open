@@ -1,22 +1,22 @@
 #include "time_period_storage.h"
 
-QnTimePeriodList QnTimePeriodStorage::periods(Qn::TimePeriodContent type) const
+QnTimePeriodList QnTimePeriodStorage::periods(Qn::TimePeriodRole type) const
 {
     return m_normalPeriods[type];
 }
 
-QnTimePeriodList QnTimePeriodStorage::aggregated(Qn::TimePeriodContent type) const
+QnTimePeriodList QnTimePeriodStorage::aggregated(Qn::TimePeriodRole type) const
 {
     return m_aggregatedPeriods[type];
 }
 
-void QnTimePeriodStorage::setPeriods( Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods )
+void QnTimePeriodStorage::setPeriods( Qn::TimePeriodRole type, const QnTimePeriodList &timePeriods )
 {
     m_normalPeriods[type] = timePeriods;
     updateAggregated(type);
 }
 
-void QnTimePeriodStorage::updateAggregated(Qn::TimePeriodContent type)
+void QnTimePeriodStorage::updateAggregated(Qn::TimePeriodRole type)
 {
     if (m_aggregationMSecs)
         m_aggregatedPeriods[type] = QnTimePeriod::aggregateTimePeriods(m_normalPeriods[type], m_aggregationMSecs);
@@ -28,8 +28,8 @@ void QnTimePeriodStorage::setAggregationMSecs(int value )
         return;
     m_aggregationMSecs = value;
     if (m_aggregationMSecs)
-        for(int type = 0; type < Qn::TimePeriodContentCount; type++)
-            updateAggregated(static_cast<Qn::TimePeriodContent>(type));
+        for(int type = 0; type < Qn::TimePeriodRoleCount; type++)
+            updateAggregated(static_cast<Qn::TimePeriodRole>(type));
 }
 
 int QnTimePeriodStorage::aggregationMSecs() const

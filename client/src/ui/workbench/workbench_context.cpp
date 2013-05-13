@@ -1,7 +1,7 @@
 #include "workbench_context.h"
 
 #include <utils/common/warnings.h>
-#include <client/client_settings.h>
+#include <utils/settings.h>
 
 #include <api/media_server_statistics_manager.h>
 
@@ -17,7 +17,6 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
-#include <ui/workbench/watchers/workbench_layout_watcher.h>
 #include "workbench_license_notifier.h"
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
@@ -32,16 +31,13 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_resourcePool = resourcePool;
     m_workbench.reset(new QnWorkbench(this));
     
-    m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
-
-    m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
     connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));
     connect(m_userWatcher,    SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
 
     /* Create dependent objects. */
     m_synchronizer.reset(new QnWorkbenchSynchronizer(this));
-
+    m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
     m_accessController.reset(new QnWorkbenchAccessController(this));
     m_menu.reset(new QnActionManager(this));
     m_display.reset(new QnWorkbenchDisplay(this));
@@ -63,7 +59,6 @@ QnWorkbenchContext::~QnWorkbenchContext() {
         delete instance;
     }
     m_userWatcher = NULL;
-    m_layoutWatcher = NULL;
 
     /* Destruction order of these objects is important. */
     m_navigator.reset();

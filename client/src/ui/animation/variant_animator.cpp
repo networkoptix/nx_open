@@ -193,12 +193,11 @@ QVariant VariantAnimator::currentValue() const {
     return toInternal(accessor()->get(targetObject()));
 }
 
-void VariantAnimator::updateCurrentValue(const QVariant &value) {
+void VariantAnimator::updateCurrentValue(const QVariant &value) const {
     if(accessor() == NULL || targetObject() == NULL)
         return;
 
     accessor()->set(m_target, toExternal(value));
-    emit valueChanged(toExternal(value));
 }
 
 void VariantAnimator::updateState(State newState) {

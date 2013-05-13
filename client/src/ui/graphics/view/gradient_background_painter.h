@@ -13,7 +13,7 @@
 class VariantAnimator;
 
 class QnGlFunctions;
-class QnClientSettings;
+class QnSettings;
 class QnRadialGradientPainter;
 
 class QnGradientBackgroundPainter: public QObject, public QnLayerPainter, public QnWorkbenchContextAware {
@@ -52,7 +52,7 @@ private:
     QScopedPointer<QnGlFunctions> m_gl;
     QScopedPointer<QnRadialGradientPainter> m_gradientPainter;
     
-    QWeakPointer<QnClientSettings> m_settings;
+    QWeakPointer<QnSettings> m_settings;
     VariantAnimator *m_backgroundColorAnimator;
     QElapsedTimer m_timer;
 

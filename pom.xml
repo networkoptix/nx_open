@@ -26,20 +26,19 @@
 		<client.name>${company.name} ${product.name} Client</client.name>
 		<client.mediafolder.name>${product.name} Media</client.mediafolder.name>
 		<applauncher.name>${company.name} Launcher</applauncher.name>
-                <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
-                <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
 		<mediaserver.name>${company.name} Media Server</mediaserver.name>
 		<mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
 		<testcamera.name>${company.name} Test Camera</testcamera.name>
 		<traytool.name>${product.name} Tray Assistant</traytool.name>
 		<vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
+		<applauncher.name>${company.name} Launcher</applauncher.name>
 		<license.environment>production</license.environment>
 
 		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
 		<unpack.skip>false</unpack.skip>
 		<ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
-		<onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
+		<onvif.version>2.1.1-io-SNAPSHOT</onvif.version>
 		<dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
 		<sigar.version>1.6-SNAPSHOT</sigar.version>
 		<boost.version>1.51.0</boost.version>
@@ -53,12 +52,12 @@
 		<qtlib4>opengl</qtlib4>
 		<qtlib5>xml</qtlib5>
 		<qtlib6>multimedia</qtlib6>
-		<qtlib7>sql</qtlib7>
+		<qtlib7/>
 		<qtlib8/>
 		<qtlib9/>
 		<!--QT plugins used-->      
 		<qtplugin1>imageformats</qtplugin1>
-		<qtplugin2>sqldrivers</qtplugin2>
+		<qtplugin2>enter its name here...</qtplugin2>
 		<qtplugin3>enter its name here...</qtplugin3>	
 	</properties>
 	<modules>
@@ -66,8 +65,6 @@
 		<module>appserver</module>
 		<module>common</module>
 		<module>applauncher</module>
-                <module>axiscamplugin</module>
-                <module>genericrtspplugin</module>
 		<module>mediaserver</module>
 		<module>mediaproxy</module>
 		<module>client</module>		
@@ -164,8 +161,6 @@
 			</activation>
 			<modules>
 				<module>quicksyncdecoder</module>	
-                                <module>axiscamplugin</module>
-                                <module>genericrtspplugin</module>
 				<module>traytool</module>
 				<module>vmaxproxy</module>	
 				<module>wixsetup</module>

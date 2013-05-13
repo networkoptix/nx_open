@@ -8,11 +8,11 @@
 
 #include <core/resource/resource_directory_browser.h>
 #include <decoders/abstractvideodecoderplugin.h>
-#include <plugins/plugin_manager.h>
+#include <plugins/pluginmanager.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
-#include <client/client_settings.h>
+#include <utils/settings.h>
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
@@ -48,7 +48,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->setupUi(this);
 
     ui->maxVideoItemsLabel->hide();
-    ui->maxVideoItemsSpinBox->hide(); // TODO: #Elric Cannot edit max number of items on the scene.
+    ui->maxVideoItemsSpinBox->hide(); // TODO: Cannot edit max number of items on the scene.
 
     if(m_settings->isBackgroundEditable()) {
         ui->backgroundColorPicker->setAutoFillBackground(false);
@@ -68,7 +68,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
 
-    m_popupSettingsWidget = new QnPopupSettingsWidget(context, this);
+    m_popupSettingsWidget = new QnPopupSettingsWidget(this);
     m_popupSettingsTabIndex = ui->tabWidget->addTab(m_popupSettingsWidget, tr("Notifications"));
 
 #if 0
@@ -100,7 +100,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     at_onDecoderPluginsListChanged();
 
     connect( PluginManager::instance(), SIGNAL(pluginLoaded()), this, SLOT(at_onDecoderPluginsListChanged()) );
-    connect( PluginManager::instance(), SIGNAL(pluginUnloaded()), this, SLOT(at_onDecoderPluginsListChanged()) ); // TODO: #AK no such signal
+    connect( PluginManager::instance(), SIGNAL(pluginUnloaded()), this, SLOT(at_onDecoderPluginsListChanged()) );
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
     connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
@@ -201,7 +201,7 @@ void QnPreferencesDialog::submitToSettings() {
 
     QStringList checkLst(m_settings->extraMediaFolders());
     checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
-    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: #Elric re-check if it is needed here.
+    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: re-check if it is needed here.
 
     m_settings->setLanguage(ui->languageComboBox->itemData(ui->languageComboBox->currentIndex()).toString());
 
@@ -210,7 +210,7 @@ void QnPreferencesDialog::submitToSettings() {
     if (m_serverSettingsWidget)
         m_serverSettingsWidget->submit();
     if (m_popupSettingsWidget)
-        m_popupSettingsWidget->submit();
+        m_popupSettingsWidget->submitToSettings(m_settings);
 
     m_settings->save();
 }
@@ -236,6 +236,9 @@ void QnPreferencesDialog::updateFromSettings() {
 
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
+
+    if (m_popupSettingsWidget)
+        m_popupSettingsWidget->updateFromSettings(m_settings);
 
     int id = ui->languageComboBox->findData(m_settings->translationPath());
     if (id >= 0)
@@ -275,7 +278,7 @@ void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
 
 void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
     QFileDialog fileDialog(this);
-    //TODO: #Elric call setDirectory
+    //TODO: call setDirectory
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
         return;

@@ -564,6 +564,7 @@ EXPORT void speex_preprocess_state_destroy(SpeexPreprocessState *st)
    av_free(st);
 }
 
+/* FIXME: The AGC doesn't work yet with fixed-point*/
 #ifndef FIXED_POINT
 static void speex_compute_agc(SpeexPreprocessState *st, spx_word16_t Pframe, spx_word16_t *ft)
 {
@@ -949,6 +950,7 @@ EXPORT int speex_preprocess_run(SpeexPreprocessState *st, spx_int16_t *x)
    st->ft[0] = MULT16_16_P15(st->gain2[0],st->ft[0]);
    st->ft[2*N-1] = MULT16_16_P15(st->gain2[N-1],st->ft[2*N-1]);
    
+   /*FIXME: This *will* not work for fixed-point */
 #ifndef FIXED_POINT
    if (st->agc_enabled)
       speex_compute_agc(st, Pframe, st->ft);
@@ -960,6 +962,7 @@ EXPORT int speex_preprocess_run(SpeexPreprocessState *st, spx_int16_t *x)
    for (i=0;i<2*N;i++)
       st->frame[i] = PSHR16(st->frame[i], st->frame_shift);
 
+   /*FIXME: This *will* not work for fixed-point */
 #ifndef FIXED_POINT
    if (st->agc_enabled)
    {
@@ -990,6 +993,7 @@ EXPORT int speex_preprocess_run(SpeexPreprocessState *st, spx_int16_t *x)
    for (i=0;i<N3;i++)
       st->outbuf[i] = st->frame[st->frame_size+i];
 
+   /* FIXME: This VAD is a kludge */
    st->speech_prob = Pframe;
    if (st->vad_enabled)
    {
@@ -1111,16 +1115,20 @@ EXPORT int speex_preprocess_ctl(SpeexPreprocessState *state, int request, void *
       break;
 
    case SPEEX_PREPROCESS_SET_DEREVERB_LEVEL:
+      /* FIXME: Re-enable when de-reverberation is actually enabled again */
       /*st->reverb_level = (*(float*)ptr);*/
       break;
    case SPEEX_PREPROCESS_GET_DEREVERB_LEVEL:
+      /* FIXME: Re-enable when de-reverberation is actually enabled again */
       /*(*(float*)ptr) = st->reverb_level;*/
       break;
    
    case SPEEX_PREPROCESS_SET_DEREVERB_DECAY:
+      /* FIXME: Re-enable when de-reverberation is actually enabled again */
       /*st->reverb_decay = (*(float*)ptr);*/
       break;
    case SPEEX_PREPROCESS_GET_DEREVERB_DECAY:
+      /* FIXME: Re-enable when de-reverberation is actually enabled again */
       /*(*(float*)ptr) = st->reverb_decay;*/
       break;
 

@@ -62,30 +62,30 @@ public:
     }
 
     /**
-     * \param target                    Action parameter key.
+     * \param target                    Name of the action parameter.
      * \returns                         Permissions that are required for the provided parameter.
      */
-    Qn::Permissions requiredPermissions(int target = -1) const {
+    Qn::Permissions requiredPermissions(const QString &target = QString()) const {
         return m_permissions.value(target).required;
     }
 
     void setRequiredPermissions(Qn::Permissions requiredPermissions);
 
     /**
-     * \param target                    Action parameter key.
+     * \param target                    Name of action parameter.
      * \param requiredPermissions       Permissions required for the provided parameter.
      */
-    void setRequiredPermissions(int target, Qn::Permissions requiredPermissions);
+    void setRequiredPermissions(const QString &target, Qn::Permissions requiredPermissions);
 
     /**
      * \param target                    Name of the action parameter.
      * \returns                         Permissions that must not be present for the provided parameter.
      */
-    Qn::Permissions forbiddenPermissions(int target = -1) const {
+    Qn::Permissions forbiddenPermissions(const QString &target = QString()) const {
         return m_permissions.value(target).forbidden;
     }
 
-    void setForbiddenPermissions(int target, Qn::Permissions forbiddenPermissions);
+    void setForbiddenPermissions(const QString &target, Qn::Permissions forbiddenPermissions);
 
     void setForbiddenPermissions(Qn::Permissions forbiddenPermissions);
 
@@ -211,7 +211,7 @@ private:
 
     const Qn::ActionId m_id;
     Qn::ActionFlags m_flags;
-    QHash<int, Permissions> m_permissions;
+    QHash<QString, Permissions> m_permissions;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
     QWeakPointer<QnActionCondition> m_condition;

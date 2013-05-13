@@ -7,12 +7,6 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <ui/common/geometry.h>
-
-
-// -------------------------------------------------------------------------- //
-// SelectionItem
-// -------------------------------------------------------------------------- //
 SelectionItem::SelectionItem(QGraphicsItem *parent):
     base_type(parent),
     m_viewport(NULL)
@@ -86,70 +80,5 @@ void SelectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
         return; /* Draw it on source viewport only. */
 
     base_type::paint(painter, option, widget);
-}
-
-
-// -------------------------------------------------------------------------- //
-// FixedArSelectionItem
-// -------------------------------------------------------------------------- //
-QRectF FixedArSelectionItem::boundingRect() const {
-    return QnGeometry::dilated(base_type::boundingRect(), m_elementSize / 2.0);
-}
-
-void FixedArSelectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    base_type::paint(painter, option, widget);
-
-    if(m_options & (DrawCentralElement | DrawSideElements)) {
-        QRectF rect = base_type::rect();
-        QPointF center = rect.center();
-        if(rect.isEmpty())
-            return;
-
-        QPainterPath path;
-        qreal elementHalfSize = qMin(m_elementSize, qMin(rect.width(), rect.height()) / 2.0) / 2.0;
-
-        if(m_options & DrawCentralElement)
-            path.addEllipse(center, elementHalfSize, elementHalfSize);
-
-        if(m_options & DrawSideElements) {
-            foreach(const QPointF &sidePoint, m_sidePoints) {
-                QPointF v = sidePoint - center;
-                qreal l = QnGeometry::length(v);
-                qreal a = -QnGeometry::atan2(v) / M_PI * 180;
-                qreal da = 60.0;
-
-                QPointF c = sidePoint - v / l * (elementHalfSize * 1.5);
-                QPointF r = QPointF(elementHalfSize, elementHalfSize) * 1.5;
-                QRectF rect(c - r, c + r);
-
-                path.arcMoveTo(rect, a - da);
-                path.arcTo(rect, a - da, 2 * da);
-            }
-        }
-
-        QnScopedPainterPenRollback penRollback(painter, QPen(pen().color().lighter(120), elementHalfSize / 2.0));
-        QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
-        painter->drawPath(path);
-    }
-}
-
-void FixedArSelectionItem::setGeometry(const QPointF &origin, const QPointF &corner, const qreal aspectRatio, const QRectF &boundingRect) {
-    QPointF boundedCorner = QnGeometry::bounded(corner, boundingRect);
-
-    QRectF rect = QnGeometry::movedInto(
-        QnGeometry::expanded(
-            aspectRatio,
-            QRectF(origin, boundedCorner).normalized(),
-            Qt::KeepAspectRatioByExpanding,
-            Qt::AlignCenter
-        ),
-        boundingRect
-    );
-
-    QVector<QPointF> sidePoints;
-    sidePoints << origin << boundedCorner;
-
-    setRect(rect);
-    setSidePoints(sidePoints);
 }
 

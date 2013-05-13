@@ -12,13 +12,8 @@ class QnCameraDiscoveryListener;
 class QnCameraPool: public QnTcpListener
 {
 public:
-    /*!
-        \param localInterfacesToListen If empty, all local interfaces are listened
-    */
-    QnCameraPool( const QStringList& localInterfacesToListen );
+    QnCameraPool();
     virtual ~QnCameraPool();
-
-    static void initGlobalInstance( QnCameraPool* _inst );
     static QnCameraPool* instance();
     
     void addCameras(int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq);

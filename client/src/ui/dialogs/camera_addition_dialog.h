@@ -13,6 +13,94 @@ namespace Ui {
     class CameraAdditionDialog;
 }
 
+namespace detail{
+    enum ProcessorState {
+        Init,
+        Progress,
+        Cancelled,
+        Error,
+        Success
+    };
+
+    class ManualCameraReplyProcessor: public QObject
+    {
+        Q_OBJECT
+    public:
+        ManualCameraReplyProcessor(QObject *parent = NULL):
+            QObject(parent),
+            m_state(Init),
+            m_eventLoop(new QEventLoop(this))
+        {
+            connect(this, SIGNAL(replyReceived()),  m_eventLoop, SLOT(quit()));
+        }
+
+        QnCamerasFoundInfoList camerasFound() const {
+            if (m_state != Success)
+                return QnCamerasFoundInfoList();
+            return m_cameras;
+        }
+
+        ProcessorState state() const {
+            return m_state;
+        }
+
+        QString getLastError() const {
+            return m_lastError;
+        }
+
+    signals:
+        void replyReceived();
+
+    public slots:
+        void processSearchReply(const QnCamerasFoundInfoList &cameras) {
+            if (m_state != Progress)
+                return;
+
+            m_state = Success;
+            m_lastError = QString();
+            m_cameras = cameras;
+            emit replyReceived();
+        }
+
+        void processSearchError(int status, const QString &error) {
+            Q_UNUSED(status)
+            if (m_state != Progress)
+                return;
+
+            m_state = Error;
+            m_lastError = error;
+            emit replyReceived();
+        }
+
+        void processAddReply(int status) {
+            if (m_state != Progress)
+                return;
+
+            m_state = status == 0 ? Success : Error;
+            m_lastError = QString();
+            emit replyReceived();
+        }
+
+        void start() {
+            Q_ASSERT(m_state == Init);
+            m_state = Progress;
+            m_eventLoop->exec();
+        }
+
+        void cancel() {
+            if (m_state != Progress)
+                qWarning() << "reply processor state error: requsted Progress while" << m_state;
+            m_state = Cancelled;
+            m_eventLoop->quit();
+        }
+
+    private:
+        QnCamerasFoundInfoList m_cameras;
+        QString m_lastError;
+        ProcessorState m_state;
+        QEventLoop* m_eventLoop;
+    };
+}
 
 class QnCheckBoxedHeaderView: public QHeaderView {
     Q_OBJECT
@@ -33,7 +121,6 @@ private slots:
 private:
     Qt::CheckState m_checkState;
 };
-
 
 class QnCameraAdditionDialog: public QDialog {
     Q_OBJECT

@@ -101,11 +101,6 @@ public:
         return m_group;
     }
 
-    /**
-     * \param durationOverride          Duration that is to be used for this animation.
-     *                                  Pass -1 to disable duration overriding.
-     */
-    void setDurationOverride(int durationOverride);
 public slots:
     /**
      * Starts this animator.
@@ -132,11 +127,6 @@ signals:
      * This signals is emitted whenever this animator is stopped.
      */
     void finished();
-
-    /**
-     * This signals is emitted whenever animation tick occurs.
-     */
-    void animationTick(int time);
 
 protected:
     /**
@@ -171,7 +161,11 @@ protected:
      */
     virtual int estimatedDuration() const = 0;
 
-
+    /**
+     * \param durationOverride          Duration that is to be used for this animation.
+     *                                  Pass -1 to disable duration overriding.
+     */
+    void setDurationOverride(int durationOverride);
 
     void setCurrentTime(int currentTime);
 

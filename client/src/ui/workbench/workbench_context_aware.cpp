@@ -1,7 +1,6 @@
 #include "workbench_context_aware.h"
 
 #include <QtCore/QObject>
-#include <QtGui/QGraphicsItem>
 
 #include <utils/common/warnings.h>
 #include <core/resource_managment/resource_pool.h>
@@ -49,15 +48,7 @@ void QnWorkbenchContextAware::init(QObject *parent) {
             return;
         }
 
-        if(parent->parent()) {
-            parent = parent->parent();
-        } else {
-            if(QGraphicsItem *parentItem = dynamic_cast<QGraphicsItem *>(parent)) {
-                parent = parentItem->scene();
-            } else {
-                parent = NULL;
-            }
-        }
+        parent = parent->parent();
     }
 }
 

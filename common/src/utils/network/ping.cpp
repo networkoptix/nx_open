@@ -1,18 +1,17 @@
 #include "ping.h"
+#include "../common/log.h"
+
 
 #ifdef Q_OS_WIN
-#   include <icmpapi.h>
-#   include <stdio.h>
+#include <icmpapi.h>
+#include <stdio.h>
 #else
-#   include <sys/types.h>
-#   include <sys/socket.h>
-#   include <arpa/inet.h>
-#   include <netinet/ip.h>
-#   include <netinet/ip_icmp.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
 #endif
-
-#include <utils/common/log.h>
-#include <utils/common/systemerror.h>
 
 
 CLPing::CLPing()
@@ -96,7 +95,23 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
     }
     else
     {
-        qWarning() << "Failed to ping camera" << ip << "error:" << SystemError::getLastOSErrorText();
+        QString errStr;
+        dwError = GetLastError();
+
+        switch (dwError) {
+        case IP_BUF_TOO_SMALL:
+            errStr = lit("ReplyBufferSize to small");
+            break;
+        case IP_REQ_TIMED_OUT:
+            errStr = lit("Request timed out");
+            break;
+        default:
+            errStr = lit("Extended error returned");
+            break;
+        }
+        
+        qWarning() << "Failed to ping camera" << ip << "error:" << errStr;
+
         return false;
     }
 }

@@ -16,7 +16,6 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, 
     m_layout(NULL),
     m_resourceUid(resourceUid),
     m_uuid(uuid),
-    m_zoomRect(0.0, 0.0, 1.0, 1.0),
     m_flags(0),
     m_rotation(0.0)
 {}
@@ -26,25 +25,23 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     m_layout(NULL),
     m_resourceUid(data.resource.path),
     m_uuid(data.uuid),
-    m_zoomRect(0.0, 0.0, 1.0, 1.0),
     m_flags(0),
     m_rotation(0.0)
 {
     if(m_resourceUid.isEmpty()) {
         qnWarning("Creating a workbench item from item data with invalid unique id.");
-        // TODO: #Elric fix layout item data conventions.
+        // TODO: fix layout item data conventions.
 
         QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
         if(resource)
-            m_resourceUid = resource->getUniqueId(); // TODO: #Elric add warning if NULL?
+            m_resourceUid = resource->getUniqueId(); // TODO: add warning if NULL?
     }
 
     setFlags(static_cast<Qn::ItemFlags>(data.flags));
     setRotation(data.rotation);
     setCombinedGeometry(data.combinedGeometry);
-    setZoomRect(data.zoomRect);
 
-    m_dataByRole = data.dataByRole; // TODO: #Elric
+    m_dataByRole = data.dataByRole; // TODO
 }
 
 QnWorkbenchItem::~QnWorkbenchItem() {
@@ -63,8 +60,6 @@ QnLayoutItemData QnWorkbenchItem::data() const {
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
-    data.zoomRect = zoomRect();
-    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QUuid();
     data.dataByRole = m_dataByRole;
 
     return data;
@@ -87,7 +82,6 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
     result &= setFlag(Qn::Pinned, false);
     result &= setCombinedGeometry(data.combinedGeometry);
     setRotation(data.rotation);
-    setZoomRect(data.zoomRect);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
     m_dataByRole = data.dataByRole; // TODO
@@ -107,8 +101,6 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
 
     data.flags = flags();
     data.rotation = rotation();
-    data.zoomRect = zoomRect();
-    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QUuid();
     data.combinedGeometry = combinedGeometry();
     data.dataByRole = m_dataByRole;
 }
@@ -217,24 +209,6 @@ void QnWorkbenchItem::setFlagInternal(Qn::ItemFlag flag, bool value) {
     emit dataChanged(Qn::ItemFlagsRole);
 }
 
-void QnWorkbenchItem::setZoomRect(const QRectF &zoomRect) {
-    if(qFuzzyCompare(zoomRect, m_zoomRect))
-        return;
-
-    m_zoomRect = zoomRect;
-
-    emit zoomRectChanged();
-    emit dataChanged(Qn::ItemZoomRectRole);
-}
-
-QnWorkbenchItem *QnWorkbenchItem::zoomTargetItem() const {
-    if(m_layout) {
-        return m_layout->zoomTargetItem(const_cast<QnWorkbenchItem *>(this));
-    } else {
-        return NULL;
-    }
-}
-
 void QnWorkbenchItem::setRotation(qreal rotation) {
     if(qFuzzyCompare(m_rotation, rotation))
         return;
@@ -272,21 +246,19 @@ void QnWorkbenchItem::adjustGeometry(const QPointF &desiredPosition) {
 QVariant QnWorkbenchItem::data(int role) const {
     switch(role) {
     case Qn::ResourceUidRole:
-        return resourceUid();
+        return m_resourceUid;
     case Qn::ItemUuidRole:
-        return QVariant::fromValue<QUuid>(uuid());
+        return QVariant::fromValue<QUuid>(m_uuid);
     case Qn::ItemGeometryRole:
-        return geometry();
+        return m_geometry;
     case Qn::ItemGeometryDeltaRole:
-        return geometryDelta();
+        return m_geometryDelta;
     case Qn::ItemCombinedGeometryRole:
         return combinedGeometry();
-    case Qn::ItemZoomRectRole:
-        return zoomRect();
     case Qn::ItemFlagsRole:
-        return static_cast<int>(flags());
+        return static_cast<int>(m_flags);
     case Qn::ItemRotationRole:
-        return rotation();
+        return m_rotation;
     default:
         return m_dataByRole.value(role);
     }
@@ -295,14 +267,14 @@ QVariant QnWorkbenchItem::data(int role) const {
 bool QnWorkbenchItem::setData(int role, const QVariant &value) {
     switch(role) {
     case Qn::ResourceUidRole:
-        if(value.toString() == resourceUid()) {
+        if(value.toString() == m_resourceUid) {
             return true;
         } else {
             qnWarning("Changing resource unique id of a workbench item is not supported.");
             return false;
         }
     case Qn::ItemUuidRole:
-        if(value.value<QUuid>() == uuid()) {
+        if(value.value<QUuid>() == m_uuid) {
             return true;
         } else {
             qnWarning("Changing UUID of a workbench item is not supported.");
@@ -330,15 +302,6 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
             qnWarning("Provided combined geometry value '%1' is not convertible to QRectF.", value);
             return false;
         }
-    case Qn::ItemZoomRectRole: {
-        if(value.canConvert<QRectF>()) {
-            setZoomRect(value.toRectF());
-            return true;
-        } else {
-            qnWarning("Provided zoom rect value '%1' is not convertible to QRectF.", value);
-            return false;
-        }
-    }
     case Qn::ItemFlagsRole: {
         bool ok;
         int flags = value.toInt(&ok);

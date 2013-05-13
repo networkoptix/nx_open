@@ -4,7 +4,7 @@
 #include <QtCore/QTranslator>
 #include <QtGui/QApplication>
 
-#include "client/client_settings.h"
+#include "utils/settings.h"
 
 QnWorkbenchTranslationManager::QnWorkbenchTranslationManager(QObject *parent):
     QObject(parent),

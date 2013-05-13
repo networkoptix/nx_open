@@ -10,9 +10,9 @@
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
-#include <api/model/statistics_reply.h>
 #include <api/message.h>
 #include <api/media_server_cameras_data.h>
+#include <api/media_server_statistics_data.h>
 #include <api/media_server_connection.h>
 
 #include <recording/time_period.h>
@@ -78,11 +78,12 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnMessage>();
 
     qRegisterMetaType<QnCamerasFoundInfoList>();
+    qRegisterMetaType<QnStatisticsDataList>();
     qRegisterMetaType<QnStatisticsData>();
 
     qRegisterMetaType<QnPtzSpaceMapper>();
 
-    qRegisterMetaType<Qn::TimePeriodContent>();
+    qRegisterMetaType<Qn::TimePeriodRole>();
     qRegisterMetaType<QnTimePeriodList>();
 
     qRegisterMetaType<QnSoftwareVersion>();
@@ -97,8 +98,6 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
 
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
-    qRegisterMetaType<QnAbstractBusinessActionList>();
-    qRegisterMetaType<QnLightBusinessActionVectorPtr>();
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
     qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<QnBusinessEventRulePtr>();
@@ -106,8 +105,6 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
-    qRegisterMetaType<QnStatisticsReply>();
-    qRegisterMetaType<QnTimeReply>();
     
     qn_commonMetaTypes_initialized = true;
 }

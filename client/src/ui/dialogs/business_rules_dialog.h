@@ -33,7 +33,7 @@ class QnBusinessRulesDialog : public QnButtonBoxDialog, public QnWorkbenchContex
     typedef QnButtonBoxDialog base_type;
 
 public:
-    explicit QnBusinessRulesDialog(QWidget *parent = 0);
+    explicit QnBusinessRulesDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     virtual ~QnBusinessRulesDialog();
 
 protected:
@@ -54,6 +54,7 @@ private slots:
     void at_newRuleButton_clicked();
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
+    void at_advancedButton_clicked();
 
     void at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle);
     void at_resources_saved(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle);
@@ -63,9 +64,6 @@ private slots:
     void at_tableViewport_resizeEvent();
     void at_model_dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
-
-    void toggleAdvancedMode();
-    void updateAdvancedAction();
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog)
 
@@ -77,9 +75,6 @@ private:
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
 
     void updateControlButtons();
-
-    bool advancedMode() const;
-    void setAdvancedMode(bool value);
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
@@ -94,8 +89,6 @@ private:
     QMenu* m_popupMenu;
     QAction* m_advancedAction;
     int m_loadingHandle;
-
-    bool m_advancedMode;
 };
 
 #endif // QN_BUSINESS_RULES_DIALOG_H

@@ -4,7 +4,7 @@
 
 #include <utils/appcast/update_checker.h>
 #include <utils/common/warnings.h>
-#include <client/client_settings.h>
+#include <utils/settings.h>
 
 #include "version.h"
 

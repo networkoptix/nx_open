@@ -4,11 +4,9 @@
 #include <QtGui/QGraphicsWidget>
 #include "graphics_style.h"
 
-#include <ui/common/frame_section_queryable.h>
-
 class GraphicsWidgetPrivate;
 
-class GraphicsWidget: public QGraphicsWidget, public FrameSectionQueryable {
+class GraphicsWidget: public QGraphicsWidget {
     Q_OBJECT;
     
     typedef QGraphicsWidget base_type;
@@ -38,12 +36,10 @@ public:
          * Item's layout changes are handled by default implementation in
          * <tt>QGraphicsWidget</tt>. If this flag is not set, 
          * <tt>handlePendingLayoutRequests()</tt> function can be used to
-         * force immediate processing of all pending layout requests, 
-         * e.g. before a paint event.
+         * process all pending layout requests.
          * 
-         * Note that this flag has no effect if 
-         * <tt>QGraphicsLayout::instantInvalidatePropagation()</tt> is <tt>false</tt>.
-         * In this case layout changes are always handled by default implementation.
+         * Note that this flag is considered set if
+         * <tt>QGraphicsLayout::instantInvalidatePropagation()</tt> is <tt>true</tt>.
          *
          * This flag is not set by default.
          */
@@ -86,9 +82,6 @@ public:
     TransformOrigin transformOrigin() const;
     void setTransformOrigin(TransformOrigin transformOrigin);
 
-    qreal resizeEffectRadius() const;
-    void setResizeEffectRadius(qreal resizeEffectRadius);
-
     /**
      * \returns                         The area inside the widget's margins.
      */
@@ -114,7 +107,6 @@ protected:
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-    virtual bool event(QEvent *event) override;
     virtual void changeEvent(QEvent *event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
@@ -123,9 +115,7 @@ protected:
 
     virtual void initStyleOption(QStyleOption *option) const;
 
-    using FrameSectionQueryable::windowFrameSectionAt;
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF& pos) const override;
-    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
 
 protected:
     QScopedPointer<GraphicsWidgetPrivate> d_ptr;

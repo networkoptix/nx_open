@@ -1928,6 +1928,8 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
       ifofile->pgci_ut = 0;
       return 0;
     }
+    // FIXME: Iterate and verify that all menus that should exists accordingly
+    //        to pgci_ut->lu[i].exists really do?
   }
 
   return 1;

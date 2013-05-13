@@ -1,9 +1,7 @@
 #include "popup_collection_widget.h"
 #include "ui_popup_collection_widget.h"
 
-#include <business/business_action_parameters.h>
-
-#include <client/client_settings.h>
+#include <business/actions/popup_business_action.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -11,26 +9,21 @@
 
 #include <ui/widgets/popups/business_event_popup_widget.h>
 #include <ui/widgets/popups/system_health_popup_widget.h>
+
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/settings.h>
 #include <utils/common/event_processors.h>
-#include <utils/kvpair_usage_helper.h>
 
-QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent):
+QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnPopupCollectionWidget)
 {
     ui->setupUi(this);
 
     this->setAutoFillBackground(true);
-
-    m_showBusinessEventsHelper = new QnUint64KvPairUsageHelper(
-                context()->user(),
-                QLatin1String("showBusinessEvents"),            //TODO: #GDM move out common consts
-                0xFFFFFFFFFFFFFFFFull,                          //TODO: #GDM move out common consts
-                this);
 
     // TODO: #GDM Evil! Layout code does not belong here.
     // Layout must be done by widget's parent, not the widget itself.
@@ -41,7 +34,6 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent):
 
     connect(ui->postponeAllButton,  SIGNAL(clicked()), this, SLOT(at_postponeAllButton_clicked()));
     connect(ui->minimizeButton,     SIGNAL(clicked()), this, SLOT(at_minimizeButton_clicked()));
-    connect(this->context(),        SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()));
 }
 
 QnPopupCollectionWidget::~QnPopupCollectionWidget()
@@ -53,15 +45,15 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         return false;
 
     //TODO: #GDM check if camera is visible to us
-    QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().getUserGroup();
-    if (userGroup == QnBusinessActionParameters::AdminOnly
-            && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
+    int group = BusinessActionParameters::getUserGroup(businessAction->getParams());
+    if (group > 0 && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
         qDebug() << "popup for admins received, we are not admin";
         return false;
     }
+    // now 1 is Admins Only
 
-    QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    BusinessEventType::Value eventType = params.getEventType();
+    QnBusinessParams params = businessAction->getRuntimeParams();
+    BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
 
     if (eventType >= BusinessEventType::UserDefined)
         return false;
@@ -70,7 +62,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     if (healthMessage >= 0) {
         QnResourceList resources;
 
-        int resourceId = params.getEventResourceId();
+        int resourceId = QnBusinessEventRuntime::getEventResourceId(params);
         QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
         if (resource)
             resources << resource;
@@ -78,12 +70,12 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         return addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resources);
     }
 
-    if (!(m_showBusinessEventsHelper->value() & (1 << eventType))) {
+    if (!(qnSettings->popupBusinessEvents() & (1 << eventType))) {
         qDebug() << "popup received, ignoring" << BusinessEventType::toString(eventType);
         return false;
     }
 
-    int id = businessAction->getRuntimeParams().getEventResourceId();
+    int id = QnBusinessEventRuntime::getEventResourceId(businessAction->getRuntimeParams());
     QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::rfAllResources);
     QString resource = res ? res->getName() : QString();
 
@@ -169,7 +161,7 @@ void QnPopupCollectionWidget::updatePosition() {
 
 void QnPopupCollectionWidget::at_businessEventWidget_closed(BusinessEventType::Value eventType, bool ignore) {
     if (ignore)
-        m_showBusinessEventsHelper->setValue(m_showBusinessEventsHelper->value() & ~(1 << eventType));
+        qnSettings->setPopupBusinessEvents(qnSettings->popupBusinessEvents() & ~(1 << eventType));
 
     if (!m_businessEventWidgets.contains(eventType))
         return;
@@ -210,7 +202,4 @@ void QnPopupCollectionWidget::at_minimizeButton_clicked() {
     hide();
 }
 
-void QnPopupCollectionWidget::at_context_userChanged() {
-    m_showBusinessEventsHelper->setResource(context()->user());
-}
 

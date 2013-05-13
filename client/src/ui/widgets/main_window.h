@@ -89,13 +89,11 @@ protected slots:
     void at_volumeSliderNotifier_manipulated();
 
 private:
-    /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
-    QScopedPointer<QGraphicsScene> m_scene;
-    QScopedPointer<QnGraphicsView> m_view;
-    QScopedPointer<QnWorkbenchController> m_controller;
-    QScopedPointer<QnWorkbenchUi> m_ui;
+    QnWorkbenchController *m_controller;
+    QnWorkbenchUi *m_ui;
 
+    QnGraphicsView *m_view;
     QnLayoutTabBar *m_tabBar;
     QToolButton *m_mainMenuButton;
 

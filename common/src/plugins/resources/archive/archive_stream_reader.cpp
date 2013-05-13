@@ -182,9 +182,10 @@ QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layo
 {
     QString rez;
     QTextStream ost(&rez);
-    ost << layout->size().width() << ',' << layout->size().height();
-    for (int i = 0; i < layout->channelCount(); ++i)
-        ost << ';' << layout->position(i).x() << ',' << layout->position(i).y();
+    ost << layout->width() << ',' << layout->height();
+    for (int i = 0; i < layout->numberOfChannels(); ++i) {
+        ost << ';' << layout->h_position(i) << ',' << layout->v_position(i);
+    }
     ost.flush();
     return rez;
 }
@@ -239,7 +240,7 @@ bool QnArchiveStreamReader::init()
     }
 
     if (!m_delegate->open(m_resource)) {
-        if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
+        if (requiredJumpTime != AV_NOPTS_VALUE)
             emit jumpOccured(requiredJumpTime); 
         return false;
     }
@@ -386,7 +387,7 @@ begin_label:
         m_prevSendMotion = sendMotion;
     }
 
-    int channelCount = m_delegate->getVideoLayout()->channelCount();
+    int channelCount = m_delegate->getVideoLayout()->numberOfChannels();
 
     m_jumpMtx.lock();
     bool reverseMode = m_reverseMode;
@@ -760,7 +761,7 @@ begin_label:
         m_playbackMaskSync.unlock();
 
         qint64 maxTime = m_delegate->endTime();
-        if (newTime == DATETIME_NOW || newTime == -1 || (maxTime != (qint64)AV_NOPTS_VALUE && newTime > maxTime)) {
+        if (newTime == DATETIME_NOW || newTime == -1 || (maxTime != AV_NOPTS_VALUE && newTime > maxTime)) {
             //internalJumpTo(qMax(0ll, newTime)); // seek to end or BOF.
             m_outOfPlaybackMask = true;
             return createEmptyPacket(reverseMode); // EOF reached
@@ -891,7 +892,7 @@ unsigned int QnArchiveStreamReader::getCurrentAudioChannel() const
 QStringList QnArchiveStreamReader::getAudioTracksInfo() const
 {
     QStringList rez;
-    for (int i = 0; i < m_delegate->getAudioLayout()->channelCount(); ++i)
+    for (int i = 0; i < m_delegate->getAudioLayout()->numberOfChannels(); ++i)
         rez << m_delegate->getAudioLayout()->getAudioTrackInfo(i).description;
     return rez;
 }
@@ -922,7 +923,7 @@ void QnArchiveStreamReader::setReverseMode(bool value, qint64 currentTimeHint)
 
 bool QnArchiveStreamReader::isNegativeSpeedSupported() const
 {
-    return true; //!m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->channelCount() == 1;
+    return true; //!m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->numberOfChannels() == 1;
 }
 
 bool QnArchiveStreamReader::isSingleShotMode() const

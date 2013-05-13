@@ -15,7 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
-#include "client/client_settings.h"
+#include "utils/settings.h"
 
 
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):
@@ -25,7 +25,7 @@ QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs
     m_backgroundColorAnimator(NULL),
     m_cycleIntervalSecs(cycleIntervalSecs)
 {
-    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_COLOR), SIGNAL(valueChanged(int)),  this,   SLOT(updateBackgroundColor()));
+    connect(qnSettings->notifier(QnSettings::BACKGROUND_COLOR), SIGNAL(valueChanged(int)),  this,   SLOT(updateBackgroundColor()));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this,   SLOT(updateBackgroundColor()));
 
     updateBackgroundColor(false);

@@ -1,16 +1,16 @@
 #include "popup_business_action_widget.h"
 #include "ui_popup_business_action_widget.h"
 
-#include <business/business_action_parameters.h>
+#include <business/actions/popup_business_action.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
-QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget *parent) :
+QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnPopupBusinessActionWidget)
 {
     ui->setupUi(this);
@@ -31,17 +31,15 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *
     Q_UNUSED(guard)
 
     if (fields & QnBusiness::ActionParamsField)
-        ui->adminsCheckBox->setChecked(model->actionParams().getUserGroup() == QnBusinessActionParameters::AdminOnly);
+        ui->adminsCheckBox->setChecked(BusinessActionParameters::getUserGroup(model->actionParams()) > 0);
 }
 
 void QnPopupBusinessActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnBusinessActionParameters params;
-    params.setUserGroup(ui->adminsCheckBox->isChecked()
-                                             ? QnBusinessActionParameters::AdminOnly
-                                             : QnBusinessActionParameters::EveryOne);
+    QnBusinessParams params;
+    BusinessActionParameters::setUserGroup(&params, ui->adminsCheckBox->isChecked() ? 1 : 0);
     model()->setActionParams(params);
 }
 

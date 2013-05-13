@@ -65,7 +65,6 @@ public:
     qint64 isBigStorageExists() const;
 
     static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
-
 signals:
     void noStoragesAvailable();
     void storageFailure(QnResourcePtr storageRes);

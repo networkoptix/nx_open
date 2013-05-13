@@ -43,7 +43,7 @@ QnToolTipItem::QnToolTipItem(QGraphicsItem *parent):
 }
 
 QnToolTipItem::~QnToolTipItem() {
-    setFocusProxy(NULL); // TODO: #Elric #Qt5.0 workaround for a qt bug that is fixed in Qt5.0
+    return;
 }
 
 const QString &QnToolTipItem::text() const {

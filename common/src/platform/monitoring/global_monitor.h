@@ -46,7 +46,6 @@ public:
     virtual qreal totalCpuUsage() override;
     virtual qreal totalRamUsage() override;
     virtual QList<HddLoad> totalHddLoad() override;
-    virtual QList<NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
     virtual QString partitionByPath(const QString &path) override;
 
@@ -54,7 +53,7 @@ protected:
     virtual void timerEvent(QTimerEvent *event) override;
 
 private:
-    Q_DECLARE_PRIVATE(QnGlobalMonitor)
+    Q_DECLARE_PRIVATE(QnGlobalMonitor);
     QScopedPointer<QnGlobalMonitorPrivate> d_ptr;
 };
 

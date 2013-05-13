@@ -8,7 +8,7 @@
 
 
 class QnWorkbenchContext;
-class QnClientSettings;
+class QnSettings;
 
 class QnConnectionsSettingsWidget;
 class QnLicenseManagerWidget;
@@ -65,7 +65,7 @@ private:
     QnLicenseManagerWidget *m_licenseManagerWidget;
     QnServerSettingsWidget *m_serverSettingsWidget;
 
-    QnClientSettings *m_settings;
+    QnSettings *m_settings;
 
     /** Index of "Licenses" tab to open it from outside. */
     int m_licenseTabIndex;

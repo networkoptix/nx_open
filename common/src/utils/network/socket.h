@@ -65,7 +65,7 @@ public:
     /**
      *   Close and deallocate this socket
      */
-    virtual ~Socket();
+    ~Socket();
 
     QString lastError() const;
 
@@ -198,13 +198,13 @@ public:
     void shutdown();
     virtual void close();
     /*!
-        \param ms. New timeout value (in millis). 0 - no timeout
+        \param ms. New timeout value. 0 - no timeout
         \return true. if timeout has been changed
         By default, there is no timeout
     */
     bool setReadTimeOut( unsigned int ms );
     /*!
-        \param ms. New timeout value (in millis). 0 - no timeout
+        \param ms. New timeout value. 0 - no timeout
         \return true. if timeout has been changed
         By default, there is no timeout
     */

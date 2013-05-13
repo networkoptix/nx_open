@@ -74,7 +74,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, cons
     return QList<QnResourcePtr>();
 }
 
-QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress)
+QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
 {
 
     QString smac;
@@ -165,7 +165,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
     return local_results;
 }
 
-void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress)
+void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
 {
     /*
     QFile gggFile("c:/123");

@@ -13,18 +13,22 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMenu>
 
+#include <utils/common/event_processors.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/common/checked_cast.h>
+
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
 
 #include <camera/resource_display.h>
-#include <camera/video_camera.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/instruments/ui_elements_instrument.h>
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
 #include <ui/graphics/instruments/bounding_instrument.h>
@@ -40,12 +44,10 @@
 #include <ui/graphics/items/generic/clickable_widget.h>
 #include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
-#include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/standard/graphics_message_box.h>
 #include <ui/processors/hover_processor.h>
 
 #include <ui/actions/action_manager.h>
@@ -61,11 +63,7 @@
 #include <ui/workaround/system_menu_event.h>
 #include <ui/screen_recording/screen_recorder.h>
 
-#include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
-#include <utils/common/checked_cast.h>
-#include <client/client_settings.h>
-
+#include "camera/video_camera.h"
 #include "openal/qtvaudiodevice.h"
 #include "core/resource_managment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
@@ -185,7 +183,7 @@ namespace {
 
 
 QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
-    base_type(parent),
+    QObject(parent),
     QnWorkbenchContextAware(parent),
     m_instrumentManager(display()->instrumentManager()),
     m_flags(0),
@@ -215,8 +213,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Install and configure instruments. */
     m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
+    m_uiElementsInstrument = new UiElementsInstrument(this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, hideConstrolsTimeoutMSec, this);
 
+    m_instrumentManager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
     m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
     m_instrumentManager->installInstrument(m_controlsActivityInstrument);
 
@@ -225,9 +225,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_fpsCountingInstrument,    SIGNAL(fpsChanged(qreal)),                                                                  this,                           SLOT(at_fpsChanged(qreal)));
 
     /* Create controls. */
-    m_controlsWidget = new QnUiElementsWidget();
-    m_controlsWidget->setAcceptedMouseButtons(0);
-    display()->scene()->addItem(m_controlsWidget);
+    m_controlsWidget = m_uiElementsInstrument->widget(); /* Setting an ItemIsPanel flag on this item prevents focusing on graphics widgets. Don't set it. */
     display()->setLayer(m_controlsWidget, Qn::UiLayer);
 
     QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
@@ -438,7 +436,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_titleYAnimator->setTargetObject(m_titleItem);
     m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
-    //m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0); // TODO: #Elric why height is zero here?
+    //m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0); // TODO: why height is zero here?
     m_titleYAnimator->setSpeed(32.0 * 2.0);
     m_titleYAnimator->setTimeLimit(500);
 
@@ -594,6 +592,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Navigation slider. */
     m_sliderResizerItem = new QnTopResizerWidget(m_controlsWidget);
     m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
+    m_instrumentManager->registerItem(m_sliderResizerItem); /* We want it registered right away. */
 
     m_sliderItem = new QnNavigationItem(m_controlsWidget);
     m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
@@ -644,7 +643,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_sliderYAnimator->setTargetObject(m_sliderItem);
     m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
-    //m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0); // TODO: #Elric why height is zero at this point?
+    //m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0); // TODO: why height is zero at this point?
     m_sliderYAnimator->setSpeed(70.0 * 2.0); 
     m_sliderYAnimator->setTimeLimit(500);
 
@@ -670,13 +669,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(action(Qn::ToggleSliderAction), SIGNAL(toggled(bool)),                  this,           SLOT(at_toggleSliderAction_toggled(bool)));
 
     /* Notifications button */
+
     m_popupShowButton = newActionButton(action(Qn::TogglePopupsAction), 2.5, -1, m_controlsWidget);
     m_popupShowButton->setProperty(Qn::NoHandScrollOver, true);
     m_popupShowButton->setVisible(false);
     connect(opacityAnimator(m_popupShowButton), SIGNAL(finished()),                 this,           SLOT(updatePopupButtonAnimation()));
     connect(action(Qn::TogglePopupsAction), SIGNAL(toggled(bool)),                  this,           SLOT(at_togglePopupsAction_toggled(bool)));
 
-    initGraphicsMessageBox();
 
     /* Connect to display. */
     display()->view()->addAction(action(Qn::FreespaceAction));
@@ -690,8 +689,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Init fields. */
     setFlags(HideWhenNormal | HideWhenZoomed | AdjustMargins);
 
+    setSliderOpened(true, false);
     setSliderVisible(false, false);
+    setTreeOpened(true, false);
     setTreeVisible(true, false);
+    setTitleOpened(true, false);
     setTitleVisible(true, false);
     setTitleUsed(false);
     setHelpOpened(false, false);
@@ -700,12 +702,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setCalendarVisible(false);
     updateControlsVisibility(false);
 
-    //TODO: #GDM think about a refactoring
-    bool treeOpened = qnSettings->isTreeOpened(); //quite a hack because m_treePinButton sets tree opened if it is pinned
-    m_treePinButton->setChecked(qnSettings->isTreePinned());
-    setTreeOpened(treeOpened, false);
-    setTitleOpened(qnSettings->isTitleOpened(), false);
-    setSliderOpened(qnSettings->isSliderOpened(), false);
+    /* Tree is pinned by default. */
+    m_treePinButton->setChecked(true);
 
     /* Set up title D&D. */
     DropInstrument *dropInstrument = new DropInstrument(true, context(), this);
@@ -722,11 +720,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
-    /* The disconnect call is needed so that our methods don't get triggered while
-     * the ui machinery is shutting down. */
-    disconnectAll();
-
-    delete m_controlsWidget;
+    return;
 }
 
 Qn::ActionScope QnWorkbenchUi::currentScope() const {
@@ -744,21 +738,13 @@ Qn::ActionScope QnWorkbenchUi::currentScope() const {
     }
 }
 
-QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const {
-    /* Get items. */
-    switch(scope) {
-    case Qn::TitleBarScope:
-        return m_tabBarWidget->currentParameters(scope);
-    case Qn::TreeScope:
-        return m_treeWidget->currentParameters(scope);
-    default:
-        return QnActionParameters(currentTarget(scope));
-    }
-}
-
 QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     /* Get items. */
     switch(scope) {
+    case Qn::TitleBarScope: 
+        return m_tabBarWidget->currentTarget(scope);
+    case Qn::TreeScope:
+        return m_treeWidget->currentTarget(scope);
     case Qn::SliderScope:
         return QVariant::fromValue(navigator()->currentWidget());
     case Qn::SceneScope:
@@ -784,8 +770,6 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate) {
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     action(Qn::ToggleTreeAction)->setChecked(opened);
     Q_UNUSED(rollback)
-
-    qnSettings->setTreeOpened(opened);
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate) {
@@ -804,8 +788,6 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate) {
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     action(Qn::ToggleSliderAction)->setChecked(opened);
     Q_UNUSED(rollback)
-
-    qnSettings->setSliderOpened(opened);
 }
 
 void QnWorkbenchUi::setTitleOpened(bool opened, bool animate) {
@@ -814,8 +796,6 @@ void QnWorkbenchUi::setTitleOpened(bool opened, bool animate) {
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     action(Qn::ToggleTitleBarAction)->setChecked(opened);
     Q_UNUSED(rollback)
-
-    qnSettings->setTitleOpened(opened);
 
     if(!m_titleUsed)
         return;
@@ -1141,7 +1121,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
         calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
 
     bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
-    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM does this belong here?
+    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: does this belong here?
 
     bool calendarVisible = calendarEnabled && m_sliderVisible && isSliderOpened();
 
@@ -1372,7 +1352,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
         m_sliderResizerItem->setGeometry(sliderResizerGeometry);
 
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
-        m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
+        m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: remove this ugly hack.
     }
 }
 
@@ -1586,30 +1566,6 @@ void QnWorkbenchUi::setOpenedPanels(Panels panels) {
     setHelpOpened(panels & HelpPanel);
 }
 
-void QnWorkbenchUi::initGraphicsMessageBox() {
-    QGraphicsWidget *graphicsMessageBoxWidget = new QnUiElementsWidget();
-    graphicsMessageBoxWidget->setAcceptedMouseButtons(0);
-    display()->scene()->addItem(graphicsMessageBoxWidget);
-    display()->setLayer(graphicsMessageBoxWidget, Qn::MessageBoxLayer);
-
-    QGraphicsLinearLayout* messageBoxVLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    messageBoxVLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    messageBoxVLayout->setSpacing(0.0);
-
-    QGraphicsLinearLayout* messageBoxHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    messageBoxHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    messageBoxHLayout->setSpacing(0.0);
-
-    graphicsMessageBoxWidget->setLayout(messageBoxHLayout);
-
-    messageBoxHLayout->addStretch();
-    messageBoxHLayout->addItem(messageBoxVLayout);
-    messageBoxHLayout->addStretch();
-
-    messageBoxVLayout->addStretch();
-    messageBoxVLayout->addItem(new QnGraphicsMessageBoxItem(graphicsMessageBoxWidget));
-    messageBoxVLayout->addStretch();
-}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -1667,7 +1623,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
         setHelpOpened(false, isFullscreen);
         setSliderOpened(false, isFullscreen);
 
-        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
+        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: change code so that this call is not needed.
         action(Qn::FitInViewAction)->trigger();
 
         m_inFreespace = true;
@@ -1707,14 +1663,12 @@ void QnWorkbenchUi::at_activityStarted() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
-        if(widget->isInfoVisible()) // TODO: #Elric wrong place?
+        if(widget->isInfoVisible()) // TODO: wrong place?
             widget->setOverlayVisible(true);
 }
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
     //QnResourceWidget *oldWidget = m_widgetByRole[role];
-    bool alreadyZoomed = m_widgetByRole[role] != NULL;
-
     QnResourceWidget *newWidget = display()->widget(role);
     m_widgetByRole[role] = newWidget;
 
@@ -1726,8 +1680,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
 
     if(role == Qn::ZoomedRole) {
         if(newWidget) {
-            if (!alreadyZoomed)
-                m_unzoomedOpenedPanels = openedPanels();
+            m_unzoomedOpenedPanels = openedPanels();
             setOpenedPanels(openedPanels() & SliderPanel); /* Leave slider open. */
         } else {
             /* User may have opened some panels while zoomed, 
@@ -1910,8 +1863,6 @@ void QnWorkbenchUi::at_pinTreeAction_toggled(bool checked) {
         setTreeOpened(true);
 
     updateViewportMargins();
-
-    qnSettings->setTreePinned(checked);
 }
 
 void QnWorkbenchUi::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {

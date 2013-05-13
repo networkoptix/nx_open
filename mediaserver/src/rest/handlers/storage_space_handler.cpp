@@ -97,10 +97,14 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
         reply.storages.push_back(data);
     }
 
+#ifdef Q_OS_WIN
+    reply.storageProtocols.push_back(lit("smb"));
+#endif
     // if storage total amount is low, and large storages is presents, remove small storages from the user control
-    // (writer omits these storages too)
+    // (writer ommits these storages too)
     if (qnStorageMan->isBigStorageExists()) {
-        for (int i = 0; i < reply.storages.size(); ++i) {
+        for (int i = 0; i < reply.storages.size(); ++i)
+        {
             if (reply.storages[i].totalSpace < QnStorageManager::BIG_STORAGE_THRESHOLD) {
                 reply.storages[i].isWritable = false;
                 reply.storages[i].isUsedForWriting = false;
@@ -108,15 +112,12 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
         }
     }
 
-#ifdef Q_OS_WIN
-    reply.storageProtocols.push_back(lit("smb"));
-#endif
     // TODO: #Elric check for other plugins, e.g. coldstore
 
     result.setReply(reply);
     return CODE_OK;
 }
 
-QString QnStorageSpaceHandler::description() const {
+QString QnStorageSpaceHandler::description(TCPSocket *) const {
     return QString(); // TODO: #Elric
 }

@@ -4,6 +4,7 @@
 #include <QtGui/QDialog>
 #include <QtCore/QTimer>
 
+//#include "api/app_server_connection.h"
 #include "utils/common/request_param.h"
 
 class QDataWidgetMapper;
@@ -27,6 +28,8 @@ public slots:
     void timeout();
 
     void oldHttpTestResults(const QnHTTPRawResponse& response, int handle);
+//    void testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
+
 private:
     void testSettings();
 
@@ -43,6 +46,7 @@ private:
     QScopedPointer<Ui::ConnectionTestingDialog> ui;
     QTimer m_timeoutTimer;
     QUrl m_url;
+//    QnAppServerConnectionPtr m_connection;
 };
 
 #endif // CONNECTION_TESTING_DIALOG_H

@@ -9,7 +9,7 @@ QnProlongedBusinessEvent::QnProlongedBusinessEvent(BusinessEventType::Value even
     Q_ASSERT(BusinessEventType::hasToggleState(eventType));
 }
 
-bool QnProlongedBusinessEvent::checkCondition(ToggleState::Value state, const QnBusinessEventParameters &params) const {
+bool QnProlongedBusinessEvent::checkCondition(ToggleState::Value state, const QnBusinessParams &params) const {
     Q_UNUSED(params)
     return state == ToggleState::NotDefined || state == getToggleState();
 }

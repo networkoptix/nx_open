@@ -16,6 +16,8 @@ static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
 static const int STORE_QUEUE_SIZE = 50;
 
+//extern QMutex global_ffmpeg_mutex;
+
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
     m_device(dev),
@@ -97,6 +99,7 @@ void QnStreamRecorder::close()
             fileFinished(fileDuration, m_fileName, m_mediaProvider, QnFfmpegHelper::getFileSizeByIOContext(m_ioContext));
         }
 
+        //QMutexLocker mutex(&global_ffmpeg_mutex);
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
         {
             if (m_formatCtx->streams[i]->codec->codec)
@@ -438,7 +441,9 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         m_fileName += dFileExt;
     QString url = m_fileName; 
 
+    //global_ffmpeg_mutex.lock();
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, url.toUtf8().constData());
+    //global_ffmpeg_mutex.unlock();
 
     if (err < 0) {
         m_lastErrMessage = tr("Can't create output file '%1' for video recording.").arg(m_fileName);
@@ -450,6 +455,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
     {
+        //QMutexLocker mutex(&global_ffmpeg_mutex);
+        
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_LayoutInfo, fileExt), layoutStr.toAscii().data(), 0);
         qint64 startTime = m_startOffset+mediaData->timestamp/1000;
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_startTime, fileExt), QString::number(startTime).toAscii().data(), 0);
@@ -468,16 +475,15 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         m_formatCtx->start_time = mediaData->timestamp;
 
-        m_videoChannels = layout->channelCount();
+        m_videoChannels = layout->numberOfChannels();
         int bottomRightChannel = 0;
         int hPos = -1, vPos = -1;
         for (int i = 0; i < m_videoChannels; ++i) 
         {
-            QPoint position = layout->position(i);
-            if (position.x() >= hPos && position.y() >= vPos) {
+            if (layout->h_position(i) >= hPos && layout->v_position(i) >= vPos) {
                 bottomRightChannel = i;
-                hPos = position.x();
-                vPos = position.y();
+                hPos = layout->h_position(i);
+                vPos  = layout->v_position(i);
             }
         }
 
@@ -557,7 +563,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
         m_isAudioPresent = false;
-        for (int i = 0; i < audioLayout->channelCount(); ++i) 
+        for (int i = 0; i < audioLayout->numberOfChannels(); ++i) 
         {
             m_isAudioPresent = true;
             // TODO: #vasilenko avoid using deprecated methods

@@ -30,7 +30,7 @@ bool QnPlVmax480Resource::isResourceAccessible()
     return true;
 }
 
-QString QnPlVmax480Resource::getDriverName() const 
+QString QnPlVmax480Resource::manufacture() const 
 {
     return QLatin1String(MANUFACTURE);
 }

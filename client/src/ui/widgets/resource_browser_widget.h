@@ -54,11 +54,11 @@ public:
 
     virtual Qn::ActionScope currentScope() const override;
 
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
+
     QPalette comboBoxPalette() const;
 
     void setComboBoxPalette(const QPalette &palette);
-
-    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
 
 signals:
     void activated(const QnResourcePtr &resource);
@@ -73,8 +73,6 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
-
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     QnResourceTreeWidget *currentItemView() const;
     QItemSelectionModel *currentSelectionModel() const;

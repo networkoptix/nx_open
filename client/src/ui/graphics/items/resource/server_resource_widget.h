@@ -5,21 +5,12 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMetaType>
 
-#include <api/model/statistics_reply.h>
+#include <api/media_server_statistics_data.h>
 
 #include "resource_widget.h"
 
 class QnRadialGradientPainter;
 class QnMediaServerStatisticsManager;
-class StatisticsOverlayWidget;
-
-enum LegendButtonBar {
-    CommonButtonBar,
-    NetworkOutButtonBar,
-    NetworkInButtonBar,
-
-    ButtonBarCount
-};
 
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -48,30 +39,18 @@ public:
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
 
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 private slots:
     void at_statistics_received();
-    void at_legend_checkedButtonsChanged();
-    void at_headerOverlayWidget_opacityChanged(const QVariant &value);
 
 private:
     /** Main painting function. */
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
-    void addOverlays();
-
-    LegendButtonBar buttonBarByDeviceType(const QnStatisticsDeviceType deviceType) const;
-
-    void updateLegend();
-
 private:
-    //TODO: #GDM move all required fields to inner class
-    friend class StatisticsOverlayWidget;
-
     QnMediaServerStatisticsManager *m_manager;
 
     /** Video server resource. */
@@ -96,11 +75,7 @@ private:
     /** Number of successfull responces received, required to smooth scroll. */
     int m_counter;
 
-    /** Number of data points displayed simultaneously. */
-    int m_pointsLimit;
-
-    /** Period of updating data from the server in milliseconds. */
-    qreal m_updatePeriod;
+    int m_storageLimit;
 
     /** Status of the frame. */
     Qn::RenderStatus m_renderStatus;
@@ -110,20 +85,6 @@ private:
 
     /** Helper for the background painting. */
     QSharedPointer<QnRadialGradientPainter> m_backgroundGradientPainter;
-
-    /** Button bars with corresponding buttons */
-    QnImageButtonBar* m_legendButtonBar[ButtonBarCount];
-
-    /** Which buttons are checked on each button bar */
-    QHash<QString, bool> m_checkedFlagByKey[ButtonBarCount];
-
-    /** Masks to get corresponding button from button bar */
-    QHash<QString, int> m_buttonMaskByKey[ButtonBarCount];
-
-    /** Mask generate variables */
-    int m_maxMaskUsed[ButtonBarCount];
-
-    qreal m_infoOpacity;
 };
 
 Q_DECLARE_METATYPE(QnServerResourceWidget *)

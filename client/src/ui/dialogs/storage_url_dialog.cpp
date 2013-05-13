@@ -45,7 +45,7 @@ QnStorageSpaceData QnStorageUrlDialog::storage() const {
 
 void QnStorageUrlDialog::accept() {
     QnMediaServerRequestResult result;
-    m_server->apiConnection()->getStorageStatusAsync(ui->urlEdit->text(), &result, SLOT(processReply(int, const QVariant &, int)));
+    m_server->apiConnection()->asyncGetStorageStatus(ui->urlEdit->text(), &result, SLOT(processReply(int, const QVariant &, int)));
 
     QEventLoop loop;
     connect(&result, SIGNAL(replyProcessed()), &loop, SLOT(quit()));

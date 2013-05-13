@@ -105,7 +105,7 @@ protected:
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect);
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget);
 
 protected:
     void updateState(StateFlags state);
@@ -168,7 +168,7 @@ public:
     }
     
 protected:
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) override;
     
     virtual void tick(int deltaMSecs) override;
     

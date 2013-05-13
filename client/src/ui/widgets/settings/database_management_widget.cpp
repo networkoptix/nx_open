@@ -3,7 +3,7 @@
 
 #include <QMessageBox>
 
-#include "client/client_settings.h"
+#include "utils/settings.h"
 #include "api/app_server_connection.h"
 
 #include <ui/actions/actions.h>

@@ -3,7 +3,6 @@
 
 #include <QtCore/QString>
 #include <QtCore/QList>
-#include <QtCore/QMap>
 
 class QnKvPair {
 public:
@@ -25,6 +24,5 @@ private:
 };
 
 typedef QList<QnKvPair> QnKvPairList;
-typedef QMap<int, QnKvPairList> QnKvPairs;
 
 #endif // QN_API_MODEL_KVPAIR_H

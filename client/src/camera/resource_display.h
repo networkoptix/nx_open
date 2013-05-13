@@ -161,7 +161,7 @@ private:
     QnAbstractArchiveReader *m_archiveReader;
 
     /** Video camera. */
-    QnVideoCamera *m_camera; // TODO: #Elric Compatibility layer. Remove.
+    QnVideoCamera *m_camera; // TODO: Compatibility layer. Remove.
 
     /** Whether this display was started. */
     bool m_started;

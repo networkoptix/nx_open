@@ -1,6 +1,3 @@
-
-#include <set>
-
 #include <QtCore/QtConcurrentMap>
 #include <QtCore/QThreadPool>
 #include "resource_discovery_manager.h"
@@ -13,12 +10,9 @@
 #include "utils/common/synctime.h"
 #include "utils/network/ping.h"
 #include "utils/network/ip_range_checker.h"
-#include "plugins/resources/upnp/upnp_device_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
 #include "core/resource/abstract_storage_resource.h"
 #include "core/resource/storage_resource.h"
-#include "camera_driver_restriction_list.h"
-
 
 QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
 
@@ -59,11 +53,9 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 
 // ------------------------------------ QnResourceDiscoveryManager -----------------------------
 
-QnResourceDiscoveryManager::QnResourceDiscoveryManager( const CameraDriverRestrictionList* cameraDriverRestrictionList )
-:
-    m_ready( false ),
-    m_state( initialSearch ),
-    m_cameraDriverRestrictionList( cameraDriverRestrictionList )
+QnResourceDiscoveryManager::QnResourceDiscoveryManager():
+    m_ready(false),
+    m_state( initialSearch )
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
 }
@@ -185,9 +177,6 @@ static int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
 
 void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
-    if( UPNPDeviceSearcher::instance() )
-        UPNPDeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
-
     ResourceSearcherList searchersList;
     {
         QMutexLocker locker(&m_searchersListMutex);
@@ -270,7 +259,6 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     time.start();
 
     QnResourceList resources;
-    std::set<QString> resourcePhysicalIDs;    //used to detect duplicate resources (same resource found by multiple drivers)
     m_searchersListMutex.lock();
     ResourceSearcherList searchersList = m_searchersList;
     m_searchersListMutex.unlock();
@@ -284,36 +272,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             // resources can be searched by client in or server.
             // if this client in stand alone => lets add QnResource::local 
             // server does not care about flags 
-            for( QnResourceList::iterator
-                it = lst.begin();
-                it != lst.end();
-                 )
+            foreach (const QnResourcePtr &res, lst)
             {
-                QnVirtualCameraResourcePtr virtCamRes = it->dynamicCast<QnVirtualCameraResource>();
-                //checking, if found resource is reserved by some other searcher
-                if( virtCamRes &&
-                    m_cameraDriverRestrictionList &&
-                    !m_cameraDriverRestrictionList->driverAllowedForCamera( searcher->manufacture(), virtCamRes->getVendorName(), virtCamRes->getModel() ) )
-                {
-                    it = lst.erase( it );
-                    continue;   //resource with such unique id is already present
-                }
-
-                QnNetworkResourcePtr networkRes = it->dynamicCast<QnNetworkResource>();
-                if( networkRes )
-                {
-                    //checking that resource do not duplicate already found ones
-                    if( !resourcePhysicalIDs.insert( networkRes->getPhysicalId() ).second )
-                    {
-                        it = lst.erase( it );
-                        continue;   //resource with such unique id is already present
-                    }
-                }
-
-                if( searcher->isLocal() )
-                    (*it)->addFlags( QnResource::local );
-
-                ++it;
+                if (searcher->isLocal())
+                    res->addFlags(QnResource::local);
             }
 
             resources.append(lst);
@@ -397,7 +359,6 @@ struct ManualSearcherHelper
         foreach(QnAbstractResourceSearcher* as, *plugins)
         {
             QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-            Q_ASSERT( ns );
             resList = ns->checkHostAddr(url, auth, true);
             if (!resList.isEmpty())
                 break;
@@ -416,7 +377,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
         stream << "Looking for cameras... StartAddr = " << startAddr << "  EndAddr = " << endAddr << "   login/pass = " << auth.user() << "/" << auth.password();
         cl_log.log(str, cl_logINFO);
     }
-
+    
     //=======================================
     QnIprangeChecker ip_cheker;
 
@@ -426,7 +387,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     if (endAddr.isNull())
         online << startAddr;
     else
-        online = ip_cheker.onlineHosts(QHostAddress(QUrl(startAddr).host()), QHostAddress(QUrl(endAddr).host()));
+        online = ip_cheker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr));
 
 
     cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
@@ -444,10 +405,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     foreach(const QString& addr, online)
     {
         ManualSearcherHelper t;
-        if( QUrl(addr).scheme().isEmpty() )
-            t.url.setHost(addr);
-        else
-            t.url.setUrl(addr);
+        t.url.setHost(addr);
         if (port)
             t.url.setPort(port);
         t.auth = auth;

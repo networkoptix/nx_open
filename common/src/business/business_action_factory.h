@@ -17,7 +17,7 @@ public:
                                                          const QnBusinessAggregationInfo& aggregationInfo);
 
     static QnAbstractBusinessActionPtr createAction(const BusinessActionType::Value actionType,
-                                                    const QnBusinessEventParameters &runtimeParams);
+                                                    const QnBusinessParams &runtimeParams);
 };
 
 #endif // BUSINESS_ACTION_FACTORY_H

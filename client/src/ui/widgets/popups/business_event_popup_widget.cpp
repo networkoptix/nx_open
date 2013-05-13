@@ -12,7 +12,6 @@
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/synctime.h>
-#include "business/business_strings_helper.h"
 
 namespace {
 
@@ -109,7 +108,7 @@ void QnBusinessEventPopupWidget::updateTreeSize() {
 
 bool QnBusinessEventPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     if (m_eventType == BusinessEventType::NotDefined) //not initialized
-        initWidget(businessAction->getRuntimeParams().getEventType());
+        initWidget(QnBusinessEventRuntime::getEventType(businessAction->getRuntimeParams()));
     if (!updateTreeModel(businessAction))
         return false;
 
@@ -196,7 +195,7 @@ bool QnBusinessEventPopupWidget::updateTreeModel(const QnAbstractBusinessActionP
         case BusinessEventType::Storage_Failure:
         case BusinessEventType::Network_Issue:
         case BusinessEventType::MediaServer_Failure:
-            item = updateReasonTree(businessAction);
+            item = updateReasonTree(businessAction->getRuntimeParams());
             break;
         case BusinessEventType::Camera_Ip_Conflict:
         case BusinessEventType::MediaServer_Conflict:
@@ -220,17 +219,17 @@ bool QnBusinessEventPopupWidget::updateTreeModel(const QnAbstractBusinessActionP
     return true;
 }
 
-QString QnBusinessEventPopupWidget::getEventTime(const QnBusinessEventParameters &eventParams) {
-    qint64 eventTimestamp = eventParams.getEventTimestamp();
+QString QnBusinessEventPopupWidget::getEventTime(const QnBusinessParams &eventParams) {
+    qint64 eventTimestamp = QnBusinessEventRuntime::getEventTimestamp(eventParams);
     if (eventTimestamp == 0)
         eventTimestamp = qnSyncTime->currentUSecsSinceEpoch();
 
     return QDateTime::fromMSecsSinceEpoch(eventTimestamp/1000).toString(QLatin1String("hh:mm:ss"));
 }
 
-QStandardItem* QnBusinessEventPopupWidget::findOrCreateItem(const QnBusinessEventParameters& eventParams) {
-    int resourceId = eventParams.getEventResourceId();
-    int eventReasonCode = eventParams.getReasonCode();
+QStandardItem* QnBusinessEventPopupWidget::findOrCreateItem(const QnBusinessParams& eventParams) {
+    int resourceId = QnBusinessEventRuntime::getEventResourceId(eventParams);
+    int eventReasonCode = QnBusinessEventRuntime::getReasonCode(eventParams);
 
     QStandardItem *root = m_model->invisibleRootItem();
     for (int i = 0; i < root->rowCount(); i++) {
@@ -250,16 +249,16 @@ QStandardItem* QnBusinessEventPopupWidget::findOrCreateItem(const QnBusinessEven
     QStandardItem *item = new QStandardItem();
     item->setText(getResourceName(resource));
     item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-    item->setData(eventParams.getEventResourceId(), ResourceIdRole);
+    item->setData(QnBusinessEventRuntime::getEventResourceId(eventParams), ResourceIdRole);
     item->setData(0, EventCountRole);
     item->setData(getEventTime(eventParams), EventTimeRole);
     item->setData(eventReasonCode, EventReasonRole);
-    item->setData(eventParams.getReasonText(), EventReasonTextRole);
+    item->setData(QnBusinessEventRuntime::getReasonText(eventParams), EventReasonTextRole);
     root->appendRow(item);
     return item;
 }
 
-QStandardItem* QnBusinessEventPopupWidget::updateSimpleTree(const QnBusinessEventParameters& eventParams) {
+QStandardItem* QnBusinessEventPopupWidget::updateSimpleTree(const QnBusinessParams& eventParams) {
     QStandardItem *item = findOrCreateItem(eventParams);
     if (!item)
         return NULL;
@@ -268,25 +267,70 @@ QStandardItem* QnBusinessEventPopupWidget::updateSimpleTree(const QnBusinessEven
     return item;
 }
 
-QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnAbstractBusinessActionPtr &businessAction) {
-    QStandardItem *item = findOrCreateItem(businessAction->getRuntimeParams());
-    if (item) {
-        item->removeRows(0, item->rowCount()); //TODO: #GDM fix removing rows
-        QString reason = QnBusinessStringsHelper::eventReason(businessAction.data()->getRuntimeParams());
-        if (!reason.isEmpty())
-            item->appendRow(new QStandardItem(reason));
+QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnBusinessParams& eventParams) {
+    QStandardItem *item = findOrCreateItem(eventParams);
+    if (!item)
+        return NULL;
+
+    item->removeRows(0, item->rowCount()); //TODO: #GDM fix removing rows
+
+    QnBusiness::EventReason reasonCode = (QnBusiness::EventReason)item->data(EventReasonRole).toInt();
+    QString reasonText = item->data(EventReasonTextRole).toString();
+
+    switch (reasonCode) {
+        case QnBusiness::NetworkIssueNoFrame:
+            if (m_eventType == BusinessEventType::Network_Issue)
+                item->appendRow(new QStandardItem(tr("No video frame received\nduring last %1 seconds.")
+                                                  .arg(reasonText)));
+            break;
+        case QnBusiness::NetworkIssueConnectionClosed:
+            if (m_eventType == BusinessEventType::Network_Issue)
+                item->appendRow(new QStandardItem(tr("Connection to camera\nwas unexpectedly closed")));
+            break;
+        case QnBusiness::NetworkIssueRtpPacketLoss:
+            if (m_eventType == BusinessEventType::Network_Issue) {
+                QStringList seqs = reasonText.split(QLatin1Char(';'));
+                if (seqs.size() != 2)
+                    break;
+                QString text = tr("RTP packet loss detected.\nPrev seq.=%1 next seq.=%2")
+                        .arg(seqs[0])
+                        .arg(seqs[1]);
+                item->appendRow(new QStandardItem(text));
+            }
+            break;
+        case QnBusiness::MServerIssueTerminated:
+            if (m_eventType == BusinessEventType::MediaServer_Failure)
+                item->appendRow(new QStandardItem(tr("Server terminated.")));
+            break;
+        case QnBusiness::MServerIssueStarted:
+            if (m_eventType == BusinessEventType::MediaServer_Failure)
+                item->appendRow(new QStandardItem(tr("Server started after crash.")));
+            break;
+        case QnBusiness::StorageIssueIoError:
+            if (m_eventType == BusinessEventType::Storage_Failure)
+                item->appendRow(new QStandardItem(tr("I/O Error occured at\n%1")
+                                                  .arg(reasonText)));
+            break;
+        case QnBusiness::StorageIssueNotEnoughSpeed:
+            if (m_eventType == BusinessEventType::Storage_Failure)
+                item->appendRow(new QStandardItem(tr("Not enough HDD/SSD speed\nfor recording at\n%1.")
+                                                  .arg(reasonText)));
+            break;
+        default:
+            break;
     }
+
     return item;
 }
 
-QStandardItem* QnBusinessEventPopupWidget::updateConflictTree(const QnBusinessEventParameters& eventParams) {
+QStandardItem* QnBusinessEventPopupWidget::updateConflictTree(const QnBusinessParams& eventParams) {
 
     QStandardItem *item = findOrCreateItem(eventParams);
     if (!item)
         return NULL;
 
-    QString source = eventParams.getSource();
-    QStringList newConflicts = eventParams.getConflicts();
+    QString source = QnBusinessEventRuntime::getSource(eventParams);
+    QStringList newConflicts = QnBusinessEventRuntime::getConflicts(eventParams);
 
     QStringList conflicts = item->data(ConflictsRole).value<QStringList>();
     foreach(QString entity, newConflicts) {

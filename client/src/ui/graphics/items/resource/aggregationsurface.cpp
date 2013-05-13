@@ -470,7 +470,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 
         m_textureFormat = PIX_FMT_RGBA;
 
-        // TODO: #Elric free memory immediately for still images
+        // TODO: free memory immediately for still images
     }
 
     {

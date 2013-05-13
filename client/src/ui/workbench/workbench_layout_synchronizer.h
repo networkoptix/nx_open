@@ -84,7 +84,6 @@ protected slots:
     void at_resource_itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &itemData);
     void at_resource_cellAspectRatioChanged();
     void at_resource_cellSpacingChanged();
-    void at_resource_lockedChanged();
 
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);

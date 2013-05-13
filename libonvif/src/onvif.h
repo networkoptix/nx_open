@@ -3569,7 +3569,6 @@ enum onvifXsd__AudioEncoding
 	onvifXsd__AudioEncoding__G711,	///< xs:string value="G711"
 	onvifXsd__AudioEncoding__G726,	///< xs:string value="G726"
 	onvifXsd__AudioEncoding__AAC,	///< xs:string value="AAC"
-    onvifXsd__AudioEncoding__AMR	///< xs:string value="AMR"
 };
 
 /// Class wrapper

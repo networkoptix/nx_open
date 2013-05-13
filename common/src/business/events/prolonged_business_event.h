@@ -12,7 +12,7 @@ protected:
                                     ToggleState::Value toggleState,
                                     qint64 timeStamp);
 public:
-    virtual bool checkCondition(ToggleState::Value state, const QnBusinessEventParameters &params) const override;
+    virtual bool checkCondition(ToggleState::Value state, const QnBusinessParams &params) const override;
 };
 
 #endif // PROLONGED_BUSINESS_EVENT_H

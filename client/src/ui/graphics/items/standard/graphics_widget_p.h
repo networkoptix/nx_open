@@ -5,14 +5,12 @@
 
 class QStyleOptionTitleBar;
 
-class ConstrainedGeometrically;
-
 class GraphicsStyle;
 class GraphicsWidgetSceneData;
 
 class GraphicsWidgetPrivate {
 public:
-    GraphicsWidgetPrivate();
+    GraphicsWidgetPrivate(): q_ptr(NULL), handlingFlags(0), transformOrigin(GraphicsWidget::Legacy), style(NULL), windowData(NULL) {};
     virtual ~GraphicsWidgetPrivate();
 
     GraphicsWidgetSceneData *ensureSceneData();
@@ -21,7 +19,6 @@ public:
     bool movableAncestorIsSelected() const { return movableAncestorIsSelected(q_func()); }
 
     bool hasDecoration() const;
-    bool handlesFrameEvents() const;
 
 protected:
     void initStyleOptionTitleBar(QStyleOptionTitleBar *option);
@@ -33,20 +30,16 @@ protected:
 
     QPointF calculateTransformOrigin() const;
 
-    bool windowFrameMouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    bool windowFrameMousePressEvent(QGraphicsSceneMouseEvent *event);
-    bool windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    bool windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *event);
-    bool windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-
-    Qn::WindowFrameSections resizingFrameSectionsAt(const QPointF &pos, QWidget *viewport) const;
-    Qt::WindowFrameSection resizingFrameSectionAt(const QPointF &pos, QWidget *viewport) const;
+    void windowFrameMouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void windowFrameMousePressEvent(QGraphicsSceneMouseEvent *event);
+    void windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *event);
+    void windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
 protected:
     GraphicsWidget *q_ptr;
     GraphicsWidget::HandlingFlags handlingFlags;
     GraphicsWidget::TransformOrigin transformOrigin;
-    qreal resizeEffectRadius;
     QWeakPointer<GraphicsWidgetSceneData> sceneData;
     mutable GraphicsStyle *style;
     mutable QScopedPointer<GraphicsStyle> reserveStyle;
@@ -59,12 +52,10 @@ protected:
         QRectF closeButtonRect;
         QPointF startPinPoint;
         QSizeF startSize;
-        ConstrainedGeometrically *constrained;
         WindowData(): 
             grabbedSection(Qt::NoSection), 
             closeButtonHovered(false), 
-            closeButtonGrabbed(false),
-            constrained(NULL)
+            closeButtonGrabbed(false)
         {}
     } *windowData;
 

@@ -161,9 +161,6 @@ public:
 
     static AnimationTimer *animationTimer(QGraphicsScene *scene);
 
-signals:
-    void sceneChanged();
-
 private slots:
     void at_view_destroyed(QObject *view);
     void at_viewport_destroyed(QObject *viewport);

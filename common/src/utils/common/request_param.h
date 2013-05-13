@@ -14,7 +14,6 @@ public:
     QnRequestParam(const char *first, const char *second): base_type(QLatin1String(first), QLatin1String(second)) {}
     QnRequestParam(const char *first, const QString &second): base_type(QLatin1String(first), second) {}
     QnRequestParam(const QString &first, const char *second): base_type(first, QLatin1String(second)) {}
-    QnRequestParam(const char *first, qint64 second): base_type(QLatin1String(first), QString::number(second)) {}
 };
 
 typedef QPair<QString, QString> QnRequestHeader;

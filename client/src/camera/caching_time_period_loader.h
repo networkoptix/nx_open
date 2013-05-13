@@ -37,10 +37,10 @@ public:
     void setMotionRegions(const QList<QRegion> &motionRegions);
     bool isMotionRegionsEmpty() const;
 
-    QnTimePeriodList periods(Qn::TimePeriodContent type);
+    QnTimePeriodList periods(Qn::TimePeriodRole type);
 
 signals:
-    void periodsChanged(Qn::TimePeriodContent type);
+    void periodsChanged(Qn::TimePeriodRole type);
     void loadingFailed();
 
 private slots:
@@ -49,8 +49,8 @@ private slots:
     void at_syncTime_timeChanged();
 
 protected:
-    void load(Qn::TimePeriodContent type);
-    void trim(Qn::TimePeriodContent type, qint64 trimTime);
+    void load(Qn::TimePeriodRole type);
+    void trim(Qn::TimePeriodRole type, qint64 trimTime);
 
     QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod) const;
 
@@ -65,10 +65,10 @@ private:
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;
     QnTimePeriod m_loadedPeriod;
-    QnAbstractTimePeriodLoader *m_loaders[Qn::TimePeriodContentCount];
-    int m_handles[Qn::TimePeriodContentCount];
+    QnAbstractTimePeriodLoader *m_loaders[Qn::TimePeriodRoleCount];
+    int m_handles[Qn::TimePeriodRoleCount];
     QList<QRegion> m_motionRegions;
-    QnTimePeriodList m_periods[Qn::TimePeriodContentCount];
+    QnTimePeriodList m_periods[Qn::TimePeriodRoleCount];
     qreal m_loadingMargin;
     qint64 m_updateInterval;
 };

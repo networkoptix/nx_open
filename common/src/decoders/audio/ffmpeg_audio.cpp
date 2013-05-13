@@ -9,12 +9,16 @@ struct AVCodecContext;
 
 #define INBUF_SIZE 4096
 
-extern int MAX_AUDIO_FRAME_SIZE; // TODO: #Elric this is totally evil.
+//extern QMutex global_ffmpeg_mutex; // TODO: evil externs, my god!
+extern int MAX_AUDIO_FRAME_SIZE; // TODO: this is totally evil.
 
 bool CLFFmpegAudioDecoder::m_first_instance = true;
 
 AVSampleFormat CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& fmt)
 {
+
+    //int s = fmt.sampleSize();
+    //QAudioFormat::SampleType st = fmt.sampleType();
     if (fmt.sampleSize() == 8)
         return AV_SAMPLE_FMT_U8;
     else if(fmt.sampleSize() == 16 && fmt.sampleType() == QnAudioFormat::SignedInt)
@@ -33,9 +37,13 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
     c(0),
     m_codec(data->compressionType)
 {
+
+	//QMutexLocker mutex(&global_ffmpeg_mutex);
+
 	if (m_first_instance)
 	{
 		m_first_instance = false;
+
 	}
 
 //    CodecID codecId = internalCodecIdToFfmpeg(m_codec);
@@ -85,6 +93,8 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
 
 CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 {
+	//QMutexLocker mutex(&global_ffmpeg_mutex);
+
 	if (c)
 	{
         if (c->codec)

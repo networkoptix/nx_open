@@ -36,7 +36,7 @@ public:
     virtual QnResourcePtr updateResource();
     //========
 
-    virtual QString getDriverName() const override;
+    virtual QString manufacture() const;
     virtual bool isResourceAccessible();
     virtual bool updateMACAddress();
 

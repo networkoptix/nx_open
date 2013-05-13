@@ -66,17 +66,17 @@ public:
     bool isThreadSafe() const;
     void setThreadSafe(bool threadSafe);
 
-    // TODO: #Elric we need a 'dirty' flag and several submit modes. Default mode is to write out only those settings that were actually changed.
+    // TODO: we need a 'dirty' flag and several submit modes. Default mode is to write out only those settings that were actually changed.
 
     void updateFromSettings(QSettings *settings);
     void submitToSettings(QSettings *settings) const;
 
-    // TODO: #Elric we need a way to make command line parameters not to be saved to settings if they are not changed.
+    // TODO: we need a way to make command line parameters not to be saved to settings if they are not changed.
 
     bool updateFromCommandLine(int &argc, char **argv, FILE *errorFile);
     bool updateFromCommandLine(int &argc, char **argv, QTextStream *errorStream);
 
-    // TODO: #Elric also need string-based interface
+    // TODO: also need string-based interface
 
 signals:
     void valueChanged(int id);

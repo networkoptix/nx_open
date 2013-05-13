@@ -234,7 +234,7 @@ private:
     QWeakPointer<QObject> m_object;
 
     /** Identifier of a timer used to track mouse press time. */
-    int m_dragTimerId; // TODO: #Elric use QBasicTimer
+    int m_dragTimerId; // TODO: use QBasicTimer
 
     /** Whether the first drag notification was sent. */
     bool m_firstDragSent;

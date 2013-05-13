@@ -38,12 +38,9 @@ void QnEmulatedFrameWidget::mousePressEvent(QMouseEvent *event) {
 
     Qt::WindowFrameSection section = windowFrameSectionAt(event->pos());
     if(section != Qt::NoSection) {
-        if(section != Qt::TitleBarArea) {
-            m_startPinPoint = Qn::calculatePinPoint(geometry(), section);
-            m_startSize = size();
-        }
-
         m_section = section;
+        m_startPinPoint = Qn::calculatePinPoint(geometry(), section);
+        m_startSize = size();
         m_dragProcessor->widgetMousePressEvent(this, event);
     }
 }

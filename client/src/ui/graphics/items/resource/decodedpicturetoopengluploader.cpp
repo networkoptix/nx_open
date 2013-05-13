@@ -128,6 +128,8 @@ class DecodedPictureToOpenGLUploaderPrivate
     Q_DECLARE_TR_FUNCTIONS(DecodedPictureToOpenGLUploaderPrivate);
 
 public:
+    static int getMaxTextureSize() { return maxTextureSize; }
+
     DecodedPictureToOpenGLUploaderPrivate(const QGLContext *context):
         QnGlFunctions(context),
         supportsNonPower2Textures(false)
@@ -138,7 +140,7 @@ public:
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
 
         /* Maximal texture size. */
-        int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
         NX_LOG(QString(QLatin1String("OpenGL max texture size: %1.")).arg(maxTextureSize), cl_logINFO);
 
         /* Clamp constant. */
@@ -150,59 +152,32 @@ public:
         supportsNonPower2Textures = extensions.contains("GL_ARB_texture_non_power_of_two");
     }
 
-    ~DecodedPictureToOpenGLUploaderPrivate()
+    uchar* filler(uchar value, int size)
     {
-        for( int i = 0; i < FILLER_COUNT; ++i )
-        {
-            if( m_fillers[i].size > 0 )
-            {
-                qFreeAligned( m_fillers[i].data );
-                m_fillers[i].data = NULL;
-                m_fillers[i].size = 0;
-            }
-        }
-    }
+        QMutexLocker locker(&fillerMutex);
 
-    unsigned char* filler( unsigned char value, size_t size )
-    {
-        QMutexLocker lk( &m_fillerMutex );
+        QVector<uchar> &filler = fillers[value];
 
-        Filler& filler = m_fillers[value];
-        if( filler.size < size )
+        if( filler.size() < size )
         {
-            filler.size = size;
-            if( filler.data )
-                qFreeAligned( filler.data );
-            filler.data = (unsigned char*)qMallocAligned( filler.size, FILLER_BUF_ALIGNMENT );
-            memset( filler.data, value, size );
+            filler.resize(size);
+            filler.fill(value);
         }
 
-        return filler.data;
+        return &filler[0];
     }
 
 public:
     GLint clampConstant;
     bool supportsNonPower2Textures;
+    static int maxTextureSize;
+
 private:
-    struct Filler
-    {
-        unsigned char* data;
-        size_t size;
-
-        Filler()
-        :
-            data( NULL ),
-            size( 0 )
-        {
-        }
-    };
-
-    static const int FILLER_COUNT = 256;
-    static const int FILLER_BUF_ALIGNMENT = 32;
-
-    QMutex m_fillerMutex;
-    Filler m_fillers[FILLER_COUNT];
+    QMutex fillerMutex;
+    QVector<uchar> fillers[256];
 };
+
+int DecodedPictureToOpenGLUploaderPrivate::maxTextureSize = 0;
 
 // -------------------------------------------------------------------------- //
 // QnGlRendererTexture
@@ -292,7 +267,7 @@ public:
              * Note that this also must be done when contents size changes because
              * in this case even though the border pixels are initialized, they are
              * initialized with old contents, which is probably not what we want. */
-            size_t fillSize = qMax(textureSize.height(), textureSize.width()) * ROUND_COEFF * internalFormatPixelSize * 16;
+            int fillSize = qMax(textureSize.height(), textureSize.width()) * ROUND_COEFF * internalFormatPixelSize * 16;
             uchar *filler = m_renderer->filler(fillValue, fillSize);
 
             if (roundedWidth < textureSize.width()) {
@@ -414,8 +389,8 @@ const std::vector<GLuint>& DecodedPictureToOpenGLUploader::UploadedPicture::glTe
     return m_surfaceRect->surface()->glTextures();
 #else
     //TODO/IMPL
-    m_picTextures.resize( MAX_TEXTURE_COUNT );
-    for( size_t i = 0; i < MAX_TEXTURE_COUNT; ++i )
+    m_picTextures.resize( TEXTURE_COUNT );
+    for( size_t i = 0; i < TEXTURE_COUNT; ++i )
         m_picTextures[i] = m_textures[i]->id();
     return m_picTextures;
 #endif
@@ -464,7 +439,7 @@ const QSharedPointer<AggregationSurfaceRect>& DecodedPictureToOpenGLUploader::Up
 #endif
 
 
-//const int DecodedPictureToOpenGLUploader::UploadedPicture::MAX_TEXTURE_COUNT;
+//const int DecodedPictureToOpenGLUploader::UploadedPicture::TEXTURE_COUNT;
 
 DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPictureToOpenGLUploader* const uploader )
 :
@@ -478,7 +453,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_glFence( uploader->d.data() )
 {
     //TODO/IMPL allocate textures when needed, because not every format require 3 planes
-    for( size_t i = 0; i < MAX_TEXTURE_COUNT; ++i )
+    for( size_t i = 0; i < TEXTURE_COUNT; ++i )
         m_textures[i].reset( new QnGlRendererTexture(uploader->d) );
 }
 
@@ -1811,22 +1786,8 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     }
 #endif
 
-    static const int MAX_PLANE_COUNT = 4;
-    static const int Y_PLANE_INDEX = 0;
-    static const int A_PLANE_INDEX = 3;
-
-    const int planeCount = format == PIX_FMT_YUVA420P ? 4 : 3;
-
-    unsigned int r_w[MAX_PLANE_COUNT];
-    r_w[0] = width;
-    r_w[1] = width / 2;
-    r_w[2] = width / 2;
-    r_w[3] = width; //alpha plane
-    unsigned int h[MAX_PLANE_COUNT];
-    h[0] = height;
-    h[1] = height / 2;
-    h[2] = height / 2;
-    h[3] = height; //alpha plane
+    unsigned int r_w[3] = { width, width / 2, width / 2 }; // real_width / visible
+    unsigned int h[3] = { height, height / 2, height / 2 };
 
     switch( format )
     {
@@ -1840,13 +1801,13 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             break;
     }
 
-    if( (format == PIX_FMT_YUV420P || format == PIX_FMT_YUV422P || format == PIX_FMT_YUV444P || format == PIX_FMT_YUVA420P) && usingShaderYuvToRgb() )
+    if( (format == PIX_FMT_YUV420P || format == PIX_FMT_YUV422P || format == PIX_FMT_YUV444P) && usingShaderYuvToRgb() )
     {
         //using pixel shader for yuv->rgb conversion
-        for( int i = 0; i < planeCount; ++i )
+        for( int i = 0; i < 3; ++i )
         {
             QnGlRendererTexture* texture = emptyPictureBuf->texture(i);
-            texture->ensureInitialized( r_w[i], h[i], lineSizes[i], 1, GL_LUMINANCE, 1, /*-1*/ i == Y_PLANE_INDEX ? 0x10 : (i == A_PLANE_INDEX ? 0x00 : 0x80) );
+            texture->ensureInitialized( r_w[i], h[i], lineSizes[i], 1, GL_LUMINANCE, 1, /*-1*/ i == 0 ? 0x10 : 0x80 );
 
 #ifdef USE_PBO
 #ifdef USE_SINGLE_PBO_PER_FRAME
@@ -2055,7 +2016,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
         emptyPictureBuf->setColorFormat( PIX_FMT_RGBA );
 
-        //TODO: #ak free memory immediately for still images
+        // TODO: free memory immediately for still images
     }
 
     //TODO/IMPL should place fence here and in getUploadedPicture should take only that picture, whose m_glFence is signaled

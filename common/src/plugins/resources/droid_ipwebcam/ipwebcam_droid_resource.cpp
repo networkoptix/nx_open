@@ -15,7 +15,7 @@ bool QnPlDriodIpWebCamResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QString QnPlDriodIpWebCamResource::getDriverName() const
+QString QnPlDriodIpWebCamResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);
 }

@@ -18,7 +18,6 @@ public:
     virtual qreal totalCpuUsage() override { return 0.0; }
     virtual qreal totalRamUsage() override { return 0.0; }
     virtual QList<HddLoad> totalHddLoad() override { return QList<HddLoad>(); }
-    virtual QList<NetworkLoad> totalNetworkLoad() override { return QList<NetworkLoad>(); }
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return QList<PartitionSpace>(); }
     virtual QString partitionByPath(const QString &) override { return QString(); }
 };
@@ -49,7 +48,6 @@ public:
         totalCpuUsage = base->totalCpuUsage();
         totalRamUsage = base->totalRamUsage();
         totalHddLoad = base->totalHddLoad();
-        totalNetworkLoad = base->totalNetworkLoad();
     }
 
 private:
@@ -63,13 +61,12 @@ private:
     qreal totalCpuUsage;
     qreal totalRamUsage;
     QList<QnPlatformMonitor::HddLoad> totalHddLoad;
-    QList<QnPlatformMonitor::NetworkLoad> totalNetworkLoad;
 
     QBasicTimer updateTimer;
     QBasicTimer stopTimer;
 
 private:
-    Q_DECLARE_PUBLIC(QnGlobalMonitor)
+    Q_DECLARE_PUBLIC(QnGlobalMonitor);
     QnGlobalMonitor *q_ptr;
 };
 
@@ -152,15 +149,6 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     d->requestCount++;
     d->stopped = false;
     return d->totalHddLoad;
-}
-
-QList<QnPlatformMonitor::NetworkLoad> QnGlobalMonitor::totalNetworkLoad() {
-    Q_D(QnGlobalMonitor);
-    QMutexLocker locker(&d->mutex);
-
-    d->requestCount++;
-    d->stopped = false;
-    return d->totalNetworkLoad;
 }
 
 QList<QnPlatformMonitor::PartitionSpace> QnGlobalMonitor::totalPartitionSpaceInfo() {

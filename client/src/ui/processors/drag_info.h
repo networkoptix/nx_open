@@ -7,7 +7,7 @@ class QGraphicsView;
 class QGraphicsItem;
 class QGraphicsScene;
 
-// TODO: #Elric refactor Drag* classes into templates.
+// TODO: refactor Drag* classes into templates.
 // * DragProcessor<QWidget>
 // * DragProcessor<QGraphicsView>
 // * DragProcessor<QGraphicsScene>

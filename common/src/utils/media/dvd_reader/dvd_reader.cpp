@@ -1350,6 +1350,8 @@ static int DVDReadBlocksPath( dvd_file_t *dvd_file, unsigned int offset,
         break;
       } else {
         size_t part1_size = dvd_file->title_sizes[ i ] - offset;
+        /* FIXME: Really needs to be a while loop.
+         * (This is only true if you try and read >1GB at a time) */
 
         /* Read part 1 */
         off = dvdinput_seek( dvd_file->title_devs[ i ], (int)offset );
@@ -1363,6 +1365,8 @@ static int DVDReadBlocksPath( dvd_file_t *dvd_file, unsigned int offset,
         ret = dvdinput_read( dvd_file->title_devs[ i ], data,
                              (int)part1_size, encrypted );
         if( ret < 0 ) return ret;
+        /* FIXME: This is wrong if i is the last file in the set.
+         * also error from this read will not show in ret. */
 
         /* Does the next part exist? If not then return now. */
         if( !dvd_file->title_devs[ i + 1 ] ) return ret;

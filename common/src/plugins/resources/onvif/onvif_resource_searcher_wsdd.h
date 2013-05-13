@@ -3,15 +3,6 @@
 
 #include "onvif_resource_information_fetcher.h"
 
-#include <map>
-
-#include <QString>
-
-#include "onvif/soapwsddProxy.h"
-
-
-class UDPSocket;
-
 struct wsdd__ProbeMatchesType;
 struct wsdd__ProbeType;
 struct wsa__EndpointReferenceType;
@@ -59,25 +50,24 @@ class OnvifResourceSearcherWsdd
     //mutable QMutex m_mutex;
 
 public:
-    virtual ~OnvifResourceSearcherWsdd();
-
     static OnvifResourceSearcherWsdd& instance();
 
-    void findResources(QnResourceList& result);
+    void findResources(QnResourceList& result) const;
 
     void pleaseStop();
 
+    CameraInfo findCamera(const QHostAddress& camAddr) const;
 private:
 
     //void updateInterfacesListenSockets() const;
     //void findHelloEndpoints(EndpointInfoHash& result) const;
-    void findEndpoints(EndpointInfoHash& result);
+    void findEndpoints(EndpointInfoHash& result) const;
     QStringList getAddrPrefixes(const QString& host) const;
     void fillWsddStructs(wsdd__ProbeType& probe, wsa__EndpointReferenceType& endpoint) const;
 
     //If iface is not null, the function will perform multicast search, otherwise - unicast
     //iface and camAddr MUST NOT be 0 at the same time
-    void findEndpointsImpl( EndpointInfoHash& result, const QnInterfaceAndAddr& iface ) const;
+    void findEndpointsImpl(EndpointInfoHash& result, const QnInterfaceAndAddr* iface, const QHostAddress* camAddr = 0) const;
 
     template <class T> QString getAppropriateAddress(const T* source, const QStringList& prefixes) const;
     template <class T> QString getName(const T* source) const;
@@ -87,30 +77,8 @@ private:
     template <class T> void printProbeMatches(const T* source, const SOAP_ENV__Header* header) const;
     template <class T> void addEndpointToHash(EndpointInfoHash& hash, const T* probeMatches,
         const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const;
-
 private:
-    class ProbeContext
-    {
-    public:
-        UDPSocket* sock;
-        wsddProxy soapWsddProxy;
-        wsdd__ProbeType wsddProbe;
-        wsa__EndpointReferenceType replyTo;
-
-        ProbeContext()
-        :
-            sock( NULL ),
-            soapWsddProxy( SOAP_IO_UDP )
-        {
-        }
-    };
-
     bool m_shouldStop;
-    mutable std::map<QString, ProbeContext*> m_ifaceToSock;
-    bool m_isFirstSearch;
-
-    bool sendProbe( const QnInterfaceAndAddr& iface );
-    bool readProbeMatches( const QnInterfaceAndAddr& iface, EndpointInfoHash& result );
 };
 
 #endif // onvif_resource_searcher_wsdd_h

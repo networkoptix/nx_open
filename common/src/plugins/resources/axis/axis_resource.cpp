@@ -39,7 +39,7 @@ bool QnPlAxisResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QString QnPlAxisResource::getDriverName() const
+QString QnPlAxisResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);
 }
@@ -933,10 +933,10 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
 
 void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
     Q_UNUSED(http)
-    // TODO: #Elric make configurable.
+    // TODO: make configurable.
     static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL};
 
-    // TODO: #Elric use QHash here, +^
+    // TODO: use QHash here, +^
     QString localModel = getModel();
     for(const char **model = brokenPtzCameras; *model; model++)
         if(localModel == QLatin1String(*model))

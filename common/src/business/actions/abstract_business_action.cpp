@@ -9,79 +9,57 @@ namespace BusinessActionType {
 
     QString toString(Value val) {
         switch(val) {
-        case NotDefined:            return QString();
-        case CameraOutput:          return QObject::tr("Camera output");
-        case CameraOutputInstant:   return QObject::tr("Camera output for 30 sec");
-        case Bookmark:              return QObject::tr("Bookmark");
-        case CameraRecording:       return QObject::tr("Camera recording");
-        case PanicRecording:        return QObject::tr("Panic recording");
-        case SendMail:              return QObject::tr("Send mail");
-        case Alert:                 return QObject::tr("Alert");
-        case ShowPopup:             return QObject::tr("Show notification");
-        case PlaySound:             return QObject::tr("Play Sound");
+            case NotDefined:         return QObject::tr("---");
+            case CameraOutput:       return QObject::tr("Camera output");
+            case Bookmark:           return QObject::tr("Bookmark");
+            case CameraRecording:    return QObject::tr("Camera recording");
+            case PanicRecording:     return QObject::tr("Panic recording");
+            case SendMail:           return QObject::tr("Send mail");
+            case Alert:              return QObject::tr("Alert");
+            case ShowPopup:          return QObject::tr("Show notification");
         }
         return QObject::tr("Unknown (%1)").arg((int)val);
     }
 
     bool requiresCameraResource(Value val) {
         switch(val) {
-        case NotDefined:
-        case PanicRecording:
-        case SendMail:
-        case Alert:
-        case ShowPopup:
-        case PlaySound:
-            return false;
-
-        case CameraOutput:
-        case CameraOutputInstant:
-        case Bookmark:
-        case CameraRecording:
-            return true;
+            case NotDefined:         return false;
+            case CameraOutput:       return true;
+            case Bookmark:           return true;
+            case CameraRecording:    return true;
+            case PanicRecording:     return false;
+            case SendMail:           return false;
+            case Alert:              return false;
+            case ShowPopup:          return false;
         }
         return false;
     }
 
     bool requiresUserResource(Value val) {
         switch(val) {
-        case NotDefined:
-        case PanicRecording:
-        case CameraOutput:
-        case CameraOutputInstant:
-        case Bookmark:
-        case CameraRecording:
-        case Alert:
-        case ShowPopup:
-        case PlaySound:
-            return false;
-
-        case SendMail:
-            return true;
+            case SendMail:           return true;
+        default:
+            break;
         }
         return false;
     }
 
     bool hasToggleState(Value val) {
         switch(val) {
-        case NotDefined:
-        case CameraOutputInstant:
-        case Bookmark:
-        case SendMail:
-        case Alert:
-        case ShowPopup:
-        case PlaySound:
-            return false;
-
-        case CameraOutput:
-        case CameraRecording:
-        case PanicRecording:
-            return true;
+            case NotDefined:         return false;
+            case CameraOutput:       return true;
+            case Bookmark:           return false;
+            case CameraRecording:    return true;
+            case PanicRecording:     return true;
+            case SendMail:           return false;
+            case Alert:              return false;
+            case ShowPopup:          return false;
         }
         return false;
     }
 }
 
-QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams):
+QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams& runtimeParams):
     m_actionType(actionType),
     m_toggleState(ToggleState::NotDefined), 
     m_receivedFromRemoteHost(false),
@@ -102,19 +80,19 @@ const QnResourceList& QnAbstractBusinessAction::getResources() const {
     return m_resources;
 }
 
-void QnAbstractBusinessAction::setParams(const QnBusinessActionParameters& params) {
+void QnAbstractBusinessAction::setParams(const QnBusinessParams& params) {
     m_params = params;
 }
 
-const QnBusinessActionParameters& QnAbstractBusinessAction::getParams() const {
+const QnBusinessParams& QnAbstractBusinessAction::getParams() const {
     return m_params;
 }
 
-void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessEventParameters& params) {
+void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessParams& params) {
     m_runtimeParams = params;
 }
 
-const QnBusinessEventParameters& QnAbstractBusinessAction::getRuntimeParams() const {
+const QnBusinessParams& QnAbstractBusinessAction::getRuntimeParams() const {
     return m_runtimeParams;
 }
 

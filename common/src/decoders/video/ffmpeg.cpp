@@ -7,6 +7,8 @@
 #include "utils/math/math.h"
 
 
+//extern QMutex global_ffmpeg_mutex;
+
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
@@ -56,11 +58,13 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedV
 {
     m_mtDecoding = mtDecoding;
 
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
     if (data->context)
     {
         m_passedContext = avcodec_alloc_context3(0);
         avcodec_copy_context(m_passedContext, data->context->ctx());
     }
+    
 
     // XXX Debug, should be passed in constructor
     m_tryHardwareAcceleration = false; //hwcounter % 2;
@@ -73,6 +77,8 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedV
 
 CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
+
     closeDecoder();
 
     if (m_passedContext && m_passedContext->codec)
@@ -99,6 +105,7 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 {
     AVCodec* codec = 0;
 
+    // CodecID codecId = internalCodecIdToFfmpeg(internalCodecId);
     if (codecId != CODEC_ID_NONE)
         codec = avcodec_find_decoder(codecId);
 
@@ -207,7 +214,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 
 
     cl_log.log(QLatin1String("Creating ") + QLatin1String(m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
-    // TODO: #vasilenko check return value
+    // TODO: check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
         m_codec = 0;
@@ -220,6 +227,8 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 
 void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
 {
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
+
     //closeDecoder();
     //openDecoder();
     //return;
@@ -547,7 +556,7 @@ double CLFFmpegVideoDecoder::getSampleAspectRatio() const
     if (qAbs(result)< 1e-7) 
     {
         result = 1.0;
-        if (m_context->width == 720) { // TODO: #vasilenko add a table!
+        if (m_context->width == 720) { // TODO: add a table!
             if (m_context->height == 480)
                 result = (4.0/3.0) / (720.0/480.0);
             else if (m_context->height == 576)

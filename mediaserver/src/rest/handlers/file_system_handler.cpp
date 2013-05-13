@@ -55,7 +55,7 @@ int QnFileSystemHandler::executeGet(const QString &, const QnRequestParamList &p
     return CODE_OK;
 }
 
-QString QnFileSystemHandler::description() const
+QString QnFileSystemHandler::description(TCPSocket *) const
 {
     return 
         "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n"

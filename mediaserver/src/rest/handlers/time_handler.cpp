@@ -1,26 +1,36 @@
 #include "time_handler.h"
+#include "utils/network/tcp_connection_priv.h"
+#include "utils/common/synctime.h"
+#include "utils/common/util.h"
 
-#include <api/model/time_reply.h>
+QnTimeHandler::QnTimeHandler()
+{
 
-#include <utils/network/tcp_connection_priv.h>
-#include <utils/common/synctime.h>
-#include <utils/common/util.h>
+}
 
-QnTimeHandler::QnTimeHandler() {}
-
-int QnTimeHandler::executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) {
+int QnTimeHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+{
     Q_UNUSED(path)
     Q_UNUSED(params)
+    Q_UNUSED(contentType)
 
-    QnTimeReply reply;
-    reply.timeZoneOffset = currentTimeZone() * 1000ll;
-    reply.utcTime = qnSyncTime->currentMSecsSinceEpoch();
+    int offset = currentTimeZone();
+    QString offsetStr = QString::number(offset);
+    if (offset >= 0)
+        offsetStr = QLatin1String("+") + offsetStr;
 
-    result.setReply(reply);
+    QString dateStr = qnSyncTime->currentDateTime().toUTC().toString("yyyy-MM-ddThh:mm:ss.zzzZ");
+    result.append(QString("<time><clock>%1</clock><utcOffset>%2</utcOffset></time>\n").arg(dateStr).arg(offsetStr).toUtf8());
     return CODE_OK;
 }
 
-QString QnTimeHandler::description() const
+int QnTimeHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+{
+    Q_UNUSED(body)
+    return executeGet(path, params, result, contentType);
+}
+
+QString QnTimeHandler::description(TCPSocket *) const
 {
     return "Returns server UTC time and time zone";
 }

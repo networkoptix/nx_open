@@ -12,15 +12,15 @@ class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 public:
     static QnPlAxisResourceSearcher& instance();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) override;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 
     // return the manufacture of the server
-    virtual QString manufacture() const override;
+    virtual QString manufacture() const;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
 protected:
-    QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress) override;
+    QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress);
 };
 
 #endif // axis_device_server_h_2219

@@ -145,6 +145,8 @@ typedef struct {
 /** 
  * Button Information
  *
+ * NOTE: I've had to change the structure from the disk layout to get
+ * the packing to work with Sun's Forte C compiler.
  * The 4 and 7 bytes are 'rotated' was: ABC DEF GHIJ  is: ABCG DEFH IJ
  */
 typedef struct {

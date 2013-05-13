@@ -78,22 +78,6 @@ public:
         quint64 sizeBytes;
     };
 
-    /**
-     * Network load entry
-     */
-    struct NetworkLoad {
-        NetworkLoad(): bytesPerSecIn(0), bytesPerSecOut(0) {}
-
-        /** Network interface name */
-        QString interfaceName;
-
-        /** Current download speed in bytes per second */
-        quint64 bytesPerSecIn;
-
-        /** Current upload speed in bytes per second */
-        quint64 bytesPerSecOut;
-    };
-
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformMonitor() {}
 
@@ -122,10 +106,6 @@ public:
      */
     virtual QList<HddLoad> totalHddLoad() = 0;
 
-    /**
-     * \returns                         A list of network load entries for all network interfaces on this PC.
-     */
-    virtual QList<NetworkLoad> totalNetworkLoad() = 0;
 
     /**
      * @returns                         A list of partition space entries for all partitions on

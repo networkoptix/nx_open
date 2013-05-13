@@ -24,7 +24,7 @@ void QnClientPullMediaStreamProvider::run()
 
     if (QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>())
     {
-        numberOfChnnels = mr->getVideoLayout()->channelCount();
+        numberOfChnnels = mr->getVideoLayout()->numberOfChannels();
     }
 
     beforeRun();
