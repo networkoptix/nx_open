@@ -14,9 +14,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
-//TODO: #GDM use documentation from http://support.google.com/mail/bin/answer.py?hl=en&answer=1074635
-
-
 namespace {
     enum WidgetPages {
         SimplePage,

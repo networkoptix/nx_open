@@ -9,7 +9,7 @@
 #include <ui/common/tool_tip_queryable.h>
 
 namespace {
-    QString widgetToolTip(QWidget *widget, const QPoint &pos) { // TODO: implement like in help topic accessor, with bubbleUp.
+    QString widgetToolTip(QWidget *widget, const QPoint &pos) { // TODO: #Elric implement like in help topic accessor, with bubbleUp.
         QWidget *childWidget = widget->childAt(pos);
         if(!childWidget)
             childWidget = widget;
@@ -72,17 +72,16 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
             break;
         }
     }
-
     if(!targetItem) {
         helpEvent->ignore();
         return true; /* Eat it anyway. */
     }
 
     GraphicsTooltip::showText(
-        itemToolTip(targetItem, targetItem->mapFromScene(scenePos)), 
-        targetItem, 
-        scenePos, 
-        QRectF(view->mapToScene(viewport->geometry().topLeft()), view->mapToScene(viewport->geometry().bottomRight()))
+        itemToolTip(targetItem, targetItem->mapFromScene(scenePos)),
+        view,
+        targetItem,
+        helpEvent->pos()
     );
 
     helpEvent->accept();

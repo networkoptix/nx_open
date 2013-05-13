@@ -38,6 +38,7 @@ public:
         RECORD_ALWAYS_COLOR,
         
         PTZ_COLOR,
+        ZOOM_WINDOW_COLOR,
 
         OPACITY_CHANGE_PERIOD,
 
@@ -63,6 +64,12 @@ public:
         POPUP_FRAME_IMPORTANT,
         POPUP_FRAME_WARNING,
 
+        /** Maximum size of the layout background - in cells */
+        LAYOUT_BACKGROUND_MAX_SIZE,
+
+        /** Recommended area of the layout background - in square cells */
+        LAYOUT_BACKGROUND_RECOMMENDED_AREA,
+
         VARIABLE_COUNT
     };
 
@@ -86,6 +93,7 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196))
         QN_DECLARE_R_PROPERTY(QColor,   selectedFrameColor,             SELECTED_FRAME_COLOR,                   QColor(64, 130, 180, 128))
         QN_DECLARE_R_PROPERTY(QColor,   ptzColor,                       PTZ_COLOR,                              QColor(128, 196, 255, 255))
+        QN_DECLARE_R_PROPERTY(QColor,   zoomWindowColor,                ZOOM_WINDOW_COLOR,                      QColor(128, 196, 255, 255))
 
         QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250)
         QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64))
@@ -108,6 +116,9 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   popupFrameNotification,         POPUP_FRAME_NOTIFICATION,               QColor(64, 130, 180, 128))
         QN_DECLARE_R_PROPERTY(QColor,   popupFrameImportant,            POPUP_FRAME_IMPORTANT,                  QColor(255, 128, 0, 128))
         QN_DECLARE_R_PROPERTY(QColor,   popupFrameWarning,              POPUP_FRAME_WARNING,                    QColor(255, 0, 0, 128))
+
+        QN_DECLARE_R_PROPERTY(QSize,    layoutBackgroundMaxSize,        LAYOUT_BACKGROUND_MAX_SIZE,             QSize(64, 64))
+        QN_DECLARE_R_PROPERTY(int,      layoutBackgroundRecommendedArea,LAYOUT_BACKGROUND_RECOMMENDED_AREA,     40*40)
     QN_END_PROPERTY_STORAGE()
 };
 

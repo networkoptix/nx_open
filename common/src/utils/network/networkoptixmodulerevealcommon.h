@@ -20,7 +20,7 @@ static const char* NX_MEDIA_SERVER_ID = "mediaserver.exe";
 
 // declaring here to avoid GCC 'unused constant' warning spam
 // also using them is much more convinient than call ::fromAscii every time
-// TODO: #elric Fix me if it is a bad idea
+// TODO: #Elric Fix me if it is a bad idea
 static const QString nxEntControllerId = QLatin1String(NX_ENTERPISE_CONTROLLER_ID);
 static const QString nxClientId = QLatin1String(NX_CLIENT_ID);
 static const QString nxMediaServerId = QLatin1String(NX_MEDIA_SERVER_ID);

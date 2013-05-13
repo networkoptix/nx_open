@@ -47,6 +47,8 @@
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
+#include <ui/graphics/items/grid/grid_background_item.h>
+#include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
@@ -124,8 +126,8 @@ namespace {
     /** Viewport lower size boundary, in scene coordinates. */
     const QSizeF viewportLowerSizeBound = QSizeF(qnGlobals->workbenchUnitSize() * 0.05, qnGlobals->workbenchUnitSize() * 0.05);
 
-    const qreal defaultFrameWidth = qnGlobals->workbenchUnitSize() * 0.005;
-    const qreal selectedFrameWidth = defaultFrameWidth * 2;
+    const qreal defaultFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings
+    const qreal selectedFrameWidth = defaultFrameWidth * 2; // TODO: #Elric same here
 
     const int widgetAnimationDurationMsec = 500;
     const int zoomAnimationDurationMsec = 500;
@@ -145,7 +147,7 @@ namespace {
 } // anonymous namespace
 
 QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_scene(NULL),
     m_view(NULL),
@@ -159,7 +161,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
     m_frameOpacityAnimator(NULL),
-    m_dummyScene(new QGraphicsScene(this)),
     m_loader(NULL)
 {
     std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
@@ -243,13 +244,9 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
-
-    setScene(m_dummyScene);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
-    m_dummyScene = NULL;
-
     setScene(NULL);
 }
 
@@ -260,15 +257,8 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
     if(m_scene && m_view)
         deinitSceneView();
 
-    /* Prepare new scene. */
     m_scene = scene;
-    if(!m_scene && m_dummyScene) {
-        m_dummyScene->clear();
-        m_scene = m_dummyScene;
-    }
 
-    /* Set up new scene.
-     * It may be NULL only when this function is called from destructor. */
     if(m_scene && m_view)
         initSceneView();
 }
@@ -320,6 +310,9 @@ void QnWorkbenchDisplay::deinitSceneView() {
 
     foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
         removeItemInternal(item, true, false);
+
+    if (gridBackgroundItem())
+        delete gridBackgroundItem();
 }
 
 void QnWorkbenchDisplay::initSceneView() {
@@ -329,7 +322,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_instrumentManager->registerScene(m_scene);
 
     /* Note that selection often changes there and back, and we don't want such changes to 
-     * affect our logic, so we use queued connections here. */ // TODO: I don't see queued connections
+     * affect our logic, so we use queued connections here. */ // TODO: #Elric I don't see queued connections
     connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
     connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged())); 
     connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
@@ -348,7 +341,7 @@ void QnWorkbenchDisplay::initSceneView() {
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if(!m_view->property(qn_viewInitializedPropertyName).toBool()) {
         if (!QGLFormat::hasOpenGL()) {
-            qnCritical("Software rendering is not supported."); // TODO: this check must be performed on startup.
+            qnCritical("Software rendering is not supported."); // TODO: #Elric this check must be performed on startup.
         } else {
             QGLFormat glFormat;
             glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
@@ -405,13 +398,17 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem = new QnGridItem();
     m_scene->addItem(m_gridItem.data());
     setLayer(m_gridItem.data(), Qn::BackLayer);
-    m_gridItem.data()->setAnimationSpeed(2.0);
-    m_gridItem.data()->setAnimationTimeLimit(300);
+    opacityAnimator(m_gridItem.data())->setTimeLimit(300);
     m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
     m_gridItem.data()->setOpacity(0.0);
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
-    m_gridItem.data()->setAnimationTimer(m_instrumentManager->animationTimer());
+
+    m_gridBackgroundItem = new QnGridBackgroundItem();
+    m_scene->addItem(gridBackgroundItem());
+    setLayer(gridBackgroundItem(), Qn::EMappingLayer);
+    gridBackgroundItem()->setOpacity(0.0);
+    gridBackgroundItem()->setMapper(workbench()->mapper());
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -437,10 +434,13 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
     m_boundingInstrument->setMovementSpeed(m_view, 4.0);
 }
 
-QnGridItem *QnWorkbenchDisplay::gridItem() {
+QnGridItem *QnWorkbenchDisplay::gridItem() const {
     return m_gridItem.data();
 }
 
+QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
+    return m_gridBackgroundItem.data();
+}
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
@@ -510,6 +510,10 @@ QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const {
 
 QnResourceWidget *QnWorkbenchDisplay::widget(const QUuid &uuid) const {
     return widget(workbench()->currentLayout()->item(uuid));
+}
+
+QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget) const {
+    return m_zoomTargetWidgetByWidget.value(widget);
 }
 
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) {
@@ -620,6 +624,19 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
     emit widgetChanged(role);
 }
 
+void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
+    if (!layout)
+        return;
+
+    gridBackgroundItem()->setImageSize(layout->backgroundSize());
+    gridBackgroundItem()->setImageFilename(layout->backgroundImageFilename());
+    gridBackgroundItem()->setImageOpacity(layout->backgroundOpacity());
+    gridBackgroundItem()->updateDisplay();
+
+    synchronizeSceneBounds();
+    fitInView();
+}
+
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
     return m_widgets;
 }
@@ -717,7 +734,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
     const int maxItemCount = sizeof(void *) == sizeof(qint32) ? 24 : 64;
 
-    if (m_widgets.size() >= maxItemCount) { // TODO: item limit must be changeable.
+    if (m_widgets.size() >= maxItemCount) { // TODO: #Elric item limit must be changeable.
         qnDeleteLater(item);
         return false;
     }
@@ -728,7 +745,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    if ((!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) || resource->hasFlags(QnResource::layout)) { // TODO: unsupported for now
+    if ((!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) || resource->hasFlags(QnResource::layout)) { // TODO: #Elric unsupported for now
         qnDeleteLater(item);
         return false;
     }
@@ -766,6 +783,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_geometryDeltaChanged()));
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
+    connect(item, SIGNAL(zoomRectChanged()),                            this, SLOT(at_item_zoomRectChanged()));
 
     m_widgets.push_back(widget);
     m_widgetByItem.insert(item, widget);
@@ -787,7 +805,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
     if(widgets(widget->resource()).size() == 1)
-        connect(widget->resource().data(),  SIGNAL(disabledChanged(const QnResourcePtr &)),  this, SLOT(at_resource_disabledChanged(const QnResourcePtr &)), Qt::QueuedConnection);
+        connect(widget->resource(),     SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_resource_disabledChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 
     emit widgetAdded(widget);
 
@@ -814,15 +832,18 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem) {
     disconnect(item, NULL, this, NULL);
 
-    QnResourceWidget *widget = m_widgetByItem.value(item);
+    QnResourceWidget *widget = this->widget(item);
     if(widget == NULL) {
         assert(!destroyItem);
         return false; /* The widget wasn't created. */
     }
 
+    /* Remove all linked zoom items. */
+    removeZoomLinksInternal(item);
+
     disconnect(widget, NULL, this, NULL);
     if(widgets(widget->resource()).size() == 1)
-        disconnect(widget->resource().data(), NULL, this, NULL);
+        disconnect(widget->resource(), NULL, this, NULL);
 
     for(int i = 0; i <= Qn::ItemRoleCount; i++)
         if(widget == m_widgetByRole[i])
@@ -851,6 +872,55 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     if(destroyItem)
         qnDeleteLater(item);
 
+    return true;
+}
+
+bool QnWorkbenchDisplay::addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
+    return addZoomLinkInternal(widget(item), widget(zoomTargetItem));
+}
+
+bool QnWorkbenchDisplay::removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
+    return removeZoomLinkInternal(widget(item), widget(zoomTargetItem));
+}
+
+bool QnWorkbenchDisplay::addZoomLinkInternal(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget) {
+    if(widget && zoomTargetWidget) {
+        if(QnResourceWidget *oldZoomTargetWidget = m_zoomTargetWidgetByWidget.value(widget)) {
+            if(oldZoomTargetWidget == zoomTargetWidget)
+                return false;
+            removeZoomLinkInternal(widget, oldZoomTargetWidget);
+        }
+
+        m_zoomTargetWidgetByWidget.insert(widget, zoomTargetWidget);
+        emit zoomLinkAdded(widget, zoomTargetWidget);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool QnWorkbenchDisplay::removeZoomLinkInternal(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget) {
+    if(widget && zoomTargetWidget) {
+        if(m_zoomTargetWidgetByWidget.contains(widget)) {
+            emit zoomLinkAboutToBeRemoved(widget, zoomTargetWidget);
+            m_zoomTargetWidgetByWidget.remove(widget);
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+bool QnWorkbenchDisplay::removeZoomLinksInternal(QnWorkbenchItem *item) {
+    QnResourceWidget *widget = this->widget(item);
+    if(!widget)
+        return false;
+
+    removeZoomLinkInternal(widget, m_zoomTargetWidgetByWidget.value(widget));
+    foreach(QnResourceWidget *zoomWidget, m_zoomTargetWidgetByWidget.keys(widget))
+        removeZoomLinkInternal(zoomWidget, widget);
     return true;
 }
 
@@ -1022,7 +1092,13 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
     if(layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
 
-    return workbench()->mapper()->mapFromGridF(QRectF(layoutBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
+    QRect backgroundBoundingRect = gridBackgroundItem() ? gridBackgroundItem()->sceneBoundingRect() : QRect();
+
+    QRect sceneBoundingRect =  (backgroundBoundingRect.isNull())
+            ? layoutBoundingRect
+            : layoutBoundingRect.united(backgroundBoundingRect);
+
+    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
@@ -1087,6 +1163,7 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate) {
     }
 
     synchronizeGeometry(widget, animate);
+    synchronizeZoomRect(widget);
     synchronizeLayer(widget);
 }
 
@@ -1115,7 +1192,13 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 
         QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
-        QSizeF maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
+        QSizeF maxWidgetSize;
+        if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()) {
+            maxWidgetSize = viewportGeometry.size() * 0.33; // TODO: #Elric
+        } else {
+            maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
+        }
+
         QPointF viewportCenter = viewportGeometry.center();
 
         /* Allow expansion no further than the maximal size, but no less than current size. */
@@ -1146,6 +1229,19 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         widget->setEnclosingGeometry(enclosingGeometry);
         widget->setRotation(item->rotation());
     }
+}
+
+void QnWorkbenchDisplay::synchronizeZoomRect(QnWorkbenchItem *item) {
+    QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL)
+        return; /* No widget was created for the given item. */
+
+    synchronizeZoomRect(widget);
+}
+
+void QnWorkbenchDisplay::synchronizeZoomRect(QnResourceWidget *widget) {
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        mediaWidget->setZoomRect(widget->item()->zoomRect());
 }
 
 void QnWorkbenchDisplay::synchronizeAllGeometries(bool animate) {
@@ -1259,7 +1355,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
     const QnResourceVideoLayout *videoLayout = widget->channelLayout();
-    const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
+    const qreal estimatedAspectRatio = aspectRatio(videoLayout->size()) * (4.0 / 3.0);
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
 
@@ -1314,10 +1410,29 @@ void QnWorkbenchDisplay::at_layout_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbenchDisplay::at_layout_itemRemoved(QnWorkbenchItem *item) {
-    if(removeItemInternal(item, true, false)) {
+    if(removeItemInternal(item, true, false))
         synchronizeSceneBounds();
+}
+
+void QnWorkbenchDisplay::at_layout_zoomLinkAdded(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
+    addZoomLinkInternal(item, zoomTargetItem);
+}
+
+void QnWorkbenchDisplay::at_layout_zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
+    removeZoomLinkInternal(item, zoomTargetItem);
+}
+
+void QnWorkbenchDisplay::at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect) {
+    QRect backgroundBoundingRect = gridBackgroundItem() ? gridBackgroundItem()->sceneBoundingRect() : QRect();
+
+    QRect oldBoundingRect = (backgroundBoundingRect.isNull())
+            ? oldRect
+            : oldRect.united(backgroundBoundingRect);
+    QRect newBoundingRect = (backgroundBoundingRect.isNull())
+            ? newRect
+            : newRect.united(backgroundBoundingRect);
+    if (oldBoundingRect != newBoundingRect)
         fitInView();
-    }
 }
 
 void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item) {
@@ -1336,6 +1451,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     QnWorkbenchLayout *layout = workbench()->currentLayout();
 
     disconnect(layout, NULL, this, NULL);
+    if (layout->resource())
+        disconnect(layout->resource(), NULL, this, NULL);
 
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
@@ -1360,6 +1477,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
+    if(gridBackgroundItem())
+        gridBackgroundItem()->setOpacity(0.0);
+
     m_inChangeLayout = false;
 }
 
@@ -1393,6 +1513,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
 
     foreach(QnWorkbenchItem *item, layout->items())
         addItemInternal(item, false, !thumbnailed);
+    foreach(QnWorkbenchItem *item, layout->items())
+        addZoomLinkInternal(item, item->zoomTargetItem());
 
     bool hasTimeLabels = layout->data(Qn::LayoutTimeLabelsRole).toBool();
 
@@ -1430,7 +1552,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         if(paused) {
             if(widget->display()->archiveReader()) {
                 widget->display()->archiveReader()->pauseMedia();
-                widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
+                widget->display()->archiveReader()->setSpeed(0.0); // TODO: #vasilenko check that this call doesn't break anything
             }
         }
 
@@ -1440,7 +1562,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             
             qint64 displayTime = time;
             if(qnSettings->timeMode() == Qn::ServerTimeMode)
-                displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: do offset adjustments in one place
+                displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
 
             QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
@@ -1457,8 +1579,15 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
 
     connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
-    connect(layout,             SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
-
+    connect(layout,             SIGNAL(zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)), this,      SLOT(at_layout_zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)));
+    connect(layout,             SIGNAL(zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)), this,    SLOT(at_layout_zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)));
+    connect(layout,             SIGNAL(boundingRectChanged(QRect, QRect)),      this,                   SLOT(at_layout_boundingRectChanged(QRect, QRect)));
+    if (layout->resource()) {
+        connect(layout->resource(), SIGNAL(backgroundImageChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
+        connect(layout->resource(), SIGNAL(backgroundSizeChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
+        connect(layout->resource(), SIGNAL(backgroundOpacityChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
+    }
+    updateBackground(layout->resource());
     synchronizeSceneBounds();
     fitInView(false);
 }
@@ -1509,6 +1638,10 @@ void QnWorkbenchDisplay::at_item_geometryChanged() {
 
 void QnWorkbenchDisplay::at_item_geometryDeltaChanged() {
     synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), true);
+}
+
+void QnWorkbenchDisplay::at_item_zoomRectChanged() {
+    synchronizeZoomRect(static_cast<QnWorkbenchItem *>(sender()));
 }
 
 void QnWorkbenchDisplay::at_item_rotationChanged() {
@@ -1640,5 +1773,8 @@ void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resour
 
         removeItemInternal(item, true, false);
         addItemInternal(item, false);
+        addZoomLinkInternal(item, item->zoomTargetItem());
     }
 }
+
+

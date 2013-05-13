@@ -10,6 +10,8 @@ namespace Ui {
     class RecordingSettings;
 }
 
+class QnDwm;
+
 class QnRecordingSettingsWidget : public QWidget
 {
     Q_OBJECT
@@ -49,10 +51,12 @@ private slots:
     void updateDisableAeroCheckbox();
 
     void at_browseRecordingFolderButton_clicked();
+    void at_dwm_compositionChanged(bool enabled);
 
 private:
     QScopedPointer<Ui::RecordingSettings> ui;
     QnVideoRecorderSettings *m_settings;
+    QnDwm* m_dwm;
 };
 
 #endif // VIDEORECORDINGDIALOG_H

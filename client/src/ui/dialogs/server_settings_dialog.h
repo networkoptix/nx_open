@@ -1,6 +1,7 @@
 #ifndef SERVER_SETTINGS_DIALOG_H
 #define SERVER_SETTINGS_DIALOG_H
 
+#include <QtCore/QWeakPointer>
 #include <QtGui/QDialog>
 
 #include <core/resource/resource_fwd.h>
@@ -38,6 +39,10 @@ private:
     QnStorageSpaceData tableItem(int row) const;
     QList<QnStorageSpaceData> tableItems() const;
 
+    void setBottomLabelText(const QString &text);
+    QString bottomLabelText() const;
+    int dataRowCount() const;
+
 private slots: 
     void at_tableBottomLabel_linkActivated();
     void at_storagesTable_cellChanged(int row, int column);
@@ -49,7 +54,7 @@ private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
     QList<QString> m_storageProtocols;
-    QLabel *m_tableBottomLabel;
+    QWeakPointer<QLabel> m_tableBottomLabel;
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;

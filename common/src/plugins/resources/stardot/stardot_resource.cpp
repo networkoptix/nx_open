@@ -30,10 +30,10 @@ namespace
 };
 
 QnStardotResource::QnStardotResource():
-    m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
-    m_maxFps(30),
     m_resolutionNum(-1),
+    m_maxFps(30),
+    m_rtspPort(DEFAULT_RTSP_PORT),
     m_rtspTransport(lit("tcp")),
     m_motionMaskBinData(0)
 {
@@ -45,7 +45,7 @@ QnStardotResource::~QnStardotResource()
     qFreeAligned(m_motionMaskBinData);
 }
 
-QString QnStardotResource::manufacture() const
+QString QnStardotResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }
@@ -136,7 +136,7 @@ void QnStardotResource::parseInfo(const QByteArray& info)
             QList<QByteArray> data = portInfo.split('/');
             m_rtspPort = data[0].toInt();
             if (data.size() > 1)
-                m_rtspTransport = lit((const char*)data[1]);
+                m_rtspTransport = lit(data[1]);
         }
     }
 }
@@ -219,8 +219,6 @@ bool QnStardotResource::hasDualStreaming() const
 {
     return false;
 }
-
-static const QString motionData();
 
 void QnStardotResource::setMotionMaskPhysical(int channel)
 {

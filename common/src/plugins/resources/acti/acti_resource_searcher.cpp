@@ -167,13 +167,20 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         devInfo.timer.restart();
         m_cashedDevInfo[devUrl] = devInfo;
     }
-    processPacket(QHostAddress(), url.host(), devInfo.info, result);
+	processPacket(QHostAddress(), url.host(), devInfo.info, QByteArray(), result);
 
     return result;
 }
 
-void QnActiResourceSearcher::processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result)
+void QnActiResourceSearcher::processPacket(
+    const QHostAddress& discoveryAddr,
+    const QString& host,
+    const UpnpDeviceInfo& devInfo,
+    const QByteArray& /*xmlDevInfo*/,
+    QnResourceList& result)
 {
+    Q_UNUSED(discoveryAddr)
+    Q_UNUSED(host)
     if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
         return;
 

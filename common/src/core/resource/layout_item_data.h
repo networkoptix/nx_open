@@ -11,7 +11,11 @@
 
 class QnLayoutItemData {
 public:
-    QnLayoutItemData(): flags(0), rotation(0) {}
+    QnLayoutItemData():
+        flags(0),
+        zoomRect(0.0, 0.0, 1.0, 1.0),
+        rotation(0)
+    {}
 
     struct {
         QnId id;
@@ -21,12 +25,14 @@ public:
     QUuid uuid;
     int flags;
     QRectF combinedGeometry;
+    QUuid zoomTargetUuid;
+    QRectF zoomRect;
     qreal rotation;
 
     QHash<int, QVariant> dataByRole;
 
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
-        if (l.uuid != r.uuid || l.flags != r.flags || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || !qFuzzyCompare(l.rotation, r.rotation))
+        if (l.uuid != r.uuid || l.flags != r.flags || l.zoomTargetUuid != r.zoomTargetUuid || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || !qFuzzyCompare(l.zoomRect, r.zoomRect) || !qFuzzyCompare(l.rotation, r.rotation))
             return false;
 
         if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || !l.resource.id.isValid() || !r.resource.id.isValid()))

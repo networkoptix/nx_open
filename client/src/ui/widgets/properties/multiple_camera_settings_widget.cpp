@@ -5,7 +5,7 @@
 
 #include <QtGui/QMessageBox>
 
-//TODO: #elric #gdm asked: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+//TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
@@ -26,7 +26,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     ui(new Ui::MultipleCameraSettingsWidget),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
-    m_hasControlsChanges(false),
+    m_hasScheduleControlsChanges(false),
     m_readOnly(false),
     m_inUpdateMaxFps(false)
 {
@@ -261,7 +261,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
     updateLicenseText();
 
     setHasDbChanges(false);
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 bool QnMultipleCameraSettingsWidget::isReadOnly() const {
@@ -308,7 +308,7 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChange
     at_dbDataChanged();
 
     m_hasScheduleChanges = true;
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
@@ -332,11 +332,11 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChan
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged() {
-    m_hasControlsChanges = true;
+    m_hasScheduleControlsChanges = true;
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied() {
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked() {

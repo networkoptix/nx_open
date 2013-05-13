@@ -44,7 +44,7 @@ public:
     QnWorkbenchNavigator(QObject *parent = NULL);
     virtual ~QnWorkbenchNavigator();
 
-    // TODO: move time slider & time scrollbar out.
+    // TODO: #Elric move time slider & time scrollbar out.
     QnTimeSlider *timeSlider() const;
     void setTimeSlider(QnTimeSlider *timeSlider);
 
@@ -77,7 +77,6 @@ public:
     Q_SLOT void stepForward();
 
     virtual Qn::ActionScope currentScope() const override;
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -94,6 +93,8 @@ signals:
     void speedRangeChanged();
 
 protected:
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
+
     enum SliderLine {
         CurrentLine,
         SyncedLine,
@@ -127,9 +128,9 @@ protected slots:
     void updateCalendarFromSlider();
 
     void updateCurrentPeriods();
-    void updateCurrentPeriods(Qn::TimePeriodRole type);
+    void updateCurrentPeriods(Qn::TimePeriodContent type);
     void updateSyncedPeriods();
-    void updateSyncedPeriods(Qn::TimePeriodRole type);
+    void updateSyncedPeriods(Qn::TimePeriodContent type);
     void updateTargetPeriod();
     void updateLines();
     void updateCalendar();
@@ -159,8 +160,8 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodRole type);
-    void at_loader_periodsChanged(Qn::TimePeriodRole type);
+    void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodContent type);
+    void at_loader_periodsChanged(Qn::TimePeriodContent type);
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();

@@ -60,6 +60,8 @@ applauncher/client.mak*
 applauncher/x86
 applauncher/x64
 
+axiscamplugin/x86
+
 client/bin
 client/build
 client/src/Info.plist
@@ -186,3 +188,15 @@ launcher/x64
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
 android-client/android-dw/**
+
+
+axiscamplugin/x86
+axiscamplugin/x64
+axiscamplugin/docs/
+appserver/hostedfiles/*
+
+genericrtspplugin/x86
+genericrtspplugin/x64
+
+
+nx_sdk/nx_sdk 

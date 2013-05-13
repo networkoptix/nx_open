@@ -19,6 +19,7 @@ class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
+class QnWorkbenchLayoutWatcher;
 class QnActionManager;
 
 /**
@@ -109,7 +110,8 @@ private:
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
 
     QnWorkbenchUserWatcher *m_userWatcher;
-    QHash<QByteArray, QObject *> m_instanceByTypeName; // TODO: use std::type_index
+    QnWorkbenchLayoutWatcher *m_layoutWatcher;
+    QHash<QByteArray, QObject *> m_instanceByTypeName; // TODO: #Elric use std::type_index
     QList<QObject *> m_instances;
 };
 

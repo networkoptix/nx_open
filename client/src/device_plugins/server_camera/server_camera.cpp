@@ -27,7 +27,7 @@ bool QnServerCamera::updateMACAddress()
     return true;
 }
 
-QString QnServerCamera::manufacture() const
+QString QnServerCamera::getDriverName() const
 {
     return QLatin1String("Server camera"); //all other manufacture are also untranslated and should not be translated
 }

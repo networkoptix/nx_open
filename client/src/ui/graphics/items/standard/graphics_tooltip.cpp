@@ -15,6 +15,10 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/weak_graphics_item_pointer.h>
 
+#include <ui/graphics/items/standard/graphics_message_box.h>
+
+#include <utils/common/checked_cast.h>
+
 namespace {
     const qreal toolTipMargin = 5.0;
 }
@@ -148,7 +152,7 @@ void GraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
     // default pos - below the button and below the cursor
     QRectF cursorRect = item()->sceneTransform().mapRect(QRectF(0, 0, 10, 20));
 
-    // TODO: doesn't work well with tree tooltips
+    // TODO: #Elric doesn't work well with tree tooltips
     //p.setY(qMax(p.y() + cursorRect.height(), item()->sceneBoundingRect().y() + item()->sceneBoundingRect().height()));
     p.setY(p.y() + cursorRect.height());
 
@@ -201,7 +205,19 @@ bool GraphicsTooltipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *even
     return base_type::sceneEventFilter(watched, event);
 }
 
-void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, QRectF viewport) {
+void GraphicsTooltip::showText(QString text, QGraphicsView *view, QGraphicsItem *item, const QPoint &pos) {
+    QPointF scenePos = view->mapToScene(pos);
+    QWidget *viewport = view->childAt(pos);
+
+    QRectF sceneRect(
+                view->mapToScene(viewport->geometry().topLeft()),
+                view->mapToScene(viewport->geometry().bottomRight())
+                );
+
+    showText(text, item, scenePos, sceneRect);
+}
+
+void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF scenePos, QRectF sceneRect) {
     QScopedPointer<QTextDocument> document(new QTextDocument());
     document->setHtml(text);
     text = document->toPlainText(); /* GraphicsLabel currently doesn't support rich text. */
@@ -215,7 +231,7 @@ void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, Q
             // that is showing (removes flickering)
             if (GraphicsTooltipLabel::instance->tipChanged(text, item)){
                 GraphicsTooltipLabel::instance->reuseTip(text, item);
-                GraphicsTooltipLabel::instance->placeTip(pos, viewport);
+                GraphicsTooltipLabel::instance->placeTip(scenePos, sceneRect);
             }
             
             opacityAnimator(GraphicsTooltipLabel::instance, 3.0)->animateTo(1.0);
@@ -226,7 +242,7 @@ void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, Q
     if (!text.isEmpty()) { // no tip can be reused, create new tip:
         new GraphicsTooltipLabel(text, item); // sets GraphicsTooltipLabel::instance to itself
         GraphicsTooltipLabel::instance->setOpacity(0.0);
-        GraphicsTooltipLabel::instance->placeTip(pos, viewport);
+        GraphicsTooltipLabel::instance->placeTip(scenePos, sceneRect);
         GraphicsTooltipLabel::instance->setObjectName(QLatin1String("graphics_tooltip_label"));
 
         opacityAnimator(GraphicsTooltipLabel::instance, 3.0)->animateTo(1.0);

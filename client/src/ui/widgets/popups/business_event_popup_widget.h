@@ -52,7 +52,7 @@ private:
      * @param eventParams           Params of the last event.
      * @return                      String formatted as hh:mm:ss
      */
-    QString getEventTime(const QnBusinessParams& eventParams);
+    QString getEventTime(const QnBusinessEventParameters& eventParams);
 
     /**
      * @brief findOrCreateItem      Find or create item in the model containing data related
@@ -60,7 +60,7 @@ private:
      * @param eventParams           Params of the last event.
      * @return                      Item or NULL if event resource does not exist.
      */
-    QStandardItem* findOrCreateItem(const QnBusinessParams& eventParams);
+    QStandardItem* findOrCreateItem(const QnBusinessEventParameters& eventParams);
 
     /**
      * @brief updateTreeModel       Build tree model depending of event type.
@@ -74,15 +74,15 @@ private:
      * @param eventParams           Params of the last event.
      * @return                      Updated item or NULL if event resource does not exist.
      */
-    QStandardItem* updateSimpleTree(const QnBusinessParams& eventParams);
+    QStandardItem* updateSimpleTree(const QnBusinessEventParameters& eventParams);
 
     /**
      * @brief updateReasonTree      Used to build and update tree containing event resources
      *                              and event reason (for failure events).
-     * @param eventParams           Params of the last event.
+     * @param businessAction        last event.
      * @return                      Updated item or NULL if event resource does not exist.
      */
-    QStandardItem* updateReasonTree(const QnBusinessParams& eventParams);
+    QStandardItem* updateReasonTree(const QnAbstractBusinessActionPtr &businessAction);
 
     /**
      * @brief updateConflictTree    Used to build and update tree containing event resources
@@ -90,7 +90,7 @@ private:
      * @param eventParams           Params of the last event.
      * @return                      Updated item or NULL if event resource does not exist.
      */
-    QStandardItem* updateConflictTree(const QnBusinessParams& eventParams);
+    QStandardItem* updateConflictTree(const QnBusinessEventParameters& eventParams);
 
 private:
     QScopedPointer<Ui::QnBusinessEventPopupWidget> ui;

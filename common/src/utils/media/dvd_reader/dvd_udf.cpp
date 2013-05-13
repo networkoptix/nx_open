@@ -473,7 +473,6 @@ static int Unicodedecode( quint8 *data, int len, char *target )
 static int UDFDescriptor( quint8 *data, quint16 *TagID ) 
 {
   *TagID = GETN2(0);
-  // TODO: check CRC 'n stuff
   return 0;
 }
 
@@ -820,7 +819,6 @@ static int UDFGetAVDP( dvd_reader_t *device,
         lbnum = lastsector;
         terminate = 1;
       } else {
-        /* TODO: Find last sector of the disc (this is optional). */
         if( lastsector ) {
           /* Try #2, backup anchor */
           lbnum = lastsector - 256;
@@ -902,7 +900,6 @@ static int UDFFindPartition( dvd_reader_t *device, int partnum,
       } else if( ( TagID == 6 ) && ( !volvalid ) ) {
         /* Logical Volume Descriptor */
         if( UDFLogVolume( LogBlock, part->VolumeDesc ) ) {  
-          /* TODO: sector size wrong! */
         } else {
           volvalid = 1;
         }

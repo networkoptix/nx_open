@@ -88,7 +88,7 @@ class QnSetCameraParamHandler
 {
 public:
     //!Implementation of QnRestRequestHandler::description
-    virtual QString description( TCPSocket* tcpSocket ) const;
+    virtual QString description() const override;
 };
 
 //!Handles setCameraParam request
@@ -101,7 +101,7 @@ class QnGetCameraParamHandler
 {
 public:
     //!Implementation of QnRestRequestHandler::description
-    virtual QString description( TCPSocket* tcpSocket ) const;
+    virtual QString description() const override;
 };
 
 #endif  //QN_CAMERA_SETTINGS_HANDLER_H

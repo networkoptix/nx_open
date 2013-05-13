@@ -2,7 +2,7 @@
 
 #include <QtGui/QAction>
 
-#include <utils/common/string_compare.h>
+#include <utils/common/string.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
@@ -16,13 +16,13 @@
 namespace {
     struct LayoutNameCmp {
         bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
-            return qnNaturalStringCaseInsensitiveLessThan(l->getName(), r->getName());
+            return naturalStringCaseInsensitiveLessThan(l->getName(), r->getName());
         }
     };
 
     struct PtzPresetNameCmp {
         bool operator()(const QnPtzPreset &l, const QnPtzPreset &r) {
-            return qnNaturalStringCaseInsensitiveLessThan(l.name, r.name);
+            return naturalStringCaseInsensitiveLessThan(l.name, r.name);
         }
     };
 
@@ -89,5 +89,5 @@ void QnPtzGoToPresetActionFactory::at_action_triggered() {
     if(!camera)
         return;
 
-    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::NameParameter, action->text()));
+    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, action->text()));
 }

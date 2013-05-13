@@ -28,6 +28,8 @@ public:
     /* stop reading from camera if no active DataConsumers left */
     void stopIfNoActivity();
 
+    void updateActivity();
+
     /* Mark some camera activity (RTSP client connection for example) */
     void inUse(void* user);
 

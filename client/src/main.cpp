@@ -10,7 +10,7 @@
 
 #include "version.h"
 #include "ui/widgets/main_window.h"
-#include "utils/settings.h"
+#include "client/client_settings.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
@@ -49,7 +49,7 @@
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
-#include "plugins/pluginmanager.h"
+#include "plugins/plugin_manager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
@@ -319,7 +319,8 @@ int main(int argc, char **argv)
         /* Set authentication parameters from command line. */
         QUrl authentication = QUrl::fromUserInput(authenticationString);
         if(authentication.isValid()) {
-            out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
+            // do not print password in plaintext
+            //out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
             qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
         }
 
@@ -445,6 +446,7 @@ int main(int argc, char **argv)
 #endif // Q_OS_WIN
         QnResourceDiscoveryManager::instance()->start();
 
+        // here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
         qApp->setStyle(qnSkin->style());
 
         /* Create workbench context. */
@@ -468,7 +470,7 @@ int main(int argc, char **argv)
         context->action(Qn::EffectiveMaximizeAction)->trigger();
 
         //initializing plugin manager. TODO supply plugin dir (from settings)
-        PluginManager::instance()->loadPlugins();
+        PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
 
         /* Process input files. */
         for (int i = 1; i < argc; ++i)
@@ -490,8 +492,9 @@ int main(int argc, char **argv)
 
         if (argc <= 1) {
             /* If no input files were supplied --- open connection settings dialog. */
-            if(!authentication.isValid()) {
-                context->menu()->trigger(Qn::ConnectToServerAction);
+            if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
+                context->menu()->trigger(Qn::ConnectToServerAction,
+                                         QnActionParameters().withArgument(Qn::StoredPasswordRole, qnSettings->storedPassword()));
             } else {
                 context->menu()->trigger(Qn::ReconnectAction);
             }
@@ -502,14 +505,14 @@ int main(int argc, char **argv)
             qnSettings->setLayoutsOpenedOnLogin(false);
 
             QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
-            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
         }
 
         if (!instantDrop.isEmpty()){
             qnSettings->setLayoutsOpenedOnLogin(false);
 
             QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
-            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
         }
 
 #ifdef _DEBUG
@@ -540,6 +543,7 @@ int main(int argc, char **argv)
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
 
+//    qApp->processEvents(); //TODO: #Elric crashes
     return result;
 }
 

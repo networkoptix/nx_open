@@ -39,9 +39,16 @@ public:
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
 
-    // like arecont or iqinvision
-    virtual QString manufacture() const = 0; // TODO: rename to manufacturer()
-    virtual QString oemName() const;
+    //!Returns driver (built-in or external) name, used to manage camera
+    /*!
+        This can be "axis", "dlink", "onvif", etc.
+    */
+    virtual QString getDriverName() const = 0;
+    //!Returns camera's vendor name
+    /*!
+        For onvif camera it returns real vendor name, not "onvif"
+    */
+    virtual QString getVendorName() const;
 
 
     virtual int getMaxFps(); // in fact this is const function;
@@ -52,7 +59,7 @@ public:
 
     virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
 
-    virtual QRect getCroping(QnDomain domain); // TODO: 'cropping' is spelled with double 'p'. Rename
+    virtual QRect getCroping(QnDomain domain); // TODO: #Elric 'cropping' is spelled with double 'p'. Rename
     virtual void setCroping(QRect croping, QnDomain domain); // sets cropping. rect is in the percents from 0 to 100
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
@@ -136,7 +143,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
-    virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
+    virtual void setCropingPhysical(QRect croping) = 0; // TODO: #Elric 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
     //!MUST be overridden for camera with input port. Default implementation does noting
     /*!

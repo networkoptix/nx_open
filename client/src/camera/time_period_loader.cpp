@@ -121,7 +121,7 @@ void QnTimePeriodLoader::discardCachedData() {
 
 int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
 {
-    return m_connection->asyncRecordedTimePeriods(
+    return m_connection->getTimePeriodsAsync(
         QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
         periodToLoad.startTimeMs, 
         periodToLoad.startTimeMs + periodToLoad.durationMs, 
@@ -134,7 +134,7 @@ int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
 
 void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle)
 {
-    // TODO: I don't see a mutex here.
+    // TODO: #Elric I don't see a mutex here.
 
     for (int i = 0; i < m_loading.size(); ++i)
     {
@@ -151,7 +151,7 @@ void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &ti
                     m_loadedData = QnTimePeriod::mergeTimePeriods(allPeriods); // union data
 
                     QnTimePeriod loadedPeriod = m_loading[i].period;
-                    loadedPeriod.durationMs -= 60 * 1000; /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: cut off near live only
+                    loadedPeriod.durationMs -= 60 * 1000; /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: #Elric cut off near live only
                     if(!m_loadedData.isEmpty())
                         loadedPeriod.durationMs = qMin(loadedPeriod.durationMs, m_loadedData.back().startTimeMs - loadedPeriod.startTimeMs);
                     if(loadedPeriod.durationMs > 0) {

@@ -14,7 +14,7 @@ class QnWorkbenchLayout;
 class QnWorkbenchGridMapper;
 class QnWorkbenchItem;
 
-// TODO: doxydoc is out of date
+// TODO: #Elric doxydoc is out of date
 
 /**
  * Workbench ties layout, items and current UI-related "state" together.
@@ -36,7 +36,7 @@ class QnWorkbenchItem;
  * <li>Currently zoomed item - an item that is shown in full screen.</li>
  * </ul>
  */
-class QnWorkbench: public QObject, public QnWorkbenchContextAware { // TODO: remove context-aware
+class QnWorkbench: public QObject, public QnWorkbenchContextAware { // TODO: #Elric remove context-aware
     Q_OBJECT;
 public:
     /**

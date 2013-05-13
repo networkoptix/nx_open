@@ -38,11 +38,11 @@ void AbstractGraphicsSliderPrivate::setSteps(qint64 single, qint64 page) {
 
 
 AbstractGraphicsSlider::AbstractGraphicsSlider(QGraphicsItem *parent): 
-    GraphicsWidget(*new AbstractGraphicsSliderPrivate, parent)
+    base_type(*new AbstractGraphicsSliderPrivate, parent)
 {}
 
 AbstractGraphicsSlider::AbstractGraphicsSlider(AbstractGraphicsSliderPrivate &dd, QGraphicsItem *parent):
-    GraphicsWidget(dd, parent)
+    base_type(dd, parent)
 {}
 
 AbstractGraphicsSlider::~AbstractGraphicsSlider() 
@@ -266,6 +266,9 @@ void AbstractGraphicsSlider::sendPendingMouseMoves(bool checkPosition) {
 
 void AbstractGraphicsSlider::sendPendingMouseMoves(QWidget *widget, bool checkPosition) {
     Q_D(AbstractGraphicsSlider);
+
+    if(!scene() || scene()->mouseGrabberItem() != this)
+        return;
 
     if(!widget || widget != d->mouseWidget.data())
         return;
@@ -491,7 +494,7 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *event)
 void AbstractGraphicsSlider::initStyleOption(QStyleOption *option) const {
     Q_D(const AbstractGraphicsSlider);
 
-    GraphicsWidget::initStyleOption(option);
+    base_type::initStyleOption(option);
 
     if (d->orientation == Qt::Horizontal)
         option->state |= QStyle::State_Horizontal;
@@ -547,7 +550,7 @@ bool AbstractGraphicsSlider::event(QEvent *event) {
     }
 #endif
 
-    return GraphicsWidget::event(event);
+    return base_type::event(event);
 }
 
 void AbstractGraphicsSlider::changeEvent(QEvent *event) {
@@ -562,7 +565,7 @@ void AbstractGraphicsSlider::changeEvent(QEvent *event) {
         break;
     }
 
-    GraphicsWidget::changeEvent(event);
+    base_type::changeEvent(event);
 }
 
 void AbstractGraphicsSlider::timerEvent(QTimerEvent *event) {

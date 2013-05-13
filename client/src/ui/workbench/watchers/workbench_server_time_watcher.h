@@ -8,6 +8,7 @@
 
 #include <utils/math/math.h>
 #include <core/resource/resource_fwd.h>
+#include <api/model/time_reply.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -19,8 +20,6 @@ class QnWorkbenchServerTimeWatcher: public QObject, public QnWorkbenchContextAwa
 public:
     QnWorkbenchServerTimeWatcher(QObject *parent);
     virtual ~QnWorkbenchServerTimeWatcher();
-
-    // TODO: this also handles non-camera offsets, so 'server' naming is not entirely correct.
 
     qint64 utcOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue = Qn::InvalidUtcOffset) const;
 
@@ -46,7 +45,7 @@ private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
-    void at_replyReceived(int status, const QDateTime &dateTime, int utcOffset, int handle);
+    void at_replyReceived(int status, const QnTimeReply &reply, int handle);
 
 private:
     QBasicTimer m_timer;

@@ -4,9 +4,9 @@
 #include <vector>
 #include <QQueue>
 #include <QVariant>
-#include <QSemaphore>
 
 #include "log.h"
+#include "qnsemaphore.h"
 
 static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
 
@@ -211,7 +211,7 @@ protected:
 
     int m_maxSize;
     mutable QMutex m_cs;
-    QSemaphore m_sem;
+    QnSemaphore m_sem;
 };
 
 template <typename T>

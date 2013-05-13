@@ -11,6 +11,8 @@
 
 #include <client/client_globals.h>
 
+#include <utils/common/connective.h>
+
 #include "workbench_context_aware.h"
 
 class QGraphicsScene;
@@ -48,14 +50,15 @@ class QnMediaResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 class QnScreenRecorder;
+class QnGraphicsMessageBox;
 
 /**
  * This class implements default scene manipulation logic.
  */
-class QnWorkbenchController: public QObject, public QnWorkbenchContextAware, protected QnGeometry {
+class QnWorkbenchController: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry {
     Q_OBJECT
 
-    typedef QObject base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     /**
@@ -114,9 +117,6 @@ protected:
     void moveCursor(const QPoint &direction);
     void showContextMenuAt(const QPoint &pos);
 
-    void showOverlayLabel(const QString &text, int width);
-    void initOverlayLabelAnimation();
-
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -128,6 +128,9 @@ protected slots:
 
     void at_rotationStarted(QGraphicsView *view, QGraphicsWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
+
+    void at_zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect);
+    void at_zoomRectCreated(QnMediaResourceWidget *widget, const QRectF &zoomRect);
 
     void at_motionSelectionProcessStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
     void at_motionSelectionStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
@@ -154,7 +157,9 @@ protected slots:
     void at_widget_rotationStartRequested();
     void at_widget_rotationStopRequested();
 
+    void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
+    void at_accessController_permissionsChanged(const QnResourcePtr &resource);
 
     void at_selectAllAction_triggered();
     void at_startSmartSearchAction_triggered();
@@ -175,11 +180,15 @@ protected slots:
     void at_screenRecorder_recordingStarted();
     void at_screenRecorder_recordingFinished(const QString &recordedFileName);
 
-    void at_recordingAnimation_valueChanged(const QVariant &value);
+    void at_recordingAnimation_tick(int tick);
     void at_recordingAnimation_finished();
 
     void at_zoomedToggle_activated();
     void at_zoomedToggle_deactivated();
+
+    void at_tourModeLabel_finished();
+
+    void updateLayoutInstruments(const QnLayoutResourcePtr &layout);
 
 private:
     /* Global state. */
@@ -278,11 +287,9 @@ private:
     bool m_countdownCanceled;
 
     /** Screen recording countdown label. */
-    QLabel *m_overlayLabel;
+    QnGraphicsMessageBox *m_recordingCountdownLabel;
 
-    /** Animation for screen recording countdown. */
-    QPropertyAnimation *m_overlayLabelAnimation;
-
+    QnGraphicsMessageBox *m_tourModeHintLabel;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H
