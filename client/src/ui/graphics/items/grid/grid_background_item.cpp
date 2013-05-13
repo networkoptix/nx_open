@@ -33,8 +33,10 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
 }
 
 QnGridBackgroundItem::~QnGridBackgroundItem() {
+#ifdef NATIVE_PAINT_BACKGROUND
     m_renderer.reset();
     m_imgUploader.reset();
+#endif
 }
 
 QRectF QnGridBackgroundItem::boundingRect() const {
