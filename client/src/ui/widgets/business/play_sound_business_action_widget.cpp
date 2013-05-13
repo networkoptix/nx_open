@@ -49,7 +49,7 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     if (fields & QnBusiness::ActionParamsField) {
         m_filename = model->actionParams().getSoundUrl();
-        updateSoundUrl();
+        updateCurrentIndex();
     }
 }
 
