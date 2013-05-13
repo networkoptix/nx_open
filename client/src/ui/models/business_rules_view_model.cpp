@@ -813,7 +813,6 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         QString filename = m_actionParams.getSoundUrl();
         if (filename.isEmpty())
             return tr("Select a sound");
-
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         return soundModel->titleByFilename(filename);
     }

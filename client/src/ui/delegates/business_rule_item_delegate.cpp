@@ -258,6 +258,8 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
                 if (actionType == BusinessActionType::ShowPopup || actionType == BusinessActionType::PlaySound) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+                        if (!soundModel->loaded())
+                            return;
                         QString filename = soundModel->filenameByRow(comboBox->currentIndex());
                         model->setData(index, filename);
                     }
