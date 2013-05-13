@@ -1,6 +1,6 @@
 #include "openssl/evp.h"
 
-#include <Quuid>
+#include <quuid.h>
 
 #include "onvif_resource_searcher_wsdd.h"
 #include "core/resource/camera_resource.h"
