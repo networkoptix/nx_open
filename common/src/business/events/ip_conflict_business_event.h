@@ -10,7 +10,7 @@ class QnIPConflictBusinessEvent: public QnConflictBusinessEvent
 {
     typedef QnConflictBusinessEvent base_type;
 public:
-    QnIPConflictBusinessEvent(const QnResourcePtr& resource, const QHostAddress& address, const QList<QByteArray>& macAddrList,  qint64 timeStamp);
+    QnIPConflictBusinessEvent(const QnResourcePtr& resource, const QHostAddress& address, const QStringList& macAddrList,  qint64 timeStamp);
 };
 
 typedef QSharedPointer<QnIPConflictBusinessEvent> QnIPConflictBusinessEventPtr;
