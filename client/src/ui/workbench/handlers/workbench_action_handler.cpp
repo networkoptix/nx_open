@@ -998,21 +998,10 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
-
-
-//    QString soundPath = QLatin1String("/home/gdm1/tmp/snd/chimes.wav");
-    QString soundPath = QLatin1String("/home/gdm1/tmp/snd/blind_willie.mp3");
-//    QString soundPath = QLatin1String("/home/gdm1/Videos/300.avi");
-    qDebug() << "play sound action received" << soundPath << QFileInfo(soundPath).exists();
-    AudioPlayer::playFileAsync(soundPath);
-
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() - 1);
-
-    QScopedPointer<QnNotificationSoundManagerDialog> dialog(new QnNotificationSoundManagerDialog());
-    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {

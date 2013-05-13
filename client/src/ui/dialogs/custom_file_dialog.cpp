@@ -1,6 +1,8 @@
 #include "custom_file_dialog.h"
 
 #include <QtGui/QGridLayout>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QLabel>
 
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent,
                                        const QString &caption,
@@ -31,13 +33,26 @@ void QnCustomFileDialog::addCheckbox(const QString &text, bool *value, QnCheckbo
 }
 
 void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxValue, int *value) {
-    QSpinBox* spinbox = new QSpinBox(this);
-    spinbox->setPrefix(text);
+
+    QWidget* widget = new QWidget(this);
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    QLabel* label = new QLabel(widget);
+    label->setText(text);
+    layout->addWidget(label);
+
+    QSpinBox* spinbox = new QSpinBox(widget);
     spinbox->setMinimum(minValue);
     spinbox->setMaximum(maxValue);
     spinbox->setValue(*value);
     m_spinboxes.insert(spinbox, value);
-    addWidget(spinbox);
+    layout->addWidget(spinbox);
+    layout->addStretch();
+
+    widget->setLayout(layout);
+
+    addWidget(widget);
 }
 
 void QnCustomFileDialog::addWidget(QWidget *widget) {
