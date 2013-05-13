@@ -17,9 +17,10 @@ public:
 protected:
     friend class ResizingInstrument;
 
-    ResizingInfo(ResizingInstrument *instrument): m_instrument(instrument) {}
+    ResizingInfo(DragInfo *info, ResizingInstrument *instrument): m_info(info), m_instrument(instrument) {}
 
 private:
+    DragInfo *m_info;
     ResizingInstrument *m_instrument;
 };
 

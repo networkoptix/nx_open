@@ -12,6 +12,7 @@
 class FixedArSelectionItem;
 class ZoomOverlayWidget;
 class ZoomWindowWidget;
+class ResizingInfo;
 
 class QnMediaResourceWidget;
 
@@ -58,6 +59,10 @@ private slots:
     void at_display_zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
     void at_display_zoomLinkAboutToBeRemoved(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
 
+    void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+
 private:
     ZoomOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
     ZoomOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
@@ -65,6 +70,10 @@ private:
 
     QnMediaResourceWidget *target() const {
         return m_target.data();
+    }
+
+    ZoomWindowWidget *windowTarget() const {
+        return m_windowTarget.data();
     }
 
     FixedArSelectionItem *selectionItem() const {
@@ -96,6 +105,7 @@ private:
     QHash<QObject *, ZoomData> m_dataByWidget;
     QSet<QObject *> m_processingWidgets;
     QWeakPointer<QnMediaResourceWidget> m_zoomedWidget;
+    QWeakPointer<ZoomWindowWidget> m_windowTarget;
 };
 
 #endif // QN_ZOOM_WINDOW_INSTRUMENT_H

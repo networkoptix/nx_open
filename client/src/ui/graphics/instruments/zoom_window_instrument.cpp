@@ -17,6 +17,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench.h>
 
+#include "instrument_manager.h"
+#include "resizing_instrument.h"
 #include "selection_item.h"
 
 namespace {
@@ -255,11 +257,11 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qn::Corner 
 // -------------------------------------------------------------------------- //
 ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
     base_type(
-      makeSet(QEvent::MouseButtonPress),
-      makeSet(),
-      makeSet(),
-      makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
-      parent
+        makeSet(QEvent::MouseButtonPress),
+        makeSet(),
+        makeSet(),
+        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
+        parent
     ),
     QnWorkbenchContextAware(parent)
 {
@@ -403,11 +405,20 @@ void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget
 void ZoomWindowInstrument::installedNotify() {
     assert(selectionItem() == NULL);
 
+    if(ResizingInstrument *resizingInstrument = manager()->instrument<ResizingInstrument>()) {
+        connect(resizingInstrument, SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)), this, SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)));
+        connect(resizingInstrument, SIGNAL(resizing(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)), this, SLOT(at_resizing(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)));
+        connect(resizingInstrument, SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)), this, SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)));
+    }
+
     base_type::installedNotify();
 }
 
 void ZoomWindowInstrument::aboutToBeUninstalledNotify() {
     base_type::aboutToBeUninstalledNotify();
+
+    if(ResizingInstrument *resizingInstrument = manager()->instrument<ResizingInstrument>())
+        disconnect(resizingInstrument, NULL, this, NULL);
 
     if(selectionItem())
         delete selectionItem();
@@ -520,6 +531,31 @@ void ZoomWindowInstrument::finishDragProcess(DragInfo *) {
     emit zoomWindowProcessFinished(target());
 }
 
+void ZoomWindowInstrument::at_widget_aboutToBeDestroyed() {
+    unregisterWidget(checked_cast<QnMediaResourceWidget *>(sender()));
+}
+
+void ZoomWindowInstrument::at_widget_zoomRectChanged() {
+    updateWindowFromWidget(checked_cast<QnMediaResourceWidget *>(sender()));
+}
+
+void ZoomWindowInstrument::at_widget_optionsChanged() {
+    updateOverlayVisibility(checked_cast<QnMediaResourceWidget *>(sender()));
+}
+
+void ZoomWindowInstrument::at_windowWidget_geometryChanged() {
+    updateWidgetFromWindow(checked_cast<ZoomWindowWidget *>(sender()));
+}
+
+void ZoomWindowInstrument::at_windowWidget_doubleClicked() {
+    ZoomWindowWidget *windowWidget = checked_cast<ZoomWindowWidget *>(sender());
+
+    // TODO: #Elric does not belong here.
+    QnMediaResourceWidget *zoomWidget = windowWidget->zoomWidget();
+    if(zoomWidget)
+        workbench()->setItem(Qn::ZoomedRole, zoomWidget->item());
+}
+
 void ZoomWindowInstrument::at_display_widgetChanged(Qn::ItemRole role) {
     if(role != Qn::ZoomedRole)
         return;
@@ -549,28 +585,20 @@ void ZoomWindowInstrument::at_display_zoomLinkAboutToBeRemoved(QnResourceWidget 
         unregisterLink(mediaWidget, mediaZoomTargetWidget);
 }
 
-void ZoomWindowInstrument::at_widget_aboutToBeDestroyed() {
-    unregisterWidget(checked_cast<QnMediaResourceWidget *>(sender()));
+void ZoomWindowInstrument::at_resizingStarted(QGraphicsView *, QGraphicsWidget *widget, ResizingInfo *info) {
+    if(info->frameSection() != Qt::TitleBarArea)
+        return;
+
+    m_windowTarget = dynamic_cast<ZoomWindowWidget *>(widget);
 }
 
-void ZoomWindowInstrument::at_widget_zoomRectChanged() {
-    updateWindowFromWidget(checked_cast<QnMediaResourceWidget *>(sender()));
+void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info) {
+    if(!windowTarget())
+        return;
 }
 
-void ZoomWindowInstrument::at_widget_optionsChanged() {
-    updateOverlayVisibility(checked_cast<QnMediaResourceWidget *>(sender()));
+void ZoomWindowInstrument::at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info) {
+    m_windowTarget.clear();
 }
 
-void ZoomWindowInstrument::at_windowWidget_geometryChanged() {
-    updateWidgetFromWindow(checked_cast<ZoomWindowWidget *>(sender()));
-}
-
-void ZoomWindowInstrument::at_windowWidget_doubleClicked() {
-    ZoomWindowWidget *windowWidget = checked_cast<ZoomWindowWidget *>(sender());
-
-    // TODO: #Elric does not belong here.
-    QnMediaResourceWidget *zoomWidget = windowWidget->zoomWidget();
-    if(zoomWidget)
-        workbench()->setItem(Qn::ZoomedRole, zoomWidget->item());
-}
 
