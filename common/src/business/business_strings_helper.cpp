@@ -244,14 +244,14 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
 
 QString QnBusinessStringsHelper::conflictString(const QnBusinessEventParameters &params)
 {
-    QByteArray source = params.getSource();
-    QList<QByteArray> conflicts = params.getConflicts();
+    QString source = params.getSource();
+    QStringList conflicts = params.getConflicts();
 
-    QString result = QString::fromUtf8(source);
+    QString result = source;
     result += QObject::tr("conflicted with:");
     result += QLatin1Char('\n');
-    foreach(const QByteArray& entity, conflicts)
-        result += QString::fromUtf8(entity) + QLatin1Char('\n');
+    foreach(const QString& entity, conflicts)
+        result += entity + QLatin1Char('\n');
     return result;
 }
 

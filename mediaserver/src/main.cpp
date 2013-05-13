@@ -748,7 +748,7 @@ void QnMain::at_storageFailure(QnResourcePtr storage)
     qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueIoError, storage);
 }
 
-void QnMain::at_cameraIPConflict(QHostAddress host, QList<QByteArray> macAddrList)
+void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
 {
     qnBusinessRuleConnector->at_cameraIPConflict(
         m_mediaServer,
@@ -876,7 +876,7 @@ void QnMain::run()
     initAppServerConnection(qSettings);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QList<QByteArray>)), this, SLOT(at_cameraIPConflict(QHostAddress, QList<QByteArray>)));
+    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
     connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr)), this, SLOT(at_storageFailure(QnResourcePtr)));
 

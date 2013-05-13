@@ -59,7 +59,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     QSet<QString> discoveredResources;
 
     //assemble list of existing ip
-    QMap<quint32, QSet<QByteArray> > ipsList;
+    QMap<quint32, QSet<QString> > ipsList;
 
 
     //excluding already existing resources
@@ -145,7 +145,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
     // ========================= send conflict info =====================
-    for (QMap<quint32, QSet<QByteArray> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
+    for (QMap<quint32, QSet<QString> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
     {
         if (itr.value().size() > 1) 
         {
