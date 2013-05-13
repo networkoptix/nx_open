@@ -131,6 +131,14 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAc
     return QVariant();
 }
 
+QString QnEventLogModel::formatUrl(const QString& url) const
+{
+    if (url.indexOf(QLatin1String("://")) == -1)
+        return url;
+    else
+        return QUrl(url).host();
+}
+
 QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAction& action) const
 {
     switch(column) 
@@ -150,7 +158,7 @@ QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAct
             QnId eventResId = action.getRuntimeParams().getEventResourceId();
             QnResourcePtr eventResource = qnResPool->getResourceById(eventResId);
             if (eventResource)
-                return eventResource->getName();
+                return QString(lit("%1 (%2)")).arg(eventResource->getName()).arg(formatUrl(eventResource->getUrl()));
             break;
         }
         case ActionColumn:
@@ -160,7 +168,7 @@ QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAct
             QnId actionResId = action.getRuntimeParams().getActionResourceId();
             QnResourcePtr actionResource = qnResPool->getResourceById(actionResId);
             if (actionResource)
-                return actionResource->getName();
+                return QString(lit("%1 (%2)")).arg(actionResource->getName()).arg(formatUrl(actionResource->getUrl()));
             break;
             }
         case DescriptionColumn: {
