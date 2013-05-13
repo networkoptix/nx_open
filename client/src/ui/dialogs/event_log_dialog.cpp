@@ -12,6 +12,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     m_context(context)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::Window);
 
     QList<QnEventLogModel::Column> columns;
         columns << QnEventLogModel::DateTimeColumn << QnEventLogModel::EventColumn << QnEventLogModel::EventCameraColumn <<
