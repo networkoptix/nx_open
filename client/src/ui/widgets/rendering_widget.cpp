@@ -55,7 +55,7 @@ void QnRenderingWidget::updateChannelScreenSize() {
     if(!m_renderer) {
         m_channelScreenSize = QSize();
     } else {
-        QSize channelScreenSize = QSizeF(width() / m_display->videoLayout()->width(), height() / m_display->videoLayout()->height()).toSize();
+        QSize channelScreenSize = QnGeometry::cwiseDiv(size(), m_display->videoLayout()->size()).toSize();
         if(channelScreenSize != m_channelScreenSize) {
             m_channelScreenSize = channelScreenSize;
             m_renderer->setChannelScreenSize(m_channelScreenSize);
@@ -124,6 +124,7 @@ void QnRenderingWidget::paintGL() {
         glLoadIdentity();
         m_renderer->paint(
             0,
+            QRectF(0.0, 0.0, 1.0, 1.0),
             QnGeometry::expanded(QnGeometry::aspectRatio(sourceSize), rect(), Qt::KeepAspectRatio, Qt::AlignCenter),
             1.0
         );

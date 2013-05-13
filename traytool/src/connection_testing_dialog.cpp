@@ -9,7 +9,7 @@
 #include <api/session_manager.h>
 #include <utils/common/warnings.h>
 
-//#include "utils/settings.h"
+//#include "client/client_settings.h"
 #include "version.h"
 
 QnConnectionTestingDialog::QnConnectionTestingDialog(const QUrl &url, QWidget *parent) :
@@ -72,59 +72,16 @@ void QnConnectionTestingDialog::oldHttpTestResults(const QnHTTPRawResponse& resp
 {
     Q_UNUSED(handle)
 
-    /*if (response.status == 204 && m_timeoutTimer.isActive())
-    {
-        m_timeoutTimer.stop();
-        updateUi(false);
-    }*/
     if (m_timeoutTimer.isActive())
         m_timeoutTimer.stop();
     updateUi(response.status == 0);
 }
-/*
-void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle)
-{
-    Q_UNUSED(requestHandle)
-    Q_UNUSED(errorString)
 
-    if (!m_timeoutTimer.isActive())
-        return;
-
-    m_timeoutTimer.stop();
-
-    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
-    QnCompatibilityChecker localChecker(localCompatibilityItems());
-
-    QnCompatibilityChecker* compatibilityChecker;
-    if (remoteChecker.size() > localChecker.size())
-        compatibilityChecker = &remoteChecker;
-    else
-        compatibilityChecker = &localChecker;
-
-    ui->progressBar->setValue(ui->progressBar->maximum());
-    updateUi(!status && compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version));
-}
-*/
 void QnConnectionTestingDialog::testSettings()
 {
-    QnRequestHeaderList headers;
-    QByteArray data;
     QnRequestParamList params;
     params.append(QnRequestParam("ping", "1"));
     QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("connect"), this, SLOT(oldHttpTestResults(const QnHTTPRawResponse&, int)));
-
-   /* 
-    m_connection = QnAppServerConnectionFactory::createConnection(m_url);
-    m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QnConnectInfoPtr,int)));
-
-    QUrl httpUrl;
-    httpUrl.setHost(m_url.host());
-    httpUrl.setPort(m_url.port());
-    httpUrl.setScheme(QLatin1String("http"));
-    httpUrl.setUserName(QString());
-    httpUrl.setPassword(QString());
-    QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(oldHttpTestResults(const QnHTTPRawResponse&, int)));
-   */
 }
 
 void QnConnectionTestingDialog::updateUi(bool success){

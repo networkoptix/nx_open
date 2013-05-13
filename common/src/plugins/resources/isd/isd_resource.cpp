@@ -27,13 +27,6 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
     return s1.width() > s2.width();
 }
 
-static float getResolutionAspectRatio(QSize s)
-{
-    if (s.height()==0)
-        return 0;
-
-    return float(s.width()) / s.height();
-}
 //==================================================================
 
 
@@ -48,7 +41,7 @@ bool QnPlIsdResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QString QnPlIsdResource::manufacture() const
+QString QnPlIsdResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }

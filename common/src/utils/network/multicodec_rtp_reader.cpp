@@ -33,7 +33,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     else
         m_RtpSession.setTCPTimeout(1000 * 5);
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
-    m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
+    m_numberOfVideoChannels = mr->getVideoLayout()->channelCount();
     m_gotKeyData.resize(m_numberOfVideoChannels);
 
     connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)),
@@ -391,11 +391,11 @@ void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* pa
     }
 }
 
-void QnMulticodecRtpReader::openStream()
+bool QnMulticodecRtpReader::openStream()
 {
     m_pleaseStop = false;
     if (isStreamOpened())
-        return;
+        return true;
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
     QString transport;
@@ -464,6 +464,11 @@ void QnMulticodecRtpReader::openStream()
         if (!m_videoIO && !m_audioIO)
             m_RtpSession.stop();
         m_rtcpReportTimer.restart();
+        return m_videoIO || m_audioIO;
+    }
+    else
+    {
+        return false;
     }
 }
 

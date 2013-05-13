@@ -17,7 +17,7 @@
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
 
-// TODO: replace with QnRenderingWidget
+// TODO: #Elric replace with QnRenderingWidget
 class QnSignDialogGlWidget: public QGLWidget
 {
 public:
@@ -56,7 +56,7 @@ public:
         QPainter painter(this);
         painter.beginNativePainting();
         if (m_renderer)
-            m_renderer->paint(0, m_videoRect, 1.0);
+            m_renderer->paint(0, QRectF(0.0, 0.0, 1.0, 1.0), m_videoRect, 1.0);
         painter.endNativePainting();
     }
     

@@ -9,8 +9,10 @@
 #include <utils/common/warnings.h>
 #include <utils/common/json.h>
 
-#include <api/app_server_connection.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
+
+#include <utils/kvpair_usage_helper.h>
 
 #include "workbench_context.h"
 
@@ -104,10 +106,10 @@ inline bool deserialize(const QVariant &value, PtzPresetData *target) {
 
 class QnWorkbenchPtzPresetManagerPrivate {
 public:
-    QnWorkbenchPtzPresetManagerPrivate(): loadHandle(-1), saveHandle(-1) {}
+    QnWorkbenchPtzPresetManagerPrivate() {}
 
     QVector<PtzPresetData> presets;
-    int loadHandle, saveHandle;
+    QnStringKvPairUsageHelper* helper;
 };
 
 QnWorkbenchPtzPresetManager::QnWorkbenchPtzPresetManager(QObject *parent):
@@ -115,7 +117,14 @@ QnWorkbenchPtzPresetManager::QnWorkbenchPtzPresetManager(QObject *parent):
     QnWorkbenchContextAware(parent),
     d(new QnWorkbenchPtzPresetManagerPrivate())
 {
+      //TODO: #Elric provide correct resource
     connect(context(), SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()));
+    d->helper = new QnStringKvPairUsageHelper(
+                context()->user(),
+                lit("ptzPresets"),
+                QString(),
+                this);
+    connect(d->helper, SIGNAL(valueChanged(QString)), this, SLOT(at_presetsLoaded(QString)));
 }
 
 QnWorkbenchPtzPresetManager::~QnWorkbenchPtzPresetManager() {
@@ -202,55 +211,23 @@ void QnWorkbenchPtzPresetManager::removePtzPreset(const QnVirtualCameraResourceP
     savePresets();
 }
 
-void QnWorkbenchPtzPresetManager::loadPresets() {
-    d->loadHandle = QnAppServerConnectionFactory::createConnection()->getKvPairsAsync(this, SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairList &, int)));
-}
-
 void QnWorkbenchPtzPresetManager::savePresets() {
     QByteArray data;
     QJson::serialize(d->presets, &data);
-
-    QnKvPairList kvPairs;
-    kvPairs.push_back(QnKvPair(lit("ptzPresets"), QString::fromUtf8(data)));
-
-    d->saveHandle = QnAppServerConnectionFactory::createConnection()->saveAsync(kvPairs, this, SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairList &, int)));
+    d->helper->setValue(QString::fromUtf8(data));
 }
 
 void QnWorkbenchPtzPresetManager::at_context_userChanged() {
+      //TODO: #Elric provide correct resource
     d->presets.clear();
-
-    if(!context()->user())
-        return;
-
-    loadPresets();
+    d->helper->setResource(context()->user());
 }
 
-void QnWorkbenchPtzPresetManager::at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairList &kvPairs, int handle) {
-    Q_UNUSED(errorString)
-    // TODO: check status
-
-    if(status != 0) {
-        qnWarning("Failed to save/load ptz presets.");
-        return;
-    }
-
-    if(handle == d->loadHandle) {
-        QByteArray data;
-        foreach(const QnKvPair &pair, kvPairs)
-            if(pair.name() == lit("ptzPresets"))
-                data = pair.value().toUtf8();
-        
-        if(data.isEmpty()) {
-            d->presets.clear();
-        } else if(!QJson::deserialize(data, &d->presets)) {
-            qnWarning("Invalid ptz preset format.");
-        }
-
-
-        d->loadHandle = -1;
-    } else if(handle == d->saveHandle) {
-        d->saveHandle = -1;
+void QnWorkbenchPtzPresetManager::at_presetsLoaded(const QString &value) {
+    QByteArray data = value.toUtf8();
+    if(data.isEmpty()) {
+        d->presets.clear();
+    } else if(!QJson::deserialize(data, &d->presets)) {
+        qnWarning("Invalid ptz preset format.");
     }
 }
-
-

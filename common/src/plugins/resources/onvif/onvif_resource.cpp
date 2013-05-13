@@ -24,6 +24,9 @@
 #include "soap/soapserver.h"
 #include "soapStub.h"
 
+//!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
+#define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
 static const float MAX_EPS = 0.01f;
@@ -57,9 +60,24 @@ struct StrictResolution {
     QSize maxRes;
 };
 
+// strict maximum resolution for this models
+
 StrictResolution strictResolutionList[] =
 {
     { "Brickcom-30xN", QSize(1920, 1080) }
+};
+
+
+struct StrictBitrateInfo {
+    const char* model;
+    int minBitrate;
+    int maxBitrate;
+};
+
+// Strict bitrate range for specified cameras
+StrictBitrateInfo strictBitrateList[] =
+{
+    { "DCS-7010L", 4096, 1024*16 }
 };
 
 
@@ -209,6 +227,28 @@ QnPlOnvifResource::QnPlOnvifResource()
 
 QnPlOnvifResource::~QnPlOnvifResource()
 {
+    {
+        QMutexLocker lk( &m_subscriptionMutex );
+        while( !m_triggerOutputTasks.empty() )
+        {
+            const quint64 timerID = m_triggerOutputTasks.begin()->first;
+            const TriggerOutputTask outputTask = m_triggerOutputTasks.begin()->second;
+            m_triggerOutputTasks.erase( m_triggerOutputTasks.begin() );
+            lk.unlock();
+            if( !outputTask.active )
+            {
+                //returning port to inactive state
+                setRelayOutputStateNonSafe(
+                    outputTask.outputID,
+                    outputTask.active,
+                    0 );
+            }
+
+            TimerManager::instance()->joinAndDeleteTimer( timerID );    //garantees that no onTimer(timerID) is running on return
+            lk.relock();
+        }
+    }
+
     stopInputPortMonitoring();
 
     delete m_onvifAdditionalSettings;
@@ -218,18 +258,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
         delete m_eventCapabilities;
         m_eventCapabilities = NULL;
     }
-
-    QMutexLocker lk( &m_subscriptionMutex );
-    while( !m_triggerOutputTasks.empty() )
-    {
-        const quint64 timerID = m_triggerOutputTasks.begin()->first;
-        m_triggerOutputTasks.erase( m_triggerOutputTasks.begin() );
-        lk.unlock();
-        TimerManager::instance()->joinAndDeleteTimer( timerID );    //garantees that no onTimer(timerID) is running on return
-        lk.relock();
-    }
 }
-
 
 const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     const QString& senderIpAddress)
@@ -248,7 +277,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
             onvifXsd__IPv4Configuration* conf = ifacePtr->IPv4->Config;
 
             if (conf->DHCP && conf->FromDHCP) {
-                //TODO:UTF unuse std::string
+                //TODO: #vasilenko UTF unuse std::string
                 if (senderIpAddress == QString::fromStdString(conf->FromDHCP->Address)) {
                     return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
                 }
@@ -262,7 +291,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
 
             while (addrPtrIter != addresses.end()) {
                 onvifXsd__PrefixedIPv4Address* addrPtr = *addrPtrIter;
-                //TODO:UTF unuse std::string
+                //TODO: #vasilenko UTF unuse std::string
                 if (senderIpAddress == QString::fromStdString(addrPtr->Address)) {
                     return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
                 }
@@ -313,9 +342,14 @@ bool QnPlOnvifResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QString QnPlOnvifResource::manufacture() const
+QString QnPlOnvifResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
+}
+
+QString QnPlOnvifResource::getVendorName() const
+{
+    return m_vendorName;
 }
 
 bool QnPlOnvifResource::hasDualStreaming() const
@@ -456,6 +490,15 @@ bool QnPlOnvifResource::initInternal()
     {
         setCameraCapability( Qn::RelayOutputCapability, true );
         setCameraCapability( Qn::RelayInputCapability, true );    //TODO it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
+
+        //resetting all ports states to inactive
+        for( std::vector<QnPlOnvifResource::RelayOutputInfo>::size_type
+            i = 0;
+            i < relayOutputs.size();
+            ++i )
+        {
+            setRelayOutputStateNonSafe( QString::fromStdString(relayOutputs[i].token), false, 0 );
+        }
     }
 
     if (m_appStopping)
@@ -484,6 +527,26 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
 {
     QMutexLocker lock(&m_mutex);
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
+}
+
+int QnPlOnvifResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
+{
+    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(q, resolution, fps));
+}
+
+void QnPlOnvifResource::setVendorName( const QString& vendorName )
+{
+    m_vendorName = vendorName;
+}
+
+int QnPlOnvifResource::strictBitrate(int bitrate) const
+{
+    for (uint i = 0; i < sizeof(strictBitrateList) / sizeof(strictBitrateList[0]); ++i)
+    {
+        if (getModel() == lit(strictBitrateList[i].model))
+            return qMin(strictBitrateList[i].maxBitrate, qMax(strictBitrateList[i].minBitrate, bitrate));
+    }
+    return bitrate;
 }
 
 void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
@@ -646,7 +709,7 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, b
 bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
 {
     QAuthenticator auth(getAuth());
-    //TODO:UTF unuse StdString
+    //TODO: #vasilenko UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
 
     QString user = auth.user();
@@ -707,7 +770,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
 
         if (response.Capabilities) 
         {
-            //TODO:UTF unuse std::string
+            //TODO: #vasilenko UTF unuse std::string
             if (response.Capabilities->Events)
                 m_eventCapabilities = new onvifXsd__EventCapabilities( *response.Capabilities->Events );
 
@@ -1534,6 +1597,12 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWra
                         options = curOpts;
                     }
                     break;
+                case onvifXsd__AudioEncoding__AMR:
+                    if (codec < AMR) {
+                        codec = AMR;
+                        options = curOpts;
+                    }
+                    break;
                 default:
                     qWarning() << "QnPlOnvifResource::fetchAndSetAudioEncoderOptions: got unknown codec type: " 
                         << curOpts->Encoding << " (URL: " << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
@@ -1682,7 +1751,7 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
             onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QMutexLocker lock(&m_mutex);
-            //TODO:UTF unuse std::string
+            //TODO: #vasilenko UTF unuse std::string
             m_audioEncoderId = QString::fromStdString(conf->token);
         }
     }
@@ -1911,7 +1980,7 @@ bool QnPlOnvifResource::fetchAndSetAudioSource()
         onvifXsd__AudioSourceConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QMutexLocker lock(&m_mutex);
-            //TODO:UTF unuse std::string
+            //TODO: #vasilenko UTF unuse std::string
             m_audioSourceId = QString::fromStdString(conf->token);
             return true;
         }
@@ -2704,7 +2773,13 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
         return false;
     }
 
+#ifdef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+    const bool isBistableModeRequired = true;
+#else
     const bool isBistableModeRequired = autoResetTimeoutMS == 0;
+#endif
+
+#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
     std::string requiredDelayTime;
     if( autoResetTimeoutMS > 0 )
     {
@@ -2712,13 +2787,18 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
         ss<<"PT"<<(autoResetTimeoutMS < 1000 ? 1 : autoResetTimeoutMS/1000)<<"S";
         requiredDelayTime = ss.str();
     }
+#endif
     if( (relayOutputInfo.isBistable != isBistableModeRequired) || 
+#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
         (!isBistableModeRequired && relayOutputInfo.delayTime != requiredDelayTime) ||
+#endif
         relayOutputInfo.activeByDefault )
     {
         //switching output to required mode
         relayOutputInfo.isBistable = isBistableModeRequired;
+#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
         relayOutputInfo.delayTime = requiredDelayTime;
+#endif
         relayOutputInfo.activeByDefault = false;
         if( !setRelayOutputSettings( relayOutputInfo ) )
         {
@@ -2751,6 +2831,15 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
             arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
+
+#ifdef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+    if( autoResetTimeoutMS > 0 )
+    {
+        //adding task to reset port state
+        const quint64 timerID = TimerManager::instance()->addTimer( this, autoResetTimeoutMS );
+        m_triggerOutputTasks.insert( std::make_pair( timerID, TriggerOutputTask( outputID, !active, 0 ) ) );
+    }
+#endif
 
     cl_log.log( QString::fromAscii("Successfully set relay %1 output state to %2. endpoint %3").
         arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );

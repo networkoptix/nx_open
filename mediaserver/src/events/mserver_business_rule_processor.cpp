@@ -7,27 +7,42 @@
 #include "api/app_server_connection.h"
 #include "core/resource_managment/resource_pool.h"
 
+QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRuleProcessor()
+{
+
+}
+
+QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
+{
+
+}
+
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (QnBusinessRuleProcessor::executeActionInternal(action, res))
-        return true;
-
-    switch(action->actionType())
-    {
-    case BusinessActionType::Bookmark:
-        // TODO: implement me
-        break;
-    case BusinessActionType::CameraOutput:
-        return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
-        break;
-    case BusinessActionType::CameraRecording:
-        return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
-    case BusinessActionType::PanicRecording:
-        return executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
-    default:
-        break;
+    bool result = QnBusinessRuleProcessor::executeActionInternal(action, res);
+    if (!result) {
+        switch(action->actionType())
+        {
+        case BusinessActionType::Bookmark:
+            // TODO: implement me
+            break;
+        case BusinessActionType::CameraOutput:
+        case BusinessActionType::CameraOutputInstant:
+            return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
+            break;
+        case BusinessActionType::CameraRecording:
+            return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
+        case BusinessActionType::PanicRecording:
+            return executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
+        default:
+            break;
+        }
     }
-    return false;
+    
+    if (result)
+        QnEventsDB::instance()->saveActionToDB(action, res);
+
+    return result;
 }
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)
@@ -91,10 +106,18 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     //    return false;
     //}
 
-    int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
+    bool instant = action->actionType() == BusinessActionType::CameraOutputInstant;
+
+    int autoResetTimeout = instant
+            ? 30*1000
+            : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
+    bool on = instant
+            ? true
+            : action->getToggleState() == ToggleState::On;
+
     return securityCam->setRelayOutputState(
-        relayOutputId,
-        action->getToggleState() == ToggleState::On,
-        autoResetTimeout );
+                relayOutputId,
+                on,
+                autoResetTimeout );
 }
 

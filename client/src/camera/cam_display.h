@@ -186,7 +186,7 @@ protected:
     int m_storedMaxQueueSize;
     QnAbstractVideoDecoder::DecodeMode m_lightCpuMode;
     QnVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
-    int m_realTimeHurryUp;
+    bool m_realTimeHurryUp;
     int m_delayedFrameCount;
     QnlTimeSource* m_extTimeSrc;
     
@@ -220,6 +220,7 @@ protected:
     QnFpsStatistics m_fpsStat;
     int m_prevLQ;
     bool m_doNotChangeDisplayTime;
+    bool m_firstLivePacket;
 };
 
 #endif //QN_CAM_DISPLAY_H

@@ -24,7 +24,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
 
 // TODO: #GDM 
@@ -48,7 +48,7 @@ namespace {
         return QString();
     }
 
-    // TODO: #gdm fill aggregationComboBox in cpp file so that
+    // TODO: #GDM fill aggregationComboBox in cpp file so that
     // names & numbers are in one place. Store steps in userData.
 
     // make sure size is equal to ui->aggregationComboBox->count()
@@ -245,7 +245,7 @@ void QnBusinessRuleWidget::initActionParameters() {
     if (m_actionWidgetsByType.contains(m_model->actionType())) {
         m_actionParameters = m_actionWidgetsByType.find(m_model->actionType()).value();
     } else {
-        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(m_model->actionType(), this, context());
+        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(m_model->actionType(), this);
         m_actionWidgetsByType[m_model->actionType()] = m_actionParameters;
     }
 
@@ -391,7 +391,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)
         dialog.setDelegate(new QnRecordingEnabledDelegate(this));
-    else if (actionType == BusinessActionType::CameraOutput)
+    else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant)
         dialog.setDelegate(new QnOutputEnabledDelegate(this));
     else if (actionType == BusinessActionType::SendMail)
         dialog.setDelegate(new QnEmailValidDelegate(this));

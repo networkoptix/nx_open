@@ -3,7 +3,7 @@
 
 #include <QtGui/QMessageBox>
 
-//TODO: #elric #gdm asked: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+//TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -126,7 +126,7 @@ void QnCameraScheduleWidget::endUpdate() {
     if (m_inUpdate > 0)
         return;
     connectToGridWidget();
-    updateGridParams(); // TODO: does not belong here...
+    updateGridParams(); // TODO: #GDM does not belong here...
 }
 
 void QnCameraScheduleWidget::setChangesDisabled(bool val)
@@ -153,7 +153,7 @@ void QnCameraScheduleWidget::setReadOnly(bool readOnly)
 
     using ::setReadOnly;
     setReadOnly(ui->recordAlwaysButton, readOnly);
-    setReadOnly(ui->recordMotionButton, readOnly); // TODO: this is not valid. Camera may not support HW motion, we need to check for this.
+    setReadOnly(ui->recordMotionButton, readOnly); // TODO: #GDM this is not valid. Camera may not support HW motion, we need to check for this.
     setReadOnly(ui->recordMotionPlusLQButton, readOnly);
     setReadOnly(ui->noRecordButton, readOnly);
     setReadOnly(ui->qualityComboBox, readOnly);
@@ -234,7 +234,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
             QnStreamQuality streamQuality = QnQualityHighest;
             if (recordType != Qn::RecordingType_Never)
             {
-                QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); // TODO: Oh crap. This string-switching is totally evil.
+                QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); // TODO: #GDM Oh crap. This string-switching is totally evil.
                 if (shortQuality == QLatin1String("Lo"))
                     streamQuality = QnQualityLow;
                 else if (shortQuality == QLatin1String("Me"))
@@ -704,7 +704,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     if(widget->isEnabled() || (widget->parentWidget() && !widget->parentWidget()->isEnabled()))
         return;
 
-    // TODO: duplicate code.
+    // TODO: #GDM duplicate code.
     bool hasDualStreaming = !m_cameras.isEmpty();
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
@@ -725,7 +725,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
 
 void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     bool recordingEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-    QnExportCameraSettingsDialog dialog(NULL, context());
+    QnExportCameraSettingsDialog dialog(this);
     dialog.setRecordingEnabled(recordingEnabled);
 
     bool motionUsed = recordingEnabled && hasMotionOnGrid();
@@ -742,7 +742,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
         if (recordingEnabled){
             int maxFps = camera->getMaxFps();
 
-            //TODO: #elric #gdm asked: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+            //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
             // or just use camera->reservedSecondStreamFps();
 
             int decreaseAlways = 0;

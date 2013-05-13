@@ -6,7 +6,7 @@
 #include <QtGui/QPainter>
 
 #include "ui/style/globals.h"
-#include "utils/settings.h"
+#include "client/client_settings.h"
 #include "utils/math/color_transformations.h"
 
 namespace {

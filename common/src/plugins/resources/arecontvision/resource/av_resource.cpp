@@ -277,7 +277,7 @@ bool QnPlAreconVisionResource::initInternal()
     return true;
 }
 
-QString QnPlAreconVisionResource::manufacture() const
+QString QnPlAreconVisionResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }

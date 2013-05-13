@@ -362,7 +362,6 @@ struct CLAVIDvdStreamReaderPriv
 
 AVIOContext* QnAVIDvdArchiveDelegate::getIOContext()
 {
-    //QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
     if (m_ffmpegIOContext == 0)
     {
         m_ioBuffer = (quint8*) av_malloc(32*1024);

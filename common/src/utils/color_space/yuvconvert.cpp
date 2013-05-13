@@ -271,8 +271,10 @@ void yuv420_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
     }
 }
 
-void bgra_to_yv12_sse2_intr(quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
+void bgra_to_yv12_sse2_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
 {
+    Q_ASSERT( qPower2Ceil((unsigned int)xStride, 32) == xStride );
+
     static const __m128i sse_2000         = _mm_setr_epi16( 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020 ); /* SSE2. */
     static const __m128i sse_00a0         = _mm_setr_epi16( 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210 ); /* SSE2. */
     static const __m128i sse_mask_color   = _mm_setr_epi32( 0x00003fc0, 0x00003fc0, 0x00003fc0, 0x00003fc0); /* SSE2. */
@@ -287,7 +289,8 @@ void bgra_to_yv12_sse2_intr(quint8* rgba, int xStride, quint8* y, quint8* u, qui
     static const __m128i uv_g_coeff = _mm_setr_epi16(-0.368*K, -0.368*K, -0.368*K, -0.368*K,    -0.291*K, -0.291*K, -0.291*K, -0.291*K ); /* SSE2. */
     static const __m128i uv_b_coeff = _mm_setr_epi16(-0.071*K, -0.071*K, -0.071*K, -0.071*K,     0.439*K,  0.439*K,  0.439*K,  0.439*K ); /* SSE2. */
 
-    int xSteps = width / 8;
+    int xSteps = qPower2Ceil((unsigned int)width, 8)/8;
+    Q_ASSERT( xSteps*4 <= xStride );
     if (flip)
     {
         y += yStride*(height-1);
@@ -350,6 +353,25 @@ void bgra_to_yv12_sse2_intr(quint8* rgba, int xStride, quint8* y, quint8* u, qui
         v += uvStride;
         y += yStride*2;
         rgba += xStride*2;
+    }
+}
+
+void bgra_to_yva12_sse2_intr(
+    const quint8* rgba, int xStride,
+    quint8* y, quint8* u, quint8* v, quint8* a,
+    int yStride, int uvStride, int aStride,
+    int width, int height,
+    bool flip )
+{
+    bgra_to_yv12_sse2_intr( rgba, xStride, y, u, v, yStride, uvStride, width, height, flip );
+
+    //copying alpha plane to \a a
+    for( int yLine = 0; yLine < height/2; ++yLine )
+    {
+        for( int x = 0; x < width; ++x )
+            *(a+x) = *((rgba + x*4)+3);
+        rgba += xStride;
+        a += aStride;
     }
 }
 

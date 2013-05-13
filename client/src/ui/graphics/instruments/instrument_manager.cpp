@@ -159,6 +159,9 @@ void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
 
     /* And only then install event filter. */
     scene->installEventFilter(sceneDispatcher);
+
+    /* Notify about scene change. */
+    emit q_func()->sceneChanged();
 }
 
 void InstrumentManagerPrivate::unregisterSceneInternal() {
@@ -191,6 +194,9 @@ void InstrumentManagerPrivate::unregisterSceneInternal() {
         delete filterItem; 
         filterItem = NULL;
     }
+
+    /* Notify about scene change. */
+    emit q_func()->sceneChanged();
 }
 
 void InstrumentManagerPrivate::registerViewInternal(QGraphicsView *view) {

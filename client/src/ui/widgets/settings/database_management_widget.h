@@ -15,7 +15,7 @@ namespace Ui {
     class DatabaseManagementWidget;
 }
 
-// TODO: #qt5 replace with proper functor
+// TODO: #Elric #qt5 replace with proper functor
 class QnDatabaseManagementWidgetReplyProcessor: public QObject {
     Q_OBJECT
 public:

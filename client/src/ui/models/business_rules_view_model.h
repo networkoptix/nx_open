@@ -61,7 +61,7 @@ namespace QnBusiness {
 }
 
 
-class QnBusinessRuleViewModel: public QObject {
+class QnBusinessRuleViewModel: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 
     typedef QObject base_type;
@@ -93,8 +93,8 @@ public:
     QnResourceList eventResources() const;
     void setEventResources(const QnResourceList &value);
 
-    QnBusinessParams eventParams() const;
-    void setEventParams(const QnBusinessParams& params);
+    QnBusinessEventParameters eventParams() const;
+    void setEventParams(const QnBusinessEventParameters& params);
 
     ToggleState::Value eventState() const;
     void setEventState(ToggleState::Value state);
@@ -105,8 +105,8 @@ public:
     QnResourceList actionResources() const;
     void setActionResources(const QnResourceList &value);
 
-    QnBusinessParams actionParams() const;
-    void setActionParams(const QnBusinessParams& params);
+    QnBusinessActionParameters actionParams() const;
+    void setActionParams(const QnBusinessActionParameters& params);
 
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
@@ -114,7 +114,7 @@ public:
     bool disabled() const;
     void setDisabled(const bool value);
 
-    // TODO: #VASILENKO Schedule as a string? What is the format? Where are docs?
+    // TODO: #vasilenko Schedule as a string? What is the format? Where are docs?
     QString schedule() const;
     void setSchedule(const QString value);
 
@@ -145,12 +145,12 @@ private:
 
     BusinessEventType::Value m_eventType;
     QnResourceList m_eventResources;
-    QnBusinessParams m_eventParams;
+    QnBusinessEventParameters m_eventParams;
     ToggleState::Value m_eventState;
 
     BusinessActionType::Value m_actionType;
     QnResourceList m_actionResources;
-    QnBusinessParams m_actionParams;
+    QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;
     bool m_disabled;
@@ -169,7 +169,7 @@ class QnBusinessRulesViewModel : public QAbstractItemModel, public QnWorkbenchCo
 
     typedef QAbstractItemModel base_type;
 public:
-    explicit QnBusinessRulesViewModel(QObject *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnBusinessRulesViewModel(QObject *parent = 0);
     virtual ~QnBusinessRulesViewModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -194,6 +194,8 @@ public:
     QnBusinessRuleViewModel* getRuleModel(int row);
 private slots:
     void at_rule_dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
+    void at_soundModel_listChanged();
+    void at_soundModel_itemChanged(const QString &filename);
 
 private:
     QList<QnBusinessRuleViewModel *> m_rules;

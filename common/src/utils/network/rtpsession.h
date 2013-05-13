@@ -116,7 +116,7 @@ public:
 
     //typedef QMap<int, QScopedPointer<RTPIODevice> > RtpIoTracks;
 
-    enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN};
+    enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
     enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
 
     struct SDPTrackInfo
@@ -140,6 +140,7 @@ public:
 
             ioDevice = new RTPIODevice(owner, useTCP);
             ioDevice->setRtpTrackNum(_trackNum * 2);
+            interleaved = QPair<int,int>(-1,-1);
         }
 
         void setSSRC(quint32 value);
@@ -152,6 +153,7 @@ public:
         QString setupURL;
         int mapNum;
         int trackNum;
+        QPair<int,int> interleaved;
 
         RTPIODevice* ioDevice;
     };
@@ -278,6 +280,7 @@ private:
     void updateTransportHeader(QByteArray &responce);
 
     void parseSDP();
+    void updateTrackNum();
     void addAdditionAttrs(QByteArray& request);
     void updateResponseStatus(const QByteArray& response);
 
@@ -286,6 +289,7 @@ private:
     void usePredefinedTracks();
     bool processTextResponseInsideBinData();
     static QByteArray getGuid();
+    void registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo);
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
@@ -335,6 +339,8 @@ private:
 
     static QByteArray m_guid; // client guid. used in proprietary extension
     static QMutex m_guidMutex;
+
+    QVector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
 };
 
 #endif //rtp_session_h_1935_h

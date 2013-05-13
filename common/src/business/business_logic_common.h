@@ -35,18 +35,52 @@ Q_DECLARE_METATYPE(QnBusiness::EventReason);
 
 typedef QMap<QString, QVariant> QnBusinessParams; // param name and param value
 
-namespace QnBusinessEventRuntime {
-    static QLatin1String paramsKeyStr("paramsKey");
 
-    inline QString getParamsKey(const QnBusinessParams &params) {
-        return params[paramsKeyStr].toString();
-    }
+namespace BusinessEventType
+{
+    enum Value
+    {
+        /** Motion has occured on a camera. */
+        Camera_Motion,
 
-    inline void setParamsKey(QnBusinessParams* params, QString value) {
-        (*params)[paramsKeyStr] = value;
-    }
+        /** Camera was disconnected. */
+        Camera_Disconnect,
+
+        /** Storage read error has occured. */
+        Storage_Failure,
+
+        /** Network issue: packet lost, RTP timeout, etc. */
+        Network_Issue,
+
+        /** Found some cameras with same IP address. */
+        Camera_Ip_Conflict,
+
+        /** Camera input signal is received. */
+        Camera_Input,
+
+        /** Connection to mediaserver lost. */
+        MediaServer_Failure,
+
+        /** Two or more mediaservers are running. */
+        MediaServer_Conflict,
+
+        /** Event type is not defined. Used in rules. */
+        NotDefined,
+
+        /**
+         * Used when enumerating to build GUI lists, this and followed actions
+         * should not be displayed.
+         */
+        Count = NotDefined,
+
+        /** System health message. */
+        SystemHealthMessage = 500,
+
+        /** Base index for the user defined events. */
+        UserDefined = 1000
+
+    };
 }
-
 
 inline QByteArray serializeBusinessParams(const QnBusinessParams& value) {
     QByteArray result;

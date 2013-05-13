@@ -10,12 +10,6 @@
 
 #include <core/resource/resource_fwd.h>
 
-namespace QnBusinessEventRuntime
-{
-    QString getInputPortId(const QnBusinessParams &params);
-    void setInputPortId(QnBusinessParams* params, const QString &value);
-}
-
 class QnCameraInputEvent: public QnProlongedBusinessEvent
 {
     typedef QnProlongedBusinessEvent base_type;
@@ -28,12 +22,12 @@ public:
 
     const QString& inputPortID() const;
 
-    virtual bool checkCondition(ToggleState::Value state, const QnBusinessParams &params) const override;
+    virtual bool checkCondition(ToggleState::Value state, const QnBusinessEventParameters &params) const override;
 
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
     static bool isResourcesListValid(const QnResourceList &resources);
 
-    virtual QnBusinessParams getRuntimeParams() const override;
+    virtual QnBusinessEventParameters getRuntimeParams() const override;
 private:
     const QString m_inputPortID;
 };

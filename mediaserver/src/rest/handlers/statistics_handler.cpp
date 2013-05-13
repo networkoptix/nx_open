@@ -44,6 +44,16 @@ int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamLis
     result.append(QString("<usage>%1</usage>\n").arg(m_monitor->totalRamUsage()));
     result.append("</memory>\n");
 
+    result.append("<network>\n");
+    foreach(const QnPlatformMonitor::NetworkLoad &networkLoad, m_monitor->totalNetworkLoad()) {
+        result.append("<interface>\n");
+        result.append(QString("<name>%1</name>\n").arg(networkLoad.interfaceName));
+        result.append(QString("<in>%1</in>\n").arg(networkLoad.bytesPerSecIn));
+        result.append(QString("<out>%1</out>\n").arg(networkLoad.bytesPerSecOut));
+        result.append("</interface>\n");
+    }
+    result.append("</network>\n");
+
     result.append("<params>\n");
     result.append(QString("<updatePeriod>%1</updatePeriod>\n").arg(m_monitor->updatePeriod()));
     result.append("</params>\n");
@@ -61,7 +71,7 @@ int QnStatisticsHandler::executePost(const QString& path, const QnRequestParamLi
     return executeGet(path, params, result, contentType);
 }
 
-QString QnStatisticsHandler::description(TCPSocket *) const
+QString QnStatisticsHandler::description() const
 {
     return "Returns server info: CPU usage, HDD usage e.t.c \n";
 }

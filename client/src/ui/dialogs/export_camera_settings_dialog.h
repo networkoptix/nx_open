@@ -20,7 +20,7 @@ class QnExportCameraSettingsDialog : public QDialog, public QnWorkbenchContextAw
     typedef QDialog base_type;
 
 public:
-    explicit QnExportCameraSettingsDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnExportCameraSettingsDialog(QWidget *parent = NULL);
     ~QnExportCameraSettingsDialog();
 
     QnVirtualCameraResourceList getSelectedCameras() const;

@@ -26,7 +26,10 @@ public:
 
     QnAbstractMediaDataPtr getNextData();
     void setRequest(const QString& request);
-    void openStream();
+    /*!
+        \return true, if successfully opened stream or stream is already opened. false, if failed. For more detail, call \a getLastResponseCode()
+    */
+    bool openStream();
     void closeStream() ;
     bool isStreamOpened() const;
     const QnResourceAudioLayout* getAudioLayout() const;

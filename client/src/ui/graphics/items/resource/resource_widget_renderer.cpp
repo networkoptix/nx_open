@@ -7,7 +7,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
 #include <utils/gl/glcontext.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include "decodedpicturetoopengluploader.h"
 #include "decodedpicturetoopengluploadercontextpool.h"
@@ -148,29 +148,31 @@ QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
     return ctx.renderer ? ctx.renderer->lastFrameMetadata() : QnMetaDataV1Ptr();
 }
 
-Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect, qreal opacity) {
+Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity) {
     frameDisplayed();
 
     RenderingTools& ctx = m_channelRenderers[channel];
     if( !ctx.renderer )
         return Qn::NothingRendered;
     ctx.uploader->setOpacity(opacity);
-    return ctx.renderer->paint(rect);
+    return ctx.renderer->paint(sourceRect, targetRect);
 }
 
 void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image) {
     RenderingTools& ctx = m_channelRenderers[image->channel];
     if( !ctx.uploader )
         return;
+
     ctx.uploader->uploadDecodedPicture( image );
     ++ctx.framesSinceJump;
 
     QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
+    if(m_sourceSize == sourceSize) 
+        return;
+
+    m_sourceSize = sourceSize;
     
-    if(m_sourceSize != sourceSize) {
-        m_sourceSize = sourceSize;
-        emit sourceSizeChanged(sourceSize);
-    }
+    emit sourceSizeChanged();
 }
 
 void QnResourceWidgetRenderer::discardAllFramesPostedToDisplay(int channel)

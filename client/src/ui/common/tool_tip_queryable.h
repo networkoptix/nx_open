@@ -18,7 +18,7 @@ class ToolTipQueryable {
 public:
     virtual ~ToolTipQueryable() {}
 
-    // TODO: bool toolTipAt(const QPointF &pos, QString *toolTip, QRectF *area) const
+    // TODO: #Elric bool toolTipAt(const QPointF &pos, QString *toolTip, QRectF *area) const
     /**
      * \param pos                       Position inside an item.
      * \returns                         Tooltip at the given position.

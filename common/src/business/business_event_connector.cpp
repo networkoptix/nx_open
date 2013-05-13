@@ -127,6 +127,6 @@ void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resou
 
 void QnBusinessEventConnector::at_NoStorages(const QnResourcePtr& resource)
 {
-    QnPopupBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::StoragesNotConfigured, resource->getId()));
-    qnBusinessRuleProcessor->showPopup(action);
+    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::StoragesNotConfigured, resource->getId()));
+    qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }

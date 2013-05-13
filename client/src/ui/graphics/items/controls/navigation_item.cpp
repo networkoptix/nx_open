@@ -12,13 +12,15 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
+#include <utils/clock_data_provider.h>
 
 #include <ui/style/skin.h>
-#include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/style/globals.h>
 #include <ui/graphics/items/controls/speed_slider.h>
 #include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/calendar_widget.h>
@@ -37,6 +39,23 @@ namespace {
         button->setCached(true);
         return button;
     }
+
+    GraphicsLabel* newClockItem(QGraphicsItem *parent = NULL) {
+        GraphicsLabel* label = new GraphicsLabel(parent);
+
+        QFont font;
+        font.setPixelSize(30);
+        label->setFont(font);
+
+        QPalette palette = label->palette();
+        palette.setColor(QPalette::WindowText, qnGlobals->selectedFrameColor());
+        label->setPalette(palette);
+
+        QnClockDataProvider* dp = new QnClockDataProvider(label);
+        QObject::connect(dp, SIGNAL(timeChanged(QString)), label, SLOT(setText(QString)));
+        return label;
+    }
+
 
 } // anonymous namespace
 
@@ -147,6 +166,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     leftLayoutV->setMinimumHeight(87.0);
     leftLayoutV->addItem(m_speedSlider);
     leftLayoutV->addItem(buttonsLayout);
+    leftLayoutV->addItem(newClockItem(this));
 
     QGraphicsWidget *leftWidget = new QGraphicsWidget();
     leftWidget->setLayout(leftLayoutV);
@@ -265,7 +285,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     //connect(speedDownAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepBackward())); // TODO
     //connect(speedUpAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepForward())); // TODO
-    // TODO: handlers must be implemented elsewhere
+    // TODO: #Elric handlers must be implemented elsewhere
 
     connect(action(Qn::VolumeUpAction),         SIGNAL(triggered()), m_volumeSlider,        SLOT(stepForward()));
     connect(action(Qn::VolumeDownAction),       SIGNAL(triggered()), m_volumeSlider,        SLOT(stepBackward()));
@@ -352,24 +372,24 @@ void QnNavigationItem::updatePlaybackButtonsPressed() {
 void QnNavigationItem::updatePlaybackButtonsIcons() {
     bool playing = m_playButton->isChecked();
 
-    // TODO: this is cheating!
+    // TODO: #Elric this is cheating!
     action(Qn::PreviousFrameAction)->setText(playing ? tr("Speed Down") : tr("Previous Frame"));
     action(Qn::NextFrameAction)->setText(playing ? tr("Speed Up") : tr("Next Frame"));
 
     m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "slider/navigation/backward.png" : "slider/navigation/step_backward.png"));
     m_stepForwardButton->setIcon(qnSkin->icon(playing ? "slider/navigation/forward.png" : "slider/navigation/step_forward.png"));
 
-    updatePlaybackButtonsEnabled(); // TODO: remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
+    updatePlaybackButtonsEnabled(); // TODO: #Elric remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
 }
 
 void QnNavigationItem::updateJumpButtonsTooltips() {
     bool hasPeriods = navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsPeriods;
 
-    // TODO: this is cheating!
+    // TODO: #Elric this is cheating!
     action(Qn::JumpToStartAction)->setText(hasPeriods ? tr("Previuos Chunk") : tr("To Start"));
     action(Qn::JumpToEndAction)->setText(hasPeriods ? tr("Next Chunk") : tr("To End"));
 
-    updatePlaybackButtonsEnabled(); // TODO: remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
+    updatePlaybackButtonsEnabled(); // TODO: #Elric remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
 }
 
 void QnNavigationItem::updatePlaybackButtonsEnabled() {

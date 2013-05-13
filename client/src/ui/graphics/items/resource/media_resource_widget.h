@@ -16,15 +16,16 @@ class QnResourceWidgetRenderer;
 
 
 class QnMediaResourceWidget: public QnResourceWidget {
-    Q_OBJECT;
-
+    Q_OBJECT
     typedef QnResourceWidget base_type;
 
 public:
     static const Button MotionSearchButton = static_cast<Button>(0x08);
     static const Button PtzButton = static_cast<Button>(0x10);
+    static const Button ZoomWindowButton = static_cast<Button>(0x20);
 #define MotionSearchButton MotionSearchButton
 #define PtzButton PtzButton
+#define ZoomWindowButton ZoomWindowButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
@@ -92,7 +93,6 @@ signals:
     void motionSelectionChanged();
 
 protected:
-    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual void channelLayoutChangedNotify() override;
@@ -104,7 +104,7 @@ protected:
     virtual Overlay calculateChannelOverlay(int channel) const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) override;
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region);
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
@@ -120,24 +120,23 @@ protected:
     void ensureMotionSelectionCache();
     void invalidateMotionSelectionCache();
 
-    int motionGridWidth() const;
-    int motionGridHeight() const;
-
+    QSize motionGridSize() const;
     QPoint channelGridOffset(int channel) const;
 
     Q_SIGNAL void updateInfoTextLater();
 
 private slots:
-    void at_renderer_sourceSizeChanged(const QSize &size);
     void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
+    void at_zoomWindowButton_toggled(bool checked);
 
     void at_camDisplay_liveChanged();
 
 private:
     int currentRecordingMode();
 
+    Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
 
 private:
@@ -175,7 +174,6 @@ private:
     mutable bool m_motionSelectionCacheValid;
 
     QStaticText m_sensStaticText[10];
-
 };
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H

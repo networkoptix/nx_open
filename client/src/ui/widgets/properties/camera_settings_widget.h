@@ -41,8 +41,11 @@ public:
     bool hasCameraChanges() const;
     bool hasAnyCameraChanges() const;
 
-    /** Checks if user changed controls but not applied them to the schedule */
-    bool hasControlsChanges() const;
+    /** Checks if user changed schedule controls but not applied them */
+    bool hasScheduleControlsChanges() const;
+
+    /** Checks if user changed motion controls but not applied them */
+    bool hasMotionControlsChanges() const;
 
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const;
     QnMediaServerConnectionPtr getServerConnection() const;

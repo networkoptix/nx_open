@@ -14,7 +14,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include <common/common_meta_types.h>
 
@@ -65,7 +65,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
-    m_resourceModel = new QnResourcePoolModel(this);
+    m_resourceModel = new QnResourcePoolModel(Qn::RootNode, false, this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
@@ -101,7 +101,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(qnSettings->notifier(QnSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
+    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
 
     /* Run handlers. */
     updateFilter();
@@ -196,11 +196,11 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
     }
     QnActionManager *manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, ignoreSelection ? QnActionParameters() : QnActionParameters(currentTarget(Qn::TreeScope))));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, ignoreSelection ? QnActionParameters() : currentParameters(Qn::TreeScope)));
 
     /* Add tree-local actions to the menu. */
     if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
-        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: implement with action parameters
+        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: #Elric implement with action parameters
 
     if(currentItemView() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
@@ -240,18 +240,32 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
     QnResourceList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        if (index.data(Qn::NodeTypeRole) == Qn::RecorderNode) {
-            for (int i = 0; i < index.model()->rowCount(index); i++) {
-                QModelIndex subIndex = index.model()->index(i, 0, index);
-                QnResourcePtr resource = subIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+        int nodeType = index.data(Qn::NodeTypeRole).toInt();
+
+        switch (nodeType) {
+        case Qn::RecorderNode: {
+                for (int i = 0; i < index.model()->rowCount(index); i++) {
+                    QModelIndex subIndex = index.model()->index(i, 0, index);
+                    QnResourcePtr resource = subIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+                    if(resource && !result.contains(resource))
+                        result.append(resource);
+                }
+            }
+        case Qn::ResourceNode: {
+                QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
                 if(resource && !result.contains(resource))
                     result.append(resource);
             }
+        case Qn::LocalNode:
+        case Qn::ServersNode:
+        case Qn::UsersNode:
+        case Qn::ItemNode:
+        case Qn::BastardNode:
+        case Qn::RootNode:
+            continue;
+        default:
+            break;
         }
-
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(resource && !result.contains(resource))
-            result.append(resource);
     }
 
     return result;
@@ -290,6 +304,12 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
     } else {
         return QVariant::fromValue(selectedResources());
     }
+}
+
+QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const {
+    QItemSelectionModel *selectionModel = currentSelectionModel();
+    int nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).toInt();
+    return QnActionParameters(currentTarget(scope)).withArgument(Qn::NodeTypeRole, nodeType); // TODO: #Elric just pass all the data through?
 }
 
 void QnResourceBrowserWidget::updateFilter(bool force) {

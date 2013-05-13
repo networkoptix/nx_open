@@ -33,7 +33,6 @@ QnResource::QnResource():
     m_initialized(false),
     m_initMutex(QMutex::Recursive)
 {
-    connect(this, SIGNAL(parameterValueChangedQueued(const QnResourcePtr &, const QnParam &)), this, SIGNAL(parameterValueChanged(const QnResourcePtr &, const QnParam &)), Qt::QueuedConnection);
 }
 
 QnResource::~QnResource()
@@ -73,7 +72,7 @@ void QnResource::updateInner(QnResourcePtr other)
 {
     Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
-    m_id = other->m_id; // TODO: this is WRONG!!!!!!!!!11111111
+    m_id = other->m_id; //TODO: #Elric this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     m_tags = other->m_tags;
@@ -90,7 +89,7 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         consumer->beforeUpdate();
 
     {
-        // TODO: use ordered mutex locker here to avoid deadlocks.
+        // TODO: #Elric use ordered mutex locker here to avoid deadlocks.
         QMutexLocker mutexLocker(&m_mutex); 
         QMutexLocker mutexLocker2(&other->m_mutex); 
         updateInner(other); 
@@ -392,7 +391,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
                 //param.setValue(newValue);
                 m_resourceParamList[name].setValue(newValue);
                 m_mutex.unlock();
-                emit parameterValueChangedQueued(::toSharedPointer(this), param);
+                emit parameterValueChanged(::toSharedPointer(this), param);
             }
             emit asyncParamGetDone(toSharedPointer(this), name, newValue, true);
             return true;
@@ -463,7 +462,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     }
 
     if (oldValue != val)
-        emit parameterValueChangedQueued(::toSharedPointer(this), param);
+        emit parameterValueChanged(::toSharedPointer(this), param);
 
     emit asyncParamSetDone(toSharedPointer(this), name, val, true);
     return true;
