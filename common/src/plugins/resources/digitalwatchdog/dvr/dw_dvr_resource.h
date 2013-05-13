@@ -5,6 +5,6 @@ class QnDwDvrResource : public QnPhysicalCameraResource
 public:
     static const char* MANUFACTURE;
 
-    virtual QString getDriverName() const override;
+    virtual QString manufacture() const override;
     virtual void setMotionMaskPhysical(int channel) override;
 };

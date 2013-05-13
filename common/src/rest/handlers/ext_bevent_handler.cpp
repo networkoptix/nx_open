@@ -77,7 +77,7 @@ int QnExternalBusinessEventHandler::executePost(const QString& path, const QnReq
     return executeGet(path, params, result, contentType);
 }
 
-QString QnExternalBusinessEventHandler::description() const
+QString QnExternalBusinessEventHandler::description(TCPSocket *) const
 {
     return QLatin1String(
         "Process external business event\n"

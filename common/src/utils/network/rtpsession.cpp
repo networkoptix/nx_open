@@ -427,46 +427,6 @@ void RTPSession::usePredefinedTracks()
     m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(METADATA_STR, QLatin1String("metadata"), QLatin1String("trackID=7"), METADATA_CODE, METADATA_TRACK_NUM, this, true));
 }
 
-bool trackNumLess(const QSharedPointer<RTPSession::SDPTrackInfo>& track1, const QSharedPointer<RTPSession::SDPTrackInfo>& track2)
-{
-    return track1->trackNum < track2->trackNum;
-}
-
-void RTPSession::updateTrackNum()
-{
-    int videoNum = 0;
-    int audioNum = 0;
-    int metadataNum = 0;
-    for (int i = 0; i < m_sdpTracks.size(); ++i)
-    {
-        if (m_sdpTracks[i]->trackType == TT_VIDEO)
-            videoNum++;
-        else if (m_sdpTracks[i]->trackType == TT_AUDIO)
-            audioNum++;
-        else if (m_sdpTracks[i]->trackType == TT_METADATA)
-            metadataNum++;
-    }
-
-    int curVideo = 0;
-    int curAudio = 0;
-    int curMetadata = 0;
-
-    for (int i = 0; i < m_sdpTracks.size(); ++i)
-    {
-        if (m_sdpTracks[i]->trackType == TT_VIDEO)
-            m_sdpTracks[i]->trackNum = curVideo++;
-        else if (m_sdpTracks[i]->trackType == TT_AUDIO)
-            m_sdpTracks[i]->trackNum = videoNum + curAudio++;
-        else if (m_sdpTracks[i]->trackType == TT_METADATA) {
-            if (m_sdpTracks[i]->codecName == lit("ffmpeg-metadata"))
-                m_sdpTracks[i]->trackNum = METADATA_TRACK_NUM; // use fixed track num for our proprietary format
-            else
-                m_sdpTracks[i]->trackNum = videoNum + audioNum + curMetadata++;
-        }
-    }
-    qSort(m_sdpTracks.begin(), m_sdpTracks.end(), trackNumLess);
-}
-
 
 void RTPSession::parseSDP()
 {
@@ -476,6 +436,7 @@ void RTPSession::parseSDP()
     QString codecName;
     QString codecType;
     QString setupURL;
+    int trackNumber = 0;
 
     foreach(QByteArray line, lines)
     {
@@ -486,8 +447,9 @@ void RTPSession::parseSDP()
             if (mapNum >= 0) {
                 if (codecName.isEmpty())
                     codecName = findCodecById(mapNum);
-                m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+                m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, trackNumber, this, m_transport == TRANSPORT_TCP));
                 setupURL.clear();
+                trackNumber++;
             }
             QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
             codecType = QLatin1String(trackParams[0]);
@@ -518,11 +480,10 @@ void RTPSession::parseSDP()
     if (mapNum >= 0) {
         if (codecName.isEmpty())
             codecName = findCodecById(mapNum);
-        //if (codecName == QLatin1String("ffmpeg-metadata"))
-        //    trackNumber = METADATA_TRACK_NUM;
-        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+        if (codecName == QLatin1String("ffmpeg-metadata"))
+            trackNumber = METADATA_TRACK_NUM;
+        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, trackNumber, this, m_transport == TRANSPORT_TCP));
     }
-    updateTrackNum();
 }
 
 void RTPSession::parseRangeHeader(const QString& rangeStr)
@@ -621,7 +582,6 @@ bool RTPSession::open(const QString& url, qint64 startTime)
     m_contentBase = mUrl.toString();
     m_responseBufferLen = 0;
     m_useDigestAuth = false;
-    m_rtpToTrack.clear();
 
 
 
@@ -857,13 +817,6 @@ QList<QByteArray> RTPSession::getSdpByType(TrackType trackType) const
     return rez;
 }
 
-void RTPSession::registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo)
-{
-    while (m_rtpToTrack.size() <= rtpNum)
-        m_rtpToTrack << QSharedPointer<SDPTrackInfo>();
-    m_rtpToTrack[rtpNum] = trackInfo;
-};
-
 bool RTPSession::sendSetup()
 {
     int audioNum = 0;
@@ -926,9 +879,7 @@ bool RTPSession::sendSetup()
         }
         else
         {
-        	int rtpNum = trackInfo->trackNum*SDP_TRACK_STEP;
-            trackInfo->interleaved = QPair<int,int>(rtpNum, rtpNum+1);
-            request += QLatin1String("interleaved=") + QString::number(trackInfo->interleaved.first) + QLatin1Char('-') + QString::number(trackInfo->interleaved.second);
+            request += QLatin1String("interleaved=") + QString::number(trackInfo->trackNum*SDP_TRACK_STEP) + QLatin1Char('-') + QString::number(trackInfo->trackNum*SDP_TRACK_STEP+1);
         }
         request += "\r\n";
 
@@ -998,17 +949,6 @@ bool RTPSession::sendSetup()
                         m_sdpTracks[i]->setSSRC(tmpParams[1].toInt(&ok, 16));
                     }
                 }
-                else if (tmpList[k].startsWith(QLatin1String("interleaved"))) {
-                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
-                    if (tmpParams.size() > 1) {
-                        tmpParams = tmpParams[1].split(lit("-"));
-                        if (tmpParams.size() == 2) {
-                            trackInfo->interleaved = QPair<int,int>(tmpParams[0].toInt(), tmpParams[1].toInt());
-                            registerRTPChannel(trackInfo->interleaved.first, trackInfo);
-                        }
-                    }
-                }
-
             }
         }
 
@@ -1771,15 +1711,7 @@ QString RTPSession::getTrackFormat(int trackNum) const
 
 RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
 {
-    TrackType rez = TT_UNKNOWN;
-    int rtpChannelNum = channelNum & ~1;
-    if (rtpChannelNum < m_rtpToTrack.size()) {
-        QSharedPointer<SDPTrackInfo> track = m_rtpToTrack[rtpChannelNum];
-        if (track)
-            rez = track->trackType;
-    }
-    if (rez == TT_UNKNOWN)
-        rez = getTrackType(channelNum / SDP_TRACK_STEP);
+    TrackType rez = getTrackType(channelNum / SDP_TRACK_STEP);
     if (channelNum % SDP_TRACK_STEP)
         rez = RTPSession::TrackType(int(rez)+1);
     return rez;
@@ -1788,7 +1720,6 @@ RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
 RTPSession::TrackType RTPSession::getTrackType(int trackNum) const
 {
     // client setup all track numbers consequentially, so we can use track num as direct vector index. Expect medata track with fixed num and always last record
-
     if (trackNum < m_sdpTracks.size())
         return m_sdpTracks[trackNum]->trackType;
     else if (trackNum == METADATA_TRACK_NUM && !m_sdpTracks.isEmpty())

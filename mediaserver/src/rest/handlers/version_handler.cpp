@@ -19,7 +19,7 @@ int QnVersionHandler::executePost(const QString& path, const QnRequestParamList&
     return executeGet(path, params, result, contentType);
 }
 
-QString QnVersionHandler::description() const
+QString QnVersionHandler::description(TCPSocket *) const
 {
     return "Returns server version";
 }

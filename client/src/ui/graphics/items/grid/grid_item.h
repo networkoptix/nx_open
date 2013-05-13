@@ -1,12 +1,9 @@
 #ifndef QN_GRID_ITEM_H
 #define QN_GRID_ITEM_H
 
-#include <QtCore/QWeakPointer>
-#include <QtGui/QGraphicsObject>
-
+#include <QGraphicsObject>
+#include <QWeakPointer>
 #include <utils/common/hash.h> /* For qHash(QPoint). */
-
-#include <ui/animation/animated.h>
 
 class AnimationTimer;
 
@@ -14,11 +11,9 @@ class QnWorkbenchGridMapper;
 class VariantAnimator;
 class QnGridHighlightItem;
 
-class QnGridItem: public Animated<QGraphicsObject> {
-    Q_OBJECT
-    Q_PROPERTY(QColor color READ color WRITE setColor)
-
-    typedef Animated<QGraphicsObject> base_type;
+class QnGridItem : public QGraphicsObject {
+    Q_OBJECT;
+    Q_PROPERTY(QColor color READ color WRITE setColor);
 
 public:
     enum CellState {
@@ -56,9 +51,21 @@ public:
         m_lineWidth = lineWidth;
     }
 
+    void animatedShow();
+
+    void animatedHide();
+
+    void setAnimationSpeed(qreal speed);
+
+    void setAnimationTimeLimit(int timeLimitMSec);
+
+    void setAnimationTimer(AnimationTimer *timer);
+
+
     QColor stateColor(int cellState) const;
 
     void setStateColor(int cellState, const QColor &color);
+
 
     int cellState(const QPoint &cell) const;
 
@@ -94,6 +101,7 @@ private:
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;
     QColor m_color;
     qreal m_lineWidth;
+    VariantAnimator *m_opacityAnimator;
     QHash<int, QColor> m_colorByState;
     QHash<QPoint, PointData> m_dataByCell;
     QList<QnGridHighlightItem *> m_freeItems;

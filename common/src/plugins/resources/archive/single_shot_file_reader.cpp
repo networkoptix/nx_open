@@ -50,12 +50,7 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
 void QnSingleShotFileStreamreader::run()
 {
     saveSysThreadID();
-    QnAbstractMediaDataPtr data;
-    try {
-        data = getNextData();
-    } catch(...) {
-        qWarning() << "Application out of memory";
-    }
+    QnAbstractMediaDataPtr data = getNextData();
     if (data)
         putData(data);
 }

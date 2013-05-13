@@ -59,6 +59,7 @@ void ff_read_frame_flush(AVFormatContext *s)
 }
 
 
+//extern QMutex global_ffmpeg_mutex;
 static const int IO_BLOCK_SIZE = 1024 * 32;
 
 QnAVIPlaylistArchiveDelegate::QnAVIPlaylistArchiveDelegate() :
@@ -73,6 +74,7 @@ QnAVIPlaylistArchiveDelegate::QnAVIPlaylistArchiveDelegate() :
 
 QnAVIPlaylistArchiveDelegate::~QnAVIPlaylistArchiveDelegate()
 {
+    //QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
     close();
     if (m_ffmpegIOContext)
     {
@@ -114,6 +116,8 @@ bool QnAVIPlaylistArchiveDelegate::findStreams()
         fi->m_formatContext = 0;
 
         m_fileList << fi;
+
+        //QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
 
         if (!switchToFile(m_fileList.size() - 1))
         {
@@ -288,6 +292,7 @@ struct CLAVIPlaylistStreamReaderPriv
 
 AVIOContext* QnAVIPlaylistArchiveDelegate::getIOContext()
 {
+    //QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
     if (m_ffmpegIOContext == 0)
     {
         m_ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);

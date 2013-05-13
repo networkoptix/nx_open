@@ -4,8 +4,6 @@
 #include <QtCore/Qt>
 #include <QtCore/QRectF>
 
-#include <common/common_globals.h>
-
 namespace Qn {
     /**
      * This enum is used to describe parts of a window frame. 
@@ -23,10 +21,6 @@ namespace Qn {
         BottomSection =         1 << Qt::BottomSection,
         BottomLeftSection =     1 << Qt::BottomLeftSection,
         TitleBarArea =          1 << Qt::TitleBarArea,
-
-        CornerSections =        TopLeftSection | TopRightSection | BottomLeftSection | BottomRightSection,
-        SideSections =          TopSection | BottomSection | LeftSection | RightSection,
-        ResizeSections =        CornerSections | SideSections,
     };
 
     Q_DECLARE_FLAGS(WindowFrameSections, WindowFrameSection);
@@ -41,9 +35,8 @@ namespace Qn {
 
     Qn::WindowFrameSections calculateRectangularFrameSections(const QRect &frameRect, const QRect &rect, const QRect &query);
 
-    Qt::CursorShape calculateHoverCursorShape(Qn::WindowFrameSection section);
-    
     Qt::CursorShape calculateHoverCursorShape(Qt::WindowFrameSection section);
+
 
 
     QSizeF calculateSizeDelta(const QPointF &dragDelta, Qt::WindowFrameSection section);
@@ -53,8 +46,6 @@ namespace Qn {
     QPointF calculatePinPoint(const QRectF &rect, Qt::WindowFrameSection section);
 
     QPoint calculatePinPoint(const QRect &rect, Qt::WindowFrameSection section);
-
-    Qn::Corner calculatePinPoint(Qt::WindowFrameSection section);
 
 
     QRectF resizeRect(const QRectF &rect, const QSizeF &size, Qt::WindowFrameSection section);

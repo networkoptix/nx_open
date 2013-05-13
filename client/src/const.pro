@@ -212,7 +212,6 @@ RESOURCES += ../build/skin.qrc
 FORMS += \
     ui/dialogs/preferences_dialog.ui \
     ui/dialogs/login_dialog.ui \
-    ui/dialogs/event_log_dialog.ui \
     ui/dialogs/sign_dialog.ui \
     ui/dialogs/tags_edit_dialog.ui \
     ui/dialogs/server_settings_dialog.ui \

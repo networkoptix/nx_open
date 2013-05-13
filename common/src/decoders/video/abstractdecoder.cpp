@@ -9,7 +9,7 @@
 #include "ffmpeg.h"
 #include "ipp_h264_decoder.h"
 #include "../abstractvideodecoderplugin.h"
-#include "../../plugins/plugin_manager.h"
+#include "../../plugins/pluginmanager.h"
 
 
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = AUTO;

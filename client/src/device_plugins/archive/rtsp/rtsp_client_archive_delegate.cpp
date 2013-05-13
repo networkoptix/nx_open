@@ -918,7 +918,7 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
     if (mediaRes) {
         const QnResourceVideoLayout* videoLayout = mediaRes->getVideoLayout(0);
         if (videoLayout)
-            numOfVideoChannels = videoLayout->channelCount();
+            numOfVideoChannels = videoLayout->numberOfChannels();
     }
     m_rtspSession.setUsePredefinedTracks(numOfVideoChannels); // ommit DESCRIBE and SETUP requests
 }

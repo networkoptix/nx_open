@@ -3,11 +3,10 @@
 
 #include <QtCore/QMetaType>
 
-// TODO: #Elric this is available in Qt5's QMetaType
+// TODO: this is available in Qt5's QMetaType
 class QnMetaHandler {
 public:
     QnMetaHandler(int type): m_type(type) {}
-    virtual ~QnMetaHandler(){}
 
     int type() const {
         return m_type;

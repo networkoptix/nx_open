@@ -19,7 +19,6 @@ class QTimer;
 
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
-class QnTimeSliderChunkPainter;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
@@ -102,8 +101,8 @@ public:
     void setLineComment(int line, const QString &comment);
     QString lineComment(int line);
 
-    QnTimePeriodList timePeriods(int line, Qn::TimePeriodContent type) const;
-    void setTimePeriods(int line, Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods);
+    QnTimePeriodList timePeriods(int line, Qn::TimePeriodRole type) const;
+    void setTimePeriods(int line, Qn::TimePeriodRole type, const QnTimePeriodList &timePeriods);
 
     Options options() const;
     void setOptions(Options options);
@@ -153,7 +152,7 @@ public:
     void setRulerHeight(qreal rulerHeight);
 
     QnThumbnailsLoader *thumbnailsLoader() const;
-    void setThumbnailsLoader(QnThumbnailsLoader *value, qreal aspectRatio); // TODO: #Elric remove aspectRatio
+    void setThumbnailsLoader(QnThumbnailsLoader *value, qreal aspectRatio); // TODO: remove aspectRatio
 
     const QVector<qint64> &indicators() const;
     void setIndicators(const QVector<qint64> &indicators);
@@ -304,8 +303,6 @@ private:
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
-
-    friend class QnTimeSliderChunkPainter;
 
     qint64 m_windowStart, m_windowEnd;
     qint64 m_minimalWindow;

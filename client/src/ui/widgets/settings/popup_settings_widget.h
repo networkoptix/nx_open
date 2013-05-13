@@ -4,35 +4,30 @@
 #include <QWidget>
 #include <QtGui/QCheckBox>
 
-#include <ui/workbench/workbench_context_aware.h>
-
 namespace Ui {
     class QnPopupSettingsWidget;
 }
 
-class QnUint64KvPairUsageHelper;
+class QnSettings;
 
-class QnPopupSettingsWidget : public QWidget, public QnWorkbenchContextAware
+class QnPopupSettingsWidget : public QWidget
 {
     Q_OBJECT
     
 public:
-    explicit QnPopupSettingsWidget(QnWorkbenchContext *context, QWidget *parent = 0);
+    explicit QnPopupSettingsWidget(QWidget *parent = 0);
     ~QnPopupSettingsWidget();
 
-    void submit();
+    void updateFromSettings(QnSettings* settings);
+    void submitToSettings(QnSettings* settings);
 
 private slots:
     void at_showAllCheckBox_toggled(bool checked);
-    void at_showBusinessEvents_valueChanged(quint64 value);
-    void at_context_userChanged();
 
 private:
     QScopedPointer<Ui::QnPopupSettingsWidget> ui;
     QList<QCheckBox* > m_businessRulesCheckBoxes;
     QList<QCheckBox* > m_systemHealthCheckBoxes;
-
-    QnUint64KvPairUsageHelper* m_showBusinessEventsHelper;
 };
 
 #endif // POPUP_SETTINGS_WIDGET_H

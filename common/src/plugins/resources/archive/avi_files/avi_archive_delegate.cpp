@@ -1,5 +1,6 @@
 #include "avi_archive_delegate.h"
 
+#include <QtCore/QSemaphore>
 #include <QtCore/QSharedPointer>
 
 #include "stdint.h"
@@ -14,6 +15,8 @@
 #include "core/resource/media_resource.h"
 #include "export/sign_helper.h"
 
+//extern QMutex global_ffmpeg_mutex;
+
 class QnAviAudioLayout: public QnResourceAudioLayout
 {
 public:
@@ -24,7 +27,7 @@ public:
 
     }
 
-    virtual int channelCount() const override
+    virtual int numberOfChannels() const override
     {
         int audioNum = 0;
         int lastStreamID = -1;
@@ -191,7 +194,6 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 data = QnAbstractMediaDataPtr(videoData);
                 packetTimestamp(videoData, packet);
                 break;
-
             case AVMEDIA_TYPE_AUDIO:
                 if (packet.stream_index != m_audioStreamIndex || stream->codec->channels < 1 /*|| m_indexToChannel[packet.stream_index] == -1*/) {
                     av_free_packet(&packet);
@@ -206,7 +208,6 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 audioData->channelNumber = m_indexToChannel[packet.stream_index];
                 packetTimestamp(audioData, packet);
                 break;
-
             default:
                 av_free_packet(&packet);
                 continue;
@@ -329,12 +330,6 @@ const char* QnAviArchiveDelegate::getTagValue(QnAviArchiveDelegate::Tag tag)
     return entry ? entry->value : 0;
 }
 
-const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
-{
-    AVDictionaryEntry* entry = av_dict_get(m_formatContext->metadata, tagName, 0, 0);
-    return entry ? entry->value : 0;
-}
-
 static QnDefaultResourceVideoLayout defaultVideoLayout;
 QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
 {
@@ -345,7 +340,7 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
 
     if (m_videoLayout == 0)
     {
-        m_videoLayout = new QnCustomResourceVideoLayout(QSize(1, 1));
+        m_videoLayout = new QnCustomResourceVideoLayout(1, 1);
 
 
         // prevent standart tag name parsing in 'avi' format
@@ -408,6 +403,7 @@ bool QnAviArchiveDelegate::findStreams()
         return false;
     if (!m_streamsFound)
     {
+        //global_ffmpeg_mutex.lock();
         if (m_fastStreamFind) {
             m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
             // TODO: #vasilenko avoid using deprecated methods
@@ -422,6 +418,7 @@ bool QnAviArchiveDelegate::findStreams()
             m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
         }
 
+        //global_ffmpeg_mutex.unlock();
         if (m_streamsFound) 
         {
             m_duration = m_formatContext->duration;
@@ -539,8 +536,9 @@ bool QnAviArchiveDelegate::deserializeLayout(QnCustomResourceVideoLayout* layout
             return false;
         }
         if (i == 0) {
-            layout->setSize(QSize(params[0].toInt(), params[1].toInt()));
-        } 
+            layout->setWidth(params[0].toInt());
+            layout->setHeight(params[1].toInt());
+        }
         else {
             layout->setChannel(params[0].toInt(), params[1].toInt(), i-1);
         }

@@ -406,7 +406,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
     const QnResourceVideoLayout* layout = d->mediaRes->getVideoLayout(currentDP.data());
-    return layout ? layout->channelCount() : -1;
+    return layout ? layout->numberOfChannels() : -1;
 }
 
 QString QnRtspConnectionProcessor::getRangeStr()
@@ -550,7 +550,7 @@ QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaD
         return rez;
     if (d->startTime != DATETIME_NOW)
         archive.seek(d->startTime, true);
-    if (archive.getAudioLayout()->channelCount() == 0 && dataType == QnAbstractMediaData::AUDIO)
+    if (archive.getAudioLayout()->numberOfChannels() == 0 && dataType == QnAbstractMediaData::AUDIO)
         return rez;
 
     for (int i = 0; i < 20; ++i)
@@ -593,10 +593,10 @@ int QnRtspConnectionProcessor::composeDescribe()
     else {
         const QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
         if (audioLayout)
-            numAudio = audioLayout->channelCount();
+            numAudio = audioLayout->numberOfChannels();
     }
 
-    int numVideo = videoLayout ? videoLayout->channelCount() : 1;
+    int numVideo = videoLayout ? videoLayout->numberOfChannels() : 1;
 
     addResponseRangeHeader();
 
@@ -713,10 +713,10 @@ int QnRtspConnectionProcessor::composeSetup()
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
     const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
-    if (trackId >= videoLayout->channelCount()) {
+    if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         if (d->archiveDP)
-            d->archiveDP->setAudioChannel(trackId - videoLayout->channelCount());
+            d->archiveDP->setAudioChannel(trackId - videoLayout->numberOfChannels());
     }
 
     if (trackId >= 0)
@@ -927,7 +927,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks()
 
     const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
     int trackNum = 0;
-    for (; trackNum < videoLayout->channelCount(); ++trackNum)
+    for (; trackNum < videoLayout->numberOfChannels(); ++trackNum)
     {
         RtspServerTrackInfoPtr vTrack(new RtspServerTrackInfo());
         vTrack->encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());

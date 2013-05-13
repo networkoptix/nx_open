@@ -3,7 +3,6 @@
 
 #include <QtCore/QHash>
 #include <QString>
-#include <QSharedPointer>
 
 #include "socket.h"
 
@@ -25,13 +24,7 @@ class CLSimpleHTTPClient
     enum { Basic, Digestaccess };
 
 public:
-    /*!
-        \param timeout Timeout in milliseconds to be used as socket's read and write timeout
-    */
     CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
-    /*!
-        \param timeout Timeout in milliseconds to be used as socket's read and write timeout
-    */
     CLSimpleHTTPClient(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
     ~CLSimpleHTTPClient();
 
@@ -106,14 +99,8 @@ private:
     QMap<QByteArray,QByteArray> m_additionHeaders;
 };
 
-/*!
-    \param timeout Timeout in milliseconds to be used as socket's read and write timeout
-*/
 QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity = 2000);
 
-/*!
-    \param timeout Timeout in milliseconds to be used as socket's read and write timeout
-*/
 bool uploadFile(const QString& fileName, const QString&  content, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
 
 

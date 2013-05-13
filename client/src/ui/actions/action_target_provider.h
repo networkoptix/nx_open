@@ -3,7 +3,6 @@
 
 #include "action_fwd.h"
 #include "actions.h"
-#include "action_parameters.h"
 
 class QVariant;
 class QnWorkbenchContext;
@@ -14,15 +13,10 @@ class QnWorkbenchContext;
  */
 class QnActionTargetProvider {
 public:
-    virtual ~QnActionTargetProvider() {}
+    virtual ~QnActionTargetProvider() {};
 
     virtual Qn::ActionScope currentScope() const = 0;
 
-    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const {
-        return QnActionParameters(currentTarget(scope));
-    }
-
-protected:
     virtual QVariant currentTarget(Qn::ActionScope scope) const = 0;
 };
 

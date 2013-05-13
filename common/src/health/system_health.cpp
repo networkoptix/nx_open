@@ -2,30 +2,20 @@
 
 namespace QnSystemHealth {
 
-    QString toString(MessageType messageType, bool shortMode) {
+    QString toString(MessageType messageType) {
         switch (messageType) {
         case NotDefined:
             return QLatin1String("---");
-        case EmailIsEmpty: {
-                QString result = QObject::tr("Your E-Mail address is not set.");
-                if (!shortMode) {
-                    result += QLatin1Char('\n');
-                    result += QObject::tr("You cannot receive system notifications via E-Mail.");
-                }
-            return result;
-            }
+        case EmailIsEmpty:
+            return QObject::tr("Your E-Mail address is not set.\n"\
+                               "You cannot receive system notifications via E-Mail");
         case NoLicenses:
             return QObject::tr("You have no licenses.");
         case SmtpIsNotSet:
             return QObject::tr("E-Mail server is not set.");
-        case UsersEmailIsEmpty: {
-                QString result = QObject::tr("Some users have not set their E-Mail addresses.");
-                if (!shortMode) {
-                    result += QLatin1Char('\n');
-                    result += QObject::tr("They cannot receive system notifications via E-Mail.");
-                }
-            return result;
-            }
+        case UsersEmailIsEmpty:
+            return QObject::tr("Some users have not set their E-Mail addresses.\n"\
+                               "They cannot receive system notifications via E-Mail");
         case ConnectionLost:
             return QObject::tr("Connection to Enterprise Controller is lost.");
 

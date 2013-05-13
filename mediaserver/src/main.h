@@ -42,6 +42,7 @@ private:
     char** m_argv;
     bool m_waitExtIpFinished;
 
+    QnAppserverResourceProcessor* m_processor;
     QnRtspListener* m_rtspListener;
     QnRestServer* m_restServer;
     QnProgressiveDownloadingServer* m_progressiveDownloadingServer;

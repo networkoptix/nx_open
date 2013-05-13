@@ -86,7 +86,7 @@ void QnCameraMotionMaskWidget::init() {
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
     display->instrumentManager()->installInstrument(m_clickInstrument);
 
-    disconnect(m_motionSelectionInstrument, NULL,                                                                                   m_controller.data(),            NULL); // TODO: #Elric controller flags?
+    disconnect(m_motionSelectionInstrument, NULL,                                                                                   m_controller.data(),            NULL); // TODO: controller flags?
     connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                               this,                           SLOT(at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)),    this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)));
     connect(m_motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                    this,                           SLOT(at_motionRegionCleared()));
@@ -154,7 +154,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
         m_context->workbench()->setItem(Qn::ZoomedRole, item);
 
         /* Set up the corresponding widget. */
-        m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: #Elric check for NULL
+        m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: check for NULL
         m_resourceWidget->setOption(QnResourceWidget::DisplayMotionSensitivity, true);
         m_resourceWidget->setOption(QnResourceWidget::DisplayButtons, false);
         m_resourceWidget->setOption(QnResourceWidget::DisplayMotion, true);
@@ -224,7 +224,7 @@ bool QnCameraMotionMaskWidget::isValidMotionRegion() {
     if (m_resourceWidget && m_needControlMaxRects) {
         const QnResourceVideoLayout *layout = m_camera->getVideoLayout();
         const QList<QnMotionRegion> &regions = m_resourceWidget->motionSensitivity();
-        for (int i = 0; i < qMin(regions.size(), layout->channelCount()); ++i) {
+        for (int i = 0; i < qMin(regions.size(), layout->numberOfChannels()); ++i) {
             QnMotionRegion::RegionValid kind = regions[i].isValid(m_camera->motionWindowCount(),
                 m_camera->motionMaskWindowCount(), m_camera->motionSensWindowCount());
             if (kind != QnMotionRegion::VALID) {

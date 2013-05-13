@@ -157,12 +157,6 @@ public:
     * @return Returns 0 if no error or error code
     */
     int transcodePacket(QnAbstractMediaDataPtr media, QnByteArray* const result);
-    //!Adds tag to the file. Maximum langth of tags and allowed names are format dependent
-    /*!
-        This implementation always returns \a false
-        \return true on success
-    */
-    virtual bool addTag( const QString& name, const QString& value );
 
     /*
     * Return description of the last error code

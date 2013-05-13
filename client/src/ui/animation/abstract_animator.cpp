@@ -74,18 +74,9 @@ void AbstractAnimator::stop() {
 }
 
 void AbstractAnimator::setDurationOverride(int durationOverride) {
-    if(durationOverride == m_durationOverride)
-        return;
-
-    bool running = isRunning();
-    if(running)
-        pause();
+    assert(!isRunning()); /* Cannot override duration of a running animation. */
 
     m_durationOverride = durationOverride;
-    invalidateDuration();
-
-    if(running)
-        start();
 }
 
 void AbstractAnimator::setState(State newState) {
@@ -115,7 +106,6 @@ void AbstractAnimator::setCurrentTime(int currentTime) {
     m_currentTime = currentTime;
     updateCurrentTime(m_currentTime);
 
-    emit animationTick(m_currentTime);
     if(m_currentTime >= m_duration)
         stop();
 }

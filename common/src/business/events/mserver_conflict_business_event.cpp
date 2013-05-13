@@ -13,5 +13,5 @@ QnMServerConflictBusinessEvent::QnMServerConflictBusinessEvent(
         return;
     m_source = QString::fromUtf8(conflictList[0]); //TODO: #GDM wtf? who formed this insane conflictList?
     for (int i = 1; i < conflictList.size(); ++i)
-        m_conflicts << QString::fromUtf8(conflictList[i]);
+        m_conflicts << QString::fromLocal8Bit(conflictList[i]);
 }

@@ -37,7 +37,7 @@ private:
     QString fetchCameraModel();
 
 private:
-    friend class QnWatchDogPtzController; // TODO: #Elric remove
+    friend class QnWatchDogPtzController; // TODO: remove
 
     QScopedPointer<QnAbstractPtzController> m_ptzController;
 

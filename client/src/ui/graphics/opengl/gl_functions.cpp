@@ -21,9 +21,6 @@ namespace {
 
     enum {
         DefaultMaxTextureSize = 1024, /* A sensible default supported by most modern GPUs. */
-#ifdef Q_OS_LINUX
-        LinuxMaxTextureSize = 4096
-#endif
     };
 
 } // anonymous namespace
@@ -97,15 +94,11 @@ public:
             /* Nothing bad could come out of this call, so const_cast is OK. */
             const_cast<QGLContext *>(context)->makeCurrent();
         }
+
         m_initialized = true;
         locker.unlock();
 
-        GLint maxTextureSize;
-        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-#ifdef Q_OS_LINUX
-        maxTextureSize = qMin((int)maxTextureSize, (int)LinuxMaxTextureSize);
-#endif
-        m_maxTextureSize = maxTextureSize;
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
     }
     
 
@@ -115,7 +108,7 @@ private:
     GLint m_maxTextureSize;
 };
 
-Q_GLOBAL_STATIC(QnGlFunctionsGlobal, qn_glFunctionsGlobal)
+Q_GLOBAL_STATIC(QnGlFunctionsGlobal, qn_glFunctionsGlobal);
 
 
 // -------------------------------------------------------------------------- //

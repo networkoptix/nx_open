@@ -3,10 +3,26 @@
 
 #include <QtCore/QMetaType>
 
-#include <common/common_globals.h>
-
 class QnTimePeriod;
 class QnTimePeriodList;
+
+// TODO: #Elric move to common_globals
+namespace Qn {
+    enum TimePeriodType {
+        NullTimePeriod      = 0x1,  /**< No period. */
+        EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
+        NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
+    };
+    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
+
+    enum TimePeriodRole {
+        RecordingRole,
+        MotionRole,
+        TimePeriodRoleCount
+    };
+
+} // namespace Qn
+
 
 class QN_EXPORT QnTimePeriod {
 public:
@@ -90,7 +106,13 @@ bool operator<(const QnTimePeriod &other, qint64 first);
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::TimePeriodTypes);
+
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
+
+Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
+Q_DECLARE_METATYPE(Qn::TimePeriodType);
+Q_DECLARE_METATYPE(Qn::TimePeriodRole);
 Q_DECLARE_METATYPE(QnTimePeriod);
 
 #endif // QN_TIME_PERIOD_H

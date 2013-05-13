@@ -11,7 +11,7 @@
 #include "recording/time_period.h"
 
 class QnLayoutResource: public QnResource {
-    Q_OBJECT
+    Q_OBJECT;
 
     typedef QnResource base_type;
 
@@ -52,7 +52,7 @@ public:
 
     QHash<int, QVariant> data() const;
 
-    void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: #Elric hack
+    void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: hack
 
     QnTimePeriod getLocalRange() const;
     void setLocalRange(const QnTimePeriod& value);
@@ -62,23 +62,8 @@ public:
     virtual void setUrl(const QString& value) override;
 
     bool userCanEdit() const;
+
     void setUserCanEdit(bool value);
-
-    /** Size of background image - in cells */
-    QSize backgroundSize() const;
-    void setBackgroundSize(QSize size);
-
-    /** Filename of background image on EC */
-    QString backgroundImageFilename() const;
-    void setBackgroundImageFilename(const QString &filename);
-
-    /** Background image opacity in range [0.0 .. 1.0] */
-    qreal backgroundOpacity() const;
-    void setBackgroundOpacity(qreal value);
-
-    /** Locked state - locked layout cannot be modified in any way */
-    bool locked() const;
-    void setLocked(bool value);
 
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
@@ -89,10 +74,6 @@ signals:
     void userCanEditChanged(const QnLayoutResourcePtr &resource);
     void storeRequested(const QnLayoutResourcePtr &resource);
 
-    void backgroundSizeChanged(const QnLayoutResourcePtr &resource);
-    void backgroundImageChanged(const QnLayoutResourcePtr &resource);
-    void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
-    void lockedChanged(const QnLayoutResourcePtr &resource);
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 
@@ -108,10 +89,6 @@ private:
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
     bool m_userCanEdit;
-    QSize m_backgroundSize;
-    QString m_backgroundImageFilename;
-    qreal m_backgroundOpacity;
-    bool m_locked;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);

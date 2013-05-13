@@ -1,7 +1,7 @@
 #include "audio_stream_display.h"
 #include "decoders/audio/audio_struct.h"
 #include "decoders/audio/abstractaudiodecoder.h"
-#include "client/client_settings.h"
+#include "utils/settings.h"
 #include "utils/media/audio_processor.h"
 
 #define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE*2)

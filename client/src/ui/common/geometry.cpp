@@ -9,20 +9,12 @@ QPointF QnGeometry::cwiseMul(const QPointF &l, const QPointF &r) {
     return QPointF(l.x() * r.x(), l.y() * r.y());
 }
 
-QPoint QnGeometry::cwiseMul(const QPoint &l, const QPoint &r) {
-    return QPoint(l.x() * r.x(), l.y() * r.y());
-}
-
 QPointF QnGeometry::cwiseDiv(const QPointF &l, const QPointF &r) {
     return QPointF(l.x() / r.x(), l.y() / r.y());
 }
 
 QPointF QnGeometry::cwiseMul(const QPointF &l, const QSizeF &r) {
     return QPointF(l.x() * r.width(), l.y() * r.height());
-}
-
-QPoint QnGeometry::cwiseMul(const QPoint &l, const QSize &r) {
-    return QPoint(l.x() * r.width(), l.y() * r.height());
 }
 
 QPointF QnGeometry::cwiseDiv(const QPointF &l, const QSizeF &r) {
@@ -33,20 +25,8 @@ QSizeF QnGeometry::cwiseMul(const QSizeF &l, const QSizeF &r) {
     return QSizeF(l.width() * r.width(), l.height() * r.height());
 }
 
-QSize QnGeometry::cwiseMul(const QSize &l, const QSize &r) {
-    return QSize(l.width() * r.width(), l.height() * r.height());
-}
-
 QSizeF QnGeometry::cwiseDiv(const QSizeF &l, const QSizeF &r) {
     return QSizeF(l.width() / r.width(), l.height() / r.height());
-}
-
-QSizeF QnGeometry::cwiseMin(const QSizeF &l, const QSizeF &r) {
-    return QSizeF(qMin(l.width(), r.width()), qMin(l.height(), r.height()));
-}
-
-QSizeF QnGeometry::cwiseMax(const QSizeF &l, const QSizeF &r) {
-    return QSizeF(qMax(l.width(), r.width()), qMax(l.height(), r.height()));
 }
 
 MarginsF QnGeometry::cwiseMul(const MarginsF &l, const QSizeF &r) {
@@ -271,19 +251,6 @@ QRectF QnGeometry::expanded(qreal aspectRatio, const QRectF &minRect, Qt::Aspect
     return aligned(expanded(aspectRatio, minRect.size(), mode), minRect, alignment);
 }
 
-QRectF QnGeometry::expanded(qreal aspectRatio, const QSizeF &minSize, const QPointF &center, Qt::AspectRatioMode mode) {
-    return expanded(aspectRatio, QRectF(center - toPoint(minSize) / 2, minSize), mode, Qt::AlignCenter);
-}
-
-QRectF QnGeometry::scaled(const QRectF &rect, const QSizeF &size, const QPointF &fixedPoint, Qt::AspectRatioMode mode) {
-    QSizeF newSize = expanded(aspectRatio(rect), size, mode);
-
-    return QRectF(
-        fixedPoint - cwiseMul(cwiseDiv(fixedPoint - rect.topLeft(), rect.size()), newSize),
-        newSize
-    );
-}
-
 namespace {
     template<class Size, class Rect>
     Rect alignedInternal(const Size &size, const Rect &rect, Qt::Alignment alignment) {
@@ -376,45 +343,4 @@ QRectF QnGeometry::movedInto(const QRectF &rect, const QRectF &target) {
         dy += target.bottom() - rect.bottom();
 
     return rect.translated(dx, dy);
-}
-
-QRectF QnGeometry::subRect(const QRectF &rect, const QRectF &relativeSubRect) {
-    return QRectF(
-        rect.topLeft() + cwiseMul(relativeSubRect.topLeft(), rect.size()),
-        cwiseMul(relativeSubRect.size(), rect.size())
-    );
-}
-
-QRectF QnGeometry::unsubRect(const QRectF &rect, const QRectF &relativeSubRect) {
-    QSizeF size = cwiseDiv(rect.size(), relativeSubRect.size());
-
-    return QRectF(
-        rect.topLeft() - cwiseMul(relativeSubRect.topLeft(), size),
-        size
-    );
-}
-
-QRectF QnGeometry::toSubRect(const QRectF &rect, const QRectF &absoluteSubRect) {
-    return QRectF(
-        cwiseDiv(absoluteSubRect.topLeft() - rect.topLeft(), rect.size()),
-        cwiseDiv(absoluteSubRect.size(), rect.size())
-    );
-}
-
-QPointF QnGeometry::corner(const QRectF &rect, Qn::Corner corner) {
-    switch(corner) {
-        case Qn::TopLeftCorner: 
-            return rect.topLeft();
-        case Qn::TopRightCorner: 
-            return rect.topRight();
-        case Qn::BottomLeftCorner: 
-            return rect.bottomLeft();
-        case Qn::BottomRightCorner: 
-            return rect.bottomRight();
-        case Qn::NoCorner: 
-            return rect.center();
-        default:
-            qnWarning("Invalid corner value '%1'.", static_cast<int>(corner));
-            return rect.center();
-    }
 }

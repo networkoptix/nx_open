@@ -111,9 +111,8 @@ public:
     bool isEditingEnabled() const;
 
 protected:
-    virtual bool eventFilter(QObject *obj, QEvent *event) override;
-    virtual void resizeEvent(QResizeEvent *event) override;
-    virtual void mousePressEvent(QMouseEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
 
     void updateCheckboxesVisibility();
 

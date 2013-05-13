@@ -83,7 +83,7 @@ void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableVertexAttribArray(m_shader->colorLocation());
     
-    // TODO: #Elric #1.5 if buffers are not supported, this code will crash
+    // TODO: #1.5 if buffers are not supported, this code will crash
     glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
     glVertexPointer(2, GL_FLOAT, 0, reinterpret_cast<const GLvoid *>(m_vertexOffset));
     glVertexAttribPointer(m_shader->colorLocation(), 4, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid *>(m_colorOffset));

@@ -70,8 +70,6 @@ public:
     QnNetworkResourcePtr getNetResourceByPhysicalId(const QString &physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString &mac) const;
 
-    QnResourceList getAllResourceByTypeName(const QString &typeName) const;
-
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
@@ -99,7 +97,7 @@ public:
         return activeCamerasByClass(true);
     }
 
-    // TODO #GDM: this is a hack. Fix.
+    // TODO #gdm: this is a hack. Fix.
     bool isLayoutsUpdated() const;
     void setLayoutsUpdated(bool updateLayouts);
 

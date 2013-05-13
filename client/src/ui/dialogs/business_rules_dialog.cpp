@@ -25,18 +25,20 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <client/client_settings.h>
+#include <utils/settings.h>
 
 #include <client_message_processor.h>
 
-QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
+QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
+    base_type(parent,
+              Qt::WindowMinMaxButtonsHint |
+              Qt::WindowCloseButtonHint |
+              Qt::WindowSystemMenuHint ),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
     m_advancedAction(NULL),
-    m_loadingHandle(-1),
-    m_advancedMode(false)
+    m_loadingHandle(-1)
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
@@ -47,7 +49,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     createActions();
 
-    m_rulesViewModel = new QnBusinessRulesViewModel(this);
+    m_rulesViewModel = new QnBusinessRulesViewModel(this, this->context());
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -60,7 +62,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     ui->tableView->installEventFilter(this);
 
-    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
+    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate());
 
     connect(m_rulesViewModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_model_dataChanged(QModelIndex,QModelIndex)));
@@ -76,14 +78,14 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
 
 
-    //TODO: #GDM show description label if no rules are loaded
+    //TODO: show description label if no rules are loaded
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(at_saveAllButton_clicked()));
     connect(ui->addRuleButton,                              SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
     connect(ui->deleteRuleButton,                           SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
-    connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
+    connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(at_advancedButton_clicked()));
 
-    connect(context(),  SIGNAL(userChanged(const QnUserResourcePtr &)),          this, SLOT(at_context_userChanged()));
+    connect(context,  SIGNAL(userChanged(const QnUserResourcePtr &)),          this, SLOT(at_context_userChanged()));
 
     connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
@@ -91,6 +93,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
             this, SLOT(at_message_ruleDeleted(int)));
 
     at_context_userChanged();
+    updateControlButtons();
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog()
@@ -112,7 +115,7 @@ void QnBusinessRulesDialog::reject() {
     bool hasChanges = hasRights && loaded && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
-                ); //TODO: #GDM calculate once and use anywhere
+                ); //TODO: calculate once and use anywhere
     if (!hasChanges) {
         base_type::reject();
         return;
@@ -179,18 +182,19 @@ void QnBusinessRulesDialog::at_context_userChanged() {
         m_loadingHandle = QnAppServerConnectionFactory::createConnection()->getBusinessRulesAsync(
                     this, SLOT(at_resources_received(int,QByteArray,QnBusinessEventRules,int)));
     }
+
     updateControlButtons();
 }
 
 void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr &rule) {
     m_rulesViewModel->updateRule(rule);
-    //TODO: #GDM ask user
+    //TODO: ask user
 }
 
 void QnBusinessRulesDialog::at_message_ruleDeleted(int id) {
     m_rulesViewModel->deleteRule(id);
     m_pendingDeleteRules.removeOne(id);
-    //TODO: #GDM ask user
+    //TODO: ask user
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
@@ -213,6 +217,13 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     if (!model)
         return;
     deleteRule(model);
+}
+
+void QnBusinessRulesDialog::at_advancedButton_clicked() {
+    bool isAdvancedVisible = !m_currentDetailsWidget->isVisible() && m_currentDetailsWidget->model();
+    m_currentDetailsWidget->setVisible(isAdvancedVisible);
+    m_advancedAction->setText(isAdvancedVisible ? tr("Hide Advanced") : tr("Show Advanced"));
+    //TODO: #GDM remove duplicate code
 }
 
 void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
@@ -288,15 +299,6 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
         updateControlButtons();
 }
 
-void QnBusinessRulesDialog::toggleAdvancedMode() {
-    setAdvancedMode(!advancedMode());
-}
-
-void QnBusinessRulesDialog::updateAdvancedAction() {
-    m_currentDetailsWidget->setVisible(advancedMode());
-    m_advancedAction->setText(advancedMode() ? tr("Hide Advanced") : tr("Show Advanced"));
-}
-
 void QnBusinessRulesDialog::createActions() {
     QAction* newAct = new QAction(tr("&New..."), this);
     connect(newAct, SIGNAL(triggered()), this, SLOT(at_newRuleButton_clicked()));
@@ -305,8 +307,7 @@ void QnBusinessRulesDialog::createActions() {
     connect(deleteAct, SIGNAL(triggered()), this, SLOT(at_deleteButton_clicked()));
 
     m_advancedAction = new QAction(this);
-    connect(m_advancedAction, SIGNAL(triggered()), this, SLOT(toggleAdvancedMode()));
-    updateAdvancedAction();
+    connect(m_advancedAction, SIGNAL(triggered()), this, SLOT(at_advancedButton_clicked()));
 
     QAction* scheduleAct = new QAction(tr("&Schedule..."), this);
     connect(scheduleAct, SIGNAL(triggered()), m_currentDetailsWidget, SLOT(at_scheduleButton_clicked()));
@@ -389,22 +390,10 @@ void QnBusinessRulesDialog::updateControlButtons() {
 
     ui->advancedButton->setEnabled(loaded && m_currentDetailsWidget->model());
     m_advancedAction->setEnabled(loaded && m_currentDetailsWidget->model());
+
+    bool isAdvancedVisible = m_currentDetailsWidget->isVisible() & loaded && m_currentDetailsWidget->model();
+    m_currentDetailsWidget->setVisible(isAdvancedVisible);
+    m_advancedAction->setText(isAdvancedVisible ? tr("Hide Advanced") : tr("Show Advanced"));
+
     ui->addRuleButton->setEnabled(hasRights && loaded);
-
-    setAdvancedMode(hasRights && loaded && advancedMode());
-}
-
-bool QnBusinessRulesDialog::advancedMode() const {
-    return m_advancedMode;
-}
-
-void QnBusinessRulesDialog::setAdvancedMode(bool value) {
-    if (m_advancedMode == value)
-        return;
-
-    if (value && !m_currentDetailsWidget->model())
-        return; // advanced options cannot be displayed
-
-    m_advancedMode = value;
-    updateAdvancedAction();
 }

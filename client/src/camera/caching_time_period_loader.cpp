@@ -49,7 +49,7 @@ void QnCachingTimePeriodLoader::init() {
     m_updateInterval = defaultUpdateInterval;
     m_resourceIsLocal = !m_resource.dynamicCast<QnNetworkResource>();
 
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
         m_handles[i] = -1;
         m_loaders[i] = NULL;
     }
@@ -59,7 +59,7 @@ void QnCachingTimePeriodLoader::init() {
 }
 
 void QnCachingTimePeriodLoader::initLoaders(QnAbstractTimePeriodLoader **loaders) {
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
         QnAbstractTimePeriodLoader *loader = loaders[i];
         m_loaders[i] = loader;
 
@@ -74,12 +74,12 @@ void QnCachingTimePeriodLoader::initLoaders(QnAbstractTimePeriodLoader **loaders
 
 bool QnCachingTimePeriodLoader::createLoaders(const QnResourcePtr &resource, QnAbstractTimePeriodLoader **loaders) 
 {
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++)
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++)
         loaders[i] = NULL;
 
     bool success = true;
     bool isNetRes = resource.dynamicCast<QnNetworkResource>();
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++) 
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) 
     {
         if (isNetRes)
             loaders[i] = QnMultiCameraTimePeriodLoader::newInstance(resource);
@@ -94,14 +94,14 @@ bool QnCachingTimePeriodLoader::createLoaders(const QnResourcePtr &resource, QnA
     if(success)
         return true;
 
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++)
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++)
         delete loaders[i];
     return false;
 }
 
 QnCachingTimePeriodLoader *QnCachingTimePeriodLoader::newInstance(const QnResourcePtr &resource, QObject *parent) 
 {
-    QnAbstractTimePeriodLoader *loaders[Qn::TimePeriodContentCount];
+    QnAbstractTimePeriodLoader *loaders[Qn::TimePeriodRoleCount];
     if(createLoaders(resource, loaders)) {
         return new QnCachingTimePeriodLoader(loaders, parent);
     } else {
@@ -138,8 +138,8 @@ void QnCachingTimePeriodLoader::setTargetPeriods(const QnTimePeriod &targetPerio
         return;
     
     m_loadedPeriod = addLoadingMargins(targetPeriod, boundingPeriod);
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++)
-        load(static_cast<Qn::TimePeriodContent>(i));
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++)
+        load(static_cast<Qn::TimePeriodRole>(i));
 }
 
 const QList<QRegion> &QnCachingTimePeriodLoader::motionRegions() const {
@@ -151,7 +151,7 @@ void QnCachingTimePeriodLoader::setMotionRegions(const QList<QRegion> &motionReg
         return;
 
     m_motionRegions = motionRegions;
-    load(Qn::MotionContent);
+    load(Qn::MotionRole);
 }
 
 bool QnCachingTimePeriodLoader::isMotionRegionsEmpty() const {
@@ -161,7 +161,7 @@ bool QnCachingTimePeriodLoader::isMotionRegionsEmpty() const {
     return true;
 }
 
-QnTimePeriodList QnCachingTimePeriodLoader::periods(Qn::TimePeriodContent type) {
+QnTimePeriodList QnCachingTimePeriodLoader::periods(Qn::TimePeriodRole type) {
     return m_periods[type];
 }
 
@@ -183,15 +183,15 @@ QnTimePeriod QnCachingTimePeriodLoader::addLoadingMargins(const QnTimePeriod &ta
     return QnTimePeriod(startTime, endTime - startTime);
 }
 
-void QnCachingTimePeriodLoader::load(Qn::TimePeriodContent type) {
+void QnCachingTimePeriodLoader::load(Qn::TimePeriodRole type) {
     QnAbstractTimePeriodLoader *loader = m_loaders[type];
     if(!loader) {
         qnWarning("No valid loader in scope.");
         emit loadingFailed();
     } else {
-        if(type == Qn::RecordingContent) {
+        if(type == Qn::RecordingRole) {
             m_handles[type] = loader->load(m_loadedPeriod);
-        } else { /* type == Qn::MotionContent */
+        } else { /* type == Qn::MotionRole */
             if(!isMotionRegionsEmpty()) {
                 m_handles[type] = loader->load(m_loadedPeriod, m_motionRegions);
             } else if(!m_periods[type].isEmpty()) {
@@ -202,7 +202,7 @@ void QnCachingTimePeriodLoader::load(Qn::TimePeriodContent type) {
     }
 }
 
-void QnCachingTimePeriodLoader::trim(Qn::TimePeriodContent type, qint64 trimTime) {
+void QnCachingTimePeriodLoader::trim(Qn::TimePeriodRole type, qint64 trimTime) {
     if(m_periods[type].isEmpty())
         return;
 
@@ -226,31 +226,31 @@ void QnCachingTimePeriodLoader::trim(Qn::TimePeriodContent type, qint64 trimTime
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnCachingTimePeriodLoader::at_loader_ready(const QnTimePeriodList &timePeriods, int handle) {
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
         if(handle == m_handles[i] && m_periods[i] != timePeriods) {
             m_periods[i] = timePeriods;
-            emit periodsChanged(static_cast<Qn::TimePeriodContent>(i));
+            emit periodsChanged(static_cast<Qn::TimePeriodRole>(i));
         }
     }
 }
 
 void QnCachingTimePeriodLoader::at_loader_failed(int /*status*/, int handle) {
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
         if(handle == m_handles[i]) {
             m_handles[i] = -1;
             emit loadingFailed();
 
             qint64 trimTime = qnSyncTime->currentMSecsSinceEpoch();
-            for(int j = 0; j < Qn::TimePeriodContentCount; j++)
-                trim(static_cast<Qn::TimePeriodContent>(j), trimTime);
+            for(int j = 0; j < Qn::TimePeriodRoleCount; j++)
+                trim(static_cast<Qn::TimePeriodRole>(j), trimTime);
         }
     }
 }
 
 void QnCachingTimePeriodLoader::at_syncTime_timeChanged() {
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
         m_loaders[i]->discardCachedData();
-        load(static_cast<Qn::TimePeriodContent>(i));
+        load(static_cast<Qn::TimePeriodRole>(i));
     }
 }
 

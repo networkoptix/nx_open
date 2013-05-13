@@ -11,7 +11,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
-#include <client/client_settings.h>
+#include <utils/settings.h>
 
 #include <ui/animation/variant_animator.h>
 #include <ui/style/skin.h>
@@ -250,15 +250,17 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
     StateFlags hoverState = m_state | HOVERED;
     StateFlags normalState = m_state & ~HOVERED;
-    paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget), rect());
+    paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget));
 }
 
-void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
     painter->beginNativePainting();
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glColor(1.0, 1.0, 1.0, painter->opacity());
+
+    QRectF rect = this->rect();
 
     bool isZero = qFuzzyIsNull(progress);
     bool isOne = qFuzzyCompare(progress, 1.0);
@@ -451,25 +453,23 @@ QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVaria
 QnImageButtonWidget::StateFlags QnImageButtonWidget::displayState(StateFlags flags) const {
     /* Some compilers don't allow expressions in case labels, so we have to
      * precalculate them. */
-    enum LocalStateFlag {
+    enum {
         CHECKED = QnImageButtonWidget::CHECKED,
         HOVERED = QnImageButtonWidget::HOVERED,
         DISABLED = QnImageButtonWidget::DISABLED,
-        PRESSED = QnImageButtonWidget::PRESSED
+        PRESSED = QnImageButtonWidget::PRESSED,
+        CHECKED_HOVERED_DISABLED_PRESSED = CHECKED | HOVERED | DISABLED | PRESSED,
+        CHECKED_HOVERED_DISABLED = CHECKED | HOVERED | DISABLED,
+        CHECKED_HOVERED = CHECKED | HOVERED,
+        CHECKED_DISABLED = CHECKED | DISABLED,
+        HOVERED_DISABLED = HOVERED | DISABLED,
+        CHECKED_HOVERED_PRESSED = CHECKED | HOVERED | PRESSED,
+        CHECKED_DISABLED_PRESSED = CHECKED | DISABLED | PRESSED,
+        HOVERED_DISABLED_PRESSED = HOVERED | DISABLED | PRESSED,
+        CHECKED_PRESSED = CHECKED | PRESSED,
+        HOVERED_PRESSED = HOVERED | PRESSED,
+        DISABLED_PRESSED = DISABLED | PRESSED
     };
-
-    const LocalStateFlag
-    CHECKED_HOVERED_DISABLED_PRESSED =  LocalStateFlag (CHECKED | HOVERED | DISABLED | PRESSED),
-    CHECKED_HOVERED_DISABLED =          LocalStateFlag (CHECKED | HOVERED | DISABLED),
-    CHECKED_HOVERED =                   LocalStateFlag (CHECKED | HOVERED),
-    CHECKED_DISABLED =                  LocalStateFlag (CHECKED | DISABLED),
-    HOVERED_DISABLED =                  LocalStateFlag (HOVERED | DISABLED),
-    CHECKED_HOVERED_PRESSED =           LocalStateFlag (CHECKED | HOVERED | PRESSED),
-    CHECKED_DISABLED_PRESSED =          LocalStateFlag (CHECKED | DISABLED | PRESSED),
-    HOVERED_DISABLED_PRESSED =          LocalStateFlag (HOVERED | DISABLED | PRESSED),
-    CHECKED_PRESSED =                   LocalStateFlag (CHECKED | PRESSED),
-    HOVERED_PRESSED =                   LocalStateFlag (HOVERED | PRESSED),
-    DISABLED_PRESSED =                  LocalStateFlag (DISABLED | PRESSED);
 
     switch(flags) {
 #define TRY(FLAGS)                                                              \
@@ -595,7 +595,7 @@ void QnImageButtonWidget::updateFromDefaultAction() {
     setToolTip(m_action->toolTip());
     setCheckable(m_action->isCheckable());
     setChecked(m_action->isChecked());
-    setEnabled(m_action->isEnabled()); // TODO: #Elric do backsync?
+    setEnabled(m_action->isEnabled()); // TODO: do backsync?
 }
 
 bool QnImageButtonWidget::isCached() const {
@@ -643,12 +643,12 @@ QnRotatingImageButtonWidget::QnRotatingImageButtonWidget(QGraphicsItem *parent):
     startListening();
 }
 
-void QnRotatingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+void QnRotatingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
     QnScopedPainterTransformRollback guard(painter);
-    painter->translate(rect.center());
+    painter->translate(rect().center());
     painter->rotate(m_rotation);
-    painter->translate(-rect.center());
-    QnImageButtonWidget::paint(painter, startState, endState, progress, widget, rect);
+    painter->translate(-rect().center());
+    QnImageButtonWidget::paint(painter, startState, endState, progress, widget);
 }
 
 void QnRotatingImageButtonWidget::tick(int deltaMSecs) {

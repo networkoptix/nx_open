@@ -1,14 +1,11 @@
 #include "workbench_layout.h"
-
 #include <limits>
-
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
 #include <ui/common/geometry.h>
 #include <ui/style/globals.h>
-
 #include "workbench_item.h"
 #include "workbench_grid_walker.h"
 #include "workbench_layout_synchronizer.h"
@@ -34,7 +31,7 @@ namespace {
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent): 
     QObject(parent)
 {
-    // TODO: #Elric this does not belong here.
+    // TODO: this does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
@@ -48,7 +45,7 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
         return;
     }
 
-    // TODO: #Elric this does not belong here.
+    // TODO: this does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
@@ -100,9 +97,8 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     setName(resource->getName());
     setCellAspectRatio(resource->cellAspectRatio());
     setCellSpacing(resource->cellSpacing());
-    setLocked(resource->locked());
 
-    // TODO: #Elric note that we keep items that are not present in resource's data.
+    // TODO: note that we keep items that are not present in resource's data.
     // This is not correct, but we currently need it.
     const QHash<int, QVariant> data = resource->data();
     for(QHash<int, QVariant>::const_iterator i = data.begin(); i != data.end(); i++)
@@ -138,15 +134,6 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
             delete item(uuid);
     }
 
-    /* Update zoom targets. */
-    foreach(QnLayoutItemData data, resource->getItems()) {
-        QnWorkbenchItem *item = this->item(data.uuid);
-        QnWorkbenchItem *currentZoomTargetItem = zoomTargetItem(item);
-        QnWorkbenchItem *expectedZoomTargetItem = this->item(data.zoomTargetUuid);
-        if(currentZoomTargetItem != expectedZoomTargetItem)
-            addZoomLink(item, expectedZoomTargetItem); /* Will automatically remove the old link if needed. */
-    }
-
     return result;
 }
 
@@ -157,11 +144,8 @@ void QnWorkbenchLayout::submit(const QnLayoutResourcePtr &resource) const {
 
     QnLayoutItemDataList datas;
     datas.reserve(items().size());
-    foreach(QnWorkbenchItem *item, items()) {
-        QnLayoutItemData data = item->data();
-        data.zoomTargetUuid = this->zoomTargetUuidInternal(item);
-        datas.push_back(data);
-    }
+    foreach(const QnWorkbenchItem *item, items()) 
+        datas.push_back(item->data());
 
     resource->setItems(datas);
 }
@@ -205,24 +189,10 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     }
 
     if(item->layout() != this) {
-        qnWarning("Cannot remove an item that does not belong to this layout.");
+        qnWarning("Cannot remove an item that belongs to a different layout.");
         return;
     }
 
-    /* Remove all zoom links first. */
-#if 0 // TODO: #Elric does not belong here?
-    if(QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item))
-        removeZoomLink(item, zoomTargetItem);
-    foreach(QnWorkbenchItem *zoomItem, this->zoomItems(item))
-        removeZoomLink(zoomItem, item);
-#else 
-    if(QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item))
-        removeZoomLink(item, zoomTargetItem);
-    foreach(QnWorkbenchItem *zoomItem, this->zoomItems(item))
-        removeItem(zoomItem);
-#endif
-
-    /* Update internal data structures. */
     if(item->isPinned())
         m_itemMap.clear(item->geometry());
     m_rectSet.remove(item->geometry());
@@ -235,80 +205,6 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     emit itemRemoved(item);
 
     updateBoundingRectInternal();
-}
-
-void QnWorkbenchLayout::addZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
-    if(!item) {
-        qnNullWarning(item);
-        return;
-    }
-
-    if(!zoomTargetItem) {
-        qnNullWarning(zoomTargetItem);
-        return;
-    }
-
-    if(item->layout() != this || zoomTargetItem->layout() != this) {
-        qnWarning("Cannot create a zoom link between items that do not belong to this layout.");
-        return;
-    }
-
-    if(item == zoomTargetItem) {
-        qnWarning("Cannot create a loop zoom link.");
-        return;
-    }
-
-    QnWorkbenchItem *currentZoomTargetItem = item->zoomTargetItem();
-    if(currentZoomTargetItem != NULL) {
-        if(currentZoomTargetItem == zoomTargetItem)
-            return;
-
-        removeZoomLinkInternal(item, currentZoomTargetItem, false);
-    }
-
-    addZoomLinkInternal(item, zoomTargetItem, true);
-}
-
-void QnWorkbenchLayout::addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem) {
-    m_zoomTargetItemByItem.insert(item, zoomTargetItem);
-    m_itemsByZoomTargetItem.insert(zoomTargetItem, item);
-
-    emit zoomLinkAdded(item, zoomTargetItem);
-    if(notifyItem)
-        emit item->zoomTargetItemChanged();
-}
-
-void QnWorkbenchLayout::removeZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
-    if(!item) {
-        qnNullWarning(item);
-        return;
-    }
-
-    if(!zoomTargetItem) {
-        qnNullWarning(zoomTargetItem);
-        return;
-    }
-    
-    if(item->layout() != this || zoomTargetItem->layout() != this) {
-        qnWarning("Cannot remove a zoom link between items that do not belong to this layout.");
-        return;
-    }
-
-    if(m_zoomTargetItemByItem.value(item) != zoomTargetItem) {
-        qnWarning("Cannot remove a zoom link that does not exist in this layout.");
-        return;
-    }
-
-    removeZoomLinkInternal(item, zoomTargetItem, true);
-}
-
-void QnWorkbenchLayout::removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem) {
-    m_zoomTargetItemByItem.remove(item);
-    m_itemsByZoomTargetItem.remove(zoomTargetItem, item);
-
-    emit zoomLinkRemoved(item, zoomTargetItem);
-    if(notifyItem)
-        emit item->zoomTargetItemChanged();
 }
 
 void QnWorkbenchLayout::clear()
@@ -505,19 +401,6 @@ QnWorkbenchItem *QnWorkbenchLayout::item(const QUuid &uuid) const {
     return m_itemByUuid.value(uuid, NULL);
 }
 
-QnWorkbenchItem *QnWorkbenchLayout::zoomTargetItem(QnWorkbenchItem *item) const {
-    return m_zoomTargetItemByItem.value(item, NULL);
-}
-
-QUuid QnWorkbenchLayout::zoomTargetUuidInternal(QnWorkbenchItem *item) const {
-    QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item);
-    return zoomTargetItem ? zoomTargetItem->uuid() : QUuid();
-}
-
-QList<QnWorkbenchItem *> QnWorkbenchLayout::zoomItems(QnWorkbenchItem *zoomTargetItem) const {
-    return m_itemsByZoomTargetItem.values(zoomTargetItem);
-}
-
 QSet<QnWorkbenchItem *> QnWorkbenchLayout::items(const QRect &region) const {
     return m_itemMap.values(region);
 }
@@ -603,9 +486,8 @@ void QnWorkbenchLayout::updateBoundingRectInternal() {
     if(m_boundingRect == boundingRect)
         return;
 
-    QRect oldRect = m_boundingRect;
     m_boundingRect = boundingRect;
-    emit boundingRectChanged(oldRect, boundingRect);
+    emit boundingRectChanged();
     emit dataChanged(Qn::LayoutBoundingRectRole);
 }
 
@@ -635,14 +517,6 @@ void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
     
     emit cellSpacingChanged();
     emit dataChanged(Qn::LayoutCellSpacingRole);
-}
-
-void QnWorkbenchLayout::setLocked(bool value) {
-    if (m_locked == value)
-        return;
-    m_locked = value;
-
-    emit lockedChanged();
 }
 
 void QnWorkbenchLayout::initCellParameters() {

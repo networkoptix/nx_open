@@ -18,7 +18,7 @@ bool QnDroidResource::isResourceAccessible()
     return true;
 }
 
-QString QnDroidResource::getDriverName() const
+QString QnDroidResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);
 }

@@ -1,40 +1,22 @@
 #include "media_server_statistics_storage.h"
 
-#include <QtCore/QTimer>
-
+#include <api/media_server_statistics_data.h>
 #include <core/resource/media_server_resource.h>
 
 #include <utils/common/synctime.h>
 
-namespace {
-    const int noDataValue = -1;
-    const int defaultUpdatePeriod = 500;
+/** Here can be any value below the zero */
+#define NoData -1
 
-    /**
-     * Set size of values to pointsLimit. Fill by noDataValue or cut from the beginning if needed.
-     */
-    void normalizeValuesList(QLinkedList<qreal> &values, int pointsLimit) {
-        while (values.size() < pointsLimit)
-            values.prepend(noDataValue);
-        while (values.size() > pointsLimit)
-            values.removeFirst();
-    }
-}
-
-QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int pointsLimit, QObject *parent):
+QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int storageLimit, QObject *parent):
     QObject(parent),
     m_alreadyUpdating(false),
     m_lastId(-1),
     m_timeStamp(0),
     m_listeners(0),
-    m_pointsLimit(pointsLimit),
-    m_updatePeriod(defaultUpdatePeriod),
-    m_apiConnection(apiConnection),
-    m_timer(new QTimer())
-{
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
-    m_timer->start(m_updatePeriod);
-}
+    m_storageLimit(storageLimit),
+    m_apiConnection(apiConnection)
+{}
 
 void QnMediaServerStatisticsStorage::registerServerWidget(QObject *target, const char *slot) {
     connect(this, SIGNAL(statisticsChanged()), target, slot);
@@ -56,10 +38,6 @@ qint64 QnMediaServerStatisticsStorage::historyId() const {
     return m_lastId;
 }
 
-int QnMediaServerStatisticsStorage::updatePeriod() const {
-    return m_updatePeriod;
-}
-
 void QnMediaServerStatisticsStorage::update() {
     if (!m_listeners || m_alreadyUpdating) {
         m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
@@ -67,62 +45,54 @@ void QnMediaServerStatisticsStorage::update() {
 
         for (QnStatisticsHistory::iterator iter = m_history.begin(); iter != m_history.end(); iter++) {
             QnStatisticsData &stats = iter.value();
-            stats.values.append(noDataValue);
-            normalizeValuesList(stats.values, m_pointsLimit);
+            stats.values.append(NoData);
+            if (stats.values.size() > m_storageLimit)
+                stats.values.removeFirst();
         }
+        if (!m_alreadyUpdating)
+            return;
     }
 
-    emit statisticsChanged();
-
-    if (m_alreadyUpdating)
-        return;
-
-    m_apiConnection->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
-
+    m_apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(int, const QnStatisticsDataList &, int)));
     m_alreadyUpdating = true;
 }
 
-void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnStatisticsReply &reply, int handle) {
+void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnStatisticsDataList &data, int handle) {
     Q_UNUSED(handle)
-
-    m_alreadyUpdating = false;
     if(status != 0)
         return;
 
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
     m_lastId++;
 
-    if (reply.updatePeriod > 0 && m_updatePeriod != reply.updatePeriod) {
-        m_updatePeriod = reply.updatePeriod;
-        m_timer->stop();
-        m_timer->start(m_updatePeriod);
-    }
-
     QSet<QString> notUpdated;
     foreach(QString key, m_history.keys())
         notUpdated << key;
 
-    foreach(const QnStatisticsDataItem &nextData, reply.statistics) {
+    foreach(const QnStatisticsDataItem &nextData, data) {
         QString id = nextData.description;
-        notUpdated.remove(id);
-
         QnStatisticsData &stats = m_history[id];
         stats.deviceType = nextData.deviceType;
         stats.description = nextData.description;
+        while (stats.values.count() < m_storageLimit)
+            stats.values.append(NoData);
         stats.values.append(nextData.value);
-        normalizeValuesList(stats.values, m_pointsLimit);
+        if (stats.values.size() > m_storageLimit)
+            stats.values.removeFirst();
+        notUpdated.remove(id);
     }
 
     foreach(QString id, notUpdated) {
         QnStatisticsData &stats = m_history[id];
-        stats.values.append(noDataValue);
-        normalizeValuesList(stats.values, m_pointsLimit);
-        if (stats.values.count(noDataValue) == stats.values.size())
+        stats.values.append(NoData);
+        if (stats.values.size() > m_storageLimit)
+            stats.values.removeFirst();
+        if (stats.values.count(NoData) == stats.values.count())
             m_history.remove(id);
     }
 
-
-//    emit statisticsChanged();
+    m_alreadyUpdating = false;
+    emit statisticsChanged();
 }
 
 

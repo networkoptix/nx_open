@@ -31,10 +31,6 @@ QnDroidControlPortProcessor::QnDroidControlPortProcessor(TCPSocket* socket, QnTc
 
 }
 
-QnDroidControlPortProcessor::~QnDroidControlPortProcessor()
-{
-    stop();
-}
 
 void QnDroidControlPortProcessor::run()
 {

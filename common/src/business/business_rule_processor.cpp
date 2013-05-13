@@ -7,7 +7,6 @@
 #include <business/business_action_factory.h>
 #include <business/business_event_rule.h>
 #include <business/actions/system_health_business_action.h>
-#include <business/business_action_parameters.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
@@ -106,18 +105,17 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     switch( action->actionType() )
     {
-    case BusinessActionType::SendMail:
-        return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
+        case BusinessActionType::SendMail:
+            return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
 
-    case BusinessActionType::Alert:
-        break;
+        case BusinessActionType::Alert:
+            break;
 
-    case BusinessActionType::ShowPopup:
-    case BusinessActionType::PlaySound:
-        return broadcastBusinessAction(action);
+        case BusinessActionType::ShowPopup:
+            return showPopup( action.dynamicCast<QnPopupBusinessAction>() );
 
-    default:
-        break;
+        default:
+            break;
     }
 
     return false;
@@ -163,7 +161,7 @@ void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bE
 {
     QMutexLocker lock(&m_mutex);
 
-    QnAbstractBusinessActionList actions = matchActions(bEvent);
+    QList<QnAbstractBusinessActionPtr> actions = matchActions(bEvent);
     foreach(QnAbstractBusinessActionPtr action, actions)
     {
         executeAction(action);
@@ -316,9 +314,9 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
     return true;
 }
 
-QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
+QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
 {
-    QnAbstractBusinessActionList result;
+    QList<QnAbstractBusinessActionPtr> result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
         if (rule->disabled() || rule->eventType() != bEvent->getEventType())
@@ -347,13 +345,13 @@ QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(QnAbstractBus
 void QnBusinessRuleProcessor::at_actionDelivered(QnAbstractBusinessActionPtr action)
 {
     Q_UNUSED(action)
-    //TODO: #vasilenko implement me
+    //TODO: implement me
 }
 
 void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action)
 {
     Q_UNUSED(action)
-    //TODO: #vasilenko implement me
+    //TODO: implement me
 }
 
 bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& action )
@@ -369,7 +367,7 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
             recipients << email;
     }
 
-    QStringList additional = action->getParams().getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
+    QStringList additional = BusinessActionParameters::getEmailAddress(action->getParams()).split(QLatin1Char(';'), QString::SkipEmptyParts);
     foreach(const QString &email, additional) {
         log << email;
         QString trimmed = email.trimmed();
@@ -409,27 +407,27 @@ void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray 
     if (result)
         return;
 
-    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
+    QnPopupBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
 
-    broadcastBusinessAction(action);
+    showPopup(action);
 
     cl_log.log( QString::fromLatin1("Error processing action SendMail: %2").
                 arg(QString::fromUtf8(errorString)), cl_logWARNING );
 
 }
 
-void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(QnHTTPRawResponse response, int handle)
+void QnBusinessRuleProcessor::at_sendPopupFinished(QnHTTPRawResponse response, int handle)
 {
     if (response.status == 0)
         return;
 
-    qWarning() << "error delivering broadcast action message #" << handle << "error:" << response.errorString;
+    qWarning() << "error delivering popup message #" << handle << "error:" << response.errorString;
 }
 
-bool QnBusinessRuleProcessor::broadcastBusinessAction(QnAbstractBusinessActionPtr action)
+bool QnBusinessRuleProcessor::showPopup(QnPopupBusinessActionPtr action)
 {
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    appServerConnection->broadcastBusinessAction(action, this, SLOT(at_broadcastBusinessActionFinished(QnHTTPRawResponse, int)));
+    appServerConnection->broadcastBusinessAction(action, this, SLOT(at_sendPopupFinished(QnHTTPRawResponse, int)));
     return true;
 }
 

@@ -74,7 +74,6 @@ protected slots:
     void updateDependantPermissions();
 
     void updateAll();
-    void updateSizeLimits();
     void setHasChanges(bool hasChanges = true);
 
     void at_accessRights_changed();

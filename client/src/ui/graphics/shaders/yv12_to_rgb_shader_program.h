@@ -11,12 +11,4 @@ public:
     void setParameters(GLfloat brightness, GLfloat contrast, GLfloat hue, GLfloat saturation, GLfloat opacity);
 };
 
-class QnYv12ToRgbaShaderProgram: public QnArbShaderProgram {
-    Q_OBJECT;
-public:
-    QnYv12ToRgbaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
-
-    void setParameters(GLfloat brightness, GLfloat contrast, GLfloat hue, GLfloat saturation, GLfloat opacity);
-};
-
 #endif // QN_YV12_TO_RGB_SHADER_PROGRAM_H

@@ -18,7 +18,7 @@ bool QnTestCameraResource::isResourceAccessible()
     return true;
 }
 
-QString QnTestCameraResource::getDriverName() const
+QString QnTestCameraResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);
 }

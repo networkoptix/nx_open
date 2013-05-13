@@ -9,7 +9,7 @@
 #include "buffered_frame_displayer.h"
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include "../client/client_settings.h"
+#include "../utils/settings.h"
 
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
@@ -292,7 +292,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
                 QnFrameScaler::downscale(tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
             else {
                 if (!rescaleFrame(*(tmpFrame.data()), *outFrame, tmpFrame->width / scaleFactor, tmpFrame->height / scaleFactor)) // universal scaler
-                    { /* do nothing. */ } // TODO: #Elric wtf?
+                    { /* do nothing. */ } // TODO: wtf?
             }
         }
         m_drawer->draw(outFrame);
@@ -359,7 +359,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
 
     QSharedPointer<CLVideoDecoderOutput> m_tmpFrame( new CLVideoDecoderOutput() );
-    m_tmpFrame->setUseExternalData(true);   //temp frame will take internal ffmpeg buffer for optimization
+    m_tmpFrame->setUseExternalData(true);
 
     if (data->compressionType == CODEC_ID_NONE)
     {
@@ -375,7 +375,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
                 data,
                 enableFrameQueue,
                 widgetRenderer ? widgetRenderer->glContext() : NULL,
-                QnClientSettings::instance()->isHardwareDecodingUsed() );
+                QnSettings::instance()->isHardwareDecodingUsed() );
         dec->setSpeed( m_speed );
         if (dec == 0) {
             cl_log.log(QString::fromAscii("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);
@@ -513,25 +513,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (useTmpFrame)
     {
-        //checkig once again for need to scale, since previous check could be incorrect due to unknown pixel format (this actual for some images, e.g., jpeg)
-        const bool scalingStillNeeded =
-            (dec->targetMemoryType() == QnAbstractPictureDataRef::pstSysMemPic) &&
-    	    (!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
-             !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) ||
-             scaleFactor != QnFrameScaler::factor_1);
-
-        if( !scalingStillNeeded )
+        if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
         {
-            CLVideoDecoderOutput::copy( m_tmpFrame.data(), outFrame.data() );
-        }
-        else if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
-        {
-            if (QnGLRenderer::isPixelFormatSupported(pixFmt) &&
-                CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && 
-                scaleFactor <= QnFrameScaler::factor_8 )
-            {
+            if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
                 QnFrameScaler::downscale(m_tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
-            }
             else {
                 if (!rescaleFrame(*m_tmpFrame, *outFrame, m_tmpFrame->width / scaleFactor, m_tmpFrame->height / scaleFactor)) // universal scaler
                     return Status_Displayed;

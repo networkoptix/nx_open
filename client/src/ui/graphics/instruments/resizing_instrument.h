@@ -6,7 +6,7 @@
 
 #include "drag_processing_instrument.h"
 
-class ConstrainedGeometrically;
+class ConstrainedResizable;
 class ResizeHoverInstrument;
 class ResizingInstrument;
 
@@ -51,14 +51,16 @@ public:
     ResizingInstrument(QObject *parent = NULL);
     virtual ~ResizingInstrument();
 
-    Instrument *resizeHoverInstrument() const;
-
-    qreal effectRadius() const {
-        return m_effectRadius;
+    ResizeHoverInstrument *resizeHoverInstrument() const {
+        return m_resizeHoverInstrument;
     }
 
-    void setEffectRadius(qreal effectRadius) {
-        m_effectRadius = effectRadius;
+    int effectiveDistance() const {
+        return m_effectiveDistance;
+    }
+
+    void setEffectiveDistance(int effectiveDistance) {
+        m_effectiveDistance = effectiveDistance;
     }
 
 signals:
@@ -85,14 +87,14 @@ private:
     friend class ResizingInfo;
 
     ResizeHoverInstrument *m_resizeHoverInstrument;
-    qreal m_effectRadius;
+    int m_effectiveDistance;
     QPointF m_startPinPoint;
     QSizeF m_startSize;
     QTransform m_startTransform;
     bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;
     QWeakPointer<QGraphicsWidget> m_widget;
-    ConstrainedGeometrically *m_constrained;
+    ConstrainedResizable *m_resizable;
 };
 
 #endif // QN_RESIZING_INSTRUMENT_H

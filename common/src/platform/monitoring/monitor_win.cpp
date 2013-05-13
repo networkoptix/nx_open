@@ -189,7 +189,7 @@ public:
 
         /* Note that additional symbol is important here.
          * See http://msdn.microsoft.com/en-us/library/windows/desktop/aa372642%28v=vs.85%29.aspx. */
-        QByteArray buffer(bufferSize + sizeof(WCHAR), '\0');
+        QByteArray buffer(bufferSize + sizeof(WCHAR), Qt::Uninitialized);
         bufferSize = buffer.size();
         itemCount = 0;
 

@@ -41,15 +41,11 @@ Qt::WindowFrameSection ResizingInfo::frameSection() const {
 ResizingInstrument::ResizingInstrument(QObject *parent):
     base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_resizeHoverInstrument(new ResizeHoverInstrument(this)),
-    m_effectRadius(0.0)
+    m_effectiveDistance(0)
 {}
 
 ResizingInstrument::~ResizingInstrument() {
     ensureUninstalled();
-}
-
-Instrument *ResizingInstrument::resizeHoverInstrument() const {
-    return m_resizeHoverInstrument;
 }
 
 void ResizingInstrument::enabledNotify() {
@@ -77,11 +73,11 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
 
     /* Find the item to resize. */
     QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item(view, event->pos(), ItemIsResizableWidget()));
-    if (widget == NULL || !satisfiesItemConditions(widget))
+    if (widget == NULL)
         return false;
 
     /* Check frame section. */
-    FrameSectionQueryable *queryable = dynamic_cast<FrameSectionQueryable *>(widget);
+    FrameSectionQuearyable *queryable = dynamic_cast<FrameSectionQuearyable *>(widget);
     if(!queryable && !((widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint)))
         return false; /* Has no decorations and not queryable for frame sections. */
 
@@ -90,9 +86,9 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     if(queryable == NULL) {
         section = open(widget)->getWindowFrameSectionAt(itemPos);
     } else {
-        QRectF effectRect = widget->mapRectFromScene(mapRectToScene(view, QRectF(0, 0, m_effectRadius, m_effectRadius)));
-        qreal effectRadius = qMax(effectRect.width(), effectRect.height());
-        section = queryable->windowFrameSectionAt(QRectF(itemPos - QPointF(effectRadius, effectRadius), QSizeF(2 * effectRadius, 2 * effectRadius)));
+        QRectF effectiveRect = widget->mapRectFromScene(mapRectToScene(view, QRect(0, 0, m_effectiveDistance, m_effectiveDistance)));
+        qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
+        section = queryable->windowFrameSectionAt(QRectF(itemPos - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
     }
     if(!isResizeGrip(section))
         return false;
@@ -102,7 +98,7 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     m_startPinPoint = widget->mapToParent(Qn::calculatePinPoint(widget->rect(), section));
     m_section = section;
     m_widget = widget;
-    m_constrained = dynamic_cast<ConstrainedGeometrically *>(widget);
+    m_resizable = dynamic_cast<ConstrainedResizable *>(widget);
 
     dragProcessor()->mousePressEvent(viewport, event);
 
@@ -113,9 +109,9 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
 bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
     QGraphicsView *view = this->view(viewport);
 
-    QRectF effectRect = mapRectToScene(view, QRectF(0, 0, m_effectRadius, m_effectRadius));
-    qreal effectRadius = qMax(effectRect.width(), effectRect.height());
-    m_resizeHoverInstrument->setEffectRadius(effectRadius);
+    QRectF effectiveRect = mapRectToScene(view, QRect(0, 0, m_effectiveDistance, m_effectiveDistance));
+    qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
+    m_resizeHoverInstrument->setEffectiveDistance(effectiveDistance);
 
     return base_type::paintEvent(viewport, event);
 }
@@ -158,17 +154,12 @@ void ResizingInstrument::dragMove(DragInfo *info) {
     );
     /* We don't handle heightForWidth. */
 
-    QPointF newPos = widget->pos() + m_startPinPoint - widget->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), m_section));
-
-    if(m_constrained != NULL) {
-        QRectF newGeometry = m_constrained->constrainedGeometry(QRectF(newPos, newSize), Qn::calculatePinPoint(m_section));
-        newSize = newGeometry.size();
-        newPos = newGeometry.topLeft();
-    }
+    if(m_resizable != NULL)
+        newSize = m_resizable->constrainedSize(newSize);
 
     /* Change size & position. */
     widget->resize(newSize);
-    widget->setPos(newPos);
+    widget->setPos(widget->pos() + m_startPinPoint - widget->mapToParent(Qn::calculatePinPoint(widget->rect(), m_section)));
 
     emit resizing(info->view(), widget, ResizingInfo(this));
 }
@@ -178,7 +169,7 @@ void ResizingInstrument::finishDrag(DragInfo *info) {
         emit resizingFinished(info->view(), m_widget.data(), ResizingInfo(this));
 
     m_widget.clear();
-    m_constrained = NULL;
+    m_resizable = NULL;
 }
 
 void ResizingInstrument::finishDragProcess(DragInfo *info) {

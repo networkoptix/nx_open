@@ -175,7 +175,7 @@ public:
         }
         fclose(file);
 
-        // TODO: #Elric read network drives?
+        // TODO: read network drives?
     }
 
     int calculateId(int majorNumber, int minorNumber) {

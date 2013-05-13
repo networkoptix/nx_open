@@ -67,7 +67,6 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     setWarningStyle(ui->hintLabel);
 
     updateAll();
-    updateSizeLimits();
 }
 
 QnUserSettingsDialog::~QnUserSettingsDialog() {
@@ -125,7 +124,7 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
 //        ui->accessRightsGroupbox->setEnabled(editable);
         setReadOnly(ui->accessRightsComboBox, !editable);
         setReadOnly(ui->accessRightsGroupbox, !editable);
-        // TODO: #GDM if readonly then do not save anyway
+        // TODO: #gdm if readonly then do not save anyway
         break;
     case Email:
         ui->emailEdit->setVisible(visible);
@@ -371,12 +370,6 @@ void QnUserSettingsDialog::updateAll() {
     updateElement(Login);
 }
 
-void QnUserSettingsDialog::updateSizeLimits() {
-    QSize hint = sizeHint();
-    setMinimumSize(hint);
-    setMaximumSize(600, hint.height());
-}
-
 void QnUserSettingsDialog::updateDependantPermissions() {
     m_inUpdateDependensies = true;
 
@@ -505,7 +498,7 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
             pos.value()->setChecked(pos.key() & rights);
     m_inUpdateDependensies = false;
 
-    updateDependantPermissions(); // TODO: #GDM rename to something more sane, connect properly
+    updateDependantPermissions(); // TODO: rename to something more sane, connect properly
 }
 
 quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {
@@ -530,7 +523,6 @@ void QnUserSettingsDialog::at_advancedButton_toggled() {
         
         widget = widget->parentWidget();
     }
-    updateSizeLimits();
 }
 
 // Utility functions

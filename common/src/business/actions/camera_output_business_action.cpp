@@ -1,23 +1,42 @@
 #include "camera_output_business_action.h"
 
-#include <business/business_action_parameters.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
-QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(bool instant, const QnBusinessEventParameters &runtimeParams):
-    base_type(instant
-              ? BusinessActionType::CameraOutputInstant
-              : BusinessActionType::CameraOutput, runtimeParams)
+namespace BusinessActionParameters {
+    static QLatin1String relayOutputId("relayOutputID");
+    static QLatin1String relayAutoResetTimeout("relayAutoResetTimeout");
+
+    QString getRelayOutputId(const QnBusinessParams &params) {
+        return params.value(relayOutputId, QString()).toString();
+    }
+
+    void setRelayOutputId(QnBusinessParams* params, const QString &value) {
+        (*params)[relayOutputId] = value;
+    }
+
+    int getRelayAutoResetTimeout(const QnBusinessParams &params) {
+        return params.value(relayAutoResetTimeout, 0).toInt();
+    }
+
+    void setRelayAutoResetTimeout(QnBusinessParams* params, int value) {
+        (*params)[relayAutoResetTimeout] = value;
+    }
+
+}
+
+
+QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(const QnBusinessParams &runtimeParams):
+    base_type(BusinessActionType::CameraOutput, runtimeParams)
 {
 }
 
 QString QnCameraOutputBusinessAction::getRelayOutputId() const {
-    return m_params.getRelayOutputId();
+    return BusinessActionParameters::getRelayOutputId(getParams());
 }
 
 int QnCameraOutputBusinessAction::getRelayAutoResetTimeout() const {
-    return m_params.getRelayAutoResetTimeout();
+    return BusinessActionParameters::getRelayAutoResetTimeout(getParams());
 }
 
 QString QnCameraOutputBusinessAction::getExternalUniqKey() const

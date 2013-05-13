@@ -63,6 +63,8 @@ void navRead_PCI(pci_t *pci, unsigned char *buffer) {
     for(j = 0; j < 2; j++)
       B2N_32(pci->hli.btn_colit.btn_coli[i][j]);
 
+  /* NOTE: I've had to change the structure from the disk layout to get
+   * the packing to work with Sun's Forte C compiler. */
   
   /* pci hli btni */
   for(i = 0; i < 36; i++) {

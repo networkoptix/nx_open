@@ -1,4 +1,3 @@
-
 #include "instant_business_event.h"
 
 QnInstantBusinessEvent::QnInstantBusinessEvent(BusinessEventType::Value eventType,
@@ -9,7 +8,7 @@ QnInstantBusinessEvent::QnInstantBusinessEvent(BusinessEventType::Value eventTyp
     Q_ASSERT(!BusinessEventType::hasToggleState(eventType));
 }
 
-bool QnInstantBusinessEvent::checkCondition(ToggleState::Value state, const QnBusinessEventParameters &params) const {
+bool QnInstantBusinessEvent::checkCondition(ToggleState::Value state, const QnBusinessParams &params) const {
     // Rule MUST contain 'Not Defined' event state filter
     Q_UNUSED(params)
     return (state == ToggleState::NotDefined);

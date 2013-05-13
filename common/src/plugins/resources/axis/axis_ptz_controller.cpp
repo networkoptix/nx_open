@@ -34,7 +34,7 @@ public:
         if(result.isNull())
             return defaultValue;
 
-        QVariant variant(result); // TODO: #Elric use sane lexical cast here.
+        QVariant variant(result); // TODO: use sane lexical cast here.
         if(variant.convert(static_cast<QVariant::Type>(qMetaTypeId<T>()))) {
             return variant.value<T>();
         } else {
@@ -48,7 +48,7 @@ public:
         if(result.isNull())
             return false;
 
-        QVariant variant(result); // TODO: #Elric use sane lexical cast here.
+        QVariant variant(result); // TODO: use sane lexical cast here.
         if(variant.convert(static_cast<QVariant::Type>(qMetaTypeId<T>()))) {
             *value = variant.value<T>();
             return true;

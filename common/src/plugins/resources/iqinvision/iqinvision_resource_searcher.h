@@ -20,10 +20,10 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
 protected:
-    virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress) override;
+    virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress) override;
     virtual QnResourceList findResources() override;
 private:
-    void  processNativePacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress);
+    void  processNativePacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress);
 };
 
 #endif //iq_device_server_h_1825

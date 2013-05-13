@@ -1,5 +1,4 @@
 #include "workbench_controller.h"
-
 #include <cassert>
 #include <cmath> /* For std::floor. */
 #include <limits>
@@ -66,12 +65,10 @@
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
 #include <ui/graphics/instruments/ptz_instrument.h>
-#include <ui/graphics/instruments/zoom_window_instrument.h>
 
-#include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/standard/graphics_message_box.h>
+#include <ui/graphics/items/grid/grid_item.h>
 
 #include <ui/help/help_handler.h>
 
@@ -99,6 +96,37 @@
 #endif
 
 namespace {
+    QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
+        QAction *result = new QAction(text, parent);
+        result->setShortcut(shortcut);
+        return result;
+    }
+
+    QRegion createRoundRegion(int rSmall, int rLarge, const QRect &rect) {
+        QRegion region;
+
+        int circleX = rLarge;
+
+        int circleY = rSmall-1;
+        for (int y = 0; y < qMin(rect.height(), rSmall); ++y)
+        {
+            // calculate circle Point
+            int x = circleX - std::sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
+            region += QRect(x,y, rect.width()-x*2,1);
+        }
+        for (int y = qMin(rect.height(), rSmall); y < rect.height() - rSmall; ++y)
+            region += QRect(0,y, rect.width(),1);
+
+        circleY = rect.height() - rSmall;
+        for (int y = rect.height() - rSmall; y < rect.height(); ++y)
+        {
+            // calculate circle Point
+            int x = circleX - std::sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
+            region += QRect(x,y, rect.width()-x*2,1);
+        }
+        return region;
+    }
+
     QPoint invalidDragDelta() {
         return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
     }
@@ -141,16 +169,13 @@ namespace {
 } // anonymous namespace
 
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
-    base_type(parent),
+    QObject(parent),
     QnWorkbenchContextAware(parent),
     m_manager(display()->instrumentManager()),
     m_cursorPos(invalidCursorPos()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
-    m_screenRecorder(NULL),
-    m_countdownCanceled(false),
-    m_recordingCountdownLabel(NULL),
-    m_tourModeHintLabel(NULL)
+    m_screenRecorder(0)
 {
     ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -193,7 +218,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::KeyPress), this);
     SignalingInstrument *sceneFocusSignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::FocusIn), this);
     PtzInstrument *ptzInstrument = new PtzInstrument(this);
-    ZoomWindowInstrument *zoomWindowInstrument = new ZoomWindowInstrument(this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
@@ -204,12 +228,10 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));
     m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
-    m_resizingInstrument->setEffectRadius(8);
+    m_resizingInstrument->setEffectiveDistance(8);
 
     m_moveInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
     m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
-    m_resizingInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
-    m_resizingInstrument->resizeHoverInstrument()->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Item, mouseEventTypes, this));
@@ -238,7 +260,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, mouseEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, mouseEventTypes, this));
     m_manager->installInstrument(ptzInstrument);
-    m_manager->installInstrument(zoomWindowInstrument);
 
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, keyEventTypes, this));
     m_manager->installInstrument(sceneKeySignalingInstrument);
@@ -278,8 +299,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                     this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)));
     connect(sceneKeySignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                             this,                           SLOT(at_scene_keyPressed(QGraphicsScene *, QEvent *)));
     connect(sceneFocusSignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                           this,                           SLOT(at_scene_focusIn(QGraphicsScene *, QEvent *)));
-    connect(zoomWindowInstrument,       SIGNAL(zoomRectChanged(QnMediaResourceWidget *, const QRectF &)),                           this,                           SLOT(at_zoomRectChanged(QnMediaResourceWidget *, const QRectF &)));
-    connect(zoomWindowInstrument,       SIGNAL(zoomRectCreated(QnMediaResourceWidget *, const QRectF &)),                           this,                           SLOT(at_zoomRectCreated(QnMediaResourceWidget *, const QRectF &)));
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
@@ -350,22 +369,10 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_itemLeftClickInstrument,      SLOT(recursiveDisable()));
     connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_itemLeftClickInstrument,      SLOT(recursiveEnable()));
 
-    connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
-    connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_handScrollInstrument,         SLOT(recursiveEnable()));
-    connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_moveInstrument,               SLOT(recursiveDisable()));
-    connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_moveInstrument,               SLOT(recursiveEnable()));
-    connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_motionSelectionInstrument,    SLOT(recursiveDisable()));
-    connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_motionSelectionInstrument,    SLOT(recursiveEnable()));
-    connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_itemLeftClickInstrument,      SLOT(recursiveDisable()));
-    connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_itemLeftClickInstrument,      SLOT(recursiveEnable()));
-    connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  ptzInstrument,                  SLOT(recursiveDisable()));
-    connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 ptzInstrument,                  SLOT(recursiveEnable()));
-
     /* Connect to display. */
     connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(workbench(),                SIGNAL(currentLayoutAboutToBeChanged()),                                                    this,                           SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),                SIGNAL(currentLayoutChanged()),                                                             this,                           SLOT(at_workbench_currentLayoutChanged()));
 
     /* Set up zoom toggle. */
@@ -410,8 +417,9 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         connect(m_screenRecorder,       SIGNAL(recordingFinished(QString)),                                                         this,                           SLOT(at_screenRecorder_recordingFinished(QString)));
         connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
     }
-
-    connect(accessController(), SIGNAL(permissionsChanged(const QnResourcePtr &)),                                                  this,                           SLOT(at_accessController_permissionsChanged(const QnResourcePtr &)));
+    m_countdownCanceled = false;
+    m_overlayLabel = 0;
+    m_overlayLabelAnimation = 0;
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -427,6 +435,21 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
+    if (watched == m_overlayLabel) {
+        if (event->type() != QEvent::KeyPress)
+            return base_type::eventFilter(watched, event);
+        //TODO: #GDM duplicating code with main_window.cpp
+        if (!action(Qn::ToggleTourModeAction)->isChecked())
+            return base_type::eventFilter(watched, event);
+
+        QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(event);
+        if (pKeyEvent->key() == Qt::Key_Alt || pKeyEvent->key() == Qt::Key_Control)
+            return base_type::eventFilter(watched, event);
+
+        menu()->trigger(Qn::ToggleTourModeAction);
+        return base_type::eventFilter(watched, event);
+    }
+
     if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
             /* Clicking on close button of a widget that is not selected should clear selection. */
@@ -553,6 +576,38 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
     menu->exec(pos);
 }
 
+void  QnWorkbenchController::showOverlayLabel(const QString &text, int width) {
+    QWidget *view = display()->view();
+
+    if (m_overlayLabel == 0) {
+        m_overlayLabel = new QLabel(view);
+        m_overlayLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+        m_overlayLabel->setAlignment(Qt::AlignCenter);
+        m_overlayLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
+        m_overlayLabel->setFocusPolicy(Qt::NoFocus);
+        m_overlayLabel->installEventFilter(this);
+    }
+
+    m_overlayLabel->resize(width, 165);
+    m_overlayLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_overlayLabel->size()) / 2);
+    m_overlayLabel->setMask(createRoundRegion(18, 18, m_overlayLabel->rect()));
+    m_overlayLabel->setText(text);
+    m_overlayLabel->show();
+}
+
+void  QnWorkbenchController::initOverlayLabelAnimation() {
+    if (m_overlayLabelAnimation == 0) {
+        m_overlayLabelAnimation = new QPropertyAnimation(m_overlayLabel, "windowOpacity", m_overlayLabel);
+        m_overlayLabelAnimation->setEasingCurve(QEasingCurve::OutCubic);
+        m_overlayLabelAnimation->setDuration(3000);
+        m_overlayLabelAnimation->setStartValue(1.0);
+        m_overlayLabelAnimation->setEndValue(0.6);
+
+    }
+    m_overlayLabelAnimation->disconnect();
+}
+
+
 // -------------------------------------------------------------------------- //
 // Screen recording
 // -------------------------------------------------------------------------- //
@@ -563,7 +618,7 @@ void QnWorkbenchController::startRecording()
         return;
     }
 
-    if(m_screenRecorder->isRecording() || (m_recordingCountdownLabel != NULL)) {
+    if(m_screenRecorder->isRecording() || (m_overlayLabelAnimation && m_overlayLabelAnimation->state() == QAbstractAnimation::Running)) {
         action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
@@ -578,9 +633,13 @@ void QnWorkbenchController::startRecording()
     action(Qn::ToggleScreenRecordingAction)->setChecked(true);
 
     m_countdownCanceled = false;
-    m_recordingCountdownLabel = QnGraphicsMessageBox::information(tr("Recording in..."));
-    connect(m_recordingCountdownLabel, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
-    connect(m_recordingCountdownLabel, SIGNAL(tick(int)), this, SLOT(at_recordingAnimation_tick(int)));
+
+    showOverlayLabel(tr("Recording in..."), 220);
+    initOverlayLabelAnimation();
+
+    connect(m_overlayLabelAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
+    connect(m_overlayLabelAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
+    m_overlayLabelAnimation->start();
 }
 
 void QnWorkbenchController::stopRecording()
@@ -600,9 +659,7 @@ void QnWorkbenchController::stopRecording()
 
 void QnWorkbenchController::at_recordingAnimation_finished()
 {
-    if (m_recordingCountdownLabel)
-        m_recordingCountdownLabel->setOpacity(0.0);
-    m_recordingCountdownLabel = NULL;
+    m_overlayLabel->hide();
     if (!m_countdownCanceled) {
         if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
             if (m_screenRecorder) // just in case =)
@@ -611,19 +668,30 @@ void QnWorkbenchController::at_recordingAnimation_finished()
     m_countdownCanceled = false;
 }
 
-void QnWorkbenchController::at_recordingAnimation_tick(int tick)
+void QnWorkbenchController::at_recordingAnimation_valueChanged(const QVariant &)
 {
-    if (!m_recordingCountdownLabel)
+    static double TICKS = 3;
+
+    QPropertyAnimation *animation = qobject_cast<QPropertyAnimation *>(sender());
+    if (!animation)
+        return;
+
+    double normValue = 1.0 - (double) animation->currentTime() / animation->duration();
+
+    QLabel *label = qobject_cast<QLabel *>(animation->targetObject());
+    if (!label)
         return;
 
     if (m_countdownCanceled) {
-        m_recordingCountdownLabel->setText(tr("Cancelled"));
+        label->setText(tr("Cancelled"));
         return;
     }
-    int left = m_recordingCountdownLabel->timeout() - tick;
-    int n = qMax(1, (left + 500) / 1000);
 
-    m_recordingCountdownLabel->setText(tr("Recording in...") + QString::number(n));
+    double d = normValue * (TICKS+1);
+    if (d < TICKS) {
+        const int n = int (d) + 1;
+        label->setText(tr("Recording in...") + QString::number(n));
+    }
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingStarted() {
@@ -642,7 +710,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     if (suggetion.isEmpty())
         suggetion = tr("recorded_video");
 
-    QSettings settings; // TODO: #Elric replace with QnSettings
+    QSettings settings; // TODO: replace with QnSettings
     settings.beginGroup(QLatin1String("videoRecording"));
 
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
@@ -759,7 +827,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
 void QnWorkbenchController::at_scene_focusIn(QGraphicsScene *scene, QEvent *event) {
     Q_UNUSED(scene)
-    // TODO: #Elric evil hack to prevent focus jumps when scene is focused.
+    // TODO: evil hack to prevent focus jumps when scene is focused.
     QFocusEvent *focusEvent = static_cast<QFocusEvent *>(event);
     *focusEvent = QFocusEvent(focusEvent->type(), Qt::OtherFocusReason);
 }
@@ -774,7 +842,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     workbench()->setItem(Qn::RaisedRole, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
 
     display()->bringToFront(m_resizedWidget);
-    opacityAnimator(display()->gridItem())->animateTo(1.0);
+    display()->gridItem()->animatedShow();
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
 }
 
@@ -818,7 +886,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     TRACE("RESIZING FINISHED");
 
-    opacityAnimator(display()->gridItem())->animateTo(0.0);
+    display()->gridItem()->animatedHide();
     opacityAnimator(m_resizedWidget)->animateTo(1.0);
 
     if(m_resizedWidget == item && item != NULL) {
@@ -867,7 +935,7 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
     display()->setLayer(items, Qn::FrontLayer);
 
     /* Show grid. */
-    opacityAnimator(display()->gridItem())->animateTo(1.0);
+    display()->gridItem()->animatedShow();
 }
 
 void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) {
@@ -954,7 +1022,7 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
     TRACE("MOVE FINISHED");
 
     /* Hide grid. */
-    opacityAnimator(display()->gridItem())->animateTo(0.0);
+    display()->gridItem()->animatedHide();
 
     if(!m_draggedWorkbenchItems.empty()) {
         QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
@@ -1006,15 +1074,6 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget
         return; /* We may also get NULL if the widget being rotated gets deleted. */
 
     resourceWidget->item()->setRotation(widget->rotation());
-}
-
-void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect) {
-    widget->item()->setZoomRect(zoomRect);
-}
-
-void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QRectF &zoomRect) {
-    menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect));
-    widget->setCheckedButtons(widget->checkedButtons() & ~QnMediaResourceWidget::ZoomWindowButton);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
@@ -1318,49 +1377,41 @@ void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
 
 void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
     if (!checked) {
-        if (m_tourModeHintLabel) {
-            m_tourModeHintLabel->hideImmideately();
-            disconnect(m_tourModeHintLabel, 0, this, 0);
-            m_tourModeHintLabel = NULL;
-        }
+        if (!m_overlayLabel)
+            return;
+        m_overlayLabel->hide();
+        if (!m_overlayLabelAnimation)
+            return;
+        m_overlayLabelAnimation->stop();
         return;
     }
-    m_tourModeHintLabel = QnGraphicsMessageBox::information(tr("Press any key to stop the tour"));
-    connect(m_tourModeHintLabel, SIGNAL(finished()), this, SLOT(at_tourModeLabel_finished()));
-}
 
-void QnWorkbenchController::at_tourModeLabel_finished() {
-    if (m_tourModeHintLabel)
-       m_tourModeHintLabel = NULL;
+
+    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
+    if (widget == NULL) {
+        qnWarning("Viewport was expected to be a QGLWidget.");
+        return;
+    }
+
+    showOverlayLabel(tr("Press any key to stop tour"), 280);
+    initOverlayLabelAnimation();
+
+    connect(m_overlayLabelAnimation, SIGNAL(finished()), m_overlayLabel, SLOT(hide()));
+    m_overlayLabelAnimation->start();
 }
 
 void QnWorkbenchController::at_fitInViewAction_triggered() {
     display()->fitInView();
 }
 
-void QnWorkbenchController::at_workbench_currentLayoutAboutToBeChanged() {
-    QnWorkbenchLayout *layout = workbench()->currentLayout();
-    if (!layout || !layout->resource())
-        return;
-
-    disconnect(layout->resource(), NULL, this, NULL);
-}
-
 void QnWorkbenchController::at_workbench_currentLayoutChanged() {
-    QnWorkbenchLayout *layout = workbench()->currentLayout();
-    if (!layout)
-        return;
-    if (layout->resource()) {
-        connect(layout->resource(), SIGNAL(lockedChanged(const QnLayoutResourcePtr &)), this, SLOT(updateLayoutInstruments(const QnLayoutResourcePtr &)));
-    }
-    updateLayoutInstruments(layout->resource());
-}
+    // TODO: subscribe to permission changes.
 
-void QnWorkbenchController::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
-    QnWorkbenchLayout *layout = workbench()->currentLayout();
-    if (!layout || !layout->resource() || layout->resource() != resource)
-        return;
-    updateLayoutInstruments(resource.dynamicCast<QnLayoutResource>());
+    Qn::Permissions permissions = accessController()->permissions(workbench()->currentLayout()->resource());
+    bool writable = permissions & Qn::WritePermission;
+
+    m_moveInstrument->setEnabled(writable);
+    m_resizingInstrument->setEnabled(writable);
 }
 
 void QnWorkbenchController::at_zoomedToggle_activated() {
@@ -1369,18 +1420,4 @@ void QnWorkbenchController::at_zoomedToggle_activated() {
 
 void QnWorkbenchController::at_zoomedToggle_deactivated() {
     m_handScrollInstrument->setMouseButtons(Qt::RightButton);
-}
-
-void QnWorkbenchController::updateLayoutInstruments(const QnLayoutResourcePtr &layout) {
-    if (!layout) {
-        m_moveInstrument->setEnabled(false);
-        m_resizingInstrument->setEnabled(false);
-        return;
-    }
-
-    Qn::Permissions permissions = accessController()->permissions(layout);
-    bool writable = permissions & Qn::WritePermission;
-
-    m_moveInstrument->setEnabled(writable && !layout->locked());
-    m_resizingInstrument->setEnabled(writable && !layout->locked());
 }

@@ -36,7 +36,7 @@ public:
 
     void setExternalTimeSource(QnlTimeSource* value) { m_extTimeSrc = value; }
 
-    // TODO: #Elric remove these
+    // TODO: remove these
     bool isVisible() const { return m_isVisible; }
     void setVisible(bool value) { m_isVisible = value; }
 

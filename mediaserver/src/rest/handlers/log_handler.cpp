@@ -84,7 +84,7 @@ int QnRestLogHandler::executePost(const QString& path, const QnRequestParamList&
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRestLogHandler::description() const
+QString QnRestLogHandler::description(TCPSocket *) const
 {
     return 
         "Returns tail of the server log file"

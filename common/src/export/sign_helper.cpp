@@ -540,8 +540,8 @@ int QnSignHelper::runX264Process(AVFrame* frame, QString optionStr, quint8* rezB
     file.write((const char*) frame->data[1], frame->linesize[1]*frame->height/(1 << descr->log2_chroma_h));
     file.write((const char*) frame->data[2], frame->linesize[2]*frame->height/(1 << descr->log2_chroma_h));
     file.close();
-                                                        
-    QString executableName = closeDirPath(qApp->applicationDirPath()) + QLatin1String("x264");
+
+    QString executableName = closeDirPath(QFileInfo(QLatin1String(qApp->argv()[0])).absolutePath()) + QLatin1String("x264");
     QString command(QLatin1String("\"%1\" %2 -o \"%3\" --input-res %4x%5 \"%6\""));
     QString outFileName(tempName + QLatin1String(".264"));
     command = command.arg(executableName).arg(optionStr).arg(outFileName).arg(frame->width).arg(frame->height).arg(tempName);

@@ -1,16 +1,17 @@
 #ifndef QN_TIME_HANDLER_H
 #define QN_TIME_HANDLER_H
 
-#include <rest/server/json_rest_handler.h>
+#include "rest/server/request_handler.h"
 
-class QnTimeHandler: public QnJsonRestHandler
+class QnTimeHandler: public QnRestRequestHandler
 {
 public:
     QnTimeHandler();
 
 protected:
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) override;
-    virtual QString description() const override;
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType) override;
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType) override;
+    virtual QString description(TCPSocket *tcpSocket) const override;
 };
 
 #endif // QN_TIME_HANDLER_H

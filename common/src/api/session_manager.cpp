@@ -38,16 +38,18 @@ void QnSessionManagerAsyncReplyProcessor::at_replyReceived() {
 void QnSessionManagerSyncReplyProcessor::at_finished(const QnHTTPRawResponse& response, int handle) {
     Q_UNUSED(handle)
 
-    QMutexLocker locker(&m_mutex);
     m_response = response;
+
+    QMutexLocker locker(&m_mutex);
     m_finished = true;
     m_condition.wakeOne();
 }
 
 int QnSessionManagerSyncReplyProcessor::wait(QnHTTPRawResponse& response) {
     QMutexLocker locker(&m_mutex);
-    while (!m_finished)
+    while (!m_finished) {
         m_condition.wait(&m_mutex);
+    }
 
     response = m_response;
     return m_response.status;
@@ -137,7 +139,7 @@ QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectNa
 // -------------------------------------------------------------------------- //
 // QnSessionManager :: sync API
 // -------------------------------------------------------------------------- //
-int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data, QnHTTPRawResponse &response) {
+int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QnHTTPRawResponse& response) {
     QScopedPointer<QnSessionManagerSyncReplyProcessor, QScopedPointerLaterDeleter> syncProcessor(new QnSessionManagerSyncReplyProcessor());
     syncProcessor->moveToThread(this->thread());
 
@@ -179,7 +181,7 @@ int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName
 int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType) {
     int handle = s_handle.fetchAndAddAcquire(1);
 
-    /* We need to create reply processor here as target could not exist when doAsyncGetRequest gets called. */
+    // We need to create reply processor here as target could not exist when doAsyncGetRequest gets called
     QnSessionManagerAsyncReplyProcessor* replyProcessor = new QnSessionManagerAsyncReplyProcessor(handle);
     replyProcessor->moveToThread(this->thread());
     connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, connectionType == Qt::AutoConnection ? Qt::QueuedConnection : connectionType);
@@ -250,16 +252,11 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
 
-    bool skipContentType = false;
-    foreach (QnRequestHeader header, headers) {
-        if (header.first == QLatin1String("Content-Type"))
-            skipContentType = true;
+    foreach (QnRequestHeader header, headers)
         request.setRawHeader(header.first.toAscii(), header.second.toUtf8());
-    }
 
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
-    if (!skipContentType)
-        request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
 
     QNetworkReply* reply = NULL;
     switch(operation) {

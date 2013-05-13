@@ -21,7 +21,7 @@ public:
 
     template<class OtherResource>
     QnSharedResourcePointerList(const QList<QnSharedResourcePointer<OtherResource> > &other) {
-        this->reserve(other.size());
+        reserve(other.size());
         qCopy(other.begin(), other.end(), std::back_inserter(*this));
     }
 

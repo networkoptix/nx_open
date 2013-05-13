@@ -165,18 +165,10 @@ bool QnCameraSettingsWidget::hasAnyCameraChanges() const {
     }
 }
 
-bool QnCameraSettingsWidget::hasScheduleControlsChanges() const {
+bool QnCameraSettingsWidget::hasControlsChanges() const {
     switch(mode()) {
-    case SingleMode: return m_singleWidget->hasScheduleControlsChanges();
-    case MultiMode: return m_multiWidget->hasScheduleControlsChanges();
-    default: return false;
-    }
-}
-
-bool QnCameraSettingsWidget::hasMotionControlsChanges() const {
-    switch(mode()) {
-    case SingleMode: return m_singleWidget->hasMotionControlsChanges();
-    case MultiMode: return false;
+    case SingleMode: return m_singleWidget->hasControlsChanges();
+    case MultiMode: return m_multiWidget->hasControlsChanges();
     default: return false;
     }
 }

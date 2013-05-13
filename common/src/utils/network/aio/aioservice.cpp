@@ -108,7 +108,6 @@ namespace aio
         if( !threadToUse )
         {
             //creating new thread
-            //TODO:#ak auto_ptr is deprecated. Use unique_ptr instead
             std::auto_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
             newThread->start();
             if( !newThread->isRunning() )

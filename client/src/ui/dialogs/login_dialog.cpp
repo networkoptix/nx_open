@@ -29,7 +29,7 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/filetypesupport.h"
 
-#include <client/client_settings.h>
+#include <utils/settings.h>
 
 #include "connection_testing_dialog.h"
 
@@ -51,14 +51,17 @@ namespace {
 } // anonymous namespace
 
 
-QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
-    base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
+    QDialog(parent),
     ui(new Ui::LoginDialog),
+    m_context(context),
     m_requestHandle(-1),
     m_renderingWidget(NULL),
     m_restartPending(false)
 {
+    if(!context)
+        qnNullWarning(context);
+
     ui->setupUi(this);
 
     setHelpTopic(this, Qn::Login_Help);
@@ -118,17 +121,17 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_entCtrlFinder->start();
 }
 
-QnLoginDialog::~QnLoginDialog() {
+LoginDialog::~LoginDialog() {
     delete m_entCtrlFinder;
     return;
 }
 
-void QnLoginDialog::updateFocus() 
+void LoginDialog::updateFocus() 
 {
     ui->passwordLineEdit->setFocus();
 }
 
-QUrl QnLoginDialog::currentUrl() const {
+QUrl LoginDialog::currentUrl() const {
     QUrl url;
     url.setScheme(QLatin1String("https"));
     url.setHost(ui->hostnameLineEdit->text().trimmed());
@@ -138,22 +141,22 @@ QUrl QnLoginDialog::currentUrl() const {
     return url;
 }
 
-QString QnLoginDialog::currentName() const {
+QString LoginDialog::currentName() const {
     QString itemText = ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
     if (itemText.startsWith(space))
         return itemText.remove(0, space.length());
     return itemText;
 }
 
-QnConnectInfoPtr QnLoginDialog::currentInfo() const {
+QnConnectInfoPtr LoginDialog::currentInfo() const {
     return m_connectInfo;
 }
 
-bool QnLoginDialog::restartPending() const {
+bool LoginDialog::restartPending() const {
     return m_restartPending;
 }
 
-void QnLoginDialog::accept() {
+void LoginDialog::accept() {
     QUrl url = currentUrl();
     if (!url.isValid()) {
         QMessageBox::warning(this, tr("Invalid Login Information"), tr("The Login Information you have entered is not valid."));
@@ -166,18 +169,9 @@ void QnLoginDialog::accept() {
     updateUsability();
 }
 
-bool QnLoginDialog::rememberPassword() const {
-    return ui->rememberPasswordCheckBox->isChecked();
-}
-
-void QnLoginDialog::setStoredPassword(const QString &password) {
-    ui->passwordLineEdit->setText(password);
-    ui->rememberPasswordCheckBox->setChecked(!password.isEmpty());
-}
-
-void QnLoginDialog::reject() {
+void LoginDialog::reject() {
     if(m_requestHandle == -1) {
-        base_type::reject();
+        QDialog::reject();
         return;
     }
 
@@ -185,8 +179,8 @@ void QnLoginDialog::reject() {
     updateUsability();
 }
 
-void QnLoginDialog::changeEvent(QEvent *event) {
-    base_type::changeEvent(event);
+void LoginDialog::changeEvent(QEvent *event) {
+    QDialog::changeEvent(event);
 
     switch (event->type()) {
     case QEvent::LanguageChange:
@@ -197,15 +191,7 @@ void QnLoginDialog::changeEvent(QEvent *event) {
     }
 }
 
-void QnLoginDialog::showEvent(QShowEvent *event) {
-    base_type::showEvent(event);
-    if (ui->rememberPasswordCheckBox->isChecked()
-            && !ui->passwordLineEdit->text().isEmpty()
-            && currentUrl().isValid())
-        accept();
-}
-
-void QnLoginDialog::resetConnectionsModel() {
+void LoginDialog::resetConnectionsModel() {
     m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
 
     QnConnectionDataList connections = qnSettings->customConnections();
@@ -252,7 +238,7 @@ void QnLoginDialog::resetConnectionsModel() {
 
 }
 
-void QnLoginDialog::resetAutoFoundConnectionsModel() {
+void LoginDialog::resetAutoFoundConnectionsModel() {
     QnConnectionDataList connections = qnSettings->customConnections();
 
     int baseCount = qMax(connections.size(), 1); //1 for default auto-created connection
@@ -279,7 +265,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
 
 }
 
-bool QnLoginDialog::sendCommandToLauncher(const QString &version, const QStringList &arguments) {
+bool LoginDialog::sendCommandToLauncher(const QString &version, const QStringList &arguments) {
     QLocalSocket sock;
     sock.connectToServer( launcherPipeName );
     if( !sock.waitForConnected( -1 ) )
@@ -304,7 +290,7 @@ bool QnLoginDialog::sendCommandToLauncher(const QString &version, const QStringL
     return true;
 }
 
-bool QnLoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
+bool LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
 
     QStringList arguments;
     arguments << QLatin1String("--no-single-application");
@@ -323,7 +309,7 @@ bool QnLoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
     return result;
 }
 
-void QnLoginDialog::updateAcceptibility() {
+void LoginDialog::updateAcceptibility() {
     bool acceptable = 
         !ui->passwordLineEdit->text().isEmpty() &&
         !ui->loginLineEdit->text().trimmed().isEmpty() &&
@@ -334,7 +320,7 @@ void QnLoginDialog::updateAcceptibility() {
     ui->testButton->setEnabled(acceptable);
 }
 
-void QnLoginDialog::updateUsability() {
+void LoginDialog::updateUsability() {
     if(m_requestHandle == -1) {
         ::setEnabled(children(), ui->buttonBox, true);
         ::setEnabled(ui->buttonBox->children(), ui->buttonBox->button(QDialogButtonBox::Cancel), true);
@@ -355,7 +341,7 @@ void QnLoginDialog::updateUsability() {
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnLoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle) {
+void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle) {
     if(m_requestHandle != requestHandle) 
         return;
     m_requestHandle = -1;
@@ -420,17 +406,17 @@ void QnLoginDialog::at_connectFinished(int status, const QByteArray &/*errorStri
     }
 
     m_connectInfo = connectInfo;
-    base_type::accept();
+    QDialog::accept();
 }
 
-void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
+void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     QModelIndex idx = m_connectionsModel->index(index, 0);
     m_dataWidgetMapper->setCurrentModelIndex(idx);
     ui->passwordLineEdit->clear();
     updateFocus();
 }
 
-void QnLoginDialog::at_testButton_clicked() {
+void LoginDialog::at_testButton_clicked() {
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
@@ -445,7 +431,7 @@ void QnLoginDialog::at_testButton_clicked() {
     updateFocus();
 }
 
-void QnLoginDialog::at_saveButton_clicked() {
+void LoginDialog::at_saveButton_clicked() {
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
@@ -506,7 +492,7 @@ void QnLoginDialog::at_saveButton_clicked() {
 
 }
 
-void QnLoginDialog::at_deleteButton_clicked() {
+void LoginDialog::at_deleteButton_clicked() {
     QString name = currentName();
 
     if (QMessageBox::warning(this, tr("Delete connections"),
@@ -520,7 +506,7 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress,
+void LoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress,
     const QString& remoteHostAddress, bool isLocal, const QString& seed) {
     Q_UNUSED(moduleVersion)
     Q_UNUSED(localInterfaceAddress)
@@ -548,7 +534,7 @@ void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, 
     resetAutoFoundConnectionsModel();
 }
 
-void QnLoginDialog::at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed ) {
+void LoginDialog::at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed ) {
     Q_UNUSED(moduleParameters)
     Q_UNUSED(remoteHostAddress)
     Q_UNUSED(isLocal)

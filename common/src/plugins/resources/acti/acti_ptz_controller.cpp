@@ -60,10 +60,10 @@ QnActiPtzController::QnActiPtzController(QnActiResource* resource):
     m_spaceMapper(NULL),
     m_zoomVelocity(0.0),
     m_moveVelocity(0, 0),
-    m_minAngle(0.0),
-    m_maxAngle(0.0),
     m_isFliped(false),
-    m_isMirrored(false)
+    m_isMirrored(false),
+    m_minAngle(0.0),
+    m_maxAngle(0.0)
 {
     init();
 }
@@ -90,9 +90,9 @@ void QnActiPtzController::init()
     QByteArray mirrorMode = m_resource->makeActiRequest(ENCODER_STR, lit("VIDEO_MIRROR_MODE"), status);
     m_isMirrored = mirrorMode.toInt() == 1;
 
-    m_capabilities |= Qn::AbsolutePtzCapability;
-    m_capabilities |= Qn::ContinuousPanTiltCapability;
-    m_capabilities |= Qn::ContinuousZoomCapability;
+    m_capabilities |= QnCommonGlobals::AbsolutePtzCapability;
+    m_capabilities |= QnCommonGlobals::ContinuousPanTiltCapability;
+    m_capabilities |= QnCommonGlobals::ContinuousZoomCapability;
 
     qreal minPanLogical = -17500, maxPanLogical = 17500; // todo: move to camera XML
     qreal minPanPhysical = 360, maxPanPhysical = 0; // todo: move to camera XML
@@ -101,7 +101,7 @@ void QnActiPtzController::init()
     qreal minTiltPhysical = -90, maxTiltPhysical = 0; //  // todo: move to camera XML
     if (!m_isFliped) {
         qSwap(minTiltPhysical, maxTiltPhysical);
-        m_capabilities &= ~Qn::AbsolutePtzCapability; // acti 8111 has bug for absolute position if flip turned off
+        m_capabilities &= ~QnCommonGlobals::AbsolutePtzCapability; // acti 8111 has bug for absolute position if flip turned off
     }
 
     QList<QByteArray> zoomParams = zoomString.split('=')[1].split(',');
@@ -116,7 +116,7 @@ void QnActiPtzController::init()
     qreal f35Min = f35Max / ANALOG_ZOOM;
 
     QVector<QPair<qreal, qreal> > data;
-    for (uint i = 0; i < sizeof(pointsData)/sizeof(pointsData[0]); ++i)
+    for (int i = 0; i < sizeof(pointsData)/sizeof(pointsData[0]); ++i)
         data << QPair<qreal, qreal>(toLogicalScale(pointsData[i][0], m_minAngle, m_maxAngle), pointsData[i][1] * f35Min);
     QnScalarSpaceMapper zMapper(data, Qn::ConstantExtrapolation);
 

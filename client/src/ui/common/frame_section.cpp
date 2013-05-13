@@ -45,9 +45,6 @@ Qt::WindowFrameSection Qn::toNaturalQtFrameSection(Qn::WindowFrameSections secti
 }
 
 Qn::WindowFrameSection Qn::toQnFrameSection(Qt::WindowFrameSection section) {
-    if(section == Qt::NoSection)
-        return Qn::NoSection;
-    
     return static_cast<Qn::WindowFrameSection>(1 << section);
 }
 
@@ -136,31 +133,27 @@ Qn::WindowFrameSections Qn::calculateRectangularFrameSections(const QRect &frame
     return calculateRectangularFrameSectionsInternal<int, QRect>(frameRect, rect, query);
 }
 
-Qt::CursorShape Qn::calculateHoverCursorShape(Qn::WindowFrameSection section) {
+Qt::CursorShape Qn::calculateHoverCursorShape(Qt::WindowFrameSection section) {
     switch (section) {
-    case Qn::TopLeftSection:
-    case Qn::BottomRightSection:
+    case Qt::TopLeftSection:
+    case Qt::BottomRightSection:
         return Qt::SizeFDiagCursor;
-    case Qn::TopRightSection:
-    case Qn::BottomLeftSection:
+    case Qt::TopRightSection:
+    case Qt::BottomLeftSection:
         return Qt::SizeBDiagCursor;
-    case Qn::LeftSection:
-    case Qn::RightSection:
+    case Qt::LeftSection:
+    case Qt::RightSection:
         return Qt::SizeHorCursor;
-    case Qn::TopSection:
-    case Qn::BottomSection:
+    case Qt::TopSection:
+    case Qt::BottomSection:
         return Qt::SizeVerCursor;
-    case Qn::NoSection:
-    case Qn::TitleBarArea:
+    case Qt::NoSection:
+    case Qt::TitleBarArea:
         return Qt::ArrowCursor;
     default:
         qnWarning("Invalid window frame section '%1'.", section);
         return Qt::ArrowCursor;
     }
-}
-
-Qt::CursorShape Qn::calculateHoverCursorShape(Qt::WindowFrameSection section) {
-    return calculateHoverCursorShape(toQnFrameSection(section));
 }
 
 
@@ -268,7 +261,7 @@ namespace {
     template<class Point, class Rect>
     Point calculatePinPointInternal(const Rect &rect, Qt::WindowFrameSection section) {
         /* Note that QRect::right & QRect::bottom return not what is expected (see Qt docs).
-         * This is why these methods are not used here. */ // TODO: #Elric comment says they are not used, but they are used!!!
+         * This is why these methods are not used here. */
         switch(section) {
         case Qt::LeftSection:
             return rect.topRight();
@@ -287,6 +280,7 @@ namespace {
         case Qt::BottomLeftSection:
             return rect.topRight();
         case Qt::TitleBarArea:
+            qnWarning("There is no pin-point when dragging title bar area.");
             return Point();
         default:
             qnWarning("Invalid window frame section '%1'.", section);
@@ -314,32 +308,6 @@ QRect Qn::resizeRect(const QRect &rect, const QSize &size, Qt::WindowFrameSectio
 
 QPointF Qn::calculatePinPoint(const QRectF &rect, Qt::WindowFrameSection section) {
     return calculatePinPointInternal<QPointF, QRectF>(rect, section);
-}
-
-Qn::Corner Qn::calculatePinPoint(Qt::WindowFrameSection section) {
-    switch(section) {
-    case Qt::LeftSection:
-        return Qn::TopRightCorner;
-    case Qt::TopLeftSection:
-        return Qn::BottomRightCorner;
-    case Qt::TopSection:
-        return Qn::BottomLeftCorner;
-    case Qt::TopRightSection:
-        return Qn::BottomLeftCorner;
-    case Qt::RightSection:
-        return Qn::TopLeftCorner;
-    case Qt::BottomRightSection:
-        return Qn::TopLeftCorner;
-    case Qt::BottomSection:
-        return Qn::TopLeftCorner;
-    case Qt::BottomLeftSection:
-        return Qn::TopRightCorner;
-    case Qt::TitleBarArea:
-        return Qn::NoCorner;
-    default:
-        qnWarning("Invalid window frame section '%1'.", section);
-        return Qn::NoCorner;
-    }
 }
 
 QPoint Qn::calculatePinPoint(const QRect &rect, Qt::WindowFrameSection section) {

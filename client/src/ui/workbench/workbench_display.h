@@ -4,8 +4,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 
-#include <utils/common/connective.h>
-
 #include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
 
@@ -41,7 +39,6 @@ class WidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
-class QnGridBackgroundItem;
 class QnWorkbenchContext;
 class QnWorkbenchStreamSynchronizer;
 class QnToggle;
@@ -56,11 +53,9 @@ class QnCamDisplay;
  * 
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations {
-    Q_OBJECT
-    Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity)
-
-    typedef Connective<QObject> base_type;
+class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations {
+    Q_OBJECT;
+    Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity);
 
 public:
     /**
@@ -162,12 +157,7 @@ public:
     /**
      * \returns                         Grid item. 
      */
-    QnGridItem *gridItem() const;
-
-    /**
-     * \returns                         Grid background item (E-Mapping).
-     */
-    QnGridBackgroundItem *gridBackgroundItem() const;
+    QnGridItem *gridItem();
 
     /**
      * \param item                      Item to get widget for.
@@ -281,10 +271,7 @@ public:
      * Status function to know if we are changing layout now.
      * \returns true if we are changing layout
      */
-    bool isChangingLayout() const { return m_inChangeLayout; } // TODO: #Elric this is evil
-
-    QnResourceWidget *zoomTargetWidget(QnResourceWidget *widget) const;
-
+    bool isChangingLayout() const { return m_inChangeLayout; }
 
 public slots:
     void fitInView(bool animate = true);
@@ -297,9 +284,6 @@ signals:
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(Qn::ItemRole role);
 
-    void zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
-    void zoomLinkAboutToBeRemoved(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
-
     void resourceAdded(const QnResourcePtr &resource);
     void resourceAboutToBeRemoved(const QnResourcePtr &resource);
 
@@ -308,8 +292,6 @@ protected:
 
     void synchronizeGeometry(QnWorkbenchItem *item, bool animate);
     void synchronizeGeometry(QnResourceWidget *widget, bool animate);
-    void synchronizeZoomRect(QnWorkbenchItem *item);
-    void synchronizeZoomRect(QnResourceWidget *widget);
     void synchronizeAllGeometries(bool animate);
     void synchronizeLayer(QnWorkbenchItem *item);
     void synchronizeLayer(QnResourceWidget *widget);
@@ -328,12 +310,6 @@ protected:
     bool addItemInternal(QnWorkbenchItem *item, bool animate = true, bool startDisplay = true);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
-    bool addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
-    bool removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
-    bool addZoomLinkInternal(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
-    bool removeZoomLinkInternal(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
-    bool removeZoomLinksInternal(QnWorkbenchItem *item);
-
     void deinitSceneView();
     void initSceneView();
     void initContext(QnWorkbenchContext *context);
@@ -350,7 +326,6 @@ protected slots:
     void updateFrameWidths();
 
     void updateCurtainedCursor();
-    void updateBackground(const QnLayoutResourcePtr &layout);
 
     void at_scene_destroyed();
     void at_scene_selectionChanged();
@@ -364,15 +339,11 @@ protected slots:
 
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);
-    void at_layout_zoomLinkAdded(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
-    void at_layout_zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
-    void at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect);
 
     void at_context_permissionsChanged(const QnResourcePtr &resource);
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
-    void at_item_zoomRectChanged();
     void at_item_rotationChanged();
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
@@ -419,9 +390,6 @@ private:
     /** Resource to widget mapping. */
     QHash<QnResourcePtr, QList<QnResourceWidget *> > m_widgetsByResource;
 
-    /** Widget to zoom target widget mapping. */
-    QHash<QnResourceWidget *, QnResourceWidget *> m_zoomTargetWidgetByWidget;
-
     /** Current front z displacement value. */
     qreal m_frontZ;
 
@@ -430,9 +398,6 @@ private:
 
     /** Grid item. */
     QWeakPointer<QnGridItem> m_gridItem;
-
-    /** Grid background item. */
-    QWeakPointer<QnGridBackgroundItem> m_gridBackgroundItem;
 
     /** Current frame opacity for widgets. */
     qreal m_frameOpacity;
@@ -492,6 +457,14 @@ private:
     VariantAnimator *m_frameOpacityAnimator;
 
 
+
+    /* Helpers. */
+
+    /** Stored dummy scene. */
+    QGraphicsScene *m_dummyScene;
+
+
+    
 
     QnThumbnailsLoader *m_loader;
 };

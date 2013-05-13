@@ -21,7 +21,7 @@ public:
     QnStardotResource();
     ~QnStardotResource();
 
-    virtual QString getDriverName() const override;
+    virtual QString manufacture() const;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 

@@ -309,11 +309,6 @@ int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray* con
     return 0;
 }
 
-bool QnTranscoder::addTag( const QString& name, const QString& value )
-{
-    return false;
-}
-
 QString QnTranscoder::getLastErrorMessage() const
 {
     return m_lastErrMessage;

@@ -5,11 +5,52 @@
 #include <QSharedPointer>
 #include "core/resource/resource_fwd.h"
 #include <business/business_logic_common.h>
-#include "../business_event_parameters.h"
-
 
 namespace BusinessEventType
 {
+    enum Value
+    {
+        /** Motion has occured on a camera. */
+        Camera_Motion,
+
+        /** Camera was disconnected. */
+        Camera_Disconnect,
+
+        /** Storage read error has occured. */
+        Storage_Failure,
+
+        /** Network issue: packet lost, RTP timeout, etc. */
+        Network_Issue,
+
+        /** Found some cameras with same IP address. */
+        Camera_Ip_Conflict,
+
+        /** Camera input signal is received. */
+        Camera_Input,
+
+        /** Connection to mediaserver lost. */
+        MediaServer_Failure,
+
+        /** Two or more mediaservers are running. */
+        MediaServer_Conflict,
+
+        /** Event type is not defined. Used in rules. */
+        NotDefined,
+
+        /**
+         * Used when enumerating to build GUI lists, this and followed actions
+         * should not be displayed.
+         */
+        Count = NotDefined,
+
+        /** System health message. */
+        SystemHealthMessage = 500,
+
+        /** Base index for the user defined events. */
+        UserDefined = 1000
+
+    };
+
     QString toString( Value val );
 
     bool isResourceRequired(Value val);
@@ -19,6 +60,18 @@ namespace BusinessEventType
     bool requiresCameraResource(Value val);
 
     bool requiresServerResource(Value val);
+}
+
+namespace QnBusinessEventRuntime {
+    BusinessEventType::Value getEventType(const QnBusinessParams &params);
+    void setEventType(QnBusinessParams* params, BusinessEventType::Value value);
+
+    qint64 getEventTimestamp(const QnBusinessParams &params);
+    void setEventTimestamp(QnBusinessParams* params, qint64 value);
+
+    int getEventResourceId(const QnBusinessParams &params);
+    void setEventResourceId(QnBusinessParams* params, int value);
+
 }
 
 /**
@@ -68,9 +121,9 @@ public:
      * @param params            Parameters of an event that are selected in rule.
      * @return                  True if event should be handled, false otherwise.
      */
-    virtual bool checkCondition (ToggleState::Value state, const QnBusinessEventParameters& params) const = 0;
+    virtual bool checkCondition (ToggleState::Value state, const QnBusinessParams& params) const = 0;
 
-    virtual QnBusinessEventParameters getRuntimeParams() const;
+    virtual QnBusinessParams getRuntimeParams() const;
 
 private:
     /**

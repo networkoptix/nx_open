@@ -21,10 +21,8 @@ public:
 
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
 
-    virtual QList<NetworkLoad> totalNetworkLoad() override;
-
 private:
-    Q_DECLARE_PRIVATE(QnSigarMonitor)
+    Q_DECLARE_PRIVATE(QnSigarMonitor);
     QScopedPointer<QnSigarMonitorPrivate> d_ptr;
 };
 

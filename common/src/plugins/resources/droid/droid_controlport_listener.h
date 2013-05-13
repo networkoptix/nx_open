@@ -18,7 +18,6 @@ class QnDroidControlPortProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnDroidControlPortProcessor(TCPSocket* socket, QnTcpListener* owner);
-    virtual ~QnDroidControlPortProcessor();
 protected:
     virtual void run() override;
 

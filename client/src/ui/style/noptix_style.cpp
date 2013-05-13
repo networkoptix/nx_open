@@ -413,7 +413,7 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
 
     /* Draw progress indicator. */
     if (progress > 0.0) { 
-        const QColor baseColor(4, 154, 116); // TODO: #GDM take color from config?
+        const QColor baseColor(4, 154, 116); // TODO: take color from config?
         const QColor glareColor = pb->palette.color(QPalette::WindowText);
 
         QLinearGradient gradient(x, y, x + w, y);

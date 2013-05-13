@@ -25,6 +25,8 @@ public:
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
+    static int maxTextureSize();
+
     void ensureTextureAllocated();
     void ensureTextureSynchronized();
     void ensureTextureSizeSynchronized();

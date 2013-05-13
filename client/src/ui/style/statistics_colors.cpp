@@ -7,10 +7,9 @@ QnStatisticsColors::QnStatisticsColors():
     grid(QColor(66, 140, 237, 100)),
     frame(QColor(66, 140, 237)),
     cpu(QColor(66, 140, 237)),
-    ram(QColor(219, 59, 169)),
-    networkLimit(QColor(Qt::white))
+    ram(QColor(219, 59, 169))
 {
-    ensureVectors();
+    ensureHdds();
 }
 
 QnStatisticsColors::QnStatisticsColors(const QnStatisticsColors &source):
@@ -18,12 +17,9 @@ QnStatisticsColors::QnStatisticsColors(const QnStatisticsColors &source):
     frame(source.frame),
     cpu(source.cpu),
     ram(source.ram),
-    networkLimit(source.networkLimit),
-    hdds(source.hdds),
-    networkIn(source.networkIn),
-    networkOut(source.networkOut)
+    hdds(source.hdds)
 {
-    ensureVectors();
+    ensureHdds();
 }
 
 QnStatisticsColors::~QnStatisticsColors() {
@@ -53,16 +49,6 @@ QColor QnStatisticsColors::hddByKey(const QString &key) const {
     return hdds[qMod(id, hdds.size())];
 }
 
-QColor QnStatisticsColors::networkInByKey(const QString &key) const {
-    int id = asciisum(key);
-    return networkIn[qMod(id, networkIn.size())];
-}
-
-QColor QnStatisticsColors::networkOutByKey(const QString &key) const {
-    int id = asciisum(key);
-    return networkOut[qMod(id, networkOut.size())];
-}
-
 
 void QnStatisticsColors::update(const QByteArray &serializedValue) {
     QnStatisticsColors other;
@@ -70,43 +56,25 @@ void QnStatisticsColors::update(const QByteArray &serializedValue) {
     if (!QJson::deserialize(serializedValue, &other))
         return;
 
-    grid            = other.grid;
-    frame           = other.frame;
-    cpu             = other.cpu;
-    ram             = other.ram;
-    networkLimit    = other.networkLimit;
-    hdds            = other.hdds;
-    networkIn       = other.networkIn;
-    networkOut      = other.networkOut;
-
-    ensureVectors();
+    grid    = other.grid;
+    frame   = other.frame;
+    cpu     = other.cpu;
+    ram     = other.ram;
+    hdds    = other.hdds;
+    ensureHdds();
 }
 
-void QnStatisticsColors::ensureVectors() {
-    if (hdds.isEmpty()) {
-        hdds << QColor(237, 237, 237)   // C: sda
-             << QColor(237, 200, 66)    // D: sdb
-             << QColor(103, 237, 66)    // E: sdc
-             << QColor(255, 131, 48)    // F: sdd
-             << QColor(178, 0, 255)     // etc
-             << QColor(0, 255, 255)
-             << QColor(38, 127, 0)
-             << QColor(255, 127, 127)
-             << QColor(201, 0, 0);
-    }
+void QnStatisticsColors::ensureHdds() {
+    if (hdds.size() > 0)
+        return;
 
-    if (networkIn.isEmpty()) {
-        networkIn   << QColor(255, 52, 52)
-                    << QColor(240, 255, 52)
-                    << QColor(228, 52, 255)
-                    << QColor(255, 52, 132);
-    }
-
-    if (networkOut.isEmpty()) {
-        networkOut  << QColor(52, 94, 255)
-                    << QColor(52, 198, 255)
-                    << QColor(52, 255, 140)
-                    << QColor(194, 255, 52);
-    }
-
+    hdds << QColor(237, 237, 237)   // C: sda
+         << QColor(237, 200, 66)    // D: sdb
+         << QColor(103, 237, 66)    // E: sdc
+         << QColor(255, 131, 48)    // F: sdd
+         << QColor(178, 0, 255)     // etc
+         << QColor(0, 255, 255)
+         << QColor(38, 127, 0)
+         << QColor(255, 127, 127)
+         << QColor(201, 0, 0);
 }

@@ -14,10 +14,13 @@
     extern const QMetaObject &getStaticMetaObject();                            \
 
 
+namespace QnCommonGlobals {}
+namespace Qn { using namespace QnCommonGlobals; }
+
 #ifdef Q_MOC_RUN
-class Qn
+class QnCommonGlobals
 #else
-namespace Qn
+namespace QnCommonGlobals
 #endif
 {
 #ifdef Q_MOC_RUN
@@ -28,35 +31,6 @@ public:
 #else
     Q_NAMESPACE
 #endif
-
-    /**
-     * Generic enumeration describing borders of a rectangle.
-     */
-    enum Border {
-        NoBorders = 0,
-        LeftBorder = 0x1,
-        RightBorder = 0x2,
-        TopBorder = 0x4,
-        BottomBorder = 0x8,
-        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
-    };
-    Q_DECLARE_FLAGS(Borders, Border)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
-
-
-    /**
-     * Generic enumeration describing corners of a rectangle.
-     */
-    enum Corner {
-        NoCorner = 0,
-        TopLeftCorner = 0x1,
-        TopRightCorner = 0x2,
-        BottomLeftCorner = 0x4,
-        BottomRightCorner = 0x8,
-        AllCorners = TopLeftCorner | TopRightCorner | BottomLeftCorner | BottomRightCorner
-    };
-    Q_DECLARE_FLAGS(Corners, Corner)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Corners)
 
     enum ExtrapolationMode {
         ConstantExtrapolation,
@@ -120,27 +94,6 @@ public:
     };
     Q_DECLARE_FLAGS(MotionTypes, MotionType);
 
-
-    enum TimePeriodType {
-        NullTimePeriod      = 0x1,  /**< No period. */
-        EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
-        NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
-    };
-    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
-
-    enum TimePeriodContent {
-        RecordingContent,
-        MotionContent,
-        TimePeriodContentCount
-    };
-
-} // namespace Qn
-
-
-Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
-Q_DECLARE_METATYPE(Qn::TimePeriodType);
-Q_DECLARE_METATYPE(Qn::TimePeriodContent);
-
+} // namespace QnCommonGlobals
 
 #endif // QN_COMMON_GLOBALS_H

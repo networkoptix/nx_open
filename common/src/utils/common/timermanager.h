@@ -27,7 +27,7 @@ class TimerManagerImpl;
 //!Timer events scheduler
 /*!
     Holds internal thread which calls method TimerEventHandler::onTimer
-    \note If some handler executes \a TimerEventHandler::onTimer for long time, some tasks can be called with delay, since all tasks are processed by a single thread
+    \note If some handler executes \a resume for long time, some tasks can be called with delay, since all tasks are processed by a single thread
     \note This timer require nor event loop (as QTimer), nor it's thread-dependent (as SystemTimer), but it delivers timer events to internal thread,
         so additional synchronization in timer event handler may be required
 */
@@ -44,7 +44,7 @@ public:
 
     /*!
         \param taskHandler
-        \param delay Timeout (millisecond) to call taskHandler->onTimer()
+        \param delay Timeout (millisecond) to call taskManager->resume()
         \return ID of created timer. Always non-zero
     */
     quint64 addTimer(

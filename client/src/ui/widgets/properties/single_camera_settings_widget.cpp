@@ -8,7 +8,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
-//TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+//TODO: #elric #gdm asked: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -34,8 +34,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_anyCameraChanges(false),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
-    m_hasScheduleControlsChanges(false),
-    m_hasMotionControlsChanges(false),
+    m_hasControlsChanges(false),
     m_readOnly(false),
     m_motionWidget(NULL),
     m_inUpdateMaxFps(false),
@@ -216,7 +215,8 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
         }
 #endif
 
-        serverConnection->getParamsAsync(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
+        qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >"); // TODO: evil!
+        serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QList<QPair<QString, QVariant> >&)) );
     }
 }
 
@@ -358,9 +358,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->analogGroupBox->setVisible(false);
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
-        QUrl url = QUrl::fromUserInput(m_camera->getUrl());
-        if (url.isValid() && url.port() != 80 && url.port() > 0)
-            webPageAddress += QLatin1Char(':') + QString::number(url.port());
 
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
@@ -425,8 +422,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
-    m_hasScheduleControlsChanges = false;
-    m_hasMotionControlsChanges = false;
+    m_hasControlsChanges = false;
 
     if (m_camera)
         updateMaxFPS();
@@ -525,7 +521,6 @@ void QnSingleCameraSettingsWidget::connectToMotionWidget() {
     assert(m_motionWidget);
 
     connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dbDataChanged()), Qt::UniqueConnection);
-    connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_motionRegionListChanged()), Qt::UniqueConnection);
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
@@ -549,7 +544,6 @@ void QnSingleCameraSettingsWidget::updateMotionAvailability() {
 void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity() {
     if(m_motionWidget)
         m_motionWidget->setMotionSensitivity(ui->sensitivitySlider->value());
-    m_hasMotionControlsChanges = true;
 }
 
 void QnSingleCameraSettingsWidget::updateLicenseText() {
@@ -621,15 +615,15 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
     updateMotionAvailability();
 }
 
-void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle)
+void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params)
 {
     if (!m_widgetsRecreator) {
         qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: widgets creator ptr is null, camera id: "
             << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
         return;
     }
-    if (status != 0) {
-        qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: http status code is not OK: " << status
+    if (httpStatusCode != 0) {
+        qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: http status code is not OK: " << httpStatusCode
             << ". Camera id: " << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
         return;
     }
@@ -703,7 +697,7 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
         return; /* Do not show message twice. */
 
     if(!m_camera)
-        return; // TODO: #Elric investigate why we get here with null camera
+        return; // TODO: investigate why we get here with null camera
 
     m_inUpdateMaxFps = true;
     int maxFps = m_camera->getMaxFps();
@@ -722,11 +716,6 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
 void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
     if (m_motionWidget)
         m_motionWidget->clearMotion();
-    m_hasMotionControlsChanges = false;
-}
-
-void QnSingleCameraSettingsWidget::at_motionRegionListChanged() {
-    m_hasMotionControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
@@ -770,7 +759,7 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
     at_cameraDataChanged();
 
     m_hasScheduleChanges = true;
-    m_hasScheduleControlsChanges = false;
+    m_hasControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
@@ -781,11 +770,11 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChan
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged() {
-    m_hasScheduleControlsChanges = true;
+    m_hasControlsChanges = true;
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied() {
-    m_hasScheduleControlsChanges = false;
+    m_hasControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged(int state) {

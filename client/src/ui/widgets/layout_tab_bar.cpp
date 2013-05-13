@@ -106,23 +106,8 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout *layout) const {
     return layout->name() + (snapshotManager()->isModified(resource) ? QLatin1String("*") : QString());
 }
 
-QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
-    if(!layout)
-        return QIcon();
-
-    QnLayoutResourcePtr resource = layout->resource();
-    if (!resource || !resource->locked())
-        return QIcon();
-    return qnSkin->icon("titlebar/lock.png");
-
-}
-
 void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout) {
     setTabText(m_layouts.indexOf(layout), layoutText(layout));
-}
-
-void QnLayoutTabBar::updateTabIcon(QnWorkbenchLayout *layout) {
-    setTabIcon(m_layouts.indexOf(layout), layoutIcon(layout));
 }
 
 
@@ -200,7 +185,7 @@ void QnLayoutTabBar::at_workbench_layoutsChanged() {
         int index = m_layouts.indexOf(layouts[i]);
         if(index == -1) {
             m_layouts.insert(i, layouts[i]);
-            insertTab(i, layoutIcon(layouts[i]), layoutText(layouts[i]));
+            insertTab(i, layoutText(layouts[i]));
         } else {
             moveTab(index, i);
         }
@@ -239,12 +224,6 @@ void QnLayoutTabBar::at_layout_nameChanged() {
     updateTabText(layout);
 }
 
-void QnLayoutTabBar::at_layout_lockedChanged() {
-    QnWorkbenchLayout *layout = checked_cast<QnWorkbenchLayout *>(sender());
-
-    updateTabIcon(layout);
-}
-
 void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     updateTabText(QnWorkbenchLayout::instance(resource));
 }
@@ -261,7 +240,6 @@ void QnLayoutTabBar::tabInserted(int index) {
 
     QnWorkbenchLayout *layout = m_layouts[index];
     connect(layout, SIGNAL(nameChanged()),          this, SLOT(at_layout_nameChanged()));
-    connect(layout, SIGNAL(lockedChanged()),        this, SLOT(at_layout_lockedChanged()));
 
     if(!name.isNull())
         layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */

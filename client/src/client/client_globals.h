@@ -13,10 +13,19 @@ namespace Qn {
         LocalNode,
         ServersNode,
         UsersNode,
-        ResourceNode,   /**< Node that represents a resource. */
-        ItemNode,       /**< Node that represents a layout item. */
-        BastardNode,    /**< Node that contains hidden resources. */
-        RecorderNode,   /**< Node that represents a recorder (VMAX, etc). */
+
+        /** Node that represents a resource. */
+        ResourceNode,
+
+        /** Node that represents a layout item. */
+        ItemNode,
+
+        /** Node that contains hidden resources. */
+        BastardNode,
+
+        /** Node that represents a recorder (VMAX, etc). */
+        RecorderNode,
+
         NodeTypeCount
     };
 
@@ -32,9 +41,6 @@ namespace Qn {
 
         /* Resource-based. */
         ResourceRole,                               /**< Role for QnResourcePtr. */
-        UserResourceRole,                           /**< Role for QnUserResourcePtr. */
-        LayoutResourceRole,                         /**< Role for QnLayoutResourcePtr. */
-        MediaServerResourceRole,                    /**< Role for QnMediaServerResourcePtr. */
         ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
         ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (QnResource::Flags). */
         ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
@@ -56,8 +62,6 @@ namespace Qn {
         ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
         ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
         ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
-        ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
-        ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
         ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
 
@@ -68,27 +72,8 @@ namespace Qn {
         ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
         ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
 
-        /* Context-based. */
-        CurrentLayoutResourceRole,
-        CurrentUserResourceRole,
-        CurrentLayoutMediaItemsRole,
-        CurrentMediaServerResourcesRole,
-
-        /* Arguments. */
-        SerializedDataRole,
-        ConnectionInfoRole,
-        FocusElementRole,
-        TimePeriodRole,
-        TimePeriodsRole,
-        MergedTimePeriodsRole,
-        StoredPasswordRole,
-        FileNameRole,
-
-
         /* Others. */
-        HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
-
-        ItemMouseCursorRole                         /**< Role for item's mouse cursor. */
+        HelpTopicIdRole                             /**< Role for item's help topic. Value of type int. */
     };
 
 
@@ -131,7 +116,6 @@ namespace Qn {
      * displayed on top of those from the layers with lower numbers.
      */
     enum ItemLayer {
-        EMappingLayer,              /**< Layer for E-Mapping background. */
         BackLayer,                  /**< Back layer. */
         PinnedLayer,                /**< Layer for pinned items. */
         PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
@@ -140,10 +124,23 @@ namespace Qn {
         ZoomedLayer,                /**< Layer for zoomed items. */
         FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
         EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer,                    /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
-        MessageBoxLayer,            /**< Layer for graphics text messages. */
-        LayerCount
+        UiLayer                     /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
     };
+
+
+    /**
+     * Generic enumeration describing borders of a rectangle.
+     */
+    enum Border {
+        NoBorders = 0,
+        LeftBorder = 0x1,
+        RightBorder = 0x2,
+        TopBorder = 0x4,
+        BottomBorder = 0x8,
+        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
+    };
+    Q_DECLARE_FLAGS(Borders, Border)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
 
 
     /**
@@ -193,8 +190,6 @@ namespace Qn {
 
         /* Layout-specific permissions. */
         AddRemoveItemsPermission                = 0x00100000,   /**< Permission to add or remove items from a layout. */
-        EditLayoutSettingsPermission            = 0x00200000,   /**< Permission to setup layout background or set locked flag. */
-        FullLayoutPermissions                   = ReadWriteSavePermission | WriteNamePermission | Qn::RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
         
         /* User-specific permissions. */
         WritePasswordPermission                 = 0x02000000,   /**< Permission to edit associated password. */

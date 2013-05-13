@@ -44,11 +44,11 @@ void QnBusinessEventRule::setEventResources(const QnResourceList &value) {
     m_eventResources = value;
 }
 
-QnBusinessEventParameters QnBusinessEventRule::eventParams() const {
+QnBusinessParams QnBusinessEventRule::eventParams() const {
     return m_eventParams;
 }
 
-void QnBusinessEventRule::setEventParams(const QnBusinessEventParameters &params)
+void QnBusinessEventRule::setEventParams(const QnBusinessParams &params)
 {
     m_eventParams = params;
 }
@@ -67,7 +67,7 @@ BusinessActionType::Value QnBusinessEventRule::actionType() const {
 
 void QnBusinessEventRule::setActionType(const BusinessActionType::Value value) {
     m_actionType = value;
-    //TODO: #GDM fill action params with default values? filter action resources?
+    //TODO: #gdm fill action params with default values? filter action resources?
 }
 
 QnResourceList QnBusinessEventRule::actionResources() const {
@@ -78,12 +78,12 @@ void QnBusinessEventRule::setActionResources(const QnResourceList &value) {
     m_actionResources = value;
 }
 
-QnBusinessActionParameters QnBusinessEventRule::actionParams() const
+QnBusinessParams QnBusinessEventRule::actionParams() const
 {
     return m_actionParams;
 }
 
-void QnBusinessEventRule::setActionParams(const QnBusinessActionParameters &params)
+void QnBusinessEventRule::setActionParams(const QnBusinessParams &params)
 {
     m_actionParams = params;
 }

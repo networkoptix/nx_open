@@ -16,26 +16,18 @@
  * This problem is solved by introducing a separate function that returns a set
  * of all window frame sections that intersect the given rectangle.
  */
-class FrameSectionQueryable {
+class FrameSectionQuearyable {
 public:
     /**
      * Virtual destructor.
      */
-    virtual ~FrameSectionQueryable() {}
+    virtual ~FrameSectionQuearyable() {}
 
     /**
      * \param region                    Region to get frame sections for, in widget coordinates.
      * \returns                         Window frame sections that intersect the given region. 
      */
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const = 0;
-
-    /**
-     * \param section                   Frame section to get cursor for.
-     * \returns                         Cursor to use for the given section.
-     */
-    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const {
-        return Qn::calculateHoverCursorShape(section);
-    }
 
     /**
      * This function calculates frame section with the highest priority that
@@ -47,16 +39,6 @@ public:
      */
     Qt::WindowFrameSection windowFrameSectionAt(const QRectF &region) const {
         return toNaturalQtFrameSection(windowFrameSectionsAt(region));
-    }
-
-    /**
-     * Helper overload for Qt frame sections.
-     *
-     * \param section                   Frame section to get cursor for.
-     * \returns                         Cursor to use for the given section.
-     */
-    QCursor windowCursorAt(Qt::WindowFrameSection section) const {
-        return windowCursorAt(Qn::toQnFrameSection(section));
     }
 
 };

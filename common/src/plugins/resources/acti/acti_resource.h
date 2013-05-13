@@ -25,7 +25,7 @@ public:
     QnActiResource();
     ~QnActiResource();
 
-    virtual QString getDriverName() const override;
+    virtual QString manufacture() const;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
@@ -75,11 +75,11 @@ private:
     QList<int> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
     void initializePtz();
 private:
+    bool m_hasAudio;
     QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
     QList<int> m_availFps[MAX_STREAMS];
     QList<int> m_availBitrate;
     int m_rtspPort;
-    bool m_hasAudio;
     QScopedPointer<QnActiPtzController> m_ptzController;
 };
 

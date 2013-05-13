@@ -21,7 +21,7 @@ public:
     virtual QIODevice *open(const QString &fileName, QIODevice::OpenMode openMode) = 0;
 
     /**
-     * TODO: #vasilenko doxydocs!
+     * TODO: #VASILENKO doxydocs!
      */
     virtual int getChunkLen() const = 0;
 
@@ -100,7 +100,7 @@ public:
     virtual bool isCatalogAccessible() = 0;
 
     /**
-     * TODO: #vasilenko doxydocs!
+     * TODO: #VASILENKO doxydocs!
      */
     virtual bool isRealFiles() const{return true;}
 
@@ -139,7 +139,7 @@ public:
 private:
     QHash<QString, StorageResourceFactory> m_factoryByProtocol;
     StorageResourceFactory m_defaultFactory;
-    QMutex m_mutex; // TODO: #vasilenko this mutex is not used, is it intentional?
+    QMutex m_mutex; // TODO: #VASILENKO this mutex is not used, is it intentional?
 };
 
 #endif // QN_STORAGE_RESOURCE_H

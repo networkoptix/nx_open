@@ -41,16 +41,12 @@
 //#define QT_USE_FAST_OPERATOR_PLUS
 
 
-/* Don't use deprecated Qt functions. */
-#define QT_NO_DEPRECATED
-
-
 /* Define override specifier. */
 #ifdef _MSC_VER
 #   define override override
 #elif defined(__GNUC__)
 #   if (GCC_VERSION >= 40700)
-//#   define override override
+#       define override override
 #   else
 #       define override
 #   endif
@@ -135,17 +131,12 @@ namespace Qn {
 }
 #endif // __cplusplus
 
-// TODO: #Elric move to client_globals
+// TODO: move to client_globals
 #define InvalidUtcOffset _id(INT64_MAX)
 
-// TODO: #Elric move out
+// TODO: move out
 #ifdef __cplusplus
 #include <QtCore/QString>
-
-/** Helper function to mark strings that are not to be translated. */
-inline QString lit(const QByteArray &data) {
-    return QLatin1String(data);
-}
 
 /** Helper function to mark strings that are not to be translated. */
 inline QString lit(const char *s) {

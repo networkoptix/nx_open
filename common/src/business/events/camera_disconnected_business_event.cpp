@@ -10,7 +10,7 @@ QnCameraDisconnectedBusinessEvent::QnCameraDisconnectedBusinessEvent(
 {
 }
 
-bool QnCameraDisconnectedBusinessEvent::checkCondition(ToggleState::Value state, const QnBusinessEventParameters& params) const
+bool QnCameraDisconnectedBusinessEvent::checkCondition(ToggleState::Value state, const QnBusinessParams& params) const
 {
     if (!base_type::checkCondition(state, params))
         return false;

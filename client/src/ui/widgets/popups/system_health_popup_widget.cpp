@@ -29,7 +29,7 @@ QnSystemHealthPopupWidget::QnSystemHealthPopupWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setBorderColor(qnGlobals->popupFrameSystem());
+    setBorderColor(qnGlobals->popupFrameSystem()); //TODO: #GDM skin color
     connect(ui->fixButton,      SIGNAL(clicked()), this, SLOT(at_fixButton_clicked()));
     connect(ui->postponeButton, SIGNAL(clicked()), this, SLOT(at_postponeButton_clicked()));
 }
@@ -95,7 +95,7 @@ void QnSystemHealthPopupWidget::at_fixButton_clicked() {
     case QnSystemHealth::EmailIsEmpty:
         {
             QnActionParameters params(context()->user());
-            params.setArgument<QString>(Qn::FocusElementRole, lit("email"));
+            params.setFocusElement(QLatin1String("email"));
             menu()->trigger(Qn::UserSettingsAction, params);
         }
         break;
@@ -123,7 +123,7 @@ void QnSystemHealthPopupWidget::at_fixUserLabel_linkActivated(const QString &anc
     if (!user)
         return;
     QnActionParameters params(user);
-    params.setArgument<QString>(Qn::FocusElementRole, lit("email"));
+    params.setFocusElement(QLatin1String("email"));
     menu()->trigger(Qn::UserSettingsAction, params);
 
     QWidget* p = dynamic_cast<QWidget *>(sender()->parent());

@@ -1,8 +1,4 @@
-
 #include "camera_pool.h"
-
-#include <memory>
-
 #include "test_camera_processor.h"
 #include "plugins/resources/test_camera/testcamera_const.h"
 
@@ -12,32 +8,19 @@ int MEDIA_PORT = 4985;
 
 // ---------------- QnCameraDiscovery -----------------
 
-//TODO/IMPL support multiple interface listening
-
 class QnCameraDiscoveryListener: public QnLongRunnable
 {
-public:
-    QnCameraDiscoveryListener( const QStringList& localInterfacesToListen )
-    :
-        m_localInterfacesToListen( localInterfacesToListen )
-    {
-    }
-
 protected:
     virtual void run() override
     {
-        std::auto_ptr<UDPSocket> discoverySock;
-        if( m_localInterfacesToListen.isEmpty() )
-            discoverySock.reset( new UDPSocket(TestCamConst::DISCOVERY_PORT) );
-        else
-            discoverySock.reset( new UDPSocket(m_localInterfacesToListen[0], TestCamConst::DISCOVERY_PORT) );
-        discoverySock->setReadTimeOut(100);
+        UDPSocket m_discoverySock(TestCamConst::DISCOVERY_PORT);
+        m_discoverySock.setReadTimeOut(100);
         quint8 buffer[1024*8];
         QString peerAddress;
         unsigned short peerPort;
         while(!m_needStop)
         {
-            int readed = discoverySock->recvFrom(buffer, sizeof(buffer), peerAddress, peerPort);
+            int readed = m_discoverySock.recvFrom(buffer, sizeof(buffer), peerAddress, peerPort);
             if (readed > 0)
             {
                 if (QByteArray((const char*)buffer, readed).startsWith(TestCamConst::TEST_CAMERA_FIND_MSG))
@@ -47,38 +30,29 @@ protected:
                     QByteArray rez(TestCamConst::TEST_CAMERA_ID_MSG);
                     rez.append(';');
                     rez.append(camResponse);
-                    discoverySock->setDestAddr(peerAddress, peerPort);
-                    discoverySock->sendTo(rez.data(), rez.size());
+                    m_discoverySock.setDestAddr(peerAddress, peerPort);
+                    m_discoverySock.sendTo(rez.data(), rez.size());
                 }
             }
         }
     }
-
-private:
-    const QStringList m_localInterfacesToListen;
 };
 
 
 // ------- QnCameraPool -----------------
 
-static QnCameraPool* inst = NULL;
-
-void QnCameraPool::initGlobalInstance( QnCameraPool* _inst )
-{
-    inst = _inst;
-}
+Q_GLOBAL_STATIC(QnCameraPool, inst);
 
 QnCameraPool* QnCameraPool::instance()
 {
-    return inst;
+    return inst();
 }
 
-QnCameraPool::QnCameraPool( const QStringList& localInterfacesToListen )
-:
-    QnTcpListener( localInterfacesToListen.isEmpty() ? QHostAddress::Any : QHostAddress(localInterfacesToListen[0]), MEDIA_PORT ),
+QnCameraPool::QnCameraPool():
+    QnTcpListener(QHostAddress::Any, MEDIA_PORT),
     m_cameraNum(0)
 {
-    m_discoveryListener = new QnCameraDiscoveryListener(localInterfacesToListen);
+    m_discoveryListener = new QnCameraDiscoveryListener();
     m_discoveryListener->start();
 }   
 

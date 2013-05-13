@@ -11,8 +11,7 @@
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
-#include <client/client_settings.h>
-#include "ui/dialogs/event_log_dialog.h"
+#include <utils/settings.h>
 
 class QAction;
 class QMenu;
@@ -33,7 +32,7 @@ class QnCameraAdditionDialog;
 class QnVideoCamera;
 class QnPopupCollectionWidget;
 
-// TODO: #Elric move out.
+// TODO: move out.
 struct QnThumbnailsSearchState {
     QnThumbnailsSearchState(): step(0) {}
     QnThumbnailsSearchState(const QnTimePeriod &period, qint64 step): period(period), step(step) {}
@@ -130,7 +129,7 @@ namespace detail {
 } // namespace detail
 
 
-// TODO: #Elric split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
+// TODO: split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
 /**
  * This class implements logic for client actions.
  */
@@ -159,7 +158,7 @@ protected:
 
     QString newLayoutName(const QnUserResourcePtr &user, const QString &baseName = tr("New layout")) const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
-    void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF(), const QRectF &zoomWindow = QRectF(0.0, 0.0, 1.0, 1.0), const QUuid &zoomUuid = QUuid()) const;
+    void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF()) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, bool usePosition, const QPointF &position = QPointF()) const;
@@ -198,10 +197,6 @@ protected:
         return m_businessRulesDialog.data();
     }
 
-    QnEventLogDialog *businessEventsLogDialog() const {
-        return m_businessEventsLogDialog.data();
-    }
-
     QnPopupCollectionWidget *popupCollectionWidget() const {
         return m_popupCollectionWidget.data();
     }
@@ -233,7 +228,6 @@ protected slots:
     void at_debugIncrementCounterAction_triggered();
     void at_debugDecrementCounterAction_triggered();
     void at_debugShowResourcePoolAction_triggered();
-    void at_debugCalibratePtzAction_triggered();
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
@@ -267,8 +261,6 @@ protected slots:
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
-    void at_businessEventsLogAction_triggered();
-    void at_webClientAction_triggered();
     void at_getMoreLicensesAction_triggered();
     void at_openServerSettingsAction_triggered();
     void at_openPopupSettingsAction_triggered();
@@ -287,7 +279,6 @@ protected slots:
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
-    void at_serverLogsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
     void at_thumbnailsSearchAction_triggered();
@@ -311,8 +302,6 @@ protected slots:
     void at_setCurrentLayoutItemSpacing20Action_triggered();
     void at_setCurrentLayoutItemSpacing30Action_triggered();
 
-    void at_createZoomWindowAction_triggered();
-
     void at_rotate0Action_triggered();
     void at_rotate90Action_triggered();
     void at_rotate180Action_triggered();
@@ -325,9 +314,6 @@ protected slots:
     void at_ptzSavePresetAction_triggered();
     void at_ptzGoToPresetAction_triggered();
     void at_ptzManagePresetsAction_triggered();
-
-    void at_setAsBackgroundAction_triggered();
-    void at_backgroundImageStored(const QString &filename, bool success);
 
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
@@ -368,16 +354,13 @@ protected slots:
 
     void at_serverSettings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
 
-    void at_notificationSoundDownloaded(const QString& filename, bool ok);
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
     void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
-#ifdef Q_OS_WIN
     QString binaryFilterName(bool readOnly) const;
-#endif
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
     void notifyAboutUpdate(bool alwaysNotify);
@@ -415,7 +398,6 @@ private:
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
-    QWeakPointer<QnEventLogDialog> m_businessEventsLogDialog;
     QWeakPointer<QnPopupCollectionWidget> m_popupCollectionWidget;
     QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
 

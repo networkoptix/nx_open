@@ -1,22 +1,21 @@
 #include "system_health_business_action.h"
 
 #include <business/events/abstract_business_event.h>
-#include <business/business_action_parameters.h>
 
 #include <utils/common/synctime.h>
 
 
 QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, int eventResourceId):
-    base_type(BusinessActionType::ShowPopup, QnBusinessEventParameters())
+    base_type(QnBusinessParams())
 {
-    QnBusinessEventParameters runtimeParams;
-    runtimeParams.setEventType(BusinessEventType::Value(BusinessEventType::SystemHealthMessage + message));
-    runtimeParams.setEventTimestamp(qnSyncTime->currentUSecsSinceEpoch());
-    runtimeParams.setEventResourceId(eventResourceId);
+    QnBusinessParams runtimeParams;
+    QnBusinessEventRuntime::setEventType(&runtimeParams, BusinessEventType::Value(BusinessEventType::SystemHealthMessage + message));
+    QnBusinessEventRuntime::setEventTimestamp(&runtimeParams, qnSyncTime->currentUSecsSinceEpoch());
+    QnBusinessEventRuntime::setEventResourceId(&runtimeParams, eventResourceId);
     setRuntimeParams(runtimeParams);
 
-    QnBusinessActionParameters actionParams;
-    actionParams.setUserGroup(QnBusinessActionParameters::AdminOnly);
+    QnBusinessParams actionParams;
+    BusinessActionParameters::setUserGroup(&actionParams, 1);
     setParams(actionParams);
 
 }

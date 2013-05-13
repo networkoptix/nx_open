@@ -7,6 +7,22 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
+
+namespace QnBusinessEventRuntime {
+
+    static QLatin1String inputPortId( "inputPortId" );
+
+    QString getInputPortId(const QnBusinessParams &params) {
+        return params.value(inputPortId, QString()).toString();
+    }
+
+    void setInputPortId(QnBusinessParams *params, const QString &value) {
+        (*params)[inputPortId] = value;
+    }
+
+}
+
+
 QnCameraInputEvent::QnCameraInputEvent(
     const QnResourcePtr& resource,
     ToggleState::Value toggleState,
@@ -27,11 +43,11 @@ const QString& QnCameraInputEvent::inputPortID() const
     return m_inputPortID;
 }
 
-bool QnCameraInputEvent::checkCondition(ToggleState::Value state, const QnBusinessEventParameters &params) const {
+bool QnCameraInputEvent::checkCondition(ToggleState::Value state, const QnBusinessParams &params) const {
     if (!base_type::checkCondition(state, params))
         return false;
 
-    QString inputPort = params.getInputPortId();
+    QString inputPort = QnBusinessEventRuntime::getInputPortId(params);
     return inputPort.isEmpty() || inputPort == m_inputPortID;
 }
 
@@ -51,9 +67,10 @@ bool QnCameraInputEvent::isResourcesListValid(const QnResourceList &resources) {
     return true;
 }
 
-QnBusinessEventParameters QnCameraInputEvent::getRuntimeParams() const {
-    QnBusinessEventParameters params = base_type::getRuntimeParams();
-    params.setInputPortId(m_inputPortID);
+QnBusinessParams QnCameraInputEvent::getRuntimeParams() const {
+    QnBusinessParams params = base_type::getRuntimeParams();
+    QnBusinessEventRuntime::setInputPortId(&params, m_inputPortID);
+    QnBusinessEventRuntime::setParamsKey(&params, m_inputPortID);
     return params;
 }
 

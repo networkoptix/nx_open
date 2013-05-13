@@ -36,7 +36,7 @@ void QnFglrxFullScreen::updateFglrxMode(bool force) {
 
     menu()->registerAlias(Qn::EffectiveMaximizeAction, m_fglrxMode ? Qn::MaximizeAction : Qn::FullscreenAction);
 
-    // TODO: #Elric using setVisible here is a hack.
+    // TODO: using setVisible here is a hack.
     action(Qn::MaximizeAction)->setVisible(m_fglrxMode); 
     action(Qn::FullscreenAction)->setVisible(!m_fglrxMode);
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>487</width>
-    <height>509</height>
+    <width>360</width>
+    <height>442</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -357,7 +357,7 @@
    <item>
     <widget class="QLabel" name="recordingWarningLabel">
      <property name="text">
-      <string>Very powerful machine is required for Best quality and high resolution.</string>
+      <string/>
      </property>
     </widget>
    </item>

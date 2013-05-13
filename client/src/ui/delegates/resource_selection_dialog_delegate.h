@@ -46,6 +46,9 @@ private:
     QLabel* m_warningLabel;
 };
 
+// TODO: #GDM please spend some time reading the sources of QObject::tr() and Q_OBJECT macro.
+// These classes lacked Q_OBJECT macro => tr() calls would have passed invalid context to translate().
+
 class QnMotionEnabledDelegate: public QnCheckResourceAndWarnDelegate<QnVirtualCameraResource> {
     Q_OBJECT
     typedef QnCheckResourceAndWarnDelegate base_type;

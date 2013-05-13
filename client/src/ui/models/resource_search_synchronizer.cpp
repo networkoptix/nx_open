@@ -64,7 +64,7 @@ void QnResourceSearchSynchronizer::start() {
     connect(m_model,    SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)),    this, SLOT(at_model_rowsAboutToBeRemoved(const QModelIndex &, int, int)));
     connect(m_model,    SIGNAL(criteriaChanged()),                                      this, SLOT(at_model_criteriaChanged()));
 
-    // TODO: #Elric we're assuming the model is empty, which may not be true.
+    // TODO: we're assuming the model is empty, which may not be true.
 
     m_submit = m_update = true;
     m_hasPendingUpdates = false;

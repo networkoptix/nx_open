@@ -17,23 +17,18 @@ public:
     QColor frame;
     QColor cpu;
     QColor ram;
-    QColor networkLimit;
     QVector<QColor> hdds;
-    QVector<QColor> networkIn;
-    QVector<QColor> networkOut;
 
     QColor hddByKey(const QString &key) const;
-    QColor networkInByKey(const QString &key) const;
-    QColor networkOutByKey(const QString &key) const;
 
     void update(const QByteArray &serializedValue);
 private:
 
     /**
-     * @brief ensureHdds        Make sure all color arrays contain at least one element.
-     *                          Fill by default values if empty.
+     * @brief ensureHdds        Make sure hdd's color array contain at least one element.
+     *                          Fill by default values if it is empty.
      */
-    void ensureVectors();
+    void ensureHdds();
 };
 
 Q_DECLARE_METATYPE(QnStatisticsColors)

@@ -5,7 +5,6 @@
 #include <QtGui/QBoxLayout>
 #include <QtGui/QFileDialog>
 #include <QtGui/QToolButton>
-#include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
 #include <QtGui/QFileOpenEvent>
@@ -46,7 +45,7 @@
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "file_processor.h"
-#include "client/client_settings.h"
+#include "utils/settings.h"
 
 #include "resource_browser_widget.h"
 #include "dwm.h"
@@ -144,10 +143,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up scene & view. */
-    m_scene.reset(new QGraphicsScene(this));
-    setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    setHelpTopic(scene, Qn::MainWindow_Scene_Help);
 
-    m_view.reset(new QnGraphicsView(m_scene.data()));
+    m_view = new QnGraphicsView(scene);
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
@@ -164,12 +163,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up model & control machinery. */
-    display()->setScene(m_scene.data());
-    display()->setView(m_view.data());
+    display()->setScene(scene);
+    display()->setView(m_view);
     display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
-    m_controller.reset(new QnWorkbenchController(this));
-    m_ui.reset(new QnWorkbenchUi(this));
+    m_controller = new QnWorkbenchController(this);
+    m_ui = new QnWorkbenchUi(this);
     m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
 
@@ -188,7 +187,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::FullscreenAction));
     addAction(action(Qn::AboutAction));
     addAction(action(Qn::SystemSettingsAction));
-    addAction(action(Qn::BusinessEventsLogAction));
+    addAction(action(Qn::BusinessEventsAction));
     addAction(action(Qn::OpenFileAction));
     addAction(action(Qn::ConnectToServerAction));
     addAction(action(Qn::OpenNewTabAction));
@@ -213,7 +212,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
 
-    menu()->setTargetProvider(m_ui.data());
+    menu()->setTargetProvider(m_ui);
 
 
     /* Tab bar. */
@@ -262,7 +261,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_viewLayout = new QVBoxLayout();
     m_viewLayout->setContentsMargins(0, 0, 0, 0);
     m_viewLayout->setSpacing(0);
-    m_viewLayout->addWidget(m_view.data());
+    m_viewLayout->addWidget(m_view);
 
     m_globalLayout = new QVBoxLayout();
     m_globalLayout->setContentsMargins(0, 0, 0, 0);
@@ -472,7 +471,7 @@ bool QnMainWindow::event(QEvent *event) {
         if(m_mainMenuButton->isVisible())
             m_mainMenuButton->click();
             
-        QApplication::sendEvent(m_ui.data(), event);
+        QApplication::sendEvent(m_ui, event);
         result = true;
     }
 
@@ -577,8 +576,7 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
 #ifdef Q_OS_WIN
 bool QnMainWindow::winEvent(MSG *message, long *result)
 {
-    /* Note that we may get here from destructor, so check for dwm is needed. */
-    if(m_dwm && m_dwm->widgetWinEvent(message, result))
+    if(m_dwm->widgetWinEvent(message, result))
         return true;
 
     return base_type::winEvent(message, result);

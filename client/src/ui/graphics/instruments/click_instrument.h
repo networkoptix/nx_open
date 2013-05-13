@@ -23,7 +23,7 @@ private:
     ClickInfoPrivate *d;
 };
 
-// TODO: #Elric rework this into a processor.
+// TODO: rework this into a processor.
 
 /**
  * This instrument listens to click events and emits corresponding signals

@@ -70,8 +70,7 @@ public:
     virtual void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) = 0;
     virtual void deserializeBusinessRules(QnBusinessEventRules&, const QByteArray& data) = 0;
     virtual void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) = 0;
-    virtual void deserializeBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionList, const QByteArray& data) = 0;
-    virtual void deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data) = 0;
+    virtual void deserializeKvPairs(QnKvPairList& kvPairs, const QByteArray& data) = 0;
     virtual void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data) = 0;
 
     virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
@@ -84,9 +83,8 @@ public:
     virtual void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) = 0;
     virtual void serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data) = 0;
     virtual void serializeBusinessAction(const QnAbstractBusinessActionPtr&, QByteArray& data) = 0;
-    virtual void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) = 0;
-    virtual void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data) = 0;
-    virtual void serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data) = 0;
+    virtual void serializeKvPair(const QnKvPair& kvPair, QByteArray& data) = 0;
+    virtual void serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data) = 0;
     virtual void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data) = 0;
 
 protected:

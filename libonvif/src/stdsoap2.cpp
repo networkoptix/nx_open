@@ -63,10 +63,8 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 
 #include "stdsoap2.h"
 
-#ifndef WIN32
 #ifndef HAVE_POLL
 #error "HAVE_POLL is not defined!!!"
-#endif
 #endif
 
 #if GSOAP_VERSION != GSOAP_LIB_VERSION
