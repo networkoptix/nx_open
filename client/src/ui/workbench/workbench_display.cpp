@@ -1206,7 +1206,8 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
-        gridRaisedConeItem()->setRaisedWidget(widget, itemGeometry(widget->item()));
+        gridRaisedConeItem()->setRaisedWidget(widget,
+                                              expanded(widget->aspectRatio(), enclosingGeometry, Qt::KeepAspectRatio));
 
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 

@@ -27,6 +27,7 @@ private:
     QRectF m_targetRect;
     QGraphicsWidget* m_raisedWidget;
     QRect m_sourceGeometry;
+    qreal m_rotation;
 };
 
 #endif // GRID_RAISED_CONE_ITEM_H

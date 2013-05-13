@@ -4,20 +4,42 @@
 
 namespace {
 
+    struct PathHelper {
+        /** Absolute offset value that will be used on the rect */
+        qreal offset;
+
+        /** Center of the rect */
+        QPointF center;
+    };
+
+    QPointF rotated(const QPointF &point, const QPointF& center, qreal degrees) {
+        if (qFuzzyIsNull(degrees))
+            return point;
+
+        QTransform transform;
+        transform.translate(center.x(), center.y());
+        transform.rotate(degrees);
+        transform.translate(-center.x(), -center.y());
+
+        return transform.map(point);
+    }
+
     /**
      * @brief createBeamPath    Creates painter path for graphics beam from source corner to target corner.
      * @param source            Source corner point.
      * @param target            Target corner point.
-     * @param offsetSource      Absolute offset value that will be used on source rect.
-     * @param offsetTarget      Absolute offset value that will be used on target rect.
+     * @param sourceHelper      Helper for the source rect.
+     * @param targetHelper      Helper for the target rect.
+     * @param rotation          Rotation in degrees.
      * @param signX             Correct sign of x-coord offset.
      * @param signY             Correct sign of y-coord offset.
      * @return                  Painter path.
      */
     QPainterPath createBeamPath(QPointF source,
                                 QPointF target,
-                                qreal offsetSource,
-                                qreal offsetTarget,
+                                PathHelper sourceHelper,
+                                PathHelper targetHelper,
+                                qreal rotation,
                                 int signX,
                                 int signY) {
 
@@ -25,19 +47,18 @@ namespace {
 
         path.setFillRule(Qt::WindingFill);
 
-        path.moveTo(target);
-        path.lineTo(source);
-        path.lineTo(source);
-        path.lineTo(source.x() + signX * offsetSource, source.y());
-        path.lineTo(target.x() + signX * offsetTarget, target.y());
+        path.moveTo(rotated(target, targetHelper.center, rotation));
+        path.lineTo(rotated(source, sourceHelper.center, rotation));
+        path.lineTo(rotated(QPointF(source.x() + signX * sourceHelper.offset, source.y()), sourceHelper.center, rotation));
+        path.lineTo(rotated(QPointF(target.x() + signX * targetHelper.offset, target.y()), targetHelper.center, rotation));
         path.closeSubpath();
 
-        path.moveTo(target);
-        path.lineTo(source);
-        path.lineTo(source);
-        path.lineTo(source.x(), source.y() + signY * offsetSource);
-        path.lineTo(target.x(), target.y() + signY * offsetTarget);
+        path.moveTo(rotated(target, targetHelper.center, rotation));
+        path.lineTo(rotated(source, sourceHelper.center, rotation));
+        path.lineTo(rotated(QPointF(source.x(), source.y() + signY * sourceHelper.offset), sourceHelper.center, rotation));
+        path.lineTo(rotated(QPointF(target.x(), target.y() + signY * targetHelper.offset), targetHelper.center, rotation));
         path.closeSubpath();
+
         return path;
     }
 
@@ -52,7 +73,8 @@ namespace {
 
 QnGridRaisedConeItem::QnGridRaisedConeItem(QGraphicsItem *parent) :
     QGraphicsObject(parent),
-    m_raisedWidget(NULL)
+    m_raisedWidget(NULL),
+    m_rotation(0)
 {
 }
 
@@ -61,7 +83,18 @@ QnGridRaisedConeItem::~QnGridRaisedConeItem() {
 }
 
 QRectF QnGridRaisedConeItem::boundingRect() const {
-    return m_sourceRect.united(m_targetRect);
+    QRectF bounding = m_sourceRect.united(m_targetRect);
+    if (qFuzzyIsNull(m_rotation))
+        return bounding;
+
+    QPointF c = bounding.center();
+
+    QTransform transform;
+    transform.translate(c.x(), c.y());
+    transform.rotate(m_rotation);
+    transform.translate(-c.x(), -c.y());
+
+    return transform.mapRect(bounding);
 }
 
 
@@ -79,6 +112,8 @@ void QnGridRaisedConeItem::setRaisedWidget(QGraphicsWidget *widget, QRectF oldGe
         return;
 
     connect(m_raisedWidget, SIGNAL(geometryChanged()), this, SLOT(updateGeometry()));
+    connect(m_raisedWidget, SIGNAL(rotationChanged()), this, SLOT(updateGeometry()));
+
     m_sourceRect = oldGeometry;
     updateGeometry();
 }
@@ -88,8 +123,11 @@ void QnGridRaisedConeItem::updateGeometry() {
     if(m_raisedWidget == NULL)
         return;
     prepareGeometryChange();
+
     m_targetRect = m_raisedWidget->geometry();
+    m_rotation = m_raisedWidget->rotation();
 }
+
 
 void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(option)
@@ -97,35 +135,52 @@ void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     if(m_raisedWidget == NULL)
         return;
 
-    const qreal offsetSource = qMin(m_sourceRect.height(), m_sourceRect.width()) * 0.2;
-    const qreal offsetTarget = qMin(m_targetRect.height(), m_targetRect.width()) * 0.1;;
+    PathHelper sourceHelper;
+    sourceHelper.offset = qMin(m_sourceRect.height(), m_sourceRect.width()) * 0.2;
+    sourceHelper.center = m_sourceRect.center();
+
+    PathHelper targetHelper;
+    targetHelper.offset = qMin(m_targetRect.height(), m_targetRect.width()) * 0.1;
+    targetHelper.center = m_targetRect.center();
 
     painter->fillPath(createBeamPath(m_sourceRect.topLeft(),
                                      m_targetRect.topLeft(),
-                                     offsetSource,
-                                     offsetTarget,
+                                     sourceHelper,
+                                     targetHelper,
+                                     m_rotation,
                                      1, 1), Qt::green);
 
     painter->fillPath(createBeamPath(m_sourceRect.topRight(),
                                      m_targetRect.topRight(),
-                                     offsetSource,
-                                     offsetTarget,
+                                     sourceHelper,
+                                     targetHelper,
+                                     m_rotation,
                                      -1, 1), Qt::green);
 
     painter->fillPath(createBeamPath(m_sourceRect.bottomLeft(),
                                      m_targetRect.bottomLeft(),
-                                     offsetSource,
-                                     offsetTarget,
+                                     sourceHelper,
+                                     targetHelper,
+                                     m_rotation,
                                      1, -1), Qt::green);
 
     painter->fillPath(createBeamPath(m_sourceRect.bottomRight(),
                                      m_targetRect.bottomRight(),
-                                     offsetSource,
-                                     offsetTarget,
+                                     sourceHelper,
+                                     targetHelper,
+                                     m_rotation,
                                      -1, -1), Qt::green);
 
-    painter->fillPath(createSourceRectPath(m_sourceRect, offsetSource), Qt::green);
+    QPointF offset = m_sourceRect.center();
+    painter->translate(offset);
+    painter->rotate(m_rotation);
+    painter->translate(-offset);
 
+    painter->fillPath(createSourceRectPath(m_sourceRect, sourceHelper.offset), Qt::green);
+
+    painter->translate(offset);
+    painter->rotate(-m_rotation);
+    painter->translate(-offset);
 
 }
 
