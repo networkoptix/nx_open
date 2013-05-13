@@ -12,6 +12,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 #include <client/client_settings.h>
+#include "ui/dialogs/event_log_dialog.h"
 
 class QAction;
 class QMenu;
@@ -197,6 +198,10 @@ protected:
         return m_businessRulesDialog.data();
     }
 
+    QnEventLogDialog *businessEventsLogDialog() const {
+        return m_businessEventsLogDialog.data();
+    }
+
     QnPopupCollectionWidget *popupCollectionWidget() const {
         return m_popupCollectionWidget.data();
     }
@@ -262,6 +267,7 @@ protected slots:
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
+    void at_businessEventsLogAction_triggered();
     void at_webClientAction_triggered();
     void at_getMoreLicensesAction_triggered();
     void at_openServerSettingsAction_triggered();
@@ -409,6 +415,7 @@ private:
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
+    QWeakPointer<QnEventLogDialog> m_businessEventsLogDialog;
     QWeakPointer<QnPopupCollectionWidget> m_popupCollectionWidget;
     QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
 

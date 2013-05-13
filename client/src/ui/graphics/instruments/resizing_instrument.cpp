@@ -94,15 +94,25 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         qreal effectRadius = qMax(effectRect.width(), effectRect.height());
         section = queryable->windowFrameSectionAt(QRectF(itemPos - QPointF(effectRadius, effectRadius), QSizeF(2 * effectRadius, 2 * effectRadius)));
     }
-    if(!isResizeGrip(section))
+    if(section == Qt::NoSection)
         return false;
 
     /* Ok to go. */
     m_startSize = widget->size();
-    m_startPinPoint = widget->mapToParent(Qn::calculatePinPoint(widget->rect(), section));
     m_section = section;
     m_widget = widget;
     m_constrained = dynamic_cast<ConstrainedGeometrically *>(widget);
+    if(section == Qt::TitleBarArea) {
+        m_startPinPoint = cwiseDiv(itemPos, m_startSize);
+
+        /* Make sure we don't get NaNs in startPinPoint. */
+        if(qFuzzyIsNull(m_startSize.width()))
+            m_startPinPoint.setX(0.0);
+        if(qFuzzyIsNull(m_startSize.height()))
+            m_startPinPoint.setY(0.0);
+    } else {
+        m_startPinPoint = widget->mapToParent(Qn::calculatePinPoint(widget->rect(), section));
+    }
 
     dragProcessor()->mousePressEvent(viewport, event);
 
@@ -146,19 +156,30 @@ void ResizingInstrument::dragMove(DragInfo *info) {
     }
 
     /* Calculate new size. */
-    QSizeF newSize = m_startSize + Qn::calculateSizeDelta(
-        widget->mapFromScene(info->mouseScenePos()) - widget->mapFromScene(info->mousePressScenePos()), 
-        m_section
-    );
-    QSizeF minSize = widget->effectiveSizeHint(Qt::MinimumSize);
-    QSizeF maxSize = widget->effectiveSizeHint(Qt::MaximumSize);
-    newSize = QSizeF(
-        qBound(minSize.width(), newSize.width(), maxSize.width()),
-        qBound(minSize.height(), newSize.height(), maxSize.height())
-    );
-    /* We don't handle heightForWidth. */
+    QSizeF newSize;
+    if(m_section == Qt::TitleBarArea) {
+        newSize = widget->size();
+    } else {
+        newSize = m_startSize + Qn::calculateSizeDelta(
+            widget->mapFromScene(info->mouseScenePos()) - widget->mapFromScene(info->mousePressScenePos()), 
+            m_section
+        );
+        QSizeF minSize = widget->effectiveSizeHint(Qt::MinimumSize);
+        QSizeF maxSize = widget->effectiveSizeHint(Qt::MaximumSize);
+        newSize = QSizeF(
+            qBound(minSize.width(), newSize.width(), maxSize.width()),
+            qBound(minSize.height(), newSize.height(), maxSize.height())
+        );
+        /* We don't handle heightForWidth. */
+    }
 
-    QPointF newPos = widget->pos() + m_startPinPoint - widget->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), m_section));
+    QPointF newPos;
+    if(m_section == Qt::TitleBarArea) {
+        QPointF itemPos = widget->mapFromScene(info->mouseScenePos());
+        newPos = widget->mapToParent(itemPos - QnGeometry::cwiseMul(m_startPinPoint, newSize));
+    } else {
+        newPos = widget->pos() + m_startPinPoint - widget->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), m_section));
+    }
 
     if(m_constrained != NULL) {
         QRectF newGeometry = m_constrained->constrainedGeometry(QRectF(newPos, newSize), Qn::calculatePinPoint(m_section));

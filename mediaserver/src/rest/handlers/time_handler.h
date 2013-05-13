@@ -10,7 +10,7 @@ public:
 
 protected:
     virtual int executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) override;
-    virtual QString description(TCPSocket *tcpSocket) const override;
+    virtual QString description() const override;
 };
 
 #endif // QN_TIME_HANDLER_H

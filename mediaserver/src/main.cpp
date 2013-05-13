@@ -73,6 +73,7 @@
 #include "rest/handlers/exec_action_handler.h"
 #include "rest/handlers/time_handler.h"
 #include "rest/handlers/ping_handler.h"
+#include "rest/handlers/events_handler.h"
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
 #include "rest/handlers/ext_bevent_handler.h"
@@ -774,6 +775,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/onEvent", new QnExternalBusinessEventHandler());
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
     QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
+    QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
     QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
 
@@ -848,6 +850,7 @@ QHostAddress QnMain::getPublicAddress()
 void QnMain::run()
 {
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
+    QnEventsDB::init();
 
     // Create SessionManager
     QnSessionManager::instance()->start();
@@ -1136,6 +1139,7 @@ void QnMain::run()
     QnBusinessEventConnector::initStaticInstance( NULL );
 
     QnBusinessRuleProcessor::fini();
+    QnEventsDB::fini();
 
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );

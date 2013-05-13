@@ -144,6 +144,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_manager(display()->instrumentManager()),
+    m_selectionOverlayHackInstrumentDisabled(false),
     m_cursorPos(invalidCursorPos()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
@@ -206,10 +207,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
     m_resizingInstrument->setEffectRadius(8);
 
-    m_moveInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
     m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
-    m_resizingInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
-    m_resizingInstrument->resizeHoverInstrument()->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Item, mouseEventTypes, this));
@@ -300,8 +298,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_moveInstrument,           SIGNAL(moveFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              selectionOverlayHackInstrument, SLOT(recursiveEnable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandStarted(QGraphicsView *)),                                                 selectionOverlayHackInstrument, SLOT(recursiveDisable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandFinished(QGraphicsView *)),                                                selectionOverlayHackInstrument, SLOT(recursiveEnable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),          selectionOverlayHackInstrument, SLOT(recursiveDisable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),         selectionOverlayHackInstrument, SLOT(recursiveEnable()));
 
     connect(m_dragInstrument,           SIGNAL(dragProcessStarted(QGraphicsView *)),                                                m_moveInstrument,               SLOT(recursiveDisable()));
     connect(m_dragInstrument,           SIGNAL(dragProcessFinished(QGraphicsView *)),                                               m_moveInstrument,               SLOT(recursiveEnable()));
@@ -771,6 +767,9 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     if(m_resizedWidget == NULL)
         return;
 
+    m_selectionOverlayHackInstrumentDisabled = true;
+    display()->selectionOverlayHackInstrument()->recursiveDisable();
+
     workbench()->setItem(Qn::RaisedRole, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
 
     display()->bringToFront(m_resizedWidget);
@@ -778,8 +777,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
 }
 
-void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
-    Q_UNUSED(info)
+void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     if(m_resizedWidget != item || item == NULL)
         return;
 
@@ -844,6 +842,10 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     display()->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
     m_resizedWidgetRect = QRect();
     m_resizedWidget = NULL;
+    if(m_selectionOverlayHackInstrumentDisabled) {
+        display()->selectionOverlayHackInstrument()->recursiveEnable();
+        m_selectionOverlayHackInstrumentDisabled = false;
+    }
 }
 
 void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {

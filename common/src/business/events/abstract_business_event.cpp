@@ -126,38 +126,6 @@ namespace BusinessEventType
     }
 }
 
-namespace QnBusinessEventRuntime {
-
-    static QLatin1String typeStr("eventType");
-    static QLatin1String timestampStr("eventTimestamp");
-    static QLatin1String resourceIdStr("eventResourceId");
-
-    BusinessEventType::Value getEventType(const QnBusinessParams &params) {
-        return (BusinessEventType::Value) params.value(typeStr, BusinessEventType::NotDefined).toInt();
-    }
-
-    void setEventType(QnBusinessParams* params, BusinessEventType::Value value) {
-        (*params)[typeStr] = (int)value;
-    }
-
-    qint64 getEventTimestamp(const QnBusinessParams &params) {
-        return params.value(timestampStr, BusinessEventType::NotDefined).toLongLong();
-    }
-
-    void setEventTimestamp(QnBusinessParams* params, qint64 value) {
-        (*params)[timestampStr] = value;
-    }
-
-    int getEventResourceId(const QnBusinessParams &params) {
-        return params.value(resourceIdStr).toInt();
-    }
-
-    void setEventResourceId(QnBusinessParams* params, int value) {
-        (*params)[resourceIdStr] = value;
-    }
-
-}
-
 QnAbstractBusinessEvent::QnAbstractBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, ToggleState::Value toggleState, qint64 timeStamp):
     m_eventType(eventType),
     m_timeStamp(timeStamp),
@@ -170,12 +138,11 @@ QnAbstractBusinessEvent::~QnAbstractBusinessEvent()
 {
 }
 
-QnBusinessParams QnAbstractBusinessEvent::getRuntimeParams() const {
-    QnBusinessParams params;
-    QnBusinessEventRuntime::setEventType(&params, m_eventType);
-    QnBusinessEventRuntime::setEventTimestamp(&params, m_timeStamp);
-    QnBusinessEventRuntime::setEventResourceId(&params, m_resource ? m_resource->getId().toInt() : 0);
-    QnBusinessEventRuntime::setParamsKey(&params, QString::number(m_eventType)); //default value, will be overwritten in required cases
+QnBusinessEventParameters QnAbstractBusinessEvent::getRuntimeParams() const {
+    QnBusinessEventParameters params;
+    params.setEventType(m_eventType);
+    params.setEventTimestamp(m_timeStamp);
+    params.setEventResourceId(m_resource ? m_resource->getId().toInt() : 0);
 
     return params;
 }

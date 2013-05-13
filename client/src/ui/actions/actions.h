@@ -219,6 +219,7 @@ namespace Qn {
          */
         SystemSettingsAction,
 
+
         /**
          * Opens about dialog.
          */
@@ -246,6 +247,11 @@ namespace Qn {
          * Opens business events editing dialog.
          */
         BusinessEventsAction,
+
+        /**
+         * Opens business events log dialog.
+         */
+        BusinessEventsLogAction,
 
         //ShowMediaServerLogs,
 

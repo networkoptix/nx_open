@@ -86,7 +86,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                         // do not count 2--N channels of multichannel cameras as conflict
                         quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
                         if (ips)
-                            ipsList[ips].insert(newNetRes->getMAC().toString());
+                            ipsList[ips].insert(newNetRes->getMAC().toString().toAscii());
                     }
                 }
 

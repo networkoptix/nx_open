@@ -58,14 +58,14 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     if (fields & QnBusiness::ActionParamsField) {
 
-        QnBusinessParams params = model->actionParams();
+        QnBusinessActionParameters params = model->actionParams();
 
-        int quality = ui->qualityComboBox->findData((int) QnBusinessActionParameters::getStreamQuality(params));
+        int quality = ui->qualityComboBox->findData((int) params.getStreamQuality());
         if (quality >= 0)
             ui->qualityComboBox->setCurrentIndex(quality);
 
-        ui->fpsSpinBox->setValue(QnBusinessActionParameters::getFps(params));
-        ui->afterSpinBox->setValue(QnBusinessActionParameters::getRecordAfter(params));
+        ui->fpsSpinBox->setValue(params.getFps());
+        ui->afterSpinBox->setValue(params.getRecordAfter());
     }
 }
 
@@ -73,11 +73,10 @@ void QnRecordingBusinessActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnBusinessParams params;
+    QnBusinessActionParameters params;
 
-    QnBusinessActionParameters::setFps(&params, ui->fpsSpinBox->value());
-    QnBusinessActionParameters::setRecordAfter(&params, ui->afterSpinBox->value());
-    QnBusinessActionParameters::setStreamQuality(&params,
-        (QnStreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
+    params.setFps(ui->fpsSpinBox->value());
+    params.setRecordAfter(ui->afterSpinBox->value());
+    params.setStreamQuality((QnStreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
     model()->setActionParams(params);
 }

@@ -241,6 +241,7 @@ private:
     /** Instrument that tracks left clicks on items. */
     ClickInstrument *m_itemLeftClickInstrument;
 
+    bool m_selectionOverlayHackInstrumentDisabled;
 
 
     /* Keyboard control-related state. */
@@ -275,7 +276,6 @@ private:
 
     /** Target geometries for concatenation of dragged and replaced item lists. */
     QList<QRect> m_dragGeometries;
-
 
 
     /* Screen recording-related state. */

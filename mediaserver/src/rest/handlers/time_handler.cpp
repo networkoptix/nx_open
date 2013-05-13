@@ -20,7 +20,7 @@ int QnTimeHandler::executeGet(const QString &path, const QnRequestParamList &par
     return CODE_OK;
 }
 
-QString QnTimeHandler::description(TCPSocket *) const
+QString QnTimeHandler::description() const
 {
     return "Returns server UTC time and time zone";
 }

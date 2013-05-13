@@ -53,15 +53,15 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         return false;
 
     //TODO: #GDM check if camera is visible to us
-    QnBusinessActionParameters::UserGroup userGroup = QnBusinessActionParameters::getUserGroup(businessAction->getParams());
+    QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().getUserGroup();
     if (userGroup == QnBusinessActionParameters::AdminOnly
             && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
         qDebug() << "popup for admins received, we are not admin";
         return false;
     }
 
-    QnBusinessParams params = businessAction->getRuntimeParams();
-    BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
+    QnBusinessEventParameters params = businessAction->getRuntimeParams();
+    BusinessEventType::Value eventType = params.getEventType();
 
     if (eventType >= BusinessEventType::UserDefined)
         return false;
@@ -70,7 +70,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     if (healthMessage >= 0) {
         QnResourceList resources;
 
-        int resourceId = QnBusinessEventRuntime::getEventResourceId(params);
+        int resourceId = params.getEventResourceId();
         QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
         if (resource)
             resources << resource;
@@ -83,7 +83,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         return false;
     }
 
-    int id = QnBusinessEventRuntime::getEventResourceId(businessAction->getRuntimeParams());
+    int id = businessAction->getRuntimeParams().getEventResourceId();
     QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::rfAllResources);
     QString resource = res ? res->getName() : QString();
 

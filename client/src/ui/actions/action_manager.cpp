@@ -635,6 +635,13 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
+    factory(Qn::BusinessEventsLogAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Log...")).
+        shortcut(tr("Ctrl+L")).
+        autoRepeat(false);
+
     factory(Qn::WebClientAction).
         flags(Qn::Tree | Qn::NoTarget).
         text(tr("Open Web Client")).

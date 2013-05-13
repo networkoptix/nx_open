@@ -117,6 +117,6 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
     return CODE_OK;
 }
 
-QString QnStorageSpaceHandler::description(TCPSocket *) const {
+QString QnStorageSpaceHandler::description() const {
     return QString(); // TODO: #Elric
 }

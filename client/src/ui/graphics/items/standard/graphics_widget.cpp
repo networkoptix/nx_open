@@ -17,6 +17,7 @@
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/scene_transformations.h>
 #include <ui/common/geometry.h>
+#include <ui/common/cursor_cache.h>
 
 class GraphicsWidgetSceneData: public QObject {
 public:
@@ -563,6 +564,22 @@ Qn::WindowFrameSections GraphicsWidget::windowFrameSectionsAt(const QRectF &regi
         return Qn::NoSection;
     } else {
         return Qn::calculateRectangularFrameSections(windowFrameRect(), rect(), region);
+    }
+}
+
+QCursor GraphicsWidget::windowCursorAt(Qn::WindowFrameSection section) const {
+    if(section & Qn::ResizeSections) {
+        QTransform sceneTransform = this->sceneTransform();
+
+        /* Note that rotation is estimated using a very simple method here. 
+         * A better way would be to calculate local rotation at cursor position,
+         * but currently there is not need for such precision. */
+        QRectF rect = this->rect();
+        qreal rotation = QnGeometry::atan2(sceneTransform.map(rect.topRight()) - sceneTransform.map(rect.topLeft())) * 180.0 / M_PI;
+
+        return QnCursorCache::instance()->cursor(Qn::calculateHoverCursorShape(section), rotation, 5.0);
+    } else {
+        return FrameSectionQueryable::windowCursorAt(section);
     }
 }
 

@@ -31,15 +31,15 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *
     Q_UNUSED(guard)
 
     if (fields & QnBusiness::ActionParamsField)
-        ui->adminsCheckBox->setChecked(QnBusinessActionParameters::getUserGroup(model->actionParams()) == QnBusinessActionParameters::AdminOnly);
+        ui->adminsCheckBox->setChecked(model->actionParams().getUserGroup() == QnBusinessActionParameters::AdminOnly);
 }
 
 void QnPopupBusinessActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnBusinessParams params;
-    QnBusinessActionParameters::setUserGroup(&params, ui->adminsCheckBox->isChecked()
+    QnBusinessActionParameters params;
+    params.setUserGroup(ui->adminsCheckBox->isChecked()
                                              ? QnBusinessActionParameters::AdminOnly
                                              : QnBusinessActionParameters::EveryOne);
     model()->setActionParams(params);
