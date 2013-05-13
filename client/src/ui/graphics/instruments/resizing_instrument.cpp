@@ -131,7 +131,8 @@ bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
 }
 
 void ResizingInstrument::startDragProcess(DragInfo *info) {
-    emit resizingProcessStarted(info->view(), m_widget.data(), ResizingInfo(this));
+    ResizingInfo resizingInfo(this);
+    emit resizingProcessStarted(info->view(), m_widget.data(), &resizingInfo);
 }
 
 void ResizingInstrument::startDrag(DragInfo *info) {
@@ -143,7 +144,8 @@ void ResizingInstrument::startDrag(DragInfo *info) {
         return;
     }
 
-    emit resizingStarted(info->view(), m_widget.data(), ResizingInfo(this));
+    ResizingInfo resizingInfo(this);
+    emit resizingStarted(info->view(), m_widget.data(), &resizingInfo);
     m_resizingStartedEmitted = true;
 }
 
@@ -191,17 +193,21 @@ void ResizingInstrument::dragMove(DragInfo *info) {
     widget->resize(newSize);
     widget->setPos(newPos);
 
-    emit resizing(info->view(), widget, ResizingInfo(this));
+    ResizingInfo resizingInfo(this);
+    emit resizing(info->view(), widget, &resizingInfo);
 }
 
 void ResizingInstrument::finishDrag(DragInfo *info) {
-    if(m_resizingStartedEmitted)
-        emit resizingFinished(info->view(), m_widget.data(), ResizingInfo(this));
+    if(m_resizingStartedEmitted) {
+        ResizingInfo resizingInfo(this);
+        emit resizingFinished(info->view(), m_widget.data(), &resizingInfo);
+    }
 
     m_widget.clear();
     m_constrained = NULL;
 }
 
 void ResizingInstrument::finishDragProcess(DragInfo *info) {
-    emit resizingProcessFinished(info->view(), m_widget.data(), ResizingInfo(this));
+    ResizingInfo resizingInfo(this);
+    emit resizingProcessFinished(info->view(), m_widget.data(), &resizingInfo);
 }
