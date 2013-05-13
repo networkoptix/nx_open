@@ -17,8 +17,8 @@ public:
 
     static QString conflictString(const QnBusinessEventParameters &params, QLatin1Char delim = QLatin1Char('\n'));
     static QString motionUrl(const QnBusinessEventParameters &params);
-private:
     static QString eventTextString(BusinessEventType::Value eventType, const QnBusinessEventParameters &params);
+private:
     static QString reasonString(const QnBusinessEventParameters &params);
     static QString timestampString(const QnBusinessEventParameters &params, int aggregationCount);
 };

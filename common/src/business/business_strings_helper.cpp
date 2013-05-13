@@ -267,21 +267,16 @@ QString QnBusinessStringsHelper::eventTextString(BusinessEventType::Value eventT
     case BusinessEventType::Camera_Motion:
         break;
     case BusinessEventType::Camera_Input:
-        {
-            result += QObject::tr("Input port: %1")
-                .arg(params.getInputPortId());
-            result += QLatin1Char('\n');
-        }
+        result = QObject::tr("Input port: %1").arg(params.getInputPortId());
         break;
     case BusinessEventType::Storage_Failure:
     case BusinessEventType::Network_Issue:
     case BusinessEventType::MediaServer_Failure:
-        result += reasonString(params);
+        result = reasonString(params);
         break;
     case BusinessEventType::Camera_Ip_Conflict:
     case BusinessEventType::MediaServer_Conflict:
-        result += QLatin1Char('\n');
-        result += conflictString(params);
+        result = conflictString(params, QLatin1Char(' '));
         break;
     default:
         break;

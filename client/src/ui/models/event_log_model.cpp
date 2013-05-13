@@ -173,25 +173,37 @@ QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAct
             }
         case DescriptionColumn: {
             BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
+            QString result;
+
             switch (eventType) {
-            case BusinessEventType::Camera_Disconnect:
-            case BusinessEventType::Camera_Input:
-                break;
-            case BusinessEventType::Camera_Motion:
-                return lit("Click me to see video");
-                break;
-            case BusinessEventType::Storage_Failure:
-            case BusinessEventType::Network_Issue:
-            case BusinessEventType::MediaServer_Failure:
-                return QnBusinessStringsHelper::eventReason(action.getRuntimeParams());
-                break;
-            case BusinessEventType::Camera_Ip_Conflict:
-            case BusinessEventType::MediaServer_Conflict:
-                return QnBusinessStringsHelper::conflictString(action.getRuntimeParams(), QLatin1Char(' '));
-                break;
+                case BusinessEventType::Camera_Disconnect:
+                    break;
+                case BusinessEventType::Camera_Input:
+                    result = QnBusinessStringsHelper::eventTextString(eventType, action.getRuntimeParams());
+                    break;
+                case BusinessEventType::Camera_Motion:
+                    result = lit("Click me to see video");
+                    break;
+                case BusinessEventType::Storage_Failure:
+                case BusinessEventType::Network_Issue:
+                case BusinessEventType::MediaServer_Failure: {
+                    result = QnBusinessStringsHelper::eventReason(action.getRuntimeParams());
+                    break;
+                }
+                case BusinessEventType::Camera_Ip_Conflict:
+                case BusinessEventType::MediaServer_Conflict: {
+                    result = QnBusinessStringsHelper::conflictString(action.getRuntimeParams(), QLatin1Char(' '));
+                    break;
+                }
             }
+            if (!BusinessEventType::hasToggleState(eventType)) {
+                int cnt = action.getAggregationCount();
+                if (cnt > 1)
+                    result += QString(lit(" (%1 times)")).arg(cnt);
+            }
+            return result;
         }
-    }    
+    } 
     return QVariant();
 }
 
