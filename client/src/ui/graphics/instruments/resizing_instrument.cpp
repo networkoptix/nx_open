@@ -34,10 +34,30 @@ namespace {
 
 } // anonymous namespace
 
+
+// -------------------------------------------------------------------------- //
+// ResizingInfo
+// -------------------------------------------------------------------------- //
 Qt::WindowFrameSection ResizingInfo::frameSection() const {
     return m_instrument->m_section;
 }
 
+QPoint ResizingInfo::mouseScreenPos() const {
+    return m_info->mouseScreenPos();
+}
+
+QPoint ResizingInfo::mouseViewportPos() const {
+    return m_info->mouseViewportPos();
+}
+
+QPointF ResizingInfo::mouseScenePos() const {
+    return m_info->mouseScenePos();
+}
+
+
+// -------------------------------------------------------------------------- //
+// ResizingInstrument
+// -------------------------------------------------------------------------- //
 ResizingInstrument::ResizingInstrument(QObject *parent):
     base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_resizeHoverInstrument(new ResizeHoverInstrument(this)),

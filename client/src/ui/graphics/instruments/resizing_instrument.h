@@ -14,6 +14,10 @@ class ResizingInfo {
 public:
     Qt::WindowFrameSection frameSection() const;
 
+    QPoint mouseScreenPos() const;
+    QPoint mouseViewportPos() const;
+    QPointF mouseScenePos() const;
+
 protected:
     friend class ResizingInstrument;
 
@@ -23,6 +27,7 @@ private:
     DragInfo *m_info;
     ResizingInstrument *m_instrument;
 };
+
 
 /**
  * This instrument implements resizing of QGraphicsWidget. 

@@ -27,6 +27,7 @@ public:
 signals:
     void zoomRectCreated(QnMediaResourceWidget *widget, const QRectF &zoomRect);
     void zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect);
+    void zoomTargetChanged(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTarget);
 
     void zoomWindowProcessStarted(QnMediaResourceWidget *widget);
     void zoomWindowStarted(QnMediaResourceWidget *widget);
@@ -84,7 +85,7 @@ private:
     void registerWidget(QnMediaResourceWidget *widget);
     void unregisterWidget(QnMediaResourceWidget *widget);
     void registerLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget);
-    void unregisterLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget);
+    void unregisterLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget, bool deleteWindowWidget = true);
 
     void updateOverlayVisibility(QnMediaResourceWidget *widget);
     void updateWindowFromWidget(QnMediaResourceWidget *widget);
@@ -106,6 +107,7 @@ private:
     QSet<QObject *> m_processingWidgets;
     QWeakPointer<QnMediaResourceWidget> m_zoomedWidget;
     QWeakPointer<ZoomWindowWidget> m_windowTarget;
+    QWeakPointer<ZoomWindowWidget> m_storedWindowWidget;
 };
 
 #endif // QN_ZOOM_WINDOW_INSTRUMENT_H
