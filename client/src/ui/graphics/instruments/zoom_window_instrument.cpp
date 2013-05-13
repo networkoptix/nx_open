@@ -47,8 +47,6 @@ public:
 
         setAcceptedMouseButtons(Qt::LeftButton);
         setClickableButtons(Qt::LeftButton);
-        setHandlingFlag(ItemHandlesResizing, false);
-        setHandlingFlag(ItemHandlesMovement, false);
 
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
