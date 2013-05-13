@@ -1074,44 +1074,6 @@ void QnApiPbSerializer::serializeBusinessActionList(const QnAbstractBusinessActi
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeBusinessActionList(QSqlQuery& actionsQuery, QByteArray& data)
-{
-    QTime t;
-    t.restart();
-
-    pb::BusinessActionList pb_businessActionList;
-
-    QSqlRecord rec = actionsQuery.record();
-    int actionTypeIdx = rec.indexOf(lit("action_type"));
-    int actionParamIdx = rec.indexOf(lit("action_params"));
-    int runtimeParamIdx = rec.indexOf(lit("runtime_params"));
-    int businessRuleIdx = rec.indexOf(lit("business_rule_id"));
-    int toggleStateIdx = rec.indexOf(lit("toggle_state"));
-    int aggregationCntIdx = rec.indexOf(lit("aggregation_count"));
-
-
-    while (actionsQuery.next()) 
-    {
-        pb::BusinessAction* ba = pb_businessActionList.add_businessaction();
-
-        ba->set_actiontype((pb::BusinessActionType) actionsQuery.value(actionTypeIdx).toInt());
-
-        ba->set_actionparams(actionsQuery.value(actionParamIdx).toByteArray());
-        ba->set_runtimeparams(actionsQuery.value(runtimeParamIdx).toByteArray());
-
-        ba->set_businessruleid(actionsQuery.value(businessRuleIdx).toInt());
-        ba->set_togglestate( (pb::ToggleStateType) actionsQuery.value(toggleStateIdx).toInt());
-        ba->set_aggregationcount(actionsQuery.value(aggregationCntIdx).toInt());
-    }
-
-    qWarning() << "serialize time1=" << t.elapsed();
-
-    data.resize(pb_businessActionList.ByteSize());
-    pb_businessActionList.SerializeToArray(data.data(), data.size());
-
-    qWarning() << "serialize time2=" << t.elapsed();
-}
-
 void QnApiPbSerializer::serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data)
 {
     pb::KvPairs pb_kvPairs;

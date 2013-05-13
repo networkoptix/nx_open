@@ -20,6 +20,7 @@ static QLatin1String PARAM_NAMES[] =
 };
 
 static const char DELIMITER('$');
+static const char STRING_LIST_DELIM('\n');
 
 QnBusinessEventParameters::QnBusinessEventParameters():
     m_eventType(BusinessEventType::NotDefined),
@@ -180,7 +181,7 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
                     result.m_source = QString::fromUtf8(field);
                     break;
                 case conflictsParam:
-                    result.m_conflicts = QString::fromUtf8(field).split(L'\n');
+                    result.m_conflicts = QString::fromUtf8(field).split(lit(STRING_LIST_DELIM));
                     break;
             }
         }
@@ -212,7 +213,7 @@ void serializeStringListParam(QByteArray& result, const QStringList& value)
     if (!value.isEmpty()) {
         for (int i = 0; i < value.size(); ++i) {
             if (i > 0)
-                result += '\n';
+                result += STRING_LIST_DELIM;
             result += value[i];
         }
     }
@@ -234,15 +235,6 @@ QByteArray QnBusinessEventParameters::serialize() const
     serializeStringParam(result, m_reasonText, m_defaultParams.m_reasonText);
     serializeStringParam(result, m_source, m_defaultParams.m_source);
     serializeStringListParam(result, m_conflicts);
-
-    /*
-    for (int i = 0; i < m_params.size(); ++i) 
-    {
-        if (m_params[i] != m_defaultParams[i])
-            result += m_params[i].toString().toAscii();
-        result += DELIMITER;
-    }
-    */
 
     int resLen = result.size();
     for (; resLen > 0 && result.data()[resLen-1] == DELIMITER; --resLen);

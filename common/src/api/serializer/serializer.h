@@ -2,7 +2,6 @@
 #define _API_SERIALIZER_H_
 
 #include <QByteArray>
-#include <QtSql>
 
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
@@ -86,7 +85,6 @@ public:
     virtual void serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data) = 0;
     virtual void serializeBusinessAction(const QnAbstractBusinessActionPtr&, QByteArray& data) = 0;
     virtual void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) = 0;
-    virtual void serializeBusinessActionList(QSqlQuery& actionsQuery, QByteArray& data) = 0;
     virtual void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data) = 0;
     virtual void serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data) = 0;
     virtual void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data) = 0;
