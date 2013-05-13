@@ -24,6 +24,8 @@ public:
     void loadList(const QStringList &filenames);
     void addUploading(const QString &filename);
     void updateTitle(const QString &filename, const QString &title);
+
+    bool loaded() const;
 signals:
     void listUnloaded();
     void listLoaded();

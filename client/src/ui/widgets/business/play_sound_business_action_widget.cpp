@@ -28,15 +28,14 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
     QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
     ui->pathComboBox->setModel(soundModel);
 
-    //TODO: #GDM update only required
-    connect(soundModel, SIGNAL(itemChanged(QString)), this, SLOT(at_soundModel_itemChanged(QString)));
+    connect(soundModel, SIGNAL(listLoaded()), this, SLOT(updateCurrentIndex()));
 }
 
 QnPlaySoundBusinessActionWidget::~QnPlaySoundBusinessActionWidget()
 {
 }
 
-void QnPlaySoundBusinessActionWidget::updateSoundUrl() {
+void QnPlaySoundBusinessActionWidget::updateCurrentIndex() {
     QnScopedValueRollback<bool> guard(&m_updating, true);
     Q_UNUSED(guard)
 
@@ -50,7 +49,7 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     if (fields & QnBusiness::ActionParamsField) {
         m_filename = QnBusinessActionParameters::getSoundUrl(model->actionParams());
-        updateSoundUrl();
+        updateCurrentIndex();
     }
 }
 
@@ -59,6 +58,9 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
         return;
 
     QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    if (!soundModel->loaded())
+        return;
+
     QString filename = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
     QnBusinessParams params;
     QnBusinessActionParameters::setSoundUrl(&params, filename);
@@ -77,7 +79,7 @@ void QnPlaySoundBusinessActionWidget::at_playButton_clicked() {
 }
 
 void QnPlaySoundBusinessActionWidget::at_manageButton_clicked() {
-    QScopedPointer<QnNotificationSoundManagerDialog> dialog(new QnNotificationSoundManagerDialog());
+    QScopedPointer<QnNotificationSoundManagerDialog> dialog(new QnNotificationSoundManagerDialog(this));
     dialog->exec();
 }
 

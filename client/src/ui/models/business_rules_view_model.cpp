@@ -809,9 +809,6 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         return tr("%n Camera(s)", "", cameras.size());
     } else if (m_actionType == BusinessActionType::PlaySound) {
         QString filename = QnBusinessActionParameters::getSoundUrl(m_actionParams);
-        if (filename.isEmpty())
-            return tr("Select a sound");
-
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         return soundModel->titleByFilename(filename);
     }

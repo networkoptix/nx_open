@@ -24,7 +24,7 @@ protected slots:
 
 private slots:
     void paramsChanged();
-    void updateSoundUrl();
+    void updateCurrentIndex();
 
     void at_playButton_clicked();
     void at_manageButton_clicked();
