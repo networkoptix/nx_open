@@ -244,11 +244,9 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
 
 QString QnBusinessStringsHelper::conflictString(const QnBusinessEventParameters &params, QLatin1Char delim)
 {
-    QString source = params.getSource();
     QStringList conflicts = params.getConflicts();
 
-    QString result = source;
-    result += QObject::tr("conflicted with:");
+    QString result = QObject::tr("%1 conflicted with:").arg(params.getSource());
     foreach(const QString& entity, conflicts) {
         result += delim;
         result += entity;
