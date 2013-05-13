@@ -114,12 +114,81 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 
 QnLightBusinessActionVectorPtr QnEventLogDialog::merge2(const QList <QnLightBusinessActionVectorPtr>& eventsList) const
 {
-    return QnLightBusinessActionVectorPtr();
+    QnLightBusinessActionVectorPtr events1 = eventsList[0];
+    QnLightBusinessActionVectorPtr events2 = eventsList[1];
+
+    QnLightBusinessActionVectorPtr events = QnLightBusinessActionVectorPtr(new QnLightBusinessActionVector);
+    events->resize(events1->size() + events2->size());
+
+    int idx1 = 0, idx2 = 0;
+
+    QnLightBusinessActionVector& v1  = *events1.data();
+    QnLightBusinessAction* ptr1 = &v1[0];
+
+    QnLightBusinessActionVector& v2  = *events2.data();
+    QnLightBusinessAction* ptr2 = &v2[0];
+
+    QnLightBusinessActionVector& vDst = *events.data();
+    QnLightBusinessAction* dst  = &vDst[0];
+
+
+    while (idx1 < events1->size() && idx2 < events2->size())
+    {
+        if (ptr1[idx1].timestamp() <= ptr2[idx2].timestamp())
+            *dst++ = ptr1[idx1++];
+        else
+            *dst++ = ptr2[idx2++];
+    }
+
+    while (idx1 < events1->size())
+        *dst++ = ptr1[idx1++];
+
+    while (idx2 < events2->size())
+        *dst++ = ptr2[idx2++];
+
+    return events;
 }
 
 QnLightBusinessActionVectorPtr QnEventLogDialog::mergeN(const QList <QnLightBusinessActionVectorPtr>& eventsList) const
 {
-    return QnLightBusinessActionVectorPtr();
+    QnLightBusinessActionVectorPtr events = QnLightBusinessActionVectorPtr(new QnLightBusinessActionVector);
+
+    QVector<int> idx;
+    idx.resize(eventsList.size());
+    
+    QVector<QnLightBusinessAction*> ptr;
+    QVector<QnLightBusinessAction*> ptrEnd;
+    int totalSize = 0;
+    for (int i = 0; i < eventsList.size(); ++i)
+    {
+        QnLightBusinessActionVector& tmp  = *eventsList[i].data();
+        ptr << &tmp[0];
+        ptrEnd << &tmp[0] + eventsList[i]->size();
+        totalSize += eventsList[i]->size();
+    }
+    events->resize(totalSize);
+    QnLightBusinessActionVector& vDst = *events.data();
+    QnLightBusinessAction* dst  = &vDst[0];
+
+    int curIdx = -1;
+    do
+    {
+        qint64 curTimestamp = DATETIME_NOW;
+        curIdx = -1;
+        for (int i = 0; i < eventsList.size(); ++i)
+        {
+            if (ptr[i] < ptrEnd[i] && ptr[i]->timestamp() < curTimestamp) {
+                curIdx = i;
+                curTimestamp = ptr[i]->timestamp();
+            }
+        }
+        if (curIdx >= 0) {
+            *dst++ = *ptr[curIdx];
+            ptr[curIdx]++;
+        }
+    } while (curIdx >= 0);
+
+    return events;
 }
 
 QnLightBusinessActionVectorPtr QnEventLogDialog::mergeEvents(const QList <QnLightBusinessActionVectorPtr>& eventsList) const
@@ -141,7 +210,8 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
     m_requests.remove(requestNum);
     if (!events->empty())
         m_allEvents << events;
-    if (m_requests.isEmpty()) {
+    if (m_requests.isEmpty()) 
+    {
         m_model->setEvents(mergeEvents(m_allEvents));
         m_allEvents.clear();
         ui->gridEvents->setDisabled(false);
