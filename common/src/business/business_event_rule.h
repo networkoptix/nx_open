@@ -6,6 +6,7 @@
 #include <business/business_logic_common.h>
 
 #include <core/resource/resource_fwd.h>
+#include "business_action_parameters.h"
 
 /**
 * This class define relation between business event and action
@@ -29,8 +30,8 @@ public:
     QnResourceList eventResources() const;
     void setEventResources(const QnResourceList &value);
 
-    QnBusinessParams eventParams() const;
-    void setEventParams(const QnBusinessParams& params);
+    QnBusinessEventParameters eventParams() const;
+    void setEventParams(const QnBusinessEventParameters& params);
 
     ToggleState::Value eventState() const;
     void setEventState(ToggleState::Value state);
@@ -41,8 +42,8 @@ public:
     QnResourceList actionResources() const;
     void setActionResources(const QnResourceList &value);
 
-    QnBusinessParams actionParams() const;
-    void setActionParams(const QnBusinessParams& params);
+    QnBusinessActionParameters actionParams() const;
+    void setActionParams(const QnBusinessActionParameters& params);
 
     /* action aggregation period in seconds */
     int aggregationPeriod() const;
@@ -66,12 +67,12 @@ private:
 
     BusinessEventType::Value m_eventType;
     QnResourceList m_eventResources;
-    QnBusinessParams m_eventParams;
+    QnBusinessEventParameters m_eventParams;
     ToggleState::Value m_eventState;
 
     BusinessActionType::Value m_actionType;
     QnResourceList m_actionResources;
-    QnBusinessParams m_actionParams;
+    QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;
     bool m_disabled;

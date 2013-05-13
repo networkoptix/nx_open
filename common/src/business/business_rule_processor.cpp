@@ -163,7 +163,7 @@ void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bE
 {
     QMutexLocker lock(&m_mutex);
 
-    QList<QnAbstractBusinessActionPtr> actions = matchActions(bEvent);
+    QnAbstractBusinessActionList actions = matchActions(bEvent);
     foreach(QnAbstractBusinessActionPtr action, actions)
     {
         executeAction(action);
@@ -316,9 +316,9 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
     return true;
 }
 
-QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
+QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
 {
-    QList<QnAbstractBusinessActionPtr> result;
+    QnAbstractBusinessActionList result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
         if (rule->disabled() || rule->eventType() != bEvent->getEventType())
@@ -369,7 +369,7 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
             recipients << email;
     }
 
-    QStringList additional = QnBusinessActionParameters::getEmailAddress(action->getParams()).split(QLatin1Char(';'), QString::SkipEmptyParts);
+    QStringList additional = action->getParams().getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
     foreach(const QString &email, additional) {
         log << email;
         QString trimmed = email.trimmed();

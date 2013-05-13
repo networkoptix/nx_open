@@ -44,7 +44,7 @@ public:
         m_info.clear();
     }
 
-    void append(const QnBusinessParams& runtimeParams) {
+    void append(const QnBusinessEventParameters& runtimeParams) {
         m_info.append(runtimeParams);
     }
 
@@ -135,7 +135,7 @@ private slots:
 
 protected:
     bool containResource(QnResourceList resList, const QnId& resId) const;
-    QList <QnAbstractBusinessActionPtr> matchActions(QnAbstractBusinessEventPtr bEvent);
+    QnAbstractBusinessActionList matchActions(QnAbstractBusinessEventPtr bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
     /*

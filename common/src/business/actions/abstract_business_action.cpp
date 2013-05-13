@@ -81,7 +81,7 @@ namespace BusinessActionType {
     }
 }
 
-QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams& runtimeParams):
+QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams):
     m_actionType(actionType),
     m_toggleState(ToggleState::NotDefined), 
     m_receivedFromRemoteHost(false),
@@ -102,19 +102,19 @@ const QnResourceList& QnAbstractBusinessAction::getResources() const {
     return m_resources;
 }
 
-void QnAbstractBusinessAction::setParams(const QnBusinessParams& params) {
+void QnAbstractBusinessAction::setParams(const QnBusinessActionParameters& params) {
     m_params = params;
 }
 
-const QnBusinessParams& QnAbstractBusinessAction::getParams() const {
+const QnBusinessActionParameters& QnAbstractBusinessAction::getParams() const {
     return m_params;
 }
 
-void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessParams& params) {
+void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessEventParameters& params) {
     m_runtimeParams = params;
 }
 
-const QnBusinessParams& QnAbstractBusinessAction::getRuntimeParams() const {
+const QnBusinessEventParameters& QnAbstractBusinessAction::getRuntimeParams() const {
     return m_runtimeParams;
 }
 

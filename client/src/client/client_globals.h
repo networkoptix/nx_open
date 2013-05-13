@@ -86,7 +86,9 @@ namespace Qn {
 
 
         /* Others. */
-        HelpTopicIdRole                             /**< Role for item's help topic. Value of type int. */
+        HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
+
+        ItemMouseCursorRole                         /**< Role for item's mouse cursor. */
     };
 
 

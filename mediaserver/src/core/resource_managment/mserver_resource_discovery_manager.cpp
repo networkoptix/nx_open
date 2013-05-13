@@ -59,7 +59,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     QSet<QString> discoveredResources;
 
     //assemble list of existing ip
-    QMap<quint32, QSet<QString> > ipsList;
+    QMap<quint32, QSet<QByteArray> > ipsList;
 
 
     //excluding already existing resources
@@ -86,7 +86,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                         // do not count 2--N channels of multichannel cameras as conflict
                         quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
                         if (ips)
-                            ipsList[ips].insert(newNetRes->getMAC().toString());
+                            ipsList[ips].insert(newNetRes->getMAC().toString().toAscii());
                     }
                 }
 
@@ -145,7 +145,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
     // ========================= send conflict info =====================
-    for (QMap<quint32, QSet<QString> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
+    for (QMap<quint32, QSet<QByteArray> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
     {
         if (itr.value().size() > 1) 
         {

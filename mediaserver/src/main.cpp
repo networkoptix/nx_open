@@ -73,6 +73,7 @@
 #include "rest/handlers/exec_action_handler.h"
 #include "rest/handlers/time_handler.h"
 #include "rest/handlers/ping_handler.h"
+#include "rest/handlers/events_handler.h"
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
 #include "rest/handlers/ext_bevent_handler.h"
@@ -747,7 +748,7 @@ void QnMain::at_storageFailure(QnResourcePtr storage)
     qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueIoError, storage);
 }
 
-void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
+void QnMain::at_cameraIPConflict(QHostAddress host, QList<QByteArray> macAddrList)
 {
     qnBusinessRuleConnector->at_cameraIPConflict(
         m_mediaServer,
@@ -774,6 +775,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/onEvent", new QnExternalBusinessEventHandler());
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
     QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
+    QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
     QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
 
@@ -848,6 +850,7 @@ QHostAddress QnMain::getPublicAddress()
 void QnMain::run()
 {
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
+    QnEventsDB::init();
 
     // Create SessionManager
     QnSessionManager::instance()->start();
@@ -873,7 +876,7 @@ void QnMain::run()
     initAppServerConnection(qSettings);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
+    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QList<QByteArray>)), this, SLOT(at_cameraIPConflict(QHostAddress, QList<QByteArray>)));
     connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr)), this, SLOT(at_storageFailure(QnResourcePtr)));
 
@@ -1136,6 +1139,7 @@ void QnMain::run()
     QnBusinessEventConnector::initStaticInstance( NULL );
 
     QnBusinessRuleProcessor::fini();
+    QnEventsDB::fini();
 
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
