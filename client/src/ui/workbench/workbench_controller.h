@@ -118,9 +118,9 @@ protected:
     void showContextMenuAt(const QPoint &pos);
 
 protected slots:
-    void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
 
     void at_moveStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
     void at_move(QGraphicsView *view, const QPointF &totalDelta);
