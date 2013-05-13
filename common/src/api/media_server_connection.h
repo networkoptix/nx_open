@@ -24,7 +24,8 @@
 
 #include "api_fwd.h"
 #include "media_server_cameras_data.h"
-
+#include "business/actions/abstract_business_action.h"
+#include "business/events/abstract_business_event.h"
 
 class QnPtzSpaceMapper;
 class QnEnumNameMapper;
@@ -68,6 +69,7 @@ signals:
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
     void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
+    void finished(int status, const QnLightBusinessActionVectorPtr &reply, int handle);
 
 private:
     template<class T>
@@ -176,6 +178,29 @@ public:
      * \returns                         Request handle.
 	 */
     int getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot);
+
+
+	/** 
+     * Get \a event log. 
+     * 
+     * Returns immediately. On request completion \a slot of object \a target 
+     * is called with signature <tt>(int handle, int httpStatusCode, const QList<QnAbstractBusinessAction> &events)</tt>.
+     * \a status is 0 in case of success, in other cases it holds error code 
+     * 
+     * \param camRes filter events by camera. Optional.
+     * \param dateFrom  start timestamp in msec
+     * \param dateTo end timestamp in msec. Can be DATETIME_NOW
+     * \param businessRuleId filter events by specified business rule. Optional.
+     * 
+     * \returns                         Request handle.
+	 */
+    int asyncEventLog(
+        qint64 dateFrom, qint64 dateTo, 
+        QnNetworkResourcePtr camRes, 
+        BusinessEventType::Value eventType, 
+        BusinessActionType::Value actionType,
+        QnId businessRuleId, 
+        QObject *target, const char *slot);
 
     /**
      * \returns                         Http response status (200 in case of success).

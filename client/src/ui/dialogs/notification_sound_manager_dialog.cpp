@@ -35,6 +35,8 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
 
     QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
     QString filename = soundModel->filenameByRow(ui->listView->currentIndex().row());
+    if (filename.isEmpty())
+        return;
 
     QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
     if (!QFileInfo(filePath).exists())

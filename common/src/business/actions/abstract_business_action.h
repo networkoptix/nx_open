@@ -7,8 +7,12 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/qnid.h>
 
+#include "../business_action_parameters.h"
+#include "business/business_event_parameters.h"
+
 namespace BusinessActionType
 {
+
     enum Value
     {
         CameraRecording,    // start camera recording
@@ -67,6 +71,8 @@ namespace BusinessActionType
 class QnAbstractBusinessAction;
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 
+
+
 /*
 * Base class for business actions
 */
@@ -74,7 +80,8 @@ typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 class QnAbstractBusinessAction
 {
 protected:
-    explicit QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams& runtimeParams);
+
+    explicit QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams);
 
 public:
     virtual ~QnAbstractBusinessAction();
@@ -89,11 +96,11 @@ public:
 
     const QnResourceList& getResources() const;
 
-    void setParams(const QnBusinessParams& params);
-    const QnBusinessParams& getParams() const;
+    void setParams(const QnBusinessActionParameters& params);
+    const QnBusinessActionParameters& getParams() const;
 
-    void setRuntimeParams(const QnBusinessParams& params);
-    const QnBusinessParams& getRuntimeParams() const;
+    void setRuntimeParams(const QnBusinessEventParameters& params);
+    const QnBusinessEventParameters& getRuntimeParams() const;
 
     void setBusinessRuleId(const QnId& value);
     QnId getBusinessRuleId() const;
@@ -119,14 +126,53 @@ protected:
     ToggleState::Value m_toggleState;
     bool m_receivedFromRemoteHost;
     QnResourceList m_resources;
-    QnBusinessParams m_params;
-    QnBusinessParams m_runtimeParams;
+    QnBusinessActionParameters m_params;
+    QnBusinessEventParameters m_runtimeParams;
     QnId m_businessRuleId; // business rule that generated this action
     int m_aggregationCount;
 };
 
+typedef QList<QnAbstractBusinessActionPtr> QnAbstractBusinessActionList;
+
+class QnLightBusinessAction
+{
+public:
+    QnLightBusinessAction(): m_actionType(BusinessActionType::NotDefined) {}
+
+    virtual ~QnLightBusinessAction() {}
+    
+    BusinessActionType::Value actionType() const { return m_actionType; }
+    void setActionType(BusinessActionType::Value type) { m_actionType = type; }
+
+    //void setParams(const QnBusinessActionParameters& params) { m_params = params;}
+    //const QnBusinessActionParameters& getParams() const { return m_params; }
+
+    void setRuntimeParams(const QnBusinessEventParameters& params) {m_runtimeParams = params;}
+    const QnBusinessEventParameters& getRuntimeParams() const {return m_runtimeParams; }
+
+    void setBusinessRuleId(const QnId& value) {m_businessRuleId = value; }
+    QnId getBusinessRuleId() const { return m_businessRuleId; }
+
+    void setAggregationCount(int value) { m_aggregationCount = value; }
+    int getAggregationCount() const { return m_aggregationCount; }
+
+    qint64 timestamp() const { return m_runtimeParams.getEventTimestamp(); }
+protected:
+    BusinessActionType::Value m_actionType;
+    //QnBusinessActionParameters m_params;
+    QnBusinessEventParameters m_runtimeParams;
+    QnId m_businessRuleId; 
+    int m_aggregationCount;
+};
+
+typedef std::vector<QnLightBusinessAction> QnLightBusinessActionVector;
+typedef QSharedPointer<QnLightBusinessActionVector> QnLightBusinessActionVectorPtr;
+
+
 Q_DECLARE_METATYPE(BusinessActionType::Value)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
+Q_DECLARE_METATYPE(QnAbstractBusinessActionList)
+Q_DECLARE_METATYPE(QnLightBusinessActionVectorPtr)
 
 
 #endif // __ABSTRACT_BUSINESS_ACTION_H_

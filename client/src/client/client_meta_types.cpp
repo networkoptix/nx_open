@@ -22,8 +22,7 @@ void QnClientMetaTypes::initialize() {
     QnCommonMetaTypes::initilize();
 
     qRegisterMetaType<Qn::ItemRole>();
-    qRegisterMetaType<QnThumbnail>();
-    qRegisterMetaType<QVector<QUuid> >();
+    qRegisterMetaType<QnThumbnail>();    qRegisterMetaType<QVector<QUuid> >();
     qRegisterMetaType<QnWorkbenchState>();
     qRegisterMetaTypeStreamOperators<QnWorkbenchState>();
     qRegisterMetaType<QnWorkbenchStateHash>();

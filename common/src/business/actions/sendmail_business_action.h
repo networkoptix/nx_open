@@ -16,7 +16,7 @@ class QnSendMailBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    explicit QnSendMailBusinessAction(const QnBusinessParams &runtimeParams);
+    explicit QnSendMailBusinessAction(const QnBusinessEventParameters &runtimeParams);
     ~QnSendMailBusinessAction() {}
 
     QString getSubject() const;
@@ -26,15 +26,6 @@ public:
 
     void setAggregationInfo(const QnBusinessAggregationInfo &info);
 private:
-    QString getMotionUrl() const;
-
-    QString eventTextString(BusinessEventType::Value eventType, const QnBusinessParams &params) const;
-
-    QString resourceString(bool useUrl) const;
-    QString timestampString(const QnBusinessParams &params, int aggregationCount) const;
-    QString reasonString(const QnBusinessParams &params) const;
-    QString conflictString() const;
-
     QnBusinessAggregationInfo m_aggregationInfo;
 };
 

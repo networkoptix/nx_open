@@ -5,29 +5,29 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
-QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessParams &runtimeParams):
+QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessEventParameters &runtimeParams):
     base_type(BusinessActionType::CameraRecording, runtimeParams)
 {
 }
 
 int QnRecordingBusinessAction::getFps() const {
-    return QnBusinessActionParameters::getFps(getParams());
+    return m_params.getFps();
 }
 
 QnStreamQuality QnRecordingBusinessAction::getStreamQuality() const {
-    return QnBusinessActionParameters::getStreamQuality(getParams());
+    return m_params.getStreamQuality();
 }
 
 int QnRecordingBusinessAction::getRecordDuration() const {
-    return QnBusinessActionParameters::getRecordDuration(getParams());
+    return m_params.getRecordDuration();
 }
 
 int QnRecordingBusinessAction::getRecordBefore() const {
-    return QnBusinessActionParameters::getRecordBefore(getParams());
+    return m_params.getRecordBefore();
 }
 
 int QnRecordingBusinessAction::getRecordAfter() const {
-    return QnBusinessActionParameters::getRecordAfter(getParams());
+    return m_params.getRecordAfter();
 }
 
 bool QnRecordingBusinessAction::isResourceValid(const QnVirtualCameraResourcePtr &camera) {

@@ -102,7 +102,7 @@ protected:
 
 signals:
     void localInterfacesChanged();
-    void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
+    void CameraIPConflict(QHostAddress addr, QList<QByteArray> macAddrList);
 
 private slots:
     void onInitAsyncFinished(QnResourcePtr res, bool initialized);

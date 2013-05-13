@@ -4,14 +4,24 @@ QnNotificationSoundModel::QnNotificationSoundModel(QObject *parent) :
     QStandardItemModel(parent),
     m_loaded(false)
 {
+    QList<QStandardItem *> row;
+    row << new QStandardItem(tr("<Downloading sound list...>"))
+        << new QStandardItem(QString());
+    appendRow(row);
 }
 
 void QnNotificationSoundModel::loadList(const QStringList &filenames) {
     clear();
+
+    QList<QStandardItem *> row;
+    row << new QStandardItem(tr("<No Sound>"))
+        << new QStandardItem(QString());
+    appendRow(row);
+
     m_loaded = true;
     foreach (QString filename, filenames) {
         QList<QStandardItem *> row;
-        row << new QStandardItem(tr("Downloading sound..."))
+        row << new QStandardItem(tr("<Downloading sound...>"))
             << new QStandardItem(filename);
         //TODO: #GDM append columns: duration, date added (?)
         appendRow(row);
@@ -29,11 +39,12 @@ void QnNotificationSoundModel::addUploading(const QString &filename) {
 }
 
 void QnNotificationSoundModel::updateTitle(const QString &filename, const QString &title) {
-    QList<QStandardItem*> items = findItems(filename, Qt::MatchExactly, FilenameColumn);
-    if (items.size() == 0) {
+    if (!m_loaded)
         return;
-        //TODO: #GDM boolean flag in the model, clear on logoff
-    }
+
+    QList<QStandardItem*> items = findItems(filename, Qt::MatchExactly, FilenameColumn);
+    if (items.size() == 0)
+        return;
     QStandardItem* item = this->item(items[0]->row(), TitleColumn);
     if (!item)
         return;
@@ -41,34 +52,28 @@ void QnNotificationSoundModel::updateTitle(const QString &filename, const QStrin
     emit itemChanged(filename);
 }
 
-
 int QnNotificationSoundModel::rowByFilename(const QString &filename) const {
+    if (!m_loaded)
+        return 0; // Downloading items list
+
     QList<QStandardItem*> items = findItems(filename, Qt::MatchExactly, FilenameColumn);
-    if (items.size() == 0) {
-        return -1;
-        //TODO: #GDM boolean flag in the model, clear on logoff
-        //TODO: #GDM what if sound was removed?
-    }
-    return items[0]->row();
+    return (items.size() > 0) ? items[0]->row() : 0;
 }
 
 QString QnNotificationSoundModel::filenameByRow(int row) const {
-    //TODO: #GDM check if model is already loaded
-    QModelIndex idx = index(row, FilenameColumn);
-    if (!idx.isValid())
+    if (!m_loaded)
         return QString();
 
-    return itemFromIndex(idx)->text();
+    QStandardItem* item = this->item(row, FilenameColumn);
+    return item ? item->text() : QString();
 }
 
-
 QString QnNotificationSoundModel::titleByFilename(const QString &filename) const {
-    QList<QStandardItem*> items = findItems(filename, Qt::MatchExactly, FilenameColumn);
-    if (items.size() == 0) {
-        return tr("Downloading sound list...");
-        //TODO: #GDM boolean flag in the model, clear on logoff
-        //TODO: #GDM what if sound was removed?
-    }
-    QStandardItem* item = items[0];
-    return this->item(item->row(), TitleColumn)->text();
+    int row = rowByFilename(filename);
+    QStandardItem* item = this->item(row, TitleColumn);
+    return item ? item->text() : QString();
+}
+
+bool QnNotificationSoundModel::loaded() const {
+    return m_loaded;
 }

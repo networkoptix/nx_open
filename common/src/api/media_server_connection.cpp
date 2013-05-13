@@ -18,6 +18,8 @@
 #include "session_manager.h"
 
 #include <api/serializer/serializer.h>
+#include "serializer/pb_serializer.h"
+#include "event_log/events_serializer.h"
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject, 
@@ -35,6 +37,7 @@ namespace {
         ((TimeObject,               "gettime"))
         ((CameraSearchObject,       "manualCamera/search"))
         ((CameraAddObject,          "manualCamera/add"))
+        ((eventLogObject,           "events"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -357,6 +360,14 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(response.status, reply, handle);
         break;
     }
+    case eventLogObject: {
+        QnApiPbSerializer serializer;
+        QnLightBusinessActionVectorPtr events(new QnLightBusinessActionVector);
+        if (response.status == 0)
+            QnEventSerializer::deserialize(events, response.data);
+        emitFinished(response.status, events, handle);
+		break;
+    }
     default:
         assert(false); /* We should never get here. */
         break;
@@ -532,6 +543,30 @@ int QnMediaServerConnection::ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &
     params << QnRequestParam("res_id", camera->getPhysicalId());
 
     return sendAsyncRequest(PtzSpaceMapperObject, params, QN_REPLY_TYPE(QnPtzSpaceMapper), target, slot);
+}
+
+int QnMediaServerConnection::asyncEventLog(
+                  qint64 dateFrom, qint64 dateTo, 
+                  QnNetworkResourcePtr camRes, 
+                  BusinessEventType::Value eventType, 
+                  BusinessActionType::Value actionType,
+                  QnId businessRuleId, 
+                  QObject *target, const char *slot)
+{
+    QnRequestParamList params;
+    params << QnRequestParam( "from", dateFrom);
+    if (dateTo != DATETIME_NOW)
+        params << QnRequestParam( "to", dateTo);
+    if (camRes)
+        params << QnRequestParam( "res_id", camRes->getPhysicalId() );
+    if (businessRuleId.isValid())
+        params << QnRequestParam( "brule_id", businessRuleId.toInt() );
+    if (eventType != BusinessEventType::NotDefined)
+        params << QnRequestParam( "event", (int) eventType);
+    if (actionType != BusinessActionType::NotDefined)
+        params << QnRequestParam( "action", (int) actionType);
+
+    return sendAsyncRequest(eventLogObject, params, QN_REPLY_TYPE(QnLightBusinessActionVectorPtr), target, slot);
 }
 
 int QnMediaServerConnection::sendAsyncRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {

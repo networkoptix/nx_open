@@ -257,6 +257,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
+    connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
@@ -383,6 +384,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
     if (businessRulesDialog())
         delete businessRulesDialog();
+
+    if (businessEventsLogDialog())
+        delete businessEventsLogDialog();
 
     if (popupCollectionWidget())
         delete popupCollectionWidget();
@@ -954,7 +958,7 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             break;
         }
     case BusinessActionType::PlaySound: {
-            QString filename = QnBusinessActionParameters::getSoundUrl(businessAction->getParams());
+            QString filename = businessAction->getParams().getSoundUrl();
             qDebug() << "play sound action received" << filename;
 
             QnAppServerNotificationCache *cache = new QnAppServerNotificationCache(this);
@@ -1643,6 +1647,18 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     url.setPassword(QString());
     url.setPath(QLatin1String("web"));
     QDesktopServices::openUrl(url);
+}
+
+void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
+    bool newlyCreated = false;
+    if(!businessEventsLogDialog()) {
+        m_businessEventsLogDialog = new QnEventLogDialog(widget(), context());
+        newlyCreated = true;
+    }
+    QRect oldGeometry = businessEventsLogDialog()->geometry();
+    businessEventsLogDialog()->show();
+    if(!newlyCreated)
+        businessEventsLogDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
