@@ -3,8 +3,8 @@
 QnConflictBusinessEvent::QnConflictBusinessEvent(const BusinessEventType::Value eventType,
                                                  const QnResourcePtr& resource,
                                                  const qint64 timeStamp,
-                                                 const QString& source,
-                                                 const QStringList& conflicts):
+                                                 const QByteArray& source,
+                                                 const QList<QByteArray>& conflicts):
     base_type(eventType, resource, timeStamp),
     m_source(source),
     m_conflicts(conflicts)

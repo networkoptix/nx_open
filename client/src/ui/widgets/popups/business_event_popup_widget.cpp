@@ -279,14 +279,23 @@ QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnAbstractBusi
     return item;
 }
 
+static QStringList baToStringList(const QList<QByteArray>& values)
+{
+    QStringList result;
+    for (int i = 0; i < values.size(); ++i)
+        result << QString::fromUtf8(values[i]);
+
+    return result;
+}
+
 QStandardItem* QnBusinessEventPopupWidget::updateConflictTree(const QnBusinessEventParameters& eventParams) {
 
     QStandardItem *item = findOrCreateItem(eventParams);
     if (!item)
         return NULL;
 
-    QString source = eventParams.getSource();
-    QStringList newConflicts = eventParams.getConflicts();
+    QByteArray source = eventParams.getSource();
+    QStringList newConflicts = baToStringList(eventParams.getConflicts());
 
     QStringList conflicts = item->data(ConflictsRole).value<QStringList>();
     foreach(QString entity, newConflicts) {
@@ -298,7 +307,7 @@ QStandardItem* QnBusinessEventPopupWidget::updateConflictTree(const QnBusinessEv
 
     item->removeRows(0, item->rowCount());
 
-    item->appendRow(new QStandardItem(source));
+    item->appendRow(new QStandardItem(QString::fromUtf8(source)));
     item->appendRow(new QStandardItem(tr("conflicted with")));
     foreach(QString entity, conflicts)
         item->appendRow(new QStandardItem(entity));

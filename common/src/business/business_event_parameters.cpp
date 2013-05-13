@@ -79,19 +79,19 @@ void QnBusinessEventParameters::setReasonText(const QString& value) {
     m_reasonText = value;
 }
 
-QString QnBusinessEventParameters::getSource() const {
+QByteArray QnBusinessEventParameters::getSource() const {
     return m_source;
 }
 
-void QnBusinessEventParameters::setSource(QString value) {
+void QnBusinessEventParameters::setSource(const QByteArray& value) {
     m_source = value;
 }
 
-QStringList QnBusinessEventParameters::getConflicts() const {
+QList<QByteArray> QnBusinessEventParameters::getConflicts() const {
     return m_conflicts;
 }
 
-void QnBusinessEventParameters::setConflicts(QStringList value) {
+void QnBusinessEventParameters::setConflicts(const QList<QByteArray>& value) {
     m_conflicts = value;
 }
 
@@ -178,10 +178,10 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
                     break;
 
                 case sourceParam:
-                    result.m_source = QString::fromUtf8(field);
+                    result.m_source = field;
                     break;
                 case conflictsParam:
-                    result.m_conflicts = QString::fromUtf8(field).split(lit(STRING_LIST_DELIM));
+                    result.m_conflicts = field.split(STRING_LIST_DELIM);
                     break;
             }
         }
@@ -208,7 +208,14 @@ void serializeStringParam(QByteArray& result, const QString& value, const QStrin
     result += DELIMITER;
 }
 
-void serializeStringListParam(QByteArray& result, const QStringList& value)
+void serializeByteArrayParam(QByteArray& result, const QByteArray& value, const QByteArray& defaultValue)
+{
+    if (value != defaultValue)
+        result += value;
+    result += DELIMITER;
+}
+
+void serializeByteArrayListParam(QByteArray& result, const QList<QByteArray>& value)
 {
     if (!value.isEmpty()) {
         for (int i = 0; i < value.size(); ++i) {
@@ -233,13 +240,31 @@ QByteArray QnBusinessEventParameters::serialize() const
     serializeStringParam(result, m_inputPort, m_defaultParams.m_inputPort);
     serializeIntParam(result, m_reasonCode, m_defaultParams.m_reasonCode);
     serializeStringParam(result, m_reasonText, m_defaultParams.m_reasonText);
-    serializeStringParam(result, m_source, m_defaultParams.m_source);
-    serializeStringListParam(result, m_conflicts);
+    serializeByteArrayParam(result, m_source, m_defaultParams.m_source);
+    serializeByteArrayListParam(result, m_conflicts);
 
     int resLen = result.size();
     for (; resLen > 0 && result.data()[resLen-1] == DELIMITER; --resLen);
 
     return result.left(resLen);
+}
+
+static QList<QByteArray> baFromStringList(const QStringList& values)
+{
+    QList<QByteArray> result;
+    for (int i = 0; i < values.size(); ++i)
+        result << values[i].toUtf8();
+
+    return result;
+}
+
+static QStringList baToStringList(const QList<QByteArray>& values)
+{
+    QStringList result;
+    for (int i = 0; i < values.size(); ++i)
+        result << QString::fromUtf8(values[i]);
+
+    return result;
 }
 
 QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
@@ -272,7 +297,7 @@ QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
         result.insert(PARAM_NAMES[sourceParam], m_source);
 
     if (m_conflicts != m_defaultParams.m_conflicts)
-        result.insert(PARAM_NAMES[conflictsParam], m_conflicts);
+        result.insert(PARAM_NAMES[conflictsParam], baToStringList(m_conflicts));
 
     /*
     for (int i = 0; i < (int) CountParam; ++i)
@@ -333,10 +358,10 @@ QnBusinessEventParameters QnBusinessEventParameters::fromBusinessParams(const Qn
                 break;
 
             case sourceParam:
-                result.m_source = itr.value().toString();
+                result.m_source = itr.value().toString().toUtf8();
                 break;
             case conflictsParam:
-                result.m_conflicts = itr.value().toStringList();
+                result.m_conflicts = baFromStringList(itr.value().toStringList());
                 break;
             }
         }
