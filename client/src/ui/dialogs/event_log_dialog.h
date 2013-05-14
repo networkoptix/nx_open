@@ -39,12 +39,21 @@ private slots:
     void onItemClicked(QListWidgetItem * item);
     void at_customContextMenuRequested(const QPoint& screenPos);
     void at_cameraButtonClicked();
+    void at_filterAction();
+    void at_resetFilterAction();
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
-    QAction* getFilterAction(const QMenu* menu, const QModelIndex& idx);
     QString getTextForNCameras(int n) const;
     QStandardItem* createEventItem(BusinessEventType::Value value);
     QStandardItem* createEventTree(QStandardItem* rootItem, BusinessEventType::Value value);
+
+    void setCameraList(QnResourceList resList);
+    void setActionType(BusinessActionType::Value value);
+    void setEventType(BusinessEventType::Value value);
+    bool setEventTypeRecursive(BusinessEventType::Value value, QAbstractItemModel* model, const QModelIndex& parentItem);
+
+    void disableUpdateData();
+    void enableUpdateData();
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  
@@ -55,6 +64,8 @@ private:
 
     QList <QnLightBusinessActionVectorPtr> m_allEvents;
     QnResourceList m_filterCameraList;
+    bool m_updateDisabled;
+    bool m_dirty;
 };
 
 #endif // __EVENT_LOG_DIALOG_H____

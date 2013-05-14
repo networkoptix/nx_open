@@ -20,6 +20,28 @@ namespace BusinessEventType
         return false;
     }
 
+    Value parentEvent(Value value)
+    {
+        switch (value) {
+            case Camera_Disconnect:
+            case Network_Issue:
+            case Camera_Ip_Conflict:
+                return AnyCameraIssue;
+
+            case Storage_Failure:
+            case MediaServer_Failure:
+            case MediaServer_Conflict:
+                return AnyServerIssue;
+
+            case AnyBusinessEvent:
+                return NotDefined;
+
+            default:
+                return AnyBusinessEvent;
+        }
+        return NotDefined;
+    }
+
     QList<Value> childEvents(Value value)
     {
         QList<Value> result;

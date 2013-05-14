@@ -40,6 +40,7 @@ void QnTreeViewComboBox::selectIndex(const QModelIndex& index)
 {
     setRootModelIndex(index.parent());
     setCurrentIndex(index.row());
+    m_treeView->setCurrentIndex(index);
 }
 
 int QnTreeViewComboBox::getTreeWidth(const QModelIndex& parent, int nestedLevel) const

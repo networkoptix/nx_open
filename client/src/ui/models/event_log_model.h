@@ -40,6 +40,9 @@ public:
     void clear();
 
     virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override;
+
+    BusinessEventType::Value eventType(const QModelIndex & index) const;
+    QnResourcePtr eventResource(const QModelIndex & index) const;
 private:
 
     static QString columnTitle(Column column);

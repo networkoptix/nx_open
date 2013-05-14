@@ -248,6 +248,28 @@ QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
     return QVariant();
 }
 
+BusinessEventType::Value QnEventLogModel::eventType(const QModelIndex & index) const
+{
+    if (index.isValid()) {
+        const QnLightBusinessAction& action = m_events->at(index.row());
+        return action.getRuntimeParams().getEventType();
+    }
+    else {
+        return BusinessEventType::NotDefined;
+    }
+}
+
+QnResourcePtr QnEventLogModel::eventResource(const QModelIndex & index) const
+{
+    if (index.isValid()) {
+        const QnLightBusinessAction& action = m_events->at(index.row());
+        return qnResPool->getResourceById(action.getRuntimeParams().getEventResourceId());
+    }
+    else {
+        return QnResourcePtr();
+    }
+}
+
 /*
 QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
 {

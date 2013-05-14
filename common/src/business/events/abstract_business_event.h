@@ -14,6 +14,8 @@ namespace BusinessEventType
 
     QList<Value> childEvents(Value value);
 
+    Value parentEvent(Value value);
+
     QString toString( Value val );
 
     bool isResourceRequired(Value val);

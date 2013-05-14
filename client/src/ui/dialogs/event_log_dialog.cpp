@@ -34,7 +34,9 @@ QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, Busine
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
     ui(new Ui::EventLogDialog),
-    m_context(context)
+    m_context(context),
+    m_updateDisabled(false),
+    m_dirty(false)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::Window);
@@ -62,7 +64,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->eventComboBox->setModel(model);
 
     QStringList actionItems;
-    actionItems << tr("All actions");
+    actionItems << tr("Any action");
     for (int i = 0; i < (int) BusinessActionType::NotDefined; ++i)
         actionItems << BusinessActionType::toString(BusinessActionType::Value(i));
     ui->actionComboBox->addItems(actionItems);
@@ -90,6 +92,11 @@ QnEventLogDialog::~QnEventLogDialog()
 
 void QnEventLogDialog::updateData()
 {
+    if (m_updateDisabled) {
+        m_dirty = true;
+        return;
+    }
+
     BusinessActionType::Value actionType = BusinessActionType::NotDefined;
     BusinessEventType::Value eventType = BusinessEventType::NotDefined;
 
@@ -170,29 +177,26 @@ void QnEventLogDialog::onItemClicked(QListWidgetItem * item)
 {
 }
 
-QAction* QnEventLogDialog::getFilterAction(const QMenu* menu, const QModelIndex& idx)
+bool QnEventLogDialog::setEventTypeRecursive(BusinessEventType::Value value, QAbstractItemModel* model, const QModelIndex& parentItem)
 {
-    return 0;
+    for (int i = 0; i < model->rowCount(parentItem); ++i)
+    {
+        QModelIndex idx = model->index(i, 0, parentItem);
+        BusinessEventType::Value curVal = (BusinessEventType::Value) model->data(idx, Qn::FirstItemDataRole).toInt();
+        if (curVal == value)
+        {
+            ui->eventComboBox->selectIndex(idx);
+            return true;
+        }
+        if (model->hasChildren(idx))
+            setEventTypeRecursive(value, model, idx);
+    }
+    return false;
 }
 
-void QnEventLogDialog::at_customContextMenuRequested(const QPoint& screenPos)
+void QnEventLogDialog::setEventType(BusinessEventType::Value value)
 {
-    QModelIndex idx = ui->gridEvents->currentIndex();
-    QnId resId = m_model->data(idx, Qn::ResourceRole).toInt();
-    QnResourcePtr resource = qnResPool->getResourceById(resId);
-
-    QnActionManager *manager = m_context->menu();
-    QScopedPointer<QMenu> menu(resource ? manager->newMenu(Qn::ActionScope::TreeScope, QnActionParameters(resource)) : new QMenu);
-    //manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
-
-    QAction* filterAction = getFilterAction(menu.data(), idx);
-    if (filterAction) {
-        if (!menu->isEmpty()) 
-            menu->addSeparator();
-        menu->addAction(filterAction);
-    }
-
-    QAction* action = menu->exec(screenPos + pos());
+    setEventTypeRecursive(value, ui->eventComboBox->model(), QModelIndex());
 }
 
 QString QnEventLogDialog::getTextForNCameras(int n) const
@@ -205,14 +209,106 @@ QString QnEventLogDialog::getTextForNCameras(int n) const
         return tr("< %1 cameras >").arg(n);
 }
 
+void QnEventLogDialog::setCameraList(QnResourceList resList)
+{
+    if (resList.size() == m_filterCameraList.size())
+    {
+        bool matched = true;
+        for (int i = 0; i < resList.size(); ++i)
+        {
+            matched &= resList[i]->getId() == m_filterCameraList[i]->getId();
+        }
+        if (matched)
+            return;
+    }
+
+    m_filterCameraList = resList;
+    ui->cameraButton->setText(getTextForNCameras(m_filterCameraList.size()));
+
+    updateData();
+}
+
+void QnEventLogDialog::setActionType(BusinessActionType::Value value)
+{
+    if (value == BusinessActionType::NotDefined)
+        ui->actionComboBox->setCurrentIndex(0);
+    else
+        ui->actionComboBox->setCurrentIndex(int(value) - 1);
+}
+
+void QnEventLogDialog::at_resetFilterAction()
+{
+    disableUpdateData();
+    setEventType(BusinessEventType::AnyBusinessEvent);
+    setCameraList(QnResourceList());
+    setActionType(BusinessActionType::NotDefined);
+    enableUpdateData();
+}
+
+void QnEventLogDialog::at_filterAction()
+{
+    QModelIndex idx = ui->gridEvents->currentIndex();
+
+    BusinessEventType::Value eventType = m_model->eventType(idx);
+    BusinessEventType::Value parentEventType = BusinessEventType::parentEvent(eventType);
+    if (parentEventType != BusinessEventType::AnyBusinessEvent && parentEventType != BusinessEventType::NotDefined)
+        eventType = parentEventType;
+    
+    QnSecurityCamResourcePtr cameraResource = m_model->eventResource(idx).dynamicCast<QnSecurityCamResource>();
+    QnResourceList camList;
+    if (cameraResource)
+        camList << cameraResource;
+
+    disableUpdateData();
+    setEventType(eventType);
+    setCameraList(camList);
+    setActionType(BusinessActionType::NotDefined);
+    enableUpdateData();
+}
+
+void QnEventLogDialog::at_customContextMenuRequested(const QPoint& screenPos)
+{
+    QModelIndex idx = ui->gridEvents->currentIndex();
+    QnId resId = m_model->data(idx, Qn::ResourceRole).toInt();
+    QnResourcePtr resource = qnResPool->getResourceById(resId);
+
+    QnActionManager *manager = m_context->menu();
+    QScopedPointer<QMenu> menu(resource ? manager->newMenu(Qn::ActionScope::TreeScope, QnActionParameters(resource)) : new QMenu);
+    //manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
+
+    if (!menu->isEmpty()) 
+        menu->addSeparator();
+
+    QAction* filterAction = new QAction(tr("&Filter similar rows"), menu.data());
+    connect(filterAction, SIGNAL(triggered()), this, SLOT(at_filterAction()));
+    menu->addAction(filterAction);
+
+    QAction* resetFilterAction = new QAction(tr("&Display all rows"), menu.data());
+    connect(resetFilterAction, SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
+    menu->addAction(resetFilterAction);
+
+    QAction* action = menu->exec(screenPos + ui->gridEvents->pos() + pos());
+}
+
 void QnEventLogDialog::at_cameraButtonClicked()
 {
     QnResourceSelectionDialog dialog(this);
     dialog.setSelectedResources(m_filterCameraList);
 
-    if (dialog.exec() == QDialog::Accepted) {
-        m_filterCameraList = dialog.getSelectedResources();
-        ui->cameraButton->setText(getTextForNCameras(m_filterCameraList.size()));
+    if (dialog.exec() == QDialog::Accepted)
+        setCameraList(dialog.getSelectedResources());
+}
+
+void QnEventLogDialog::disableUpdateData()
+{
+    m_updateDisabled = true;
+}
+
+void QnEventLogDialog::enableUpdateData()
+{
+    m_updateDisabled = false;
+    if (m_dirty) {
+        m_dirty = false;
         updateData();
     }
 }

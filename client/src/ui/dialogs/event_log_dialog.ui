@@ -141,7 +141,7 @@
   <customwidget>
    <class>QnTreeViewComboBox</class>
    <extends>QComboBox</extends>
-   <header>ui/common/treeComboBox.h</header>
+   <header>ui/common/tree_combo_box.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
