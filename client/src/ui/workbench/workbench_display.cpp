@@ -1209,7 +1209,8 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         assertRaisedConeItem(widget);
 
         raisedConeItem(widget)->adjustGeometry(expanded(widget->aspectRatio(), enclosingGeometry, Qt::KeepAspectRatio));
-        opacityAnimator(raisedConeItem(widget), 0.5)->animateTo(0.3);
+        if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
+            opacityAnimator(raisedConeItem(widget), 0.5)->animateTo(0.3);
 
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 
