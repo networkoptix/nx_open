@@ -10,6 +10,10 @@
 
 namespace BusinessEventType
 {
+    bool hasChild(Value value);
+
+    QList<Value> childEvents(Value value);
+
     QString toString( Value val );
 
     bool isResourceRequired(Value val);

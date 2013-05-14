@@ -6,6 +6,39 @@
 
 namespace BusinessEventType
 {
+
+    bool hasChild(Value value)
+    {
+        switch (value) {
+            case AnyCameraIssue:
+                return true;
+            case AnyServerIssue:
+                return true;
+            case AnyBusinessEvent:
+                return true;
+        }
+        return false;
+    }
+
+    QList<Value> childEvents(Value value)
+    {
+        QList<Value> result;
+
+        switch (value) {
+            case AnyCameraIssue:
+                result << BusinessEventType::Camera_Disconnect << BusinessEventType::Network_Issue << BusinessEventType::Camera_Ip_Conflict;
+                break;
+            case AnyServerIssue:
+                result << BusinessEventType::Storage_Failure << BusinessEventType::MediaServer_Failure << BusinessEventType::MediaServer_Conflict;
+                break;
+            case AnyBusinessEvent:
+                result << BusinessEventType::Camera_Motion << BusinessEventType::AnyCameraIssue << BusinessEventType::AnyServerIssue;
+                break;
+        }
+        
+        return result;
+    }
+
     QString toString( Value val )  {
         if (val >= UserDefined)
             return QObject::tr("User Defined (%1)").arg((int)val - (int)UserDefined);

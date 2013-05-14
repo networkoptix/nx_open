@@ -19,6 +19,18 @@ QStandardItem* QnEventLogDialog::createEventItem(BusinessEventType::Value value)
     return result;
 }
 
+void QnEventLogDialog::addEventSubItems(QStandardItem* rootItem, BusinessEventType::Value value)
+{
+    QList<BusinessEventType::Value> chields = BusinessEventType::childEvents(value);
+    foreach(BusinessEventType::Value value, chields) {
+        QStandardItem* item = createEventItem(value);
+        rootItem->appendRow(item);
+        if (BusinessEventType::hasChild(value))
+            addEventSubItems(item, value);
+    }
+}
+
+
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
     ui(new Ui::EventLogDialog),
@@ -44,30 +56,9 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
 
     QStandardItem* rootItem = createEventItem(BusinessEventType::AnyBusinessEvent);
-
-    rootItem->appendRow(createEventItem(BusinessEventType::Camera_Motion));
-
-    QStandardItem* groupItem = createEventItem(BusinessEventType::AnyCameraIssue);
-    rootItem->appendRow(groupItem);
-    groupItem->appendRow(createEventItem(BusinessEventType::Camera_Disconnect));
-    groupItem->appendRow(createEventItem(BusinessEventType::Network_Issue));
-    groupItem->appendRow(createEventItem(BusinessEventType::Camera_Ip_Conflict));
-
-    groupItem = createEventItem(BusinessEventType::AnyServerIssue);
-    rootItem->appendRow(groupItem);
-    groupItem->appendRow(createEventItem(BusinessEventType::Storage_Failure));
-    groupItem->appendRow(createEventItem(BusinessEventType::MediaServer_Failure));
-    groupItem->appendRow(createEventItem(BusinessEventType::MediaServer_Conflict));
-
+    addEventSubItems(rootItem, BusinessEventType::AnyBusinessEvent);
     
-    QStringList eventItems;
-    eventItems << tr("All events");
-    for (int i = 0; i < (int) BusinessEventType::NotDefined; ++i)
-        eventItems << BusinessEventType::toString(BusinessEventType::Value(i));
-    ui->eventComboBox->addItems(eventItems);
-    
-
-    QStandardItemModel* model = new QStandardItemModel(); // 3 rows, 1 col
+    QStandardItemModel* model = new QStandardItemModel();
     model->appendRow(rootItem);
     ui->eventComboBox->setModel(model);
 
