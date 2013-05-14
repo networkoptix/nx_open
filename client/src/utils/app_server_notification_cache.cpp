@@ -12,7 +12,7 @@
 namespace {
     const QLatin1String folder("notifications");
     const QLatin1String targetContainter("mp3");
-    const QLatin1String titleTag("Comment");
+    const QLatin1String titleTag("Title");
 }
 
 QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
