@@ -2437,7 +2437,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        dialog->addCheckbox(tr("Include Timestamp"), &withTimestamps);
+        dialog->addCheckBox(tr("Include Timestamp"), &withTimestamps);
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
@@ -3236,7 +3236,7 @@ Do you want to continue?"),
 #ifdef Q_OS_WIN
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(false), this);
 #endif
-        dialog->addCheckbox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
+        dialog->addCheckBox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 

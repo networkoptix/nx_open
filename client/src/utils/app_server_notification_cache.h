@@ -16,7 +16,7 @@ public:
     explicit QnAppServerNotificationCache(QObject *parent = 0);
     ~QnAppServerNotificationCache();
     
-    void storeSound(const QString &filePath, int maxLengthMSecs = -1);
+    void storeSound(const QString &filePath, int maxLengthMSecs = -1, const QString &customTitle = QString());
 
     QnNotificationSoundModel* persistentGuiModel() const;
 private slots:
