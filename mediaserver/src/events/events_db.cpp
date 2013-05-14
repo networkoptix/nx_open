@@ -159,7 +159,7 @@ inline void appendIntToBA(QByteArray& ba, int value)
 void QnEventsDB::getAndSerializeActions(
                                         QByteArray& result,
                                         const QnTimePeriod& period,
-                                        const QnId& cameraId, 
+                                        const QnResourceList& resList,
                                         const BusinessEventType::Value& eventType, 
                                         const BusinessActionType::Value& actionType,
                                         const QnId& businessRuleId) const
@@ -177,8 +177,19 @@ void QnEventsDB::getAndSerializeActions(
     else {
         request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs);
     }
-    if (cameraId.isValid())
-        request += QString(lit(" and event_resource_id = %1 ")).arg(cameraId.toInt());
+    
+    if (resList.size() == 1)
+        request += QString(lit(" and event_resource_id = %1 ")).arg(resList[0]->getId().toInt());
+    else if (resList.size() > 1) {
+        QString idList;
+        foreach(QnResourcePtr res, resList) {
+            if (!idList.isEmpty())
+                idList += QLatin1Char(',');
+            idList += QString::number(res->getId());
+        }
+        request += QString(lit(" and event_resource_id in (%1) ")).arg(idList);
+    }
+
     if (eventType != BusinessEventType::NotDefined)
         request += QString(lit( " and event_type = %1 ")).arg((int) eventType);
     if (actionType != BusinessActionType::NotDefined)

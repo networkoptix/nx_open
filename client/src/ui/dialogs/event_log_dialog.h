@@ -29,7 +29,7 @@ public:
     * \param businessRuleId optional business rule id
     */
     void query(qint64 fromMsec, qint64 toMsec, 
-               QnNetworkResourcePtr camRes, 
+               QnResourceList camList,
                BusinessEventType::Value eventType, 
                BusinessActionType::Value actionType,
                QnId businessRuleId);
@@ -38,11 +38,14 @@ private slots:
     void at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum);
     void onItemClicked(QListWidgetItem * item);
     void at_customContextMenuRequested(const QPoint& screenPos);
+    void at_cameraButtonClicked();
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     QnLightBusinessActionVectorPtr mergeEvents(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
     QnLightBusinessActionVectorPtr merge2(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
     QnLightBusinessActionVectorPtr mergeN(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
+    QAction* getFilterAction(const QMenu* menu, const QModelIndex& idx);
+    QString getTextForNCameras(int n) const;
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  
@@ -52,6 +55,7 @@ private:
     QnWorkbenchContext* m_context;
 
     QList <QnLightBusinessActionVectorPtr> m_allEvents;
+    QnResourceList m_filterCameraList;
 };
 
 #endif // __EVENT_LOG_DIALOG_H____

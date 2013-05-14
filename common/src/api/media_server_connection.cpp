@@ -547,7 +547,7 @@ int QnMediaServerConnection::ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &
 
 int QnMediaServerConnection::asyncEventLog(
                   qint64 dateFrom, qint64 dateTo, 
-                  QnNetworkResourcePtr camRes, 
+                  QnResourceList camList,
                   BusinessEventType::Value eventType, 
                   BusinessActionType::Value actionType,
                   QnId businessRuleId, 
@@ -557,8 +557,11 @@ int QnMediaServerConnection::asyncEventLog(
     params << QnRequestParam( "from", dateFrom);
     if (dateTo != DATETIME_NOW)
         params << QnRequestParam( "to", dateTo);
-    if (camRes)
-        params << QnRequestParam( "res_id", camRes->getPhysicalId() );
+    foreach(QnResourcePtr res, camList) {
+        QnNetworkResourcePtr camera = res.dynamicCast<QnNetworkResource>();
+        if (camera)
+            params << QnRequestParam( "res_id", camera->getPhysicalId() );
+    }
     if (businessRuleId.isValid())
         params << QnRequestParam( "brule_id", businessRuleId.toInt() );
     if (eventType != BusinessEventType::NotDefined)

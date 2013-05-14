@@ -23,6 +23,8 @@ public:
 
     virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
+
+    QString getUniqueIdForServer(const QnResourcePtr mServer) const;
 protected:
     virtual QString getUniqueId() const override;
     virtual void setCropingPhysical(QRect croping);

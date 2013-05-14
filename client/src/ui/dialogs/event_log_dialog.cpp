@@ -7,6 +7,9 @@
 #include "business/events/abstract_business_event.h"
 #include "ui/actions/action_manager.h"
 #include "ui/actions/actions.h"
+#include "ui/style/resource_icon_cache.h"
+#include "device_plugins/server_camera/server_camera.h"
+#include "resource_selection_dialog.h"
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -42,6 +45,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         actionItems << BusinessActionType::toString(BusinessActionType::Value(i));
     ui->actionComboBox->addItems(actionItems);
 
+    ui->cameraButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera | QnResourceIconCache::Online));
+
     connect(ui->dateEditFrom, SIGNAL(dateChanged(const QDate &)), this, SLOT(updateData()) );
     connect(ui->dateEditTo, SIGNAL(dateChanged(const QDate &)), this, SLOT(updateData()) );
 
@@ -52,6 +57,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     connect(ui->gridEvents, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT(at_customContextMenuRequested(const QPoint &)) );
 
+    connect(ui->cameraButton, SIGNAL(clicked (bool)), this, SLOT(at_cameraButtonClicked()) );
 
     updateData();
 }
@@ -71,7 +77,7 @@ void QnEventLogDialog::updateData()
         actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
     query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(), ui->dateEditTo->dateTime().addDays(1).toMSecsSinceEpoch(),
-          QnNetworkResourcePtr(), // todo: add camera resource here
+          m_filterCameraList,
           eventType, actionType,
           QnId() // todo: add businessRuleID here
           );
@@ -94,7 +100,7 @@ QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
 }
 
 void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec, 
-                             QnNetworkResourcePtr camRes, 
+                             QnResourceList camList, 
                              BusinessEventType::Value eventType,
                              BusinessActionType::Value actionType,
                              QnId businessRuleId)
@@ -110,7 +116,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
         {
             m_requests << mserver->apiConnection()->asyncEventLog(
                 fromMsec, toMsec, 
-                camRes, 
+                m_filterCameraList, 
                 eventType,
                 actionType,
                 businessRuleId, 
@@ -231,21 +237,49 @@ void QnEventLogDialog::onItemClicked(QListWidgetItem * item)
 {
 }
 
+QAction* QnEventLogDialog::getFilterAction(const QMenu* menu, const QModelIndex& idx)
+{
+    return 0;
+}
+
 void QnEventLogDialog::at_customContextMenuRequested(const QPoint& screenPos)
 {
     QModelIndex idx = ui->gridEvents->currentIndex();
-    QnId resId = m_model->data(ui->gridEvents->currentIndex(), Qn::ResourceRole).toInt();
-    if (!resId.isValid())
-        return;
+    QnId resId = m_model->data(idx, Qn::ResourceRole).toInt();
     QnResourcePtr resource = qnResPool->getResourceById(resId);
-    if (!resource)
-        return;
 
     QnActionManager *manager = m_context->menu();
-    const QnActionParameters parameters(resource);
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::ActionScope::TreeScope, parameters));
-    if (menu) {
-        //manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
-        QAction *action = menu->exec(screenPos + pos());
+    QScopedPointer<QMenu> menu(resource ? manager->newMenu(Qn::ActionScope::TreeScope, QnActionParameters(resource)) : new QMenu);
+    //manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
+
+    QAction* filterAction = getFilterAction(menu.data(), idx);
+    if (filterAction) {
+        if (!menu->isEmpty()) 
+            menu->addSeparator();
+        menu->addAction(filterAction);
+    }
+
+    QAction* action = menu->exec(screenPos + pos());
+}
+
+QString QnEventLogDialog::getTextForNCameras(int n) const
+{
+    if (n == 0)
+        return tr("< Any camera >");
+    else if (n == 1)
+        return tr("< 1 camera >");
+    else 
+        return tr("< %1 cameras >").arg(n);
+}
+
+void QnEventLogDialog::at_cameraButtonClicked()
+{
+    QnResourceSelectionDialog dialog(this);
+    dialog.setSelectedResources(m_filterCameraList);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        m_filterCameraList = dialog.getSelectedResources();
+        ui->cameraButton->setText(getTextForNCameras(m_filterCameraList.size()));
+        updateData();
     }
 }

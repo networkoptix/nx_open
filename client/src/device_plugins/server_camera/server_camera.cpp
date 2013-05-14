@@ -72,6 +72,11 @@ QString QnServerCamera::getUniqueId() const
     return getPhysicalId() + getParentId().toString();
 }
 
+QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
+{
+    return getPhysicalId() + mServer->getId().toString();
+}
+
 // --------------------------- QnServerCameraFactory -----------------------------
 
 QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)

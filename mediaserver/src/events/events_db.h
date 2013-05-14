@@ -26,7 +26,7 @@ public:
     void QnEventsDB::getAndSerializeActions(
         QByteArray& result,
         const QnTimePeriod& period,
-        const QnId& cameraId, 
+        const QnResourceList& resList,
         const BusinessEventType::Value& eventType, 
         const BusinessActionType::Value& actionType,
         const QnId& businessRuleId) const;
