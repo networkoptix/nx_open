@@ -19,11 +19,16 @@ QnTreeViewComboBox::QnTreeViewComboBox(QWidget *parent): QComboBox(parent), m_tr
     setView(m_treeView);
 }
 
+QModelIndex QnTreeViewComboBox::currentIndex()
+{
+    return m_treeView->currentIndex();
+}
+
 void QnTreeViewComboBox::showPopup() 
 {
     setRootModelIndex(QModelIndex());
 
-    for(int i=1;i<model()->columnCount();++i)
+    for(int i = 1; i<model()->columnCount(); ++i)
         m_treeView->hideColumn(i);
 
     m_treeView->expandAll();

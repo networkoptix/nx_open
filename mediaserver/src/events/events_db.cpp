@@ -89,9 +89,60 @@ QString QnEventsDB::toSQLDate(qint64 timeMs) const
     return QDateTime::fromMSecsSinceEpoch(timeMs).toString("yyyy-MM-dd hh:mm:ss");
 }
 
+QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
+                                  const QnResourceList& resList,
+                                  const BusinessEventType::Value& eventType, 
+                                  const BusinessActionType::Value& actionType,
+                                  const QnId& businessRuleId) const
+
+{
+    QString request(lit("SELECT * FROM runtime_actions where"));
+    if (period.durationMs != -1) {
+        request += QString(lit(" timestamp between '%1' and '%2'")).arg(toSQLDate(period.startTimeMs)).arg(toSQLDate(period.endTimeMs()));
+    }
+    else {
+        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs);
+    }
+
+    if (resList.size() == 1)
+        request += QString(lit(" and event_resource_id = %1 ")).arg(resList[0]->getId().toInt());
+    else if (resList.size() > 1) {
+        QString idList;
+        foreach(QnResourcePtr res, resList) {
+            if (!idList.isEmpty())
+                idList += QLatin1Char(',');
+            idList += QString::number(res->getId());
+        }
+        request += QString(lit(" and event_resource_id in (%1) ")).arg(idList);
+    }
+
+    if (eventType != BusinessEventType::NotDefined && eventType != BusinessEventType::AnyBusinessEvent)
+    {
+        if (BusinessEventType::hasChild(eventType)) {
+            QList<BusinessEventType::Value> events = BusinessEventType::childEvents(eventType);
+            QString eventTypeStr;
+            foreach(BusinessEventType::Value evnt, events) {
+                if (!eventTypeStr.isEmpty())
+                    eventTypeStr += QLatin1Char(',');
+                eventTypeStr += QString::number((int) evnt);
+            }
+            request += QString(lit( " and event_type in (%1) ")).arg(eventTypeStr);
+        }
+        else {
+            request += QString(lit( " and event_type = %1 ")).arg((int) eventType);
+        }
+    }
+    if (actionType != BusinessActionType::NotDefined)
+        request += QString(lit( " and action_type = %1 ")).arg((int) actionType);
+    if (businessRuleId.isValid())
+        request += QString(lit( " and  business_rule_id = %1 ")).arg(businessRuleId.toInt());
+
+    return request;
+}
+
 QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     const QnTimePeriod& period,
-    const QnId& cameraId, 
+    const QnResourceList& resList, 
     const BusinessEventType::Value& eventType, 
     const BusinessActionType::Value& actionType,
     const QnId& businessRuleId) const
@@ -100,25 +151,10 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     QTime t;
     t.restart();
 
-    QMutexLocker lock(&m_mutex);
-
     QList<QnAbstractBusinessActionPtr> result;
+    QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QString request(lit("SELECT * FROM runtime_actions where"));
-    if (period.durationMs != -1) {
-        request += QString(lit(" timestamp between '%1' and '%2'")).arg(toSQLDate(period.startTimeMs)).arg(toSQLDate(period.endTimeMs()));
-    }
-    else {
-        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs);
-    }
-    if (cameraId.isValid())
-        request += QString(lit(" and event_resource_id = %1 ")).arg(cameraId.toInt());
-    if (eventType != BusinessEventType::NotDefined)
-        request += QString(lit( " and event_type = %1 ")).arg((int) eventType);
-    if (actionType != BusinessActionType::NotDefined)
-        request += QString(lit( " and action_type = %1 ")).arg((int) actionType);
-    if (businessRuleId.isValid())
-        request += QString(lit( " and  business_rule_id = %1 ")).arg(businessRuleId.toInt());
+    QMutexLocker lock(&m_mutex);
 
     QSqlQuery query(request);
     if (!query.exec())
@@ -168,34 +204,9 @@ void QnEventsDB::getAndSerializeActions(
     QTime t;
     t.restart();
 
+    QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
+
     QMutexLocker lock(&m_mutex);
-
-    QString request(lit("SELECT * FROM runtime_actions where"));
-    if (period.durationMs != -1) {
-        request += QString(lit(" timestamp between '%1' and '%2'")).arg(toSQLDate(period.startTimeMs)).arg(toSQLDate(period.endTimeMs()));
-    }
-    else {
-        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs);
-    }
-    
-    if (resList.size() == 1)
-        request += QString(lit(" and event_resource_id = %1 ")).arg(resList[0]->getId().toInt());
-    else if (resList.size() > 1) {
-        QString idList;
-        foreach(QnResourcePtr res, resList) {
-            if (!idList.isEmpty())
-                idList += QLatin1Char(',');
-            idList += QString::number(res->getId());
-        }
-        request += QString(lit(" and event_resource_id in (%1) ")).arg(idList);
-    }
-
-    if (eventType != BusinessEventType::NotDefined)
-        request += QString(lit( " and event_type = %1 ")).arg((int) eventType);
-    if (actionType != BusinessActionType::NotDefined)
-        request += QString(lit( " and action_type = %1 ")).arg((int) actionType);
-    if (businessRuleId.isValid())
-        request += QString(lit( " and  business_rule_id = %1 ")).arg(businessRuleId.toInt());
 
     QSqlQuery actionsQuery(request);
     if (!actionsQuery.exec())

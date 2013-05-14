@@ -10,6 +10,8 @@ class QnTreeViewComboBox : public QComboBox
 public:
     explicit QnTreeViewComboBox(QWidget *parent = 0);
     virtual void showPopup();
+
+    QModelIndex currentIndex();
 protected:
     virtual QSize sizeHint() const override;
 public slots:

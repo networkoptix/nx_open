@@ -50,7 +50,7 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
             }
             else if (params[i].first == "event") {
                 eventType = (BusinessEventType::Value) params[i].second.toInt();
-                if (eventType < 0 || eventType >= BusinessEventType::NotDefined)
+                if (eventType < 0)
                     errStr = QString("Invalid event type %1. Valid range is [0..%2]").arg(params[i].second).arg(BusinessEventType::NotDefined-1);
             }
             else if (params[i].first == "action") {

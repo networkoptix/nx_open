@@ -18,7 +18,7 @@ public:
     
     QList<QnAbstractBusinessActionPtr> getActions(
         const QnTimePeriod& period,
-        const QnId& cameraId = QnId(), 
+        const QnResourceList& resList,
         const BusinessEventType::Value& eventType = BusinessEventType::NotDefined, 
         const BusinessActionType::Value& actionType = BusinessActionType::NotDefined,
         const QnId& businessRuleId = QnId()) const;
@@ -42,6 +42,11 @@ protected:
 private:
     bool cleanupEvents();
     QString toSQLDate(qint64 timeMs) const;
+    QString getRequestStr(const QnTimePeriod& period,
+        const QnResourceList& resList,
+        const BusinessEventType::Value& eventType, 
+        const BusinessActionType::Value& actionType,
+        const QnId& businessRuleId) const;
 private:
     QSqlDatabase m_sdb;
     qint64 m_lastCleanuptime;

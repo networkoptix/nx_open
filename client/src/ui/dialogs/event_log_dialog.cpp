@@ -19,14 +19,14 @@ QStandardItem* QnEventLogDialog::createEventItem(BusinessEventType::Value value)
     return result;
 }
 
-QStandardItem* QnEventLogDialog::addEventSubItems(QStandardItem* rootItem, BusinessEventType::Value value)
+QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, BusinessEventType::Value value)
 {
     QStandardItem* item = createEventItem(value);
     if (rootItem)
         rootItem->appendRow(item);
 
     foreach(BusinessEventType::Value value, BusinessEventType::childEvents(value))
-        addEventSubItems(item, value);
+        createEventTree(item, value);
     return item;
 }
 
@@ -55,7 +55,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
 
 
-    QStandardItem* rootItem = addEventSubItems(0, BusinessEventType::AnyBusinessEvent);
+    QStandardItem* rootItem = createEventTree(0, BusinessEventType::AnyBusinessEvent);
     
     QStandardItemModel* model = new QStandardItemModel();
     model->appendRow(rootItem);
@@ -90,11 +90,13 @@ QnEventLogDialog::~QnEventLogDialog()
 
 void QnEventLogDialog::updateData()
 {
-    BusinessEventType::Value eventType = BusinessEventType::NotDefined;
     BusinessActionType::Value actionType = BusinessActionType::NotDefined;
+    BusinessEventType::Value eventType = BusinessEventType::NotDefined;
 
-    //if (ui->eventComboBox->currentIndex() > 0)
-    //    eventType = BusinessEventType::Value(ui->eventComboBox->currentIndex()-1);
+    QModelIndex idx = ui->eventComboBox->currentIndex();
+    if (idx.isValid())
+        eventType = (BusinessEventType::Value) ui->eventComboBox->model()->data(idx, Qn::FirstItemDataRole).toInt();
+
     if (ui->actionComboBox->currentIndex() > 0)
         actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
