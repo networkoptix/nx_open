@@ -10,9 +10,6 @@ namespace BusinessEventType
         if (val >= UserDefined)
             return QObject::tr("User Defined (%1)").arg((int)val - (int)UserDefined);
 
-        if (val >= Count)
-            return QString();
-
         switch( val )
         {
         case Camera_Motion:
@@ -31,6 +28,12 @@ namespace BusinessEventType
             return QObject::tr("Media Server Failure");
         case MediaServer_Conflict:
             return QObject::tr("Media Server Conflict");
+        case AnyCameraIssue:
+            return QObject::tr("Any camera issue");
+        case AnyServerIssue:
+            return QObject::tr("Any server issue");
+        case AnyBusinessEvent:
+            return QObject::tr("Any event");
         default:
             return QString();
         }

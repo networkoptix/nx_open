@@ -29,6 +29,7 @@ public:
 
     const QnLightBusinessActionVectorPtr &events() const;
     void setEvents(const QnLightBusinessActionVectorPtr &events);
+    void setEvents(const QList<QnLightBusinessActionVectorPtr> &events);
     //void addEvents(const QnLightBusinessActionVectorPtr &events);
 
     QList<Column> columns() const;
@@ -50,6 +51,10 @@ private:
     QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action) const;
     QVariant resourceData(const Column& column, const QnLightBusinessAction &action) const;
     QString formatUrl(const QString& url) const;
+
+    QnLightBusinessActionVectorPtr mergeEvents(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
+    QnLightBusinessActionVectorPtr merge2(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
+    QnLightBusinessActionVectorPtr mergeN(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
 private:
     QList<Column> m_columns;
     QnLightBusinessActionVectorPtr m_events;

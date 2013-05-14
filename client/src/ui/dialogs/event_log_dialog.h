@@ -41,11 +41,9 @@ private slots:
     void at_cameraButtonClicked();
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
-    QnLightBusinessActionVectorPtr mergeEvents(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
-    QnLightBusinessActionVectorPtr merge2(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
-    QnLightBusinessActionVectorPtr mergeN(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
     QAction* getFilterAction(const QMenu* menu, const QModelIndex& idx);
     QString getTextForNCameras(int n) const;
+    QStandardItem* createEventItem(BusinessEventType::Value value);
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  

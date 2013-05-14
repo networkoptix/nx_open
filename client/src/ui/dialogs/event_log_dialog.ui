@@ -44,7 +44,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="eventComboBox"/>
+      <widget class="QnTreeViewComboBox" name="eventComboBox"/>
      </item>
      <item>
       <widget class="QLabel" name="label_3">
@@ -137,6 +137,11 @@
    <class>QnTableView</class>
    <extends>QTableView</extends>
    <header>ui/widgets/table_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnTreeViewComboBox</class>
+   <extends>QComboBox</extends>
+   <header>ui/common/treeComboBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
