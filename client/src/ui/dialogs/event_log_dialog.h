@@ -44,7 +44,7 @@ private:
     QAction* getFilterAction(const QMenu* menu, const QModelIndex& idx);
     QString getTextForNCameras(int n) const;
     QStandardItem* createEventItem(BusinessEventType::Value value);
-    void addEventSubItems(QStandardItem* rootItem, BusinessEventType::Value value);
+    QStandardItem* createEventTree(QStandardItem* rootItem, BusinessEventType::Value value);
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  

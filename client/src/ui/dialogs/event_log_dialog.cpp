@@ -19,15 +19,15 @@ QStandardItem* QnEventLogDialog::createEventItem(BusinessEventType::Value value)
     return result;
 }
 
-void QnEventLogDialog::addEventSubItems(QStandardItem* rootItem, BusinessEventType::Value value)
+QStandardItem* QnEventLogDialog::addEventSubItems(QStandardItem* rootItem, BusinessEventType::Value value)
 {
-    QList<BusinessEventType::Value> chields = BusinessEventType::childEvents(value);
-    foreach(BusinessEventType::Value value, chields) {
-        QStandardItem* item = createEventItem(value);
+    QStandardItem* item = createEventItem(value);
+    if (rootItem)
         rootItem->appendRow(item);
-        if (BusinessEventType::hasChild(value))
-            addEventSubItems(item, value);
-    }
+
+    foreach(BusinessEventType::Value value, BusinessEventType::childEvents(value))
+        addEventSubItems(item, value);
+    return item;
 }
 
 
@@ -55,8 +55,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
 
 
-    QStandardItem* rootItem = createEventItem(BusinessEventType::AnyBusinessEvent);
-    addEventSubItems(rootItem, BusinessEventType::AnyBusinessEvent);
+    QStandardItem* rootItem = addEventSubItems(0, BusinessEventType::AnyBusinessEvent);
     
     QStandardItemModel* model = new QStandardItemModel();
     model->appendRow(rootItem);
