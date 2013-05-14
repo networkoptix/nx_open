@@ -165,8 +165,8 @@ void QnEventsDB::getAndSerializeActions(
                                         const QnId& businessRuleId) const
 
 {
-    QTime t;
-    t.restart();
+//    QTime t;
+//    t.restart();
 
     QMutexLocker lock(&m_mutex);
 
@@ -192,10 +192,10 @@ void QnEventsDB::getAndSerializeActions(
 
     QSqlRecord rec = actionsQuery.record();
     int actionTypeIdx = rec.indexOf(lit("action_type"));
-    int actionParamIdx = rec.indexOf(lit("action_params"));
+//    int actionParamIdx = rec.indexOf(lit("action_params"));
     int runtimeParamIdx = rec.indexOf(lit("runtime_params"));
     int businessRuleIdx = rec.indexOf(lit("business_rule_id"));
-    int toggleStateIdx = rec.indexOf(lit("toggle_state"));
+//    int toggleStateIdx = rec.indexOf(lit("toggle_state"));
     int aggregationCntIdx = rec.indexOf(lit("aggregation_count"));
 
 
@@ -219,7 +219,7 @@ void QnEventsDB::getAndSerializeActions(
     }
     memcpy(result.data(), &sizeField, sizeof(int));
 
-    qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
+//    qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
 }
 
 
