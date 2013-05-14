@@ -22,8 +22,6 @@ QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
     connect(this, SIGNAL(fileListReceived(QStringList,bool)),   this, SLOT(at_fileListReceived(QStringList,bool)));
     connect(this, SIGNAL(fileDownloaded(QString,bool)),         this, SLOT(at_fileAdded(QString,bool)));
     connect(this, SIGNAL(fileUploaded(QString,bool)),           this, SLOT(at_fileAdded(QString, bool)));
-
-    getFileList();
 }
 
 QnAppServerNotificationCache::~QnAppServerNotificationCache() {
@@ -59,6 +57,10 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
     connect(transcoder, SIGNAL(done(QString)), this, SLOT(at_soundConverted(QString)));
     connect(transcoder, SIGNAL(done(QString)), transcoder, SLOT(deleteLater()));
     transcoder->startAsync();
+}
+
+void QnAppServerNotificationCache::clear() {
+    m_model->init();
 }
 
 void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {

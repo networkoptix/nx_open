@@ -941,6 +941,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
     if (cameraAdditionDialog())
         cameraAdditionDialog()->hide();
+    context()->instance<QnAppServerNotificationCache>()->clear();
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
@@ -948,6 +949,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM use conditional texts?
 
     at_checkSystemHealthAction_triggered(); //TODO: #GDM place to corresponding place
+    context()->instance<QnAppServerNotificationCache>()->getFileList();
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
