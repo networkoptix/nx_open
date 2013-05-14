@@ -551,7 +551,6 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(newWidget != NULL) {
             bringToFront(newWidget);
             synchronize(newWidget, true);
-            newWidget->setOpacity(0.7);
         }
         break;
     }
