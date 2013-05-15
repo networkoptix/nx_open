@@ -25,11 +25,38 @@
      </item>
      <item>
       <widget class="QPushButton" name="cameraButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>0</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="mouseTracking">
-        <bool>true</bool>
+        <bool>false</bool>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
        </property>
        <property name="text">
-        <string>&lt; Any camera&gt;</string>
+        <string>&lt; Any camera &gt;</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
        </property>
        <property name="flat">
         <bool>false</bool>
