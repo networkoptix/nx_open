@@ -93,7 +93,7 @@
      <item row="0" column="3">
       <widget class="QComboBox" name="actionComboBox"/>
      </item>
-     <item row="0" column="4">
+     <item row="0" column="5">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -106,7 +106,21 @@
        </property>
       </spacer>
      </item>
+     <item row="0" column="4">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>&lt;- Filter</string>
+       </property>
+      </widget>
+     </item>
     </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QnTableView" name="gridEvents">
