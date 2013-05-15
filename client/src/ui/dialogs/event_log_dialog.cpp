@@ -125,7 +125,7 @@ void QnEventLogDialog::updateData()
           );
 
     ui->gridEvents->setDisabled(true);
-    ui->gridEvents->setCursor(Qt::WaitCursor);
+    setCursor(Qt::BusyCursor);
 
 }
 
@@ -191,7 +191,7 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
         m_model->setEvents(m_allEvents);
         m_allEvents.clear();
         ui->gridEvents->setDisabled(false);
-        ui->gridEvents->setCursor(Qt::ArrowCursor);
+        setCursor(Qt::ArrowCursor);
         updateHeaderWidth();
     }
 }
