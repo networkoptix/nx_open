@@ -33,7 +33,7 @@ protected:
     virtual void innerValueChanged(const QString &value) = 0;
 
 private slots:
-   void at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairs &kvPairs, int handle);
+   void at_connection_replyReceived(int status, const QnKvPairs &kvPairs, int handle);
 private:
     void load();
     void save();

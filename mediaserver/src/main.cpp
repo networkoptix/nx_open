@@ -707,7 +707,7 @@ void QnMain::loadResourcesFromECS()
         qnResPool->addResource(user);
 
     //loading business rules
-    QnBusinessEventRules rules;
+    QnBusinessEventRuleList rules;
     while( appServerConnection->getBusinessRules(rules) != 0 )
     {
         qDebug() << "QnMain::run(): Can't get business rules. Reason: " << appServerConnection->getLastError();

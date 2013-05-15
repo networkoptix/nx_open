@@ -4,10 +4,10 @@
 #include "serializer.h"
 
 /**
-  * Serialize resource to protobuf
-  */
-class QnApiPbSerializer : public QnApiSerializer
-{
+ * Serialize resource to protobuf
+ */
+class QnApiPbSerializer : public QnApiSerializer {
+    Q_DECLARE_TR_FUNCTIONS(QnApiPbSerializer)
 public:
     const char* format() const { return "pb"; }
 
@@ -21,7 +21,7 @@ public:
     void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) override;
     void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) override;
     void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) override;
-    void deserializeBusinessRules(QnBusinessEventRules& businessRules, const QByteArray& data) override;
+    void deserializeBusinessRules(QnBusinessEventRuleList& businessRules, const QByteArray& data) override;
     void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) override;
     void deserializeBusinessActionVector(QnLightBusinessActionVectorPtr &businessActionList, const QByteArray& data) override;
     void deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data);
@@ -33,7 +33,7 @@ public:
     void serializeLicense(const QnLicensePtr& license, QByteArray& data) override;
 	void serializeLicenses(const QList<QnLicensePtr>& licenses, QByteArray& data) override;
     void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) override;
-    void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) override;
+    void serializeBusinessRules(const QnBusinessEventRuleList&, QByteArray& data) override;
     void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) override;
     void serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data) override;
     void serializeBusinessAction(const QnAbstractBusinessActionPtr& action, QByteArray& data) override;

@@ -7,10 +7,6 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
-#include <utils/common/request_param.h>
-#include <utils/common/warnings.h>
-#include <utils/common/util.h>
-
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
@@ -23,11 +19,12 @@
 #include "api_fwd.h"
 #include "abstract_connection.h"
 #include "media_server_cameras_data.h"
+
+// TODO: #Elric add fwd header
 #include "business/actions/abstract_business_action.h"
 #include "business/events/abstract_business_event.h"
 
 class QnPtzSpaceMapper;
-class QnEnumNameMapper;
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
 typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;

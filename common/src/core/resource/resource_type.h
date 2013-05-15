@@ -13,6 +13,8 @@ class QnResourceType;
 typedef QSharedPointer<QnResourceType> QnResourceTypePtr;
 typedef QList<QnResourceTypePtr> QnResourceTypeList;
 
+Q_DECLARE_METATYPE(QnResourceTypeList)
+
 class QN_EXPORT QnResourceType
 {
 public:

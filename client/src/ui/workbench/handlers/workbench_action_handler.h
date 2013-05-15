@@ -51,7 +51,7 @@ namespace detail {
         QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
+        void at_replyReceived(int status, const QnResourceList &resources, int handle);
 
     private:
         QWeakPointer<QnWorkbenchActionHandler> m_handler;
@@ -81,10 +81,10 @@ namespace detail {
         }
 
     signals:
-        void finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
+        void finished(int status, const QnResourceList &resources, int handle);
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
+        void at_replyReceived(int status, const QnResourceList &resources, int handle);
 
     private:
         int m_handle;
@@ -115,10 +115,10 @@ namespace detail {
         }
 
     signals:
-        void finished(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle);
+        void finished(int status, const QnConnectInfoPtr &connectInfo, int handle);
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle);
+        void at_replyReceived(int status, const QnConnectInfoPtr &connectInfo, int handle);
 
     private:
         int m_handle;
@@ -351,9 +351,9 @@ protected slots:
     void at_camera_exportFinished(QString fileName);
     void at_camera_exportFailed(QString errorMessage);
 
-    void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+    void at_resources_saved(int status, const QnResourceList &resources, int handle);
     void at_resource_deleted(const QnHTTPRawResponse& resource, int handle);
-    void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
+    void at_resources_statusSaved(int status, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
 
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
@@ -383,7 +383,7 @@ protected slots:
 
     void at_togglePopupsAction_toggled(bool checked);
 
-    void at_serverSettings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
+    void at_serverSettings_received(int status, const QnKvPairList& settings, int handle);
 
     void at_notificationSoundDownloaded(const QString& filename, bool ok);
 private:

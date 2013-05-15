@@ -32,7 +32,7 @@ void QnAbstractConnection::setNameMapper(QnEnumNameMapper *nameMapper) {
     m_nameMapper.reset(nameMapper);
 }
 
-int QnAbstractConnection::sendAsyncRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
+int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
     QnAbstractReplyProcessor *processor = newReplyProcessor(object);
 
     QByteArray signal;
@@ -43,33 +43,52 @@ int QnAbstractConnection::sendAsyncRequest(int object, const QnRequestParamList 
     }
     connectProcessor(processor, signal.constData(), target, slot, Qt::QueuedConnection);
 
-    return QnSessionManager::instance()->sendAsyncGetRequest(
+    return QnSessionManager::instance()->sendAsyncRequest(
+        operation,
         m_url, 
         nameMapper()->name(processor->object()), 
-        QnRequestHeaderList(), 
+        headers, 
         params, 
+        data,
         processor, 
         SLOT(processReply(QnHTTPRawResponse, int))
     );
 }
 
-int QnAbstractConnection::sendSyncRequest(int object, const QnRequestParamList &params, QVariant *reply) {
-    assert(reply);
+int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
+    return sendAsyncRequest(QNetworkAccessManager::GetOperation, object, headers, params, QByteArray(), replyTypeName, target, slot);
+}
 
+int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
+    return sendAsyncGetRequest(object, QnRequestHeaderList(), params, replyTypeName, target, slot);
+}
+
+int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
     QnHTTPRawResponse response;
-    QnSessionManager::instance()->sendGetRequest(
+    QnSessionManager::instance()->sendSyncRequest(
+        operation,
         m_url,
         nameMapper()->name(object),
-        QnRequestHeaderList(),
+        headers,
         params,
+        data,
         response
     );
 
     QScopedPointer<QnAbstractReplyProcessor> processor(newReplyProcessor(object));
     processor->processReply(response, -1);
-    *reply = processor->reply();
+    if(reply)
+        *reply = processor->reply();
 
     return processor->status();
+}
+
+int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, QVariant *reply) {
+    return sendSyncRequest(QNetworkAccessManager::GetOperation, object, headers, params, QByteArray(), reply);
+}
+
+int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply) {
+    return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
 }
 
 bool QnAbstractConnection::connectProcessor(QnAbstractReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType) {

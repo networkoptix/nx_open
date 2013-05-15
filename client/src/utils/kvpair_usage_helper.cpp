@@ -90,7 +90,7 @@ void QnAbstractKvPairUsageHelper::setInnerValue(const QString &value) {
 void QnAbstractKvPairUsageHelper::load() {
     d->loadHandle = QnAppServerConnectionFactory::createConnection()->getKvPairsAsync(
                 this,
-                SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairs &, int)));
+                SLOT(at_connection_replyReceived(int, const QnKvPairs &, int)));
 }
 
 void QnAbstractKvPairUsageHelper::save() {
@@ -101,12 +101,12 @@ void QnAbstractKvPairUsageHelper::save() {
                 d->resource,
                 kvPairs,
                 this,
-                SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairs &, int)));
+                SLOT(at_connection_replyReceived(int, const QnKvPairs &, int)));
 }
 
-void QnAbstractKvPairUsageHelper::at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairs &kvPairs, int handle) {
+void QnAbstractKvPairUsageHelper::at_connection_replyReceived(int status, const QnKvPairs &kvPairs, int handle) {
     if(status != 0) {
-        qnWarning("Failed to save/load kvPairs cause of %1.", errorString);
+        qnWarning("Failed to save/load kvPairs.");
         return;
     }
 

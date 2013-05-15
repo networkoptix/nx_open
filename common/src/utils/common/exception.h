@@ -1,12 +1,12 @@
 #ifndef QN_EXCEPTION_H
 #define QN_EXCEPTION_H
 
-#include <utils/common/config.h>
 #include <exception>
-#include <QString>
-#include <QByteArray>
 
-// TODO: #Elric use this class for Ivan's custom exceptions
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
+
+
 class QnException: virtual public std::exception {
 public:
     QnException(const QString &message = QString()): m_message(message) {}

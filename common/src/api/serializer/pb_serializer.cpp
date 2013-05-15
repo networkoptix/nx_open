@@ -387,7 +387,7 @@ void parseSettings(QnKvPairList& kvPairs, const PbSettingList& pb_settings)
 }
 
 
-void parseBusinessRules(QnBusinessEventRules& businessRules, const PbBusinessRuleList& pb_businessRules) {
+void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules) {
     for (PbBusinessRuleList::const_iterator ci = pb_businessRules.begin(); ci != pb_businessRules.end(); ++ci)
     {
         const pb::BusinessRule& pb_businessRule = *ci;
@@ -640,11 +640,8 @@ BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
 void QnApiPbSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
     pb::Resources pb_cameras;
-    if (!pb_cameras.ParseFromArray(data.data(), data.size())) {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeCameras(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+    if (!pb_cameras.ParseFromArray(data.data(), data.size()))
+        throw QnSerializeException(tr("Cannot parse serialized cameras."));
 
     parseCameras(cameras, pb_cameras.resource(), resourceFactory);
 }
@@ -652,11 +649,8 @@ void QnApiPbSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras,
 void QnApiPbSerializer::deserializeServers(QnMediaServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
     pb::Resources pb_servers;
-    if (!pb_servers.ParseFromArray(data.data(), data.size())) {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeServers(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+    if (!pb_servers.ParseFromArray(data.data(), data.size()))
+        throw QnSerializeException(tr("Cannot parse serialized servers."));
 
     parseServers(servers, pb_servers.resource(), resourceFactory);
 }
@@ -664,11 +658,8 @@ void QnApiPbSerializer::deserializeServers(QnMediaServerResourceList& servers, c
 void QnApiPbSerializer::deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data)
 {
     pb::Resources pb_layouts;
-    if (!pb_layouts.ParseFromArray(data.data(), data.size())) {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeLayouts(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+    if (!pb_layouts.ParseFromArray(data.data(), data.size()))
+        throw QnSerializeException(tr("Cannot parse serialized layouts."));
 
     parseLayouts(layouts, pb_layouts.resource());
 }
@@ -687,11 +678,8 @@ void QnApiPbSerializer::deserializeLayout(QnLayoutResourcePtr& layout, const QBy
 void QnApiPbSerializer::deserializeUsers(QnUserResourceList& users, const QByteArray& data)
 {
     pb::Resources pb_users;
-    if (!pb_users.ParseFromArray(data.data(), data.size())) {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeUsers(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+    if (!pb_users.ParseFromArray(data.data(), data.size()))
+        throw QnSerializeException(tr("Cannot parse serialized users."));
 
     parseUsers(users, pb_users.resource());
 }
@@ -699,11 +687,8 @@ void QnApiPbSerializer::deserializeUsers(QnUserResourceList& users, const QByteA
 void QnApiPbSerializer::deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
     pb::Resources pb_resources;
-    if (!pb_resources.ParseFromArray(data.data(), data.size())) {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeCameras(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+    if (!pb_resources.ParseFromArray(data.data(), data.size()))
+        throw QnSerializeException(tr("Cannot parse serialized resources."));
 
     parseResources(resources, pb_resources.resource(), resourceFactory);
 }
@@ -711,11 +696,8 @@ void QnApiPbSerializer::deserializeResources(QnResourceList& resources, const QB
 void QnApiPbSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data)
 {
     pb::ResourceTypes pb_resourceTypes;
-    if (!pb_resourceTypes.ParseFromArray(data.data(), data.size())) {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeResourceTypes(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+    if (!pb_resourceTypes.ParseFromArray(data.data(), data.size()))
+        throw QnSerializeException(tr("Cannot parse serialized resource types."));
 
     parseResourceTypes(resourceTypes, pb_resourceTypes.resourcetype());
 }
@@ -723,11 +705,8 @@ void QnApiPbSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTyp
 void QnApiPbSerializer::deserializeLicenses(QnLicenseList &licenses, const QByteArray &data)
 {
     pb::Licenses pb_licenses;
-    if (!pb_licenses.ParseFromArray(data.data(), data.size())) {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeLicenses(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+    if (!pb_licenses.ParseFromArray(data.data(), data.size()))
+        throw QnSerializeException(tr("Cannot parse serialized licenses."));
 
     licenses.setHardwareId(pb_licenses.hwid().c_str());
     licenses.setOldHardwareId(pb_licenses.oldhardwareid().c_str());
@@ -739,11 +718,7 @@ void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &camera
     pb::CameraServerItems pb_csis;
 
     if (!pb_csis.ParseFromArray(data.data(), data.size()))
-    {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeLicenses(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+        throw QnSerializeException(tr("Cannot parse serialized camera history."));
 
     parseCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
 }
@@ -753,11 +728,7 @@ void QnApiPbSerializer::deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray&
     pb::KvPairs pb_kvPairs;
 
     if (!pb_kvPairs.ParseFromArray(data.data(), data.size()))
-    {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeKvPairs(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+        throw QnSerializeException(tr("Cannot parse serialized key-value pairs."));
 
     parseKvPairs(kvPairs, pb_kvPairs.kvpair());
 }
@@ -767,11 +738,7 @@ void QnApiPbSerializer::deserializeSettings(QnKvPairList& kvPairs, const QByteAr
     pb::Settings pb_settings;
 
     if (!pb_settings.ParseFromArray(data.data(), data.size()))
-    {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeSettings(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+        throw QnSerializeException(tr("Cannot parse serialized settings."));
 
     parseSettings(kvPairs, pb_settings.setting());
 }
@@ -781,11 +748,7 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
     pb::ConnectInfo pb_connectInfo;
 
     if (!pb_connectInfo.ParseFromArray(data.data(), data.size()))
-    {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeConnectInfo(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+        throw QnSerializeException(tr("Cannot parse serialized connection information."));
 
     connectInfo->version = QString::fromUtf8(pb_connectInfo.version().c_str());
 
@@ -801,15 +764,12 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
     connectInfo->ecsGuid = QString::fromUtf8(pb_connectInfo.ecsguid().c_str());
 }
 
-void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRules &businessRules, const QByteArray &data)
+void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRuleList &businessRules, const QByteArray &data)
 {
     pb::BusinessRules pb_businessRules;
     if (!pb_businessRules.ParseFromArray(data.data(), data.size()))
-    {
-        QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeBusinessRules(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+        throw QnSerializeException(tr("Cannot parse serialized event/action rules."));
+
     parseBusinessRules(businessRules, pb_businessRules.businessrule());
 }
 
@@ -817,11 +777,8 @@ void QnApiPbSerializer::deserializeBusinessAction(QnAbstractBusinessActionPtr& b
 {
     pb::BusinessAction pb_businessAction;
     if (!pb_businessAction.ParseFromArray(data.data(), data.size()))
-    {
-        QByteArray errorString;
-        errorString = "QnAbstractBusinessAction::fromByteArray(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+        throw QnSerializeException(tr("Cannot parse serialized action."));
+
     parseBusinessAction(businessAction, pb_businessAction);
 }
 
@@ -832,11 +789,7 @@ void QnApiPbSerializer::deserializeBusinessActionVector(QnLightBusinessActionVec
 
     pb::BusinessActionList pb_businessActionList;
     if (!pb_businessActionList.ParseFromArray(data.data(), data.size()))
-    {
-        QByteArray errorString;
-        errorString = "QnAbstractBusinessAction::fromByteArray(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
+        throw QnSerializeException(tr("Cannot parse serialized actions."));
 
     qWarning() << "deserialize time0=" << t.elapsed();
 
@@ -985,7 +938,7 @@ void QnApiPbSerializer::serializeCameraServerItem(const QnCameraHistoryItem& cam
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeBusinessRules(const QnBusinessEventRules &businessRules, QByteArray &data)
+void QnApiPbSerializer::serializeBusinessRules(const QnBusinessEventRuleList &businessRules, QByteArray &data)
 {
     pb::BusinessRules pb_businessRules;
 

@@ -83,8 +83,9 @@ private:
 };
 
 typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
-typedef QList<QnBusinessEventRulePtr> QnBusinessEventRules; // TODO: #Elric QnBusinessEventRuleList
+typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
 
 Q_DECLARE_METATYPE(QnBusinessEventRulePtr)
+Q_DECLARE_METATYPE(QnBusinessEventRuleList)
 
 #endif // __ABSTRACT_BUSINESS_EVENT_RULE_H__

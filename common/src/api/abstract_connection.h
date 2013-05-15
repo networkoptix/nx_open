@@ -8,8 +8,10 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QScopedPointer>
+#include <QtNetwork/QNetworkAccessManager>
 
 #include <utils/common/request_param.h>
+#include <utils/common/warnings.h>
 
 class QnEnumNameMapper;
 
@@ -149,17 +151,32 @@ protected:
     QnEnumNameMapper *nameMapper() const;
     void setNameMapper(QnEnumNameMapper *nameMapper);
 
-    int sendAsyncRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
-    int sendSyncRequest(int object, const QnRequestParamList &params, QVariant *reply);
+    int sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot);
+    int sendAsyncGetRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
+    int sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
+
+    int sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply);
+    int sendSyncGetRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, QVariant *reply);
+    int sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply);
 
     template<class T>
-    int sendSyncRequest(int object, const QnRequestParamList &params, T *reply) {
+    int sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, T *reply) {
         assert(reply);
 
         QVariant replyVariant;
-        int status = sendSyncRequest(object, params, &replyVariant);
+        int status = sendSyncRequest(operation, object, headers, params, data, &replyVariant);
         *reply = replyVariant.value<T>();
         return status;
+    }
+
+    template<class T>
+    int sendSyncGetRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, T *reply) {
+        return sendSyncRequest(QNetworkAccessManager::GetOperation, object, headers, params, QByteArray(), reply);
+    }
+
+    template<class T>
+    int sendSyncGetRequest(int object, const QnRequestParamList &params, T *reply) {
+        return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
     }
 
 private:

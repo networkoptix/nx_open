@@ -1,8 +1,9 @@
 #ifndef _API_SERIALIZER_H_
 #define _API_SERIALIZER_H_
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 
+#include <utils/common/exception.h>
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/media_server_resource.h"
@@ -31,22 +32,11 @@ QString serializeRegion(const QRegion& region);
 QString serializeRegionList(const QList<QRegion>& regions);
 
 /**
-  * Base exception class for serialization related errors
-  */
-class QnSerializeException : public std::exception
-{
+ * Base exception class for serialization-related errors.
+ */
+class QnSerializeException : public QnException {
 public:
-    QnSerializeException(const QByteArray& errorString)
-        : m_errorString(errorString)
-    {
-    }
-
-    ~QnSerializeException() throw() {}
-
-    const QByteArray& errorString() const { return m_errorString; }
-
-private:
-    QByteArray m_errorString;
+    QnSerializeException(const QString &message): QnException(message) {}
 };
 
 /**
@@ -68,7 +58,7 @@ public:
     virtual void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) = 0;
     virtual void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) = 0;
     virtual void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) = 0;
-    virtual void deserializeBusinessRules(QnBusinessEventRules&, const QByteArray& data) = 0;
+    virtual void deserializeBusinessRules(QnBusinessEventRuleList&, const QByteArray& data) = 0;
     virtual void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) = 0;
     virtual void deserializeBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionList, const QByteArray& data) = 0;
     virtual void deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data) = 0;
@@ -80,7 +70,7 @@ public:
     virtual void serializeLicense(const QnLicensePtr& license, QByteArray& data) = 0;
 	virtual void serializeLicenses(const QList<QnLicensePtr>& licenses, QByteArray& data) = 0;
     virtual void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) = 0;
-    virtual void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) = 0;
+    virtual void serializeBusinessRules(const QnBusinessEventRuleList&, QByteArray& data) = 0;
     virtual void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) = 0;
     virtual void serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data) = 0;
     virtual void serializeBusinessAction(const QnAbstractBusinessActionPtr&, QByteArray& data) = 0;

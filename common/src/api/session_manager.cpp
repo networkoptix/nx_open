@@ -156,19 +156,19 @@ int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QStr
     return syncProcessor->wait(response);
 }
 
-int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response) {
-    return sendGetRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), response);
+int QnSessionManager::sendSyncGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response) {
+    return sendSyncGetRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), response);
 }
 
-int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QnHTTPRawResponse& response) {
+int QnSessionManager::sendSyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QnHTTPRawResponse& response) {
     return sendSyncRequest(QNetworkAccessManager::GetOperation, url, objectName, headers, params, QByteArray(), response);
 }
 
-int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QnHTTPRawResponse& response) {
-    return sendPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, response);
+int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QnHTTPRawResponse& response) {
+    return sendSyncPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, response);
 }
 
-int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QnHTTPRawResponse& response) {
+int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QnHTTPRawResponse& response) {
     return sendSyncRequest(QNetworkAccessManager::PostOperation, url, objectName, headers, params, data, response);
 }
 

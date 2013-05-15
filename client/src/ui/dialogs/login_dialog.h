@@ -78,7 +78,7 @@ private slots:
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(int index);
-    void at_connectFinished(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
+    void at_connectFinished(int status, QnConnectInfoPtr connectInfo, int requestHandle);
 
     void at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
     void at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );
