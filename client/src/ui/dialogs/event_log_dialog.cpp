@@ -303,28 +303,33 @@ void QnEventLogDialog::at_filterAction()
 
 void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
 {
+    QMenu* menu = 0;
     QModelIndex idx = ui->gridEvents->currentIndex();
-    if (!idx.isValid())
-        return;
+    if (idx.isValid()) 
+    {
+        QnId resId = m_model->data(idx, Qn::ResourceRole).toInt();
+        QnResourcePtr resource = qnResPool->getResourceById(resId);
 
-    QnId resId = m_model->data(idx, Qn::ResourceRole).toInt();
-    QnResourcePtr resource = qnResPool->getResourceById(resId);
-
-    QnActionManager *manager = m_context->menu();
-    QScopedPointer<QMenu> menu(resource ? manager->newMenu(Qn::ActionScope::TreeScope, QnActionParameters(resource)) : new QMenu);
-
-    if (!menu->isEmpty())
+        QnActionManager *manager = m_context->menu();
+        if (resource)
+            menu = manager->newMenu(Qn::ActionScope::TreeScope, QnActionParameters(resource));
+    }
+    if (menu)
         menu->addSeparator();
+    else
+        menu = new QMenu();
 
-    QAction* filterAction = new QAction(tr("&Filter similar rows"), menu.data());
+    QAction* filterAction = new QAction(tr("&Filter similar rows"), menu);
     connect(filterAction, SIGNAL(triggered()), this, SLOT(at_filterAction()));
+    filterAction->setEnabled(idx.isValid());
     menu->addAction(filterAction);
 
-    QAction* resetFilterAction = new QAction(tr("&Display all rows"), menu.data());
+    QAction* resetFilterAction = new QAction(tr("&Display all rows"), menu);
     connect(resetFilterAction, SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
     menu->addAction(resetFilterAction);
 
-    QAction* action = menu->exec(QCursor::pos());
+    menu->exec(QCursor::pos());
+    menu->deleteLater();
 }
 
 void QnEventLogDialog::at_cameraButtonClicked()
