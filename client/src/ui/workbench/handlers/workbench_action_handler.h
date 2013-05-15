@@ -384,8 +384,6 @@ protected slots:
     void at_togglePopupsAction_toggled(bool checked);
 
     void at_serverSettings_received(int status, const QnKvPairList& settings, int handle);
-
-    void at_notificationSoundDownloaded(const QString& filename, bool ok);
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 

@@ -22,7 +22,6 @@
 
 	<properties>
 		<product.title>${axiscamplugin.name}</product.title>	
-		<buildLib>sharedlib</buildLib>
 		<!--Global libs-->
 		<global.libs/>
 		<!--Specific os libs used-->

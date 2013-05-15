@@ -30,7 +30,10 @@ namespace Qn {
         Message_Type_CameraServerItem = 7,
         Message_Type_BusinessRuleInsertOrUpdate = 8,
         Message_Type_BusinessRuleDelete = 9,
-        Message_Type_BroadcastBusinessAction = 10
+        Message_Type_BroadcastBusinessAction = 10,
+        Message_Type_FileAdd = 11,
+        Message_Type_FileRemove = 12,
+        Message_Type_FileUpdate = 13
     };
 
     QString toString( Message_Type val );
@@ -59,6 +62,8 @@ struct QnMessage
     QnResourceList resources;
     QnLicenseList licenses;
     QnCameraHistoryList cameraServerItems;
+
+    QString filename;
 
     bool load(const pb::Message& message);
 

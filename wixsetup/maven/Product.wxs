@@ -722,6 +722,10 @@
 								</Component>
 							</Directory>
 
+							<Component Id="ServerRtspPlugin" Guid="{9fd70e0e-08b6-46a6-b99d-f730946c0fbe}">
+								<File Id="ServerRtspPluginDll" Name="genericrtspplugin1.dll" Source="${libdir}/bin/${build.configuration}\sqldrivers\genericrtspplugin1.dll" />
+							</Component>
+
 							<Component Id="ServerFFmpegLibraries" Guid="{692DCCAD-138B-4763-822E-8BC8712F5007}">
 								<File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
 								<File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
@@ -1065,6 +1069,7 @@
 			<ComponentRef Id="ServerExecutable" />
 			<ComponentRef Id="ServerFFmpegLibraries"/>
 			<ComponentRef Id="ServerSqlDrivers"/>
+			<ComponentRef Id="ServerRtspPlugin"/>
 			<ComponentRef Id="ServerQTLibraries" />
 			<ComponentRef Id="ServerOpenSSL"/>
 			<ComponentRef Id="ServerSigar"/>
