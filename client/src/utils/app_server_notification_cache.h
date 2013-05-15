@@ -25,6 +25,7 @@ private slots:
 
     void at_fileListReceived(const QStringList &filenames, bool ok);
     void at_fileAdded(const QString &filename, bool ok);
+    void at_fileRemoved(const QString &filename, bool ok);
 private:
     QnNotificationSoundModel* m_model;
 };

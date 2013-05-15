@@ -58,6 +58,11 @@ void QnAppServerFileCache::downloadFile(const QString &filename) {
         return;
     }
 
+    if (m_deleting.values().contains(filename)) {
+        emit fileDownloaded(filename, false);
+        return;
+    }
+
     QFileInfo info(getFullPath(filename));
     if (info.exists()) {
         emit fileDownloaded(filename, true);
@@ -140,3 +145,44 @@ void QnAppServerFileCache::at_fileUploaded(int status, int handle) {
     emit fileUploaded(filename, ok);
 }
 
+// -------------- Deleting methods ----------------
+
+void QnAppServerFileCache::deleteFile(const QString &filename) {
+    if (filename.isEmpty()) {
+        emit fileDeleted(filename, false);
+        return;
+    }
+
+    if (m_loading.values().contains(filename)) {
+        QHash<int, QString>::iterator i = m_loading.begin();
+        while (i != m_loading.end()) {
+            QHash<int, QString>::iterator prev = i;
+            ++i;
+            if (prev.value() == filename)
+                m_loading.erase(prev);
+        }
+    }
+
+    if (m_deleting.values().contains(filename))
+      return;
+
+    int handle = QnAppServerConnectionFactory::createConnection()->deleteStoredFileAsync(
+                    m_folderName + QLatin1Char('/') +filename,
+                    this,
+                    SLOT(at_fileDeleted(int, int))
+                    );
+
+    m_deleting.insert(handle, filename);
+}
+
+void QnAppServerFileCache::at_fileDeleted(int status, int handle) {
+    if (!m_deleting.contains(handle))
+        return;
+
+    QString filename = m_deleting[handle];
+    m_deleting.remove(handle);
+    bool ok = status == 0;
+    if (ok)
+        QFile::remove(getFullPath(filename));
+    emit fileDeleted(filename, ok);
+}

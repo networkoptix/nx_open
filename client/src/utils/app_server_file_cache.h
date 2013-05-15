@@ -8,12 +8,12 @@ class QnAppServerFileCache : public QObject
 {
     Q_OBJECT
 public:
-    enum Category {
+ /*   enum Category {
         LayoutBackground,
         NotificationSound,
 
         CategoryCount
-    };
+    };*/
 
     explicit QnAppServerFileCache(QString folderName, QObject *parent = 0);
     ~QnAppServerFileCache();
@@ -29,25 +29,29 @@ public:
      * @param filename      Name of the file (without path).
      */
     void downloadFile(const QString &filename);
-signals:
-    void fileDownloaded(const QString& filename, bool ok);
-    void fileUploaded(const QString& filename, bool ok);
-    void fileListReceived(const QStringList& filenames, bool ok);
 
-protected:
     /**
      * @brief uploadFile    Uploads file already located in cache directory to the server.
      *                      Emits fileUploaded() when completed.
      * @param filename      Filename in the cache directory.
      */
     void uploadFile(const QString &filename);
+
+    void deleteFile(const QString &filename);
+signals:
+    void fileDownloaded(const QString& filename, bool ok);
+    void fileUploaded(const QString& filename, bool ok);
+    void fileDeleted(const QString& filename, bool ok);
+    void fileListReceived(const QStringList& filenames, bool ok);
 private slots:
     void at_fileLoaded(int status, const QByteArray& data, int handle);
     void at_fileUploaded(int status, int handle);
+    void at_fileDeleted(int status, int handle);
     void at_fileListReceived(int status, const QStringList& filenames, int handle);
 private:
     QHash<int, QString> m_loading;
     QHash<int, QString> m_uploading;
+    QHash<int, QString> m_deleting;
     int m_fileListHandle;
     QString m_folderName;
 };

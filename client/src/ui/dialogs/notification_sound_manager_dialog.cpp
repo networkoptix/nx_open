@@ -17,12 +17,12 @@ QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *pare
     ui(new Ui::QnNotificationSoundManagerDialog)
 {
     ui->setupUi(this);
-    ui->removeButton->setVisible(false);
 
     ui->listView->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
 
-    connect(ui->playButton, SIGNAL(clicked()), this, SLOT(at_playButton_clicked()));
-    connect(ui->addButton, SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
+    connect(ui->playButton,     SIGNAL(clicked()), this, SLOT(at_playButton_clicked()));
+    connect(ui->addButton,      SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
+    connect(ui->removeButton,   SIGNAL(clicked()), this, SLOT(at_removeButton_clicked()));
 }
 
 QnNotificationSoundManagerDialog::~QnNotificationSoundManagerDialog()
@@ -68,6 +68,16 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     QString filename = files[0];
 
     context()->instance<QnAppServerNotificationCache>()->storeSound(filename, cropSoundSecs*1000, title);
+}
 
+void QnNotificationSoundManagerDialog::at_removeButton_clicked() {
+    if (!ui->listView->currentIndex().isValid())
+        return;
 
+    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    QString filename = soundModel->filenameByRow(ui->listView->currentIndex().row());
+    if (filename.isEmpty())
+        return;
+
+    context()->instance<QnAppServerNotificationCache>()->deleteFile(filename);
 }
