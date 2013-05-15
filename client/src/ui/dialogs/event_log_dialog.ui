@@ -117,9 +117,18 @@
       </widget>
      </item>
      <item row="0" column="6">
-      <widget class="QToolButton" name="refreshButton">
+      <widget class="QPushButton" name="refreshButton">
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
        <property name="text">
         <string/>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
