@@ -14,6 +14,9 @@
    <string>Event log</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>3</number>
+   </property>
    <item>
     <layout class="QGridLayout" name="mainGridLayout">
      <property name="horizontalSpacing">
