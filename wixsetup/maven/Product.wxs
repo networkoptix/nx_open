@@ -723,7 +723,7 @@
 							</Directory>
 
 							<Component Id="ServerRtspPlugin" Guid="{9fd70e0e-08b6-46a6-b99d-f730946c0fbe}">
-								<File Id="ServerRtspPluginDll" Name="genericrtspplugin1.dll" Source="${libdir}/bin/${build.configuration}\sqldrivers\genericrtspplugin1.dll" />
+								<File Id="ServerRtspPluginDll" Name="genericrtspplugin1.dll" Source="${libdir}/bin/${build.configuration}\genericrtspplugin1.dll" />
 							</Component>
 
 							<Component Id="ServerFFmpegLibraries" Guid="{692DCCAD-138B-4763-822E-8BC8712F5007}">
