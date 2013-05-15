@@ -50,6 +50,7 @@ signals:
     void finishedSendEmail(int status, const QByteArray &errorString, bool result, int handle);
     void finishedGetFile(int status, const QByteArray& data, int handle);
     void finishedPutFile(int status, int handle);
+    void finishedDeleteFile(int status, int handle);
     void finishedDirectoryListing(int status, const QStringList &filenames, int handle);
 
 private:
@@ -126,6 +127,15 @@ public:
      * @return                              Handle of the request
      */
     int addStoredFileAsync(const QString &filename, const QByteArray &data, QObject *target, const char *slot);
+
+    /**
+     * @brief deleteStoredFileAsync         Delete stored file from EC
+     * @param filename                      Name of the file
+     * @param target                        Receiver object
+     * @param slot                          SLOT(int status, int handle)
+     * @return                              Handle of the request
+     */
+    int deleteStoredFileAsync(const QString &filename, QObject *target, const char *slot);
 
     /**
      * @brief requestDirectoryListingAsync  Get filenames for all stored files on EC in the selected directory

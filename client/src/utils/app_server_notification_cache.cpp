@@ -22,6 +22,7 @@ QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
     connect(this, SIGNAL(fileListReceived(QStringList,bool)),   this, SLOT(at_fileListReceived(QStringList,bool)));
     connect(this, SIGNAL(fileDownloaded(QString,bool)),         this, SLOT(at_fileAdded(QString,bool)));
     connect(this, SIGNAL(fileUploaded(QString,bool)),           this, SLOT(at_fileAdded(QString, bool)));
+    connect(this, SIGNAL(fileDeleted(QString,bool)),            this, SLOT(at_fileRemoved(QString, bool)));
 }
 
 QnAppServerNotificationCache::~QnAppServerNotificationCache() {
@@ -89,3 +90,10 @@ void QnAppServerNotificationCache::at_fileAdded(const QString &filename, bool ok
         m_model->updateTitle(filename, title);
 }
 
+void QnAppServerNotificationCache::at_fileRemoved(const QString &filename, bool ok) {
+    if (!ok)
+        return;
+    int row = m_model->rowByFilename(filename);
+    if (row >= 0)
+        m_model->removeRow(row);
+}

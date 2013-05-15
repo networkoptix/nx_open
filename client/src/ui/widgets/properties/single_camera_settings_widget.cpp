@@ -623,6 +623,8 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
 
 void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle)
 {
+    Q_UNUSED(handle)
+
     if (!m_widgetsRecreator) {
         qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: widgets creator ptr is null, camera id: "
             << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());

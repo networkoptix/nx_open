@@ -36,6 +36,7 @@ namespace {
         ((TestEmailSettingsObject,  "testEmailSettings"))
         ((GetFileObject,            "getfile"))
         ((PutFileObject,            "putfile"))
+        ((DeleteFileObject,         "rmfile"))
         ((ListDirObject,            "listdir"))
     );
 
@@ -228,6 +229,10 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         }
     case PutFileObject: {
             emit finishedPutFile(status, handle);
+            break;
+        }
+    case DeleteFileObject: {
+            emit finishedDeleteFile(status, handle);
             break;
         }
     case ListDirObject: {
@@ -967,6 +972,19 @@ int QnAppServerConnection::addStoredFileAsync(const QString &filename, const QBy
                                                               data,
                                                               processor,
                                                               SLOT(processReply(QnHTTPRawResponse, int)));
+}
+
+int QnAppServerConnection::deleteStoredFileAsync(const QString &filename, QObject *target, const char *slot)
+{
+    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, DeleteFileObject);
+    QObject::connect(processor, SIGNAL(finishedDeleteFile(int, int)), target, slot);
+
+    return QnSessionManager::instance()->sendAsyncDeleteRequest(m_url,
+                                                                m_objectNameMapper->name(DeleteFileObject) + QLatin1String("/") + filename,
+                                                                m_requestHeaders,
+                                                                m_requestParams,
+                                                                processor,
+                                                                SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot) {

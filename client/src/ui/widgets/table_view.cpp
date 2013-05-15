@@ -79,5 +79,6 @@ void QnTableView::resetCursor()
 
 void QnTableView::leaveEvent(QEvent * event)
 {
+    Q_UNUSED(event)
     resetCursor();
 }

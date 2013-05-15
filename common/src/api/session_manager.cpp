@@ -212,6 +212,11 @@ int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &obj
     return sendAsyncRequest(QNetworkAccessManager::DeleteOperation, url, objectName, QnRequestHeaderList(), params, QByteArray(), target, slot, connectionType);
 }
 
+int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType) {
+    return sendAsyncRequest(QNetworkAccessManager::DeleteOperation, url, objectName, headers, params, QByteArray(), target, slot, connectionType);
+}
+
+
 
 // -------------------------------------------------------------------------- //
 // QnSessionManager :: handlers
