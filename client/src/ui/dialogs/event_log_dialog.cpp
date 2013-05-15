@@ -60,10 +60,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     for (int i = 4; i < columns.size(); ++i)
         headers->setResizeMode(i, QHeaderView::ResizeToContents);
 
-    connect(ui->dateEditFrom, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
-    connect(ui->eventComboBox, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
-    connect(ui->cameraButton, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
-    connect(ui->actionComboBox, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
+    //connect(ui->dateEditFrom, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
+    //connect(ui->eventComboBox, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
+    //connect(ui->cameraButton, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
+    //connect(ui->actionComboBox, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
 
 
     QStandardItem* rootItem = createEventTree(0, BusinessEventType::AnyBusinessEvent);
@@ -93,11 +93,21 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     updateData();
 
-    int w = ui->actionComboBox->width();
-    int w2 = ui->dateEditFrom->width();
-    int w3 = ui->eventComboBox->width();
-    int w4 = ui->cameraButton->width();
-    w = w;
+    //show();
+    ui->gridLayout->activate();
+
+
+    //connect(ui->dateEditFrom, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
+    //connect(ui->eventComboBox, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
+    //connect(ui->cameraButton, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
+    //connect(ui->actionComboBox, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
+
+    int space = ui->mainGridLayout->horizontalSpacing();
+
+    ui->gridEvents->horizontalHeader()->resizeSection(0, ui->dateEditFrom->width() + ui->dateEditTo->width());
+    ui->gridEvents->horizontalHeader()->resizeSection(1, ui->eventComboBox->width() + space);
+    ui->gridEvents->horizontalHeader()->resizeSection(2, ui->cameraButton->width() + space);
+    ui->gridEvents->horizontalHeader()->resizeSection(3, ui->actionComboBox->width() + space);
 }
 
 QnEventLogDialog::~QnEventLogDialog()
@@ -169,22 +179,6 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
         }
     }
 
-}
-
-void QnEventLogDialog::at_ControlResized(QResizeEvent* event)
-{
-    int colIdx = -1;
-    if (sender() == ui->dateEditFrom)
-        colIdx = 0;
-    else if (sender() == ui->eventComboBox)
-        colIdx = 1;
-    else if (sender() == ui->cameraButton)
-        colIdx = 2;
-    else if (sender() == ui->actionComboBox)
-        colIdx = 3;
-    
-    if (colIdx >= 0)
-        ui->gridEvents->horizontalHeader()->resizeSection(colIdx, event->size().width());
 }
 
 void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum)

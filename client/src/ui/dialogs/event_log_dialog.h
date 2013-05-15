@@ -41,7 +41,6 @@ private slots:
     void at_cameraButtonClicked();
     void at_filterAction();
     void at_resetFilterAction();
-    void at_ControlResized(QResizeEvent* event);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     QString getTextForNCameras(int n) const;
