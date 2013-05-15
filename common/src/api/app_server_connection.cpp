@@ -294,14 +294,11 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         int status = response.status;
 
         QStringList reply;
-        if(status == 0) {
-            QVariantMap map;
-            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply)) {
+        if (status == 0) {
+            if(!QJson::deserialize(response.data, &reply)) {
                 qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
-                status = -1;
+                status = 1;
             }
-        } else {
-            qnWarning("Error processing request: %1.", response.errorString);
         }
 
         emitFinished(this, status, reply, handle);
