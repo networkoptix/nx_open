@@ -1389,17 +1389,17 @@ int QnPlOnvifResource::getSecondaryIndex(const QList<VideoOptionsLocal>& optList
 
     qreal bestResCoeff = INT_MAX;
     int bestResIndex = 1;
-    bool bestIsH264 = false;
+//    bool bestIsH264 = false; //is not used --gdm
 
     qreal aspectRation = (qreal) optList[0].resolutions[0].width() / (qreal) optList[0].resolutions[0].height();
 
     for (int i = 1; i < optList.size(); ++i)
     {
         qreal resCoeff = getBestSecondaryCoeff(optList[i].resolutions, aspectRation);
-        if (resCoeff < bestResCoeff || resCoeff == bestResCoeff && optList[i].isH264) {
+        if (resCoeff < bestResCoeff || (resCoeff == bestResCoeff && optList[i].isH264)) {
             bestResCoeff = resCoeff;
             bestResIndex = i;
-            bestIsH264 = optList[i].isH264;
+//            bestIsH264 = optList[i].isH264; //is not used --gdm
         }
     }
 

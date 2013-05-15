@@ -159,10 +159,27 @@ protected:
 
     QString newLayoutName(const QnUserResourcePtr &user, const QString &baseName = tr("New layout")) const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
-    void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF(), const QRectF &zoomWindow = QRectF(0.0, 0.0, 1.0, 1.0), const QUuid &zoomUuid = QUuid()) const;
-    void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
-    void addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
-    void addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, bool usePosition, const QPointF &position = QPointF()) const;
+
+    struct AddToLayoutParams {
+        bool usePosition;
+        QPointF position;
+        QRectF zoomWindow;
+        QUuid zoomUuid;
+        quint64 time;
+
+        AddToLayoutParams():
+            usePosition(false),
+            position(QPointF()),
+            zoomWindow(QRectF(0.0, 0.0, 1.0, 1.0)),
+            zoomUuid(QUuid()),
+            time(0)
+        {}
+    };
+
+    void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const;
+    void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, const AddToLayoutParams &params) const;
+    void addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, const AddToLayoutParams &params) const;
+    void addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, const AddToLayoutParams &params) const;
     
     QnResourceList addToResourcePool(const QString &file) const;
     QnResourceList addToResourcePool(const QList<QString> &files) const;

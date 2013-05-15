@@ -265,7 +265,7 @@ public:
 
     /**
      * \param item                      Item to check.
-     * \returns                         Whether the given item satisfies this instrument's item conditions.
+     * \returns                         Whether the given item satisfies all of this instrument's item conditions.
      */
     bool satisfiesItemConditions(QGraphicsItem *item) const;
 

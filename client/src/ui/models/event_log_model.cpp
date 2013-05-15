@@ -37,6 +37,7 @@ void QnEventLogModel::setEvents(const QList<QnLightBusinessActionVectorPtr> &eve
 void QnEventLogModel::setEvents(const QnLightBusinessActionVectorPtr& events) {
     m_events = events;
     rebuild();
+    int idx1 = 0, idx2 = 0;
 }
 
 QList<QnEventLogModel::Column> QnEventLogModel::columns() const {
@@ -133,6 +134,8 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAc
                 return qnResIconCache->icon(actionResource->flags(), actionResource->getStatus());
             break;
         }
+    	default:
+        	break;
     }
     return QVariant();
 }
@@ -211,7 +214,9 @@ QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAct
                 case BusinessEventType::MediaServer_Conflict: {
                     result = QnBusinessStringsHelper::conflictString(action.getRuntimeParams(), QLatin1Char(' '));
                     break;
-                }
+				}
+            	default:
+					break;
             }
             if (!BusinessEventType::hasToggleState(eventType)) {
                 int cnt = action.getAggregationCount();

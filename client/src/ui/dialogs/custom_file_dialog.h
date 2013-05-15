@@ -6,6 +6,7 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QCheckBox>
 #include <QtGui/QSpinBox>
+#include <QtGui/QLineEdit>
 
 class QnCheckboxControlAbstractDelegate: public QObject
 {
@@ -52,10 +53,25 @@ public:
      *                                  that pointed-to value still exists at that point.
      * @param delegate                  Delegate that will control state of the checkbox.
      */
-    void addCheckbox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate = NULL);
+    void addCheckBox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate = NULL);
 
-
+    /**
+     * @brief addSpinBox                Adds a spinbox to this file dialog.
+     * @param text                      Text that will be displaed on a label before spinbox.
+     *                                  If %n is used within the text, spinbox will be placed in the
+     *                                  middle of the text (in the position of %n).
+     * @param minValue                  Minimum value
+     * @param maxValue                  Maximum value
+     * @param value                     Pointer to the initial value.
+     *                                  This pointer will be saved and when the dialog
+     *                                  closes, resulting spinbox value will be written into it.
+     *                                  It is the callee's responsibility to make sure
+     *                                  that pointed-to value still exists at that point.
+     */
     void addSpinBox(const QString &text, int minValue, int maxValue, int *value);
+
+    void addLineEdit(const QString& text, QString *value);
+
 
     /**
      * @brief addWidget                 Adds custom widget to this file dialog.
@@ -67,6 +83,7 @@ private slots:
 private:
     QMap<QCheckBox*, bool *> m_checkboxes;
     QMap<QSpinBox*, int *> m_spinboxes;
+    QMap<QLineEdit*, QString *> m_lineedits;
 
 };
 

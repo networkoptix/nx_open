@@ -359,7 +359,8 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
 
     qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
-    if(!opaque) {
+    // always use blending for images --gdm
+    if(!opaque || (resource()->flags() & QnResource::still_image)) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -779,6 +780,24 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
+    QColor fc = frameColor();
+    if (fc == qnGlobals->frameColor()) {
+        setFrameColor(QColor(Qt::blue));
+    } else if (fc == QColor(Qt::blue)) {
+        setFrameColor(QColor(Qt::red));
+    } else if (fc == QColor(Qt::red)) {
+        setFrameColor(QColor(Qt::green));
+    } else if (fc == QColor(Qt::green)) {
+        setFrameColor(QColor(Qt::yellow));
+    } else if (fc == QColor(Qt::yellow)) {
+        setFrameColor(QColor(Qt::magenta));
+    } else if (fc == QColor(Qt::magenta)) {
+        setFrameColor(QColor(Qt::cyan));
+    } else if (fc == QColor(Qt::cyan)) {
+        setFrameColor(QColor(Qt::white));
+    } else
+        setFrameColor(qnGlobals->frameColor());
+
     setOption(ControlZoomWindow, checked);
 
     if(checked)

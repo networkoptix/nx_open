@@ -48,6 +48,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
+#include <ui/graphics/items/grid/grid_raised_cone_item.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
@@ -516,6 +517,16 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
     return m_zoomTargetWidgetByWidget.value(widget);
 }
 
+void QnWorkbenchDisplay::assertRaisedConeItem(QnResourceWidget *widget) {
+    QnGridRaisedConeItem* item = raisedConeItem(widget);
+    if (item->scene() == m_scene)
+        return;
+    m_scene->addItem(item);
+    setLayer(item, Qn::RaisedConeLayer);
+    item->setOpacity(0.0);
+    opacityAnimator(item)->setTimeLimit(2000);
+}
+
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) {
     if(role < 0 || role >= Qn::ItemRoleCount) {
         qnWarning("Invalid item role '%1'.", static_cast<int>(role));
@@ -531,14 +542,16 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
     switch(role) {
     case Qn::RaisedRole: {
         /* Sync new & old geometry. */
-        if(oldWidget != NULL)
+        if(oldWidget != NULL) {
             synchronize(oldWidget, true);
+            oldWidget->setOpacity(1.0);
+            opacityAnimator(raisedConeItem(oldWidget), 0.5)->animateTo(0.0);
+        }
 
         if(newWidget != NULL) {
             bringToFront(newWidget);
             synchronize(newWidget, true);
         }
-
         break;
     }
     case Qn::ZoomedRole: {
@@ -820,6 +833,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             if(item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
                 mediaWidget->display()->archiveReader()->setPlaybackRange(item->layout()->resource()->getLocalRange());
 
+            quint64 time = item->data(Qn::ItemTimeRole).toULongLong() * 1000;
+            if (time > 0)
+                mediaWidget->display()->archiveReader()->jumpTo(time, time);
+            else
             if(startDisplay)
                 if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
                     mediaWidget->display()->archiveReader()->jumpTo(0, 0);
@@ -1189,12 +1206,18 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
+        assertRaisedConeItem(widget);
+
+        raisedConeItem(widget)->adjustGeometry(expanded(widget->aspectRatio(), enclosingGeometry, Qt::KeepAspectRatio));
+        if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
+            opacityAnimator(raisedConeItem(widget), 0.5)->animateTo(0.3);
+
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 
         QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
         QSizeF maxWidgetSize;
         if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()) {
-            maxWidgetSize = viewportGeometry.size() * 0.33; // TODO: #Elric
+            maxWidgetSize = viewportGeometry.size() * 0.33; // TODO: #Elric magic const
         } else {
             maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
         }

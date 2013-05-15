@@ -12,7 +12,7 @@
 namespace {
     const QLatin1String folder("notifications");
     const QLatin1String targetContainter("mp3");
-    const QLatin1String titleTag("Comment");
+    const QLatin1String titleTag("Title");
 }
 
 QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
@@ -22,8 +22,6 @@ QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
     connect(this, SIGNAL(fileListReceived(QStringList,bool)),   this, SLOT(at_fileListReceived(QStringList,bool)));
     connect(this, SIGNAL(fileDownloaded(QString,bool)),         this, SLOT(at_fileAdded(QString,bool)));
     connect(this, SIGNAL(fileUploaded(QString,bool)),           this, SLOT(at_fileAdded(QString, bool)));
-
-    getFileList();
 }
 
 QnAppServerNotificationCache::~QnAppServerNotificationCache() {
@@ -34,11 +32,17 @@ QnNotificationSoundModel* QnAppServerNotificationCache::persistentGuiModel() con
     return m_model;
 }
 
-void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs) {
+void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs, const QString &customTitle) {
     QString uuid = QUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".mp3");
-    QString title = QFileInfo(filePath).fileName();
-    title = title.mid(0, title.lastIndexOf(QLatin1Char('.')));
+
+    QString title = customTitle;
+    if (title.isEmpty())
+        title = AudioPlayer::getTagValue(filePath, titleTag);
+    if (title.isEmpty()) {
+        title = QFileInfo(filePath).fileName();
+        title = title.mid(0, title.lastIndexOf(QLatin1Char('.')));
+    }
 
     FileTranscoder* transcoder = new FileTranscoder();
     transcoder->setSourceFile(filePath);
@@ -53,6 +57,10 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
     connect(transcoder, SIGNAL(done(QString)), this, SLOT(at_soundConverted(QString)));
     connect(transcoder, SIGNAL(done(QString)), transcoder, SLOT(deleteLater()));
     transcoder->startAsync();
+}
+
+void QnAppServerNotificationCache::clear() {
+    m_model->init();
 }
 
 void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {

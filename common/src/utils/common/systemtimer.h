@@ -88,6 +88,8 @@ private:
     class AbstractTimerHandler
     {
     public:
+        AbstractTimerHandler() {}
+        virtual ~AbstractTimerHandler() {}
         virtual void onTimer() = 0;
     };
 

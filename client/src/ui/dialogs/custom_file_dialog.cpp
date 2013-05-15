@@ -1,6 +1,8 @@
 #include "custom_file_dialog.h"
 
 #include <QtGui/QGridLayout>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QLabel>
 
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent,
                                        const QString &caption,
@@ -17,7 +19,7 @@ QnCustomFileDialog::QnCustomFileDialog(QWidget *parent,
 QnCustomFileDialog::~QnCustomFileDialog() {
 }
 
-void QnCustomFileDialog::addCheckbox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate) {
+void QnCustomFileDialog::addCheckBox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate) {
     QCheckBox* checkbox = new QCheckBox(this);
     checkbox->setText(text);
     checkbox->setChecked(*value);
@@ -31,14 +33,62 @@ void QnCustomFileDialog::addCheckbox(const QString &text, bool *value, QnCheckbo
 }
 
 void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxValue, int *value) {
-    QSpinBox* spinbox = new QSpinBox(this);
-    spinbox->setPrefix(text);
+
+    QWidget* widget = new QWidget(this);
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    int index = text.indexOf(QLatin1String("%n"));
+    QString prefix = text.mid(0, index).trimmed();
+    QString postfix = index >= 0 ? text.mid(index + 2).trimmed() : QString();
+
+    QLabel* labelPrefix = new QLabel(widget);
+    labelPrefix->setText(prefix);
+    layout->addWidget(labelPrefix);
+
+    QSpinBox* spinbox = new QSpinBox(widget);
     spinbox->setMinimum(minValue);
     spinbox->setMaximum(maxValue);
     spinbox->setValue(*value);
     m_spinboxes.insert(spinbox, value);
-    addWidget(spinbox);
+    layout->addWidget(spinbox);
+
+    if (!postfix.isEmpty()) {
+        QLabel* labelPostfix = new QLabel(widget);
+        labelPostfix->setText(postfix);
+        layout->addWidget(labelPostfix);
+    }
+
+    layout->addStretch();
+
+    widget->setLayout(layout);
+
+    addWidget(widget);
 }
+
+
+void QnCustomFileDialog::addLineEdit(const QString &text, QString *value) {
+
+    QWidget* widget = new QWidget(this);
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    QLabel* label = new QLabel(widget);
+    label->setText(text);
+    layout->addWidget(label);
+
+    QLineEdit* edit = new QLineEdit(widget);
+    edit->setText(*value);
+    m_lineedits.insert(edit, value);
+    layout->addWidget(edit);
+
+    layout->addStretch();
+
+    widget->setLayout(layout);
+
+    addWidget(widget);
+}
+
 
 void QnCustomFileDialog::addWidget(QWidget *widget) {
     QGridLayout * gl = dynamic_cast<QGridLayout*>(layout());
@@ -51,11 +101,12 @@ void QnCustomFileDialog::addWidget(QWidget *widget) {
 }
 
 void QnCustomFileDialog::at_accepted() {
-    foreach(QCheckBox* key, m_checkboxes.keys()) {
+    foreach(QCheckBox* key, m_checkboxes.keys())
         *m_checkboxes[key] = key->isChecked();
-    }
 
-    foreach(QSpinBox* key, m_spinboxes.keys()) {
+    foreach(QSpinBox* key, m_spinboxes.keys())
         *m_spinboxes[key] = key->value();
-    }
+
+    foreach(QLineEdit* key, m_lineedits.keys())
+        *m_lineedits[key] = key->text();
 }

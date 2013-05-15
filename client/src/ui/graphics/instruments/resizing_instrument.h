@@ -14,14 +14,20 @@ class ResizingInfo {
 public:
     Qt::WindowFrameSection frameSection() const;
 
+    QPoint mouseScreenPos() const;
+    QPoint mouseViewportPos() const;
+    QPointF mouseScenePos() const;
+
 protected:
     friend class ResizingInstrument;
 
-    ResizingInfo(ResizingInstrument *instrument): m_instrument(instrument) {}
+    ResizingInfo(DragInfo *info, ResizingInstrument *instrument): m_info(info), m_instrument(instrument) {}
 
 private:
+    DragInfo *m_info;
     ResizingInstrument *m_instrument;
 };
+
 
 /**
  * This instrument implements resizing of QGraphicsWidget. 
@@ -62,11 +68,11 @@ public:
     }
 
 signals:
-    void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void resizing(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
 
 protected:
     virtual void enabledNotify() override;

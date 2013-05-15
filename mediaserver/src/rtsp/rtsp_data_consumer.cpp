@@ -537,7 +537,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (trackInfo->firstRtpTime == -1)
         trackInfo->firstRtpTime = media->timestamp;
     static AVRational r = {1, 1000000};
-    AVRational time_base = {1, codecEncoder->getFrequency() };
+    AVRational time_base = {1, (int)codecEncoder->getFrequency() }; //TODO: #vasilenko assure that conversion to uint32->int is allowed
 
     qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
 

@@ -34,6 +34,8 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
+#include <utils/math/linear_combination.h>
+
 /** @def QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
  * 
  * When defined, makes loading overlay much more 'flashy', drawing loading circles
@@ -76,12 +78,6 @@ namespace {
     const QColor overlayBackgroundColor = QColor(0, 0, 0, 96);
 
     const QColor overlayTextColor = QColor(255, 255, 255, 160);
-
-    const QColor selectedFrameColor = qnGlobals->selectedFrameColor();
-
-    const QColor frameColor = qnGlobals->frameColor();
-
-    const QColor activeFrameColor = frameColor.lighter();
 
     class QnLoadingProgressPainterFactory {
     public:
@@ -129,6 +125,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_enclosingAspectRatio(1.0),
     m_frameOpacity(1.0),
     m_frameWidth(-1.0),
+    m_frameColor(qnGlobals->frameColor()),
     m_titleTextFormat(QLatin1String("%1")),
     m_infoTextFormat(QLatin1String("%1")),
     m_titleTextFormatHasPlaceholder(true),
@@ -531,14 +528,6 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
     return result;
 }
 
-QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const {
-    if(section & Qn::ResizeSections) {
-        return QnCursorCache::instance()->cursor(Qn::calculateHoverCursorShape(section), rotation(), 5.0);
-    } else {
-        return base_type::windowCursorAt(section);
-    }
-}
-
 int QnResourceWidget::helpTopicAt(const QPointF &) const {
     return -1;
 }
@@ -850,7 +839,7 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     qreal w = size.width();
     qreal h = size.height();
     qreal fw = m_frameWidth;
-    QColor color = isSelected() ? selectedFrameColor : isLocalActive() ? activeFrameColor : frameColor;
+    QColor color = isSelected() ? selectedFrameColor() : isLocalActive() ? activeFrameColor() : frameColor();
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
@@ -1035,5 +1024,14 @@ void QnResourceWidget::at_iconButton_visibleChanged() {
 void QnResourceWidget::at_infoButton_toggled(bool toggled){
     setInfoVisible(toggled);
     setOverlayVisible(toggled || m_mouseInWidget);
+}
+
+QColor QnResourceWidget::activeFrameColor() const {
+    return m_frameColor.lighter();
+}
+
+QColor QnResourceWidget::selectedFrameColor() const {
+    qreal a = 0.7; //magic const --gdm
+    return linearCombine(1.0 - a, m_frameColor, a, qnGlobals->selectedFrameColor());
 }
 

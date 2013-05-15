@@ -29,6 +29,10 @@ message Message {
         BusinessRuleDelete      = 9;
 
         BroadcastBusinessAction = 10;
+
+        FileAdd                 = 11;
+        FileRemove              = 12;
+        FileUpdate              = 13;
     }
 
     required Type type = 1;
@@ -86,4 +90,28 @@ message InitialMessage {
     repeated CameraServerItem cameraServerItem = 4;
     optional string hardwareId = 5;
     optional string oldHardwareId = 6;
+}
+
+message FileAddMessage {
+    extend Message {
+        required FileAddMessage message = 106;
+    }
+
+    required string path = 1;
+}
+
+message FileRemoveMessage {
+    extend Message {
+        required FileRemoveMessage message = 107;
+    }
+
+    required string path = 1;
+}
+
+message FileUpdateMessage {
+    extend Message {
+        required FileUpdateMessage message = 108;
+    }
+
+    required string path = 1;
 }

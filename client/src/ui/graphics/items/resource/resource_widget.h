@@ -37,6 +37,7 @@ class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnW
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
+    Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor)
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio)
@@ -136,6 +137,20 @@ public:
      * \param frameWidth                New frame width for this widget.
      */
     void setFrameWidth(qreal frameWidth);
+
+    /**
+     * \returns                         Frame color of this widget.
+     */
+    QColor frameColor() const {
+        return m_frameColor;
+    }
+
+    /**
+     * \param frameColor                New frame color for this widget.
+     */
+    void setFrameColor(const QColor &frameColor) {
+        m_frameColor = frameColor;
+    }
 
     virtual void setGeometry(const QRectF &geometry) override;
 
@@ -290,7 +305,6 @@ protected:
     };
 
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
-    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual bool windowFrameEvent(QEvent *event) override;
@@ -357,6 +371,8 @@ protected:
 
     void ensureAboutToBeDestroyedEmitted();
 
+    QColor activeFrameColor() const;
+    QColor selectedFrameColor() const;
 private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
@@ -427,6 +443,9 @@ private:
 
     /** Frame width. */
     qreal m_frameWidth;
+
+    /** Base frame color */
+    QColor m_frameColor;
 
     QString m_titleTextFormat, m_infoTextFormat;
     bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;

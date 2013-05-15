@@ -522,6 +522,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
         if( !scalingStillNeeded )
         {
+            if( outFrame->isExternalData() )
+                outFrame->reallocate( m_tmpFrame->width, m_tmpFrame->height, m_tmpFrame->format );
             CLVideoDecoderOutput::copy( m_tmpFrame.data(), outFrame.data() );
         }
         else if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )

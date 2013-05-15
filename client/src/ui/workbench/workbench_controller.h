@@ -118,9 +118,9 @@ protected:
     void showContextMenuAt(const QPoint &pos);
 
 protected slots:
-    void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
 
     void at_moveStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
     void at_move(QGraphicsView *view, const QPointF &totalDelta);
@@ -241,6 +241,7 @@ private:
     /** Instrument that tracks left clicks on items. */
     ClickInstrument *m_itemLeftClickInstrument;
 
+    bool m_selectionOverlayHackInstrumentDisabled;
 
 
     /* Keyboard control-related state. */
@@ -275,7 +276,6 @@ private:
 
     /** Target geometries for concatenation of dragged and replaced item lists. */
     QList<QRect> m_dragGeometries;
-
 
 
     /* Screen recording-related state. */

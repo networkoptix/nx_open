@@ -183,6 +183,8 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
                 case conflictsParam:
                     result.m_conflicts = QString::fromUtf8(field.data(), field.size()).split(lit(STRING_LIST_DELIM));
                     break;
+            default:
+                break;
             }
         }
 
@@ -241,7 +243,7 @@ QByteArray QnBusinessEventParameters::serialize() const
 
     return result.left(resLen);
 }
-
+/*
 static QList<QByteArray> baFromStringList(const QStringList& values)
 {
     QList<QByteArray> result;
@@ -250,7 +252,7 @@ static QList<QByteArray> baFromStringList(const QStringList& values)
 
     return result;
 }
-
+*/
 QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
 {
     static QnBusinessEventParameters m_defaultParams;
@@ -347,6 +349,8 @@ QnBusinessEventParameters QnBusinessEventParameters::fromBusinessParams(const Qn
             case conflictsParam:
                 result.m_conflicts = itr.value().toStringList();
                 break;
+            default:
+                break;
             }
         }
     }
@@ -408,6 +412,8 @@ QString QnBusinessEventParameters::getParamsKey() const
         case BusinessEventType::Camera_Input:
             paramKey += QLatin1String("_") + getInputPortId();
             break;
+    default:
+        break;
     }
 
     return paramKey;

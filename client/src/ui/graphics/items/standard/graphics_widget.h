@@ -124,8 +124,10 @@ protected:
     virtual void initStyleOption(QStyleOption *option) const;
 
     using FrameSectionQueryable::windowFrameSectionAt;
+    using FrameSectionQueryable::windowCursorAt;
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF& pos) const override;
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
+    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;
 
 protected:
     QScopedPointer<GraphicsWidgetPrivate> d_ptr;

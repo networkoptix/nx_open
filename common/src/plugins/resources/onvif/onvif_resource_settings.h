@@ -63,6 +63,8 @@ public:
 class OnvifCameraSettingOperationAbstract
 {
 public:
+    OnvifCameraSettingOperationAbstract() {}
+    virtual ~OnvifCameraSettingOperationAbstract() {}
 
     static const OnvifCameraSettingOperationAbstract& EMPTY_OPERATION;
 
