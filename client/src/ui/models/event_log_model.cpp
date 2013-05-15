@@ -174,7 +174,7 @@ public:
         qSort(m_records.begin(), m_records.end(), lessThan);
 
         int elapsed = t.elapsed();
-        qWarning() << "sort time=" << elapsed;
+        qDebug() << "sort time=" << elapsed;
     }
 
 private:

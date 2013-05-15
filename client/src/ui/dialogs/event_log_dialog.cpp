@@ -287,7 +287,7 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     QnActionManager *manager = m_context->menu();
     QScopedPointer<QMenu> menu(resource ? manager->newMenu(Qn::ActionScope::TreeScope, QnActionParameters(resource)) : new QMenu);
 
-    if (!menu->isEmpty()) 
+    if (!menu->isEmpty())
         menu->addSeparator();
 
     QAction* filterAction = new QAction(tr("&Filter similar rows"), menu.data());

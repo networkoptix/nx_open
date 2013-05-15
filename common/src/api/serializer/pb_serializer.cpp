@@ -838,11 +838,7 @@ void QnApiPbSerializer::deserializeBusinessActionVector(QnLightBusinessActionVec
         throw QnSerializeException(errorString);
     }
 
-    qWarning() << "deserialize time0=" << t.elapsed();
-
     parseBusinessActionVector(businessActionList, pb_businessActionList);
-
-    qWarning() << "deserialize time=" << t.elapsed();
 }
 
 void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data)

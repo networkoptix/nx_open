@@ -36,6 +36,7 @@ public:
     static void init();
     static void fini();
 
+    bool createDatabase();
     static void migrate();
 protected:
     QnEventsDB();
@@ -47,6 +48,7 @@ private:
         const BusinessEventType::Value& eventType, 
         const BusinessActionType::Value& actionType,
         const QnId& businessRuleId) const;
+    bool isObjectExists(const QString& objectType, const QString& objectName);
 private:
     QSqlDatabase m_sdb;
     qint64 m_lastCleanuptime;

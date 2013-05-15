@@ -36,5 +36,5 @@ void QnEventSerializer::deserialize(QnLightBusinessActionVectorPtr& eventsPtr, c
         curPtr += runTimeParamsLen;
     }
 
-    qWarning() << "deserialize time=" << t.elapsed() << "msec";
+    qDebug() << "deserialize events log time=" << t.elapsed() << "msec";
 }

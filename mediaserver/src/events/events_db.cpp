@@ -19,16 +19,58 @@ QnEventsDB::QnEventsDB():
 
     if (m_sdb.open())
     {
-        //
+        if (!createDatabase()) // create tables is DB is empty
+            qWarning() << "can't create tables for sqlLite database!";
     }
     else {
-        qWarning() << "can't initialize mySQL database! Actions log is not created!";
+        qWarning() << "can't initialize sqlLite database! Actions log is not created!";
     }
 }
 
 void QnEventsDB::setEventLogPeriod(qint64 periodUsec)
 {
     m_eventKeepPeriod = periodUsec;
+}
+
+bool QnEventsDB::isObjectExists(const QString& objectType, const QString& objectName)
+{
+    QSqlQuery tableList(m_sdb);
+    QString request;
+    request = QString(lit("SELECT * FROM sqlite_master WHERE type='%1' and name='%2'")).arg(objectType).arg(objectName);
+    tableList.prepare(request);
+    if (!tableList.exec())
+        return false;
+    int fieldNo = tableList.record().indexOf(lit("name"));
+    tableList.next();
+    QString value = tableList.value(fieldNo).toString();
+    return !value.isEmpty();
+}
+
+bool QnEventsDB::createDatabase()
+{
+    if (!isObjectExists(lit("table"), lit("runtime_actions")))
+    {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(
+            "CREATE TABLE \"runtime_actions\" "
+            "(timestamp TIMESTAMP NOT NULL, action_type SMALLINT NOT NULL, "
+            "action_params TEXT, runtime_params TEXT, business_rule_id INTEGER, toggle_state SMALLINT, aggregation_count INTEGER, "
+            "event_type SMALLINT, event_resource_id INTEGER, action_resource_id INTEGER)"
+        );
+        if (!ddlQuery.exec())
+            return false;
+    }
+
+    if (!isObjectExists(lit("index"), lit("timeAndCamIdx"))) {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(
+            "CREATE INDEX \"timeAndCamIdx\" ON \"runtime_actions\" (timestamp,event_resource_id)"
+        );
+        if (!ddlQuery.exec())
+            return false;
+    }
+
+    return true;
 }
 
 bool QnEventsDB::cleanupEvents()
