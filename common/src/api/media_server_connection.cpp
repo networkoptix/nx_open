@@ -4,7 +4,6 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
-#include <QDebug>
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QSharedPointer>
@@ -176,24 +175,13 @@ QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
 // -------------------------------------------------------------------------- //
 // QnMediaServerReplyProcessor
 // -------------------------------------------------------------------------- //
-QnMediaServerReplyProcessor::QnMediaServerReplyProcessor(int object): 
-    m_object(object),
-    m_finished(false),
-    m_status(0),
-    m_handle(0)
-{}
-
-QnMediaServerReplyProcessor::~QnMediaServerReplyProcessor() {
-    return;
-}
-
 void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle) {
-    switch(m_object) {
+    switch(object()) {
     case StorageStatusObject:
-        processJsonReply<QnStorageStatusReply>(response, handle);
+        processJsonReply<QnStorageStatusReply>(this, response, handle);
         break;
     case StorageSpaceObject:
-        processJsonReply<QnStorageSpaceReply>(response, handle);
+        processJsonReply<QnStorageSpaceReply>(this, response, handle);
         break;
     case TimePeriodsObject: {
         int status = response.status;
@@ -208,7 +196,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
             }
         }
 
-        emitFinished(status, reply, handle);
+        emitFinished(this, status, reply, handle);
         break;
     }
     case StatisticsObject: {
@@ -269,11 +257,11 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
             reply.updatePeriod = extractXmlBody(paramsBlock, "updatePeriod").toInt();
         }
         
-        emitFinished(status, reply, handle);
+        emitFinished(this, status, reply, handle);
         break;
     }
     case PtzSpaceMapperObject:
-        processJsonReply<QnPtzSpaceMapper>(response, handle);
+        processJsonReply<QnPtzSpaceMapper>(this, response, handle);
         break;
     case PtzPositionObject: {
         const QByteArray& data = response.data;
@@ -287,7 +275,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 //            qnWarning("Could not get ptz position from camera: %1.", response.errorString);
         }
 
-        emitFinished(response.status, reply, handle);
+        emitFinished(this, response.status, reply, handle);
         break;
     }
     case GetParamsObject: {
@@ -307,7 +295,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
             }
         }
 
-        emitFinished(response.status, reply, handle);
+        emitFinished(this, response.status, reply, handle);
         break;
     }
     case SetParamsObject: {
@@ -325,17 +313,17 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
             ));
         }
 
-        emitFinished(response.status, reply, handle);
+        emitFinished(this, response.status, reply, handle);
         break;
     }
     case TimeObject:
-        processJsonReply<QnTimeReply>(response, handle);
+        processJsonReply<QnTimeReply>(this, response, handle);
         break;
     case PtzSetPositionObject:
     case PtzStopObject:
     case PtzMoveObject:
     case CameraAddObject: 
-        emitFinished(response.status, handle);
+        emitFinished(this, response.status, handle);
         break;
     case CameraSearchObject: {
         QnCamerasFoundInfoList reply;
@@ -357,7 +345,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
             qnWarning("Camera search failed: %1.", extractXmlBody(response.data, "root"));
         }
 
-        emitFinished(response.status, reply, handle);
+        emitFinished(this, response.status, reply, handle);
         break;
     }
     case eventLogObject: {
@@ -365,7 +353,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         QnLightBusinessActionVectorPtr events(new QnLightBusinessActionVector);
         if (response.status == 0)
             QnEventSerializer::deserialize(events, response.data);
-        emitFinished(response.status, events, handle);
+        emitFinished(this, response.status, events, handle);
 		break;
     }
     default:
@@ -381,11 +369,12 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
 QnMediaServerConnection::QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent):
-    QObject(parent),
-    m_nameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>())),
-    m_url(mediaServerApiUrl),
+    base_type(parent),
     m_proxyPort(0)
-{}
+{
+    setUrl(mediaServerApiUrl);
+    setNameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>()));
+}
 
 QnMediaServerConnection::~QnMediaServerConnection() {
     return;
@@ -569,52 +558,6 @@ int QnMediaServerConnection::asyncEventLog(
     return sendAsyncRequest(eventLogObject, params, QN_REPLY_TYPE(QnLightBusinessActionVectorPtr), target, slot);
 }
 
-int QnMediaServerConnection::sendAsyncRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
-    QnMediaServerReplyProcessor *processor = new QnMediaServerReplyProcessor(object);
-
-    QByteArray signal;
-    if(replyTypeName == NULL) {
-        signal = SIGNAL(finished(int, int));
-    } else {
-        signal = lit("%1finished(int, const %2 &, int)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
-    }
-    connect(processor, signal.constData(), target, slot, Qt::QueuedConnection);
-
-    return QnSessionManager::instance()->sendAsyncGetRequest(
-        m_url, 
-        m_nameMapper->name(processor->object()), 
-        QnRequestHeaderList(), 
-        params, 
-        processor, 
-        SLOT(processReply(QnHTTPRawResponse, int))
-    );
+QnAbstractReplyProcessor *QnMediaServerConnection::newReplyProcessor(int object) {
+    return new QnMediaServerReplyProcessor(object);
 }
-
-int QnMediaServerConnection::sendSyncRequest(int object, const QnRequestParamList &params, QVariant *reply) {
-    assert(reply);
-
-    QnHTTPRawResponse response;
-    QnSessionManager::instance()->sendGetRequest(
-        m_url,
-        m_nameMapper->name(object),
-        QnRequestHeaderList(),
-        params,
-        response
-    );
-
-    QnMediaServerReplyProcessor processor(object);
-    processor.processReply(response, -1);
-    *reply = processor.reply();
-
-    return processor.status();
-}
-
-bool QnMediaServerConnection::connect(QnMediaServerReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType) {
-    if(strstr(method, "QVariant")) {
-        return base_type::connect(sender, SIGNAL(finished(int, const QVariant &, int)), receiver, method, connectionType);
-    } else {
-        return base_type::connect(sender, signal, receiver, method, connectionType);
-    }
-}
-
-

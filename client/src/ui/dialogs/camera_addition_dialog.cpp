@@ -431,7 +431,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     ui->stopScanButton->setVisible(true);
     ui->stopScanButton->setFocus();
 
-    QnMediaServerRequestResult result;
+    QnConnectionRequestResult result;
     m_server->apiConnection()->searchCameraAsync(startAddrStr, endAddrStr, username, password, port, &result, SLOT(processReply(int, const QVariant &, int)));
 
     QEventLoop loop;
@@ -511,7 +511,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     ui->scanButton->setEnabled(false);
     ui->camerasTable->setEnabled(false);
 
-    QnMediaServerRequestResult result;
+    QnConnectionRequestResult result;
     m_server->apiConnection()->addCameraAsync(urls, manufacturers, username, password, &result, SLOT(processReply(int, const QVariant &, int)));
 
     QEventLoop loop;

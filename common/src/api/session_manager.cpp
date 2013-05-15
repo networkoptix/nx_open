@@ -24,7 +24,7 @@ void QnSessionManagerAsyncReplyProcessor::at_replyReceived() {
     QString errorString = reply->errorString();
     // Common EC error looks like:
     // "Error downloading https://user:password@host:port/path - server replied: INTERNAL SERVER ERROR"
-    // displaying plaint-text password is unsecure and strongly not recommended
+    // displaying plain-text password is unsecure and strongly not recommended
     if (errorString.indexOf(QLatin1String("@")) > 0 && errorString.indexOf(QLatin1String(":")) > 0) {
         int n = errorString.lastIndexOf(QLatin1String(":"));
         errorString = errorString.mid(n + 1).trimmed();

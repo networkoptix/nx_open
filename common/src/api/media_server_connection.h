@@ -1,8 +1,6 @@
 #ifndef QN_MEDIA_SERVER_CONNECTION_H
 #define QN_MEDIA_SERVER_CONNECTION_H
 
-#include <cassert>
-
 #include <QtCore/QUrl>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
@@ -23,6 +21,7 @@
 #include <recording/time_period_list.h>
 
 #include "api_fwd.h"
+#include "abstract_connection.h"
 #include "media_server_cameras_data.h"
 #include "business/actions/abstract_business_action.h"
 #include "business/events/abstract_business_event.h"
@@ -37,28 +36,15 @@ Q_DECLARE_METATYPE(QnStringBoolPairList);
 Q_DECLARE_METATYPE(QnStringVariantPairList);
 
 
-class QnMediaServerReplyProcessor: public QObject {
+class QnMediaServerReplyProcessor: public QnAbstractReplyProcessor {
     Q_OBJECT
 
-    typedef QObject base_type;
-
 public:
-    QnMediaServerReplyProcessor(int object);
-    virtual ~QnMediaServerReplyProcessor();
+    QnMediaServerReplyProcessor(int object): QnAbstractReplyProcessor(object) {}
 
-    int object() const { return m_object; }
-
-    bool isFinished() const { return m_finished; }
-    int status() const { return m_status; }
-    int handle() const { return m_handle; }
-    QVariant reply() const { return m_reply; }
-
-public slots:
-    void processReply(const QnHTTPRawResponse &response, int handle);
+    virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
 
 signals:
-    void finished(int status, int handle);
-    void finished(int status, const QVariant &reply, int handle);
     void finished(int status, const QnStorageStatusReply &reply, int handle);
     void finished(int status, const QnStorageSpaceReply &reply, int handle);
     void finished(int status, const QnTimePeriodList &reply, int handle);
@@ -72,90 +58,13 @@ signals:
     void finished(int status, const QnLightBusinessActionVectorPtr &reply, int handle);
 
 private:
-    template<class T>
-    void emitFinished(int status, const T &reply, int handle) {
-        m_finished = true;
-        m_status = status;
-        m_handle = handle;
-        m_reply = QVariant::fromValue<T>(reply);
-
-        emit finished(status, reply, handle);
-        emit finished(status, m_reply, handle);
-    }
-
-    void emitFinished(int status, int handle) {
-        m_finished = true;
-        m_status = status;
-        m_handle = handle;
-        m_reply = QVariant();
-
-        emit finished(status, handle);
-        emit finished(status, m_reply, handle);
-    }
-
-    template<class T>
-    void processJsonReply(const QnHTTPRawResponse &response, int handle) {
-        int status = response.status;
-
-        T reply;
-        if(status == 0) {
-            QVariantMap map;
-            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply)) {
-                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
-                status = 1;
-            }
-        } else {
-            qnWarning("Error processing request: %1.", response.errorString);
-        }
-
-        emitFinished(status, reply, handle);
-    }
-
-private:
-    int m_object;
-    bool m_finished;
-    int m_status;
-    int m_handle;
-    QVariant m_reply;
+    friend class QnAbstractReplyProcessor;
 };
 
 
-class QnMediaServerRequestResult: public QObject {
+class QnMediaServerConnection: public QnAbstractConnection {
     Q_OBJECT
-public:
-    QnMediaServerRequestResult(QObject *parent = NULL): QObject(parent), m_finished(false), m_status(0), m_handle(0) {}
-
-    bool isFinished() const { return m_finished; }
-    int status() const { return m_status; }
-    int handle() const { return m_handle; }
-    const QVariant &reply() const { return m_reply; }
-
-signals:
-    void replyProcessed();
-
-public slots:
-    void processReply(int status, const QVariant &reply, int handle) {
-        m_finished = true;
-        m_status = status;
-        m_reply = reply;
-        m_handle = handle;
-
-        emit replyProcessed();
-    }
-
-private:
-    bool m_finished;
-    int m_status;
-    int m_handle;
-    QVariant m_reply;
-};
-
-
-class QN_EXPORT QnMediaServerConnection: public QObject
-{
-    Q_OBJECT
-
-    typedef QObject base_type;
+    typedef QnAbstractConnection base_type;
 
 public:
     QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent = NULL);
@@ -164,7 +73,6 @@ public:
     void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
     int getProxyPort() { return m_proxyPort; }
     QString getProxyHost() { return m_proxyAddr; }
-    QString getUrl() const { return m_url.toString(); }
 
     int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
 
@@ -243,31 +151,14 @@ public:
 
     int getTimeAsync(QObject *target, const char *slot);
 
-    using base_type::connect;
-    static bool connect(QnMediaServerReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
-
 protected:
+    virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
+
     static QnRequestParamList createTimePeriodsRequest(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
     static QnRequestParamList createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params);
     static QnRequestParamList createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params);
 
 private:
-    int sendAsyncRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
-    int sendSyncRequest(int object, const QnRequestParamList &params, QVariant *reply);
-
-    template<class T>
-    int sendSyncRequest(int object, const QnRequestParamList &params, T *reply) {
-        assert(reply);
-
-        QVariant replyVariant;
-        int status = sendSyncRequest(object, params, &replyVariant);
-        *reply = replyVariant.value<T>();
-        return status;
-    }
-
-private:
-    QScopedPointer<QnEnumNameMapper> m_nameMapper;
-    QUrl m_url;
     QString m_proxyAddr;
     int m_proxyPort;
 };

@@ -2134,7 +2134,7 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if(!server)
         return;
 
-    QUrl url(server->apiConnection()->getUrl() + QLatin1String("/api/showLog"));
+    QUrl url(server->apiConnection()->url().toString() + QLatin1String("/api/showLog"));
     QDesktopServices::openUrl(url);
 }
 
