@@ -278,8 +278,8 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
     NX_LOG( QString::fromAscii("AggregationSurface(%1)::ensureUploadedToOGL. Uploading aggregation surface containing %2 locked rects (bounding rect %3) to opengl...").
         arg((size_t)this, 0, 16).arg(lockedRectCount).arg(rectToString(lockedRegionBeingLoaded.boundingRect())), cl_logDEBUG1 );
 
-    unsigned int r_w[3] = { m_fullRect.width(), m_fullRect.width() / 2, m_fullRect.width() / 2 }; // real_width / visible
-    unsigned int h[3] = { m_fullRect.height(), m_fullRect.height() / 2, m_fullRect.height() / 2 };
+    unsigned int r_w[3] = { (uint)m_fullRect.width(), (uint)m_fullRect.width() / 2, (uint)m_fullRect.width() / 2 }; // real_width / visible
+    unsigned int h[3] = { (uint)m_fullRect.height(), (uint)m_fullRect.height() / 2, (uint)m_fullRect.height() / 2 };
 
     switch( m_format )
     {
