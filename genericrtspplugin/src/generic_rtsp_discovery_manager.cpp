@@ -7,6 +7,7 @@
 
 #include <cstring>
 
+#include <QCryptographicHash>
 #include <QUrl>
 
 #include "generic_rtsp_camera_manager.h"
@@ -69,8 +70,12 @@ int GenericRTSPDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, c
 
     //cameras[0].modelName[256];
     //cameras[0].firmware[256];
+
+    //providing camera uid as md5 hash of url
+    const QByteArray& uidStr = QCryptographicHash::hash( QByteArray::fromRawData(address, strlen(address)), QCryptographicHash::Md5 ).toHex();
+
     memset( &cameras[0], 0, sizeof(cameras[0]) );
-    strncpy( cameras[0].uid, address, sizeof(cameras[0].uid)-1 );
+    strncpy( cameras[0].uid, uidStr.constData(), sizeof(cameras[0].uid)-1 );
     strncpy( cameras[0].url, address, sizeof(cameras[0].url)-1 );
     //cameras[0].auxiliaryData[256];
     strncpy( cameras[0].defaultLogin, login, sizeof(cameras[0].defaultLogin)-1 );
