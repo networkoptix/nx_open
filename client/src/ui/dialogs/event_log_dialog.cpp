@@ -11,6 +11,7 @@
 #include "device_plugins/server_camera/server_camera.h"
 #include "resource_selection_dialog.h"
 #include "client/client_globals.h"
+#include "ui/style/skin.h"
 
 QStandardItem* QnEventLogDialog::createEventItem(BusinessEventType::Value value)
 {
@@ -60,12 +61,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     for (int i = 4; i < columns.size(); ++i)
         headers->setResizeMode(i, QHeaderView::ResizeToContents);
 
-    //connect(ui->dateEditFrom, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
-    //connect(ui->eventComboBox, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
-    //connect(ui->cameraButton, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
-    //connect(ui->actionComboBox, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(at_ControlResized()));
-
-
     QStandardItem* rootItem = createEventTree(0, BusinessEventType::AnyBusinessEvent);
     QStandardItemModel* model = new QStandardItemModel();
     model->appendRow(rootItem);
@@ -78,6 +73,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->actionComboBox->addItems(actionItems);
 
     ui->cameraButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera | QnResourceIconCache::Online));
+    ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
 
     connect(ui->dateEditFrom, SIGNAL(dateChanged(const QDate &)), this, SLOT(updateData()) );
     connect(ui->dateEditTo, SIGNAL(dateChanged(const QDate &)), this, SLOT(updateData()) );
@@ -85,11 +81,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(ui->eventComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateData()) );
     connect(ui->actionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateData()) );
 
-    //connect(ui->gridEvents->selectionModel(), SIGNAL(currentChanged(const QModelIndex&,const QModelIndex&)), this, SLOT(at_gridCelLSelected(const QModelIndex&)) );
-
     connect(ui->gridEvents, SIGNAL(clicked (const QModelIndex &)), this, SLOT(at_itemClicked(const QModelIndex&)) );
     connect(ui->gridEvents, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT(at_customContextMenuRequested(const QPoint &)) );
     connect(ui->cameraButton, SIGNAL(clicked (bool)), this, SLOT(at_cameraButtonClicked()) );
+    connect(ui->refreshButton, SIGNAL(clicked (bool)), this, SLOT(updateData()) );
 
     updateData();
 
