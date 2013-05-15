@@ -230,6 +230,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)), this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(fileAdded(QString)), this, SLOT(at_eventManager_fileAdded(QString)));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -961,25 +962,17 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
         }
     case BusinessActionType::PlaySound: {
             QString filename = businessAction->getParams().getSoundUrl();
-            qDebug() << "play sound action received" << filename;
+            QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
 
-            QnAppServerNotificationCache *cache = new QnAppServerNotificationCache(this);
-            connect(cache,  SIGNAL(fileDownloaded(QString,bool)),  this,  SLOT(at_notificationSoundDownloaded(QString, bool)));
-            connect(cache,  SIGNAL(fileDownloaded(QString,bool)),  cache, SLOT(deleteLater()));
-            cache->downloadFile(filename);
+            // if file is not exists then it is already deleted or just not downloaded yet
+            // I think it should not be played when downloaded
+            AudioPlayer::playFileAsync(filePath);
+            qDebug() << "play sound action received" << filename << filePath;
             break;
         }
     default:
         break;
     }
-}
-
-void QnWorkbenchActionHandler::at_notificationSoundDownloaded(const QString &filename, bool ok) {
-    if (!ok)
-        return;
-    qDebug() << "ready to play" << filename;
-    AudioPlayer::playFileAsync(filename);
-    //TODO: #GDM play sound
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
