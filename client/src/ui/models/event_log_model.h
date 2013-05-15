@@ -43,6 +43,7 @@ public:
 
     BusinessEventType::Value eventType(const QModelIndex & index) const;
     QnResourcePtr eventResource(const QModelIndex & index) const;
+    qint64 eventTimestamp(const QModelIndex & index) const;
 private:
 
     static QString columnTitle(Column column);

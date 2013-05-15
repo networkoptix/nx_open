@@ -76,8 +76,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     //connect(ui->gridEvents->selectionModel(), SIGNAL(currentChanged(const QModelIndex&,const QModelIndex&)), this, SLOT(at_gridCelLSelected(const QModelIndex&)) );
 
+    connect(ui->gridEvents, SIGNAL(clicked (const QModelIndex &)), this, SLOT(at_itemClicked(const QModelIndex&)) );
     connect(ui->gridEvents, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT(at_customContextMenuRequested(const QPoint &)) );
-
     connect(ui->cameraButton, SIGNAL(clicked (bool)), this, SLOT(at_cameraButtonClicked()) );
 
     updateData();
@@ -170,8 +170,20 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
     }
 }
 
-void QnEventLogDialog::onItemClicked(QListWidgetItem * item)
+void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
 {
+    if (!idx.isValid() || idx.column() != QnEventLogModel::DescriptionColumn)
+        return;
+    
+    QnResourcePtr resource = m_model->eventResource(idx);
+    if (m_model->eventType(idx) != BusinessEventType::Camera_Motion || !resource)
+        return;
+    qint64 pos = m_model->eventTimestamp(idx);
+
+    QnActionParameters params(resource);
+    params.setArgument(Qn::ItemTimeRole, pos);
+
+    m_context->menu()->trigger(Qn::OpenInNewLayoutAction, params);
 }
 
 bool QnEventLogDialog::setEventTypeRecursive(BusinessEventType::Value value, QAbstractItemModel* model, const QModelIndex& parentItem)

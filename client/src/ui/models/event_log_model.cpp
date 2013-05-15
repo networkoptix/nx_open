@@ -275,6 +275,17 @@ QnResourcePtr QnEventLogModel::eventResource(const QModelIndex & index) const
     }
 }
 
+qint64 QnEventLogModel::eventTimestamp(const QModelIndex & index) const
+{
+    if (index.isValid()) {
+        const QnLightBusinessAction& action = m_events->at(index.row());
+        return action.timestamp();
+    }
+    else {
+        return AV_NOPTS_VALUE;
+    }
+}
+
 /*
 QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
 {

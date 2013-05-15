@@ -36,7 +36,7 @@ public:
 private slots:
     void updateData();
     void at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum);
-    void onItemClicked(QListWidgetItem * item);
+    void at_itemClicked(const QModelIndex & index);
     void at_customContextMenuRequested(const QPoint& screenPos);
     void at_cameraButtonClicked();
     void at_filterAction();
