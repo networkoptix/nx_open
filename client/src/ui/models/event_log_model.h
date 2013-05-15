@@ -40,6 +40,7 @@ public:
     void clear();
 
     virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override;
+    virtual void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder ) override;
 
     BusinessEventType::Value eventType(const QModelIndex & index) const;
     QnResourcePtr eventResource(const QModelIndex & index) const;

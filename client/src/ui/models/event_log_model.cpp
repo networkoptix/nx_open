@@ -37,7 +37,6 @@ void QnEventLogModel::setEvents(const QList<QnLightBusinessActionVectorPtr> &eve
 void QnEventLogModel::setEvents(const QnLightBusinessActionVectorPtr& events) {
     m_events = events;
     rebuild();
-    int idx1 = 0, idx2 = 0;
 }
 
 QList<QnEventLogModel::Column> QnEventLogModel::columns() const {
@@ -56,6 +55,11 @@ void QnEventLogModel::setColumns(const QList<Column> &columns) {
     }
 
     m_columns = columns;
+
+    /* Fill header. */
+    setColumnCount(m_columns.size());
+    for(int c = 0; c < m_columns.size(); c++)
+        setHeaderData(c, Qt::Horizontal, columnTitle(m_columns[c]));
 
     rebuild();
 }
@@ -229,6 +233,12 @@ QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAct
     return QVariant();
 }
 
+void QnEventLogModel::sort ( int column, Qt::SortOrder order)
+{
+    int gg =  4;
+}
+
+
 QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
 {
     const Column& column = m_columns[index.column()];
@@ -286,45 +296,9 @@ qint64 QnEventLogModel::eventTimestamp(const QModelIndex & index) const
     }
 }
 
-/*
-QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
-{
-    QStandardItem* i = item(index.row(), index.column());
-    if (i == 0) {
-        i = createItem(m_columns[index.column()], m_events[index.row()]);
-        const_cast<QnEventLogModel*>(this)->setItem(index.row(), index.column(), i);
-    }
-    return i->data(role);
-}
-*/
-
 void QnEventLogModel::rebuild() 
 {
-    QTime t;
-    t.restart();
-
-    QStandardItemModel::clear();
-    if(m_columns.isEmpty())
-        return;
-
-    /* Fill header. */
-    setColumnCount(m_columns.size());
-    for(int c = 0; c < m_columns.size(); c++)
-        setHeaderData(c, Qt::Horizontal, columnTitle(m_columns[c]));
-
     setRowCount(m_events ? m_events->size() : 0);
-    /*
-    // Fill data.
-    for(int r = 0; r < m_events.size(); r++) {
-        QList<QStandardItem *> items;
-        for(int c = 0; c < m_columns.size(); c++)
-            items.push_back(createItem(m_columns[c], m_events[r]));
-
-        appendRow(items);
-    }
-    */
-
-    qDebug() << Q_FUNC_INFO << "time=" << t.elapsed();
 }
 
 QnLightBusinessActionVectorPtr QnEventLogModel::merge2(const QList <QnLightBusinessActionVectorPtr>& eventsList) const
