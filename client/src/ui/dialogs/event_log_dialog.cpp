@@ -55,10 +55,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     ui->gridEvents->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 
-
-
     QStandardItem* rootItem = createEventTree(0, BusinessEventType::AnyBusinessEvent);
-    
     QStandardItemModel* model = new QStandardItemModel();
     model->appendRow(rootItem);
     ui->eventComboBox->setModel(model);
@@ -266,15 +263,17 @@ void QnEventLogDialog::at_filterAction()
     enableUpdateData();
 }
 
-void QnEventLogDialog::at_customContextMenuRequested(const QPoint& screenPos)
+void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
 {
     QModelIndex idx = ui->gridEvents->currentIndex();
+    if (!idx.isValid())
+        return;
+
     QnId resId = m_model->data(idx, Qn::ResourceRole).toInt();
     QnResourcePtr resource = qnResPool->getResourceById(resId);
 
     QnActionManager *manager = m_context->menu();
     QScopedPointer<QMenu> menu(resource ? manager->newMenu(Qn::ActionScope::TreeScope, QnActionParameters(resource)) : new QMenu);
-    //manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
 
     if (!menu->isEmpty()) 
         menu->addSeparator();
@@ -287,7 +286,7 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint& screenPos)
     connect(resetFilterAction, SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
     menu->addAction(resetFilterAction);
 
-    QAction* action = menu->exec(screenPos + ui->gridEvents->pos() + pos());
+    QAction* action = menu->exec(QCursor::pos());
 }
 
 void QnEventLogDialog::at_cameraButtonClicked()

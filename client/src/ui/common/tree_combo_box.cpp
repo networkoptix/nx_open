@@ -1,4 +1,4 @@
-#include "treeComboBox.h"
+#include "tree_combo_box.h"
 
 #include <QtGui/QHeaderView>
 
