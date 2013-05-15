@@ -56,10 +56,6 @@ private:
     QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action) const;
     QVariant resourceData(const Column& column, const QnLightBusinessAction &action) const;
     QString formatUrl(const QString& url) const;
-
-    QnLightBusinessActionVectorPtr mergeEvents(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
-    QnLightBusinessActionVectorPtr merge2(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
-    QnLightBusinessActionVectorPtr mergeN(const QList <QnLightBusinessActionVectorPtr>& eventsList) const;
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;

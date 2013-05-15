@@ -49,9 +49,11 @@ public:
 
     void setSort(int column, Qt::SortOrder order)
     { 
-        if ((Column) column == m_sortCol && order == m_sortOrder)
+        if ((Column) column == m_sortCol) {
+            m_sortOrder = order;
             return;
-            
+        }
+
         m_sortCol = (Column) column;
         m_sortOrder = order;
 
@@ -101,7 +103,7 @@ public:
 
     inline QnLightBusinessAction& at(int row)
     {
-        return *m_records[row];
+        return m_sortOrder == Qt::AscendingOrder ? *m_records[row] : *m_records[m_size-1-row];
     }
 
     // comparators
@@ -128,21 +130,6 @@ public:
         return d1->compareString() < d2->compareString();
     }
 
-    static bool greatThanTimestamp(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
-    {
-        return d1->timestamp() >= d2->timestamp();
-    }
-
-    static bool greatThanEventType(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
-    {
-        return QnEventLogModel::DataIndex::toLexEventType(d1->eventType()) >= QnEventLogModel::DataIndex::toLexEventType(d2->eventType());
-    }
-
-    static bool greatThanActionType(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
-    {
-        return QnEventLogModel::DataIndex::toLexActionType(d1->actionType()) >= QnEventLogModel::DataIndex::toLexActionType(d2->actionType());
-    }
-
     static bool greatLexographic(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
     {
         return d1->compareString() >= d2->compareString();
@@ -166,43 +153,22 @@ public:
         }
 
         LessFunc lessThan;
-        if (m_sortOrder == Qt::AscendingOrder) {
-            switch(m_sortCol)
-            {
-            case DateTimeColumn:
-                lessThan = &lessThanTimestamp;
-                break;
-            case EventColumn:
-                lessThan = &lessThanEventType;
-                break;
-            case ActionColumn:
-                lessThan = &lessThanActionType;
-                break;
-            default:
-                lessThan = &lessLexographic;
-                for (int i = 0; i < m_records.size(); ++i)
-                    m_records[i]->setCompareString(m_owner->textData(m_sortCol, *m_records[i]));
-                break;
-            }
-        }
-        else {
-            switch(m_sortCol)
-            {
-            case DateTimeColumn:
-                lessThan = &greatThanTimestamp;
-                break;
-            case EventColumn:
-                lessThan = &greatThanEventType;
-                break;
-            case ActionColumn:
-                lessThan = &greatThanActionType;
-                break;
-            default:
-                lessThan = &lessLexographic;
-                for (int i = 0; i < m_records.size(); ++i)
-                    m_records[i]->setCompareString(m_owner->textData(m_sortCol, *m_records[i]));
-                break;
-            }
+        switch(m_sortCol)
+        {
+        case DateTimeColumn:
+            lessThan = &lessThanTimestamp;
+            break;
+        case EventColumn:
+            lessThan = &lessThanEventType;
+            break;
+        case ActionColumn:
+            lessThan = &lessThanActionType;
+            break;
+        default:
+            lessThan = &lessLexographic;
+            for (int i = 0; i < m_records.size(); ++i)
+                m_records[i]->setCompareString(m_owner->textData(m_sortCol, *m_records[i]));
+            break;
         }
 
         qSort(m_records.begin(), m_records.end(), lessThan);
@@ -254,7 +220,8 @@ QList<QnEventLogModel::Column> QnEventLogModel::columns() const {
     return m_columns;
 }
 
-void QnEventLogModel::setColumns(const QList<Column> &columns) {
+void QnEventLogModel::setColumns(const QList<Column> &columns) 
+{
     if(m_columns == columns)
         return;
 
@@ -446,7 +413,10 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
 
 void QnEventLogModel::sort(int column, Qt::SortOrder order)
 {
+    emit layoutAboutToBeChanged();
     m_index->setSort(column, order);
+    emit layoutChanged();
+
 }
 
 QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
@@ -506,98 +476,7 @@ qint64 QnEventLogModel::eventTimestamp(const QModelIndex & index) const
     }
 }
 
-void QnEventLogModel::rebuild() 
+void QnEventLogModel::rebuild()
 {
     setRowCount(m_index->size());
-}
-
-QnLightBusinessActionVectorPtr QnEventLogModel::merge2(const QList <QnLightBusinessActionVectorPtr>& eventsList) const
-{
-    QnLightBusinessActionVectorPtr events1 = eventsList[0];
-    QnLightBusinessActionVectorPtr events2 = eventsList[1];
-
-    QnLightBusinessActionVectorPtr events = QnLightBusinessActionVectorPtr(new QnLightBusinessActionVector);
-    events->resize(events1->size() + events2->size());
-
-    int idx1 = 0, idx2 = 0;
-
-    QnLightBusinessActionVector& v1  = *events1.data();
-    QnLightBusinessAction* ptr1 = &v1[0];
-
-    QnLightBusinessActionVector& v2  = *events2.data();
-    QnLightBusinessAction* ptr2 = &v2[0];
-
-    QnLightBusinessActionVector& vDst = *events.data();
-    QnLightBusinessAction* dst  = &vDst[0];
-
-
-    while (idx1 < events1->size() && idx2 < events2->size())
-    {
-        if (ptr1[idx1].timestamp() <= ptr2[idx2].timestamp())
-            *dst++ = ptr1[idx1++];
-        else
-            *dst++ = ptr2[idx2++];
-    }
-
-    while (idx1 < events1->size())
-        *dst++ = ptr1[idx1++];
-
-    while (idx2 < events2->size())
-        *dst++ = ptr2[idx2++];
-
-    return events;
-}
-
-QnLightBusinessActionVectorPtr QnEventLogModel::mergeN(const QList <QnLightBusinessActionVectorPtr>& eventsList) const
-{
-    QnLightBusinessActionVectorPtr events = QnLightBusinessActionVectorPtr(new QnLightBusinessActionVector);
-
-    QVector<int> idx;
-    idx.resize(eventsList.size());
-
-    QVector<QnLightBusinessAction*> ptr;
-    QVector<QnLightBusinessAction*> ptrEnd;
-    int totalSize = 0;
-    for (int i = 0; i < eventsList.size(); ++i)
-    {
-        QnLightBusinessActionVector& tmp  = *eventsList[i].data();
-        ptr << &tmp[0];
-        ptrEnd << &tmp[0] + eventsList[i]->size();
-        totalSize += eventsList[i]->size();
-    }
-    events->resize(totalSize);
-    QnLightBusinessActionVector& vDst = *events.data();
-    QnLightBusinessAction* dst  = &vDst[0];
-
-    int curIdx = -1;
-    do
-    {
-        qint64 curTimestamp = INT64_MAX;
-        curIdx = -1;
-        for (int i = 0; i < eventsList.size(); ++i)
-        {
-            if (ptr[i] < ptrEnd[i] && ptr[i]->timestamp() < curTimestamp) {
-                curIdx = i;
-                curTimestamp = ptr[i]->timestamp();
-            }
-        }
-        if (curIdx >= 0) {
-            *dst++ = *ptr[curIdx];
-            ptr[curIdx]++;
-        }
-    } while (curIdx >= 0);
-
-    return events;
-}
-
-QnLightBusinessActionVectorPtr QnEventLogModel::mergeEvents(const QList <QnLightBusinessActionVectorPtr>& eventsList) const
-{
-    if (eventsList.empty())
-        return QnLightBusinessActionVectorPtr();
-    else if (eventsList.size() == 1)
-        return eventsList[0];
-    else if (eventsList.size() == 2)
-        return merge2(eventsList);
-    else
-        return mergeN(eventsList);
 }
