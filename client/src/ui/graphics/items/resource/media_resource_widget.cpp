@@ -780,24 +780,6 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
-    QColor fc = frameColor();
-    if (fc == qnGlobals->frameColor()) {
-        setFrameColor(QColor(Qt::blue));
-    } else if (fc == QColor(Qt::blue)) {
-        setFrameColor(QColor(Qt::red));
-    } else if (fc == QColor(Qt::red)) {
-        setFrameColor(QColor(Qt::green));
-    } else if (fc == QColor(Qt::green)) {
-        setFrameColor(QColor(Qt::yellow));
-    } else if (fc == QColor(Qt::yellow)) {
-        setFrameColor(QColor(Qt::magenta));
-    } else if (fc == QColor(Qt::magenta)) {
-        setFrameColor(QColor(Qt::cyan));
-    } else if (fc == QColor(Qt::cyan)) {
-        setFrameColor(QColor(Qt::white));
-    } else
-        setFrameColor(qnGlobals->frameColor());
-
     setOption(ControlZoomWindow, checked);
 
     if(checked)

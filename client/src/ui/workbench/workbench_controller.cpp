@@ -278,6 +278,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(sceneFocusSignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                           this,                           SLOT(at_scene_focusIn(QGraphicsScene *, QEvent *)));
     connect(zoomWindowInstrument,       SIGNAL(zoomRectChanged(QnMediaResourceWidget *, const QRectF &)),                           this,                           SLOT(at_zoomRectChanged(QnMediaResourceWidget *, const QRectF &)));
     connect(zoomWindowInstrument,       SIGNAL(zoomRectCreated(QnMediaResourceWidget *, const QRectF &)),                           this,                           SLOT(at_zoomRectCreated(QnMediaResourceWidget *, const QRectF &)));
+    connect(zoomWindowInstrument,       SIGNAL(zoomTargetChanged(QnMediaResourceWidget *, QnMediaResourceWidget *)),                this,                           SLOT(at_zoomTargetChanged(QnMediaResourceWidget *, QnMediaResourceWidget *)));
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
@@ -1017,6 +1018,18 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, co
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QRectF &zoomRect) {
     menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect));
     widget->setCheckedButtons(widget->checkedButtons() & ~QnMediaResourceWidget::ZoomWindowButton);
+}
+
+void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget) {
+    QnLayoutItemData data = widget->item()->data();
+    data.uuid = QUuid::createUuid();
+    data.resource.id = zoomTargetWidget->resource()->getId().toInt();
+    data.resource.path = zoomTargetWidget->resource()->getUniqueId();
+    data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
+
+    delete widget;
+
+    workbench()->currentLayout()->resource()->addItem(data);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {

@@ -37,7 +37,7 @@ class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnW
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
-    Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor)
+    Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor NOTIFY frameColorChanged)
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio)
@@ -120,7 +120,7 @@ public:
     }
 
     /**
-     * \param frameColor                New frame opacity for this widget.
+     * \param frameOpacity              New frame opacity for this widget.
      */
     void setFrameOpacity(qreal frameOpacity) {
         m_frameOpacity = frameOpacity;
@@ -148,9 +148,7 @@ public:
     /**
      * \param frameColor                New frame color for this widget.
      */
-    void setFrameColor(const QColor &frameColor) {
-        m_frameColor = frameColor;
-    }
+    void setFrameColor(const QColor &frameColor);
 
     virtual void setGeometry(const QRectF &geometry) override;
 
@@ -290,6 +288,7 @@ signals:
     void aboutToBeDestroyed();
     void optionsChanged();
     void zoomRectChanged();
+    void frameColorChanged();
     void rotationStartRequested();
     void rotationStopRequested();
 
@@ -373,6 +372,7 @@ protected:
 
     QColor activeFrameColor() const;
     QColor selectedFrameColor() const;
+
 private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);

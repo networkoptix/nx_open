@@ -622,7 +622,7 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
             delete m_storedWindowWidget.data(); /* Just to feel safe that we don't leak memory. */
         m_storedWindowWidget = windowTarget();
 
-        emit zoomTargetChanged(windowTarget()->zoomWidget(), mediaWidget);
+        emit zoomTargetChanged(widget, mediaWidget);
     }
 }
 

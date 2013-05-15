@@ -339,6 +339,15 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
         shadowItem()->setSoftWidth(m_frameWidth);
 }
 
+void QnResourceWidget::setFrameColor(const QColor &frameColor) {
+    if(m_frameColor == frameColor)
+        return;
+
+    m_frameColor = frameColor;
+
+    emit frameColorChanged();
+}
+
 void QnResourceWidget::setAspectRatio(qreal aspectRatio) {
     if(qFuzzyCompare(m_aspectRatio, aspectRatio))
         return;
