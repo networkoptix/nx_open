@@ -64,7 +64,7 @@ int QnTreeViewComboBox::getTreeWidth(const QModelIndex& parent, int nestedLevel)
     return textWidth;
 }
 
-QSize QnTreeViewComboBox::sizeHint() const
+QSize QnTreeViewComboBox::minimumSizeHint() const
 {   
     int textWidth = getTreeWidth(QModelIndex(), 0);
 
