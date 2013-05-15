@@ -80,7 +80,7 @@ public:
         m_events.clear();
     }
 
-    int size() const
+    inline int size() const
     {
         return m_size;
     }
@@ -421,6 +421,9 @@ void QnEventLogModel::sort(int column, Qt::SortOrder order)
 
 QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
 {
+    if (index.row() >= m_index->size())
+        return QVariant();
+
     const Column& column = m_columns[index.column()];
     const QnLightBusinessAction& action = m_index->at(index.row());
     
