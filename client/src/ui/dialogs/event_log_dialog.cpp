@@ -178,7 +178,7 @@ void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
     QnResourcePtr resource = m_model->eventResource(idx);
     if (m_model->eventType(idx) != BusinessEventType::Camera_Motion || !resource)
         return;
-    qint64 pos = m_model->eventTimestamp(idx);
+    qint64 pos = m_model->eventTimestamp(idx)/1000;
 
     QnActionParameters params(resource);
     params.setArgument(Qn::ItemTimeRole, pos);
