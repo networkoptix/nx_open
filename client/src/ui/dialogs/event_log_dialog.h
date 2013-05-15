@@ -54,6 +54,7 @@ private:
 
     void disableUpdateData();
     void enableUpdateData();
+    void updateHeaderWidth();
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  

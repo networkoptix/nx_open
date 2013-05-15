@@ -94,16 +94,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     updateData();
 
     ui->mainGridLayout->activate();
-
-    int space = ui->mainGridLayout->horizontalSpacing();
-    int w = ui->gridEvents->verticalHeader()->sizeHint().width();
-    w = 12; // todo: determine real vHeader width value. previous line doesn't work
-
-    space--; // grid line delimiter
-    ui->gridEvents->horizontalHeader()->resizeSection(0, ui->dateEditFrom->width() + ui->dateEditTo->width() + ui->delimLabel->width() - w + space);
-    ui->gridEvents->horizontalHeader()->resizeSection(1, ui->eventComboBox->width() + space);
-    ui->gridEvents->horizontalHeader()->resizeSection(2, ui->cameraButton->width() + space);
-    ui->gridEvents->horizontalHeader()->resizeSection(3, ui->actionComboBox->width() + space);
+    updateHeaderWidth();
 }
 
 QnEventLogDialog::~QnEventLogDialog()
@@ -175,7 +166,17 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                 this, SLOT(at_gotEvents(int, const QnLightBusinessActionVectorPtr&, int)));
         }
     }
+}
 
+void QnEventLogDialog::updateHeaderWidth()
+{
+    int space = ui->mainGridLayout->horizontalSpacing();
+    int w = ui->gridEvents->verticalHeader()->sizeHint().width();
+    space--; // grid line delimiter
+    ui->gridEvents->horizontalHeader()->resizeSection(0, ui->dateEditFrom->width() + ui->dateEditTo->width() + ui->delimLabel->width() + space - w);
+    ui->gridEvents->horizontalHeader()->resizeSection(1, ui->eventComboBox->width() + space);
+    ui->gridEvents->horizontalHeader()->resizeSection(2, ui->cameraButton->width() + space);
+    ui->gridEvents->horizontalHeader()->resizeSection(3, ui->actionComboBox->width() + space);
 }
 
 void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum)
@@ -191,6 +192,7 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
         m_allEvents.clear();
         ui->gridEvents->setDisabled(false);
         ui->gridEvents->setCursor(Qt::ArrowCursor);
+        updateHeaderWidth();
     }
 }
 
