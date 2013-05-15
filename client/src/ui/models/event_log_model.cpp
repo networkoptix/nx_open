@@ -15,7 +15,7 @@
 class QnEventLogModel::DataIndex
 {
 public:
-    DataIndex(): m_sortCol(DateTimeColumn), m_sortOrder(Qt::AscendingOrder)
+    DataIndex(): m_sortCol(DateTimeColumn), m_sortOrder(Qt::DescendingOrder)
     {
         static bool firstCall = true;
         if (firstCall) {
