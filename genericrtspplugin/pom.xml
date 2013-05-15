@@ -31,6 +31,5 @@
 		<linux.defines/>
 		<!--Specific os defines-->
 		<windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
-		<buildLib>sharedlib</buildLib>
 	</properties>  
 </project>
