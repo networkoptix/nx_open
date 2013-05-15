@@ -1,9 +1,14 @@
 #include "notification_sound_model.h"
 
 QnNotificationSoundModel::QnNotificationSoundModel(QObject *parent) :
-    QStandardItemModel(parent),
-    m_loaded(false)
+    QStandardItemModel(parent)
 {
+    init();
+}
+
+void QnNotificationSoundModel::init() {
+    clear();
+    m_loaded = false;
     QList<QStandardItem *> row;
     row << new QStandardItem(tr("<Downloading sound list...>"))
         << new QStandardItem(QString());

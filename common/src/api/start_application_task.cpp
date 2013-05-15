@@ -31,6 +31,8 @@ namespace applauncher
         {
         }
 
+        BaseTask::~BaseTask(){}
+
 
         bool deserializeTask( const QByteArray& str, BaseTask** ptr )
         {

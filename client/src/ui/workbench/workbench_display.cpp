@@ -551,7 +551,6 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(newWidget != NULL) {
             bringToFront(newWidget);
             synchronize(newWidget, true);
-            newWidget->setOpacity(0.7);
         }
         break;
     }
@@ -834,6 +833,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             if(item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
                 mediaWidget->display()->archiveReader()->setPlaybackRange(item->layout()->resource()->getLocalRange());
 
+            quint64 time = item->data(Qn::ItemTimeRole).toULongLong() * 1000;
+            if (time > 0)
+                mediaWidget->display()->archiveReader()->jumpTo(time, time);
+            else
             if(startDisplay)
                 if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
                     mediaWidget->display()->archiveReader()->jumpTo(0, 0);
@@ -1206,7 +1209,8 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         assertRaisedConeItem(widget);
 
         raisedConeItem(widget)->adjustGeometry(expanded(widget->aspectRatio(), enclosingGeometry, Qt::KeepAspectRatio));
-        opacityAnimator(raisedConeItem(widget), 0.5)->animateTo(0.3);
+        if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
+            opacityAnimator(raisedConeItem(widget), 0.5)->animateTo(0.3);
 
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 

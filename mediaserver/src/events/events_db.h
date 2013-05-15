@@ -23,7 +23,7 @@ public:
         const BusinessActionType::Value& actionType = BusinessActionType::NotDefined,
         const QnId& businessRuleId = QnId()) const;
 
-    void QnEventsDB::getAndSerializeActions(
+    void getAndSerializeActions(
         QByteArray& result,
         const QnTimePeriod& period,
         const QnId& cameraId, 

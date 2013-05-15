@@ -19,7 +19,7 @@ QnCustomFileDialog::QnCustomFileDialog(QWidget *parent,
 QnCustomFileDialog::~QnCustomFileDialog() {
 }
 
-void QnCustomFileDialog::addCheckbox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate) {
+void QnCustomFileDialog::addCheckBox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate) {
     QCheckBox* checkbox = new QCheckBox(this);
     checkbox->setText(text);
     checkbox->setChecked(*value);
@@ -66,6 +66,30 @@ void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxVa
     addWidget(widget);
 }
 
+
+void QnCustomFileDialog::addLineEdit(const QString &text, QString *value) {
+
+    QWidget* widget = new QWidget(this);
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    QLabel* label = new QLabel(widget);
+    label->setText(text);
+    layout->addWidget(label);
+
+    QLineEdit* edit = new QLineEdit(widget);
+    edit->setText(*value);
+    m_lineedits.insert(edit, value);
+    layout->addWidget(edit);
+
+    layout->addStretch();
+
+    widget->setLayout(layout);
+
+    addWidget(widget);
+}
+
+
 void QnCustomFileDialog::addWidget(QWidget *widget) {
     QGridLayout * gl = dynamic_cast<QGridLayout*>(layout());
     if (gl)
@@ -77,11 +101,12 @@ void QnCustomFileDialog::addWidget(QWidget *widget) {
 }
 
 void QnCustomFileDialog::at_accepted() {
-    foreach(QCheckBox* key, m_checkboxes.keys()) {
+    foreach(QCheckBox* key, m_checkboxes.keys())
         *m_checkboxes[key] = key->isChecked();
-    }
 
-    foreach(QSpinBox* key, m_spinboxes.keys()) {
+    foreach(QSpinBox* key, m_spinboxes.keys())
         *m_spinboxes[key] = key->value();
-    }
+
+    foreach(QLineEdit* key, m_lineedits.keys())
+        *m_lineedits[key] = key->text();
 }

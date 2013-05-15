@@ -54,8 +54,10 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     dialog->setNameFilter(supportedFormats);
 
     int cropSoundSecs = 5;
+    QString title;
 
     dialog->addSpinBox(tr("Clip sound up to %n seconds"), 1, 10, &cropSoundSecs);
+    dialog->addLineEdit(tr("Custom Title"), &title);
     if(!dialog->exec())
         return;
 
@@ -65,7 +67,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
 
     QString filename = files[0];
 
-    context()->instance<QnAppServerNotificationCache>()->storeSound(filename, cropSoundSecs*1000);
+    context()->instance<QnAppServerNotificationCache>()->storeSound(filename, cropSoundSecs*1000, title);
 
 
 }

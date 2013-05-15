@@ -291,7 +291,7 @@ void QnLayoutSettingsDialog::selectFile() {
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
     dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
 
-    dialog->addCheckbox(tr("Crop to current monitor AR"), &m_cropImage);
+    dialog->addCheckBox(tr("Crop to current monitor AR"), &m_cropImage);
     if(!dialog->exec())
         return;
 

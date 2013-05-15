@@ -439,7 +439,7 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
     return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
 }
 
-void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position, const QRectF &zoomWindow, const QUuid &zoomUuid) const {
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
     {
         //TODO: #GDM refactor duplicated code
@@ -459,29 +459,29 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.resource.path = resource->getUniqueId();
     data.uuid = QUuid::createUuid();
     data.flags = Qn::PendingGeometryAdjustment;
-    data.zoomRect = zoomWindow;
-    data.zoomTargetUuid = zoomUuid;
-    if(usePosition) {
-        data.combinedGeometry = QRectF(position, position); /* Desired position is encoded into a valid rect. */
+    data.zoomRect = params.zoomWindow;
+    data.zoomTargetUuid = params.zoomUuid;
+    data.dataByRole[Qn::ItemTimeRole] = params.time;
+    if(params.usePosition) {
+        data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
     } else {
         data.combinedGeometry = QRectF(QPointF(0.5, 0.5), QPointF(-0.5, -0.5)); /* The fact that any position is OK is encoded into an invalid rect. */
     }
-    
     layout->addItem(data);
 }
 
-void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, bool usePosition, const QPointF &position) const {
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, const AddToLayoutParams &params) const {
     foreach(const QnResourcePtr &resource, resources)
-        addToLayout(layout, resource, usePosition, position);
+        addToLayout(layout, resource, params);
 }
 
-void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, bool usePosition, const QPointF &position) const {
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, const AddToLayoutParams &params) const {
     foreach(const QnMediaResourcePtr &resource, resources)
-        addToLayout(layout, resource, usePosition, position);
+        addToLayout(layout, resource, params);
 }
 
-void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, bool usePosition, const QPointF &position) const {
-    addToLayout(layout, addToResourcePool(files), usePosition, position);
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, const AddToLayoutParams &params) const {
+    addToLayout(layout, addToResourcePool(files), params);
 }
 
 QnResourceList QnWorkbenchActionHandler::addToResourcePool(const QList<QString> &files) const {
@@ -941,6 +941,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
     if (cameraAdditionDialog())
         cameraAdditionDialog()->hide();
+    context()->instance<QnAppServerNotificationCache>()->clear();
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
@@ -948,6 +949,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM use conditional texts?
 
     at_checkSystemHealthAction_triggered(); //TODO: #GDM place to corresponding place
+    context()->instance<QnAppServerNotificationCache>()->getFileList();
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
@@ -1084,9 +1086,14 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     }
 
     // TODO: #Elric server & media resources only!
+
     QnResourceList resources = parameters.resources();
     if(!resources.isEmpty()) {
-        addToLayout(layout, resources, !position.isNull(), position);
+        AddToLayoutParams addParams;
+        addParams.usePosition = !position.isNull();
+        addParams.position = position;
+        addParams.time = parameters.argument(Qn::ItemTimeRole, (quint64)0);
+        addToLayout(layout, resources, addParams);
         return;
     }
 }
@@ -2437,7 +2444,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        dialog->addCheckbox(tr("Include Timestamp"), &withTimestamps);
+        dialog->addCheckBox(tr("Include Timestamp"), &withTimestamps);
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
@@ -3236,7 +3243,7 @@ Do you want to continue?"),
 #ifdef Q_OS_WIN
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(false), this);
 #endif
-        dialog->addCheckbox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
+        dialog->addCheckBox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
@@ -3429,7 +3436,13 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
         return;
 
     QRectF rect = params.argument<QRectF>(Qn::ItemZoomRectRole, QRectF(0.25, 0.25, 0.5, 0.5));
-    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), rect, widget->item()->uuid());
+    AddToLayoutParams addParams;
+    addParams.usePosition = true;
+    addParams.position = widget->item()->combinedGeometry().center();
+    addParams.zoomWindow = rect;
+    addParams.zoomUuid = widget->item()->uuid();
+
+    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), addParams);
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){

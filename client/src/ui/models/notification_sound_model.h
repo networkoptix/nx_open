@@ -21,6 +21,7 @@ public:
 
     QString titleByFilename(const QString &filename) const;
 
+    void init();
     void loadList(const QStringList &filenames);
     void addUploading(const QString &filename);
     void updateTitle(const QString &filename, const QString &title);

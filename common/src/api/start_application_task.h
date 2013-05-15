@@ -25,7 +25,7 @@ namespace applauncher
             };
 
             Value fromString( const QnByteArrayConstRef& str );
-        };
+        }
 
         class BaseTask
         {
@@ -33,6 +33,7 @@ namespace applauncher
             const TaskType::Value type;
 
             BaseTask( TaskType::Value _type );
+            virtual ~BaseTask();
         
             virtual QByteArray serialize() const = 0;
             virtual bool deserialize( const QByteArray& data ) = 0;
