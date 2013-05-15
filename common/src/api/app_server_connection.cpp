@@ -1075,11 +1075,11 @@ bool QnAppServerConnection::setPanicMode(QnMediaServerResource::PanicMode value)
     return result;
 }
 
-int QnAppServerConnection::dumpDatabase(QObject *target, const char *slot) {
+int QnAppServerConnection::dumpDatabaseAsync(QObject *target, const char *slot) {
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, m_objectNameMapper->name(DumpDbObject), m_requestHeaders, m_requestParams, target, slot);
 }
 
-int QnAppServerConnection::restoreDatabase(const QByteArray &data, QObject *target, const char *slot) {
+int QnAppServerConnection::restoreDatabaseAsync(const QByteArray &data, QObject *target, const char *slot) {
     return QnSessionManager::instance()->sendAsyncPostRequest(m_url, m_objectNameMapper->name(RestoreDbObject), m_requestHeaders, m_requestParams, data, target, slot);
 }
 

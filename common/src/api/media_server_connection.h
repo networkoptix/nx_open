@@ -179,7 +179,7 @@ public:
 	 */
     int getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot);
 
-
+    // TODO: #Elric rename getEventLogAsync
 	/** 
      * Get \a event log. 
      * 

@@ -63,8 +63,7 @@ private:
 class QN_EXPORT QnAppServerConnection
 {
 public:
-
-    ~QnAppServerConnection();
+    virtual ~QnAppServerConnection();
 
     void stop();
     static int getMediaProxyPort();
@@ -91,9 +90,12 @@ public:
     int getUsers(QnUserResourceList& users);
     int getLicenses(QnLicenseList& licenses);
     int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList);
+    qint64 getCurrentTime(); // TODO: #Elric this method doesn't follow the sync api guidelines
 
-    int saveSync(const QnMediaServerResourcePtr&);
-    int saveSync(const QnVirtualCameraResourcePtr&);
+    int saveSync(const QnMediaServerResourcePtr &resource);
+    int saveSync(const QnVirtualCameraResourcePtr &resource);
+
+
 
 	/**
 	  * Test if email settings are valid
@@ -107,7 +109,6 @@ public:
 
     int sendEmailAsync(const QString& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
     int sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
-    qint64 getCurrentTime();
 
     /**
      * @brief requestStoredFileAsync        Get stored file from EC
@@ -146,7 +147,6 @@ public:
      */
     int requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot);
 
-    // Asynchronous API
     int testConnectionAsync(QObject *target, const char *slot);
     int connectAsync(QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
@@ -160,8 +160,8 @@ public:
     int setResourceDisabledAsync(const QnId &resourceId, bool disabled, QObject *target, const char *slot);
     int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
-    int dumpDatabase(QObject *target, const char *slot);
-    int restoreDatabase(const QByteArray &data, QObject *target, const char *slot);
+    int dumpDatabaseAsync(QObject *target, const char *slot);
+    int restoreDatabaseAsync(const QByteArray &data, QObject *target, const char *slot);
 
     int saveAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
     int saveAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
