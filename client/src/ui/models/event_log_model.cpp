@@ -12,30 +12,241 @@
 #include "client/client_globals.h"
 #include <utils/math/math.h>
 
+class QnEventLogModel::DataIndex
+{
+public:
+    DataIndex(): m_sortCol(DateTimeColumn), m_sortOrder(Qt::AscendingOrder)
+    {
+        static bool firstCall = true;
+        if (firstCall) {
+            initStaticData();
+            firstCall = false;
+        }
+    }
+
+    void initStaticData()
+    {
+        // event types to lex order
+        QMap<QString, int> events;
+        for (int i = 0; i < 256; ++i) {
+            events.insert(BusinessEventType::toString(BusinessEventType::Value(i)), i);
+            m_eventTypeToLexOrder[i] = 255; // put undefined events to the end of the list
+        }
+        int cnt = 0;
+        for(QMap<QString, int>::const_iterator itr = events.begin(); itr != events.end(); ++itr)
+            m_eventTypeToLexOrder[itr.value()] = cnt++;
+
+        // action types to lex order
+        QMap<QString, int> actions;
+        for (int i = 0; i < 256; ++i) {
+            actions.insert(BusinessActionType::toString(BusinessActionType::Value(i)), i);
+            m_actionTypeToLexOrder[i] = 255; // put undefined actions to the end of the list
+        }
+        cnt = 0;
+        for(QMap<QString, int>::const_iterator itr = events.begin(); itr != events.end(); ++itr)
+            m_actionTypeToLexOrder[itr.value()] = cnt++;
+    }
+
+    void setSort(int column, Qt::SortOrder order)
+    { 
+        if ((Column) column == m_sortCol && order == m_sortOrder)
+            return;
+            
+        m_sortCol = (Column) column;
+        m_sortOrder = order;
+
+        updateIndex();
+    }
+
+    void setEvents(const QVector<QnLightBusinessActionVectorPtr>& events) 
+    { 
+        m_events = events;
+        m_size = 0;
+        for (int i = 0; i < events.size(); ++i)
+            m_size += events[i]->size();
+
+        updateIndex();
+    }
+
+    QVector<QnLightBusinessActionVectorPtr> events() const
+    {
+        return m_events;
+    }
+
+    void clear()
+    {
+        m_events.clear();
+    }
+
+    int size() const
+    {
+        return m_size;
+    }
+
+    /*
+    * Reorder event types to lexographical order (for sorting)
+    */
+    static int toLexEventType(BusinessEventType::Value eventType)
+    {
+        return m_eventTypeToLexOrder[((int) eventType) & 0xff];
+    }
+
+    /*
+    * Reorder actions types to lexographical order (for sorting)
+    */
+    static int toLexActionType(BusinessActionType::Value actionType)
+    {
+        return m_actionTypeToLexOrder[((int) actionType) & 0xff];
+    }
+
+    inline QnLightBusinessAction& at(int row)
+    {
+        return *m_records[row];
+    }
+
+    // comparators
+
+    typedef bool (*LessFunc)(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2);
+
+    static bool lessThanTimestamp(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    {
+        return d1->timestamp() < d2->timestamp();
+    }
+
+    static bool lessThanEventType(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    {
+        return QnEventLogModel::DataIndex::toLexEventType(d1->eventType()) < QnEventLogModel::DataIndex::toLexEventType(d2->eventType());
+    }
+
+    static bool lessThanActionType(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    {
+        return QnEventLogModel::DataIndex::toLexActionType(d1->actionType()) < QnEventLogModel::DataIndex::toLexActionType(d2->actionType());
+    }
+
+    static bool lessLexographic(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    {
+        return d1->compareString() < d2->compareString();
+    }
+
+    static bool greatThanTimestamp(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    {
+        return d1->timestamp() >= d2->timestamp();
+    }
+
+    static bool greatThanEventType(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    {
+        return QnEventLogModel::DataIndex::toLexEventType(d1->eventType()) >= QnEventLogModel::DataIndex::toLexEventType(d2->eventType());
+    }
+
+    static bool greatThanActionType(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    {
+        return QnEventLogModel::DataIndex::toLexActionType(d1->actionType()) >= QnEventLogModel::DataIndex::toLexActionType(d2->actionType());
+    }
+
+    static bool greatLexographic(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    {
+        return d1->compareString() >= d2->compareString();
+    }
+
+    void updateIndex()
+    {
+        QTime t;
+        t.restart();
+
+        m_records.resize(m_size);
+        if (m_records.isEmpty())
+            return;
+
+        QnLightBusinessAction** dst = &m_records[0];
+        for (int i = 0; i < m_events.size(); ++i)
+        {
+            QnLightBusinessActionVector& data = *m_events[i].data();
+            for (int j = 0; j < data.size(); ++j)
+                *dst++ = &data[j];
+        }
+
+        LessFunc lessThan;
+        if (m_sortOrder == Qt::AscendingOrder) {
+            switch(m_sortCol)
+            {
+            case DateTimeColumn:
+                lessThan = &lessThanTimestamp;
+                break;
+            case EventColumn:
+                lessThan = &lessThanEventType;
+                break;
+            case ActionColumn:
+                lessThan = &lessThanActionType;
+                break;
+            default:
+                lessThan = &lessLexographic;
+                for (int i = 0; i < m_records.size(); ++i)
+                    m_records[i]->setCompareString(m_owner->textData(m_sortCol, *m_records[i]));
+                break;
+            }
+        }
+        else {
+            switch(m_sortCol)
+            {
+            case DateTimeColumn:
+                lessThan = &greatThanTimestamp;
+                break;
+            case EventColumn:
+                lessThan = &greatThanEventType;
+                break;
+            case ActionColumn:
+                lessThan = &greatThanActionType;
+                break;
+            default:
+                lessThan = &lessLexographic;
+                for (int i = 0; i < m_records.size(); ++i)
+                    m_records[i]->setCompareString(m_owner->textData(m_sortCol, *m_records[i]));
+                break;
+            }
+        }
+
+        qSort(m_records.begin(), m_records.end(), lessThan);
+
+        int elapsed = t.elapsed();
+        qWarning() << "sort time=" << elapsed;
+    }
+
+private:
+    Column m_sortCol;
+    Qt::SortOrder m_sortOrder;
+    QVector<QnLightBusinessActionVectorPtr> m_events;
+    QVector<QnLightBusinessAction*> m_records;
+    int m_size;
+    QnEventLogModel* m_owner;
+    static int m_eventTypeToLexOrder[256];
+    static int m_actionTypeToLexOrder[256];
+};
+
+int QnEventLogModel::DataIndex::m_eventTypeToLexOrder[256];
+int QnEventLogModel::DataIndex::m_actionTypeToLexOrder[256];
+
+// ---------------------- EventLogModel --------------------------
+
 QnEventLogModel::QnEventLogModel(QObject *parent):
     base_type(parent),
     m_linkBrush(QPalette().link())
 {
-    m_events = QnLightBusinessActionVectorPtr(new QnLightBusinessActionVector());
     m_linkFont.setUnderline(true);
+    m_index = new DataIndex();
     rebuild();
 }
 
 QnEventLogModel::~QnEventLogModel() {
-    return;
+    delete m_index;
 }
 
-const QnLightBusinessActionVectorPtr &QnEventLogModel::events() const {
-    return m_events;
+const QVector<QnLightBusinessActionVectorPtr> &QnEventLogModel::events() const {
+    return m_index->events();
 }
 
-void QnEventLogModel::setEvents(const QList<QnLightBusinessActionVectorPtr> &events)
+void QnEventLogModel::setEvents(const QVector<QnLightBusinessActionVectorPtr> &events)
 {
-    setEvents(mergeEvents(events));
-}
-
-void QnEventLogModel::setEvents(const QnLightBusinessActionVectorPtr& events) {
-    m_events = events;
+    m_index->setEvents(events);
     rebuild();
 }
 
@@ -80,7 +291,7 @@ QString QnEventLogModel::columnTitle(Column column) {
 
 void QnEventLogModel::clear()
 {
-    m_events.clear();
+    m_index->clear();
     QStandardItemModel::clear();
 }
 
@@ -163,7 +374,7 @@ QString QnEventLogModel::formatUrl(const QString& url) const
         return QUrl(url).host();
 }
 
-QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAction& action) const
+QString QnEventLogModel::textData(const Column& column,const QnLightBusinessAction& action) const
 {
     switch(column) 
     {
@@ -230,24 +441,23 @@ QVariant QnEventLogModel::textData(const Column& column,const QnLightBusinessAct
             return result;
         }
     } 
-    return QVariant();
+    return QString();
 }
 
-void QnEventLogModel::sort ( int column, Qt::SortOrder order)
+void QnEventLogModel::sort(int column, Qt::SortOrder order)
 {
-    int gg =  4;
+    m_index->setSort(column, order);
 }
-
 
 QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
 {
     const Column& column = m_columns[index.column()];
-    const QnLightBusinessAction& action = m_events->at(index.row());
+    const QnLightBusinessAction& action = m_index->at(index.row());
     
     switch(role)
     {
         case Qt::DisplayRole:
-            return textData(column, action);
+            return QVariant(textData(column, action));
         case Qt::DecorationRole:
             return iconData(column, action);
         case Qt::FontRole:
@@ -266,7 +476,7 @@ QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
 BusinessEventType::Value QnEventLogModel::eventType(const QModelIndex & index) const
 {
     if (index.isValid()) {
-        const QnLightBusinessAction& action = m_events->at(index.row());
+        const QnLightBusinessAction& action = m_index->at(index.row());
         return action.getRuntimeParams().getEventType();
     }
     else {
@@ -277,7 +487,7 @@ BusinessEventType::Value QnEventLogModel::eventType(const QModelIndex & index) c
 QnResourcePtr QnEventLogModel::eventResource(const QModelIndex & index) const
 {
     if (index.isValid()) {
-        const QnLightBusinessAction& action = m_events->at(index.row());
+        const QnLightBusinessAction& action = m_index->at(index.row());
         return qnResPool->getResourceById(action.getRuntimeParams().getEventResourceId());
     }
     else {
@@ -288,7 +498,7 @@ QnResourcePtr QnEventLogModel::eventResource(const QModelIndex & index) const
 qint64 QnEventLogModel::eventTimestamp(const QModelIndex & index) const
 {
     if (index.isValid()) {
-        const QnLightBusinessAction& action = m_events->at(index.row());
+        const QnLightBusinessAction& action = m_index->at(index.row());
         return action.timestamp();
     }
     else {
@@ -298,7 +508,7 @@ qint64 QnEventLogModel::eventTimestamp(const QModelIndex & index) const
 
 void QnEventLogModel::rebuild() 
 {
-    setRowCount(m_events ? m_events->size() : 0);
+    setRowCount(m_index->size());
 }
 
 QnLightBusinessActionVectorPtr QnEventLogModel::merge2(const QList <QnLightBusinessActionVectorPtr>& eventsList) const

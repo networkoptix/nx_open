@@ -62,7 +62,7 @@ private:
     QSet<int> m_requests;
     QnWorkbenchContext* m_context;
 
-    QList <QnLightBusinessActionVectorPtr> m_allEvents;
+    QVector <QnLightBusinessActionVectorPtr> m_allEvents;
     QnResourceList m_filterCameraList;
     bool m_updateDisabled;
     bool m_dirty;
