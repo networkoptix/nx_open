@@ -215,7 +215,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     deleteRule(model);
 }
 
-void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
+void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRuleList &rules, int handle) {
 
     if (handle != m_loadingHandle)
         return;
@@ -234,7 +234,7 @@ void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& 
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
+void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnBusinessEventRuleList &rules, int handle) {
 
     if (!m_processing.contains(handle))
         return;

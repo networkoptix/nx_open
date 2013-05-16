@@ -11,6 +11,7 @@
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
+#include <api/model/kvpair.h>
 #include <api/message.h>
 #include <api/media_server_cameras_data.h>
 #include <api/media_server_connection.h>
@@ -26,11 +27,15 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
-
+#include <core/resource/camera_history.h>
 #include <core/misc/schedule_task.h>
+
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
-#include "business/business_logic_common.h"
+#include <business/business_logic_common.h>
+
+#include <licensing/license.h>
+#include "connectinfo.h"
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -42,6 +47,8 @@ void QnCommonMetaTypes::initilize() {
     if(qn_commonMetaTypes_initialized)
         return;
 
+    qRegisterMetaType<QnConnectInfoPtr>();
+
     qRegisterMetaType<QUuid>();
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
@@ -51,7 +58,12 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnParam>();
     qRegisterMetaType<QnId>();
+    
+    qRegisterMetaType<QnKvPair>();
+    qRegisterMetaType<QnKvPairList>();
+    qRegisterMetaType<QnKvPairs>();
 
+    qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<QnResource::Status>();
@@ -64,6 +76,9 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnSecurityCamResourcePtr>();
     qRegisterMetaType<QnAbstractStorageResourcePtr>();
 
+    qRegisterMetaType<QnCameraHistoryList>();
+
+    qRegisterMetaType<QnLicenseList>();
 
     qRegisterMetaType<QnLayoutItemData>();
     qRegisterMetaType<QnMotionRegion>();
@@ -102,6 +117,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
     qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<QnBusinessEventRulePtr>();
+    qRegisterMetaType<QnBusinessEventRuleList>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();
 
     qRegisterMetaType<QnStorageSpaceReply>();

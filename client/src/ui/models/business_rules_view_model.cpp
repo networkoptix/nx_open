@@ -962,7 +962,7 @@ void QnBusinessRulesViewModel::clear() {
     reset();
 }
 
-void QnBusinessRulesViewModel::addRules(const QnBusinessEventRules &businessRules) {
+void QnBusinessRulesViewModel::addRules(const QnBusinessEventRuleList &businessRules) {
     foreach (QnBusinessEventRulePtr rule, businessRules) {
         addRule(rule);
     }

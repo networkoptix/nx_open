@@ -126,6 +126,8 @@ private:
 	QByteArray m_oldHardwareId;
 };
 
+Q_DECLARE_METATYPE(QnLicenseList)
+
 
 /**
  * License storage which is associated with instance of Enterprise Controller (i.e. should be reloaded when switching appserver).

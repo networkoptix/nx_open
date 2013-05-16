@@ -2,6 +2,7 @@
 #include "core/resource_managment/resource_pool.h"
 #include "media_server_resource.h"
 #include "utils/common/warnings.h"
+#include "utils/common/util.h"
 
 QnId QnCameraTimePeriod::getServerId() const
 {

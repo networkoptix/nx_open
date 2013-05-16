@@ -12,7 +12,7 @@
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutReplyProcessor
 // -------------------------------------------------------------------------- //
-void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &, int handle) {
+void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QnResourceList &, int handle) {
     /* Note that we may get reply of size 0 if appserver is down.
      * This is why we use stored list of layouts. */
     if(m_manager) {
@@ -23,7 +23,7 @@ void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByt
         }
     }
 
-    emit finished(status, errorString, QnResourceList(m_resources), handle);
+    emit finished(status, QnResourceList(m_resources), handle);
 
     deleteLater();
 }
@@ -127,8 +127,8 @@ void QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resource
             synchronizer->submit();
 
     detail::QnWorkbenchLayoutReplyProcessor *processor = new detail::QnWorkbenchLayoutReplyProcessor(this, resources);
-    connect(processor, SIGNAL(finished(int, const QByteArray &, const QnResourceList &, int)), object, slot);
-    connection()->saveAsync(resources, processor, SLOT(at_finished(int, const QByteArray &, const QnResourceList &, int)));
+    connect(processor, SIGNAL(finished(int, const QnResourceList &, int)), object, slot);
+    connection()->saveAsync(resources, processor, SLOT(at_finished(int, const QnResourceList &, int)));
 
     foreach(const QnLayoutResourcePtr &resource, resources)
         setFlags(resource, flags(resource) | Qn::ResourceIsBeingSaved);

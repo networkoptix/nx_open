@@ -183,7 +183,7 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     void clear();
-    void addRules(const QnBusinessEventRules &businessRules);
+    void addRules(const QnBusinessEventRuleList &businessRules);
     void addRule(QnBusinessEventRulePtr rule);
 
     void updateRule(QnBusinessEventRulePtr rule);

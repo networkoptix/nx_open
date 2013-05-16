@@ -2,6 +2,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
+#include <utils/math/math.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 

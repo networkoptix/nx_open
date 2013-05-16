@@ -24,7 +24,7 @@ void QnSessionManagerAsyncReplyProcessor::at_replyReceived() {
     QString errorString = reply->errorString();
     // Common EC error looks like:
     // "Error downloading https://user:password@host:port/path - server replied: INTERNAL SERVER ERROR"
-    // displaying plaint-text password is unsecure and strongly not recommended
+    // displaying plain-text password is unsecure and strongly not recommended
     if (errorString.indexOf(QLatin1String("@")) > 0 && errorString.indexOf(QLatin1String(":")) > 0) {
         int n = errorString.lastIndexOf(QLatin1String(":"));
         errorString = errorString.mid(n + 1).trimmed();
@@ -156,19 +156,19 @@ int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QStr
     return syncProcessor->wait(response);
 }
 
-int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response) {
-    return sendGetRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), response);
+int QnSessionManager::sendSyncGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response) {
+    return sendSyncGetRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), response);
 }
 
-int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QnHTTPRawResponse& response) {
+int QnSessionManager::sendSyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QnHTTPRawResponse& response) {
     return sendSyncRequest(QNetworkAccessManager::GetOperation, url, objectName, headers, params, QByteArray(), response);
 }
 
-int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QnHTTPRawResponse& response) {
-    return sendPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, response);
+int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QnHTTPRawResponse& response) {
+    return sendSyncPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, response);
 }
 
-int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QnHTTPRawResponse& response) {
+int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QnHTTPRawResponse& response) {
     return sendSyncRequest(QNetworkAccessManager::PostOperation, url, objectName, headers, params, data, response);
 }
 
@@ -209,7 +209,7 @@ int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objec
 int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, Qt::ConnectionType connectionType) {
     QnRequestParamList params;
     params.push_back(QnRequestParam("id", QString::number(id)));
-    return sendAsyncRequest(QNetworkAccessManager::DeleteOperation, url, objectName, QnRequestHeaderList(), params, QByteArray(), target, slot, connectionType);
+    return sendAsyncDeleteRequest(url, objectName, QnRequestHeaderList(), params, target, slot, connectionType);
 }
 
 int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType) {

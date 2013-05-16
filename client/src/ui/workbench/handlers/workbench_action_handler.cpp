@@ -141,11 +141,11 @@ detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkben
     assert(oldDisabledFlags.size() == resources.size());
 }
 
-void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
+void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QnResourceList &resources, int handle) {
     Q_UNUSED(handle);
 
     if(m_handler)
-        m_handler.data()->at_resources_statusSaved(status, errorString, resources, m_oldDisabledFlags);
+        m_handler.data()->at_resources_statusSaved(status, resources, m_oldDisabledFlags);
     
     deleteLater();
 }
@@ -160,13 +160,12 @@ detail::QnResourceReplyProcessor::QnResourceReplyProcessor(QObject *parent):
     m_status(0)
 {}
 
-void detail::QnResourceReplyProcessor::at_replyReceived(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
+void detail::QnResourceReplyProcessor::at_replyReceived(int status, const QnResourceList &resources, int handle) {
     m_status = status;
-    m_errorString = errorString;
     m_resources = resources;
     m_handle = handle;
 
-    emit finished(status, errorString, resources, handle);
+    emit finished(status, resources, handle);
 }
 
 
@@ -179,13 +178,12 @@ detail::QnConnectReplyProcessor::QnConnectReplyProcessor(QObject *parent):
     m_status(0)
 {}
 
-void detail::QnConnectReplyProcessor::at_replyReceived(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle) {
+void detail::QnConnectReplyProcessor::at_replyReceived(int status, const QnConnectInfoPtr &connectInfo, int handle) {
     m_status = status;
-    m_errorString = errorString;
     m_connectInfo = connectInfo;
     m_handle = handle;
 
-    emit finished(status, errorString, connectInfo, handle);
+    emit finished(status, connectInfo, handle);
 }
 
 // -------------------------------------------------------------------------- //
@@ -557,7 +555,7 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
         }
 
         if(!waitForReply || saveableResources.empty()) {
-            closeLayouts(resources, rollbackResources, saveableResources, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+            closeLayouts(resources, rollbackResources, saveableResources, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
             return true;
         } else {
             QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(widget()));
@@ -576,11 +574,11 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             QScopedPointer<detail::QnResourceReplyProcessor> processor(new detail::QnResourceReplyProcessor(this));
             connect(processor.data(), SIGNAL(finished(int, const QByteArray &, const QnResourceList &, int)), dialog.data(), SLOT(accept()));
 
-            closeLayouts(resources, rollbackResources, saveableResources, processor.data(), SLOT(at_replyReceived(int, const QByteArray &, const QnResourceList &, int)));
+            closeLayouts(resources, rollbackResources, saveableResources, processor.data(), SLOT(at_replyReceived(int, const QnResourceList &, int)));
             dialog->exec();
 
             QnWorkbenchLayoutList currentLayouts = workbench()->layouts();
-            at_resources_saved(processor->status(), processor->errorString(), processor->resources(), processor->handle());
+            at_resources_saved(processor->status(), processor->resources(), processor->handle());
             return workbench()->layouts() == currentLayouts; // TODO: #Elric This is an ugly hack, think of a better solution.
         }
     } else {
@@ -734,7 +732,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     cameraSettingsDialog()->widget()->submitToResources();
 
     if (hasDbChanges) {
-        connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+        connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     }
 
     if (hasCameraChanges) {
@@ -1163,7 +1161,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
         bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
         saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly); // overwrite layout file
     } else {
-        snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+        snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     }
 }
 
@@ -1271,7 +1269,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
             snapshotManager()->restore(layout);
     }
 
-    snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
 }
@@ -1382,7 +1380,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
-        connection()->saveAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QnResourceList &, int)));
+        connection()->saveAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QnResourceList &, int)));
     }
 }
 
@@ -1574,7 +1572,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     if(!dialog->exec() || !dialog->submitToResource(layout))
         return;
 
-    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
@@ -1731,7 +1729,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         QScopedPointer<detail::QnConnectReplyProcessor> processor(new detail::QnConnectReplyProcessor());
         QScopedPointer<QEventLoop> loop(new QEventLoop());
         connect(processor.data(), SIGNAL(finished(int, const QByteArray &, const QnConnectInfoPtr &, int)), loop.data(), SLOT(quit()));
-        connection->connectAsync(processor.data(), SLOT(at_replyReceived(int, const QByteArray &, const QnConnectInfoPtr &, int)));
+        connection->connectAsync(processor.data(), SLOT(at_replyReceived(int, const QnConnectInfoPtr &, int)));
         loop->exec();
 
         if(processor->status() != 0)
@@ -2058,7 +2056,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras){
-    connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_rejected() {
@@ -2119,7 +2117,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     // TODO: #Elric move submitToResources here.
-    connection()->saveAsync(server, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    connection()->saveAsync(server, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
@@ -2127,7 +2125,7 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if(!server)
         return;
 
-    QUrl url(server->apiConnection()->getUrl() + QLatin1String("/api/showLog"));
+    QUrl url(server->apiConnection()->url().toString() + QLatin1String("/api/showLog"));
     QDesktopServices::openUrl(url);
 }
 
@@ -2250,10 +2248,10 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             QnWorkbenchLayout::instance(layout)->setName(name); // TODO: #Elric hack
 
         if(!changed)
-            snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+            snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     } else {
         resource->setName(name);
-        connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+        connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     }
 }
 
@@ -2315,7 +2313,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->submitToResource();
     user->setGuid(QUuid::createUuid());
 
-    connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     user->setPassword(QString()); // forget the password now
 }
 
@@ -2363,7 +2361,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: #Elric this does not belong here.
     resourcePool()->addResource(layout);
 
-    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
 
     menu()->trigger(Qn::OpenSingleLayoutAction, QnActionParameters(layout));
 }
@@ -2597,7 +2595,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
 
-        connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+        connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
 
         QString newPassword = user->getPassword();
         user->setPassword(QString());
@@ -3627,10 +3625,10 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
         layout->setBackgroundSize(QSize(w, h));
     }
 
-    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
 }
 
-void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
+void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceList &resources, int handle) {
     Q_UNUSED(handle);
 
     if(status == 0)
@@ -3665,7 +3663,6 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
             resources,
             tr("Error"),
             tr("Could not save the following %n items to Enterprise Controller.", "", resources.size()),
-            tr("Error description: \n%1").arg(QLatin1String(errorString.data())),
             QDialogButtonBox::Ok
         );
     }
@@ -3680,7 +3677,7 @@ void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& resp
     QMessageBox::critical(widget(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
 }
 
-void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
+void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
     if(status == 0 || resources.isEmpty())
         return;
 
@@ -3689,7 +3686,6 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
         resources,
         tr("Error"),
         tr("Could not save changes made to the following %n resource(s).", "", resources.size()),
-        tr("Error description:\n%1").arg(QLatin1String(errorString.constData())),
         QDialogButtonBox::Ok
     );
 
@@ -3716,7 +3712,7 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = QnMediaServerResource::PM_User;
             resource->setPanicMode(val);
-            connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+            connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
         }
     }
 }
@@ -3796,7 +3792,7 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
 
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
         m_healthRequestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                       this, SLOT(at_serverSettings_received(int,QByteArray,QnKvPairList,int)));
+                       this, SLOT(at_serverSettings_received(int,QnKvPairList,int)));
 
         QnUserResourceList usersWithNoEmail;
         QnUserResourceList users = qnResPool->getResources().filtered<QnUserResource>();
@@ -3826,12 +3822,10 @@ void QnWorkbenchActionHandler::at_togglePopupsAction_toggled(bool checked) {
         popupCollectionWidget()->show();
 }
 
-void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QByteArray &errorString, const QnKvPairList &settings, int handle) {
-
+void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QnKvPairList &settings, int handle) {
     if (handle != m_healthRequestHandle)
         return;
 
-    Q_UNUSED(errorString)
     if(status != 0)
         return;
 
