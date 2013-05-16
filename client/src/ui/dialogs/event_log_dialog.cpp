@@ -323,8 +323,49 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     connect(resetFilterAction, SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
     menu->addAction(resetFilterAction);
 
+    menu->addSeparator();
+    QAction* clipboardAction = new QAction(tr("&Copy selection to clipboard"), menu);
+    connect(clipboardAction, SIGNAL(triggered()), this, SLOT(at_copyToClipboard()));
+    clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
+    menu->addAction(clipboardAction);
+
     menu->exec(QCursor::pos());
     menu->deleteLater();
+}
+
+void QnEventLogDialog::at_copyToClipboard()
+{
+    QAbstractItemModel *model = ui->gridEvents->model();
+    QModelIndexList list = ui->gridEvents->selectionModel()->selectedIndexes();
+    if(list.isEmpty())
+        return;
+
+    qSort(list);
+    QString result;
+
+    for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
+    {
+        if (i > 0)
+            result.append(QLatin1Char('\t'));
+        result.append(model->headerData(list[i].column(), Qt::Horizontal).toString());
+    }
+
+    int prevRow = -1;
+    for(int i = 0; i < list.size(); ++i)
+    {
+        if(list[i].row() != prevRow) {
+            prevRow = list[i].row();
+            result.append(QLatin1Char('\n'));
+        }
+        else {
+            result.append(QLatin1Char('\t'));
+        }
+        result.append(model->data(list[i]).toString());
+    }
+    result.append(QLatin1Char('\n'));
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(result);
 }
 
 void QnEventLogDialog::at_cameraButtonClicked()
