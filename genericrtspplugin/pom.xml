@@ -31,5 +31,6 @@
 		<linux.defines/>
 		<!--Specific os defines-->
 		<windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
+		<buildLib>runlib</buildLib>
 	</properties>  
 </project>
