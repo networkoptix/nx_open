@@ -406,7 +406,8 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
                     result = QnBusinessStringsHelper::eventTextString(eventType, action.getRuntimeParams());
                     break;
                 case BusinessEventType::Camera_Motion:
-                    result = lit("Click me to see video");
+                    if (action.hasFlags(QnLightBusinessAction::MotionExists))
+                        result = lit("Motion video");
                     break;
                 case BusinessEventType::Storage_Failure:
                 case BusinessEventType::Network_Issue:
@@ -443,7 +444,7 @@ void QnEventLogModel::sort(int column, Qt::SortOrder order)
 
 QString QnEventLogModel::motionUrl(Column column, const QnLightBusinessAction& action) const
 {
-    if (column != DescriptionColumn)
+    if (column != DescriptionColumn || !action.hasFlags(QnLightBusinessAction::MotionExists))
         return QString();
 
     if (action.getRuntimeParams().getEventType() != BusinessEventType::Camera_Motion)

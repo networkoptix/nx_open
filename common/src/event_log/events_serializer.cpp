@@ -27,6 +27,7 @@ void QnEventSerializer::deserialize(QnLightBusinessActionVectorPtr& eventsPtr, c
     events.resize(sz);
     for (int i = 0; i < sz; ++i) {
         QnLightBusinessAction& action = events[i];
+        action.setFlags(readInt(curPtr));
         action.setActionType((BusinessActionType::Value) readInt(curPtr));
         action.setBusinessRuleId(readInt(curPtr));
         action.setAggregationCount(readInt(curPtr));
