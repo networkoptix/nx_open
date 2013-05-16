@@ -5,6 +5,8 @@
 #include "serverutil.h"
 #include "business/business_action_factory.h"
 #include "api/serializer/pb_serializer.h"
+#include "core/resource_managment/resource_pool.h"
+#include "recorder/storage_manager.h"
 
 static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
 static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; // 30 days
@@ -243,8 +245,8 @@ void QnEventsDB::getAndSerializeActions(
                                         const QnId& businessRuleId) const
 
 {
-//    QTime t;
-//    t.restart();
+    QTime t;
+    t.restart();
 
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
@@ -261,6 +263,9 @@ void QnEventsDB::getAndSerializeActions(
     int businessRuleIdx = rec.indexOf(lit("business_rule_id"));
 //    int toggleStateIdx = rec.indexOf(lit("toggle_state"));
     int aggregationCntIdx = rec.indexOf(lit("aggregation_count"));
+    int eventTypeIdx = rec.indexOf(lit("event_type"));
+    int eventResIdx = rec.indexOf(lit("event_resource_id"));
+    int timestampIdx = rec.indexOf(lit("timestamp"));
 
 
     int sizeField = 0;
@@ -268,6 +273,20 @@ void QnEventsDB::getAndSerializeActions(
 
     while (actionsQuery.next()) 
     {
+        int flags = 0;
+        BusinessEventType::Value eventType = (BusinessEventType::Value) actionsQuery.value(actionTypeIdx).toInt();
+        if (eventType == BusinessEventType::Camera_Motion) 
+        {
+            QnId eventResId = actionsQuery.value(eventResIdx).toInt();
+            QnNetworkResourcePtr camRes = qnResPool->getResourceById(eventResId).dynamicCast<QnNetworkResource>();
+            if (camRes) {
+                if (qnStorageMan->isArchiveTimeExists(camRes->getPhysicalId(), actionsQuery.value(timestampIdx).toDateTime().toMSecsSinceEpoch()))
+                    flags |= QnLightBusinessAction::MotionExists;
+
+            }
+        }
+
+        appendIntToBA(result, flags);
         appendIntToBA(result, actionsQuery.value(actionTypeIdx).toInt());
         appendIntToBA(result, actionsQuery.value(businessRuleIdx).toInt());
         appendIntToBA(result, actionsQuery.value(aggregationCntIdx).toInt());
@@ -283,7 +302,7 @@ void QnEventsDB::getAndSerializeActions(
     }
     memcpy(result.data(), &sizeField, sizeof(int));
 
-//    qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
+    qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
 }
 
 
