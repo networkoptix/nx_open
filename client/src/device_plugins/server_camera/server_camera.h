@@ -3,6 +3,9 @@
 
 #include "core/resource/camera_resource.h"
 
+class QnServerCamera;
+typedef QnSharedResourcePointer<QnServerCamera> QnServerCameraPtr;
+
 class QnLocalFileProcessor : public QObject, public QnResourceProcessor
 {
     Q_OBJECT
@@ -25,10 +28,14 @@ public:
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
 
     QString getUniqueIdForServer(const QnResourcePtr mServer) const;
+
+    QnServerCameraPtr findEnabledSubling();
 protected:
     virtual QString getUniqueId() const override;
     virtual void setCropingPhysical(QRect croping);
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
+private:
+    QnServerCameraPtr m_activeCamera;
 };
 
 class QnServerCameraFactory : public QnResourceFactory

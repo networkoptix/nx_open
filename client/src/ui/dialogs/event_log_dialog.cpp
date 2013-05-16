@@ -302,9 +302,7 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid()) 
     {
-        QnId resId = m_model->data(idx, Qn::ResourceRole).toInt();
-        QnResourcePtr resource = qnResPool->getResourceById(resId);
-
+        QnResourcePtr resource = m_model->getResource(idx);
         QnActionManager *manager = m_context->menu();
         if (resource)
             menu = manager->newMenu(Qn::ActionScope::TreeScope, QnActionParameters(resource));

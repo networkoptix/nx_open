@@ -11,6 +11,7 @@
 #include "business/business_strings_helper.h"
 #include "client/client_globals.h"
 #include <utils/math/math.h>
+#include "device_plugins/server_camera/server_camera.h"
 
 class QnEventLogModel::DataIndex
 {
@@ -295,6 +296,26 @@ QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnLightBus
     return QVariant();
 }
 
+QnResourcePtr QnEventLogModel::getResource(const QModelIndex& idx) const
+{
+    return getResourceById(data(idx, Qn::ResourceRole).toInt());
+}
+
+
+QnResourcePtr QnEventLogModel::getResourceById(const QnId& id) const
+{
+    QnResourcePtr resource = qnResPool->getResourceById(id);
+    if (resource && resource->isDisabled())
+    {
+        QnServerCameraPtr localCam = resource.dynamicCast<QnServerCamera>();
+        if (localCam) {
+            localCam = localCam->findEnabledSubling();
+            if (localCam)
+                return localCam;
+        }
+    }
+    return resource;
+}
 
 QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAction &action) const
 {
@@ -303,7 +324,8 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAc
         case EventCameraColumn: 
         {
             QnId eventResId = action.getRuntimeParams().getEventResourceId();
-            QnResourcePtr eventResource = qnResPool->getResourceById(eventResId);
+                
+            QnResourcePtr eventResource = getResourceById(eventResId);
             if (eventResource)
                 return qnResIconCache->icon(eventResource->flags(), eventResource->getStatus());
             break;
@@ -311,7 +333,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAc
         case ActionCameraColumn: 
         {
             QnId actionResId = action.getRuntimeParams().getActionResourceId();
-            QnResourcePtr actionResource = qnResPool->getResourceById(actionResId);
+            QnResourcePtr actionResource = getResourceById(actionResId);
             if (actionResource)
                 return qnResIconCache->icon(actionResource->flags(), actionResource->getStatus());
             break;
@@ -358,7 +380,7 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
         }
         case EventCameraColumn: {
             QnId eventResId = action.getRuntimeParams().getEventResourceId();
-            QnResourcePtr eventResource = qnResPool->getResourceById(eventResId);
+            QnResourcePtr eventResource = getResourceById(eventResId);
             if (eventResource)
                 return QString(lit("%1 (%2)")).arg(eventResource->getName()).arg(formatUrl(eventResource->getUrl()));
             break;
@@ -368,7 +390,7 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
             break;
         case ActionCameraColumn: {
             QnId actionResId = action.getRuntimeParams().getActionResourceId();
-            QnResourcePtr actionResource = qnResPool->getResourceById(actionResId);
+            QnResourcePtr actionResource = getResourceById(actionResId);
             if (actionResource)
                 return QString(lit("%1 (%2)")).arg(actionResource->getName()).arg(formatUrl(actionResource->getUrl()));
             break;

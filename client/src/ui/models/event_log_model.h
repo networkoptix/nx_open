@@ -44,6 +44,8 @@ public:
     QnResourcePtr eventResource(const QModelIndex & index) const;
     qint64 eventTimestamp(const QModelIndex & index) const;
 
+    QnResourcePtr getResource(const QModelIndex& idx) const;
+
     class DataIndex;
 private:
 
@@ -57,6 +59,8 @@ private:
     QVariant resourceData(const Column& column, const QnLightBusinessAction &action) const;
     QString motionUrl(Column column, const QnLightBusinessAction& action) const;
     QString formatUrl(const QString& url) const;
+
+    QnResourcePtr getResourceById(const QnId& id) const;
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;

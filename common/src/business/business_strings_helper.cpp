@@ -223,17 +223,29 @@ QString QnBusinessStringsHelper::longEventDescription(const QnAbstractBusinessAc
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params)
 {
     int id = params.getEventResourceId();
-    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
+    QnNetworkResourcePtr res = id > 0 ? 
+                            qnResPool->getResourceById(id, QnResourcePool::rfAllResources).dynamicCast<QnNetworkResource>() : 
+                            QnNetworkResourcePtr();
     if (!res)
         return QString();
+
     QnResourcePtr mserverRes = res->getParentResource();
     if (!mserverRes)
         return QString();
 
     QUrl apPServerUrl = QnAppServerConnectionFactory::defaultUrl();
-    QUrl mserverUrl = mserverRes->getUrl();
     quint64 ts = params.getEventTimestamp();
     QByteArray rnd = QByteArray::number(rand()).toHex();
+
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
+    if (history) {
+        QnTimePeriod period;
+        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, period, false);
+        if (newServer)
+            mserverRes = newServer;
+    }
+    QUrl mserverUrl = mserverRes->getUrl();
+
 
     QString result(lit("https://%1:%2/proxy/http/%3:%4/media/%5.webm?rand=%6&resolution=240p&pos=%7"));
     result = result.arg(apPServerUrl.host()).arg(apPServerUrl.port(80)).arg(mserverUrl.host()).arg(mserverUrl.port(80)).
