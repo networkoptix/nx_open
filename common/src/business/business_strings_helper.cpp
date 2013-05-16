@@ -249,7 +249,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
 
     QString result(lit("https://%1:%2/proxy/http/%3:%4/media/%5.webm?rand=%6&resolution=240p&pos=%7"));
     result = result.arg(apPServerUrl.host()).arg(apPServerUrl.port(80)).arg(mserverUrl.host()).arg(mserverUrl.port(80)).
-        arg(res->getUniqueId()).arg(QLatin1String(rnd)).arg(ts/1000);
+        arg(res->getPhysicalId()).arg(QLatin1String(rnd)).arg(ts/1000);
 
     return result;
 }
