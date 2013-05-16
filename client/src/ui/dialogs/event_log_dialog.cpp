@@ -231,7 +231,7 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
                 .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate))
                 .arg(m_model->rowCount()));
         else
-            setWindowTitle(tr("Event log by %1  - %2 event(s) found")
+            setWindowTitle(tr("Event log for %1  - %2 event(s) found")
             .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
             .arg(m_model->rowCount()));
     }
