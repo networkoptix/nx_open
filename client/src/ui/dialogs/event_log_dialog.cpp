@@ -225,7 +225,15 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
         ui->gridEvents->setDisabled(false);
         setCursor(Qt::ArrowCursor);
         updateHeaderWidth();
-        setWindowTitle(tr("Event log - %1 event(s) found").arg(m_model->rowCount()));
+        if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
+            setWindowTitle(tr("Event log for period from %1 to %2 - %3 event(s) found")
+                .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
+                .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate))
+                .arg(m_model->rowCount()));
+        else
+            setWindowTitle(tr("Event log by %1  - %2 event(s) found")
+            .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
+            .arg(m_model->rowCount()));
     }
 }
 
