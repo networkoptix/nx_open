@@ -60,6 +60,9 @@ applauncher/client.mak*
 applauncher/x86
 applauncher/x64
 
+axiscamplugin/x86
+axiscamplugin/x64
+
 client/bin
 client/build
 client/src/Info.plist
@@ -110,6 +113,9 @@ debsetup/client-deb/x64
 debsetup/appserver-deb/package
 debsetup/appserver-deb/x86
 debsetup/appserver-deb/x64
+
+genericrtspplugin/x86
+genericrtspplugin/x64
 
 mediaserver/bin
 mediaserver/build
