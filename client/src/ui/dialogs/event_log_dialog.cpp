@@ -85,7 +85,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(ui->gridEvents, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT(at_customContextMenuRequested(const QPoint &)) );
     connect(ui->cameraButton, SIGNAL(clicked (bool)), this, SLOT(at_cameraButtonClicked()) );
     connect(ui->refreshButton, SIGNAL(clicked (bool)), this, SLOT(updateData()) );
-
+    connect(ui->clearFilterButton, SIGNAL(clicked (bool)), this, SLOT(at_resetFilterAction()) );
+    
     updateData();
 
     ui->mainGridLayout->activate();
@@ -94,6 +95,23 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
 QnEventLogDialog::~QnEventLogDialog()
 {
+}
+
+bool QnEventLogDialog::isFilterExist() const
+{
+    if (!m_filterCameraList.isEmpty())
+        return true;
+    QModelIndex idx = ui->eventComboBox->currentIndex();
+    if (idx.isValid()) {
+        BusinessEventType::Value eventType = (BusinessEventType::Value) ui->eventComboBox->model()->data(idx, Qn::FirstItemDataRole).toInt();
+        if (eventType != BusinessEventType::NotDefined && eventType != BusinessEventType::AnyBusinessEvent)
+            return true;
+    }
+
+    if (ui->actionComboBox->currentIndex() > 0)
+        return true;
+
+    return false;
 }
 
 void QnEventLogDialog::updateData()
@@ -119,6 +137,7 @@ void QnEventLogDialog::updateData()
           QnId() // todo: add businessRuleID here
           );
 
+    ui->clearFilterButton->setEnabled(isFilterExist());
     ui->gridEvents->setDisabled(true);
     setCursor(Qt::BusyCursor);
 
@@ -318,8 +337,9 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     filterAction->setEnabled(idx.isValid());
     menu->addAction(filterAction);
 
-    QAction* resetFilterAction = new QAction(tr("&Display all rows"), menu);
+    QAction* resetFilterAction = new QAction(tr("&Clear filter"), menu);
     connect(resetFilterAction, SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
+    resetFilterAction->setEnabled(isFilterExist());
     menu->addAction(resetFilterAction);
 
     menu->addSeparator();

@@ -56,6 +56,7 @@ private:
     void disableUpdateData();
     void enableUpdateData();
     void updateHeaderWidth();
+    bool isFilterExist() const;
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  
