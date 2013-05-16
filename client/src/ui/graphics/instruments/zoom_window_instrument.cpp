@@ -6,6 +6,8 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <ui/actions/action.h>
+#include <ui/actions/action_manager.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/constrained_resizable.h>
@@ -612,20 +614,25 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
         return;
 
     QnMediaResourceWidget *mediaWidget = this->item<QnMediaResourceWidget>(view, info->mouseViewportPos());
-    if(mediaWidget && mediaWidget != windowTarget()->overlay()->target()) {
-        QnMediaResourceWidget *widget = windowTarget()->zoomWidget();
-        QnMediaResourceWidget *zoomTargetWidget = windowTarget()->overlay()->target();
+    if(!mediaWidget || mediaWidget == windowTarget()->overlay()->target()) 
+        return;
+    
+    QnAction *action = menu()->action(Qn::CreateZoomWindowAction);
+    if(!action || action->checkCondition(action->scope(), QnActionParameters(mediaWidget)) != Qn::EnabledAction)
+        return;
 
-        /* Preserve zoom window widget. */
-        windowTarget()->hide();
-        unregisterLink(widget, zoomTargetWidget, false);
+    QnMediaResourceWidget *widget = windowTarget()->zoomWidget();
+    QnMediaResourceWidget *zoomTargetWidget = windowTarget()->overlay()->target();
 
-        if(m_storedWindowWidget)
-            delete m_storedWindowWidget.data(); /* Just to feel safe that we don't leak memory. */
-        m_storedWindowWidget = windowTarget();
+    /* Preserve zoom window widget. */
+    windowTarget()->hide();
+    unregisterLink(widget, zoomTargetWidget, false);
 
-        emit zoomTargetChanged(widget, mediaWidget);
-    }
+    if(m_storedWindowWidget)
+        delete m_storedWindowWidget.data(); /* Just to feel safe that we don't leak memory. */
+    m_storedWindowWidget = windowTarget();
+
+    emit zoomTargetChanged(widget, mediaWidget);
 }
 
 void ZoomWindowInstrument::at_resizingFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *) {
