@@ -111,7 +111,7 @@ bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePt
     insQuery.bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch(timestampUsec/1000));
     insQuery.bindValue(":action_type", (int) action->actionType());
     insQuery.bindValue(":action_params", action->getParams().serialize());
-    insQuery.bindValue(":runtime_params", action->getRuntimeParams().serialize());
+    insQuery.bindValue(":runtime_params", actionRuntime.serialize());
     insQuery.bindValue(":business_rule_id", action->getBusinessRuleId().toInt());
     insQuery.bindValue(":toggle_state", (int) action->getToggleState());
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());

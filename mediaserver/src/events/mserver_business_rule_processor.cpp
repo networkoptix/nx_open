@@ -28,12 +28,14 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
             break;
         case BusinessActionType::CameraOutput:
         case BusinessActionType::CameraOutputInstant:
-            return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
+            result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
             break;
         case BusinessActionType::CameraRecording:
-            return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
+            result = executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
+            break;
         case BusinessActionType::PanicRecording:
-            return executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
+            result = executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
+            break;
         default:
             break;
         }
