@@ -188,6 +188,7 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
         ui->gridEvents->setDisabled(false);
         setCursor(Qt::ArrowCursor);
         updateHeaderWidth();
+        setWindowTitle(tr("Event log - %1 event(s) found").arg(m_model->rowCount()));
     }
 }
 
