@@ -85,8 +85,19 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(ui->gridEvents, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT(at_customContextMenuRequested(const QPoint &)) );
     connect(ui->cameraButton, SIGNAL(clicked (bool)), this, SLOT(at_cameraButtonClicked()) );
     connect(ui->refreshButton, SIGNAL(clicked (bool)), this, SLOT(updateData()) );
-    connect(ui->clearFilterButton, SIGNAL(clicked (bool)), this, SLOT(at_resetFilterAction()) );
     
+    filterAction = new QAction(tr("&Filter similar rows"), this);
+    connect(filterAction, SIGNAL(triggered()), this, SLOT(at_filterAction()));
+
+    resetFilterAction = new QAction(tr("&Clear filter"), this);
+    connect(resetFilterAction, SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
+
+    clipboardAction = new QAction(tr("&Copy selection to clipboard"), this);
+    connect(clipboardAction, SIGNAL(triggered()), this, SLOT(at_copyToClipboard()));
+    clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
+
+    ui->clearFilterButton->setDefaultAction(resetFilterAction);
+
     updateData();
 
     ui->mainGridLayout->activate();
@@ -137,7 +148,14 @@ void QnEventLogDialog::updateData()
           QnId() // todo: add businessRuleID here
           );
 
-    ui->clearFilterButton->setEnabled(isFilterExist());
+    // update UI
+
+    resetFilterAction->setEnabled(isFilterExist());
+    if (resetFilterAction->isEnabled())
+        resetFilterAction->setIcon(qnSkin->icon("tree/clear_hovered.png"));
+    else
+        resetFilterAction->setIcon(qnSkin->icon("tree/clear.png"));
+
     ui->gridEvents->setDisabled(true);
     setCursor(Qt::BusyCursor);
 
@@ -332,20 +350,14 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     else
         menu = new QMenu();
 
-    QAction* filterAction = new QAction(tr("&Filter similar rows"), menu);
-    connect(filterAction, SIGNAL(triggered()), this, SLOT(at_filterAction()));
     filterAction->setEnabled(idx.isValid());
-    menu->addAction(filterAction);
+    clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
 
-    QAction* resetFilterAction = new QAction(tr("&Clear filter"), menu);
-    connect(resetFilterAction, SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
-    resetFilterAction->setEnabled(isFilterExist());
+    menu->addAction(filterAction);
     menu->addAction(resetFilterAction);
 
     menu->addSeparator();
-    QAction* clipboardAction = new QAction(tr("&Copy selection to clipboard"), menu);
-    connect(clipboardAction, SIGNAL(triggered()), this, SLOT(at_copyToClipboard()));
-    clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
+
     menu->addAction(clipboardAction);
 
     menu->exec(QCursor::pos());

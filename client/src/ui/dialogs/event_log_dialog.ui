@@ -142,9 +142,18 @@
       </spacer>
      </item>
      <item row="0" column="6">
-      <widget class="QPushButton" name="clearFilterButton">
+      <widget class="QToolButton" name="clearFilterButton">
        <property name="text">
         <string>Clear filter</string>
+       </property>
+       <property name="popupMode">
+        <enum>QToolButton::InstantPopup</enum>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+       <property name="autoRaise">
+        <bool>false</bool>
        </property>
       </widget>
      </item>

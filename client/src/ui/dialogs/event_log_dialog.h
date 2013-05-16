@@ -69,6 +69,11 @@ private:
     QnResourceList m_filterCameraList;
     bool m_updateDisabled;
     bool m_dirty;
+
+    QAction* filterAction;
+    QAction* resetFilterAction;
+    QAction* clipboardAction;
+
 };
 
 #endif // __EVENT_LOG_DIALOG_H____
