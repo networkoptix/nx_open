@@ -45,8 +45,14 @@
 #define QT_NO_DEPRECATED
 
 
+/* Use variadic macros in boost even for older GCC versions. */
+#if defined(__GNUC__) && GCC_VERSION >= 40000
+#   define BOOST_PP_VARIADICS
+#endif
+
+
 /* Define override specifier. */
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #   define override override
 #elif defined(__GNUC__)
 #   if (GCC_VERSION >= 40700)
