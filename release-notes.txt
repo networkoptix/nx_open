@@ -6,13 +6,14 @@ NEW CAMERAS AND RECORDERS SUPPORTED:
  
 IMPROVEMENTS: 
  - Live view is smoother
+ - ACTI cameras can be added manually even if UPNP port is not opened. Only one HTTP port can be used for discovery
  - Second stream quality is improved for some onvif cameras 
  - IOs Client support improved on the server side
  - DW cameras can have different HTTP port (had to be 80)   
- - Linux Media Server is more stable if record  80+ cameras and view more than 60
+ - Linux Media Server is more stable if record 80+ cameras and view more than 60
  - Camera discovery is much faster
  - Linux: improved external storages (NAS) support
- - ONVIF is slightly improved
+ - ONVIF support is improved
  - VMAX fixes and improvements:
    - Improved VMAX channels playback in Web-client and Android (fixed IE freezes as well)
    - VMAX playback improved 
@@ -29,6 +30,7 @@ BUGS FIXED:
  - Motion was displayed incorrectly during Smart Search if time zone had been changed. Fixed
  - Some analog encoders were discovered as digital cameras. Fixed
  - Linux upgrade improved - libgl-mesa-dev is not needed if upgrading Media Server
+ - If Media Server is disconnected and reconnected to EC, then event rules were duplicated. Fixed.
  
 ----------------------------------------------- 1.5 -----------------------------------------------
 
