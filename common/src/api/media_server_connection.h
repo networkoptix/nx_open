@@ -101,7 +101,7 @@ public:
 	 */
     int asyncEventLog(
         qint64 dateFrom, qint64 dateTo, 
-        QnNetworkResourcePtr camRes, 
+        QnResourceList camList,
         BusinessEventType::Value eventType, 
         BusinessActionType::Value actionType,
         QnId businessRuleId, 

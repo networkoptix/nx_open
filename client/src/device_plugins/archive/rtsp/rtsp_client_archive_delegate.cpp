@@ -11,6 +11,7 @@
 #include "core/resource/camera_history.h"
 #include "core/resource/media_server_resource.h"
 #include "redass/redass_controller.h"
+#include "device_plugins/server_camera/server_camera.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -160,19 +161,15 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
 
 QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64 time)
 {
-    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (!netRes)
+    QnServerCameraPtr camRes = qSharedPointerDynamicCast<QnServerCamera>(resource);
+    if (!camRes)
         return resource;
-    QString physicalId = netRes->getPhysicalId();
+    QString physicalId = camRes->getPhysicalId();
 
     if (time == DATETIME_NOW)
     {
-        QnNetworkResourceList cameraList = qnResPool->getAllNetResourceByPhysicalId(physicalId);
-        foreach(QnNetworkResourcePtr camera, cameraList) {
-            if (!camera->isDisabled())
-                return camera;
-        }
-        return resource;
+        QnServerCameraPtr activeCam = camRes->findEnabledSubling();
+        return activeCam ? activeCam : camRes;
     }
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);

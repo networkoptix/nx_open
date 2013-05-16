@@ -76,6 +76,11 @@ namespace BusinessEventType
         /** System health message. */
         SystemHealthMessage = 500,
 
+        /** Event group. */
+        AnyCameraIssue = 600,
+        AnyServerIssue = 601,
+        AnyBusinessEvent = 602,
+
         /** Base index for the user defined events. */
         UserDefined = 1000
 

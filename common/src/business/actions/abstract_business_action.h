@@ -157,12 +157,17 @@ public:
     int getAggregationCount() const { return m_aggregationCount; }
 
     qint64 timestamp() const { return m_runtimeParams.getEventTimestamp(); }
+    BusinessEventType::Value eventType() const { return m_runtimeParams.getEventType(); }
+
+    void setCompareString(const QString& value) { m_compareString = value; }
+    const QString& compareString() const { return m_compareString; }
 protected:
     BusinessActionType::Value m_actionType;
     //QnBusinessActionParameters m_params;
     QnBusinessEventParameters m_runtimeParams;
     QnId m_businessRuleId; 
     int m_aggregationCount;
+    QString m_compareString;
 };
 
 typedef std::vector<QnLightBusinessAction> QnLightBusinessActionVector;
