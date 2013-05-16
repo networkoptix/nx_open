@@ -7,11 +7,13 @@
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 
-#ifndef _WIN32
-#include <sys/types.h>
-#include <linux/unistd.h>
-
-static pid_t gettid(void) { return syscall(__NR_gettid); }
+#ifdef _WIN32
+#elif defined(__APPLE__)
+  #include <pthread.h>
+#else
+  #include <sys/types.h>
+  #include <linux/unistd.h>
+  static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
 
@@ -155,7 +157,7 @@ void QnLongRunnable::pauseDelay() {
         m_semaphore.tryAcquire(1, 50);
 }
 
-int QnLongRunnable::sysThreadID() const
+size_t QnLongRunnable::sysThreadID() const
 {
     return m_sysThreadID;
 }
@@ -215,6 +217,8 @@ void QnLongRunnable::saveSysThreadID()
 {
 #ifdef _WIN32
     //TODO
+#elif defined(__APPLE__)
+    m_sysThreadID = (size_t)pthread_self();
 #else
     m_sysThreadID = gettid();
 #endif

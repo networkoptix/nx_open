@@ -1,3 +1,5 @@
+#ifdef Q_OS_LINUXG
+
 #include "monitor_unix.h"
 
 #include <QtCore/QHash>
@@ -216,3 +218,4 @@ QList<QnPlatformMonitor::HddLoad> QnLinuxMonitor::totalHddLoad() {
     return d_func()->totalHddLoad();
 }
 
+#endif

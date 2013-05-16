@@ -1,6 +1,13 @@
 #ifndef coldstore_helper_h_2137_h
 #define coldstore_helper_h_2137_h
 
+#include <QtGlobal>
+#include <QFileInfoList>
+#include <QHash>
+#include <QTime>
+#include <QMutex>
+#include <QSharedPointer>
+
 
 struct QnCSFileInfo
 {

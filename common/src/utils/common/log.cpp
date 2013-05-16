@@ -63,7 +63,7 @@ public:
             return;
 
         std::ostringstream ostr;
-        ostr << QDateTime::currentDateTime().toString(lit("ddd MMM d yy  hh:mm:ss.zzz")).toUtf8().data()
+        ostr << QDateTime::currentDateTime().toString(QLatin1String("ddd MMM d yy  hh:mm:ss.zzz")).toUtf8().data()
             << " Thread " << QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).data()
             << " (" << qn_logLevelNames[logLevel] << "): " << msg.toUtf8().data() << "\r\n";
         ostr.flush();

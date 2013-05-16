@@ -62,6 +62,17 @@
 				<buildLib>sharedlib</buildLib>
 			</properties>
 		</profile>	
+		<profile>
+			<id>macosx</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<buildLib>sharedlib</buildLib>
+			</properties>
+		</profile>	
 	</profiles>	
 
 </project>

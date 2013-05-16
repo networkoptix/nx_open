@@ -3,6 +3,7 @@
 
 #include <QSharedPointer>
 #include "../abstract_archive_delegate.h"
+#include <libavformat/avformat.h>
 
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;

@@ -1,3 +1,5 @@
+
+#include <QElapsedTimer>
 #include <QUrl>
 
 #include "rest_connection_processor.h"

@@ -1,6 +1,10 @@
 #include "avi_dvd_resource.h"
+
+#include <QDir>
+
 #include "../archive_stream_reader.h"
 #include "avi_dvd_archive_delegate.h"
+
 
 QnAviDvdResource::QnAviDvdResource(const QString& file):
     QnAviResource(file)

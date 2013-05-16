@@ -1,8 +1,13 @@
 #include "ffmpeg_helper.h"
+
+#include <QBuffer>
+#include <QDebug>
+
 #include "nalUnits.h"
 #include "bitStream.h"
 #include "vc1Parser.h"
 #include "core/resource/storage_resource.h"
+
 
 static inline QByteArray codecIDToByteArray(CodecID codecID)
 {

@@ -8,6 +8,8 @@
 #  include <iphlpapi.h>
 #endif
 
+#include <QElapsedTimer>
+
 #include "../common/systemerror.h"
 
 
@@ -296,11 +298,14 @@ namespace
     template<class Func>
     int doInterruptableSystemCallWithTimeout( const Func& func, unsigned int timeout )
     {
-        struct timespec waitStartTime;
-        memset( &waitStartTime, 0, sizeof(waitStartTime) );
+        QElapsedTimer et;
+        et.start();
+
+        //struct timespec waitStartTime;
+        //memset( &waitStartTime, 0, sizeof(waitStartTime) );
         bool waitStartTimeActual = false;
         if( timeout > 0 )
-            waitStartTimeActual = clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
+            waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
         for( ;; )
         {
             int result = func();
@@ -312,14 +317,15 @@ namespace
                 {
                     continue;
                 }
-                struct timespec waitStopTime;
-                memset( &waitStopTime, 0, sizeof(waitStopTime) );
-                if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
-                    continue;   //not updating timeout value
-                const int millisAlreadySlept = 
-                    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
-                    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
-                if( (unsigned int)millisAlreadySlept < timeout )
+                //struct timespec waitStopTime;
+                //memset( &waitStopTime, 0, sizeof(waitStopTime) );
+                //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
+                //    continue;   //not updating timeout value
+                //const int millisAlreadySlept = 
+                //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
+                //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
+                //if( (unsigned int)millisAlreadySlept < timeout )
+                if( et.elapsed() < timeout )
                     continue;
                 errno = ERR_TIMEOUT;    //operation timedout
             }
@@ -405,11 +411,13 @@ bool CommunicatingSocket::connect(
         timeoutMs >= 0 ? &timeVal : NULL );
 #else
     //handling interruption by a signal
-    struct timespec waitStartTime;
-    memset( &waitStartTime, 0, sizeof(waitStartTime) );
+    //struct timespec waitStartTime;
+    //memset( &waitStartTime, 0, sizeof(waitStartTime) );
+    QElapsedTimer et;
+    et.start();
     bool waitStartTimeActual = false;
     if( timeoutMs >= 0 )
-        waitStartTimeActual = clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
+        waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
     for( ;; )
     {
         struct pollfd sockPollfd;
@@ -435,13 +443,13 @@ bool CommunicatingSocket::connect(
                 //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)
                 continue;
             }
-            struct timespec waitStopTime;
-            memset( &waitStopTime, 0, sizeof(waitStopTime) );
-            if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
-                continue;   //not updating timeout value
-            const int millisAlreadySlept = 
-                ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
-                ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
+            //struct timespec waitStopTime;
+            //memset( &waitStopTime, 0, sizeof(waitStopTime) );
+            //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
+            //    continue;   //not updating timeout value
+            const int millisAlreadySlept = et.elapsed();
+            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
+            //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
             if( millisAlreadySlept >= timeoutMs )
                 break;
             timeoutMs -= millisAlreadySlept;

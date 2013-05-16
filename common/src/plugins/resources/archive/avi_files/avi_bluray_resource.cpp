@@ -1,6 +1,10 @@
 #include "avi_bluray_resource.h"
+
+#include <QDir>
+
 #include "avi_bluray_archive_delegate.h"
 #include "../archive_stream_reader.h"
+
 
 QnAviBlurayResource::QnAviBlurayResource(const QString& file):
     QnAviResource(file)

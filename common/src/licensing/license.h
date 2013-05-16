@@ -1,10 +1,12 @@
 #ifndef QN_LICENSING_LICENSE
 #define QN_LICENSING_LICENSE
 
+#include <QByteArray>
 #include <QCoreApplication>
 #include <QSharedPointer>
 #include <QString>
 #include <QList>
+#include <QMap>
 #include <QMutex>
 #include <QSet>
 #include <QTextStream>

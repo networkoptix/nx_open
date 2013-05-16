@@ -32,6 +32,9 @@
 
 #include "dvdcss.h"
 
+#include <QtGlobal>
+
+
 #define KEY_SIZE 5
 
 typedef quint8 dvd_key_t[KEY_SIZE];

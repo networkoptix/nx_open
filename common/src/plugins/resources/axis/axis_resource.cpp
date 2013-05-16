@@ -1,6 +1,7 @@
 
 #include "axis_resource.h"
 
+#include <algorithm>
 #include <functional>
 #include <memory>
 

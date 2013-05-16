@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include <QDateTime>
+
 #include "socket.h"
 #include "../common/log.h"
 #include "../common/systemerror.h"

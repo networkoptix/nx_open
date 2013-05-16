@@ -1,6 +1,7 @@
 #ifndef __SIMPLE_HTTP_CLIENT__
 #define __SIMPLE_HTTP_CLIENT__
 
+#include <QAuthenticator>
 #include <QtCore/QHash>
 #include <QString>
 #include <QSharedPointer>

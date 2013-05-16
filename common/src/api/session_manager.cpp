@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include <QMetaEnum>
 #include <QtCore/QUrl>
 #include <QtCore/QBuffer>
 #include <QtCore/QThread>
@@ -74,7 +75,7 @@ QnSessionManager::QnSessionManager(QObject *parent):
     connect(this, SIGNAL(aboutToBeStopped()), this, SLOT(at_aboutToBeStopped()));
     connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(at_aboutToBeStarted()));
 
-    m_thread->setObjectName(lit("QnSessionManagerThread")); /* Name will be shown in debugger. */
+    m_thread->setObjectName("QnSessionManagerThread"); /* Name will be shown in debugger. */
     this->moveToThread(m_thread.data());
     m_thread->start();
 }

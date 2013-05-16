@@ -1,6 +1,7 @@
 #ifndef onvif_device_server_h_2054
 #define onvif_device_server_h_2054
 
+#include <QUdpSocket>
 
 #include "core/resource/network_resource.h"
 #include "core/resource_managment/resource_searcher.h"

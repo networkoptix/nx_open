@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 #include "monitor_win.h"
 
 #include <cassert>
@@ -282,3 +284,4 @@ QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
     return result;
 }
 
+#endif

@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include <QtCore/QElapsedTimer>
+#include <QStringList>
 
 #include <utils/common/warnings.h>
 

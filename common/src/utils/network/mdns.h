@@ -1,6 +1,10 @@
 #ifndef uniclient_mdns_h
 #define uniclient_mdns_h
 
+#include <QByteArray>
+#include <QVector>
+
+
 struct MDNSPacket
 {
     struct Query

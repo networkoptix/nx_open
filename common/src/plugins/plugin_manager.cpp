@@ -7,6 +7,7 @@
 
 #include "plugin_manager.h"
 
+#include <algorithm>
 #include <set>
 
 #include <QAtomicPointer>

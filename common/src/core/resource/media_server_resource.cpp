@@ -1,6 +1,8 @@
 #include "media_server_resource.h"
 
 #include <QtCore/QUrl>
+#include <QCoreApplication>
+#include <QTimer>
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 #include "utils/common/sleep.h"

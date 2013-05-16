@@ -1,5 +1,8 @@
 #include "system_health.h"
 
+#include <QObject>
+
+
 namespace QnSystemHealth {
 
     QString toString(MessageType messageType, bool shortMode) {

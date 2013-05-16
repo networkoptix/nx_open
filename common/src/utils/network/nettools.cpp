@@ -1,4 +1,12 @@
+
+#include <QCoreApplication>
+#include <QtConcurrentMap>
 #include <QHostInfo>
+#include <QTime>
+#include <QSettings>
+#include <QStringList>
+#include <QThreadPool>
+
 #include "nettools.h"
 #include "ping.h"
 #include "netstate.h"

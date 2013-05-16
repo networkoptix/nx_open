@@ -5,6 +5,8 @@
 
 #include "linesplitter.h"
 
+#include <algorithm>
+
 
 namespace nx_http
 {

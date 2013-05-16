@@ -1,9 +1,11 @@
 #ifndef __BLURAY_HELPER_H
 #define __BLURAY_HELPER_H
 
+#include <QMap>
 #include <QString>
-#include "../bitStream.h"
+#include <QVector>
 
+#include "../bitStream.h"
 
 
 class AbstractBlurayStream

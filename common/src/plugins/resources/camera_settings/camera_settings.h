@@ -2,6 +2,7 @@
 #define camera_settings_h_1726
 
 #include "qdom.h"
+#include <QHash>
 
 class CameraSettingValue
 {

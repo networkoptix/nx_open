@@ -10,6 +10,7 @@
 #include <QList>
 #include <QVector>
 #include <QString>
+#include <QStringList>
 #include <QMutex>
 
 #include "camera_plugin.h"

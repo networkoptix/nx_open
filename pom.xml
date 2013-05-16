@@ -256,23 +256,23 @@
 			</modules>
 		</profile>		
 		<profile>
-			<id>macos</id>
+			<id>macosx</id>
 			<activation>
 				<os>
 					<family>mac</family>
 				</os> 
 			</activation>
 			<modules>
-				<!--<module>xvbadecoder</module>-->
 				<module>ios-client</module>
 			</modules>
-			<!--<properties>
+			<properties>
 				<environment.dir>${env.environment}</environment.dir>
 				<python.dir>/usr/bin/</python.dir>				
-				<qt.dir>${env.QTDIR}</qt.dir>				
-				<platform>linux</platform>
+				<qt.dir></qt.dir>
+				<platform>macosx</platform>
 				<compiler>gcc</compiler>
-			</properties> -->
+				<arch>x64</arch>
+			</properties>
 		</profile>	
 	</profiles>	
 </project>

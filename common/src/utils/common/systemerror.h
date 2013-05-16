@@ -12,6 +12,8 @@
 #include <errno.h>
 #endif
 
+#include <QString>
+
 
 namespace SystemError
 {

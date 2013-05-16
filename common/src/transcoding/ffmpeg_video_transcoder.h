@@ -2,6 +2,9 @@
 #define __FFMPEG_VIDEO_TRANSCODER_H__
 
 #include "transcoder.h"
+
+#include <libswscale/swscale.h>
+
 #include "utils/media/frame_info.h"
 #include "decoders/video/ffmpeg.h"
 

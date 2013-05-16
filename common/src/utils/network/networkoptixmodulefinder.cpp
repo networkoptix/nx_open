@@ -7,6 +7,7 @@
 
 #include <memory>
 
+#include <QDateTime>
 #include <QNetworkInterface>
 #include <QScopedArrayPointer>
 

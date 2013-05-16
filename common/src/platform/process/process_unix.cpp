@@ -4,6 +4,9 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
+#include <QProcess>
+#include <QWeakPointer>
+
 #include <utils/common/warnings.h>
 
 namespace {

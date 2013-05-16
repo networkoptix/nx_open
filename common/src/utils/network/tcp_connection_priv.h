@@ -29,7 +29,7 @@ static const int CODE_UNSPOORTED_TRANSPORT = 461;
 static const int CODE_NOT_IMPLEMETED = 501;
 static const int CODE_INTERNAL_ERROR = 500;
 
-#include "ssl.h"
+#include <openssl/ssl.h>
 
 class QnTCPConnectionProcessorPrivate
 {

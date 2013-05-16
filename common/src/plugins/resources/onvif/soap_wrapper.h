@@ -1,6 +1,8 @@
 #ifndef onvif_soap_wrapper_h
 #define onvif_soap_wrapper_h
 
+#include <QSharedPointer>
+
 #include "onvif_helper.h"
 
 struct soap;

@@ -42,7 +42,7 @@ inline QString replaceNonFileNameCharacters(const QString &string, const QChar &
  * \param pattern                       Pattern to use for result construction. 
  *                                      <tt>%1</tt> will be replaced with size in resulting units, and <tt>%2</tt> with unit name.
  */
-QString formatFileSize(qint64 size, int precision = 1, int prefixThreshold = 1, Qn::MetricPrefix minPrefix = Qn::NoPrefix, Qn::MetricPrefix maxPrefix = Qn::YottaPrefix, bool useBinaryPrefixes = true, const QString pattern = lit("%1 %2"));
+QString formatFileSize(qint64 size, int precision = 1, int prefixThreshold = 1, Qn::MetricPrefix minPrefix = Qn::NoPrefix, Qn::MetricPrefix maxPrefix = Qn::YottaPrefix, bool useBinaryPrefixes = true, const QString pattern = QLatin1String("%1 %2"));
 
 int naturalStringCompare(const QString &lhs, const QString &rhs, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
 QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);

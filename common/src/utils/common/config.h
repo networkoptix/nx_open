@@ -4,12 +4,14 @@
 // -------------------------------------------------------------------------- //
 // Application settings. OK to change.
 // -------------------------------------------------------------------------- //
+#ifndef __APPLE__
 /** 
  * \def QN_HAS_PRIVATE_INCLUDES
  * 
  * Define if Qt private headers are available on your system.
  */
 #define QN_HAS_PRIVATE_INCLUDES
+#endif
 
 
 

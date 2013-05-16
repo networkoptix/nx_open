@@ -4,6 +4,8 @@
 #include <QBuffer>
 #include <QtGui/QImage>
 
+#include <libavformat/avformat.h>
+
 #include <utils/common/cryptographic_hash.h>
 
 #include <core/dataconsumer/abstract_data_consumer.h>

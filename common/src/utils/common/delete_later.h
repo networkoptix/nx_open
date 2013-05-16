@@ -2,6 +2,7 @@
 #define QN_DELETE_LATER_H
 
 #include <QtCore/QObject>
+#include <QThread>
 #include "warnings.h"
 #include "event_loop.h"
 

@@ -6,6 +6,8 @@
 #include <QTime>
 #include <QList>
 #include <QMap>
+#include <QStringList>
+
 #include "utils/network/socket.h"
 
 

@@ -181,7 +181,7 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
                     result.m_source = QString::fromUtf8(field.data(), field.size());
                     break;
                 case conflictsParam:
-                    result.m_conflicts = QString::fromUtf8(field.data(), field.size()).split(lit(STRING_LIST_DELIM));
+                    result.m_conflicts = QString::fromUtf8(field.data(), field.size()).split(STRING_LIST_DELIM);
                     break;
             default:
                 break;

@@ -9,6 +9,7 @@
 #   include <arpa/inet.h>
 #   include <netinet/ip.h>
 #   include <netinet/ip_icmp.h>
+#   include <unistd.h>
 #endif
 
 #include <utils/common/log.h>

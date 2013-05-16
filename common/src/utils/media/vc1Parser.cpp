@@ -1,7 +1,13 @@
+
 #include <memory.h>
 #include <sstream>
+
+#include <QDebug>
+#include <QTextStream>
+
 #include "vc1Parser.h"
 #include "nalUnits.h"
+
 
 const char* pict_type_str[4] = {"I_TYPE", "P_TYPE", "B_TYPE", "BI_TYPE"};
 

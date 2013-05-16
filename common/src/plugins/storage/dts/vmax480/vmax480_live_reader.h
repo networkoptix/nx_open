@@ -5,6 +5,9 @@
 #include "core/resource/resource_fwd.h"
 #include "vmax480_stream_fetcher.h"
 
+#include <QElapsedTimer>
+
+
 class QnVMax480ConnectionProcessor;
 class VMaxStreamFetcher;
 

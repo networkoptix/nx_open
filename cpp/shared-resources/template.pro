@@ -4,7 +4,7 @@ TARGET = ${project.artifactId}
 VERSION = ${release.version}
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
-CONFIG += flat silent
+#CONFIG += flat silent
 CONFIG -= flat app_bundle
 DEFINES += __STDC_CONSTANT_MACROS
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-common.qrc
@@ -58,8 +58,10 @@ include(${environment.dir}/qt-custom/QtCore/private/qtcore.pri)
 INCLUDEPATH += ${environment.dir}/qt/include ${environment.dir}/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt-custom ${environment.dir}/qt-custom/QtCore
 DEPENDPATH *= $${INCLUDEPATH}
 
-PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
-PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
+!mac {
+  PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
+  PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
+}
 
 win* {
   isEmpty(BUILDLIB) {
@@ -96,9 +98,14 @@ unix {
 }
 
 mac {
+  #QMAKE_CXXFLAGS -= -std=c++0x -msse2
+  QMAKE_CXXFLAGS -= -msse2
+  QMAKE_CXXFLAGS += -msse4.1
+  QMAKE_CFLAGS += -msse4.1
   DEFINES += QN_EXPORT=  
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
+  CONFIG -= app_bundle objective_c
 }
 
 

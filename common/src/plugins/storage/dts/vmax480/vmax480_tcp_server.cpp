@@ -1,4 +1,8 @@
 #include "vmax480_tcp_server.h"
+
+#include <QElapsedTimer>
+#include <QUuid>
+
 #include "vmax480_stream_fetcher.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "../../../../vmaxproxy/src/vmax480_helper.h"

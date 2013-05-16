@@ -1,5 +1,7 @@
 #include "resource_pool.h"
 
+#include <algorithm>
+
 #include <QtCore/QMetaObject>
 
 #include "utils/common/warnings.h"

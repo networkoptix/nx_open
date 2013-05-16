@@ -1,4 +1,10 @@
 #include "sign_helper.h"
+
+#include <QProcess>
+#include <QTemporaryFile>
+
+#include <libswscale/swscale.h>
+
 #include "utils/common/util.h"
 #include "licensing/license.h"
 #include "utils/common/scoped_painter_rollback.h"
