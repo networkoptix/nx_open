@@ -12,6 +12,7 @@
 
 #include <utils/common/request_param.h>
 #include <utils/common/warnings.h>
+#include <utils/common/json.h>
 
 class QnEnumNameMapper;
 
