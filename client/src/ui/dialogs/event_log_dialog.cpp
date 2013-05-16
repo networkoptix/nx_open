@@ -341,31 +341,59 @@ void QnEventLogDialog::at_copyToClipboard()
         return;
 
     qSort(list);
-    QString result;
 
+    QString textData;
+    QString htmlData;
+    QMimeData* mimeData = new QMimeData();
+
+    htmlData.append(lit("<body>"));
+    htmlData.append(lit("<table>"));
+
+    htmlData.append(lit("<tr>"));
     for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
     {
         if (i > 0)
-            result.append(QLatin1Char('\t'));
-        result.append(model->headerData(list[i].column(), Qt::Horizontal).toString());
+            textData.append(QLatin1Char('\t'));
+        QString header = model->headerData(list[i].column(), Qt::Horizontal).toString();
+        htmlData.append(lit("<th>"));
+        htmlData.append(header);
+        htmlData.append(lit("</th>"));
+        textData.append(header);
     }
+    htmlData.append(lit("</tr>"));
 
     int prevRow = -1;
     for(int i = 0; i < list.size(); ++i)
     {
         if(list[i].row() != prevRow) {
             prevRow = list[i].row();
-            result.append(QLatin1Char('\n'));
+            textData.append(QLatin1Char('\n'));
+            if (i > 0)
+                htmlData.append(lit("</tr>"));
+            htmlData.append(lit("<tr>"));
         }
         else {
-            result.append(QLatin1Char('\t'));
+            textData.append(QLatin1Char('\t'));
         }
-        result.append(model->data(list[i]).toString());
+
+        htmlData.append(lit("<td>"));
+        htmlData.append(model->data(list[i], Qn::DisplayHtmlRole).toString());
+        htmlData.append(lit("</td>"));
+
+        textData.append(model->data(list[i]).toString());
     }
-    result.append(QLatin1Char('\n'));
+    htmlData.append(lit("</tr>"));
+    htmlData.append(lit("</table>"));
+    htmlData.append(lit("</body>"));
+    textData.append(QLatin1Char('\n'));
+
+    mimeData->setText(textData);
+    mimeData->setHtml(htmlData);
 
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(result);
+    clipboard->setMimeData(mimeData);
+
+    //clipboard->setText(result);
 }
 
 void QnEventLogDialog::at_cameraButtonClicked()

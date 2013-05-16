@@ -419,7 +419,17 @@ void QnEventLogModel::sort(int column, Qt::SortOrder order)
 
 }
 
-QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
+QString QnEventLogModel::motionUrl(Column column, const QnLightBusinessAction& action) const
+{
+    if (column != DescriptionColumn)
+        return QString();
+
+    if (action.getRuntimeParams().getEventType() != BusinessEventType::Camera_Motion)
+        return QString();
+    return QnBusinessStringsHelper::motionUrl(action.getRuntimeParams());
+}
+
+QVariant QnEventLogModel::data( const QModelIndex & index, int role) const
 {
     if (index.row() >= m_index->size())
         return QVariant();
@@ -441,6 +451,16 @@ QVariant QnEventLogModel::data ( const QModelIndex & index, int role) const
             return mouseCursorData(column, action);
         case Qn::ResourceRole:
             return resourceData(column, action);
+        case Qn::DisplayHtmlRole: {
+            QString text = textData(column, action);
+            QString url = motionUrl(column, action);
+            if (url.isEmpty())
+                return text;
+            else 
+                return QString(lit("<a href=\"%1\">%2</a>")).arg(url, text);
+        }
+        default:
+            return QVariant();
     }
 
     return QVariant();

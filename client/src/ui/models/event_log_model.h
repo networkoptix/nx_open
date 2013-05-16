@@ -55,6 +55,7 @@ private:
     QVariant foregroundData(const Column& column, const QnLightBusinessAction &action) const;
     QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action) const;
     QVariant resourceData(const Column& column, const QnLightBusinessAction &action) const;
+    QString motionUrl(Column column, const QnLightBusinessAction& action) const;
     QString formatUrl(const QString& url) const;
 private:
     QList<Column> m_columns;
