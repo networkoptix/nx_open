@@ -18,7 +18,7 @@ public:
     
     QList<QnAbstractBusinessActionPtr> getActions(
         const QnTimePeriod& period,
-        const QnId& cameraId = QnId(), 
+        const QnResourceList& resList,
         const BusinessEventType::Value& eventType = BusinessEventType::NotDefined, 
         const BusinessActionType::Value& actionType = BusinessActionType::NotDefined,
         const QnId& businessRuleId = QnId()) const;
@@ -26,7 +26,7 @@ public:
     void getAndSerializeActions(
         QByteArray& result,
         const QnTimePeriod& period,
-        const QnId& cameraId, 
+        const QnResourceList& resList,
         const BusinessEventType::Value& eventType, 
         const BusinessActionType::Value& actionType,
         const QnId& businessRuleId) const;
@@ -36,12 +36,19 @@ public:
     static void init();
     static void fini();
 
+    bool createDatabase();
     static void migrate();
 protected:
     QnEventsDB();
 private:
     bool cleanupEvents();
     QString toSQLDate(qint64 timeMs) const;
+    QString getRequestStr(const QnTimePeriod& period,
+        const QnResourceList& resList,
+        const BusinessEventType::Value& eventType, 
+        const BusinessActionType::Value& actionType,
+        const QnId& businessRuleId) const;
+    bool isObjectExists(const QString& objectType, const QString& objectName);
 private:
     QSqlDatabase m_sdb;
     qint64 m_lastCleanuptime;

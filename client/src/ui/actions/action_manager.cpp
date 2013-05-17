@@ -596,6 +596,13 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::PreferencesRole).
         autoRepeat(false);
 
+    factory(Qn::BusinessEventsLogAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Log...")).
+        shortcut(tr("Ctrl+L")).
+        autoRepeat(false);
+
     factory().
         flags(Qn::Main).
         separator();
@@ -634,13 +641,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+E")).
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
-
-    factory(Qn::BusinessEventsLogAction).
-        flags(Qn::Main).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Alarm/Event Log...")).
-        shortcut(tr("Ctrl+L")).
-        autoRepeat(false);
 
     factory(Qn::WebClientAction).
         flags(Qn::Tree | Qn::NoTarget).

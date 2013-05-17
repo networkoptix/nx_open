@@ -66,10 +66,9 @@ void QnConnectionTestingDialog::timeout()
     updateUi(false, tr("Request timed out."));
 }
 
-void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle)
+void QnConnectionTestingDialog::testResults(int status, QnConnectInfoPtr connectInfo, int requestHandle)
 {
     Q_UNUSED(requestHandle)
-    Q_UNUSED(errorString)
 
     if (!m_timeoutTimer.isActive())
         return;
@@ -124,7 +123,7 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorS
 void QnConnectionTestingDialog::testSettings()
 {
     m_connection = QnAppServerConnectionFactory::createConnection(m_url);
-    m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QnConnectInfoPtr,int)));
+    m_connection->testConnectionAsync(this, SLOT(testResults(int,QnConnectInfoPtr,int)));
 }
 
 void QnConnectionTestingDialog::updateUi(bool success, const QString &details){

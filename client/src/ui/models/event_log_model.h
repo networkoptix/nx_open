@@ -20,15 +20,14 @@ public:
         ActionColumn,
         ActionCameraColumn,
         DescriptionColumn,
+        
         ColumnCount
     };
 
     QnEventLogModel(QObject *parent = NULL);
     virtual ~QnEventLogModel();
 
-    const QnLightBusinessActionVectorPtr &events() const;
-    void setEvents(const QnLightBusinessActionVectorPtr &events);
-    void addEvents(const QnLightBusinessActionVectorPtr &events);
+    void setEvents(const QVector<QnLightBusinessActionVectorPtr> &events);
 
     QList<Column> columns() const;
     void setColumns(const QList<Column> &columns);
@@ -38,20 +37,35 @@ public:
     void clear();
 
     virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override;
+    virtual void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder ) override;
+
+    bool isMotionUrl(const QModelIndex & index) const;
+    QnResourcePtr getResource(const QModelIndex& idx) const;
+
+    BusinessEventType::Value eventType(int row) const;
+    QnResourcePtr eventResource(int row) const;
+    qint64 eventTimestamp(int row) const;
+
+    class DataIndex;
 private:
+    QVariant fontData(const Column& column, const QnLightBusinessAction &action) const;
+    QVariant foregroundData(const Column& column, const QnLightBusinessAction &action) const;
 
     static QString columnTitle(Column column);
     
-    QVariant textData(const Column& column,const QnLightBusinessAction &action) const;
-    QVariant iconData(const Column& column, const QnLightBusinessAction &action) const;
-    QVariant fontData(const Column& column, const QnLightBusinessAction &action) const;
-    QVariant foregroundData(const Column& column, const QnLightBusinessAction &action) const;
-    QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action) const;
+    static QVariant iconData(const Column& column, const QnLightBusinessAction &action);
+    static QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action);
+    static QVariant resourceData(const Column& column, const QnLightBusinessAction &action);
+    static QString textData(const Column& column,const QnLightBusinessAction &action);
+
+    static QString motionUrl(Column column, const QnLightBusinessAction& action);
+    static QString formatUrl(const QString& url);
+    static QnResourcePtr getResourceById(const QnId& id);
 private:
     QList<Column> m_columns;
-    QnLightBusinessActionVectorPtr m_events;
     QBrush m_linkBrush;
     QFont m_linkFont;
+    DataIndex* m_index;
 };
 
 #endif // QN_EVENT_LOG_MODEL_H

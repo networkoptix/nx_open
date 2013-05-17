@@ -886,8 +886,11 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
         qnDeleteLater(widget);
     }
 
-    if(destroyItem)
+    if(destroyItem) {
+        if(item->layout())
+            item->layout()->removeItem(item);
         qnDeleteLater(item);
+    }
 
     return true;
 }

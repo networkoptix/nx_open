@@ -1,6 +1,7 @@
+
 #ifdef Q_OS_LINUX
 
-#include "monitor_unix.h"
+#include "sys_dependent_monitor.h"
 
 #include <QtCore/QHash>
 
@@ -9,7 +10,7 @@
 #include <errno.h>
 
 
-class QnLinuxMonitorPrivate {
+class QnSysDependentMonitorPrivate {
 public:
     //!This structure is read from /proc/diskstat
     struct DiskStatSys {
@@ -65,13 +66,13 @@ public:
     static const size_t MAX_LINE_LENGTH = 256;
 
 
-    QnLinuxMonitorPrivate():
+    QnSysDependentMonitorPrivate():
         lastPartitionsUpdateTime(0)
     {
         memset(&lastDiskUsageUpdateTime, 0, sizeof(lastDiskUsageUpdateTime));
     }
 
-    virtual ~QnLinuxMonitorPrivate() {}
+    virtual ~QnSysDependentMonitorPrivate() {}
 
     QList<HddLoad> totalHddLoad() {
         QList<HddLoad> result;
@@ -199,22 +200,22 @@ private:
     struct timespec lastDiskUsageUpdateTime;
 
 private:
-    Q_DECLARE_PUBLIC(QnLinuxMonitor);
-    QnLinuxMonitor *q_ptr;
+    Q_DECLARE_PUBLIC(QnSysDependentMonitor);
+    QnSysDependentMonitor *q_ptr;
 };
 
-QnLinuxMonitor::QnLinuxMonitor(QObject *parent):
+QnSysDependentMonitor::QnSysDependentMonitor(QObject *parent):
     base_type(parent),
-    d_ptr(new QnLinuxMonitorPrivate())
+    d_ptr(new QnSysDependentMonitorPrivate())
 {
     d_ptr->q_ptr = this;
 }
 
-QnLinuxMonitor::~QnLinuxMonitor() {
+QnSysDependentMonitor::~QnSysDependentMonitor() {
     return;
 }
 
-QList<QnPlatformMonitor::HddLoad> QnLinuxMonitor::totalHddLoad() {
+QList<QnPlatformMonitor::HddLoad> QnSysDependentMonitor::totalHddLoad() {
     return d_func()->totalHddLoad();
 }
 

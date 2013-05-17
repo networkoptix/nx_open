@@ -29,16 +29,34 @@ public:
     * \param businessRuleId optional business rule id
     */
     void query(qint64 fromMsec, qint64 toMsec, 
-               QnNetworkResourcePtr camRes, 
+               QnResourceList camList,
                BusinessEventType::Value eventType, 
                BusinessActionType::Value actionType,
                QnId businessRuleId);
 private slots:
     void updateData();
     void at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum);
-    void onItemClicked(QListWidgetItem * item);
+    void at_itemClicked(const QModelIndex & index);
+    void at_customContextMenuRequested(const QPoint& screenPos);
+    void at_cameraButtonClicked();
+    void at_filterAction();
+    void at_resetFilterAction();
+    void at_copyToClipboard();
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
+    QString getTextForNCameras(int n) const;
+    QStandardItem* createEventItem(BusinessEventType::Value value);
+    QStandardItem* createEventTree(QStandardItem* rootItem, BusinessEventType::Value value);
+
+    void setCameraList(QnResourceList resList);
+    void setActionType(BusinessActionType::Value value);
+    void setEventType(BusinessEventType::Value value);
+    bool setEventTypeRecursive(BusinessEventType::Value value, QAbstractItemModel* model, const QModelIndex& parentItem);
+
+    void disableUpdateData();
+    void enableUpdateData();
+    void updateHeaderWidth();
+    bool isFilterExist() const;
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  
@@ -46,6 +64,16 @@ private:
     QnEventLogModel *m_model;
     QSet<int> m_requests;
     QnWorkbenchContext* m_context;
+
+    QVector <QnLightBusinessActionVectorPtr> m_allEvents;
+    QnResourceList m_filterCameraList;
+    bool m_updateDisabled;
+    bool m_dirty;
+
+    QAction* m_filterAction;
+    QAction* m_resetFilterAction;
+    QAction* m_clipboardAction;
+
 };
 
 #endif // __EVENT_LOG_DIALOG_H____

@@ -571,14 +571,14 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             eventEater->addEventType(QEvent::Close);
             dialog->installEventFilter(eventEater.data());
             
-            QScopedPointer<detail::QnResourceReplyProcessor> processor(new detail::QnResourceReplyProcessor(this));
-            connect(processor.data(), SIGNAL(finished(int, const QByteArray &, const QnResourceList &, int)), dialog.data(), SLOT(accept()));
-
-            closeLayouts(resources, rollbackResources, saveableResources, processor.data(), SLOT(at_replyReceived(int, const QnResourceList &, int)));
+            QnConnectionRequestResult result;
+            connect(&result, SIGNAL(replyProcessed()), dialog.data(), SLOT(accept()));
+            
+            closeLayouts(resources, rollbackResources, saveableResources, &result, SLOT(processReply(int, const QVariant &, int))); // TODO: #Elric we have a QObject::connect failure here
             dialog->exec();
 
             QnWorkbenchLayoutList currentLayouts = workbench()->layouts();
-            at_resources_saved(processor->status(), processor->resources(), processor->handle());
+            at_resources_saved(result.status(), result.reply<QnResourceList>(), result.handle());
             return workbench()->layouts() == currentLayouts; // TODO: #Elric This is an ugly hack, think of a better solution.
         }
     } else {
@@ -1728,7 +1728,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         
         QScopedPointer<detail::QnConnectReplyProcessor> processor(new detail::QnConnectReplyProcessor());
         QScopedPointer<QEventLoop> loop(new QEventLoop());
-        connect(processor.data(), SIGNAL(finished(int, const QByteArray &, const QnConnectInfoPtr &, int)), loop.data(), SLOT(quit()));
+        connect(processor.data(), SIGNAL(finished(int, const QnConnectInfoPtr &, int)), loop.data(), SLOT(quit()));
         connection->connectAsync(processor.data(), SLOT(at_replyReceived(int, const QnConnectInfoPtr &, int)));
         loop->exec();
 
