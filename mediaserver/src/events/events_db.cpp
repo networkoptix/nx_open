@@ -282,7 +282,7 @@ void QnEventsDB::getAndSerializeActions(
             QnId eventResId = actionsQuery.value(eventResIdx).toInt();
             QnNetworkResourcePtr camRes = qnResPool->getResourceById(eventResId).dynamicCast<QnNetworkResource>();
             if (camRes) {
-                if (qnStorageMan->isArchiveTimeExists(camRes->getPhysicalId(), actionsQuery.value(timestampIdx).toInt()*1000))
+                if (qnStorageMan->isArchiveTimeExists(camRes->getPhysicalId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
                     flags |= QnLightBusinessAction::MotionExists;
 
             }
