@@ -153,6 +153,9 @@ void QnEventLogDialog::updateData()
         ui->gridEvents->setDisabled(true);
         setCursor(Qt::BusyCursor);
     }
+
+    ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
+    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date());
 }
 
 QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
