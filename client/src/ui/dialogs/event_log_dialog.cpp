@@ -151,9 +151,10 @@ void QnEventLogDialog::updateData()
     else
         m_resetFilterAction->setIcon(qnSkin->icon("tree/clear.png"));
 
-    ui->gridEvents->setDisabled(true);
-    setCursor(Qt::BusyCursor);
-
+    if (!m_requests.isEmpty()) {
+        ui->gridEvents->setDisabled(true);
+        setCursor(Qt::BusyCursor);
+    }
 }
 
 QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const

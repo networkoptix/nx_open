@@ -277,7 +277,7 @@ QVariant QnEventLogModel::foregroundData(const Column& column, const QnLightBusi
 
 QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnLightBusinessAction &action)
 {
-    if (column == DescriptionColumn) {
+    if (column == DescriptionColumn && action.hasFlags(QnLightBusinessAction::MotionExists)) {
         BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
         if (eventType == BusinessEventType::Camera_Motion)
             return Qt::PointingHandCursor;
@@ -449,9 +449,12 @@ bool QnEventLogModel::isMotionUrl(const QModelIndex & index) const
     if (!index.isValid() || index.column() != DescriptionColumn)
         return false;
 
-    if (eventType(index.row()) != BusinessEventType::Camera_Motion || !eventResource(index.row()))
+    const QnLightBusinessAction& action = m_index->at(index.row());
+    if (!action.hasFlags(QnLightBusinessAction::MotionExists))
         return false;
-
+    if (!action.getRuntimeParams().getEventResourceId())
+        return false;
+    
     return true;
 }
 
