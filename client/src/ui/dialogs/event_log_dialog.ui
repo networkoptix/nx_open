@@ -113,7 +113,7 @@
        </property>
       </spacer>
      </item>
-     <item row="0" column="8">
+     <item row="0" column="9">
       <widget class="QPushButton" name="refreshButton">
        <property name="focusPolicy">
         <enum>Qt::TabFocus</enum>
@@ -158,6 +158,13 @@
        </property>
        <property name="autoRaise">
         <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="8">
+      <widget class="QPushButton" name="eventRulesButton">
+       <property name="text">
+        <string>Alarm/Event Rules</string>
        </property>
       </widget>
      </item>
