@@ -90,6 +90,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(int)),
             this, SLOT(at_message_ruleDeleted(int)));
 
+    connect(ui->eventLogButton,   SIGNAL(clicked(bool)),              
+            context()->action(Qn::BusinessEventsLogAction), SIGNAL(triggered()));
+
+
     at_context_userChanged();
 }
 

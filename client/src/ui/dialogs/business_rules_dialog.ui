@@ -22,7 +22,7 @@
         <string>Add</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../x86/build/client-custom.qrc">
+        <iconset resource="../../../x64/build/client-custom.qrc">
          <normaloff>:/skin/titlebar/new_layout_hovered.png</normaloff>:/skin/titlebar/new_layout_hovered.png</iconset>
        </property>
       </widget>
@@ -51,6 +51,18 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="eventLogButton">
+       <property name="text">
+        <string>Event log</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normalon>:/skin/tree/layout.png</normalon>
+        </iconset>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="advancedButton">
@@ -144,7 +156,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../x86/build/client-custom.qrc"/>
+  <include location="../../../x64/build/client-custom.qrc"/>
  </resources>
  <connections/>
 </ui>

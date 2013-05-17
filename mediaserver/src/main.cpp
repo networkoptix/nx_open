@@ -91,6 +91,7 @@
 #include "plugins/resources/stardot/stardot_resource_searcher.h"
 #include "plugins/plugin_manager.h"
 #include "core/resource_managment/camera_driver_restriction_list.h"
+#include <utils/network/multicodec_rtp_reader.h>
 
 
 #define USE_SINGLE_STREAMING_PORT
@@ -874,6 +875,8 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));
     initAppServerConnection(qSettings);
+
+    QnMulticodecRtpReader::setDefaultTransport( qSettings.value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
