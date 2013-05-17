@@ -153,6 +153,9 @@ void QnEventLogDialog::updateData()
         ui->gridEvents->setDisabled(true);
         setCursor(Qt::BusyCursor);
     }
+    else {
+        requestFinished(); // just clear grid
+    }
 
     ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
     ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date());
@@ -216,22 +219,25 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
     if (httpStatus == 0 && !events->empty())
         m_allEvents << events;
     if (m_requests.isEmpty())
-    {
-        m_model->setEvents(m_allEvents);
-        m_allEvents.clear();
-        ui->gridEvents->setDisabled(false);
-        setCursor(Qt::ArrowCursor);
-        updateHeaderWidth();
-        if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
-            setWindowTitle(tr("Event log for period from %1 to %2 - %3 event(s) found")
-                .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
-                .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate))
-                .arg(m_model->rowCount()));
-        else
-            setWindowTitle(tr("Event log for %1  - %2 event(s) found")
-            .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
-            .arg(m_model->rowCount()));
-    }
+        requestFinished();
+}
+
+void QnEventLogDialog::requestFinished()
+{
+    m_model->setEvents(m_allEvents);
+    m_allEvents.clear();
+    ui->gridEvents->setDisabled(false);
+    setCursor(Qt::ArrowCursor);
+    updateHeaderWidth();
+    if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
+        setWindowTitle(tr("Event log for period from %1 to %2 - %3 event(s) found")
+        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
+        .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate))
+        .arg(m_model->rowCount()));
+    else
+        setWindowTitle(tr("Event log for %1  - %2 event(s) found")
+        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
+        .arg(m_model->rowCount()));
 }
 
 void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
