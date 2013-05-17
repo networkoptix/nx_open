@@ -56,6 +56,7 @@ private:
     void disableUpdateData();
     void enableUpdateData();
     void updateHeaderWidth();
+    bool isFilterExist() const;
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  
@@ -68,6 +69,11 @@ private:
     QnResourceList m_filterCameraList;
     bool m_updateDisabled;
     bool m_dirty;
+
+    QAction* m_filterAction;
+    QAction* m_resetFilterAction;
+    QAction* m_clipboardAction;
+
 };
 
 #endif // __EVENT_LOG_DIALOG_H____

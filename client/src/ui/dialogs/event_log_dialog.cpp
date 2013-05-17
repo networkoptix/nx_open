@@ -13,25 +13,6 @@
 #include "client/client_globals.h"
 #include "ui/style/skin.h"
 
-QStandardItem* QnEventLogDialog::createEventItem(BusinessEventType::Value value)
-{
-    QStandardItem* result = new QStandardItem(BusinessEventType::toString(value));
-    result->setData((int) value, Qn::FirstItemDataRole);
-    return result;
-}
-
-QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, BusinessEventType::Value value)
-{
-    QStandardItem* item = createEventItem(value);
-    if (rootItem)
-        rootItem->appendRow(item);
-
-    foreach(BusinessEventType::Value value, BusinessEventType::childEvents(value))
-        createEventTree(item, value);
-    return item;
-}
-
-
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
     ui(new Ui::EventLogDialog),
@@ -56,9 +37,9 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
 
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < (int) QnEventLogModel::ActionCameraColumn; ++i)
         headers->setResizeMode(i, QHeaderView::Fixed);
-    for (int i = 4; i < columns.size(); ++i)
+    for (int i = (int) QnEventLogModel::ActionCameraColumn; i < columns.size(); ++i)
         headers->setResizeMode(i, QHeaderView::ResizeToContents);
 
     QStandardItem* rootItem = createEventTree(0, BusinessEventType::AnyBusinessEvent);
@@ -72,28 +53,71 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         actionItems << BusinessActionType::toString(BusinessActionType::Value(i));
     ui->actionComboBox->addItems(actionItems);
 
+    m_filterAction      = new QAction(tr("&Filter similar rows"), this);
+    m_clipboardAction   = new QAction(tr("&Copy selection to clipboard"), this);
+    m_resetFilterAction = new QAction(tr("&Clear filter"), this);
+
+    ui->clearFilterButton->setDefaultAction(m_resetFilterAction);
     ui->cameraButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera | QnResourceIconCache::Online));
     ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
 
-    connect(ui->dateEditFrom, SIGNAL(dateChanged(const QDate &)), this, SLOT(updateData()) );
-    connect(ui->dateEditTo, SIGNAL(dateChanged(const QDate &)), this, SLOT(updateData()) );
+    connect(m_filterAction,     SIGNAL(triggered()), this, SLOT(at_filterAction()));
+    connect(m_resetFilterAction,SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
+    connect(m_clipboardAction,  SIGNAL(triggered()), this, SLOT(at_copyToClipboard()));
 
-    connect(ui->eventComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateData()) );
-    connect(ui->actionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateData()) );
+    connect(ui->dateEditFrom,   SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
+    connect(ui->dateEditTo,     SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
+    connect(ui->eventComboBox,  SIGNAL(currentIndexChanged(int)),   this, SLOT(updateData()) );
+    connect(ui->actionComboBox, SIGNAL(currentIndexChanged(int)),   this, SLOT(updateData()) );
+    connect(ui->refreshButton,  SIGNAL(clicked(bool)),              this, SLOT(updateData()) );
 
-    connect(ui->gridEvents, SIGNAL(clicked (const QModelIndex &)), this, SLOT(at_itemClicked(const QModelIndex&)) );
-    connect(ui->gridEvents, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT(at_customContextMenuRequested(const QPoint &)) );
-    connect(ui->cameraButton, SIGNAL(clicked (bool)), this, SLOT(at_cameraButtonClicked()) );
-    connect(ui->refreshButton, SIGNAL(clicked (bool)), this, SLOT(updateData()) );
-
-    updateData();
-
+    connect(ui->cameraButton,   SIGNAL(clicked(bool)),              this, SLOT(at_cameraButtonClicked()) );
+    connect(ui->gridEvents,     SIGNAL(clicked(const QModelIndex&)),this, SLOT(at_itemClicked(const QModelIndex&)) );
+    connect(ui->gridEvents,     SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(at_customContextMenuRequested(const QPoint&)) );
+    
     ui->mainGridLayout->activate();
     updateHeaderWidth();
+
+    updateData();
 }
 
 QnEventLogDialog::~QnEventLogDialog()
 {
+}
+
+QStandardItem* QnEventLogDialog::createEventItem(BusinessEventType::Value value)
+{
+    QStandardItem* result = new QStandardItem(BusinessEventType::toString(value));
+    result->setData((int) value, Qn::FirstItemDataRole);
+    return result;
+}
+
+QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, BusinessEventType::Value value)
+{
+    QStandardItem* item = createEventItem(value);
+    if (rootItem)
+        rootItem->appendRow(item);
+
+    foreach(BusinessEventType::Value value, BusinessEventType::childEvents(value))
+        createEventTree(item, value);
+    return item;
+}
+
+bool QnEventLogDialog::isFilterExist() const
+{
+    if (!m_filterCameraList.isEmpty())
+        return true;
+    QModelIndex idx = ui->eventComboBox->currentIndex();
+    if (idx.isValid()) {
+        BusinessEventType::Value eventType = (BusinessEventType::Value) ui->eventComboBox->model()->data(idx, Qn::FirstItemDataRole).toInt();
+        if (eventType != BusinessEventType::NotDefined && eventType != BusinessEventType::AnyBusinessEvent)
+            return true;
+    }
+
+    if (ui->actionComboBox->currentIndex() > 0)
+        return true;
+
+    return false;
 }
 
 void QnEventLogDialog::updateData()
@@ -118,6 +142,14 @@ void QnEventLogDialog::updateData()
           eventType, actionType,
           QnId() // todo: add businessRuleID here
           );
+
+    // update UI
+
+    m_resetFilterAction->setEnabled(isFilterExist());
+    if (m_resetFilterAction->isEnabled())
+        m_resetFilterAction->setIcon(qnSkin->icon("tree/clear_hovered.png"));
+    else
+        m_resetFilterAction->setIcon(qnSkin->icon("tree/clear.png"));
 
     ui->gridEvents->setDisabled(true);
     setCursor(Qt::BusyCursor);
@@ -166,9 +198,9 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 void QnEventLogDialog::updateHeaderWidth()
 {
     int space = ui->mainGridLayout->horizontalSpacing();
-    int w = ui->gridEvents->verticalHeader()->sizeHint().width();
+    int offset = ui->gridEvents->verticalHeader()->sizeHint().width();
     space--; // grid line delimiter
-    ui->gridEvents->horizontalHeader()->resizeSection(0, ui->dateEditFrom->width() + ui->dateEditTo->width() + ui->delimLabel->width() + space - w);
+    ui->gridEvents->horizontalHeader()->resizeSection(0, ui->dateEditFrom->width() + ui->dateEditTo->width() + ui->delimLabel->width() + space - offset);
     ui->gridEvents->horizontalHeader()->resizeSection(1, ui->eventComboBox->width() + space);
     ui->gridEvents->horizontalHeader()->resizeSection(2, ui->cameraButton->width() + space);
     ui->gridEvents->horizontalHeader()->resizeSection(3, ui->actionComboBox->width() + space);
@@ -179,33 +211,38 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
     if (!m_requests.contains(requestNum))
         return;
     m_requests.remove(requestNum);
-    if (!events->empty())
+    if (httpStatus == 0 && !events->empty())
         m_allEvents << events;
-    if (m_requests.isEmpty()) 
+    if (m_requests.isEmpty())
     {
         m_model->setEvents(m_allEvents);
         m_allEvents.clear();
         ui->gridEvents->setDisabled(false);
         setCursor(Qt::ArrowCursor);
         updateHeaderWidth();
-        setWindowTitle(tr("Event log - %1 event(s) found").arg(m_model->rowCount()));
+        if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
+            setWindowTitle(tr("Event log for period from %1 to %2 - %3 event(s) found")
+                .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
+                .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate))
+                .arg(m_model->rowCount()));
+        else
+            setWindowTitle(tr("Event log for %1  - %2 event(s) found")
+            .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
+            .arg(m_model->rowCount()));
     }
 }
 
 void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
 {
-    if (!idx.isValid() || idx.column() != QnEventLogModel::DescriptionColumn)
-        return;
-    
-    QnResourcePtr resource = m_model->eventResource(idx);
-    if (m_model->eventType(idx) != BusinessEventType::Camera_Motion || !resource)
-        return;
-    qint64 pos = m_model->eventTimestamp(idx)/1000;
+    if (m_model->isMotionUrl(idx))
+    {
+        QnResourcePtr resource = m_model->eventResource(idx.row());
+        qint64 pos = m_model->eventTimestamp(idx.row())/1000;
+        QnActionParameters params(resource);
+        params.setArgument(Qn::ItemTimeRole, pos);
 
-    QnActionParameters params(resource);
-    params.setArgument(Qn::ItemTimeRole, pos);
-
-    m_context->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+        m_context->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+    }
 }
 
 bool QnEventLogDialog::setEventTypeRecursive(BusinessEventType::Value value, QAbstractItemModel* model, const QModelIndex& parentItem)
@@ -280,12 +317,12 @@ void QnEventLogDialog::at_filterAction()
 {
     QModelIndex idx = ui->gridEvents->currentIndex();
 
-    BusinessEventType::Value eventType = m_model->eventType(idx);
+    BusinessEventType::Value eventType = m_model->eventType(idx.row());
     BusinessEventType::Value parentEventType = BusinessEventType::parentEvent(eventType);
     if (parentEventType != BusinessEventType::AnyBusinessEvent && parentEventType != BusinessEventType::NotDefined)
         eventType = parentEventType;
     
-    QnSecurityCamResourcePtr cameraResource = m_model->eventResource(idx).dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResourcePtr cameraResource = m_model->eventResource(idx.row()).dynamicCast<QnSecurityCamResource>();
     QnResourceList camList;
     if (cameraResource)
         camList << cameraResource;
@@ -306,27 +343,22 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
         QnResourcePtr resource = m_model->getResource(idx);
         QnActionManager *manager = m_context->menu();
         if (resource)
-            menu = manager->newMenu(Qn::ActionScope::TreeScope, QnActionParameters(resource));
+            menu = manager->newMenu(Qn::TreeScope, QnActionParameters(resource));
     }
     if (menu)
         menu->addSeparator();
     else
         menu = new QMenu();
 
-    QAction* filterAction = new QAction(tr("&Filter similar rows"), menu);
-    connect(filterAction, SIGNAL(triggered()), this, SLOT(at_filterAction()));
-    filterAction->setEnabled(idx.isValid());
-    menu->addAction(filterAction);
+    m_filterAction->setEnabled(idx.isValid());
+    m_clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
 
-    QAction* resetFilterAction = new QAction(tr("&Display all rows"), menu);
-    connect(resetFilterAction, SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
-    menu->addAction(resetFilterAction);
+    menu->addAction(m_filterAction);
+    menu->addAction(m_resetFilterAction);
 
     menu->addSeparator();
-    QAction* clipboardAction = new QAction(tr("&Copy selection to clipboard"), menu);
-    connect(clipboardAction, SIGNAL(triggered()), this, SLOT(at_copyToClipboard()));
-    clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
-    menu->addAction(clipboardAction);
+
+    menu->addAction(m_clipboardAction);
 
     menu->exec(QCursor::pos());
     menu->deleteLater();
@@ -389,10 +421,7 @@ void QnEventLogDialog::at_copyToClipboard()
     mimeData->setText(textData);
     mimeData->setHtml(htmlData);
 
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setMimeData(mimeData);
-
-    //clipboard->setText(result);
+    QApplication::clipboard()->setMimeData(mimeData);
 }
 
 void QnEventLogDialog::at_cameraButtonClicked()
