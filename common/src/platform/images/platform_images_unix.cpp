@@ -1,4 +1,7 @@
-#include "images_unix.h"
+
+#ifdef Q_OS_LINUX
+
+#include "platform_images.h"
 
 #include <QtGui/QCursor>
 #include <QtGui/QPixmap>
@@ -8,19 +11,11 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/Xfixes.h>
 
+
 /* X.h defines CursorShape, which conflicts with Qt::CursorShape. */
 #undef CursorShape
 
-QnX11Images::QnX11Images(QObject *parent):
-    base_type(parent) 
-{
-}
-
-QnX11Images::~QnX11Images() {
-    return;
-}
-
-QCursor QnX11Images::bitmapCursor(Qt::CursorShape shape) const {
+QCursor QnPlatformImages::bitmapCursor(Qt::CursorShape shape) const {
     QApplication::setOverrideCursor(shape);
     XFixesCursorImage *xImage = XFixesGetCursorImage(QX11Info::display());
     QApplication::restoreOverrideCursor();
@@ -68,3 +63,4 @@ QCursor QnX11Images::bitmapCursor(Qt::CursorShape shape) const {
     return result;
 }
 
+#endif  //Q_OS_LINUX
