@@ -12,6 +12,7 @@
 #include "client/client_globals.h"
 #include <utils/math/math.h>
 #include "device_plugins/server_camera/server_camera.h"
+#include "client/client_settings.h"
 
 class QnEventLogModel::DataIndex
 {
@@ -371,8 +372,12 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
         case EventCameraColumn: {
             QnId eventResId = action.getRuntimeParams().getEventResourceId();
             QnResourcePtr eventResource = getResourceById(eventResId);
-            if (eventResource)
-                return QString(lit("%1 (%2)")).arg(eventResource->getName()).arg(formatUrl(eventResource->getUrl()));
+            if (eventResource) {
+                QString result = eventResource->getName();
+                if (qnSettings->isIpShownInTree())
+                    result += QString(lit(" (%2)")).arg(formatUrl(eventResource->getUrl()));
+                return result;
+            }
             break;
         }
         case ActionColumn:
@@ -381,8 +386,12 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
         case ActionCameraColumn: {
             QnId actionResId = action.getRuntimeParams().getActionResourceId();
             QnResourcePtr actionResource = getResourceById(actionResId);
-            if (actionResource)
-                return QString(lit("%1 (%2)")).arg(actionResource->getName()).arg(formatUrl(actionResource->getUrl()));
+            if (actionResource) {
+                QString result = actionResource->getName();
+                if (qnSettings->isIpShownInTree())
+                    result += QString(lit(" (%2)")).arg(formatUrl(actionResource->getUrl()));
+                return result;
+            }
             break;
             }
         case DescriptionColumn: {
