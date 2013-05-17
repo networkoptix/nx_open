@@ -1,6 +1,10 @@
-#include "images_win.h"
+
+#ifdef _WIN32
+
+#include "platform_images.h"
 
 #include <Windows.h>
+
 
 namespace {
     /**
@@ -126,16 +130,8 @@ namespace {
 
 } // anonymous namespace
 
-QnWindowsImages::QnWindowsImages(QObject *parent):
-    base_type(parent)
-{
-}
 
-QnWindowsImages::~QnWindowsImages() {
-    return;
-}
-
-QCursor QnWindowsImages::bitmapCursor(Qt::CursorShape shape) const {
+QCursor QnPlatformImages::bitmapCursor(Qt::CursorShape shape) const {
     QCursor cursor(shape);
     HCURSOR handle = cursor.handle();
     // TODO: There is a bug in Qt 4.7.4 that results in drag cursors returning NULL handle. We don't care.
@@ -146,4 +142,4 @@ QCursor QnWindowsImages::bitmapCursor(Qt::CursorShape shape) const {
     return QCursor(pixmap, hotSpot.x(), hotSpot.y());
 }
 
-
+#endif  //_WIN32
