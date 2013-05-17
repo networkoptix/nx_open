@@ -48,7 +48,7 @@
 
 
 /* Use variadic macros in boost even for older GCC versions. */
-#if defined(__GNUC__) && GCC_VERSION >= 40000
+#if !defined(BOOST_PP_VARIADICS) && defined(__GNUC__) && GCC_VERSION >= 40000
 #   define BOOST_PP_VARIADICS
 #endif
 

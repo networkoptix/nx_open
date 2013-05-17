@@ -4,6 +4,8 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
+#include <QMetaType>
+
 
 class QnKvPair {
 public:

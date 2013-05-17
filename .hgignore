@@ -200,3 +200,6 @@ genericrtspplugin/x64
 
 
 nx_sdk/nx_sdk 
+
+
+libonvif/.build/

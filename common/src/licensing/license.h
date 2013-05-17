@@ -3,6 +3,7 @@
 
 #include <QByteArray>
 #include <QCoreApplication>
+#include <QMetaType>
 #include <QSharedPointer>
 #include <QString>
 #include <QList>
