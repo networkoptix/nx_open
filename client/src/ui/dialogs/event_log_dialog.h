@@ -70,9 +70,9 @@ private:
     bool m_updateDisabled;
     bool m_dirty;
 
-    QAction* filterAction;
-    QAction* resetFilterAction;
-    QAction* clipboardAction;
+    QAction* m_filterAction;
+    QAction* m_resetFilterAction;
+    QAction* m_clipboardAction;
 
 };
 

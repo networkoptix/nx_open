@@ -452,6 +452,17 @@ QString QnEventLogModel::motionUrl(Column column, const QnLightBusinessAction& a
     return QnBusinessStringsHelper::motionUrl(action.getRuntimeParams());
 }
 
+bool QnEventLogModel::isMotionUrl(const QModelIndex & index) const
+{
+    if (!index.isValid() || index.column() != DescriptionColumn)
+        return false;
+
+    if (eventType(index.row()) != BusinessEventType::Camera_Motion || !eventResource(index.row()))
+        return false;
+
+    return true;
+}
+
 QVariant QnEventLogModel::data( const QModelIndex & index, int role) const
 {
     if (index.row() >= m_index->size())
@@ -489,10 +500,10 @@ QVariant QnEventLogModel::data( const QModelIndex & index, int role) const
     return QVariant();
 }
 
-BusinessEventType::Value QnEventLogModel::eventType(const QModelIndex & index) const
+BusinessEventType::Value QnEventLogModel::eventType(int row) const
 {
-    if (index.isValid()) {
-        const QnLightBusinessAction& action = m_index->at(index.row());
+    if (row >= 0) {
+        const QnLightBusinessAction& action = m_index->at(row);
         return action.getRuntimeParams().getEventType();
     }
     else {
@@ -500,10 +511,10 @@ BusinessEventType::Value QnEventLogModel::eventType(const QModelIndex & index) c
     }
 }
 
-QnResourcePtr QnEventLogModel::eventResource(const QModelIndex & index) const
+QnResourcePtr QnEventLogModel::eventResource(int row) const
 {
-    if (index.isValid()) {
-        const QnLightBusinessAction& action = m_index->at(index.row());
+    if (row >= 0) {
+        const QnLightBusinessAction& action = m_index->at(row);
         return qnResPool->getResourceById(action.getRuntimeParams().getEventResourceId());
     }
     else {
@@ -511,10 +522,10 @@ QnResourcePtr QnEventLogModel::eventResource(const QModelIndex & index) const
     }
 }
 
-qint64 QnEventLogModel::eventTimestamp(const QModelIndex & index) const
+qint64 QnEventLogModel::eventTimestamp(int row) const
 {
-    if (index.isValid()) {
-        const QnLightBusinessAction& action = m_index->at(index.row());
+    if (row >= 0) {
+        const QnLightBusinessAction& action = m_index->at(row);
         return action.timestamp();
     }
     else {

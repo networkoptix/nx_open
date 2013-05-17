@@ -40,11 +40,12 @@ public:
     virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override;
     virtual void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder ) override;
 
-    BusinessEventType::Value eventType(const QModelIndex & index) const;
-    QnResourcePtr eventResource(const QModelIndex & index) const;
-    qint64 eventTimestamp(const QModelIndex & index) const;
-
+    bool isMotionUrl(const QModelIndex & index) const;
     QnResourcePtr getResource(const QModelIndex& idx) const;
+
+    BusinessEventType::Value eventType(int row) const;
+    QnResourcePtr eventResource(int row) const;
+    qint64 eventTimestamp(int row) const;
 
     class DataIndex;
 private:

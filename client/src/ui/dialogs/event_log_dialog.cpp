@@ -86,17 +86,17 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(ui->cameraButton, SIGNAL(clicked (bool)), this, SLOT(at_cameraButtonClicked()) );
     connect(ui->refreshButton, SIGNAL(clicked (bool)), this, SLOT(updateData()) );
     
-    filterAction = new QAction(tr("&Filter similar rows"), this);
-    connect(filterAction, SIGNAL(triggered()), this, SLOT(at_filterAction()));
+    m_filterAction = new QAction(tr("&Filter similar rows"), this);
+    connect(m_filterAction, SIGNAL(triggered()), this, SLOT(at_filterAction()));
 
-    resetFilterAction = new QAction(tr("&Clear filter"), this);
-    connect(resetFilterAction, SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
+    m_resetFilterAction = new QAction(tr("&Clear filter"), this);
+    connect(m_resetFilterAction, SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
 
-    clipboardAction = new QAction(tr("&Copy selection to clipboard"), this);
-    connect(clipboardAction, SIGNAL(triggered()), this, SLOT(at_copyToClipboard()));
-    clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
+    m_clipboardAction = new QAction(tr("&Copy selection to clipboard"), this);
+    connect(m_clipboardAction, SIGNAL(triggered()), this, SLOT(at_copyToClipboard()));
+    m_clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
 
-    ui->clearFilterButton->setDefaultAction(resetFilterAction);
+    ui->clearFilterButton->setDefaultAction(m_resetFilterAction);
 
     updateData();
 
@@ -150,11 +150,11 @@ void QnEventLogDialog::updateData()
 
     // update UI
 
-    resetFilterAction->setEnabled(isFilterExist());
-    if (resetFilterAction->isEnabled())
-        resetFilterAction->setIcon(qnSkin->icon("tree/clear_hovered.png"));
+    m_resetFilterAction->setEnabled(isFilterExist());
+    if (m_resetFilterAction->isEnabled())
+        m_resetFilterAction->setIcon(qnSkin->icon("tree/clear_hovered.png"));
     else
-        resetFilterAction->setIcon(qnSkin->icon("tree/clear.png"));
+        m_resetFilterAction->setIcon(qnSkin->icon("tree/clear.png"));
 
     ui->gridEvents->setDisabled(true);
     setCursor(Qt::BusyCursor);
@@ -216,9 +216,9 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
     if (!m_requests.contains(requestNum))
         return;
     m_requests.remove(requestNum);
-    if (!events->empty())
+    if (httpStatus == 0 && !events->empty())
         m_allEvents << events;
-    if (m_requests.isEmpty()) 
+    if (m_requests.isEmpty())
     {
         m_model->setEvents(m_allEvents);
         m_allEvents.clear();
@@ -239,18 +239,15 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
 
 void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
 {
-    if (!idx.isValid() || idx.column() != QnEventLogModel::DescriptionColumn)
-        return;
-    
-    QnResourcePtr resource = m_model->eventResource(idx);
-    if (m_model->eventType(idx) != BusinessEventType::Camera_Motion || !resource)
-        return;
-    qint64 pos = m_model->eventTimestamp(idx)/1000;
+    if (m_model->isMotionUrl(idx))
+    {
+        QnResourcePtr resource = m_model->eventResource(idx.row());
+        qint64 pos = m_model->eventTimestamp(idx.row())/1000;
+        QnActionParameters params(resource);
+        params.setArgument(Qn::ItemTimeRole, pos);
 
-    QnActionParameters params(resource);
-    params.setArgument(Qn::ItemTimeRole, pos);
-
-    m_context->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+        m_context->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+    }
 }
 
 bool QnEventLogDialog::setEventTypeRecursive(BusinessEventType::Value value, QAbstractItemModel* model, const QModelIndex& parentItem)
@@ -325,12 +322,12 @@ void QnEventLogDialog::at_filterAction()
 {
     QModelIndex idx = ui->gridEvents->currentIndex();
 
-    BusinessEventType::Value eventType = m_model->eventType(idx);
+    BusinessEventType::Value eventType = m_model->eventType(idx.row());
     BusinessEventType::Value parentEventType = BusinessEventType::parentEvent(eventType);
     if (parentEventType != BusinessEventType::AnyBusinessEvent && parentEventType != BusinessEventType::NotDefined)
         eventType = parentEventType;
     
-    QnSecurityCamResourcePtr cameraResource = m_model->eventResource(idx).dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResourcePtr cameraResource = m_model->eventResource(idx.row()).dynamicCast<QnSecurityCamResource>();
     QnResourceList camList;
     if (cameraResource)
         camList << cameraResource;
@@ -351,22 +348,22 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
         QnResourcePtr resource = m_model->getResource(idx);
         QnActionManager *manager = m_context->menu();
         if (resource)
-            menu = manager->newMenu(Qn::ActionScope::TreeScope, QnActionParameters(resource));
+            menu = manager->newMenu(Qn::TreeScope, QnActionParameters(resource));
     }
     if (menu)
         menu->addSeparator();
     else
         menu = new QMenu();
 
-    filterAction->setEnabled(idx.isValid());
-    clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
+    m_filterAction->setEnabled(idx.isValid());
+    m_clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
 
-    menu->addAction(filterAction);
-    menu->addAction(resetFilterAction);
+    menu->addAction(m_filterAction);
+    menu->addAction(m_resetFilterAction);
 
     menu->addSeparator();
 
-    menu->addAction(clipboardAction);
+    menu->addAction(m_clipboardAction);
 
     menu->exec(QCursor::pos());
     menu->deleteLater();
@@ -431,8 +428,6 @@ void QnEventLogDialog::at_copyToClipboard()
 
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setMimeData(mimeData);
-
-    //clipboard->setText(result);
 }
 
 void QnEventLogDialog::at_cameraButtonClicked()
