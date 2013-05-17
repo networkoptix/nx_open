@@ -54,7 +54,8 @@ namespace BusinessEventType
                 result << BusinessEventType::Storage_Failure << BusinessEventType::MediaServer_Failure << BusinessEventType::MediaServer_Conflict;
                 break;
             case AnyBusinessEvent:
-                result << BusinessEventType::Camera_Motion << BusinessEventType::AnyCameraIssue << BusinessEventType::AnyServerIssue;
+                result << BusinessEventType::Camera_Motion << BusinessEventType::Camera_Input << 
+                          BusinessEventType::AnyCameraIssue << BusinessEventType::AnyServerIssue;
                 break;
         }
         
