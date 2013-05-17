@@ -39,7 +39,6 @@ namespace {
 
 } // anonymous namespace
 
-QSettings qSettings;	//TODO: #Elric remove this shit. Have to add to build common as shared object, since it requires extern qSettibns to be defined somewhere...
 Q_GLOBAL_STATIC(QnClientSettings, qn_settings)
 
 QnClientSettings::QnClientSettings():
