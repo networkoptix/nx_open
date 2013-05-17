@@ -6,6 +6,8 @@
 #ifndef POLLSET_H
 #define POLLSET_H
 
+#include <cstddef>
+
 
 class Socket;
 class PollSetImpl;
