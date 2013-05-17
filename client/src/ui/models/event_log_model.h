@@ -27,7 +27,6 @@ public:
     QnEventLogModel(QObject *parent = NULL);
     virtual ~QnEventLogModel();
 
-    const QVector<QnLightBusinessActionVectorPtr> &events() const;
     void setEvents(const QVector<QnLightBusinessActionVectorPtr> &events);
 
     QList<Column> columns() const;
@@ -49,19 +48,19 @@ public:
 
     class DataIndex;
 private:
+    QVariant fontData(const Column& column, const QnLightBusinessAction &action) const;
+    QVariant foregroundData(const Column& column, const QnLightBusinessAction &action) const;
 
     static QString columnTitle(Column column);
     
-    QString textData(const Column& column,const QnLightBusinessAction &action) const;
-    QVariant iconData(const Column& column, const QnLightBusinessAction &action) const;
-    QVariant fontData(const Column& column, const QnLightBusinessAction &action) const;
-    QVariant foregroundData(const Column& column, const QnLightBusinessAction &action) const;
-    QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action) const;
-    QVariant resourceData(const Column& column, const QnLightBusinessAction &action) const;
-    QString motionUrl(Column column, const QnLightBusinessAction& action) const;
-    QString formatUrl(const QString& url) const;
+    static QVariant iconData(const Column& column, const QnLightBusinessAction &action);
+    static QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action);
+    static QVariant resourceData(const Column& column, const QnLightBusinessAction &action);
+    static QString textData(const Column& column,const QnLightBusinessAction &action);
 
-    QnResourcePtr getResourceById(const QnId& id) const;
+    static QString motionUrl(Column column, const QnLightBusinessAction& action);
+    static QString formatUrl(const QString& url);
+    static QnResourcePtr getResourceById(const QnId& id);
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;

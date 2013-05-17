@@ -66,7 +66,7 @@ public:
         m_events = events;
         m_size = 0;
         for (int i = 0; i < events.size(); ++i)
-            m_size += events[i]->size();
+            m_size += (int) events[i]->size();
 
         updateIndex();
     }
@@ -131,11 +131,6 @@ public:
         return d1->compareString() < d2->compareString();
     }
 
-    static bool greatLexographic(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
-    {
-        return d1->compareString() >= d2->compareString();
-    }
-
     void updateIndex()
     {
         QTime t;
@@ -168,7 +163,7 @@ public:
         default:
             lessThan = &lessLexographic;
             for (int i = 0; i < m_records.size(); ++i)
-                m_records[i]->setCompareString(m_owner->textData(m_sortCol, *m_records[i]));
+                m_records[i]->setCompareString(QnEventLogModel::textData(m_sortCol, *m_records[i]));
             break;
         }
 
@@ -184,7 +179,6 @@ private:
     QVector<QnLightBusinessActionVectorPtr> m_events;
     QVector<QnLightBusinessAction*> m_records;
     int m_size;
-    QnEventLogModel* m_owner;
     static int m_eventTypeToLexOrder[256];
     static int m_actionTypeToLexOrder[256];
 };
@@ -205,10 +199,6 @@ QnEventLogModel::QnEventLogModel(QObject *parent):
 
 QnEventLogModel::~QnEventLogModel() {
     delete m_index;
-}
-
-const QVector<QnLightBusinessActionVectorPtr> &QnEventLogModel::events() const {
-    return m_index->events();
 }
 
 void QnEventLogModel::setEvents(const QVector<QnLightBusinessActionVectorPtr> &events)
@@ -285,7 +275,7 @@ QVariant QnEventLogModel::foregroundData(const Column& column, const QnLightBusi
     return QVariant();
 }
 
-QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnLightBusinessAction &action) const
+QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnLightBusinessAction &action)
 {
     if (column == DescriptionColumn) {
         BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
@@ -302,7 +292,7 @@ QnResourcePtr QnEventLogModel::getResource(const QModelIndex& idx) const
 }
 
 
-QnResourcePtr QnEventLogModel::getResourceById(const QnId& id) const
+QnResourcePtr QnEventLogModel::getResourceById(const QnId& id)
 {
     QnResourcePtr resource = qnResPool->getResourceById(id);
     if (resource && resource->isDisabled())
@@ -317,7 +307,7 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnId& id) const
     return resource;
 }
 
-QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAction &action) const
+QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAction &action)
 {
 
     switch(column) {
@@ -344,7 +334,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAc
     return QVariant();
 }
 
-QVariant QnEventLogModel::resourceData(const Column& column, const QnLightBusinessAction &action) const
+QVariant QnEventLogModel::resourceData(const Column& column, const QnLightBusinessAction &action)
 {
     switch(column) {
         case EventCameraColumn: 
@@ -355,7 +345,7 @@ QVariant QnEventLogModel::resourceData(const Column& column, const QnLightBusine
     return QVariant();
 }
 
-QString QnEventLogModel::formatUrl(const QString& url) const
+QString QnEventLogModel::formatUrl(const QString& url)
 {
     if (url.indexOf(QLatin1String("://")) == -1)
         return url;
@@ -363,7 +353,7 @@ QString QnEventLogModel::formatUrl(const QString& url) const
         return QUrl(url).host();
 }
 
-QString QnEventLogModel::textData(const Column& column,const QnLightBusinessAction& action) const
+QString QnEventLogModel::textData(const Column& column,const QnLightBusinessAction& action)
 {
     switch(column) 
     {
@@ -430,7 +420,9 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
             }
             return result;
         }
-    } 
+        default:
+            break;
+    }
     return QString();
 }
 
@@ -442,7 +434,7 @@ void QnEventLogModel::sort(int column, Qt::SortOrder order)
 
 }
 
-QString QnEventLogModel::motionUrl(Column column, const QnLightBusinessAction& action) const
+QString QnEventLogModel::motionUrl(Column column, const QnLightBusinessAction& action)
 {
     if (column != DescriptionColumn || !action.hasFlags(QnLightBusinessAction::MotionExists))
         return QString();
