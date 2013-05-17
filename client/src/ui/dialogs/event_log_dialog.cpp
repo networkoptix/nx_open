@@ -77,8 +77,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     
     ui->mainGridLayout->activate();
     updateHeaderWidth();
-
-    updateData();
 }
 
 QnEventLogDialog::~QnEventLogDialog()
@@ -155,6 +153,9 @@ void QnEventLogDialog::updateData()
         ui->gridEvents->setDisabled(true);
         setCursor(Qt::BusyCursor);
     }
+
+    ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
+    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date());
 }
 
 QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
@@ -446,4 +447,11 @@ void QnEventLogDialog::enableUpdateData()
         m_dirty = false;
         updateData();
     }
+}
+
+void QnEventLogDialog::setVisible(bool value)
+{
+    if (value)
+        updateData();
+    QDialog::setVisible(value);
 }
