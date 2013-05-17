@@ -204,6 +204,7 @@ QnEventLogModel::~QnEventLogModel() {
 
 void QnEventLogModel::setEvents(const QVector<QnLightBusinessActionVectorPtr> &events)
 {
+    reset();
     m_index->setEvents(events);
     rebuild();
 }
@@ -437,10 +438,8 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
 
 void QnEventLogModel::sort(int column, Qt::SortOrder order)
 {
-    emit layoutAboutToBeChanged();
+    reset();
     m_index->setSort(column, order);
-    emit layoutChanged();
-
 }
 
 QString QnEventLogModel::motionUrl(Column column, const QnLightBusinessAction& action)
