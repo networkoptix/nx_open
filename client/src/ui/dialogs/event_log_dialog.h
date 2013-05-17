@@ -33,6 +33,8 @@ public:
                BusinessEventType::Value eventType, 
                BusinessActionType::Value actionType,
                QnId businessRuleId);
+protected:
+    void setVisible(bool value) override;
 private slots:
     void updateData();
     void at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum);

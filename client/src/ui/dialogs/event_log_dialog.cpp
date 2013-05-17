@@ -77,8 +77,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     
     ui->mainGridLayout->activate();
     updateHeaderWidth();
-
-    updateData();
 }
 
 QnEventLogDialog::~QnEventLogDialog()
@@ -446,4 +444,11 @@ void QnEventLogDialog::enableUpdateData()
         m_dirty = false;
         updateData();
     }
+}
+
+void QnEventLogDialog::setVisible(bool value)
+{
+    if (value)
+        updateData();
+    QDialog::setVisible(value);
 }
