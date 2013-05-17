@@ -15,6 +15,8 @@
 #include <onvif/wsseapi.h>
 
 #include <QtGlobal>
+#include <QDateTime>
+#include <QDebug>
 
 
 namespace {

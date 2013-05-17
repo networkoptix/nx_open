@@ -1,7 +1,11 @@
 #include "tcp_connection_processor.h"
+
+#include <openssl/ssl.h>
+
+#include <QTime>
+
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
-#include "ssl.h"
 #include "err.h"
 
 #ifndef Q_OS_WIN

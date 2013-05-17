@@ -15,6 +15,8 @@
 #include <string.h>
 #include <errno.h>
 
+#include <QDebug>
+
 #include "bswap.h"
 #include "ifo_types.h"
 #include "ifo_read.h"

@@ -10,7 +10,7 @@ DEBUG_OBJECTS_DIR=.build/debug/
 debug_objects := $(patsubst src/%.cpp,$(DEBUG_OBJECTS_DIR)/%.o,$(wildcard src/*.cpp)) $(patsubst src/%.c,$(DEBUG_OBJECTS_DIR)/%.o,$(wildcard src/*.c))
 DEBUG_TARGET=$(DEBUG_OBJECTS_DIR)/libonvif.a
 
-CXXFLAGS_RELEASE=-fPIC -o2
+CXXFLAGS_RELEASE=-fPIC -O2
 RELEASE_OBJECTS_DIR=.build/release/
 release_objects := $(patsubst src/%.cpp,$(RELEASE_OBJECTS_DIR)/%.o,$(wildcard src/*.cpp)) $(patsubst src/%.c,$(RELEASE_OBJECTS_DIR)/%.o,$(wildcard src/*.c))
 RELEASE_TARGET=$(RELEASE_OBJECTS_DIR)/libonvif.a

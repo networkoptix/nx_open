@@ -1,6 +1,11 @@
 #include "layout_storage_resource.h"
+
+#include <QDebug>
+#include <QDir>
+
 #include "utils/common/util.h"
 #include "plugins/resources/archive/filetypesupport.h"
+
 
 class QnLayoutFile: public QIODevice
 {

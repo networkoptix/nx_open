@@ -1,3 +1,6 @@
+
+#ifndef __APPLE__
+
 #include <openssl/crypto/md4/md4_dgst.c>
 
 #undef HASH_LONG
@@ -33,3 +36,5 @@
 #undef HOST_l2c
 
 #include <openssl/crypto/sha/sha1dgst.c>
+
+#endif

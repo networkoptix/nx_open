@@ -1,5 +1,7 @@
 #include "resource_type.h"
 
+#include <QDebug>
+
 #include "utils/common/log.h"
 
 QnResourceType::QnResourceType()

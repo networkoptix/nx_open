@@ -480,5 +480,72 @@
 				</plugins>	
 			</build>			
 		</profile>	
+		<profile>
+			<id>macosx</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>		
+			</activation>
+			<properties>
+				<compiler>gcc</compiler>
+				<rename-skip>false</rename-skip>
+				<exclude_platform>win</exclude_platform>				
+			</properties>
+			<build>	
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>generate-makefile</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>qmake</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<arguments>
+										<commandlineArgs>-spec</commandlineArgs>
+										<commandlineArgs>macx-g++47</commandlineArgs>
+										<commandlineArgs>CONFIG+=${build.configuration}</commandlineArgs>
+										<commandlineArgs>-o</commandlineArgs>
+										<commandlineArgs>${project.build.directory}/Makefile.${build.configuration}</commandlineArgs>
+										<commandlineArgs>${project.build.directory}/${project.artifactId}.pro</commandlineArgs>
+									</arguments>
+								</configuration>
+							</execution>	
+							<execution>
+								<id>process-with-make</id>
+								<phase>process-classes</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.build.directory}/build.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+								</configuration>
+							</execution>
+
+							<execution>
+								<id>prepare-deb</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.build.directory}/prepare-package.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<skip>${assembly-skip}</skip>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>	
+			</build>			
+		</profile>	
 	</profiles>	
 </project>

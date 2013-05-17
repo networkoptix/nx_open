@@ -4,12 +4,14 @@
 // -------------------------------------------------------------------------- //
 // Application settings. OK to change.
 // -------------------------------------------------------------------------- //
+#ifndef __APPLE__
 /** 
  * \def QN_HAS_PRIVATE_INCLUDES
  * 
  * Define if Qt private headers are available on your system.
  */
 #define QN_HAS_PRIVATE_INCLUDES
+#endif
 
 
 
@@ -46,7 +48,7 @@
 
 
 /* Use variadic macros in boost even for older GCC versions. */
-#if defined(__GNUC__) && GCC_VERSION >= 40000
+#if !defined(BOOST_PP_VARIADICS) && defined(__GNUC__) && GCC_VERSION >= 40000
 #   define BOOST_PP_VARIADICS
 #endif
 

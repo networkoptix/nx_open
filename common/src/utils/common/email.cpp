@@ -1,9 +1,12 @@
 #include "email.h"
 
+#include <QApplication>
+#include <QDebug>
 #include <QRegExp>
 #include <QHash>
 #include <QFile>
-#include <QApplication>
+#include <QThread>
+
 
 namespace {
     typedef QHash<QString, QnEmail::SmtpServerPreset> QnSmtpPresets;

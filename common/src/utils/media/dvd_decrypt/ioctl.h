@@ -24,6 +24,9 @@
 #ifndef DVDCSS_IOCTL_H
 #define DVDCSS_IOCTL_H
 
+#include <QtGlobal>
+
+
 int ioctl_ReadCopyright     ( int, int, int * );
 int ioctl_ReadDiscKey       ( int, int *, quint8 * );
 int ioctl_ReadTitleKey      ( int, int *, int, quint8 * );

@@ -1,10 +1,15 @@
 #ifndef __FFMPEG_TRANSCODER_H
 #define __FFMPEG_TRANSCODER_H
 
-#include "libavcodec/avcodec.h"
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
+
 #include "transcoder.h"
 #include "utils/media/frame_info.h"
 #include "decoders/video/ffmpeg.h"
+
 
 class QnFfmpegTranscoder: public QnTranscoder
 {

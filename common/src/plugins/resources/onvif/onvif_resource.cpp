@@ -1,8 +1,10 @@
 
+#include <algorithm>
 #include <climits>
 #include <cmath>
 #include <sstream>
 
+#include <QBuffer>
 #include <QDebug>
 #include <QHash>
 #include <QTimer>

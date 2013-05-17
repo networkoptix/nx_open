@@ -1,4 +1,7 @@
 #include "avi_resource.h"
+
+#include <QDir>
+
 #include "avi_archive_delegate.h"
 
 #include <core/resource/storage_resource.h>

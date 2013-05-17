@@ -1,5 +1,9 @@
 #include "qtfile_storage_resource.h"
+
+#include <QDir>
+
 #include "utils/common/util.h"
+
 
 QIODevice* QnQtFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {

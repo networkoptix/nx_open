@@ -2,7 +2,7 @@
 #include "socket.h"
 #include "utils/common/log.h"
 #include "tcp_connection_processor.h"
-#include "ssl.h"
+#include <openssl/ssl.h>
 
 #include <utils/common/log.h>
 

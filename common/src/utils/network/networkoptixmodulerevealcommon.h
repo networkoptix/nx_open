@@ -7,6 +7,7 @@
 #define NETWORKOPTIXMODULEREVEALCOMMON_H
 
 #include <QHostAddress>
+#include <QMetaType>
 #include <QString>
 
 

@@ -1,6 +1,10 @@
 #ifndef ip_range_checker_h_1427
 #define ip_range_checker_h_1427
 
+#include <QHostInfo>
+#include <QObject>
+
+
 class QnIprangeChecker : public QObject
 {
     Q_OBJECT

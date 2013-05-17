@@ -1,5 +1,8 @@
 #include "compatibility.h"
 
+#include <QStringList>
+
+
 QString stripVersion(const QString& version)
 {
     QStringList versionList = version.split(QLatin1Char('.'));

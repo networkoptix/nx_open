@@ -1,5 +1,11 @@
 #include "filetypesupport.h"
 
+#include <QFile>
+extern "C"
+{
+    #include <libavutil/avutil.h>
+}
+
 #include "filetypes.h"
 #include "utils/common/util.h"
 

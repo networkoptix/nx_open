@@ -20,6 +20,8 @@
 #include <stdint.h>
 #endif
 
+#include <QDebug>
+
 #include "dvd_reader.h"
 #include "dvd_udf.h"
 #include "dvdread_internal.h"

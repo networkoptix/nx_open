@@ -1,4 +1,7 @@
 #include "multicodec_rtp_reader.h"
+
+#include <QSettings>
+
 #include "utils/network/rtp_stream_parser.h"
 #include "core/resource/network_resource.h"
 #include "utils/network/h264_rtp_parser.h"

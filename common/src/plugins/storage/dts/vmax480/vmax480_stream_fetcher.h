@@ -1,7 +1,9 @@
 #ifndef __VMAX480_STREAM_FETCHER_H__
 #define __VMAX480_STREAM_FETCHER_H__
 
+#include <QProcess>
 #include <QSet>
+#include <QWaitCondition>
 
 #include "core/resource/resource_fwd.h"
 #include "core/datapacket/media_data_packet.h"

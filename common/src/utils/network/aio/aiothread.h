@@ -6,6 +6,8 @@
 #ifndef AIOTHREAD_H
 #define AIOTHREAD_H
 
+#include <QMutex>
+
 #include "aioeventhandler.h"
 #include "pollset.h"
 #include "../../common/long_runnable.h"

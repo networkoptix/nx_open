@@ -1,6 +1,7 @@
 
 #include "upnp_device_searcher.h"
 
+#include <algorithm>
 #include <memory>
 
 #include <QMutexLocker>

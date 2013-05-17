@@ -26,7 +26,7 @@
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
 		<linux.oslibs>-lz -lX11 -lXext -lXfixes</linux.oslibs>
-		<mac.oslibs>-framework IOKit</mac.oslibs>
+		<mac.oslibs>-framework IOKit -lcrypto -lssl -lsigar-universal64-macosx -lswscale -lavutil -lavformat -lavcodec -lavdevice -lavfilter -lqjson -lswresample</mac.oslibs>
 		<!--Global defines-->
 		<global.defines/>
 		<!--Specific os defines-->
@@ -56,6 +56,17 @@
 				<os>
 					<family>unix</family>
 					<name>linux</name>
+				</os>
+			</activation>
+			<properties>
+				<buildLib>sharedlib</buildLib>
+			</properties>
+		</profile>	
+		<profile>
+			<id>macosx</id>
+			<activation>
+				<os>
+					<family>mac</family>
 				</os>
 			</activation>
 			<properties>

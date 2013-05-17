@@ -2,6 +2,8 @@
 #include "../../coldstore/coldstore_api/sfs-client.h"
 #include "core/resource/resource_media_layout.h"
 
+#include <QDomDocument>
+
 
 #define COLD_STORE_VIDEO_CHANNEL 0
 #define COLD_STORE_EVENT_CHANNEL 1 

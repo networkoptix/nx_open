@@ -4,6 +4,11 @@
 #include <QSharedPointer>
 #include "../abstract_archive_delegate.h"
 
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
 class QnAviAudioLayout;

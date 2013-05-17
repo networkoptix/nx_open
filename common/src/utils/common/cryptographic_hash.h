@@ -2,6 +2,10 @@
 #define QN_CRYPTOGRAPHIC_HASH_H
 
 #include <QtCore/QCryptographicHash>
+
+//#ifdef __APPLE__
+//typedef QCryptographicHash QnCryptographicHash;
+//#else
 #include <QtCore/QScopedPointer>
 
 class QnCryptographicHashPrivate;
@@ -33,6 +37,6 @@ private:
     QScopedPointer<QnCryptographicHashPrivate> d;
 };
 
-
+//#endif
 
 #endif // QN_CRYPTOGRAPHIC_HASH_H

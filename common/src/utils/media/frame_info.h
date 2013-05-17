@@ -6,7 +6,10 @@
 #endif
 #include <QAtomicInt>
 
-#include "libavcodec/avcodec.h"
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
 #include "core/datapacket/media_data_packet.h"
 
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart

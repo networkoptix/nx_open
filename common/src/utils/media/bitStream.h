@@ -1,6 +1,8 @@
 #ifndef __BITSTREAM_H
 #define __BITSTREAM_H
 
+#include <QString>
+
 #include <assert.h>
 #include <limits.h>
 #include <stdexcept>

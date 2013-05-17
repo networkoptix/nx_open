@@ -1,5 +1,6 @@
 #include <QMutex>
 #include <QFileInfo>
+#include <QUrl>
 
 #include "avi_dvd_archive_delegate.h"
 #include "avi_dvd_resource.h"

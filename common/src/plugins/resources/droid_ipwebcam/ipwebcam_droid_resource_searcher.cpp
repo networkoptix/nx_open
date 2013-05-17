@@ -3,6 +3,8 @@
 #include "ipwebcam_droid_resource.h"
 #include "core/resource_managment/resource_pool.h"
 
+#include <QtConcurrentMap>
+
 
 
 QnPlIpWebCamResourceSearcher::QnPlIpWebCamResourceSearcher()

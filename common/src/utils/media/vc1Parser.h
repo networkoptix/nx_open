@@ -2,9 +2,15 @@
 #define VC1_PARSER_H
 
 #include <QString>
+
+extern "C"
+{
+    #include <libavutil/rational.h>
+}
+
 #include "bitStream.h"
 #include "memory.h"
-#include "libavutil/rational.h"
+
 
 static const int NOT_ENOUGHT_BUFFER = -1;
 

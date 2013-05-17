@@ -3,7 +3,11 @@
 
 #include <QVector>
 #include <QRect>
-#include "libavcodec/avcodec.h"
+
+extern "C"
+{
+    #include "libavcodec/avcodec.h"
+}
 #include "abstract_data_packet.h"
 #include "utils/common/byte_array.h"
 #include "utils/media/sse_helper.h"

@@ -13,6 +13,7 @@
 #include <QtGui/QVector4D>
 
 #include "fuzzy.h"
+#include "utils/common/config.h"
 
 
 #ifndef M_E

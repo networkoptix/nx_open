@@ -1,4 +1,7 @@
 #include "ffmpeg.h"
+
+#include <QThread>
+
 #include "utils/media/nalUnits.h"
 
 #ifdef _USE_DXVA

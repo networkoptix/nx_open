@@ -9,6 +9,8 @@
 #include <map>
 
 #include <QByteArray>
+#include <QMap>
+#include <QUrl>
 
 #include "qnbytearrayref.h"
 

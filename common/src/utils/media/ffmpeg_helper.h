@@ -3,8 +3,17 @@
 
 #include "core/resource/resource_fwd.h"
 
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
+#include <QIODevice>
+
+
 QString codecIDToString(CodecID codecID);
 QString getAudioCodecDescription(AVCodecContext* codecContext);
+
 
 class VC1SequenceHeader;
 

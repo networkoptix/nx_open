@@ -1,6 +1,7 @@
 #ifndef __MOTION_WINDOW_H__
 #define __MOTION_WINDOW_H__
 
+#include <QMetaType>
 #include <QtCore/QMultiMap>
 #include <QtGui/QRegion>
 #include <QtGui/QPainterPath>
