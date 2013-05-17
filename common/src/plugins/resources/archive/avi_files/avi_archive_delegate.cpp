@@ -1,9 +1,15 @@
+
 #include "avi_archive_delegate.h"
 
 #include <QtCore/QSharedPointer>
 
 #include "stdint.h"
-#include <libavformat/avformat.h>
+
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/resource/storage_resource.h"

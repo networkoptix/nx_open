@@ -1,7 +1,10 @@
 
 #include "bluray_helper.h"
 
-#include <libavutil/avutil.h>
+extern "C"
+{
+    #include <libavutil/avutil.h>
+}
 
 #include "utils/common/util.h"
 #include "utils/common/log.h"

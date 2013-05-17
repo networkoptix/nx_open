@@ -3,7 +3,10 @@
 
 #include "core/resource/resource_fwd.h"
 
-#include <libavformat/avformat.h>
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
 
 #include <QIODevice>
 

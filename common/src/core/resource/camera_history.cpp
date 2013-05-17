@@ -1,6 +1,10 @@
+
 #include "camera_history.h"
 
-#include <libavutil/avutil.h>
+extern "C"
+{
+    #include <libavutil/avutil.h>
+}
 
 #include "core/resource_managment/resource_pool.h"
 #include "media_server_resource.h"

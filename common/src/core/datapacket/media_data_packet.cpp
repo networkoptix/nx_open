@@ -1,6 +1,10 @@
 #include "media_data_packet.h"
 
-#include "libavformat/avformat.h"
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/sse_helper.h"
 #include "utils/common/synctime.h"

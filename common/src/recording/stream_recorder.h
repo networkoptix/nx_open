@@ -4,7 +4,10 @@
 #include <QBuffer>
 #include <QtGui/QImage>
 
-#include <libavformat/avformat.h>
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
 
 #include <utils/common/cryptographic_hash.h>
 

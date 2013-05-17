@@ -4,7 +4,10 @@
 #include <QAuthenticator>
 #include "socket.h"
 
-#include <libavformat/avformat.h>
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
 
 #include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>

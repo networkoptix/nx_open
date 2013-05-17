@@ -3,7 +3,10 @@
 
 #include "transcoder.h"
 
-#include <libswscale/swscale.h>
+extern "C"
+{
+    #include <libswscale/swscale.h>
+}
 
 #include "utils/media/frame_info.h"
 #include "decoders/video/ffmpeg.h"

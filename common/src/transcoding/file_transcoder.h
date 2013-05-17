@@ -12,7 +12,10 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-#include <libavcodec/avcodec.h>
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
 
 #include <core/resource/media_resource.h>
 #include <plugins/resources/archive/avi_files/avi_archive_delegate.h>

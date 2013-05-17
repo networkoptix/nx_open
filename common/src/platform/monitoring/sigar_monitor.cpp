@@ -7,8 +7,11 @@
 
 #include <utils/common/warnings.h>
 
-#include <sigar.h>
-#include <sigar_format.h>
+extern "C"
+{
+    #include <sigar.h>
+    #include <sigar_format.h>
+}
 
 #ifdef _MSC_VER
 #   pragma comment(lib, "sigar.lib")

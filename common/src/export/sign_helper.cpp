@@ -3,18 +3,17 @@
 #include <QProcess>
 #include <QTemporaryFile>
 
-#include <libswscale/swscale.h>
-
 #include "utils/common/util.h"
 #include "licensing/license.h"
 #include "utils/common/scoped_painter_rollback.h"
 #include "utils/math/math.h"
 
 extern "C" {
+#include <libswscale/swscale.h>
 #ifdef WIN32
 #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
-#include "libavutil/pixdesc.h"
+#include <libavutil/pixdesc.h>
 #ifdef WIN32
 #undef AVPixFmtDescriptor
 #endif

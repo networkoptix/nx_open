@@ -10,7 +10,7 @@ extern "C" {
 #ifdef WIN32
 #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
-#include "libavutil/pixdesc.h"
+#include <libavutil/pixdesc.h>
 #ifdef WIN32
 #undef AVPixFmtDescriptor
 #endif
