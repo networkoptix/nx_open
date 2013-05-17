@@ -4,7 +4,11 @@ TARGET = ${project.artifactId}
 VERSION = ${release.version}
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
-#CONFIG += flat silent
+
+CONFIG(release, debug|release) {
+  CONFIG += flat silent
+}
+
 CONFIG -= flat app_bundle
 DEFINES += __STDC_CONSTANT_MACROS
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-common.qrc
