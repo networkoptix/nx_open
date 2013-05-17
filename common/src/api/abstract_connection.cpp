@@ -92,7 +92,7 @@ int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamLis
 }
 
 bool QnAbstractConnection::connectProcessor(QnAbstractReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType) {
-    if(std::strstr(method, "QVariant")) {
+    if(method && std::strstr(method, "QVariant")) {
         return base_type::connect(sender, SIGNAL(finished(int, const QVariant &, int)), receiver, method, connectionType);
     } else {
         return base_type::connect(sender, signal, receiver, method, connectionType);
