@@ -55,7 +55,7 @@ bool QnEventsDB::createDatabase()
         QSqlQuery ddlQuery(m_sdb);
         ddlQuery.prepare(
             "CREATE TABLE \"runtime_actions\" "
-            "(timestamp TIMESTAMP NOT NULL, action_type SMALLINT NOT NULL, "
+            "(timestamp INTEGER NOT NULL, action_type SMALLINT NOT NULL, "
             "action_params TEXT, runtime_params TEXT, business_rule_id INTEGER, toggle_state SMALLINT, aggregation_count INTEGER, "
             "event_type SMALLINT, event_resource_id INTEGER, action_resource_id INTEGER)"
         );
@@ -85,7 +85,8 @@ bool QnEventsDB::cleanupEvents()
         m_lastCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp;");
-        delQuery.bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch((currentTime - m_eventKeepPeriod)/1000));
+        int utc = (currentTime - m_eventKeepPeriod)/1000000ll;
+        delQuery.bindValue(":timestamp", utc);
         rez = delQuery.exec();
     }
     return rez;
@@ -110,7 +111,7 @@ bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePt
         actionRuntime.setActionResourceId(actionRes->getId().toInt());
     int eventType = (int) actionRuntime.getEventType();
 
-    insQuery.bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch(timestampUsec/1000));
+    insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());
     insQuery.bindValue(":action_params", action->getParams().serialize());
     insQuery.bindValue(":runtime_params", actionRuntime.serialize());
@@ -142,10 +143,10 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
 {
     QString request(lit("SELECT * FROM runtime_actions where"));
     if (period.durationMs != -1) {
-        request += QString(lit(" timestamp between '%1' and '%2'")).arg(toSQLDate(period.startTimeMs)).arg(toSQLDate(period.endTimeMs()));
+        request += QString(lit(" timestamp between '%1' and '%2'")).arg(period.startTimeMs/1000).arg(period.endTimeMs()/1000);
     }
     else {
-        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs);
+        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs/1000);
     }
 
     if (resList.size() == 1)
@@ -266,6 +267,7 @@ void QnEventsDB::getAndSerializeActions(
     int eventTypeIdx = rec.indexOf(lit("event_type"));
     int eventResIdx = rec.indexOf(lit("event_resource_id"));
     int timestampIdx = rec.indexOf(lit("timestamp"));
+    rec.field(timestampIdx).setType(QVariant::LongLong);
 
 
     int sizeField = 0;
@@ -280,7 +282,7 @@ void QnEventsDB::getAndSerializeActions(
             QnId eventResId = actionsQuery.value(eventResIdx).toInt();
             QnNetworkResourcePtr camRes = qnResPool->getResourceById(eventResId).dynamicCast<QnNetworkResource>();
             if (camRes) {
-                if (qnStorageMan->isArchiveTimeExists(camRes->getPhysicalId(), actionsQuery.value(timestampIdx).toDateTime().toMSecsSinceEpoch()))
+                if (qnStorageMan->isArchiveTimeExists(camRes->getPhysicalId(), actionsQuery.value(timestampIdx).toInt()*1000))
                     flags |= QnLightBusinessAction::MotionExists;
 
             }
@@ -305,48 +307,6 @@ void QnEventsDB::getAndSerializeActions(
     qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
 }
 
-
-/*
-void QnEventsDB::getAndSerializeActions(
-    QByteArray& result,
-    const QnTimePeriod& period,
-    const QnId& cameraId, 
-    const BusinessEventType::Value& eventType, 
-    const BusinessActionType::Value& actionType,
-    const QnId& businessRuleId) const
-
-{
-    QTime t;
-    t.restart();
-
-    QMutexLocker lock(&m_mutex);
-
-    QString request(lit("SELECT * FROM runtime_actions where"));
-    if (period.durationMs != -1) {
-        request += QString(lit(" timestamp between '%1' and '%2'")).arg(toSQLDate(period.startTimeMs)).arg(toSQLDate(period.endTimeMs()));
-    }
-    else {
-        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs);
-    }
-    if (cameraId.isValid())
-        request += QString(lit(" and event_resource_id = %1 ")).arg(cameraId.toInt());
-    if (eventType != BusinessEventType::NotDefined)
-        request += QString(lit( " and event_type = %1 ")).arg((int) eventType);
-    if (actionType != BusinessActionType::NotDefined)
-        request += QString(lit( " and action_type = %1 ")).arg((int) actionType);
-    if (businessRuleId.isValid())
-        request += QString(lit( " and  business_rule_id = %1 ")).arg(businessRuleId.toInt());
-
-    QSqlQuery query(request);
-    if (!query.exec())
-        return;
-
-    QnApiPbSerializer serializer;
-    serializer.serializeBusinessActionList(query, result);
-
-    qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
-}
-*/
 
 void QnEventsDB::migrate()
 {
