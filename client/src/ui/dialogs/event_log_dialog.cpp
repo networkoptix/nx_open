@@ -60,20 +60,23 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->clearFilterButton->setDefaultAction(m_resetFilterAction);
     ui->cameraButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera | QnResourceIconCache::Online));
     ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
+    ui->eventRulesButton->setIcon(qnSkin->icon("tree/layout.png"));
 
-    connect(m_filterAction,     SIGNAL(triggered()), this, SLOT(at_filterAction()));
-    connect(m_resetFilterAction,SIGNAL(triggered()), this, SLOT(at_resetFilterAction()));
-    connect(m_clipboardAction,  SIGNAL(triggered()), this, SLOT(at_copyToClipboard()));
+    connect(m_filterAction,         SIGNAL(triggered()),                this, SLOT(at_filterAction()));
+    connect(m_resetFilterAction,    SIGNAL(triggered()),                this, SLOT(at_resetFilterAction()));
+    connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));
 
-    connect(ui->dateEditFrom,   SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
-    connect(ui->dateEditTo,     SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
-    connect(ui->eventComboBox,  SIGNAL(currentIndexChanged(int)),   this, SLOT(updateData()) );
-    connect(ui->actionComboBox, SIGNAL(currentIndexChanged(int)),   this, SLOT(updateData()) );
-    connect(ui->refreshButton,  SIGNAL(clicked(bool)),              this, SLOT(updateData()) );
+    connect(ui->dateEditFrom,       SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
+    connect(ui->dateEditTo,         SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
+    connect(ui->eventComboBox,      SIGNAL(currentIndexChanged(int)),   this, SLOT(updateData()) );
+    connect(ui->actionComboBox,     SIGNAL(currentIndexChanged(int)),   this, SLOT(updateData()) );
+    connect(ui->refreshButton,      SIGNAL(clicked(bool)),              this, SLOT(updateData()) );
+    connect(ui->eventRulesButton,   SIGNAL(clicked(bool)),              m_context->action(Qn::BusinessEventsAction), SIGNAL(triggered()));
 
-    connect(ui->cameraButton,   SIGNAL(clicked(bool)),              this, SLOT(at_cameraButtonClicked()) );
-    connect(ui->gridEvents,     SIGNAL(clicked(const QModelIndex&)),this, SLOT(at_itemClicked(const QModelIndex&)) );
-    connect(ui->gridEvents,     SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(at_customContextMenuRequested(const QPoint&)) );
+
+    connect(ui->cameraButton,       SIGNAL(clicked(bool)),              this, SLOT(at_cameraButtonClicked()) );
+    connect(ui->gridEvents,         SIGNAL(clicked(const QModelIndex&)),this, SLOT(at_itemClicked(const QModelIndex&)) );
+    connect(ui->gridEvents,         SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(at_customContextMenuRequested(const QPoint&)) );
     
     ui->mainGridLayout->activate();
     updateHeaderWidth();
