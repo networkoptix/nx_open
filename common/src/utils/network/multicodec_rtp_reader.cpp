@@ -16,9 +16,10 @@
 #include <business/events/reasoned_business_event.h>
 #include "utils/common/synctime.h"
 
-extern QSettings qSettings;
 static const int RTSP_RETRY_COUNT = 6;
 static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
+
+static RtpTransport::Value defaultTransportToUse( RtpTransport::_auto );
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     QnResourceConsumer(res),
@@ -394,6 +395,8 @@ void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* pa
     }
 }
 
+static int TCP_READ_BUFFER_SIZE = 512*1024;
+
 bool QnMulticodecRtpReader::openStream()
 {
     m_pleaseStop = false;
@@ -408,15 +411,15 @@ bool QnMulticodecRtpReader::openStream()
 
     if (transport.isEmpty()) {
         // if not defined, try transport from registry
-        transport = qSettings.value(QLatin1String("rtspTransport"), QLatin1String("AUTO")).toString().toUpper();
+        transport = defaultTransportToUse;
     }
 
-    if (transport != QLatin1String("AUTO") && transport != QLatin1String("UDP") && transport != QLatin1String("TCP"))
-        transport = QLatin1String("AUTO");
+    if (transport != RtpTransport::_auto && transport != RtpTransport::udp && transport != RtpTransport::tcp)
+        transport = RtpTransport::_auto;
 
     m_RtpSession.setTransport(transport);
-    if (transport != QLatin1String("UDP"))
-        m_RtpSession.setTCPReadBufferSize(1024*512);
+    if (transport != RtpTransport::udp)
+        m_RtpSession.setTCPReadBufferSize(TCP_READ_BUFFER_SIZE);
 
 
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
@@ -502,4 +505,9 @@ const QnResourceAudioLayout* QnMulticodecRtpReader::getAudioLayout() const
 void QnMulticodecRtpReader::pleaseStop()
 {
     m_pleaseStop = true;
+}
+
+void QnMulticodecRtpReader::setDefaultTransport( const RtpTransport::Value& _defaultTransportToUse )
+{
+    defaultTransportToUse = _defaultTransportToUse;
 }
