@@ -15,6 +15,7 @@
 #include "core/resource/abstract_storage_resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/dataprovider/live_stream_provider.h"
+#include "business/business_event_connector.h"
 
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
@@ -25,6 +26,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager( const Came
     m_foundSmth(false)
 {
     netStateTime.restart();
+    connect(this, SIGNAL(cameraDisconnected(QnResourcePtr, qint64)), qnBusinessRuleConnector, SLOT(at_cameraDisconnected(const QnResourcePtr&, qint64)));
 }
 
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
@@ -434,14 +436,24 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             // resource is not found
             m_resourceDiscoveryCounter[uniqId]++;
 
-            if (m_resourceDiscoveryCounter[uniqId] >= 5 && !QnLiveStreamProvider::hasRunningLiveProvider(netRes))
+
+            if (m_resourceDiscoveryCounter[uniqId] >= 5)
             {
-                res->setStatus(QnResource::Offline);
-                m_resourceDiscoveryCounter[uniqId] = 0;
+                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)) {
+                    if (res->getStatus() == QnResource::Offline && !m_disconnectSended[uniqId]) {
+                        emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
+                        m_disconnectSended[uniqId] = true;
+                    }
+                } else {
+                    res->setStatus(QnResource::Offline);
+                    m_resourceDiscoveryCounter[uniqId] = 0;
+                    m_disconnectSended[uniqId] = false;
+                }
             }
         }
         else {
             m_resourceDiscoveryCounter[uniqId] = 0;
+            m_disconnectSended[uniqId] = false;
         }
      
 

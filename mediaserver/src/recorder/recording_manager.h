@@ -44,9 +44,6 @@ public:
 
     bool stopForcedRecording(QnSecurityCamResourcePtr camRes, bool afterThresholdCheck = true);
 
-signals:
-    void cameraDisconnected(QnResourcePtr camera, qint64 timestamp);
-
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
