@@ -276,7 +276,7 @@ void QnEventsDB::getAndSerializeActions(
     while (actionsQuery.next()) 
     {
         int flags = 0;
-        BusinessEventType::Value eventType = (BusinessEventType::Value) actionsQuery.value(actionTypeIdx).toInt();
+        BusinessEventType::Value eventType = (BusinessEventType::Value) actionsQuery.value(eventTypeIdx).toInt();
         if (eventType == BusinessEventType::Camera_Motion) 
         {
             QnId eventResId = actionsQuery.value(eventResIdx).toInt();
