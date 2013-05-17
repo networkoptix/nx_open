@@ -42,7 +42,7 @@ void QnTableView::mouseMoveEvent(QMouseEvent *event)
 {
     QAbstractItemModel *m(model());
     // Only do something when a model is set.
-    if (m)
+    if (isEnabled() && m)
     {
         QModelIndex index = indexAt(event->pos());
         if (index.isValid())

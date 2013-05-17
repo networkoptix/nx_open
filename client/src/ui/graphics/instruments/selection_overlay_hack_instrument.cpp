@@ -1,4 +1,5 @@
 #include "selection_overlay_hack_instrument.h"
+
 #include <ui/graphics/items/resource/resource_widget.h>
 
 SelectionOverlayHackInstrument::SelectionOverlayHackInstrument(QObject *parent):
@@ -26,6 +27,20 @@ void SelectionOverlayHackInstrument::enabledNotify() {
 
 void SelectionOverlayHackInstrument::aboutToBeDisabledNotify() {
     showSelectedOverlay(singleSelectedWidget(), true);
+}
+
+bool SelectionOverlayHackInstrument::registeredNotify(QGraphicsItem *item) {
+    return base_type::registeredNotify(item);
+}
+
+void SelectionOverlayHackInstrument::unregisteredNotify(QGraphicsItem *item) {
+    /* Note that scene selection change may be triggered when
+     * QnResourceWidget is partially destroyed, but weak pointer is still valid.
+     * We don't want that, so we explicitly clear the weak pointer. */ 
+    if(item == m_singleSelectedWidget.data())
+        m_singleSelectedWidget.clear();
+
+    base_type::unregisteredNotify(item);
 }
 
 void SelectionOverlayHackInstrument::at_scene_selectionChanged() {

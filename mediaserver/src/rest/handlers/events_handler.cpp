@@ -20,7 +20,7 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
     Q_UNUSED(contentType)
 
     QnTimePeriod period(-1,-1);
-    QnResourcePtr res;
+    QnResourceList resList;
     QString errStr;
     BusinessEventType::Value  eventType = BusinessEventType::NotDefined;
     BusinessActionType::Value  actionType = BusinessActionType::NotDefined;
@@ -42,13 +42,15 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
             if (params[i].first == "to")
                 period.durationMs = params[i].second.toLongLong() - period.startTimeMs;
             else if (params[i].first == "res_id") {
-                res = qSharedPointerDynamicCast<QnVirtualCameraResource> (qnResPool->getNetResourceByPhysicalId(params[i].second));
-                if (!res)
+                QnResourcePtr res = qSharedPointerDynamicCast<QnVirtualCameraResource> (qnResPool->getNetResourceByPhysicalId(params[i].second));
+                if (res)
+                    resList << res;
+                else
                     errStr = QString("Camera resource %1 not found").arg(params[i].second);
             }
             else if (params[i].first == "event") {
                 eventType = (BusinessEventType::Value) params[i].second.toInt();
-                if (eventType < 0 || eventType >= BusinessEventType::NotDefined)
+                if (eventType < 0)
                     errStr = QString("Invalid event type %1. Valid range is [0..%2]").arg(params[i].second).arg(BusinessEventType::NotDefined-1);
             }
             else if (params[i].first == "action") {
@@ -83,7 +85,7 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
     qnEventsDB->getAndSerializeActions(
         result,
         period, 
-        res ? res->getId() : QnId(), 
+        resList,
         eventType, 
         actionType,
         businessRuleId);

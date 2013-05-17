@@ -35,7 +35,6 @@ void QnRecordingManager::start()
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(&m_scheduleWatchingTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
-    connect(this, SIGNAL(cameraDisconnected(QnResourcePtr, qint64)), qnBusinessRuleConnector, SLOT(at_cameraDisconnected(const QnResourcePtr&, qint64)));
 
     m_scheduleWatchingTimer.start(1000);
 
@@ -393,12 +392,7 @@ void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
     }
 
     if((status == QnResource::Offline || status == QnResource::Unauthorized) && m_onlineCameras.contains(camera)) 
-    {
-        if (QnLiveStreamProvider::hasRunningLiveProvider(resource.dynamicCast<QnNetworkResource>())) {
-            emit cameraDisconnected(camera, qnSyncTime->currentUSecsSinceEpoch());
-        }
         m_onlineCameras.remove(camera);
-    }
 }
 
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)

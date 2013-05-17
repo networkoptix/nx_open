@@ -679,6 +679,19 @@ qint64 DeviceFileCatalog::maxTime() const
         return m_chunks.last().startTimeMs + qMax(0, m_chunks.last().durationMs);
 }
 
+bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
+{
+    if (m_chunks.isEmpty())
+        return false;
+
+    ChunkMap::const_iterator itr = qUpperBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), timeMs);
+    if (itr != m_chunks.end() && itr->startTimeMs - timeMs <= eps)
+        return true;
+    if (itr > m_chunks.begin()+m_firstDeleteCount)
+        --itr;
+    return itr->distanceToTime(timeMs) <= eps;
+}
+
 bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
 {
     QMutexLocker lock(&m_mutex);

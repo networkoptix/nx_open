@@ -137,7 +137,11 @@ typedef QList<QnAbstractBusinessActionPtr> QnAbstractBusinessActionList;
 class QnLightBusinessAction
 {
 public:
-    QnLightBusinessAction(): m_actionType(BusinessActionType::NotDefined) {}
+    enum Flags {
+        MotionExists = 1
+    };
+
+    QnLightBusinessAction(): m_actionType(BusinessActionType::NotDefined), m_flags(0) {}
 
     virtual ~QnLightBusinessAction() {}
     
@@ -157,12 +161,23 @@ public:
     int getAggregationCount() const { return m_aggregationCount; }
 
     qint64 timestamp() const { return m_runtimeParams.getEventTimestamp(); }
+    BusinessEventType::Value eventType() const { return m_runtimeParams.getEventType(); }
+
+    void setCompareString(const QString& value) { m_compareString = value; }
+    const QString& compareString() const { return m_compareString; }
+
+    void setFlags(int value) { m_flags = value; }
+    int flags() const { return m_flags; }
+    bool hasFlags(int flags) const { return m_flags & flags; }
+
 protected:
     BusinessActionType::Value m_actionType;
     //QnBusinessActionParameters m_params;
     QnBusinessEventParameters m_runtimeParams;
     QnId m_businessRuleId; 
     int m_aggregationCount;
+    QString m_compareString;
+    int m_flags;
 };
 
 typedef std::vector<QnLightBusinessAction> QnLightBusinessActionVector;

@@ -112,6 +112,8 @@ public:
     int status() const { return m_status; }
     int handle() const { return m_handle; }
     const QVariant &reply() const { return m_reply; }
+    template<class T>
+    T reply() const { return m_reply.value<T>(); }
 
 signals:
     void replyProcessed();

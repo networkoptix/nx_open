@@ -223,35 +223,46 @@ QString QnBusinessStringsHelper::longEventDescription(const QnAbstractBusinessAc
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params)
 {
     int id = params.getEventResourceId();
-    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
+    QnNetworkResourcePtr res = id > 0 ? 
+                            qnResPool->getResourceById(id, QnResourcePool::rfAllResources).dynamicCast<QnNetworkResource>() : 
+                            QnNetworkResourcePtr();
     if (!res)
         return QString();
+
     QnResourcePtr mserverRes = res->getParentResource();
     if (!mserverRes)
         return QString();
 
     QUrl apPServerUrl = QnAppServerConnectionFactory::defaultUrl();
-    QUrl mserverUrl = mserverRes->getUrl();
     quint64 ts = params.getEventTimestamp();
     QByteArray rnd = QByteArray::number(rand()).toHex();
 
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
+    if (history) {
+        QnTimePeriod period;
+        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, period, false);
+        if (newServer)
+            mserverRes = newServer;
+    }
+    QUrl mserverUrl = mserverRes->getUrl();
+
+
     QString result(lit("https://%1:%2/proxy/http/%3:%4/media/%5.webm?rand=%6&resolution=240p&pos=%7"));
     result = result.arg(apPServerUrl.host()).arg(apPServerUrl.port(80)).arg(mserverUrl.host()).arg(mserverUrl.port(80)).
-        arg(res->getUniqueId()).arg(QLatin1String(rnd)).arg(ts/1000);
+        arg(res->getPhysicalId()).arg(QLatin1String(rnd)).arg(ts/1000);
 
     return result;
 }
 
-QString QnBusinessStringsHelper::conflictString(const QnBusinessEventParameters &params)
+QString QnBusinessStringsHelper::conflictString(const QnBusinessEventParameters &params, QLatin1Char delim)
 {
-    QString source = params.getSource();
     QStringList conflicts = params.getConflicts();
 
-    QString result = source;
-    result += QObject::tr("conflicted with:");
-    result += QLatin1Char('\n');
-    foreach(const QString& entity, conflicts)
-        result += entity + QLatin1Char('\n');
+    QString result = QObject::tr("%1 conflicted with:").arg(params.getSource());
+    foreach(const QString& entity, conflicts) {
+        result += delim;
+        result += entity;
+    }
     return result;
 }
 
@@ -268,21 +279,16 @@ QString QnBusinessStringsHelper::eventTextString(BusinessEventType::Value eventT
     case BusinessEventType::Camera_Motion:
         break;
     case BusinessEventType::Camera_Input:
-        {
-            result += QObject::tr("Input port: %1")
-                .arg(params.getInputPortId());
-            result += QLatin1Char('\n');
-        }
+        result = QObject::tr("Input port: %1").arg(params.getInputPortId());
         break;
     case BusinessEventType::Storage_Failure:
     case BusinessEventType::Network_Issue:
     case BusinessEventType::MediaServer_Failure:
-        result += reasonString(params);
+        result = reasonString(params);
         break;
     case BusinessEventType::Camera_Ip_Conflict:
     case BusinessEventType::MediaServer_Conflict:
-        result += QLatin1Char('\n');
-        result += conflictString(params);
+        result = conflictString(params, QLatin1Char(' '));
         break;
     default:
         break;

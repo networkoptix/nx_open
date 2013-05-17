@@ -6,12 +6,64 @@
 
 namespace BusinessEventType
 {
+
+    bool hasChild(Value value)
+    {
+        switch (value) {
+            case AnyCameraIssue:
+                return true;
+            case AnyServerIssue:
+                return true;
+            case AnyBusinessEvent:
+                return true;
+        }
+        return false;
+    }
+
+    Value parentEvent(Value value)
+    {
+        switch (value) {
+            case Camera_Disconnect:
+            case Network_Issue:
+            case Camera_Ip_Conflict:
+                return AnyCameraIssue;
+
+            case Storage_Failure:
+            case MediaServer_Failure:
+            case MediaServer_Conflict:
+                return AnyServerIssue;
+
+            case AnyBusinessEvent:
+                return NotDefined;
+
+            default:
+                return AnyBusinessEvent;
+        }
+        return NotDefined;
+    }
+
+    QList<Value> childEvents(Value value)
+    {
+        QList<Value> result;
+
+        switch (value) {
+            case AnyCameraIssue:
+                result << BusinessEventType::Camera_Disconnect << BusinessEventType::Network_Issue << BusinessEventType::Camera_Ip_Conflict;
+                break;
+            case AnyServerIssue:
+                result << BusinessEventType::Storage_Failure << BusinessEventType::MediaServer_Failure << BusinessEventType::MediaServer_Conflict;
+                break;
+            case AnyBusinessEvent:
+                result << BusinessEventType::Camera_Motion << BusinessEventType::AnyCameraIssue << BusinessEventType::AnyServerIssue;
+                break;
+        }
+        
+        return result;
+    }
+
     QString toString( Value val )  {
         if (val >= UserDefined)
             return QObject::tr("User Defined (%1)").arg((int)val - (int)UserDefined);
-
-        if (val >= Count)
-            return QString();
 
         switch( val )
         {
@@ -31,6 +83,12 @@ namespace BusinessEventType
             return QObject::tr("Media Server Failure");
         case MediaServer_Conflict:
             return QObject::tr("Media Server Conflict");
+        case AnyCameraIssue:
+            return QObject::tr("Any camera issue");
+        case AnyServerIssue:
+            return QObject::tr("Any server issue");
+        case AnyBusinessEvent:
+            return QObject::tr("Any event");
         default:
             return QString();
         }

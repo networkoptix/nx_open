@@ -18,8 +18,8 @@ class QnWorkbenchLayoutWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
     QnWorkbenchLayoutWatcher(QObject *parent = NULL);
-
     virtual ~QnWorkbenchLayoutWatcher();
+
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
 };
