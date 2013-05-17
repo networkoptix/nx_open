@@ -158,6 +158,7 @@ void QnEventLogDialog::updateData()
     }
     else {
         requestFinished(); // just clear grid
+        QMessageBox::warning(this, tr("No online media servers"), tr("All media server(s) is offline. No data is selected"));
     }
 
     ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());

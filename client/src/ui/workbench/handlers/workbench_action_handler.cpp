@@ -1624,6 +1624,7 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
     }
     QRect oldGeometry = businessRulesDialog()->geometry();
     businessRulesDialog()->show();
+    businessRulesDialog()->raise();
     if(!newlyCreated)
         businessRulesDialog()->setGeometry(oldGeometry);
 }
@@ -1644,6 +1645,7 @@ void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
     }
     QRect oldGeometry = businessEventsLogDialog()->geometry();
     businessEventsLogDialog()->show();
+    businessEventsLogDialog()->raise();
     if(!newlyCreated)
         businessEventsLogDialog()->setGeometry(oldGeometry);
 }
