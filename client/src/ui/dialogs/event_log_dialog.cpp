@@ -461,7 +461,7 @@ void QnEventLogDialog::enableUpdateData()
 
 void QnEventLogDialog::setVisible(bool value)
 {
-    if (value)
+    if (value && !isVisible())
         updateData();
     QDialog::setVisible(value);
 }
