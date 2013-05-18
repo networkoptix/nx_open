@@ -8,56 +8,6 @@
 #include "api/app_server_connection.h"
 #include "events/conflict_business_event.h"
 
-QString QnBusinessStringsHelper::reasonString(const QnBusinessEventParameters &params) 
-{
-    BusinessEventType::Value eventType = params.getEventType();
-    QnBusiness::EventReason reasonCode = params.getReasonCode();
-    QString reasonText = params.getReasonText();
-
-    QString result;
-    switch (reasonCode) {
-    case QnBusiness::NetworkIssueNoFrame:
-        if (eventType == BusinessEventType::Network_Issue)
-            result = QObject::tr("No video frames were received during the last %1 seconds")
-            .arg(reasonText);
-        break;
-    case QnBusiness::NetworkIssueConnectionClosed:
-        if (eventType == BusinessEventType::Network_Issue)
-            result = QObject::tr("Connection to camera was closed unexpectedly");
-        break;
-    case QnBusiness::NetworkIssueRtpPacketLoss:
-        if (eventType == BusinessEventType::Network_Issue) {
-            result = QObject::tr("RTP packet was loss detected");
-        }
-        break;
-    case QnBusiness::MServerIssueTerminated:
-        if (eventType == BusinessEventType::MediaServer_Failure)
-            result = QObject::tr("Server has been terminated");
-        break;
-    case QnBusiness::MServerIssueStarted:
-        if (eventType == BusinessEventType::MediaServer_Failure)
-            result = QObject::tr("Server started after crash");
-        break;
-    case QnBusiness::StorageIssueIoError:
-        if (eventType == BusinessEventType::Storage_Failure)
-            result = QObject::tr("An error has occured while writing to %1")
-            .arg(reasonText);
-        break;
-    case QnBusiness::StorageIssueNotEnoughSpeed:
-        if (eventType == BusinessEventType::Storage_Failure)
-            result = QObject::tr("Writing speed of HDD/SSD at %1 was found to be insufficient to sustain continuous recording")
-            .arg(reasonText);
-        break;
-    default:
-        break;
-    }
-
-    if (!result.isEmpty())
-        result += QLatin1Char('\n');
-    return result;
-
-}
-
 QString QnBusinessStringsHelper::timestampString(const QnBusinessEventParameters &params, int aggregationCount) 
 {
     quint64 ts = params.getEventTimestamp();
@@ -74,7 +24,6 @@ QString QnBusinessStringsHelper::timestampString(const QnBusinessEventParameters
         result = QObject::tr("%n times since %1 %2", "%1 means time, %2 means date", count)
         .arg(time.time().toString())
         .arg(time.date().toString());
-    result += QLatin1Char('\n');
     return result;
 }
 
@@ -128,10 +77,13 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         case QnBusiness::StorageIssueIoError:
             if (eventType == BusinessEventType::Storage_Failure)
                 result = QString(tr("I/O Error occured at\n%1").arg(reasonText));
+                //result = QObject::tr("An error has occured while writing to %1").arg(reasonText);
+
             break;
         case QnBusiness::StorageIssueNotEnoughSpeed:
             if (eventType == BusinessEventType::Storage_Failure)
-                result = QString(tr("Not enough HDD/SSD speed\nfor recording at\n%1.").arg(reasonText));
+                result = QString(tr("Not enough HDD/SSD speed\nfor recording to\n%1.").arg(reasonText));
+                //result = QObject::tr("Writing speed of HDD/SSD at %1 was found to be insufficient to sustain continuous recording").arg(reasonText);
             break;
         default:
             break;
@@ -142,6 +94,8 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
 
 QString QnBusinessStringsHelper::longEventDescription(const QnAbstractBusinessAction* action, const QnBusinessAggregationInfo& aggregationInfo)
 {
+    static const QString DELIM(lit("<br>"));
+
     BusinessEventType::Value eventType = action->getRuntimeParams().getEventType();
     QString resourceName = resourceUrl(action->getRuntimeParams());
     QString serverName = QObject::tr("%1 Server").arg(QLatin1String(VER_COMPANYNAME_STR));
@@ -206,15 +160,19 @@ QString QnBusinessStringsHelper::longEventDescription(const QnAbstractBusinessAc
             messageBody = tr("Unknown Event has occured on").arg(serverName);
         break;
     }
-    messageBody += lit("<br>");
+    messageBody += DELIM;
 
     if (aggregationInfo.totalCount() == 0) {
-        messageBody += eventTextString(eventType, action->getRuntimeParams());
+        messageBody += eventParamsString(eventType, action->getRuntimeParams());
+        messageBody += DELIM;
         messageBody += timestampString(action->getRuntimeParams(), action->getAggregationCount());
+        messageBody += DELIM;
     }
     foreach (QnInfoDetail detail, aggregationInfo.toList()) {
-        messageBody += eventTextString(eventType, detail.runtimeParams);
+        messageBody += eventParamsString(eventType, detail.runtimeParams);
+        messageBody += DELIM;
         messageBody += timestampString(detail.runtimeParams, detail.count);
+        messageBody += DELIM;
     }
 
     return messageBody;
@@ -254,19 +212,20 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     return result;
 }
 
-QString QnBusinessStringsHelper::conflictString(const QnBusinessEventParameters &params, QLatin1Char delim)
+QString QnBusinessStringsHelper::conflictString(const QnBusinessEventParameters &params)
 {
     QStringList conflicts = params.getConflicts();
 
-    QString result = QObject::tr("%1 conflicted with:").arg(params.getSource());
-    foreach(const QString& entity, conflicts) {
-        result += delim;
-        result += entity;
+    QString result = QObject::tr("%1 conflicted with: ").arg(params.getSource());
+    for (int i = 0; i < conflicts.size(); ++i) {
+        if (i > 0)
+            result += lit(", ");
+        result += conflicts[i];
     }
     return result;
 }
 
-QString QnBusinessStringsHelper::eventTextString(BusinessEventType::Value eventType, const QnBusinessEventParameters &params) 
+QString QnBusinessStringsHelper::eventParamsString(BusinessEventType::Value eventType, const QnBusinessEventParameters &params) 
 {
     QString result;
     switch (eventType) {
@@ -284,11 +243,11 @@ QString QnBusinessStringsHelper::eventTextString(BusinessEventType::Value eventT
     case BusinessEventType::Storage_Failure:
     case BusinessEventType::Network_Issue:
     case BusinessEventType::MediaServer_Failure:
-        result = reasonString(params);
+        result = eventReason(params);
         break;
     case BusinessEventType::Camera_Ip_Conflict:
     case BusinessEventType::MediaServer_Conflict:
-        result = conflictString(params, QLatin1Char(' '));
+        result = conflictString(params);
         break;
     default:
         break;

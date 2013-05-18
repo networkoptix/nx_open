@@ -195,7 +195,6 @@ QnEventLogModel::QnEventLogModel(QObject *parent):
 {
     m_linkFont.setUnderline(true);
     m_index = new DataIndex();
-    rebuild();
 }
 
 QnEventLogModel::~QnEventLogModel() {
@@ -204,7 +203,6 @@ QnEventLogModel::~QnEventLogModel() {
 
 void QnEventLogModel::setEvents(const QVector<QnLightBusinessActionVectorPtr> &events)
 {
-    reset();
     m_index->setEvents(events);
     rebuild();
 }
@@ -399,30 +397,14 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
             BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
             QString result;
 
-            switch (eventType) {
-                case BusinessEventType::Camera_Disconnect:
-                    break;
-                case BusinessEventType::Camera_Input:
-                    result = QnBusinessStringsHelper::eventTextString(eventType, action.getRuntimeParams());
-                    break;
-                case BusinessEventType::Camera_Motion:
-                    if (action.hasFlags(QnLightBusinessAction::MotionExists))
-                        result = lit("Motion video");
-                    break;
-                case BusinessEventType::Storage_Failure:
-                case BusinessEventType::Network_Issue:
-                case BusinessEventType::MediaServer_Failure: {
-                    result = QnBusinessStringsHelper::eventReason(action.getRuntimeParams());
-                    break;
-                }
-                case BusinessEventType::Camera_Ip_Conflict:
-                case BusinessEventType::MediaServer_Conflict: {
-                    result = QnBusinessStringsHelper::conflictString(action.getRuntimeParams(), QLatin1Char(' '));
-                    break;
-				}
-            	default:
-					break;
+            if (eventType == BusinessEventType::Camera_Motion) {
+                if (action.hasFlags(QnLightBusinessAction::MotionExists))
+                    result = lit("Motion video");
             }
+            else {
+                result = QnBusinessStringsHelper::eventParamsString(eventType, action.getRuntimeParams());
+            }
+
             if (!BusinessEventType::hasToggleState(eventType)) {
                 int cnt = action.getAggregationCount();
                 if (cnt > 1)
@@ -438,8 +420,8 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
 
 void QnEventLogModel::sort(int column, Qt::SortOrder order)
 {
-    reset();
     m_index->setSort(column, order);
+    rebuild();
 }
 
 QString QnEventLogModel::motionUrl(Column column, const QnLightBusinessAction& action)
@@ -539,4 +521,5 @@ qint64 QnEventLogModel::eventTimestamp(int row) const
 void QnEventLogModel::rebuild()
 {
     setRowCount(m_index->size());
+    reset();
 }

@@ -10,16 +10,23 @@ class QnBusinessStringsHelper: QObject
 {
 public:
     static QString eventReason(const QnBusinessEventParameters& params);
+
+    /*
+    * Full description at HTML format
+    */
     static QString longEventDescription(const QnAbstractBusinessAction* action, const QnBusinessAggregationInfo& aggregationInfo);
+
+    /*
+    * Short description. Contain event params only. Doesn't include event type to message
+    */
+    static QString eventParamsString(BusinessEventType::Value eventType, const QnBusinessEventParameters &params);
 
     static QString resourceUrl(const QnBusinessEventParameters &params);
     static QString resourceName(const QnBusinessEventParameters &params);
 
-    static QString conflictString(const QnBusinessEventParameters &params, QLatin1Char delim = QLatin1Char('\n'));
+    static QString conflictString(const QnBusinessEventParameters &params);
     static QString motionUrl(const QnBusinessEventParameters &params);
-    static QString eventTextString(BusinessEventType::Value eventType, const QnBusinessEventParameters &params);
 private:
-    static QString reasonString(const QnBusinessEventParameters &params);
     static QString timestampString(const QnBusinessEventParameters &params, int aggregationCount);
 };
 

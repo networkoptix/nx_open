@@ -12,6 +12,7 @@
 #include "resource_selection_dialog.h"
 #include "client/client_globals.h"
 #include "ui/style/skin.h"
+#include "client/client_settings.h"
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -77,6 +78,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(ui->cameraButton,       SIGNAL(clicked(bool)),              this, SLOT(at_cameraButtonClicked()) );
     connect(ui->gridEvents,         SIGNAL(clicked(const QModelIndex&)),this, SLOT(at_itemClicked(const QModelIndex&)) );
     connect(ui->gridEvents,         SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(at_customContextMenuRequested(const QPoint&)) );
+    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
     
     ui->mainGridLayout->activate();
     updateHeaderWidth();
@@ -443,6 +445,11 @@ void QnEventLogDialog::at_cameraButtonClicked()
 
     if (dialog.exec() == QDialog::Accepted)
         setCameraList(dialog.getSelectedResources());
+}
+
+void QnEventLogDialog::at_showUrlsInTree_changed()
+{
+    m_model->rebuild();
 }
 
 void QnEventLogDialog::disableUpdateData()
