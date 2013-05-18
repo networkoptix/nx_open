@@ -38,10 +38,14 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
 
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
+
+    /*
     for (int i = 0; i < (int) QnEventLogModel::ActionCameraColumn; ++i)
         headers->setResizeMode(i, QHeaderView::Fixed);
     for (int i = (int) QnEventLogModel::ActionCameraColumn; i < columns.size(); ++i)
         headers->setResizeMode(i, QHeaderView::ResizeToContents);
+    */
+    headers->setResizeMode(QHeaderView::Fixed);
 
     QStandardItem* rootItem = createEventTree(0, BusinessEventType::AnyBusinessEvent);
     QStandardItemModel* model = new QStandardItemModel();
@@ -215,6 +219,7 @@ void QnEventLogDialog::updateHeaderWidth()
     ui->gridEvents->horizontalHeader()->resizeSection(1, ui->eventComboBox->width() + space);
     ui->gridEvents->horizontalHeader()->resizeSection(2, ui->cameraButton->width() + space);
     ui->gridEvents->horizontalHeader()->resizeSection(3, ui->actionComboBox->width() + space);
+    ui->gridEvents->horizontalHeader()->resizeSection(4, ui->eventComboBox->width() + space);
 }
 
 void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum)
