@@ -119,17 +119,37 @@ public:
 
     static bool lessThanEventType(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
     {
-        return QnEventLogModel::DataIndex::toLexEventType(d1->eventType()) < QnEventLogModel::DataIndex::toLexEventType(d2->eventType());
+        int r1 = QnEventLogModel::DataIndex::toLexEventType(d1->eventType());
+        int r2 = QnEventLogModel::DataIndex::toLexEventType(d2->eventType());
+        if (r1 < r2)
+            return true;
+        else if (r1 > r2)
+            return false;
+        else
+            return lessThanTimestamp(d1, d2);
     }
 
     static bool lessThanActionType(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
     {
-        return QnEventLogModel::DataIndex::toLexActionType(d1->actionType()) < QnEventLogModel::DataIndex::toLexActionType(d2->actionType());
+        int r1 = QnEventLogModel::DataIndex::toLexActionType(d1->actionType());
+        int r2 = QnEventLogModel::DataIndex::toLexActionType(d2->actionType());
+        if (r1 < r2)
+            return true;
+        else if (r1 > r2)
+            return false;
+        else
+            return lessThanTimestamp(d1, d2);
     }
 
     static bool lessLexographic(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
     {
-        return d1->compareString() < d2->compareString();
+        int rez = d1->compareString().compare(d2->compareString());
+        if (rez < 0)
+            return true;
+        else if (rez > 0)
+            return false;
+        else
+            return lessThanTimestamp(d1, d2);
     }
 
     void updateIndex()
