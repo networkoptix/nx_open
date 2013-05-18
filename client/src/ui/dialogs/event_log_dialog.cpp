@@ -219,7 +219,7 @@ void QnEventLogDialog::updateHeaderWidth()
     ui->gridEvents->horizontalHeader()->resizeSection(1, ui->eventComboBox->width() + space);
     ui->gridEvents->horizontalHeader()->resizeSection(2, ui->cameraButton->width() + space);
     ui->gridEvents->horizontalHeader()->resizeSection(3, ui->actionComboBox->width() + space);
-    ui->gridEvents->horizontalHeader()->resizeSection(4, ui->eventComboBox->width() + space);
+    ui->gridEvents->horizontalHeader()->resizeSection(4, ui->cameraButton->width() + space);
 }
 
 void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum)
