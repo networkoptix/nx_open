@@ -331,29 +331,22 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnId& id)
 
 QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAction &action)
 {
-
+    QnId resId;
     switch(column) {
         case EventCameraColumn: 
-        {
-            QnId eventResId = action.getRuntimeParams().getEventResourceId();
-                
-            QnResourcePtr eventResource = getResourceById(eventResId);
-            if (eventResource)
-                return qnResIconCache->icon(eventResource->flags(), eventResource->getStatus());
+            resId = action.getRuntimeParams().getEventResourceId();
             break;
-        }
         case ActionCameraColumn: 
-        {
-            QnId actionResId = action.getRuntimeParams().getActionResourceId();
-            QnResourcePtr actionResource = getResourceById(actionResId);
-            if (actionResource)
-                return qnResIconCache->icon(actionResource->flags(), actionResource->getStatus());
-            break;
-        }
+            resId = action.getRuntimeParams().getActionResourceId();
     	default:
         	break;
     }
-    return QVariant();
+
+    QnResourcePtr res = getResourceById(resId);
+    if (res)
+        return qnResIconCache->icon(res->flags(), res->getStatus());
+    else
+        return QVariant();
 }
 
 QVariant QnEventLogModel::resourceData(const Column& column, const QnLightBusinessAction &action)
@@ -387,6 +380,18 @@ QString QnEventLogModel::formatUrl(const QString& url)
     return url;
 }
 
+QString QnEventLogModel::getResourceNameString(QnId id)
+{
+    QString result;
+    QnResourcePtr res = getResourceById(id);
+    if (res) {
+        result = res->getName();
+        if (qnSettings->isIpShownInTree())
+            result += QString(lit(" (%2)")).arg(formatUrl(res->getUrl()));
+    }
+    return result;
+}
+
 QString QnEventLogModel::textData(const Column& column,const QnLightBusinessAction& action)
 {
     switch(column) 
@@ -397,46 +402,18 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
             return dt.toString(Qt::SystemLocaleShortDate);
             break;
         }
-        case EventColumn: {
-            BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
-            return BusinessEventType::toString(eventType);
+        case EventColumn:
+            return BusinessEventType::toString(action.getRuntimeParams().getEventType());
             break;
-        }
-        case EventCameraColumn: {
-            QnId eventResId = action.getRuntimeParams().getEventResourceId();
-            QnResourcePtr eventResource = getResourceById(eventResId);
-            if (eventResource) {
-                QString result = eventResource->getName();
-                if (qnSettings->isIpShownInTree()) {
-                    // I didn't want to use QString.arg() here because it is slow down sort time
-                    result += lit(" (");  
-                    result += formatUrl(eventResource->getUrl());
-                    result += lit(")");
-                    //result += QString(lit(" (%2)")).arg(formatUrl(eventResource->getUrl()));
-                }
-                return result;
-            }
+        case EventCameraColumn:
+            return getResourceNameString(action.getRuntimeParams().getEventResourceId());
             break;
-        }
         case ActionColumn:
             return BusinessActionType::toString(action.actionType());
             break;
-        case ActionCameraColumn: {
-            QnId actionResId = action.getRuntimeParams().getActionResourceId();
-            QnResourcePtr actionResource = getResourceById(actionResId);
-            if (actionResource) {
-                QString result = actionResource->getName();
-                if (qnSettings->isIpShownInTree()) {
-                    // I didn't want to use QString.arg() here because it is slow down sort time
-                    result += lit(" (");
-                    result += formatUrl(actionResource->getUrl());
-                    result += lit(")");
-                    //result += QString(lit(" (%2)")).arg(formatUrl(actionResource->getUrl()));
-                }
-                return result;
-            }
+        case ActionCameraColumn:
+            return getResourceNameString(action.getRuntimeParams().getActionResourceId());
             break;
-            }
         case DescriptionColumn: {
             BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
             QString result;
@@ -478,7 +455,7 @@ QString QnEventLogModel::motionUrl(Column column, const QnLightBusinessAction& a
     return QnBusinessStringsHelper::motionUrl(action.getRuntimeParams());
 }
 
-bool QnEventLogModel::isMotionUrl(const QModelIndex & index) const
+bool QnEventLogModel::hasMotionUrl(const QModelIndex & index) const
 {
     if (!index.isValid() || index.column() != DescriptionColumn)
         return false;

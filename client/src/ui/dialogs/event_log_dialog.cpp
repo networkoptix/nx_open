@@ -246,7 +246,7 @@ void QnEventLogDialog::requestFinished()
 
 void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
 {
-    if (m_model->isMotionUrl(idx))
+    if (m_model->hasMotionUrl(idx))
     {
         QnResourcePtr resource = m_model->eventResource(idx.row());
         qint64 pos = m_model->eventTimestamp(idx.row())/1000;

@@ -35,7 +35,7 @@ public:
     virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override;
     virtual void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder ) override;
 
-    bool isMotionUrl(const QModelIndex & index) const;
+    bool hasMotionUrl(const QModelIndex & index) const;
     QnResourcePtr getResource(const QModelIndex& idx) const;
 
     BusinessEventType::Value eventType(int row) const;
@@ -60,6 +60,7 @@ private:
     static QString motionUrl(Column column, const QnLightBusinessAction& action);
     static QString formatUrl(const QString& url);
     static QnResourcePtr getResourceById(const QnId& id);
+    static QString getResourceNameString(QnId id);
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
