@@ -36,7 +36,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->dateEditFrom->setDate(dt);
     ui->dateEditTo->setDate(dt);
 
-
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
 
     /*
@@ -78,11 +77,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(ui->refreshButton,      SIGNAL(clicked(bool)),              this, SLOT(updateData()) );
     connect(ui->eventRulesButton,   SIGNAL(clicked(bool)),              m_context->action(Qn::BusinessEventsAction), SIGNAL(triggered()));
 
-
     connect(ui->cameraButton,       SIGNAL(clicked(bool)),              this, SLOT(at_cameraButtonClicked()) );
     connect(ui->gridEvents,         SIGNAL(clicked(const QModelIndex&)),this, SLOT(at_itemClicked(const QModelIndex&)) );
     connect(ui->gridEvents,         SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(at_customContextMenuRequested(const QPoint&)) );
-    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
+    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), m_model, SLOT(rebuild()) );
     
     ui->mainGridLayout->activate();
     updateHeaderWidth();
@@ -92,16 +90,11 @@ QnEventLogDialog::~QnEventLogDialog()
 {
 }
 
-QStandardItem* QnEventLogDialog::createEventItem(BusinessEventType::Value value)
-{
-    QStandardItem* result = new QStandardItem(BusinessEventType::toString(value));
-    result->setData((int) value, Qn::FirstItemDataRole);
-    return result;
-}
-
 QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, BusinessEventType::Value value)
 {
-    QStandardItem* item = createEventItem(value);
+    QStandardItem* item = new QStandardItem(BusinessEventType::toString(value));
+    item->setData((int) value, Qn::FirstItemDataRole);
+
     if (rootItem)
         rootItem->appendRow(item);
 
@@ -450,11 +443,6 @@ void QnEventLogDialog::at_cameraButtonClicked()
 
     if (dialog.exec() == QDialog::Accepted)
         setCameraList(dialog.getSelectedResources());
-}
-
-void QnEventLogDialog::at_showUrlsInTree_changed()
-{
-    m_model->rebuild();
 }
 
 void QnEventLogDialog::disableUpdateData()

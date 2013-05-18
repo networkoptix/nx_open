@@ -44,11 +44,9 @@ private slots:
     void at_filterAction();
     void at_resetFilterAction();
     void at_copyToClipboard();
-    void at_showUrlsInTree_changed();
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     QString getTextForNCameras(int n) const;
-    QStandardItem* createEventItem(BusinessEventType::Value value);
     QStandardItem* createEventTree(QStandardItem* rootItem, BusinessEventType::Value value);
 
     void setCameraList(QnResourceList resList);

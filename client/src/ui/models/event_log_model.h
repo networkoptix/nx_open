@@ -32,10 +32,6 @@ public:
     QList<Column> columns() const;
     void setColumns(const QList<Column> &columns);
 
-    //QnLightBusinessActionPtr getEvent(const QModelIndex &index) const;
-    void rebuild();
-    void clear();
-
     virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override;
     virtual void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder ) override;
 
@@ -47,6 +43,9 @@ public:
     qint64 eventTimestamp(int row) const;
 
     class DataIndex;
+public slots:
+    void clear();
+    void rebuild();
 private:
     QVariant fontData(const Column& column, const QnLightBusinessAction &action) const;
     QVariant foregroundData(const Column& column, const QnLightBusinessAction &action) const;
