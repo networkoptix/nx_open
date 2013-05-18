@@ -14,6 +14,8 @@
 #include "device_plugins/server_camera/server_camera.h"
 #include "client/client_settings.h"
 
+typedef QnLightBusinessAction* QnLightBusinessActionP;
+
 class QnEventLogModel::DataIndex
 {
 public:
@@ -110,14 +112,14 @@ public:
 
     // comparators
 
-    typedef bool (*LessFunc)(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2);
+    typedef bool (*LessFunc)(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2);
 
-    static bool lessThanTimestamp(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    static bool lessThanTimestamp(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2)
     {
         return d1->timestamp() < d2->timestamp();
     }
 
-    static bool lessThanEventType(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    static bool lessThanEventType(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2)
     {
         int r1 = QnEventLogModel::DataIndex::toLexEventType(d1->eventType());
         int r2 = QnEventLogModel::DataIndex::toLexEventType(d2->eventType());
@@ -129,7 +131,7 @@ public:
             return lessThanTimestamp(d1, d2);
     }
 
-    static bool lessThanActionType(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    static bool lessThanActionType(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2)
     {
         int r1 = QnEventLogModel::DataIndex::toLexActionType(d1->actionType());
         int r2 = QnEventLogModel::DataIndex::toLexActionType(d2->actionType());
@@ -141,7 +143,7 @@ public:
             return lessThanTimestamp(d1, d2);
     }
 
-    static bool lessLexographic(QnLightBusinessAction* &d1, QnLightBusinessAction* &d2)
+    static bool lessLexographic(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2)
     {
         int rez = d1->compareString().compare(d2->compareString());
         if (rez < 0)
@@ -161,7 +163,7 @@ public:
         if (m_records.isEmpty())
             return;
 
-        QnLightBusinessAction** dst = &m_records[0];
+        QnLightBusinessActionP* dst = &m_records[0];
         for (int i = 0; i < m_events.size(); ++i)
         {
             QnLightBusinessActionVector& data = *m_events[i].data();
@@ -198,7 +200,7 @@ private:
     Column m_sortCol;
     Qt::SortOrder m_sortOrder;
     QVector<QnLightBusinessActionVectorPtr> m_events;
-    QVector<QnLightBusinessAction*> m_records;
+    QVector<QnLightBusinessActionP> m_records;
     int m_size;
     static int m_eventTypeToLexOrder[256];
     static int m_actionTypeToLexOrder[256];
@@ -367,10 +369,22 @@ QVariant QnEventLogModel::resourceData(const Column& column, const QnLightBusine
 
 QString QnEventLogModel::formatUrl(const QString& url)
 {
-    if (url.indexOf(QLatin1String("://")) == -1)
+    int prefix = url.indexOf(QLatin1String("://"));
+    if (prefix == -1)
         return url;
-    else
-        return QUrl(url).host();
+    else {
+        prefix += 3;
+        int hostEnd = url.indexOf(QLatin1Char(':'), prefix);
+        if (hostEnd == -1) {
+            hostEnd = url.indexOf(QLatin1Char('/'), prefix);
+            if (hostEnd == -1)
+                hostEnd = url.indexOf(QLatin1Char('?'), prefix);
+        }
+
+        if (hostEnd != -1)
+            return url.mid(prefix, hostEnd - prefix);
+    }
+    return url;
 }
 
 QString QnEventLogModel::textData(const Column& column,const QnLightBusinessAction& action)
@@ -393,8 +407,13 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
             QnResourcePtr eventResource = getResourceById(eventResId);
             if (eventResource) {
                 QString result = eventResource->getName();
-                if (qnSettings->isIpShownInTree())
-                    result += QString(lit(" (%2)")).arg(formatUrl(eventResource->getUrl()));
+                if (qnSettings->isIpShownInTree()) {
+                    // I didn't want to use QString.arg() here because it is slow down sort time
+                    result += lit(" (");  
+                    result += formatUrl(eventResource->getUrl());
+                    result += lit(")");
+                    //result += QString(lit(" (%2)")).arg(formatUrl(eventResource->getUrl()));
+                }
                 return result;
             }
             break;
@@ -407,8 +426,13 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
             QnResourcePtr actionResource = getResourceById(actionResId);
             if (actionResource) {
                 QString result = actionResource->getName();
-                if (qnSettings->isIpShownInTree())
-                    result += QString(lit(" (%2)")).arg(formatUrl(actionResource->getUrl()));
+                if (qnSettings->isIpShownInTree()) {
+                    // I didn't want to use QString.arg() here because it is slow down sort time
+                    result += lit(" (");
+                    result += formatUrl(actionResource->getUrl());
+                    result += lit(")");
+                    //result += QString(lit(" (%2)")).arg(formatUrl(actionResource->getUrl()));
+                }
                 return result;
             }
             break;
