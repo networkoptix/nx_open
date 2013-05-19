@@ -47,7 +47,6 @@ private slots:
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     QString getTextForNCameras(int n) const;
-    QStandardItem* createEventItem(BusinessEventType::Value value);
     QStandardItem* createEventTree(QStandardItem* rootItem, BusinessEventType::Value value);
 
     void setCameraList(QnResourceList resList);

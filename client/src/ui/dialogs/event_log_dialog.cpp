@@ -12,6 +12,7 @@
 #include "resource_selection_dialog.h"
 #include "client/client_globals.h"
 #include "ui/style/skin.h"
+#include "client/client_settings.h"
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -35,12 +36,15 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->dateEditFrom->setDate(dt);
     ui->dateEditTo->setDate(dt);
 
-
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
+
+    /*
     for (int i = 0; i < (int) QnEventLogModel::ActionCameraColumn; ++i)
         headers->setResizeMode(i, QHeaderView::Fixed);
     for (int i = (int) QnEventLogModel::ActionCameraColumn; i < columns.size(); ++i)
         headers->setResizeMode(i, QHeaderView::ResizeToContents);
+    */
+    headers->setResizeMode(QHeaderView::Fixed);
 
     QStandardItem* rootItem = createEventTree(0, BusinessEventType::AnyBusinessEvent);
     QStandardItemModel* model = new QStandardItemModel();
@@ -73,10 +77,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(ui->refreshButton,      SIGNAL(clicked(bool)),              this, SLOT(updateData()) );
     connect(ui->eventRulesButton,   SIGNAL(clicked(bool)),              m_context->action(Qn::BusinessEventsAction), SIGNAL(triggered()));
 
-
     connect(ui->cameraButton,       SIGNAL(clicked(bool)),              this, SLOT(at_cameraButtonClicked()) );
     connect(ui->gridEvents,         SIGNAL(clicked(const QModelIndex&)),this, SLOT(at_itemClicked(const QModelIndex&)) );
     connect(ui->gridEvents,         SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(at_customContextMenuRequested(const QPoint&)) );
+    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), m_model, SLOT(rebuild()) );
     
     ui->mainGridLayout->activate();
     updateHeaderWidth();
@@ -86,16 +90,11 @@ QnEventLogDialog::~QnEventLogDialog()
 {
 }
 
-QStandardItem* QnEventLogDialog::createEventItem(BusinessEventType::Value value)
-{
-    QStandardItem* result = new QStandardItem(BusinessEventType::toString(value));
-    result->setData((int) value, Qn::FirstItemDataRole);
-    return result;
-}
-
 QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, BusinessEventType::Value value)
 {
-    QStandardItem* item = createEventItem(value);
+    QStandardItem* item = new QStandardItem(BusinessEventType::toString(value));
+    item->setData((int) value, Qn::FirstItemDataRole);
+
     if (rootItem)
         rootItem->appendRow(item);
 
@@ -213,6 +212,7 @@ void QnEventLogDialog::updateHeaderWidth()
     ui->gridEvents->horizontalHeader()->resizeSection(1, ui->eventComboBox->width() + space);
     ui->gridEvents->horizontalHeader()->resizeSection(2, ui->cameraButton->width() + space);
     ui->gridEvents->horizontalHeader()->resizeSection(3, ui->actionComboBox->width() + space);
+    ui->gridEvents->horizontalHeader()->resizeSection(4, ui->cameraButton->width() + space);
 }
 
 void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum)
@@ -246,7 +246,7 @@ void QnEventLogDialog::requestFinished()
 
 void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
 {
-    if (m_model->isMotionUrl(idx))
+    if (m_model->hasMotionUrl(idx))
     {
         QnResourcePtr resource = m_model->eventResource(idx.row());
         qint64 pos = m_model->eventTimestamp(idx.row())/1000;
@@ -461,7 +461,7 @@ void QnEventLogDialog::enableUpdateData()
 
 void QnEventLogDialog::setVisible(bool value)
 {
-    if (value)
+    if (value && !isVisible())
         updateData();
     QDialog::setVisible(value);
 }
