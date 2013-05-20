@@ -22,19 +22,9 @@ win32 {
 
 mac {
   DEFINES += QN_EXPORT=
-
-  PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
-  PRIVATE_FRAMEWORKS.path = Contents/MacOS
-  QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
-
-  QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f $$PWD/../resource/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
-        
-  #  QMAKE_CXXFLAGS += -DAPI_TEST_MAIN
-  #  TARGET = consoleapp
-
   INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/ /usr/X11/include/
 }
 
-unix {
+unix: !mac {
   LIBS += -lX11
 }
