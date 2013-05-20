@@ -10,12 +10,14 @@ namespace BusinessEventType
     bool hasChild(Value value)
     {
         switch (value) {
-            case AnyCameraIssue:
-                return true;
-            case AnyServerIssue:
-                return true;
-            case AnyBusinessEvent:
-                return true;
+        case AnyCameraIssue:
+            return true;
+        case AnyServerIssue:
+            return true;
+        case AnyBusinessEvent:
+            return true;
+        default:
+            break;
         }
         return false;
     }
@@ -23,21 +25,21 @@ namespace BusinessEventType
     Value parentEvent(Value value)
     {
         switch (value) {
-            case Camera_Disconnect:
-            case Network_Issue:
-            case Camera_Ip_Conflict:
-                return AnyCameraIssue;
+        case Camera_Disconnect:
+        case Network_Issue:
+        case Camera_Ip_Conflict:
+            return AnyCameraIssue;
 
-            case Storage_Failure:
-            case MediaServer_Failure:
-            case MediaServer_Conflict:
-                return AnyServerIssue;
+        case Storage_Failure:
+        case MediaServer_Failure:
+        case MediaServer_Conflict:
+            return AnyServerIssue;
 
-            case AnyBusinessEvent:
-                return NotDefined;
+        case AnyBusinessEvent:
+            return NotDefined;
 
-            default:
-                return AnyBusinessEvent;
+        default:
+            return AnyBusinessEvent;
         }
         return NotDefined;
     }
@@ -47,16 +49,18 @@ namespace BusinessEventType
         QList<Value> result;
 
         switch (value) {
-            case AnyCameraIssue:
-                result << BusinessEventType::Camera_Disconnect << BusinessEventType::Network_Issue << BusinessEventType::Camera_Ip_Conflict;
-                break;
-            case AnyServerIssue:
-                result << BusinessEventType::Storage_Failure << BusinessEventType::MediaServer_Failure << BusinessEventType::MediaServer_Conflict;
-                break;
-            case AnyBusinessEvent:
-                result << BusinessEventType::Camera_Motion << BusinessEventType::Camera_Input << 
-                          BusinessEventType::AnyCameraIssue << BusinessEventType::AnyServerIssue;
-                break;
+        case AnyCameraIssue:
+            result << BusinessEventType::Camera_Disconnect << BusinessEventType::Network_Issue << BusinessEventType::Camera_Ip_Conflict;
+            break;
+        case AnyServerIssue:
+            result << BusinessEventType::Storage_Failure << BusinessEventType::MediaServer_Failure << BusinessEventType::MediaServer_Conflict;
+            break;
+        case AnyBusinessEvent:
+            result << BusinessEventType::Camera_Motion << BusinessEventType::Camera_Input <<
+                      BusinessEventType::AnyCameraIssue << BusinessEventType::AnyServerIssue;
+            break;
+        default:
+            break;
         }
         
         return result;
