@@ -5,6 +5,8 @@
 
 #include "glcontext.h"
 
+#ifdef NX_GLCONTEXT_PRESENT
+
 #include <QGLContext>
 
 #include <utils/common/log.h>
@@ -299,3 +301,5 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
 	m_previousErrorCode = errno;
 #endif
 }
+
+#endif  //NX_GLCONTEXT_PRESENT

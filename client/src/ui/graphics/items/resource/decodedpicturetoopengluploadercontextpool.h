@@ -16,7 +16,6 @@
 
 #include <utils/common/safepool.h>
 #include <utils/common/threadqueue.h>
-#include <utils/gl/glcontext.h>
 
 
 class GLContext;
