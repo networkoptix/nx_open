@@ -4,6 +4,7 @@
 extern "C" {
 #include <libavutil/opt.h>
 #include <libavutil/base64.h>
+#include <libavutil/avstring.h>
 }
 
 static const int  RTP_PT_PRIVATE = 96;

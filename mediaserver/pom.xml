@@ -27,7 +27,7 @@
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
 		<linux.oslibs>-lz</linux.oslibs>
-		<mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+		<mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lavcodec -lswscale -lavutil -lavformat</mac.oslibs>
 		<!--Global defines-->
 		<global.defines/>
 		<!--Specific os defines-->

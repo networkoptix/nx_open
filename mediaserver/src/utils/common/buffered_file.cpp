@@ -1,5 +1,10 @@
 #include <QDir>
 
+extern "C"
+{
+    #include <libavutil/avutil.h>
+}
+
 #include "buffered_file.h"
 #include <QSharedPointer>
 #include "utils/common/util.h"
