@@ -1,5 +1,6 @@
 #include "threaded_image_loader.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>

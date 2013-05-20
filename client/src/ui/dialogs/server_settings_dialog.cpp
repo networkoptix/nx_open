@@ -10,6 +10,9 @@
 #include <QtGui/QStyledItemDelegate>
 #include <QtGui/QSlider>
 #include <QtGui/QLabel>
+#include <QPainter>
+#include <QMenu>
+#include <QMouseEvent>
 
 #include <utils/common/counter.h>
 #include <utils/common/string.h>

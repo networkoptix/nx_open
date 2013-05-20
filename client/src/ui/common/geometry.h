@@ -4,6 +4,7 @@
 #include <QtCore/Qt>
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
+#include <QPolygonF>
 
 #include <utils/math/math.h>
 #include <common/common_globals.h>

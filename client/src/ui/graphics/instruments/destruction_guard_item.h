@@ -1,8 +1,10 @@
 #ifndef QN_DESTRUCTION_GUARD_ITEM_H
 #define QN_DESTRUCTION_GUARD_ITEM_H
 
-#include <QGraphicsObject>
+#include <QtGui/QGraphicsObject>
+#include <QtGui/QGraphicsScene>
 #include <ui/common/weak_graphics_item_pointer.h>
+
 
 class DestructionGuardItem: public QGraphicsObject {
     Q_OBJECT;

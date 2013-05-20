@@ -1,5 +1,6 @@
 #include "fglrx_full_screen.h"
 
+#include <QtGui/QAction>
 #include <QtOpenGL/QGLWidget>
 
 #include <ui/actions/action_manager.h>

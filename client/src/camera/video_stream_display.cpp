@@ -1,5 +1,8 @@
 
 #include "video_stream_display.h"
+
+#include <algorithm>
+
 #include "decoders/video/abstractdecoder.h"
 #include "utils/common/util.h"
 #include "utils/common/long_runnable.h"

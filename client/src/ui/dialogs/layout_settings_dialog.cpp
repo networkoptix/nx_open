@@ -2,11 +2,13 @@
 #include "ui_layout_settings_dialog.h"
 
 #include <QtCore/qmath.h>
+#include <QUrl>
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
 #include <QtGui/QPen>
 #include <QtGui/QPaintEvent>
+#include <QImageReader>
 
 #include <core/resource/layout_resource.h>
 

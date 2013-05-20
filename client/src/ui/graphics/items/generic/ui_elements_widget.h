@@ -3,6 +3,7 @@
 
 #include <QtCore/QWeakPointer>
 #include <QtGui/QGraphicsWidget>
+#include <QGraphicsView>
 
 class Instrument;
 

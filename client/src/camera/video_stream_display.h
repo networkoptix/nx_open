@@ -2,6 +2,11 @@
 #ifndef QN_VIDEO_STREAM_DISPLAY_H
 #define QN_VIDEO_STREAM_DISPLAY_H
 
+extern "C"
+{
+    #include <libswscale/swscale.h>
+}
+
 #include "decoders/video/abstractdecoder.h"
 #include "decoders/frame_scaler.h"
 #include "../ui/workbench/workbench_context_aware.h"

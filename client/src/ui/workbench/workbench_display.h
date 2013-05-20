@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QUuid>
 
 #include <utils/common/connective.h>
 

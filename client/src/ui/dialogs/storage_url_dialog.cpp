@@ -1,4 +1,8 @@
+
 #include "storage_url_dialog.h"
+
+#include <QMessageBox>
+
 #include "ui_storage_url_dialog.h"
 
 #include <core/resource/media_server_resource.h>

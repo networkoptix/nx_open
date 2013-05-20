@@ -11,6 +11,7 @@
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QTextDocument>
 #include <QtGui/QGraphicsDropShadowEffect>
+#include <QApplication>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/weak_graphics_item_pointer.h>

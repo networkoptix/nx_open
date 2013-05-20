@@ -2,6 +2,7 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
+#include <QtCore/QUuid>
 
 #include <transcoding/file_transcoder.h>
 

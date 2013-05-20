@@ -1,10 +1,11 @@
 #ifndef QN_LAYOUT_ITEM_DATA_H
 #define QN_LAYOUT_ITEM_DATA_H
 
+#include <QtCore/QHash>
+#include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QUuid>
-#include <QtCore/QList>
-#include <QtCore/QHash>
+#include <QtCore/QVariant>
 
 #include <utils/math/fuzzy.h>
 #include <utils/common/qnid.h>

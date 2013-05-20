@@ -1,6 +1,11 @@
 #ifndef QN_WORKBENCH_STREAM_SYNCHRONIZER_H
 #define QN_WORKBENCH_STREAM_SYNCHRONIZER_H
 
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 #include <QtCore/QSet>

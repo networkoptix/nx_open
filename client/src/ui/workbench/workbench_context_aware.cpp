@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtGui/QGraphicsItem>
+#include <QtGui/QGraphicsScene>
 
 #include <utils/common/warnings.h>
 #include <core/resource_managment/resource_pool.h>

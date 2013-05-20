@@ -27,7 +27,7 @@
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
 		<linux.oslibs>-lcrypto -lz -lopenal</linux.oslibs>
-		<mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
+		<mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -framework OpenAL -lswscale -lavformat -lavcodec -lavutil -lqtcolorpickerplugin -framework QtScript -framework QtDesigner</mac.oslibs>
 		<!--Global defines-->
 		<global.defines/>
 		<!--Specific os defines-->

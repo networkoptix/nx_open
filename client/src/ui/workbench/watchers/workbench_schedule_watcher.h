@@ -2,6 +2,7 @@
 #define QN_WORKBENCH_SCHEDULE_WATCHER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
 

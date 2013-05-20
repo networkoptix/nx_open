@@ -3,6 +3,7 @@
 
 #include <typeinfo>
 
+#include <QtCore/QHash>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 

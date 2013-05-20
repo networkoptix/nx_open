@@ -1,8 +1,16 @@
+
 #include "rtsp_client_archive_delegate.h"
+
+#include <QBuffer>
+
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
+
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource_managment/resource_pool.h"
 #include "utils/network/rtp_stream_parser.h"
-#include "libavcodec/avcodec.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/common/util.h"

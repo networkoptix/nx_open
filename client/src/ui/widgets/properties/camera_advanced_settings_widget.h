@@ -1,6 +1,12 @@
 #ifndef camera_settings_widgets_h_1214
 #define camera_settings_widgets_h_1214
 
+#include <QtGui/QRadioButton>
+#include <QtGui/QLineEdit>
+#include <QtGui/QPushButton>
+#include <QtGui/QCheckBox>
+#include <QtGui/QGroupBox>
+#include <QtGui/QHBoxLayout>
 #include <QtGui/QSlider>
 #include <QtGui/QScrollArea>
 #include "plugins/resources/camera_settings/camera_settings.h"

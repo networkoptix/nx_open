@@ -10,6 +10,7 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QMessageBox>
 #include <QtGui/QIcon>
+#include <QDragEnterEvent>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>

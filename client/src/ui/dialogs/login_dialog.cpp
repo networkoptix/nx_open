@@ -6,6 +6,8 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QInputDialog>
 #include <QtGui/QStandardItemModel>
+#include <QDesktopWidget>
+#include <QDir>
 
 #include <QtNetwork/QLocalSocket>
 

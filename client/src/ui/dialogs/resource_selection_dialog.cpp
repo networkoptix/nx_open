@@ -1,4 +1,9 @@
+
 #include "resource_selection_dialog.h"
+
+#include <QKeyEvent>
+#include <QPushButton>
+
 #include "ui_resource_selection_dialog.h"
 
 #include <core/resource_managment/resource_pool.h>

@@ -2,7 +2,9 @@
 #define QN_NEW_USER_DIALOG_H
 
 #include <QDialog>
+#include <QHash>
 #include <QScopedPointer>
+#include <QString>
 
 #include <core/resource/resource_fwd.h>
 

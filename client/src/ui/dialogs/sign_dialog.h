@@ -2,6 +2,8 @@
 #define SIGNDIALOG_H
 
 #include <QtGui/QDialog>
+#include <QVboxLayout>
+
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 class QDataWidgetMapper;

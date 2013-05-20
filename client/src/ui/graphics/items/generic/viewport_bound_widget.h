@@ -4,6 +4,7 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 
 class QGraphicsScale;
+class QGraphicsView;
 
 class Instrument;
 

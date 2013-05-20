@@ -3,6 +3,7 @@
 
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
+#include <QTime>
 #include "sleep.h"
 
 #define MAX_VALID_SLEEP_TIME 5000000

@@ -1,6 +1,7 @@
 #ifndef QN_GLOBALS_H
 #define QN_GLOBALS_H
 
+#include <QFont>
 #include <QObject>
 #include <QVariant>
 #include <QSizeF>

@@ -2,6 +2,7 @@
 #include "ui_ptz_presets_dialog.h"
 
 #include <QtGui/QPushButton>
+#include <QStandardItem>
 
 #include <core/resource/camera_resource.h>
 

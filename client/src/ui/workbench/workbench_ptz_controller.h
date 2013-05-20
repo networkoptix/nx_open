@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtGui/QVector3D>
+#include <quuid.h>
 
 #include <utils/math/space_mapper.h>
 

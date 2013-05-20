@@ -3,6 +3,9 @@
 #include <cmath>
 #include <QtGui/QGraphicsWidget>
 
+#include <qmath.h>
+
+
 Qn::FixedRotation fixedRotationFromDegrees(qreal degrees){
     qreal result = std::fmod(degrees + 45, 360);
     if(result < 0)

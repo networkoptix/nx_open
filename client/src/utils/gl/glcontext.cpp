@@ -5,7 +5,11 @@
 
 #include "glcontext.h"
 
+#ifdef NX_GLCONTEXT_PRESENT
+
 #include <QGLContext>
+
+#include <utils/common/log.h>
 
 #ifdef _WIN32
 #define WGL_WGLEXT_PROTOTYPES
@@ -16,8 +20,6 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #endif
-
-#include <utils/common/log.h>
 
 
 //!Creates context shared with \a contextToShareWith (if not NULL)
@@ -299,3 +301,5 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
 	m_previousErrorCode = errno;
 #endif
 }
+
+#endif  //NX_GLCONTEXT_PRESENT

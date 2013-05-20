@@ -4,6 +4,7 @@
 #include <limits>
 
 #include <QtGui/QPainter>
+#include <QWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -21,6 +22,8 @@ namespace {
     const char *pointPropertyName = "_qn_itemPoint";
     const char *animatorPropertyName = "_qn_itemAnimator";
 }
+
+class QWidget;
 
 QnGridItem::QnGridItem(QGraphicsItem *parent):
     base_type(parent),
