@@ -181,7 +181,7 @@ void QnBusinessRulesDialog::at_context_userChanged() {
 
     if ((accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
         m_loadingHandle = QnAppServerConnectionFactory::createConnection()->getBusinessRulesAsync(
-                    this, SLOT(at_resources_received(int,QByteArray,QnBusinessEventRules,int)));
+                    this, SLOT(at_resources_received(int,QnBusinessEventRuleList,int)));
     }
     updateControlButtons();
 }
@@ -219,14 +219,14 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     deleteRule(model);
 }
 
-void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRuleList &rules, int handle) {
+void QnBusinessRulesDialog::at_resources_received(int status, const QnBusinessEventRuleList &rules, int handle) {
 
     if (handle != m_loadingHandle)
         return;
 
     bool success = (status == 0);
     if(!success) {
-        QMessageBox::critical(this, tr("Error while receiving rules"), QString::fromLatin1(errorString));
+        QMessageBox::critical(this, tr("Error"), tr("Error while receiving rules"));
         return;
     }
     m_rulesViewModel->addRules(rules);
@@ -366,7 +366,7 @@ void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
 
     QnBusinessEventRulePtr rule = ruleModel->createRule();
     int handle = QnAppServerConnectionFactory::createConnection()->saveAsync(
-                rule, this, SLOT(at_resources_saved(int, const QByteArray &, const QnBusinessEventRules &, int)));
+                rule, this, SLOT(at_resources_saved(int, const QByteArray &, const QnBusinessEventRuleList &, int)));
     m_processing[handle] = ruleModel;
 }
 
