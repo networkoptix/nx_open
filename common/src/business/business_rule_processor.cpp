@@ -397,12 +397,12 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
                 action->getMessageBody(),
                 EMAIL_SEND_TIMEOUT,
                 this,
-                SLOT(at_sendEmailFinished(int,QByteArray,bool,int)));
+                SLOT(at_sendEmailFinished(int,bool,int)));
 
     return true;
 }
 
-void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray &errorString, bool result, int handle)
+void QnBusinessRuleProcessor::at_sendEmailFinished(int status, bool result, int handle)
 {
     Q_UNUSED(status)
     Q_UNUSED(handle)
@@ -413,9 +413,7 @@ void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray 
 
     broadcastBusinessAction(action);
 
-    cl_log.log( QString::fromLatin1("Error processing action SendMail: %2").
-                arg(QString::fromUtf8(errorString)), cl_logWARNING );
-
+    cl_log.log(QString::fromLatin1("Error processing action SendMail."), cl_logWARNING);
 }
 
 void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(QnHTTPRawResponse response, int handle)

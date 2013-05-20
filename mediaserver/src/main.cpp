@@ -725,13 +725,13 @@ void QnMain::at_localInterfacesChanged()
 
     m_mediaServer->setNetAddrList(allLocalAddresses());
 
-    appServerConnection->saveAsync(m_mediaServer, this, SLOT(at_serverSaved(int, const QByteArray&, const QnResourceList&, int)));
+    appServerConnection->saveAsync(m_mediaServer, this, SLOT(at_serverSaved(int, const QnResourceList&, int)));
 }
 
-void QnMain::at_serverSaved(int status, const QByteArray &errorString, const QnResourceList &, int)
+void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 {
     if (status != 0)
-        qWarning() << "Error saving server: " << errorString;
+        qWarning() << "Error saving server.";
 }
 
 void QnMain::at_timer()

@@ -29,7 +29,7 @@ public slots:
 private slots:
     void loadResourcesFromECS();
     void at_localInterfacesChanged();
-    void at_serverSaved(int, const QByteArray&, const QnResourceList&, int);
+    void at_serverSaved(int, const QnResourceList&, int);
     void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
     void at_noStorages();
     void at_storageFailure(QnResourcePtr storage);
