@@ -145,6 +145,12 @@ protected:
                 {
                     //preparing timestamp header
                     QByteArray timestampHeader;
+
+                    // This is for buggy iOS 5, which for some reason stips multipart headers
+                    timestampHeader.append( "Content-Type: image/jpeg;ts=" );
+                    timestampHeader.append( QByteArray::number(media->timestamp,10) );
+                    timestampHeader.append( "\r\n" );
+
                     timestampHeader.append( "x-Content-Timestamp: " );
                     timestampHeader.append( QByteArray::number(media->timestamp,10) );
                     timestampHeader.append( "\r\n" );

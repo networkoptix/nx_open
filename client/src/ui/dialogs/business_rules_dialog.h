@@ -55,7 +55,7 @@ private slots:
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
 
-    void at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRuleList &rules, int handle);
+    void at_resources_received(int status, const QnBusinessEventRuleList &rules, int handle);
     void at_resources_saved(int status, const QByteArray& errorString, const QnBusinessEventRuleList &rules, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
