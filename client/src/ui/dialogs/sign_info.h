@@ -2,6 +2,7 @@
 #define __SIGN_INGO_H__
 
 #include <QLabel>
+#include <QTimer>
 #include "export/sign_helper.h"
 
 class QnSignInfo: public QLabel

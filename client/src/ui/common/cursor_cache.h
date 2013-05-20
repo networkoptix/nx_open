@@ -1,6 +1,7 @@
 #ifndef QN_CURSOR_CACHE_H
 #define QN_CURSOR_CACHE_H
 
+#include <QCursor>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 

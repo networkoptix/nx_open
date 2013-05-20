@@ -22,7 +22,7 @@ QnRedAssController* QnRedAssController::instance()
 
 QnRedAssController::QnRedAssController(): m_mutex(QMutex::Recursive), m_mode(Qn::AutoResolution)
 {
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     m_timer.start(TIMER_TICK_INTERVAL);
     m_hiQualityRetryCounter = 0;
     m_timerTicks = 0;

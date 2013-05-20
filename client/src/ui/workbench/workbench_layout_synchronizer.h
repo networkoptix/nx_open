@@ -2,8 +2,9 @@
 #define QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
 
 #include <QtCore/QObject>
-#include <QtCore/QSet>
 #include <QtCore/QMetaType>
+#include <QtCore/QSet>
+#include <QtCore/QUuid>
 
 #include <core/resource/resource_fwd.h>
 

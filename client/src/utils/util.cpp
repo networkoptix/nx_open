@@ -1,4 +1,8 @@
+
 #include "util.h"
+
+#include <QtGui/QDesktopServices>
+
 
 QString getDataDirectory()
 {

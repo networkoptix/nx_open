@@ -1,6 +1,7 @@
 #include "camera_advanced_settings_widget.h"
 
 #include <QtGui/QApplication>
+#include <QtGui/QLabel>
 #include <QtGui/QStyle>
 #include <QtGui/QStyleFactory>
 #include <QtGui/QVBoxLayout>

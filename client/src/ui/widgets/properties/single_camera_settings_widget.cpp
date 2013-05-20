@@ -7,6 +7,7 @@
 #include <QtCore/QProcess>
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
+#include <QtGui/QSplitter>
 
 //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>

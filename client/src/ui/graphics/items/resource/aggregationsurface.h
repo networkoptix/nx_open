@@ -6,7 +6,15 @@
 #ifndef AGGREGATIONSURFACE_H
 #define AGGREGATIONSURFACE_H
 
+#include <map>
 #include <vector>
+
+extern "C"
+{
+    #include <libavutil/pixfmt.h>
+}
+
+#include <gl.h>
 
 #include <QMutex>
 #include <QRect>

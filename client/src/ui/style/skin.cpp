@@ -11,6 +11,7 @@
 #include <utils/common/warnings.h>
 
 #include "noptix_style.h"
+#include "../../config.h"
 
 namespace {
     class QnIconBuilder {

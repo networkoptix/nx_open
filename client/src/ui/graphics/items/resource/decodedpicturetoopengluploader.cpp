@@ -15,7 +15,11 @@
 #endif
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/glext.h>
-#include <libavcodec/avcodec.h>
+
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
 
 #include <utils/color_space/yuvconvert.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
@@ -72,7 +76,13 @@ namespace
     }
 } // anonymous namespace
 
-#ifndef _WIN32
+#ifdef _WIN32
+#elif __APPLE__
+unsigned int GetTickCount()
+{
+    return QDateTime::currentMSecsSinceEpoch();
+}
+#else
 unsigned int GetTickCount()
 {
     struct timespec tp;

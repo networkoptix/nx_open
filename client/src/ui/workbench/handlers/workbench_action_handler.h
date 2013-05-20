@@ -1,6 +1,7 @@
 #ifndef QN_WORKBENCH_ACTION_HANDLER_H
 #define QN_WORKBENCH_ACTION_HANDLER_H
 
+#include <QtCore/QBuffer>
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QPalette>
+
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
 #include "core/resource/resource.h"
@@ -356,6 +358,8 @@ QVariant QnEventLogModel::resourceData(const Column& column, const QnLightBusine
             return action.getRuntimeParams().getEventResourceId();
         case ActionCameraColumn: 
             return action.getRuntimeParams().getActionResourceId();
+        default:
+            return QVariant();
     }
     return QVariant();
 }

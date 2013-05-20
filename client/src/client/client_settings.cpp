@@ -12,6 +12,8 @@
 #include <client/client_meta_types.h>
 
 #include <version.h>
+#include "../config.h"
+
 
 namespace {
     QnConnectionData readConnectionData(QSettings *settings)

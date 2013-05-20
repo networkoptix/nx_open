@@ -2,6 +2,7 @@
 #define QN_WORKBENCH_PTZ_CAMERA_WATCHER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
 

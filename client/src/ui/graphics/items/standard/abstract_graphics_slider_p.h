@@ -5,6 +5,7 @@
 #include "abstract_graphics_slider.h"
 
 #include <QtCore/QBasicTimer>
+#include <QGraphicsSceneMouseEvent>
 #ifdef QT_KEYPAD_NAVIGATION
 #  include <QtCore/QElapsedTimer>
 #endif

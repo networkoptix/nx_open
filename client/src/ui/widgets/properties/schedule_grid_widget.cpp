@@ -2,8 +2,10 @@
 
 #include <cassert>
 
+#include <QtCore/QDate>
 #include <QtGui/QApplication>
 #include <QtGui/QPainter>
+#include <QtGui/QMouseEvent>
 
 #include "ui/style/globals.h"
 #include "client/client_settings.h"

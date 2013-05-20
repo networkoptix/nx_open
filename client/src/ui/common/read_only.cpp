@@ -2,6 +2,7 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QKeyEvent>
+#include <QMetaProperty>
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>

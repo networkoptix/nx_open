@@ -2,6 +2,7 @@
 #define QN_SHADED_H
 
 #include <QtGui/QGraphicsItem>
+#include <QEvent>
 
 #include <utils/common/forward.h>
 

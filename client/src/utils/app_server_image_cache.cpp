@@ -1,6 +1,7 @@
 #include "app_server_image_cache.h"
 
 #include <QtCore/QFileInfo>
+#include <QtCore/QUuid>
 
 #include <ui/graphics/opengl/gl_functions.h>
 

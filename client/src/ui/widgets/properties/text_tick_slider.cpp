@@ -1,4 +1,10 @@
+
 #include "text_tick_slider.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QStyleOptionSlider>
+
 
 QnTextTickSlider::QnTextTickSlider(QWidget *parent): 
     QSlider(parent)

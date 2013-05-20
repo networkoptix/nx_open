@@ -12,6 +12,7 @@
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
 
+#include <QAction>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
@@ -20,6 +21,12 @@
 #include <QtGui/QDesktopWidget>
 
 #include <QtSingleApplication>
+
+extern "C"
+{
+    #include <libavformat/avformat.h>
+    #include <libavformat/avio.h>
+}
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -31,7 +38,6 @@
 #ifdef Q_OS_WIN
     #include "device_plugins/desktop_win/device/desktop_resource_searcher.h"
 #endif
-#include "libavformat/avio.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_discovery_manager.h"

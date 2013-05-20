@@ -1,6 +1,11 @@
+
 #include "masked_proxy_widget.h"
+
+#include <QPainter>
 #include <QStyleOptionGraphicsItem>
+
 #include <ui/common/geometry.h>
+
 
 namespace {
     template<class Base>

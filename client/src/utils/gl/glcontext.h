@@ -18,6 +18,7 @@ struct __GLXcontextRec;
 #endif
 
 class QGLContext;
+class QGLWidget;
 
 
 //!Cross-platform GL context which can be used in any thread (not in GUI only) unlike QGLContext

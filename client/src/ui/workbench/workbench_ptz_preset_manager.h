@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <QVector3D>
 
 #include <api/model/kvpair.h>
 #include <core/resource/resource_fwd.h>

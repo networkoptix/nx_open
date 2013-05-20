@@ -1,4 +1,9 @@
+
 #include "export_camera_settings_dialog.h"
+
+#include <QKeyEvent>
+#include <QPushButton>
+
 #include "ui_export_camera_settings_dialog.h"
 
 #include <core/resource_managment/resource_pool.h>

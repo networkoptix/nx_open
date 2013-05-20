@@ -1,6 +1,8 @@
 #include "tree_combo_box.h"
 
+#include <QApplication>
 #include <QtGui/QHeaderView>
+
 
 QnTreeViewComboBox::QnTreeViewComboBox(QWidget *parent): QComboBox(parent), m_treeView(NULL) 
 {

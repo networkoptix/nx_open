@@ -1,4 +1,8 @@
+
 #include "graphics_path_item.h"
+
+#include <QPainter>
+
 
 GraphicsPathItem::GraphicsPathItem(QGraphicsItem *parent):
     base_type(parent) 

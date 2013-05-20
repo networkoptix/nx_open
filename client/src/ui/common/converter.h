@@ -1,7 +1,10 @@
 #ifndef QN_CONVERTER_H
 #define QN_CONVERTER_H
 
+#include <typeinfo>
+
 #include <utils/common/warnings.h>
+
 
 class QVariant;
 

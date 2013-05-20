@@ -1,4 +1,11 @@
+
 #include "table_view.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QHeaderView>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QScrollBar>
+
 #include "client/client_globals.h"
 
 

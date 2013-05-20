@@ -1,8 +1,12 @@
 #include "thumbnails_loader.h"
 
 #include <cassert>
-
 #include <limits>
+
+extern "C"
+{
+    #include <libswscale/swscale.h>
+}
 
 #include <QtCore/QTimer>
 #include <QtGui/QImage>

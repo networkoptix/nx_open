@@ -7,6 +7,8 @@
 
 #include <QGLContext>
 
+#include <utils/common/log.h>
+
 #ifdef _WIN32
 #define WGL_WGLEXT_PROTOTYPES
 #include <gl/wglext.h>
@@ -16,8 +18,6 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #endif
-
-#include <utils/common/log.h>
 
 
 //!Creates context shared with \a contextToShareWith (if not NULL)

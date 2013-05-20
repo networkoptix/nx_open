@@ -2,6 +2,8 @@
 #include "ui_database_management_widget.h"
 
 #include <QMessageBox>
+#include <QtGui/QFileDialog>
+#include <QtCore/QFileInfo>
 
 #include "client/client_settings.h"
 #include "api/app_server_connection.h"

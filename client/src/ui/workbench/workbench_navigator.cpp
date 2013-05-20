@@ -9,6 +9,11 @@
 #include <QtGui/QGraphicsSceneContextMenuEvent>
 #include <QtGui/QApplication>
 
+extern "C"
+{
+    #include <libavutil/avutil.h> // TODO: remove
+}
+
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -43,7 +48,6 @@
 
 #include "camera/thumbnails_loader.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "libavutil/avutil.h" // TODO: remove
 #include "handlers/workbench_action_handler.h"
 #include "redass/redass_controller.h"
 

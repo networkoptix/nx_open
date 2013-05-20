@@ -2,6 +2,7 @@
 #define QN_LICENSE_MANAGER_WIDGET_H
 
 #include <QtGui/QWidget>
+#include <QtCore/QModelIndex>
 
 #include "licensing/license.h"
 #include "api/app_server_connection.h"

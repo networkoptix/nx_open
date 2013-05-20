@@ -31,6 +31,8 @@ mac {
         
   #  QMAKE_CXXFLAGS += -DAPI_TEST_MAIN
   #  TARGET = consoleapp
+
+  INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/ /usr/X11/include/
 }
 
 unix {

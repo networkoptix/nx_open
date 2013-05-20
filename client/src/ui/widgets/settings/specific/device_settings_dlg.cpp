@@ -1,8 +1,11 @@
 #include "device_settings_dlg.h"
 
+#include <QtCore/QMetaProperty>
+#include <QtGui/QAbstractButton>
 #include <QtGui/QBoxLayout>
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QGroupBox>
+#include <QtGui/QPushButton>
 #include <QtGui/QMessageBox>
 #include <QtGui/QTabWidget>
 

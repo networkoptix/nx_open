@@ -1,6 +1,7 @@
 #ifndef QN_SCHEDULE_GRID_WIDGET_H
 #define QN_SCHEDULE_GRID_WIDGET_H
 
+#include <QtCore/QVariant>
 #include <QtGui/QWidget>
 #include <core/misc/schedule_recording_type.h>
 
