@@ -410,10 +410,10 @@ int QnAppServerConnection::getResource(const QnId &id, QnResourcePtr &resource)
     QnRequestParamList params(m_requestParams);
     params.append(QnRequestParam("id", id.toString()));
 
-    QnResourceList resources;
-    int status = sendSyncGetRequest(ResourceObject, m_requestHeaders, params, &resources);
+    QnResourceList reply;
+    int status = sendSyncGetRequest(ResourceObject, m_requestHeaders, params, &reply);
     if (status == 0) 
-        resource = resources[0];
+        resource = reply[0];
     return status;
 }
 
@@ -441,7 +441,6 @@ int QnAppServerConnection::addCamera(const QnVirtualCameraResourcePtr &cameraPtr
     int status = sendSyncRequest(QNetworkAccessManager::PostOperation, CameraObject, m_requestHeaders, m_requestParams, data, &reply);
     if (status == 0)
         cameras = reply.filtered<QnVirtualCameraResource>();
-
     return status;
 }
 
@@ -577,10 +576,10 @@ int QnAppServerConnection::addBusinessRule(const QnBusinessEventRulePtr &busines
 
 int QnAppServerConnection::getServers(QnMediaServerResourceList &servers)
 {
-    QnResourceList resources;
-    int status = sendSyncGetRequest(ServerObject, m_requestHeaders, m_requestParams, &resources);
+    QnResourceList reply;
+    int status = sendSyncGetRequest(ServerObject, m_requestHeaders, m_requestParams, &reply);
     if(status == 0)
-        servers = resources.filtered<QnMediaServerResource>();
+        servers = reply.filtered<QnMediaServerResource>();
     return status;
 }
 
@@ -589,28 +588,28 @@ int QnAppServerConnection::getCameras(QnVirtualCameraResourceList &cameras, QnId
     QnRequestParamList params = m_requestParams;
     params.append(QnRequestParam("parent_id", mediaServerId.toString()));
 
-    QnResourceList resources;
-    int status = sendSyncGetRequest(CameraObject, m_requestHeaders, params, &resources);
+    QnResourceList reply;
+    int status = sendSyncGetRequest(CameraObject, m_requestHeaders, params, &reply);
     if(status == 0)
-        cameras = resources.filtered<QnVirtualCameraResource>();
+        cameras = reply.filtered<QnVirtualCameraResource>();
     return status;
 }
 
 int QnAppServerConnection::getLayouts(QnLayoutResourceList &layouts)
 {
-    QnResourceList resources;
-    int status = sendSyncGetRequest(LayoutObject, m_requestHeaders, m_requestParams, &resources);
+    QnResourceList reply;
+    int status = sendSyncGetRequest(LayoutObject, m_requestHeaders, m_requestParams, &reply);
     if(status == 0)
-        layouts = resources.filtered<QnLayoutResource>();
+        layouts = reply.filtered<QnLayoutResource>();
     return status;
 }
 
 int QnAppServerConnection::getUsers(QnUserResourceList &users)
 {
-    QnResourceList resources;
+    QnResourceList reply;
     int status = sendSyncGetRequest(UserObject, m_requestHeaders, m_requestParams, &users);
     if(status == 0)
-        users = resources.filtered<QnUserResource>();
+        users = reply.filtered<QnUserResource>();
     return status;
 }
 
