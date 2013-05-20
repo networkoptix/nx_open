@@ -500,7 +500,7 @@ int main(int argc, char **argv)
             /* If no input files were supplied --- open connection settings dialog. */
             if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
                 context->menu()->trigger(Qn::ConnectToServerAction,
-                                         QnActionParameters().withArgument(Qn::StoredPasswordRole, qnSettings->storedPassword()));
+                                         QnActionParameters().withArgument(Qn::AutoConnectRole, true));
             } else {
                 context->menu()->trigger(Qn::ReconnectAction);
             }

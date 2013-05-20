@@ -59,7 +59,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     ui(new Ui::LoginDialog),
     m_requestHandle(-1),
     m_renderingWidget(NULL),
-    m_restartPending(false)
+    m_restartPending(false),
+    m_autoConnectPending(false)
 {
     ui->setupUi(this);
 
@@ -118,6 +119,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     connect(m_entCtrlFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
             this,               SLOT(at_entCtrlFinder_remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
     m_entCtrlFinder->start();
+
+
 }
 
 QnLoginDialog::~QnLoginDialog() {
@@ -172,9 +175,8 @@ bool QnLoginDialog::rememberPassword() const {
     return ui->rememberPasswordCheckBox->isChecked();
 }
 
-void QnLoginDialog::setStoredPassword(const QString &password) {
-    ui->passwordLineEdit->setText(password);
-    ui->rememberPasswordCheckBox->setChecked(!password.isEmpty());
+void QnLoginDialog::setAutoConnect(bool value) {
+    m_autoConnectPending = value;
 }
 
 void QnLoginDialog::reject() {
@@ -201,7 +203,8 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
-    if (ui->rememberPasswordCheckBox->isChecked()
+    if (m_autoConnectPending
+            && ui->rememberPasswordCheckBox->isChecked()
             && !ui->passwordLineEdit->text().isEmpty()
             && currentUrl().isValid())
         accept();
@@ -250,8 +253,10 @@ void QnLoginDialog::resetConnectionsModel() {
     m_connectionsModel->appendRow(headerFoundItem);
     resetAutoFoundConnectionsModel();
     ui->connectionsComboBox->setCurrentIndex(selectedIndex); /* Last used connection if exists, else last saved connection. */
-    ui->passwordLineEdit->clear();
 
+    QString password = qnSettings->storedPassword();
+    ui->passwordLineEdit->setText(password);
+    ui->rememberPasswordCheckBox->setChecked(!password.isEmpty());
 }
 
 void QnLoginDialog::resetAutoFoundConnectionsModel() {

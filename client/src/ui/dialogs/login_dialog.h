@@ -40,8 +40,8 @@ public:
     bool restartPending() const;
 
     bool rememberPassword() const;
-    void setStoredPassword(const QString &password);
 
+    void setAutoConnect(bool value = true);
 
 public slots:
     virtual void accept() override;
@@ -97,6 +97,7 @@ private:
     QMultiHash<QString, QUrl> m_foundEcs;
 
     bool m_restartPending;
+    bool m_autoConnectPending;
 };
 
 #endif // LOGINDIALOG_H

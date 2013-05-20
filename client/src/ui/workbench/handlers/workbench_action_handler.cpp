@@ -1661,7 +1661,8 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     dialog->setModal(true);
     while(true) {
         QnActionParameters parameters = menu()->currentParameters(sender());
-        dialog->setStoredPassword(parameters.argument(Qn::StoredPasswordRole).toString());
+        if (parameters.argument(Qn::AutoConnectRole, false))
+            dialog->setAutoConnect();
 
         if(!dialog->exec())
             return;

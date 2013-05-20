@@ -81,7 +81,7 @@ namespace Qn {
         TimePeriodRole,
         TimePeriodsRole,
         MergedTimePeriodsRole,
-        StoredPasswordRole,
+        AutoConnectRole,
         FileNameRole,
 
 
