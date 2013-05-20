@@ -29,6 +29,7 @@
 		<!--Global defines-->
 		<global.defines/>
 		<linux.defines/>
+		<mac.defines/>
 		<!--Specific os defines-->
 		<windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
 	</properties>  

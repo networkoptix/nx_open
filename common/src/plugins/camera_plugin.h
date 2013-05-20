@@ -74,6 +74,9 @@ namespace nxcip
         }
     };
 
+    static const int CAMERA_INFO_ARRAY_SIZE = 1024;
+    static const int MAX_MODEL_NAME_SIZE = 256;
+
     //!This interface is used to find cameras and create \a BaseCameraManager instance
     /*!
         Mediaserver has built-in UPNP & MDNS support, plugin needs only implement \a nxcip::CameraDiscoveryManager::fromUpnpData or 
@@ -101,7 +104,6 @@ namespace nxcip
         */
         virtual void getVendorName( char* buf ) const = 0;
 
-        static const int CAMERA_INFO_ARRAY_SIZE = 1024;
         //!Vendor-specific camera search method. Returns list of found cameras
         /*!
             It is recommended that this method works in asynchronous mode (only returning list of already found cameras).
@@ -154,7 +156,6 @@ namespace nxcip
         //!Instanciates camera manager instance based on \a info
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
 
-        static const int MAX_MODEL_NAME_SIZE = 256;
         //!Get model model names, reserved by the plugin
         /*!
              \param[out] modelList        Array of \a char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
@@ -203,6 +204,8 @@ namespace nxcip
     // {528FD641-52BB-4f8b-B279-6C21FEF5A2BB}
     static const nxpl::NX_GUID IID_CameraMediaEncoder = { { 0x52, 0x8f, 0xd6, 0x41, 0x52, 0xbb, 0x4f, 0x8b, 0xb2, 0x79, 0x6c, 0x21, 0xfe, 0xf5, 0xa2, 0xbb } };
 
+    static const int MAX_RESOLUTION_LIST_SIZE = 64;
+
     //!Provides encoder parameter configuration and media stream access (by providing media stream url)
     class CameraMediaEncoder
     :
@@ -221,8 +224,6 @@ namespace nxcip
             \return 0 on success, otherwise - error code
         */
         virtual int getMediaUrl( char* urlBuf ) const = 0;
-
-        static const int MAX_RESOLUTION_LIST_SIZE = 64;
 
         //!Returns supported resolution list
         /*!

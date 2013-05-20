@@ -94,7 +94,7 @@ int AxisMediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* i
 
     *infoListCount = std::min<int>(
         m_supportedResolutions.size(),
-        nxcip::CameraMediaEncoder::MAX_RESOLUTION_LIST_SIZE);
+        nxcip::MAX_RESOLUTION_LIST_SIZE);
     memcpy(
         infoList,
         &m_supportedResolutions[0],

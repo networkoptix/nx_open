@@ -40,7 +40,7 @@ namespace nxcip_qt
     //!See nxcip::CameraDiscoveryManager::findCameras
     int CameraDiscoveryManager::findCameras( QVector<nxcip::CameraInfo>* const cameras, const QString& localInterfaceIPAddr )
     {
-        cameras->resize( nxcip::CameraDiscoveryManager::CAMERA_INFO_ARRAY_SIZE );
+        cameras->resize( nxcip::CAMERA_INFO_ARRAY_SIZE );
         const QByteArray& localInterfaceIPAddrUtf8 = localInterfaceIPAddr.toUtf8();
         int result = m_intf->findCameras( cameras->data(), localInterfaceIPAddrUtf8.data() );
         cameras->resize( result > 0 ? result : 0 );
@@ -54,7 +54,7 @@ namespace nxcip_qt
         const QString* login,
         const QString* password )
     {
-        cameras->resize( nxcip::CameraDiscoveryManager::CAMERA_INFO_ARRAY_SIZE );
+        cameras->resize( nxcip::CAMERA_INFO_ARRAY_SIZE );
         const QByteArray& urlUtf8 = url.toUtf8();
         const QByteArray loginUtf8 = login ? login->toUtf8() : QByteArray();
         const QByteArray passwordUtf8 = password ? password->toUtf8() : QByteArray();
@@ -102,7 +102,7 @@ namespace nxcip_qt
         //preparing temporary buffer
         char** tempModelList = new char*[count];
         for( int i = 0; i < count; ++i )
-            tempModelList[i] = new char[nxcip::CameraDiscoveryManager::MAX_MODEL_NAME_SIZE];
+            tempModelList[i] = new char[nxcip::MAX_MODEL_NAME_SIZE];
 
         //requesting list
         m_intf->getReservedModelList( tempModelList, &count );
@@ -149,7 +149,7 @@ namespace nxcip_qt
     //!See nxcip::BaseCameraManager::getResolutionList
     int CameraMediaEncoder::getResolutionList( QVector<nxcip::ResolutionInfo>* infoList ) const
     {
-        infoList->resize( nxcip::CameraMediaEncoder::MAX_RESOLUTION_LIST_SIZE );
+        infoList->resize( nxcip::MAX_RESOLUTION_LIST_SIZE );
         int infoListCount = 0;
         int result = m_intf->getResolutionList( infoList->data(), &infoListCount );
         infoList->resize( infoListCount );
