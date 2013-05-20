@@ -92,7 +92,11 @@ private:
     QMap<int, int> m_deleting;
 
     QMenu* m_popupMenu;
+
+    QAction* m_newAction;
+    QAction* m_deleteAction;
     QAction* m_advancedAction;
+
     int m_loadingHandle;
 
     bool m_advancedMode;

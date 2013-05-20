@@ -220,7 +220,6 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRuleList &rules, int handle) {
-
     if (handle != m_loadingHandle)
         return;
 
@@ -302,11 +301,11 @@ void QnBusinessRulesDialog::updateAdvancedAction() {
 }
 
 void QnBusinessRulesDialog::createActions() {
-    QAction* newAct = new QAction(tr("&New..."), this);
-    connect(newAct, SIGNAL(triggered()), this, SLOT(at_newRuleButton_clicked()));
+    m_newAction = new QAction(tr("&New..."), this);
+    connect(m_newAction, SIGNAL(triggered()), this, SLOT(at_newRuleButton_clicked()));
 
-    QAction* deleteAct = new QAction(tr("&Delete"), this);
-    connect(deleteAct, SIGNAL(triggered()), this, SLOT(at_deleteButton_clicked()));
+    m_deleteAction = new QAction(tr("&Delete"), this);
+    connect(m_deleteAction, SIGNAL(triggered()), this, SLOT(at_deleteButton_clicked()));
 
     m_advancedAction = new QAction(this);
     connect(m_advancedAction, SIGNAL(triggered()), this, SLOT(toggleAdvancedMode()));
@@ -315,8 +314,8 @@ void QnBusinessRulesDialog::createActions() {
     QAction* scheduleAct = new QAction(tr("&Schedule..."), this);
     connect(scheduleAct, SIGNAL(triggered()), m_currentDetailsWidget, SLOT(at_scheduleButton_clicked()));
 
-    m_popupMenu->addAction(newAct);
-    m_popupMenu->addAction(deleteAct);
+    m_popupMenu->addAction(m_newAction);
+    m_popupMenu->addAction(m_deleteAction);
     m_popupMenu->addSeparator();
     m_popupMenu->addAction(m_advancedAction);
     m_popupMenu->addAction(scheduleAct);
@@ -390,10 +389,13 @@ void QnBusinessRulesDialog::updateControlButtons() {
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges);
 
     ui->deleteRuleButton->setEnabled(hasRights && loaded && m_currentDetailsWidget->model());
+    m_deleteAction->setEnabled(hasRights && loaded && m_currentDetailsWidget->model());
 
     ui->advancedButton->setEnabled(loaded && m_currentDetailsWidget->model());
     m_advancedAction->setEnabled(loaded && m_currentDetailsWidget->model());
     ui->addRuleButton->setEnabled(hasRights && loaded);
+    m_newAction->setEnabled(hasRights && loaded);
+
 
     setAdvancedMode(hasRights && loaded && advancedMode());
 }
