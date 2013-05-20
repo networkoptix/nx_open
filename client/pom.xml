@@ -74,5 +74,14 @@
 				</plugins>
 			</build>
 		</profile>	
+                <profile>
+                        <id>linux</id>
+                        <activation>
+                                <os>
+                                        <family>unix</family>
+                                        <name>linux</name>
+                                </os>
+                        </activation>
+		</profile>	
 	</profiles>
 </project>

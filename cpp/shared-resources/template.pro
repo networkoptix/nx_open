@@ -91,7 +91,7 @@ win* {
   QMAKE_MOC = $$QMAKE_MOC -DQ_OS_WIN
 }
 
-unix {
+unix:!mac {
   LIBS += ${linux.oslibs}
   DEFINES += QN_EXPORT=
   QMAKE_CXXFLAGS += -msse2 -std=c++0x -fpermissive
@@ -102,13 +102,11 @@ unix {
 }
 
 mac {
-  #QMAKE_CXXFLAGS -= -std=c++0x -msse2
-  QMAKE_CXXFLAGS -= -msse2
-  QMAKE_CXXFLAGS += -msse4.1
+  QMAKE_CXXFLAGS += -msse4.1 -std=c++0x -fpermissive
   QMAKE_CFLAGS += -msse4.1
   DEFINES += QN_EXPORT=  
   LIBS += ${mac.oslibs}
-  DEFINES += ${mac.defines}
+  DEFINES += ${mac.defines} override=
   CONFIG -= app_bundle objective_c
   INCLUDEPATH +=  ${environment.dir}/include/glext/
 }

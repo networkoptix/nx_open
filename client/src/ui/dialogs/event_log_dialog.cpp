@@ -3,6 +3,7 @@
 
 #include <QClipboard>
 #include <QMenu>
+#include <QtGui/QMessageBox>
 #include <QMimeData>
 
 #include "ui_event_log_dialog.h"
