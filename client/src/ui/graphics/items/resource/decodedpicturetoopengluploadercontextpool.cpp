@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include <utils/gl/glcontext.h>
+
 #include "decodedpicturetoopengluploader.h"
 
 
@@ -24,19 +26,23 @@ DecodedPictureToOpenGLUploadThread::DecodedPictureToOpenGLUploadThread( GLContex
 
 DecodedPictureToOpenGLUploadThread::~DecodedPictureToOpenGLUploadThread()
 {
+#ifdef NX_GLCONTEXT_PRESENT
     push( NULL );
     wait();
 
     delete m_glContext;
     m_glContext = NULL;
+#endif
 }
 
 void DecodedPictureToOpenGLUploadThread::push( UploadFrameRunnable* toRun )
 {
+#ifdef NX_GLCONTEXT_PRESENT
     //m_taskQueue.push( toRun );
     QMutexLocker lk( &m_mutex );
     m_taskQueue.push_back( toRun );
     m_cond.wakeAll();
+#endif
 }
 
 const GLContext* DecodedPictureToOpenGLUploadThread::glContext() const
@@ -46,6 +52,7 @@ const GLContext* DecodedPictureToOpenGLUploadThread::glContext() const
 
 void DecodedPictureToOpenGLUploadThread::run()
 {
+#ifdef NX_GLCONTEXT_PRESENT
 #if !(defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD))
     GLContext::ScopedContextUsage scu( m_glContext );
 #endif
@@ -74,6 +81,7 @@ void DecodedPictureToOpenGLUploadThread::run()
     }
 
     NX_LOG( QString::fromAscii("DecodedPictureToOpenGLUploadThread stopped"), cl_logDEBUG1 );
+#endif
 }
 
 
@@ -113,6 +121,7 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
     QGLWidget* const shareWidget,
     int poolSizeIncrement )
 {
+#ifdef NX_GLCONTEXT_PRESENT
     QMutexLocker lk( &m_mutex );
 
     UploaderPoolContext& pool = m_auxiliaryGLContextPool[shareWidget->context()];
@@ -143,6 +152,9 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
     }
 
     return !pool.uploaders.empty();
+#else
+    return false;
+#endif
 }
 
 const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& DecodedPictureToOpenGLUploaderContextPool::getPoolOfContextsSharedWith( const QGLContext* const parentContext ) const
@@ -160,6 +172,7 @@ DecodedPictureToOpenGLUploaderContextPool* DecodedPictureToOpenGLUploaderContext
 
 void DecodedPictureToOpenGLUploaderContextPool::onShareWidgetDestroyed( QObject* obj )
 {
+#ifdef NX_GLCONTEXT_PRESENT
     QMutexLocker lk( &m_mutex );
     for( std::map<const QGLContext*, UploaderPoolContext>::const_iterator
         it = m_auxiliaryGLContextPool.begin();
@@ -172,4 +185,5 @@ void DecodedPictureToOpenGLUploaderContextPool::onShareWidgetDestroyed( QObject*
             return;
         }
     }
+#endif
 }

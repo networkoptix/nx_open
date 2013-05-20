@@ -19,7 +19,6 @@
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/common/safepool.h>
 #include <utils/common/stoppable.h>
-#include <utils/gl/glcontext.h>
 #include <ui/graphics/opengl/gl_fence.h>
 #include <utils/media/frame_info.h>
 
@@ -34,7 +33,6 @@ class AsyncPicDataUploader;
 class CLVideoDecoderOutput;
 class DecodedPictureToOpenGLUploaderPrivate;
 class DecodedPictureToOpenGLUploadThread;
-class GLContext;
 class QnGlRendererTexture;
 class AVPacketUploader;
 

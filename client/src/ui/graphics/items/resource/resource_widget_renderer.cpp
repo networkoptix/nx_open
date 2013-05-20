@@ -6,7 +6,6 @@
 #include <camera/gl_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
-#include <utils/gl/glcontext.h>
 #include <client/client_settings.h>
 
 #include "decodedpicturetoopengluploader.h"

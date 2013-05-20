@@ -17,6 +17,7 @@ public:
     ~QnAppServerNotificationCache();
     
     void storeSound(const QString &filePath, int maxLengthMSecs = -1, const QString &customTitle = QString());
+    void updateTitle(const QString &filename, const QString &title);
     void clear();
 
     QnNotificationSoundModel* persistentGuiModel() const;

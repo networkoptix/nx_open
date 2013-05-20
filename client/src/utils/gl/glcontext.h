@@ -6,6 +6,10 @@
 #ifndef GLCONTEXT_H
 #define GLCONTEXT_H
 
+#if defined(_WIN32) || defined(Q_OS_WIN) || defined(Q_OS_LINUX)
+
+#define NX_GLCONTEXT_PRESENT
+
 #include <memory>
 
 #include <QString>
@@ -112,5 +116,7 @@ private:
 
     void initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith );
 };
+
+#endif  //defined(Q_OS_WIN) || defined(Q_OS_LINUX)
 
 #endif  //GLCONTEXT_H
