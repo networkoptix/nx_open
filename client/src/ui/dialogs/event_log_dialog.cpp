@@ -1,7 +1,7 @@
 
 #include "event_log_dialog.h"
 
-#include <QClipBoard>
+#include <QClipboard>
 #include <QMenu>
 #include <QMimeData>
 

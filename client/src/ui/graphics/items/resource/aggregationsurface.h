@@ -14,7 +14,7 @@ extern "C"
     #include <libavutil/pixfmt.h>
 }
 
-#include <gl.h>
+#include <GL/gl.h>
 
 #include <QMutex>
 #include <QRect>

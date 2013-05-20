@@ -2,7 +2,7 @@
 #define SIGNDIALOG_H
 
 #include <QtGui/QDialog>
-#include <QVboxLayout>
+#include <QVBoxLayout>
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
