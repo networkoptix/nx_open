@@ -21,7 +21,7 @@ typedef QnLightBusinessAction* QnLightBusinessActionP;
 class QnEventLogModel::DataIndex
 {
 public:
-    DataIndex(): m_sortCol(DateTimeColumn), m_sortOrder(Qt::DescendingOrder)
+    DataIndex(): m_sortCol(DateTimeColumn), m_sortOrder(Qt::DescendingOrder), m_size(0)
     {
         static bool firstCall = true;
         if (firstCall) {
