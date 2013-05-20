@@ -20,6 +20,10 @@ public:
     void clear();
 
     QnNotificationSoundModel* persistentGuiModel() const;
+public slots:
+    void at_fileAddedEvent(const QString &filename);
+    void at_fileUpdatedEvent(const QString &filename);
+    void at_fileRemovedEvent(const QString &filename);
 private slots:
     void at_soundConverted(const QString &filePath);
 

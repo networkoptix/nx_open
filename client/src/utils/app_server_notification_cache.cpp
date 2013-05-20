@@ -64,6 +64,39 @@ void QnAppServerNotificationCache::clear() {
     m_model->init();
 }
 
+void QnAppServerNotificationCache::at_fileAddedEvent(const QString &filename) {
+    if (!filename.startsWith(folder))
+        return;
+
+    QString localFilename = filename.mid(QString(folder).size() + 1);
+
+    // will do nothing if we have added this file
+    downloadFile(localFilename);
+}
+
+void QnAppServerNotificationCache::at_fileUpdatedEvent(const QString &filename) {
+    if (!filename.startsWith(folder))
+        return;
+
+    QString localFilename = filename.mid(QString(folder).size() + 1);
+
+    // how and when should we redownload the file? check if we have modified the file by ourselves!
+
+    QString title = AudioPlayer::getTagValue(getFullPath(localFilename), titleTag);
+    if (!title.isEmpty())
+        m_model->updateTitle(localFilename, title);
+}
+
+void QnAppServerNotificationCache::at_fileRemovedEvent(const QString &filename) {
+    if (!filename.startsWith(folder))
+        return;
+
+    QString localFilename = filename.mid(QString(folder).size() + 1);
+
+    // double removing is quite safe
+    QFile::remove(getFullPath(localFilename));
+}
+
 void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {
     QString filename = QFileInfo(filePath).fileName();
     m_model->addUploading(filename);
