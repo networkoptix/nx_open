@@ -279,6 +279,8 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
             continue;
         if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) == 0)
             continue;
+        if ((config.flags & SIGAR_IFF_LOOPBACK) > 0)
+            continue;
 
         result.push_back(d->networkLoad(interfaceName));
     }
