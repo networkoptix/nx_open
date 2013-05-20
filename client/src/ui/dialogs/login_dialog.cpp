@@ -59,6 +59,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     ui(new Ui::LoginDialog),
     m_requestHandle(-1),
     m_renderingWidget(NULL),
+    m_entCtrlFinder(NULL),
     m_restartPending(false),
     m_autoConnectPending(false)
 {
@@ -113,14 +114,14 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
+#ifndef __APPLE__
     m_entCtrlFinder = new NetworkOptixModuleFinder();
     connect(m_entCtrlFinder,    SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
             this,               SLOT(at_entCtrlFinder_remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
     connect(m_entCtrlFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
             this,               SLOT(at_entCtrlFinder_remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
     m_entCtrlFinder->start();
-
-
+#endif
 }
 
 QnLoginDialog::~QnLoginDialog() {
