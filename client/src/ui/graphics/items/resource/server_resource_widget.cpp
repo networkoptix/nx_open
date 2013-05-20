@@ -341,7 +341,9 @@ protected:
         qreal offsetTop = isEmpty? itemSpacing : painter->fontMetrics().height() + itemSpacing;
         qreal offsetBottom = itemSpacing;
 
-        qreal pen_width = 1.0;
+        const qreal grid_pen_width = 2.5;
+        const qreal graph_pen_width = 3.0;
+        const qreal frame_pen_width = 3.0;
 
         qreal ow = width - offsetX*2;
         qreal oh = height - offsetTop - offsetBottom;
@@ -362,7 +364,7 @@ protected:
         {
             QPen grid;
             grid.setColor(qnGlobals->statisticsColors().grid);
-            grid.setWidthF(pen_width);
+            grid.setWidthF(grid_pen_width);
 
             QPainterPath grid_path;
             for (qreal i = offsetX - (x_step * (elapsed_step + m_widget->m_counter%4 - 4)); i < ow + offsetX; i += x_step*4){
@@ -397,14 +399,14 @@ protected:
             QnScopedPainterTransformRollback transformRollback(painter);
             Q_UNUSED(transformRollback)
 
-            qreal space_offset = pen_width * 2;
+            qreal space_offset = graph_pen_width;
 
             QTransform graphTransform = painter->transform();
             graphTransform.translate(offsetX, oh + offsetTop - space_offset);
             painter->setTransform(graphTransform);
 
             QPen graphPen;
-            graphPen.setWidthF(pen_width * 2);
+            graphPen.setWidthF(graph_pen_width);
             graphPen.setCapStyle(Qt::FlatCap);
 
             foreach(QString key, m_widget->m_sortedKeys) {
@@ -433,7 +435,7 @@ protected:
 
             QPen main_pen;
             main_pen.setColor(qnGlobals->statisticsColors().frame);
-            main_pen.setWidthF(pen_width * 2);
+            main_pen.setWidthF(frame_pen_width);
             main_pen.setJoinStyle(Qt::MiterJoin);
 
             painter->setPen(main_pen);
@@ -537,13 +539,13 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painte
     Q_UNUSED(channel)
     Q_UNUSED(channelRect)
 
-    drawStatistics(paintRect, painter);
+    drawBackground(paintRect, painter);
 
     return m_renderStatus;
 }
 
 // TODO: #GDM this method draws background only, why 'drawStatistics'?
-void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painter) {
+void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painter) {
     qreal width = rect.width();
     qreal height = rect.height();
     qreal min = qMin(width, height);
@@ -585,9 +587,6 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 }
 
 void QnServerResourceWidget::addOverlays() {
-
-
-
     StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this, this);
     statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
 

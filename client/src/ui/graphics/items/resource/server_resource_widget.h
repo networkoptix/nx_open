@@ -59,8 +59,8 @@ private slots:
     void at_headerOverlayWidget_opacityChanged(const QVariant &value);
 
 private:
-    /** Main painting function. */
-    void drawStatistics(const QRectF &rect, QPainter *painter);
+    /** Background painting function. */
+    void drawBackground(const QRectF &rect, QPainter *painter);
 
     void addOverlays();
 
