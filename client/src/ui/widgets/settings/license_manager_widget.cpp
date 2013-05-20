@@ -158,7 +158,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
 
     if (!licensesToUpdate.isEmpty()) {
         QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
-        int handle = connection->addLicensesAsync(licensesToUpdate, this, SLOT(at_licensesReceived(int,QByteArray,QnLicenseList,int)));
+        int handle = connection->addLicensesAsync(licensesToUpdate, this, SLOT(at_licensesReceived(int,QnLicenseList,int)));
         m_handleKeyMap[handle] = licenseKey;
     }
 
@@ -186,7 +186,7 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnLicenseManagerWidget::at_licensesReceived(int status, const QByteArray &/*errorString*/, QnLicenseList licenses, int handle)
+void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licenses, int handle)
 {
     QByteArray licenseKey = m_handleKeyMap[handle];
     m_handleKeyMap.remove(handle);
