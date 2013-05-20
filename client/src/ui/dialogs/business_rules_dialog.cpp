@@ -188,13 +188,13 @@ void QnBusinessRulesDialog::at_context_userChanged() {
 
 void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr &rule) {
     m_rulesViewModel->updateRule(rule);
-    //TODO: ask user
+    //TODO: #GDM ask user
 }
 
 void QnBusinessRulesDialog::at_message_ruleDeleted(int id) {
     m_rulesViewModel->deleteRule(id);
     m_pendingDeleteRules.removeOne(id);
-    //TODO: ask user
+    //TODO: #GDM ask user
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
