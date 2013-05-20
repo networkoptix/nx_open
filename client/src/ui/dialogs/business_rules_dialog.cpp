@@ -237,8 +237,7 @@ void QnBusinessRulesDialog::at_resources_received(int status, const QnBusinessEv
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnBusinessEventRuleList &rules, int handle) {
-
+void QnBusinessRulesDialog::at_resources_saved(int status, const QnBusinessEventRuleList &rules, int handle) {
     if (!m_processing.contains(handle))
         return;
     QnBusinessRuleViewModel* model = m_processing[handle];
@@ -246,7 +245,7 @@ void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& err
 
     bool success = (status == 0 && rules.size() == 1);
     if(!success) {
-        QMessageBox::critical(this, tr("Error while saving rule"), QString::fromLatin1(errorString));
+        QMessageBox::critical(this, tr("Error"), tr("Error while saving rule."));
         return;
     }
 
@@ -365,7 +364,7 @@ void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
 
     QnBusinessEventRulePtr rule = ruleModel->createRule();
     int handle = QnAppServerConnectionFactory::createConnection()->saveAsync(
-                rule, this, SLOT(at_resources_saved(int, const QByteArray &, const QnBusinessEventRuleList &, int)));
+                rule, this, SLOT(at_resources_saved(int, const QnBusinessEventRuleList &, int)));
     m_processing[handle] = ruleModel;
 }
 
