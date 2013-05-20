@@ -3,6 +3,7 @@
 
 #include <QtCore/QFileInfo>
 #include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
 
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/models/notification_sound_model.h>
@@ -77,6 +78,14 @@ void QnNotificationSoundManagerDialog::at_removeButton_clicked() {
     QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
     QString filename = soundModel->filenameByRow(ui->listView->currentIndex().row());
     if (filename.isEmpty())
+        return;
+
+    QString title = soundModel->titleByFilename(filename);
+    if (QMessageBox::question(this,
+                              tr("Confirm file deletion"),
+                              tr("Are you sure you want to delete %1").arg(title),
+                              QMessageBox::Ok,
+                              QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
 
     context()->instance<QnAppServerNotificationCache>()->deleteFile(filename);
