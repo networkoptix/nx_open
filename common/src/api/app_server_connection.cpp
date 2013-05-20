@@ -582,7 +582,7 @@ int QnAppServerConnection::getServers(QnMediaServerResourceList &servers)
 
 int QnAppServerConnection::getCameras(QnVirtualCameraResourceList &cameras, QnId mediaServerId)
 {
-    QnRequestParamList params;
+    QnRequestParamList params = m_requestParams;
     params.append(QnRequestParam("parent_id", mediaServerId.toString()));
 
     return sendSyncGetRequest(CameraObject, m_requestHeaders, params, &cameras);

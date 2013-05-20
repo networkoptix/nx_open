@@ -8,6 +8,7 @@
 #include "gl_functions.h"
 
 #ifndef __APPLE__
+#define GL_GLEXT_PROTOTYPES /* We want typedefs, not function declarations. */
 #include <GL/glext.h>
 #endif
 
