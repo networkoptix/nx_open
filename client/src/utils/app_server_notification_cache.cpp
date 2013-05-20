@@ -60,6 +60,11 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
     transcoder->startAsync();
 }
 
+void QnAppServerNotificationCache::updateTitle(const QString &filename, const QString &title) {
+    m_model->updateTitle(filename, title);
+//    AudioPlayer::setTagValue(getFullPath(filename), title);
+}
+
 void QnAppServerNotificationCache::clear() {
     m_model->init();
 }

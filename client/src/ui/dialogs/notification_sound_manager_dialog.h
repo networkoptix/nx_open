@@ -20,7 +20,8 @@ public:
 private slots:
     void at_playButton_clicked();
     void at_addButton_clicked();
-    void at_removeButton_clicked();
+    void at_renameButton_clicked();
+    void at_deleteButton_clicked();
 private:
     QScopedPointer<Ui::QnNotificationSoundManagerDialog> ui;
 };
