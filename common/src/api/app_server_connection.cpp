@@ -577,7 +577,11 @@ int QnAppServerConnection::addBusinessRule(const QnBusinessEventRulePtr &busines
 
 int QnAppServerConnection::getServers(QnMediaServerResourceList &servers)
 {
-    return sendSyncGetRequest(ServerObject, m_requestHeaders, m_requestParams, &servers);
+    QnResourceList resources;
+    int status = sendSyncGetRequest(ServerObject, m_requestHeaders, m_requestParams, &resources);
+    if(status == 0)
+        servers = resources.filtered<QnMediaServerResource>();
+    return status;
 }
 
 int QnAppServerConnection::getCameras(QnVirtualCameraResourceList &cameras, QnId mediaServerId)
@@ -585,17 +589,29 @@ int QnAppServerConnection::getCameras(QnVirtualCameraResourceList &cameras, QnId
     QnRequestParamList params = m_requestParams;
     params.append(QnRequestParam("parent_id", mediaServerId.toString()));
 
-    return sendSyncGetRequest(CameraObject, m_requestHeaders, params, &cameras);
+    QnResourceList resources;
+    int status = sendSyncGetRequest(CameraObject, m_requestHeaders, params, &resources);
+    if(status == 0)
+        cameras = resources.filtered<QnVirtualCameraResource>();
+    return status;
 }
 
 int QnAppServerConnection::getLayouts(QnLayoutResourceList &layouts)
 {
-    return sendSyncGetRequest(LayoutObject, m_requestHeaders, m_requestParams, &layouts);
+    QnResourceList resources;
+    int status = sendSyncGetRequest(LayoutObject, m_requestHeaders, m_requestParams, &resources);
+    if(status == 0)
+        layouts = resources.filtered<QnLayoutResource>();
+    return status;
 }
 
 int QnAppServerConnection::getUsers(QnUserResourceList &users)
 {
-    return sendSyncGetRequest(UserObject, m_requestHeaders, m_requestParams, &users);
+    QnResourceList resources;
+    int status = sendSyncGetRequest(UserObject, m_requestHeaders, m_requestParams, &users);
+    if(status == 0)
+        users = resources.filtered<QnUserResource>();
+    return status;
 }
 
 int QnAppServerConnection::getLicenses(QnLicenseList &licenses)
