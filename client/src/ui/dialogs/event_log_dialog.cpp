@@ -463,8 +463,18 @@ void QnEventLogDialog::at_copyToClipboard()
     QString htmlData;
     QMimeData* mimeData = new QMimeData();
 
-    htmlData.append(lit("<body>"));
-    htmlData.append(lit("<table>"));
+    htmlData.append(lit("<!DOCTYPE html>\n"));
+    htmlData.append(lit("<html>\n"));
+
+    htmlData.append(lit("<head>\n"));
+    htmlData.append(lit("<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"));
+    htmlData.append(lit("<title>"));
+    htmlData.append(windowTitle());
+    htmlData.append(lit("</title>\n"));
+    htmlData.append(lit("</head>\n"));
+
+    htmlData.append(lit("<body>\n"));
+    htmlData.append(lit("<table>\n"));
 
     htmlData.append(lit("<tr>"));
     for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
@@ -499,9 +509,10 @@ void QnEventLogDialog::at_copyToClipboard()
 
         textData.append(model->data(list[i]).toString());
     }
-    htmlData.append(lit("</tr>"));
-    htmlData.append(lit("</table>"));
-    htmlData.append(lit("</body>"));
+    htmlData.append(lit("</tr>\n"));
+    htmlData.append(lit("</table>\n"));
+    htmlData.append(lit("</body>\n"));
+    htmlData.append(lit("</html>\n"));
     textData.append(QLatin1Char('\n'));
 
     mimeData->setText(textData);
