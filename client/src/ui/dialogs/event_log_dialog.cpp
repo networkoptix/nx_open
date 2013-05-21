@@ -325,6 +325,9 @@ void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
         params.setArgument(Qn::ItemTimeRole, pos);
 
         m_context->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+        
+        if (isMaximized())
+            showNormal();
     }
 }
 
