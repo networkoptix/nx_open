@@ -613,26 +613,34 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
     if(!windowTarget() || windowTarget() == m_storedWindowWidget.data())
         return;
 
-    QnMediaResourceWidget *mediaWidget = this->item<QnMediaResourceWidget>(view, info->mouseViewportPos());
-    if(!mediaWidget || mediaWidget == windowTarget()->overlay()->target()) 
+    QnMediaResourceWidget *newTargetWidget = this->item<QnMediaResourceWidget>(view, info->mouseViewportPos());
+    if(!newTargetWidget || newTargetWidget == windowTarget()->overlay()->target()) 
         return;
     
     QnAction *action = menu()->action(Qn::CreateZoomWindowAction);
-    if(!action || action->checkCondition(action->scope(), QnActionParameters(mediaWidget)) != Qn::EnabledAction)
+    if(!action || action->checkCondition(action->scope(), QnActionParameters(newTargetWidget)) != Qn::EnabledAction)
         return;
 
     QnMediaResourceWidget *widget = windowTarget()->zoomWidget();
-    QnMediaResourceWidget *zoomTargetWidget = windowTarget()->overlay()->target();
+    QnMediaResourceWidget *oldTargetWidget = windowTarget()->overlay()->target();
 
     /* Preserve zoom window widget. */
     windowTarget()->hide();
-    unregisterLink(widget, zoomTargetWidget, false);
+    unregisterLink(widget, oldTargetWidget, false);
 
     if(m_storedWindowWidget)
         delete m_storedWindowWidget.data(); /* Just to feel safe that we don't leak memory. */
     m_storedWindowWidget = windowTarget();
 
-    emit zoomTargetChanged(widget, mediaWidget);
+    QRectF zoomRect = widget->zoomRect();
+    QSizeF oldLayoutSize = oldTargetWidget->channelLayout()->size();
+    QSizeF newLayoutSize = newTargetWidget->channelLayout()->size();
+    if(oldLayoutSize != newLayoutSize) {
+        QSizeF zoomSize = cwiseDiv(cwiseMul(zoomRect.size(), oldLayoutSize), newLayoutSize);
+        zoomRect = movedInto(QRectF(zoomRect.topLeft(), zoomSize), QRectF(0, 0, 1, 1));
+    }
+
+    emit zoomTargetChanged(widget, zoomRect, newTargetWidget);
 }
 
 void ZoomWindowInstrument::at_resizingFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *) {

@@ -27,7 +27,7 @@ public:
 signals:
     void zoomRectCreated(QnMediaResourceWidget *widget, const QRectF &zoomRect);
     void zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect);
-    void zoomTargetChanged(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget);
+    void zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget);
 
     void zoomWindowProcessStarted(QnMediaResourceWidget *widget);
     void zoomWindowStarted(QnMediaResourceWidget *widget);
