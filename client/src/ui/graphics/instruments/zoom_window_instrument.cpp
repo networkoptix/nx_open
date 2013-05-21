@@ -74,6 +74,14 @@ public:
         m_zoomWidget = zoomWidget;
     }
 
+    QColor frameColor() const {
+        return m_frameColor;
+    }
+
+    void setFrameColor(const QColor &frameColor) {
+        m_frameColor = frameColor;
+    }
+
 protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override {
         qreal scale = std::pow(2.0, (-event->delta() / 8.0) / 180.0);
@@ -105,7 +113,7 @@ protected:
         QSizeF size = this->size();
         qreal w = size.width();
         qreal h = size.height();
-        QColor color = zoomFrameColor;
+        QColor color = toTransparent(m_frameColor, 0.75);
 
         painter->fillRect(QRectF(-l,      -t,      w + l + r,   t), color);
         painter->fillRect(QRectF(-l,      h,       w + l + r,   b), color);
@@ -125,6 +133,7 @@ protected:
     }
 
 private:
+    QColor m_frameColor;
     QWeakPointer<ZoomOverlayWidget> m_overlay;
     QWeakPointer<QnMediaResourceWidget> m_zoomWidget;
 };
@@ -319,6 +328,7 @@ void ZoomWindowInstrument::ensureSelectionItem() {
 
 void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget) {
     connect(widget, SIGNAL(zoomRectChanged()), this, SLOT(at_widget_zoomRectChanged()));
+    connect(widget, SIGNAL(frameColorChanged()), this, SLOT(at_widget_frameColorChanged()));
     connect(widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_widget_aboutToBeDestroyed()));
     connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
 }
@@ -392,8 +402,10 @@ void ZoomWindowInstrument::updateWindowFromWidget(QnMediaResourceWidget *widget)
     ZoomWindowWidget *windowWidget = this->windowWidget(widget);
     ZoomOverlayWidget *overlayWidget = windowWidget ? windowWidget->overlay() : NULL;
 
-    if(windowWidget && overlayWidget)
+    if(windowWidget && overlayWidget) {
         overlayWidget->setWidgetRect(windowWidget, widget->zoomRect());
+        windowWidget->setFrameColor(widget->frameColor().lighter(110));
+    }
 
     m_processingWidgets.remove(widget);
 }
@@ -553,6 +565,10 @@ void ZoomWindowInstrument::at_widget_aboutToBeDestroyed() {
 }
 
 void ZoomWindowInstrument::at_widget_zoomRectChanged() {
+    updateWindowFromWidget(checked_cast<QnMediaResourceWidget *>(sender()));
+}
+
+void ZoomWindowInstrument::at_widget_frameColorChanged() {
     updateWindowFromWidget(checked_cast<QnMediaResourceWidget *>(sender()));
 }
 

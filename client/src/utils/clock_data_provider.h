@@ -10,6 +10,7 @@ class QnClockDataProvider : public QObject
 public:
     explicit QnClockDataProvider(QObject *parent = 0);
     ~QnClockDataProvider();
+
 signals:
     void timeChanged(const QString &timeString);
     
