@@ -981,6 +981,12 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
+    factory(Qn::CameraIssuesAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Check camera issues...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+
     factory(Qn::LayoutSettingsAction).
        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
        text(tr("Layout Settings...")).

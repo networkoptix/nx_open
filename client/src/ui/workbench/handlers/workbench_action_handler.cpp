@@ -281,6 +281,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CloseAllButThisLayoutAction),            SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
     connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
     connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
     connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
@@ -2038,6 +2039,27 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     if(!newlyCreated)
         cameraSettingsDialog()->setGeometry(oldGeometry);
 }
+
+void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
+{
+    bool newlyCreated = false;
+    if(!businessEventsLogDialog()) {
+        m_businessEventsLogDialog = new QnEventLogDialog(widget(), context());
+        newlyCreated = true;
+    }
+
+    businessEventsLogDialog()->disableUpdateData();
+    businessEventsLogDialog()->setEventType(BusinessEventType::AnyCameraIssue);
+    businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());
+    businessEventsLogDialog()->enableUpdateData();
+
+    QRect oldGeometry = businessEventsLogDialog()->geometry();
+    businessEventsLogDialog()->show();
+    businessEventsLogDialog()->raise();
+    if(!newlyCreated)
+        businessEventsLogDialog()->setGeometry(oldGeometry);
+}
+
 
 void QnWorkbenchActionHandler::at_clearCameraSettingsAction_triggered() {
     if(cameraSettingsDialog() && cameraSettingsDialog()->isVisible())

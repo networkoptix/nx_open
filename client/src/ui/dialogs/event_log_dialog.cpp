@@ -529,7 +529,8 @@ void QnEventLogDialog::enableUpdateData()
     m_updateDisabled = false;
     if (m_dirty) {
         m_dirty = false;
-        updateData();
+        if (isVisible())
+            updateData();
     }
 }
 
