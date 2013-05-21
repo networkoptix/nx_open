@@ -480,7 +480,7 @@ void QnEventLogDialog::at_copyToClipboard()
     for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
     {
         if (i > 0)
-            textData.append(QLatin1Char('\t'));
+            textData.append(lit('\t'));
         QString header = model->headerData(list[i].column(), Qt::Horizontal).toString();
         htmlData.append(lit("<th>"));
         htmlData.append(header);
@@ -494,13 +494,13 @@ void QnEventLogDialog::at_copyToClipboard()
     {
         if(list[i].row() != prevRow) {
             prevRow = list[i].row();
-            textData.append(QLatin1Char('\n'));
+            textData.append(lit('\n'));
             if (i > 0)
                 htmlData.append(lit("</tr>"));
             htmlData.append(lit("<tr>"));
         }
         else {
-            textData.append(QLatin1Char('\t'));
+            textData.append(lit('\t'));
         }
 
         htmlData.append(lit("<td>"));
@@ -513,7 +513,7 @@ void QnEventLogDialog::at_copyToClipboard()
     htmlData.append(lit("</table>\n"));
     htmlData.append(lit("</body>\n"));
     htmlData.append(lit("</html>\n"));
-    textData.append(QLatin1Char('\n'));
+    textData.append(lit('\n'));
 
     mimeData->setText(textData);
     mimeData->setHtml(htmlData);
