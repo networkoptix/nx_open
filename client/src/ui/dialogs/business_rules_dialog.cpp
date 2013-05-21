@@ -35,7 +35,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
     m_advancedAction(NULL),
-    m_loadingHandle(-1),
     m_advancedMode(false)
 {
     ui->setupUi(this);
@@ -47,7 +46,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     createActions();
 
-    m_rulesViewModel = new QnBusinessRulesViewModel(this);
+    m_rulesViewModel = new QnBusinessRulesActualModel(this);
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -83,18 +82,16 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->deleteRuleButton,                           SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
     connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
 
-    connect(context(),  SIGNAL(userChanged(const QnUserResourcePtr &)),          this, SLOT(at_context_userChanged()));
-
-    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
-            this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
-    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(int)),
+    connect(m_rulesViewModel,                               SIGNAL(businessRuleDeleted(int)),
             this, SLOT(at_message_ruleDeleted(int)));
 
     connect(ui->eventLogButton,   SIGNAL(clicked(bool)),              
             context()->action(Qn::BusinessEventsLogAction), SIGNAL(triggered()));
 
+    connect(m_rulesViewModel,   SIGNAL(beforeModelChanged(int)), this, SLOT(at_beforeModelChanged(int)));
+    connect(m_rulesViewModel,   SIGNAL(afterModelChanged(int, int)), this, SLOT(at_afterModelChanged(int, int)));
 
-    at_context_userChanged();
+    m_rulesViewModel->reloadData();
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog()
@@ -112,7 +109,7 @@ void QnBusinessRulesDialog::accept()
 void QnBusinessRulesDialog::reject() {
 
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
-    bool loaded = m_loadingHandle < 0;
+    bool loaded = m_rulesViewModel->isLoaded();
     bool hasChanges = hasRights && loaded && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
@@ -134,7 +131,7 @@ void QnBusinessRulesDialog::reject() {
             return;
         break;
     case QMessageBox::No:
-        at_context_userChanged();
+        m_rulesViewModel->reloadData();
         break;
     default:
         return;
@@ -169,32 +166,17 @@ void QnBusinessRulesDialog::keyPressEvent(QKeyEvent *event) {
     base_type::keyPressEvent(event);
 }
 
-void QnBusinessRulesDialog::at_context_userChanged() {
+void QnBusinessRulesDialog::at_beforeModelChanged(int changeNum) {
    // bool enabled = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
     m_currentDetailsWidget->setModel(NULL);
-
-    m_rulesViewModel->clear();
     m_pendingDeleteRules.clear();
     m_deleting.clear();
     m_processing.clear();
-    m_loadingHandle = -1;
-
-    if ((accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        m_loadingHandle = QnAppServerConnectionFactory::createConnection()->getBusinessRulesAsync(
-                    this, SLOT(at_resources_received(int,QnBusinessEventRuleList,int)));
-    }
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr &rule) {
-    m_rulesViewModel->updateRule(rule);
-    //TODO: #GDM ask user
-}
-
 void QnBusinessRulesDialog::at_message_ruleDeleted(int id) {
-    m_rulesViewModel->deleteRule(id);
-    m_pendingDeleteRules.removeOne(id);
-    //TODO: #GDM ask user
+    m_pendingDeleteRules.removeOne(id); //TODO: #GDM ask user
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
@@ -219,17 +201,12 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     deleteRule(model);
 }
 
-void QnBusinessRulesDialog::at_resources_received(int status, const QnBusinessEventRuleList &rules, int handle) {
-    if (handle != m_loadingHandle)
-        return;
-
+void QnBusinessRulesDialog::at_afterModelChanged(int changeNum, int status) {
     bool success = (status == 0);
     if(!success) {
         QMessageBox::critical(this, tr("Error"), tr("Error while receiving rules"));
         return;
     }
-    m_rulesViewModel->addRules(rules);
-    m_loadingHandle = -1;
 
     ui->tableView->resizeColumnsToContents();
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
@@ -377,7 +354,7 @@ void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
 
 void QnBusinessRulesDialog::updateControlButtons() {
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
-    bool loaded = m_loadingHandle < 0;
+    bool loaded = m_rulesViewModel->isLoaded();
     bool hasChanges = hasRights && loaded && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()

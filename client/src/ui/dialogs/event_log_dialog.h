@@ -12,6 +12,8 @@
 
 class QnEventLogModel;
 class QnWorkbenchContext;
+class QnBusinessRulesActualModel;
+class QnBusinessRuleViewModel;
 
 namespace Ui {
     class EventLogDialog;
@@ -63,6 +65,8 @@ private:
     void updateHeaderWidth();
     bool isFilterExist() const;
     void requestFinished();
+    bool isRuleExistByCond() const;
+    bool isCameraMatched(QnBusinessRuleViewModel* ruleModel) const;
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  
@@ -79,7 +83,7 @@ private:
     QAction* m_filterAction;
     QAction* m_resetFilterAction;
     QAction* m_clipboardAction;
-
+    QnBusinessRulesActualModel* m_rulesModel;
 };
 
 #endif // __EVENT_LOG_DIALOG_H____

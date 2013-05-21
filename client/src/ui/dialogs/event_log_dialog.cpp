@@ -20,6 +20,7 @@
 #include "client/client_globals.h"
 #include "ui/style/skin.h"
 #include "client/client_settings.h"
+#include "ui/models/business_rules_actual_model.h"
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -30,6 +31,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::Window);
+
+    m_rulesModel = new QnBusinessRulesActualModel(this);
 
     QList<QnEventLogModel::Column> columns;
         columns << QnEventLogModel::DateTimeColumn << QnEventLogModel::EventColumn << QnEventLogModel::EventCameraColumn <<
@@ -91,6 +94,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     
     ui->mainGridLayout->activate();
     updateHeaderWidth();
+
+    m_rulesModel->reloadData();
 }
 
 QnEventLogDialog::~QnEventLogDialog()
@@ -229,8 +234,67 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
     m_requests.remove(requestNum);
     if (httpStatus == 0 && !events->empty())
         m_allEvents << events;
-    if (m_requests.isEmpty())
+    if (m_requests.isEmpty()) {
         requestFinished();
+        if (m_model->rowCount() == 0 && isFilterExist() && !isRuleExistByCond()) 
+        {
+            QMessageBox::information(this, tr("No rule(s) for current filter"), tr("You have not configured business rules to match current filter condition."));
+        }
+    }
+}
+
+bool QnEventLogDialog::isCameraMatched(QnBusinessRuleViewModel* ruleModel) const
+{
+    if (m_filterCameraList.isEmpty())
+        return true;
+    BusinessEventType::Value eventType = ruleModel->eventType();
+    if (!BusinessEventType::requiresCameraResource(eventType))
+        return false;
+    if (ruleModel->eventResources().isEmpty())
+        return true;
+
+    for (int i = 0; i < m_filterCameraList.size(); ++i)
+    {
+        for (int j = 0; j < ruleModel->eventResources().size(); ++j)
+        {
+            if (m_filterCameraList[i]->getId() == ruleModel->eventResources()[j]->getId())
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool QnEventLogDialog::isRuleExistByCond() const
+{
+    if (!m_rulesModel->isLoaded())
+        return true;
+
+    QModelIndex idx = ui->eventComboBox->currentIndex();
+    BusinessEventType::Value eventType = (BusinessEventType::Value) ui->eventComboBox->model()->data(idx, Qn::FirstItemDataRole).toInt();
+
+    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
+    if (ui->actionComboBox->currentIndex() > 0)
+        actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
+
+    
+    for (int i = 0; i < m_rulesModel->rowCount(); ++i)
+    {
+        QnBusinessRuleViewModel* ruleModel = m_rulesModel->getRuleModel(i);
+        if (ruleModel->disabled())
+            continue;
+        bool isEventMatch = eventType == BusinessEventType::NotDefined || 
+                            eventType == BusinessEventType::AnyBusinessEvent ||
+                            ruleModel->eventType() == eventType ||
+                            BusinessEventType::parentEvent(ruleModel->eventType()) == eventType;
+        if (isEventMatch && isCameraMatched(ruleModel))
+        {
+            if (actionType == BusinessActionType::NotDefined || actionType == ruleModel->actionType())
+                return true;
+        }
+    }
+    
+    return false;
 }
 
 void QnEventLogDialog::requestFinished()
