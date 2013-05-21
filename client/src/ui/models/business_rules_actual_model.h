@@ -13,11 +13,6 @@ class QnBusinessRulesActualModel: public QnBusinessRulesViewModel
 public:
     QnBusinessRulesActualModel(QObject *parent = 0);
 
-    /*
-    * Load data from DB
-    */
-    void reloadData();
-
     bool isLoaded() const;
 signals:
     void beforeModelChanged(int changeNum);
@@ -25,8 +20,12 @@ signals:
     
     void businessRuleChanged(int id);
     void businessRuleDeleted(int id);
+public slots:
+    /*
+    * Load data from DB
+    */
+    void reloadData();
 private slots:
-    void at_context_userChanged();
     void at_resources_received(int status, const QnBusinessEventRuleList &rules, int handle);
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);

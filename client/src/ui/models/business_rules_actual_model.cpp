@@ -9,7 +9,7 @@ QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
     m_isDataLoaded(false)
 {
     connect(context(),  SIGNAL(userChanged(const QnUserResourcePtr &)),          
-            this, SLOT(at_context_userChanged()));
+            this, SLOT(reloadData()));
     connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
     connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(int)),
@@ -17,12 +17,7 @@ QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
 
 }
 
-void QnBusinessRulesActualModel::reloadData()
-{
-    at_context_userChanged();
-}
-
-void QnBusinessRulesActualModel::at_context_userChanged() 
+void QnBusinessRulesActualModel::reloadData() 
 {
     clear();
     m_isDataLoaded = false;
