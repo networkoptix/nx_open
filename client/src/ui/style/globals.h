@@ -131,9 +131,9 @@ private:
         QN_DECLARE_R_PROPERTY(int,      layoutBackgroundRecommendedArea,LAYOUT_BACKGROUND_RECOMMENDED_AREA,     40*40)
 
 
-        QN_DECLARE_R_PROPERTY(QColor,   raisedConeColor,                RAISED_CONE_COLOR,                      QColor(0, 255, 0, 255))
-        QN_DECLARE_R_PROPERTY(qreal,    raisedConeOpacity,              RAISED_CONE_OPACITY,                    0.5)
-        QN_DECLARE_R_PROPERTY(qreal,    raisedWigdetOpacity,            RAISED_WIDGET_OPACITY,                  0.88)
+        QN_DECLARE_R_PROPERTY(QColor,   raisedConeColor,                RAISED_CONE_COLOR,                      QColor(64, 130, 180, 128))
+        QN_DECLARE_R_PROPERTY(qreal,    raisedConeOpacity,              RAISED_CONE_OPACITY,                    1.0)
+        QN_DECLARE_R_PROPERTY(qreal,    raisedWigdetOpacity,            RAISED_WIDGET_OPACITY,                  0.7)
     QN_END_PROPERTY_STORAGE()
 };
 

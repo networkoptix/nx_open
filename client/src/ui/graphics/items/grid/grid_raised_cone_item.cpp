@@ -143,7 +143,7 @@ void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     Q_UNUSED(widget)
 
     PathHelper sourceHelper;
-    sourceHelper.offset = qMin(m_sourceRect.height(), m_sourceRect.width()) * 0.2;
+    sourceHelper.offset = qMin(m_sourceRect.height(), m_sourceRect.width()) * 0.1;
     sourceHelper.center = m_sourceRect.center();
 
     PathHelper targetHelper;
