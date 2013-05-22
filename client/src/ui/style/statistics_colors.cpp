@@ -13,6 +13,9 @@ namespace {
 
 } // anonymous namespace
 
+namespace detail {
+    QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStatisticsColors, (grid)(frame)(cpu)(ram)(hdds), static)
+}
 
 QnStatisticsColors::QnStatisticsColors():
     grid(QColor(66, 140, 237, 100)),
@@ -92,4 +95,18 @@ void QnStatisticsColors::ensureVectors() {
                     << QColor(52, 255, 140)
                     << QColor(194, 255, 52);
     }
+}
+
+void serialize(const QnStatisticsColors &value, QVariant *target) {
+    detail::serialize(value, target);
+}
+
+bool deserialize(const QVariant &value, QnStatisticsColors *target) {
+    if(value.type() == QVariant::Invalid) {
+        /* That's null color storage. */
+        *target = QnStatisticsColors();
+        return true;
+    }
+
+    return detail::deserialize(value, target);
 }

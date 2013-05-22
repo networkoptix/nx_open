@@ -28,7 +28,6 @@ public:
     void update(const QByteArray &serializedValue);
 
 private:
-
     /**
      * @brief ensureHdds        Make sure all color arrays contain at least one element.
      *                          Fill with default values if empty.
@@ -38,7 +37,6 @@ private:
 
 Q_DECLARE_METATYPE(QnStatisticsColors)
 
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStatisticsColors, (grid)(frame)(cpu)(ram)(hdds), inline)
-
+QN_DECLARE_SERIALIZATION_FUNCTIONS(QnStatisticsColors)
 
 #endif // QN_STATISTICS_COLORS_H
