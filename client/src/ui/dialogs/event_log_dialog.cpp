@@ -67,9 +67,16 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         actionItems << BusinessActionType::toString(BusinessActionType::Value(i));
     ui->actionComboBox->addItems(actionItems);
 
-    m_filterAction      = new QAction(tr("&Filter similar rows"), this);
-    m_clipboardAction   = new QAction(tr("&Copy selection to clipboard"), this);
-    m_resetFilterAction = new QAction(tr("&Clear filter"), this);
+    m_filterAction      = new QAction(tr("Filter similar rows"), this);
+    m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
+    m_clipboardAction   = new QAction(tr("Copy selection to clipboard"), this);
+    m_clipboardAction->setShortcut(QKeySequence::Copy);
+    m_resetFilterAction = new QAction(tr("Clear filter"), this);
+    m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R);
+
+    ui->gridEvents->addAction(m_clipboardAction);
+    ui->gridEvents->addAction(m_filterAction);
+    ui->gridEvents->addAction(m_resetFilterAction);
 
     ui->clearFilterButton->setDefaultAction(m_resetFilterAction);
     ui->cameraButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera | QnResourceIconCache::Online));
