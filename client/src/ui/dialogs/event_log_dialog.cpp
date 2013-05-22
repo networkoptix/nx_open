@@ -20,6 +20,7 @@
 #include "client/client_globals.h"
 #include "ui/style/skin.h"
 #include "client/client_settings.h"
+#include "ui/models/business_rules_actual_model.h"
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -30,6 +31,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::Window);
+
+    m_rulesModel = new QnBusinessRulesActualModel(this);
 
     QList<QnEventLogModel::Column> columns;
         columns << QnEventLogModel::DateTimeColumn << QnEventLogModel::EventColumn << QnEventLogModel::EventCameraColumn <<
@@ -91,6 +94,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     
     ui->mainGridLayout->activate();
     updateHeaderWidth();
+
+    m_rulesModel->reloadData();
 }
 
 QnEventLogDialog::~QnEventLogDialog()
@@ -229,8 +234,67 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionV
     m_requests.remove(requestNum);
     if (httpStatus == 0 && !events->empty())
         m_allEvents << events;
-    if (m_requests.isEmpty())
+    if (m_requests.isEmpty()) {
         requestFinished();
+        if (m_model->rowCount() == 0 && isFilterExist() && !isRuleExistByCond()) 
+        {
+            QMessageBox::information(this, tr("No rule(s) for current filter"), tr("You have not configured business rules to match current filter condition."));
+        }
+    }
+}
+
+bool QnEventLogDialog::isCameraMatched(QnBusinessRuleViewModel* ruleModel) const
+{
+    if (m_filterCameraList.isEmpty())
+        return true;
+    BusinessEventType::Value eventType = ruleModel->eventType();
+    if (!BusinessEventType::requiresCameraResource(eventType))
+        return false;
+    if (ruleModel->eventResources().isEmpty())
+        return true;
+
+    for (int i = 0; i < m_filterCameraList.size(); ++i)
+    {
+        for (int j = 0; j < ruleModel->eventResources().size(); ++j)
+        {
+            if (m_filterCameraList[i]->getId() == ruleModel->eventResources()[j]->getId())
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool QnEventLogDialog::isRuleExistByCond() const
+{
+    if (!m_rulesModel->isLoaded())
+        return true;
+
+    QModelIndex idx = ui->eventComboBox->currentIndex();
+    BusinessEventType::Value eventType = (BusinessEventType::Value) ui->eventComboBox->model()->data(idx, Qn::FirstItemDataRole).toInt();
+
+    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
+    if (ui->actionComboBox->currentIndex() > 0)
+        actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
+
+    
+    for (int i = 0; i < m_rulesModel->rowCount(); ++i)
+    {
+        QnBusinessRuleViewModel* ruleModel = m_rulesModel->getRuleModel(i);
+        if (ruleModel->disabled())
+            continue;
+        bool isEventMatch = eventType == BusinessEventType::NotDefined || 
+                            eventType == BusinessEventType::AnyBusinessEvent ||
+                            ruleModel->eventType() == eventType ||
+                            BusinessEventType::parentEvent(ruleModel->eventType()) == eventType;
+        if (isEventMatch && isCameraMatched(ruleModel))
+        {
+            if (actionType == BusinessActionType::NotDefined || actionType == ruleModel->actionType())
+                return true;
+        }
+    }
+    
+    return false;
 }
 
 void QnEventLogDialog::requestFinished()
@@ -261,6 +325,9 @@ void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
         params.setArgument(Qn::ItemTimeRole, pos);
 
         m_context->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+        
+        if (isMaximized())
+            showNormal();
     }
 }
 
@@ -396,14 +463,24 @@ void QnEventLogDialog::at_copyToClipboard()
     QString htmlData;
     QMimeData* mimeData = new QMimeData();
 
-    htmlData.append(lit("<body>"));
-    htmlData.append(lit("<table>"));
+    htmlData.append(lit("<!DOCTYPE html>\n"));
+    htmlData.append(lit("<html>\n"));
+
+    htmlData.append(lit("<head>\n"));
+    htmlData.append(lit("<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"));
+    htmlData.append(lit("<title>"));
+    htmlData.append(windowTitle());
+    htmlData.append(lit("</title>\n"));
+    htmlData.append(lit("</head>\n"));
+
+    htmlData.append(lit("<body>\n"));
+    htmlData.append(lit("<table>\n"));
 
     htmlData.append(lit("<tr>"));
     for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
     {
         if (i > 0)
-            textData.append(QLatin1Char('\t'));
+            textData.append(lit('\t'));
         QString header = model->headerData(list[i].column(), Qt::Horizontal).toString();
         htmlData.append(lit("<th>"));
         htmlData.append(header);
@@ -417,13 +494,13 @@ void QnEventLogDialog::at_copyToClipboard()
     {
         if(list[i].row() != prevRow) {
             prevRow = list[i].row();
-            textData.append(QLatin1Char('\n'));
+            textData.append(lit('\n'));
             if (i > 0)
                 htmlData.append(lit("</tr>"));
             htmlData.append(lit("<tr>"));
         }
         else {
-            textData.append(QLatin1Char('\t'));
+            textData.append(lit('\t'));
         }
 
         htmlData.append(lit("<td>"));
@@ -432,10 +509,11 @@ void QnEventLogDialog::at_copyToClipboard()
 
         textData.append(model->data(list[i]).toString());
     }
-    htmlData.append(lit("</tr>"));
-    htmlData.append(lit("</table>"));
-    htmlData.append(lit("</body>"));
-    textData.append(QLatin1Char('\n'));
+    htmlData.append(lit("</tr>\n"));
+    htmlData.append(lit("</table>\n"));
+    htmlData.append(lit("</body>\n"));
+    htmlData.append(lit("</html>\n"));
+    textData.append(lit('\n'));
 
     mimeData->setText(textData);
     mimeData->setHtml(htmlData);
@@ -462,7 +540,8 @@ void QnEventLogDialog::enableUpdateData()
     m_updateDisabled = false;
     if (m_dirty) {
         m_dirty = false;
-        updateData();
+        if (isVisible())
+            updateData();
     }
 }
 

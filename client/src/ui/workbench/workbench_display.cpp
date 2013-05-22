@@ -844,6 +844,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         }
     }
 
+    QColor frameColor = item->data(Qn::ItemFrameColorRole).value<QColor>();
+    if(frameColor.isValid())
+        widget->setFrameColor(frameColor);
+
     return true;
 }
 

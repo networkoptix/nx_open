@@ -409,6 +409,11 @@ namespace Qn {
         CameraSettingsAction,
 
         /**
+         * Opens event log dialog with filter for current camera(s) issues
+         */
+        CameraIssuesAction,
+
+        /**
          * Opens current layout settings dialog.
          */
         CurrentLayoutSettingsAction,

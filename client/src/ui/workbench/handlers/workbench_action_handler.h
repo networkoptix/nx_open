@@ -167,6 +167,7 @@ protected:
         QRectF zoomWindow;
         QUuid zoomUuid;
         quint64 time;
+        QColor frameColor;
 
         AddToLayoutParams():
             usePosition(false),
@@ -295,6 +296,7 @@ protected slots:
     void at_disconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
+    void at_cameraIssuesAction_triggered();
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
     void at_clearCameraSettingsAction_triggered();

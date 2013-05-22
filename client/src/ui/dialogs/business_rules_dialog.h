@@ -21,6 +21,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/request_param.h>
+#include "ui/models/business_rules_actual_model.h"
 
 namespace Ui {
     class BusinessRulesDialog;
@@ -45,17 +46,15 @@ public Q_SLOTS:
     virtual void reject() override;
 
 private slots:
-
-    void at_context_userChanged();
-
-    void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
     void at_message_ruleDeleted(int id);
 
     void at_newRuleButton_clicked();
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
 
-    void at_resources_received(int status, const QnBusinessEventRuleList &rules, int handle);
+    void at_beforeModelChanged(int changeNum);
+    void at_afterModelChanged(int changeNum, int status);
+
     void at_resources_saved(int status, const QnBusinessEventRuleList &rules, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
@@ -84,7 +83,7 @@ private:
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
-    QnBusinessRulesViewModel* m_rulesViewModel;
+    QnBusinessRulesActualModel* m_rulesViewModel;
     QList<int> m_pendingDeleteRules;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
@@ -97,8 +96,6 @@ private:
     QAction* m_newAction;
     QAction* m_deleteAction;
     QAction* m_advancedAction;
-
-    int m_loadingHandle;
 
     bool m_advancedMode;
 };

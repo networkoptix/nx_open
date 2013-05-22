@@ -12,6 +12,8 @@
 
 class QnEventLogModel;
 class QnWorkbenchContext;
+class QnBusinessRulesActualModel;
+class QnBusinessRuleViewModel;
 
 namespace Ui {
     class EventLogDialog;
@@ -37,6 +39,13 @@ public:
                BusinessEventType::Value eventType, 
                BusinessActionType::Value actionType,
                QnId businessRuleId);
+
+
+    void disableUpdateData();
+    void enableUpdateData();
+    void setCameraList(QnResourceList resList);
+    void setActionType(BusinessActionType::Value value);
+    void setEventType(BusinessEventType::Value value);
 protected:
     void setVisible(bool value) override;
 private slots:
@@ -53,16 +62,13 @@ private:
     QString getTextForNCameras(int n) const;
     QStandardItem* createEventTree(QStandardItem* rootItem, BusinessEventType::Value value);
 
-    void setCameraList(QnResourceList resList);
-    void setActionType(BusinessActionType::Value value);
-    void setEventType(BusinessEventType::Value value);
     bool setEventTypeRecursive(BusinessEventType::Value value, QAbstractItemModel* model, const QModelIndex& parentItem);
 
-    void disableUpdateData();
-    void enableUpdateData();
     void updateHeaderWidth();
     bool isFilterExist() const;
     void requestFinished();
+    bool isRuleExistByCond() const;
+    bool isCameraMatched(QnBusinessRuleViewModel* ruleModel) const;
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
  
@@ -79,7 +85,7 @@ private:
     QAction* m_filterAction;
     QAction* m_resetFilterAction;
     QAction* m_clipboardAction;
-
+    QnBusinessRulesActualModel* m_rulesModel;
 };
 
 #endif // __EVENT_LOG_DIALOG_H____

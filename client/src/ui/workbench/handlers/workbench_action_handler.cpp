@@ -281,6 +281,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CloseAllButThisLayoutAction),            SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
     connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
     connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
     connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
@@ -463,6 +464,8 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
+    if(params.frameColor.isValid())
+        data.dataByRole[Qn::ItemFrameColorRole] = params.frameColor;
     if(params.usePosition) {
         data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
     } else {
@@ -2039,6 +2042,27 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         cameraSettingsDialog()->setGeometry(oldGeometry);
 }
 
+void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
+{
+    bool newlyCreated = false;
+    if(!businessEventsLogDialog()) {
+        m_businessEventsLogDialog = new QnEventLogDialog(widget(), context());
+        newlyCreated = true;
+    }
+
+    businessEventsLogDialog()->disableUpdateData();
+    businessEventsLogDialog()->setEventType(BusinessEventType::AnyCameraIssue);
+    businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());
+    businessEventsLogDialog()->enableUpdateData();
+
+    QRect oldGeometry = businessEventsLogDialog()->geometry();
+    businessEventsLogDialog()->show();
+    businessEventsLogDialog()->raise();
+    if(!newlyCreated)
+        businessEventsLogDialog()->setGeometry(oldGeometry);
+}
+
+
 void QnWorkbenchActionHandler::at_clearCameraSettingsAction_triggered() {
     if(cameraSettingsDialog() && cameraSettingsDialog()->isVisible())
         menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnResourceList());
@@ -3437,6 +3461,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.position = widget->item()->combinedGeometry().center();
     addParams.zoomWindow = rect;
     addParams.zoomUuid = widget->item()->uuid();
+    addParams.frameColor = QColor(255, 0, 0); // TODO: #Elric
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource(), addParams);
 }

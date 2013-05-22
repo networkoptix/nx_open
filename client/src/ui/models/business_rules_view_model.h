@@ -114,8 +114,12 @@ public:
     bool disabled() const;
     void setDisabled(const bool value);
 
-    // TODO: #vasilenko Schedule as a string? What is the format? Where are docs?
     QString schedule() const;
+
+    /**
+    * param value binary string encoded as HEX. Each bit represent 1 hour of week schedule. First 24*7 bits is used. Rest of the string is ignored.
+    * First day of week is Monday independent of system settings
+    */
     void setSchedule(const QString value);
 
     QString comments() const;
