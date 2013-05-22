@@ -42,6 +42,7 @@ private:
     QnVideoCamera* m_camera;
     bool m_activityStarted;
     QnResource::ConnectionRole m_role;
+    qint64 m_nextMinTryTime;
 };
 
 QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, QnResourcePtr resource, QnResource::ConnectionRole role): 
@@ -52,7 +53,8 @@ QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, QnResource
     m_allChannelsMask(0),
     m_camera(camera),
     m_activityStarted(false),
-    m_role(role)
+    m_role(role),
+    m_nextMinTryTime(0)
 {
     const QnResourceVideoLayout* layout = (qSharedPointerDynamicCast<QnMediaResource>(resource))->getVideoLayout();
     m_allChannelsMask = (1 << layout->channelCount()) - 1;
@@ -158,11 +160,13 @@ QnCompressedAudioDataPtr QnVideoCameraGopKeeper::getLastAudioFrame()
 
 void QnVideoCameraGopKeeper::updateCameraActivity()
 {
+    qint64 usecTime = getUsecTimer();
     if (!m_resource->isDisabled() && m_resource->isInitialized() &&
        (!m_lastKeyFrame || qnSyncTime->currentUSecsSinceEpoch() - m_lastKeyFrame->timestamp > CAMERA_UPDATE_INTERNVAL))
     {
-        if (!m_activityStarted) {
+        if (!m_activityStarted && usecTime > m_nextMinTryTime) {
             m_activityStarted = true;
+            m_nextMinTryTime = usecTime + (rand()%100 + 60) * 1000000ll;
             m_camera->inUse(this);
             QnAbstractMediaStreamDataProviderPtr provider = m_camera->getLiveReader(m_role);
             if (provider)
