@@ -139,6 +139,10 @@ void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &
 void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 {
     switch(message.eventType) {
+    case Qn::Message_Type_Initial:
+    case Qn::Message_Type_Ping:
+        break;
+
     case Qn::Message_Type_License:
         {
             qnLicensePool->addLicense(message.license);
@@ -220,7 +224,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             break;
         }
     }
-
+    // default-case is not used for a reason
 
 }
 
