@@ -24,6 +24,7 @@
 		<arch>x86</arch>
 		<skip.test>true</skip.test>
 		<skip.compress>true</skip.compress>
+		<install.type>all</install.type>
 	</properties>
 
 	<dependencies>
@@ -46,7 +47,7 @@
 	<build>
 		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
-		<finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
+		<finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${install.type}-${build.configuration}-beta</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -225,7 +226,7 @@
 										<argument>MyFeaturesDlg.wxs</argument>
 										<argument>SelectionWarning.wxs</argument>
 										<argument>DowngradeWarningDlg.wxs</argument>
-										<argument>Product.wxs</argument>
+										<argument>Product-${install.type}.wxs</argument>
 										<argument>AppServerFiles.wxs</argument>
 										<argument>ClientHelp.wxs</argument>
 										<argument>AppServerDlg.wxs</argument> 
