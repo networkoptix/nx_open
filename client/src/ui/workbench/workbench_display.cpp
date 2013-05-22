@@ -551,7 +551,8 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(newWidget != NULL) {
             bringToFront(newWidget);
             synchronize(newWidget, true);
-            newWidget->setOpacity(0.7);
+            if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
+                newWidget->setOpacity(qnGlobals->raisedWigdetOpacity());
         }
         break;
     }
@@ -642,6 +643,9 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     if (!layout)
         return;
 
+    bool backgroundPresentChanged = (gridBackgroundItem()->imageFilename().isEmpty() !=
+            layout->backgroundImageFilename().isEmpty());
+
     gridBackgroundItem()->setImageSize(layout->backgroundSize());
     gridBackgroundItem()->setImageFilename(layout->backgroundImageFilename());
     gridBackgroundItem()->setImageOpacity(layout->backgroundOpacity());
@@ -649,6 +653,13 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
 
     synchronizeSceneBounds();
     fitInView();
+
+    // so raised cone will be drawn or hidden and raised widget opacity will be fixed
+    if (backgroundPresentChanged && m_widgetByRole[Qn::RaisedRole] != NULL) {
+        QnResourceWidget* raisedWidget = m_widgetByRole[Qn::RaisedRole];
+        setWidget(Qn::RaisedRole, NULL);
+        setWidget(Qn::RaisedRole, raisedWidget);
+    }
 }
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
@@ -1216,9 +1227,12 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
         assertRaisedConeItem(widget);
 
-        raisedConeItem(widget)->adjustGeometry(expanded(widget->aspectRatio(), enclosingGeometry, Qt::KeepAspectRatio));
+        QRectF coneGeometry = enclosingGeometry;
+        if (widget->hasAspectRatio())
+            coneGeometry = expanded(widget->aspectRatio(), coneGeometry, Qt::KeepAspectRatio);
+        raisedConeItem(widget)->adjustGeometry(coneGeometry);
         if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
-            opacityAnimator(raisedConeItem(widget), 0.5)->animateTo(0.3);
+            opacityAnimator(raisedConeItem(widget))->animateTo(qnGlobals->raisedConeOpacity());
 
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 

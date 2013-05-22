@@ -21,13 +21,15 @@
 #include "ui/style/skin.h"
 #include "client/client_settings.h"
 #include "ui/models/business_rules_actual_model.h"
+#include "utils/common/event_processors.h"
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
     ui(new Ui::EventLogDialog),
     m_context(context),
     m_updateDisabled(false),
-    m_dirty(false)
+    m_dirty(false),
+    m_lastMouseButton(Qt::NoButton)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::Window);
@@ -67,9 +69,21 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         actionItems << BusinessActionType::toString(BusinessActionType::Value(i));
     ui->actionComboBox->addItems(actionItems);
 
-    m_filterAction      = new QAction(tr("&Filter similar rows"), this);
-    m_clipboardAction   = new QAction(tr("&Copy selection to clipboard"), this);
-    m_resetFilterAction = new QAction(tr("&Clear filter"), this);
+    m_filterAction      = new QAction(tr("Filter similar rows"), this);
+    m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
+    m_clipboardAction   = new QAction(tr("Copy selection to clipboard"), this);
+    m_clipboardAction->setShortcut(QKeySequence::Copy);
+    m_resetFilterAction = new QAction(tr("Clear filter"), this);
+    m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R);
+
+    QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
+    mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
+    ui->gridEvents->viewport()->installEventFilter(mouseSignalizer);
+    connect(mouseSignalizer,       SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_mouseButtonRelease(QObject *, QEvent *)));
+
+    ui->gridEvents->addAction(m_clipboardAction);
+    ui->gridEvents->addAction(m_filterAction);
+    ui->gridEvents->addAction(m_resetFilterAction);
 
     ui->clearFilterButton->setDefaultAction(m_resetFilterAction);
     ui->cameraButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera | QnResourceIconCache::Online));
@@ -317,7 +331,7 @@ void QnEventLogDialog::requestFinished()
 
 void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
 {
-    if (m_model->hasMotionUrl(idx))
+    if (m_lastMouseButton == Qt::LeftButton && m_model->hasMotionUrl(idx))
     {
         QnResourcePtr resource = m_model->eventResource(idx.row());
         qint64 pos = m_model->eventTimestamp(idx.row())/1000;
@@ -463,16 +477,7 @@ void QnEventLogDialog::at_copyToClipboard()
     QString htmlData;
     QMimeData* mimeData = new QMimeData();
 
-    htmlData.append(lit("<!DOCTYPE html>\n"));
     htmlData.append(lit("<html>\n"));
-
-    htmlData.append(lit("<head>\n"));
-    htmlData.append(lit("<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"));
-    htmlData.append(lit("<title>"));
-    htmlData.append(windowTitle());
-    htmlData.append(lit("</title>\n"));
-    htmlData.append(lit("</head>\n"));
-
     htmlData.append(lit("<body>\n"));
     htmlData.append(lit("<table>\n"));
 
@@ -519,6 +524,12 @@ void QnEventLogDialog::at_copyToClipboard()
     mimeData->setHtml(htmlData);
 
     QApplication::clipboard()->setMimeData(mimeData);
+}
+
+void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
+{
+    QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
+    m_lastMouseButton = me->button();
 }
 
 void QnEventLogDialog::at_cameraButtonClicked()
