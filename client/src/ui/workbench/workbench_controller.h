@@ -130,7 +130,7 @@ protected slots:
     void at_rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
     void at_zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect);
-    void at_zoomRectCreated(QnMediaResourceWidget *widget, const QRectF &zoomRect);
+    void at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect);
     void at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget);
 
     void at_motionSelectionProcessStarted(QGraphicsView *view, QnMediaResourceWidget *widget);

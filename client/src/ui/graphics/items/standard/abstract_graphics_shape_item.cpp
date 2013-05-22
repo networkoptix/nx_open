@@ -9,6 +9,15 @@ AbstractGraphicsShapeItem::~AbstractGraphicsShapeItem() {
     return;
 }
 
+QColor AbstractGraphicsShapeItem::color() const {
+    return m_pen.color();
+}
+
+void AbstractGraphicsShapeItem::setColor(const QColor &color) {
+    m_pen.setColor(color);
+    update();
+}
+
 QPen AbstractGraphicsShapeItem::pen() const {
     return m_pen;
 }

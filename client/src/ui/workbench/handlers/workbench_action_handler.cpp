@@ -3461,7 +3461,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.position = widget->item()->combinedGeometry().center();
     addParams.zoomWindow = rect;
     addParams.zoomUuid = widget->item()->uuid();
-    addParams.frameColor = QColor(255, 0, 0); // TODO: #Elric
+    addParams.frameColor = params.argument<QColor>(Qn::ItemFrameColorRole);
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource(), addParams);
 }
