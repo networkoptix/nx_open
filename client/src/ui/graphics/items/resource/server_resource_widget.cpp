@@ -64,7 +64,7 @@ namespace {
     }
 
     QLinkedList<qreal> scaledNetworkValues(const QLinkedList<qreal> &values, const qreal upperBound) {
-        if (qFuzzyCompare(upperBound, 0.0))
+        if (qFuzzyIsNull(upperBound))
             return values;
 
         QLinkedList<qreal> result;
@@ -90,10 +90,10 @@ namespace {
 
     QString networkLoadText(const qreal value, qreal upperBound) {
         int idx = 0;
-        qreal upper = upperBound / 1024;
+        qreal upper = upperBound / 1000;
         while (upper >= 1.0) {
             upperBound = upper;
-            upper = upperBound / 1024;
+            upper = upperBound / 1000;
             idx++;
         }
         idx = qMin(idx, networkSuffixes.size() - 1);
@@ -390,9 +390,9 @@ protected:
             if (stats.deviceType == NETWORK_IN || stats.deviceType == NETWORK_OUT)
                 maxNetworkValue = qMax(maxNetworkValue, maxValue(stats.values));
         }
-        qreal networkUpperBound = qFuzzyCompare(maxNetworkValue, 0.0) ? 0.0 : 1.0;
-        while (maxNetworkValue > networkUpperBound)
-            networkUpperBound *= 2;
+        qreal networkUpperBound = qFuzzyIsNull(maxNetworkValue) ? 0.0 : 1.0;
+        while (maxNetworkValue > networkUpperBound && !qFuzzyIsNull(networkUpperBound))
+            networkUpperBound *= 10;
 
         /* Draw graph lines */
         {

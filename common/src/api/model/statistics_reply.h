@@ -7,11 +7,11 @@
 #include <QtCore/QLinkedList>
 
 enum QnStatisticsDeviceType {
-    CPU,
-    RAM,
-    HDD,
-    NETWORK_IN,
-    NETWORK_OUT
+    CPU,                /**< CPU load in percents */
+    RAM,                /**< RAM load in percents */
+    HDD,                /**< HDD load in percents */
+    NETWORK_IN,         /**< Network load in bits per sec - inbound traffic */
+    NETWORK_OUT         /**< Network load in bits per sec - outbound traffic */
 };
 
 struct QnStatisticsDataItem {
