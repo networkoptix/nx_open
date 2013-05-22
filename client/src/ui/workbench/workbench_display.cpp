@@ -522,9 +522,8 @@ void QnWorkbenchDisplay::assertRaisedConeItem(QnResourceWidget *widget) {
     if (item->scene() == m_scene)
         return;
     m_scene->addItem(item);
-    setLayer(item, Qn::RaisedConeLayer);
+    setLayer(item, Qn::RaisedConeBgLayer);
     item->setOpacity(0.0);
-    opacityAnimator(item)->setTimeLimit(2000);
 }
 
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) {
@@ -544,15 +543,16 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         /* Sync new & old geometry. */
         if(oldWidget != NULL) {
             synchronize(oldWidget, true);
-            oldWidget->setOpacity(1.0);
-            opacityAnimator(raisedConeItem(oldWidget), 0.5)->animateTo(0.0);
+            opacityAnimator(oldWidget)->animateTo(1.0);
+            opacityAnimator(raisedConeItem(oldWidget))->animateTo(0.0);
+            setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
         }
 
         if(newWidget != NULL) {
             bringToFront(newWidget);
             synchronize(newWidget, true);
             if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
-                newWidget->setOpacity(qnGlobals->raisedWigdetOpacity());
+                opacityAnimator(newWidget)->animateTo(qnGlobals->raisedWigdetOpacity());
         }
         break;
     }
@@ -1231,8 +1231,10 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         if (widget->hasAspectRatio())
             coneGeometry = expanded(widget->aspectRatio(), coneGeometry, Qt::KeepAspectRatio);
         raisedConeItem(widget)->adjustGeometry(coneGeometry);
-        if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
+        if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()) {
+            setLayer(raisedConeItem(widget), Qn::RaisedConeLayer);
             opacityAnimator(raisedConeItem(widget))->animateTo(1.0);
+        }
 
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 

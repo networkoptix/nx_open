@@ -135,8 +135,9 @@ namespace Qn {
     enum ItemLayer {
         EMappingLayer,              /**< Layer for E-Mapping background. */
         BackLayer,                  /**< Back layer. */
+        RaisedConeBgLayer,          /**< Layer for origin cone when item is not raised anymore. */
         PinnedLayer,                /**< Layer for pinned items. */
-        RaisedConeLayer,            /**< Layer for source cone for raised items. */
+        RaisedConeLayer,            /**< Layer for origin cone for raised items. */
         PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
         UnpinnedLayer,              /**< Layer for unpinned items. */
         UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
