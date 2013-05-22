@@ -243,12 +243,12 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
                     QString interfaceName = QLatin1String(extractXmlBody(interfaceBlock, "name"));
                     reply.statistics.append(QnStatisticsDataItem(
                         interfaceName + QChar(0x21e9),
-                        extractXmlBody(interfaceBlock, "in").toDouble(),
+                        extractXmlBody(interfaceBlock, "in").toDouble() * 8, //converting from bytes to bits
                         NETWORK_IN
                     ));
                     reply.statistics.append(QnStatisticsDataItem(
                         interfaceName + QChar(0x21e7),
-                        extractXmlBody(interfaceBlock, "out").toDouble(),
+                        extractXmlBody(interfaceBlock, "out").toDouble() * 8, //converting from bytes to bits
                         NETWORK_OUT
                     ));
                 } while (networkBlock.length() > 0);
