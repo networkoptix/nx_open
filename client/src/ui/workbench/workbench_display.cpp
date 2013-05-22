@@ -1216,7 +1216,10 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
         assertRaisedConeItem(widget);
 
-        raisedConeItem(widget)->adjustGeometry(expanded(widget->aspectRatio(), enclosingGeometry, Qt::KeepAspectRatio));
+        QRectF coneGeometry = enclosingGeometry;
+        if (widget->hasAspectRatio())
+            coneGeometry = expanded(widget->aspectRatio(), coneGeometry, Qt::KeepAspectRatio);
+        raisedConeItem(widget)->adjustGeometry(coneGeometry);
         if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
             opacityAnimator(raisedConeItem(widget), 0.5)->animateTo(0.3);
 
