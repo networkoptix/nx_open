@@ -57,6 +57,7 @@ private slots:
     void at_filterAction();
     void at_resetFilterAction();
     void at_copyToClipboard();
+    void at_mouseButtonRelease(QObject* sender, QEvent* event);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     QString getTextForNCameras(int n) const;
@@ -86,6 +87,7 @@ private:
     QAction* m_resetFilterAction;
     QAction* m_clipboardAction;
     QnBusinessRulesActualModel* m_rulesModel;
+    Qt::MouseButton m_lastMouseButton;
 };
 
 #endif // __EVENT_LOG_DIALOG_H____
