@@ -74,9 +74,6 @@ public:
         /** Color of the cone that points to the raised widget origin if layout background is present. */
         RAISED_CONE_COLOR,
 
-        /** Opacity of the cone that points to the raised widget origin if layout background is present. */
-        RAISED_CONE_OPACITY,
-
         /** Opacity of the raised widget if layout background is present. */
         RAISED_WIDGET_OPACITY,
 
@@ -133,7 +130,6 @@ private:
 
 
         QN_DECLARE_R_PROPERTY(QColor,   raisedConeColor,                RAISED_CONE_COLOR,                      QColor(64, 130, 180, 128))
-        QN_DECLARE_R_PROPERTY(qreal,    raisedConeOpacity,              RAISED_CONE_OPACITY,                    1.0)
         QN_DECLARE_R_PROPERTY(qreal,    raisedWigdetOpacity,            RAISED_WIDGET_OPACITY,                  0.7)
     QN_END_PROPERTY_STORAGE()
 };
