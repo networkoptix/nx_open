@@ -89,7 +89,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
             context()->action(Qn::BusinessEventsLogAction), SIGNAL(triggered()));
 
     connect(m_rulesViewModel,   SIGNAL(beforeModelChanged(int)), this, SLOT(at_beforeModelChanged(int)));
-    connect(m_rulesViewModel,   SIGNAL(afterModelChanged(int, int)), this, SLOT(at_afterModelChanged(int, int)));
+
+    connect(m_rulesViewModel,   SIGNAL(afterModelChanged(QnBusinessRulesActualModelChange, bool)),
+            this,               SLOT(at_afterModelChanged(QnBusinessRulesActualModelChange, bool)));
 
     m_rulesViewModel->reloadData();
 }
@@ -171,7 +173,6 @@ void QnBusinessRulesDialog::at_beforeModelChanged(int changeNum) {
     m_currentDetailsWidget->setModel(NULL);
     m_pendingDeleteRules.clear();
     m_deleting.clear();
-    m_processing.clear();
     updateControlButtons();
 }
 
@@ -201,33 +202,24 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     deleteRule(model);
 }
 
-void QnBusinessRulesDialog::at_afterModelChanged(int changeNum, int status) {
-    bool success = (status == 0);
-    if(!success) {
-        QMessageBox::critical(this, tr("Error"), tr("Error while receiving rules"));
+void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok) {
+    if (!ok) {
+        switch (change) {
+        case RulesLoaded:
+            QMessageBox::critical(this, tr("Error"), tr("Error while receiving rules"));
+            break;
+        case RuleSaved:
+            QMessageBox::critical(this, tr("Error"), tr("Error while saving rule."));
+            break;
+        }
         return;
     }
 
-    ui->tableView->resizeColumnsToContents();
-    ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
-    updateControlButtons();
-}
-
-void QnBusinessRulesDialog::at_resources_saved(int status, const QnBusinessEventRuleList &rules, int handle) {
-    if (!m_processing.contains(handle))
-        return;
-    QnBusinessRuleViewModel* model = m_processing[handle];
-    m_processing.remove(handle);
-
-    bool success = (status == 0 && rules.size() == 1);
-    if(!success) {
-        QMessageBox::critical(this, tr("Error"), tr("Error while saving rule."));
-        return;
+    if (change == RulesLoaded) {
+        ui->tableView->resizeColumnsToContents();
+        ui->tableView->horizontalHeader()->setStretchLastSection(true);
+        ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     }
-
-    QnBusinessEventRulePtr rule = rules.first();
-    model->loadFromRule(rule); //here ID is set and modified flag is cleared
     updateControlButtons();
 }
 
@@ -324,7 +316,7 @@ bool QnBusinessRulesDialog::saveAll() {
 
 
     foreach (QModelIndex idx, modified) {
-        saveRule(m_rulesViewModel->getRuleModel(idx.row()));
+        m_rulesViewModel->saveRule(idx.row());
     }
     foreach (int id, m_pendingDeleteRules) {
         int handle = QnAppServerConnectionFactory::createConnection()->deleteRuleAsync(
@@ -333,16 +325,6 @@ bool QnBusinessRulesDialog::saveAll() {
     }
     m_pendingDeleteRules.clear();
     return true;
-}
-
-void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
-    if (m_processing.values().contains(ruleModel))
-        return;
-
-    QnBusinessEventRulePtr rule = ruleModel->createRule();
-    int handle = QnAppServerConnectionFactory::createConnection()->saveAsync(
-                rule, this, SLOT(at_resources_saved(int, const QnBusinessEventRuleList &, int)));
-    m_processing[handle] = ruleModel;
 }
 
 void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {

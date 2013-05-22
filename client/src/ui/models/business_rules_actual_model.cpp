@@ -23,16 +23,43 @@ void QnBusinessRulesActualModel::reloadData()
     m_isDataLoaded = false;
     m_loadingHandle = QnAppServerConnectionFactory::createConnection()->getBusinessRulesAsync(
         this, SLOT(at_resources_received(int,QnBusinessEventRuleList,int)));
+    m_savingRules.clear();
     emit beforeModelChanged(m_loadingHandle);
+}
+
+void QnBusinessRulesActualModel::saveRule(int row) {
+    QnBusinessRuleViewModel* ruleModel = getRuleModel(row);
+
+    if (m_savingRules.values().contains(ruleModel))
+        return;
+
+    QnBusinessEventRulePtr rule = ruleModel->createRule();
+    int handle = QnAppServerConnectionFactory::createConnection()->saveAsync(
+                rule, this, SLOT(at_resources_saved(int, const QnBusinessEventRuleList &, int)));
+    m_savingRules[handle] = ruleModel;
 }
 
 void QnBusinessRulesActualModel::at_resources_received(int status, const QnBusinessEventRuleList &rules, int handle) {
     if (handle != m_loadingHandle)
         return;
-    addRules(rules);
     m_isDataLoaded = status == 0;
-    emit afterModelChanged(m_loadingHandle, status);
+    addRules(rules);
+    emit afterModelChanged(RulesLoaded, m_isDataLoaded);
     m_loadingHandle = -1;
+}
+
+void QnBusinessRulesActualModel::at_resources_saved(int status, const QnBusinessEventRuleList &rules, int handle) {
+    if (!m_savingRules.contains(handle))
+        return;
+    QnBusinessRuleViewModel* model = m_savingRules[handle];
+    m_savingRules.remove(handle);
+
+    bool success = (status == 0 && rules.size() == 1);
+    if(success) {
+        deleteRule(model);
+        updateRule(rules.first());
+    }
+    emit afterModelChanged(RuleSaved, success);
 }
 
 void QnBusinessRulesActualModel::at_message_ruleChanged(const QnBusinessEventRulePtr &rule) {

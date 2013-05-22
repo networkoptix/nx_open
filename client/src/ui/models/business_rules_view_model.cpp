@@ -986,16 +986,17 @@ void QnBusinessRulesViewModel::addRule(QnBusinessEventRulePtr rule) {
 }
 
 void QnBusinessRulesViewModel::updateRule(QnBusinessEventRulePtr rule) {
-    foreach (QnBusinessRuleViewModel* ruleModel, m_rules) {
-        if (ruleModel->id() == rule->id()) {
-            ruleModel->loadFromRule(rule);
-            return;
-        }
-    }
-    addRule(rule);
+    QnBusinessRuleViewModel* ruleModel = ruleModelById(rule->id());
+    if (ruleModel)
+        ruleModel->loadFromRule(rule);
+    else
+        addRule(rule);
 }
 
 void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
+    if (!ruleModel)
+        return;
+
     int row = m_rules.indexOf(ruleModel);
     if (row < 0)
         return;
@@ -1008,18 +1009,22 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
 }
 
 void QnBusinessRulesViewModel::deleteRule(int id) {
-    foreach (QnBusinessRuleViewModel* rule, m_rules) {
-        if (rule->id() == id) {
-            deleteRule(rule);
-            return;
-        }
-    }
+    deleteRule(ruleModelById(id));
 }
 
 QnBusinessRuleViewModel* QnBusinessRulesViewModel::getRuleModel(int row) {
     if (row < 0 || row >= m_rules.size())
         return NULL;
     return m_rules[row];
+}
+
+QnBusinessRuleViewModel* QnBusinessRulesViewModel::ruleModelById(int id) {
+    foreach (QnBusinessRuleViewModel* rule, m_rules) {
+        if (rule->id() == id) {
+            return rule;
+        }
+    }
+    return NULL;
 }
 
 void QnBusinessRulesViewModel::at_rule_dataChanged(QnBusinessRuleViewModel *source, QnBusiness::Fields fields) {

@@ -15,13 +15,12 @@
 
 #include <ui/dialogs/button_box_dialog.h>
 
-#include <ui/models/business_rules_view_model.h>
+#include <ui/models/business_rules_actual_model.h>
 
 #include <ui/widgets/business/business_rule_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/request_param.h>
-#include "ui/models/business_rules_actual_model.h"
 
 namespace Ui {
     class BusinessRulesDialog;
@@ -53,9 +52,8 @@ private slots:
     void at_deleteButton_clicked();
 
     void at_beforeModelChanged(int changeNum);
-    void at_afterModelChanged(int changeNum, int status);
+    void at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
 
-    void at_resources_saved(int status, const QnBusinessEventRuleList &rules, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
@@ -73,7 +71,6 @@ private:
 
     bool saveAll();
 
-    void saveRule(QnBusinessRuleViewModel* ruleModel);
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
 
     void updateControlButtons();
@@ -88,7 +85,7 @@ private:
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
-    QMap<int, QnBusinessRuleViewModel*> m_processing;
+
     QMap<int, int> m_deleting;
 
     QMenu* m_popupMenu;

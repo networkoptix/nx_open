@@ -196,6 +196,9 @@ public:
     void deleteRule(int id);
 
     QnBusinessRuleViewModel* getRuleModel(int row);
+protected:
+    QnBusinessRuleViewModel* ruleModelById(int id);
+
 private slots:
     void at_rule_dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
     void at_soundModel_listChanged();
