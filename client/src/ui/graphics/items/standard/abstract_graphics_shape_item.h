@@ -17,6 +17,9 @@ public:
     AbstractGraphicsShapeItem(QGraphicsItem *parent = NULL);
     virtual ~AbstractGraphicsShapeItem();
 
+    QColor color() const;
+    void setColor(const QColor &color);
+
     QPen pen() const;
     void setPen(const QPen &pen);
 

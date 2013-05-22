@@ -5,6 +5,7 @@
 #include <utils/math/color_transformations.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/hash.h>
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
@@ -24,10 +25,6 @@
 #include "selection_item.h"
 
 namespace {
-    const QColor zoomWindowColor = qnGlobals->zoomWindowColor();
-    const QColor zoomDraggerColor = toTransparent(qnGlobals->zoomWindowColor().lighter(50), 0.5);
-    const QColor zoomFrameColor = toTransparent(zoomWindowColor, 0.75);
-
     const qreal zoomFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings;
 
     const qreal zoomWindowMinSize = 0.1;
@@ -276,6 +273,8 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
     ),
     QnWorkbenchContextAware(parent)
 {
+    m_zoomWindowColors = qnGlobals->zoomWindowColors();
+
     connect(display(), SIGNAL(zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)));
     connect(display(), SIGNAL(zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)));
     connect(display(), SIGNAL(widgetChanged(Qn::ItemRole)), this, SLOT(at_display_widgetChanged(Qn::ItemRole)));
@@ -283,6 +282,18 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
 
 ZoomWindowInstrument::~ZoomWindowInstrument() {
     ensureUninstalled();
+}
+
+QColor ZoomWindowInstrument::nextZoomWindowColor() const {
+    QSet<QColor> colors;
+    foreach(QnResourceWidget *widget, display()->widgets())
+        colors.insert(widget->frameColor());
+
+    foreach(const QColor &color, m_zoomWindowColors)
+        if(!colors.contains(color))
+            return color;
+
+    return m_zoomWindowColors[static_cast<qint64>(qrand()) * m_zoomWindowColors.size() / (RAND_MAX + 1)];
 }
 
 ZoomOverlayWidget *ZoomWindowInstrument::overlayWidget(QnMediaResourceWidget *widget) const {
@@ -317,7 +328,7 @@ void ZoomWindowInstrument::ensureSelectionItem() {
 
     m_selectionItem = new FixedArSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setPen(QPen(zoomFrameColor, zoomFrameWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+    selectionItem()->setPen(QPen(Qt::white, zoomFrameWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     selectionItem()->setBrush(Qt::NoBrush);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
     selectionItem()->setOptions(FixedArSelectionItem::DrawSideElements);
@@ -518,6 +529,10 @@ void ZoomWindowInstrument::startDrag(DragInfo *) {
     selectionItem()->setViewport(m_viewport.data());
     opacityAnimator(selectionItem())->stop();
     selectionItem()->setOpacity(1.0);
+    
+    m_zoomWindowColor = nextZoomWindowColor();
+    selectionItem()->setColor(toTransparent(m_zoomWindowColor, 0.75));
+
     /* Everything else will be initialized in the first call to drag(). */
 
     emit zoomWindowStarted(target());
@@ -549,7 +564,7 @@ void ZoomWindowInstrument::finishDrag(DragInfo *) {
         if(zoomRect.width() >= zoomWindowMaxSize || zoomRect.height() >= zoomWindowMaxSize)
             zoomRect = expanded(aspectRatio(zoomRect), QSizeF(zoomWindowMaxSize, zoomWindowMaxSize), zoomRect.center(), Qt::KeepAspectRatio);
         
-        emit zoomRectCreated(target(), zoomRect);
+        emit zoomRectCreated(target(), m_zoomWindowColor, zoomRect);
     }
 
     if(m_zoomWindowStartedEmitted)

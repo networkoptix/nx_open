@@ -25,7 +25,7 @@ public:
     virtual ~ZoomWindowInstrument();
 
 signals:
-    void zoomRectCreated(QnMediaResourceWidget *widget, const QRectF &zoomRect);
+    void zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect);
     void zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect);
     void zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget);
 
@@ -66,6 +66,8 @@ private slots:
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
 
 private:
+    QColor nextZoomWindowColor() const;
+
     ZoomOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
     ZoomOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
     ZoomWindowWidget *windowWidget(QnMediaResourceWidget *widget) const;
@@ -101,8 +103,10 @@ private:
     };
 
     bool m_zoomWindowStartedEmitted;
+    QVector<QColor> m_zoomWindowColors;
     QWeakPointer<FixedArSelectionItem> m_selectionItem;
     QWeakPointer<QWidget> m_viewport;
+    QColor m_zoomWindowColor;
     QWeakPointer<QnMediaResourceWidget> m_target;
     QHash<QObject *, ZoomData> m_dataByWidget;
     QSet<QObject *> m_processingWidgets;
