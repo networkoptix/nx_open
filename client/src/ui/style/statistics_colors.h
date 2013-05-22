@@ -10,7 +10,7 @@ class QnStatisticsColors
 {
 public:
     QnStatisticsColors();
-    QnStatisticsColors(const QnStatisticsColors &source);
+    QnStatisticsColors(const QnStatisticsColors &other);
     ~QnStatisticsColors();
 
     QColor grid;
@@ -31,7 +31,7 @@ private:
 
     /**
      * @brief ensureHdds        Make sure all color arrays contain at least one element.
-     *                          Fill by default values if empty.
+     *                          Fill with default values if empty.
      */
     void ensureVectors();
 };
