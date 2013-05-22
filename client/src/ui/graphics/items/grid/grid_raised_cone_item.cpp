@@ -2,6 +2,8 @@
 
 #include <QPainter>
 
+#include <ui/style/globals.h>
+
 namespace {
 
     const char *raisedConeItemPropertyName = "_qn_raisedConeItem";
@@ -153,28 +155,28 @@ void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
                                      sourceHelper,
                                      targetHelper,
                                      m_rotation,
-                                     1, 1), Qt::green);
+                                     1, 1), qnGlobals->raisedConeColor());
 
     painter->fillPath(createBeamPath(m_sourceRect.topRight(),
                                      m_targetRect.topRight(),
                                      sourceHelper,
                                      targetHelper,
                                      m_rotation,
-                                     -1, 1), Qt::green);
+                                     -1, 1), qnGlobals->raisedConeColor());
 
     painter->fillPath(createBeamPath(m_sourceRect.bottomLeft(),
                                      m_targetRect.bottomLeft(),
                                      sourceHelper,
                                      targetHelper,
                                      m_rotation,
-                                     1, -1), Qt::green);
+                                     1, -1), qnGlobals->raisedConeColor());
 
     painter->fillPath(createBeamPath(m_sourceRect.bottomRight(),
                                      m_targetRect.bottomRight(),
                                      sourceHelper,
                                      targetHelper,
                                      m_rotation,
-                                     -1, -1), Qt::green);
+                                     -1, -1), qnGlobals->raisedConeColor());
 
     // translate the whole painter is much easier than translate all 8 points of the path --gdm
     QPointF offset = m_sourceRect.center();
@@ -182,7 +184,7 @@ void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     painter->rotate(m_rotation);
     painter->translate(-offset);
 
-    painter->fillPath(createSourceRectPath(m_sourceRect, sourceHelper.offset), Qt::green);
+    painter->fillPath(createSourceRectPath(m_sourceRect, sourceHelper.offset), qnGlobals->raisedConeColor());
 
     painter->translate(offset);
     painter->rotate(-m_rotation);

@@ -140,9 +140,6 @@ namespace {
      * operation is performed. */
     const qreal zStep = 1.0;
 
-    /** Opacity of raised widgets if the layout has a background. */
-    const qreal raisedItemOpacity = 0.88;
-
     enum {
         ITEM_LAYER_KEY = 0x93A7FA71,    /**< Key for item layer. */
         ITEM_ANIMATOR_KEY = 0x81AFD591  /**< Key for item animator. */
@@ -555,7 +552,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             bringToFront(newWidget);
             synchronize(newWidget, true);
             if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
-                newWidget->setOpacity(raisedItemOpacity);
+                newWidget->setOpacity(qnGlobals->raisedWigdetOpacity());
         }
         break;
     }
@@ -1235,7 +1232,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
             coneGeometry = expanded(widget->aspectRatio(), coneGeometry, Qt::KeepAspectRatio);
         raisedConeItem(widget)->adjustGeometry(coneGeometry);
         if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
-            opacityAnimator(raisedConeItem(widget), 0.5)->animateTo(0.3);
+            opacityAnimator(raisedConeItem(widget))->animateTo(qnGlobals->raisedConeOpacity());
 
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 

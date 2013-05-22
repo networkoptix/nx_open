@@ -71,6 +71,15 @@ public:
         /** Recommended area of the layout background - in square cells */
         LAYOUT_BACKGROUND_RECOMMENDED_AREA,
 
+        /** Color of the cone that points to the raised widget origin if layout background is present. */
+        RAISED_CONE_COLOR,
+
+        /** Opacity of the cone that points to the raised widget origin if layout background is present. */
+        RAISED_CONE_OPACITY,
+
+        /** Opacity of the raised widget if layout background is present. */
+        RAISED_WIDGET_OPACITY,
+
         VARIABLE_COUNT
     };
 
@@ -120,6 +129,11 @@ private:
 
         QN_DECLARE_R_PROPERTY(QSize,    layoutBackgroundMaxSize,        LAYOUT_BACKGROUND_MAX_SIZE,             QSize(64, 64))
         QN_DECLARE_R_PROPERTY(int,      layoutBackgroundRecommendedArea,LAYOUT_BACKGROUND_RECOMMENDED_AREA,     40*40)
+
+
+        QN_DECLARE_R_PROPERTY(QColor,   raisedConeColor,                RAISED_CONE_COLOR,                      QColor(0, 255, 0, 255))
+        QN_DECLARE_R_PROPERTY(qreal,    raisedConeOpacity,              RAISED_CONE_OPACITY,                    0.5)
+        QN_DECLARE_R_PROPERTY(qreal,    raisedWigdetOpacity,            RAISED_WIDGET_OPACITY,                  0.88)
     QN_END_PROPERTY_STORAGE()
 };
 
