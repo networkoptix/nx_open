@@ -279,7 +279,7 @@ void QnVMax480ConnectionProcessor::run()
                     break;
             }
         }
-        else if (dataSize == VMAXDT_GotAudioPacket)
+        else if (dataType == VMAXDT_GotAudioPacket)
         {
             quint8 vMaxAudioHeader[4];
             if (!readBuffer(vMaxAudioHeader, sizeof(vMaxAudioHeader)))
