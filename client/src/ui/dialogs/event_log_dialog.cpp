@@ -463,16 +463,7 @@ void QnEventLogDialog::at_copyToClipboard()
     QString htmlData;
     QMimeData* mimeData = new QMimeData();
 
-    htmlData.append(lit("<!DOCTYPE html>\n"));
     htmlData.append(lit("<html>\n"));
-
-    htmlData.append(lit("<head>\n"));
-    htmlData.append(lit("<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"));
-    htmlData.append(lit("<title>"));
-    htmlData.append(windowTitle());
-    htmlData.append(lit("</title>\n"));
-    htmlData.append(lit("</head>\n"));
-
     htmlData.append(lit("<body>\n"));
     htmlData.append(lit("<table>\n"));
 
