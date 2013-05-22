@@ -276,6 +276,8 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
     ),
     QnWorkbenchContextAware(parent)
 {
+    m_zoomColors = qnGlobals->zoomWindowColors();
+
     connect(display(), SIGNAL(zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)));
     connect(display(), SIGNAL(zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)));
     connect(display(), SIGNAL(widgetChanged(Qn::ItemRole)), this, SLOT(at_display_widgetChanged(Qn::ItemRole)));
@@ -283,6 +285,13 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
 
 ZoomWindowInstrument::~ZoomWindowInstrument() {
     ensureUninstalled();
+}
+
+QColor ZoomWindowInstrument::nextZoomWindowColor() const {
+    //QSet<QColor> colors;
+    //foreach(QnResourceWidget *widget, )
+
+    return QColor();
 }
 
 ZoomOverlayWidget *ZoomWindowInstrument::overlayWidget(QnMediaResourceWidget *widget) const {

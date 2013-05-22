@@ -66,6 +66,8 @@ private slots:
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
 
 private:
+    QColor nextZoomWindowColor() const;
+
     ZoomOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
     ZoomOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
     ZoomWindowWidget *windowWidget(QnMediaResourceWidget *widget) const;
@@ -101,6 +103,7 @@ private:
     };
 
     bool m_zoomWindowStartedEmitted;
+    QVector<QColor> m_zoomColors;
     QWeakPointer<FixedArSelectionItem> m_selectionItem;
     QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;

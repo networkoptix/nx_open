@@ -1,8 +1,8 @@
 #ifndef QN_STATISTICS_COLORS_H
 #define QN_STATISTICS_COLORS_H
 
-#include <QColor>
 #include <QtCore/QMetaType>
+#include <QtGui/QColor>
 
 #include <utils/common/json.h>
 

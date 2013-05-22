@@ -1,14 +1,17 @@
 #ifndef QN_GLOBALS_H
 #define QN_GLOBALS_H
 
-#include <QFont>
-#include <QObject>
-#include <QVariant>
-#include <QSizeF>
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
+#include <QtCore/QSizeF>
+#include <QtGui/QFont>
+#include <QtGui/QColor>
+
+#include <utils/common/property_storage.h>
 
 #include <ui/style/statistics_colors.h>
 
-#include <utils/common/property_storage.h>
+#include <client/client_meta_types.h>
 
 /**
  * Global style settings.
@@ -19,7 +22,6 @@
  */
 class QnGlobals: public QnPropertyStorage {
     Q_OBJECT
-
     typedef QnPropertyStorage base_type;
 
 public:
@@ -59,6 +61,7 @@ public:
         BACKGROUD_GRADIENT_COLOR,
 
         STATISTICS_COLORS,
+        ZOOM_WINDOW_COLORS,
 
         POPUP_FRAME_SYSTEM,
         POPUP_FRAME_NOTIFICATION,
@@ -88,10 +91,12 @@ public:
 
     static QnGlobals *instance();
 
-
 protected:
     virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
     virtual QVariant readValueFromJson(const QVariantMap &json, int id, const QVariant &defaultValue) override;
+
+    static QVector<QColor> defaultZoomWindowColors();
+
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_R_PROPERTY(QFont,    settingsFont,                   SETTINGS_FONT,                          QFont())
@@ -122,6 +127,7 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   backgroundGradientColor,        BACKGROUD_GRADIENT_COLOR,               QColor(5, 5, 50))
 
         QN_DECLARE_R_PROPERTY(QnStatisticsColors,   statisticsColors,   STATISTICS_COLORS,                      QnStatisticsColors())
+        QN_DECLARE_R_PROPERTY(QVector<QColor>,      zoomWindowColors,   ZOOM_WINDOW_COLORS,                     defaultZoomWindowColors())
 
         QN_DECLARE_R_PROPERTY(QColor,   popupFrameSystem,               POPUP_FRAME_SYSTEM,                     QColor(255, 0, 0, 128))
         QN_DECLARE_R_PROPERTY(QColor,   popupFrameNotification,         POPUP_FRAME_NOTIFICATION,               QColor(64, 130, 180, 128))
@@ -130,7 +136,6 @@ private:
 
         QN_DECLARE_R_PROPERTY(QSize,    layoutBackgroundMaxSize,        LAYOUT_BACKGROUND_MAX_SIZE,             QSize(64, 64))
         QN_DECLARE_R_PROPERTY(int,      layoutBackgroundRecommendedArea,LAYOUT_BACKGROUND_RECOMMENDED_AREA,     40*40)
-
 
         QN_DECLARE_R_PROPERTY(QColor,   raisedConeColor,                RAISED_CONE_COLOR,                      QColor(64, 130, 180, 128))
         QN_DECLARE_R_PROPERTY(qreal,    raisedConeOpacity,              RAISED_CONE_OPACITY,                    1.0)

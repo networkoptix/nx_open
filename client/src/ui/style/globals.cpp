@@ -81,3 +81,12 @@ QVariant QnGlobals::readValueFromJson(const QVariantMap &json, int id, const QVa
         return base_type::readValueFromJson(json, id, defaultValue);
     }
 }
+
+QVector<QColor> QnGlobals::defaultZoomWindowColors() {
+    QVector<QColor> result;
+    result << QColor(192, 0, 0);
+    return result;
+}
+
+
+
