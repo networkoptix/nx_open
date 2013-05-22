@@ -71,11 +71,15 @@ QnClientSettings::QnClientSettings():
     addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items");
 
     /* Load from internal resource. */
-    QString path = QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.ini");
-    QScopedPointer<QSettings> settings(new QSettings(path, QSettings::IniFormat));
-    settings->beginGroup(QLatin1String("settings"));
-    updateFromSettings(settings.data());
-    settings->endGroup();
+    QFile file(QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.json"));
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QVariantMap json;
+        if(!QJson::deserialize(file.readAll(), &json)) {
+            qWarning() << "Client settings file could not be parsed!";
+        } else {
+            updateFromJson(json.value(lit("settings")).toMap());
+        }
+    }
 
     /* Load from settings. */
     load();

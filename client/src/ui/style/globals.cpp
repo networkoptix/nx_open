@@ -14,7 +14,7 @@
 
 #include "config.h"
 
-Q_GLOBAL_STATIC(QnGlobals, qn_globalsInstance);
+Q_GLOBAL_STATIC(QnGlobals, qn_globals_instance);
 
 QnGlobals::QnGlobals(QObject *parent):
     base_type(parent)
@@ -26,11 +26,15 @@ QnGlobals::QnGlobals(QObject *parent):
 
     init();
 
-    QString path = QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.ini");
-    QScopedPointer<QSettings> settings(new QSettings(path, QSettings::IniFormat));
-    settings->beginGroup(QLatin1String("style"));
-    updateFromSettings(settings.data());
-    settings->endGroup();
+    QFile file(QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.json"));
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QVariantMap json;
+        if(!QJson::deserialize(file.readAll(), &json)) {
+            qWarning() << "Client settings file could not be parsed!";
+        } else {
+            updateFromJson(json.value(lit("style")).toMap());
+        }
+    }
 }
 
 QnGlobals::~QnGlobals() {
@@ -38,7 +42,7 @@ QnGlobals::~QnGlobals() {
 }
 
 QnGlobals *QnGlobals::instance() {
-    return qn_globalsInstance();
+    return qn_globals_instance();
 }
 
 QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
@@ -61,5 +65,19 @@ QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVa
     }
     else {
         return base_type::readValueFromSettings(settings, id, defaultValue);
+    }
+}
+
+QVariant QnGlobals::readValueFromJson(const QVariantMap &json, int id, const QVariant &defaultValue) {
+    int type = this->type(id);
+    if(type == qMetaTypeId<QnStatisticsColors>()) {
+        QnStatisticsColors value;
+        if(QJson::deserialize(json.value(name(id)), &value)) {
+            return QVariant::fromValue<QnStatisticsColors>(value);
+        } else {
+            return defaultValue;
+        }
+    } else {
+        return base_type::readValueFromJson(json, id, defaultValue);
     }
 }

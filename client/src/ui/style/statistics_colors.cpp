@@ -30,7 +30,7 @@ QnStatisticsColors::QnStatisticsColors(const QnStatisticsColors &other) {
 }
 
 QnStatisticsColors::~QnStatisticsColors() {
-
+    return;
 }
 
 QColor QnStatisticsColors::hddByKey(const QString &key) const {

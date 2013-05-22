@@ -1,13 +1,12 @@
-#ifndef STATISTICS_COLORS_H
-#define STATISTICS_COLORS_H
+#ifndef QN_STATISTICS_COLORS_H
+#define QN_STATISTICS_COLORS_H
 
 #include <QColor>
 #include <QtCore/QMetaType>
 
 #include <utils/common/json.h>
 
-class QnStatisticsColors
-{
+class QnStatisticsColors {
 public:
     QnStatisticsColors();
     QnStatisticsColors(const QnStatisticsColors &other);
@@ -27,6 +26,7 @@ public:
     QColor networkOutByKey(const QString &key) const;
 
     void update(const QByteArray &serializedValue);
+
 private:
 
     /**
@@ -41,4 +41,4 @@ Q_DECLARE_METATYPE(QnStatisticsColors)
 QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStatisticsColors, (grid)(frame)(cpu)(ram)(hdds), inline)
 
 
-#endif // STATISTICS_COLORS_H
+#endif // QN_STATISTICS_COLORS_H
