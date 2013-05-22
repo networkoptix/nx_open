@@ -109,13 +109,16 @@ void QnRecordingSettingsWidget::submitToSettings() {
 Qn::CaptureMode QnRecordingSettingsWidget::captureMode() const
 {
     if (ui->fullscreenButton->isChecked()) {
-        bool noAero = ui->disableAeroCheckBox->isChecked() &&
-                ui->disableAeroCheckBox->isVisible() &&
-                ui->disableAeroCheckBox->isEnabled();
+        if (!m_dwm->isSupported() || !m_dwm->isCompositionEnabled())
+            return Qn::FullScreenMode; // no need to disable aero if dwm is disabled
 
-        if (noAero)
-            return Qn::FullScreenNoAeroMode;
-        return Qn::FullScreenMode;
+        bool isPrimary = ui->screenComboBox->itemData(ui->screenComboBox->currentIndex()) == qApp->desktop()->primaryScreen();
+        if (!isPrimary)
+            return Qn::FullScreenMode; // recording from secondary screen without aero is not supported
+
+        return (ui->disableAeroCheckBox->isChecked())
+                ? Qn::FullScreenNoAeroMode
+                : Qn::FullScreenMode;
     }
     return Qn::WindowMode;
 }
@@ -238,6 +241,7 @@ void QnRecordingSettingsWidget::updateRecordingWarning() {
 }
 
 void QnRecordingSettingsWidget::updateDisableAeroCheckbox() {
+    // without Aero only recording from primary screen is supported
     bool isPrimary = ui->screenComboBox->itemData(ui->screenComboBox->currentIndex()) == qApp->desktop()->primaryScreen();
     ui->disableAeroCheckBox->setEnabled(isPrimary);
 }
@@ -278,5 +282,6 @@ void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked(){
 }
 
 void QnRecordingSettingsWidget::at_dwm_compositionChanged(bool enabled) {
+    // Aero is already disabled if dwm is not enabled or not supported
     ui->disableAeroCheckBox->setVisible(m_dwm->isSupported() && enabled);
 }
