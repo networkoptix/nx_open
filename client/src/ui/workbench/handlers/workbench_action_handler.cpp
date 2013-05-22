@@ -464,6 +464,8 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
+    if(params.frameColor.isValid())
+        data.dataByRole[Qn::ItemFrameColorRole] = params.frameColor;
     if(params.usePosition) {
         data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
     } else {
@@ -3459,6 +3461,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.position = widget->item()->combinedGeometry().center();
     addParams.zoomWindow = rect;
     addParams.zoomUuid = widget->item()->uuid();
+    addParams.frameColor = QColor(255, 0, 0); // TODO: #Elric
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource(), addParams);
 }

@@ -167,6 +167,7 @@ protected:
         QRectF zoomWindow;
         QUuid zoomUuid;
         quint64 time;
+        QColor frameColor;
 
         AddToLayoutParams():
             usePosition(false),

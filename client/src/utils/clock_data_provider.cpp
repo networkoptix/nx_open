@@ -24,7 +24,7 @@ QnClockDataProvider::QnClockDataProvider(QObject *parent) :
 }
 
 QnClockDataProvider::~QnClockDataProvider() {
-
+    return;
 }
 
 void QnClockDataProvider::at_timer_timeout() {

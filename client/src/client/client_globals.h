@@ -60,6 +60,7 @@ namespace Qn {
         ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
         ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
+        ItemFrameColorRole,                         /**< Role for item's frame color. Value of type QColor. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */

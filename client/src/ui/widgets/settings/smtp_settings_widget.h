@@ -40,6 +40,7 @@ public:
     void submit();
 
     void updateFocusedElement();
+
 private:
     QnEmail::Settings settings();
     void stopTesting(QString result);
