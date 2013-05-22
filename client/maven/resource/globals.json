@@ -1,0 +1,15 @@
+{
+    "style": {
+        "selectionColor":           "${selection.color}",
+        "backgroundGradientColor":  "${background.color}",
+        "frameColor":               "${frame.color}",
+        "selectedFrameColor":       "${frame.selectedColor}",
+        "ptzColor":                 "${ptz.color}",
+        "statisticsColors":         ${statistics.colors},
+        "zoomWindowColor":          "${zoomWindow.color}"
+    },
+    
+    "settings": {
+        "updateFeedUrl":            "${updatefeed.url}"
+    }
+}

@@ -87,6 +87,7 @@ void serialize(const QVariant &value, QVariant *target) {
     case QMetaType::Int:
     case QMetaType::Long:
     case QMetaType::LongLong:       QJson::serialize(value.toLongLong(), target); break;
+    case QMetaType::QColor:         QJson::serialize(value.value<QColor>(), target); break;
     default:
         qnWarning("Type '%1' is not supported for JSON serialization.", QMetaType::typeName(value.userType()));
         *target = QVariant();

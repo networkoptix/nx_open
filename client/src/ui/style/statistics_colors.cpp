@@ -3,6 +3,20 @@
 #include <utils/common/json.h>
 #include <utils/math/math.h>
 
+namespace {
+    int asciisum(const QString &value) {
+        int result = 0;
+        foreach (QChar c, value)
+            result += c.toAscii();
+        return result;
+    }
+
+} // anonymous namespace
+
+namespace detail {
+    QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStatisticsColors, (grid)(frame)(cpu)(ram)(hdds), static)
+}
+
 QnStatisticsColors::QnStatisticsColors():
     grid(QColor(66, 140, 237, 100)),
     frame(QColor(66, 140, 237)),
@@ -13,28 +27,13 @@ QnStatisticsColors::QnStatisticsColors():
     ensureVectors();
 }
 
-QnStatisticsColors::QnStatisticsColors(const QnStatisticsColors &source):
-    grid(source.grid),
-    frame(source.frame),
-    cpu(source.cpu),
-    ram(source.ram),
-    networkLimit(source.networkLimit),
-    hdds(source.hdds),
-    networkIn(source.networkIn),
-    networkOut(source.networkOut)
-{
+QnStatisticsColors::QnStatisticsColors(const QnStatisticsColors &other) {
+    *this = other;
     ensureVectors();
 }
 
 QnStatisticsColors::~QnStatisticsColors() {
-
-}
-
-int asciisum(const QString &value) {
-    int result = 0;
-    foreach (QChar c, value)
-        result += c.toAscii();
-    return result;
+    return;
 }
 
 QColor QnStatisticsColors::hddByKey(const QString &key) const {
@@ -63,21 +62,9 @@ QColor QnStatisticsColors::networkOutByKey(const QString &key) const {
     return networkOut[qMod(id, networkOut.size())];
 }
 
-
 void QnStatisticsColors::update(const QByteArray &serializedValue) {
-    QnStatisticsColors other;
-
-    if (!QJson::deserialize(serializedValue, &other))
+    if (!QJson::deserialize(serializedValue, this))
         return;
-
-    grid            = other.grid;
-    frame           = other.frame;
-    cpu             = other.cpu;
-    ram             = other.ram;
-    networkLimit    = other.networkLimit;
-    hdds            = other.hdds;
-    networkIn       = other.networkIn;
-    networkOut      = other.networkOut;
 
     ensureVectors();
 }
@@ -108,5 +95,18 @@ void QnStatisticsColors::ensureVectors() {
                     << QColor(52, 255, 140)
                     << QColor(194, 255, 52);
     }
+}
 
+void serialize(const QnStatisticsColors &value, QVariant *target) {
+    detail::serialize(value, target);
+}
+
+bool deserialize(const QVariant &value, QnStatisticsColors *target) {
+    if(value.type() == QVariant::Invalid) {
+        /* That's null color storage. */
+        *target = QnStatisticsColors();
+        return true;
+    }
+
+    return detail::deserialize(value, target);
 }
