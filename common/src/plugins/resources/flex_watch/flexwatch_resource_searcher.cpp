@@ -59,7 +59,7 @@ void QnFlexWatchResourceSearcher::sendBroadcast()
         if (shouldStop())
             break;
 
-        QByteArray rndPattern = QByteArray::number(rand(),16);
+        QByteArray rndPattern = QByteArray::number(qrand(),16);
         while (rndPattern.size() < 4)
             rndPattern = "0" + rndPattern;
         QByteArray pattern = requestPattertn.replace("____", rndPattern);

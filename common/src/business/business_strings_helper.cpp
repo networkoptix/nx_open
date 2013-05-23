@@ -193,7 +193,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
 
     QUrl apPServerUrl = QnAppServerConnectionFactory::defaultUrl();
     quint64 ts = params.getEventTimestamp();
-    QByteArray rnd = QByteArray::number(rand()).toHex();
+    QByteArray rnd = QByteArray::number(qrand()).toHex();
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
     if (history) {

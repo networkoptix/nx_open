@@ -5,6 +5,7 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSettings>
 #include <QtCore/QMutex>
+#include <QtGui/QColor>
 
 #include "warnings.h"
 #include "command_line_parser.h"

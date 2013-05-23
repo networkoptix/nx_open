@@ -1147,7 +1147,7 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
         pool = DecodedPictureToOpenGLUploaderContextPool::instance()->getPoolOfContextsSharedWith( mainContext );
     Q_ASSERT( !pool.empty() );
 
-    m_uploadThread = pool[rand() % pool.size()];    //TODO/IMPL should take 
+    m_uploadThread = pool[random(0, pool.size())];    //TODO/IMPL should take 
 
     for( size_t i = 0; i < asyncDepth+MIN_GL_PIC_BUF_COUNT; ++i )
         m_emptyBuffers.push_back( new UploadedPicture( this ) );
