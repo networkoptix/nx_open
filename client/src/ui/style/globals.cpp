@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtCore/QDebug>
+#include <QtCore/QFile>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSettings>
 #include <QtCore/QStringList>

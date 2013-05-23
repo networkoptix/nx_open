@@ -1,5 +1,7 @@
 #include "client_settings.h"
 
+#include <QtCore/QDebug>
+#include <QtCore/QFile>
 #include <QtCore/QSettings>
 
 #include <utils/common/util.h>
