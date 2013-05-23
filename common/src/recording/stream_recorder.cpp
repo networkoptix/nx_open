@@ -620,7 +620,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     }
     fileStarted(m_startDateTime/1000, m_currentTimeZone, m_fileName, m_mediaProvider);
     if (m_truncateInterval > 4000000ll)
-        m_truncateIntervalEps = (rand() % (m_truncateInterval/4000000ll)) * 1000000ll;
+        m_truncateIntervalEps = (qrand() % (m_truncateInterval/4000000ll)) * 1000000ll;
 
     return true;
 }

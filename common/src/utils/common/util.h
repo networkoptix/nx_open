@@ -169,4 +169,12 @@ int currentTimeZone(); // TODO: #Elric move to time.h
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 
 
+/**
+ * \param min
+ * \param max
+ * \returns                             Random number in range [min, max).
+ */
+int random(int min, int max);
+
+
 #endif // _UNIVERSAL_CLIENT_UTIL_H
