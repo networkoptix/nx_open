@@ -396,6 +396,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
     if (cameraAdditionDialog())
         delete cameraAdditionDialog();
 
+    if (loginDialog())
+        delete loginDialog();
+
     if (m_layoutExportCamera)
         m_layoutExportCamera->deleteLater();
 }
@@ -1660,14 +1663,15 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
         return;
 
-    QScopedPointer<QnLoginDialog> dialog(new QnLoginDialog(widget(), context()));
-    dialog->setModal(true);
+    if (!loginDialog()) {
+        m_loginDialog = new QnLoginDialog(widget(), context());
+        loginDialog()->setModal(true);
+    }
     while(true) {
         QnActionParameters parameters = menu()->currentParameters(sender());
-        if (parameters.argument(Qn::AutoConnectRole, false))
-            dialog->setAutoConnect();
+        loginDialog()->setAutoConnect(parameters.argument(Qn::AutoConnectRole, false));
 
-        if(!dialog->exec())
+        if(!loginDialog()->exec())
             return;
 
         if(!context()->user())
@@ -1689,10 +1693,10 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     QnConnectionDataList connections = qnSettings->customConnections();
 
     QnConnectionData connectionData;
-    connectionData.url = dialog->currentUrl();
+    connectionData.url = loginDialog()->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 
-    qnSettings->setStoredPassword(dialog->rememberPassword()
+    qnSettings->setStoredPassword(loginDialog()->rememberPassword()
                 ? connectionData.url.password()
                 : QString()
                   );
@@ -1702,7 +1706,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
 
     QUrl clean_url(connectionData.url);
     clean_url.setPassword(QString());
-    QnConnectionData selected = connections.getByName(dialog->currentName());
+    QnConnectionData selected = connections.getByName(loginDialog()->currentName());
     if (selected.url == clean_url){
         connections.removeOne(selected.name);
         connections.prepend(selected);
@@ -1717,10 +1721,10 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
 
     //updateStoredConnections(connectionData);
 
-    if (dialog->restartPending())
+    if (loginDialog()->restartPending())
         QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
     else
-        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectionInfoRole, dialog->currentInfo()));
+        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectionInfoRole, loginDialog()->currentInfo()));
 }
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
