@@ -700,12 +700,14 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
-        QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule. Press APPLY to save changes.");
+        QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
         int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
                              QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
+        } else {
+            cameraSettingsDialog()->widget()->clearScheduleControlsChanges();
         }
     } else if (checkControls && cameraSettingsDialog()->widget()->hasMotionControlsChanges()){
         QString message = tr("Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.");
@@ -714,6 +716,8 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
         if (button == QMessageBox::Retry){
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
+        } else {
+            cameraSettingsDialog()->widget()->clearMotionControlsChanges();
         }
     }
 
@@ -2075,10 +2079,8 @@ void QnWorkbenchActionHandler::at_clearCameraSettingsAction_triggered() {
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
     switch(button) {
     case QDialogButtonBox::Ok:
-        saveCameraSettingsFromDialog(true);
-        break;
     case QDialogButtonBox::Apply:
-        saveCameraSettingsFromDialog();
+        saveCameraSettingsFromDialog(true);
         break;
     case QDialogButtonBox::Cancel:
         cameraSettingsDialog()->widget()->updateFromResources();

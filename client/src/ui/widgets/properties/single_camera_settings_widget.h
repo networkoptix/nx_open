@@ -51,9 +51,19 @@ public:
         return m_hasScheduleControlsChanges;
     }
 
+    /** Clear flag that user changed schedule controls but not applied them */
+    void clearScheduleControlsChanges() {
+        m_hasScheduleControlsChanges = false;
+    }
+
     /** Checks if user changed motion controls but not applied them */
     bool hasMotionControlsChanges() const {
         return m_hasMotionControlsChanges;
+    }
+
+    /** Clear flag that  user changed motion controls but not applied them */
+    void clearMotionControlsChanges() {
+        m_hasMotionControlsChanges = false;
     }
 
 

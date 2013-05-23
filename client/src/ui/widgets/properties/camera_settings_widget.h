@@ -44,8 +44,14 @@ public:
     /** Checks if user changed schedule controls but not applied them */
     bool hasScheduleControlsChanges() const;
 
+    /** Clear flag that user changed schedule controls but not applied them */
+    void clearScheduleControlsChanges();
+
     /** Checks if user changed motion controls but not applied them */
     bool hasMotionControlsChanges() const;
+
+    /** Clear flag that  user changed motion controls but not applied them */
+    void clearMotionControlsChanges();
 
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const;
     QnMediaServerConnectionPtr getServerConnection() const;
