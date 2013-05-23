@@ -40,6 +40,11 @@ public:
         return m_hasScheduleControlsChanges;
     }
 
+    /** Clear flag that user changed schedule controls but not applied them */
+    void clearScheduleControlsChanges() {
+        m_hasScheduleControlsChanges = false;
+    }
+
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
         //Currently this ability avaible only for single camera settings
         Q_ASSERT(false);
