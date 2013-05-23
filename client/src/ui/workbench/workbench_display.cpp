@@ -517,7 +517,7 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
     return m_zoomTargetWidgetByWidget.value(widget);
 }
 
-void QnWorkbenchDisplay::assertRaisedConeItem(QnResourceWidget *widget) {
+void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget) {
     QnGridRaisedConeItem* item = raisedConeItem(widget);
     if (item->scene() == m_scene)
         return;
@@ -1225,7 +1225,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
-        assertRaisedConeItem(widget);
+        ensureRaisedConeItem(widget);
 
         QRectF coneGeometry = enclosingGeometry;
         if (widget->hasAspectRatio())
