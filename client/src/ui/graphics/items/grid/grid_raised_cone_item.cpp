@@ -2,6 +2,7 @@
 
 #include <QPainter>
 
+#include <ui/animation/opacity_animator.h>
 #include <ui/style/globals.h>
 
 namespace {
@@ -96,12 +97,12 @@ QnGridRaisedConeItem* raisedConeItem(QGraphicsWidget* widget) {
 
 QnGridRaisedConeItem::QnGridRaisedConeItem(QGraphicsWidget *parent) :
     QGraphicsObject(NULL),
-    m_raisedWidget(parent),
+    m_widget(parent),
     m_rotation(0)
 {
-    connect(m_raisedWidget, SIGNAL(geometryChanged()), this, SLOT(updateGeometry()));
-    connect(m_raisedWidget, SIGNAL(rotationChanged()), this, SLOT(updateGeometry()));
-    connect(m_raisedWidget, SIGNAL(destroyed()),       this, SLOT(deleteLater()));
+    connect(m_widget, SIGNAL(geometryChanged()), this, SLOT(updateGeometry()));
+    connect(m_widget, SIGNAL(rotationChanged()), this, SLOT(updateGeometry()));
+    connect(m_widget, SIGNAL(destroyed()),       this, SLOT(deleteLater()));
 }
 
 QnGridRaisedConeItem::~QnGridRaisedConeItem() {
@@ -109,7 +110,7 @@ QnGridRaisedConeItem::~QnGridRaisedConeItem() {
 }
 
 QRectF QnGridRaisedConeItem::boundingRect() const {
-    QRectF bounding = m_sourceRect.united(m_targetRect);
+    QRectF bounding = m_originRect.united(m_targetRect);
     if (qFuzzyIsNull(m_rotation))
         return bounding;
 
@@ -124,8 +125,16 @@ QRectF QnGridRaisedConeItem::boundingRect() const {
 }
 
 
-void QnGridRaisedConeItem::adjustGeometry(QRectF oldGeometry) {
-    m_sourceRect = oldGeometry;
+void QnGridRaisedConeItem::setEffectEnabled(bool value) {
+    if (m_effectEnabled == value)
+        return;
+    m_effectEnabled = value;
+    updateGeometry();
+}
+
+
+void QnGridRaisedConeItem::setOriginGeometry(QRectF originGeometry) {
+    m_originRect = originGeometry;
     updateGeometry();
 }
 
@@ -133,8 +142,20 @@ void QnGridRaisedConeItem::adjustGeometry(QRectF oldGeometry) {
 void QnGridRaisedConeItem::updateGeometry() {
     prepareGeometryChange();
 
-    m_targetRect = m_raisedWidget->geometry();
-    m_rotation = m_raisedWidget->rotation();
+    m_targetRect = m_widget->geometry();
+    m_rotation = m_widget->rotation();
+
+    qreal coneOpacity = m_effectEnabled
+            ? m_originRect.width() > 0
+              ? qBound(0.0, m_targetRect.width() / m_originRect.width() - 1.0, 1.0)
+              : 0.0
+              : 0.0;
+    qreal widgetOpacity = m_effectEnabled
+            ? 1.0 - (1.0 - qnGlobals->raisedWigdetOpacity())*coneOpacity
+            : 1.0;
+
+    opacityAnimator(this)->animateTo(coneOpacity);
+    opacityAnimator(m_widget)->animateTo(widgetOpacity);
 }
 
 
@@ -143,35 +164,35 @@ void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     Q_UNUSED(widget)
 
     PathHelper sourceHelper;
-    sourceHelper.offset = qMin(m_sourceRect.height(), m_sourceRect.width()) * 0.1;
-    sourceHelper.center = m_sourceRect.center();
+    sourceHelper.offset = qMin(m_originRect.height(), m_originRect.width()) * 0.1;
+    sourceHelper.center = m_originRect.center();
 
     PathHelper targetHelper;
     targetHelper.offset = qMin(m_targetRect.height(), m_targetRect.width()) * 0.1;
     targetHelper.center = m_targetRect.center();
 
-    painter->fillPath(createBeamPath(m_sourceRect.topLeft(),
+    painter->fillPath(createBeamPath(m_originRect.topLeft(),
                                      m_targetRect.topLeft(),
                                      sourceHelper,
                                      targetHelper,
                                      m_rotation,
                                      1, 1), qnGlobals->raisedConeColor());
 
-    painter->fillPath(createBeamPath(m_sourceRect.topRight(),
+    painter->fillPath(createBeamPath(m_originRect.topRight(),
                                      m_targetRect.topRight(),
                                      sourceHelper,
                                      targetHelper,
                                      m_rotation,
                                      -1, 1), qnGlobals->raisedConeColor());
 
-    painter->fillPath(createBeamPath(m_sourceRect.bottomLeft(),
+    painter->fillPath(createBeamPath(m_originRect.bottomLeft(),
                                      m_targetRect.bottomLeft(),
                                      sourceHelper,
                                      targetHelper,
                                      m_rotation,
                                      1, -1), qnGlobals->raisedConeColor());
 
-    painter->fillPath(createBeamPath(m_sourceRect.bottomRight(),
+    painter->fillPath(createBeamPath(m_originRect.bottomRight(),
                                      m_targetRect.bottomRight(),
                                      sourceHelper,
                                      targetHelper,
@@ -179,12 +200,12 @@ void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
                                      -1, -1), qnGlobals->raisedConeColor());
 
     // translate the whole painter is much easier than translate all 8 points of the path --gdm
-    QPointF offset = m_sourceRect.center();
+    QPointF offset = m_originRect.center();
     painter->translate(offset);
     painter->rotate(m_rotation);
     painter->translate(-offset);
 
-    painter->fillPath(createSourceRectPath(m_sourceRect, sourceHelper.offset), qnGlobals->raisedConeColor());
+    painter->fillPath(createSourceRectPath(m_originRect, sourceHelper.offset), qnGlobals->raisedConeColor());
 
     painter->translate(offset);
     painter->rotate(-m_rotation);
