@@ -50,6 +50,11 @@ extern "C"
 #error "UPLOAD_SYSMEM_FRAMES_ASYNC and UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD cannot be defined simultaneously"
 #endif
 
+#define ASYNC_UPLOADING_USED
+#if defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD) && !defined(UPLOAD_SYSMEM_FRAMES_ASYNC) && !defined(_WIN32)
+#undef ASYNC_UPLOADING_USED
+#endif
+
 #define PERFORMANCE_TEST
 #ifdef PERFORMANCE_TEST
 //#define DISABLE_FRAME_DOWNLOAD
@@ -1143,11 +1148,13 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     m_asyncUploadUsed( false ),
     m_initializedCtx( NULL )
 {
+#ifdef ASYNC_UPLOADING_USED
     const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& 
         pool = DecodedPictureToOpenGLUploaderContextPool::instance()->getPoolOfContextsSharedWith( mainContext );
     Q_ASSERT( !pool.empty() );
 
     m_uploadThread = pool[random(0, pool.size())];    //TODO/IMPL should take 
+#endif
 
     for( size_t i = 0; i < asyncDepth+MIN_GL_PIC_BUF_COUNT; ++i )
         m_emptyBuffers.push_back( new UploadedPicture( this ) );
@@ -1183,7 +1190,11 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
         }
         else
 #endif
+#ifdef ASYNC_UPLOADING_USED
         m_uploadThread->push( new DecodedPicturesDeleter( this ) );
+#else
+            ;
+#endif
         while( !(m_emptyBuffers.empty() && m_renderedPictures.empty() && m_picturesWaitingRendering.empty() && m_picturesBeingRendered.empty()) )
         {
             m_cond.wait( lk.mutex() );
@@ -1195,8 +1206,10 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
         runningUploader = NULL;
 #endif
 
+#ifdef ASYNC_UPLOADING_USED
     //unbinding uploading thread
     m_uploadThread.clear();
+#endif
 
     delete[] m_rgbaBuf;
 }
@@ -1361,6 +1374,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
 
     if( decodedPicture->picData )
     {
+#ifdef _WIN32
         if( decodedPicture->picData->type() == QnAbstractPictureDataRef::pstD3DSurface )
         {
             //posting picture to worker thread
@@ -1381,7 +1395,9 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
             decodedPicture->picData.clear();    //releasing no more needed reference to picture data
             m_uploadThread->push( uploaderToUse );
         }
-        else if( decodedPicture->picData->type() == QnAbstractPictureDataRef::pstOpenGL )
+        else
+#endif
+        if( decodedPicture->picData->type() == QnAbstractPictureDataRef::pstOpenGL )
         {
             //TODO/IMPL save reference to existing opengl texture
             Q_ASSERT( false );
