@@ -139,6 +139,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateButtonsVisibility()));
     connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateAspectRatio()));
+    connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateIconButton()));
 
     at_camDisplay_liveChanged();
     updateButtonsVisibility();
@@ -511,6 +512,15 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channe
 }
 
 void QnMediaResourceWidget::updateIconButton() {
+    bool isZoomWindow = !qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0)); //TODO: #Elric fix zoom window
+
+    if (isZoomWindow) {
+        iconButton()->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
+        iconButton()->setToolTip(tr("Zoom window."));
+        return;
+    }
+
+
     if(!m_camera) {
         iconButton()->setVisible(false);
         return;
