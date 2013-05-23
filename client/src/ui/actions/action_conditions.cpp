@@ -71,7 +71,10 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
         if(!widget)
             continue;
 
-        if (!widget->resource()->hasFlags(QnResource::motion))
+        if(!widget->resource()->hasFlags(QnResource::motion))
+            continue;
+
+        if(!qFuzzyCompare(widget->zoomRect(), QRectF(0, 0, 1, 1)))
             continue;
 
         if(m_hasRequiredGridDisplayValue) {

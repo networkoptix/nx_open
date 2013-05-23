@@ -462,6 +462,8 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
     foreach(QnResourceWidget *widget, widgets) {
         if(!widget->resource()->hasFlags(QnResource::motion))
             continue;
+        if (!qFuzzyCompare(widget->zoomRect(), QRectF(0, 0, 1, 1)))
+            continue;
         widget->setOption(QnResourceWidget::DisplayMotion, display);
     }
 }
@@ -1266,6 +1268,9 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
 
     foreach(QnResourceWidget *widget, widgets) {
         if (!widget->resource()->hasFlags(QnResource::motion))
+            continue;
+
+        if (!qFuzzyCompare(widget->zoomRect(), QRectF(0, 0, 1, 1)))
             continue;
 
         if(!(widget->options() & QnResourceWidget::DisplayMotion)) {
