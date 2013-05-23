@@ -30,6 +30,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include "resource_widget_renderer.h"
@@ -678,23 +680,24 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
+    bool isZoomWindow = !qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0)); //TODO: #Elric fix zoom window
+    if (isZoomWindow)
+        return result;
+
     if (resource()->hasFlags(QnResource::motion))
-        result |= MotionSearchButton | InfoButton;
+        result |= MotionSearchButton;
 
-    if(m_camera) {
-        if(
-            (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)) && 
-            accessController()->hasPermissions(m_resource, Qn::WritePtzPermission) 
-        ) {
-            result |= PtzButton;
-        }
-    }
+    if(m_camera
+            && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability))
+            && accessController()->hasPermissions(m_resource, Qn::WritePtzPermission)
+            )
+        result |= PtzButton;
 
-    if(!qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0))) {
-        result &= ~(PtzButton | MotionSearchButton);
-    } else {
+    if(item()
+            && item()->layout()
+            && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
+            )
         result |= ZoomWindowButton;
-    }
 
     return result;
 }
