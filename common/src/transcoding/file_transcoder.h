@@ -43,10 +43,12 @@ public:
     virtual ~FileTranscoder();
 
     /*!
+        File \a filePath must exist
         \return false on file access error
     */
     bool setSourceFile( const QString& filePath );
     /*!
+        If file \a filePath does not exist, it is created. Existing file will be overwitten
         \return false on file access error
     */
     bool setDestFile( const QString& filePath );
@@ -65,7 +67,7 @@ public:
     /*!
         \param codec codec to transcode to. Ignored if \a transcodeMethod == \a TM_NoTranscode
         \param transcodeMethod Underlying transcoder to use
-        \param resolution output resolution. If \a QSize(0,0), then origin resolution is used. Not used if transcode method \a TM_NoTranscode
+        \param resolution output resolution. If \a QSize(0,0), then original resolution is used. Not used if transcode method \a TM_NoTranscode
         \param bitrate Bitrate after transcode. By default bitrate is autodetected. Not used if transcode method \a TM_NoTranscode
         \param params codec params. Not used if transcode method \a TM_NoTranscode
         \return Returns \a true on success
@@ -90,6 +92,15 @@ public:
     void setTranscodeDurationLimit( unsigned int lengthToReadMS );
     //!Returns zero on success else - error code (TODO: define error codes)
     int resultCode() const;
+
+    //!Set tag \a name to \a value on EXISTING file \a filePath
+    /*!
+        Creates temporary file in the same dir with \a filePath
+    */
+    static bool setTagValue(
+        const QString& filePath,
+        const QString& name,
+        const QString& value );
 
 public slots:
     //!Overrides QnLongRunnable::pleaseStop
