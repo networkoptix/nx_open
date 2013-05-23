@@ -1193,7 +1193,7 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
 #ifdef ASYNC_UPLOADING_USED
         m_uploadThread->push( new DecodedPicturesDeleter( this ) );
 #else
-            ;
+            {}
 #endif
         while( !(m_emptyBuffers.empty() && m_renderedPictures.empty() && m_picturesWaitingRendering.empty() && m_picturesBeingRendered.empty()) )
         {
