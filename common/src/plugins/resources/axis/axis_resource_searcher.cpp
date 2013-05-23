@@ -58,7 +58,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     if (host.isEmpty())
         host = url.toString(); // in case if url just host address without protocol and port
 
-    int timeout = 2000;
+    int timeout = 4000;
 
 
     if (port < 0)
@@ -92,6 +92,8 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     }
 
     name = name.left(name.lastIndexOf(QLatin1Char('-')));
+    name.replace(QLatin1Char('-'), QString());
+    
 
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
