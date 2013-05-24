@@ -3,23 +3,25 @@
 
 #include <QtGui/QGraphicsItem>
 
-#include <ui/graphics/items/generic/simple_frame_widget.h>
+#include <ui/graphics/items/standard/graphics_widget.h>
+
 #include <health/system_health.h>
 
-class QnNotificationsCollectionItem : public QnSimpleFrameWidget
+class QGraphicsLinearLayout;
+
+class QnNotificationsCollectionItem : public GraphicsWidget
 {
     Q_OBJECT
 
-    typedef QnSimpleFrameWidget base_type;
+    typedef GraphicsWidget base_type;
 public:
-    explicit QnNotificationsCollectionItem(QGraphicsItem *parent = 0);
-    
+    explicit QnNotificationsCollectionItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0);
+    virtual ~QnNotificationsCollectionItem();
 
     bool addSystemHealthEvent(QnSystemHealth::MessageType message);
 
-signals:
-    
-public slots:
+private:
+    QGraphicsLinearLayout* m_layout;
     
 };
 
