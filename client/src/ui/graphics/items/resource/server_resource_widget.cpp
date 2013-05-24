@@ -310,8 +310,8 @@ private:
 class StatisticsOverlayWidget: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 public:
-    StatisticsOverlayWidget(QGraphicsItem *parent = NULL, QnServerResourceWidget* widget = NULL):
-        base_type(parent),
+    StatisticsOverlayWidget(QnServerResourceWidget* widget):
+        base_type(widget),
         m_widget(widget)
     {
     }
@@ -587,7 +587,7 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
 }
 
 void QnServerResourceWidget::addOverlays() {
-    StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this, this);
+    StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this);
     statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
 
     QGraphicsLinearLayout *mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);

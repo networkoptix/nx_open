@@ -45,7 +45,7 @@ class QnActionManager;
 class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
 class QnGraphicsMessageBoxItem;
-class QnPopupCollectionWidget;
+class QnNotificationsCollectionItem;
 
 class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT
@@ -428,9 +428,7 @@ private:
 
     QnSimpleFrameWidget *m_notificationsBackgroundItem;
 
-    QnMaskedProxyWidget *m_notificationsItem;
-
-    QnPopupCollectionWidget *m_notificationsWidget;
+    QnNotificationsCollectionItem *m_notificationsItem;
 
     QnImageButtonWidget *m_notificationsPinButton;
 

@@ -46,6 +46,7 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
+#include <ui/graphics/items/notifications/notifications_collection_item.h>
 #include <ui/processors/hover_processor.h>
 
 #include <ui/actions/action_manager.h>
@@ -478,23 +479,25 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_notificationsBackgroundItem->setFrameWidth(0.5);
 
-    m_notificationsWidget = new QnPopupCollectionWidget(context());
+//    m_notificationsWidget = new QnPopupCollectionWidget(context());
 
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
-        m_notificationsWidget->addSystemHealthEvent(i);
-            //context()->instance<QnPopupCollectionWidget>();
-    m_notificationsWidget->setAttribute(Qt::WA_TranslucentBackground);
-    {
-        QPalette palette = m_notificationsWidget->palette();
-        palette.setColor(QPalette::Window, Qt::transparent);
-        palette.setColor(QPalette::Base, Qt::transparent);
-        m_notificationsWidget->setPalette(palette);
-    }
-    m_notificationsWidget->resize(250, 0);
+//    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
+//        m_notificationsWidget->addSystemHealthEvent(i);
+//            //context()->instance<QnPopupCollectionWidget>();
+//    m_notificationsWidget->setAttribute(Qt::WA_TranslucentBackground);
+//    {
+//        QPalette palette = m_notificationsWidget->palette();
+//        palette.setColor(QPalette::Window, Qt::transparent);
+//        palette.setColor(QPalette::Base, Qt::transparent);
+//        m_notificationsWidget->setPalette(palette);
+//    }
+//    m_notificationsWidget->resize(250, 0);
 
-    m_notificationsItem = new QnMaskedProxyWidget(m_controlsWidget);
-    m_notificationsItem->setWidget(m_notificationsWidget);
+    m_notificationsItem = new QnNotificationsCollectionItem(m_controlsWidget);
+//    m_notificationsItem->setWidget(m_notificationsWidget);
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
+         m_notificationsItem->addSystemHealthEvent((QnSystemHealth::MessageType)i);
 
     m_notificationsPinButton = newPinButton(m_controlsWidget);
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
@@ -942,7 +945,6 @@ void QnWorkbenchUi::setPopupsButtonVisible(bool visible) {
 }
 
 void QnWorkbenchUi::setProxyUpdatesEnabled(bool updatesEnabled) {
-    m_notificationsItem->setUpdatesEnabled(updatesEnabled);
     m_treeItem->setUpdatesEnabled(updatesEnabled);
 }
 
@@ -1256,7 +1258,7 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
 void QnWorkbenchUi::updateNotificationsGeometry() {
     /* Update painting rect the "fair" way. */
     QRectF geometry = updatedNotificationsGeometry(m_notificationsItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry(), m_calendarItem->paintGeometry());
-    m_notificationsItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
+    //m_notificationsItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
     m_notificationsItem->setPos(geometry.topLeft());
@@ -1994,8 +1996,9 @@ void QnWorkbenchUi::at_notificationsShowingProcessor_hoverEntered() {
     m_notificationsOpacityProcessor->forceHoverEnter();
 }
 
+
 void QnWorkbenchUi::at_notificationsItem_paintGeometryChanged() {
-    QRectF paintGeometry = m_notificationsItem->paintGeometry();
+    QRectF paintGeometry = m_notificationsItem->geometry();//paintGeometry();
 
     /* Don't hide notifications item here. It will repaint itself when shown, which will
      * degrade performance. */
