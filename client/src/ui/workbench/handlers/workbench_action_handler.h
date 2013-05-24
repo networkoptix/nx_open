@@ -222,9 +222,7 @@ protected:
         return m_businessEventsLogDialog.data();
     }
 
-    QnPopupCollectionWidget *popupCollectionWidget() const {
-        return m_popupCollectionWidget.data();
-    }
+    QnPopupCollectionWidget *popupCollectionWidget() const;
 
     QnCameraAdditionDialog *cameraAdditionDialog() const {
         return m_cameraAdditionDialog.data();
@@ -426,8 +424,6 @@ private:
 
     void removeLayouts(const QnLayoutResourceList &layouts);
 
-    void ensurePopupCollectionWidget();
-
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
@@ -439,7 +435,6 @@ private:
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QWeakPointer<QnEventLogDialog> m_businessEventsLogDialog;
-    QWeakPointer<QnPopupCollectionWidget> m_popupCollectionWidget;
     QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QWeakPointer<QnLoginDialog> m_loginDialog;
 

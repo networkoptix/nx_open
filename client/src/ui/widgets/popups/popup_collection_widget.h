@@ -26,8 +26,11 @@ class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
     typedef QWidget base_type;
     
 public:
+    explicit QnPopupCollectionWidget(QnWorkbenchContext* context);
     explicit QnPopupCollectionWidget(QWidget *parent);
     virtual ~QnPopupCollectionWidget();
+
+    void init();
 
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     bool addSystemHealthEvent(QnSystemHealth::MessageType message);

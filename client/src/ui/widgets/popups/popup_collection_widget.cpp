@@ -17,35 +17,47 @@
 #include <utils/common/event_processors.h>
 #include <utils/kvpair_usage_helper.h>
 
+QnPopupCollectionWidget::QnPopupCollectionWidget(QnWorkbenchContext* context):
+    base_type(NULL),
+    QnWorkbenchContextAware(context),
+    ui(new Ui::QnPopupCollectionWidget)
+{
+    init();
+}
+
 QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnPopupCollectionWidget)
 {
+    init();
+}
+
+QnPopupCollectionWidget::~QnPopupCollectionWidget()
+{
+}
+
+void QnPopupCollectionWidget::init() {
     ui->setupUi(this);
 
-    this->setAutoFillBackground(true);
+//    this->setAutoFillBackground(true);
 
     m_showBusinessEventsHelper = new QnUint64KvPairUsageHelper(
-                context()->user(),
+                this->context()->user(),
                 QLatin1String("showBusinessEvents"),            //TODO: #GDM move out common consts
                 0xFFFFFFFFFFFFFFFFull,                          //TODO: #GDM move out common consts
                 this);
 
     // TODO: #GDM Evil! Layout code does not belong here.
     // Layout must be done by widget's parent, not the widget itself.
-    QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
-    resizeSignalizer->setEventType(QEvent::Resize);
-    parent->installEventFilter(resizeSignalizer);
-    connect(resizeSignalizer,       SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updatePosition()));
+//    QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
+//    resizeSignalizer->setEventType(QEvent::Resize);
+//    parent->installEventFilter(resizeSignalizer);
+//    connect(resizeSignalizer,       SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updatePosition()));
 
-    connect(ui->postponeAllButton,  SIGNAL(clicked()), this, SLOT(at_postponeAllButton_clicked()));
-    connect(ui->minimizeButton,     SIGNAL(clicked()), this, SLOT(at_minimizeButton_clicked()));
+//    connect(ui->postponeAllButton,  SIGNAL(clicked()), this, SLOT(at_postponeAllButton_clicked()));
+//    connect(ui->minimizeButton,     SIGNAL(clicked()), this, SLOT(at_minimizeButton_clicked()));
     connect(this->context(),        SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()));
-}
-
-QnPopupCollectionWidget::~QnPopupCollectionWidget()
-{
 }
 
 bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -150,21 +162,21 @@ bool QnPopupCollectionWidget::isEmpty() const {
 
 void QnPopupCollectionWidget::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
-    updatePosition();
+//    updatePosition();
 }
 
 void QnPopupCollectionWidget::resizeEvent(QResizeEvent *event) {
     base_type::resizeEvent(event);
-    updatePosition();
+//    updatePosition();
 }
 
 void QnPopupCollectionWidget::updatePosition() {
     //TODO: #GDM will not be used when will be placed on scene
-    const int offset = 3;
+//    const int offset = 3;
 
-    QSize parentSize = parentWidget()->size();
-    QSize size = this->size();
-    move(parentSize.width() - size.width() - offset, parentSize.height() - size.height() - offset);
+//    QSize parentSize = parentWidget()->size();
+//    QSize size = this->size();
+//    move(parentSize.width() - size.width() - offset, parentSize.height() - size.height() - offset);
 }
 
 void QnPopupCollectionWidget::at_businessEventWidget_closed(BusinessEventType::Value eventType, bool ignore) {

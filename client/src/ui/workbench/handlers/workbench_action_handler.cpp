@@ -390,9 +390,6 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
     if (businessEventsLogDialog())
         delete businessEventsLogDialog();
 
-    if (popupCollectionWidget())
-        delete popupCollectionWidget();
-
     if (cameraAdditionDialog())
         delete cameraAdditionDialog();
 
@@ -806,6 +803,10 @@ void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMo
     qnRedAssController->setMode(resolutionMode);
 }
 
+QnPopupCollectionWidget* QnWorkbenchActionHandler::popupCollectionWidget() const {
+    return context()->instance<QnPopupCollectionWidget>();
+}
+
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
     if(!cameraSettingsDialog())
         return;
@@ -948,7 +949,6 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     if (!widget())
         return;
 
-    ensurePopupCollectionWidget();
     popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
     if (cameraAdditionDialog())
         cameraAdditionDialog()->hide();
@@ -966,7 +966,6 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
     switch (businessAction->actionType()) {
     case BusinessActionType::ShowPopup: {
-            ensurePopupCollectionWidget();
             popupCollectionWidget()->addBusinessAction(businessAction);
             break;
         }
@@ -1560,11 +1559,6 @@ void QnWorkbenchActionHandler::removeLayouts(const QnLayoutResourceList &layouts
         else
             connection()->deleteAsync(layout, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
     }
-}
-
-void QnWorkbenchActionHandler::ensurePopupCollectionWidget() {
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
 }
 
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
@@ -3817,7 +3811,6 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
     if (!context()->user())
         return;
 
-    ensurePopupCollectionWidget();
     popupCollectionWidget()->clear();
 
     if (!QnEmail::isValid(context()->user()->getEmail())) {
@@ -3856,7 +3849,6 @@ void QnWorkbenchActionHandler::at_togglePopupsAction_toggled(bool checked) {
     if (checked)
         return;
 
-    ensurePopupCollectionWidget();
     if (!popupCollectionWidget()->isEmpty())
         popupCollectionWidget()->show();
 }
@@ -3872,6 +3864,5 @@ void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QnKv
     if (!email.server.isEmpty() && !email.user.isEmpty() && !email.password.isEmpty())
         return;
 
-    ensurePopupCollectionWidget();
     popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::SmtpIsNotSet);
 }
