@@ -517,7 +517,7 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
     return m_zoomTargetWidgetByWidget.value(widget);
 }
 
-void QnWorkbenchDisplay::assertRaisedConeItem(QnResourceWidget *widget) {
+void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget) {
     QnGridRaisedConeItem* item = raisedConeItem(widget);
     if (item->scene() == m_scene)
         return;
@@ -543,16 +543,18 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         /* Sync new & old geometry. */
         if(oldWidget != NULL) {
             synchronize(oldWidget, true);
-            opacityAnimator(oldWidget)->animateTo(1.0);
-            opacityAnimator(raisedConeItem(oldWidget))->animateTo(0.0);
+            ensureRaisedConeItem(oldWidget);
+            raisedConeItem(oldWidget)->setEffectEnabled(false);
             setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
         }
 
         if(newWidget != NULL) {
             bringToFront(newWidget);
+            ensureRaisedConeItem(newWidget);
+            setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
+            raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
+
             synchronize(newWidget, true);
-            if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
-                opacityAnimator(newWidget)->animateTo(qnGlobals->raisedWigdetOpacity());
         }
         break;
     }
@@ -643,9 +645,6 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     if (!layout)
         return;
 
-    bool backgroundPresentChanged = (gridBackgroundItem()->imageFilename().isEmpty() !=
-            layout->backgroundImageFilename().isEmpty());
-
     gridBackgroundItem()->setImageSize(layout->backgroundSize());
     gridBackgroundItem()->setImageFilename(layout->backgroundImageFilename());
     gridBackgroundItem()->setImageOpacity(layout->backgroundOpacity());
@@ -654,11 +653,10 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     synchronizeSceneBounds();
     fitInView();
 
-    // so raised cone will be drawn or hidden and raised widget opacity will be fixed
-    if (backgroundPresentChanged && m_widgetByRole[Qn::RaisedRole] != NULL) {
-        QnResourceWidget* raisedWidget = m_widgetByRole[Qn::RaisedRole];
-        setWidget(Qn::RaisedRole, NULL);
-        setWidget(Qn::RaisedRole, raisedWidget);
+    QnResourceWidget* raisedWidget = m_widgetByRole[Qn::RaisedRole];
+    if (raisedWidget) {
+        ensureRaisedConeItem(raisedWidget);
+        raisedConeItem(raisedWidget)->setEffectEnabled(!layout->backgroundImageFilename().isEmpty());
     }
 }
 
@@ -1225,16 +1223,13 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
-        assertRaisedConeItem(widget);
 
-        QRectF coneGeometry = enclosingGeometry;
+        QRectF originGeometry = enclosingGeometry;
         if (widget->hasAspectRatio())
-            coneGeometry = expanded(widget->aspectRatio(), coneGeometry, Qt::KeepAspectRatio);
-        raisedConeItem(widget)->adjustGeometry(coneGeometry);
-        if (!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()) {
-            setLayer(raisedConeItem(widget), Qn::RaisedConeLayer);
-            opacityAnimator(raisedConeItem(widget))->animateTo(1.0);
-        }
+            originGeometry = expanded(widget->aspectRatio(), originGeometry, Qt::KeepAspectRatio);
+
+        ensureRaisedConeItem(widget);
+        raisedConeItem(widget)->setOriginGeometry(originGeometry);
 
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 

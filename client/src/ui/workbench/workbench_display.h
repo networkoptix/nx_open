@@ -286,7 +286,7 @@ public:
 
     QnResourceWidget *zoomTargetWidget(QnResourceWidget *widget) const;
 
-    void assertRaisedConeItem(QnResourceWidget *widget);
+    void ensureRaisedConeItem(QnResourceWidget *widget);
 
 public slots:
     void fitInView(bool animate = true);

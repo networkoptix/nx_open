@@ -1,8 +1,8 @@
 #include "utils/common/util.h"
 
 #ifndef Q_OS_WIN
-#include <sys/statvfs.h>
-#include <sys/time.h>
+#   include <sys/statvfs.h>
+#   include <sys/time.h>
 #endif
 
 #include <QDateTime>
@@ -244,3 +244,9 @@ int currentTimeZone()
     int res = dt2.secsTo(dt1);
     return res;
 }
+
+int random(int min, int max) {
+    return min + static_cast<int>(static_cast<qint64>(max - min) * qrand() / (RAND_MAX + 1));
+}
+
+

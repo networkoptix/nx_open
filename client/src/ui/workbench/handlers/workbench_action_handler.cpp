@@ -396,6 +396,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
     if (cameraAdditionDialog())
         delete cameraAdditionDialog();
 
+    if (loginDialog())
+        delete loginDialog();
+
     if (m_layoutExportCamera)
         m_layoutExportCamera->deleteLater();
 }
@@ -697,12 +700,14 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
-        QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule. Press APPLY to save changes.");
+        QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
         int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
                              QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
+        } else {
+            cameraSettingsDialog()->widget()->clearScheduleControlsChanges();
         }
     } else if (checkControls && cameraSettingsDialog()->widget()->hasMotionControlsChanges()){
         QString message = tr("Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.");
@@ -711,6 +716,8 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
         if (button == QMessageBox::Retry){
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
+        } else {
+            cameraSettingsDialog()->widget()->clearMotionControlsChanges();
         }
     }
 
@@ -1660,14 +1667,15 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
         return;
 
-    QScopedPointer<QnLoginDialog> dialog(new QnLoginDialog(widget(), context()));
-    dialog->setModal(true);
+    if (!loginDialog()) {
+        m_loginDialog = new QnLoginDialog(widget(), context());
+        loginDialog()->setModal(true);
+    }
     while(true) {
         QnActionParameters parameters = menu()->currentParameters(sender());
-        if (parameters.argument(Qn::AutoConnectRole, false))
-            dialog->setAutoConnect();
+        loginDialog()->setAutoConnect(parameters.argument(Qn::AutoConnectRole, false));
 
-        if(!dialog->exec())
+        if(!loginDialog()->exec())
             return;
 
         if(!context()->user())
@@ -1689,10 +1697,10 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     QnConnectionDataList connections = qnSettings->customConnections();
 
     QnConnectionData connectionData;
-    connectionData.url = dialog->currentUrl();
+    connectionData.url = loginDialog()->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 
-    qnSettings->setStoredPassword(dialog->rememberPassword()
+    qnSettings->setStoredPassword(loginDialog()->rememberPassword()
                 ? connectionData.url.password()
                 : QString()
                   );
@@ -1702,7 +1710,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
 
     QUrl clean_url(connectionData.url);
     clean_url.setPassword(QString());
-    QnConnectionData selected = connections.getByName(dialog->currentName());
+    QnConnectionData selected = connections.getByName(loginDialog()->currentName());
     if (selected.url == clean_url){
         connections.removeOne(selected.name);
         connections.prepend(selected);
@@ -1717,10 +1725,10 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
 
     //updateStoredConnections(connectionData);
 
-    if (dialog->restartPending())
+    if (loginDialog()->restartPending())
         QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
     else
-        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectionInfoRole, dialog->currentInfo()));
+        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectionInfoRole, loginDialog()->currentInfo()));
 }
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
@@ -2071,10 +2079,8 @@ void QnWorkbenchActionHandler::at_clearCameraSettingsAction_triggered() {
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
     switch(button) {
     case QDialogButtonBox::Ok:
-        saveCameraSettingsFromDialog(true);
-        break;
     case QDialogButtonBox::Apply:
-        saveCameraSettingsFromDialog();
+        saveCameraSettingsFromDialog(true);
         break;
     case QDialogButtonBox::Cancel:
         cameraSettingsDialog()->widget()->updateFromResources();
@@ -3725,10 +3731,13 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QnReso
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
     action(Qn::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
+    if (!action(Qn::TogglePanicModeAction)->isChecked())
+        action(Qn::TogglePanicModeAction)->setEnabled(context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled());
 }
 
 void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
-    action(Qn::TogglePanicModeAction)->setEnabled(context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled());
+    action(Qn::TogglePanicModeAction)->setEnabled(context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled()
+                                                  || action(Qn::TogglePanicModeAction)->isChecked());
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {

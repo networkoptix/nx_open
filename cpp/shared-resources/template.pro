@@ -108,7 +108,7 @@ mac {
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines} override=
   CONFIG -= app_bundle objective_c
-  INCLUDEPATH +=  ${environment.dir}/include/glext/
+  INCLUDEPATH +=  ${environment.dir}/include/glext/ /usr/local/protobuf-2.5.0/include/
 }
 
 

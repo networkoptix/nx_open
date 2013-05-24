@@ -6,6 +6,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/hash.h>
+#include <utils/common/util.h>
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
@@ -293,7 +294,7 @@ QColor ZoomWindowInstrument::nextZoomWindowColor() const {
         if(!colors.contains(color))
             return color;
 
-    return m_zoomWindowColors[static_cast<qint64>(qrand()) * m_zoomWindowColors.size() / (RAND_MAX + 1)];
+    return m_zoomWindowColors[random(0, m_zoomWindowColors.size())];
 }
 
 ZoomOverlayWidget *ZoomWindowInstrument::overlayWidget(QnMediaResourceWidget *widget) const {

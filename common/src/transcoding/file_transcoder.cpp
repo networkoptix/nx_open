@@ -85,6 +85,57 @@ int FileTranscoder::resultCode() const
     return m_resultCode;
 }
 
+bool FileTranscoder::setTagValue(
+    const QString& srcFilePath,
+    const QString& name,
+    const QString& value )
+{
+    AVFormatContext* formatCtx = NULL;
+    if( avformat_open_input( &formatCtx, srcFilePath.toLatin1().constData(), NULL, NULL ) < 0 )
+        return false;
+    if( !formatCtx )
+        return false;
+
+    QDir srcFileDir = QFileInfo(srcFilePath).dir();
+    const QString& tempFileName = QString::fromAscii("~%1%2.tmp.%3").arg(QDateTime::currentMSecsSinceEpoch()).arg(rand()).arg(QLatin1String(formatCtx->iformat->name));
+    const QString& tempFilePath = QString::fromAscii("%1/%2").arg(srcFileDir.path()).arg(tempFileName);
+
+    //setting audio/video codecID
+    for( int i = 0; i < formatCtx->nb_streams; ++i )
+    {
+        if( formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO )
+            formatCtx->audio_codec_id = formatCtx->streams[i]->codec->codec_id;
+        else if( formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO )
+            formatCtx->video_codec_id = formatCtx->streams[i]->codec->codec_id;
+    }
+
+    std::auto_ptr<FileTranscoder> transcoder( new FileTranscoder() );
+    if( !transcoder->setSourceFile( srcFilePath ) ||
+        !transcoder->setDestFile( tempFilePath ) ||
+        !transcoder->setContainer( QLatin1String(formatCtx->iformat->name) ) ||
+        !transcoder->setAudioCodec( formatCtx->audio_codec_id, QnTranscoder::TM_DirectStreamCopy ) ||
+        !transcoder->setVideoCodec( formatCtx->video_codec_id, QnTranscoder::TM_DirectStreamCopy ) ||
+        !transcoder->addTag( name, value ) )
+    {
+        avformat_close_input(&formatCtx);
+        return false;
+    }
+
+    if( !transcoder->doSyncTranscode() )
+    {
+        avformat_close_input(&formatCtx);
+        return false;
+    }
+    transcoder.reset();
+
+    avformat_close_input(&formatCtx);
+
+    //replacing source file with new file
+    if( !srcFileDir.remove(QFileInfo(srcFilePath).fileName()) )
+        return false;
+    return srcFileDir.rename( tempFileName, QFileInfo(srcFilePath).fileName() );
+}
+
 void FileTranscoder::pleaseStop()
 {
     QnLongRunnable::pleaseStop();

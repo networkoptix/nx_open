@@ -134,7 +134,9 @@ void FixedArSelectionItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 }
 
 void FixedArSelectionItem::setGeometry(const QPointF &origin, const QPointF &corner, const qreal aspectRatio, const QRectF &boundingRect) {
-    QPointF boundedCorner = QnGeometry::bounded(corner, boundingRect);
+    QSizeF extraBoundingSize = QSizeF(boundingRect.height() * aspectRatio, boundingRect.width() / aspectRatio);
+    QRectF actualBoundingRect = boundingRect.intersected(QRectF(origin - QnGeometry::toPoint(extraBoundingSize), 2 * extraBoundingSize));
+    QPointF boundedCorner = QnGeometry::bounded(corner, actualBoundingRect);
 
     QRectF rect = QnGeometry::movedInto(
         QnGeometry::expanded(
@@ -143,7 +145,7 @@ void FixedArSelectionItem::setGeometry(const QPointF &origin, const QPointF &cor
             Qt::KeepAspectRatioByExpanding,
             Qt::AlignCenter
         ),
-        boundingRect
+        actualBoundingRect
     );
 
     QVector<QPointF> sidePoints;
