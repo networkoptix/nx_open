@@ -719,11 +719,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Set up notifications context processing. */
     m_motionDisplayWatcher = context()->instance<QnWorkbenchMotionDisplayWatcher>();
-    connect(display()->focusListenerInstrument(), SIGNAL(focusItemChanged()),                                                       this,                           SLOT(updateNotificationsContext()));
-    connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateNotificationsContext()));
-    connect(m_motionDisplayWatcher,     SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateNotificationsContext()));
-    connect(m_motionDisplayWatcher,     SIGNAL(motionGridHidden()),                                                                 this,                           SLOT(updateNotificationsContext()));
-    updateNotificationsContext();
+    connect(display()->focusListenerInstrument(), SIGNAL(focusItemChanged()),                                                       this,                           SLOT(updateHelpContext()));
+    connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
+    connect(m_motionDisplayWatcher,     SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));
+    connect(m_motionDisplayWatcher,     SIGNAL(motionGridHidden()),                                                                 this,                           SLOT(updateHelpContext()));
+    updateHelpContext();
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
@@ -1512,7 +1512,7 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
     }
 }
 
-void QnWorkbenchUi::updateNotificationsContext() {
+void QnWorkbenchUi::updateHelpContext() {
 #if 0
     Qn::ActionScope scope = Qn::InvalidScope;
 
@@ -1530,23 +1530,23 @@ void QnWorkbenchUi::updateNotificationsContext() {
         return;
     }
 
-    QnContextNotifications::ContextId context;
+    QnContextHelp::ContextId context;
     switch(scope) {
     case Qn::TreeScope:
-        context = QnContextNotifications::ContextId_Tree;
+        context = QnContextHelp::ContextId_Tree;
         break;
     case Qn::SliderScope:
-        context = QnContextNotifications::ContextId_Slider;
+        context = QnContextHelp::ContextId_Slider;
         break;
     case Qn::SceneScope:
         if(m_motionDisplayWatcher->isMotionGridDisplayed()) {
-            context = QnContextNotifications::ContextId_MotionGrid;
+            context = QnContextHelp::ContextId_MotionGrid;
         } else {
-            context = QnContextNotifications::ContextId_Scene;
+            context = QnContextHelp::ContextId_Scene;
         }
         break;
     default:
-        context = QnContextNotifications::ContextId_Invalid;
+        context = QnContextHelp::ContextId_Invalid;
         break;
     }
 

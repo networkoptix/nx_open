@@ -217,7 +217,7 @@ private:
 
     void initGraphicsMessageBox();
 private slots:
-    void updateNotificationsContext();
+    void updateHelpContext();
     
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
