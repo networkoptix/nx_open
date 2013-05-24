@@ -9,6 +9,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/animation/opacity_animator.h>
 #include <ui/widgets/popups/business_event_popup_widget.h>
 #include <ui/widgets/popups/system_health_popup_widget.h>
 #include <ui/workbench/workbench_context.h>
@@ -40,23 +41,13 @@ QnPopupCollectionWidget::~QnPopupCollectionWidget()
 void QnPopupCollectionWidget::init() {
     ui->setupUi(this);
 
-//    this->setAutoFillBackground(true);
-
     m_showBusinessEventsHelper = new QnUint64KvPairUsageHelper(
                 this->context()->user(),
                 QLatin1String("showBusinessEvents"),            //TODO: #GDM move out common consts
                 0xFFFFFFFFFFFFFFFFull,                          //TODO: #GDM move out common consts
                 this);
 
-    // TODO: #GDM Evil! Layout code does not belong here.
-    // Layout must be done by widget's parent, not the widget itself.
-//    QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
-//    resizeSignalizer->setEventType(QEvent::Resize);
-//    parent->installEventFilter(resizeSignalizer);
-//    connect(resizeSignalizer,       SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updatePosition()));
-
-//    connect(ui->postponeAllButton,  SIGNAL(clicked()), this, SLOT(at_postponeAllButton_clicked()));
-//    connect(ui->minimizeButton,     SIGNAL(clicked()), this, SLOT(at_minimizeButton_clicked()));
+    connect(ui->postponeAllButton,  SIGNAL(clicked()), this, SLOT(at_postponeAllButton_clicked()));
     connect(this->context(),        SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()));
 }
 
@@ -143,7 +134,7 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
     return true;
 }
 
-void QnPopupCollectionWidget::clear() {
+void QnPopupCollectionWidget::clear(bool animate) {
     while (!ui->verticalLayout->isEmpty()) {
         QLayoutItem* item = ui->verticalLayout->itemAt(0);
         if (item->widget())
@@ -158,25 +149,6 @@ void QnPopupCollectionWidget::clear() {
 
 bool QnPopupCollectionWidget::isEmpty() const {
     return ui->verticalLayout->isEmpty();
-}
-
-void QnPopupCollectionWidget::showEvent(QShowEvent *event) {
-    base_type::showEvent(event);
-//    updatePosition();
-}
-
-void QnPopupCollectionWidget::resizeEvent(QResizeEvent *event) {
-    base_type::resizeEvent(event);
-//    updatePosition();
-}
-
-void QnPopupCollectionWidget::updatePosition() {
-    //TODO: #GDM will not be used when will be placed on scene
-//    const int offset = 3;
-
-//    QSize parentSize = parentWidget()->size();
-//    QSize size = this->size();
-//    move(parentSize.width() - size.width() - offset, parentSize.height() - size.height() - offset);
 }
 
 void QnPopupCollectionWidget::at_businessEventWidget_closed(BusinessEventType::Value eventType, bool ignore) {

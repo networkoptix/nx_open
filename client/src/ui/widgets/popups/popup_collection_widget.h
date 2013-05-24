@@ -38,14 +38,8 @@ public:
 
     bool isEmpty() const;
 
-    void clear();
-protected:
-    virtual void showEvent(QShowEvent *event) override;
-    virtual void resizeEvent(QResizeEvent *event) override;
-
+    void clear(bool animate = true);
 private slots:
-    void updatePosition();
-
     void at_businessEventWidget_closed(BusinessEventType::Value actionType, bool ignore);
     void at_systemHealthWidget_closed(QnSystemHealth::MessageType message, bool ignore);
 
