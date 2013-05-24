@@ -46,6 +46,7 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
         title = title.mid(0, title.lastIndexOf(QLatin1Char('.')));
     }
 
+    ensureCacheFolder();
     FileTranscoder* transcoder = new FileTranscoder();
     transcoder->setSourceFile(filePath);
     transcoder->setDestFile(getFullPath(newFilename));
@@ -58,7 +59,7 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
 
     connect(transcoder, SIGNAL(done(QString)), this, SLOT(at_soundConverted(QString)));
     connect(transcoder, SIGNAL(done(QString)), transcoder, SLOT(deleteLater()));
-    transcoder->startAsync();
+    transcoder->startAsync(); //TODO: #GDM it can return false - diagnostics required, progressbar also
 }
 
 void QnAppServerNotificationCache::updateTitle(const QString &filename, const QString &title) {
