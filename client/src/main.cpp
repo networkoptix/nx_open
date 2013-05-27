@@ -12,13 +12,14 @@
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
 
-#include <QAction>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QTranslator>
+#include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
+#include <QtGui/QDesktopServices>
 
 #include <QtSingleApplication>
 
@@ -46,7 +47,6 @@ extern "C"
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "device_plugins/server_camera/appserver.h"
-#include "utils/util.h"
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
@@ -374,7 +374,7 @@ int main(int argc, char **argv)
 
 
         /* Initialize log. */
-        const QString dataLocation = getDataDirectory();
+        const QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
         if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
             return 0;
         if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
