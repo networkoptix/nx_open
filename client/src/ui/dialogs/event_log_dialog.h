@@ -50,7 +50,7 @@ protected:
     void setVisible(bool value) override;
 private slots:
     void updateData();
-    void at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum);
+    void at_gotEvents(int httpStatus, const QnBusinessActionDataListPtr& events, int requestNum);
     void at_itemClicked(const QModelIndex & index);
     void at_customContextMenuRequested(const QPoint& screenPos);
     void at_cameraButtonClicked();
@@ -78,7 +78,7 @@ private:
     QSet<int> m_requests;
     QnWorkbenchContext* m_context;
 
-    QVector <QnLightBusinessActionVectorPtr> m_allEvents;
+    QVector <QnBusinessActionDataListPtr> m_allEvents;
     QnResourceList m_filterCameraList;
     bool m_updateDisabled;
     bool m_dirty;

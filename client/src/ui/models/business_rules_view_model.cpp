@@ -26,41 +26,34 @@
 #include <utils/media/audio_player.h>
 
 namespace {
-
-    QString prolongedEvent = QObject::tr("While %1");
-    QString instantEvent = QObject::tr("On %1 %2");
-
-    QString toggleStateToModelString(ToggleState::Value value) {
+    QString toggleStateToModelString(Qn::ToggleState value) {
         switch( value )
         {
-            case ToggleState::Off:
+            case Qn::OffState:
                 return QObject::tr("Stops");
-            case ToggleState::On:
+            case Qn::OnState:
                 return QObject::tr("Starts");
-            case ToggleState::NotDefined:
+            case Qn::UndefinedState:
                 return QObject::tr("Starts/Stops");
         }
         return QString();
     }
 
-    QString toggleStateToString(ToggleState::Value state) {
+    QString toggleStateToString(Qn::ToggleState state) {
         switch (state) {
-        case ToggleState::On: return QObject::tr("start");
-        case ToggleState::Off: return QObject::tr("stop");
+        case Qn::OnState: return QObject::tr("start");
+        case Qn::OffState: return QObject::tr("stop");
             default: return QString();
         }
         return QString();
     }
 
-    QString eventTypeString(BusinessEventType::Value eventType,
-                            ToggleState::Value eventState,
-                            BusinessActionType::Value actionType){
+    QString eventTypeString(BusinessEventType::Value eventType, Qn::ToggleState eventState, BusinessActionType::Value actionType) {
         QString typeStr = BusinessEventType::toString(eventType);
         if (BusinessActionType::hasToggleState(actionType))
-            return QString(prolongedEvent).arg(typeStr);
+            return QObject::tr("While %1").arg(typeStr);
         else
-            return QString(instantEvent).arg(typeStr)
-                    .arg(toggleStateToString(eventState));
+            return QObject::tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
     }
 
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -77,7 +70,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_id(0),
     m_modified(false),
     m_eventType(BusinessEventType::Camera_Disconnect),
-    m_eventState(ToggleState::NotDefined),
+    m_eventState(Qn::UndefinedState),
     m_actionType(BusinessActionType::ShowPopup),
     m_aggregationPeriod(60),
     m_disabled(false),
@@ -97,9 +90,9 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventTypesModel->appendRow(row);
     }
 
-    QList<ToggleState::Value> values;
-    values << ToggleState::On << ToggleState::Off;
-    foreach (ToggleState::Value val, values) {
+    QList<Qn::ToggleState> values;
+    values << Qn::OnState << Qn::OffState;
+    foreach (Qn::ToggleState val, values) {
         QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
         item->setData(val);
 
@@ -354,11 +347,11 @@ void QnBusinessRuleViewModel::setEventType(const BusinessEventType::Value value)
         fields |= QnBusiness::EventResourcesField;
     }
 
-    if (!BusinessEventType::hasToggleState(m_eventType) && m_eventState != ToggleState::NotDefined){
-        m_eventState = ToggleState::NotDefined;
+    if (!BusinessEventType::hasToggleState(m_eventType) && m_eventState != Qn::UndefinedState){
+        m_eventState = Qn::UndefinedState;
         fields |= QnBusiness::EventStateField;
     } else if (BusinessEventType::hasToggleState(m_eventType) && !BusinessActionType::hasToggleState(m_actionType)) {
-        m_eventState = ToggleState::On;
+        m_eventState = Qn::OnState;
         fields |= QnBusiness::EventStateField;
     }
     if (!BusinessEventType::hasToggleState(m_eventType) && BusinessActionType::hasToggleState(m_actionType)) {
@@ -414,11 +407,11 @@ void QnBusinessRuleViewModel::setEventParams(const QnBusinessEventParameters &pa
     emit dataChanged(this, QnBusiness::EventParamsField | QnBusiness::ModifiedField);
 }
 
-ToggleState::Value QnBusinessRuleViewModel::eventState() const {
+Qn::ToggleState QnBusinessRuleViewModel::eventState() const {
     return m_eventState;
 }
 
-void QnBusinessRuleViewModel::setEventState(ToggleState::Value state) {
+void QnBusinessRuleViewModel::setEventState(Qn::ToggleState state) {
     if (m_eventState == state)
         return;
 
@@ -464,8 +457,8 @@ void QnBusinessRuleViewModel::setActionType(const BusinessActionType::Value valu
 
     if (BusinessEventType::hasToggleState(m_eventType) &&
             !BusinessActionType::hasToggleState(m_actionType) &&
-            m_eventState == ToggleState::NotDefined) {
-        m_eventState = ToggleState::On;
+            m_eventState == Qn::UndefinedState) {
+        m_eventState = Qn::OnState;
         fields |= QnBusiness::EventStateField;
     }
 

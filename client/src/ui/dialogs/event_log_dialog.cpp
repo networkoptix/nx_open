@@ -225,7 +225,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                 eventType,
                 actionType,
                 businessRuleId, 
-                this, SLOT(at_gotEvents(int, const QnLightBusinessActionVectorPtr&, int)));
+                this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
         }
     }
 }
@@ -242,7 +242,7 @@ void QnEventLogDialog::updateHeaderWidth()
     ui->gridEvents->horizontalHeader()->resizeSection(4, ui->cameraButton->width() + space);
 }
 
-void QnEventLogDialog::at_gotEvents(int httpStatus, const QnLightBusinessActionVectorPtr& events, int requestNum)
+void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataListPtr& events, int requestNum)
 {
     if (!m_requests.contains(requestNum))
         return;

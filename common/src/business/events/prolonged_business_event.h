@@ -7,12 +7,9 @@ class QnProlongedBusinessEvent: public QnAbstractBusinessEvent
 {
     typedef QnAbstractBusinessEvent base_type;
 protected:
-    explicit QnProlongedBusinessEvent(BusinessEventType::Value eventType,
-                                    const QnResourcePtr& resource,
-                                    ToggleState::Value toggleState,
-                                    qint64 timeStamp);
+    explicit QnProlongedBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp);
 public:
-    virtual bool checkCondition(ToggleState::Value state, const QnBusinessEventParameters &params) const override;
+    virtual bool checkCondition(Qn::ToggleState state, const QnBusinessEventParameters &params) const override;
 };
 
 #endif // PROLONGED_BUSINESS_EVENT_H

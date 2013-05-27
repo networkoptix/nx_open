@@ -43,7 +43,7 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
-void parseBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionList, const pb::BusinessActionList& pb_businessActionList);
+void parseBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const pb::BusinessActionList& pb_businessActionList);
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
@@ -642,7 +642,7 @@ void QnApiPbSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras,
 {
     pb::Resources pb_cameras;
     if (!pb_cameras.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized cameras."));
+        throw QnSerializationException(tr("Cannot parse serialized cameras."));
 
     parseCameras(cameras, pb_cameras.resource(), resourceFactory);
 }
@@ -651,7 +651,7 @@ void QnApiPbSerializer::deserializeServers(QnMediaServerResourceList& servers, c
 {
     pb::Resources pb_servers;
     if (!pb_servers.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized servers."));
+        throw QnSerializationException(tr("Cannot parse serialized servers."));
 
     parseServers(servers, pb_servers.resource(), resourceFactory);
 }
@@ -660,7 +660,7 @@ void QnApiPbSerializer::deserializeLayouts(QnLayoutResourceList& layouts, const 
 {
     pb::Resources pb_layouts;
     if (!pb_layouts.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized layouts."));
+        throw QnSerializationException(tr("Cannot parse serialized layouts."));
 
     parseLayouts(layouts, pb_layouts.resource());
 }
@@ -680,7 +680,7 @@ void QnApiPbSerializer::deserializeUsers(QnUserResourceList& users, const QByteA
 {
     pb::Resources pb_users;
     if (!pb_users.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized users."));
+        throw QnSerializationException(tr("Cannot parse serialized users."));
 
     parseUsers(users, pb_users.resource());
 }
@@ -689,7 +689,7 @@ void QnApiPbSerializer::deserializeResources(QnResourceList& resources, const QB
 {
     pb::Resources pb_resources;
     if (!pb_resources.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized resources."));
+        throw QnSerializationException(tr("Cannot parse serialized resources."));
 
     parseResources(resources, pb_resources.resource(), resourceFactory);
 }
@@ -698,7 +698,7 @@ void QnApiPbSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTyp
 {
     pb::ResourceTypes pb_resourceTypes;
     if (!pb_resourceTypes.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized resource types."));
+        throw QnSerializationException(tr("Cannot parse serialized resource types."));
 
     parseResourceTypes(resourceTypes, pb_resourceTypes.resourcetype());
 }
@@ -707,7 +707,7 @@ void QnApiPbSerializer::deserializeLicenses(QnLicenseList &licenses, const QByte
 {
     pb::Licenses pb_licenses;
     if (!pb_licenses.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized licenses."));
+        throw QnSerializationException(tr("Cannot parse serialized licenses."));
 
     licenses.setHardwareId(pb_licenses.hwid().c_str());
     licenses.setOldHardwareId(pb_licenses.oldhardwareid().c_str());
@@ -719,7 +719,7 @@ void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &camera
     pb::CameraServerItems pb_csis;
 
     if (!pb_csis.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized camera history."));
+        throw QnSerializationException(tr("Cannot parse serialized camera history."));
 
     parseCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
 }
@@ -729,7 +729,7 @@ void QnApiPbSerializer::deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray&
     pb::KvPairs pb_kvPairs;
 
     if (!pb_kvPairs.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized key-value pairs."));
+        throw QnSerializationException(tr("Cannot parse serialized key-value pairs."));
 
     parseKvPairs(kvPairs, pb_kvPairs.kvpair());
 }
@@ -739,7 +739,7 @@ void QnApiPbSerializer::deserializeSettings(QnKvPairList& kvPairs, const QByteAr
     pb::Settings pb_settings;
 
     if (!pb_settings.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized settings."));
+        throw QnSerializationException(tr("Cannot parse serialized settings."));
 
     parseSettings(kvPairs, pb_settings.setting());
 }
@@ -749,7 +749,7 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
     pb::ConnectInfo pb_connectInfo;
 
     if (!pb_connectInfo.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized connection information."));
+        throw QnSerializationException(tr("Cannot parse serialized connection information."));
 
     connectInfo->version = QString::fromUtf8(pb_connectInfo.version().c_str());
 
@@ -769,7 +769,7 @@ void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRuleList &busine
 {
     pb::BusinessRules pb_businessRules;
     if (!pb_businessRules.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized event/action rules."));
+        throw QnSerializationException(tr("Cannot parse serialized event/action rules."));
 
     parseBusinessRules(businessRules, pb_businessRules.businessrule());
 }
@@ -778,19 +778,19 @@ void QnApiPbSerializer::deserializeBusinessAction(QnAbstractBusinessActionPtr& b
 {
     pb::BusinessAction pb_businessAction;
     if (!pb_businessAction.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized action."));
+        throw QnSerializationException(tr("Cannot parse serialized action."));
 
     parseBusinessAction(businessAction, pb_businessAction);
 }
 
-void QnApiPbSerializer::deserializeBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionList, const QByteArray& data)
+void QnApiPbSerializer::deserializeBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const QByteArray& data)
 {
     QTime t;
     t.restart();
 
     pb::BusinessActionList pb_businessActionList;
     if (!pb_businessActionList.ParseFromArray(data.data(), data.size()))
-        throw QnSerializeException(tr("Cannot parse serialized actions."));
+        throw QnSerializationException(tr("Cannot parse serialized actions."));
 
     parseBusinessActionVector(businessActionList, pb_businessActionList);
 }
@@ -1156,7 +1156,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
     businessRule->setEventResources(eventResources);
     QnBusinessParams bParams = deserializeBusinessParams(pb_businessRule.eventcondition().c_str());
     businessRule->setEventParams(QnBusinessEventParameters::fromBusinessParams(bParams));
-    businessRule->setEventState((ToggleState::Value)pb_businessRule.eventstate());
+    businessRule->setEventState((Qn::ToggleState)pb_businessRule.eventstate());
 
     businessRule->setActionType(parsePbBusinessActionType(pb_businessRule.actiontype()));
     QnResourceList actionResources;
@@ -1193,7 +1193,7 @@ void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::
 
     businessAction->setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
-    businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
+    businessAction->setToggleState((Qn::ToggleState) pb_businessAction.togglestate());
     businessAction->setAggregationCount(pb_businessAction.aggregationcount());
 }
 
@@ -1217,23 +1217,23 @@ void parseBusinessActionList(QnAbstractBusinessActionList& businessActionList, c
 
         businessAction->setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
         businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
-        businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
+        businessAction->setToggleState((Qn::ToggleState) pb_businessAction.togglestate());
         businessAction->setAggregationCount(pb_businessAction.aggregationcount());
 
         businessActionList << businessAction;
     }
 }
 
-void parseBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionVectorPtr, const pb::BusinessActionList& pb_businessActionList)
+void parseBusinessActionVector(QnBusinessActionDataListPtr& businessActionVectorPtr, const pb::BusinessActionList& pb_businessActionList)
 {
-    QnLightBusinessActionVector& businessActionVector = *(businessActionVectorPtr.data());
+    QnBusinessActionDataList& businessActionVector = *(businessActionVectorPtr.data());
 
     businessActionVector.resize(pb_businessActionList.businessaction_size());
     for (int i = 0; i < pb_businessActionList.businessaction_size(); ++i)
     {
         const pb::BusinessAction& pb_businessAction = pb_businessActionList.businessaction(i);
 
-        QnLightBusinessAction& businessAction = businessActionVector[i];
+        QnBusinessActionData& businessAction = businessActionVector[i];
         businessAction.setActionType((BusinessActionType::Value) pb_businessAction.actiontype());
         if (pb_businessAction.has_runtimeparams()) 
             businessAction.setRuntimeParams(QnBusinessEventParameters::deserialize(pb_businessAction.runtimeparams().c_str()));
@@ -1245,7 +1245,7 @@ void parseBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionVec
 
         //businessAction.setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
         businessAction.setBusinessRuleId(pb_businessAction.businessruleid());
-        //businessAction.setToggleState((ToggleState::Value) pb_businessAction.togglestate());
+        //businessAction.setToggleState((Qn::ToggleState) pb_businessAction.togglestate());
         businessAction.setAggregationCount(pb_businessAction.aggregationcount());
     }
 }

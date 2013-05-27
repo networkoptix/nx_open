@@ -5,7 +5,7 @@
 #include "core/datapacket/media_data_packet.h"
 #include "utils/network/rtpsession.h"
 
-#include <business/business_logic_common.h>
+#include <business/business_fwd.h>
 
 
 namespace RtpTransport

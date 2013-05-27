@@ -135,6 +135,12 @@ public:
         TimePeriodContentCount
     };
 
+    enum ToggleState {
+        OffState,
+        OnState,
+        UndefinedState /**< Also used in event rule to associate non-toggle action with event with any toggle state. */
+    };
+
 } // namespace Qn
 
 
