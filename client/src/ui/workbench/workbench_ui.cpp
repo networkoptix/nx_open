@@ -529,7 +529,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_notificationsOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_notificationsHidingProcessor,      SIGNAL(hoverFocusLeft()),                                                                   this,                           SLOT(at_notificationsHidingProcessor_hoverFocusLeft()));
     connect(m_notificationsShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_notificationsShowingProcessor_hoverEntered()));
-    connect(m_notificationsItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_notificationsItem_paintGeometryChanged()));
+    connect(m_notificationsItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_notificationsItem_geometryChanged()));
 
 
     /* Calendar. */
@@ -833,6 +833,7 @@ void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate) {
 
     qreal newX = m_controlsWidgetRect.right() + (opened ? -m_notificationsItem->size().width() : 1.0 /* Just in case. */);
     if (animate) {
+        m_notificationsXAnimator->setSpeed(m_notificationsItem->size().width() * 2.0);
         m_notificationsXAnimator->animateTo(newX);
     } else {
         m_notificationsXAnimator->stop();
@@ -1998,7 +1999,7 @@ void QnWorkbenchUi::at_notificationsShowingProcessor_hoverEntered() {
 }
 
 
-void QnWorkbenchUi::at_notificationsItem_paintGeometryChanged() {
+void QnWorkbenchUi::at_notificationsItem_geometryChanged() {
     QRectF paintGeometry = m_notificationsItem->geometry();//paintGeometry();
 
     /* Don't hide notifications item here. It will repaint itself when shown, which will
@@ -2010,6 +2011,8 @@ void QnWorkbenchUi::at_notificationsItem_paintGeometryChanged() {
         (paintGeometry.top() + paintGeometry.bottom() - m_notificationsShowButton->size().height()) / 2
     ));
     m_notificationsPinButton->setPos(paintGeometry.topLeft());
+    if (isNotificationsOpened())
+        setNotificationsOpened(); //there is no check here but it will fix the X-coord
 
     updateViewportMargins();
 }

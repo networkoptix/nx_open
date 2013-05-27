@@ -264,7 +264,7 @@ private slots:
     void at_notificationsShowButton_toggled(bool checked);
     void at_notificationsHidingProcessor_hoverFocusLeft();
     void at_notificationsShowingProcessor_hoverEntered();
-    void at_notificationsItem_paintGeometryChanged();
+    void at_notificationsItem_geometryChanged();
 
     void at_calendarShowButton_toggled(bool checked);
     void at_calendarItem_paintGeometryChanged();

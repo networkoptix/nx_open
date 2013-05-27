@@ -3,7 +3,10 @@
 #include <ui/graphics/items/notifications/notification_item.h>
 
 QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::WindowFlags flags):
-    base_type(parent, flags) {
+    base_type(parent, flags)
+{
+    registerAnimation(this);
+    startListening();
 }
 
 QnNotificationListWidget::~QnNotificationListWidget() {
@@ -32,9 +35,14 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
     return result;
 }
 
+void QnNotificationListWidget::tick(int deltaMSecs) {
+ //   qDebug() << "tick" << deltaMSecs;
+}
+
 void QnNotificationListWidget::addItem(QnNotificationItem *item)  {
     connect(item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
     item->setText(QLatin1String("Motion detected on camera\nblablabla") + QString::number(m_items.size()));
+    item->setZValue(-1* m_items.size());
     m_items.append(item);
     at_item_geometryChanged();
 }
