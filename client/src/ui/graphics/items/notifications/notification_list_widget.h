@@ -14,6 +14,10 @@ public:
     ~QnNotificationListWidget();
 
     void addItem(QnNotificationItem *item);
+
+protected:
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
+
 private slots:
     void at_item_geometryChanged();
 

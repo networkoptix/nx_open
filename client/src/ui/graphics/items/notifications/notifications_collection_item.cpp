@@ -16,14 +16,14 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     QnImageButtonWidget* button = new QnImageButtonWidget(controlsWidget);
     button->setIcon(qnSkin->icon("item/zoom_window.png"));
     button->setCheckable(true);
-    button->setToolTip(tr("Create Zoom Window"));
-    button->setGeometry(QRectF(0, 0, 36, 36));
+    button->setToolTip(tr("Settings, bla-bla"));
+    button->setMinimumSize(QSizeF(24, 24));
+    button->setMaximumSize(QSizeF(24, 24));
 
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     controlsLayout->addStretch();
     controlsLayout->addItem(button);
-    controlsLayout->addStretch();
 
     controlsWidget->setLayout(controlsLayout);
 

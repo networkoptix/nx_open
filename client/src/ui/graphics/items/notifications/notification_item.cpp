@@ -15,7 +15,8 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
     m_color(Qt::red)
 {
-    m_image->setGeometry(QRectF(0, 0, 24, 24));
+    m_image->setMinimumSize(QSizeF(24, 24));
+    m_image->setMaximumSize(QSizeF(24, 24));
 
     setIconPath(QLatin1String("item/zoom_window.png"));
     setText(tr("Create Zoom Window"));
