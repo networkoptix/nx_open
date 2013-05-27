@@ -7,6 +7,22 @@
 
 class QnNotificationItem;
 
+struct QnItemState {
+    enum State {
+        Waiting,
+        Displaying,
+        Displayed,
+        Hiding,
+        Hidden
+    };
+
+    QnNotificationItem* item;
+    State state;
+    qreal targetValue;
+    qreal valueStep;
+
+};
+
 class QnNotificationListWidget : public Animated<GraphicsWidget>, public AnimationTimerListener
 {
     Q_OBJECT
@@ -26,7 +42,8 @@ private slots:
     void at_item_geometryChanged();
 
 private:
-    QList<QnNotificationItem*> m_items;
+    QList<QnItemState *> m_items;
+    qreal m_bottomY;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H
