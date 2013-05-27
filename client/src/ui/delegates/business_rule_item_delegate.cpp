@@ -4,6 +4,8 @@
 #include <QtGui/QLayout>
 #include <QtGui/QComboBox>
 
+#include <business/business_action_parameters.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -127,8 +129,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
 
                 if (actionType == BusinessActionType::ShowPopup) {
                     QComboBox* comboBox = new QComboBox(parent);
-                    comboBox->addItem(tr("For All Users"), 0);
-                    comboBox->addItem(tr("For Administrators Only"), 1);
+                    comboBox->addItem(tr("For All Users"), QnBusinessActionParameters::EveryOne);
+                    comboBox->addItem(tr("For Administrators Only"), QnBusinessActionParameters::AdminOnly);
                     connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     return comboBox;
                 } else if (actionType == BusinessActionType::PlaySound) {
@@ -255,7 +257,12 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
             {
                 BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
 
-                if (actionType == BusinessActionType::ShowPopup || actionType == BusinessActionType::PlaySound) {
+                if (actionType == BusinessActionType::ShowPopup) {
+                    if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+                        model->setData(index, comboBox->itemData(comboBox->currentIndex()));
+                    }
+                    return;
+                } else if (actionType == BusinessActionType::PlaySound) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
                         if (!soundModel->loaded())
