@@ -56,7 +56,8 @@ void QnBusinessRulesActualModel::at_resources_saved(int status, const QnBusiness
 
     bool success = (status == 0 && rules.size() == 1);
     if(success) {
-        deleteRule(model);
+        if (model->id() == 0)
+            deleteRule(model);
         updateRule(rules.first());
     }
     emit afterModelChanged(RuleSaved, success);
