@@ -19,7 +19,6 @@ struct QnItemState {
     QnNotificationItem* item;
     State state;
     qreal targetValue;
-    qreal valueStep;
 
 };
 
@@ -38,6 +37,7 @@ protected:
 
     virtual void tick(int deltaMSecs) override;
 
+    bool hasFreeSpaceY(qreal required) const;
 private slots:
     void at_item_geometryChanged();
 

@@ -22,7 +22,6 @@ public:
     bool addSystemHealthEvent(QnSystemHealth::MessageType message);
 
 private:
-    QGraphicsLinearLayout* m_layout;
     QnNotificationListWidget *m_list;
     
 };

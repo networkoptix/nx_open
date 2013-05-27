@@ -6,9 +6,9 @@
 
 namespace {
 
-    int timeToMove = 2000;
-    int timeToDisplay = 10000;
-    int timeToHide = 2000;
+    int timeToMove = 1000;
+    int timeToDisplay = 5000;
+    int timeToHide = 1000;
 
 }
 
@@ -21,9 +21,8 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
 }
 
 QnNotificationListWidget::~QnNotificationListWidget() {
-    foreach (QnItemState *state, m_items) {
-        delete state;
-    }
+    while (m_items.isEmpty())
+        delete m_items.takeFirst();
 }
 
 QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
@@ -64,26 +63,26 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
     foreach (QnItemState *state, m_items) {
         switch (state->state) {
         case QnItemState::Waiting: {
-                if (isDisplaying != NULL && isDisplaying != state /* || !isEnoughSpace() */)
-                    break;
-
-                state->state = QnItemState::Displaying;
-                connect(state->item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
-                state->item->setY(m_bottomY - state->item->geometry().height());
-                state->item->setVisible(true);
-                state->targetValue = m_bottomY;
-                state->valueStep = state->item->geometry().height();
-                isDisplaying = state;
+                if (isDisplaying == NULL && hasFreeSpaceY(state->item->geometry().height())) {
+                    state->state = QnItemState::Displaying;
+                    connect(state->item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
+                    state->item->setY(m_bottomY);
+                    m_bottomY = state->item->geometry().bottom();
+                    state->item->setX(state->item->geometry().width());
+                    state->item->setVisible(true);
+                    state->item->setOpacity(1.0);
+                    state->targetValue = 0.0;
+                    isDisplaying = state;
+                }
                 break;
             }
         case QnItemState::Displaying: {
-                qreal step = state->valueStep * (qreal)deltaMSecs / (qreal)timeToMove;
-                qreal value = qMin(state->item->y() + step, state->targetValue);
-                state->item->setY(value);
+                qreal step = state->item->geometry().width() * (qreal)deltaMSecs / (qreal)timeToMove;
+                qreal value = qMax(state->item->x() - step, state->targetValue);
+                state->item->setX(value);
                 if (qFuzzyCompare(value, state->targetValue)) {
                     state->state = QnItemState::Displayed;
                     state->targetValue = 0.0;
-                    m_bottomY = state->item->geometry().bottom();
                 }
                 break;
             }
@@ -107,11 +106,29 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 break;
             }
         case QnItemState::Hidden: {
+                state->state = QnItemState::Waiting;
                 //here will be item removing from the list
                 break;
             }
         }
     }
+
+    bool anyVisible = false;
+    foreach (QnItemState *state, m_items) {
+        if (state->state == QnItemState::Displaying
+                || state->state == QnItemState::Displayed
+                || state->state == QnItemState::Hiding) {
+            anyVisible = true;
+            break;
+        }
+    }
+    if (!anyVisible)
+        m_bottomY = 0;
+
+}
+
+bool QnNotificationListWidget::hasFreeSpaceY(qreal required) const {
+    return m_bottomY + required <= geometry().height();
 }
 
 void QnNotificationListWidget::addItem(QnNotificationItem *item)  {

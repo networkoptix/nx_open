@@ -27,16 +27,16 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
 
     controlsWidget->setLayout(controlsLayout);
 
-    m_layout = new QGraphicsLinearLayout(Qt::Vertical);
-    m_layout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
-    m_layout->setSpacing(0.5);
-    m_layout->addItem(controlsWidget);
+    QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+    layout->setSpacing(0.5);
+    layout->addItem(controlsWidget);
 
     m_list = new QnNotificationListWidget(this);
-    m_layout->addItem(m_list);
-    m_layout->addStretch();
+    layout->addItem(m_list);
+    layout->setStretchFactor(m_list, 1.0);
 
-    setLayout(m_layout);
+    setLayout(layout);
 }
 
 QnNotificationsCollectionItem::~QnNotificationsCollectionItem() {
