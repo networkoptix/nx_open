@@ -14,28 +14,29 @@ class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotStorage;
 class QnWorkbenchLayoutSnapshotManager;
 
-namespace detail {
-    class QnWorkbenchLayoutReplyProcessor: public QObject {
-        Q_OBJECT
+class QnWorkbenchLayoutReplyProcessor: public QnAbstractReplyProcessor {
+    Q_OBJECT
 
-    public:
-        QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourceList &resources): 
-            m_manager(manager),
-            m_resources(resources)
-        {}
+public:
+    QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourceList &resources): 
+        QnAbstractReplyProcessor(0),
+        m_manager(manager),
+        m_resources(resources)
+    {}
 
-    public slots:
-        void at_finished(int status, const QnResourceList &resources, int handle);
+public slots:
+    void processReply(int status, const QnResourceList &resources, int handle);
 
-    signals:
-        void finished(int status, const QnResourceList &resources, int handle);
+signals:
+    void finished(int status, const QnResourceList &resources, int handle);
 
-    private:
-        QWeakPointer<QnWorkbenchLayoutSnapshotManager> m_manager;
-        QnLayoutResourceList m_resources;
-    };
+private:
+    friend class QnAbstractReplyProcessor;
 
-} // namespace detail
+    QWeakPointer<QnWorkbenchLayoutSnapshotManager> m_manager;
+    QnLayoutResourceList m_resources;
+};
+
 
 /**
  * This class maintains a storage of layout snapshots and tracks the state of
@@ -43,8 +44,10 @@ namespace detail {
  * 
  * It also provides some functions for layout and snapshot manipulation.
  */
-class QnWorkbenchLayoutSnapshotManager: public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchLayoutSnapshotManager: public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT;
+    typedef Connective<QObject> base_type;
+
 public:
     QnWorkbenchLayoutSnapshotManager(QObject *parent = NULL);
     virtual ~QnWorkbenchLayoutSnapshotManager();
@@ -102,16 +105,16 @@ protected:
     QnAppServerConnectionPtr connection() const;
 
 protected slots:
+    void processReply(int status, const QnLayoutResourceList &resources, int handle);
+
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_layouts_saved(const QnLayoutResourceList &resources);
-    void at_layouts_saveFailed(const QnLayoutResourceList &resources);
     void at_layout_storeRequested(const QnLayoutResourcePtr &resource);
     void at_layout_changed(const QnLayoutResourcePtr &resource);
     void at_layout_changed(const QnResourcePtr &resource);
 
 private:
-    friend class detail::QnWorkbenchLayoutReplyProcessor;
+    friend class QnWorkbenchLayoutReplyProcessor;
 
     /** Layout state storage that this object manages. */
     QnWorkbenchLayoutSnapshotStorage *m_storage;

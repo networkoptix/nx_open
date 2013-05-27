@@ -13,6 +13,7 @@
 #include <utils/common/request_param.h>
 #include <utils/common/warnings.h>
 #include <utils/common/json.h>
+#include <utils/common/connective.h>
 
 class QnEnumNameMapper;
 
@@ -33,6 +34,7 @@ namespace detail {
 
 class QnAbstractReplyProcessor: public QObject {
     Q_OBJECT
+    typedef QObject base_type;
 
 public:
     QnAbstractReplyProcessor(int object): m_object(object), m_finished(false), m_status(0), m_handle(0) {}
@@ -45,8 +47,11 @@ public:
     int handle() const { return m_handle; }
     QVariant reply() const { return m_reply; }
 
+    using base_type::connect;
+    bool connect(const char *signal, QObject *receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection);
+
 public slots:
-    virtual void processReply(const QnHTTPRawResponse &response, int handle) = 0;
+    virtual void processReply(const QnHTTPRawResponse &response, int handle);
 
 signals:
     void finished(int status, int handle);
@@ -137,9 +142,9 @@ private:
 
 
 
-class QnAbstractConnection: public QObject {
+class QnAbstractConnection: public Connective<QObject> {
     Q_OBJECT
-    typedef QObject base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     QnAbstractConnection(QObject *parent = NULL);

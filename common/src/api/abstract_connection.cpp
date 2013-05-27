@@ -8,8 +8,21 @@
 
 Q_GLOBAL_STATIC(QnEnumNameMapper, qn_abstractConnection_emptyNameMapper);
 
+void QnAbstractReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle) {
+    Q_UNUSED(response);
+    Q_UNUSED(handle);
+}
+
+bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, const char *method, Qt::ConnectionType type) {
+    if(method && std::strstr(method, "QVariant")) {
+        return connect(this, SIGNAL(finished(int, const QVariant &, int)), receiver, method, type);
+    } else {
+        return connect(this, signal, receiver, method, type);
+    }
+}
+
 QnAbstractConnection::QnAbstractConnection(QObject *parent): 
-    QObject(parent)
+    base_type(parent)
 {}
 
 QnAbstractConnection::~QnAbstractConnection() {
@@ -41,7 +54,7 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     } else {
         signal = QString::fromLatin1("%1finished(int, const %2 &, int)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
     }
-    connectProcessor(processor, signal.constData(), target, slot, Qt::QueuedConnection);
+    processor->connect(signal.constData(), target, slot, Qt::QueuedConnection);
 
     return QnSessionManager::instance()->sendAsyncRequest(
         operation,
@@ -91,10 +104,3 @@ int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamLis
     return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
 }
 
-bool QnAbstractConnection::connectProcessor(QnAbstractReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType) {
-    if(method && std::strstr(method, "QVariant")) {
-        return base_type::connect(sender, SIGNAL(finished(int, const QVariant &, int)), receiver, method, connectionType);
-    } else {
-        return base_type::connect(sender, signal, receiver, method, connectionType);
-    }
-}
