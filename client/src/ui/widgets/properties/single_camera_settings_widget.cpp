@@ -706,7 +706,7 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
 
     int maxDualStreamingFps;
     if (m_camera->streamFpsSharingMethod() == Qn::shareFps)
-        maxDualStreamingFps = maxFps - MIN_SECOND_STREAM_FPS;
+        maxDualStreamingFps = m_camera->getMaxFps() - MIN_SECOND_STREAM_FPS;
     else
         maxDualStreamingFps = maxFps;
 
