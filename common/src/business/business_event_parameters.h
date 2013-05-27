@@ -1,6 +1,8 @@
 #ifndef BUSINESS_EVENT_PARAMETERS_H
 #define BUSINESS_EVENT_PARAMETERS_H
 
+#include <QtCore/QStringList>
+
 #include <business/business_fwd.h>
 #include <utils/common/qnid.h>
 
