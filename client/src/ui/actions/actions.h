@@ -703,6 +703,8 @@ namespace Qn {
         ToggleSliderAction,
 
 
+        PinNotificationsAction,
+
         /* Playback actions. */
         PlayPauseAction,
         SpeedDownAction,

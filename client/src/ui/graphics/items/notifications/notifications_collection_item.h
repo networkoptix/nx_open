@@ -8,6 +8,7 @@
 #include <health/system_health.h>
 
 class QGraphicsLinearLayout;
+class QnNotificationListWidget;
 
 class QnNotificationsCollectionItem : public GraphicsWidget
 {
@@ -22,6 +23,7 @@ public:
 
 private:
     QGraphicsLinearLayout* m_layout;
+    QnNotificationListWidget *m_list;
     
 };
 

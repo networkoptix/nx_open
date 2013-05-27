@@ -348,6 +348,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_paintGeometryChanged()));
     connect(action(Qn::ToggleTreeAction), SIGNAL(toggled(bool)),                                                                    this,                           SLOT(at_toggleTreeAction_toggled(bool)));
     connect(action(Qn::PinTreeAction),  SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_pinTreeAction_toggled(bool)));
+    connect(action(Qn::PinNotificationsAction),  SIGNAL(toggled(bool)),                                                             this,                           SLOT(at_pinNotificationsAction_toggled(bool)));
 
 
     /* Title bar. */
@@ -479,27 +480,12 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_notificationsBackgroundItem->setFrameWidth(0.5);
 
-//    m_notificationsWidget = new QnPopupCollectionWidget(context());
-
-//    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
-//        m_notificationsWidget->addSystemHealthEvent(i);
-//            //context()->instance<QnPopupCollectionWidget>();
-//    m_notificationsWidget->setAttribute(Qt::WA_TranslucentBackground);
-//    {
-//        QPalette palette = m_notificationsWidget->palette();
-//        palette.setColor(QPalette::Window, Qt::transparent);
-//        palette.setColor(QPalette::Base, Qt::transparent);
-//        m_notificationsWidget->setPalette(palette);
-//    }
-//    m_notificationsWidget->resize(250, 0);
-
     m_notificationsItem = new QnNotificationsCollectionItem(m_controlsWidget);
-//    m_notificationsItem->setWidget(m_notificationsWidget);
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
          m_notificationsItem->addSystemHealthEvent((QnSystemHealth::MessageType)i);
 
-    m_notificationsPinButton = newPinButton(m_controlsWidget);
+    m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
 
     m_notificationsShowButton = newShowHideButton(m_controlsWidget);
@@ -710,10 +696,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     //TODO: #GDM think about a refactoring
     bool treeOpened = qnSettings->isTreeOpened(); //quite a hack because m_treePinButton sets tree opened if it is pinned
+    bool notificationsOpened = qnSettings->isNotificationsOpened(); //same shit
     m_treePinButton->setChecked(qnSettings->isTreePinned());
+    m_notificationsPinButton->setChecked(qnSettings->isNotificationsPinned());
     setTreeOpened(treeOpened, false);
     setTitleOpened(qnSettings->isTitleOpened(), false);
     setSliderOpened(qnSettings->isSliderOpened(), false);
+    setNotificationsOpened(notificationsOpened, false);
 
     /* Set up title D&D. */
     DropInstrument *dropInstrument = new DropInstrument(true, context(), this);
@@ -854,6 +843,8 @@ void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate) {
 
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     m_notificationsShowButton->setChecked(opened);
+
+    qnSettings->setNotificationsOpened(opened);
 }
 
 void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate) {
@@ -1463,6 +1454,10 @@ bool QnWorkbenchUi::isTitleOpened() const {
     return action(Qn::ToggleTitleBarAction)->isChecked();
 }
 
+bool QnWorkbenchUi::isNotificationsOpened() const {
+    return m_notificationsOpened;
+}
+
 void QnWorkbenchUi::setTreeShowButtonUsed(bool used) {
     if(used) {
         m_treeShowButton->setAcceptedMouseButtons(Qt::LeftButton);
@@ -1917,6 +1912,14 @@ void QnWorkbenchUi::at_pinTreeAction_toggled(bool checked) {
     updateViewportMargins();
 
     qnSettings->setTreePinned(checked);
+}
+
+void QnWorkbenchUi::at_pinNotificationsAction_toggled(bool checked) {
+    if (checked)
+        setNotificationsOpened(true);
+    updateViewportMargins();
+
+    qnSettings->setNotificationsPinned(checked);
 }
 
 void QnWorkbenchUi::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {

@@ -9,16 +9,17 @@
 #include <ui/style/skin.h>
 
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
-    base_type(parent, flags)
+    base_type(parent, flags),
+    m_textLabel(new GraphicsLabel(this)),
+    m_image(new QnImageButtonWidget(this)),
+    m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
+    m_color(Qt::red)
 {
-    m_image = new QnImageButtonWidget(this);
-    m_image->setIcon(qnSkin->icon("item/zoom_window.png"));
-    m_image->setToolTip(tr("Create Zoom Window"));
+    m_image->setGeometry(QRectF(0, 0, 24, 24));
 
-    m_textLabel = new GraphicsLabel(this);
-    m_textLabel->setText(tr("Ololo - testing notifications"));
+    setIconPath(QLatin1String("item/zoom_window.png"));
+    setText(tr("Create Zoom Window"));
 
-    m_layout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_layout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
     m_layout->addItem(m_textLabel);
     m_layout->addStretch();
@@ -28,4 +29,36 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 }
 
 QnNotificationItem::~QnNotificationItem() {
+}
+
+QString QnNotificationItem::text() const {
+    return m_textLabel->text();
+}
+
+void QnNotificationItem::setText(const QString &text) {
+    m_textLabel->setText(text);
+    m_image->setToolTip(text);
+}
+
+QString QnNotificationItem::iconPath() const {
+    return m_iconPath;
+}
+
+void QnNotificationItem::setIconPath(const QString& iconPath) {
+    if (m_iconPath == iconPath)
+        return;
+    m_iconPath = iconPath;
+    m_image->setIcon(qnSkin->icon(m_iconPath));
+}
+
+QColor QnNotificationItem::color() const {
+    return m_color;
+}
+
+void QnNotificationItem::setColor(const QColor &color) {
+    m_color = color;
+}
+
+void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    painter->fillRect(rect(), m_color);
 }

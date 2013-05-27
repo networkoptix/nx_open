@@ -110,9 +110,7 @@ public:
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
 
-    bool isNotificationsOpened() const {
-        return m_notificationsOpened;
-    }
+    bool isNotificationsOpened() const;
 
     bool isCalendarOpened() const {
         return m_calendarOpened;
@@ -255,6 +253,7 @@ private slots:
     void at_treeShowButton_toggled(bool checked);
     void at_toggleTreeAction_toggled(bool checked);
     void at_pinTreeAction_toggled(bool checked);
+    void at_pinNotificationsAction_toggled(bool checked);
 
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
     void at_titleItem_geometryChanged();

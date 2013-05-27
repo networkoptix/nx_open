@@ -18,11 +18,14 @@ public:
     QString text() const;
     void setText(const QString &text);
 
-    QImage image() const;
-    void setImage(const QImage& image);
+    QString iconPath() const;
+    void setIconPath(const QString& iconPath);
 
     QColor color() const;
     void setColor(const QColor &color);
+
+protected:
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 signals:
     void imageClicked();
@@ -31,6 +34,8 @@ private:
     GraphicsLabel* m_textLabel;
     QnImageButtonWidget *m_image;
     QGraphicsLinearLayout* m_layout;
+    QString m_iconPath;
+    QColor m_color;
 };
 
 #endif // NOTIFICATION_ITEM_H

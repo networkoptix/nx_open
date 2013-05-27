@@ -68,6 +68,8 @@ public:
         TREE_OPENED,
         SLIDER_OPENED,
         TITLE_OPENED,
+        NOTIFICATIONS_PINNED,
+        NOTIFICATIONS_OPENED,
 
         STORED_PASSWORD,
 
@@ -138,6 +140,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isTreeOpened,           setTreeOpened,              TREE_OPENED,                true)
         QN_DECLARE_RW_PROPERTY(bool,                        isSliderOpened,         setSliderOpened,            SLIDER_OPENED,              true)
         QN_DECLARE_RW_PROPERTY(bool,                        isTitleOpened,          setTitleOpened,             TITLE_OPENED,               true)
+        QN_DECLARE_RW_PROPERTY(bool,                        isNotificationsPinned,  setNotificationsPinned,     NOTIFICATIONS_PINNED,       false)
+        QN_DECLARE_RW_PROPERTY(bool,                        isNotificationsOpened,  setNotificationsOpened,     NOTIFICATIONS_OPENED,       false)
         QN_DECLARE_RW_PROPERTY(QString,                     storedPassword,         setStoredPassword,          STORED_PASSWORD,            QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isClock24Hour,          setClock24Hour,             CLOCK_24HOUR,               true)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
