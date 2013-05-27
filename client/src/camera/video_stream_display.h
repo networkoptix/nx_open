@@ -8,9 +8,8 @@ extern "C"
 }
 
 #include "decoders/video/abstractdecoder.h"
-#include "decoders/frame_scaler.h"
-#include "../ui/workbench/workbench_context_aware.h"
 #include <utils/common/stoppable.h>
+#include "frame_scaler.h"
 
 
 class QnAbstractVideoDecoder;

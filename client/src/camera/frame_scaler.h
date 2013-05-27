@@ -1,5 +1,5 @@
-#ifndef __FRAME_SCALER_H__
-#define __FRAME_SCALER_H__
+#ifndef QN_FRAME_SCALER_H
+#define QN_FRAME_SCALER_H
 
 #include "utils/media/frame_info.h"
 
@@ -28,4 +28,4 @@ private:
     static void downscalePlate_factor8(unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height);
 };
 
-#endif // __FRAME_SCALER_H__
+#endif // QN_FRAME_SCALER_H
