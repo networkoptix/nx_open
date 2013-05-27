@@ -1275,6 +1275,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Slider | Qn::NoTarget | Qn::SingleTarget).
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
+
+    factory(Qn::PinNotificationsAction).
+        flags(Qn::Notifications | Qn::NoTarget).
+        text(tr("Pin Notifications")).
+        toggledText(tr("Unpin Notifications"));
 }
 
 QnActionManager::~QnActionManager() {

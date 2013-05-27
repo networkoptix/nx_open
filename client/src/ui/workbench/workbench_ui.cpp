@@ -529,7 +529,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_notificationsOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_notificationsHidingProcessor,      SIGNAL(hoverFocusLeft()),                                                                   this,                           SLOT(at_notificationsHidingProcessor_hoverFocusLeft()));
     connect(m_notificationsShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_notificationsShowingProcessor_hoverEntered()));
-    connect(m_notificationsItem,                 SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_notificationsItem_paintGeometryChanged()));
     connect(m_notificationsItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_notificationsItem_paintGeometryChanged()));
 
 
@@ -688,7 +687,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setTreeVisible(true, false);
     setTitleVisible(true, false);
     setTitleUsed(false);
-    setNotificationsOpened(false, false);
     setNotificationsVisible(true, false);
     setCalendarOpened(false, false);
     setCalendarVisible(false);
