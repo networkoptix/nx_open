@@ -15,7 +15,7 @@ public:
         factor_16 = 16, 
         factor_32 = 32, 
         factor_64 = 64, 
-        factor_128 = 128 , 
+        factor_128 = 128, 
         factor_256 = 256, 
         factor_unknown = 512
     };
