@@ -68,7 +68,7 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     connect(ui->secondaryAudioDeviceComboBox,   SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
     connect(ui->screenComboBox,                 SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateDisableAeroCheckbox()));
     connect(ui->browseRecordingFolderButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseRecordingFolderButton_clicked()));
-    connect(m_dwm,                              SIGNAL(compositionChanged(bool)),   this,   SLOT(at_dwm_compositionChanged(bool)));
+    connect(m_dwm,                              SIGNAL(compositionChanged()),       this,   SLOT(at_dwm_compositionChanged(bool)));
 
     setWarningStyle(ui->recordingWarningLabel);
     setDefaultSoundIcon(ui->primaryDeviceIconLabel);
