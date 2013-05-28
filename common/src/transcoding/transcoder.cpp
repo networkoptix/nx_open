@@ -46,6 +46,11 @@ void QnCodecTranscoder::setQuality( QnStreamQuality quality )
     m_quality = quality;
 }
 
+void QnCodecTranscoder::setSrcRect(const QRect& srcRect)
+{
+    m_srcRect = srcRect;
+}
+
 // --------------------------- QnVideoTranscoder -----------------
 
 QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):

@@ -174,6 +174,7 @@ private:
 
     qint64 m_nextIFrameTime;
     qint64 m_truncateIntervalEps;
+    QRect m_srcRect;
 };
 
 #endif // _STREAM_RECORDER_H__

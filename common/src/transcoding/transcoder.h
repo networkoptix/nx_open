@@ -67,13 +67,14 @@ public:
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) = 0;
     QString getLastError() const;
     virtual void setQuality( QnStreamQuality quality );
-
+    void setSrcRect(const QRect& srcRect);
 protected:
     QString m_lastErrMessage;
     QnCodecParams::Value m_params;
     int m_bitrate;
     CodecID m_codecId;
     QnStreamQuality m_quality;
+    QRect m_srcRect;
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 

@@ -503,8 +503,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
             // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
             // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
-            
-            if (m_role == Role_FileExportWithTime || (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != videoCodecCtx->codec_id))
+            bool isTranscode = m_role == Role_FileExportWithTime || 
+                              (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != videoCodecCtx->codec_id) || 
+                              !m_srcRect.isEmpty();
+            if (isTranscode)
             {
                 // transcode video
                 if (m_dstVideoCodec == CODEC_ID_NONE)
@@ -516,6 +518,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 m_videoTranscoder[i]->setOnScreenDateOffset(m_onscreenDateOffset);
                 m_videoTranscoder[i]->setQuality(QnQualityHighest);
                 m_videoTranscoder[i]->open(mediaData);
+                if (!m_srcRect.isEmpty()) {
+                    QRect rect = m_srcRect; // todo: strict rect for multisensor
+                    m_videoTranscoder[i]->setSrcRect(rect);
+                }
                 avcodec_copy_context(videoStream->codec, m_videoTranscoder[i]->getCodecContext());
             }
             else if (!m_forceDefaultCtx && mediaData->context && mediaData->context->ctx()->width > 0)

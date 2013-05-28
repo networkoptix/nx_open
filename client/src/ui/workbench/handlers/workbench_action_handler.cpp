@@ -3379,7 +3379,9 @@ Do you want to continue?"),
         }
         qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
         m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1), 
-                                                  QnStorageResourcePtr(), role, timeOffset, serverTimeZone);
+                                                  QnStorageResourcePtr(), role, 
+                                                  timeOffset, serverTimeZone,
+                                                  QRect());
         exportProgressDialog->exec();
     }
 }

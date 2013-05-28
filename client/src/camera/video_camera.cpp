@@ -115,8 +115,12 @@ void QnVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
     m_camdispay.setLightCPUMode(val);
 }
 
-void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage, 
-                                            QnStreamRecorder::Role role, int timeOffsetMs, int serverTimeZoneMs)
+void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const 
+                                            QString& fileName, const QString& format, 
+                                            QnStorageResourcePtr storage, 
+                                            QnStreamRecorder::Role role, 
+                                            int timeOffsetMs, int serverTimeZoneMs,
+                                            QRect srcRect)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
