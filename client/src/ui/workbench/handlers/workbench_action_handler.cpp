@@ -2422,7 +2422,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     if (!widget)
         return;
 
-    QnResourceDisplay *display = widget->display();
+    QnResourceDisplay *display = widget->display().data();
     const QnResourceVideoLayout *layout = display->videoLayout();
 
     // TODO: #Elric move out, common code

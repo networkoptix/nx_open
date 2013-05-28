@@ -19,21 +19,20 @@ namespace detail {
         Q_OBJECT;
     public:
         QnRendererGuard(QnAbstractRenderer *renderer): 
-            m_renderer(renderer) 
-        {}
+          m_renderer(renderer) 
+          {}
 
-        virtual ~QnRendererGuard();
+          virtual ~QnRendererGuard();
 
-        QnAbstractRenderer *renderer() const {
-            return m_renderer;
-        }
+          QnAbstractRenderer *renderer() const {
+              return m_renderer;
+          }
 
     private:
         QnAbstractRenderer *m_renderer;
     };
 
 } // namespace detail
-
 
 class QnResourceDisplay: public QObject, protected QnResourceConsumer {
     Q_OBJECT
@@ -138,6 +137,7 @@ public:
      * \param renderer                  Renderer to assign to this display. Ownership of the renderer is transferred to this display. 
      */
     void addRenderer(QnAbstractRenderer *renderer);
+    void removeRenderer(QnAbstractRenderer *renderer);
 
 protected:
     virtual void beforeDisconnectFromResource() override;
@@ -169,5 +169,7 @@ private:
     /** List of associated renderer guards. */
     QList<detail::QnRendererGuard *> m_guards;
 };
+
+typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 
 #endif // QN_UI_DISPLAY_H

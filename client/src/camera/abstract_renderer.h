@@ -15,12 +15,13 @@ class CLVideoDecoderOutput;
  * 
  * Note that it is owned by the rendering thread.
  */
-class QnAbstractRenderer
-:
-    public QnStoppable
+class QnAbstractRenderer: public QObject, public QnStoppable
 {
+    Q_OBJECT
+signals:
+    void canBeDestroyed();
 public:
-    QnAbstractRenderer(): m_displayCounter(0) {}
+    QnAbstractRenderer(QObject* parent = 0): QObject(parent), m_displayCounter(0), m_useCount(0), m_needStop(false) {}
 
     virtual ~QnAbstractRenderer() {}
 
@@ -61,7 +62,12 @@ public:
      * This function may be called from any thread.
      * It is called just before this object is destroyed.
      */
-    virtual void beforeDestroy() = 0;
+    virtual void beforeDestroy() 
+    {
+        m_needStop = true;
+        if (m_useCount == 0)
+            emit canBeDestroyed();
+    }
 
     /**
      * This function is supposed to be called from <i>decoding</i> thread.
@@ -107,12 +113,21 @@ public:
     virtual void unblockTimeValue(int channelNumber) const = 0;
     virtual bool isTimeBlocked(int channelNumber) const  = 0;
 
+    virtual bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const = 0;
+
+    void inUse() { m_useCount++; }
+    void notInUse() { 
+        if (--m_useCount == 0)
+            emit canBeDestroyed();
+    }
 protected:
     virtual void doFrameDisplayed() {} // Not used for now.
 
 
 private:
     int m_displayCounter;
+    int m_useCount;
+    bool m_needStop;
 };
 
 #endif // QN_ABSTRACT_RENDERER_H

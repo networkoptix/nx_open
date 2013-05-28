@@ -678,7 +678,7 @@ QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resou
 
 QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(this->widget(item)))
-        return widget->display();
+        return widget->display().data();
     return NULL;
 }
 
@@ -927,6 +927,7 @@ bool QnWorkbenchDisplay::addZoomLinkInternal(QnResourceWidget *widget, QnResourc
 
         m_zoomTargetWidgetByWidget.insert(widget, zoomTargetWidget);
         emit zoomLinkAdded(widget, zoomTargetWidget);
+        emit widget->zoomTargetWidgetChanged();
         return true;
     } else {
         return false;
@@ -938,6 +939,7 @@ bool QnWorkbenchDisplay::removeZoomLinkInternal(QnResourceWidget *widget, QnReso
         if(m_zoomTargetWidgetByWidget.contains(widget)) {
             emit zoomLinkAboutToBeRemoved(widget, zoomTargetWidget);
             m_zoomTargetWidgetByWidget.remove(widget);
+            emit widget->zoomTargetWidgetChanged();
             return true;
         } else {
             return false;

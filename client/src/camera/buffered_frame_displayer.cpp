@@ -4,14 +4,19 @@
 #include "video_stream_display.h"
 #include "abstract_renderer.h"
 
-QnBufferedFrameDisplayer::QnBufferedFrameDisplayer(QnAbstractRenderer *drawer): 
-    m_queue(MAX_FRAME_QUEUE_SIZE - 1), 
-    m_drawer(drawer)
+QnBufferedFrameDisplayer::QnBufferedFrameDisplayer(): 
+    m_queue(MAX_FRAME_QUEUE_SIZE - 1)
 {
     m_currentTime = AV_NOPTS_VALUE;
     m_expectedTime = AV_NOPTS_VALUE;
     m_lastDisplayedTime = AV_NOPTS_VALUE;
     start();
+}
+
+void QnBufferedFrameDisplayer::setRenderList(QSet<QnAbstractRenderer*> renderList)
+{
+    QMutexLocker lock(&m_renderMtx);
+    m_renderList = renderList;
 }
 
 QnBufferedFrameDisplayer::~QnBufferedFrameDisplayer() {
@@ -138,7 +143,11 @@ void QnBufferedFrameDisplayer::run()
             m_lastDisplayedTime = frame->pkt_dts;
             m_sync.unlock();
 
-            m_drawer->draw(frame);
+            {
+                QMutexLocker lock(&m_renderMtx);
+                foreach(QnAbstractRenderer* render, m_renderList)
+                    render->draw(frame);
+            }
             //m_drawer->waitForFrameDisplayed(0);
             m_sync.lock();
             m_queue.pop(frame);

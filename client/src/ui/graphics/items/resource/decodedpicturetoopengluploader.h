@@ -168,6 +168,7 @@ public:
             As soon as uploader is done with \a decodedPicture->picData it releases reference to it
     */
     void uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture );
+    bool isUsingFrame( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
     //!Returns latest uploaded picture. Used by GUI thread
     /*!
         \return Uploaded picture data, NULL if no picture. Returned object memory is managed by \a DecodedPictureToOpenGLUploader, and MUST NOT be deleted

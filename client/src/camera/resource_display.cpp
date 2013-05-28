@@ -11,10 +11,6 @@
 #include <utils/common/warnings.h>
 #include <utils/common/counter.h>
 
-detail::QnRendererGuard::~QnRendererGuard() {
-    delete m_renderer;
-}
-
 QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
     QObject(parent),
     QnResourceConsumer(resource),
@@ -62,8 +58,6 @@ QnResourceDisplay::~QnResourceDisplay() {
 
 void QnResourceDisplay::beforeDestroy()
 {
-    foreach(detail::QnRendererGuard *guard, m_guards)
-        guard->renderer()->beforeDestroy();
 }
 
 void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
@@ -104,12 +98,6 @@ void QnResourceDisplay::disconnectFromResource() {
     cleanUp(m_dataProvider);
     if(m_camera != NULL)
         m_camera->beforeStopDisplay();
-
-#if 0
-    if(!m_started)
-        foreach(detail::QnRendererGuard *guard, m_guards)
-            delete guard;
-#endif
 
     m_mediaResource.clear();
     m_dataProvider = NULL;
@@ -182,16 +170,20 @@ bool QnResourceDisplay::isStillImage() const {
 }
 
 void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {
-    if(m_camera == NULL) {
-        delete renderer;
-        return;
+    if (m_camera) {
+        renderer->inUse();
+        m_camera->getCamDisplay()->addVideoRenderer(videoLayout()->channelCount(), renderer, true);
+
+        m_guards.push_back(new detail::QnRendererGuard(renderer));
+        connect(renderer, SIGNAL(canBeDestroyed()), m_guards.back(), SLOT(deleteLater()));
     }
-
-    int channelCount = videoLayout()->channelCount();
-    for(int i = 0; i < channelCount; i++)
-        m_camera->getCamDisplay()->addVideoChannel(i, renderer, true);
-
-    m_guards.push_back(new detail::QnRendererGuard(renderer));
-    connect(m_camera->getCamDisplay(), SIGNAL(destroyed()), m_guards.back(), SLOT(deleteLater()));
 }
 
+void QnResourceDisplay::removeRenderer(QnAbstractRenderer *renderer) {
+    int channelCount = videoLayout()->channelCount();
+    if (m_camera) {
+        renderer->notInUse();
+        for(int i = 0; i < channelCount; i++)
+            m_camera->getCamDisplay()->removeVideoRenderer(renderer);
+    }
+}

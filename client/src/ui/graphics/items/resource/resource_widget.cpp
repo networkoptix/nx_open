@@ -30,6 +30,7 @@
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -322,6 +323,10 @@ void QnResourceWidget::setZoomRect(const QRectF &zoomRect) {
     m_zoomRect = zoomRect;
 
     emit zoomRectChanged();
+}
+
+QnResourceWidget *QnResourceWidget::zoomTargetWidget() const {
+    return QnWorkbenchContextAware::display()->zoomTargetWidget(const_cast<QnResourceWidget *>(this));
 }
 
 void QnResourceWidget::setFrameWidth(qreal frameWidth) {
