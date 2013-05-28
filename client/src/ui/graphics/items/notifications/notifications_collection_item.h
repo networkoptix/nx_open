@@ -9,6 +9,7 @@
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
+class QnNotificationItem;
 
 class QnNotificationsCollectionItem : public GraphicsWidget
 {
@@ -22,6 +23,9 @@ public:
     bool addSystemHealthEvent(QnSystemHealth::MessageType message);
 
     QRectF headerGeometry() const;
+
+private slots:
+    void at_list_itemRemoved(QnNotificationItem* item);
 private:
     QnNotificationListWidget *m_list;
     QGraphicsWidget* m_headerWidget;

@@ -41,6 +41,8 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     layout->addItem(m_list);
     layout->setStretchFactor(m_list, 1.0);
 
+    connect(m_list, SIGNAL(itemRemoved(QnNotificationItem*)), this, SLOT(at_list_itemRemoved(QnNotificationItem*)));
+
     setLayout(layout);
 }
 
@@ -56,4 +58,8 @@ bool QnNotificationsCollectionItem::addSystemHealthEvent(QnSystemHealth::Message
 
 QRectF QnNotificationsCollectionItem::headerGeometry() const {
     return m_headerWidget->geometry();
+}
+
+void QnNotificationsCollectionItem::at_list_itemRemoved(QnNotificationItem *item) {
+    m_list->addItem(item);
 }

@@ -484,6 +484,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
          m_notificationsItem->addSystemHealthEvent((QnSystemHealth::MessageType)i);
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
+         m_notificationsItem->addSystemHealthEvent((QnSystemHealth::MessageType)i);
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
+         m_notificationsItem->addSystemHealthEvent((QnSystemHealth::MessageType)i);
 
     m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
