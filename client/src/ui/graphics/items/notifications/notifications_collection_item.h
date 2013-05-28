@@ -21,8 +21,10 @@ public:
 
     bool addSystemHealthEvent(QnSystemHealth::MessageType message);
 
+    QRectF headerGeometry() const;
 private:
     QnNotificationListWidget *m_list;
+    QGraphicsWidget* m_headerWidget;
     
 };
 

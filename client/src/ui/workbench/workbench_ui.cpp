@@ -2000,19 +2000,19 @@ void QnWorkbenchUi::at_notificationsShowingProcessor_hoverEntered() {
 
 
 void QnWorkbenchUi::at_notificationsItem_geometryChanged() {
-    QRectF paintGeometry = m_notificationsItem->geometry();//paintGeometry();
+    QRectF geometry = m_controlsWidget->mapRectFromItem(m_notificationsItem, m_notificationsItem->headerGeometry());
 
     /* Don't hide notifications item here. It will repaint itself when shown, which will
      * degrade performance. */
 
-    m_notificationsBackgroundItem->setGeometry(paintGeometry);
+    m_notificationsBackgroundItem->setGeometry(geometry);
     m_notificationsShowButton->setPos(QPointF(
-        qMin(m_controlsWidgetRect.right(), paintGeometry.left()),
-        (paintGeometry.top() + paintGeometry.bottom() - m_notificationsShowButton->size().height()) / 2
+        qMin(m_controlsWidgetRect.right(), geometry.left()),
+        (geometry.top() + geometry.bottom() - m_notificationsShowButton->size().height()) / 2
     ));
-    m_notificationsPinButton->setPos(paintGeometry.topLeft());
+    m_notificationsPinButton->setPos(geometry.topLeft());
     if (isNotificationsOpened())
-        setNotificationsOpened(); //there is no check here but it will fix the X-coord
+        setNotificationsOpened(); //there is no check there but it will fix the X-coord animation
 
     updateViewportMargins();
 }

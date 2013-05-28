@@ -11,9 +11,9 @@
 QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags)
 {
-    QGraphicsWidget* controlsWidget = new QGraphicsWidget(this);
+    m_headerWidget = new QGraphicsWidget(this);
 
-    QnImageButtonWidget* button = new QnImageButtonWidget(controlsWidget);
+    QnImageButtonWidget* button = new QnImageButtonWidget(m_headerWidget);
     button->setIcon(qnSkin->icon("item/zoom_window.png"));
     button->setCheckable(true);
     button->setToolTip(tr("Settings, bla-bla"));
@@ -24,13 +24,12 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     controlsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     controlsLayout->addStretch();
     controlsLayout->addItem(button);
-
-    controlsWidget->setLayout(controlsLayout);
+    m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
     layout->setSpacing(0.5);
-    layout->addItem(controlsWidget);
+    layout->addItem(m_headerWidget);
 
     m_list = new QnNotificationListWidget(this);
     layout->addItem(m_list);
@@ -47,4 +46,8 @@ bool QnNotificationsCollectionItem::addSystemHealthEvent(QnSystemHealth::Message
     m_list->addItem(item);
 
     return true;
+}
+
+QRectF QnNotificationsCollectionItem::headerGeometry() const {
+    return m_headerWidget->geometry();
 }
