@@ -177,7 +177,9 @@ public:
     quint64 nextFrameToDisplayTimestamp() const;
     //!Blocks until all submitted frames have been rendered
     void waitForAllFramesDisplayed();
+    //!Marks all posted frames as non-ignorable
     void ensureAllFramesWillBeDisplayed();
+    //!Clears display queue. MUST NOT be called from GUI thread
     void discardAllFramesPostedToDisplay();
     //!Blocks till frame currently being rendered is done
     void waitForCurrentFrameDisplayed();

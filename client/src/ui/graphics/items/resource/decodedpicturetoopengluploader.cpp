@@ -1592,6 +1592,8 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
         m_emptyBuffers.push_back( *it );
         it = m_picturesWaitingRendering.erase( it );
     }
+
+     m_cond.wakeAll();
 }
 
 void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
@@ -1607,6 +1609,7 @@ void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
         {
             if( (*it)->isRunning() )
             {
+                //NOTE this CANNOT occur, if in GUI thread now...
                 ++it;
                 continue;
             }
@@ -1617,7 +1620,7 @@ void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
 
         if( m_framesWaitingUploadInGUIThread.empty() )
             break;
-        m_cond.wait( &m_mutex );
+        m_cond.wait( &m_mutex );    //NOTE this CANNOT occur, if in GUI thread now...
     }
 }
 
