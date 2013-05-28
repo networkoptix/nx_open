@@ -33,7 +33,8 @@
 		<!--Specific os defines-->
 		<windows.defines/>
 		<linux.defines/>
-		<mac.defines/>          
+		<mac.defines/>
+                <postfix.libs>unix: !mac: LIBS += -ltermcap</postfix.libs>
 	</properties>   
 	<profiles>
 		<profile>
