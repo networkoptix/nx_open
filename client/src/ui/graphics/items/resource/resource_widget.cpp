@@ -133,8 +133,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_overlayVisible(0),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
-    m_overlayRotation(Qn::Angle0),
-    m_zoomRect(0.0, 0.0, 1.0, 1.0)
+    m_overlayRotation(Qn::Angle0)
 {
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
@@ -475,7 +474,7 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    QRectF rect = unsubRect(this->rect(), zoomRect());
+    QRectF rect = zoomRect().isNull() ? this->rect() : unsubRect(this->rect(), zoomRect());
 
     if (m_channelsLayout->channelCount() == 1)
         return rect;

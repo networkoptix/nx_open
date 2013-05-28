@@ -307,8 +307,6 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
                 itemData.zoomRect.setTop(pb_item.zoomtop());
                 itemData.zoomRect.setRight(pb_item.zoomright());
                 itemData.zoomRect.setBottom(pb_item.zoombottom());
-            } else {
-                itemData.zoomRect = QRectF(0.0, 0.0, 1.0, 1.0);
             }
 
             items.append(itemData);

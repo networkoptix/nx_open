@@ -512,12 +512,10 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channe
 }
 
 void QnMediaResourceWidget::updateIconButton() {
-    bool isZoomWindow = !qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0)); //TODO: #Elric fix zoom window
-
-    if (isZoomWindow) {
+    if (!zoomRect().isNull()) {
         iconButton()->setVisible(true);
         iconButton()->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
-        iconButton()->setToolTip(tr("Zoom window."));
+        iconButton()->setToolTip(tr("Zoom window"));
         return;
     }
 
@@ -530,23 +528,26 @@ void QnMediaResourceWidget::updateIconButton() {
     if(m_camera->getStatus() == QnResource::Recording)
         recordingMode = currentRecordingMode();
     
-    iconButton()->setVisible(true);
     switch(recordingMode) {
     case Qn::RecordingType_Never:
+        iconButton()->setVisible(true);
         iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
-        iconButton()->setToolTip(tr("Not recording."));
+        iconButton()->setToolTip(tr("Not recording"));
         break;
     case Qn::RecordingType_Run:
+        iconButton()->setVisible(true);
         iconButton()->setIcon(qnSkin->icon("item/recording.png"));
-        iconButton()->setToolTip(tr("Recording everything."));
+        iconButton()->setToolTip(tr("Recording everything"));
         break;
     case Qn::RecordingType_MotionOnly:
+        iconButton()->setVisible(true);
         iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
-        iconButton()->setToolTip(tr("Recording motion only."));
+        iconButton()->setToolTip(tr("Recording motion only"));
         break;
     case Qn::RecordingType_MotionPlusLQ:
+        iconButton()->setVisible(true);
         iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
-        iconButton()->setToolTip(tr("Recording motion and low quality."));
+        iconButton()->setToolTip(tr("Recording motion and low quality"));
         break;
     default:
         iconButton()->setVisible(false);
@@ -690,8 +691,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
-    bool isZoomWindow = !qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0)); //TODO: #Elric fix zoom window
-    if (isZoomWindow)
+    if (!zoomRect().isNull())
         return result;
 
     if (resource()->hasFlags(QnResource::motion))
@@ -761,7 +761,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
         setAspectRatio(
             QnGeometry::aspectRatio(m_renderer->sourceSize()) * 
             QnGeometry::aspectRatio(channelLayout()->size()) *
-            QnGeometry::aspectRatio(zoomRect())
+            (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
         );
     }
 }

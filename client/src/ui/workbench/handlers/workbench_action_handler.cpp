@@ -1989,7 +1989,6 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.flags = Qn::Pinned;
         item.uuid = QUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
-        item.zoomRect = QRectF(0.0, 0.0, 1.0, 1.0);
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
         item.dataByRole[Qn::ItemPausedRole] = true;
@@ -3626,7 +3625,7 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
         foreach(QnWorkbenchItem *item, items)
             bounds = bounds.united(item->geometry());
         if (bounds.isNull())
-            bounds = QRect(0, 0, 1, 1); // paranoya security check
+            bounds = QRect(0, 0, 1, 1); // paranoia security check
 
         int minWidth = bounds.width();
         int minHeight = bounds.height();
