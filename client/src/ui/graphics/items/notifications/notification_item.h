@@ -34,7 +34,6 @@ signals:
 private:
     GraphicsLabel* m_textLabel;
     QnImageButtonWidget *m_image;
-    QGraphicsLinearLayout* m_layout;
     QString m_iconPath;
     QColor m_color;
 };

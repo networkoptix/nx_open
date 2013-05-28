@@ -65,7 +65,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
             * (qreal) deltaMSecs / (qreal) moveUpTimeoutMs;
     qreal bottomY = 0;
 
-    //TODO: #GDM speed should depend on m_items.size
+    //TODO: #GDM speed should depend on m_items.size (?)
 
     bool anyDisplaying = false;
     foreach (QnItemState *state, m_items) {
@@ -154,20 +154,6 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         emit itemRemoved(deleting->item);
         delete deleting;
     }
-
-/*
-    bool anyVisible = false;
-    foreach (QnItemState *state, m_items) {
-        if (state->state == QnItemState::Displaying
-                || state->state == QnItemState::Displayed
-                || state->state == QnItemState::Hiding) {
-            anyVisible = true;
-            break;
-        }
-    }
-    if (!anyVisible)
-        m_bottomY = 0;*/
-
 }
 
 void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {

@@ -8,27 +8,42 @@
 
 #include <ui/style/skin.h>
 
+namespace {
+    const qreal margin = 4;
+    const qreal totalWidth = 200;
+    const qreal totalHeight = 24;
+    const qreal spacerSize = totalHeight * .5;
+}
+
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
     m_textLabel(new GraphicsLabel(this)),
     m_image(new QnImageButtonWidget(this)),
-    m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
     m_color(Qt::red)
 {
-    m_image->setMinimumSize(QSizeF(24, 24));
-    m_image->setMaximumSize(QSizeF(24, 24));
+//    QSizeF size(totalWidth + margin*2, totalHeight + margin*2);
+//    setMinimumSize(size);
+//    setMaximumSize(size);
+
+    m_image->setMinimumSize(QSizeF(totalHeight, totalHeight));
+    m_image->setMaximumSize(QSizeF(totalHeight, totalHeight));
+//    m_image->setPos(totalWidth - totalHeight + margin, margin);
+
+ //   m_textLabel->setMinimumSize(totalWidth - totalHeight - spacerSize, totalHeight);
+ //   m_textLabel->setMaximumSize(totalWidth - totalHeight - spacerSize, totalHeight);
+//    m_textLabel->setPos(margin + spacerSize, margin);
 
     setIconPath(QLatin1String("item/zoom_window.png"));
     setText(tr("Create Zoom Window"));
 
-    m_layout->setContentsMargins(2.5, 2.5, 2.5, 2.5);
-    m_layout->addItem(m_textLabel);
-    m_layout->addStretch();
-    m_layout->addItem(m_image);
+    QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Horizontal);
+    layout->setContentsMargins(margin*2, margin, margin, margin);
+    layout->addItem(m_textLabel);
+    layout->addStretch();
+    layout->addItem(m_image);
+    setLayout(layout);
 
-    setLayout(m_layout);
-    setMinimumWidth(200);
-    setMaximumWidth(200);
+
 }
 
 QnNotificationItem::~QnNotificationItem() {
@@ -63,5 +78,7 @@ void QnNotificationItem::setColor(const QColor &color) {
 }
 
 void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    painter->fillRect(rect(), m_color);
+    QRectF spacer(0, margin, margin, totalHeight + margin);
+
+    painter->fillRect(spacer, m_color);
 }
