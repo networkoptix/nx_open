@@ -1128,7 +1128,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
 
     QRect backgroundBoundingRect = gridBackgroundItem() ? gridBackgroundItem()->sceneBoundingRect() : QRect();
 
-    QRect sceneBoundingRect =  (backgroundBoundingRect.isNull())
+    QRect sceneBoundingRect = (backgroundBoundingRect.isNull())
             ? layoutBoundingRect
             : layoutBoundingRect.united(backgroundBoundingRect);
 
@@ -1265,6 +1265,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
     if(animate) {
+        qDebug() << "MOVETO";
         animator->moveTo(enclosingGeometry, item->rotation());
     } else {
         animator->stop();
@@ -1348,7 +1349,8 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
 
 void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
     QnResourceWidget *raisedWidget = m_widgetByRole[Qn::RaisedRole];
-    if(!raisedWidget)
+    QnResourceWidget *zoomedWidget = m_widgetByRole[Qn::ZoomedRole];
+    if(!raisedWidget || raisedWidget == zoomedWidget)
         return;
 
     synchronizeGeometry(raisedWidget, animator(raisedWidget)->isRunning());
