@@ -6,7 +6,7 @@
 #include <festival.h>
 
 #include <version.h>
-#include <EST_Wave_aux.h>
+#include <EST_wave_aux.h>
 
 
 static char festivalVoxPath[256];
@@ -245,7 +245,7 @@ bool textToWav( const QString& text, QIODevice* const dest )
     fflush( f );
     fclose( f );
     const bool result = (buf && (bufSize > 0))
-        ? ifdest->write( buf, bufSize ) == bufSize
+        ? dest->write( buf, bufSize ) == bufSize
         : false;
     if( buf )
         free( buf );
