@@ -1593,7 +1593,7 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
         it = m_picturesWaitingRendering.erase( it );
     }
 
-     m_cond.wakeAll();
+    m_cond.wakeAll();
 }
 
 void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
