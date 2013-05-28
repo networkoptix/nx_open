@@ -4,12 +4,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QStringList>
-#include <QtCore/QMutex>
-#include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
 #include <utils/common/property_storage.h>
 #include <utils/common/software_version.h>
+#include <utils/common/singleton.h>
 
 #include <client/client_globals.h>
 #include <client/client_connection_data.h>
@@ -17,9 +16,8 @@
 
 class QSettings;
 
-class QnClientSettings: public QnPropertyStorage {
+class QnClientSettings: public QnPropertyStorage, public QnSingleton<QnClientSettings> {
     Q_OBJECT
-
     typedef QnPropertyStorage base_type;
 
 public:
@@ -81,10 +79,8 @@ public:
         VARIABLE_COUNT
     };
     
-    QnClientSettings();
+    QnClientSettings(QObject *parent = NULL);
     virtual ~QnClientSettings();
-
-    static QnClientSettings *instance();
 
     void load();
     void save();
@@ -152,6 +148,6 @@ private:
 };
 
 
-#define qnSettings QnClientSettings::instance()
+#define qnSettings (QnClientSettings::instance())
 
 #endif // QN_CLIENT_SETTINGS_H
