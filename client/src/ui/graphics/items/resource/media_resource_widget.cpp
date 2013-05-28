@@ -45,6 +45,11 @@
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
+
+detail::QnRendererGuard::~QnRendererGuard() {
+    delete m_renderer;
+}
+
 namespace {
     template<class T>
     void resizeList(QList<T> &list, int size) {
@@ -76,6 +81,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
+    //m_guards.push_back(new detail::QnRendererGuard(m_renderer));
+    //connect(m_renderer, SIGNAL(canBeDestroyed()), m_guards.last(), SLOT(deleteLater()), Qt::QueuedConnection);
+    connect(m_renderer, SIGNAL(canBeDestroyed()), m_renderer, SLOT(deleteLater()), Qt::QueuedConnection);
+
 
     connect(m_resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
 
@@ -148,12 +157,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
 QnMediaResourceWidget::~QnMediaResourceWidget() 
 {
-    m_renderer->beforeDestroy();
-
     ensureAboutToBeDestroyedEmitted();
 
     if (m_display)
         m_display->removeRenderer(m_renderer);
+
+    m_renderer->beforeDestroy();
 
     foreach(__m128i *data, m_binaryMotionMask)
         qFreeAligned(data);

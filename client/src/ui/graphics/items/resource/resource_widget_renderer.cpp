@@ -64,6 +64,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
 
 void QnResourceWidgetRenderer::beforeDestroy() 
 {
+    QnAbstractRenderer::beforeDestroy();
     foreach(RenderingTools ctx, m_channelRenderers)
     {
         if( ctx.renderer )

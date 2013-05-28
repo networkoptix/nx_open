@@ -170,19 +170,13 @@ bool QnResourceDisplay::isStillImage() const {
 }
 
 void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {
-    if (m_camera) {
-        renderer->inUse();
+    if (m_camera)
         m_camera->getCamDisplay()->addVideoRenderer(videoLayout()->channelCount(), renderer, true);
-
-        m_guards.push_back(new detail::QnRendererGuard(renderer));
-        connect(renderer, SIGNAL(canBeDestroyed()), m_guards.back(), SLOT(deleteLater()));
-    }
 }
 
 void QnResourceDisplay::removeRenderer(QnAbstractRenderer *renderer) {
     int channelCount = videoLayout()->channelCount();
     if (m_camera) {
-        renderer->notInUse();
         for(int i = 0; i < channelCount; i++)
             m_camera->getCamDisplay()->removeVideoRenderer(renderer);
     }

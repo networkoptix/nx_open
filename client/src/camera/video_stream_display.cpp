@@ -53,6 +53,13 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber)
 
 QnVideoStreamDisplay::~QnVideoStreamDisplay()
 {
+    foreach(QnAbstractRenderer* renderer, m_renderList)
+        renderer->notInUse();
+
+    m_renderList = m_newList;
+    m_renderListModified = false;
+
+
     delete m_bufferedFrameDisplayer;
     QMutexLocker _lock(&m_mtx);
 
@@ -336,7 +343,14 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
 void QnVideoStreamDisplay::updateRenderList()
 {
     QMutexLocker lock(&m_renderListMtx);
-    if (m_renderListModified) {
+    if (m_renderListModified) 
+    {
+        foreach(QnAbstractRenderer* renderer, m_newList)
+            renderer->inUse();
+
+        foreach(QnAbstractRenderer* renderer, m_renderList)
+            renderer->notInUse();
+
         m_renderList = m_newList;
         m_renderListModified = false;
     }

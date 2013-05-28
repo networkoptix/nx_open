@@ -16,6 +16,20 @@ class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 
 
+namespace detail {
+    class QnRendererGuard: public QObject {
+        Q_OBJECT;
+    public:
+        QnRendererGuard(QnAbstractRenderer *renderer): m_renderer(renderer) {}
+        virtual ~QnRendererGuard();
+
+        QnAbstractRenderer *renderer() const { return m_renderer; }
+    private:
+        QnAbstractRenderer *m_renderer;
+    };
+
+} // namespace detail
+
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
     typedef QnResourceWidget base_type;
@@ -177,6 +191,9 @@ private:
     QStaticText m_sensStaticText[10];
 
     QnMediaResourceWidget* zoomTargetWidget;
+
+    /** List of associated renderer guards. */
+    //QList<detail::QnRendererGuard *> m_guards;
 };
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H

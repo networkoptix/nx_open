@@ -14,26 +14,6 @@ class QnLongRunnable;
 class QnAbstractRenderer;
 class QnVideoCamera;
 
-namespace detail {
-    class QnRendererGuard: public QObject {
-        Q_OBJECT;
-    public:
-        QnRendererGuard(QnAbstractRenderer *renderer): 
-          m_renderer(renderer) 
-          {}
-
-          virtual ~QnRendererGuard();
-
-          QnAbstractRenderer *renderer() const {
-              return m_renderer;
-          }
-
-    private:
-        QnAbstractRenderer *m_renderer;
-    };
-
-} // namespace detail
-
 class QnResourceDisplay: public QObject, protected QnResourceConsumer {
     Q_OBJECT
 public:
@@ -165,9 +145,6 @@ private:
 
     /** Whether this display was started. */
     bool m_started;
-
-    /** List of associated renderer guards. */
-    QList<detail::QnRendererGuard *> m_guards;
 };
 
 typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
