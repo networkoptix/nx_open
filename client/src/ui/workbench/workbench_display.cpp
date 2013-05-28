@@ -1265,7 +1265,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
     if(animate) {
-        qDebug() << "MOVETO";
         animator->moveTo(enclosingGeometry, item->rotation());
     } else {
         animator->stop();
