@@ -10,6 +10,7 @@
 #include <QWaitCondition>
 
 #include <core/datapacket/abstract_data_packet.h>
+#include <plugins/storage/memory/ext_iodevice_storage.h>
 #include <utils/common/adaptive_sleep.h>
 #include <utils/common/long_runnable.h>
 
@@ -20,8 +21,6 @@ class QnAudioStreamDisplay;
 //!Plays audio file
 /*!
     Underlying API uses ffmpeg, so any ffmpeg-supported file format can be used. If file contains multiple audio streams, it is unspecified which one is played
-
-    Object belongs to thread it was created in
 */
 class AudioPlayer
 :
@@ -30,6 +29,13 @@ class AudioPlayer
     Q_OBJECT
 
 public:
+    enum ResultCode
+    {
+        rcNoError,
+        rcSynthesizingError,
+        rcMediaInitializationError
+    };
+
     /*!
         \param filePath If not empty, calls \a open(\a filePath)
     */
@@ -41,8 +47,12 @@ public:
     //!Returns tag \a name from file. Can be used on opened file
     QString getTagValue( const QString& name ) const;
     //!Returns zero on success else - error code (TODO: define error codes)
-    int playbackResultCode() const;
+    ResultCode playbackResultCode() const;
 
+    /*!
+        \note \a dataSource removed in any case
+    */
+    static bool playAsync( QIODevice* dataSource );
     //!Starts playing file, returns immediately
     /*!
         Creates \a AudioPlayer object, which is removed on playback finish
@@ -50,6 +60,8 @@ public:
         \note With this method, there is no way to receive playback done event, or cancel playback
     */
     static bool playFileAsync( const QString& filePath );
+    //!Generates wav from \a text and plays it...
+    static bool sayTextAsync( const QString& text );
     //!Reads tag \a tagName
     /*!
         This method is synchronous
@@ -59,11 +71,25 @@ public:
 public slots:
     //!Overrides QnLongRunnable::pleaseStop
     virtual void pleaseStop() override;
+    //!Openes data source for playback and initializes internal data
+    /*!
+        \param dataSource MUST be opened for reading
+        \note \a dataSource is removed in any case (event if this method fails)
+        \note If there is opened file, it's being closed first
+        \note Ownership of \a dataSource is passed to this object. \a dataSource is destroyed after playback done
+    */
+    bool open( QIODevice* dataSource );
     //!Openes file for playback and initializes internal data
     /*!
         If there is opened file, it's being closed first
     */
     bool open( const QString& filePath );
+    //!Prepares to play \a text
+    /*!
+        Subsequent \a AudioPlayer::playAsync call will synthesize speech and play it.
+        \note Speech synthesizing takes place in internal worker thread
+    */
+    bool prepareTextPlayback( const QString& text );
     //!Starts playing file
     /*!
         This method returns immediately and playback is performed asynchronously.
@@ -86,8 +112,10 @@ private:
     enum State
     {
         sInit,
-        sReady,  //!< file opened successfully
-        sPlaying //!< file being played. On reaching end of file, state moves to \ ready
+        sReady,                 //!< file opened successfully
+        sSynthesizing,          //!< synthesizing speech from text
+        sSynthesizingAutoPlay,  //!< synthesizing speech from text. Playback will start just after synthesizing is complete
+        sPlaying                //!< file being played. On reaching end of file, state moves to \ ready
     };
 
     QString m_filePath;
@@ -99,7 +127,12 @@ private:
     mutable QMutex m_mutex;
     QWaitCondition m_cond;
     State m_state;
+    QnExtIODeviceStorageResourcePtr m_storage;
+    std::auto_ptr<QBuffer> m_synthesizingTarget;
+    QString m_textToPlay;
+    ResultCode m_resultCode;
 
+    bool openNonSafe( QIODevice* dataSource );
     bool isOpenedNonSafe() const;
     void closeNonSafe();
     void doRealtimeDelay( const QnAbstractDataPacketPtr& media );

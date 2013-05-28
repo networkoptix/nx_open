@@ -154,6 +154,7 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
+    //QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("memory"), QnLayoutFileStorageResource::instance);
 
     /*
     extern URLProtocol ufile_protocol;
@@ -256,8 +257,33 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 #ifndef API_TEST_MAIN
 
+#include "utils/media/audio_player.h"
+//#include "text_to_wav.h"
+
+
 int main(int argc, char **argv)
 {
+    //{
+    //    //QFile f( QLatin1String("C:\\develop\\festival_test.wav") );
+    //    //f.open( QFile::WriteOnly );
+    //    QBuffer f;
+    //    f.open( QFile::WriteOnly );
+    //    textToWav( QLatin1String("Hello world. Hello world. Hello world. Hello world. Hello world. Hello world. Hello world. Hello world. Hello world"), &f );
+    //}
+
+    //{
+    //    QBuffer f;
+    //    f.open( QFile::WriteOnly );
+    //    textToWav( QLatin1String("Hello world. Hello world. Hello world. Hello world. Hello world. Hello world. Hello world. Hello world. Hello world"), &f );
+    //}
+
+    //return 0;
+
+
+
+
+
+
 #ifdef Q_WS_X11
     XInitThreads();
 #endif
@@ -477,6 +503,9 @@ int main(int argc, char **argv)
 
         //initializing plugin manager. TODO supply plugin dir (from settings)
         PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
+
+        if( !AudioPlayer::sayTextAsync( QLatin1String("Hello world. Hello world. Hello world. Hello world. Hello world. Hello world. Hello world. Hello world. Hello world") ) )
+            int x = 0;
 
         /* Process input files. */
         for (int i = 1; i < argc; ++i)
