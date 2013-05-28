@@ -2,15 +2,16 @@
 #define NOTIFICATION_ITEM_H
 
 #include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/graphics/items/generic/clickable_widget.h>
 
 class GraphicsLabel;
 class QnImageButtonWidget;
 class QGraphicsLinearLayout;
 
-class QnNotificationItem: public GraphicsWidget {
+class QnNotificationItem: public QnClickableWidget {
     Q_OBJECT
 
-    typedef GraphicsWidget base_type;
+    typedef QnClickableWidget base_type;
 public:
     explicit QnNotificationItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~QnNotificationItem();

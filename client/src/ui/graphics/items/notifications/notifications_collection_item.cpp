@@ -51,7 +51,7 @@ QnNotificationsCollectionItem::~QnNotificationsCollectionItem() {
 
 bool QnNotificationsCollectionItem::addSystemHealthEvent(QnSystemHealth::MessageType message) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
-    m_list->addItem(item);
+    m_list->addItem(item, message == QnSystemHealth::EmailIsEmpty);
 
     return true;
 }

@@ -27,6 +27,8 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_layout->addItem(m_image);
 
     setLayout(m_layout);
+    setMinimumWidth(200);
+    setMaximumWidth(200);
 }
 
 QnNotificationItem::~QnNotificationItem() {

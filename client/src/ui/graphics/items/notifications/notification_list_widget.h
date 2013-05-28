@@ -10,7 +10,20 @@
 class QnNotificationItem;
 class HoverFocusProcessor;
 
-struct QnItemState {
+class QnItemState: public QObject {
+    Q_OBJECT
+public:
+    explicit QnItemState(QObject *parent = NULL):
+        QObject(parent){}
+
+    Q_SLOT void unlockAndHide(Qt::MouseButton button) {
+        if (button != Qt::RightButton)
+            return;
+
+        locked = false;
+        hide();
+    }
+
     enum State {
         Waiting,
         Displaying,
@@ -19,9 +32,19 @@ struct QnItemState {
         Hidden
     };
 
+    bool isVisible() const {
+        return state == Displaying || state == Displayed || state == Hiding;
+    }
+
+    void hide() {
+        state = QnItemState::Hiding;
+        targetValue = 0.0;
+    }
+
     QnNotificationItem* item;
     State state;
     qreal targetValue;
+    bool locked;
 
 };
 
@@ -33,7 +56,7 @@ public:
     explicit QnNotificationListWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags flags = 0);
     ~QnNotificationListWidget();
 
-    void addItem(QnNotificationItem *item);
+    void addItem(QnNotificationItem *item, bool locked = false);
 
 signals:
     void itemRemoved(QnNotificationItem *item);
@@ -42,15 +65,12 @@ protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
 
     virtual void tick(int deltaMSecs) override;
-
-    bool hasFreeSpaceY(qreal required) const;
 private slots:
     void at_item_geometryChanged();
 
 private:
     HoverFocusProcessor* m_hoverProcessor;
     QLinkedList<QnItemState *> m_items;
-    qreal m_bottomY;
     int m_counter;
 };
 

@@ -20,7 +20,6 @@ namespace {
 QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::WindowFlags flags):
     base_type(parent, flags),
     m_hoverProcessor(new HoverFocusProcessor(this)),
-    m_bottomY(0),
     m_counter(0)
 {
     registerAnimation(this);
@@ -31,8 +30,6 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
 }
 
 QnNotificationListWidget::~QnNotificationListWidget() {
-    while (m_items.isEmpty())
-        delete m_items.takeFirst();
 }
 
 QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
@@ -62,34 +59,43 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
 }
 
 void QnNotificationListWidget::tick(int deltaMSecs) {
-    QnItemState *isDisplaying = NULL;
-    foreach (QnItemState *state, m_items) {
-        if (state->state == QnItemState::Displaying) {
-            isDisplaying = state;
-            break;
-        }
-    }
 
     qreal topY = m_items.isEmpty() ? 0 : m_items.first()->item->geometry().top();
     qreal stepY = (m_items.isEmpty() ? 0 : m_items.first()->item->geometry().height())
             * (qreal) deltaMSecs / (qreal) moveUpTimeoutMs;
+    qreal bottomY = 0;
+
+    //TODO: #GDM speed should depend on m_items.size
+
+    bool anyDisplaying = false;
+    foreach (QnItemState *state, m_items) {
+        if (!state->isVisible())
+            continue;
+        bottomY = qMax(bottomY, state->item->geometry().bottom());
+        if (state->state == QnItemState::Displaying)
+            anyDisplaying = true;
+    }
+
+
     QnItemState *previous = NULL;
+    QList<QnItemState*> itemsToDelete;
 
     foreach (QnItemState *state, m_items) {
-        qreal previousBottom = (previous == NULL ? 0 : previous->item->geometry().bottom());
-
         switch (state->state) {
         case QnItemState::Waiting: {
-                if (isDisplaying == NULL && (previousBottom + state->item->geometry().height() <= geometry().height())) {
-                    isDisplaying = state;
+                if (!anyDisplaying && (bottomY + state->item->geometry().height() <= geometry().height())) {
+                    anyDisplaying = true;
 
                     state->state = QnItemState::Displaying;
-                    connect(state->item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
-                    state->item->setY(previousBottom);
+
+                    state->item->setY(bottomY);
                     state->item->setX(state->item->geometry().width());
                     state->item->setVisible(true);
                     state->item->setOpacity(1.0);
                     state->targetValue = 0.0;
+                    state->item->setClickableButtons(state->item->clickableButtons() | Qt::RightButton);
+                    connect(state->item, SIGNAL(clicked(Qt::MouseButton)), state, SLOT(unlockAndHide(Qt::MouseButton)));
+                    connect(state->item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
                 }
                 break;
             }
@@ -104,15 +110,13 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 break;
             }
         case QnItemState::Displayed: {
-                if (m_hoverProcessor->isHovered())
+                if (m_hoverProcessor->isHovered() || state->locked)
                     break;
 
                 qreal step = (qreal)deltaMSecs / (qreal)displayTimeoutMs;
                 state->targetValue += step;
-                if (state->targetValue >= 1.0) {
-                    state->state = QnItemState::Hiding;
-                    state->targetValue = 0.0;
-                }
+                if (state->targetValue >= 1.0)
+                    state->hide();
                 break;
             }
         case QnItemState::Hiding: {
@@ -126,15 +130,15 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 break;
             }
         case QnItemState::Hidden: {
-                state->state = QnItemState::Waiting;
+                itemsToDelete << state;
 
                 //here will be item removing from the list
                 break;
             }
         }
 
-
-        if (state->state != QnItemState::Waiting && state->state != QnItemState::Hidden) {
+        // moving items up
+        if (state->isVisible()) {
             qreal targetY = (previous == NULL ? 0 : previous->item->geometry().bottom());
             qreal currentY = state->item->y();
             if (currentY > targetY)
@@ -143,23 +147,15 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         }
     }
 
-    do {
-        if (m_items.isEmpty())
-            break;
+    // remove unused items
+    foreach(QnItemState* deleting, itemsToDelete) {
+        disconnect(deleting->item, 0, this, 0);
+        m_items.removeOne(deleting);
+        emit itemRemoved(deleting->item);
+        delete deleting;
+    }
 
-        QnItemState* state = m_items.first();
-        if (state->state != QnItemState::Hidden)
-            break;
-
-        disconnect(state->item, 0, this, 0);
-        m_items.removeFirst();
-        emit itemRemoved(state->item);
-
-        delete state;
-
-    } while (true);
-
-
+/*
     bool anyVisible = false;
     foreach (QnItemState *state, m_items) {
         if (state->state == QnItemState::Displaying
@@ -170,24 +166,24 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         }
     }
     if (!anyVisible)
-        m_bottomY = 0;
+        m_bottomY = 0;*/
 
 }
 
-bool QnNotificationListWidget::hasFreeSpaceY(qreal required) const {
-    return m_bottomY + required <= geometry().height();
-}
-
-void QnNotificationListWidget::addItem(QnNotificationItem *item)  {
-    item->setText(QLatin1String("Motion detected on camera\nblablabla") + QString::number(m_counter));
+void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
+    if (locked)
+        item->setText(QLatin1String("No smtp settings set\nblablabla") + QString::number(m_counter));
+    else
+        item->setText(QLatin1String("Motion detected on camera\nblablabla") + QString::number(m_counter));
     item->setVisible(false);
 
     QVector<QColor> colors = qnGlobals->statisticsColors().hdds;
     item->setColor(colors[m_counter % colors.size()]);
 
-    QnItemState* state = new QnItemState();
+    QnItemState* state = new QnItemState(this);
     state->item = item;
     state->state = QnItemState::Waiting;
+    state->locked = locked;
     m_items.append(state);
     m_counter++;
 }
