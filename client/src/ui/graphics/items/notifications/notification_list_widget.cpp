@@ -3,21 +3,27 @@
 #include <QtCore/QDateTime>
 
 #include <ui/graphics/items/notifications/notification_item.h>
+#include <ui/processors/hover_processor.h>
 
 namespace {
 
-    int timeToMove = 1000;
-    int timeToDisplay = 5000;
-    int timeToHide = 1000;
+    int popoutTimeoutMs = 1000;
+    int displayTimeoutMs = 5000;
+    int hideTimeoutMs = 1000;
+    int hoverLeaveTimeoutMSec = 250;
 
 }
 
 QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::WindowFlags flags):
     base_type(parent, flags),
+    m_hoverProcessor(new HoverFocusProcessor(this)),
     m_bottomY(0)
 {
     registerAnimation(this);
     startListening();
+
+    m_hoverProcessor->addTargetItem(this);
+    m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
 }
 
 QnNotificationListWidget::~QnNotificationListWidget() {
@@ -77,7 +83,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 break;
             }
         case QnItemState::Displaying: {
-                qreal step = state->item->geometry().width() * (qreal)deltaMSecs / (qreal)timeToMove;
+                qreal step = state->item->geometry().width() * (qreal)deltaMSecs / (qreal)popoutTimeoutMs;
                 qreal value = qMax(state->item->x() - step, state->targetValue);
                 state->item->setX(value);
                 if (qFuzzyCompare(value, state->targetValue)) {
@@ -87,16 +93,16 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 break;
             }
         case QnItemState::Displayed: {
-                qreal step = (qreal)deltaMSecs / (qreal)timeToDisplay;
+                qreal step = (qreal)deltaMSecs / (qreal)displayTimeoutMs;
                 state->targetValue += step;
-                if (state->targetValue >= 1.0) {
+                if (state->targetValue >= 1.0 && !m_hoverProcessor->isHovered()) {
                     state->state = QnItemState::Hiding;
                     state->targetValue = 0.0;
                 }
                 break;
             }
         case QnItemState::Hiding: {
-                qreal step = (qreal)deltaMSecs / (qreal)timeToHide;
+                qreal step = (qreal)deltaMSecs / (qreal)hideTimeoutMs;
                 qreal value = qMax(state->item->opacity() - step, state->targetValue);
                 state->item->setOpacity(value);
                 if (qFuzzyCompare(value, state->targetValue)) {

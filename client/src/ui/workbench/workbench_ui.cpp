@@ -521,15 +521,15 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsOpacityAnimatorGroup->addAnimator(opacityAnimator(m_notificationsShowButton));
     m_notificationsOpacityAnimatorGroup->addAnimator(opacityAnimator(m_notificationsPinButton));
 
-    connect(m_notificationsPinButton,            SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_notificationsPinButton_toggled(bool)));
-    connect(m_notificationsShowButton,           SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_notificationsShowButton_toggled(bool)));
-    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateNotificationsOpacity()));
-    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateNotificationsOpacity()));
-    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
-    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
-    connect(m_notificationsHidingProcessor,      SIGNAL(hoverFocusLeft()),                                                                   this,                           SLOT(at_notificationsHidingProcessor_hoverFocusLeft()));
-    connect(m_notificationsShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_notificationsShowingProcessor_hoverEntered()));
-    connect(m_notificationsItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_notificationsItem_geometryChanged()));
+    connect(m_notificationsPinButton,            SIGNAL(toggled(bool)),     this,   SLOT(at_notificationsPinButton_toggled(bool)));
+    connect(m_notificationsShowButton,           SIGNAL(toggled(bool)),     this,   SLOT(at_notificationsShowButton_toggled(bool)));
+    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverLeft()),       this,   SLOT(updateNotificationsOpacity()));
+    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverEntered()),    this,   SLOT(updateNotificationsOpacity()));
+    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverEntered()),    this,   SLOT(updateControlsVisibility()));
+    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverLeft()),       this,   SLOT(updateControlsVisibility()));
+    connect(m_notificationsHidingProcessor,      SIGNAL(hoverFocusLeft()),  this,   SLOT(at_notificationsHidingProcessor_hoverFocusLeft()));
+    connect(m_notificationsShowingProcessor,     SIGNAL(hoverEntered()),    this,   SLOT(at_notificationsShowingProcessor_hoverEntered()));
+    connect(m_notificationsItem,                 SIGNAL(geometryChanged()), this,   SLOT(at_notificationsItem_geometryChanged()));
 
 
     /* Calendar. */

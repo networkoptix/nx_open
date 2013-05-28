@@ -13,17 +13,23 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
 {
     m_headerWidget = new QGraphicsWidget(this);
 
-    QnImageButtonWidget* button = new QnImageButtonWidget(m_headerWidget);
-    button->setIcon(qnSkin->icon("item/zoom_window.png"));
-    button->setCheckable(true);
-    button->setToolTip(tr("Settings, bla-bla"));
-    button->setMinimumSize(QSizeF(24, 24));
-    button->setMaximumSize(QSizeF(24, 24));
+    QnImageButtonWidget* hideAllButton = new QnImageButtonWidget(m_headerWidget);
+    hideAllButton->setIcon(qnSkin->icon("tree/servers.png"));
+    hideAllButton->setToolTip(tr("Hide all"));
+    hideAllButton->setMinimumSize(QSizeF(24, 24));
+    hideAllButton->setMaximumSize(QSizeF(24, 24));
+
+    QnImageButtonWidget* settingsButton = new QnImageButtonWidget(m_headerWidget);
+    settingsButton->setIcon(qnSkin->icon("item/close.png"));
+    settingsButton->setToolTip(tr("Hide all"));
+    settingsButton->setMinimumSize(QSizeF(24, 24));
+    settingsButton->setMaximumSize(QSizeF(24, 24));
 
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     controlsLayout->addStretch();
-    controlsLayout->addItem(button);
+    controlsLayout->addItem(settingsButton);
+    controlsLayout->addItem(hideAllButton);
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);

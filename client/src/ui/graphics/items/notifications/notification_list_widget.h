@@ -6,6 +6,7 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 
 class QnNotificationItem;
+class HoverFocusProcessor;
 
 struct QnItemState {
     enum State {
@@ -42,6 +43,7 @@ private slots:
     void at_item_geometryChanged();
 
 private:
+    HoverFocusProcessor* m_hoverProcessor;
     QList<QnItemState *> m_items;
     qreal m_bottomY;
 };
