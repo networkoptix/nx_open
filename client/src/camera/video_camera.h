@@ -54,6 +54,8 @@ public:
     void setExportProgressOffset(int value);
     int getExportProgressOffset() const;
     QString exportedFileName() const;
+
+    bool isDisplayStarted() const { return m_displayStarted; }
 signals:
     void recordingFailed(QString errMessage);
     void exportProgress(int progress);
@@ -84,6 +86,7 @@ private:
     QnAbstractArchiveReader* m_exportReader;
     int m_progressOffset;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
+    bool m_displayStarted;
 };
 
 #endif //QN_VIDEO_CAMERA_H

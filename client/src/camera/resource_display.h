@@ -13,6 +13,7 @@ class QnCamDisplay;
 class QnLongRunnable;
 class QnAbstractRenderer;
 class QnVideoCamera;
+class QnCounter;
 
 class QnResourceDisplay: public QObject, protected QnResourceConsumer {
     Q_OBJECT
@@ -145,6 +146,8 @@ private:
 
     /** Whether this display was started. */
     bool m_started;
+
+    QnCounter *m_counter;
 };
 
 typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
