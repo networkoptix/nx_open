@@ -515,11 +515,11 @@ void QnMediaResourceWidget::updateIconButton() {
     bool isZoomWindow = !qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0)); //TODO: #Elric fix zoom window
 
     if (isZoomWindow) {
+        iconButton()->setVisible(true);
         iconButton()->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
         iconButton()->setToolTip(tr("Zoom window."));
         return;
     }
-
 
     if(!m_camera) {
         iconButton()->setVisible(false);
