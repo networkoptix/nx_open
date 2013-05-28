@@ -51,7 +51,7 @@ private slots:
     void updateDisableAeroCheckbox();
 
     void at_browseRecordingFolderButton_clicked();
-    void at_dwm_compositionChanged(bool enabled);
+    void at_dwm_compositionChanged();
 
 private:
     QScopedPointer<Ui::RecordingSettings> ui;

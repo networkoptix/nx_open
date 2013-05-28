@@ -68,13 +68,13 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     connect(ui->secondaryAudioDeviceComboBox,   SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
     connect(ui->screenComboBox,                 SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateDisableAeroCheckbox()));
     connect(ui->browseRecordingFolderButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseRecordingFolderButton_clicked()));
-    connect(m_dwm,                              SIGNAL(compositionChanged()),       this,   SLOT(at_dwm_compositionChanged(bool)));
+    connect(m_dwm,                              SIGNAL(compositionChanged()),       this,   SLOT(at_dwm_compositionChanged()));
 
     setWarningStyle(ui->recordingWarningLabel);
     setDefaultSoundIcon(ui->primaryDeviceIconLabel);
     setDefaultSoundIcon(ui->secondaryDeviceIconLabel);
 
-    at_dwm_compositionChanged(m_dwm->isCompositionEnabled());
+    at_dwm_compositionChanged();
     updateDisableAeroCheckbox();
     updateRecordingWarning();
 }
@@ -281,7 +281,7 @@ void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked(){
     ui->recordingFolderLabel->setText(dir);
 }
 
-void QnRecordingSettingsWidget::at_dwm_compositionChanged(bool enabled) {
-    // Aero is already disabled if dwm is not enabled or not supported
-    ui->disableAeroCheckBox->setVisible(m_dwm->isSupported() && enabled);
+void QnRecordingSettingsWidget::at_dwm_compositionChanged() {
+    /* Aero is already disabled if dwm is not enabled or not supported. */
+    ui->disableAeroCheckBox->setVisible(m_dwm->isSupported() && m_dwm->isCompositionEnabled());
 }
