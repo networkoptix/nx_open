@@ -12,7 +12,9 @@ public:
 
 public slots:
     void print() {
+#ifndef Q_OS_MAC
         qDebug() << m_debugString;
+#endif
     }
 
 private:

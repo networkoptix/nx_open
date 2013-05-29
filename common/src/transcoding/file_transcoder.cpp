@@ -6,6 +6,8 @@
 #include "file_transcoder.h"
 
 #include <QMutexLocker>
+#include <QDir>
+#include <QFileInfo>
 
 #include <core/resource/resource.h>
 
