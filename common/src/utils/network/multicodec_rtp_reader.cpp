@@ -2,6 +2,10 @@
 
 #include <QSettings>
 
+#ifdef __GNUC__
+#include <sys/select.h>
+#endif
+
 #include "utils/network/rtp_stream_parser.h"
 #include "core/resource/network_resource.h"
 #include "utils/network/h264_rtp_parser.h"

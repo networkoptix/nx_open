@@ -8,6 +8,7 @@
 
 #include <memory>
 
+#include <QBuffer>
 #include <QMutex>
 #include <QWaitCondition>
 
