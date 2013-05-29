@@ -10,10 +10,10 @@ namespace QnSystemHealth {
         case NotDefined:
             return QLatin1String("---");
         case EmailIsEmpty: {
-                QString result = QObject::tr("Your E-Mail address is not set.");
+                QString result = QObject::tr("Your E-Mail address\nis not set.");
                 if (!shortMode) {
                     result += QLatin1Char('\n');
-                    result += QObject::tr("You cannot receive system notifications via E-Mail.");
+                    result += QObject::tr("You cannot receive system\n notifications via E-Mail.");
                 }
             return result;
             }

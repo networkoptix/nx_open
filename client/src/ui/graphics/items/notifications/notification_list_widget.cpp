@@ -91,12 +91,13 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
                     state->state = QnItemState::Displaying;
 
-                    state->item->setMinimumWidth(geometry().width());
+                    state->item->setMinimumWidth(widgetWidth);
+                    state->item->setMaximumWidth(widgetWidth);
                     state->item->setY(bottomY);
                     state->item->setX(state->item->geometry().width());
                     state->item->setVisible(true);
                     state->item->setOpacity(1.0);
-                    state->targetValue = widgetWidth - state->item->geometry().width(); //target x-coord
+                    state->targetValue = 0.0; //target x-coord
                     state->item->setClickableButtons(state->item->clickableButtons() | Qt::RightButton);
                     connect(state->item, SIGNAL(clicked(Qt::MouseButton)), state, SLOT(unlockAndHide(Qt::MouseButton)));
                     updateGeometry();

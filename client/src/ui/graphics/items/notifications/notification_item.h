@@ -22,6 +22,8 @@ public:
     QString iconPath() const;
     void setIconPath(const QString& iconPath);
 
+    void setIcon(const QIcon &icon);
+
     QColor color() const;
     void setColor(const QColor &color);
 

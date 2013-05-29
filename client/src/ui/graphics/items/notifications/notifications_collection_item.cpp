@@ -3,11 +3,13 @@
 #include <QtGui/QGraphicsLinearLayout>
 
 #include <core/resource/resource.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/style/skin.h>
+#include <ui/style/resource_icon_cache.h>
 
 QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags)
@@ -15,22 +17,24 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     m_headerWidget = new QGraphicsWidget(this);
 
     QnImageButtonWidget* hideAllButton = new QnImageButtonWidget(m_headerWidget);
-    hideAllButton->setIcon(qnSkin->icon("tree/servers.png"));
+    hideAllButton->setIcon(qnSkin->icon("titlebar/exit.png"));
     hideAllButton->setToolTip(tr("Hide all"));
     hideAllButton->setMinimumSize(QSizeF(24, 24));
     hideAllButton->setMaximumSize(QSizeF(24, 24));
+    connect(hideAllButton, SIGNAL(clicked()), this, SLOT(hideAll()));
 
     QnImageButtonWidget* settingsButton = new QnImageButtonWidget(m_headerWidget);
-    settingsButton->setIcon(qnSkin->icon("item/close.png"));
-    settingsButton->setToolTip(tr("Hide all"));
+    settingsButton->setIcon(qnSkin->icon("titlebar/connected.png"));
+    settingsButton->setToolTip(tr(""));
     settingsButton->setMinimumSize(QSizeF(24, 24));
     settingsButton->setMaximumSize(QSizeF(24, 24));
+    connect(settingsButton, SIGNAL(clicked()), this, SIGNAL(settingsRequested()));
 
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     controlsLayout->addStretch();
-    controlsLayout->addItem(settingsButton);
     controlsLayout->addItem(hideAllButton);
+    controlsLayout->addItem(settingsButton);
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -56,8 +60,26 @@ QRectF QnNotificationsCollectionItem::headerGeometry() const {
 
 void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
-    item->setText(BusinessActionType::toString(businessAction->actionType()));
-    m_list->addItem(item, true);
+
+
+    QnBusinessEventParameters params = businessAction->getRuntimeParams();
+    BusinessEventType::Value eventType = params.getEventType();
+
+    QString text = BusinessEventType::toString(eventType);
+
+
+    int resourceId = params.getEventResourceId();
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
+    if (resource) {
+        text += QLatin1Char('\n');
+        text += resource->getName();
+
+        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+    }
+    item->setText(text);
+
+
+    m_list->addItem(item);
 }
 
 void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources) {

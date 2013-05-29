@@ -24,6 +24,9 @@ public:
 
     QRectF headerGeometry() const;
 
+signals:
+    void settingsRequested();
+
 public slots:
     void showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);

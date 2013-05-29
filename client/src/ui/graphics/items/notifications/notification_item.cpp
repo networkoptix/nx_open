@@ -33,8 +33,8 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
  //   m_textLabel->setMaximumSize(totalWidth - totalHeight - spacerSize, totalHeight);
 //    m_textLabel->setPos(margin + spacerSize, margin);
 
-    setIconPath(QLatin1String("item/zoom_window.png"));
-    setText(tr("Create Zoom Window"));
+//    setIconPath(QLatin1String("item/zoom_window.png"));
+//    setText(tr("Create Zoom Window"));
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Horizontal);
     layout->setContentsMargins(margin*2, margin, margin, margin);
@@ -68,6 +68,11 @@ void QnNotificationItem::setIconPath(const QString& iconPath) {
         return;
     m_iconPath = iconPath;
     m_image->setIcon(qnSkin->icon(m_iconPath));
+}
+
+void QnNotificationItem::setIcon(const QIcon &icon) {
+    m_iconPath = QString();
+    m_image->setIcon(icon);
 }
 
 QColor QnNotificationItem::color() const {

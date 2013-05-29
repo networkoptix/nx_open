@@ -491,6 +491,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
             m_notificationsItem, SLOT(showSystemHealthEvent(QnSystemHealth::MessageType,QnResourceList)));
     connect(handler, SIGNAL(cleared()),
             m_notificationsItem, SLOT(hideAll()));
+    connect(m_notificationsItem, SIGNAL(settingsRequested()), action(Qn::OpenPopupSettingsAction), SLOT(trigger()));
 
     m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
