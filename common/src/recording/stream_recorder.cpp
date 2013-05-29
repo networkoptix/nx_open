@@ -48,12 +48,12 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_role(Role_ServerRecording),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
     m_nextIFrameTime(AV_NOPTS_VALUE),
-    m_truncateIntervalEps(0)
+    m_truncateIntervalEps(0),
+    m_videoTranscoder(0)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
-    memset(m_videoTranscoder, 0, sizeof(m_videoTranscoder));
 }
 
 QnStreamRecorder::~QnStreamRecorder()
@@ -61,8 +61,7 @@ QnStreamRecorder::~QnStreamRecorder()
     stop();
     close();
     delete m_audioTranscoder;
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        delete m_videoTranscoder[i];
+    delete m_videoTranscoder;
 }
 
 /* It is impossible to write avi/mkv attribute in the end
@@ -347,10 +346,10 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
             md.clear();
         } while (result);
     }
-    else if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder[md->channelNumber])
+    else if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder)
     {
         QnAbstractMediaDataPtr result;
-        m_videoTranscoder[md->channelNumber]->transcodePacket(md, &result);
+        m_videoTranscoder->transcodePacket(md, &result);
         if (result && result->data.size() > 0)
             writeData(result, streamIndex);
     }
@@ -513,18 +512,18 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 // transcode video
                 if (m_dstVideoCodec == CODEC_ID_NONE)
                     m_dstVideoCodec = CODEC_ID_MPEG4; // default value
-                m_videoTranscoder[i] = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
-                m_videoTranscoder[i]->setMTMode(true);
+                m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
+                m_videoTranscoder->setMTMode(true);
                 if (m_role == Role_FileExportWithTime && i == bottomRightChannel)
-                    m_videoTranscoder[i]->setDrawDateTime(QnFfmpegVideoTranscoder::Date_RightBottom);
-                m_videoTranscoder[i]->setOnScreenDateOffset(m_onscreenDateOffset);
-                m_videoTranscoder[i]->setQuality(QnQualityHighest);
+                    m_videoTranscoder->setDrawDateTime(QnFfmpegVideoTranscoder::Date_RightBottom);
+                m_videoTranscoder->setOnScreenDateOffset(m_onscreenDateOffset);
+                m_videoTranscoder->setQuality(QnQualityHighest);
                 if (!m_srcRect.isEmpty())
-                    m_videoTranscoder[i]->setSrcRect(m_srcRect);
-                m_videoTranscoder[i]->setVideoLayout(layout);
-                m_videoTranscoder[i]->open(mediaData);
+                    m_videoTranscoder->setSrcRect(m_srcRect);
+                m_videoTranscoder->setVideoLayout(layout);
+                m_videoTranscoder->open(mediaData);
 
-                avcodec_copy_context(videoStream->codec, m_videoTranscoder[i]->getCodecContext());
+                avcodec_copy_context(videoStream->codec, m_videoTranscoder->getCodecContext());
             }
             else if (!m_forceDefaultCtx && mediaData->context && mediaData->context->ctx()->width > 0)
             {

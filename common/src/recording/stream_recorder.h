@@ -166,7 +166,7 @@ private:
     QnCompressedVideoDataPtr m_lastIFrame;
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     QnFfmpegAudioTranscoder* m_audioTranscoder;
-    QnFfmpegVideoTranscoder* m_videoTranscoder[CL_MAX_CHANNELS];
+    QnFfmpegVideoTranscoder* m_videoTranscoder;
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
     int m_onscreenDateOffset;
