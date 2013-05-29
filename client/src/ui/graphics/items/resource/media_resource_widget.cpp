@@ -46,9 +46,9 @@
 
 namespace {
     template<class T>
-    void resizeList(QList<T> &list, int size) {
+    void resizeList(T &list, int size) {
         while(list.size() < size)
-            list.push_back(T());
+            list.push_back(typename T::value_type());
         while(list.size() > size)
             list.pop_back();
     }
@@ -351,7 +351,13 @@ void QnMediaResourceWidget::invalidateMotionSelectionCache() {
 // Painting
 // -------------------------------------------------------------------------- //
 void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    m_paintedChannels.fill(false);
+
     base_type::paint(painter, option, widget);
+
+    for(int channel = 0; channel < channelCount(); channel++)
+        if(!m_paintedChannels[channel])
+            m_renderer->skip(channel);
 
     if(isOverlayVisible() && isInfoVisible())
         updateInfoTextLater();
@@ -370,6 +376,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
 
     QRectF sourceRect = toSubRect(channelRect, paintRect);
     Qn::RenderStatus result = m_renderer->paint(channel, sourceRect, paintRect, effectiveOpacity());
+    m_paintedChannels[channel] = true;
     
     /* There is no need to restore blending state before invoking endNativePainting. */
     painter->endNativePainting();
@@ -599,6 +606,7 @@ void QnMediaResourceWidget::channelLayoutChangedNotify() {
     resizeList(m_motionSelection, channelCount());
     resizeList(m_motionSelectionPathCache, channelCount());
     resizeList(m_motionSensitivity, channelCount());
+    resizeList(m_paintedChannels, channelCount());
 
     while(m_binaryMotionMask.size() > channelCount()) {
         qFreeAligned(m_binaryMotionMask.back());
