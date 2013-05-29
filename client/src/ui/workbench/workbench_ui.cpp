@@ -61,6 +61,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/system_menu_event.h>
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include <utils/common/event_processors.h>
@@ -482,12 +483,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_notificationsItem = new QnNotificationsCollectionItem(m_controlsWidget);
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
-         m_notificationsItem->addSystemHealthEvent((QnSystemHealth::MessageType)i);
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
-         m_notificationsItem->addSystemHealthEvent((QnSystemHealth::MessageType)i);
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++)
-         m_notificationsItem->addSystemHealthEvent((QnSystemHealth::MessageType)i);
+
+    QnWorkbenchNotificationsHandler* handler = context()->instance<QnWorkbenchNotificationsHandler>();
+    connect(handler, SIGNAL(businessActionAdded(QnAbstractBusinessActionPtr)),
+            m_notificationsItem, SLOT(showBusinessAction(QnAbstractBusinessActionPtr)));
+    connect(handler, SIGNAL(systemHealthEventAdded(QnSystemHealth::MessageType,QnResourceList)),
+            m_notificationsItem, SLOT(showSystemHealthEvent(QnSystemHealth::MessageType,QnResourceList)));
+    connect(handler, SIGNAL(cleared()),
+            m_notificationsItem, SLOT(hideAll()));
 
     m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
@@ -665,13 +668,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(action(Qn::ToggleTourModeAction), SIGNAL(toggled(bool)),                this,           SLOT(updateControlsVisibility()));
     connect(action(Qn::ToggleThumbnailsAction), SIGNAL(toggled(bool)),              this,           SLOT(at_toggleThumbnailsAction_toggled(bool)));
     connect(action(Qn::ToggleSliderAction), SIGNAL(toggled(bool)),                  this,           SLOT(at_toggleSliderAction_toggled(bool)));
-
-    /* Notifications button */
-    m_popupShowButton = newActionButton(action(Qn::TogglePopupsAction), 2.5, -1, m_controlsWidget);
-    m_popupShowButton->setProperty(Qn::NoHandScrollOver, true);
-    m_popupShowButton->setVisible(false);
-    connect(opacityAnimator(m_popupShowButton), SIGNAL(finished()),                 this,           SLOT(updatePopupButtonAnimation()));
-    connect(action(Qn::TogglePopupsAction), SIGNAL(toggled(bool)),                  this,           SLOT(at_togglePopupsAction_toggled(bool)));
 
     initGraphicsMessageBox();
 
@@ -888,7 +884,6 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
     if(changed) {
         updateTreeGeometry();
         updateNotificationsGeometry();
-        updatePopupButtonGeometry();
         updateCalendarVisibility(animate);
 
         m_sliderItem->setEnabled(m_sliderVisible); /* So that it doesn't handle mouse events while disappearing. */
@@ -925,17 +920,7 @@ void QnWorkbenchUi::setCalendarVisible(bool visible, bool animate) {
     updateCalendarOpacity(animate);
     if(changed) {
         updateNotificationsGeometry();
-        updatePopupButtonGeometry();
     }
-}
-
-void QnWorkbenchUi::setPopupsButtonVisible(bool visible) {
-    if (m_popupShowButton->isVisible() == visible)
-        return;
-    m_popupShowButton->setVisible(visible);
-
-    updatePopupButtonAnimation();
-    updatePopupButtonGeometry();
 }
 
 void QnWorkbenchUi::setProxyUpdatesEnabled(bool updatesEnabled) {
@@ -1381,37 +1366,6 @@ void QnWorkbenchUi::updateSliderZoomButtonsGeometry() {
     m_sliderZoomButtonsWidget->setPos(pos);
 }
 
-QRectF QnWorkbenchUi::updatedPopupButtonGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry) {
-    QRectF geometry = m_popupShowButton->geometry();
-    geometry.moveLeft(m_controlsWidgetRect.right() - geometry.width());
-    if (m_calendarVisible)
-        geometry.moveBottom(calendarGeometry.top());
-    else if (m_sliderVisible)
-        geometry.moveBottom(qMin(sliderGeometry.top(), m_controlsWidgetRect.bottom()));
-    else
-        geometry.moveBottom(m_controlsWidgetRect.bottom());
-    return geometry;
-}
-
-void QnWorkbenchUi::updatePopupButtonGeometry() {
-    QRectF geometry = updatedPopupButtonGeometry(m_sliderItem->geometry(), m_calendarItem->paintGeometry());
-    m_popupShowButton->setPos(geometry.topLeft());
-}
-
-void QnWorkbenchUi::updatePopupButtonAnimation() {
-    if (!m_popupShowButton->isVisible())
-        return;
-
-    VariantAnimator* animator = opacityAnimator(m_popupShowButton);
-    if(!animator->isRunning())
-        animator->setTimeLimit(1000);
-    qreal opacity = m_popupShowButton->opacity();
-    if (qFuzzyCompare(opacity, 1.0))
-        animator->animateTo(0.1);
-    else
-        animator->animateTo(1.0);
-}
-
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX) {
     return QMargins(
         isTreePinned() ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
@@ -1782,7 +1736,6 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
     updateTreeGeometry();
     updateNotificationsGeometry();
     updateFpsGeometry();
-    updatePopupButtonGeometry();
 }
 
 void QnWorkbenchUi::at_sliderItem_geometryChanged() {
@@ -1790,7 +1743,6 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
 
     updateTreeGeometry();
     updateNotificationsGeometry();
-    updatePopupButtonGeometry();
 
     updateViewportMargins();
     updateSliderResizerGeometry();
@@ -1815,10 +1767,6 @@ void QnWorkbenchUi::at_toggleCalendarAction_toggled(bool checked){
 void QnWorkbenchUi::at_toggleSliderAction_toggled(bool checked) {
     if (!m_ignoreClickEvent)
         setSliderOpened(checked);
-}
-
-void QnWorkbenchUi::at_togglePopupsAction_toggled(bool checked) {
-    setPopupsButtonVisible(checked);
 }
 
 void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
@@ -2046,7 +1994,6 @@ void QnWorkbenchUi::at_calendarItem_paintGeometryChanged() {
     ));
 
     updateNotificationsGeometry();
-    updatePopupButtonGeometry();
 }
 
 void QnWorkbenchUi::at_calendarHidingProcessor_hoverFocusLeft() {

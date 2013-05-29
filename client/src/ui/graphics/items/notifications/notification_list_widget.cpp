@@ -163,10 +163,6 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 }
 
 void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
-    if (locked)
-        item->setText(QLatin1String("No smtp settings set\nblablabla") + QString::number(m_counter));
-    else
-        item->setText(QLatin1String("Motion detected on camera\nblablabla") + QString::number(m_counter));
     item->setVisible(false);
 
     QVector<QColor> colors = qnGlobals->statisticsColors().hdds;
@@ -180,8 +176,16 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     m_counter++;
 }
 
+void QnNotificationListWidget::clear() {
+    foreach (QnItemState *state, m_items) {
+        if (state->isVisible())
+            state->hide();
+        else
+            state->state = QnItemState::Hidden;
+    }
+}
+
 void QnNotificationListWidget::at_item_geometryChanged() {
-    qDebug() << "catch: geometry changed";
     foreach (QnItemState *state, m_items) {
         if (!state->isVisible())
             continue;

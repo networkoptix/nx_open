@@ -57,6 +57,7 @@ public:
     ~QnNotificationListWidget();
 
     void addItem(QnNotificationItem *item, bool locked = false);
+    void clear();
 
 signals:
     void itemRemoved(QnNotificationItem *item);

@@ -150,7 +150,6 @@ public slots:
     void setTitleVisible(bool visible = true, bool animate = true);
     void setNotificationsVisible(bool visible = true, bool animate = true);
     void setCalendarVisible(bool visible = true, bool animate = true);
-    void setPopupsButtonVisible(bool visible = true);
 
     void setTreeOpened(bool opened = true, bool animate = true);
     void setSliderOpened(bool opened = true, bool animate = true);
@@ -190,13 +189,10 @@ protected:
     void updateCalendarGeometry();
     Q_SLOT void updateSliderResizerGeometry();
     void updateSliderZoomButtonsGeometry();
-    void updatePopupButtonGeometry();
-    Q_SLOT void updatePopupButtonAnimation();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
-    QRectF updatedPopupButtonGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     void updateActivityInstrumentState();
 
     void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
@@ -244,7 +240,6 @@ private slots:
     void at_toggleThumbnailsAction_toggled(bool checked);
     void at_toggleCalendarAction_toggled(bool checked);
     void at_toggleSliderAction_toggled(bool checked);
-    void at_togglePopupsAction_toggled(bool checked);
     
     void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
@@ -461,10 +456,6 @@ private:
     HoverFocusProcessor *m_calendarHidingProcessor;
 
     bool m_inCalendarGeometryUpdate;
-
-    /* Notifications window-related state */
-
-    QnImageButtonWidget *m_popupShowButton;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)

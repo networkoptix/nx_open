@@ -15,7 +15,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <utils/common/event_processors.h>
 #include <utils/kvpair_usage_helper.h>
 
 QnPopupCollectionWidget::QnPopupCollectionWidget(QnWorkbenchContext* context):
@@ -104,8 +103,6 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_businessEventWidget_closed(BusinessEventType::Value, bool)));
     }
 
-    if (!isVisible())
-        action(Qn::TogglePopupsAction)->setChecked(true);
     return true;
 }
 
@@ -129,8 +126,6 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
         connect(pw, SIGNAL(closed(QnSystemHealth::MessageType, bool)), this, SLOT(at_systemHealthWidget_closed(QnSystemHealth::MessageType, bool)));
     }
 
-    if (!isVisible())
-        action(Qn::TogglePopupsAction)->setChecked(true);
     return true;
 }
 
@@ -143,7 +138,6 @@ void QnPopupCollectionWidget::clear(bool animate) {
     }
     m_businessEventWidgets.clear();
     m_systemHealthWidgets.clear();
-    action(Qn::TogglePopupsAction)->setChecked(false);
     hide();
 }
 
@@ -190,7 +184,6 @@ void QnPopupCollectionWidget::at_postponeAllButton_clicked() {
 }
 
 void QnPopupCollectionWidget::at_minimizeButton_clicked() {
-    action(Qn::TogglePopupsAction)->setChecked(ui->verticalLayout->count() > 0);
     hide();
 }
 

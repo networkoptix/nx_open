@@ -132,12 +132,6 @@ namespace Qn {
          */
         EscapeHotkeyAction,
 
-        /**
-         * Toggles visibility of popup windows.
-         */
-        TogglePopupsAction,
-
-
         /* Main menu actions. */
 
         /**

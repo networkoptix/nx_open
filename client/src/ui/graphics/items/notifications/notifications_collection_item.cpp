@@ -2,10 +2,11 @@
 
 #include <QtGui/QGraphicsLinearLayout>
 
+#include <core/resource/resource.h>
+
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
-
 #include <ui/style/skin.h>
 
 QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
@@ -49,15 +50,24 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
 QnNotificationsCollectionItem::~QnNotificationsCollectionItem() {
 }
 
-bool QnNotificationsCollectionItem::addSystemHealthEvent(QnSystemHealth::MessageType message) {
-    QnNotificationItem *item = new QnNotificationItem(m_list);
-    m_list->addItem(item, message <= QnSystemHealth::ConnectionLost);
-
-    return true;
-}
-
 QRectF QnNotificationsCollectionItem::headerGeometry() const {
     return m_headerWidget->geometry();
+}
+
+void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
+    QnNotificationItem *item = new QnNotificationItem(m_list);
+    item->setText(BusinessActionType::toString(businessAction->actionType()));
+    m_list->addItem(item, true);
+}
+
+void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources) {
+    QnNotificationItem *item = new QnNotificationItem(m_list);
+    item->setText(QnSystemHealth::toString(message));
+    m_list->addItem(item, true);
+}
+
+void QnNotificationsCollectionItem::hideAll() {
+    m_list->clear();
 }
 
 void QnNotificationsCollectionItem::at_list_itemRemoved(QnNotificationItem *item) {
