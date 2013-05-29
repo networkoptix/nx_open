@@ -2421,7 +2421,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     if (!widget)
         return;
 
-    QnResourceDisplay *display = widget->display();
+    QnResourceDisplay *display = widget->display().data();
     const QnResourceVideoLayout *layout = display->videoLayout();
 
     // TODO: #Elric move out, common code
@@ -3138,7 +3138,12 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
         if (m_exportStorage && (m_exportedMediaRes->hasFlags(QnResource::utc)))
             role = QnStreamRecorder::Role_FileExportWithEmptyContext;
-        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage, role);
+        QRect rect(100,100, 200, 50);
+        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, 
+                                                      (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage, 
+                                                       role, 
+                                                       0, 0,
+                                                       rect);
 
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->getUrl()).arg(m_layoutFileName));
@@ -3331,6 +3336,8 @@ Do you want to continue?"),
     }
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
+    QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
+
 #ifdef Q_OS_WIN
     if (selectedFilter.contains(binaryFilterName(false)))
     {
@@ -3342,7 +3349,6 @@ Do you want to continue?"),
 
         QnLayoutResourcePtr newLayout(new QnLayoutResource());
 
-        QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
         itemData.uuid = QUuid::createUuid();
         newLayout->addItem(itemData);
         saveLayoutToLocalFile(period, newLayout, fileName, LayoutExport_Export, false);
@@ -3378,7 +3384,9 @@ Do you want to continue?"),
         }
         qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
         m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1), 
-                                                  QnStorageResourcePtr(), role, timeOffset, serverTimeZone);
+                                                  QnStorageResourcePtr(), role, 
+                                                  timeOffset, serverTimeZone,
+                                                  itemData.zoomRect);
         exportProgressDialog->exec();
     }
 }

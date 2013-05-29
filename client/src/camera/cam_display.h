@@ -45,7 +45,9 @@ public:
     QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* reader);
     ~QnCamDisplay();
 
-    void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
+    void addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bool canDownscale);
+    void removeVideoRenderer(QnAbstractRenderer* vw);
+
     virtual bool processData(QnAbstractDataPacketPtr data);
 
     virtual void pleaseStop() override;
@@ -87,7 +89,7 @@ public:
     bool isEOFReached() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
-    QSize getScreenSize() const;
+    QSize getMaxScreenSize() const;
     QnArchiveStreamReader* getArchiveReader() const;
     bool isFullScreen() const;
     void setFullScreen(bool fullScreen);

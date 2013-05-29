@@ -15,7 +15,6 @@ class QnGLRenderer;
 
 class QnResourceWidgetRenderer
 :
-    public QObject,
     public QnAbstractRenderer
 {
     Q_OBJECT;
@@ -24,7 +23,9 @@ public:
     /*!
         \param context MUST not be NULL
     */
-    QnResourceWidgetRenderer( int channelCount, QObject* parent, const QGLContext* context );
+    QnResourceWidgetRenderer(QObject* parent, const QGLContext* context );
+    void setChannelCount(int channelCount);
+
 
     virtual ~QnResourceWidgetRenderer();
 
@@ -69,6 +70,8 @@ public:
     QSize sourceSize() const;
 
     const QGLContext* glContext() const;
+
+    bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
 
 signals:
     /**

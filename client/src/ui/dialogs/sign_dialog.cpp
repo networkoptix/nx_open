@@ -111,9 +111,9 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
 
     connect(m_camDispay, SIGNAL(gotImageSize(int, int)), this, SLOT(at_gotImageSize(int, int)));
 
-    m_renderer = new QnResourceWidgetRenderer(1, 0, m_glWindow->context());
+    m_renderer = new QnResourceWidgetRenderer(0, m_glWindow->context());
     m_glWindow->setRenderer(m_renderer);
-    m_camDispay->addVideoChannel(0, m_renderer, true);
+    m_camDispay->addVideoRenderer(1, m_renderer, true);
     m_camDispay->setSpeed(1024*1024);
     m_reader->addDataProcessor(m_camDispay);
     m_reader->start();

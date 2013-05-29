@@ -91,6 +91,7 @@ public:
     */
     void setServerTimeZoneMs(int value);
 
+    void setSrcRect(const QRectF& srcRect);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -165,7 +166,7 @@ private:
     QnCompressedVideoDataPtr m_lastIFrame;
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     QnFfmpegAudioTranscoder* m_audioTranscoder;
-    QnFfmpegVideoTranscoder* m_videoTranscoder[CL_MAX_CHANNELS];
+    QnFfmpegVideoTranscoder* m_videoTranscoder;
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
     int m_onscreenDateOffset;
@@ -174,6 +175,7 @@ private:
 
     qint64 m_nextIFrameTime;
     qint64 m_truncateIntervalEps;
+    QRectF m_srcRect;
 };
 
 #endif // _STREAM_RECORDER_H__

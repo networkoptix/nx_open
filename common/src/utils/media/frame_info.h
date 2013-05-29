@@ -152,8 +152,8 @@ public:
     static bool isPixelFormatSupported(PixelFormat format);
     void setUseExternalData(bool value);
     bool isExternalData() const { return m_useExternalData; }
-    void setDisplaying(bool value) {m_displaying = value; }
-    bool isDisplaying() const { return m_displaying; }
+    //void setDisplaying(bool value) {m_displaying = value; }
+    //bool isDisplaying() const { return m_displaying; }
     void reallocate(int newWidth, int newHeight, int format);
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
 
@@ -175,7 +175,7 @@ private:
 
 private:
     bool m_useExternalData; // pointers only copied to this frame
-    bool m_displaying;
+    //bool m_displaying;
 
     CLVideoDecoderOutput( const CLVideoDecoderOutput& );
     const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );

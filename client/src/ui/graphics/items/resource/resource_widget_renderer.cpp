@@ -12,34 +12,16 @@
 #include "decodedpicturetoopengluploadercontextpool.h"
 
 
-QnResourceWidgetRenderer::QnResourceWidgetRenderer(
-    int channelCount,
-    QObject* parent,
-    const QGLContext* context )
+QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, const QGLContext* context )
 :
-    QObject( parent ),
+    QnAbstractRenderer( parent ),
     m_glContext( context )
 {
-    if( !channelCount )
-        return;
-
     Q_ASSERT( context != NULL );
 
     const QGLContext* currentContextBak = QGLContext::currentContext();
     if( context && (currentContextBak != context) )
         const_cast<QGLContext*>(context)->makeCurrent();
-
-    m_channelRenderers.resize( channelCount );
-    for( int i = 0; i < channelCount; ++i )
-    {
-        RenderingTools renderingTools;
-        renderingTools.uploader = new DecodedPictureToOpenGLUploader( context );
-        renderingTools.uploader->setForceSoftYUV( qnSettings->isSoftwareYuv() );
-        renderingTools.renderer = new QnGLRenderer( context, *renderingTools.uploader );
-        renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());
-        renderingTools.uploader->setNV12ToRgbShaderUsed(renderingTools.renderer->isNV12ToRgbShaderUsed());
-        m_channelRenderers[i] = renderingTools;
-    }
 
     if( context && currentContextBak != context ) {
         if( currentContextBak )
@@ -47,9 +29,42 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(
         else
             const_cast<QGLContext*>(context)->doneCurrent();
     }
+
+    setChannelCount(1);
 }
 
-void QnResourceWidgetRenderer::beforeDestroy() {
+void QnResourceWidgetRenderer::setChannelCount(int channelCount)
+{
+    if( !channelCount )
+        return;
+
+    Q_ASSERT( m_glContext != NULL );
+
+    for (int i = channelCount; i < m_channelRenderers.size(); ++i)
+    {
+        delete m_channelRenderers[i].renderer;
+        delete m_channelRenderers[i].uploader;
+    }
+
+    m_channelRenderers.resize( channelCount );
+
+    for( int i = 0; i < channelCount; ++i )
+    {
+        if (m_channelRenderers[i].uploader == 0) {
+            RenderingTools renderingTools;
+            renderingTools.uploader = new DecodedPictureToOpenGLUploader( m_glContext );
+            renderingTools.uploader->setForceSoftYUV( qnSettings->isSoftwareYuv() );
+            renderingTools.renderer = new QnGLRenderer( m_glContext, *renderingTools.uploader );
+            renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());
+            renderingTools.uploader->setNV12ToRgbShaderUsed(renderingTools.renderer->isNV12ToRgbShaderUsed());
+            m_channelRenderers[i] = renderingTools;
+        }
+    }
+}
+
+void QnResourceWidgetRenderer::beforeDestroy() 
+{
+    QnAbstractRenderer::beforeDestroy();
     foreach(RenderingTools ctx, m_channelRenderers)
     {
         if( ctx.renderer )
@@ -232,4 +247,12 @@ QSize QnResourceWidgetRenderer::sourceSize() const {
 const QGLContext* QnResourceWidgetRenderer::glContext() const
 {
     return m_glContext;
+}
+
+bool QnResourceWidgetRenderer::isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const
+{
+    RenderingTools& ctx = m_channelRenderers[image->channel];
+    if( !ctx.uploader )
+        return false;
+    return ctx.uploader->isUsingFrame( image );
 }

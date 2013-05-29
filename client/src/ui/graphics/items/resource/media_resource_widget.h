@@ -10,10 +10,25 @@
 #include <api/api_fwd.h>
 
 #include <client/client_globals.h>
+#include "camera/resource_display.h"
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 
+
+namespace detail {
+    class QnRendererGuard: public QObject {
+        Q_OBJECT;
+    public:
+        QnRendererGuard(QnAbstractRenderer *renderer): m_renderer(renderer) {}
+        virtual ~QnRendererGuard();
+
+        QnAbstractRenderer *renderer() const { return m_renderer; }
+    private:
+        QnAbstractRenderer *m_renderer;
+    };
+
+} // namespace detail
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -38,7 +53,7 @@ public:
     /**
      * \returns                         Display associated with this widget.
      */
-    QnResourceDisplay *display() const {
+    QnResourceDisplayPtr display() const {
         return m_display;
     }
 
@@ -132,7 +147,7 @@ private slots:
     void at_zoomWindowButton_toggled(bool checked);
 
     void at_camDisplay_liveChanged();
-
+    void at_updateResourceDisplay();
 private:
     int currentRecordingMode();
 
@@ -147,7 +162,7 @@ private:
     QnVirtualCameraResourcePtr m_camera;
 
     /** Display. */
-    QnResourceDisplay *m_display;
+    QnResourceDisplayPtr m_display;
 
     /** Associated renderer. */
     QnResourceWidgetRenderer *m_renderer;
@@ -176,6 +191,11 @@ private:
     mutable bool m_motionSelectionCacheValid;
 
     QStaticText m_sensStaticText[10];
+
+    QnMediaResourceWidget* zoomTargetWidget;
+
+    /** List of associated renderer guards. */
+    //QList<detail::QnRendererGuard *> m_guards;
 };
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H

@@ -1014,14 +1014,14 @@ public:
     {
         setAutoDelete( false );
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
-        m_src->setDisplaying( true );
+        //m_src->setDisplaying( true );
 #endif
     }
 
     ~AVPacketUploader()
     {
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
-        m_src->setDisplaying( false );
+        //m_src->setDisplaying( false );
 #endif
     }
 
@@ -1059,6 +1059,11 @@ public:
     bool success() const
     {
         return m_success;
+    }
+
+    const QSharedPointer<CLVideoDecoderOutput>& decodedFrame() const
+    {
+        return m_src;
     }
 
     DecodedPictureToOpenGLUploader::UploadedPicture* picture()
@@ -1438,6 +1443,21 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
         //else
         //    m_emptyBuffers.push_back( emptyPictureBuf );        //considering picture buffer invalid
     }
+}
+
+bool DecodedPictureToOpenGLUploader::isUsingFrame( const QSharedPointer<CLVideoDecoderOutput>& image ) const
+{
+    QMutexLocker lk( &m_mutex );
+
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+    foreach( AVPacketUploader* uploader, m_framesWaitingUploadInGUIThread )
+    {
+        if( uploader->decodedFrame() == image )
+            return true;
+    }
+#endif
+
+    return false;
 }
 
 DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader::getUploadedPicture() const

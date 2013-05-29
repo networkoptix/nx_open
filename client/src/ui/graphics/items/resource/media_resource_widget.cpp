@@ -41,8 +41,14 @@
 //TODO: #Elric remove
 #include "camera/caching_time_period_loader.h"
 #include "ui/workbench/workbench_navigator.h"
+#include "ui/workbench/workbench_item.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
+
+
+detail::QnRendererGuard::~QnRendererGuard() {
+    delete m_renderer;
+}
 
 namespace {
     template<class T>
@@ -54,8 +60,6 @@ namespace {
     }
 
 } // anonymous namespace
-
-
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
@@ -69,21 +73,25 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         qnCritical("Media resource widget was created with a non-media resource.");
     m_camera = m_resource.dynamicCast<QnVirtualCameraResource>();
 
-    /* Set up video rendering. */
-    m_display = new QnResourceDisplay(m_resource, this);
-    connect(m_resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
-    connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
-    connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
-    setChannelLayout(m_display->videoLayout());
 
     // TODO: #Elric
     // Strictly speaking, this is a hack.
     // We shouldn't be using OpenGL context in class constructor.
     QGraphicsView *view = QnWorkbenchContextAware::display()->view();
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
-    m_renderer = new QnResourceWidgetRenderer(channelCount(), NULL, viewport ? viewport->context() : NULL);
+    m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
-    m_display->addRenderer(m_renderer);
+    //m_guards.push_back(new detail::QnRendererGuard(m_renderer));
+    //connect(m_renderer, SIGNAL(canBeDestroyed()), m_guards.last(), SLOT(deleteLater()), Qt::QueuedConnection);
+    connect(m_renderer, SIGNAL(canBeDestroyed()), m_renderer, SLOT(deleteLater()), Qt::QueuedConnection);
+
+
+    connect(m_resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
+
+    connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(at_updateResourceDisplay()) );
+    
+    
+    at_updateResourceDisplay();
 
     /* Set up static text. */
     for (int i = 0; i < 10; ++i) {
@@ -147,14 +155,42 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateAspectRatio();
 }
 
-QnMediaResourceWidget::~QnMediaResourceWidget() {
+QnMediaResourceWidget::~QnMediaResourceWidget() 
+{
     ensureAboutToBeDestroyedEmitted();
 
-    delete m_display;
+    if (m_display)
+        m_display->removeRenderer(m_renderer);
+
+    m_renderer->beforeDestroy();
 
     foreach(__m128i *data, m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
+
+}
+
+void QnMediaResourceWidget::at_updateResourceDisplay()
+{
+    zoomTargetWidget = dynamic_cast<QnMediaResourceWidget*> (QnWorkbenchContextAware::display()->widget(item()->zoomTargetItem()));
+
+    if (m_display)
+        m_display->removeRenderer(m_renderer);
+
+    if (zoomTargetWidget /* && syncPlayEnabled() */) 
+        m_display = zoomTargetWidget->display();
+    else 
+        m_display = QnResourceDisplayPtr(new QnResourceDisplay(m_resource, this));
+
+    setChannelLayout(m_display->videoLayout());
+    m_display->addRenderer(m_renderer);
+
+    m_display->disconnect(this);
+
+    connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
+    connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
+
+    m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
