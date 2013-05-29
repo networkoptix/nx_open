@@ -165,11 +165,20 @@ QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
 Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity) {
     frameDisplayed();
 
-    RenderingTools& ctx = m_channelRenderers[channel];
-    if( !ctx.renderer )
+    RenderingTools &ctx = m_channelRenderers[channel];
+    if(!ctx.renderer)
         return Qn::NothingRendered;
     ctx.uploader->setOpacity(opacity);
     return ctx.renderer->paint(sourceRect, targetRect);
+}
+
+void QnResourceWidgetRenderer::skip(int channel) {
+    frameDisplayed();
+
+    RenderingTools &ctx = m_channelRenderers[channel];
+    if(!ctx.renderer)
+        return;
+    ctx.uploader->discardAllFramesPostedToDisplay();
 }
 
 void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image) {

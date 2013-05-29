@@ -1,8 +1,12 @@
+
 #include "business_event_parameters.h"
+
+#include <QVariant>
 
 #include "events/abstract_business_event.h"
 
-static QLatin1String PARAM_NAMES[] =
+
+static QString PARAM_NAMES[] =
 {
     QLatin1String("eventType"),
     QLatin1String("eventTimestamp"),

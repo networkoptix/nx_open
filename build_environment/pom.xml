@@ -63,6 +63,13 @@
 			<type>zip</type>
 			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>                               	
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>festival</artifactId>
+			<version>${festival.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>                               	
 	</dependencies>		
 
 	<build>

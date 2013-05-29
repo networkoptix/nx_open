@@ -28,6 +28,11 @@ namespace Qn {
  */
 QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement);
 
+/**
+ * \param string                        String to perform replacement on.
+ * \param replacement                   Character to use as a replacement.
+ * \returns                             String with all non-filename characters replaces with \a replacement.
+ */
 inline QString replaceNonFileNameCharacters(const QString &string, const QChar &replacement) {
     return replaceCharacters(string, "\\/:*?\"<>|", replacement);
 }

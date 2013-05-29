@@ -3,8 +3,10 @@
 
 #include <vector>
 
-#include <QtCore/QSharedPointer>
 #include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QMetaType>
+#include <QtCore/QSharedPointer>
 
 class QnAbstractBusinessEvent;
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;

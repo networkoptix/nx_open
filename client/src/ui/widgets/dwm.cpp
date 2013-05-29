@@ -496,7 +496,10 @@ bool QnDwmPrivate::calcSizeEvent(MSG *message, long *result) {
 bool QnDwmPrivate::compositionChangedEvent(MSG *message, long *result) {
     Q_UNUSED(message);
 
-    emit q->compositionChanged(q->isCompositionEnabled());
+    emit q->compositionChanged();
+
+    /* We also need to repaint the window. */
+    widget->update();
 
     *result = 0;
     return false; /* It's OK to let it fall through. */

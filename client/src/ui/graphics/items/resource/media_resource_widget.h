@@ -173,6 +173,8 @@ private:
     /** Painter path cache for the list of selected regions. */
     QList<QPainterPath> m_motionSelectionPathCache;
 
+    QVector<bool> m_paintedChannels;
+
     /** Image region where motion is currently present, in parrots. */
     mutable QList<QnMotionRegion> m_motionSensitivity;
 

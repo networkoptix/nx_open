@@ -178,7 +178,12 @@ public:
     quint64 nextFrameToDisplayTimestamp() const;
     //!Blocks until all submitted frames have been rendered
     void waitForAllFramesDisplayed();
+    //!Marks all posted frames as non-ignorable
     void ensureAllFramesWillBeDisplayed();
+    //!Clears display queue
+    /*!
+        This method will not block if called from GUI thread. Otherwise, it can block till GUI thread finishes rendering of a picture
+    */
     void discardAllFramesPostedToDisplay();
     //!Blocks till frame currently being rendered is done
     void waitForCurrentFrameDisplayed();

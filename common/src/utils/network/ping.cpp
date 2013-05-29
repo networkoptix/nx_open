@@ -29,7 +29,6 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
     HANDLE hIcmpFile;
     unsigned long ipaddr = INADDR_NONE;
     DWORD dwRetVal = 0;
-    DWORD dwError = 0;
     char SendData[] = "Data Buffer";
 
     const DWORD ReplySize = sizeof (ICMP_ECHO_REPLY) + sizeof (SendData) + 8;;
