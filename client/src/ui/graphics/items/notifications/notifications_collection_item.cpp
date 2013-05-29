@@ -51,7 +51,7 @@ QnNotificationsCollectionItem::~QnNotificationsCollectionItem() {
 
 bool QnNotificationsCollectionItem::addSystemHealthEvent(QnSystemHealth::MessageType message) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
-    m_list->addItem(item, message == QnSystemHealth::EmailIsEmpty);
+    m_list->addItem(item, message <= QnSystemHealth::ConnectionLost);
 
     return true;
 }
@@ -61,5 +61,5 @@ QRectF QnNotificationsCollectionItem::headerGeometry() const {
 }
 
 void QnNotificationsCollectionItem::at_list_itemRemoved(QnNotificationItem *item) {
-    m_list->addItem(item);
+    delete item;
 }

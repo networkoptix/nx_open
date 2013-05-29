@@ -41,6 +41,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     layout->addItem(m_textLabel);
     layout->addStretch();
     layout->addItem(m_image);
+
     setLayout(layout);
 
 
@@ -78,7 +79,15 @@ void QnNotificationItem::setColor(const QColor &color) {
 }
 
 void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    QRectF spacer(0, margin, margin, totalHeight + margin);
+    QRadialGradient gradient(margin, totalHeight*.5 + margin, totalHeight*2);
+    gradient.setColorAt(0.0, m_color);
+    QColor gradientTo(m_color);
+    gradientTo.setAlpha(64);
+    gradient.setColorAt(0.5, gradientTo);
+    gradient.setColorAt(1.0, Qt::transparent);
 
-    painter->fillRect(spacer, m_color);
+    gradient.setSpread(QGradient::PadSpread);
+//    painter->fillRect(QRectF(0, 0, totalHeight*2, totalHeight + margin*2), QBrush(gradient));
+    painter->fillRect(boundingRect(), QBrush(gradient));
+
 }

@@ -27,6 +27,8 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
+
+    connect(this, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
 }
 
 QnNotificationListWidget::~QnNotificationListWidget() {
@@ -46,7 +48,7 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
 
     QSizeF result;
     foreach (QnItemState *state, m_items) {
-        if (state->state == QnItemState::Waiting)
+        if (!state->isVisible())
             continue;
 
         QSizeF itemSize = state->item->geometry().size();
@@ -88,14 +90,16 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
                     state->state = QnItemState::Displaying;
 
+                    state->item->setMinimumWidth(geometry().width());
                     state->item->setY(bottomY);
                     state->item->setX(state->item->geometry().width());
                     state->item->setVisible(true);
                     state->item->setOpacity(1.0);
-                    state->targetValue = 0.0;
+                    state->targetValue = 0.0; //target x-coord
                     state->item->setClickableButtons(state->item->clickableButtons() | Qt::RightButton);
                     connect(state->item, SIGNAL(clicked(Qt::MouseButton)), state, SLOT(unlockAndHide(Qt::MouseButton)));
-                    connect(state->item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
+                    //connect(state->item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
+                    updateGeometry();
                 }
                 break;
             }
@@ -105,7 +109,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 state->item->setX(value);
                 if (qFuzzyCompare(value, state->targetValue)) {
                     state->state = QnItemState::Displayed;
-                    state->targetValue = 0.0;
+                    state->targetValue = 0.0; //counter for display time
                 }
                 break;
             }
@@ -148,6 +152,8 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
     }
 
     // remove unused items
+    if (!itemsToDelete.isEmpty())
+        updateGeometry();
     foreach(QnItemState* deleting, itemsToDelete) {
         disconnect(deleting->item, 0, this, 0);
         m_items.removeOne(deleting);
@@ -175,6 +181,10 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
 }
 
 void QnNotificationListWidget::at_item_geometryChanged() {
-    prepareGeometryChange();
-    updateGeometry();
+    qDebug() << "catch: geometry changed";
+    foreach (QnItemState *state, m_items) {
+        if (!state->isVisible())
+            continue;
+        state->item->setMinimumWidth(geometry().width());
+    }
 }
