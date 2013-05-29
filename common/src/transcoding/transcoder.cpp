@@ -46,25 +46,35 @@ void QnCodecTranscoder::setQuality( QnStreamQuality quality )
     m_quality = quality;
 }
 
-void QnCodecTranscoder::setSrcRect(const QRect& srcRect)
+void QnCodecTranscoder::setSrcRect(const QRectF& srcRect)
+{
+    m_srcRectF = srcRect;
+}
+
+QRect QnCodecTranscoder::roundRect(const QRect& srcRect) const
 {
     int left = qPower2Floor((unsigned) srcRect.left(), 16);
-    int right = qPower2Ceil((unsigned) srcRect.right()+1, 16);
-
     int top = qPower2Floor((unsigned) srcRect.top(), 2);
-    int bottom = qPower2Ceil((unsigned) srcRect.bottom()+1, 2);
 
-    m_srcRect = QRect(left, top, right-left, bottom - top);
+    int width = qPower2Ceil((unsigned) srcRect.width(), 16);
+    int height = qPower2Ceil((unsigned) srcRect.height(), 2);
+
+    return QRect(left, top, width, height);
 }
 
 // --------------------------- QnVideoTranscoder -----------------
 
 QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
-    QnCodecTranscoder(codecId)
+    QnCodecTranscoder(codecId),
+    m_layout(0)
 {
 
 }
 
+void QnVideoTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
+{
+    m_layout = layout;
+}
 
 void QnVideoTranscoder::setResolution(const QSize& value)
 {
@@ -81,10 +91,14 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
+
+    /*
     if (m_resolution.isEmpty() && !m_srcRect.isEmpty()) {
         m_resolution = m_srcRect.size();
     }
-    else if (m_resolution.width() == 0 && m_resolution.height() > 0)
+    */
+
+    if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
         m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),16)); // round resolution height
         m_resolution.setHeight(qMin(decoder.getContext()->height, m_resolution.height())); // strict to source frame height
@@ -94,8 +108,24 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
         m_resolution.setWidth(qPower2Ceil((unsigned) m_resolution.width(),16)); // round resolution width
         m_resolution.setWidth(qMin(decoder.getContext()->width, m_resolution.width())); // strict to source frame width
     }
-    else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty())
+    else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty()) {
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
+    }
+
+    int width = m_resolution.width();
+    int height = m_resolution.height();
+    if (!m_srcRectF.isEmpty())
+    {
+        width  *= m_srcRectF.width();
+        height *= m_srcRectF.height();
+    }
+    if (m_layout) {
+        width *= m_layout->size().width();
+        height *= m_layout->size().height();
+    }
+
+    m_resolution.setWidth(qPower2Ceil((unsigned)width,16));
+    m_resolution.setHeight(qPower2Ceil((unsigned)height,2));
 
     return true;
 }

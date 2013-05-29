@@ -67,14 +67,16 @@ public:
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) = 0;
     QString getLastError() const;
     virtual void setQuality( QnStreamQuality quality );
-    void setSrcRect(const QRect& srcRect);
+    void setSrcRect(const QRectF& srcRect);
+protected:
+    QRect roundRect(const QRect& srcRect) const;
 protected:
     QString m_lastErrMessage;
     QnCodecParams::Value m_params;
     int m_bitrate;
     CodecID m_codecId;
     QnStreamQuality m_quality;
-    QRect m_srcRect;
+    QRectF m_srcRectF;
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 
@@ -93,10 +95,12 @@ public:
     virtual void setResolution( const QSize& value );
     //!Returns picture size (in pixels) of output video stream
     QSize getResolution() const;
+    void setVideoLayout(const QnResourceVideoLayout* layout);
 
     virtual bool open(QnCompressedVideoDataPtr video);
 protected:
     QSize m_resolution;
+    const QnResourceVideoLayout* m_layout;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 

@@ -356,6 +356,7 @@ QString QnPlOnvifResource::getVendorName() const
 
 bool QnPlOnvifResource::hasDualStreaming() const
 {
+    return false;
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
     this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
@@ -1537,7 +1538,7 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
 {
     QMutexLocker lock(&m_mutex);
 
-    bool dualStreaming = m_secondaryResolution != EMPTY_RESOLUTION_PAIR && !m_secondaryVideoEncoderId.isEmpty();
+    bool dualStreaming = false; //m_secondaryResolution != EMPTY_RESOLUTION_PAIR && !m_secondaryVideoEncoderId.isEmpty();
     if (dualStreaming)
         qDebug() << "ONVIF debug: enable dualstreaming for camera" << getHostAddress();
     else {

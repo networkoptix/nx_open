@@ -468,7 +468,14 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         m_formatCtx->start_time = mediaData->timestamp;
 
-        m_videoChannels = layout->channelCount();
+        // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
+        // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
+        bool isTranscode = m_role == Role_FileExportWithTime || 
+            (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
+            !m_srcRect.isEmpty();
+
+
+        m_videoChannels = isTranscode ? 1 : layout->channelCount();
         int bottomRightChannel = 0;
         int hPos = -1, vPos = -1;
         for (int i = 0; i < m_videoChannels; ++i) 
@@ -480,12 +487,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 vPos = position.y();
             }
         }
-
-        // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
-        // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
-        bool isTranscode = m_role == Role_FileExportWithTime || 
-            (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
-            !m_srcRect.isEmpty();
 
         for (int i = 0; i < m_videoChannels; ++i) 
         {
@@ -518,10 +519,9 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                     m_videoTranscoder[i]->setDrawDateTime(QnFfmpegVideoTranscoder::Date_RightBottom);
                 m_videoTranscoder[i]->setOnScreenDateOffset(m_onscreenDateOffset);
                 m_videoTranscoder[i]->setQuality(QnQualityHighest);
-                if (!m_srcRect.isEmpty()) {
-                    QRect rect = m_srcRect.toRect(); // todo: strict rect for multisensor
-                    m_videoTranscoder[i]->setSrcRect(rect);
-                }
+                if (!m_srcRect.isEmpty())
+                    m_videoTranscoder[i]->setSrcRect(m_srcRect);
+                m_videoTranscoder[i]->setVideoLayout(layout);
                 m_videoTranscoder[i]->open(mediaData);
 
                 avcodec_copy_context(videoStream->codec, m_videoTranscoder[i]->getCodecContext());
