@@ -67,7 +67,7 @@ protected:
 
     virtual void tick(int deltaMSecs) override;
 private slots:
-    void at_item_geometryChanged();
+    void at_geometryChanged();
 
 private:
     HoverFocusProcessor* m_hoverProcessor;

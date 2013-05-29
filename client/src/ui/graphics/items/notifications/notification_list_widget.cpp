@@ -15,6 +15,7 @@ namespace {
     int hideTimeoutMs = 1000;
     int hoverLeaveTimeoutMSec = 250;
 
+    qreal widgetWidth = 200;
 }
 
 QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::WindowFlags flags):
@@ -28,7 +29,7 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
 
-    connect(this, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
+    connect(this, SIGNAL(geometryChanged()), this, SLOT(at_geometryChanged()));
 }
 
 QnNotificationListWidget::~QnNotificationListWidget() {
@@ -46,7 +47,7 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
     if (m_items.isEmpty())
         return QSizeF();
 
-    QSizeF result;
+    QSizeF result(widgetWidth, 0);
     foreach (QnItemState *state, m_items) {
         if (!state->isVisible())
             continue;
@@ -54,7 +55,7 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
         QSizeF itemSize = state->item->geometry().size();
         if (itemSize.isNull())
             continue;
-        result.setWidth(qMax(result.width(), itemSize.width()));
+//        result.setWidth(qMax(result.width(), itemSize.width()));
         result.setHeight(result.height() + itemSize.height());
     }
     return result;
@@ -95,10 +96,9 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                     state->item->setX(state->item->geometry().width());
                     state->item->setVisible(true);
                     state->item->setOpacity(1.0);
-                    state->targetValue = 0.0; //target x-coord
+                    state->targetValue = widgetWidth - state->item->geometry().width(); //target x-coord
                     state->item->setClickableButtons(state->item->clickableButtons() | Qt::RightButton);
                     connect(state->item, SIGNAL(clicked(Qt::MouseButton)), state, SLOT(unlockAndHide(Qt::MouseButton)));
-                    //connect(state->item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
                     updateGeometry();
                 }
                 break;
@@ -185,10 +185,10 @@ void QnNotificationListWidget::clear() {
     }
 }
 
-void QnNotificationListWidget::at_item_geometryChanged() {
-    foreach (QnItemState *state, m_items) {
+void QnNotificationListWidget::at_geometryChanged() {
+  /*  foreach (QnItemState *state, m_items) {
         if (!state->isVisible())
             continue;
         state->item->setMinimumWidth(geometry().width());
-    }
+    }*/
 }
