@@ -120,7 +120,7 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
                                             QnStorageResourcePtr storage, 
                                             QnStreamRecorder::Role role, 
                                             int timeOffsetMs, int serverTimeZoneMs,
-                                            QRect srcRect)
+                                            QRectF srcRect)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
@@ -150,6 +150,7 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
         m_exportRecorder->disconnect(this);
         if (storage)
             m_exportRecorder->setStorage(storage);
+        m_exportRecorder->setSrcRect(srcRect);
         connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SLOT(onExportFailed(QString)));
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
         connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SLOT(at_exportProgress(int)));

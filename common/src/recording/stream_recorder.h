@@ -91,6 +91,7 @@ public:
     */
     void setServerTimeZoneMs(int value);
 
+    void setSrcRect(const QRectF& srcRect);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -174,7 +175,7 @@ private:
 
     qint64 m_nextIFrameTime;
     qint64 m_truncateIntervalEps;
-    QRect m_srcRect;
+    QRectF m_srcRect;
 };
 
 #endif // _STREAM_RECORDER_H__

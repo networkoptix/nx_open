@@ -48,7 +48,13 @@ void QnCodecTranscoder::setQuality( QnStreamQuality quality )
 
 void QnCodecTranscoder::setSrcRect(const QRect& srcRect)
 {
-    m_srcRect = srcRect;
+    int left = qPower2Floor((unsigned) srcRect.left(), 16);
+    int right = qPower2Ceil((unsigned) srcRect.right()+1, 16);
+
+    int top = qPower2Floor((unsigned) srcRect.top(), 2);
+    int bottom = qPower2Ceil((unsigned) srcRect.bottom()+1, 2);
+
+    m_srcRect = QRect(left, top, right-left, bottom - top);
 }
 
 // --------------------------- QnVideoTranscoder -----------------
@@ -75,7 +81,10 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
-    if (m_resolution.width() == 0 && m_resolution.height() > 0)
+    if (m_resolution.isEmpty() && !m_srcRect.isEmpty()) {
+        m_resolution = m_srcRect.size();
+    }
+    else if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
         m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),16)); // round resolution height
         m_resolution.setHeight(qMin(decoder.getContext()->height, m_resolution.height())); // strict to source frame height

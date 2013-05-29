@@ -481,6 +481,12 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             }
         }
 
+        // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
+        // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
+        bool isTranscode = m_role == Role_FileExportWithTime || 
+            (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
+            !m_srcRect.isEmpty();
+
         for (int i = 0; i < m_videoChannels; ++i) 
         {
             // TODO: #vasilenko avoid using deprecated methods
@@ -501,11 +507,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 videoCodecCtx->pix_fmt = PIX_FMT_YUV420P;
 
 
-            // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
-            // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
-            bool isTranscode = m_role == Role_FileExportWithTime || 
-                              (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != videoCodecCtx->codec_id) || 
-                              !m_srcRect.isEmpty();
             if (isTranscode)
             {
                 // transcode video
@@ -517,11 +518,12 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                     m_videoTranscoder[i]->setDrawDateTime(QnFfmpegVideoTranscoder::Date_RightBottom);
                 m_videoTranscoder[i]->setOnScreenDateOffset(m_onscreenDateOffset);
                 m_videoTranscoder[i]->setQuality(QnQualityHighest);
-                m_videoTranscoder[i]->open(mediaData);
                 if (!m_srcRect.isEmpty()) {
-                    QRect rect = m_srcRect; // todo: strict rect for multisensor
+                    QRect rect = m_srcRect.toRect(); // todo: strict rect for multisensor
                     m_videoTranscoder[i]->setSrcRect(rect);
                 }
+                m_videoTranscoder[i]->open(mediaData);
+
                 avcodec_copy_context(videoStream->codec, m_videoTranscoder[i]->getCodecContext());
             }
             else if (!m_forceDefaultCtx && mediaData->context && mediaData->context->ctx()->width > 0)
@@ -795,4 +797,9 @@ void QnStreamRecorder::setOnScreenDateOffset(int timeOffsetMs)
 void QnStreamRecorder::setServerTimeZoneMs(int value)
 {
     m_serverTimeZoneMs = value;
+}
+
+void QnStreamRecorder::setSrcRect(const QRectF& srcRect)
+{
+    m_srcRect = srcRect;
 }

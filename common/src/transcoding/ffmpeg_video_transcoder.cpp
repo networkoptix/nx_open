@@ -2,6 +2,17 @@
 #include "decoders/video/ffmpeg.h"
 #include <utils/color_space/yuvconvert.h>
 
+extern "C" {
+#ifdef WIN32
+#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#endif
+#include <libavutil/pixdesc.h>
+#ifdef WIN32
+#undef AVPixFmtDescriptor
+#endif
+};
+
+
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
 static const int MIN_TEXT_HEIGHT = 14;
@@ -26,6 +37,8 @@ m_bufXOffs(0),
 m_bufYOffs(0)
 {
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
+    m_decodedVideoFrame->setUseExternalData(true);
+    m_decodedFrameRect.setUseExternalData(true);
 }
 
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
@@ -44,13 +57,13 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
     qFreeAligned(m_imageBuffer);
 }
 
-int QnFfmpegVideoTranscoder::rescaleFrame()
+int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame)
 {
-    if (m_decodedVideoFrame->width != m_lastSrcWidth ||  m_decodedVideoFrame->height != m_lastSrcHeight)
+    if (decodedFrame->width != m_lastSrcWidth ||  decodedFrame->height != m_lastSrcHeight)
     {
         // src resolution is changed
-        m_lastSrcWidth = m_decodedVideoFrame->width;
-        m_lastSrcHeight = m_decodedVideoFrame->height;
+        m_lastSrcWidth = decodedFrame->width;
+        m_lastSrcHeight = decodedFrame->height;
         if (scaleContext) {
             sws_freeContext(scaleContext);
             scaleContext = 0;
@@ -59,7 +72,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
 
     if (scaleContext == 0)
     {
-        scaleContext = sws_getContext(m_decodedVideoFrame->width, m_decodedVideoFrame->height, (PixelFormat) m_decodedVideoFrame->format, 
+        scaleContext = sws_getContext(decodedFrame->width, decodedFrame->height, (PixelFormat) decodedFrame->format, 
                                       m_resolution.width(), m_resolution.height(), (PixelFormat) PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
         if (!scaleContext) {
             m_lastErrMessage = QObject::tr("Can't allocate scaler context for resolution %1x%2").arg(m_resolution.width()).arg(m_resolution.height());
@@ -69,8 +82,8 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
     }
 
     sws_scale(scaleContext,
-        m_decodedVideoFrame->data, m_decodedVideoFrame->linesize, 
-        0, m_decodedVideoFrame->height, 
+        decodedFrame->data, decodedFrame->linesize, 
+        0, decodedFrame->height, 
         m_scaledVideoFrame.data, m_scaledVideoFrame.linesize);
     //m_scaledVideoFrame.pkt_dts = m_decodedVideoFrame->pkt_dts;
     //m_scaledVideoFrame.pkt_pts = m_decodedVideoFrame->pkt_pts;
@@ -236,9 +249,26 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
     if (m_videoDecoder->decode(video, &m_decodedVideoFrame)) 
     {
         CLVideoDecoderOutput* decodedFrame = m_decodedVideoFrame.data();
-        m_decodedVideoFrame->pts = m_decodedVideoFrame->pkt_dts;
-        if (m_decodedVideoFrame->width != m_resolution.width() || m_decodedVideoFrame->height != m_resolution.height() || m_decodedVideoFrame->format != PIX_FMT_YUV420P) {
-            rescaleFrame();
+
+        if (!m_srcRect.isEmpty()) 
+        {
+            const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[decodedFrame->format];
+            for (int i = 0; i < descr->nb_components && decodedFrame->data[i]; ++i)
+            {
+                int w = m_srcRect.left();
+                if (i > 0)
+                    w >>= descr->log2_chroma_w;
+                m_decodedFrameRect.data[i] = decodedFrame->data[i] + w + m_srcRect.top() * decodedFrame->linesize[i];
+                m_decodedFrameRect.linesize[i] = decodedFrame->linesize[i];
+            }
+            m_decodedFrameRect.format = decodedFrame->format;
+            m_decodedFrameRect.width = m_srcRect.width();
+            m_decodedFrameRect.height = m_srcRect.height();
+            decodedFrame = &m_decodedFrameRect;
+        }
+
+        if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P) {
+            rescaleFrame(decodedFrame);
             decodedFrame = &m_scaledVideoFrame;
         }
 
@@ -246,7 +276,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             doDrawOnScreenTime(decodedFrame);
 
         static AVRational r = {1, 1000000};
-        decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
+        decodedFrame->pts  = av_rescale_q(m_decodedVideoFrame->pkt_dts, r, m_encoderCtx->time_base);
         if ((quint64)m_firstEncodedPts == AV_NOPTS_VALUE)
             m_firstEncodedPts = decodedFrame->pts;
 

@@ -32,13 +32,14 @@ public:
     void setOnScreenDateOffset(int timeOffsetMs);
 
 private:
-    int rescaleFrame();
+    int rescaleFrame(CLVideoDecoderOutput* decodedFrame);
     void doDrawOnScreenTime(CLVideoDecoderOutput* frame);
     void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);
 private:
     CLFFmpegVideoDecoder* m_videoDecoder;
     QSharedPointer<CLVideoDecoderOutput> m_decodedVideoFrame;
     CLVideoDecoderOutput m_scaledVideoFrame;
+    CLVideoDecoderOutput m_decodedFrameRect;
     quint8* m_videoEncodingBuffer;
     AVCodecContext* m_encoderCtx;
     SwsContext* scaleContext;
