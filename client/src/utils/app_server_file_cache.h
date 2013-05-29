@@ -38,6 +38,8 @@ public:
     void uploadFile(const QString &filename);
 
     void deleteFile(const QString &filename);
+protected:
+    void ensureCacheFolder();
 signals:
     void fileDownloaded(const QString& filename, bool ok);
     void fileUploaded(const QString& filename, bool ok);

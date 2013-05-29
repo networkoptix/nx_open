@@ -32,7 +32,7 @@
 
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
-#include <business/business_logic_common.h>
+#include <business/business_fwd.h>
 
 #include <licensing/license.h>
 #include "connectinfo.h"
@@ -113,7 +113,7 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
     qRegisterMetaType<QnAbstractBusinessActionList>();
-    qRegisterMetaType<QnLightBusinessActionVectorPtr>();
+    qRegisterMetaType<QnBusinessActionDataListPtr>();
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
     qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<QnBusinessEventRulePtr>();

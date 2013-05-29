@@ -1,11 +1,13 @@
 #ifndef __ABSTRACT_BUSINESS_EVENT_H_
 #define __ABSTRACT_BUSINESS_EVENT_H_
 
-#include <QByteArray>
-#include <QSharedPointer>
-#include "core/resource/resource_fwd.h"
-#include <business/business_logic_common.h>
-#include "../business_event_parameters.h"
+#include <QtCore/QByteArray>
+#include <QtCore/QSharedPointer>
+
+#include <common/common_globals.h>
+#include <core/resource/resource_fwd.h>
+#include <business/business_fwd.h>
+#include <business/business_event_parameters.h>
 
 
 namespace BusinessEventType
@@ -45,7 +47,7 @@ protected:
      * @param toggleState       On/off state of the event if it is toggleable.
      * @param timeStamp         Event date and time in usec from UTC.
      */
-    QnAbstractBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, ToggleState::Value toggleState, qint64 timeStamp);
+    QnAbstractBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp);
 
 public:
     virtual ~QnAbstractBusinessEvent();
@@ -63,18 +65,16 @@ public:
     BusinessEventType::Value getEventType() const { return m_eventType; }
 
     /**
-     * @brief getToggleState    Get on/off state of the event.
-     * @return                  Enumeration value. See ToggleState::Value.
+     * @return                  On/off state of the event.
      */
-    ToggleState::Value getToggleState()     const { return m_toggleState; }
+    Qn::ToggleState getToggleState()     const { return m_toggleState; }
 
     /**
-     * @brief checkCondition    Checks event parameters. Default implementation includes
-     *                          check agains ToggleState only.
+     * @brief checkCondition    Checks event parameters. 
      * @param params            Parameters of an event that are selected in rule.
      * @return                  True if event should be handled, false otherwise.
      */
-    virtual bool checkCondition (ToggleState::Value state, const QnBusinessEventParameters& params) const = 0;
+    virtual bool checkCondition(Qn::ToggleState state, const QnBusinessEventParameters& params) const = 0;
 
     virtual QnBusinessEventParameters getRuntimeParams() const;
 
@@ -97,10 +97,8 @@ private:
     /**
      * @brief m_toggleState     State on/off for togglable events.
      */
-    const ToggleState::Value m_toggleState;
+    const Qn::ToggleState m_toggleState;
 };
-
-typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;
 
 Q_DECLARE_METATYPE(BusinessEventType::Value)
 Q_DECLARE_METATYPE(QnAbstractBusinessEventPtr)

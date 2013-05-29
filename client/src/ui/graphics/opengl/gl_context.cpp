@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "glcontext.h"
+#include "gl_context.h"
 
 #ifdef NX_GLCONTEXT_PRESENT
 

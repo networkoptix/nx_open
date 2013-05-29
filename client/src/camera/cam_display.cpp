@@ -194,13 +194,24 @@ void QnCamDisplay::resume()
     QnAbstractDataConsumer::resume();
 }
 
-void QnCamDisplay::addVideoChannel(int index, QnAbstractRenderer* vw, bool canDownscale)
+void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bool canDownscale)
 {
-    Q_ASSERT(index < CL_MAX_CHANNELS);
+    Q_ASSERT(channelCount <= CL_MAX_CHANNELS);
+    
+    for(int i = 0; i < channelCount; i++)
+    {
+        if (!m_display[i])
+            m_display[i] = new QnVideoStreamDisplay(canDownscale, i);
+        m_display[i]->addRenderer(vw);
+    }
+}
 
-    delete m_display[index];
-    m_display[index] = new QnVideoStreamDisplay(canDownscale, index);
-    m_display[index]->setDrawer(vw);
+void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+        if (m_display[i])
+            m_display[i]->removeRenderer(vw);
+    }
 }
 
 QImage QnCamDisplay::getScreenshot(int channel)
@@ -1567,10 +1578,10 @@ bool QnCamDisplay::isLongWaiting() const
     return m_isLongWaiting || m_emptyPacketCounter >= 3;
 }
 
-QSize QnCamDisplay::getScreenSize() const
+QSize QnCamDisplay::getMaxScreenSize() const
 {
     if (m_display[0])
-        return m_display[0]->getScreenSize();
+        return m_display[0]->getMaxScreenSize();
     else
         return QSize();
 }

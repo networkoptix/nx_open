@@ -6,9 +6,7 @@
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/common_business_action.h>
 
-QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule,
-                                                                       const QnAbstractBusinessEventPtr &event,
-                                                                       ToggleState::Value state) {
+QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, Qn::ToggleState state) {
     if (BusinessActionType::requiresCameraResource(rule->actionType()) && rule->actionResources().isEmpty())
         return QnAbstractBusinessActionPtr(); //camera is not exists anymore
     //TODO: #GDM check resource type?
@@ -21,7 +19,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnB
     result->setResources(rule->actionResources());
 
     if (BusinessEventType::hasToggleState(event->getEventType()) && BusinessActionType::hasToggleState(rule->actionType())) {
-        ToggleState::Value value = state != ToggleState::NotDefined ? state : event->getToggleState();
+        Qn::ToggleState value = state != Qn::UndefinedState ? state : event->getToggleState();
         result->setToggleState(value);
     }
     result->setBusinessRuleId(rule->id());

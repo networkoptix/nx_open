@@ -7,11 +7,13 @@
 
 #include <memory>
 
+#include <QBuffer>
 #include <QMutexLocker>
 
 #include <core/resource/resource.h>
 #include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
 #include <utils/common/util.h>
+#include <text_to_wav.h>
 
 #include "../../camera/audio_stream_display.h"
 
@@ -32,7 +34,10 @@ AudioPlayer::AudioPlayer( const QString& filePath )
     m_renderer( NULL ),
     m_rtStartTime( AV_NOPTS_VALUE ),
     m_lastRtTime( 0 ),
-    m_state( sInit )
+    m_state( sInit ),
+    m_storage( new QnExtIODeviceStorageResource() ),
+    m_synthesizingTarget( NULL ),
+    m_resultCode( rcNoError )
 {
     if( !filePath.isEmpty() )
         open( filePath );
@@ -58,10 +63,22 @@ QString AudioPlayer::getTagValue( const QString& name ) const
     return tagValueCStr ? QString::fromUtf8(tagValueCStr) : QString();
 }
 
-int AudioPlayer::playbackResultCode() const
+AudioPlayer::ResultCode AudioPlayer::playbackResultCode() const
 {
-    //TODO/IMPL
-    return 0;
+    return m_resultCode;
+}
+
+bool AudioPlayer::playAsync( QIODevice* dataSource )
+{
+    std::auto_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
+    if( !audioPlayer->open( dataSource ) )
+        return false;
+
+    connect( audioPlayer.get(), SIGNAL(done()), audioPlayer.get(), SLOT(deleteLater()) );
+    if( !audioPlayer->playAsync() )
+        return false;
+    audioPlayer.release();
+    return true;
 }
 
 bool AudioPlayer::playFileAsync( const QString& filePath )
@@ -71,10 +88,21 @@ bool AudioPlayer::playFileAsync( const QString& filePath )
         return false;
 
     connect( audioPlayer.get(), SIGNAL(done()), audioPlayer.get(), SLOT(deleteLater()) );
-
     if( !audioPlayer->playAsync() )
         return false;
+    audioPlayer.release();
+    return true;
+}
 
+bool AudioPlayer::sayTextAsync( const QString& text )
+{
+    std::auto_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
+    if( !audioPlayer->prepareTextPlayback( text ) )
+        return false;
+
+    connect( audioPlayer.get(), SIGNAL(done()), audioPlayer.get(), SLOT(deleteLater()) );
+    if( !audioPlayer->playAsync() )
+        return false;
     audioPlayer.release();
     return true;
 }
@@ -98,28 +126,41 @@ void AudioPlayer::pleaseStop()
     m_cond.wakeAll();
 }
 
-bool AudioPlayer::open( const QString& filePath )
+bool AudioPlayer::open( QIODevice* dataSource )
 {
     QMutexLocker lk( &m_mutex );
 
+    m_resultCode = rcNoError;
     if( isOpenedNonSafe() )
         closeNonSafe();
-
-    std::auto_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() );
-
-    QnResourcePtr res( new LocalAudioFileResource() );
-    res->setUrl( filePath );
-    res->setStatus( QnResource::Online );
-    if( !mediaFileReader->open( res ) )
+    if( !openNonSafe( dataSource ) )
         return false;
-
-    m_mediaFileReader = mediaFileReader.release();
-    m_mediaFileReader->setAudioChannel( 0 );
-
-    m_renderer = new QnAudioStreamDisplay( AUDIO_BUF_SIZE, AUDIO_BUF_SIZE / 2 );
-
-    m_filePath = filePath;
     m_state = sReady;
+    return true;
+}
+
+bool AudioPlayer::open( const QString& filePath )
+{
+    std::auto_ptr<QFile> srcFile( new QFile( filePath ) );
+    if( !srcFile->open(QFile::ReadOnly) )
+        return false;
+    return open( srcFile.release() );
+}
+
+bool AudioPlayer::prepareTextPlayback( const QString& text )
+{
+    QMutexLocker lk( &m_mutex );
+
+    m_resultCode = rcNoError;
+
+    m_synthesizingTarget.reset( new QBuffer() );
+
+    //NOTE cannot open at the moment, since no media data yet
+
+    //starting speech synthesizing
+    m_textToPlay = text;
+    m_cond.wakeAll();
+    m_state = sSynthesizing;
 
     return true;
 }
@@ -138,7 +179,7 @@ bool AudioPlayer::playAsync()
             return false;
     }
     m_cond.wakeAll();
-    m_state = sPlaying;
+    m_state = sSynthesizing ? sSynthesizingAutoPlay : sPlaying;
 
     return true;
 }
@@ -154,7 +195,7 @@ void AudioPlayer::run()
     QMutexLocker lk( &m_mutex );
     for( ;; )
     {
-        while( (m_state < sPlaying || !m_mediaFileReader) && !needToStop() )
+        while( m_state <= sReady && !needToStop() )
             m_cond.wait( lk.mutex() );
 
         lk.unlock();
@@ -162,30 +203,66 @@ void AudioPlayer::run()
             break;
         lk.relock();
 
-            //reading frame
-        QnAbstractMediaDataPtr dataPacket = m_mediaFileReader->getNextData();
-        if( !dataPacket )
+        switch( m_state )
         {
-            m_renderer->playCurrentBuffer();
+            case sSynthesizing:
+            case sSynthesizingAutoPlay:
+            {
+                if( !m_synthesizingTarget->open( QIODevice::WriteOnly ) ||
+                    !textToWav( m_textToPlay, m_synthesizingTarget.get() ) )
+                {
+                    emit done();
+                    m_state = sReady;
+                    m_resultCode = rcSynthesizingError;
+                    continue;
+                }
+                m_synthesizingTarget->close();
+                if( m_state == sSynthesizingAutoPlay )
+                    m_state = sPlaying;
+                else
+                    m_state = sReady;
 
-            //TODO: #ak IMPL block till playback is finished
-            sleep( AUDIO_BUF_SIZE / 2 );
+                //opening media
+                if( !m_synthesizingTarget->open( QIODevice::ReadOnly ) ||
+                    !openNonSafe( m_synthesizingTarget.release() ) )
+                {
+                    emit done();
+                    m_state = sReady;
+                    m_resultCode = rcMediaInitializationError;
+                    continue;
+                }
+                break;
+            }
 
-            //end of file reached
-            emit done();
-            m_state = sReady;
-            continue;
+            case sPlaying:
+            {
+                    //reading frame
+                QnAbstractMediaDataPtr dataPacket = m_mediaFileReader->getNextData();
+                if( !dataPacket )
+                {
+                    //end of file reached
+                    m_renderer->playCurrentBuffer();
+
+                    //TODO: #ak IMPL block till playback is finished
+                    msleep( AUDIO_BUF_SIZE / 2 );
+
+                    emit done();
+                    m_state = sReady;
+                    continue;
+                }
+
+                QnCompressedAudioDataPtr audioData = dataPacket.dynamicCast<QnCompressedAudioData>();
+                if( !audioData )
+                    continue;
+
+                    //delay
+                doRealtimeDelay( dataPacket );
+
+                    //playing it
+                m_renderer->putData( audioData );
+                break;
+            }
         }
-
-        QnCompressedAudioDataPtr audioData = dataPacket.dynamicCast<QnCompressedAudioData>();
-        if( !audioData )
-            continue;
-
-            //delay
-        doRealtimeDelay( dataPacket );
-
-            //playing it
-        m_renderer->putData( audioData );
     }
 }
 
@@ -205,11 +282,40 @@ void AudioPlayer::closeNonSafe()
 
     m_filePath.clear();
     m_state = sInit;
+    m_synthesizingTarget.reset();
+}
+
+bool AudioPlayer::openNonSafe( QIODevice* dataSource )
+{
+    const QString& temporaryFilePath = QString::number(rand());
+    const QString& temporaryResUrl = QString::fromAscii("%1://%2").arg(QLatin1String("qiodev")).arg(temporaryFilePath);
+    m_storage->registerResourceData( temporaryFilePath, dataSource );
+
+    std::auto_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() );
+    mediaFileReader->setStorage( m_storage );
+
+    QnResourcePtr res( new LocalAudioFileResource() );
+    res->setUrl( temporaryResUrl );
+    res->setStatus( QnResource::Online );
+    if( !mediaFileReader->open( res ) )
+    {
+        m_storage->removeFile( temporaryFilePath );
+        return false;
+    }
+
+    m_mediaFileReader = mediaFileReader.release();
+    m_mediaFileReader->setAudioChannel( 0 );
+
+    m_renderer = new QnAudioStreamDisplay( AUDIO_BUF_SIZE, AUDIO_BUF_SIZE / 2 );
+
+    m_filePath = temporaryResUrl;
+
+    return true;
 }
 
 bool AudioPlayer::isOpenedNonSafe() const
 {
-    return m_mediaFileReader != NULL;
+    return m_state >= sReady || m_mediaFileReader != NULL;
 }
 
 void AudioPlayer::doRealtimeDelay( const QnAbstractDataPacketPtr& media )

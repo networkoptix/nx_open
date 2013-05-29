@@ -669,7 +669,7 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
     QSizeF newLayoutSize = newTargetWidget->channelLayout()->size();
     if(oldLayoutSize != newLayoutSize) {
         QSizeF zoomSize = cwiseDiv(cwiseMul(zoomRect.size(), oldLayoutSize), newLayoutSize);
-        zoomRect = movedInto(QRectF(zoomRect.topLeft(), zoomSize), QRectF(0, 0, 1, 1));
+        zoomRect = movedInto(QRectF(zoomRect.topLeft(), zoomSize), QRectF(0.0, 0.0, 1.0, 1.0));
     }
 
     emit zoomTargetChanged(widget, zoomRect, newTargetWidget);

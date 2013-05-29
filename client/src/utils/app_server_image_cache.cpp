@@ -29,6 +29,8 @@ void QnAppServerImageCache::storeImage(const QString &filePath, bool cropImageTo
     QString uuid = QUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".png");
 
+    ensureCacheFolder();
+
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(filePath);
     loader->setSize(getMaxImageSize());

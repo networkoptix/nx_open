@@ -1,5 +1,5 @@
-#ifndef _API_SERIALIZER_H_
-#define _API_SERIALIZER_H_
+#ifndef QN_API_SERIALIZER_H
+#define QN_API_SERIALIZER_H
 
 #include <QtCore/QByteArray>
 
@@ -15,10 +15,10 @@
 #include "licensing/license.h"
 #include "connectinfo.h"
 
+/*
+ * Helper serialization functions. Not related to any specific serializarion format.
+ */
 
-/**
-  * Helper serialize functions. Not related to any specific serializarion format.
-  */
 void parseRegion(QRegion& region, const QString& regionString);
 void parseRegionList(QList<QRegion>& regions, const QString& regionsString);
 
@@ -31,17 +31,19 @@ QString serializeMotionRegionList(const QList<QnMotionRegion>& regions);
 QString serializeRegion(const QRegion& region);
 QString serializeRegionList(const QList<QRegion>& regions);
 
+
 /**
  * Base exception class for serialization-related errors.
  */
-class QnSerializeException : public QnException {
+class QnSerializationException : public QnException {
 public:
-    QnSerializeException(const QString &message): QnException(message) {}
+    QnSerializationException(const QString &message): QnException(message) {}
 };
 
+
 /**
-  * Serialize resource
-  */
+ * Serialize resource.
+ */
 class QnApiSerializer
 {
 public:
@@ -60,7 +62,7 @@ public:
     virtual void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) = 0;
     virtual void deserializeBusinessRules(QnBusinessEventRuleList&, const QByteArray& data) = 0;
     virtual void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) = 0;
-    virtual void deserializeBusinessActionVector(QnLightBusinessActionVectorPtr& businessActionList, const QByteArray& data) = 0;
+    virtual void deserializeBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const QByteArray& data) = 0;
     virtual void deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data) = 0;
     virtual void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data) = 0;
 
@@ -85,4 +87,4 @@ protected:
     virtual void serializeUser(const QnUserResourcePtr& resource, QByteArray& data) = 0;
 };
 
-#endif // _API_SERIALIZER_H_
+#endif // QN_API_SERIALIZER_H

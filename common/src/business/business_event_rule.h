@@ -3,7 +3,7 @@
 
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
-#include <business/business_logic_common.h>
+#include <business/business_fwd.h>
 
 #include <core/resource/resource_fwd.h>
 #include "business_action_parameters.h"
@@ -33,8 +33,8 @@ public:
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
 
-    ToggleState::Value eventState() const;
-    void setEventState(ToggleState::Value state);
+    Qn::ToggleState eventState() const;
+    void setEventState(Qn::ToggleState state);
 
     BusinessActionType::Value actionType() const;
     void setActionType(const BusinessActionType::Value value);
@@ -68,7 +68,7 @@ private:
     BusinessEventType::Value m_eventType;
     QnResourceList m_eventResources;
     QnBusinessEventParameters m_eventParams;
-    ToggleState::Value m_eventState;
+    Qn::ToggleState m_eventState;
 
     BusinessActionType::Value m_actionType;
     QnResourceList m_actionResources;

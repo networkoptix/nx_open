@@ -47,13 +47,15 @@ public:
 
     void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, 
                                  QnStorageResourcePtr storage = QnStorageResourcePtr(), QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport, 
-                                 int timeOffsetMs = 0,
-                                 int serverTimeZoneMs = Qn::InvalidUtcOffset);
+                                 int timeOffsetMs = 0, int serverTimeZoneMs = Qn::InvalidUtcOffset,
+                                 QRectF srcRect = QRectF());
 
     void setResource(QnMediaResourcePtr resource);
     void setExportProgressOffset(int value);
     int getExportProgressOffset() const;
     QString exportedFileName() const;
+
+    bool isDisplayStarted() const { return m_displayStarted; }
 signals:
     void recordingFailed(QString errMessage);
     void exportProgress(int progress);
@@ -84,6 +86,7 @@ private:
     QnAbstractArchiveReader* m_exportReader;
     int m_progressOffset;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
+    bool m_displayStarted;
 };
 
 #endif //QN_VIDEO_CAMERA_H

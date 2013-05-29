@@ -1,7 +1,7 @@
 #ifndef BUSINESS_ACTION_PARAMETERS_H
 #define BUSINESS_ACTION_PARAMETERS_H
 
-#include <business/business_logic_common.h>
+#include <business/business_fwd.h>
 
 //TODO: #GDM move QnStreamQuality OUT OF THERE!
 #include <core/resource/media_resource.h>
@@ -9,7 +9,6 @@
 class QnBusinessActionParameters 
 {
 public:
-
     enum Params 
     {
         soundUrlParam,
@@ -101,5 +100,8 @@ private:
 private:
     QVector<QVariant> m_params;
 };
+
+QByteArray serializeBusinessParams(const QnBusinessParams& value);
+QnBusinessParams deserializeBusinessParams(const QByteArray& value);
 
 #endif // BUSINESS_ACTION_PARAMETERS_H

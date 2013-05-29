@@ -12,17 +12,14 @@
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
 
+#include <utils/common/qnid.h>
 #include <core/resource/resource_fwd.h>
-
+#include <business/business_fwd.h>
 #include <recording/time_period_list.h>
 
 #include "api_fwd.h"
 #include "abstract_connection.h"
 #include "media_server_cameras_data.h"
-
-// TODO: #Elric add fwd header
-#include "business/actions/abstract_business_action.h"
-#include "business/events/abstract_business_event.h"
 
 class QnPtzSpaceMapper;
 
@@ -52,7 +49,7 @@ signals:
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
     void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
-    void finished(int status, const QnLightBusinessActionVectorPtr &reply, int handle);
+    void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
 
 private:
     friend class QnAbstractReplyProcessor;

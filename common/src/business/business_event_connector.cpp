@@ -41,49 +41,31 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
 
 void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnAbstractDataPacketPtr metadata)
 {
-    QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(
-                                             resource,
-                                             value ? ToggleState::On : ToggleState::Off,
-                                             timeStamp,
-                                             metadata));
+    QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(resource, value ? Qn::OnState : Qn::OffState, timeStamp, metadata)); 
     qnBusinessRuleProcessor->processBusinessEvent(motionEvent);
 }
 
 void QnBusinessEventConnector::at_cameraDisconnected(const QnResourcePtr &resource, qint64 timeStamp)
 {
-    QnCameraDisconnectedBusinessEventPtr cameraEvent(new QnCameraDisconnectedBusinessEvent(
-        resource,
-        timeStamp));
+    QnCameraDisconnectedBusinessEventPtr cameraEvent(new QnCameraDisconnectedBusinessEvent(resource, timeStamp));
     qnBusinessRuleProcessor->processBusinessEvent(cameraEvent);
 }
 
 void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QnResourcePtr &storageRes)
 {
-    QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(
-        mServerRes,
-        timeStamp,
-        reasonCode,
-        storageRes
-    ));
+    QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(mServerRes, timeStamp, reasonCode, storageRes));
     qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
 }
 
 void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode)
 {
-    QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(
-        resource,
-        timeStamp,
-        reasonCode));
+    QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(resource, timeStamp, reasonCode));
     qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
 }
 
 void QnBusinessEventConnector::at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QStringList& macAddrList , qint64 timeStamp)
 {
-    QnIPConflictBusinessEventPtr ipConflictEvent(new QnIPConflictBusinessEvent(
-        resource,
-        hostAddress,
-        macAddrList,
-        timeStamp));
+    QnIPConflictBusinessEventPtr ipConflictEvent(new QnIPConflictBusinessEvent(resource, hostAddress, macAddrList, timeStamp));
     qnBusinessRuleProcessor->processBusinessEvent(ipConflictEvent);
 }
 
@@ -94,11 +76,7 @@ void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qi
     if (++netIssueCounter % 10)
         return; // mutex is not nessessary here
 #endif
-    QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(
-        resource,
-        timeStamp,
-        reasonCode,
-        reasonText));
+    QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(resource, timeStamp, reasonCode, reasonText));
     qnBusinessRuleProcessor->processBusinessEvent(networkEvent);
 }
 
@@ -108,20 +86,14 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
         return;
 
     qnBusinessRuleProcessor->processBusinessEvent(
-        QnCameraInputEventPtr( new QnCameraInputEvent(
-                                   resource->toSharedPointer(),
-                                   value ? ToggleState::On : ToggleState::Off,
-                                   timeStamp*1000,
-                                   inputPortID)));
+        QnCameraInputEventPtr(new QnCameraInputEvent(resource->toSharedPointer(), value ? Qn::OnState : Qn::OffState, timeStamp * 1000, inputPortID))
+    );
 }
 
 
 void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QList<QByteArray>& otherServers)
 {
-    QnMServerConflictBusinessEventPtr conflictEvent(new QnMServerConflictBusinessEvent(
-        resource,
-        timeStamp,
-        otherServers));
+    QnMServerConflictBusinessEventPtr conflictEvent(new QnMServerConflictBusinessEvent(resource, timeStamp, otherServers));
     qnBusinessRuleProcessor->processBusinessEvent(conflictEvent);
 }
 

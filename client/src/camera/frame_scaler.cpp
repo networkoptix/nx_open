@@ -1,8 +1,10 @@
 #include "frame_scaler.h"
-#include <emmintrin.h>
 
+#include <cassert>
+
+#include <emmintrin.h>
 #ifdef Q_OS_MAC
-#include <smmintrin.h>
+#   include <smmintrin.h>
 #endif
 
 #include "utils/media/sse_helper.h"
@@ -14,7 +16,7 @@ const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x00
 void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                       const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
 {
-    Q_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/2,16) <= dst_stride);
+    assert(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/2,16) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(fillter, fillter, fillter, fillter, fillter, fillter, fillter, fillter); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
@@ -67,7 +69,7 @@ void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int ds
 void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                        const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
-    Q_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/4,8) <= dst_stride);
+    assert(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/4,8) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
@@ -114,7 +116,7 @@ void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const
 void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                        const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
-    Q_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/8,4) <= dst_stride);
+    assert(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/8,4) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
@@ -231,10 +233,9 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
                 */
         if (useSSE2()) {
             downscalePlate_factor2_sse2_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0x00);
-                    downscalePlate_factor2_sse2_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
-                    downscalePlate_factor2_sse2_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
-        }
-        else {
+            downscalePlate_factor2_sse2_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
+            downscalePlate_factor2_sse2_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
+        } else {
             downscalePlate_factor2(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height);
             downscalePlate_factor2(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
             downscalePlate_factor2(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
@@ -246,8 +247,7 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
             downscalePlate_factor4_ssse3_intr(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height, 0);
             downscalePlate_factor4_ssse3_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
             downscalePlate_factor4_ssse3_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
-        }
-        else {
+        } else {
             downscalePlate_factor4(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height);
             downscalePlate_factor4(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
             downscalePlate_factor4(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
@@ -259,12 +259,15 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
             downscalePlate_factor8_sse41_intr(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height, 0);
             downscalePlate_factor8_sse41_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
             downscalePlate_factor8_sse41_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
-        }
-        else {
+        } else {
             downscalePlate_factor8(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height);
             downscalePlate_factor8(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
             downscalePlate_factor8(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
         }
+    }
+    else 
+    {
+        assert(false);
     }
 }
 

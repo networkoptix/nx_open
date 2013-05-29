@@ -1,7 +1,7 @@
 #ifndef BUSINESS_AGGREGATION_INFO_H
 #define BUSINESS_AGGREGATION_INFO_H
 
-#include <business/business_logic_common.h>
+#include <business/business_fwd.h>
 #include "business_event_parameters.h"
 
 struct QnInfoDetail {

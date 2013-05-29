@@ -74,7 +74,7 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
         if(!widget->resource()->hasFlags(QnResource::motion))
             continue;
 
-        if(!qFuzzyCompare(widget->zoomRect(), QRectF(0, 0, 1, 1)))
+        if(!widget->zoomRect().isNull())
             continue;
 
         if(m_hasRequiredGridDisplayValue) {
@@ -444,7 +444,7 @@ Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceLis
 Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
     foreach(const QnLayoutItemIndex &index, layoutItems) {
         QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
-        if(qFuzzyCompare(itemData.zoomRect, QRectF(0.0, 0.0, 1.0, 1.0)))
+        if(itemData.zoomRect.isNull())
             return QnActionCondition::check(layoutItems);
     }
 

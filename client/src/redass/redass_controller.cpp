@@ -60,7 +60,7 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality fi
         if (!isSupportedDisplay(display))
             continue; // ommit cameras without dual streaming, offline and non-authorized cameras
 
-        QSize size = display->getScreenSize();
+        QSize size = display->getMaxScreenSize();
         QSize res = display->getVideoSize();
         qint64 screenSquare = size.width() * size.height();
         int pps = res.width()*res.height()*display->getAvarageFps(); // pps - pixels per second
@@ -198,13 +198,13 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
 
 bool QnRedAssController::isSmallItem(QnCamDisplay* display)
 {
-    QSize sz = display->getScreenSize();
+    QSize sz = display->getMaxScreenSize();
     return sz.height() <= TO_LOWQ_SCREEN_SIZE.height();
 }
 
 bool QnRedAssController::isSmallItem2(QnCamDisplay* display)
 {
-    QSize sz = display->getScreenSize();
+    QSize sz = display->getMaxScreenSize();
     return sz.height() <= TO_LOWQ_SCREEN_SIZE.height() * LQ_HQ_THRESHOLD;
 }
 

@@ -13,7 +13,8 @@ QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamD
     m_isVisible(true),
     m_exportRecorder(0),
     m_exportReader(0),
-    m_progressOffset(0)
+    m_progressOffset(0),
+    m_displayStarted(false)
 {
     if (m_resource)
         cl_log.log(QLatin1String("Creating camera for "), m_resource->toString(), cl_logDEBUG1);
@@ -70,13 +71,14 @@ void QnVideoCamera::startDisplay()
     m_camdispay.start();
     //m_reader->start(QThread::HighestPriority);
     m_reader->start(QThread::HighPriority);
+    m_displayStarted = true;
 }
 
 void QnVideoCamera::stopDisplay()
 {
     //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay"), m_resource->getUniqueId(), cl_logDEBUG1);
     //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
-
+    m_displayStarted = false;
     m_reader->stop();
     m_camdispay.stop();
     m_camdispay.clearUnprocessedData();
@@ -113,8 +115,12 @@ void QnVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
     m_camdispay.setLightCPUMode(val);
 }
 
-void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage, 
-                                            QnStreamRecorder::Role role, int timeOffsetMs, int serverTimeZoneMs)
+void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const 
+                                            QString& fileName, const QString& format, 
+                                            QnStorageResourcePtr storage, 
+                                            QnStreamRecorder::Role role, 
+                                            int timeOffsetMs, int serverTimeZoneMs,
+                                            QRectF srcRect)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
@@ -144,6 +150,7 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
         m_exportRecorder->disconnect(this);
         if (storage)
             m_exportRecorder->setStorage(storage);
+        m_exportRecorder->setSrcRect(srcRect);
         connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SLOT(onExportFailed(QString)));
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
         connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SLOT(at_exportProgress(int)));

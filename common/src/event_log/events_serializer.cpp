@@ -10,12 +10,12 @@ inline int readInt(quint8* &curPtr)
     return val;
 }
 
-void QnEventSerializer::deserialize(QnLightBusinessActionVectorPtr& eventsPtr, const QByteArray& data)
+void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, const QByteArray& data)
 {
     QTime t;
     t.restart();
 
-    QnLightBusinessActionVector& events = *(eventsPtr.data());
+    QnBusinessActionDataList& events = *(eventsPtr.data());
 
     if (data.size() < 4)
         return;
@@ -29,7 +29,7 @@ void QnEventSerializer::deserialize(QnLightBusinessActionVectorPtr& eventsPtr, c
 
     events.resize(sz);
     for (int i = 0; i < sz; ++i) {
-        QnLightBusinessAction& action = events[i];
+        QnBusinessActionData& action = events[i];
         action.setFlags(readInt(curPtr));
         action.setActionType((BusinessActionType::Value) readInt(curPtr));
         action.setBusinessRuleId(readInt(curPtr));

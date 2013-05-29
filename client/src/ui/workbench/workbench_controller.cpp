@@ -462,7 +462,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
     foreach(QnResourceWidget *widget, widgets) {
         if(!widget->resource()->hasFlags(QnResource::motion))
             continue;
-        if (!qFuzzyCompare(widget->zoomRect(), QRectF(0, 0, 1, 1)))
+        if (!widget->zoomRect().isNull())
             continue;
         widget->setOption(QnResourceWidget::DisplayMotion, display);
     }
@@ -737,19 +737,19 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_PageUp:
     case Qt::Key_PageDown:
         break; /* Don't let the view handle these and scroll. */
-    case Qt::Key_Menu:{
+    case Qt::Key_Menu: {
         QGraphicsView *view = display()->view();        
         QList<QGraphicsItem *> items = display()->scene()->selectedItems();
         QPoint offset = view->mapToGlobal(QPoint(0, 0));
-        if (items.count() == 0)
+        if (items.count() == 0) {
             showContextMenuAt(offset);
-        else{ 
+        } else {
             QRectF rect = items[0]->mapToScene(items[0]->boundingRect()).boundingRect();
             QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */ 
             showContextMenuAt(offset + testRect.bottomRight());
         }
-        }
         break;
+    }
     default:
         event->ignore(); /* Wasn't recognized? Ignore. */
         break;
@@ -1270,7 +1270,7 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
         if (!widget->resource()->hasFlags(QnResource::motion))
             continue;
 
-        if (!qFuzzyCompare(widget->zoomRect(), QRectF(0, 0, 1, 1)))
+        if (!widget->zoomRect().isNull())
             continue;
 
         if(!(widget->options() & QnResourceWidget::DisplayMotion)) {

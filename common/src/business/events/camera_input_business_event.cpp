@@ -7,18 +7,9 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
-QnCameraInputEvent::QnCameraInputEvent(
-    const QnResourcePtr& resource,
-    ToggleState::Value toggleState,
-    qint64 timeStamp,
-    const QString& inputPortID)
-:
-    base_type(
-        BusinessEventType::Camera_Input,
-        resource,
-        toggleState,
-        timeStamp),
-    m_inputPortID( inputPortID )
+QnCameraInputEvent::QnCameraInputEvent(const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp, const QString& inputPortID):
+    base_type(BusinessEventType::Camera_Input, resource, toggleState, timeStamp),
+    m_inputPortID(inputPortID)
 {
 }
 
@@ -27,7 +18,7 @@ const QString& QnCameraInputEvent::inputPortID() const
     return m_inputPortID;
 }
 
-bool QnCameraInputEvent::checkCondition(ToggleState::Value state, const QnBusinessEventParameters &params) const {
+bool QnCameraInputEvent::checkCondition(Qn::ToggleState state, const QnBusinessEventParameters &params) const {
     if (!base_type::checkCondition(state, params))
         return false;
 

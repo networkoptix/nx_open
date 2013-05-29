@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <utils/gl/glcontext.h>
+#include <ui/graphics/opengl/gl_context.h>
 
 #include "decodedpicturetoopengluploader.h"
 

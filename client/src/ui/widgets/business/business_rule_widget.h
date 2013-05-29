@@ -3,8 +3,8 @@
 
 #include <QWidget>
 
+#include <business/business_fwd.h>
 #include <business/business_event_rule.h>
-#include <business/business_logic_common.h>
 #include <business/events/abstract_business_event.h>
 
 #include <ui/models/business_rules_view_model.h>

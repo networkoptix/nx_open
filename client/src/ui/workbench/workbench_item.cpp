@@ -16,7 +16,6 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, 
     m_layout(NULL),
     m_resourceUid(resourceUid),
     m_uuid(uuid),
-    m_zoomRect(0.0, 0.0, 1.0, 1.0),
     m_flags(0),
     m_rotation(0.0)
 {}
@@ -26,7 +25,6 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     m_layout(NULL),
     m_resourceUid(data.resource.path),
     m_uuid(data.uuid),
-    m_zoomRect(0.0, 0.0, 1.0, 1.0),
     m_flags(0),
     m_rotation(0.0)
 {

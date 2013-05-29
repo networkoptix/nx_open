@@ -9,8 +9,6 @@
 #include "session_manager.h"
 #include "message.pb.h"
 
-#include <business/actions/abstract_business_action.h>
-
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject, 
         ((CameraObject,             "camera"))
@@ -79,7 +77,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
                 if(!authKey.isEmpty())
                     foreach(QnMediaServerResourcePtr resource, reply)
                         resource->setProperty("authKey", authKey);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -95,7 +93,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if(status == 0) {
             try {
                 m_serializer.deserializeCameras(reply, response.data, m_resourceFactory);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -111,7 +109,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if (status == 0) {
             try {
                 m_serializer.deserializeCameraHistoryList(reply, response.data);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -127,7 +125,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if(status == 0) {
             try {
                 m_serializer.deserializeUsers(reply, response.data);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -143,7 +141,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if(status == 0) {
             try {
                 m_serializer.deserializeLayouts(reply, response.data);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -159,7 +157,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if(status == 0) {
             try {
                 m_serializer.deserializeResources(reply, response.data, m_resourceFactory);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -175,7 +173,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if (status == 0) {
             try {
                 m_serializer.deserializeResourceTypes(reply, response.data);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -191,7 +189,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if(status == 0) {
             try {
                 m_serializer.deserializeLicenses(reply, response.data);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -207,7 +205,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if(status == 0) {
             try {
                 m_serializer.deserializeConnectInfo(reply, response.data);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -223,7 +221,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if(status == 0) {
             try {
                 m_serializer.deserializeKvPairs(reply, response.data);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -239,7 +237,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if(status == 0) {
             try {
                 m_serializer.deserializeBusinessRules(reply, response.data);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
@@ -255,7 +253,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         if(status == 0) {
             try {
                 m_serializer.deserializeSettings(reply, response.data);
-            } catch (const QnSerializeException& e) {
+            } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
