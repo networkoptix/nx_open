@@ -289,8 +289,8 @@ const SocketImpl* Socket::impl() const
 
 Socket::Socket(int type, int protocol)
 :
-    m_impl( NULL ),
     sockDesc( -1 ),
+    m_impl( NULL ),
     m_nonBlockingMode( false ),
     m_status( 0 ),
     m_prevErrorCode( SystemError::noError )
@@ -306,8 +306,8 @@ Socket::Socket(int type, int protocol)
 
 Socket::Socket(int _sockDesc)
 :
-    m_impl( NULL ),
     sockDesc( -1 ),
+    m_impl( NULL ),
     m_nonBlockingMode( false ),
     m_status( 0 ),
     m_prevErrorCode( SystemError::noError )

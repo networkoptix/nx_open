@@ -8,11 +8,12 @@
 
 #include "pollset.h"
 
-#include <map>
+#include <set>
 
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #include "../socket.h"
 #include "../socket_impl.h"
@@ -26,7 +27,7 @@ class PollSetImpl
 {
 public:
     //!map<pair<socket, event type> >
-    typedef std::set<std::pair<Socket*, SockData> > MonitoredEventSet;
+    typedef std::set<std::pair<Socket*, PollSet::EventType> > MonitoredEventSet;
 
     int kqueueFD;
     MonitoredEventSet monitoredEvents;
@@ -41,7 +42,7 @@ public:
         receivedEventCount( 0 ),
         eventFD( -1 )
     {
-        memset( &receivedEventlist, 0, sizeof(v) );
+        memset( &receivedEventlist, 0, sizeof(receivedEventlist) );
     }
 
     ~PollSetImpl()
@@ -68,8 +69,8 @@ public:
 
     ConstIteratorImpl( const ConstIteratorImpl& right )
     :
-        currentIndex( right.currentIndex ),
-        pollSetImpl( right.pollSetImpl )
+        pollSetImpl( right.pollSetImpl ),
+        currentIndex( right.currentIndex )
     {
     }
 
@@ -129,7 +130,12 @@ PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
     return *this;
 }
 
-Socket* PollSet::const_iterator::socket() const
+Socket* PollSet::const_iterator::socket()
+{
+    return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+}
+
+const Socket* PollSet::const_iterator::socket() const
 {
     return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
 }
@@ -177,7 +183,7 @@ PollSet::PollSet()
 
     //registering filter for interrupting poll
     struct kevent _newEvent;
-    EV_SET( &_newEvent, 0, EVFILT_USER, EV_ADD, 0, NULL, NULL );
+    EV_SET( &_newEvent, 0, EVFILT_USER, EV_ADD, 0, 0, NULL );
     kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL );
 }
 
@@ -204,7 +210,7 @@ bool PollSet::isValid() const
 void PollSet::interrupt()
 {
     struct kevent _newEvent;
-    EV_SET( &_newEvent, 0, EVFILT_USER, 0, NOTE_TRIGGER, NULL, NULL );
+    EV_SET( &_newEvent, 0, EVFILT_USER, 0, NOTE_TRIGGER, 0, NULL );
     kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL );
 }
 
@@ -222,7 +228,7 @@ bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
     memset( &_newEvent, 0, sizeof(_newEvent) );
     _newEvent.ident = sock->handle();
     _newEvent.flags = EV_ENABLE;
-    _newEvent.fiter = kfilterType;
+    _newEvent.filter = kfilterType;
     _newEvent.udata = sock;
     if( kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL ) == 0 )
     {
@@ -246,6 +252,7 @@ void* PollSet::remove( Socket* const sock, EventType eventType )
     struct kevent changeList;
     memset( &changeList, 0, sizeof(changeList) );
     changeList.ident = sock->handle();
+    changeList.filter = kfilterType;
     changeList.flags = EV_DISABLE | EV_DELETE;
     kevent( m_impl->kqueueFD, &changeList, 1, NULL, 0, NULL );  //ignoring return code, since event is removed in any case
     m_impl->monitoredEvents.erase( it );
@@ -276,7 +283,7 @@ static const int NSEC_IN_MS = 1000000;
 */
 int PollSet::poll( int millisToWait )
 {
-    memset( &receivedEventlist, 0, sizeof(receivedEventlist) );
+    memset( &m_impl->receivedEventlist, 0, sizeof(m_impl->receivedEventlist) );
     struct timespec timeout;
     if( millisToWait >= 0 )
     {
@@ -285,7 +292,7 @@ int PollSet::poll( int millisToWait )
         timeout.tv_nsec = (millisToWait % MILLIS_IN_SEC) * NSEC_IN_MS;
     }
     m_impl->receivedEventCount = 0;
-    int result = kevent( m_impl->kqueueFD, NULL, 0, &receivedEventlist, MAX_EVENTS_TO_RECEIVE, millisToWait >= 0 ? &timeout : NULL );
+    int result = kevent( m_impl->kqueueFD, NULL, 0, m_impl->receivedEventlist, sizeof(m_impl->receivedEventlist)/sizeof(*m_impl->receivedEventlist), millisToWait >= 0 ? &timeout : NULL );
     if( result == EINTR )
         return 0;   //TODO/IMPL #ak repeat wait (with timeout correction) in this case
     if( result <= 0 )
