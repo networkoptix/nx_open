@@ -80,8 +80,8 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
         QPoint pos = m_layout->position(ch);
         int left = pos.x() * m_resolution.width() / m_layout->size().width();
         int top = pos.y() * m_resolution.height() / m_layout->size().height();
-        dstRect = QRect(dstRectF.left() * m_resolution.width() , dstRectF.top() * m_resolution.height(),
-                        dstRectF.width() * m_resolution.width() , dstRectF.height() * m_resolution.height());
+        dstRect = QRect(dstRectF.left() * m_resolution.width() + 0.5, dstRectF.top() * m_resolution.height() + 0.5,
+                        dstRectF.width() * m_resolution.width() + 0.5, dstRectF.height() * m_resolution.height() + 0.5);
         dstRect = roundRect(dstRect);
 
         for (int i = 0; i < 3; ++i)
@@ -295,9 +295,6 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             QSize lSize = m_layout->size();
             QRectF srcRectF(m_srcRectF.left() * lSize.width(), m_srcRectF.top() * lSize.height(),
                             m_srcRectF.width() * lSize.width(), m_srcRectF.height() * lSize.height());
-            //QRectF srcRectF(m_srcRectF);
-            //QRectF channelRect(pos.x() / (float) lSize.width(), pos.y() / (float) lSize.height(),
-            //    1.0 / (float) m_layout->size().width(), 1.0 / (float) m_layout->size().height());
             QRectF channelRect(pos.x(), pos.y(), 1, 1);
 
             if (!channelRect.intersects(srcRectF))
@@ -316,8 +313,8 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             frameRectF.translate(-channelRect.left(), -channelRect.top());
             //frameRectF.setWidth(frameRectF.width()*lSize.width());
             //frameRectF.setHeight(frameRectF.height()*lSize.height());
-            frameRect = QRect(frameRectF.left() * decoder->getWidth(), frameRectF.top() * decoder->getHeight(), 
-                frameRectF.width() * decoder->getWidth(), frameRectF.height() * decoder->getHeight());
+            frameRect = QRect(frameRectF.left() * decoder->getWidth() + 0.5, frameRectF.top() * decoder->getHeight() + 0.5, 
+                frameRectF.width() * decoder->getWidth() + 0.5, frameRectF.height() * decoder->getHeight() + 0.5);
             frameRect = roundRect(frameRect);
         }
 

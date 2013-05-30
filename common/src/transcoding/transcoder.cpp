@@ -114,18 +114,33 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
 
     int width = m_resolution.width();
     int height = m_resolution.height();
-    if (!m_srcRectF.isEmpty())
-    {
-        width  *= m_srcRectF.width();
-        height *= m_srcRectF.height();
-    }
     if (m_layout) {
         width *= m_layout->size().width();
         height *= m_layout->size().height();
     }
 
+    if (!m_srcRectF.isEmpty())
+    {
+        // round srcRect
+        int srcLeft = qPower2Floor(unsigned(m_srcRectF.left() * width), 16);
+        int srcTop = qPower2Floor(unsigned(m_srcRectF.top() * height), 2);
+        int srcWidth = qPower2Ceil(unsigned(m_srcRectF.width() * width), 16);
+        int srcHeight = qPower2Ceil(unsigned(m_srcRectF.height() * height), 2);
+
+        m_srcRectF = QRectF(srcLeft / (qreal) width, srcTop / (qreal) height, 
+                            srcWidth / (qreal) width, srcHeight / (qreal) height);
+
+        width  = srcWidth;
+        height = srcHeight;
+    }
+
     m_resolution.setWidth(qPower2Ceil((unsigned)width,16));
     m_resolution.setHeight(qPower2Ceil((unsigned)height,2));
+
+    if (!m_srcRectF.isEmpty())
+    {
+        // round srcRect
+    }
 
     return true;
 }
