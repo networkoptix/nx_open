@@ -10,9 +10,9 @@
 #include "tool_tip_item.h"
 
 namespace {
-    class QnSliderToolTipItem: public QnToolTipItem {
+    class QnSliderToolTipItem: public QnToolTipWidget {
     public:
-        QnSliderToolTipItem(QGraphicsItem *parent = 0) : QnToolTipItem(parent)
+        QnSliderToolTipItem(QGraphicsItem *parent = 0) : QnToolTipWidget(parent)
         {
             setTextPen(QColor(63, 159, 216));
             setBrush(QColor(0, 0, 0, 255));
@@ -94,11 +94,11 @@ QnToolTipSlider::~QnToolTipSlider() {
     m_hideTimer.stop();
 }
 
-QnToolTipItem *QnToolTipSlider::toolTipItem() const {
+QnToolTipWidget *QnToolTipSlider::toolTipItem() const {
     return m_toolTipItem.data();
 }
 
-void QnToolTipSlider::setToolTipItem(QnToolTipItem *newToolTipItem) {
+void QnToolTipSlider::setToolTipItem(QnToolTipWidget *newToolTipItem) {
     qreal opacity = 0.0;
     if(toolTipItem()) {
         opacity = toolTipItem()->opacity();

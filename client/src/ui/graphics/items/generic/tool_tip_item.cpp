@@ -18,7 +18,7 @@ namespace  {
     const qreal arrowWidth = 8.0;
 }
 
-QnToolTipItem::QnToolTipItem(QGraphicsItem *parent):
+QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent):
     base_type(parent),
     m_shapeValid(false)
 {
@@ -42,15 +42,15 @@ QnToolTipItem::QnToolTipItem(QGraphicsItem *parent):
     updateTextSize();
 }
 
-QnToolTipItem::~QnToolTipItem() {
+QnToolTipWidget::~QnToolTipWidget() {
     setFocusProxy(NULL); // TODO: #Elric #Qt5.0 workaround for a qt bug that is fixed in Qt5.0
 }
 
-const QString &QnToolTipItem::text() const {
+const QString &QnToolTipWidget::text() const {
     return m_text;
 }
 
-void QnToolTipItem::setText(const QString &text) {
+void QnToolTipWidget::setText(const QString &text) {
     if (m_text == text)
         return;
 
@@ -59,11 +59,11 @@ void QnToolTipItem::setText(const QString &text) {
     update();
 }
 
-const QFont &QnToolTipItem::font() const {
+const QFont &QnToolTipWidget::font() const {
     return m_font;
 }
 
-void QnToolTipItem::setFont(const QFont &font) {
+void QnToolTipWidget::setFont(const QFont &font) {
     if(m_font == font)
         return;
 
@@ -72,11 +72,11 @@ void QnToolTipItem::setFont(const QFont &font) {
     update();
 }
 
-const QPen &QnToolTipItem::textPen() const {
+const QPen &QnToolTipWidget::textPen() const {
     return m_textPen;
 }
 
-void QnToolTipItem::setTextPen(const QPen &textPen) {
+void QnToolTipWidget::setTextPen(const QPen &textPen) {
     if(m_textPen == textPen)
         return;
 
@@ -84,11 +84,11 @@ void QnToolTipItem::setTextPen(const QPen &textPen) {
     update();
 }
 
-const QPen &QnToolTipItem::borderPen() const {
+const QPen &QnToolTipWidget::borderPen() const {
     return m_borderPen;
 }
 
-void QnToolTipItem::setBorderPen(const QPen &borderPen) {
+void QnToolTipWidget::setBorderPen(const QPen &borderPen) {
     if (m_borderPen == borderPen)
         return;
 
@@ -97,11 +97,11 @@ void QnToolTipItem::setBorderPen(const QPen &borderPen) {
     update();
 }
 
-const QBrush &QnToolTipItem::brush() const {
+const QBrush &QnToolTipWidget::brush() const {
     return m_brush;
 }
 
-void QnToolTipItem::setBrush(const QBrush &brush) {
+void QnToolTipWidget::setBrush(const QBrush &brush) {
     if(m_brush == brush)
         return;
 
@@ -110,19 +110,19 @@ void QnToolTipItem::setBrush(const QBrush &brush) {
     update();
 }
 
-QRectF QnToolTipItem::boundingRect() const {
+QRectF QnToolTipWidget::boundingRect() const {
     ensureShape();
 
     return m_boundingRect;
 }
 
-QPainterPath QnToolTipItem::shape() const {
+QPainterPath QnToolTipWidget::shape() const {
     ensureShape();
 
     return m_itemShape;
 }
 
-void QnToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void QnToolTipWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
@@ -138,19 +138,19 @@ void QnToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     painter->drawText(QRectF(-m_textSize.width() / 2, -arrowHeight - roundingRadius - padding - m_textSize.height(), m_textSize.width(), m_textSize.height()), Qt::AlignCenter, m_text);
 }
 
-void QnToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event) {
+void QnToolTipWidget::wheelEvent(QGraphicsSceneWheelEvent *event) {
     event->ignore();
 
     base_type::wheelEvent(event);
 }
 
-void QnToolTipItem::invalidateShape() {
+void QnToolTipWidget::invalidateShape() {
     m_shapeValid = false;
 
     prepareGeometryChange();
 }
 
-void QnToolTipItem::ensureShape() const {
+void QnToolTipWidget::ensureShape() const {
     if(m_shapeValid)
         return;
 
@@ -193,7 +193,7 @@ void QnToolTipItem::ensureShape() const {
     m_shapeValid = true;
 }
 
-void QnToolTipItem::updateTextSize() {
+void QnToolTipWidget::updateTextSize() {
     QFontMetrics metrics(m_font);
     QSize textSize = metrics.size(0, m_text);
     if(textSize.width() < arrowWidth)

@@ -1,19 +1,20 @@
 #ifndef QN_TOOL_TIP_ITEM_H
 #define QN_TOOL_TIP_ITEM_H
 
-#include <QtGui/QGraphicsItem>
 #include <QtGui/QPen>
 #include <QtGui/QBrush>
 #include <QtGui/QFont>
 
-class QnToolTipItem: public QGraphicsObject {
+#include <ui/graphics/items/standard/graphics_widget.h>
+
+class QnToolTipWidget: public QGraphicsObject {
     Q_OBJECT;
 
     typedef QGraphicsObject base_type;
 
 public:
-    QnToolTipItem(QGraphicsItem *parent = 0);
-    virtual ~QnToolTipItem();
+    QnToolTipWidget(QGraphicsItem *parent = 0);
+    virtual ~QnToolTipWidget();
 
     const QString &text() const;
     void setText(const QString &text);

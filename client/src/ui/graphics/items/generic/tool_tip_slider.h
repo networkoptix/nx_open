@@ -10,7 +10,7 @@
 
 class VariantAnimator;
 
-class QnToolTipItem;
+class QnToolTipWidget;
 class QnToolTipSliderAnimationListener;
 
 /**
@@ -25,8 +25,8 @@ public:
     explicit QnToolTipSlider(QGraphicsItem *parent = NULL);
     virtual ~QnToolTipSlider();
 
-    QnToolTipItem *toolTipItem() const;
-    void setToolTipItem(QnToolTipItem *toolTipItem);
+    QnToolTipWidget *toolTipItem() const;
+    void setToolTipItem(QnToolTipWidget *toolTipItem);
 
     bool isToolTipAutoHidden() const;
     void setAutoHideToolTip(bool autoHideToolTip);
@@ -63,7 +63,7 @@ private:
     friend class QnToolTipSliderVisibilityAccessor;
 
     QScopedPointer<QnToolTipSliderAnimationListener> m_animationListener;
-    QWeakPointer<QnToolTipItem> m_toolTipItem;
+    QWeakPointer<QnToolTipWidget> m_toolTipItem;
     VariantAnimator *m_toolTipItemVisibilityAnimator;
     qreal m_toolTipItemVisibility;
     QBasicTimer m_hideTimer;
