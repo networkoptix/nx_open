@@ -1,26 +1,52 @@
 /**********************************************************
 * 31 oct 2012
 * a.kolesnikov
-* PollSet class implementation for macosx
+* PollSet class implementation for macosx/freebsd
 ***********************************************************/
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__FreeBSD__)
 
 #include "pollset.h"
 
 #include <map>
 
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
+
 #include "../socket.h"
+#include "../socket_impl.h"
 
 
 using namespace std;
 
-//////////////////////////////////////////////////////////
-// PollSetImpl
-//////////////////////////////////////////////////////////
+static const int MAX_EVENTS_TO_RECEIVE = 32;
+
 class PollSetImpl
 {
 public:
+    //!map<pair<socket, event type> >
+    typedef std::set<std::pair<Socket*, SockData> > MonitoredEventSet;
+
+    int kqueueFD;
+    MonitoredEventSet monitoredEvents;
+    int receivedEventCount;
+    struct kevent receivedEventlist[MAX_EVENTS_TO_RECEIVE];
+    //!linux event, used to interrupt epoll_wait
+    int eventFD;
+
+    PollSetImpl()
+    :
+        kqueueFD( -1 ),
+        receivedEventCount( 0 ),
+        eventFD( -1 )
+    {
+        memset( &receivedEventlist, 0, sizeof(v) );
+    }
+
+    ~PollSetImpl()
+    {
+    }
 };
 
 
@@ -30,6 +56,29 @@ public:
 class ConstIteratorImpl
 {
 public:
+    PollSetImpl* pollSetImpl;
+    int currentIndex;
+
+    ConstIteratorImpl()
+    :
+        pollSetImpl( NULL ),
+        currentIndex( 0 )
+    {
+    }
+
+    ConstIteratorImpl( const ConstIteratorImpl& right )
+    :
+        currentIndex( right.currentIndex ),
+        pollSetImpl( right.pollSetImpl )
+    {
+    }
+
+    const ConstIteratorImpl& operator=( const ConstIteratorImpl& right )
+    {
+        pollSetImpl = right.pollSetImpl;
+        currentIndex = right.currentIndex;
+		return *this;
+    }
 };
 
 
@@ -71,14 +120,18 @@ PollSet::const_iterator PollSet::const_iterator::operator++(int)    //it++
 //!Selects next socket which state has been changed with previous \a poll call
 PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
 {
-    //TODO/IMPL
+    m_impl->currentIndex++;
+    while( m_impl->currentIndex < m_impl->pollSetImpl->receivedEventCount && 
+           m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].filter == EVFILT_USER )
+    {
+        continue;
+    }
     return *this;
 }
 
 Socket* PollSet::const_iterator::socket() const
 {
-    //TODO/IMPL
-    return NULL;
+    return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
 }
 
 /*!
@@ -86,20 +139,23 @@ Socket* PollSet::const_iterator::socket() const
 */
 PollSet::EventType PollSet::const_iterator::eventType() const
 {
-    //TODO/IMPL
-    return PollSet::etRead;
+    int kFilterType = m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].filter;
+    PollSet::EventType revents = PollSet::etNone;
+    if( kFilterType == EVFILT_READ )
+        revents = PollSet::etRead;
+    else if( kFilterType == EVFILT_WRITE )
+        revents = PollSet::etWrite;
+    return revents;
 }
 
 void* PollSet::const_iterator::userData()
 {
-    //TODO/IMPL
-    return NULL;
+    return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata)->impl()->getUserData(eventType());
 }
 
 bool PollSet::const_iterator::operator==( const const_iterator& right ) const
 {
-    //TODO/IMPL
-    return true;
+    return (m_impl->pollSetImpl == right.m_impl->pollSetImpl) && (m_impl->currentIndex == right.m_impl->currentIndex);
 }
 
 bool PollSet::const_iterator::operator!=( const const_iterator& right ) const
@@ -115,20 +171,31 @@ PollSet::PollSet()
 :
     m_impl( new PollSetImpl() )
 {
-    //TODO/IMPL
+    m_impl->kqueueFD = kqueue();
+    if( m_impl->kqueueFD < 0 )
+        return;
+
+    //registering filter for interrupting poll
+    struct kevent _newEvent;
+    EV_SET( &_newEvent, 0, EVFILT_USER, EV_ADD, 0, NULL, NULL );
+    kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL );
 }
 
 PollSet::~PollSet()
 {
-    //TODO/IMPL
+    if( m_impl->kqueueFD > 0 )
+    {
+        close( m_impl->kqueueFD );
+        m_impl->kqueueFD = -1;
+    }
+    delete m_impl;
+    m_impl = NULL;
 }
 
 bool PollSet::isValid() const
 {
-    //TODO/IMPL
-    return false;
+    return m_impl->kqueueFD > 0;
 }
-
 
 //!Interrupts \a poll method, blocked in other thread
 /*!
@@ -136,36 +203,71 @@ bool PollSet::isValid() const
 */
 void PollSet::interrupt()
 {
-    //TODO/IMPL
+    struct kevent _newEvent;
+    EV_SET( &_newEvent, 0, EVFILT_USER, 0, NOTE_TRIGGER, NULL, NULL );
+    kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL );
 }
 
 //!Add socket to set. Does not take socket ownership
 bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
 {
-    //TODO/IMPL
+    pair<PollSetImpl::MonitoredEventSet::iterator, bool> p = m_impl->monitoredEvents.insert( make_pair( sock, eventType ) );
+    if( !p.second )
+        return true;    //event evenType is already listened on socket
+
+    const short kfilterType = eventType == etRead ? EVFILT_READ : EVFILT_WRITE;
+
+    //adding new fd to set
+    struct kevent _newEvent;
+    memset( &_newEvent, 0, sizeof(_newEvent) );
+    _newEvent.ident = sock->handle();
+    _newEvent.flags = EV_ENABLE;
+    _newEvent.fiter = kfilterType;
+    _newEvent.udata = sock;
+    if( kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL ) == 0 )
+    {
+        sock->impl()->getUserData(eventType) = userData;
+        return true;
+    }
+
+    m_impl->monitoredEvents.erase( p.first );
     return false;
 }
 
 //!Remove socket from set
 void* PollSet::remove( Socket* const sock, EventType eventType )
 {
-    //TODO/IMPL
-    return NULL;
+    PollSetImpl::MonitoredEventSet::iterator it = m_impl->monitoredEvents.find( make_pair( sock, eventType ) );
+    if( it == m_impl->monitoredEvents.end() )
+        return NULL;
+
+    const int kfilterType = eventType == etRead ? EVFILT_READ : EVFILT_WRITE;
+
+    struct kevent changeList;
+    memset( &changeList, 0, sizeof(changeList) );
+    changeList.ident = sock->handle();
+    changeList.flags = EV_DISABLE | EV_DELETE;
+    kevent( m_impl->kqueueFD, &changeList, 1, NULL, 0, NULL );  //ignoring return code, since event is removed in any case
+    m_impl->monitoredEvents.erase( it );
+
+    void* userData = sock->impl()->getUserData(eventType);
+    sock->impl()->getUserData(eventType) = NULL;
+    return userData;
 }
 
 size_t PollSet::size( EventType /*eventType*/ ) const
 {
-    //TODO/IMPL
-    return 0;
+    return m_impl->monitoredEvents.size();
 }
 
 void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
 {
-    //TODO/IMPL
-    return NULL;
+    return sock->impl()->getUserData(eventType);
 }
 
 static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;
+static const int MILLIS_IN_SEC = 1000;
+static const int NSEC_IN_MS = 1000000;
 
 /*!
     \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.
@@ -174,28 +276,46 @@ static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;
 */
 int PollSet::poll( int millisToWait )
 {
-    //TODO/IMPL
-    return 0;
+    memset( &receivedEventlist, 0, sizeof(receivedEventlist) );
+    struct timespec timeout;
+    if( millisToWait >= 0 )
+    {
+        memset( &timeout, 0, sizeof(timeout) );
+        timeout.tv_sec = millisToWait / MILLIS_IN_SEC;
+        timeout.tv_nsec = (millisToWait % MILLIS_IN_SEC) * NSEC_IN_MS;
+    }
+    m_impl->receivedEventCount = 0;
+    int result = kevent( m_impl->kqueueFD, NULL, 0, &receivedEventlist, MAX_EVENTS_TO_RECEIVE, millisToWait >= 0 ? &timeout : NULL );
+    if( result == EINTR )
+        return 0;   //TODO/IMPL #ak repeat wait (with timeout correction) in this case
+    if( result <= 0 )
+        return result;
+
+    m_impl->receivedEventCount = result;
+    return result;
 }
 
 //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
 PollSet::const_iterator PollSet::begin() const
 {
-    //TODO/IMPL
-    return const_iterator();
+    const_iterator beginIter;
+    beginIter.m_impl->pollSetImpl = m_impl;
+    beginIter.m_impl->currentIndex = 0;
+    return beginIter;
 }
 
 //!Returns iterator pointing to next element after last socket, which state has been changed in previous \a poll call
 PollSet::const_iterator PollSet::end() const
 {
-    //TODO/IMPL
-    return const_iterator();
+    const_iterator endIter;
+    endIter.m_impl->pollSetImpl = m_impl;
+    endIter.m_impl->currentIndex = m_impl->receivedEventCount;
+    return endIter;
 }
 
 unsigned int PollSet::maxPollSetSize()
 {
-    //TODO/IMPL
-    return 128;
+    return 16*1024; //TODO/IMPL #ak: why?
 }
 
-#endif  //__APPLE__
+#endif  //defined(__APPLE__) || defined(__FreeBSD__)
