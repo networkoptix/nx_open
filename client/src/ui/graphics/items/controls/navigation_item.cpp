@@ -18,7 +18,7 @@
 #include <ui/style/globals.h>
 #include <ui/graphics/items/controls/speed_slider.h>
 #include <ui/graphics/items/controls/volume_slider.h>
-#include <ui/graphics/items/generic/tool_tip_item.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/help/help_topic_accessor.h>

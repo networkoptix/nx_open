@@ -7,7 +7,7 @@
 
 #include <ui/animation/opacity_animator.h>
 
-#include "tool_tip_item.h"
+#include "tool_tip_widget.h"
 
 namespace {
     class QnSliderToolTipItem: public QnToolTipWidget {

@@ -1,5 +1,5 @@
-#ifndef QN_TOOL_TIP_ITEM_H
-#define QN_TOOL_TIP_ITEM_H
+#ifndef QN_TOOL_TIP_WIDGET_H
+#define QN_TOOL_TIP_WIDGET_H
 
 #include <QtGui/QPen>
 #include <QtGui/QBrush>
@@ -58,4 +58,4 @@ private:
 };
 
 
-#endif // QN_TOOL_TIP_ITEM_H
+#endif // QN_TOOL_TIP_WIDGET_H

@@ -1,4 +1,4 @@
-#include "tool_tip_item.h"
+#include "tool_tip_widget.h"
 
 #include <cmath>
 
