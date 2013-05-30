@@ -3,16 +3,22 @@
 #include <QtGui/QGraphicsLinearLayout>
 
 #include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/actions/actions.h>
+#include <ui/actions/action_parameters.h>
+#include <ui/actions/action_manager.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/workbench/workbench_context.h>
 
-QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
-    base_type(parent, flags)
+QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
+    base_type(parent, flags),
+    QnWorkbenchContextAware(context)
 {
     m_headerWidget = new QGraphicsWidget(this);
 
@@ -61,13 +67,31 @@ QRectF QnNotificationsCollectionItem::headerGeometry() const {
 void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
 
-
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     BusinessEventType::Value eventType = params.getEventType();
 
+    switch (eventType) {
+    case BusinessEventType::Camera_Input:
+    case BusinessEventType::Camera_Disconnect:
+        item->setColor(QColor(255, 131, 48)); //orange
+        break;
+
+    case BusinessEventType::Storage_Failure:
+    case BusinessEventType::Network_Issue:
+    case BusinessEventType::Camera_Ip_Conflict:
+    case BusinessEventType::MediaServer_Failure:
+    case BusinessEventType::MediaServer_Conflict:
+        item->setColor(QColor(237, 200, 66)); // yellow
+        break;
+
+        //case BusinessEventType::Camera_Motion:
+        //case BusinessEventType::UserDefined:
+    default:
+        item->setColor(QColor(103, 237, 66)); // green
+        break;
+    }
+
     QString text = BusinessEventType::toString(eventType);
-
-
     int resourceId = params.getEventResourceId();
     QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
     if (resource) {
@@ -75,6 +99,8 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
         text += resource->getName();
 
         item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+    } else {
+        item->setIcon(qnSkin->icon("titlebar/disconnected.png")); // should never got this
     }
     item->setText(text);
 
@@ -85,9 +111,15 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
 void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
     item->setText(QnSystemHealth::toString(message));
+    item->setColor(QColor(255, 127, 127)); // red
+
     switch (message) {
-    case QnSystemHealth::EmailIsEmpty:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
+    case QnSystemHealth::EmailIsEmpty: {
+            item->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
+            QnActionParameters* params = new QnActionParameters(context()->user());
+            params->setArgument<QString>(Qn::FocusElementRole, QLatin1String("email"));
+            item->setAction(Qn::UserSettingsAction, params);
+        }
         break;
     case QnSystemHealth::NoLicenses:
         item->setIcon(qnResIconCache->icon(QnResourceIconCache::Recorder));
@@ -113,6 +145,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
     default:
         break;
     }
+    connect(item, SIGNAL(actionTriggered(Qn::ActionId,QnActionParameters*)), this, SLOT(at_item_actionTriggered(Qn::ActionId,QnActionParameters*)));
 
     m_list->addItem(item, true);
 }
@@ -123,4 +156,8 @@ void QnNotificationsCollectionItem::hideAll() {
 
 void QnNotificationsCollectionItem::at_list_itemRemoved(QnNotificationItem *item) {
     delete item;
+}
+
+void QnNotificationsCollectionItem::at_item_actionTriggered(Qn::ActionId id, QnActionParameters *parameters) {
+    menu()->trigger(id, *parameters);
 }

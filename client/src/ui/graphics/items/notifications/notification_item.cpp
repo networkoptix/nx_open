@@ -17,7 +17,9 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     base_type(parent, flags),
     m_textLabel(new QnProxyLabel(this)),
     m_image(new QnImageButtonWidget(this)),
-    m_color(Qt::red)
+    m_color(Qt::red),
+    m_action(Qn::NoAction),
+    m_parameters(NULL)
 {
     m_textLabel->setWordWrap(true);
     {
@@ -29,6 +31,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_image->setMinimumSize(QSizeF(totalHeight, totalHeight));
     m_image->setMaximumSize(QSizeF(totalHeight, totalHeight));
     m_image->setVisible(false);
+    connect(m_image, SIGNAL(clicked()), this, SLOT(at_image_clicked()));
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Horizontal);
     layout->setContentsMargins(margin*2, margin, margin, margin);
@@ -43,6 +46,8 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 }
 
 QnNotificationItem::~QnNotificationItem() {
+//    if (m_parameters)
+//        delete m_parameters;
 }
 
 QString QnNotificationItem::text() const {
@@ -77,5 +82,8 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
     gradient.setSpread(QGradient::PadSpread);
     painter->fillRect(boundingRect(), QBrush(gradient));
+}
 
+void QnNotificationItem::at_image_clicked() {
+    emit actionTriggered(m_action, m_parameters);
 }

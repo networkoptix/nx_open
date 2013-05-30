@@ -20,8 +20,7 @@ namespace {
 
 QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::WindowFlags flags):
     base_type(parent, flags),
-    m_hoverProcessor(new HoverFocusProcessor(this)),
-    m_counter(0)
+    m_hoverProcessor(new HoverFocusProcessor(this))
 {
     registerAnimation(this);
     startListening();
@@ -166,15 +165,11 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     item->setVisible(false);
 
-    QVector<QColor> colors = qnGlobals->statisticsColors().hdds;
-    item->setColor(colors[m_counter % colors.size()]);
-
     QnItemState* state = new QnItemState(this);
     state->item = item;
     state->state = QnItemState::Waiting;
     state->locked = locked;
     m_items.append(state);
-    m_counter++;
 }
 
 void QnNotificationListWidget::clear() {

@@ -8,18 +8,20 @@
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
 class QnNotificationItem;
+class QnActionParameters;
 
-class QnNotificationsCollectionItem : public GraphicsWidget
+class QnNotificationsCollectionItem : public GraphicsWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef GraphicsWidget base_type;
 public:
-    explicit QnNotificationsCollectionItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0);
+    explicit QnNotificationsCollectionItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0, QnWorkbenchContext* context = NULL);
     virtual ~QnNotificationsCollectionItem();
 
     QRectF headerGeometry() const;
@@ -34,6 +36,7 @@ public slots:
 
 private slots:
     void at_list_itemRemoved(QnNotificationItem* item);
+    void at_item_actionTriggered(Qn::ActionId id, QnActionParameters* parameters);
 private:
     QnNotificationListWidget *m_list;
     QGraphicsWidget* m_headerWidget;

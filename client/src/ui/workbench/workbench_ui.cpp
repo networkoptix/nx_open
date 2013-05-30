@@ -481,7 +481,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_notificationsBackgroundItem->setFrameWidth(0.5);
 
-    m_notificationsItem = new QnNotificationsCollectionItem(m_controlsWidget);
+    m_notificationsItem = new QnNotificationsCollectionItem(m_controlsWidget, 0, context());
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
 
     QnWorkbenchNotificationsHandler* handler = context()->instance<QnWorkbenchNotificationsHandler>();

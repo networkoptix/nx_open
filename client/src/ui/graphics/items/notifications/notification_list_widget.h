@@ -72,7 +72,6 @@ private slots:
 private:
     HoverFocusProcessor* m_hoverProcessor;
     QLinkedList<QnItemState *> m_items;
-    int m_counter;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H
