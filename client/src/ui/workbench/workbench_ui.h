@@ -31,7 +31,6 @@ class HoverFocusProcessor;
 class QnNavigationItem;
 class QnResourceBrowserWidget;
 class QnProxyLabel;
-class GraphicsLabel;
 
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
