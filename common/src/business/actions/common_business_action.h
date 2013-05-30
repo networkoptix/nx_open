@@ -7,7 +7,9 @@
 
 #include "abstract_business_action.h"
 
-// TODO: #AK what is the purpose of this class?
+/*!
+    Initiallly, this class has been created so that code like "new QnAbstractBusinessAction" never appears in project
+*/
 class QnCommonBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
