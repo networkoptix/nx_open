@@ -4,7 +4,7 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widget.h>
 
-class GraphicsLabel;
+class QnProxyLabel;
 class QnImageButtonWidget;
 class QGraphicsLinearLayout;
 
@@ -34,7 +34,7 @@ signals:
     void imageClicked();
 
 private:
-    GraphicsLabel* m_textLabel;
+    QnProxyLabel* m_textLabel;
     QnImageButtonWidget *m_image;
     QString m_iconPath;
     QColor m_color;

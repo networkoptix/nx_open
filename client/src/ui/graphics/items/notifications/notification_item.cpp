@@ -3,7 +3,7 @@
 #include <QtGui/QGraphicsLinearLayout>
 
 #include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 
 #include <ui/style/skin.h>
@@ -17,25 +17,20 @@ namespace {
 
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
-    m_textLabel(new GraphicsLabel(this)),
+    m_textLabel(new QnProxyLabel(this)),
     m_image(new QnImageButtonWidget(this)),
     m_color(Qt::red)
 {
-//    QSizeF size(totalWidth + margin*2, totalHeight + margin*2);
-//    setMinimumSize(size);
-//    setMaximumSize(size);
+    m_textLabel->setWordWrap(true);
+    {
+        QPalette palette = m_textLabel->palette();
+        palette.setColor(QPalette::Window, Qt::transparent);
+        m_textLabel->setPalette(palette);
+    }
 
     m_image->setMinimumSize(QSizeF(totalHeight, totalHeight));
     m_image->setMaximumSize(QSizeF(totalHeight, totalHeight));
     m_image->setVisible(false);
-//    m_image->setPos(totalWidth - totalHeight + margin, margin);
-
- //   m_textLabel->setMinimumSize(totalWidth - totalHeight - spacerSize, totalHeight);
- //   m_textLabel->setMaximumSize(totalWidth - totalHeight - spacerSize, totalHeight);
-//    m_textLabel->setPos(margin + spacerSize, margin);
-
-//    setIconPath(QLatin1String("item/zoom_window.png"));
-//    setText(tr("Create Zoom Window"));
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Horizontal);
     layout->setContentsMargins(margin*2, margin, margin, margin);

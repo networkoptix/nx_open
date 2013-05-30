@@ -9,10 +9,10 @@
 
 namespace {
 
-    int popoutTimeoutMs = 1000;
-    int moveUpTimeoutMs = 500;
+    int popoutTimeoutMs = 500;
+    int moveUpTimeoutMs = 200;
     int displayTimeoutMs = 5000;
-    int hideTimeoutMs = 1000;
+    int hideTimeoutMs = 300;
     int hoverLeaveTimeoutMSec = 250;
 
     qreal widgetWidth = 200;
