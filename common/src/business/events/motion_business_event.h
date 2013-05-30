@@ -10,10 +10,7 @@ class QnMotionBusinessEvent: public QnProlongedBusinessEvent
 {
     typedef QnProlongedBusinessEvent base_type;
 public:
-    QnMotionBusinessEvent(const QnResourcePtr& resource,
-                          ToggleState::Value toggleState,
-                          qint64 timeStamp,
-                          QnAbstractDataPacketPtr metadata);
+    QnMotionBusinessEvent(const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp, QnAbstractDataPacketPtr metadata);
 
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
     static bool isResourcesListValid(const QnResourceList &resources);

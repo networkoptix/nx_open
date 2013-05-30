@@ -1014,14 +1014,14 @@ public:
     {
         setAutoDelete( false );
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
-        m_src->setDisplaying( true );
+        //m_src->setDisplaying( true );
 #endif
     }
 
     ~AVPacketUploader()
     {
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
-        m_src->setDisplaying( false );
+        //m_src->setDisplaying( false );
 #endif
     }
 
@@ -1059,6 +1059,11 @@ public:
     bool success() const
     {
         return m_success;
+    }
+
+    const QSharedPointer<CLVideoDecoderOutput>& decodedFrame() const
+    {
+        return m_src;
     }
 
     DecodedPictureToOpenGLUploader::UploadedPicture* picture()
@@ -1440,6 +1445,21 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
     }
 }
 
+bool DecodedPictureToOpenGLUploader::isUsingFrame( const QSharedPointer<CLVideoDecoderOutput>& image ) const
+{
+    QMutexLocker lk( &m_mutex );
+
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+    foreach( AVPacketUploader* uploader, m_framesWaitingUploadInGUIThread )
+    {
+        if( uploader->decodedFrame() == image )
+            return true;
+    }
+#endif
+
+    return false;
+}
+
 DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader::getUploadedPicture() const
 {
     QMutexLocker lk( &m_mutex );
@@ -1592,6 +1612,8 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
         m_emptyBuffers.push_back( *it );
         it = m_picturesWaitingRendering.erase( it );
     }
+
+    m_cond.wakeAll();
 }
 
 void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
@@ -1607,6 +1629,7 @@ void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
         {
             if( (*it)->isRunning() )
             {
+                //NOTE this CANNOT occur, if in GUI thread now...
                 ++it;
                 continue;
             }
@@ -1617,7 +1640,7 @@ void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
 
         if( m_framesWaitingUploadInGUIThread.empty() )
             break;
-        m_cond.wait( &m_mutex );
+        m_cond.wait( &m_mutex );    //NOTE this CANNOT occur, if in GUI thread now...
     }
 }
 

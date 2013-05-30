@@ -7,6 +7,11 @@
 
 class Instrument;
 
+/**
+ * A graphics widget that has the same coordinate system as a viewport.
+ * 
+ * Useful for placing UI controls.
+ */
 class QnUiElementsWidget: public QGraphicsWidget {
     Q_OBJECT;
     typedef QGraphicsWidget base_type;

@@ -33,14 +33,14 @@
 // Why don't just use QWidget?
 
 namespace {
-    QString toggleStateToString(ToggleState::Value value, bool prolonged) {
+    QString toggleStateToString(Qn::ToggleState value, bool prolonged) {
         switch( value )
         {
-            case ToggleState::Off:
+            case Qn::OffState:
                 return QObject::tr("Stops");
-            case ToggleState::On:
+            case Qn::OnState:
                 return QObject::tr("Starts");
-            case ToggleState::NotDefined:
+            case Qn::UndefinedState:
             if (prolonged)
                 return QObject::tr("Starts/Stops");
             else
@@ -330,7 +330,7 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
         return;
 
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
-    ToggleState::Value val = (ToggleState::Value)typeIdx;
+    Qn::ToggleState val = (Qn::ToggleState) typeIdx;
     m_model->setEventState(val);
 }
 

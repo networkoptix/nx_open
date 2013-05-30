@@ -5,7 +5,10 @@
 
 #include "file_transcoder.h"
 
+#include <QDir>
 #include <QMutexLocker>
+#include <QDir>
+#include <QFileInfo>
 
 #include <core/resource/resource.h>
 
@@ -101,7 +104,7 @@ bool FileTranscoder::setTagValue(
     const QString& tempFilePath = QString::fromAscii("%1/%2").arg(srcFileDir.path()).arg(tempFileName);
 
     //setting audio/video codecID
-    for( int i = 0; i < formatCtx->nb_streams; ++i )
+    for( size_t i = 0; i < formatCtx->nb_streams; ++i )
     {
         if( formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO )
             formatCtx->audio_codec_id = formatCtx->streams[i]->codec->codec_id;
@@ -270,7 +273,7 @@ void FileTranscoder::run()
     }
 }
 
-void FileTranscoder::setSource( QIODevice* src )
+void FileTranscoder::setSource( QIODevice* /*src*/ )
 {
     //TODO/IMPL need support in QnAviArchiveDelegate
 }

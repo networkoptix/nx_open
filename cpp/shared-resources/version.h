@@ -38,6 +38,8 @@
 #define QN_LICENSE_URL              "${license.url}"
 #define QN_RSA_PUBLIC_KEY           ${rsa.public.key}
 
+#define QN_BUILDENV_PATH            "${environment.dir}"
+
 /* 
  * These constans are here for windows resouce file.
  *

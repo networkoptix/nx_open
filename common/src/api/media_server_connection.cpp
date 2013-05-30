@@ -351,7 +351,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     }
     case eventLogObject: {
         QnApiPbSerializer serializer;
-        QnLightBusinessActionVectorPtr events(new QnLightBusinessActionVector);
+        QnBusinessActionDataListPtr events(new QnBusinessActionDataList);
         if (response.status == 0)
             QnEventSerializer::deserialize(events, response.data);
         emitFinished(this, response.status, events, handle);
@@ -563,6 +563,6 @@ int QnMediaServerConnection::asyncEventLog(
     if (actionType != BusinessActionType::NotDefined)
         params << QnRequestParam( "action", (int) actionType);
 
-    return sendAsyncGetRequest(eventLogObject, params, QN_REPLY_TYPE(QnLightBusinessActionVectorPtr), target, slot);
+    return sendAsyncGetRequest(eventLogObject, params, QN_REPLY_TYPE(QnBusinessActionDataListPtr), target, slot);
 }
 

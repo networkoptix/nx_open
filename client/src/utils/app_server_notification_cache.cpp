@@ -34,7 +34,7 @@ QnNotificationSoundModel* QnAppServerNotificationCache::persistentGuiModel() con
     return m_model;
 }
 
-void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs, const QString &customTitle) {
+bool QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs, const QString &customTitle) {
     QString uuid = QUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".mp3");
 
@@ -46,6 +46,7 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
         title = title.mid(0, title.lastIndexOf(QLatin1Char('.')));
     }
 
+    ensureCacheFolder();
     FileTranscoder* transcoder = new FileTranscoder();
     transcoder->setSourceFile(filePath);
     transcoder->setDestFile(getFullPath(newFilename));
@@ -58,12 +59,16 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
 
     connect(transcoder, SIGNAL(done(QString)), this, SLOT(at_soundConverted(QString)));
     connect(transcoder, SIGNAL(done(QString)), transcoder, SLOT(deleteLater()));
-    transcoder->startAsync();
+    return transcoder->startAsync();
 }
 
-void QnAppServerNotificationCache::updateTitle(const QString &filename, const QString &title) {
-    m_model->updateTitle(filename, title);
-//    AudioPlayer::setTagValue(getFullPath(filename), title);
+bool QnAppServerNotificationCache::updateTitle(const QString &filename, const QString &title) {
+    bool result = FileTranscoder::setTagValue( getFullPath(filename), titleTag, title );
+    if (result) {
+        m_model->updateTitle(filename, title);
+        uploadFile(filename);
+    }
+    return result;
 }
 
 void QnAppServerNotificationCache::clear() {

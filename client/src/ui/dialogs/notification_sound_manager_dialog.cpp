@@ -26,8 +26,6 @@ QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *pare
     connect(ui->addButton,      SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
     connect(ui->renameButton,   SIGNAL(clicked()), this, SLOT(at_renameButton_clicked()));
     connect(ui->deleteButton,   SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
-
-    ui->renameButton->setVisible(false);
 }
 
 QnNotificationSoundManagerDialog::~QnNotificationSoundManagerDialog()
@@ -51,6 +49,7 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
 }
 
 void QnNotificationSoundManagerDialog::at_addButton_clicked() {
+    //TODO: #GDM progressbar required
     QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file...")));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
@@ -72,7 +71,10 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
 
     QString filename = files[0];
 
-    context()->instance<QnAppServerNotificationCache>()->storeSound(filename, cropSoundSecs*1000, title);
+    if (!context()->instance<QnAppServerNotificationCache>()->storeSound(filename, cropSoundSecs*1000, title))
+        QMessageBox::warning(this,
+                             tr("Error"),
+                             tr("File cannot be added."));
 }
 
 void QnNotificationSoundManagerDialog::at_renameButton_clicked() {
@@ -88,15 +90,21 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked() {
 
     QString newTitle = QInputDialog::getText(this,
                                              tr("Rename sound"),
-                                             tr("Enter new sound name:"),
+                                             tr("Enter new title:"),
                                              QLineEdit::Normal,
                                              title);
     if (newTitle.isEmpty())
         return;
-    context()->instance<QnAppServerNotificationCache>()->updateTitle(filename, newTitle);
+
+    if (!context()->instance<QnAppServerNotificationCache>()->updateTitle(filename, newTitle))
+        QMessageBox::warning(this,
+                             tr("Error"),
+                             tr("New title could not be set"));
+
 }
 
 void QnNotificationSoundManagerDialog::at_deleteButton_clicked() {
+    //TODO: #GDM progressbar required
     if (!ui->listView->currentIndex().isValid())
         return;
 

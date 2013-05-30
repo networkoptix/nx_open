@@ -43,9 +43,8 @@ namespace {
 
 } // anonymous namespace
 
-Q_GLOBAL_STATIC(QnClientSettings, qn_settings)
-
-QnClientSettings::QnClientSettings():
+QnClientSettings::QnClientSettings(QObject *parent):
+    base_type(parent),
     m_settings(new QSettings(this)),
     m_loading(true)
 {
@@ -93,10 +92,6 @@ QnClientSettings::QnClientSettings():
 
 QnClientSettings::~QnClientSettings() {
     return;
-}
-
-QnClientSettings *QnClientSettings::instance() {
-    return qn_settings();
 }
 
 QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {

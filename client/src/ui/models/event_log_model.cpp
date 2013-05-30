@@ -16,7 +16,7 @@
 #include "device_plugins/server_camera/server_camera.h"
 #include "client/client_settings.h"
 
-typedef QnLightBusinessAction* QnLightBusinessActionP;
+typedef QnBusinessActionData* QnLightBusinessActionP;
 
 class QnEventLogModel::DataIndex
 {
@@ -66,7 +66,7 @@ public:
         updateIndex();
     }
 
-    void setEvents(const QVector<QnLightBusinessActionVectorPtr>& events) 
+    void setEvents(const QVector<QnBusinessActionDataListPtr>& events) 
     { 
         m_events = events;
         m_size = 0;
@@ -76,7 +76,7 @@ public:
         updateIndex();
     }
 
-    QVector<QnLightBusinessActionVectorPtr> events() const
+    QVector<QnBusinessActionDataListPtr> events() const
     {
         return m_events;
     }
@@ -107,7 +107,7 @@ public:
         return m_actionTypeToLexOrder[((int) actionType) & 0xff];
     }
 
-    inline QnLightBusinessAction& at(int row)
+    inline QnBusinessActionData& at(int row)
     {
         return m_sortOrder == Qt::AscendingOrder ? *m_records[row] : *m_records[m_size-1-row];
     }
@@ -168,7 +168,7 @@ public:
         QnLightBusinessActionP* dst = &m_records[0];
         for (int i = 0; i < m_events.size(); ++i)
         {
-            QnLightBusinessActionVector& data = *m_events[i].data();
+            QnBusinessActionDataList& data = *m_events[i].data();
             for (int j = 0; j < data.size(); ++j)
                 *dst++ = &data[j];
         }
@@ -201,7 +201,7 @@ public:
 private:
     Column m_sortCol;
     Qt::SortOrder m_sortOrder;
-    QVector<QnLightBusinessActionVectorPtr> m_events;
+    QVector<QnBusinessActionDataListPtr> m_events;
     QVector<QnLightBusinessActionP> m_records;
     int m_size;
     static int m_eventTypeToLexOrder[256];
@@ -225,7 +225,7 @@ QnEventLogModel::~QnEventLogModel() {
     delete m_index;
 }
 
-void QnEventLogModel::setEvents(const QVector<QnLightBusinessActionVectorPtr> &events)
+void QnEventLogModel::setEvents(const QVector<QnBusinessActionDataListPtr> &events)
 {
     m_index->setEvents(events);
     rebuild();
@@ -277,7 +277,7 @@ void QnEventLogModel::clear()
     QStandardItemModel::clear();
 }
 
-QVariant QnEventLogModel::fontData(const Column& column, const QnLightBusinessAction &action) const
+QVariant QnEventLogModel::fontData(const Column& column, const QnBusinessActionData &action) const
 {
     if (column == DescriptionColumn) {
         BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
@@ -288,7 +288,7 @@ QVariant QnEventLogModel::fontData(const Column& column, const QnLightBusinessAc
     return QVariant();
 }
 
-QVariant QnEventLogModel::foregroundData(const Column& column, const QnLightBusinessAction &action) const
+QVariant QnEventLogModel::foregroundData(const Column& column, const QnBusinessActionData &action) const
 {
     if (column == DescriptionColumn) {
         BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
@@ -299,9 +299,9 @@ QVariant QnEventLogModel::foregroundData(const Column& column, const QnLightBusi
     return QVariant();
 }
 
-QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnLightBusinessAction &action)
+QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnBusinessActionData &action)
 {
-    if (column == DescriptionColumn && action.hasFlags(QnLightBusinessAction::MotionExists)) {
+    if (column == DescriptionColumn && action.hasFlags(QnBusinessActionData::MotionExists)) {
         BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
         if (eventType == BusinessEventType::Camera_Motion)
             return Qt::PointingHandCursor;
@@ -331,7 +331,7 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnId& id)
     return resource;
 }
 
-QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAction &action)
+QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionData &action)
 {
     QnId resId;
     switch(column) {
@@ -351,7 +351,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnLightBusinessAc
         return QVariant();
 }
 
-QVariant QnEventLogModel::resourceData(const Column& column, const QnLightBusinessAction &action)
+QVariant QnEventLogModel::resourceData(const Column& column, const QnBusinessActionData &action)
 {
     switch(column) {
         case EventCameraColumn: 
@@ -396,7 +396,7 @@ QString QnEventLogModel::getResourceNameString(QnId id)
     return result;
 }
 
-QString QnEventLogModel::textData(const Column& column,const QnLightBusinessAction& action)
+QString QnEventLogModel::textData(const Column& column,const QnBusinessActionData& action)
 {
     switch(column) 
     {
@@ -423,7 +423,7 @@ QString QnEventLogModel::textData(const Column& column,const QnLightBusinessActi
             QString result;
 
             if (eventType == BusinessEventType::Camera_Motion) {
-                if (action.hasFlags(QnLightBusinessAction::MotionExists))
+                if (action.hasFlags(QnBusinessActionData::MotionExists))
                     result = lit("Motion video");
             }
             else {
@@ -449,9 +449,9 @@ void QnEventLogModel::sort(int column, Qt::SortOrder order)
     rebuild();
 }
 
-QString QnEventLogModel::motionUrl(Column column, const QnLightBusinessAction& action)
+QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& action)
 {
-    if (column != DescriptionColumn || !action.hasFlags(QnLightBusinessAction::MotionExists))
+    if (column != DescriptionColumn || !action.hasFlags(QnBusinessActionData::MotionExists))
         return QString();
 
     if (action.getRuntimeParams().getEventType() != BusinessEventType::Camera_Motion)
@@ -464,8 +464,8 @@ bool QnEventLogModel::hasMotionUrl(const QModelIndex & index) const
     if (!index.isValid() || index.column() != DescriptionColumn)
         return false;
 
-    const QnLightBusinessAction& action = m_index->at(index.row());
-    if (!action.hasFlags(QnLightBusinessAction::MotionExists))
+    const QnBusinessActionData& action = m_index->at(index.row());
+    if (!action.hasFlags(QnBusinessActionData::MotionExists))
         return false;
     if (!action.getRuntimeParams().getEventResourceId())
         return false;
@@ -479,7 +479,7 @@ QVariant QnEventLogModel::data( const QModelIndex & index, int role) const
         return QVariant();
 
     const Column& column = m_columns[index.column()];
-    const QnLightBusinessAction& action = m_index->at(index.row());
+    const QnBusinessActionData& action = m_index->at(index.row());
     
     switch(role)
     {
@@ -513,7 +513,7 @@ QVariant QnEventLogModel::data( const QModelIndex & index, int role) const
 BusinessEventType::Value QnEventLogModel::eventType(int row) const
 {
     if (row >= 0) {
-        const QnLightBusinessAction& action = m_index->at(row);
+        const QnBusinessActionData& action = m_index->at(row);
         return action.getRuntimeParams().getEventType();
     }
     else {
@@ -524,7 +524,7 @@ BusinessEventType::Value QnEventLogModel::eventType(int row) const
 QnResourcePtr QnEventLogModel::eventResource(int row) const
 {
     if (row >= 0) {
-        const QnLightBusinessAction& action = m_index->at(row);
+        const QnBusinessActionData& action = m_index->at(row);
         return qnResPool->getResourceById(action.getRuntimeParams().getEventResourceId());
     }
     else {
@@ -535,7 +535,7 @@ QnResourcePtr QnEventLogModel::eventResource(int row) const
 qint64 QnEventLogModel::eventTimestamp(int row) const
 {
     if (row >= 0) {
-        const QnLightBusinessAction& action = m_index->at(row);
+        const QnBusinessActionData& action = m_index->at(row);
         return action.timestamp();
     }
     else {

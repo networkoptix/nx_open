@@ -1,7 +1,5 @@
 #include "server_resource_widget.h"
 
-#include <iterator> /* For std::advance. */
-
 #include <utils/math/math.h> /* For M_PI. */
 #include <utils/math/color_transformations.h>
 

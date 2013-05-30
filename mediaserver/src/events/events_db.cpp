@@ -221,7 +221,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
         action->setBusinessRuleId(query.value(businessRuleIdx).toInt());
-        action->setToggleState( (ToggleState::Value) query.value(toggleStateIdx).toInt());
+        action->setToggleState( (Qn::ToggleState) query.value(toggleStateIdx).toInt());
         action->setAggregationCount(query.value(aggregationCntIdx).toInt());
 
         result << action;
@@ -283,7 +283,7 @@ void QnEventsDB::getAndSerializeActions(
             QnNetworkResourcePtr camRes = qnResPool->getResourceById(eventResId).dynamicCast<QnNetworkResource>();
             if (camRes) {
                 if (qnStorageMan->isArchiveTimeExists(camRes->getPhysicalId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
-                    flags |= QnLightBusinessAction::MotionExists;
+                    flags |= QnBusinessActionData::MotionExists;
 
             }
         }
@@ -344,7 +344,7 @@ void QnEventsDB::migrate()
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
         action->setBusinessRuleId(query.value(businessRuleIdx).toInt());
-        action->setToggleState( (ToggleState::Value) query.value(toggleStateIdx).toInt());
+        action->setToggleState( (Qn::ToggleState) query.value(toggleStateIdx).toInt());
         action->setAggregationCount(query.value(aggregationCntIdx).toInt());
 
         result << action;

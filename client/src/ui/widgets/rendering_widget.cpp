@@ -76,7 +76,7 @@ void QnRenderingWidget::ensureDisplay() {
         return;
 
     m_display = new QnResourceDisplay(m_resource, this);
-    m_renderer = new QnResourceWidgetRenderer(1, NULL, context());
+    m_renderer = new QnResourceWidgetRenderer(NULL, context());
     updateChannelScreenSize();
 
     m_display->addRenderer(m_renderer); /* Ownership of the renderer is transferred to the display. */

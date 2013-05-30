@@ -244,9 +244,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     }
 
     m_imgUploader->setOpacity( painter->opacity() );
-    m_renderer->paint(
-        QRectF(0, 0, 1, 1),
-        m_rect );
+    m_renderer->paint(QRectF(0, 0, 1, 1), m_rect);
     painter->endNativePainting();
 #else
     if (!m_image.isNull())

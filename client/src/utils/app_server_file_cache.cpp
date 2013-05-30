@@ -32,6 +32,11 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
                                     );
 }
 
+void QnAppServerFileCache::ensureCacheFolder() {
+    QString folderPath = getFullPath(QString());
+    QDir().mkpath(folderPath);
+}
+
 
 // -------------- File List loading methods -----
 
@@ -92,9 +97,8 @@ void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int
         return;
     }
 
+    ensureCacheFolder();
     QString filePath = getFullPath(filename);
-    QString folder = QFileInfo(filePath).absolutePath();
-    QDir().mkpath(folder);
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
         emit fileDownloaded(filename, false);

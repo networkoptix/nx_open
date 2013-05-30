@@ -28,8 +28,6 @@
 #include <ui/widgets/settings/popup_settings_widget.h>
 #include <ui/widgets/settings/server_settings_widget.h>
 
-#include <youtube/youtubesettingswidget.h>
-
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),

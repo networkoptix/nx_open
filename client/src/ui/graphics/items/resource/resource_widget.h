@@ -111,6 +111,7 @@ public:
     
     const QRectF &zoomRect() const;
     void setZoomRect(const QRectF &zoomRect);
+    QnResourceWidget *zoomTargetWidget() const;
 
     /**
      * \returns                         Frame opacity of this widget.
@@ -288,6 +289,7 @@ signals:
     void aboutToBeDestroyed();
     void optionsChanged();
     void zoomRectChanged();
+    void zoomTargetWidgetChanged();
     void frameColorChanged();
     void rotationStartRequested();
     void rotationStopRequested();
@@ -408,6 +410,8 @@ private:
     };
 
 private:
+    friend class QnWorkbenchDisplay;
+
     /** Paused painter. */
     QSharedPointer<QnPausedPainter> m_pausedPainter;
 

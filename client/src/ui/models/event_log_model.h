@@ -27,7 +27,7 @@ public:
     QnEventLogModel(QObject *parent = NULL);
     virtual ~QnEventLogModel();
 
-    void setEvents(const QVector<QnLightBusinessActionVectorPtr> &events);
+    void setEvents(const QVector<QnBusinessActionDataListPtr> &events);
 
     QList<Column> columns() const;
     void setColumns(const QList<Column> &columns);
@@ -47,17 +47,17 @@ public slots:
     void clear();
     void rebuild();
 private:
-    QVariant fontData(const Column& column, const QnLightBusinessAction &action) const;
-    QVariant foregroundData(const Column& column, const QnLightBusinessAction &action) const;
+    QVariant fontData(const Column& column, const QnBusinessActionData &action) const;
+    QVariant foregroundData(const Column& column, const QnBusinessActionData &action) const;
 
     static QString columnTitle(Column column);
     
-    static QVariant iconData(const Column& column, const QnLightBusinessAction &action);
-    static QVariant mouseCursorData(const Column& column, const QnLightBusinessAction &action);
-    static QVariant resourceData(const Column& column, const QnLightBusinessAction &action);
-    static QString textData(const Column& column,const QnLightBusinessAction &action);
+    static QVariant iconData(const Column& column, const QnBusinessActionData &action);
+    static QVariant mouseCursorData(const Column& column, const QnBusinessActionData &action);
+    static QVariant resourceData(const Column& column, const QnBusinessActionData &action);
+    static QString textData(const Column& column,const QnBusinessActionData &action);
 
-    static QString motionUrl(Column column, const QnLightBusinessAction& action);
+    static QString motionUrl(Column column, const QnBusinessActionData& action);
     static QString formatUrl(const QString& url);
     static QnResourcePtr getResourceById(const QnId& id);
     static QString getResourceNameString(QnId id);

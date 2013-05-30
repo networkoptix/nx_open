@@ -1,6 +1,7 @@
 #ifndef DYNAMIC_DEBUGGER_H
 #define DYNAMIC_DEBUGGER_H
 
+#include <QDebug>
 #include <QObject>
 
 class QnDynamicDebugger: public QObject {
@@ -12,7 +13,9 @@ public:
 
 public slots:
     void print() {
+#ifndef Q_OS_MAC
         qDebug() << m_debugString;
+#endif
     }
 
 private:

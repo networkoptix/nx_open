@@ -30,6 +30,7 @@
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -133,8 +134,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_overlayVisible(0),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
-    m_overlayRotation(Qn::Angle0),
-    m_zoomRect(0.0, 0.0, 1.0, 1.0)
+    m_overlayRotation(Qn::Angle0)
 {
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
@@ -324,6 +324,10 @@ void QnResourceWidget::setZoomRect(const QRectF &zoomRect) {
     emit zoomRectChanged();
 }
 
+QnResourceWidget *QnResourceWidget::zoomTargetWidget() const {
+    return QnWorkbenchContextAware::display()->zoomTargetWidget(const_cast<QnResourceWidget *>(this));
+}
+
 void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     if(qFuzzyCompare(m_frameWidth, frameWidth))
         return;
@@ -475,7 +479,7 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    QRectF rect = unsubRect(this->rect(), zoomRect());
+    QRectF rect = zoomRect().isNull() ? this->rect() : unsubRect(this->rect(), zoomRect());
 
     if (m_channelsLayout->channelCount() == 1)
         return rect;

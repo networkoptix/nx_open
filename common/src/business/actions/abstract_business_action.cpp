@@ -83,7 +83,7 @@ namespace BusinessActionType {
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams):
     m_actionType(actionType),
-    m_toggleState(ToggleState::NotDefined), 
+    m_toggleState(Qn::UndefinedState), 
     m_receivedFromRemoteHost(false),
     m_runtimeParams(runtimeParams),
     m_aggregationCount(1)
@@ -126,11 +126,11 @@ QnId QnAbstractBusinessAction::getBusinessRuleId() const {
     return m_businessRuleId;
 }
 
-void QnAbstractBusinessAction::setToggleState(ToggleState::Value value) {
+void QnAbstractBusinessAction::setToggleState(Qn::ToggleState value) {
     m_toggleState = value;
 }
 
-ToggleState::Value QnAbstractBusinessAction::getToggleState() const {
+Qn::ToggleState QnAbstractBusinessAction::getToggleState() const {
     return m_toggleState;
 }
 

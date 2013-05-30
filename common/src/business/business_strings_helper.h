@@ -4,7 +4,7 @@
 #include "actions/abstract_business_action.h"
 #include "events/abstract_business_event.h"
 #include "business_aggregation_info.h"
-#include "business_logic_common.h"
+#include "business_fwd.h"
 
 class QnBusinessStringsHelper: QObject
 {

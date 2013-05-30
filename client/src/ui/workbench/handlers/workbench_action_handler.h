@@ -174,7 +174,6 @@ protected:
         AddToLayoutParams():
             usePosition(false),
             position(QPointF()),
-            zoomWindow(QRectF(0.0, 0.0, 1.0, 1.0)),
             zoomUuid(QUuid()),
             time(0)
         {}

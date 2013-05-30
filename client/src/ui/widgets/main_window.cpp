@@ -129,7 +129,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
 
-    connect(m_dwm,                          SIGNAL(compositionChanged(bool)),               this,                                   SLOT(updateDwmState()));
+    connect(m_dwm,                          SIGNAL(compositionChanged()),                   this,                                   SLOT(updateDwmState()));
 
     /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
