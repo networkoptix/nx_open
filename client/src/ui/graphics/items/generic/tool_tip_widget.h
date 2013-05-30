@@ -7,10 +7,10 @@
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 
-class QnToolTipWidget: public QGraphicsObject {
+class QnToolTipWidget: public GraphicsWidget {
     Q_OBJECT;
 
-    typedef QGraphicsObject base_type;
+    typedef GraphicsWidget base_type;
 
 public:
     QnToolTipWidget(QGraphicsItem *parent = 0);
