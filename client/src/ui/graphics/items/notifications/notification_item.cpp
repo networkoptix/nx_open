@@ -27,6 +27,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 
     m_image->setMinimumSize(QSizeF(totalHeight, totalHeight));
     m_image->setMaximumSize(QSizeF(totalHeight, totalHeight));
+    m_image->setVisible(false);
 //    m_image->setPos(totalWidth - totalHeight + margin, margin);
 
  //   m_textLabel->setMinimumSize(totalWidth - totalHeight - spacerSize, totalHeight);
@@ -68,11 +69,13 @@ void QnNotificationItem::setIconPath(const QString& iconPath) {
         return;
     m_iconPath = iconPath;
     m_image->setIcon(qnSkin->icon(m_iconPath));
+    m_image->setVisible(true);
 }
 
 void QnNotificationItem::setIcon(const QIcon &icon) {
     m_iconPath = QString();
     m_image->setIcon(icon);
+    m_image->setVisible(true);
 }
 
 QColor QnNotificationItem::color() const {
