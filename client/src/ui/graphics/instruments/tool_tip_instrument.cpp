@@ -5,7 +5,7 @@
 #include <QtGui/QGraphicsProxyWidget>
 #include <QtGui/QAbstractItemView>
 
-#include <ui/graphics/items/standard/graphics_tooltip.h>
+#include <ui/graphics/items/standard/graphics_tool_tip.h>
 #include <ui/common/tool_tip_queryable.h>
 
 namespace {
@@ -77,7 +77,7 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
         return true; /* Eat it anyway. */
     }
 
-    GraphicsTooltip::showText(
+    GraphicsToolTip::showText(
         itemToolTip(targetItem, targetItem->mapFromScene(scenePos)),
         view,
         targetItem,

@@ -7,6 +7,8 @@
 
 #include <QDir>
 #include <QMutexLocker>
+#include <QDir>
+#include <QFileInfo>
 
 #include <core/resource/resource.h>
 
