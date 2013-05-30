@@ -80,9 +80,14 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
         QPoint pos = m_layout->position(ch);
         int left = pos.x() * m_resolution.width() / m_layout->size().width();
         int top = pos.y() * m_resolution.height() / m_layout->size().height();
-        dstRect = QRect(dstRectF.left() * m_resolution.width() + 0.5, dstRectF.top() * m_resolution.height() + 0.5,
-                        dstRectF.width() * m_resolution.width() + 0.5, dstRectF.height() * m_resolution.height() + 0.5);
-        dstRect = roundRect(dstRect);
+        if (!dstRectF.isEmpty()) {
+            dstRect = QRect(dstRectF.left() * m_resolution.width() + 0.5, dstRectF.top() * m_resolution.height() + 0.5,
+                            dstRectF.width() * m_resolution.width() + 0.5, dstRectF.height() * m_resolution.height() + 0.5);
+            dstRect = roundRect(dstRect);
+        }
+        else {
+            dstRect = QRect(left, top, m_resolution.width() / m_layout->size().width(), m_resolution.height() / m_layout->size().height());
+        }
 
         for (int i = 0; i < 3; ++i)
         {
@@ -118,9 +123,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
         decodedFrame->data, decodedFrame->linesize, 
         0, decodedFrame->height, 
         dstData, m_scaledVideoFrame.linesize);
-    //m_scaledVideoFrame.pkt_dts = m_decodedVideoFrame->pkt_dts;
-    //m_scaledVideoFrame.pkt_pts = m_decodedVideoFrame->pkt_pts;
-    m_scaledVideoFrame.pts = m_decodedVideoFrame->pts;
+    m_scaledVideoFrame.pkt_dts = m_decodedVideoFrame->pkt_dts;
     return 0;
 }
 
@@ -332,6 +335,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
                 m_decodedFrameRect.linesize[i] = decodedFrame->linesize[i];
             }
             m_decodedFrameRect.format = decodedFrame->format;
+            m_decodedFrameRect.pkt_dts = decodedFrame->pkt_dts;
             m_decodedFrameRect.width = frameRect.width();
             m_decodedFrameRect.height = frameRect.height();
             decodedFrame = &m_decodedFrameRect;
