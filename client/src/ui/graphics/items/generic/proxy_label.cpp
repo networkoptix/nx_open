@@ -2,11 +2,23 @@
 
 #include <QtGui/QLabel>
 
-QnProxyLabel::QnProxyLabel(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags),
-    m_label(new QLabel())
+QnProxyLabel::QnProxyLabel(const QString &text, QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags)
 {
+    init();
+    setText(text);
+}
+
+QnProxyLabel::QnProxyLabel(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags)
+{
+    init();
+}
+
+void QnProxyLabel::init() {
+    m_label.reset(new QLabel());
     setWidget(m_label.data());
+
     connect(m_label, SIGNAL(linkActivated(const QString &)), this, SIGNAL(linkActivated(const QString &)));
     connect(m_label, SIGNAL(linkHovered(const QString &)), this, SIGNAL(linkHovered(const QString &)));
 

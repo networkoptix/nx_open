@@ -1,11 +1,11 @@
-#ifndef QN_GRAPHICS_TOOLTIP_H
-#define QN_GRAPHICS_TOOLTIP_H
+#ifndef QN_GRAPHICS_TOOL_TIP_H
+#define QN_GRAPHICS_TOOL_TIP_H
 
 #include <QtCore/QString>
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QGraphicsView>
 
-class GraphicsTooltip {
+class GraphicsToolTip {
 public:
     /**
      * @brief showText      Show tooltip on the scene.
@@ -14,15 +14,16 @@ public:
      * @param item          Graphics item that provides the tip.
      * @param pos           Position of the mouse cursor in viewport coordinates.
      */
-    static void showText(QString text, QGraphicsView *view, QGraphicsItem *item, const QPoint &pos);
+    static void showText(const QString &text, QGraphicsView *view, QGraphicsItem *item, const QPoint &pos);
 
     /**
-     * @brief hideText      Hide displayed tool (if any).
+     * @brief hideText      Hide displayed tooltip (if any).
      */
     static inline void hideText() { showText(QString(), NULL, QPointF(), QRectF()); }
+
 private:
-    static void showText(QString text, QGraphicsItem *item, QPointF scenePos, QRectF sceneRect);
+    static void showText(const QString &text, QGraphicsItem *item, QPointF scenePos, QRectF sceneRect);
 };
 
 
-#endif // QN_GRAPHICS_TOOLTIP_H
+#endif // QN_GRAPHICS_TOOL_TIP_H
