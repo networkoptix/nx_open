@@ -30,6 +30,7 @@ class HoverFocusProcessor;
 
 class QnNavigationItem;
 class QnResourceBrowserWidget;
+class QnProxyLabel;
 class GraphicsLabel;
 
 class QnWorkbenchDisplay;
@@ -326,7 +327,7 @@ private:
 
     bool m_inactive;
 
-    GraphicsLabel *m_fpsItem;
+    QnProxyLabel *m_fpsItem;
 
     /* In freespace mode? */
     bool m_inFreespace;

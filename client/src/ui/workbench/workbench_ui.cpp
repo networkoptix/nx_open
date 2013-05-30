@@ -41,6 +41,7 @@
 #include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
+#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
@@ -244,7 +245,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Fps counter. */
-    m_fpsItem = new GraphicsLabel(m_controlsWidget);
+    m_fpsItem = new QnProxyLabel(m_controlsWidget);
     m_fpsItem->setAcceptedMouseButtons(0);
     m_fpsItem->setAcceptsHoverEvents(false);
 
