@@ -31,6 +31,8 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, const QGLCon
     }
 
     setChannelCount(1);
+
+    connect(this, SIGNAL(canBeDestroyed()), this, SLOT(deleteLater()), Qt::QueuedConnection);
 }
 
 void QnResourceWidgetRenderer::setChannelCount(int channelCount)
