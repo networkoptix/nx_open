@@ -45,7 +45,7 @@ public:
     //!Implementation of finishPostedFramesRender QnAbstractRenderer::finishPostedFramesRender
     virtual void finishPostedFramesRender(int channel) override;
 
-    virtual void beforeDestroy() override;
+    virtual void destroyAsync() override;
 
     virtual QSize sizeOnScreen(unsigned int channel) const override;
 

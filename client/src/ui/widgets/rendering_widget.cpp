@@ -37,7 +37,7 @@ QnRenderingWidget::~QnRenderingWidget()
 {
     if( m_display ) {
         m_display->removeRenderer(m_renderer);
-        m_renderer->beforeDestroy();
+        m_renderer->destroyAsync();
         m_display->beforeDestroy();
     }
 }

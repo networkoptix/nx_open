@@ -159,7 +159,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     if (m_display)
         m_display->removeRenderer(m_renderer);
 
-    m_renderer->beforeDestroy();
+    m_renderer->destroyAsync();
 
     foreach(__m128i *data, m_binaryMotionMask)
         qFreeAligned(data);
