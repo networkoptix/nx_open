@@ -6,8 +6,6 @@
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 
-#include <ui/style/skin.h>
-
 namespace {
     const qreal margin = 4;
     const qreal totalWidth = 200;
@@ -35,8 +33,9 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Horizontal);
     layout->setContentsMargins(margin*2, margin, margin, margin);
     layout->addItem(m_textLabel);
-    layout->addStretch();
+//    layout->addStretch();
     layout->addItem(m_image);
+    layout->setStretchFactor(m_textLabel, 1.0);
 
     setLayout(layout);
 
@@ -55,20 +54,7 @@ void QnNotificationItem::setText(const QString &text) {
     m_image->setToolTip(text);
 }
 
-QString QnNotificationItem::iconPath() const {
-    return m_iconPath;
-}
-
-void QnNotificationItem::setIconPath(const QString& iconPath) {
-    if (m_iconPath == iconPath)
-        return;
-    m_iconPath = iconPath;
-    m_image->setIcon(qnSkin->icon(m_iconPath));
-    m_image->setVisible(true);
-}
-
 void QnNotificationItem::setIcon(const QIcon &icon) {
-    m_iconPath = QString();
     m_image->setIcon(icon);
     m_image->setVisible(true);
 }
@@ -90,7 +76,6 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     gradient.setColorAt(1.0, Qt::transparent);
 
     gradient.setSpread(QGradient::PadSpread);
-//    painter->fillRect(QRectF(0, 0, totalHeight*2, totalHeight + margin*2), QBrush(gradient));
     painter->fillRect(boundingRect(), QBrush(gradient));
 
 }

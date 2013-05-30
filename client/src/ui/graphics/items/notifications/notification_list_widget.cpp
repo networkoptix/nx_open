@@ -15,7 +15,7 @@ namespace {
     int hideTimeoutMs = 300;
     int hoverLeaveTimeoutMSec = 250;
 
-    qreal widgetWidth = 200;
+    qreal widgetWidth = 250;
 }
 
 QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::WindowFlags flags):

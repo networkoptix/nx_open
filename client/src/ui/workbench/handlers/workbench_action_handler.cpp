@@ -3852,6 +3852,12 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
         if (!usersWithNoEmail.isEmpty())
             notificationsHandler()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, usersWithNoEmail);
     }
+
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        notificationsHandler()->addSystemHealthEvent(QnSystemHealth::MessageType(i), QnResourceList());
+    }
+
+
 }
 
 void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QnKvPairList &settings, int handle) {

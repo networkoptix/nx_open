@@ -85,6 +85,35 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
 void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
     item->setText(QnSystemHealth::toString(message));
+    switch (message) {
+    case QnSystemHealth::EmailIsEmpty:
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
+        break;
+    case QnSystemHealth::NoLicenses:
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Recorder));
+        break;
+    case QnSystemHealth::SmtpIsNotSet:
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Server));
+        break;
+    case QnSystemHealth::UsersEmailIsEmpty:
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Users));
+        break;
+    case QnSystemHealth::ConnectionLost:
+        item->setIcon(qnSkin->icon("titlebar/disconnected.png"));
+        break;
+    case QnSystemHealth::EmailSendError:
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Server | QnResourceIconCache::Offline));
+        break;
+    case QnSystemHealth::StoragesNotConfigured:
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
+        break;
+    case QnSystemHealth::StoragesAreFull:
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
+        break;
+    default:
+        break;
+    }
+
     m_list->addItem(item, true);
 }
 

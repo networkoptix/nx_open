@@ -19,9 +19,6 @@ public:
     QString text() const;
     void setText(const QString &text);
 
-    QString iconPath() const;
-    void setIconPath(const QString& iconPath);
-
     void setIcon(const QIcon &icon);
 
     QColor color() const;
@@ -36,7 +33,6 @@ signals:
 private:
     QnProxyLabel* m_textLabel;
     QnImageButtonWidget *m_image;
-    QString m_iconPath;
     QColor m_color;
 };
 
