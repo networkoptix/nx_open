@@ -63,10 +63,12 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
     qFreeAligned(m_imageBuffer);
 }
 
-int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, int ch)
+int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch)
 {
-    if (m_scaledVideoFrame.width == 0)
+    if (m_scaledVideoFrame.width == 0) {
         m_scaledVideoFrame.reallocate(m_resolution.width(), m_resolution.height(), PIX_FMT_YUV420P);
+        m_scaledVideoFrame.memZerro();
+    }
 
     QRect dstRect(0,0, m_resolution.width(), m_resolution.height());
     quint8* dstData[4];
@@ -78,7 +80,8 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, in
         QPoint pos = m_layout->position(ch);
         int left = pos.x() * m_resolution.width() / m_layout->size().width();
         int top = pos.y() * m_resolution.height() / m_layout->size().height();
-        dstRect = QRect(left, top, m_resolution.width() / m_layout->size().width(), m_resolution.height() / m_layout->size().height());
+        dstRect = QRect(dstRectF.left() * m_resolution.width() , dstRectF.top() * m_resolution.height(),
+                        dstRectF.width() * m_resolution.width() , dstRectF.height() * m_resolution.height());
         dstRect = roundRect(dstRect);
 
         for (int i = 0; i < 3; ++i)
@@ -280,6 +283,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
 
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
     CLFFmpegVideoDecoder* decoder = m_videoDecoders[m_layout ? video->channelNumber : 0];
+    QRectF dstRectF;
 
     if (decoder->decode(video, &m_decodedVideoFrame)) 
     {
@@ -288,13 +292,30 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         if (!m_srcRectF.isEmpty() && m_layout)
         {
             QPoint pos = m_layout->position(video->channelNumber);
-            QRectF channelRect(pos.x() / (float) m_layout->size().width(), pos.y() / (float) m_layout->size().height(),
-                1.0 / (float) m_layout->size().width(), 1.0 / (float) m_layout->size().height());
+            QSize lSize = m_layout->size();
+            QRectF srcRectF(m_srcRectF.left() * lSize.width(), m_srcRectF.top() * lSize.height(),
+                            m_srcRectF.width() * lSize.width(), m_srcRectF.height() * lSize.height());
+            //QRectF srcRectF(m_srcRectF);
+            //QRectF channelRect(pos.x() / (float) lSize.width(), pos.y() / (float) lSize.height(),
+            //    1.0 / (float) m_layout->size().width(), 1.0 / (float) m_layout->size().height());
+            QRectF channelRect(pos.x(), pos.y(), 1, 1);
 
-            if (!channelRect.intersects(m_srcRectF))
+            if (!channelRect.intersects(srcRectF))
                 return 0; // channel outside bounding rect
 
-            QRectF frameRectF = m_srcRectF.intersected(channelRect).translated(channelRect.left(), channelRect.top());
+            QRectF frameRectF = srcRectF.intersected(channelRect);
+
+            qreal dstWidth = frameRectF.width() / srcRectF.width();
+            qreal dstHeight = frameRectF.height() / srcRectF.height();
+            qreal dstLeft = (frameRectF.left() - srcRectF.left())/srcRectF.width();
+            qreal dstTop = (frameRectF.top() - srcRectF.top())/srcRectF.height();
+            dstRectF = QRectF(dstLeft, dstTop, dstWidth, dstHeight);
+
+
+
+            frameRectF.translate(-channelRect.left(), -channelRect.top());
+            //frameRectF.setWidth(frameRectF.width()*lSize.width());
+            //frameRectF.setHeight(frameRectF.height()*lSize.height());
             frameRect = QRect(frameRectF.left() * decoder->getWidth(), frameRectF.top() * decoder->getHeight(), 
                 frameRectF.width() * decoder->getWidth(), frameRectF.height() * decoder->getHeight());
             frameRect = roundRect(frameRect);
@@ -320,7 +341,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         }
 
         if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P) {
-            rescaleFrame(decodedFrame, m_layout ? video->channelNumber : 0);
+            rescaleFrame(decodedFrame, dstRectF, video->channelNumber);
             decodedFrame = &m_scaledVideoFrame;
         }
 

@@ -328,8 +328,8 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     }
 
     int streamIndex = channel;
-    //if (md->dataType == QnAbstractMediaData::AUDIO)
-    //    streamIndex += m_videoChannels;
+    if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder)
+        streamIndex = 0;
 
     if ((uint)streamIndex >= m_formatCtx->nb_streams)
         return true; // skip packet

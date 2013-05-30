@@ -174,6 +174,23 @@ void CLVideoDecoderOutput::fillRightEdge()
     }
 }
 
+void CLVideoDecoderOutput::memZerro()
+{
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    quint8 filler = 0;
+    for (int i = 0; i < descr->nb_components && data[i]; ++i)
+    {
+        int w = linesize[i];
+        int h = height;
+        if (i > 0)
+            h >>= descr->log2_chroma_h;
+
+        int bpp = descr->comp[i].step_minus1 + 1;
+        int fillLen = h*w*bpp;
+        memset(data[i], i == 0 ? 0 : 0x80, fillLen);
+    }
+}
+
 void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat)
 {
     clean();

@@ -32,7 +32,7 @@ public:
     void setOnScreenDateOffset(int timeOffsetMs);
 
 private:
-    int rescaleFrame(CLVideoDecoderOutput* decodedFrame, int ch);
+    int rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch);
     void doDrawOnScreenTime(CLVideoDecoderOutput* frame);
     void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);
 private:
