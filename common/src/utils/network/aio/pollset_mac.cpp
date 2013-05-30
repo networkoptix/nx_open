@@ -225,11 +225,7 @@ bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
 
     //adding new fd to set
     struct kevent _newEvent;
-    memset( &_newEvent, 0, sizeof(_newEvent) );
-    _newEvent.ident = sock->handle();
-    _newEvent.flags = EV_ENABLE;
-    _newEvent.filter = kfilterType;
-    _newEvent.udata = sock;
+    EV_SET( &_newEvent, sock->handle(), kfilterType, EV_ADD, 0, 0, sock );
     if( kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL ) == 0 )
     {
         sock->impl()->getUserData(eventType) = userData;
@@ -249,12 +245,9 @@ void* PollSet::remove( Socket* const sock, EventType eventType )
 
     const int kfilterType = eventType == etRead ? EVFILT_READ : EVFILT_WRITE;
 
-    struct kevent changeList;
-    memset( &changeList, 0, sizeof(changeList) );
-    changeList.ident = sock->handle();
-    changeList.filter = kfilterType;
-    changeList.flags = EV_DISABLE | EV_DELETE;
-    kevent( m_impl->kqueueFD, &changeList, 1, NULL, 0, NULL );  //ignoring return code, since event is removed in any case
+    struct kevent _eventChange;
+    EV_SET( &_eventChange, sock->handle(), kfilterType, EV_DELETE, 0, 0, NULL );
+    kevent( m_impl->kqueueFD, &_eventChange, 1, NULL, 0, NULL );  //ignoring return code, since event is removed in any case
     m_impl->monitoredEvents.erase( it );
 
     void* userData = sock->impl()->getUserData(eventType);
