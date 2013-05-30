@@ -29,7 +29,8 @@ class QnProxyLabel: public Connective<QGraphicsProxyWidget> {
     typedef Connective<QGraphicsProxyWidget> base_type;
 
 public:
-    QnProxyLabel(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    explicit QnProxyLabel(const QString &text, QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    explicit QnProxyLabel(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnProxyLabel();
 
     QString text() const;
@@ -69,6 +70,9 @@ public slots:
 signals:
     void linkActivated(const QString &link);
     void linkHovered(const QString &link);
+
+private:
+    void init();
 
 private:
     QScopedPointer<QLabel> m_label;
