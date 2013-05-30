@@ -93,6 +93,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
     name = name.left(name.lastIndexOf(QLatin1Char('-')));
     name.replace(QLatin1Char('-'), QString());
+    
 
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();

@@ -1153,7 +1153,7 @@ int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl)
     _onvifDevice__GetSystemDateAndTimeResponse response;
     int soapRes = soapWrapper.GetSystemDateAndTime(request, response);
 
-    if (soapRes == SOAP_OK && response.SystemDateAndTime->UTCDateTime)
+    if (soapRes == SOAP_OK && response.SystemDateAndTime && response.SystemDateAndTime->UTCDateTime)
     {
         onvifXsd__Date* date = response.SystemDateAndTime->UTCDateTime->Date;
         onvifXsd__Time* time = response.SystemDateAndTime->UTCDateTime->Time;
