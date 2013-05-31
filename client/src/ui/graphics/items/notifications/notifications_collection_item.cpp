@@ -97,13 +97,16 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
         break;
     }
 
+    m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
+                                               QnActionParameters(resource)));
+
     QString text = BusinessEventType::toString(eventType);
     text += QLatin1Char('\n');
     text += resource->getName();
     item->setText(text);
     item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
 
-
+    connect(item, SIGNAL(actionTriggered(QnNotificationItem*)), this, SLOT(at_item_actionTriggered(QnNotificationItem*)));
     m_list->addItem(item);
 }
 
