@@ -1,3 +1,7 @@
+
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glext.h>
+
 #include "gl_renderer.h"
 
 #include <cassert>
@@ -19,7 +23,6 @@
 #include <ui/common/geometry.h>
 
 #include "video_camera.h"
-
 
 #ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
 #   include <utils/common/performance.h>
@@ -213,26 +216,17 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 }
 
 void QnGLRenderer::drawVideoTextureDirectly(
-    const QRectF& /*tex0Coords*/,
+    const QRectF& tex0Coords,
     unsigned int tex0ID,
     const float* v_array )
 {
     cl_log.log( QString::fromAscii("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
 
-//    float tx_array[8] = {
-//        0.0f, 0.0f,
-//        tex0Coords.x(), 0.0f,
-//        tex0Coords.x(), tex0Coords.y(),
-//        0.0f, tex0Coords.y()
-//    };
     float tx_array[8] = {
-        0.0f, 0.0f,
-        1, 0.0f,
-        1, 1,
-        0.0f, 1
-//        (float)tex0->texCoords().x(), 0.0f,
-//        (float)tex0->texCoords().x(), (float)tex0->texCoords().y(),
-//        0.0f, (float)tex0->texCoords().y()
+        (float)tex0Coords.x(), (float)tex0Coords.y(),
+        (float)tex0Coords.right(), (float)tex0Coords.top(),
+        (float)tex0Coords.right(), (float)tex0Coords.bottom(),
+        (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
     glEnable(GL_TEXTURE_2D);
@@ -241,7 +235,19 @@ void QnGLRenderer::drawVideoTextureDirectly(
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
+    //applying opacity
+    if( m_decodedPictureProvider.opacity() < 1.0 )
+    {
+        this->glBlendColor( 0, 0, 0, m_decodedPictureProvider.opacity() );
+        glBlendFunc( GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA );
+    }
+
     drawBindedTexture( v_array, tx_array );
+
+    if( m_decodedPictureProvider.opacity() < 1.0 )
+    {
+        glBlendFunc( GL_SRC_COLOR, GL_DST_COLOR );
+    }
 }
 
 void QnGLRenderer::drawYV12VideoTexture(
