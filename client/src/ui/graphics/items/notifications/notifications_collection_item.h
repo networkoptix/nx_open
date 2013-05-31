@@ -7,13 +7,13 @@
 #include <business/events/abstract_business_event.h>
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
+#include <ui/actions/action_parameters.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
 class QnNotificationItem;
-class QnActionParameters;
 
 class QnNotificationsCollectionItem : public GraphicsWidget, public QnWorkbenchContextAware
 {
@@ -36,10 +36,21 @@ public slots:
 
 private slots:
     void at_list_itemRemoved(QnNotificationItem* item);
-    void at_item_actionTriggered(Qn::ActionId id, QnActionParameters* parameters);
+    void at_item_actionTriggered(QnNotificationItem* item);
 private:
+    struct ActionData {
+        ActionData():
+            action(Qn::NoAction){}
+        ActionData(Qn::ActionId action, const QnActionParameters &params):
+            action(action), params(params){}
+
+        Qn::ActionId action;
+        QnActionParameters params;
+    };
+
     QnNotificationListWidget *m_list;
     QGraphicsWidget* m_headerWidget;
+    QMap<QnNotificationItem*, ActionData> m_actionDataByItem;
     
 };
 

@@ -62,10 +62,10 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
 
 void QnNotificationListWidget::tick(int deltaMSecs) {
 
-    qreal topY = m_items.isEmpty() ? 0 : m_items.first()->item->geometry().top();
     qreal stepY = (m_items.isEmpty() ? 0 : m_items.first()->item->geometry().height())
             * (qreal) deltaMSecs / (qreal) moveUpTimeoutMs;
     qreal bottomY = 0;
+    qreal topY = 0;
 
     //TODO: #GDM speed should depend on m_items.size (?)
 
@@ -74,6 +74,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         if (!state->isVisible())
             continue;
         bottomY = qMax(bottomY, state->item->geometry().bottom());
+        topY = qMin(topY,  state->item->y());
         if (state->state == QnItemState::Displaying)
             anyDisplaying = true;
     }

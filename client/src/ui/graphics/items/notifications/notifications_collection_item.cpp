@@ -7,7 +7,6 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/actions.h>
-#include <ui/actions/action_parameters.h>
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
@@ -116,9 +115,9 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
     switch (message) {
     case QnSystemHealth::EmailIsEmpty: {
             item->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
-            QnActionParameters* params = new QnActionParameters(context()->user());
-            params->setArgument<QString>(Qn::FocusElementRole, QLatin1String("email"));
-            item->setAction(Qn::UserSettingsAction, params);
+            m_actionDataByItem.insert(item, ActionData(Qn::UserSettingsAction,
+                                                       QnActionParameters(context()->user())
+                                                       .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))));
         }
         break;
     case QnSystemHealth::NoLicenses:
@@ -145,7 +144,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
     default:
         break;
     }
-    connect(item, SIGNAL(actionTriggered(Qn::ActionId,QnActionParameters*)), this, SLOT(at_item_actionTriggered(Qn::ActionId,QnActionParameters*)));
+    connect(item, SIGNAL(actionTriggered(QnNotificationItem*)), this, SLOT(at_item_actionTriggered(QnNotificationItem*)));
 
     m_list->addItem(item, true);
 }
@@ -155,9 +154,14 @@ void QnNotificationsCollectionItem::hideAll() {
 }
 
 void QnNotificationsCollectionItem::at_list_itemRemoved(QnNotificationItem *item) {
+    m_actionDataByItem.remove(item);
     delete item;
 }
 
-void QnNotificationsCollectionItem::at_item_actionTriggered(Qn::ActionId id, QnActionParameters *parameters) {
-    menu()->trigger(id, *parameters);
+void QnNotificationsCollectionItem::at_item_actionTriggered(QnNotificationItem* item) {
+    if (!m_actionDataByItem.contains(item))
+        return;
+
+    ActionData data = m_actionDataByItem[item];
+    menu()->trigger(data.action, data.params);
 }

@@ -17,9 +17,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     base_type(parent, flags),
     m_textLabel(new QnProxyLabel(this)),
     m_image(new QnImageButtonWidget(this)),
-    m_color(Qt::red),
-    m_action(Qn::NoAction),
-    m_parameters(NULL)
+    m_color(Qt::red)
 {
     m_textLabel->setWordWrap(true);
     {
@@ -36,18 +34,13 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Horizontal);
     layout->setContentsMargins(margin*2, margin, margin, margin);
     layout->addItem(m_textLabel);
-//    layout->addStretch();
     layout->addItem(m_image);
     layout->setStretchFactor(m_textLabel, 1.0);
 
     setLayout(layout);
-
-
 }
 
 QnNotificationItem::~QnNotificationItem() {
-//    if (m_parameters)
-//        delete m_parameters;
 }
 
 QString QnNotificationItem::text() const {
@@ -85,5 +78,5 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 }
 
 void QnNotificationItem::at_image_clicked() {
-    emit actionTriggered(m_action, m_parameters);
+    emit actionTriggered(this);
 }
