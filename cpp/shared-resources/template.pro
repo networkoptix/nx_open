@@ -95,7 +95,7 @@ unix:!mac {
   LIBS += ${linux.oslibs}
   DEFINES += QN_EXPORT=
   QMAKE_CXXFLAGS += -msse2 -std=c++0x -fpermissive
-  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas
+  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC = $$QMAKE_MOC -DQ_OS_LINUX
   DEFINES += override=
