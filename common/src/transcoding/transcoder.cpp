@@ -154,7 +154,8 @@ QnTranscoder::QnTranscoder():
     m_firstTime(AV_NOPTS_VALUE),
     m_initialized(false),
     m_eofCounter(0),
-    m_packetizedMode(false)
+    m_packetizedMode(false),
+    m_vLayout(0)
 {
     QThread::currentThread()->setPriority(QThread::LowPriority); 
 }
@@ -232,6 +233,11 @@ int QnTranscoder::suggestMediaStreamParams(
     return qMax(128,result)*1024;
 }
 
+void QnTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
+{
+    m_vLayout = layout;
+}
+
 int QnTranscoder::setVideoCodec(
     CodecID codec,
     TranscodeMethod method,
@@ -254,6 +260,7 @@ int QnTranscoder::setVideoCodec(
             break;
         case TM_FfmpegTranscode:
             ffmpegTranscoder = new QnFfmpegVideoTranscoder(codec);
+            ffmpegTranscoder->setVideoLayout(m_vLayout);
             if (getCPUString().toLower().contains(QLatin1String("atom")))
                 ffmpegTranscoder->setMTMode(true);
             m_vTranscoder = QnVideoTranscoderPtr(ffmpegTranscoder);
