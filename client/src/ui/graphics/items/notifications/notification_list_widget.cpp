@@ -10,7 +10,7 @@
 namespace {
 
     int popoutTimeoutMs = 500;
-    int moveUpTimeoutMs = 200;
+    int moveUpTimeoutMs = 500;
     int displayTimeoutMs = 5000;
     int hideTimeoutMs = 300;
     int hoverLeaveTimeoutMSec = 250;
@@ -27,8 +27,6 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
-
-    connect(this, SIGNAL(geometryChanged()), this, SLOT(at_geometryChanged()));
 }
 
 QnNotificationListWidget::~QnNotificationListWidget() {
@@ -43,18 +41,17 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
         return constraint;
     }
 
-    if (m_items.isEmpty())
+    if (m_itemDataByItem.isEmpty())
         return QSizeF();
 
     QSizeF result(widgetWidth, 0);
-    foreach (QnItemState *state, m_items) {
-        if (!state->isVisible())
+    foreach (ItemData *data, m_itemDataByItem) {
+        if (!data->isVisible())
             continue;
 
-        QSizeF itemSize = state->item->geometry().size();
+        QSizeF itemSize = data->item->geometry().size();
         if (itemSize.isNull())
             continue;
-//        result.setWidth(qMax(result.width(), itemSize.width()));
         result.setHeight(result.height() + itemSize.height());
     }
     return result;
@@ -62,130 +59,131 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
 
 void QnNotificationListWidget::tick(int deltaMSecs) {
 
-    qreal stepY = (m_items.isEmpty() ? 0 : m_items.first()->item->geometry().height())
-            * (qreal) deltaMSecs / (qreal) moveUpTimeoutMs;
+    // y-coord of the lowest item
     qreal bottomY = 0;
-    qreal topY = 0;
-
-    //TODO: #GDM speed should depend on m_items.size (?)
 
     bool anyDisplaying = false;
-    foreach (QnItemState *state, m_items) {
-        if (!state->isVisible())
+    foreach (ItemData *data, m_itemDataByItem) {
+        if (!data->isVisible())
             continue;
-        bottomY = qMax(bottomY, state->item->geometry().bottom());
-        topY = qMin(topY,  state->item->y());
-        if (state->state == QnItemState::Displaying)
+        bottomY = qMax(bottomY, data->item->geometry().bottom());
+        if (data->state == ItemData::Displaying)
             anyDisplaying = true;
     }
 
+    ItemData *previous = NULL;
+    QList<QnNotificationItem*> itemsToDelete;
 
-    QnItemState *previous = NULL;
-    QList<QnItemState*> itemsToDelete;
-
-    foreach (QnItemState *state, m_items) {
-        switch (state->state) {
-        case QnItemState::Waiting: {
-                if (!anyDisplaying && (bottomY + state->item->geometry().height() <= geometry().height())) {
+    foreach (QnNotificationItem* item, m_items) {
+        ItemData* data = m_itemDataByItem[item];
+        switch (data->state) {
+        case ItemData::Waiting: {
+                if (!anyDisplaying && (bottomY + item->geometry().height() <= geometry().height())) {
                     anyDisplaying = true;
 
-                    state->state = QnItemState::Displaying;
+                    data->state = ItemData::Displaying;
 
-                    state->item->setMinimumWidth(widgetWidth);
-                    state->item->setMaximumWidth(widgetWidth);
-                    state->item->setY(bottomY);
-                    state->item->setX(state->item->geometry().width());
-                    state->item->setVisible(true);
-                    state->item->setOpacity(1.0);
-                    state->targetValue = 0.0; //target x-coord
-                    state->item->setClickableButtons(state->item->clickableButtons() | Qt::RightButton);
-                    connect(state->item, SIGNAL(clicked(Qt::MouseButton)), state, SLOT(unlockAndHide(Qt::MouseButton)));
+                    item->setY(bottomY);
+                    item->setX(item->geometry().width());
+                    item->setVisible(true);
+                    item->setOpacity(1.0);
+                    data->targetValue = 0.0; //target x-coord
+
                     updateGeometry();
                 }
                 break;
             }
-        case QnItemState::Displaying: {
-                qreal step = state->item->geometry().width() * (qreal)deltaMSecs / (qreal)popoutTimeoutMs;
-                qreal value = qMax(state->item->x() - step, state->targetValue);
-                state->item->setX(value);
-                if (qFuzzyCompare(value, state->targetValue)) {
-                    state->state = QnItemState::Displayed;
-                    state->targetValue = 0.0; //counter for display time
+        case ItemData::Displaying: {
+                qreal step = item->geometry().width() * (qreal)deltaMSecs / (qreal)popoutTimeoutMs;
+                qreal value = qMax(item->x() - step, data->targetValue);
+                item->setX(value);
+                if (qFuzzyCompare(value, data->targetValue)) {
+                    data->state = ItemData::Displayed;
+                    data->targetValue = 0.0; //counter for display time
                 }
                 break;
             }
-        case QnItemState::Displayed: {
-                if (m_hoverProcessor->isHovered() || state->locked)
+        case ItemData::Displayed: {
+                if (m_hoverProcessor->isHovered() || data->locked)
                     break;
 
                 qreal step = (qreal)deltaMSecs / (qreal)displayTimeoutMs;
-                state->targetValue += step;
-                if (state->targetValue >= 1.0)
-                    state->hide();
+                data->targetValue += step;
+                if (data->targetValue >= 1.0)
+                    data->hide();
                 break;
             }
-        case QnItemState::Hiding: {
+        case ItemData::Hiding: {
                 qreal step = (qreal)deltaMSecs / (qreal)hideTimeoutMs;
-                qreal value = qMax(state->item->opacity() - step, state->targetValue);
-                state->item->setOpacity(value);
-                if (qFuzzyCompare(value, state->targetValue)) {
-                    state->state = QnItemState::Hidden;
-                    state->item->setVisible(false);
+                qreal value = qMax(item->opacity() - step, data->targetValue);
+                item->setOpacity(value);
+                if (qFuzzyCompare(value, data->targetValue)) {
+                    data->state = ItemData::Hidden;
+                    item->setVisible(false);
                 }
                 break;
             }
-        case QnItemState::Hidden: {
-                itemsToDelete << state;
-
-                //here will be item removing from the list
+        case ItemData::Hidden: {
+                //do not remove while iterating
+                itemsToDelete << item;
                 break;
             }
         }
 
         // moving items up
-        if (state->isVisible()) {
+        if (data->isVisible()) {
             qreal targetY = (previous == NULL ? 0 : previous->item->geometry().bottom());
-            qreal currentY = state->item->y();
+            qreal currentY = item->y();
+            qreal stepY = currentY * (qreal) deltaMSecs / (qreal) moveUpTimeoutMs;
             if (currentY > targetY)
-                state->item->setY(qMax(currentY - stepY, targetY));
-            previous = state;
+                item->setY(qMax(currentY - stepY, targetY));
+            previous = data;
         }
     }
 
     // remove unused items
     if (!itemsToDelete.isEmpty())
         updateGeometry();
-    foreach(QnItemState* deleting, itemsToDelete) {
-        disconnect(deleting->item, 0, this, 0);
-        m_items.removeOne(deleting);
-        emit itemRemoved(deleting->item);
-        delete deleting;
+    foreach(QnNotificationItem* item, itemsToDelete) {
+        ItemData* data = m_itemDataByItem[item];
+        delete data;
+
+        disconnect(item, 0, this, 0);
+        m_itemDataByItem.remove(item);
+        m_items.removeOne(item);
+        emit itemRemoved(item);
     }
 }
 
 void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     item->setVisible(false);
+    item->setMinimumWidth(widgetWidth);
+    item->setMaximumWidth(widgetWidth);
+    item->setClickableButtons(item->clickableButtons() | Qt::RightButton);
+    connect(item, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_item_clicked(Qt::MouseButton)));
 
-    QnItemState* state = new QnItemState(this);
-    state->item = item;
-    state->state = QnItemState::Waiting;
-    state->locked = locked;
-    m_items.append(state);
+    ItemData* data = new ItemData();
+    data->item = item;
+    data->state = ItemData::Waiting;
+    data->locked = locked;
+    m_itemDataByItem.insert(item, data);
+    m_items.append(item);
 }
 
 void QnNotificationListWidget::clear() {
-    foreach (QnItemState *state, m_items) {
-        if (state->isVisible())
-            state->hide();
+    foreach (ItemData *data, m_itemDataByItem) {
+        if (data->isVisible())
+            data->hide();
         else
-            state->state = QnItemState::Hidden;
+            data->state = ItemData::Hidden;
     }
 }
 
-void QnNotificationListWidget::at_geometryChanged() {
-  /*  foreach (QnItemState *state, m_items) {
-        if (!state->isVisible())
-            continue;
-        state->item->setMinimumWidth(geometry().width());
-    }*/
+void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
+    if (button != Qt::RightButton)
+        return;
+    QnNotificationItem *item = dynamic_cast<QnNotificationItem *>(sender());
+    if (!item)
+        return;
+    m_itemDataByItem[item]->unlockAndHide();
 }

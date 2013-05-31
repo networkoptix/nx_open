@@ -122,6 +122,7 @@
 
 // TODO: #Elric remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
+#include <business/actions/common_business_action.h>
 
 #ifdef Q_OS_WIN
 #include "launcher_win/nov_launcher.h"
@@ -3851,8 +3852,57 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
 
     }
 
+    QnResourcePtr sampleServer = qnResPool->getResources().filtered<QnMediaServerResource>().first();
+    QnResourcePtr sampleCamera = qnResPool->getResources().filtered<QnVirtualCameraResource>().first();
+
+    //TODO: #GDM REMOVE DEBUG
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
-        notificationsHandler()->addSystemHealthEvent(QnSystemHealth::MessageType(i), context()->user());
+        QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
+        QnResourcePtr resource;
+        switch (message) {
+        case QnSystemHealth::EmailIsEmpty:
+            resource = context()->user();
+            break;
+        case QnSystemHealth::UsersEmailIsEmpty:
+            resource = qnResPool->getResources().filtered<QnUserResource>().last();
+            break;
+        case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::StoragesAreFull:
+            resource = sampleServer;
+            break;
+        default:
+            break;
+        }
+        notificationsHandler()->addSystemHealthEvent(message, resource);
+    }
+
+    //TODO: #GDM REMOVE DEBUG
+    for (int i = 0; i < BusinessEventType::Count; i++) {
+        BusinessEventType::Value eventType = BusinessEventType::Value(i);
+
+        QnBusinessEventParameters params;
+        params.setEventType(eventType);
+        switch(eventType) {
+        case BusinessEventType::Camera_Motion:
+        case BusinessEventType::Camera_Input:
+        case BusinessEventType::Camera_Disconnect:
+        case BusinessEventType::Network_Issue:
+            params.setEventResourceId(sampleCamera->getId());
+            break;
+
+        case BusinessEventType::Storage_Failure:
+        case BusinessEventType::Camera_Ip_Conflict:
+        case BusinessEventType::MediaServer_Failure:
+        case BusinessEventType::MediaServer_Conflict:
+            params.setEventResourceId(sampleServer->getId());
+            break;
+        default:
+            break;
+
+        }
+
+        QnAbstractBusinessActionPtr baction(new QnCommonBusinessAction(BusinessActionType::ShowPopup, params));
+        notificationsHandler()->addBusinessAction(baction);
     }
 
 

@@ -10,44 +10,6 @@
 class QnNotificationItem;
 class HoverFocusProcessor;
 
-class QnItemState: public QObject {
-    Q_OBJECT
-public:
-    explicit QnItemState(QObject *parent = NULL):
-        QObject(parent){}
-
-    Q_SLOT void unlockAndHide(Qt::MouseButton button) {
-        if (button != Qt::RightButton)
-            return;
-
-        locked = false;
-        hide();
-    }
-
-    enum State {
-        Waiting,
-        Displaying,
-        Displayed,
-        Hiding,
-        Hidden
-    };
-
-    bool isVisible() const {
-        return state == Displaying || state == Displayed || state == Hiding;
-    }
-
-    void hide() {
-        state = QnItemState::Hiding;
-        targetValue = 0.0;
-    }
-
-    QnNotificationItem* item;
-    State state;
-    qreal targetValue;
-    bool locked;
-
-};
-
 class QnNotificationListWidget : public Animated<GraphicsWidget>, public AnimationTimerListener
 {
     Q_OBJECT
@@ -67,11 +29,41 @@ protected:
 
     virtual void tick(int deltaMSecs) override;
 private slots:
-    void at_geometryChanged();
+    void at_item_clicked(Qt::MouseButton button);
 
 private:
+    struct ItemData {
+        enum State {
+            Waiting,
+            Displaying,
+            Displayed,
+            Hiding,
+            Hidden
+        };
+
+        bool isVisible() const {
+            return state == Displaying || state == Displayed || state == Hiding;
+        }
+
+        void unlockAndHide() {
+            locked = false;
+            hide();
+        }
+
+        void hide() {
+            state = Hiding;
+            targetValue = 0.0;
+        }
+
+        QnNotificationItem* item;
+        State state;
+        qreal targetValue;
+        bool locked;
+    };
+
     HoverFocusProcessor* m_hoverProcessor;
-    QLinkedList<QnItemState *> m_items;
+    QLinkedList<QnNotificationItem *> m_items;
+    QMap<QnNotificationItem*, ItemData*> m_itemDataByItem;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H

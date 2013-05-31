@@ -64,44 +64,44 @@ QRectF QnNotificationsCollectionItem::headerGeometry() const {
 }
 
 void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
+    QnBusinessEventParameters params = businessAction->getRuntimeParams();
+    int resourceId = params.getEventResourceId();
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
+    if (!resource)
+        return;
+
     QnNotificationItem *item = new QnNotificationItem(m_list);
 
-    QnBusinessEventParameters params = businessAction->getRuntimeParams();
+
     BusinessEventType::Value eventType = params.getEventType();
 
     switch (eventType) {
-    case BusinessEventType::Camera_Input:
-    case BusinessEventType::Camera_Disconnect:
+    case BusinessEventType::Camera_Input:                   //camera
+    case BusinessEventType::Camera_Disconnect:              //camera
         item->setColor(QColor(255, 131, 48)); //orange
         break;
 
-    case BusinessEventType::Storage_Failure:
-    case BusinessEventType::Network_Issue:
-    case BusinessEventType::Camera_Ip_Conflict:
-    case BusinessEventType::MediaServer_Failure:
-    case BusinessEventType::MediaServer_Conflict:
+    case BusinessEventType::Storage_Failure:                //server -- monitor
+    case BusinessEventType::Network_Issue:                  //camera
+    case BusinessEventType::Camera_Ip_Conflict:             //server - mac addrs in conflict list
+    case BusinessEventType::MediaServer_Failure:            //server -- monitor
+    case BusinessEventType::MediaServer_Conflict:           //server -- monitor
         item->setColor(QColor(237, 200, 66)); // yellow
         break;
 
-        //case BusinessEventType::Camera_Motion:
-        //case BusinessEventType::UserDefined:
-    default:
+    case BusinessEventType::Camera_Motion:                  //camera
         item->setColor(QColor(103, 237, 66)); // green
+        break;
+
+    default:
         break;
     }
 
     QString text = BusinessEventType::toString(eventType);
-    int resourceId = params.getEventResourceId();
-    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
-    if (resource) {
-        text += QLatin1Char('\n');
-        text += resource->getName();
-
-        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-    } else {
-        item->setIcon(qnSkin->icon("titlebar/disconnected.png")); // should never got this
-    }
+    text += QLatin1Char('\n');
+    text += resource->getName();
     item->setText(text);
+    item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
 
 
     m_list->addItem(item);
@@ -109,7 +109,13 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
 
 void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
-    item->setText(QnSystemHealth::toString(message));
+    QString text = QnSystemHealth::toString(message);
+    if (resource) {
+        text += QLatin1Char('\n');
+        text += resource->getName();
+    }
+    item->setText(text);
+
     item->setColor(QColor(255, 127, 127)); // red
 
     switch (message) {
@@ -121,11 +127,11 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
 
         break;
     case QnSystemHealth::NoLicenses:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Recorder));
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
         m_actionDataByItem.insert(item, ActionData(Qn::GetMoreLicensesAction));
         break;
     case QnSystemHealth::SmtpIsNotSet:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Server));
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
         m_actionDataByItem.insert(item, ActionData(Qn::OpenServerSettingsAction));
         break;
     case QnSystemHealth::UsersEmailIsEmpty:
@@ -133,23 +139,22 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
         m_actionDataByItem.insert(item, ActionData(Qn::UserSettingsAction,
                                                    QnActionParameters(resource)
                                                    .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))));
-        m_actionDataByItem.insert(item, ActionData(Qn::GetMoreLicensesAction));
         break;
     case QnSystemHealth::ConnectionLost:
         item->setIcon(qnSkin->icon("titlebar/disconnected.png"));
         m_actionDataByItem.insert(item, ActionData(Qn::ConnectToServerAction));
         break;
     case QnSystemHealth::EmailSendError:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Server | QnResourceIconCache::Offline));
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
         m_actionDataByItem.insert(item, ActionData(Qn::OpenServerSettingsAction));
         break;
     case QnSystemHealth::StoragesNotConfigured:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
+        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
         m_actionDataByItem.insert(item, ActionData(Qn::ServerSettingsAction,
                                                    QnActionParameters(resource)));
         break;
     case QnSystemHealth::StoragesAreFull:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
+        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
         m_actionDataByItem.insert(item, ActionData(Qn::ServerSettingsAction,
                                                    QnActionParameters(resource)));
         break;
@@ -158,7 +163,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
     }
     connect(item, SIGNAL(actionTriggered(QnNotificationItem*)), this, SLOT(at_item_actionTriggered(QnNotificationItem*)));
 
-    m_list->addItem(item, true);
+    m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
 }
 
 void QnNotificationsCollectionItem::hideAll() {
