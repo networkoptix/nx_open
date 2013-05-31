@@ -18,8 +18,8 @@ namespace  {
     const qreal arrowWidth = 8.0;
 }
 
-QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent):
-    base_type(parent),
+QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags),
     m_shapeValid(false)
 {
     setFlag(ItemIsMovable, false);
@@ -29,17 +29,17 @@ QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent):
     setProperty(Qn::NoHandScrollOver, true);
 
     /* Set up default colors. */
-    QStyle *style = QApplication::style();
+    /*QStyle *style = QApplication::style();
     setTextPen(QPen(style->standardPalette().windowText(), 0));
     setBorderPen(QPen(style->standardPalette().windowText(), 0));
-    setBrush(style->standardPalette().window());
+    setBrush(style->standardPalette().window());*/
 
-    QFont fixedFont = QApplication::font();
+    /*QFont fixedFont = QApplication::font();
     fixedFont.setPixelSize(14);
-    setFont(fixedFont);
+    setFont(fixedFont);*/
 
     /* Update. */
-    updateTextSize();
+    //updateTextSize();
 }
 
 QnToolTipWidget::~QnToolTipWidget() {
@@ -59,72 +59,17 @@ void QnToolTipWidget::setText(const QString &text) {
     update();
 }
 
-const QFont &QnToolTipWidget::font() const {
-    return m_font;
-}
-
-void QnToolTipWidget::setFont(const QFont &font) {
-    if(m_font == font)
-        return;
-
-    m_font = font;
-    updateTextSize();
-    update();
-}
-
-const QPen &QnToolTipWidget::textPen() const {
-    return m_textPen;
-}
-
-void QnToolTipWidget::setTextPen(const QPen &textPen) {
-    if(m_textPen == textPen)
-        return;
-
-    m_textPen = textPen;
-    update();
-}
-
-const QPen &QnToolTipWidget::borderPen() const {
-    return m_borderPen;
-}
-
-void QnToolTipWidget::setBorderPen(const QPen &borderPen) {
-    if (m_borderPen == borderPen)
-        return;
-
-    m_borderPen = borderPen;
-    invalidateShape();
-    update();
-}
-
-const QBrush &QnToolTipWidget::brush() const {
-    return m_brush;
-}
-
-void QnToolTipWidget::setBrush(const QBrush &brush) {
-    if(m_brush == brush)
-        return;
-
-    m_brush = brush;
-    invalidateShape();
-    update();
-}
-
 QRectF QnToolTipWidget::boundingRect() const {
     ensureShape();
 
     return m_boundingRect;
 }
 
-QPainterPath QnToolTipWidget::shape() const {
-    ensureShape();
-
-    return m_itemShape;
-}
-
 void QnToolTipWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(option)
     Q_UNUSED(widget)
+
+    // Use QPalette::Highlight & QPalette::Window
 
     /* Render background. */
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
@@ -178,30 +123,7 @@ void QnToolTipWidget::ensureShape() const {
         m_borderShape.closeSubpath();
     }
 
-    /* Calculate item shape & bounding rect. */
-    if (m_borderPen.isCosmetic()) {
-        m_itemShape = m_borderShape;
-    } else {
-        QPainterPathStroker stroker;
-        stroker.setWidth(m_borderPen.widthF());
-        m_itemShape = stroker.createStroke(m_borderShape);
-        m_itemShape.addPath(m_borderShape);
-        m_itemShape = m_itemShape.simplified();
-    }
-    m_boundingRect = m_itemShape.boundingRect();
-
+    m_boundingRect = m_itemShape.boundingRect(); // TODO: add m_borderPen.widthF() / 2
     m_shapeValid = true;
 }
 
-void QnToolTipWidget::updateTextSize() {
-    QFontMetrics metrics(m_font);
-    QSize textSize = metrics.size(0, m_text);
-    if(textSize.width() < arrowWidth)
-        textSize.setWidth(arrowWidth);
-
-    if(textSize == m_textSize)
-        return;
-
-    m_textSize = textSize;
-    invalidateShape();
-}
