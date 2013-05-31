@@ -948,11 +948,11 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 
     m_healthRequestHandle = 0; //TODO: #GDM doubling code in disconnect/reconnect
 
-    notificationsHandler()->clear();
-    notificationsHandler()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
-
     if (!widget())
         return;
+
+    notificationsHandler()->clear();
+    notificationsHandler()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
 
     if (cameraAdditionDialog())
         cameraAdditionDialog()->hide();

@@ -30,6 +30,7 @@ protected:
     virtual void tick(int deltaMSecs) override;
 private slots:
     void at_item_clicked(Qt::MouseButton button);
+    void at_geometry_changed();
 
 private:
     struct ItemData {
@@ -62,6 +63,11 @@ private:
     };
 
     HoverFocusProcessor* m_hoverProcessor;
+
+    /**
+     * @brief m_items       List of all items. Strictly ordered by item state:
+     *                      (Displayed|Hiding|Hidden)* (Displaying)? (Waiting)*
+     */
     QLinkedList<QnNotificationItem *> m_items;
     QMap<QnNotificationItem*, ItemData*> m_itemDataByItem;
 };

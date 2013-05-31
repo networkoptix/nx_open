@@ -9,7 +9,7 @@
 
 namespace {
 
-    int popoutTimeoutMs = 500;
+    int popoutTimeoutMs = 300;
     int moveUpTimeoutMs = 500;
     int displayTimeoutMs = 5000;
     int hideTimeoutMs = 300;
@@ -27,6 +27,8 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
+
+    connect(this, SIGNAL(geometryChanged()), this, SLOT(at_geometry_changed()));
 }
 
 QnNotificationListWidget::~QnNotificationListWidget() {
@@ -42,7 +44,7 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
     }
 
     if (m_itemDataByItem.isEmpty())
-        return QSizeF();
+        return QSizeF(widgetWidth, 0);
 
     QSizeF result(widgetWidth, 0);
     foreach (ItemData *data, m_itemDataByItem) {
@@ -62,25 +64,22 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
     // y-coord of the lowest item
     qreal bottomY = 0;
 
-    bool anyDisplaying = false;
-    foreach (ItemData *data, m_itemDataByItem) {
+    bool canShowNew = true;
+    foreach (QnNotificationItem* item, m_items) {
+        ItemData* data = m_itemDataByItem[item];
         if (!data->isVisible())
             continue;
-        bottomY = qMax(bottomY, data->item->geometry().bottom());
-        if (data->state == ItemData::Displaying)
-            anyDisplaying = true;
+
+        bottomY = qMax(bottomY, item->geometry().bottom());
     }
 
-    ItemData *previous = NULL;
+    // updating state and animating
     QList<QnNotificationItem*> itemsToDelete;
-
     foreach (QnNotificationItem* item, m_items) {
         ItemData* data = m_itemDataByItem[item];
         switch (data->state) {
         case ItemData::Waiting: {
-                if (!anyDisplaying && (bottomY + item->geometry().height() <= geometry().height())) {
-                    anyDisplaying = true;
-
+                if (canShowNew && (bottomY + item->geometry().height() <= geometry().height())) {
                     data->state = ItemData::Displaying;
 
                     item->setY(bottomY);
@@ -91,6 +90,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
                     updateGeometry();
                 }
+                canShowNew = false; // maintaining order in the list
                 break;
             }
         case ItemData::Displaying: {
@@ -101,6 +101,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                     data->state = ItemData::Displayed;
                     data->targetValue = 0.0; //counter for display time
                 }
+                canShowNew = false;
                 break;
             }
         case ItemData::Displayed: {
@@ -109,8 +110,9 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
                 qreal step = (qreal)deltaMSecs / (qreal)displayTimeoutMs;
                 data->targetValue += step;
-                if (data->targetValue >= 1.0)
+                if (data->targetValue >= 1.0) {
                     data->hide();
+                }
                 break;
             }
         case ItemData::Hiding: {
@@ -129,16 +131,23 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 break;
             }
         }
+    }
 
-        // moving items up
-        if (data->isVisible()) {
-            qreal targetY = (previous == NULL ? 0 : previous->item->geometry().bottom());
-            qreal currentY = item->y();
-            qreal stepY = currentY * (qreal) deltaMSecs / (qreal) moveUpTimeoutMs;
-            if (currentY > targetY)
-                item->setY(qMax(currentY - stepY, targetY));
-            previous = data;
+    // moving items up
+    ItemData *previous = NULL;
+    foreach (QnNotificationItem* item, m_items) {
+        ItemData* data = m_itemDataByItem[item];
+        if (!data->isVisible())
+            continue;
+
+        qreal targetY = (previous == NULL ? 0 : previous->item->geometry().bottom());
+        qreal currentY = item->y();
+        qreal stepY = currentY * (qreal) deltaMSecs / (qreal) moveUpTimeoutMs;
+        if (currentY > targetY) {
+            item->setY(qMax(currentY - stepY, targetY));
         }
+        previous = data;
+
     }
 
     // remove unused items
@@ -187,3 +196,9 @@ void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
         return;
     m_itemDataByItem[item]->unlockAndHide();
 }
+
+void QnNotificationListWidget::at_geometry_changed() {
+   // qDebug() << "geometry changed" << geometry();
+}
+
+
