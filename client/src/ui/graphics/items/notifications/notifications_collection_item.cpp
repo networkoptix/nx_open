@@ -107,39 +107,51 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
     m_list->addItem(item);
 }
 
-void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources) {
+void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
     item->setText(QnSystemHealth::toString(message));
     item->setColor(QColor(255, 127, 127)); // red
 
     switch (message) {
-    case QnSystemHealth::EmailIsEmpty: {
-            item->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
-            m_actionDataByItem.insert(item, ActionData(Qn::UserSettingsAction,
-                                                       QnActionParameters(context()->user())
-                                                       .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))));
-        }
+    case QnSystemHealth::EmailIsEmpty:
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
+        m_actionDataByItem.insert(item, ActionData(Qn::UserSettingsAction,
+                                                   QnActionParameters(context()->user())
+                                                   .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))));
+
         break;
     case QnSystemHealth::NoLicenses:
         item->setIcon(qnResIconCache->icon(QnResourceIconCache::Recorder));
+        m_actionDataByItem.insert(item, ActionData(Qn::GetMoreLicensesAction));
         break;
     case QnSystemHealth::SmtpIsNotSet:
         item->setIcon(qnResIconCache->icon(QnResourceIconCache::Server));
+        m_actionDataByItem.insert(item, ActionData(Qn::OpenServerSettingsAction));
         break;
     case QnSystemHealth::UsersEmailIsEmpty:
         item->setIcon(qnResIconCache->icon(QnResourceIconCache::Users));
+        m_actionDataByItem.insert(item, ActionData(Qn::UserSettingsAction,
+                                                   QnActionParameters(resource)
+                                                   .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))));
+        m_actionDataByItem.insert(item, ActionData(Qn::GetMoreLicensesAction));
         break;
     case QnSystemHealth::ConnectionLost:
         item->setIcon(qnSkin->icon("titlebar/disconnected.png"));
+        m_actionDataByItem.insert(item, ActionData(Qn::ConnectToServerAction));
         break;
     case QnSystemHealth::EmailSendError:
         item->setIcon(qnResIconCache->icon(QnResourceIconCache::Server | QnResourceIconCache::Offline));
+        m_actionDataByItem.insert(item, ActionData(Qn::OpenServerSettingsAction));
         break;
     case QnSystemHealth::StoragesNotConfigured:
         item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
+        m_actionDataByItem.insert(item, ActionData(Qn::ServerSettingsAction,
+                                                   QnActionParameters(resource)));
         break;
     case QnSystemHealth::StoragesAreFull:
         item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
+        m_actionDataByItem.insert(item, ActionData(Qn::ServerSettingsAction,
+                                                   QnActionParameters(resource)));
         break;
     default:
         break;

@@ -487,8 +487,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QnWorkbenchNotificationsHandler* handler = context()->instance<QnWorkbenchNotificationsHandler>();
     connect(handler, SIGNAL(businessActionAdded(QnAbstractBusinessActionPtr)),
             m_notificationsItem, SLOT(showBusinessAction(QnAbstractBusinessActionPtr)));
-    connect(handler, SIGNAL(systemHealthEventAdded(QnSystemHealth::MessageType,QnResourceList)),
-            m_notificationsItem, SLOT(showSystemHealthEvent(QnSystemHealth::MessageType,QnResourceList)));
+    connect(handler, SIGNAL(systemHealthEventAdded(QnSystemHealth::MessageType,const QnResourcePtr&)),
+            m_notificationsItem, SLOT(showSystemHealthEvent(QnSystemHealth::MessageType,const QnResourcePtr&)));
     connect(handler, SIGNAL(cleared()),
             m_notificationsItem, SLOT(hideAll()));
     connect(m_notificationsItem, SIGNAL(settingsRequested()), action(Qn::OpenPopupSettingsAction), SLOT(trigger()));

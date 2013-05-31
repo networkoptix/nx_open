@@ -30,7 +30,7 @@ signals:
     void settingsRequested();
 
 public slots:
-    void showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources);
+    void showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideAll();
 
@@ -41,6 +41,8 @@ private:
     struct ActionData {
         ActionData():
             action(Qn::NoAction){}
+        ActionData(Qn::ActionId action):
+            action(action){}
         ActionData(Qn::ActionId action, const QnActionParameters &params):
             action(action), params(params){}
 

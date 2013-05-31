@@ -26,7 +26,7 @@ namespace Qn {
         /**
          * Opens server settings preferences tab.
          */
-        OpenServerSettingsAction,
+        OpenServerSettingsAction, //TODO: #GDM rename - collisions with ServerSettingsAction
 
         /**
          * Opens popup settings preferences tab.

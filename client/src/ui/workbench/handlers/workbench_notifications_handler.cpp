@@ -52,14 +52,10 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 
     int healthMessage = eventType - BusinessEventType::SystemHealthMessage;
     if (healthMessage >= 0) {
-        QnResourceList resources;
-
         int resourceId = params.getEventResourceId();
         QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
-        if (resource)
-            resources << resource;
-
-        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resources);
+        if (resource) //all incoming systemhealth events should contain source resource
+           addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
         return;
     }
 
@@ -77,13 +73,13 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 }
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message) {
-    addSystemHealthEvent(message, QnResourceList());
+    addSystemHealthEvent(message, QnResourcePtr());
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources) {
+void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource) {
     if (!(qnSettings->popupSystemHealth() & (1 << message)))
         return;
-    emit systemHealthEventAdded(message, resources);
+    emit systemHealthEventAdded(message, resource);
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {

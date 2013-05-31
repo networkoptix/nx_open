@@ -3835,7 +3835,6 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
         m_healthRequestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
                        this, SLOT(at_serverSettings_received(int,QnKvPairList,int)));
 
-        QnUserResourceList usersWithNoEmail;
         QnUserResourceList users = qnResPool->getResources().filtered<QnUserResource>();
         foreach (const QnUserResourcePtr &user, users) {
             if (user == context()->user())
@@ -3847,14 +3846,13 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
                 (!(accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission)))
                     continue; // usual admins can not edit other admins, owner can
 
-            usersWithNoEmail << user;
+            notificationsHandler()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, user);
         }
-        if (!usersWithNoEmail.isEmpty())
-            notificationsHandler()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, usersWithNoEmail);
+
     }
 
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
-        notificationsHandler()->addSystemHealthEvent(QnSystemHealth::MessageType(i), QnResourceList());
+        notificationsHandler()->addSystemHealthEvent(QnSystemHealth::MessageType(i), context()->user());
     }
 
 
