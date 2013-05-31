@@ -100,7 +100,7 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
 
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
-        m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),16)); // round resolution height
+        m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),8)); // round resolution height
         m_resolution.setHeight(qMin(decoder.getContext()->height, m_resolution.height())); // strict to source frame height
 
         float ar = decoder.getContext()->width / (float) decoder.getContext()->height;

@@ -469,7 +469,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     }
 };
 
-QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractMediaDataPtr media, QSize resolution)
+QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout)
 {
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
@@ -509,7 +509,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
         case CODEC_ID_VP8:
         case CODEC_ID_ADPCM_G722:
         case CODEC_ID_ADPCM_G726:
-            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution)); // transcode src codec to MPEG4/AAC
+            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, vLayout)); // transcode src codec to MPEG4/AAC
             if (universalEncoder->isOpened())
                 return universalEncoder;
             else
@@ -596,7 +596,7 @@ int QnRtspConnectionProcessor::composeDescribe()
             numAudio = audioLayout->channelCount();
     }
 
-    int numVideo = videoLayout ? videoLayout->channelCount() : 1;
+    int numVideo = videoLayout && d->useProprietaryFormat ? videoLayout->channelCount() : 1;
 
     addResponseRangeHeader();
 
@@ -625,7 +625,7 @@ int QnRtspConnectionProcessor::composeDescribe()
             QnAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
             if (media) 
             {
-                encoder = createEncoderByMediaData(media, d->transcodedVideoSize);
+                encoder = createEncoderByMediaData(media, d->transcodedVideoSize, d->mediaRes->getVideoLayout(d->getCurrentDP().data()));
                 if (encoder)
                     encoder->setMediaData(media);
                 else 
@@ -984,6 +984,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor = new QnRtspDataConsumer(this);
         d->dataProcessor->pauseNetwork();
         d->dataProcessor->setUseRealTimeStreamingMode(!d->useProprietaryFormat);
+        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
     }
     else 
         d->dataProcessor->clearUnprocessedData();
