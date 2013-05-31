@@ -62,7 +62,7 @@ public:
      * This function may be called from any thread.
      * It is called just before this object is destroyed.
      */
-    virtual void beforeDestroy() 
+    virtual void destroyAsync() 
     {
         QMutexLocker lock(&m_usingMutex);
         m_needStop = true;

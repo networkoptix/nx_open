@@ -236,7 +236,12 @@ PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
     return *this;
 }
 
-Socket* PollSet::const_iterator::socket() const
+Socket* PollSet::const_iterator::socket()
+{
+    return m_impl->currentSocket.socket;
+}
+
+const Socket* PollSet::const_iterator::socket() const
 {
     return m_impl->currentSocket.socket;
 }

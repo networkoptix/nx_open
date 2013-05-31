@@ -255,6 +255,14 @@ bool QnPlAxisResource::readMotionInfo()
     return true;
 }
 
+bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnPlAxisResource::AxisResolution& res2)
+{
+    int square1 = res1.size.width() * res1.size.height();
+    int square2 = res2.size.width() * res2.size.height();
+
+    return !(square1 < square2);
+}
+
 bool QnPlAxisResource::initInternal()
 {
 
@@ -311,48 +319,47 @@ bool QnPlAxisResource::initInternal()
             return false;
         }
 
-        m_palntscRes = false;
-
-        m_resolutionList = body.mid(paramValuePos+1).split(',');
-        for (int i = 0; i < m_resolutionList.size(); ++i)
+        QList<QByteArray> rawResolutionList = body.mid(paramValuePos+1).split(',');
+        for (int i = 0; i < rawResolutionList.size(); ++i)
         {
-            m_resolutionList[i] = m_resolutionList[i].toLower().trimmed();
+            QByteArray resolutionStr = rawResolutionList[i].toLower().trimmed();
 
-            
-            if (m_resolutionList[i]=="qcif")
+            if (resolutionStr == "qcif")
             {
-                m_resolutionList[i] = "176x144";
-                m_palntscRes = true;
+                m_resolutionList << AxisResolution(QSize(176,144), resolutionStr);
             }
 
-            else if (m_resolutionList[i]=="cif")
+            else if (resolutionStr == "cif")
             {
-                m_resolutionList[i] = "352x288";
-                m_palntscRes = true;
+                m_resolutionList << AxisResolution(QSize(352,288), resolutionStr);
             }
 
-            else if (m_resolutionList[i]=="2cif")
+            else if (resolutionStr == "2cif")
             {
-                m_resolutionList[i] = "704x288";
-                m_palntscRes = true;
+                m_resolutionList << AxisResolution(QSize(704,288), resolutionStr);
             }
 
-            else if (m_resolutionList[i]=="4cif")
+            else if (resolutionStr == "4cif")
             {
-                m_resolutionList[i] = "704x576";
-                m_palntscRes = true;
+                m_resolutionList << AxisResolution(QSize(704,576), resolutionStr);
             }
 
-            else if (m_resolutionList[i]=="d1")
+            else if (resolutionStr == "d1")
             {
-                m_resolutionList[i] = "720x576";
-                m_palntscRes = true;
+                m_resolutionList << AxisResolution(QSize(720,576), resolutionStr);
+            }
+            else {
+                QList<QByteArray> dimensions = resolutionStr.split('x');
+                if (dimensions.size() >= 2) {
+                    QSize size( dimensions[0].trimmed().toInt(), dimensions[1].trimmed().toInt());
+                    m_resolutionList << AxisResolution(size, resolutionStr);
+                }
             }
         }
     }   //releasing mutex so that not to make other threads using the resource to wait for completion of heavy-wait io & pts initialization,
             //m_initMutex is locked up the stack
     
-
+    qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
 
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
@@ -375,55 +382,34 @@ bool QnPlAxisResource::initInternal()
     return true;
 }
 
-QByteArray QnPlAxisResource::getMaxResolution() const
+QnPlAxisResource::AxisResolution QnPlAxisResource::getMaxResolution() const
 {
     QMutexLocker lock(&m_mutex);
-
-    if (m_palntscRes)
-        return QByteArray("D1");
-
-    return !m_resolutionList.isEmpty() ? m_resolutionList[0] : QByteArray();
+    return !m_resolutionList.isEmpty() ? m_resolutionList[0] : AxisResolution();
 }
 
-float QnPlAxisResource::getResolutionAspectRatio(const QByteArray& resolution) const
+float QnPlAxisResource::getResolutionAspectRatio(const AxisResolution& resolution) const
 {
-    QList<QByteArray> dimensions = resolution.split('x');
-    if (dimensions.size() != 2)
-    {
-        qWarning() << Q_FUNC_INFO << "invalid resolution format. Expected widthxheight";
+    if (!resolution.size.isEmpty())
+        return resolution.size.width() / (float) resolution.size.height();
+    else
         return 1.0;
-    }
-    return dimensions[0].toFloat()/dimensions[1].toFloat();
 }
 
 
-QString QnPlAxisResource::getNearestResolution(const QByteArray& resolution, float aspectRatio) const
+QnPlAxisResource::AxisResolution QnPlAxisResource::getNearestResolution(const QSize& resolution, float aspectRatio) const
 {
     QMutexLocker lock(&m_mutex);
 
-    if (m_palntscRes)
-        return QLatin1String("CIF");
-
-
-
-    QList<QByteArray> dimensions = resolution.split('x');
-    if (dimensions.size() != 2)
-    {
-        qWarning() << Q_FUNC_INFO << "invalid request resolution format. Expected widthxheight";
-        return QString();
-    }
-    float requestSquare = dimensions[0].toInt() * dimensions[1].toInt();
+    float requestSquare = resolution.width() * resolution.height();
     int bestIndex = -1;
     float bestMatchCoeff = (float)INT_MAX;
     for (int i = 0; i < m_resolutionList.size(); ++ i)
     {
         float ar = getResolutionAspectRatio(m_resolutionList[i]);
-        if (qAbs(ar-aspectRatio) > MAX_AR_EPS)
+        if (aspectRatio != 0 && qAbs(ar-aspectRatio) > MAX_AR_EPS)
             continue;
-        dimensions = m_resolutionList[i].split('x');
-        if (dimensions.size() != 2)
-            continue;
-        float square = dimensions[0].toInt() * dimensions[1].toInt();
+        float square = m_resolutionList[i].size.width() * m_resolutionList[i].size.height();
         float matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
         if (matchCoeff < bestMatchCoeff)
         {
@@ -431,7 +417,7 @@ QString QnPlAxisResource::getNearestResolution(const QByteArray& resolution, flo
             bestMatchCoeff = matchCoeff;
         }
     }
-    return bestIndex >= 0 ? QLatin1String(m_resolutionList[bestIndex]) : QLatin1String(resolution);
+    return bestIndex >= 0 ? m_resolutionList[bestIndex] : AxisResolution();
 }
 
 QRect QnPlAxisResource::getMotionWindow(int num) const

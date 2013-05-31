@@ -425,6 +425,18 @@ void QnProgressiveDownloadingConsumer::run()
             codecParams[it->first] = it->second;
         }
 
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(resUniqueID);
+        if (resource == 0)
+        {
+            d->responseBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLocal8Bit()) + QByteArray(" not found ");
+            sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
+            return;
+        }
+
+        QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
+        if (mediaRes)
+            d->transcoder.setVideoLayout(mediaRes->getVideoLayout());
+
         if (d->transcoder.setVideoCodec(
                 d->videoCodec,
                 QnTranscoder::TM_FfmpegTranscode,
@@ -441,15 +453,6 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
-
-
-        QnResourcePtr resource = qnResPool->getResourceByUniqId(resUniqueID);
-        if (resource == 0)
-        {
-            d->responseBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLocal8Bit()) + QByteArray(" not found ");
-            sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
-            return;
-        }
 
         //taking max send queue size from url
         bool dropLateFrames = d->streamingFormat == "mpjpeg";

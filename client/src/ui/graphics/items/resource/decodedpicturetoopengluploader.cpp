@@ -1507,7 +1507,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
     }
     else
     {
-        NX_LOG( QString::fromAscii( "Failed to find picture for rendering. No data from decoder?" ), cl_logWARNING );
+        NX_LOG( QString::fromAscii( "Failed to find picture for rendering. No data from decoder?" ), cl_logDEBUG1 );
         return NULL;
     }
 

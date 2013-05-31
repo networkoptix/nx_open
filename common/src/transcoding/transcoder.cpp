@@ -114,18 +114,33 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
 
     int width = m_resolution.width();
     int height = m_resolution.height();
-    if (!m_srcRectF.isEmpty())
-    {
-        width  *= m_srcRectF.width();
-        height *= m_srcRectF.height();
-    }
     if (m_layout) {
         width *= m_layout->size().width();
         height *= m_layout->size().height();
     }
 
+    if (!m_srcRectF.isEmpty())
+    {
+        // round srcRect
+        int srcLeft = qPower2Floor(unsigned(m_srcRectF.left() * width), 16);
+        int srcTop = qPower2Floor(unsigned(m_srcRectF.top() * height), 2);
+        int srcWidth = qPower2Ceil(unsigned(m_srcRectF.width() * width), 16);
+        int srcHeight = qPower2Ceil(unsigned(m_srcRectF.height() * height), 2);
+
+        m_srcRectF = QRectF(srcLeft / (qreal) width, srcTop / (qreal) height, 
+                            srcWidth / (qreal) width, srcHeight / (qreal) height);
+
+        width  = srcWidth;
+        height = srcHeight;
+    }
+
     m_resolution.setWidth(qPower2Ceil((unsigned)width,16));
     m_resolution.setHeight(qPower2Ceil((unsigned)height,2));
+
+    if (!m_srcRectF.isEmpty())
+    {
+        // round srcRect
+    }
 
     return true;
 }
@@ -139,7 +154,8 @@ QnTranscoder::QnTranscoder():
     m_firstTime(AV_NOPTS_VALUE),
     m_initialized(false),
     m_eofCounter(0),
-    m_packetizedMode(false)
+    m_packetizedMode(false),
+    m_vLayout(0)
 {
     QThread::currentThread()->setPriority(QThread::LowPriority); 
 }
@@ -217,6 +233,11 @@ int QnTranscoder::suggestMediaStreamParams(
     return qMax(128,result)*1024;
 }
 
+void QnTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
+{
+    m_vLayout = layout;
+}
+
 int QnTranscoder::setVideoCodec(
     CodecID codec,
     TranscodeMethod method,
@@ -239,6 +260,7 @@ int QnTranscoder::setVideoCodec(
             break;
         case TM_FfmpegTranscode:
             ffmpegTranscoder = new QnFfmpegVideoTranscoder(codec);
+            ffmpegTranscoder->setVideoLayout(m_vLayout);
             if (getCPUString().toLower().contains(QLatin1String("atom")))
                 ffmpegTranscoder->setMTMode(true);
             m_vTranscoder = QnVideoTranscoderPtr(ffmpegTranscoder);

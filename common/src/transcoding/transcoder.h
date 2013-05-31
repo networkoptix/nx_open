@@ -133,6 +133,8 @@ public:
     */
     virtual int setContainer(const QString& value) = 0;
 
+    void setVideoLayout(const QnResourceVideoLayout* layout);
+
     /*
     * Set ffmpeg video codec and params
     * @return Returns 0 if no error or error code
@@ -219,7 +221,7 @@ protected:
 
 protected:
     bool m_initialized;
-
+    const QnResourceVideoLayout* m_vLayout;
 private:
     QString m_lastErrMessage;
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;
