@@ -415,9 +415,16 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
         case ActionColumn:
             return BusinessActionType::toString(action.actionType());
             break;
-        case ActionCameraColumn:
-            return getResourceNameString(action.getRuntimeParams().getActionResourceId());
+        case ActionCameraColumn: {
+            BusinessActionType::Value actionType = action.actionType();
+            if (actionType == BusinessActionType::ShowPopup) {
+                int gg = 4;
+            }
+            else {
+                return getResourceNameString(action.getRuntimeParams().getActionResourceId());
+            }
             break;
+        }
         case DescriptionColumn: {
             BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
             QString result;

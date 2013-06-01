@@ -88,17 +88,26 @@ public:
     QnBusinessParams toBusinessParams() const;
     static QnBusinessActionParameters fromBusinessParams(const QnBusinessParams& bParams);
 
-    QVariant& operator[](int index);
-    const QVariant& operator[](int index) const;
-
     /*
     * Returns true if all parameters have default values
     */
     bool isDefault() const;
+    bool equalTo(const QnBusinessActionParameters& other) const;
 private:
     static int getParamIndex(const QString& key);
 private:
-    QVector<QVariant> m_params;
+    QString m_soundUrl;
+    QString m_emailAddress;
+    int m_userGroup;
+    int m_fps;
+    int m_streamQuality;
+    int m_recordingDuration;
+    int m_before;
+    int m_after;
+    QString m_relayOutputID;
+    int m_relayAutoResetTimeout;
+    QString m_inputPortId;
+    QString m_keyParam;
 };
 
 QByteArray serializeBusinessParams(const QnBusinessParams& value);
