@@ -123,7 +123,6 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
         decodedFrame->data, decodedFrame->linesize, 
         0, decodedFrame->height, 
         dstData, m_scaledVideoFrame.linesize);
-    m_scaledVideoFrame.pkt_dts = m_decodedVideoFrame->pkt_dts;
     return 0;
 }
 
@@ -335,7 +334,6 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
                 m_decodedFrameRect.linesize[i] = decodedFrame->linesize[i];
             }
             m_decodedFrameRect.format = decodedFrame->format;
-            m_decodedFrameRect.pkt_dts = decodedFrame->pkt_dts;
             m_decodedFrameRect.width = frameRect.width();
             m_decodedFrameRect.height = frameRect.height();
             decodedFrame = &m_decodedFrameRect;
@@ -346,8 +344,10 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             decodedFrame = &m_scaledVideoFrame;
         }
 
-        if (m_dateTextPos != Date_None)
+        if (m_dateTextPos != Date_None) {
+            decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
             doDrawOnScreenTime(decodedFrame);
+        }
 
         static AVRational r = {1, 1000000};
         decodedFrame->pts  = av_rescale_q(m_decodedVideoFrame->pkt_dts, r, m_encoderCtx->time_base);
