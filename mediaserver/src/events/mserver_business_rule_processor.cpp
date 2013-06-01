@@ -9,12 +9,17 @@
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRuleProcessor()
 {
-
+    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
 }
 
 QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
 {
 
+}
+
+void QnMServerBusinessRuleProcessor::onRemoveResource(const QnResourcePtr &resource)
+{
+    QnEventsDB::instance()->removeLogForRes(resource->getId());
 }
 
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)

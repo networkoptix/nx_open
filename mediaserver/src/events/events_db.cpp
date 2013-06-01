@@ -92,6 +92,23 @@ bool QnEventsDB::cleanupEvents()
     return rez;
 }
 
+bool QnEventsDB::removeLogForRes(QnId resId)
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (!m_sdb.isOpen())
+        return false;
+
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM runtime_actions where event_resource_id = :id1 or action_resource_id = :id2");
+
+
+    delQuery.bindValue(":id1", resId.toInt());
+    delQuery.bindValue(":id2", resId.toInt());
+
+    return delQuery.exec();
+}
+
 bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes)
 {
     QMutexLocker lock(&m_mutex);
