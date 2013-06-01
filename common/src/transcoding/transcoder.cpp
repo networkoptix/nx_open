@@ -92,12 +92,6 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
 
-    /*
-    if (m_resolution.isEmpty() && !m_srcRect.isEmpty()) {
-        m_resolution = m_srcRect.size();
-    }
-    */
-
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
         m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),8)); // round resolution height
@@ -115,6 +109,12 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
     int width = m_resolution.width();
     int height = m_resolution.height();
     if (m_layout) {
+        int maxDimension = qMax(m_layout->size().width(), m_layout->size().height());
+        width /= maxDimension;
+        height /= maxDimension;
+        width = qPower2Ceil((unsigned) width ,16);
+        height = qPower2Ceil((unsigned) height ,8);
+
         width *= m_layout->size().width();
         height *= m_layout->size().height();
     }
