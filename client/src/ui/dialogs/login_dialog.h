@@ -50,6 +50,7 @@ public slots:
 protected:
     virtual void changeEvent(QEvent *event) override;
     virtual void showEvent(QShowEvent *event) override;
+    virtual void hideEvent(QHideEvent *event) override;
 
     /**
      * Reset connections model to its initial state. Select last used connection.

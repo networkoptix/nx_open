@@ -63,12 +63,12 @@ void QnBufferedFrameDisplayer::setCurrentTime(qint64 time) {
 }
 
 void QnBufferedFrameDisplayer::clear() {
-    stop();
+    QMutexLocker processFrameLock( &m_processFrameMutex );
+    m_queue.clear();
     m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
-    start();
 }
 
-qint64 QnBufferedFrameDisplayer::getTimestampOfNextFrameToRender() 
+qint64 QnBufferedFrameDisplayer::getTimestampOfNextFrameToRender() const 
 {
     QMutexLocker lock(&m_sync);
     return m_lastDisplayedTime;
@@ -85,6 +85,8 @@ void QnBufferedFrameDisplayer::run()
     QSharedPointer<CLVideoDecoderOutput> frame;
     while (!needToStop())
     {
+        QMutexLocker processFrameLock( &m_processFrameMutex );
+
         if (m_queue.size() > 0)
         {
             frame = m_queue.front();
@@ -94,7 +96,7 @@ void QnBufferedFrameDisplayer::run()
                 m_expectedTime = frame->pkt_dts;
             }
 
-            m_sync.lock();
+            QMutexLocker syncLock( &m_sync );
             qint64 expectedTime = m_expectedTime  + m_alignedTimer.elapsed()*1000ll;
             qint64 currentTime = (quint64)m_currentTime != AV_NOPTS_VALUE ? m_currentTime + m_timer.elapsed()*1000ll : expectedTime;
                 
@@ -114,7 +116,7 @@ void QnBufferedFrameDisplayer::run()
             }
             qint64 sleepTime = frame->pkt_dts - currentTime;
 
-            m_sync.unlock();
+            syncLock.unlock();
 
             if (sleepTime > 0) {
                 msleep(sleepTime/1000);
@@ -128,9 +130,9 @@ void QnBufferedFrameDisplayer::run()
                 if (m_queue.size() > 1 && sleepTime + (m_queue.at(1)->pkt_dts - frame->pkt_dts) <= 0) 
                 {
                     cl_log.log("Late picture skipped at ", frame->pkt_dts/1000000.0, cl_logWARNING);
-                    m_sync.lock();
+                    syncLock.relock();
                     m_queue.pop(frame);
-                    m_sync.unlock();
+                    syncLock.unlock();
                     continue;
                 }
                 if (sleepTime < -1000000) {
@@ -139,9 +141,9 @@ void QnBufferedFrameDisplayer::run()
             }
             */
 
-            m_sync.lock();
+            syncLock.relock();
             m_lastDisplayedTime = frame->pkt_dts;
-            m_sync.unlock();
+            syncLock.unlock();
 
             {
                 QMutexLocker lock(&m_renderMtx);
@@ -149,16 +151,16 @@ void QnBufferedFrameDisplayer::run()
                     render->draw(frame);
             }
             //m_drawer->waitForFrameDisplayed(0);
-            m_sync.lock();
+            syncLock.relock();
             m_queue.pop(frame);
-            m_sync.unlock();
+            syncLock.unlock();
             //cl_log.log("queue size:", m_queue.size(), cl_logALWAYS);
         }
         else {
             msleep(1);
         }
     }
-    while (m_queue.size() > 0)
-        m_queue.pop(frame);
-}
 
+    QMutexLocker processFrameLock( &m_processFrameMutex );
+    m_queue.clear();
+}
