@@ -3138,12 +3138,12 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
         if (m_exportStorage && (m_exportedMediaRes->hasFlags(QnResource::utc)))
             role = QnStreamRecorder::Role_FileExportWithEmptyContext;
-        QRect rect(100,100, 200, 50);
+        QnLayoutItemData itemData = m_exportLayout->getItem(uniqId);
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, 
                                                       (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage, 
                                                        role, 
                                                        0, 0,
-                                                       rect);
+                                                       itemData.zoomRect);
 
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->getUrl()).arg(m_layoutFileName));
