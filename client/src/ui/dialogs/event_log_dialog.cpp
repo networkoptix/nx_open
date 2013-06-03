@@ -443,8 +443,11 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     {
         QnResourcePtr resource = m_model->getResource(idx);
         QnActionManager *manager = m_context->menu();
-        if (resource)
+        if (resource) {
             menu = manager->newMenu(Qn::TreeScope, QnActionParameters(resource));
+            foreach(QAction* action, menu->actions())
+                action->setShortcut(QKeySequence());
+        }
     }
     if (menu)
         menu->addSeparator();
