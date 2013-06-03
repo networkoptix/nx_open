@@ -11,6 +11,7 @@
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
+QThreadPool QnStorageManager::m_testStoragesAsyncPool;
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
 
@@ -218,7 +219,7 @@ void QnStorageManager::removeAbsentStorages(QnAbstractStorageResourceList newSto
 
 QnStorageManager::~QnStorageManager()
 {
-
+    stopAsyncTasks();
 }
 
 QnStorageManager* QnStorageManager::instance()
@@ -412,6 +413,35 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     return result;
 }
 
+class TestStorageAsyncTask: public QRunnable
+{
+public:
+    TestStorageAsyncTask(QnStorageManager* owner): m_owner(owner) {}
+    void run()
+    {
+        QnStorageManager::StorageMap storageRoots = m_owner->getAllStorages();
+
+        for (QnStorageManager::StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+        {
+            QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+            QnResource::Status status = fileStorage->isStorageAvailable() ? QnResource::Online : QnResource::Offline;
+            if (fileStorage->getStatus() != status)
+                m_owner->changeStorageStatus(fileStorage, status);
+        }
+    }
+private:
+    QnStorageManager* m_owner;
+};
+
+void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status)
+{
+    QMutexLocker lock(&m_mutexStorages);
+    fileStorage->setStatus(status);
+    m_storagesStatisticsReady = false;
+    if (status == QnResource::Offline)
+        emit storageFailure(fileStorage);
+}
+
 void QnStorageManager::testOfflineStorages()
 {
     QMutexLocker lock(&m_mutexStorages);
@@ -419,20 +449,15 @@ void QnStorageManager::testOfflineStorages()
     if (m_lastTestTime.elapsed() < OFFLINE_STORAGES_TEST_INTERVAL)
         return;
 
-    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
-    {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
-        QnResource::Status status = fileStorage->isStorageAvailable() ? QnResource::Online : QnResource::Offline;
-        if (fileStorage->getStatus() != status)
-        {
-            fileStorage->setStatus(status);
-            m_storagesStatisticsReady = false;
-            if (status == QnResource::Offline)
-                emit storageFailure(fileStorage);
-        }
-    }
+    TestStorageAsyncTask *task = new TestStorageAsyncTask(this);
+    m_testStoragesAsyncPool.start(task);
 
     m_lastTestTime.restart();
+}
+
+void QnStorageManager::stopAsyncTasks()
+{
+    m_testStoragesAsyncPool.waitForDone();
 }
 
 void QnStorageManager::updateStorageStatistics()
