@@ -193,7 +193,6 @@ void QnToolTipWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     /* Render background. */
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     painter->setPen(QPen(frameBrush(), frameWidth()));
-    qDebug() << windowBrush();
     painter->setBrush(windowBrush());
     painter->drawPath(m_borderShape);
 }
