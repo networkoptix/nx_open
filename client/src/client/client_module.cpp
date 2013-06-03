@@ -1,5 +1,7 @@
 #include "client_module.h"
 
+#include <QApplication>
+
 #include <utils/common/module_resources.h>
 
 #include <common/common_module.h>

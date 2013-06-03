@@ -357,7 +357,7 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
     //TODO: #vasilenko implement me
 }
 
-bool QnBusinessRuleProcessor::sendMail(QnSendMailBusinessActionPtr& action )
+bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
 {
     Q_ASSERT( action );
 

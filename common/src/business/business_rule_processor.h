@@ -150,7 +150,7 @@ private:
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
 
-    bool sendMail(QnSendMailBusinessActionPtr& action );
+    bool sendMail(const QnSendMailBusinessActionPtr& action );
 
     QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
