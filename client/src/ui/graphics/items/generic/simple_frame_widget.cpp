@@ -27,8 +27,8 @@ QBrush QnSimpleFrameWidget::frameBrush() const {
 }
 
 void QnSimpleFrameWidget::setFrameBrush(const QBrush &frameBrush) {
-    if(this->frameBrush() == frameBrush)
-        return;
+    /* Note that we cannot optimize the setPalette call away because palette stores
+     * bitmask of changed colors for palette inheritance handling. */
 
     QPalette palette = this->palette();
     palette.setBrush(QPalette::Highlight, frameBrush);
@@ -48,8 +48,8 @@ QBrush QnSimpleFrameWidget::windowBrush() const {
 }
 
 void QnSimpleFrameWidget::setWindowBrush(const QBrush &windowBrush) {
-    if(this->windowBrush() == windowBrush)
-        return;
+    /* Note that we cannot optimize the setPalette call away because palette stores
+     * bitmask of changed colors for palette inheritance handling. */
 
     QPalette palette = this->palette();
     palette.setBrush(QPalette::Window, windowBrush);

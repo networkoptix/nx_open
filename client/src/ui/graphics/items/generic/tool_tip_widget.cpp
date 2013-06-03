@@ -10,16 +10,10 @@
 #include <utils/math/math.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/common/geometry.h>
 
 namespace  {
-    /*const qreal roundingRadius = 5.0;
-    const qreal padding = -1.0;
-    const qreal arrowHeight = 8.0;
-    const qreal arrowWidth = 8.0;*/
-
     void addEdgeTo(qreal x, qreal y, const QPointF &tailPos, qreal tailWidth, bool useTail, QPainterPath *path) {
         if(!useTail) {
             path->lineTo(x, y);
@@ -93,24 +87,7 @@ QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent, Qt::WindowFlags windowFl
     m_shapeValid(false),
     m_tailWidth(5.0)
 {
-    //setFlag(ItemIsMovable, false);
-    //setFlag(ItemIsSelectable, false);
-
-    //setCacheMode(ItemCoordinateCache);
-    //setProperty(Qn::NoHandScrollOver, true);
-
-    /* Set up default colors. */
-    /*QStyle *style = QApplication::style();
-    setTextPen(QPen(style->standardPalette().windowText(), 0));
-    setBorderPen(QPen(style->standardPalette().windowText(), 0));
-    setBrush(style->standardPalette().window());*/
-
-    /*QFont fixedFont = QApplication::font();
-    fixedFont.setPixelSize(14);
-    setFont(fixedFont);*/
-
-    /* Update. */
-    //updateTextSize();
+    // setProperty(Qn::NoHandScrollOver, true); // TODO: #Elric
 }
 
 QnToolTipWidget::~QnToolTipWidget() {
@@ -199,6 +176,7 @@ void QnToolTipWidget::setText(const QString &text) {
     label->setText(text);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addItem(label);
     setLayout(layout);
 }
@@ -215,13 +193,9 @@ void QnToolTipWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     /* Render background. */
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     painter->setPen(QPen(frameBrush(), frameWidth()));
+    qDebug() << windowBrush();
     painter->setBrush(windowBrush());
     painter->drawPath(m_borderShape);
-
-    /* Render text. */
-    /*painter->setFont(m_font);
-    painter->setPen(m_textPen);
-    painter->drawText(QRectF(-m_textSize.width() / 2, -arrowHeight - roundingRadius - padding - m_textSize.height(), m_textSize.width(), m_textSize.height()), Qt::AlignCenter, m_text);*/
 }
 
 void QnToolTipWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {

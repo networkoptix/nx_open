@@ -17,9 +17,19 @@ namespace {
         {
             setContentsMargins(5.0, 5.0, 5.0, 5.0);
             setTailWidth(5.0);
-            //setTextPen(QColor(63, 159, 216));
-            //setBrush(QColor(0, 0, 0, 255));
-            //setBorderPen(QPen(QColor(203, 210, 233, 128), 0.7));
+
+            QPalette palette = this->palette();
+            palette.setColor(QPalette::WindowText, QColor(63, 159, 216));
+            setPalette(palette);
+
+            setWindowBrush(QColor(0, 0, 0, 255));
+            setFrameBrush(QColor(203, 210, 233, 128));
+            setFrameWidth(1.0);
+
+            QFont fixedFont = QApplication::font();
+            fixedFont.setPixelSize(14);
+            setFont(fixedFont);
+
             updateTailPos();
         }
 
