@@ -341,7 +341,18 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
         case ActionCameraColumn: 
             {
                 BusinessActionType::Value actionType = action.actionType();
-                if (actionType == BusinessActionType::ShowPopup) {
+                if (actionType == BusinessActionType::SendMail) {
+                    if (!action.getParams().getEmailAddress().isEmpty()) {
+                        if (action.getParams().getEmailAddress().indexOf(L';') > 0)
+                            return qnResIconCache->icon(QnResourceIconCache::Users);
+                        else
+                            return qnResIconCache->icon(QnResourceIconCache::User);
+                    }
+                    else {
+                        return QVariant();
+                    }
+                }
+                else if (actionType == BusinessActionType::ShowPopup) {
                     if (action.getParams().getUserGroup() == QnBusinessActionParameters::AdminOnly)
                         return qnResIconCache->icon(QnResourceIconCache::User);
                     else

@@ -46,6 +46,7 @@ public:
 
     void setParams(const QnBusinessActionParameters& params);
     const QnBusinessActionParameters& getParams() const;
+    QnBusinessActionParameters& getParams();
 
     void setRuntimeParams(const QnBusinessEventParameters& params);
     const QnBusinessEventParameters& getRuntimeParams() const;
