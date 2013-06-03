@@ -90,14 +90,12 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         ItemData* data = m_itemDataByItem[item];
         switch (data->state) {
         case ItemData::Collapsing: {
-                qreal step = (qreal)deltaMSecs / (qreal)collapseTimeoutMs;
-                data->animationValue = qMin(data->animationValue + step, data->targetValue);
-                //item->setOpacity(value);
+                data->animationTick(deltaMSecs);
                 QTransform transform = this->transform();
-                transform.rotate(data->animationValue*(90), Qt::XAxis);
+                transform.rotate(data->animation.value, Qt::XAxis);
                 item->setTransform(transform);
 
-                if (qFuzzyCompare(data->animationValue, data->targetValue)) {
+                if (data->animationFinished()) {
                     data->state = ItemData::Collapsed;
                     item->setVisible(false);
                 }
@@ -109,14 +107,11 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                     data->state = ItemData::Displaying;
 
                     item->setY(bottomY);
-                    item->setX(0.0);//item->geometry().width());
                     item->setOpacity(1.0);
-                    data->animationValue = 1.0;
-                    data->targetValue = 0.0; //target x-coord
+                    item->setTransform(transform());
 
-                    QTransform transform = this->transform();
-                    transform.rotate(data->animationValue*(90), Qt::XAxis);
-                    item->setTransform(transform);
+                    data->setAnimation(item->geometry().width(), 0.0, popoutTimeoutMs);
+                    item->setX(data->animation.value);
 
                     item->setVisible(true);
 
@@ -126,18 +121,11 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 break;
             }
         case ItemData::Displaying: {
-                qreal step = /*item->geometry().width() **/ (qreal)deltaMSecs / (qreal)popoutTimeoutMs;
-                data->animationValue = qMax(data->animationValue - step, data->targetValue);
-                //qreal value = qMax(item->x() - step, data->targetValue);
-                //item->setX(value);
-
-                QTransform transform = this->transform();
-                transform.rotate(data->animationValue*(90), Qt::XAxis);
-                item->setTransform(transform);
-
-                if (qFuzzyCompare(data->animationValue, data->targetValue)) {
+                data->animationTick(deltaMSecs);
+                item->setX(data->animation.value);
+                if (data->animationFinished()) {
                     data->state = ItemData::Displayed;
-                    data->targetValue = 0.0; //counter for display time
+                    data->setAnimation(0.0, 1.0, displayTimeoutMs);
                 }
                 canShowNew = false;
                 break;
@@ -146,18 +134,15 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 if (m_hoverProcessor->isHovered() || data->locked)
                     break;
 
-                qreal step = (qreal)deltaMSecs / (qreal)displayTimeoutMs;
-                data->targetValue += step;
-                if (data->targetValue >= 1.0) {
+                data->animationTick(deltaMSecs);
+                if (data->animationFinished())
                     data->hide();
-                }
                 break;
             }
         case ItemData::Hiding: {
-                qreal step = (qreal)deltaMSecs / (qreal)hideTimeoutMs;
-                qreal value = qMax(item->opacity() - step, data->targetValue);
-                item->setOpacity(value);
-                if (qFuzzyCompare(value, data->targetValue)) {
+                data->animationTick(deltaMSecs);
+                item->setOpacity(data->animation.value);
+                if (data->animationFinished()) {
                     data->state = ItemData::Hidden;
                     item->setVisible(false);
                 }
@@ -248,12 +233,33 @@ void QnNotificationListWidget::at_geometry_changed() {
 
         if ((*i)->geometry().bottom() > geometry().bottom()) {
             data->state = ItemData::Collapsing;
-            data->targetValue = 1.0;
-            data->animationValue = 0.0;
+            data->setAnimation(0.0, 90.0, collapseTimeoutMs);
         } else
             break;
     }
-
 }
 
+void QnNotificationListWidget::ItemData::hide()  {
+    state = Hiding;
+    setAnimation(1.0, 0.0, hideTimeoutMs);
+}
+
+void QnNotificationListWidget::ItemData::setAnimation(qreal from, qreal to, qreal time) {
+    animation.source = from;
+    animation.value = from;
+    animation.target = to;
+    animation.length = time;
+}
+
+void QnNotificationListWidget::ItemData::animationTick(qreal deltaMSecs) {
+    qreal step = (animation.target - animation.source) * deltaMSecs / animation.length;
+    if (animation.source < animation.target)
+        animation.value = qMin(animation.value + step, animation.target);
+    else
+        animation.value = qMax(animation.value + step, animation.target);
+}
+
+bool QnNotificationListWidget::ItemData::animationFinished() {
+    return qFuzzyCompare(animation.value, animation.target);
+}
 

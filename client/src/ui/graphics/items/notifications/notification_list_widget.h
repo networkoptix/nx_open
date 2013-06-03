@@ -52,15 +52,21 @@ private:
             hide();
         }
 
-        void hide() {
-            state = Hiding;
-            targetValue = 0.0;
-        }
+        void hide();
+
+        void setAnimation(qreal from, qreal to, qreal time);
+        void animationTick(qreal deltaMSecs);
+        bool animationFinished();
+
+        struct {
+            qreal value;
+            qreal source;
+            qreal target;
+            qreal length;
+        } animation;
 
         QnNotificationItem* item;
         State state;
-        qreal animationValue;
-        qreal targetValue;
         bool locked;
     };
 

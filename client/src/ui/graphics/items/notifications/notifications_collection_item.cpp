@@ -107,7 +107,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
     item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
 
     connect(item, SIGNAL(actionTriggered(QnNotificationItem*)), this, SLOT(at_item_actionTriggered(QnNotificationItem*)));
-    m_list->addItem(item, true);
+    m_list->addItem(item);
 }
 
 void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
@@ -166,7 +166,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
     }
     connect(item, SIGNAL(actionTriggered(QnNotificationItem*)), this, SLOT(at_item_actionTriggered(QnNotificationItem*)));
 
-    m_list->addItem(item, /*message != QnSystemHealth::ConnectionLost*/ true);
+    m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
 }
 
 void QnNotificationsCollectionItem::hideAll() {
