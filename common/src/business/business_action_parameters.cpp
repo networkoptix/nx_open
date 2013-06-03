@@ -30,6 +30,7 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     m_recordingDuration = 0;
     m_before = 0;
     m_after = 0;
+    m_relayAutoResetTimeout = 0;
 }
 
 QString QnBusinessActionParameters::getSoundUrl() const {
