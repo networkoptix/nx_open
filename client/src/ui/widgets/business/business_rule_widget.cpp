@@ -10,12 +10,13 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QMessageBox>
 #include <QtGui/QIcon>
-#include <QDragEnterEvent>
+#include <QtGui/QDragEnterEvent>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/common/palette.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/resource_icon_cache.h>
@@ -76,9 +77,7 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
     ui->eventDefinitionGroupBox->installEventFilter(this);
     ui->actionDefinitionGroupBox->installEventFilter(this);
 
-    QPalette pal = this->palette();
-    pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
-    this->setPalette(pal);
+    setPaletteColor(this, QPalette::Window, palette().color(QPalette::Window).lighter());
 
     connect(ui->eventTypeComboBox,          SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
     connect(ui->eventStatesComboBox,        SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));

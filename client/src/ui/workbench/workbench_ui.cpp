@@ -46,8 +46,9 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
-#include <ui/processors/hover_processor.h>
 
+#include <ui/common/palette.h>
+#include <ui/processors/hover_processor.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
@@ -264,18 +265,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Tree widget. */
     m_treeWidget = new QnResourceBrowserWidget(NULL, context());
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
-    {
-        QPalette palette = m_treeWidget->palette();
-        palette.setColor(QPalette::Window, Qt::transparent);
-        palette.setColor(QPalette::Base, Qt::transparent);
-        
-        QPalette cbPalette = m_treeWidget->comboBoxPalette();
-        cbPalette.setColor(QPalette::Window, Qt::black);
-        cbPalette.setColor(QPalette::Base, Qt::black);
-        
-        m_treeWidget->setPalette(palette);
-        m_treeWidget->setComboBoxPalette(cbPalette);
-    }
+    setPaletteColor(m_treeWidget, QPalette::Window, Qt::transparent);
+    setPaletteColor(m_treeWidget, QPalette::Base, Qt::transparent);
+    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Window, Qt::black);
+    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, Qt::black);
     m_treeWidget->resize(250, 0);
 
     m_treeBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
@@ -470,12 +463,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_helpWidget = new QWidget();
     m_helpWidget->setAttribute(Qt::WA_TranslucentBackground);
-    {
-        QPalette palette = m_helpWidget->palette();
-        palette.setColor(QPalette::Window, Qt::transparent);
-        palette.setColor(QPalette::Base, Qt::transparent);
-        m_helpWidget->setPalette(palette);
-    }
+    setPaletteColor(m_helpWidget, QPalette::Window, Qt::transparent);
+    setPaletteColor(m_helpWidget, QPalette::Base, Qt::transparent);
     m_helpWidget->resize(250, 0);
 
     m_helpItem = new QnMaskedProxyWidget(m_controlsWidget);

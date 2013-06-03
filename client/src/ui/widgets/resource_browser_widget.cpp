@@ -12,17 +12,17 @@
 #include <QtGui/QTreeView>
 #include <QtGui/QWheelEvent>
 
+#include <common/common_meta_types.h>
+
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <client/client_settings.h>
-
-#include <common/common_meta_types.h>
 
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-
+#include <ui/common/palette.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/help/help_topic_accessor.h>
@@ -119,12 +119,8 @@ QnResourceBrowserWidget::~QnResourceBrowserWidget() {
     ui->resourceTreeWidget->setWorkbench(NULL);
 }
 
-QPalette QnResourceBrowserWidget::comboBoxPalette() const {
-    return ui->typeComboBox->palette();
-}
-
-void QnResourceBrowserWidget::setComboBoxPalette(const QPalette &palette) {
-    ui->typeComboBox->setPalette(palette);
+QComboBox *QnResourceBrowserWidget::typeComboBox() const {
+    return ui->typeComboBox;
 }
 
 QnResourceBrowserWidget::Tab QnResourceBrowserWidget::currentTab() const {
