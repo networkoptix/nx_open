@@ -56,7 +56,7 @@ void QnRenderingWidget::setResource(const QnMediaResourcePtr &resource) {
     m_resource = resource;
 }
 
-void QnRenderingWidget::restartPlayback()
+void QnRenderingWidget::stopPlayback()
 {
     if( !m_display )
         return;
