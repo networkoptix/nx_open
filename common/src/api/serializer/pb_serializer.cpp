@@ -69,7 +69,7 @@ void deserializeNetAddrList(QList<QHostAddress>& netAddrList, const QString& net
     std::transform(addListStrings.begin(), addListStrings.end(), std::back_inserter(netAddrList), stringToAddr);
 }
 
-void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_cameraResource, QnResourceFactory& resourceFactory)
+void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraResource, QnResourceFactory& resourceFactory)
 {
     const pb::Camera& pb_camera = pb_cameraResource.GetExtension(pb::Camera::resource);
 
@@ -88,39 +88,40 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     parameters["disabled"] = QString::number((int)pb_cameraResource.disabled());
     parameters["parentId"] = QString::number(pb_cameraResource.parentid());
 
-    QnResourcePtr cameraBase = resourceFactory.createResource(pb_cameraResource.typeid_(), parameters);
-    if (cameraBase.isNull())
+    camera = resourceFactory.createResource(pb_cameraResource.typeid_(), parameters).dynamicCast<QnNetworkResource>();
+    if (camera.isNull())
         return;
 
-    camera = cameraBase.dynamicCast<QnVirtualCameraResource>();
-    if (camera.isNull())
+    if (pb_camera.has_physicalid())
+        camera->setPhysicalId(QString::fromUtf8(pb_camera.physicalid().c_str()));
+    camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
+
+
+    QnVirtualCameraResourcePtr vCamera = camera.dynamicCast<QnVirtualCameraResource>();
+    if (vCamera.isNull())
         return;
 
     for (int j = 0; j < pb_cameraResource.property_size(); j++)
     {
         const pb::Resource_Property& pb_property = pb_cameraResource.property(j);
 
-        camera->setParam(QString::fromUtf8(pb_property.name().c_str()), QString::fromUtf8(pb_property.value().c_str()), QnDomainDatabase);
+        vCamera->setParam(QString::fromUtf8(pb_property.name().c_str()), QString::fromUtf8(pb_property.value().c_str()), QnDomainDatabase);
     }
 
-    camera->setScheduleDisabled(pb_camera.scheduledisabled());
+    vCamera->setScheduleDisabled(pb_camera.scheduledisabled());
     if (pb_camera.has_audioenabled())
-        camera->setAudioEnabled(pb_camera.audioenabled());
+        vCamera->setAudioEnabled(pb_camera.audioenabled());
 
     if (pb_camera.has_manuallyadded())
-        camera->setManuallyAdded(pb_camera.manuallyadded());
+        vCamera->setManuallyAdded(pb_camera.manuallyadded());
 
-    if (pb_camera.has_physicalid())
-        camera->setPhysicalId(QString::fromUtf8(pb_camera.physicalid().c_str()));
+    vCamera->setModel(QString::fromUtf8(pb_camera.model().c_str()));
+    vCamera->setFirmware(QString::fromUtf8(pb_camera.firmware().c_str()));
 
-    camera->setModel(QString::fromUtf8(pb_camera.model().c_str()));
-    camera->setFirmware(QString::fromUtf8(pb_camera.firmware().c_str()));
+    vCamera->setMotionType(static_cast<Qn::MotionType>(pb_camera.motiontype()));
 
-    camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
-    camera->setMotionType(static_cast<Qn::MotionType>(pb_camera.motiontype()));
-
-    camera->setGroupId(QString::fromUtf8(pb_camera.groupid().c_str()));
-    camera->setGroupName(QString::fromUtf8(pb_camera.groupname().c_str()));
+    vCamera->setGroupId(QString::fromUtf8(pb_camera.groupid().c_str()));
+    vCamera->setGroupName(QString::fromUtf8(pb_camera.groupname().c_str()));
 
     if (pb_camera.has_region())
     {
@@ -129,7 +130,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
         while (regions.size() < CL_MAX_CHANNELS)
             regions << QnMotionRegion();
 
-        camera->setMotionRegionList(regions, QnDomainMemory);
+        vCamera->setMotionRegionList(regions, QnDomainMemory);
     }
 
     if (pb_camera.scheduletask_size())
@@ -156,17 +157,17 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
             scheduleTasks.append(scheduleTask);
         }
 
-        camera->setScheduleTasks(scheduleTasks);
+        vCamera->setScheduleTasks(scheduleTasks);
     }
 }
 
-void parseCameras(QnVirtualCameraResourceList& cameras, const PbResourceList& pb_cameras, QnResourceFactory& resourceFactory)
+void parseCameras(QnNetworkResourceList& cameras, const PbResourceList& pb_cameras, QnResourceFactory& resourceFactory)
 {
     for (PbResourceList::const_iterator ci = pb_cameras.begin(); ci != pb_cameras.end(); ++ci)
     {
         const pb::Resource& pb_cameraResource = *ci;
 
-        QnVirtualCameraResourcePtr camera;
+        QnNetworkResourcePtr camera;
         parseCamera(camera, pb_cameraResource, resourceFactory);
         if (camera)
             cameras.append(camera);
@@ -636,7 +637,7 @@ BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
 
 
 
-void QnApiPbSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory)
+void QnApiPbSerializer::deserializeCameras(QnNetworkResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
     pb::Resources pb_cameras;
     if (!pb_cameras.ParseFromArray(data.data(), data.size()))
@@ -1062,7 +1063,7 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
     {
         case pb::Resource_Type_Camera:
         {
-            QnVirtualCameraResourcePtr camera;
+            QnNetworkResourcePtr camera;
             parseCamera(camera, pb_resource, resourceFactory);
             resource = camera;
             break;

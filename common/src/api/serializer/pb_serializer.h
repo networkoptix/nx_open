@@ -11,7 +11,7 @@ class QnApiPbSerializer : public QnApiSerializer {
 public:
     const char* format() const { return "pb"; }
 
-    void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) override;
+    void deserializeCameras(QnNetworkResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) override;
     void deserializeServers(QnMediaServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) override;
     void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data) override;
     void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data) override;

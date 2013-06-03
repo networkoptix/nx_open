@@ -89,7 +89,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
     case CameraObject: {
         int status = response.status;
 
-        QnVirtualCameraResourceList reply;
+        QnNetworkResourceList reply;
         if(status == 0) {
             try {
                 m_serializer.deserializeCameras(reply, response.data, m_resourceFactory);
