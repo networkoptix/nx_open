@@ -8,9 +8,7 @@
 
 namespace {
     const qreal margin = 4;
-    const qreal totalWidth = 200;
     const qreal totalHeight = 24;
-    const qreal spacerSize = totalHeight * .5;
 }
 
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
@@ -66,6 +64,9 @@ void QnNotificationItem::setColor(const QColor &color) {
 }
 
 void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
+
     QRadialGradient gradient(margin, totalHeight*.5 + margin, totalHeight*2);
     gradient.setColorAt(0.0, m_color);
     QColor gradientTo(m_color);

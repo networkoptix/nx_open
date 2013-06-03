@@ -80,6 +80,8 @@ private:
     QLinkedList<QnNotificationItem *> m_items;
 
     QMap<QnNotificationItem*, ItemData*> m_itemDataByItem;
+
+    ItemData m_collapser;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H

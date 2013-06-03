@@ -17,7 +17,7 @@ namespace {
     int hoverLeaveTimeoutMSec = 250;
 
     qreal widgetWidth = 250;
-    qreal collapserHeight = 40;
+    qreal collapserHeight = 30;
 }
 
 QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::WindowFlags flags):
@@ -30,10 +30,21 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
 
+    m_collapser.item = new QnNotificationItem(this);
+    m_collapser.item->setColor(QColor(Qt::white));
+    m_collapser.item->setText(tr("%1 items more").arg(0));
+    m_collapser.item->setMinimumSize(QSizeF(widgetWidth, collapserHeight));
+    m_collapser.item->setMaximumSize(QSizeF(widgetWidth, collapserHeight));
+    m_collapser.item->setOpacity(0.0);
+    m_collapser.item->setVisible(true);
+    m_collapser.setAnimation(0, 0, moveUpTimeoutMs * 0.5);
+
     connect(this, SIGNAL(geometryChanged()), this, SLOT(at_geometry_changed()));
 }
 
 QnNotificationListWidget::~QnNotificationListWidget() {
+    foreach(ItemData* data, m_itemDataByItem)
+        delete data;
 }
 
 QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
@@ -51,7 +62,8 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
 
     bool collapserRequired = false;
     QSizeF result(widgetWidth, 0);
-    foreach (ItemData *data, m_itemDataByItem) {
+    foreach (QnNotificationItem* item, m_items) {
+        ItemData* data = m_itemDataByItem[item];
         if (!data->isVisible()) {
             if (!collapserRequired)
                 result.setHeight(result.height() + collapserHeight);
@@ -59,7 +71,7 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
             continue;
         }
 
-        QSizeF itemSize = data->item->geometry().size();
+        QSizeF itemSize = item->geometry().size();
         if (itemSize.isNull())
             continue;
         result.setHeight(result.height() + itemSize.height());
@@ -83,10 +95,10 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
     // updating state and animating
     QList<QnNotificationItem*> itemsToDelete;
-    int counter = 0;
-    foreach (QnNotificationItem* item, m_items) {
-        counter++;
+    bool itemsCountChanged = false;
+    int collapsedItemsCount = 0;
 
+    foreach (QnNotificationItem* item, m_items) {
         ItemData* data = m_itemDataByItem[item];
         switch (data->state) {
         case ItemData::Collapsing: {
@@ -98,6 +110,8 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 if (data->animationFinished()) {
                     data->state = ItemData::Collapsed;
                     item->setVisible(false);
+                    collapsedItemsCount++;
+                    itemsCountChanged = true;
                 }
                 canShowNew = false; // maintaining order in the list
                 break;
@@ -109,13 +123,14 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                     item->setY(bottomY);
                     item->setOpacity(1.0);
                     item->setTransform(transform());
-
                     data->setAnimation(item->geometry().width(), 0.0, popoutTimeoutMs);
                     item->setX(data->animation.value);
-
                     item->setVisible(true);
+                    itemsCountChanged = true;
 
                     updateGeometry();
+                } else {
+                    collapsedItemsCount++;
                 }
                 canShowNew = false; // maintaining order in the list
                 break;
@@ -123,6 +138,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         case ItemData::Displaying: {
                 data->animationTick(deltaMSecs);
                 item->setX(data->animation.value);
+
                 if (data->animationFinished()) {
                     data->state = ItemData::Displayed;
                     data->setAnimation(0.0, 1.0, displayTimeoutMs);
@@ -145,6 +161,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 if (data->animationFinished()) {
                     data->state = ItemData::Hidden;
                     item->setVisible(false);
+                    itemsCountChanged = true;
                 }
                 break;
             }
@@ -154,6 +171,11 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 break;
             }
         }
+    }
+
+    if (itemsCountChanged) {
+        m_collapser.animation.source = m_collapser.item->y();
+        m_collapser.item->setText(tr("%1 items more").arg(collapsedItemsCount));
     }
 
     // moving items up
@@ -170,8 +192,20 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
             item->setY(qMax(currentY - stepY, targetY));
         }
         previous = data;
-
     }
+
+    // moving collapser
+    {
+        m_collapser.animation.target = (previous == NULL ? 0 : previous->item->geometry().bottom());
+        m_collapser.animationTick(deltaMSecs);
+        m_collapser.item->setY(m_collapser.animation.value);
+        qreal opacityStep = (qreal)deltaMSecs / (qreal) hideTimeoutMs;
+        if (collapsedItemsCount == 0)
+            m_collapser.item->setOpacity(qMax(0.0, m_collapser.item->opacity() - opacityStep));
+        else
+            m_collapser.item->setOpacity(qMin(1.0, m_collapser.item->opacity() + opacityStep));
+    }
+
 
     // remove unused items
     if (!itemsToDelete.isEmpty())
@@ -203,7 +237,8 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
 }
 
 void QnNotificationListWidget::clear() {
-    foreach (ItemData *data, m_itemDataByItem) {
+    foreach (QnNotificationItem* item, m_items) {
+        ItemData* data = m_itemDataByItem[item];
         if (data->isVisible())
             data->hide();
         else
@@ -221,6 +256,7 @@ void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
 }
 
 void QnNotificationListWidget::at_geometry_changed() {
+    //reverse iterating
     QLinkedList<QnNotificationItem*>::const_iterator i = m_items.constEnd();
     i--;
     for (; i != m_items.constEnd(); --i) {
@@ -228,7 +264,7 @@ void QnNotificationListWidget::at_geometry_changed() {
         if (!data->isVisible())
             continue;
         if (data->state == ItemData::Hiding ||
-                data->state == ItemData::Collapsing) //do not collapse already hiding item
+                data->state == ItemData::Collapsing) //do not collapse item tha is already hiding
             continue;
 
         if ((*i)->geometry().bottom() > geometry().bottom()) {
