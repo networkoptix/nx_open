@@ -12,6 +12,7 @@
 
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/common/geometry.h>
+#include <ui/common/palette.h>
 
 namespace  {
     void addEdgeTo(qreal x, qreal y, const QPointF &tailPos, qreal tailWidth, bool useTail, QPainterPath *path) {
@@ -177,7 +178,8 @@ void QnToolTipWidget::setText(const QString &text) {
 
     label = new QnProxyLabel();
     label->setText(text);
-    
+    label->setAlignment(Qt::AlignCenter);
+    setPaletteColor(label, QPalette::Window, Qt::transparent);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);
