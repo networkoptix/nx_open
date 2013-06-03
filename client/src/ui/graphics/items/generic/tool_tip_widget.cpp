@@ -177,6 +177,7 @@ void QnToolTipWidget::setText(const QString &text) {
 
     label = new QnProxyLabel();
     label->setText(text);
+    
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);
