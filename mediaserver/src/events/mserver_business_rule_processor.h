@@ -12,6 +12,7 @@
 
 class QnMServerBusinessRuleProcessor: public QnBusinessRuleProcessor
 {
+    Q_OBJECT
 public:
     QnMServerBusinessRuleProcessor();
     virtual ~QnMServerBusinessRuleProcessor();
@@ -25,6 +26,7 @@ public:
 
 protected slots:
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res) override;
+    void onRemoveResource(const QnResourcePtr &resource);
 private:
     bool executeRecordingAction(QnRecordingBusinessActionPtr action, QnResourcePtr res);
     bool executePanicAction(QnPanicBusinessActionPtr action);

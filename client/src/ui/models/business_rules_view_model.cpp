@@ -486,14 +486,7 @@ QnBusinessActionParameters QnBusinessRuleViewModel::actionParams() const
 
 void QnBusinessRuleViewModel::setActionParams(const QnBusinessActionParameters &params)
 {
-    bool hasChanges = false;
-    for (int i = 0; i < (int) QnBusinessActionParameters::CountParam; ++i) {
-        if (m_actionParams[i] == params[i])
-            continue;
-        m_actionParams[i] = params[i];
-        hasChanges = true;
-    }
-
+    bool hasChanges = !params.equalTo(m_actionParams);
     if (!hasChanges)
         return;
 

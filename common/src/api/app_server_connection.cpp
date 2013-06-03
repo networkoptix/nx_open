@@ -605,7 +605,7 @@ int QnAppServerConnection::getLayouts(QnLayoutResourceList &layouts)
 int QnAppServerConnection::getUsers(QnUserResourceList &users)
 {
     QnResourceList reply;
-    int status = sendSyncGetRequest(UserObject, m_requestHeaders, m_requestParams, &users);
+    int status = sendSyncGetRequest(UserObject, m_requestHeaders, m_requestParams, &reply);
     if(status == 0)
         users = reply.filtered<QnUserResource>();
     return status;

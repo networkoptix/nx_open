@@ -110,6 +110,10 @@ const QnBusinessActionParameters& QnAbstractBusinessAction::getParams() const {
     return m_params;
 }
 
+QnBusinessActionParameters& QnAbstractBusinessAction::getParams(){
+    return m_params;
+}
+
 void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessEventParameters& params) {
     m_runtimeParams = params;
 }

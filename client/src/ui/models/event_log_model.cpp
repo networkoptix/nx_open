@@ -339,6 +339,26 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
             resId = action.getRuntimeParams().getEventResourceId();
             break;
         case ActionCameraColumn: 
+            {
+                BusinessActionType::Value actionType = action.actionType();
+                if (actionType == BusinessActionType::SendMail) {
+                    if (!action.getParams().getEmailAddress().isEmpty()) {
+                        if (action.getParams().getEmailAddress().indexOf(L';') > 0)
+                            return qnResIconCache->icon(QnResourceIconCache::Users);
+                        else
+                            return qnResIconCache->icon(QnResourceIconCache::User);
+                    }
+                    else {
+                        return QVariant();
+                    }
+                }
+                else if (actionType == BusinessActionType::ShowPopup) {
+                    if (action.getParams().getUserGroup() == QnBusinessActionParameters::AdminOnly)
+                        return qnResIconCache->icon(QnResourceIconCache::User);
+                    else
+                        return qnResIconCache->icon(QnResourceIconCache::Users);
+                }
+            }
             resId = action.getRuntimeParams().getActionResourceId();
     	default:
         	break;
@@ -396,6 +416,19 @@ QString QnEventLogModel::getResourceNameString(QnId id)
     return result;
 }
 
+QString QnEventLogModel::getUserGroupString(QnBusinessActionParameters::UserGroup value)
+{
+    switch (value) {
+        case QnBusinessActionParameters::EveryOne:
+            return tr("All users");
+        case QnBusinessActionParameters::AdminOnly:
+            return tr("Administrators Only");
+        default:
+            return QString();
+    }
+    return QString();
+}
+
 QString QnEventLogModel::textData(const Column& column,const QnBusinessActionData& action)
 {
     switch(column) 
@@ -415,9 +448,16 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
         case ActionColumn:
             return BusinessActionType::toString(action.actionType());
             break;
-        case ActionCameraColumn:
-            return getResourceNameString(action.getRuntimeParams().getActionResourceId());
+        case ActionCameraColumn: {
+            BusinessActionType::Value actionType = action.actionType();
+            if (actionType == BusinessActionType::SendMail)
+                return action.getParams().getEmailAddress();
+            else if (actionType == BusinessActionType::ShowPopup)
+                return getUserGroupString(action.getParams().getUserGroup());
+            else
+                return getResourceNameString(action.getRuntimeParams().getActionResourceId());
             break;
+        }
         case DescriptionColumn: {
             BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
             QString result;

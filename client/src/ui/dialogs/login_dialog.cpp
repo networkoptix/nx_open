@@ -202,6 +202,7 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
+    m_renderingWidget->restartPlayback();
     if (m_autoConnectPending
             && ui->rememberPasswordCheckBox->isChecked()
             && !ui->passwordLineEdit->text().isEmpty()
