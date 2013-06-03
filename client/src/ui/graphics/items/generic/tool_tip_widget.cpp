@@ -11,6 +11,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/common/geometry.h>
 
 namespace  {
@@ -47,6 +48,7 @@ namespace  {
             path->lineTo(pos0 + t0 * delta);
             path->lineTo(tailPos);
             path->lineTo(pos0 + t1 * delta);
+            path->lineTo(pos1);
         }
     }
 
@@ -170,12 +172,35 @@ void QnToolTipWidget::pointTo(const QPointF &pos) {
     setPos(pos + parentZeroPos - parentTailPos);
 }
 
+QnProxyLabel *QnToolTipWidget::label() const {
+    if(layout() && layout()->count() == 1) {
+        return dynamic_cast<QnProxyLabel *>(layout()->itemAt(0));
+    } else {
+        return NULL;
+    }
+}
+
 QString QnToolTipWidget::text() const {
-    return QString();
+    QnProxyLabel *label = this->label();
+    return label ? label->text() : QString();
 }
 
 void QnToolTipWidget::setText(const QString &text) {
-    return;
+    QnProxyLabel *label = this->label();
+    if(label) {
+        label->setText(text);
+        return;
+    }
+
+    while(layout() && layout()->count() > 0)
+        delete layout()->itemAt(0);
+
+    label = new QnProxyLabel();
+    label->setText(text);
+
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->addItem(label);
+    setLayout(layout);
 }
 
 QRectF QnToolTipWidget::boundingRect() const {

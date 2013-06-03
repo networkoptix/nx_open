@@ -7,6 +7,8 @@
 
 #include "simple_frame_widget.h"
 
+class QnProxyLabel;
+
 class QnToolTipWidget: public QnSimpleFrameWidget {
     Q_OBJECT;
     typedef QnSimpleFrameWidget base_type;
@@ -43,8 +45,12 @@ public:
      */
     void setTailWidth(qreal tailWidth);
 
+    /**
+     * Moves the tooltip item so that its tail points to the given position.
+     * 
+     * \param pos                       Position for the tooltip to point to, in parent coordinates.
+     */
     void pointTo(const QPointF &pos);
-
 
     QString text() const;
     void setText(const QString &text);
@@ -58,6 +64,8 @@ protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
 private:
+    QnProxyLabel *label() const;
+
     void invalidateShape();
     void ensureShape() const;
 

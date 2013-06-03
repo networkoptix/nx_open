@@ -11,14 +11,29 @@
 
 namespace {
     class QnSliderToolTipItem: public QnToolTipWidget {
+        typedef QnToolTipWidget base_type;
     public:
-        QnSliderToolTipItem(QGraphicsItem *parent = 0) : QnToolTipWidget(parent)
+        QnSliderToolTipItem(QGraphicsItem *parent = 0): base_type(parent)
         {
-            setContentsMargins(5, 5, 5, 5);
-            setTailPos(QPointF(25, 75));
+            setContentsMargins(5.0, 5.0, 5.0, 5.0);
+            setTailWidth(5.0);
             //setTextPen(QColor(63, 159, 216));
             //setBrush(QColor(0, 0, 0, 255));
             //setBorderPen(QPen(QColor(203, 210, 233, 128), 0.7));
+            updateTailPos();
+        }
+
+    protected:
+        virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override {
+            base_type::resizeEvent(event);
+
+            updateTailPos();
+        }
+
+    private:
+        void updateTailPos() {
+            QRectF rect = this->rect();
+            setTailPos(QPointF((rect.left() + rect.right()) / 2, rect.bottom() + 10.0));
         }
     };
 
