@@ -339,6 +339,15 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
             resId = action.getRuntimeParams().getEventResourceId();
             break;
         case ActionCameraColumn: 
+            {
+                BusinessActionType::Value actionType = action.actionType();
+                if (actionType == BusinessActionType::ShowPopup) {
+                    if (action.getParams().getUserGroup() == QnBusinessActionParameters::AdminOnly)
+                        return qnResIconCache->icon(QnResourceIconCache::User);
+                    else
+                        return qnResIconCache->icon(QnResourceIconCache::Users);
+                }
+            }
             resId = action.getRuntimeParams().getActionResourceId();
     	default:
         	break;
@@ -396,6 +405,19 @@ QString QnEventLogModel::getResourceNameString(QnId id)
     return result;
 }
 
+QString QnEventLogModel::getUserGroupString(QnBusinessActionParameters::UserGroup value)
+{
+    switch (value) {
+        case QnBusinessActionParameters::EveryOne:
+            return tr("All users");
+        case QnBusinessActionParameters::AdminOnly:
+            return tr("Administrators Only");
+        default:
+            return QString();
+    }
+    return QString();
+}
+
 QString QnEventLogModel::textData(const Column& column,const QnBusinessActionData& action)
 {
     switch(column) 
@@ -417,12 +439,12 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
             break;
         case ActionCameraColumn: {
             BusinessActionType::Value actionType = action.actionType();
-            if (actionType == BusinessActionType::ShowPopup) {
-                int gg = 4;
-            }
-            else {
+            if (actionType == BusinessActionType::SendMail)
+                return action.getParams().getEmailAddress();
+            else if (actionType == BusinessActionType::ShowPopup)
+                return getUserGroupString(action.getParams().getUserGroup());
+            else
                 return getResourceNameString(action.getRuntimeParams().getActionResourceId());
-            }
             break;
         }
         case DescriptionColumn: {
