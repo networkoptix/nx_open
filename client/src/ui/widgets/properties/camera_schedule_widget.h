@@ -64,7 +64,6 @@ public:
 
     const QnVirtualCameraResourceList &cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
-    bool isSecondaryStreamReserver() const;
 
     /** Returns true if there is at least one "record-motion" square on the grid */
     bool hasMotionOnGrid() const;

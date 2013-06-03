@@ -14,8 +14,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/json.h>
 #include <utils/common/connective.h>
-
-class QnEnumNameMapper;
+#include <utils/common/enum_name_mapper.h>
 
 namespace detail {
     template<class T>

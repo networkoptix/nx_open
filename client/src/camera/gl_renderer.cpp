@@ -1,6 +1,8 @@
 
+#ifndef __APPLE__
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glext.h>
+#endif
 
 #include "gl_renderer.h"
 

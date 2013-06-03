@@ -147,15 +147,18 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
 
 // ---------------------- QnTranscoder -------------------------
 
+
 QnTranscoder::QnTranscoder():
     m_videoCodec(CODEC_ID_NONE),
     m_audioCodec(CODEC_ID_NONE),
+    m_videoStreamCopy(false),
+    m_audioStreamCopy(false),
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
     m_firstTime(AV_NOPTS_VALUE),
     m_initialized(false),
+    m_vLayout(0),
     m_eofCounter(0),
-    m_packetizedMode(false),
-    m_vLayout(0)
+    m_packetizedMode(false)
 {
     QThread::currentThread()->setPriority(QThread::LowPriority); 
 }
