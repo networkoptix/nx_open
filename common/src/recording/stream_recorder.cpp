@@ -29,12 +29,14 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_forceDefaultCtx(true),
     m_formatCtx(0),
     m_packetWrited(false),
+    m_currentChunkLen(0),
     m_startOffset(0),
     m_prebufferingUsec(0),
     m_EofDateTime(AV_NOPTS_VALUE),
     m_endOfData(false),
     m_lastProgress(-1),
     m_needCalcSignature(false),
+    m_mediaProvider(0),
     m_mdctx(EXPORT_SIGN_METHOD),
     m_container(QLatin1String("matroska")),
     m_videoChannels(0),
@@ -42,14 +44,14 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_needReopen(false),
     m_isAudioPresent(false),
     m_audioTranscoder(0),
+    m_videoTranscoder(0),
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
     m_onscreenDateOffset(0),
     m_role(Role_ServerRecording),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
     m_nextIFrameTime(AV_NOPTS_VALUE),
-    m_truncateIntervalEps(0),
-    m_videoTranscoder(0)
+    m_truncateIntervalEps(0)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
