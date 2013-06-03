@@ -13,6 +13,7 @@ namespace {
     int moveUpTimeoutMs = 500;
     int displayTimeoutMs = 5000;
     int hideTimeoutMs = 300;
+    int collapseTimeoutMs = 250;
     int hoverLeaveTimeoutMSec = 250;
 
     qreal widgetWidth = 250;
@@ -82,14 +83,21 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
     // updating state and animating
     QList<QnNotificationItem*> itemsToDelete;
+    int counter = 0;
     foreach (QnNotificationItem* item, m_items) {
+        counter++;
+
         ItemData* data = m_itemDataByItem[item];
         switch (data->state) {
         case ItemData::Collapsing: {
-                qreal step = (qreal)deltaMSecs / (qreal)hideTimeoutMs;
-                qreal value = qMax(item->opacity() - step, data->targetValue);
-                item->setOpacity(value);
-                if (qFuzzyCompare(value, data->targetValue)) {
+                qreal step = (qreal)deltaMSecs / (qreal)collapseTimeoutMs;
+                data->animationValue = qMin(data->animationValue + step, data->targetValue);
+                //item->setOpacity(value);
+                QTransform transform = this->transform();
+                transform.rotate(data->animationValue*(90), Qt::XAxis);
+                item->setTransform(transform);
+
+                if (qFuzzyCompare(data->animationValue, data->targetValue)) {
                     data->state = ItemData::Collapsed;
                     item->setVisible(false);
                 }
@@ -101,10 +109,16 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                     data->state = ItemData::Displaying;
 
                     item->setY(bottomY);
-                    item->setX(item->geometry().width());
-                    item->setVisible(true);
+                    item->setX(0.0);//item->geometry().width());
                     item->setOpacity(1.0);
+                    data->animationValue = 1.0;
                     data->targetValue = 0.0; //target x-coord
+
+                    QTransform transform = this->transform();
+                    transform.rotate(data->animationValue*(90), Qt::XAxis);
+                    item->setTransform(transform);
+
+                    item->setVisible(true);
 
                     updateGeometry();
                 }
@@ -112,10 +126,16 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 break;
             }
         case ItemData::Displaying: {
-                qreal step = item->geometry().width() * (qreal)deltaMSecs / (qreal)popoutTimeoutMs;
-                qreal value = qMax(item->x() - step, data->targetValue);
-                item->setX(value);
-                if (qFuzzyCompare(value, data->targetValue)) {
+                qreal step = /*item->geometry().width() **/ (qreal)deltaMSecs / (qreal)popoutTimeoutMs;
+                data->animationValue = qMax(data->animationValue - step, data->targetValue);
+                //qreal value = qMax(item->x() - step, data->targetValue);
+                //item->setX(value);
+
+                QTransform transform = this->transform();
+                transform.rotate(data->animationValue*(90), Qt::XAxis);
+                item->setTransform(transform);
+
+                if (qFuzzyCompare(data->animationValue, data->targetValue)) {
                     data->state = ItemData::Displayed;
                     data->targetValue = 0.0; //counter for display time
                 }
@@ -216,20 +236,20 @@ void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
 }
 
 void QnNotificationListWidget::at_geometry_changed() {
-    qDebug() << "geometry changed" << geometry();
-
     QLinkedList<QnNotificationItem*>::const_iterator i = m_items.constEnd();
     i--;
     for (; i != m_items.constEnd(); --i) {
         ItemData* data = m_itemDataByItem[*i];
         if (!data->isVisible())
             continue;
-        if (data->state == ItemData::Hiding) //do not collapse already hiding item
+        if (data->state == ItemData::Hiding ||
+                data->state == ItemData::Collapsing) //do not collapse already hiding item
             continue;
 
         if ((*i)->geometry().bottom() > geometry().bottom()) {
             data->state = ItemData::Collapsing;
-            data->targetValue = 0.0;
+            data->targetValue = 1.0;
+            data->animationValue = 0.0;
         } else
             break;
     }

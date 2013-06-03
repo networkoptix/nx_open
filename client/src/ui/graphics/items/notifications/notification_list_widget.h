@@ -59,6 +59,7 @@ private:
 
         QnNotificationItem* item;
         State state;
+        qreal animationValue;
         qreal targetValue;
         bool locked;
     };
