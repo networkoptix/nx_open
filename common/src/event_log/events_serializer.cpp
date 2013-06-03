@@ -34,10 +34,17 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
         action.setActionType((BusinessActionType::Value) readInt(curPtr));
         action.setBusinessRuleId(readInt(curPtr));
         action.setAggregationCount(readInt(curPtr));
+        
         int runTimeParamsLen = readInt(curPtr);
         QByteArray ba = QByteArray::fromRawData((const char*)curPtr, runTimeParamsLen);
         action.setRuntimeParams(QnBusinessEventParameters::deserialize(ba));
         curPtr += runTimeParamsLen;
+
+        int actionParamsLen = readInt(curPtr);
+        ba = QByteArray::fromRawData((const char*)curPtr, actionParamsLen);
+        action.setParams(QnBusinessActionParameters::deserialize(ba));
+        curPtr += actionParamsLen;
+
     }
 
     qDebug() << "deserialize events log time=" << t.elapsed() << "msec";

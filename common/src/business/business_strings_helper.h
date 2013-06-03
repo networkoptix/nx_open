@@ -26,6 +26,7 @@ public:
 
     static QString conflictString(const QnBusinessEventParameters &params);
     static QString motionUrl(const QnBusinessEventParameters &params);
+    static QString formatEmailList(const QStringList& value);
 private:
     static QString timestampString(const QnBusinessEventParameters &params, int aggregationCount);
 };

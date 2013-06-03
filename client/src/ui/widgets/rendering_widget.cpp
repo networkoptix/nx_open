@@ -33,9 +33,14 @@ QnRenderingWidget::QnRenderingWidget(QWidget *parent, Qt::WindowFlags f):
     timer->start(1000 / 60);
 }
 
-QnRenderingWidget::~QnRenderingWidget() {
-    if( m_display )
+QnRenderingWidget::~QnRenderingWidget() 
+{
+    if( m_display ) {
+        m_display->removeRenderer(m_renderer);
+        m_renderer->destroyAsync();
         m_display->beforeDestroy();
+        delete m_display;
+    }
 }
 
 QnMediaResourcePtr QnRenderingWidget::resource() const {
@@ -49,6 +54,22 @@ void QnRenderingWidget::setResource(const QnMediaResourcePtr &resource) {
     invalidateDisplay();
 
     m_resource = resource;
+}
+
+void QnRenderingWidget::restartPlayback()
+{
+    if( !m_display )
+        return;
+
+    m_display->removeRenderer( m_renderer );
+    m_renderer->destroyAsync();
+    m_renderer = NULL;
+
+    m_display->beforeDestroy();
+    delete m_display;
+    m_display = NULL;
+
+    m_channelScreenSize = QSize();
 }
 
 void QnRenderingWidget::updateChannelScreenSize() {
@@ -79,7 +100,7 @@ void QnRenderingWidget::ensureDisplay() {
     m_renderer = new QnResourceWidgetRenderer(NULL, context());
     updateChannelScreenSize();
 
-    m_display->addRenderer(m_renderer); /* Ownership of the renderer is transferred to the display. */
+    m_display->addRenderer(m_renderer);
     m_display->start();
 
     if(m_display->archiveReader())

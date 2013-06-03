@@ -31,6 +31,8 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, const QGLCon
     }
 
     setChannelCount(1);
+
+    connect(this, SIGNAL(canBeDestroyed()), this, SLOT(deleteLater()), Qt::QueuedConnection);
 }
 
 void QnResourceWidgetRenderer::setChannelCount(int channelCount)
@@ -62,9 +64,9 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     }
 }
 
-void QnResourceWidgetRenderer::beforeDestroy() 
+void QnResourceWidgetRenderer::destroyAsync() 
 {
-    QnAbstractRenderer::beforeDestroy();
+    QnAbstractRenderer::destroyAsync();
     foreach(RenderingTools ctx, m_channelRenderers)
     {
         if( ctx.renderer )

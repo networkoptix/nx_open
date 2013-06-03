@@ -92,6 +92,23 @@ bool QnEventsDB::cleanupEvents()
     return rez;
 }
 
+bool QnEventsDB::removeLogForRes(QnId resId)
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (!m_sdb.isOpen())
+        return false;
+
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM runtime_actions where event_resource_id = :id1 or action_resource_id = :id2");
+
+
+    delQuery.bindValue(":id1", resId.toInt());
+    delQuery.bindValue(":id2", resId.toInt());
+
+    return delQuery.exec();
+}
+
 bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes)
 {
     QMutexLocker lock(&m_mutex);
@@ -259,7 +276,7 @@ void QnEventsDB::getAndSerializeActions(
 
     QSqlRecord rec = actionsQuery.record();
     int actionTypeIdx = rec.indexOf(lit("action_type"));
-//    int actionParamIdx = rec.indexOf(lit("action_params"));
+    int actionParamIdx = rec.indexOf(lit("action_params"));
     int runtimeParamIdx = rec.indexOf(lit("runtime_params"));
     int businessRuleIdx = rec.indexOf(lit("business_rule_id"));
 //    int toggleStateIdx = rec.indexOf(lit("toggle_state"));
@@ -296,6 +313,10 @@ void QnEventsDB::getAndSerializeActions(
         QByteArray runtimeParams = actionsQuery.value(runtimeParamIdx).toByteArray();
         appendIntToBA(result, runtimeParams.size());
         result.append(runtimeParams);
+
+        QByteArray actionParams = actionsQuery.value(actionParamIdx).toByteArray();
+        appendIntToBA(result, actionParams.size());
+        result.append(actionParams);
 
         ++sizeField;
 

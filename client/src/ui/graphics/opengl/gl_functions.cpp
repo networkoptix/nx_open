@@ -69,6 +69,8 @@ namespace QnGl {
     void APIENTRY glWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); }
     GLAPI GLenum APIENTRY glClientWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); return 0; }
 
+    void APIENTRY glBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) { WARN(); }
+
 #undef WARN
 
 } // namespace QnGl
@@ -185,6 +187,8 @@ public:
         if(status)
             m_features |= QnGlFunctions::OpenGL3_2 | QnGlFunctions::ArbSync;
 
+        RESOLVE(PFNGLBLENDCOLORPROC,                     glBlendColor);
+
 #undef RESOLVE
 
         QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
@@ -237,6 +241,8 @@ public:
     PFNGLDELETESYNCPROC glDeleteSync;
     PFNGLCLIENTWAITSYNCPROC glClientWaitSync;
     PFNGLWAITSYNCPROC glWaitSync;
+
+    PFNGLBLENDCOLORPROC glBlendColor;
 
 private:
     template<class Function>
@@ -376,6 +382,11 @@ void QnGlFunctions::glWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
 GLenum QnGlFunctions::glClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
 {
     return d->glClientWaitSync(sync, flags, timeout);
+}
+
+void QnGlFunctions::glBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+{
+    return d->glBlendColor(red, green, blue, alpha);
 }
 
 #ifdef Q_OS_WIN

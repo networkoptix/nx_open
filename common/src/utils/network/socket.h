@@ -50,6 +50,9 @@ private:
     char m_message[MAX_ERROR_MSG_LENGTH];
 };
 
+
+class SocketImpl;
+
 /**
  *   Base class representing basic communication endpoint
  */
@@ -156,6 +159,9 @@ public:
     bool failed() const;
     SystemError::ErrorCode prevErrorCode() const;
 
+    SocketImpl* impl();
+    const SocketImpl* impl() const;
+
 protected:
     int sockDesc;              // Socket descriptor
     QString m_lastError;
@@ -169,6 +175,7 @@ protected:
     void saveErrorInfo();
 
 private:
+    SocketImpl* m_impl;
     bool m_nonBlockingMode;
     unsigned int m_status;
     SystemError::ErrorCode m_prevErrorCode;

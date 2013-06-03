@@ -156,7 +156,7 @@ public:
     //bool isDisplaying() const { return m_displaying; }
     void reallocate(int newWidth, int newHeight, int format);
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
-
+    void memZerro();
 public:
     int flags;
 

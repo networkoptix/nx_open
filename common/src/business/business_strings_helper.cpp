@@ -254,3 +254,15 @@ QString QnBusinessStringsHelper::eventParamsString(BusinessEventType::Value even
     }
     return result;
 }
+
+QString QnBusinessStringsHelper::formatEmailList(const QStringList& value)
+{
+    QString result;
+    for (int i = 0; i < value.size(); ++i)
+    {
+        if (i > 0)
+            result.append(L';');
+        result.append(QString(QLatin1String("<%1>")).arg(value[i]));
+    }
+    return result;
+}

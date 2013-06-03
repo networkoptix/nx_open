@@ -850,8 +850,6 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
-    QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
-    QnEventsDB::init();
 
     // Create SessionManager
     QnSessionManager::instance()->start();
@@ -861,6 +859,9 @@ void QnMain::run()
     QnSoapServer::instance()->start();
 
     QnResourcePool::initStaticInstance( new QnResourcePool() );
+
+    QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
+    QnEventsDB::init();
 
     QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
 

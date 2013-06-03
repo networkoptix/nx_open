@@ -4,6 +4,8 @@
 * PollSet class implementation for linux
 ***********************************************************/
 
+#include <qglobal.h>
+
 #ifdef Q_OS_LINUX
 
 #include "pollset.h"
@@ -214,10 +216,16 @@ PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
     return *this;
 }
 
-Socket* PollSet::const_iterator::socket() const
+const Socket* PollSet::const_iterator::socket() const
 {
     return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
 }
+
+Socket* PollSet::const_iterator::socket()
+{
+    return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
+}
+
 
 /*!
     \return bit mask of \a EventType

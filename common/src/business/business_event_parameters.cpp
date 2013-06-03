@@ -200,14 +200,14 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
     return result;
 }
 
-void serializeIntParam(QByteArray& result, qint64 value, qint64 defaultValue)
+static void serializeIntParam(QByteArray& result, qint64 value, qint64 defaultValue)
 {
     if (value != defaultValue)
         result += QByteArray::number(value);
     result += DELIMITER;
 }
 
-void serializeStringParam(QByteArray& result, const QString& value, const QString& defaultValue)
+static void serializeStringParam(QByteArray& result, const QString& value, const QString& defaultValue)
 {
     if (value != defaultValue)
         result += value.toUtf8();

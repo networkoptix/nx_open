@@ -352,6 +352,8 @@ void QnVideoStreamDisplay::updateRenderList()
             renderer->notInUse();
 
         m_renderList = m_newList;
+        if (m_bufferedFrameDisplayer)
+            m_bufferedFrameDisplayer->setRenderList(m_renderList);
         m_renderListModified = false;
     }
 };

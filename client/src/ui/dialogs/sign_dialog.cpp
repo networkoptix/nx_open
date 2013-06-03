@@ -126,7 +126,8 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
 
 SignDialog::~SignDialog()
 {
-    m_renderer->beforeDestroy();
+    m_camDispay->removeVideoRenderer(m_renderer);
+    m_renderer->destroyAsync();
 
     m_reader->pleaseStop();
     m_camDispay->pleaseStop();
@@ -137,7 +138,6 @@ SignDialog::~SignDialog()
     
     delete m_camDispay;
     delete m_reader;
-    delete m_renderer;
     delete m_glWindow;
 }
 

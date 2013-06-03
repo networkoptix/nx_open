@@ -15,7 +15,8 @@ class QnEventsDB
 public:
     void setEventLogPeriod(qint64 periodUsec);
     bool saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes);
-    
+    bool removeLogForRes(QnId resId);
+
     QList<QnAbstractBusinessActionPtr> getActions(
         const QnTimePeriod& period,
         const QnResourceList& resList,

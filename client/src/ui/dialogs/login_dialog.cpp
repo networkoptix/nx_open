@@ -114,14 +114,12 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-#ifndef __APPLE__
     m_entCtrlFinder = new NetworkOptixModuleFinder();
     connect(m_entCtrlFinder,    SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
             this,               SLOT(at_entCtrlFinder_remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
     connect(m_entCtrlFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
             this,               SLOT(at_entCtrlFinder_remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
     m_entCtrlFinder->start();
-#endif
 }
 
 QnLoginDialog::~QnLoginDialog() {
@@ -204,6 +202,7 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
+    m_renderingWidget->restartPlayback();
     if (m_autoConnectPending
             && ui->rememberPasswordCheckBox->isChecked()
             && !ui->passwordLineEdit->text().isEmpty()
