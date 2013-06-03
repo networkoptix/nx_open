@@ -35,7 +35,8 @@ private slots:
 private:
     struct ItemData {
         enum State {
-            Waiting,
+            Collapsing,
+            Collapsed,
             Displaying,
             Displayed,
             Hiding,
@@ -43,7 +44,7 @@ private:
         };
 
         bool isVisible() const {
-            return state == Displaying || state == Displayed || state == Hiding;
+            return state == Displaying || state == Displayed || state == Hiding || state == Collapsing;
         }
 
         void unlockAndHide() {
@@ -67,8 +68,10 @@ private:
     /**
      * @brief m_items       List of all items. Strictly ordered by item state:
      *                      (Displayed|Hiding|Hidden)* (Displaying)? (Waiting)*
+     *                      Item that is closer to the beginning of the list is displayed earlier.
      */
     QLinkedList<QnNotificationItem *> m_items;
+
     QMap<QnNotificationItem*, ItemData*> m_itemDataByItem;
 };
 

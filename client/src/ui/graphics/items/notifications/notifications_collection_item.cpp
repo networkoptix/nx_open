@@ -107,7 +107,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
     item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
 
     connect(item, SIGNAL(actionTriggered(QnNotificationItem*)), this, SLOT(at_item_actionTriggered(QnNotificationItem*)));
-    m_list->addItem(item);
+    m_list->addItem(item, true);
 }
 
 void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
@@ -119,7 +119,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
     }
     item->setText(text);
 
-    item->setColor(QColor(255, 127, 127)); // red
+    item->setColor(QColor(255, 0, 0)); // red
 
     switch (message) {
     case QnSystemHealth::EmailIsEmpty:
@@ -166,7 +166,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
     }
     connect(item, SIGNAL(actionTriggered(QnNotificationItem*)), this, SLOT(at_item_actionTriggered(QnNotificationItem*)));
 
-    m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
+    m_list->addItem(item, /*message != QnSystemHealth::ConnectionLost*/ true);
 }
 
 void QnNotificationsCollectionItem::hideAll() {
