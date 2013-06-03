@@ -12,6 +12,7 @@
 #include "core/resource/storage_resource.h"
 
 class QnAbstractMediaStreamDataProvider;
+class TestStorageAsyncTask;
 
 class QnStorageManager: public QObject
 {
@@ -67,12 +68,15 @@ public:
     static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
 
     bool isArchiveTimeExists(const QString& physicalId, qint64 timeMs);
+    void stopAsyncTasks();
 signals:
     void noStoragesAvailable();
     void storageFailure(QnResourcePtr storageRes);
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
+    friend class TestStorageAsyncTask;
+
     void clearSpace(QnStorageResourcePtr storage);
     int detectStorageIndex(const QString& path);
     QSet<int> getDeprecateIndexList(const QString& p);
@@ -90,6 +94,7 @@ private:
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
     QSet<QnStorageResourcePtr> getWritableStorages() const;
+    void changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
@@ -112,6 +117,7 @@ private:
     bool m_bigStorageExists;
     QTime m_lastTestTime;
     QTime m_storageWarnTimer;
+    static QThreadPool m_testStoragesAsyncPool;
 };
 
 #define qnStorageMan QnStorageManager::instance()

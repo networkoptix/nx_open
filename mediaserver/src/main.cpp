@@ -1156,6 +1156,7 @@ void QnMain::run()
 
     delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
+    QnStorageManager::instance()->stopAsyncTasks();
 
     av_lockmgr_register(NULL);
 
