@@ -7,13 +7,13 @@ class CLSimpleHTTPClient;
 
 class QnPlVmax480ResourceSearcher : public QnUpnpResourceSearcherAsync
 {
-    QnPlVmax480ResourceSearcher();
-
 public:
 
+    QnPlVmax480ResourceSearcher();
     ~QnPlVmax480ResourceSearcher();
 
-    static QnPlVmax480ResourceSearcher& instance();
+    static void initStaticInstance( QnPlVmax480ResourceSearcher* _instance );
+    static QnPlVmax480ResourceSearcher* instance();
 
 
     virtual void processPacket(

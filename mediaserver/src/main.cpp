@@ -1048,7 +1048,10 @@ void QnMain::run()
 
 #ifdef Q_OS_WIN
     if (qnCustomization() == Qn::DwSpectrumCustomization)
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlVmax480ResourceSearcher::instance());
+    {
+        QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
+        QnResourceDiscoveryManager::instance()->addDeviceServer(QnPlVmax480ResourceSearcher::instance());
+    }
 #endif
 
     //Onvif searcher should be the last:
@@ -1131,6 +1134,14 @@ void QnMain::run()
 
     delete ThirdPartyResourceSearcher::instance();
     ThirdPartyResourceSearcher::initStaticInstance( NULL );
+
+#ifdef Q_OS_WIN
+    if (qnCustomization() == Qn::DwSpectrumCustomization)
+    {
+        delete QnPlVmax480ResourceSearcher::instance();
+        QnPlVmax480ResourceSearcher::initStaticInstance( NULL );
+    }
+#endif
 
     delete UPNPDeviceSearcher::instance();
     UPNPDeviceSearcher::initGlobalInstance( NULL );
