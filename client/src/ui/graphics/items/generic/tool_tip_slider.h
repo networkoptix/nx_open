@@ -54,7 +54,7 @@ private:
     void showToolTip();
     
     void updateToolTipVisibility();
-    void updateToolTipPosition();
+    Q_SLOT void updateToolTipPosition();
     void updateToolTipOpacity();
     void updateToolTipText();
 

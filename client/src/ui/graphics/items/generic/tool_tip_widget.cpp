@@ -129,6 +129,8 @@ void QnToolTipWidget::setTailPos(const QPointF &tailPos) {
      * but not the actual widget's geometry. */
     prepareGeometryChange();
     invalidateShape();
+
+    emit tailPosChanged();
 }
 
 qreal QnToolTipWidget::tailWidth() const {

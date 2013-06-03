@@ -60,6 +60,9 @@ public:
 
     virtual QRectF boundingRect() const override;
 
+signals:
+    void tailPosChanged();
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void updateGeometry() override;

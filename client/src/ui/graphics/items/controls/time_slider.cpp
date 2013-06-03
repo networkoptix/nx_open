@@ -1088,9 +1088,6 @@ void QnTimeSlider::updateToolTipText() {
         toolTip = msecsToTime(pos).toString(m_toolTipFormat);
     }
 
-    if(toolTip.endsWith(QLatin1String("0")))
-        toolTip += QLatin1String("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-
     setToolTip(toolTip);
 }
 
