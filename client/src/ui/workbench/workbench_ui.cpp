@@ -281,16 +281,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treeBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
     m_treeBackgroundItem->setAutoFillBackground(true);
     {
-        QPalette palette = m_treeBackgroundItem->palette();
-
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
         gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
         gradient.setSpread(QGradient::RepeatSpread);
 
-        palette.setBrush(QPalette::Window, QBrush(gradient));
-        m_treeBackgroundItem->setPalette(palette);
+        m_treeBackgroundItem->setWindowBrush(gradient);
     }
     m_treeBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_treeBackgroundItem->setFrameWidth(0.5);
@@ -352,16 +349,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
     m_titleBackgroundItem->setAutoFillBackground(true);
     {
-        QPalette palette = m_titleBackgroundItem->palette();
-
         QLinearGradient gradient(0, 0, 0, 1);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
         gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
         gradient.setSpread(QGradient::RepeatSpread);
 
-        palette.setBrush(QPalette::Window, QBrush(gradient));
-        m_titleBackgroundItem->setPalette(palette);
+        m_titleBackgroundItem->setWindowBrush(gradient);
     }
     m_titleBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_titleBackgroundItem->setFrameWidth(0.5);
@@ -463,16 +457,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_helpBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
     m_helpBackgroundItem->setAutoFillBackground(true);
     {
-        QPalette palette = m_helpBackgroundItem->palette();
-
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(1.0, QColor(0, 0, 0, 255));
         gradient.setColorAt(0.0, QColor(0, 0, 0, 64));
         gradient.setSpread(QGradient::RepeatSpread);
 
-        palette.setBrush(QPalette::Window, QBrush(gradient));
-        m_helpBackgroundItem->setPalette(palette);
+        m_helpBackgroundItem->setWindowBrush(gradient);
     }
     m_helpBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_helpBackgroundItem->setFrameWidth(0.5);

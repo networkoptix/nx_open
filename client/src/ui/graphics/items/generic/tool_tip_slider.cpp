@@ -14,9 +14,11 @@ namespace {
     public:
         QnSliderToolTipItem(QGraphicsItem *parent = 0) : QnToolTipWidget(parent)
         {
-            setTextPen(QColor(63, 159, 216));
-            setBrush(QColor(0, 0, 0, 255));
-            setBorderPen(QPen(QColor(203, 210, 233, 128), 0.7));
+            setContentsMargins(5, 5, 5, 5);
+            setTailPos(QPointF(25, 75));
+            //setTextPen(QColor(63, 159, 216));
+            //setBrush(QColor(0, 0, 0, 255));
+            //setBorderPen(QPen(QColor(203, 210, 233, 128), 0.7));
         }
     };
 
@@ -187,7 +189,7 @@ void QnToolTipSlider::updateToolTipPosition() {
     qreal x = positionFromValue(sliderPosition()).x() + handleRect.width() / 2.0;
     qreal y = handleRect.top();
     
-    toolTipItem()->setPos(toolTipItem()->mapToParent(toolTipItem()->mapFromItem(this, x, y)));
+    toolTipItem()->pointTo(toolTipItem()->mapToParent(toolTipItem()->mapFromItem(this, x, y)));
 }
 
 

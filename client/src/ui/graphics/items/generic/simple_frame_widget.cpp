@@ -1,10 +1,9 @@
 #include "simple_frame_widget.h"
 #include <utils/common/scoped_painter_rollback.h>
 
-QnSimpleFrameWidget::QnSimpleFrameWidget(QGraphicsItem *parent):
-    base_type(parent),
-    m_frameWidth(1.0),
-    m_frameColor(palette().color(QPalette::WindowText))
+QnSimpleFrameWidget::QnSimpleFrameWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags),
+    m_frameWidth(1.0)
 {}
 
 QnSimpleFrameWidget::~QnSimpleFrameWidget() {
@@ -23,22 +22,50 @@ void QnSimpleFrameWidget::setFrameWidth(qreal frameWidth) {
     update();
 }
 
+QBrush QnSimpleFrameWidget::frameBrush() const {
+    return palette().color(QPalette::Highlight);
+}
+
+void QnSimpleFrameWidget::setFrameBrush(const QBrush &frameBrush) {
+    if(this->frameBrush() == frameBrush)
+        return;
+
+    QPalette palette = this->palette();
+    palette.setBrush(QPalette::Highlight, frameBrush);
+    setPalette(palette);
+}
+
 QColor QnSimpleFrameWidget::frameColor() const {
-    return m_frameColor;
+    return frameBrush().color();
 }
 
 void QnSimpleFrameWidget::setFrameColor(const QColor &frameColor) {
-    if(m_frameColor == frameColor)
+    setFrameBrush(frameColor);
+}
+
+QBrush QnSimpleFrameWidget::windowBrush() const {
+    return palette().brush(QPalette::Window);
+}
+
+void QnSimpleFrameWidget::setWindowBrush(const QBrush &windowBrush) {
+    if(this->windowBrush() == windowBrush)
         return;
 
-    m_frameColor = frameColor;
-    update();
+    QPalette palette = this->palette();
+    palette.setBrush(QPalette::Window, windowBrush);
+    setPalette(palette);
+}
+
+QColor QnSimpleFrameWidget::windowColor() const {
+    return windowBrush().color();
+}
+
+void QnSimpleFrameWidget::setWindowColor(const QColor &windowColor) {
+    setWindowBrush(windowColor);
 }
 
 void QnSimpleFrameWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    base_type::paint(painter, option, widget);
-
-    QnScopedPainterPenRollback penRollback(painter, QPen(m_frameColor, m_frameWidth));
-    QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
+    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), m_frameWidth));
+    QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
     painter->drawRect(rect().adjusted(m_frameWidth, m_frameWidth, -m_frameWidth, -m_frameWidth));
 }

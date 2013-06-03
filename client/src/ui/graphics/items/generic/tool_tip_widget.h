@@ -5,12 +5,11 @@
 #include <QtGui/QBrush>
 #include <QtGui/QFont>
 
-#include <ui/graphics/items/standard/graphics_widget.h>
+#include "simple_frame_widget.h"
 
-class QnToolTipWidget: public GraphicsWidget {
+class QnToolTipWidget: public QnSimpleFrameWidget {
     Q_OBJECT;
-
-    typedef GraphicsWidget base_type;
+    typedef QnSimpleFrameWidget base_type;
 
 public:
     QnToolTipWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
@@ -18,18 +17,44 @@ public:
 
     /* Use setContentsMargins to change tooltip's margins. */
 
+    /**
+     * \returns                         Position of balloon's tail, in local coordinates.
+     */
     QPointF tailPos() const;
+
+    /**
+     * \returns                         Widget's side to which balloon's tail is attached, or zero if 
+     *                                  there is no tail.
+     */
+    Qn::Border tailBorder() const;
+
+    /**
+     * \param tailPos                   New position of balloon's tail, in local coordinates.
+     */
     void setTailPos(const QPointF &tailPos);
 
-    const QString &text() const;
+    /**
+     * \returns                         Width of the base of balloon's tail.
+     */
+    qreal tailWidth() const;
+
+    /**
+     * \param tailWidth                 New width of the base of balloon's tail.
+     */
+    void setTailWidth(qreal tailWidth);
+
+    void pointTo(const QPointF &pos);
+
+
+    QString text() const;
     void setText(const QString &text);
 
     virtual QRectF boundingRect() const override;
-    virtual QPainterPath shape() const override;
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
 private:
@@ -41,7 +66,8 @@ private:
     mutable QPainterPath m_borderShape;
     mutable QRectF m_boundingRect;
 
-    QString m_text;
+    QPointF m_tailPos;
+    qreal m_tailWidth;
 };
 
 

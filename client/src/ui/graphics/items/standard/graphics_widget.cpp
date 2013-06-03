@@ -280,6 +280,16 @@ void GraphicsWidget::setResizeEffectRadius(qreal resizeEffectRadius) {
     d_func()->resizeEffectRadius = resizeEffectRadius;
 }
 
+MarginsF GraphicsWidget::contentsMargins() const {
+    qreal left, top, right, bottom;
+    getContentsMargins(&left, &top, &right, &bottom);
+    return MarginsF(left, top, right, bottom);
+}
+
+void GraphicsWidget::setContentsMargins(const MarginsF &margins) {
+    setContentsMargins(margins.left(), margins.top(), margins.right(), margins.bottom());
+}
+
 QRectF GraphicsWidget::contentsRect() const {
     qreal left, top, right, bottom;
     getContentsMargins(&left, &top, &right, &bottom);
