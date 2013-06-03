@@ -374,7 +374,7 @@ RTPSession::RTPSession():
     m_openedTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
-    m_tcpTimeout(50 * 1000 * 1000),
+    m_tcpTimeout(10 * 1000),
     m_proxyPort(0),
     m_responseCode(CODE_OK),
     m_isAudioEnabled(true),
