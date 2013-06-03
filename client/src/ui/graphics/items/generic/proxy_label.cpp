@@ -158,3 +158,4 @@ QString QnProxyLabel::selectedText() const {
 int QnProxyLabel::selectionStart() const {
     return m_label->selectionStart();
 }
+

@@ -38,7 +38,7 @@
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/clickable_widget.h>
 #include <ui/graphics/items/generic/simple_frame_widget.h>
-#include <ui/graphics/items/generic/tool_tip_item.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/controls/navigation_item.h>
@@ -46,8 +46,9 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
-#include <ui/processors/hover_processor.h>
 
+#include <ui/common/palette.h>
+#include <ui/processors/hover_processor.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
@@ -264,33 +265,22 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Tree widget. */
     m_treeWidget = new QnResourceBrowserWidget(NULL, context());
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
-    {
-        QPalette palette = m_treeWidget->palette();
-        palette.setColor(QPalette::Window, Qt::transparent);
-        palette.setColor(QPalette::Base, Qt::transparent);
-        
-        QPalette cbPalette = m_treeWidget->comboBoxPalette();
-        cbPalette.setColor(QPalette::Window, Qt::black);
-        cbPalette.setColor(QPalette::Base, Qt::black);
-        
-        m_treeWidget->setPalette(palette);
-        m_treeWidget->setComboBoxPalette(cbPalette);
-    }
+    setPaletteColor(m_treeWidget, QPalette::Window, Qt::transparent);
+    setPaletteColor(m_treeWidget, QPalette::Base, Qt::transparent);
+    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Window, Qt::black);
+    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, Qt::black);
     m_treeWidget->resize(250, 0);
 
     m_treeBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
     m_treeBackgroundItem->setAutoFillBackground(true);
     {
-        QPalette palette = m_treeBackgroundItem->palette();
-
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
         gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
         gradient.setSpread(QGradient::RepeatSpread);
 
-        palette.setBrush(QPalette::Window, QBrush(gradient));
-        m_treeBackgroundItem->setPalette(palette);
+        m_treeBackgroundItem->setWindowBrush(gradient);
     }
     m_treeBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_treeBackgroundItem->setFrameWidth(0.5);
@@ -352,16 +342,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
     m_titleBackgroundItem->setAutoFillBackground(true);
     {
-        QPalette palette = m_titleBackgroundItem->palette();
-
         QLinearGradient gradient(0, 0, 0, 1);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
         gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
         gradient.setSpread(QGradient::RepeatSpread);
 
-        palette.setBrush(QPalette::Window, QBrush(gradient));
-        m_titleBackgroundItem->setPalette(palette);
+        m_titleBackgroundItem->setWindowBrush(gradient);
     }
     m_titleBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_titleBackgroundItem->setFrameWidth(0.5);
@@ -463,28 +450,21 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_helpBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
     m_helpBackgroundItem->setAutoFillBackground(true);
     {
-        QPalette palette = m_helpBackgroundItem->palette();
-
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(1.0, QColor(0, 0, 0, 255));
         gradient.setColorAt(0.0, QColor(0, 0, 0, 64));
         gradient.setSpread(QGradient::RepeatSpread);
 
-        palette.setBrush(QPalette::Window, QBrush(gradient));
-        m_helpBackgroundItem->setPalette(palette);
+        m_helpBackgroundItem->setWindowBrush(gradient);
     }
     m_helpBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_helpBackgroundItem->setFrameWidth(0.5);
 
     m_helpWidget = new QWidget();
     m_helpWidget->setAttribute(Qt::WA_TranslucentBackground);
-    {
-        QPalette palette = m_helpWidget->palette();
-        palette.setColor(QPalette::Window, Qt::transparent);
-        palette.setColor(QPalette::Base, Qt::transparent);
-        m_helpWidget->setPalette(palette);
-    }
+    setPaletteColor(m_helpWidget, QPalette::Window, Qt::transparent);
+    setPaletteColor(m_helpWidget, QPalette::Base, Qt::transparent);
     m_helpWidget->resize(250, 0);
 
     m_helpItem = new QnMaskedProxyWidget(m_controlsWidget);
