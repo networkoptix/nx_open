@@ -55,10 +55,14 @@ public:
     QString text() const;
     void setText(const QString &text);
 
+    bool isAutoSize() const;
+    void setAutoSize(bool autoSize);
+
     virtual QRectF boundingRect() const override;
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void updateGeometry() override;
 
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
@@ -76,6 +80,7 @@ private:
 
     QPointF m_tailPos;
     qreal m_tailWidth;
+    bool m_autoSize;
 };
 
 

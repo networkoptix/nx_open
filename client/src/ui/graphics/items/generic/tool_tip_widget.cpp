@@ -85,7 +85,8 @@ namespace  {
 QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     m_shapeValid(false),
-    m_tailWidth(5.0)
+    m_tailWidth(5.0),
+    m_autoSize(true)
 {
     // setProperty(Qn::NoHandScrollOver, true); // TODO: #Elric
 }
@@ -181,6 +182,14 @@ void QnToolTipWidget::setText(const QString &text) {
     setLayout(layout);
 }
 
+bool QnToolTipWidget::isAutoSize() const {
+    return m_autoSize;
+}
+
+void QnToolTipWidget::setAutoSize(bool autoSize) {
+    m_autoSize = autoSize;
+}
+
 QRectF QnToolTipWidget::boundingRect() const {
     ensureShape();
 
@@ -195,6 +204,13 @@ void QnToolTipWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->setPen(QPen(frameBrush(), frameWidth()));
     painter->setBrush(windowBrush());
     painter->drawPath(m_borderShape);
+}
+
+void QnToolTipWidget::updateGeometry() {
+    base_type::updateGeometry();
+
+    if(m_autoSize)
+        resize(effectiveSizeHint(Qt::PreferredSize));
 }
 
 void QnToolTipWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
