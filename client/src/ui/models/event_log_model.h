@@ -61,6 +61,7 @@ private:
     static QString formatUrl(const QString& url);
     static QnResourcePtr getResourceById(const QnId& id);
     static QString getResourceNameString(QnId id);
+    static QString getUserGroupString(QnBusinessActionParameters::UserGroup value);
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;

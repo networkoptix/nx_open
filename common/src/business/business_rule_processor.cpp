@@ -15,6 +15,7 @@
 
 #include "utils/common/synctime.h"
 #include <utils/common/email.h>
+#include "business_strings_helper.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -356,7 +357,7 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
     //TODO: #vasilenko implement me
 }
 
-bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& action )
+bool QnBusinessRuleProcessor::sendMail(QnSendMailBusinessActionPtr& action )
 {
     Q_ASSERT( action );
 
@@ -398,7 +399,7 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
                 EMAIL_SEND_TIMEOUT,
                 this,
                 SLOT(at_sendEmailFinished(int,bool,int)));
-
+    action->getParams().setEmailAddress(QnBusinessStringsHelper::formatEmailList(recipients)); // update final email list in action (for storing into DB)
     return true;
 }
 

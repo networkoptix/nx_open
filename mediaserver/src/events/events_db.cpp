@@ -276,7 +276,7 @@ void QnEventsDB::getAndSerializeActions(
 
     QSqlRecord rec = actionsQuery.record();
     int actionTypeIdx = rec.indexOf(lit("action_type"));
-//    int actionParamIdx = rec.indexOf(lit("action_params"));
+    int actionParamIdx = rec.indexOf(lit("action_params"));
     int runtimeParamIdx = rec.indexOf(lit("runtime_params"));
     int businessRuleIdx = rec.indexOf(lit("business_rule_id"));
 //    int toggleStateIdx = rec.indexOf(lit("toggle_state"));
@@ -313,6 +313,10 @@ void QnEventsDB::getAndSerializeActions(
         QByteArray runtimeParams = actionsQuery.value(runtimeParamIdx).toByteArray();
         appendIntToBA(result, runtimeParams.size());
         result.append(runtimeParams);
+
+        QByteArray actionParams = actionsQuery.value(actionParamIdx).toByteArray();
+        appendIntToBA(result, actionParams.size());
+        result.append(actionParams);
 
         ++sizeField;
 
