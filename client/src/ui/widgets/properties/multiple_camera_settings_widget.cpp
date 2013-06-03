@@ -16,6 +16,7 @@
 #include <ui/style/warning_style.h>
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
+#include <ui/widgets/properties/camera_settings_widget_p.h>
 
 #include <utils/license_usage_helper.h>
 
@@ -23,6 +24,7 @@
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
     QnWorkbenchContextAware(parent),
+    d_ptr(new QnCameraSettingsWidgetPrivate()),
     ui(new Ui::MultipleCameraSettingsWidget),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
@@ -70,6 +72,8 @@ void QnMultipleCameraSettingsWidget::setCameras(const QnVirtualCameraResourceLis
         return;
 
     m_cameras = cameras;
+    Q_D(QnCameraSettingsWidget);
+    d->setCameras(cameras);
 
     updateFromResources();
 }
@@ -366,18 +370,10 @@ void QnMultipleCameraSettingsWidget::updateMaxFPS(){
     m_inUpdateMaxFps = true;
 
     int maxFps = std::numeric_limits<int>::max();
-    int maxDualStreamingFps  = maxFps;
+    int maxDualStreamingFps = maxFps;
 
-    foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
-    {
-        int cameraFps = camera->getMaxFps();
-        int cameraDualStreamingFps = cameraFps;
-        if ((((camera->supportedMotionType() & Qn::MT_SoftwareGrid))
-            || ui->cameraScheduleWidget->isSecondaryStreamReserver()) && camera->streamFpsSharingMethod() == Qn::shareFps)
-            cameraDualStreamingFps -= MIN_SECOND_STREAM_FPS;
-        maxFps = qMin(maxFps, cameraFps);
-        maxDualStreamingFps = qMin(maxFps, cameraDualStreamingFps);
-    }
+    Q_D(QnCameraSettingsWidget);
+    d->calculateMaxFps(&maxFps, &maxDualStreamingFps);
 
     ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
