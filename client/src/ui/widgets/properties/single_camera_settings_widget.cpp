@@ -19,6 +19,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
+#include <ui/widgets/properties/camera_settings_widget_p.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/style/warning_style.h>
 
@@ -28,6 +29,7 @@
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
     QnWorkbenchContextAware(parent),
+    d_ptr(new QnCameraSettingsWidgetPrivate()),
     ui(new Ui::SingleCameraSettingsWidget),
     m_cameraSupportsMotion(false),
     m_hasCameraChanges(false),
@@ -229,6 +231,8 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         return;
 
     m_camera = camera;
+    Q_D(QnCameraSettingsWidget);
+    d->setCameras(QnVirtualCameraResourceList() << camera);
     
     updateFromResource();
 }
@@ -700,6 +704,19 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
         return; // TODO: investigate why we get here with null camera
 
     m_inUpdateMaxFps = true;
+
+    Q_D(QnCameraSettingsWidget);
+
+    int maxFps = std::numeric_limits<int>::max();
+    int maxDualStreamingFps = maxFps;
+
+    // motionType selected in GUI
+    Qn::MotionType motionType = ui->cameraMotionButton->isChecked()
+            ? m_camera->getCameraBasedMotionType()
+            : Qn::MT_SoftwareGrid;
+
+    d->calculateMaxFps(&maxFps, &maxDualStreamingFps, motionType);
+/*
     int maxFps = m_camera->getMaxFps();
     if (ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
         maxFps -= MIN_SECOND_STREAM_FPS;
@@ -708,7 +725,7 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
     if (m_camera->streamFpsSharingMethod() == Qn::shareFps)
         maxDualStreamingFps = m_camera->getMaxFps() - MIN_SECOND_STREAM_FPS;
     else
-        maxDualStreamingFps = maxFps;
+        maxDualStreamingFps = maxFps;*/
 
     ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;

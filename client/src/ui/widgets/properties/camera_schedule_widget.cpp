@@ -691,11 +691,6 @@ void QnCameraScheduleWidget::at_licensesButton_clicked()
     emit moreLicensesRequested();
 }
 
-bool QnCameraScheduleWidget::isSecondaryStreamReserver() const
-{
-    return ui->recordMotionPlusLQButton->isChecked();
-}
-
 void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     QWidget *widget = qobject_cast<QWidget *>(target);
     if(!widget)

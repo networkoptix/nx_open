@@ -14,8 +14,8 @@ namespace Ui {
 }
 
 class QVBoxLayout;
-
 class QnCameraMotionMaskWidget;
+class QnCameraSettingsWidgetPrivate;
 
 class QnSingleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -83,6 +83,8 @@ protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void hideEvent(QHideEvent *event) override;
 
+    QnCameraSettingsWidgetPrivate* d_ptr;
+
 private slots:
     void at_tabWidget_currentChanged();
     void at_dbDataChanged();
@@ -124,6 +126,7 @@ private:
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
+    Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
     QnVirtualCameraResourcePtr m_camera;
