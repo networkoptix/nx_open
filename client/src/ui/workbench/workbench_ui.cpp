@@ -679,8 +679,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treePinButton->setChecked(qnSettings->isTreePinned());
     m_notificationsPinButton->setChecked(qnSettings->isNotificationsPinned());
     setTreeOpened(treeOpened, false);
-    setTitleOpened(qnSettings->isTitleOpened(), false);
-    setSliderOpened(qnSettings->isSliderOpened(), false);
+    setTitleOpened(qnSettings->isTitleOpened(), false, false);
+    setSliderOpened(qnSettings->isSliderOpened(), false, false);
     setNotificationsOpened(notificationsOpened, false);
 
     /* Set up title D&D. */
@@ -744,7 +744,7 @@ QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     }
 }
 
-void QnWorkbenchUi::setTreeOpened(bool opened, bool animate) {
+void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
 
     m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
@@ -761,10 +761,11 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate) {
     action(Qn::ToggleTreeAction)->setChecked(opened);
     Q_UNUSED(rollback)
 
-    qnSettings->setTreeOpened(opened);
+    if (save)
+        qnSettings->setTreeOpened(opened);
 }
 
-void QnWorkbenchUi::setSliderOpened(bool opened, bool animate) {
+void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
 
     qreal newY = m_controlsWidgetRect.bottom() + (opened ? -m_sliderItem->size().height() : 48.0 /* So that tooltips are not opened. */);
@@ -781,17 +782,19 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate) {
     action(Qn::ToggleSliderAction)->setChecked(opened);
     Q_UNUSED(rollback)
 
-    qnSettings->setSliderOpened(opened);
+    if (save)
+        qnSettings->setSliderOpened(opened);
 }
 
-void QnWorkbenchUi::setTitleOpened(bool opened, bool animate) {
+void QnWorkbenchUi::setTitleOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
 
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     action(Qn::ToggleTitleBarAction)->setChecked(opened);
     Q_UNUSED(rollback)
 
-    qnSettings->setTitleOpened(opened);
+    if (save)
+        qnSettings->setTitleOpened(opened);
 
     if(!m_titleUsed)
         return;
@@ -805,7 +808,7 @@ void QnWorkbenchUi::setTitleOpened(bool opened, bool animate) {
     }
 }
 
-void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate) {
+void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
 
     m_notificationsShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
@@ -824,7 +827,8 @@ void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate) {
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     m_notificationsShowButton->setChecked(opened);
 
-    qnSettings->setNotificationsOpened(opened);
+    if (save)
+        qnSettings->setNotificationsOpened(opened);
 }
 
 void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate) {
@@ -1514,14 +1518,14 @@ QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const {
         (isTreeOpened() ? TreePanel : NoPanel) |
         (isTitleOpened() ? TitlePanel : NoPanel) |
         (isSliderOpened() ? SliderPanel : NoPanel) |
-        (m_notificationsOpened ? NotificationsPanel : NoPanel);
+        (isNotificationsOpened() ? NotificationsPanel : NoPanel);
 }
 
-void QnWorkbenchUi::setOpenedPanels(Panels panels) {
-    setTreeOpened(panels & TreePanel);
-    setTitleOpened(panels & TitlePanel);
-    setSliderOpened(panels & SliderPanel);
-    setNotificationsOpened(panels & NotificationsPanel);
+void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate, bool save) {
+    setTreeOpened(panels & TreePanel, animate, save);
+    setTitleOpened(panels & TitlePanel, animate, save);
+    setSliderOpened(panels & SliderPanel, animate, save);
+    setNotificationsOpened(panels & NotificationsPanel, animate, save);
 }
 
 void QnWorkbenchUi::initGraphicsMessageBox() {
@@ -1600,22 +1604,19 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
         if(!isFullscreen)
             fullScreenAction->setChecked(true);
         
-        setTreeOpened(false, isFullscreen);
-        setTitleOpened(false, isFullscreen);
-        setSliderOpened(false, isFullscreen);
-
-        bool wasNotificationsOpened = isNotificationsOpened();
-        setNotificationsOpened(false, isFullscreen);
-        qnSettings->setNotificationsOpened(wasNotificationsOpened);
+        setTreeOpened(false, isFullscreen, false);
+        setTitleOpened(false, isFullscreen, false);
+        setSliderOpened(false, isFullscreen, false);
+        setNotificationsOpened(false, isFullscreen, false);
 
         updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
         action(Qn::FitInViewAction)->trigger();
 
         m_inFreespace = true;
     } else {
-        setTreeOpened(true, isFullscreen);
-        setTitleOpened(true, isFullscreen);
-        setSliderOpened(true, isFullscreen);
+        setTreeOpened(qnSettings->isTreeOpened(), isFullscreen);
+        setTitleOpened(qnSettings->isTitleOpened(), isFullscreen);
+        setSliderOpened(qnSettings->isSliderOpened(), isFullscreen);
         setNotificationsOpened(qnSettings->isNotificationsOpened(), isFullscreen);
 
         m_inFreespace = false;
@@ -1669,11 +1670,11 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
         if(newWidget) {
             if (!alreadyZoomed)
                 m_unzoomedOpenedPanels = openedPanels();
-            setOpenedPanels(openedPanels() & SliderPanel); /* Leave slider open. */
+            setOpenedPanels(openedPanels() & SliderPanel, true, false); /* Leave slider open. */
         } else {
             /* User may have opened some panels while zoomed, 
              * we want to leave them opened even if they were closed before. */
-            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels());
+            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels(), true, false);
 
             /* Viewport margins have changed, force fit-in-view. */
             display()->fitInView();
