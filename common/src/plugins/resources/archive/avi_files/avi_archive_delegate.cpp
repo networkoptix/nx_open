@@ -40,7 +40,7 @@ public:
         for(unsigned i = 0; i < formatContext->nb_streams; i++)
         {
             AVStream *strm= formatContext->streams[i];
-            if(strm->codec->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+            if(strm->codec->codec_type >= AVMEDIA_TYPE_NB)
                 continue;
             if (strm->id && strm->id == lastStreamID)
                 continue; // duplicate
@@ -66,7 +66,7 @@ public:
 
             AVCodecContext *codecContext = strm->codec;
 
-            if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+            if(codecContext->codec_type >= AVMEDIA_TYPE_NB)
                 continue;
 
             if (strm->id && strm->id == lastStreamID)
@@ -451,7 +451,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
         AVStream *strm= m_formatContext->streams[i];
         AVCodecContext *codecContext = strm->codec;
 
-        if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+        if(codecContext->codec_type >= AVMEDIA_TYPE_NB)
             continue;
 
         if (strm->id && strm->id == lastStreamID)
@@ -481,7 +481,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
         AVStream *strm= m_formatContext->streams[i];
         AVCodecContext *codecContext = strm->codec;
 
-        if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+        if(codecContext->codec_type >= AVMEDIA_TYPE_NB)
             continue;
 
         if (strm->id && strm->id == lastStreamID)
