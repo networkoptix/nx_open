@@ -267,7 +267,7 @@ void QnNotificationListWidget::at_geometry_changed() {
                 data->state == ItemData::Collapsing) //do not collapse item tha is already hiding
             continue;
 
-        if ((*i)->geometry().bottom() > geometry().bottom()) {
+        if ((*i)->geometry().bottom() > geometry().height()) {
             data->state = ItemData::Collapsing;
             data->setAnimation(0.0, 90.0, collapseTimeoutMs);
         } else
