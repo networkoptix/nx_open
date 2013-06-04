@@ -13,6 +13,7 @@
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 
 QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
@@ -84,29 +85,64 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
     BusinessEventType::Value eventType = params.getEventType();
 
     switch (eventType) {
-    case BusinessEventType::Camera_Input:                   //camera
-    case BusinessEventType::Camera_Disconnect:              //camera
-        item->setColor(QColor(255, 131, 48)); //orange
-        break;
+    case BusinessEventType::Camera_Motion: {
+            item->setColor(qnGlobals->notificationColorCommon());
+            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
+                                                       QnActionParameters(resource)
+                                                       .withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)));
+            break;
+        }
 
-    case BusinessEventType::Storage_Failure:                //server -- monitor
-    case BusinessEventType::Network_Issue:                  //camera
-    case BusinessEventType::Camera_Ip_Conflict:             //server - mac addrs in conflict list
-    case BusinessEventType::MediaServer_Failure:            //server -- monitor
-    case BusinessEventType::MediaServer_Conflict:           //server -- monitor
-        item->setColor(QColor(237, 200, 66)); // yellow
-        break;
+    case BusinessEventType::Camera_Input: {
+            item->setColor(qnGlobals->notificationColorCommon());
+            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
+                                                       QnActionParameters(resource)));
+            break;
+        }
+    case BusinessEventType::Camera_Disconnect: {
+            item->setColor(qnGlobals->notificationColorImportant());
+            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
+                                                       QnActionParameters(resource)));
+            // TODO: #GDM second action : settings
+            break;
+        }
 
-    case BusinessEventType::Camera_Motion:                  //camera
-        item->setColor(QColor(103, 237, 66)); // green
-        break;
+    case BusinessEventType::Storage_Failure: {
+            item->setColor(qnGlobals->notificationColorImportant());
+            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
+                                                       QnActionParameters(resource)));
+            // TODO: #GDM second action : settings
+            break;
+        }
+    case BusinessEventType::Network_Issue:{
+            item->setColor(qnGlobals->notificationColorImportant());
+            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
+                                                       QnActionParameters(resource)));
+            // TODO: #GDM second action : settings
+            break;
+        }
+
+    case BusinessEventType::Camera_Ip_Conflict: {
+            item->setColor(qnGlobals->notificationColorCritical());
+            //TODO: #GDM page in browser
+            break;
+        }
+    case BusinessEventType::MediaServer_Failure: {
+            item->setColor(qnGlobals->notificationColorCritical());
+            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
+                                                       QnActionParameters(resource)));
+            // TODO: #GDM second action : ping
+            break;
+        }
+    case BusinessEventType::MediaServer_Conflict: {
+            item->setColor(qnGlobals->notificationColorCritical());
+            //TODO: #GDM notification
+            break;
+        }
 
     default:
         break;
     }
-
-    m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
-                                               QnActionParameters(resource)));
 
     QString text = BusinessEventType::toString(eventType);
     text += QLatin1Char('\n');
@@ -127,7 +163,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
     }
     item->setText(text);
 
-    item->setColor(QColor(255, 0, 0)); // red
+    item->setColor(qnGlobals->notificationColorSystem());
 
     switch (message) {
     case QnSystemHealth::EmailIsEmpty:

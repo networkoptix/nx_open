@@ -80,8 +80,6 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
-#include <ui/widgets/popups/popup_collection_widget.h>
-
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_synchronizer.h>

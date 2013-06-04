@@ -58,7 +58,6 @@
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <ui/widgets/popups/popup_collection_widget.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/system_menu_event.h>
