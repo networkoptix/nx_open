@@ -151,10 +151,10 @@ public slots:
     void setNotificationsVisible(bool visible = true, bool animate = true);
     void setCalendarVisible(bool visible = true, bool animate = true);
 
-    void setTreeOpened(bool opened = true, bool animate = true);
-    void setSliderOpened(bool opened = true, bool animate = true);
-    void setTitleOpened(bool opened = true, bool animate = true);
-    void setNotificationsOpened(bool opened = true, bool animate = true);
+    void setTreeOpened(bool opened = true, bool animate = true, bool save = true);
+    void setSliderOpened(bool opened = true, bool animate = true, bool save = true);
+    void setTitleOpened(bool opened = true, bool animate = true, bool save = true);
+    void setNotificationsOpened(bool opened = true, bool animate = true, bool save = true);
     void setCalendarOpened(bool opened = true, bool animate = true);
 
     void toggleTreeOpened() {
@@ -207,7 +207,7 @@ protected:
 
 private:
     Panels openedPanels() const;
-    void setOpenedPanels(Panels panels);
+    void setOpenedPanels(Panels panels, bool animate = true, bool save = true);
 
     void initGraphicsMessageBox();
 private slots:
