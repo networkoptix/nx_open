@@ -205,7 +205,7 @@ QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
 }
 
 void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec, 
-                             QnResourceList camList, 
+                             QnResourceList camList,  //TODO: #vasilenko why parameter is not used?
                              BusinessEventType::Value eventType,
                              BusinessActionType::Value actionType,
                              QnId businessRuleId)
@@ -532,6 +532,7 @@ void QnEventLogDialog::at_copyToClipboard()
 
 void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
 {
+    Q_UNUSED(sender)
     QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
     m_lastMouseButton = me->button();
 }

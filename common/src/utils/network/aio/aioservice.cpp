@@ -10,7 +10,7 @@
 #include <QMutexLocker>
 
 #include "aiothread.h"
-
+#include "qglobal.h"
 
 using namespace std;
 
@@ -108,8 +108,12 @@ namespace aio
         if( !threadToUse )
         {
             //creating new thread
-            //TODO:#ak auto_ptr is deprecated. Use unique_ptr instead
+#if (GCC_VERSION >= 40700)
+            std::unique_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
+#else
             std::auto_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
+#endif
+
             newThread->start();
             if( !newThread->isRunning() )
                 return false;

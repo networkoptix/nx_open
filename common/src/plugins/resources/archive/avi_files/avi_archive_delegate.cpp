@@ -569,7 +569,7 @@ AVCodecContext* QnAviArchiveDelegate::setAudioChannel(int num)
         AVStream *strm= m_formatContext->streams[i];
         AVCodecContext *codecContext = strm->codec;
 
-        if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+        if(codecContext->codec_type >= AVMEDIA_TYPE_NB)
             continue;
 
         if (strm->id && strm->id == lastStreamID)
