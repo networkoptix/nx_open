@@ -22,7 +22,8 @@ namespace {
 
 QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::WindowFlags flags):
     base_type(parent, flags),
-    m_hoverProcessor(new HoverFocusProcessor(this))
+    m_hoverProcessor(new HoverFocusProcessor(this)),
+    m_collapsedItemCountChanged(false)
 {
     registerAnimation(this);
     startListening();
@@ -95,7 +96,6 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
     // updating state and animating
     QList<QnNotificationItem*> itemsToDelete;
-    bool itemsCountChanged = false;
     int collapsedItemsCount = 0;
 
     foreach (QnNotificationItem* item, m_items) {
@@ -111,7 +111,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                     data->state = ItemData::Collapsed;
                     item->setVisible(false);
                     collapsedItemsCount++;
-                    itemsCountChanged = true;
+                    m_collapsedItemCountChanged = true;
                 }
                 canShowNew = false; // maintaining order in the list
                 break;
@@ -126,7 +126,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                     data->setAnimation(item->geometry().width(), 0.0, popoutTimeoutMs);
                     item->setX(data->animation.value);
                     item->setVisible(true);
-                    itemsCountChanged = true;
+                    m_collapsedItemCountChanged = true;
 
                     updateGeometry();
                 } else {
@@ -161,7 +161,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                 if (data->animationFinished()) {
                     data->state = ItemData::Hidden;
                     item->setVisible(false);
-                    itemsCountChanged = true;
+                    m_collapsedItemCountChanged = true;
                 }
                 break;
             }
@@ -173,9 +173,10 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         }
     }
 
-    if (itemsCountChanged) {
+    if (m_collapsedItemCountChanged) {
         m_collapser.animation.source = m_collapser.item->y();
         m_collapser.item->setText(tr("%1 items more").arg(collapsedItemsCount));
+        m_collapsedItemCountChanged = false;
     }
 
     // moving items up
@@ -234,6 +235,8 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     data->locked = locked;
     m_itemDataByItem.insert(item, data);
     m_items.append(item);
+
+    m_collapsedItemCountChanged = true;
 }
 
 void QnNotificationListWidget::clear() {
@@ -244,6 +247,8 @@ void QnNotificationListWidget::clear() {
         else
             data->state = ItemData::Hidden;
     }
+
+    m_collapsedItemCountChanged = true;
 }
 
 void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {

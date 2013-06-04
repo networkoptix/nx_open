@@ -82,6 +82,7 @@ private:
     QMap<QnNotificationItem*, ItemData*> m_itemDataByItem;
 
     ItemData m_collapser;
+    bool m_collapsedItemCountChanged;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H
