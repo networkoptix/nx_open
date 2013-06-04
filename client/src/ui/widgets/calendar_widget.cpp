@@ -10,9 +10,10 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
-
 #include <utils/math/color_transformations.h>
+
 #include <ui/style/globals.h>
+#include <ui/common/palette.h>
 
 namespace {
     const QColor selectionColor = withAlpha(qnGlobals->selectionColor(), 192);
@@ -62,9 +63,7 @@ QnCalendarWidget::QnCalendarWidget():
 
     m_tableView->viewport()->installEventFilter(this);
 
-    QPalette palette = m_tableView->palette();
-    palette.setColor(QPalette::Highlight, QColor(0, 0, 0, 255));
-    m_tableView->setPalette(palette);
+    setPaletteColor(m_tableView, QPalette::Highlight, QColor(0, 0, 0, 255));
 
     QWidget* navBarBackground = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
     navBarBackground->setBackgroundRole(QPalette::Window);

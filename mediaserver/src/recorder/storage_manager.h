@@ -12,7 +12,7 @@
 #include "core/resource/storage_resource.h"
 
 class QnAbstractMediaStreamDataProvider;
-class TestStorageAsyncTask;
+class TestStorageThread;
 
 class QnStorageManager: public QObject
 {
@@ -75,7 +75,7 @@ signals:
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
-    friend class TestStorageAsyncTask;
+    friend class TestStorageThread;
 
     void clearSpace(QnStorageResourcePtr storage);
     int detectStorageIndex(const QString& path);
@@ -117,7 +117,7 @@ private:
     bool m_bigStorageExists;
     QTime m_lastTestTime;
     QTime m_storageWarnTimer;
-    static QThreadPool m_testStoragesAsyncPool;
+    static TestStorageThread* m_testStorageThread;
 };
 
 #define qnStorageMan QnStorageManager::instance()

@@ -5,6 +5,7 @@
 #include "graphics_style.h"
 
 #include <ui/common/frame_section_queryable.h>
+#include <ui/common/margins.h>
 
 class GraphicsWidgetPrivate;
 
@@ -88,6 +89,10 @@ public:
 
     qreal resizeEffectRadius() const;
     void setResizeEffectRadius(qreal resizeEffectRadius);
+
+    MarginsF contentsMargins() const;
+    using base_type::setContentsMargins;
+    void setContentsMargins(const MarginsF &margins);
 
     /**
      * \returns                         The area inside the widget's margins.

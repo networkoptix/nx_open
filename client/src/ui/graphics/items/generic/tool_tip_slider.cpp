@@ -7,16 +7,43 @@
 
 #include <ui/animation/opacity_animator.h>
 
-#include "tool_tip_item.h"
+#include "tool_tip_widget.h"
 
 namespace {
-    class QnSliderToolTipItem: public QnToolTipItem {
+    class QnSliderToolTipItem: public QnToolTipWidget {
+        typedef QnToolTipWidget base_type;
     public:
-        QnSliderToolTipItem(QGraphicsItem *parent = 0) : QnToolTipItem(parent)
+        QnSliderToolTipItem(QGraphicsItem *parent = 0): base_type(parent)
         {
-            setTextPen(QColor(63, 159, 216));
-            setBrush(QColor(0, 0, 0, 255));
-            setBorderPen(QPen(QColor(203, 210, 233, 128), 0.7));
+            setContentsMargins(5.0, 5.0, 5.0, 5.0);
+            setTailWidth(5.0);
+
+            QPalette palette = this->palette();
+            palette.setColor(QPalette::WindowText, QColor(63, 159, 216));
+            setPalette(palette);
+
+            setWindowBrush(QColor(0, 0, 0, 255));
+            setFrameBrush(QColor(203, 210, 233, 128));
+            setFrameWidth(1.0);
+
+            QFont fixedFont = QApplication::font();
+            fixedFont.setPixelSize(14);
+            setFont(fixedFont);
+
+            updateTailPos();
+        }
+
+    protected:
+        virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override {
+            base_type::resizeEvent(event);
+
+            updateTailPos();
+        }
+
+    private:
+        void updateTailPos() {
+            QRectF rect = this->rect();
+            setTailPos(QPointF((rect.left() + rect.right()) / 2, rect.bottom() + 10.0));
         }
     };
 
@@ -94,11 +121,11 @@ QnToolTipSlider::~QnToolTipSlider() {
     m_hideTimer.stop();
 }
 
-QnToolTipItem *QnToolTipSlider::toolTipItem() const {
+QnToolTipWidget *QnToolTipSlider::toolTipItem() const {
     return m_toolTipItem.data();
 }
 
-void QnToolTipSlider::setToolTipItem(QnToolTipItem *newToolTipItem) {
+void QnToolTipSlider::setToolTipItem(QnToolTipWidget *newToolTipItem) {
     qreal opacity = 0.0;
     if(toolTipItem()) {
         opacity = toolTipItem()->opacity();
@@ -114,6 +141,7 @@ void QnToolTipSlider::setToolTipItem(QnToolTipItem *newToolTipItem) {
         toolTipItem()->setAcceptHoverEvents(true);
         toolTipItem()->installEventFilter(this);
         toolTipItem()->setFlag(ItemIgnoresParentOpacity, true);
+        connect(toolTipItem(), SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
 
         updateToolTipText();
         updateToolTipOpacity();
@@ -187,7 +215,7 @@ void QnToolTipSlider::updateToolTipPosition() {
     qreal x = positionFromValue(sliderPosition()).x() + handleRect.width() / 2.0;
     qreal y = handleRect.top();
     
-    toolTipItem()->setPos(toolTipItem()->mapToParent(toolTipItem()->mapFromItem(this, x, y)));
+    toolTipItem()->pointTo(toolTipItem()->mapToParent(toolTipItem()->mapFromItem(this, x, y)));
 }
 
 

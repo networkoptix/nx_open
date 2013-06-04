@@ -27,6 +27,7 @@
 #include "ui/workbench/workbench_layout.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/style/globals.h"
+#include "ui/common/palette.h"
 
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent): 
@@ -46,13 +47,8 @@ void QnCameraMotionMaskWidget::init() {
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
-    {
-        /* Adjust palette so that inherited background painting is not needed. */
-        QPalette palette = m_view->palette();
-        palette.setColor(QPalette::Background, Qt::black);
-        palette.setColor(QPalette::Base, Qt::black);
-        m_view->setPalette(palette);
-    }
+    setPaletteColor(m_view.data(), QPalette::Background, Qt::black);
+    setPaletteColor(m_view.data(), QPalette::Base, Qt::black);
 
     /* Set up model & control machinery. */
     m_context.reset(new QnWorkbenchContext(NULL, this));

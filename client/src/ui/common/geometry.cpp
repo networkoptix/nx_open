@@ -167,8 +167,16 @@ qreal QnGeometry::aspectRatio(const QRectF &rect) {
     return aspectRatio(rect.size());
 }
 
+qreal QnGeometry::dotProduct(const QPointF &a, const QPointF &b) {
+    return a.x() * b.x() + a.y() * b.y();
+}
+
 qreal QnGeometry::length(const QPointF &point) {
-    return std::sqrt(point.x() * point.x() + point.y() * point.y());
+    return std::sqrt(lengthSquared(point));
+}
+
+qreal QnGeometry::lengthSquared(const QPointF &point) {
+    return dotProduct(point, point);
 }
 
 qreal QnGeometry::length(const QSizeF &size) {
@@ -418,3 +426,43 @@ QPointF QnGeometry::corner(const QRectF &rect, Qn::Corner corner) {
             return rect.center();
     }
 }
+
+QPointF QnGeometry::closestPoint(const QRectF &rect, const QPointF &point) {
+    if(point.x() < rect.left()) {
+        if(point.y() < rect.top()) {
+            return rect.topLeft();
+        } else if(point.y() < rect.bottom()) {
+            return QPointF(rect.left(), point.y());
+        } else {
+            return rect.bottomLeft();
+        }
+    } else if(point.x() < rect.right()) {
+        if(point.y() < rect.top()) {
+            return QPointF(point.x(), rect.top());
+        } else if(point.y() < rect.bottom()) {
+            return point;
+        } else {
+            return QPointF(point.x(), rect.bottom());
+        }
+    } else {
+        if(point.y() < rect.top()) {
+            return rect.topRight();
+        } else if(point.y() < rect.bottom()) {
+            return QPointF(rect.right(), point.y());
+        } else {
+            return rect.bottomRight();
+        }
+    }
+}
+
+QPointF QnGeometry::closestPoint(const QPointF &a, const QPointF &b, const QPointF &point, qreal *t) {
+    if(qFuzzyCompare(a, b))
+        return a;
+
+    qreal k = qBound(0.0, dotProduct(point - a, b - a) / lengthSquared(b - a), 1.0);
+    if(t)
+        *t = k;
+    return a + k * b;
+}
+
+
