@@ -14,11 +14,12 @@
 #include <utils/common/synctime.h>
 #include <utils/clock_data_provider.h>
 
+#include <ui/common/palette.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/graphics/items/controls/speed_slider.h>
 #include <ui/graphics/items/controls/volume_slider.h>
-#include <ui/graphics/items/generic/tool_tip_item.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/help/help_topic_accessor.h>
@@ -73,11 +74,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setCursor(Qt::ArrowCursor);
 
     setAutoFillBackground(true);
-    {
-        QPalette pal = palette();
-        pal.setColor(QPalette::Window, Qt::black);
-        setPalette(pal);
-    }
+    setPaletteColor(this, QPalette::Window, Qt::black);
 
 
     /* Create buttons. */

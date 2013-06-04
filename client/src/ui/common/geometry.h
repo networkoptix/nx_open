@@ -113,11 +113,19 @@ public:
         return QSize(point.x(), point.y());
     }
 
+    static qreal dotProduct(const QPointF &a, const QPointF &b);
+
     /**
      * \param point                     Point, treated as a vector.
      * \returns                         Length of the given vector.
      */
     static qreal length(const QPointF &point);
+
+    /**
+     * \param point                     Point, treated as a vector.
+     * \returns                         Squared length of the given vector.
+     */
+    static qreal lengthSquared(const QPointF &point);
 
     /**
      * \param size                      Size, treated as a vector.
@@ -320,6 +328,8 @@ public:
 
     static QPointF corner(const QRectF &rect, Qn::Corner corner);
 
+    static QPointF closestPoint(const QRectF &rect, const QPointF &point);
+    static QPointF closestPoint(const QPointF &a, const QPointF &b, const QPointF &point, qreal *t);
 };
 
 #endif // QN_GEOMETRY_H

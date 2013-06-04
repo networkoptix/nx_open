@@ -54,9 +54,7 @@ public:
 
     virtual Qn::ActionScope currentScope() const override;
 
-    QPalette comboBoxPalette() const;
-
-    void setComboBoxPalette(const QPalette &palette);
+    QComboBox *typeComboBox() const;
 
     virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
 

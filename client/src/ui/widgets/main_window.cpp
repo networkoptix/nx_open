@@ -21,6 +21,7 @@
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 
+#include "ui/common/palette.h"
 #include "ui/common/frame_section.h"
 #include "ui/actions/action_manager.h"
 #include "ui/graphics/view/graphics_view.h"
@@ -136,11 +137,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     setAcceptDrops(true);
     setMinimumWidth(minimalWindowWidth);
     setMinimumHeight(minimalWindowHeight);
-    {
-        QPalette palette = this->palette();
-        palette.setColor(QPalette::Window, Qt::black);
-        setPalette(palette);
-    }
+    setPaletteColor(this, QPalette::Window, Qt::black);
 
 
     /* Set up scene & view. */

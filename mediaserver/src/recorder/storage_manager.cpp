@@ -11,9 +11,32 @@
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
-QThreadPool QnStorageManager::m_testStoragesAsyncPool;
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
+
+class TestStorageThread: public QnLongRunnable
+{
+public:
+    TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
+    virtual void run() override
+    {
+        QnStorageManager::StorageMap storageRoots = m_owner->getAllStorages();
+
+        for (QnStorageManager::StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+        {
+            if (needToStop())
+                break;
+            QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+            QnResource::Status status = fileStorage->isStorageAvailable() ? QnResource::Online : QnResource::Offline;
+            if (fileStorage->getStatus() != status)
+                m_owner->changeStorageStatus(fileStorage, status);
+        }
+    }
+private:
+    QnStorageManager* m_owner;
+};
+
+TestStorageThread* QnStorageManager::m_testStorageThread;
 
 // -------------------- QnStorageManager --------------------
 
@@ -30,6 +53,7 @@ QnStorageManager::QnStorageManager():
 {
     m_lastTestTime.restart();
     m_storageWarnTimer.restart();
+    m_testStorageThread = new TestStorageThread(this);
 }
 
 void QnStorageManager::loadFullFileCatalog()
@@ -413,26 +437,6 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     return result;
 }
 
-class TestStorageAsyncTask: public QRunnable
-{
-public:
-    TestStorageAsyncTask(QnStorageManager* owner): m_owner(owner) {}
-    void run()
-    {
-        QnStorageManager::StorageMap storageRoots = m_owner->getAllStorages();
-
-        for (QnStorageManager::StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
-        {
-            QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
-            QnResource::Status status = fileStorage->isStorageAvailable() ? QnResource::Online : QnResource::Offline;
-            if (fileStorage->getStatus() != status)
-                m_owner->changeStorageStatus(fileStorage, status);
-        }
-    }
-private:
-    QnStorageManager* m_owner;
-};
-
 void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status)
 {
     QMutexLocker lock(&m_mutexStorages);
@@ -446,18 +450,20 @@ void QnStorageManager::testOfflineStorages()
 {
     QMutexLocker lock(&m_mutexStorages);
 
-    if (m_lastTestTime.elapsed() < OFFLINE_STORAGES_TEST_INTERVAL)
+    if (m_lastTestTime.elapsed() < OFFLINE_STORAGES_TEST_INTERVAL || m_testStorageThread->isRunning())
         return;
 
-    TestStorageAsyncTask *task = new TestStorageAsyncTask(this);
-    m_testStoragesAsyncPool.start(task);
-
+    m_testStorageThread->start();
     m_lastTestTime.restart();
 }
 
 void QnStorageManager::stopAsyncTasks()
 {
-    m_testStoragesAsyncPool.waitForDone();
+    if (m_testStorageThread) {
+        m_testStorageThread->stop();
+        delete m_testStorageThread;
+        m_testStorageThread = 0;
+    }
 }
 
 void QnStorageManager::updateStorageStatistics()
