@@ -274,7 +274,10 @@ void QnGLRenderer::drawYV12VideoTexture(
     DEBUG_CODE(glCheckError("glEnable"));
 
     m_yv12ToRgbShaderProgram->bind();
-    m_yv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
+    m_yv12ToRgbShaderProgram->setYTexture( 0 );
+    m_yv12ToRgbShaderProgram->setUTexture( 1 );
+    m_yv12ToRgbShaderProgram->setVTexture( 2 );
+    m_yv12ToRgbShaderProgram->setOpacity(m_decodedPictureProvider.opacity());
 
     glActiveTexture(GL_TEXTURE2);
     DEBUG_CODE(glCheckError("glActiveTexture"));
