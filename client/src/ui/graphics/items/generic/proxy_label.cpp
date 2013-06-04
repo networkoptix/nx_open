@@ -159,3 +159,51 @@ int QnProxyLabel::selectionStart() const {
     return m_label->selectionStart();
 }
 
+QSizeF QnProxyLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
+    /* QGraphicsProxyWidget doesn't take heightForWidth into account.
+     * So we implement sizeHint our own way. */
+
+    QWidget *widget = this->widget();
+    if (!widget)
+        return QGraphicsWidget::sizeHint(which, constraint);
+
+    QSizeF result;
+    switch (which) {
+    case Qt::PreferredSize:
+        if (QLayout *layout = widget->layout()) {
+            result = layout->sizeHint();
+        } else {
+            result = widget->sizeHint();
+            
+            if(constraint.width() > 0 && /*result.width() > constraint.width() &&*/ widget->sizePolicy().hasHeightForWidth()) {
+                int height = widget->heightForWidth(constraint.width());
+                if(height > 0) {
+                    result.setWidth(constraint.width());
+                    result.setHeight(height);
+                }
+            }
+        }
+        break;
+    case Qt::MinimumSize:
+        if (QLayout *layout = widget->layout()) {
+            result = layout->minimumSize();
+        } else {
+            result = widget->minimumSizeHint();
+        }
+        break;
+    case Qt::MaximumSize:
+        if (QLayout *layout = widget->layout()) {
+            result = layout->maximumSize();
+        } else {
+            result = QSizeF(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+        }
+        break;
+    case Qt::MinimumDescent:
+        result = constraint;
+        break;
+    default:
+        break;
+    }
+
+    return result;
+}
