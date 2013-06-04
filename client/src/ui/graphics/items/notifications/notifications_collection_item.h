@@ -26,15 +26,14 @@ public:
 
     QRectF headerGeometry() const;
 
-signals:
-    void settingsRequested();
-
 public slots:
     void showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideAll();
 
 private slots:
+    void at_settingsButton_clicked();
+    void at_eventLogButton_clicked();
     void at_list_itemRemoved(QnNotificationItem* item);
     void at_item_actionTriggered(QnNotificationItem* item);
 private:

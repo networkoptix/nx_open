@@ -60,6 +60,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_tooltipItem = new QnNotificationToolTipItem(this);
 
     m_textLabel->setWordWrap(true);
+    m_textLabel->setAlignment(Qt::AlignCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
     m_image->setMinimumSize(QSizeF(totalHeight, totalHeight));

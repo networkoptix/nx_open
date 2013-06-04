@@ -30,14 +30,22 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
 
     QnImageButtonWidget* settingsButton = new QnImageButtonWidget(m_headerWidget);
     settingsButton->setIcon(qnSkin->icon("titlebar/connected.png"));
-    settingsButton->setToolTip(tr(""));
+    settingsButton->setToolTip(tr("Settings"));
     settingsButton->setMinimumSize(QSizeF(24, 24));
     settingsButton->setMaximumSize(QSizeF(24, 24));
-    connect(settingsButton, SIGNAL(clicked()), this, SIGNAL(settingsRequested()));
+    connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
+
+    QnImageButtonWidget* eventLogButton = new QnImageButtonWidget(m_headerWidget);
+    eventLogButton->setIcon(qnSkin->icon("item/info.png"));
+    eventLogButton->setToolTip(tr("Event Log"));
+    eventLogButton->setMinimumSize(QSizeF(24, 24));
+    eventLogButton->setMaximumSize(QSizeF(24, 24));
+    connect(eventLogButton, SIGNAL(clicked()), this, SLOT(at_eventLogButton_clicked()));
 
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     controlsLayout->addStretch();
+    controlsLayout->addItem(eventLogButton);
     controlsLayout->addItem(hideAllButton);
     controlsLayout->addItem(settingsButton);
     m_headerWidget->setLayout(controlsLayout);
@@ -171,6 +179,14 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
 
 void QnNotificationsCollectionItem::hideAll() {
     m_list->clear();
+}
+
+void QnNotificationsCollectionItem::at_settingsButton_clicked() {
+    menu()->trigger(Qn::OpenPopupSettingsAction);
+}
+
+void QnNotificationsCollectionItem::at_eventLogButton_clicked() {
+    menu()->trigger(Qn::BusinessEventsLogAction);
 }
 
 void QnNotificationsCollectionItem::at_list_itemRemoved(QnNotificationItem *item) {
