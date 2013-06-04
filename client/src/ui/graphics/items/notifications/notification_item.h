@@ -7,6 +7,8 @@
 class QnProxyLabel;
 class QnImageButtonWidget;
 class QGraphicsLinearLayout;
+class QnToolTipWidget;
+class HoverFocusProcessor;
 
 class QnNotificationItem: public QnClickableWidget {
     Q_OBJECT
@@ -30,13 +32,25 @@ signals:
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+private:
+    void hideToolTip();
+    void showToolTip();
+
 private slots:
+    void updateToolTipVisibility();
+    void updateToolTipPosition();
+
     void at_image_clicked();
 
 private:
     QnProxyLabel* m_textLabel;
     QnImageButtonWidget *m_image;
     QColor m_color;
+
+    QnToolTipWidget* m_tooltipItem;
+    HoverFocusProcessor* m_hoverProcessor;
+    bool m_pendingPositionUpdate;
+    bool m_instantPositionUpdate;
 };
 
 #endif // NOTIFICATION_ITEM_H
