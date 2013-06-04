@@ -51,7 +51,7 @@ private slots:
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
 
-    void at_beforeModelChanged(int changeNum);
+    void at_beforeModelChanged();
     void at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
 
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
