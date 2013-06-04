@@ -712,6 +712,7 @@ void QnCamDisplay::onJumpOccured(qint64 time)
     m_bofReceived = false;
     m_buffering = getBufferingMask();
     m_lastDecodedTime = AV_NOPTS_VALUE;
+    m_firstAfterJumpTime = AV_NOPTS_VALUE;
     
     m_singleShotQuantProcessed = false;
     m_jumpTime = time;
