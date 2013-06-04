@@ -174,8 +174,8 @@ QSizeF QnProxyLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) cons
             result = layout->sizeHint();
         } else {
             result = widget->sizeHint();
-            
-            if(constraint.width() > 0 && /*result.width() > constraint.width() &&*/ widget->sizePolicy().hasHeightForWidth()) {
+
+            if(constraint.width() > 0 && widget->sizePolicy().hasHeightForWidth()) {
                 int height = widget->heightForWidth(constraint.width());
                 if(height > 0) {
                     result.setWidth(constraint.width());
@@ -189,6 +189,14 @@ QSizeF QnProxyLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) cons
             result = layout->minimumSize();
         } else {
             result = widget->minimumSizeHint();
+
+            if(constraint.width() > 0 && widget->sizePolicy().hasHeightForWidth()) {
+                int height = widget->heightForWidth(constraint.width());
+                if(height > 0) {
+                    result.setWidth(constraint.width());
+                    result.setHeight(height);
+                }
+            }
         }
         break;
     case Qt::MaximumSize:
