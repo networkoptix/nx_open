@@ -1,5 +1,7 @@
+
 #include "notification_item.h"
 
+#include <QApplication>
 #include <QtGui/QGraphicsLinearLayout>
 
 #include <ui/animation/opacity_animator.h>

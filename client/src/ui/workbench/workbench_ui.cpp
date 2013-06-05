@@ -5,6 +5,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QTimer>
 
+#include <QtGui/QComboBox>
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsView>
 #include <QtGui/QGraphicsProxyWidget>
@@ -264,6 +265,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
     setPaletteColor(m_treeWidget, QPalette::Window, Qt::transparent);
     setPaletteColor(m_treeWidget, QPalette::Base, Qt::transparent);
+    setPaletteColor(m_treeWidget, QPalette::Text, Qt::white);
     setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Window, Qt::black);
     setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, Qt::black);
     m_treeWidget->resize(250, 0);
@@ -285,6 +287,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
+    m_treeWidget->installEventFilter(m_treeItem);
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
     m_treeItem->setProperty(Qn::NoHandScrollOver, true);
 
@@ -367,6 +370,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_tabBarWidget = new QnLayoutTabBar(NULL, context());
     m_tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBarItem->setWidget(m_tabBarWidget);
+    m_tabBarWidget->installEventFilter(m_tabBarItem);
 
     m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
 
@@ -525,6 +529,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_calendarItem->setWidget(calendarWidget);
+    calendarWidget->installEventFilter(m_calendarItem);
     m_calendarItem->resize(250, 200);
     m_calendarItem->setProperty(Qn::NoHandScrollOver, true);
 
@@ -928,6 +933,7 @@ void QnWorkbenchUi::setTitleUsed(bool used) {
         QTabBar *widget = checked_cast<QTabBar *>(m_tabBarItem->widget());
         m_tabBarItem->setWidget(NULL);
         m_tabBarItem->setWidget(widget);
+        widget->installEventFilter(m_tabBarItem);
 
         /* There are cases where even re-embedding doesn't notifications.
          * So we cheat even more, forcing the tab bar to refresh. */
