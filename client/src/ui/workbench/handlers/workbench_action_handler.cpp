@@ -466,6 +466,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
+    data.rotation = params.rotation;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
     if(params.frameColor.isValid())
         data.dataByRole[Qn::ItemFrameColorRole] = params.frameColor;
@@ -3475,6 +3476,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.zoomWindow = rect;
     addParams.zoomUuid = widget->item()->uuid();
     addParams.frameColor = params.argument<QColor>(Qn::ItemFrameColorRole);
+    addParams.rotation = widget->item()->rotation();
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource(), addParams);
 }

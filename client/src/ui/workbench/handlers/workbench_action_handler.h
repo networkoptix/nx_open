@@ -169,12 +169,14 @@ protected:
         QUuid zoomUuid;
         quint64 time;
         QColor frameColor;
+        qreal rotation;
 
         AddToLayoutParams():
             usePosition(false),
             position(QPointF()),
             zoomUuid(QUuid()),
-            time(0)
+            time(0),
+            rotation(0)
         {}
     };
 
