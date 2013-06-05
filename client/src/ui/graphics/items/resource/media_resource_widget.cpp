@@ -855,8 +855,17 @@ void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     if(checked)
         buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
 }
-void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
-    m_renderer->setHistogramChecked(checked);
+void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) 
+{
+    ImageCorrectionParams value;
+    
+    value.enabled = checked;
+    value.blackLevel = 0.01;
+    value.whiteLevel = 0.01;
+    value.gamma = 1.0;
+    value.srcRect = QRectF(0, 0, 1, 1);
+
+    m_renderer->setImageCorrection(value);
 
 }
 

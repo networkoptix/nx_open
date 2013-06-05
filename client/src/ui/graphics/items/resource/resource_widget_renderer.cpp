@@ -259,12 +259,12 @@ bool QnResourceWidgetRenderer::isDisplaying( const QSharedPointer<CLVideoDecoder
     return ctx.uploader->isUsingFrame( image );
 }
 
-void QnResourceWidgetRenderer::setHistogramChecked( bool checked )
+void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& value)
 {
     for (int i = 0; i < m_channelRenderers.size(); ++i){
         RenderingTools& ctx = m_channelRenderers[i];
         if( !ctx.uploader )
             continue;
-        ctx.uploader->setHistogramChecked(checked); 
+        ctx.uploader->setImageCorrection(value); 
     }
 }

@@ -457,20 +457,19 @@ QnGlRendererTexture* DecodedPictureToOpenGLUploader::UploadedPicture::texture( i
     return m_textures[index].data();
 }
 
-const GammaInfo& DecodedPictureToOpenGLUploader::UploadedPicture::gamma() const
+const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::imageCorrectionResult() const
 {
-    return m_gamma;
+    return m_imgCorrection;
 }
 
-void DecodedPictureToOpenGLUploader::UploadedPicture::calcLevels( quint8* yPlane, int width, int height, int stride, 
-                   float blackLevel, float whiteLevel, const QRectF& srcRect)
+void DecodedPictureToOpenGLUploader::UploadedPicture::calcLevels( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data)
 {
-    m_gamma.calcLevels(yPlane, width, height, stride, blackLevel, whiteLevel, srcRect);
+    m_imgCorrection.processImage(yPlane, width, height, stride, data);
 }
 
 void DecodedPictureToOpenGLUploader::UploadedPicture::resetHistogram()
 {
-    m_gamma.reset();
+    m_imgCorrection.reset();
 }
 
 GLuint DecodedPictureToOpenGLUploader::UploadedPicture::pboID( int index ) const
@@ -723,10 +722,14 @@ public:
             m_uploader->pictureDataUploadFailed( this, pictureBuf );
             return;
         }
-        if (m_uploader->histogramChecked())
-            m_pictureBuf->calcLevels(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0]);
-        else
+
+        ImageCorrectionParams imCor = m_uploader->getImageCorrection();
+        if (imCor.enabled) {
+            m_pictureBuf->calcLevels(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
+        }
+        else {
             m_pictureBuf->resetHistogram();
+        }
 
 #ifdef GL_COPY_AGGREGATION
         if( !m_uploader->uploadDataToGlWithAggregation(
@@ -1068,8 +1071,9 @@ public:
         else
             m_uploader->pictureDataUploadFailed( NULL, m_dest );
 
-        if (m_uploader->histogramChecked())
-            m_dest->calcLevels(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0]);
+        ImageCorrectionParams imCor = m_uploader->getImageCorrection();
+        if (imCor.enabled)
+            m_dest->calcLevels(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0], imCor);
         else
             m_dest->resetHistogram();
 
@@ -1177,8 +1181,7 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     m_fileNumber( 0 ),
     m_hardwareDecoderUsed( false ),
     m_asyncUploadUsed( false ),
-    m_initializedCtx( NULL ),
-    m_histogramChecked(false)
+    m_initializedCtx( NULL )
 {
 #ifdef ASYNC_UPLOADING_USED
     const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& 
@@ -1855,6 +1858,17 @@ inline void memcpy_sse4_stream_store( __m128i* dst, __m128i* src, size_t sz )
     }
 }
 #endif
+
+//void DecodedPictureToOpenGLUploader::setImageCorrection( bool enabled, float blackLevel, float whiteLevel, float gamma)
+void DecodedPictureToOpenGLUploader::setImageCorrection(const ImageCorrectionParams& value)
+{
+    m_imageCorrection = value;
+}
+
+ImageCorrectionParams DecodedPictureToOpenGLUploader::getImageCorrection() const {
+    return m_imageCorrection;
+}
+
 
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,

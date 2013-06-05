@@ -2,7 +2,7 @@
 #define QN_YV12_TO_RGB_SHADER_PROGRAM_H
 
 #include "arb_shader_program.h"
-#include "utils/common/util.h"
+#include "utils/color_space/image_correction.h"
 
 class QnYv12ToRgbShaderProgram: public QGLShaderProgram {
     Q_OBJECT;
@@ -23,11 +23,11 @@ public:
         setUniformValue(m_opacityLocation, opacity);
     }
 
-    void setGamma(const GammaInfo& gamma)
+    void setImageCorrection(const ImageCorrectionResult& value)
     {
-        setUniformValue(m_yLevels1Location, gamma.levels1);
-        setUniformValue(m_yLevels2Location, gamma.levels2);
-        setUniformValue(m_yGammaLocation, gamma.gamma);
+        setUniformValue(m_yLevels1Location, value.aCoeff);
+        setUniformValue(m_yLevels2Location, value.bCoeff);
+        setUniformValue(m_yGammaLocation, value.gamma);
     }
 
 private:

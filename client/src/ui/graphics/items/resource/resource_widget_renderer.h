@@ -6,6 +6,7 @@
 
 #include <camera/abstract_renderer.h>
 #include <camera/render_status.h>
+#include "utils/color_space/image_correction.h"
 
 
 class QThread;
@@ -73,7 +74,7 @@ public:
 
     bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
 
-    void setHistogramChecked( bool checked );
+    void setImageCorrection(const ImageCorrectionParams& value);
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.

@@ -27,6 +27,7 @@
 #include "aggregationsurface.h"
 #define UPLOAD_TO_GL_IN_GUI_THREAD
 #endif
+#include "utils/color_space/image_correction.h"
 
 
 class AsyncPicDataUploader;
@@ -85,15 +86,14 @@ public:
         QnGlRendererTexture* texture( int index ) const;
         GLuint pboID( int index ) const;
         int flags() const;
-        const GammaInfo& gamma() const;
 #ifdef GL_COPY_AGGREGATION
         void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
         const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
 #endif
-        void calcLevels( quint8* yPlane, int width, int height, int stride, 
-            float blackLevel = 0.01, float whiteLevel = 0.01,
-            const QRectF& srcRect = QRectF(0.0,0.0, 1.0,1.0));
+        void calcLevels( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data);
         void resetHistogram();
+
+        const ImageCorrectionResult& imageCorrectionResult() const;
     private:
         struct PBOData
         {
@@ -120,7 +120,7 @@ public:
         bool m_skippingForbidden;
         int m_flags;
         GLFence m_glFence;
-        GammaInfo m_gamma;
+        ImageCorrectionResult m_imgCorrection;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
@@ -215,13 +215,8 @@ public:
     //!Uploader calles this method, if picture uploading has been cancelled from outside
     void pictureDataUploadCancelled( AsyncPicDataUploader* const uploader );
 
-    void setHistogramChecked( bool checked ) {
-        m_histogramChecked = checked;
-    }
-    bool histogramChecked() const {
-        return m_histogramChecked;
-    }
-
+    void setImageCorrection(const ImageCorrectionParams& value);
+    ImageCorrectionParams getImageCorrection() const;
 
     //!Loads picture with dat stored in \a planes to opengl \a dest
     /*!
@@ -281,7 +276,8 @@ private:
     bool m_hardwareDecoderUsed;
     bool m_asyncUploadUsed;
     QGLContext* m_initializedCtx;
-    bool m_histogramChecked;
+    
+    ImageCorrectionParams m_imageCorrection;
 
     bool usingShaderYuvToRgb() const;
     bool usingShaderNV12ToRgb() const;
