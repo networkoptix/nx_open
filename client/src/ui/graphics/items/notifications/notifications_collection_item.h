@@ -34,6 +34,7 @@ public slots:
 private slots:
     void at_settingsButton_clicked();
     void at_eventLogButton_clicked();
+    void at_debugButton_clicked();
     void at_list_itemRemoved(QnNotificationItem* item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
 private:

@@ -16,6 +16,11 @@
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 
+//TODO: #GDM remove debug
+#include <business/actions/common_business_action.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+
 QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
     QnWorkbenchContextAware(context)
@@ -43,12 +48,20 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     eventLogButton->setMaximumSize(QSizeF(24, 24));
     connect(eventLogButton, SIGNAL(clicked()), this, SLOT(at_eventLogButton_clicked()));
 
+    QnImageButtonWidget* debugButton = new QnImageButtonWidget(m_headerWidget);
+    debugButton->setIcon(qnSkin->icon("item/search.png"));
+    debugButton->setToolTip(tr("DEBUG"));
+    debugButton->setMinimumSize(QSizeF(24, 24));
+    debugButton->setMaximumSize(QSizeF(24, 24));
+    connect(debugButton, SIGNAL(clicked()), this, SLOT(at_debugButton_clicked()));
+
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     controlsLayout->addStretch();
     controlsLayout->addItem(eventLogButton);
     controlsLayout->addItem(hideAllButton);
     controlsLayout->addItem(settingsButton);
+    controlsLayout->addItem(debugButton);
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -362,6 +375,65 @@ void QnNotificationsCollectionItem::at_settingsButton_clicked() {
 
 void QnNotificationsCollectionItem::at_eventLogButton_clicked() {
     menu()->trigger(Qn::BusinessEventsLogAction);
+}
+
+void QnNotificationsCollectionItem::at_debugButton_clicked() {
+
+    QnResourceList servers = qnResPool->getResources().filtered<QnMediaServerResource>();
+    QnResourcePtr sampleServer = servers.isEmpty() ? QnResourcePtr() : servers.first();
+
+    QnResourceList cameras = qnResPool->getResources().filtered<QnVirtualCameraResource>();
+    QnResourcePtr sampleCamera = cameras.isEmpty() ? QnResourcePtr() : cameras.first();
+
+    //TODO: #GDM REMOVE DEBUG
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
+        QnResourcePtr resource;
+        switch (message) {
+        case QnSystemHealth::EmailIsEmpty:
+            resource = context()->user();
+            break;
+        case QnSystemHealth::UsersEmailIsEmpty:
+            resource = qnResPool->getResources().filtered<QnUserResource>().last();
+            break;
+        case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::StoragesAreFull:
+            resource = sampleServer;
+            break;
+        default:
+            break;
+        }
+        showSystemHealthEvent(message, resource);
+    }
+
+    //TODO: #GDM REMOVE DEBUG
+    for (int i = 0; i < BusinessEventType::Count; i++) {
+        BusinessEventType::Value eventType = BusinessEventType::Value(i);
+
+        QnBusinessEventParameters params;
+        params.setEventType(eventType);
+        switch(eventType) {
+        case BusinessEventType::Camera_Motion:
+        case BusinessEventType::Camera_Input:
+        case BusinessEventType::Camera_Disconnect:
+        case BusinessEventType::Network_Issue:
+            params.setEventResourceId(sampleCamera->getId());
+            break;
+
+        case BusinessEventType::Storage_Failure:
+        case BusinessEventType::Camera_Ip_Conflict:
+        case BusinessEventType::MediaServer_Failure:
+        case BusinessEventType::MediaServer_Conflict:
+            params.setEventResourceId(sampleServer->getId());
+            break;
+        default:
+            break;
+
+        }
+
+        QnAbstractBusinessActionPtr baction(new QnCommonBusinessAction(BusinessActionType::ShowPopup, params));
+        showBusinessAction(baction);
+    }
 }
 
 void QnNotificationsCollectionItem::at_list_itemRemoved(QnNotificationItem *item) {
