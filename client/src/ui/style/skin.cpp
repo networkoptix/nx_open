@@ -7,6 +7,8 @@
 #include <QtGui/QImage>
 #include <QtGui/QPixmapCache>
 #include <QtGui/QStyleFactory>
+#include <QPluginLoader>
+#include <QStylePlugin>
 
 #include <utils/common/warnings.h>
 
@@ -176,15 +178,9 @@ QPixmap QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::S
 
 QStyle *QnSkin::style() {
     QString baseStyleName;
-#ifndef Q_OS_DARWIN
     baseStyleName = QLatin1String("Bespin");
-#else
-    baseStyleName = QLatin1String("cleanlooks");
-#endif
-
     QStyle *baseStyle = QStyleFactory::create(baseStyleName);
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
-
     return style;
 }
 
