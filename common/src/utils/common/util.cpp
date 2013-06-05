@@ -259,14 +259,20 @@ void GammaInfo::calcLevels( quint8* yPlane, int width, int height, int stride,
     static const float NORM_RANGE_START = 16.0 / 256.0;
 
     Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
-    int xSteps = width / 4;
     int hystogram[256];
     memset(hystogram, 0, sizeof(hystogram));
 
+    int left = qPower2Floor(srcRect.left()*width, 4);
+    int right = qPower2Floor(srcRect.right()*width, 4);
+    int top = srcRect.top()*height;
+    int bottom = srcRect.bottom()*height;
+
+    int xSteps = (right-left) / 4;
+
     // prepare hystogram
-    for (int y = 0; y < height; ++y)
+    for (int y = top; y < bottom; ++y)
     {
-        quint32* line = (quint32*) (yPlane + stride * y);
+        quint32* line = (quint32*) (yPlane + stride * y + left);
         quint32* lineEnd = line + xSteps;
         for (;line < lineEnd; ++line)
         {
