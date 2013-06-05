@@ -80,8 +80,6 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
-#include <ui/widgets/popups/popup_collection_widget.h>
-
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -94,6 +92,8 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_ptz_preset_manager.h>
 #include <ui/workbench/workbench_ptz_controller.h>
+
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
@@ -330,7 +330,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
-    connect(action(Qn::TogglePopupsAction),                     SIGNAL(toggled(bool)),  this,   SLOT(at_togglePopupsAction_toggled(bool)));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -389,9 +388,6 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
     if (businessEventsLogDialog())
         delete businessEventsLogDialog();
-
-    if (popupCollectionWidget())
-        delete popupCollectionWidget();
 
     if (cameraAdditionDialog())
         delete cameraAdditionDialog();
@@ -807,6 +803,10 @@ void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMo
     qnRedAssController->setMode(resolutionMode);
 }
 
+QnWorkbenchNotificationsHandler* QnWorkbenchActionHandler::notificationsHandler() const {
+    return context()->instance<QnWorkbenchNotificationsHandler>();
+}
+
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
     if(!cameraSettingsDialog())
         return;
@@ -949,8 +949,9 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     if (!widget())
         return;
 
-    ensurePopupCollectionWidget();
-    popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
+    notificationsHandler()->clear();
+    notificationsHandler()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
+
     if (cameraAdditionDialog())
         cameraAdditionDialog()->hide();
     context()->instance<QnAppServerNotificationCache>()->clear();
@@ -960,6 +961,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM use conditional texts?
 
+    notificationsHandler()->clear();
     at_checkSystemHealthAction_triggered(); //TODO: #GDM place to corresponding place
     context()->instance<QnAppServerNotificationCache>()->getFileList();
 }
@@ -967,8 +969,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
     switch (businessAction->actionType()) {
     case BusinessActionType::ShowPopup: {
-            ensurePopupCollectionWidget();
-            popupCollectionWidget()->addBusinessAction(businessAction);
+            notificationsHandler()->addBusinessAction(businessAction);
             break;
         }
     case BusinessActionType::PlaySound: {
@@ -1563,11 +1564,6 @@ void QnWorkbenchActionHandler::removeLayouts(const QnLayoutResourceList &layouts
     }
 }
 
-void QnWorkbenchActionHandler::ensurePopupCollectionWidget() {
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-}
-
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
     if(!layout)
         return;
@@ -1789,8 +1785,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     qnLicensePool->reset();
 
-    if (popupCollectionWidget())
-        popupCollectionWidget()->clear();
+    notificationsHandler()->clear();
 
     QnSessionManager::instance()->start();
     QnClientMessageProcessor::instance()->run();
@@ -1833,8 +1828,7 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     QnAppServerConnectionFactory::setCurrentVersion(QLatin1String(""));
     // TODO: #Elric save workbench state on logout.
 
-    if (popupCollectionWidget())
-        popupCollectionWidget()->clear();
+    notificationsHandler()->clear();
 
     qnSettings->setStoredPassword(QString());
 }
@@ -3826,23 +3820,21 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
     if (!context()->user())
         return;
 
-    ensurePopupCollectionWidget();
-    popupCollectionWidget()->clear();
+    notificationsHandler()->clear();
 
     if (!QnEmail::isValid(context()->user()->getEmail())) {
-        popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
+        notificationsHandler()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
     }
 
     if (qnLicensePool->isEmpty() &&
             (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
+        notificationsHandler()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
     }
 
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
         m_healthRequestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
                        this, SLOT(at_serverSettings_received(int,QnKvPairList,int)));
 
-        QnUserResourceList usersWithNoEmail;
         QnUserResourceList users = qnResPool->getResources().filtered<QnUserResource>();
         foreach (const QnUserResourcePtr &user, users) {
             if (user == context()->user())
@@ -3854,20 +3846,10 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
                 (!(accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission)))
                     continue; // usual admins can not edit other admins, owner can
 
-            usersWithNoEmail << user;
+            notificationsHandler()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, user);
         }
-        if (!usersWithNoEmail.isEmpty())
-            popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, usersWithNoEmail);
+
     }
-}
-
-void QnWorkbenchActionHandler::at_togglePopupsAction_toggled(bool checked) {
-    if (checked)
-        return;
-
-    ensurePopupCollectionWidget();
-    if (!popupCollectionWidget()->isEmpty())
-        popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QnKvPairList &settings, int handle) {
@@ -3881,6 +3863,5 @@ void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QnKv
     if (!email.server.isEmpty() && !email.user.isEmpty() && !email.password.isEmpty())
         return;
 
-    ensurePopupCollectionWidget();
-    popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::SmtpIsNotSet);
+    notificationsHandler()->addSystemHealthEvent(QnSystemHealth::SmtpIsNotSet);
 }

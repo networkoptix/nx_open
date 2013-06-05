@@ -65,6 +65,8 @@ void QnSimpleFrameWidget::setWindowColor(const QColor &windowColor) {
 }
 
 void QnSimpleFrameWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
     QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), m_frameWidth));
     QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
     painter->drawRect(rect().adjusted(m_frameWidth, m_frameWidth, -m_frameWidth, -m_frameWidth));

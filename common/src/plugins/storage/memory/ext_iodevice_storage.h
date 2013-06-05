@@ -49,15 +49,15 @@ public:
     //!Implementation of QnStorageResource::removeFile
     virtual bool removeFile( const QString& path ) override;
     //!Implementation of QnStorageResource::removeDir
-    virtual bool removeDir( const QString& path ) override { return false; }
+    virtual bool removeDir( const QString& path ) override { Q_UNUSED(path) return false; }
     //!Implementation of QnStorageResource::renameFile
-    virtual bool renameFile( const QString& oldName, const QString& newName ) override { return false; }
+    virtual bool renameFile( const QString& oldName, const QString& newName ) override { Q_UNUSED(oldName) Q_UNUSED(newName) return false; }
     //!Implementation of QnStorageResource::getFileList
     virtual QFileInfoList getFileList( const QString& dirName );
     //!Implementation of QnStorageResource::isFileExists
     virtual bool isFileExists( const QString& path );
     //!Implementation of QnStorageResource::isDirExists
-    virtual bool isDirExists( const QString& path ) override { return false; }
+    virtual bool isDirExists( const QString& path ) override { Q_UNUSED(path) return false; }
     //!Implementation of QnStorageResource::isCatalogAccessible
     virtual bool isCatalogAccessible() override { return true; }
     //!Implementation of QnStorageResource::isRealFiles

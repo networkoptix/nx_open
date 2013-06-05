@@ -17,6 +17,7 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
 
     QnBusinessActionDataList& events = *(eventsPtr.data());
 
+
     if (data.size() < 4)
         return;
 
