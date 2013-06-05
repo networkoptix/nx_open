@@ -115,7 +115,12 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::OpenInNewLayoutAction,
                         QnActionParameters(resource)
                         );
-            // TODO: #GDM second action : settings
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Camera Settings"),
+                        Qn::CameraSettingsAction,
+                        QnActionParameters(resource)
+                        );
             break;
         }
 
@@ -123,7 +128,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
             item->setColor(qnGlobals->notificationColorImportant());
             item->addActionButton(
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                        tr("Open Camera"),
+                        tr("Open Monitor"),
                         Qn::OpenInNewLayoutAction,
                         QnActionParameters(resource)
                         );
@@ -145,8 +150,8 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         );
             item->addActionButton(
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                        tr("Server settings"),
-                        Qn::ServerSettingsAction,
+                        tr("Camera Settings"),
+                        Qn::CameraSettingsAction,
                         QnActionParameters(resource)
                         );
             break;
@@ -161,7 +166,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
             item->setColor(qnGlobals->notificationColorCritical());
             item->addActionButton(
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                        tr("Open Camera"),
+                        tr("Open Monitor"),
                         Qn::OpenInNewLayoutAction,
                         QnActionParameters(resource)
                         );
