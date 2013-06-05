@@ -3851,7 +3851,7 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
         }
 
     }
-
+/*
     QnResourcePtr sampleServer = qnResPool->getResources().filtered<QnMediaServerResource>().first();
     QnResourcePtr sampleCamera = qnResPool->getResources().filtered<QnVirtualCameraResource>().first();
 
@@ -3904,7 +3904,7 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
         QnAbstractBusinessActionPtr baction(new QnCommonBusinessAction(BusinessActionType::ShowPopup, params));
         notificationsHandler()->addBusinessAction(baction);
     }
-
+*/
 
 }
 
