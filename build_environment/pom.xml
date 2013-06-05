@@ -506,13 +506,13 @@
                         </activation>
 
 			<dependencies>
-				<!-- <dependency>
+				<dependency>
 					<groupId>com.google</groupId>
 					<artifactId>protobuf</artifactId>
 					<version>2.5.0</version>
 					<type>zip</type>
 					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency> -->
+				</dependency>
 	             		<dependency>
 				        <groupId>net.sourceforge</groupId>
             				<artifactId>qjson</artifactId>
