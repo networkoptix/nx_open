@@ -72,6 +72,67 @@ QRectF QnNotificationsCollectionItem::headerGeometry() const {
     return m_headerWidget->geometry();
 }
 
+/*
+    int eventReasonCode = QnBusinessEventRuntime::getReasonCode(eventParams);
+
+    item->setText(getResourceName(resource));
+    item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+    item->setData(QnBusinessEventRuntime::getEventResourceId(eventParams), ResourceIdRole);
+    item->setData(0, EventCountRole);
+    item->setData(getEventTime(eventParams), EventTimeRole);
+    item->setData(eventReasonCode, EventReasonRole);
+    item->setData(QnBusinessEventRuntime::getReasonText(eventParams), EventReasonTextRole);
+
+
+
+ *
+QnBusiness::EventReason reasonCode = (QnBusiness::EventReason)item->data(EventReasonRole).toInt();
+    QString reasonText = item->data(EventReasonTextRole).toString();
+
+    switch (reasonCode) {
+        case QnBusiness::NetworkIssueNoFrame:
+            if (m_eventType == BusinessEventType::Network_Issue)
+                item->appendRow(new QStandardItem(tr("No video frame received\nduring last %1 seconds.")
+                                                  .arg(reasonText)));
+            break;
+        case QnBusiness::NetworkIssueConnectionClosed:
+            if (m_eventType == BusinessEventType::Network_Issue)
+                item->appendRow(new QStandardItem(tr("Connection to camera\nwas unexpectedly closed")));
+            break;
+        case QnBusiness::NetworkIssueRtpPacketLoss:
+            if (m_eventType == BusinessEventType::Network_Issue) {
+                QStringList seqs = reasonText.split(QLatin1Char(';'));
+                if (seqs.size() != 2)
+                    break;
+                QString text = tr("RTP packet loss detected.\nPrev seq.=%1 next seq.=%2")
+                        .arg(seqs[0])
+                        .arg(seqs[1]);
+                item->appendRow(new QStandardItem(text));
+            }
+            break;
+        case QnBusiness::MServerIssueTerminated:
+            if (m_eventType == BusinessEventType::MediaServer_Failure)
+                item->appendRow(new QStandardItem(tr("Server terminated.")));
+            break;
+        case QnBusiness::MServerIssueStarted:
+            if (m_eventType == BusinessEventType::MediaServer_Failure)
+                item->appendRow(new QStandardItem(tr("Server started after crash.")));
+            break;
+        case QnBusiness::StorageIssueIoError:
+            if (m_eventType == BusinessEventType::Storage_Failure)
+                item->appendRow(new QStandardItem(tr("I/O Error occured at\n%1")
+                                                  .arg(reasonText)));
+            break;
+        case QnBusiness::StorageIssueNotEnoughSpeed:
+            if (m_eventType == BusinessEventType::Storage_Failure)
+                item->appendRow(new QStandardItem(tr("Not enough HDD/SSD speed\nfor recording at\n%1.")
+                                                  .arg(reasonText)));
+            break;
+        default:
+            break;
+    }
+ **/
+
 void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     int resourceId = params.getEventResourceId();
@@ -80,7 +141,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
         return;
 
     QnNotificationItem *item = new QnNotificationItem(m_list);
-
+    QString name = resource->getName();
 
     BusinessEventType::Value eventType = params.getEventType();
 
@@ -94,6 +155,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         QnActionParameters(resource)
                         .withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)
                         );
+            item->setText(tr("Motion was detected on camera %1.").arg(name));
             break;
         }
 
@@ -105,6 +167,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::OpenInNewLayoutAction,
                         QnActionParameters(resource)
                         );
+            item->setText(tr("Input signal was detected on camera %1.").arg(name));
             break;
         }
     case BusinessEventType::Camera_Disconnect: {
@@ -121,6 +184,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::CameraSettingsAction,
                         QnActionParameters(resource)
                         );
+            item->setText(tr("Camera %1 disconnected.").arg(name));
             break;
         }
 
@@ -138,6 +202,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::ServerSettingsAction,
                         QnActionParameters(resource)
                         );
+            item->setText(tr("Storage failure on %1.").arg(name));
             break;
         }
     case BusinessEventType::Network_Issue:{
@@ -154,11 +219,13 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::CameraSettingsAction,
                         QnActionParameters(resource)
                         );
+            item->setText(tr("Network issue on %1.").arg(name));
             break;
         }
 
     case BusinessEventType::Camera_Ip_Conflict: {
             item->setColor(qnGlobals->notificationColorCritical());
+            item->setText(tr("Cameras' IP conflict detected."));
             //TODO: #GDM page in browser
             break;
         }
@@ -171,11 +238,14 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         QnActionParameters(resource)
                         );
             // TODO: #GDM second action : ping
+            item->setText(tr("Failure on %1.").arg(name));
             break;
         }
     case BusinessEventType::MediaServer_Conflict: {
             item->setColor(qnGlobals->notificationColorCritical());
             //TODO: #GDM notification
+
+            item->setText(tr("Media Servers' conflict detected."));
             break;
         }
 
@@ -183,23 +253,14 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
         break;
     }
 
-    QString text = BusinessEventType::toString(eventType);
-    text += QLatin1Char('\n');
-    text += resource->getName();
-    item->setText(text);
-
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
     m_list->addItem(item);
 }
 
 void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
-    QString text = QnSystemHealth::toString(message);
-    if (message != QnSystemHealth::EmailIsEmpty && resource) {
-        text += QLatin1Char('\n');
-        text += resource->getName();
-    }
-    item->setText(text);
+
+    QString name = resource ? resource->getName() : QString();
 
     item->setColor(qnGlobals->notificationColorSystem());
 
@@ -212,6 +273,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     QnActionParameters(context()->user())
                     .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
                     );
+        //default text
         break;
     case QnSystemHealth::NoLicenses:
         item->addActionButton(
@@ -219,6 +281,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     tr("Licenses"),
                     Qn::GetMoreLicensesAction
                     );
+        //default text
         break;
     case QnSystemHealth::SmtpIsNotSet:
         item->addActionButton(
@@ -226,6 +289,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     tr("SMTP Settings"),
                     Qn::OpenServerSettingsAction
                     );
+        //default text
         break;
     case QnSystemHealth::UsersEmailIsEmpty:
         item->addActionButton(
@@ -235,6 +299,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     QnActionParameters(resource)
                     .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
                     );
+        item->setText(tr("E-Mail address is not set for user %1").arg(name));
         break;
     case QnSystemHealth::ConnectionLost:
         item->addActionButton(
@@ -242,6 +307,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     tr("Connect to server"),
                     Qn::ConnectToServerAction
                     );
+        //default text
         break;
     case QnSystemHealth::EmailSendError:
         item->addActionButton(
@@ -249,6 +315,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     tr("SMTP Settings"),
                     Qn::OpenServerSettingsAction
                     );
+        //default text
         break;
     case QnSystemHealth::StoragesNotConfigured:
         item->addActionButton(
@@ -257,6 +324,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     Qn::ServerSettingsAction,
                     QnActionParameters(resource)
                     );
+        item->setText(tr("Storages are not configured on %1").arg(name));
         break;
     case QnSystemHealth::StoragesAreFull:
         item->addActionButton(
@@ -265,10 +333,16 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     Qn::ServerSettingsAction,
                     QnActionParameters(resource)
                     );
+        item->setText(tr("Some storages are full on %1").arg(name));
         break;
     default:
         break;
     }
+    if (item->text().isEmpty()) {
+        QString text = QnSystemHealth::toString(message, true);
+        item->setText(text);
+    }
+
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
 
     m_list->addItem(item, message != QnSystemHealth::ConnectionLost);

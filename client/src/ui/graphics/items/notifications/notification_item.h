@@ -23,6 +23,8 @@ public:
     QString text() const;
     void setText(const QString &text);
 
+    void setTooltipText(const QString &text);
+
     void addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId, const QnActionParameters &parameters = QnActionParameters());
 
     QColor color() const;
