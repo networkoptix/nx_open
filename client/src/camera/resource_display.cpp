@@ -35,14 +35,14 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
             /* Camera will free media provider in its destructor. */
             m_camera = new QnVideoCamera(m_mediaResource, m_mediaProvider);
 
-            connect(this,                           SIGNAL(destroyed()),    m_camera,   SLOT(beforeStopDisplay()));
+            connect(this,                           SIGNAL(destroyed()),    m_camera,       SLOT(beforeStopDisplay()));
 
             m_counter = new QnCounter(2);
-            connect(m_camera->getCamDisplay(),      SIGNAL(finished()),     m_counter,    SLOT(decrement()));
-            connect(m_camera->getStreamreader(),    SIGNAL(finished()),     m_counter,    SLOT(decrement()));
+            connect(m_camera->getCamDisplay(),      SIGNAL(finished()),     m_counter,      SLOT(decrement()));
+            connect(m_camera->getStreamreader(),    SIGNAL(finished()),     m_counter,      SLOT(decrement()));
 
-            connect(m_counter,                        SIGNAL(reachedZero()),  m_counter,    SLOT(deleteLater()));
-            connect(m_counter,                        SIGNAL(reachedZero()),  m_camera,   SLOT(deleteLater()));
+            connect(m_counter,                      SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));
+            connect(m_counter,                      SIGNAL(reachedZero()),  m_camera,       SLOT(deleteLater()));
         } else {
             m_camera = NULL;
 
