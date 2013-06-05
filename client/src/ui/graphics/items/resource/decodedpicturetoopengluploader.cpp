@@ -68,74 +68,6 @@ extern "C"
 //preceding bunch of macro will be removed after this functionality has been tested and works as expected
 
 
-void GammaInfo::calcHistogram( quint8* yPlane, int width, int height, int stride, 
-                              float blackLevel, float whiteLevel,
-                              const QRectF& srcRect)
-{
-    //static const float HYSTOGRAM_DEFAULT_THRESHOLD = 0.05;
-    static const float HYSTOGRAM_DEFAULT_THRESHOLD = 0.01;
-    static const int MIN_GAMMA_RANGE = 6;
-
-    Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
-    int xSteps = width / 4;
-    int hystogram[256];
-    memset(hystogram, 0, sizeof(hystogram));
-
-    // prepare hystogram
-    for (int y = 0; y < height; ++y)
-    {
-        quint32* line = (quint32*) (yPlane + stride * y);
-        quint32* lineEnd = line + xSteps;
-        for (;line < lineEnd; ++line)
-        {
-            quint32 value = *line;
-
-            hystogram[(quint8) value]++;
-            value >>= 8;
-
-            hystogram[(quint8) value]++;
-            value >>= 8;
-
-            hystogram[(quint8) value]++;
-            value >>= 8;
-
-            hystogram[(quint8) value]++;
-        }
-    }
-
-    // get hystogram range
-    int pixels = width * height;
-    float leftThresholdF = HYSTOGRAM_DEFAULT_THRESHOLD * blackLevel;
-    float rightThresholdF = HYSTOGRAM_DEFAULT_THRESHOLD * whiteLevel;
-    int leftThreshold = leftThresholdF * pixels + 0.5;
-    int rightThreshold = rightThresholdF * pixels + 0.5;
-
-    int leftPos = 0;
-    int sum = 0;
-    for (; leftPos < 256 && sum < leftThreshold; ++leftPos)
-        sum += hystogram[leftPos];
-
-    int rightPos = 255;
-    sum = 0;
-    for (; rightPos >= leftPos && sum < rightThreshold; --rightPos)
-        sum += hystogram[rightPos];
-
-    if (right - left < MIN_GAMMA_RANGE) {
-        reset();
-    }
-    else {
-        // transform vector 0..255 to vector [left..right] and store result data in range [0..1]
-        gamma1 = 256.0 / float(rightPos-leftPos+1);
-        gamma2 = -float(leftPos) / 256.0;
-    }
-}
-
-void GammaInfo::reset()
-{
-    gamma1 = 1.0;
-    gamma2 = 0.0;
-}
-
 namespace
 {
     const int ROUND_COEFF = 8;
@@ -530,11 +462,10 @@ const GammaInfo& DecodedPictureToOpenGLUploader::UploadedPicture::gamma() const
     return m_gamma;
 }
 
-void DecodedPictureToOpenGLUploader::UploadedPicture::calcHistogram( quint8* yPlane, int width, int height, int stride, 
-                   float blackLevel, float whiteLevel,
-                   const QRectF& srcRect)
+void DecodedPictureToOpenGLUploader::UploadedPicture::calcLevels( quint8* yPlane, int width, int height, int stride, 
+                   float blackLevel, float whiteLevel, const QRectF& srcRect)
 {
-    m_gamma.calcHistogram(yPlane, width, height, stride, blackLevel, whiteLevel, srcRect);
+    m_gamma.calcLevels(yPlane, width, height, stride, blackLevel, whiteLevel, srcRect);
 }
 
 void DecodedPictureToOpenGLUploader::UploadedPicture::resetHistogram()
@@ -793,7 +724,7 @@ public:
             return;
         }
         if (m_uploader->histogramChecked())
-            m_pictureBuf->calcHistogram(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0]);
+            m_pictureBuf->calcLevels(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0]);
         else
             m_pictureBuf->resetHistogram();
 
@@ -1138,7 +1069,7 @@ public:
             m_uploader->pictureDataUploadFailed( NULL, m_dest );
 
         if (m_uploader->histogramChecked())
-            m_dest->calcHistogram(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0]);
+            m_dest->calcLevels(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0]);
         else
             m_dest->resetHistogram();
 

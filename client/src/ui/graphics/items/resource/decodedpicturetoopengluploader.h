@@ -36,20 +36,6 @@ class DecodedPictureToOpenGLUploadThread;
 class QnGlRendererTexture;
 class AVPacketUploader;
 
-struct GammaInfo
-{
-    GammaInfo(): gamma1(1.0), gamma2(0.0) {}
-    float gamma1;
-    float gamma2;
-
-    void calcHistogram( quint8* yPlane, int width, int height, int stride, 
-        float blackLevel = 1.0, float whiteLevel = 1.0,
-        const QRectF& srcRect = QRectF(0.0,0.0, 1.0,1.0));
-
-    void reset();
-};
-
-
 //!Used by decoding thread to load decoded picture from system memory to opengl texture(s)
 /*!
     - loads decoded picture from system memory to opengl texture(s)
@@ -104,8 +90,8 @@ public:
         void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
         const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
 #endif
-        void calcHistogram( quint8* yPlane, int width, int height, int stride, 
-            float blackLevel = 1.0, float whiteLevel = 1.0,
+        void calcLevels( quint8* yPlane, int width, int height, int stride, 
+            float blackLevel = 0.01, float whiteLevel = 0.01,
             const QRectF& srcRect = QRectF(0.0,0.0, 1.0,1.0));
         void resetHistogram();
     private:

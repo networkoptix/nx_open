@@ -176,5 +176,18 @@ static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
  */
 int random(int min, int max);
 
+struct GammaInfo
+{
+
+    GammaInfo(): levels1(1.0), levels2(0.0), gamma(1.0) {}
+    float levels1;
+    float levels2;
+    float gamma;
+
+    void calcLevels( quint8* yPlane, int width, int height, int stride, float blackLevel, float whiteLevel, const QRectF& srcRect);
+
+    void reset();
+};
+
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H
