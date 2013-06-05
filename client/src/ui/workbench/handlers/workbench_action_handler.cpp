@@ -2511,7 +2511,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             images.push_back(display->camDisplay()->getScreenshot(i));
         QSize channelSize = images[0].size();
         QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
-        QRectF zoomRect = widget->zoomRect();
+        QRectF zoomRect = widget->zoomRect().isNull() ? QRectF(0, 0, 1, 1) : widget->zoomRect();
 
         screenshot = QImage(totalSize.width() * zoomRect.width(), totalSize.height() * zoomRect.height(), QImage::Format_ARGB32);
         screenshot.fill(qRgba(0, 0, 0, 0));
