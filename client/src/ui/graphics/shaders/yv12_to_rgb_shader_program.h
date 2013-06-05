@@ -22,11 +22,20 @@ public:
         setUniformValue(m_opacityLocation, opacity);
     }
 
+    void setGamma1(GLfloat gamma1) {
+        setUniformValue(m_yGamma1Location, gamma1);
+    }
+
+    void setGamma2(GLfloat gamma2) {
+        setUniformValue(m_yGamma2Location, gamma2);
+    }
 private:
     int m_yTextureLocation;
     int m_uTextureLocation;
     int m_vTextureLocation;
     int m_opacityLocation;
+    int m_yGamma1Location;
+    int m_yGamma2Location;
 };
 
 class QnYv12ToRgbaShaderProgram: public QGLShaderProgram {

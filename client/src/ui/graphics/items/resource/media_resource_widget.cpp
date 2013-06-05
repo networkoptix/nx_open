@@ -118,9 +118,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     zoomWindowButton->setToolTip(tr("Create Zoom Window"));
     connect(zoomWindowButton, SIGNAL(toggled(bool)), this, SLOT(at_zoomWindowButton_toggled(bool)));
 
+    QnImageButtonWidget *histogramButton = new QnImageButtonWidget();
+    histogramButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+    histogramButton->setCheckable(true);
+    histogramButton->setProperty(Qn::NoBlockMotionSelection, true);
+    histogramButton->setToolTip(tr("Histogram"));
+    connect(histogramButton, SIGNAL(toggled(bool)), this, SLOT(at_histogramButton_toggled(bool)));
+
     buttonBar()->addButton(MotionSearchButton,  searchButton);
     buttonBar()->addButton(PtzButton,           ptzButton);
     buttonBar()->addButton(ZoomWindowButton,    zoomWindowButton);
+    buttonBar()->addButton(HistogramButton,    histogramButton);
     
     if(m_camera) {
         QTimer *timer = new QTimer(this);
@@ -735,6 +743,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
+    result |= HistogramButton;
 
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
@@ -846,3 +855,8 @@ void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     if(checked)
         buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
 }
+void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
+    m_renderer->setHistogramChecked(checked);
+
+}
+

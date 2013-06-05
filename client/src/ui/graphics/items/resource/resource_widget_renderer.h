@@ -73,6 +73,7 @@ public:
 
     bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
 
+    void setHistogramChecked( bool checked );
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.
@@ -80,7 +81,6 @@ signals:
      * \param newSourceSize             New source size.
      */
     void sourceSizeChanged();
-
 private:
     struct RenderingTools
     {

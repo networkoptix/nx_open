@@ -36,6 +36,20 @@ class DecodedPictureToOpenGLUploadThread;
 class QnGlRendererTexture;
 class AVPacketUploader;
 
+struct GammaInfo
+{
+    GammaInfo(): gamma1(1.0), gamma2(0.0) {}
+    float gamma1;
+    float gamma2;
+
+    void calcHistogram( quint8* yPlane, int width, int height, int stride, 
+        float blackLevel = 1.0, float whiteLevel = 1.0,
+        const QRectF& srcRect = QRectF(0.0,0.0, 1.0,1.0));
+
+    void reset();
+};
+
+
 //!Used by decoding thread to load decoded picture from system memory to opengl texture(s)
 /*!
     - loads decoded picture from system memory to opengl texture(s)
@@ -85,11 +99,15 @@ public:
         QnGlRendererTexture* texture( int index ) const;
         GLuint pboID( int index ) const;
         int flags() const;
+        const GammaInfo& gamma() const;
 #ifdef GL_COPY_AGGREGATION
         void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
         const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
 #endif
-
+        void calcHistogram( quint8* yPlane, int width, int height, int stride, 
+            float blackLevel = 1.0, float whiteLevel = 1.0,
+            const QRectF& srcRect = QRectF(0.0,0.0, 1.0,1.0));
+        void resetHistogram();
     private:
         struct PBOData
         {
@@ -116,6 +134,7 @@ public:
         bool m_skippingForbidden;
         int m_flags;
         GLFence m_glFence;
+        GammaInfo m_gamma;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
@@ -210,6 +229,14 @@ public:
     //!Uploader calles this method, if picture uploading has been cancelled from outside
     void pictureDataUploadCancelled( AsyncPicDataUploader* const uploader );
 
+    void setHistogramChecked( bool checked ) {
+        m_histogramChecked = checked;
+    }
+    bool histogramChecked() const {
+        return m_histogramChecked;
+    }
+
+
     //!Loads picture with dat stored in \a planes to opengl \a dest
     /*!
         \param glContext This context MUST be current in the current thread
@@ -238,7 +265,6 @@ public:
         int lineSizes[],
         bool /*isVideoMemory*/ );
 #endif
-
 private:
     friend class QnGlRendererTexture;
     friend class DecodedPicturesDeleter;
@@ -269,6 +295,7 @@ private:
     bool m_hardwareDecoderUsed;
     bool m_asyncUploadUsed;
     QGLContext* m_initializedCtx;
+    bool m_histogramChecked;
 
     bool usingShaderYuvToRgb() const;
     bool usingShaderNV12ToRgb() const;
@@ -284,6 +311,7 @@ private:
     void savePicToFile( AVFrame* const pic, int pts );
     //!m_mutex MUST be locked before this call
     void cancelUploadingInGUIThread();
+
 };
 
 #endif  //DECODEDPICTURETOOPENGLUPLOADER_H
