@@ -49,7 +49,7 @@ namespace {
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
     const qreal margin = 4;
-    const qreal buttonHeight = 24;
+    const qreal buttonSize = 24;
 } // anonymous namespace
 
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
@@ -101,6 +101,7 @@ QString QnNotificationItem::text() const {
 void QnNotificationItem::setText(const QString &text) {
     //TODO: #GDM
     m_textLabel->setText(text);
+    m_tooltipItem->setText(text);
 }
 
 void QnNotificationItem::setTooltipText(const QString &text) {
@@ -115,12 +116,15 @@ void QnNotificationItem::setColor(const QColor &color) {
     m_color = color;
 }
 
-void QnNotificationItem::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId, const QnActionParameters &parameters) {
+void QnNotificationItem::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
+                                         const QnActionParameters &parameters, const qreal sizeMultiplier) {
     QnImageButtonWidget *button = new QnImageButtonWidget(this);
     button->setIcon(icon);
     button->setToolTip(tooltip);
-    button->setMinimumSize(QSizeF(buttonHeight, buttonHeight));
-    button->setMaximumSize(QSizeF(buttonHeight, buttonHeight));
+
+    QSizeF size(buttonSize * sizeMultiplier, buttonSize * sizeMultiplier);
+    button->setMinimumSize(size);
+    button->setMaximumSize(size);
     button->setProperty(actionIndexPropertyName, m_actions.size());
     m_layout->addItem(button);
 
@@ -132,7 +136,7 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    QRadialGradient gradient(margin, buttonHeight*.5 + margin, buttonHeight*2);
+    QRadialGradient gradient(margin, buttonSize*.5 + margin, buttonSize*2);
     gradient.setColorAt(0.0, m_color);
     QColor gradientTo(m_color);
     gradientTo.setAlpha(64);

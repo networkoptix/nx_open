@@ -25,7 +25,8 @@ public:
 
     void setTooltipText(const QString &text);
 
-    void addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId, const QnActionParameters &parameters = QnActionParameters());
+    void addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
+                         const QnActionParameters &parameters = QnActionParameters(), const qreal sizeMultiplier = 1.0);
 
     QColor color() const;
     void setColor(const QColor &color);

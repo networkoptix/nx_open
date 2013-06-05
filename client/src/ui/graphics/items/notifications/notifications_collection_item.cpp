@@ -153,7 +153,8 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         tr("Browse Archive"),
                         Qn::OpenInNewLayoutAction,
                         QnActionParameters(resource)
-                        .withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)
+                        .withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000),
+                        2.0
                         );
             item->setText(tr("Motion was detected on camera %1.").arg(name));
             break;
@@ -165,7 +166,8 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
                         tr("Open Camera"),
                         Qn::OpenInNewLayoutAction,
-                        QnActionParameters(resource)
+                        QnActionParameters(resource),
+                        2.0
                         );
             item->setText(tr("Input signal was detected on camera %1.").arg(name));
             break;
@@ -176,7 +178,8 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
                         tr("Open Camera"),
                         Qn::OpenInNewLayoutAction,
-                        QnActionParameters(resource)
+                        QnActionParameters(resource),
+                        2.0
                         );
             item->addActionButton(
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
@@ -211,7 +214,8 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
                         tr("Open Camera"),
                         Qn::OpenInNewLayoutAction,
-                        QnActionParameters(resource)
+                        QnActionParameters(resource),
+                        2.0
                         );
             item->addActionButton(
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
@@ -299,7 +303,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     QnActionParameters(resource)
                     .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
                     );
-        item->setText(tr("E-Mail address is not set for user %1").arg(name));
+        item->setText(tr("E-Mail address is not set for user %1.").arg(name));
         break;
     case QnSystemHealth::ConnectionLost:
         item->addActionButton(
@@ -324,7 +328,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     Qn::ServerSettingsAction,
                     QnActionParameters(resource)
                     );
-        item->setText(tr("Storages are not configured on %1").arg(name));
+        item->setText(tr("Storages are not configured on %1.").arg(name));
         break;
     case QnSystemHealth::StoragesAreFull:
         item->addActionButton(
@@ -333,7 +337,7 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
                     Qn::ServerSettingsAction,
                     QnActionParameters(resource)
                     );
-        item->setText(tr("Some storages are full on %1").arg(name));
+        item->setText(tr("Some storages are full on %1.").arg(name));
         break;
     default:
         break;
