@@ -35,24 +35,11 @@ private slots:
     void at_settingsButton_clicked();
     void at_eventLogButton_clicked();
     void at_list_itemRemoved(QnNotificationItem* item);
-    void at_item_actionTriggered(QnNotificationItem* item);
+    void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
 private:
-    struct ActionData {
-        ActionData():
-            action(Qn::NoAction){}
-        ActionData(Qn::ActionId action):
-            action(action){}
-        ActionData(Qn::ActionId action, const QnActionParameters &params):
-            action(action), params(params){}
-
-        Qn::ActionId action;
-        QnActionParameters params;
-    };
 
     QnNotificationListWidget *m_list;
     QGraphicsWidget* m_headerWidget;
-    QMap<QnNotificationItem*, ActionData> m_actionDataByItem;
-    
 };
 
 #endif // NOTIFICATIONS_COLLECTION_ITEM_H

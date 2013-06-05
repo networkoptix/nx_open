@@ -46,15 +46,17 @@ namespace {
         }
     };
 
+    const char *actionIndexPropertyName = "_qn_actionIndex";
+
     const qreal margin = 4;
-    const qreal totalHeight = 24;
+    const qreal buttonHeight = 24;
 } // anonymous namespace
 
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
+    m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
     m_textLabel(new QnProxyLabel(this)),
-    m_image(new QnImageButtonWidget(this)),
-    m_color(Qt::red),
+    m_color(Qt::transparent),
     m_hoverProcessor(new HoverFocusProcessor(this))
 {
     m_tooltipItem = new QnNotificationToolTipItem(this);
@@ -63,18 +65,11 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_textLabel->setAlignment(Qt::AlignCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
-    m_image->setMinimumSize(QSizeF(totalHeight, totalHeight));
-    m_image->setMaximumSize(QSizeF(totalHeight, totalHeight));
-    m_image->setVisible(false);
-    connect(m_image, SIGNAL(clicked()), this, SLOT(at_image_clicked()));
+    m_layout->setContentsMargins(margin*2, margin, margin, margin);
+    m_layout->addItem(m_textLabel);
+    m_layout->setStretchFactor(m_textLabel, 1.0);
 
-    QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Horizontal);
-    layout->setContentsMargins(margin*2, margin, margin, margin);
-    layout->addItem(m_textLabel);
-    layout->addItem(m_image);
-    layout->setStretchFactor(m_textLabel, 1.0);
-
-    setLayout(layout);
+    setLayout(m_layout);
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipItem);
@@ -105,13 +100,7 @@ QString QnNotificationItem::text() const {
 
 void QnNotificationItem::setText(const QString &text) {
     m_textLabel->setText(text);
-    m_image->setToolTip(text);
     m_tooltipItem->setText(text);
-}
-
-void QnNotificationItem::setIcon(const QIcon &icon) {
-    m_image->setIcon(icon);
-    m_image->setVisible(true);
 }
 
 QColor QnNotificationItem::color() const {
@@ -122,11 +111,24 @@ void QnNotificationItem::setColor(const QColor &color) {
     m_color = color;
 }
 
+void QnNotificationItem::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId, const QnActionParameters &parameters) {
+    QnImageButtonWidget *button = new QnImageButtonWidget(this);
+    button->setIcon(icon);
+    button->setToolTip(tooltip);
+    button->setMinimumSize(QSizeF(buttonHeight, buttonHeight));
+    button->setMaximumSize(QSizeF(buttonHeight, buttonHeight));
+    button->setProperty(actionIndexPropertyName, m_actions.size());
+    m_layout->addItem(button);
+
+    connect(button, SIGNAL(clicked()), this, SLOT(at_button_clicked()));
+    m_actions << ActionData(actionId, parameters);
+}
+
 void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    QRadialGradient gradient(margin, totalHeight*.5 + margin, totalHeight*2);
+    QRadialGradient gradient(margin, buttonHeight*.5 + margin, buttonHeight*2);
     gradient.setColorAt(0.0, m_color);
     QColor gradientTo(m_color);
     gradientTo.setAlpha(64);
@@ -157,6 +159,11 @@ void QnNotificationItem::updateToolTipPosition() {
     m_tooltipItem->pointTo(QPointF(0, geometry().height() / 2 ));
 }
 
-void QnNotificationItem::at_image_clicked() {
-    emit actionTriggered(this);
+void QnNotificationItem::at_button_clicked() {
+    int idx = sender()->property(actionIndexPropertyName).toInt();
+    if (m_actions.size() <= idx)
+        return;
+    ActionData data = m_actions[idx];
+
+    emit actionTriggered(data.action, data.params);
 }

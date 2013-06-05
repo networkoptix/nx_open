@@ -87,38 +87,68 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
     switch (eventType) {
     case BusinessEventType::Camera_Motion: {
             item->setColor(qnGlobals->notificationColorCommon());
-            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
-                                                       QnActionParameters(resource)
-                                                       .withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)));
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Browse Archive"),
+                        Qn::OpenInNewLayoutAction,
+                        QnActionParameters(resource)
+                        .withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)
+                        );
             break;
         }
 
     case BusinessEventType::Camera_Input: {
             item->setColor(qnGlobals->notificationColorCommon());
-            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
-                                                       QnActionParameters(resource)));
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Open Camera"),
+                        Qn::OpenInNewLayoutAction,
+                        QnActionParameters(resource)
+                        );
             break;
         }
     case BusinessEventType::Camera_Disconnect: {
             item->setColor(qnGlobals->notificationColorImportant());
-            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
-                                                       QnActionParameters(resource)));
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Open Camera"),
+                        Qn::OpenInNewLayoutAction,
+                        QnActionParameters(resource)
+                        );
             // TODO: #GDM second action : settings
             break;
         }
 
     case BusinessEventType::Storage_Failure: {
             item->setColor(qnGlobals->notificationColorImportant());
-            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
-                                                       QnActionParameters(resource)));
-            // TODO: #GDM second action : settings
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Open Camera"),
+                        Qn::OpenInNewLayoutAction,
+                        QnActionParameters(resource)
+                        );
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Server settings"),
+                        Qn::ServerSettingsAction,
+                        QnActionParameters(resource)
+                        );
             break;
         }
     case BusinessEventType::Network_Issue:{
             item->setColor(qnGlobals->notificationColorImportant());
-            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
-                                                       QnActionParameters(resource)));
-            // TODO: #GDM second action : settings
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Open Camera"),
+                        Qn::OpenInNewLayoutAction,
+                        QnActionParameters(resource)
+                        );
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Server settings"),
+                        Qn::ServerSettingsAction,
+                        QnActionParameters(resource)
+                        );
             break;
         }
 
@@ -129,8 +159,12 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
         }
     case BusinessEventType::MediaServer_Failure: {
             item->setColor(qnGlobals->notificationColorCritical());
-            m_actionDataByItem.insert(item, ActionData(Qn::OpenInNewLayoutAction,
-                                                       QnActionParameters(resource)));
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Open Camera"),
+                        Qn::OpenInNewLayoutAction,
+                        QnActionParameters(resource)
+                        );
             // TODO: #GDM second action : ping
             break;
         }
@@ -148,7 +182,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
     text += QLatin1Char('\n');
     text += resource->getName();
     item->setText(text);
-    item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+
 
     connect(item, SIGNAL(actionTriggered(QnNotificationItem*)), this, SLOT(at_item_actionTriggered(QnNotificationItem*)));
     m_list->addItem(item);
@@ -167,48 +201,71 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
 
     switch (message) {
     case QnSystemHealth::EmailIsEmpty:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
-        m_actionDataByItem.insert(item, ActionData(Qn::UserSettingsAction,
-                                                   QnActionParameters(context()->user())
-                                                   .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))));
-
+        item->addActionButton(
+                    qnResIconCache->icon(QnResourceIconCache::User),
+                    tr("User Settings"),
+                    Qn::UserSettingsAction,
+                    QnActionParameters(context()->user())
+                    .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
+                    );
         break;
     case QnSystemHealth::NoLicenses:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
-        m_actionDataByItem.insert(item, ActionData(Qn::GetMoreLicensesAction));
+        item->addActionButton(
+                    qnResIconCache->icon(QnResourceIconCache::Servers),
+                    tr("Licenses"),
+                    Qn::GetMoreLicensesAction
+                    );
         break;
     case QnSystemHealth::SmtpIsNotSet:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
-        m_actionDataByItem.insert(item, ActionData(Qn::OpenServerSettingsAction));
+        item->addActionButton(
+                    qnResIconCache->icon(QnResourceIconCache::Servers),
+                    tr("SMTP Settings"),
+                    Qn::OpenServerSettingsAction
+                    );
         break;
     case QnSystemHealth::UsersEmailIsEmpty:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Users));
-        m_actionDataByItem.insert(item, ActionData(Qn::UserSettingsAction,
-                                                   QnActionParameters(resource)
-                                                   .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))));
+        item->addActionButton(
+                    qnResIconCache->icon(QnResourceIconCache::User),
+                    tr("User Settings"),
+                    Qn::UserSettingsAction,
+                    QnActionParameters(resource)
+                    .withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
+                    );
         break;
     case QnSystemHealth::ConnectionLost:
-        item->setIcon(qnSkin->icon("titlebar/disconnected.png"));
-        m_actionDataByItem.insert(item, ActionData(Qn::ConnectToServerAction));
+        item->addActionButton(
+                    qnSkin->icon("titlebar/disconnected.png"),
+                    tr("Connect to server"),
+                    Qn::ConnectToServerAction
+                    );
         break;
     case QnSystemHealth::EmailSendError:
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
-        m_actionDataByItem.insert(item, ActionData(Qn::OpenServerSettingsAction));
+        item->addActionButton(
+                    qnResIconCache->icon(QnResourceIconCache::Servers),
+                    tr("SMTP Settings"),
+                    Qn::OpenServerSettingsAction
+                    );
         break;
     case QnSystemHealth::StoragesNotConfigured:
-        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        m_actionDataByItem.insert(item, ActionData(Qn::ServerSettingsAction,
-                                                   QnActionParameters(resource)));
+        item->addActionButton(
+                    qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                    tr("Server settings"),
+                    Qn::ServerSettingsAction,
+                    QnActionParameters(resource)
+                    );
         break;
     case QnSystemHealth::StoragesAreFull:
-        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        m_actionDataByItem.insert(item, ActionData(Qn::ServerSettingsAction,
-                                                   QnActionParameters(resource)));
+        item->addActionButton(
+                    qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                    tr("Server settings"),
+                    Qn::ServerSettingsAction,
+                    QnActionParameters(resource)
+                    );
         break;
     default:
         break;
     }
-    connect(item, SIGNAL(actionTriggered(QnNotificationItem*)), this, SLOT(at_item_actionTriggered(QnNotificationItem*)));
+    connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
 
     m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
 }
@@ -226,14 +283,9 @@ void QnNotificationsCollectionItem::at_eventLogButton_clicked() {
 }
 
 void QnNotificationsCollectionItem::at_list_itemRemoved(QnNotificationItem *item) {
-    m_actionDataByItem.remove(item);
     delete item;
 }
 
-void QnNotificationsCollectionItem::at_item_actionTriggered(QnNotificationItem* item) {
-    if (!m_actionDataByItem.contains(item))
-        return;
-
-    ActionData data = m_actionDataByItem[item];
-    menu()->trigger(data.action, data.params);
+void QnNotificationsCollectionItem::at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters) {
+    menu()->trigger(actionId, parameters);
 }

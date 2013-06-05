@@ -4,8 +4,10 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widget.h>
 
+#include <ui/actions/actions.h>
+#include <ui/actions/action_parameters.h>
+
 class QnProxyLabel;
-class QnImageButtonWidget;
 class QGraphicsLinearLayout;
 class QnToolTipWidget;
 class HoverFocusProcessor;
@@ -21,13 +23,13 @@ public:
     QString text() const;
     void setText(const QString &text);
 
-    void setIcon(const QIcon &icon);
+    void addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId, const QnActionParameters &parameters = QnActionParameters());
 
     QColor color() const;
     void setColor(const QColor &color);
 
 signals:
-    void actionTriggered(QnNotificationItem* item);
+    void actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -40,11 +42,25 @@ private slots:
     void updateToolTipVisibility();
     void updateToolTipPosition();
 
-    void at_image_clicked();
+    void at_button_clicked();
 
 private:
+    struct ActionData {
+        ActionData():
+            action(Qn::NoAction){}
+        ActionData(Qn::ActionId action):
+            action(action){}
+        ActionData(Qn::ActionId action, const QnActionParameters &params):
+            action(action), params(params){}
+
+        Qn::ActionId action;
+        QnActionParameters params;
+    };
+
+    QList<ActionData> m_actions;
+
+    QGraphicsLinearLayout* m_layout;
     QnProxyLabel* m_textLabel;
-    QnImageButtonWidget *m_image;
     QColor m_color;
 
     QnToolTipWidget* m_tooltipItem;
