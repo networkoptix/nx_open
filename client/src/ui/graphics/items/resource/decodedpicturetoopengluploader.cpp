@@ -457,6 +457,22 @@ QnGlRendererTexture* DecodedPictureToOpenGLUploader::UploadedPicture::texture( i
     return m_textures[index].data();
 }
 
+const GammaInfo& DecodedPictureToOpenGLUploader::UploadedPicture::gamma() const
+{
+    return m_gamma;
+}
+
+void DecodedPictureToOpenGLUploader::UploadedPicture::calcLevels( quint8* yPlane, int width, int height, int stride, 
+                   float blackLevel, float whiteLevel, const QRectF& srcRect)
+{
+    m_gamma.calcLevels(yPlane, width, height, stride, blackLevel, whiteLevel, srcRect);
+}
+
+void DecodedPictureToOpenGLUploader::UploadedPicture::resetHistogram()
+{
+    m_gamma.reset();
+}
+
 GLuint DecodedPictureToOpenGLUploader::UploadedPicture::pboID( int index ) const
 {
     return m_pbo[index].id;
@@ -707,6 +723,10 @@ public:
             m_uploader->pictureDataUploadFailed( this, pictureBuf );
             return;
         }
+        if (m_uploader->histogramChecked())
+            m_pictureBuf->calcLevels(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0]);
+        else
+            m_pictureBuf->resetHistogram();
 
 #ifdef GL_COPY_AGGREGATION
         if( !m_uploader->uploadDataToGlWithAggregation(
@@ -1048,6 +1068,12 @@ public:
         else
             m_uploader->pictureDataUploadFailed( NULL, m_dest );
 
+        if (m_uploader->histogramChecked())
+            m_dest->calcLevels(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0]);
+        else
+            m_dest->resetHistogram();
+
+
         m_isRunning = false;
     }
 
@@ -1151,7 +1177,8 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     m_fileNumber( 0 ),
     m_hardwareDecoderUsed( false ),
     m_asyncUploadUsed( false ),
-    m_initializedCtx( NULL )
+    m_initializedCtx( NULL ),
+    m_histogramChecked(false)
 {
 #ifdef ASYNC_UPLOADING_USED
     const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& 
@@ -2314,3 +2341,4 @@ void DecodedPictureToOpenGLUploader::savePicToFile( AVFrame* const pic, int pts 
     /*if( !img.save( fileName, "bmp" ) )
         int x = 0;*/
 }
+

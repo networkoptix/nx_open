@@ -250,3 +250,68 @@ int random(int min, int max) {
 }
 
 
+void GammaInfo::calcLevels( quint8* yPlane, int width, int height, int stride, 
+                              float blackLevel, float whiteLevel,
+                              const QRectF& srcRect)
+{
+    static const int MIN_GAMMA_RANGE = 6;
+    static const float NORM_RANGE_RANGE = 256.0 - 16.0 - 16.0;
+    static const float NORM_RANGE_START = 16.0 / 256.0;
+
+    Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
+    int xSteps = width / 4;
+    int hystogram[256];
+    memset(hystogram, 0, sizeof(hystogram));
+
+    // prepare hystogram
+    for (int y = 0; y < height; ++y)
+    {
+        quint32* line = (quint32*) (yPlane + stride * y);
+        quint32* lineEnd = line + xSteps;
+        for (;line < lineEnd; ++line)
+        {
+            quint32 value = *line;
+
+            hystogram[(quint8) value]++;
+            value >>= 8;
+
+            hystogram[(quint8) value]++;
+            value >>= 8;
+
+            hystogram[(quint8) value]++;
+            value >>= 8;
+
+            hystogram[(quint8) value]++;
+        }
+    }
+
+    // get hystogram range
+    int pixels = width * height;
+    int leftThreshold = blackLevel * pixels + 0.5;
+    int rightThreshold = whiteLevel * pixels + 0.5;
+
+    int leftPos = 0;
+    int sum = 0;
+    for (; leftPos < 256 && sum < leftThreshold; ++leftPos)
+        sum += hystogram[leftPos];
+
+    int rightPos = 255;
+    sum = 0;
+    for (; rightPos >= leftPos && sum < rightThreshold; --rightPos)
+        sum += hystogram[rightPos];
+
+    if (rightPos - leftPos < MIN_GAMMA_RANGE) {
+        reset();
+    }
+    else {
+        levels1 = NORM_RANGE_RANGE / float(rightPos-leftPos+1);
+        levels2 = -float(leftPos) / NORM_RANGE_RANGE + NORM_RANGE_START;
+    }
+}
+
+void GammaInfo::reset()
+{
+    levels1 = 1.0;
+    levels2 = 0.0;
+    gamma = 1.0;
+}
