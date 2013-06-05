@@ -46,6 +46,39 @@ namespace {
         }
     };
 
+
+    /**
+     * An image button widget that displays thumbnail behind the button.
+     */
+    class QnThumbnailImageButtonWidget: public QnImageButtonWidget {
+        Q_OBJECT
+
+        typedef QnImageButtonWidget base_type;
+
+    public:
+        QnThumbnailImageButtonWidget(QGraphicsItem *parent = NULL):
+            base_type(parent) {}
+
+        const QImage& thumbnail() const {
+            return m_thumbnail;
+        }
+
+        void setThumbnail(const QImage &image) {
+            m_thumbnail = image;
+        }
+
+    protected:
+        virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override {
+            if (!m_thumbnail.isNull())
+                painter->drawImage(rect, m_thumbnail);
+            base_type::paint(painter, startState, endState, progress, widget, rect);
+
+        }
+    private:
+        QImage m_thumbnail;
+    };
+
+
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
     const qreal margin = 4;
