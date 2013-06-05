@@ -285,6 +285,7 @@ public:
     using base_type::mapRectToScene;
 
 signals:
+    void painted();
     void aspectRatioChanged();
     void aboutToBeDestroyed();
     void optionsChanged();

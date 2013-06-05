@@ -838,6 +838,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         /* Draw selected / not selected overlay. */
         paintSelection(painter, paintRect);
     }
+
+    emit painted();
 }
 
 void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &) {

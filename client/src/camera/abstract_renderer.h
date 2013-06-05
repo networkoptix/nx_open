@@ -49,16 +49,6 @@ public:
     virtual void finishPostedFramesRender(int channel) = 0;
 
     /**
-     * This function is supposed to be called from <i>rendering</i> thread.
-     * It notifies the <i>decoding</i> thread that the current frame was rendered.
-     */
-    void frameDisplayed() {
-        m_displayCounter++;
-
-        doFrameDisplayed();
-    }
-
-    /**
      * This function may be called from any thread.
      * It is called just before this object is destroyed.
      */
@@ -113,21 +103,18 @@ public:
     virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const = 0;
     virtual void unblockTimeValue(int channelNumber) const = 0;
     virtual bool isTimeBlocked(int channelNumber) const  = 0;
-
     virtual bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const = 0;
 
     void inUse() {
         QMutexLocker lock(&m_usingMutex);
         m_useCount++; 
     }
+
     void notInUse() { 
         QMutexLocker lock(&m_usingMutex);
         if (--m_useCount == 0 && m_needStop)
             emit canBeDestroyed();
     }
-protected:
-    virtual void doFrameDisplayed() {} // Not used for now.
-
 
 private:
     int m_displayCounter;
