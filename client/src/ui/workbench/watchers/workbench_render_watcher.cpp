@@ -29,21 +29,14 @@ void QnWorkbenchRenderWatcher::registerRenderer(QnAbstractRenderer *renderer) {
         return;
     }
 
-    QObject *lifetime = dynamic_cast<QObject *>(renderer);
-    if(lifetime == NULL) {
-        qnWarning("Given renderer must be derived from QObject.");
-        return;
-    }
-
     if(m_infoByRenderer.contains(renderer)) {
         qnWarning("Renderer re-registration is not allowed.");
         return;
     }
 
-    m_infoByRenderer[renderer] = Info(0, false, lifetime);
-    m_rendererByLifetime[lifetime] = renderer;
+    m_infoByRenderer[renderer] = Info(0, false);
 
-    connect(lifetime, SIGNAL(destroyed()), this, SLOT(at_lifetime_destroyed()));
+    connect(renderer, SIGNAL(destroyed()), this, SLOT(at_renderer_destroyed()));
 }
 
 void QnWorkbenchRenderWatcher::unregisterRenderer(QnAbstractRenderer *renderer) {
@@ -55,10 +48,8 @@ void QnWorkbenchRenderWatcher::unregisterRenderer(QnAbstractRenderer *renderer) 
     if(!m_infoByRenderer.contains(renderer))
         return; /* It's OK to unregister a renderer that is not there. */
 
-    QObject *lifetime = m_infoByRenderer[renderer].lifetime;
-    disconnect(lifetime, NULL, this, NULL);
+    disconnect(renderer, NULL, this, NULL);
 
-    m_rendererByLifetime.remove(lifetime);
     m_infoByRenderer.remove(renderer);
 }
 
@@ -109,7 +100,7 @@ void QnWorkbenchRenderWatcher::at_display_widgetAboutToBeRemoved(QnResourceWidge
     unregisterRenderer(mediaWidget->renderer());
 }
 
-void QnWorkbenchRenderWatcher::at_lifetime_destroyed() {
-    unregisterRenderer(m_rendererByLifetime[sender()]);
+void QnWorkbenchRenderWatcher::at_renderer_destroyed() {
+    unregisterRenderer(static_cast<QnAbstractRenderer *>(sender()));
 }
 
