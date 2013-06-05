@@ -45,11 +45,6 @@
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
-
-detail::QnRendererGuard::~QnRendererGuard() {
-    delete m_renderer;
-}
-
 namespace {
     template<class T>
     void resizeList(T &list, int size) {
@@ -58,6 +53,8 @@ namespace {
         while(list.size() > size)
             list.pop_back();
     }
+
+    Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
 
 } // anonymous namespace
 
@@ -81,14 +78,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
-
-
     connect(m_resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
-
-    connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(at_updateResourceDisplay()) );
-    
-    
-    at_updateResourceDisplay();
+    connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(updateDisplay()));
+    updateDisplay();
 
     /* Set up static text. */
     for (int i = 0; i < 10; ++i) {
@@ -165,29 +157,6 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
         qFreeAligned(data);
     m_binaryMotionMask.clear();
 
-}
-
-void QnMediaResourceWidget::at_updateResourceDisplay()
-{
-    zoomTargetWidget = dynamic_cast<QnMediaResourceWidget*> (QnWorkbenchContextAware::display()->widget(item()->zoomTargetItem()));
-
-    if (m_display)
-        m_display->removeRenderer(m_renderer);
-
-    if (zoomTargetWidget /* && syncPlayEnabled() */) 
-        m_display = zoomTargetWidget->display();
-    else 
-        m_display = QnResourceDisplayPtr(new QnResourceDisplay(m_resource, this));
-
-    setChannelLayout(m_display->videoLayout());
-    m_display->addRenderer(m_renderer);
-
-    m_display->disconnect(this);
-
-    connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
-    connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
-
-    m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
@@ -377,6 +346,44 @@ void QnMediaResourceWidget::ensureMotionSelectionCache() {
 
 void QnMediaResourceWidget::invalidateMotionSelectionCache() {
     m_motionSelectionCacheValid = false;
+}
+
+void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
+    if(display == m_display)
+        return;
+
+    if(m_display) {
+        m_display->removeRenderer(m_renderer);
+        disconnect(m_display->camDisplay(), NULL, this, NULL);
+    }
+
+    m_display = display;
+
+    if(m_display) {
+        connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
+        connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
+        
+        setChannelLayout(m_display->videoLayout());
+        m_display->addRenderer(m_renderer);
+        m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
+    } else {
+        setChannelLayout(qn_resourceWidget_defaultContentLayout());
+        m_renderer->setChannelCount(0);
+    }
+
+    emit displayChanged();
+}
+
+void QnMediaResourceWidget::updateDisplay() {
+    QnMediaResourceWidget *zoomTargetWidget = dynamic_cast<QnMediaResourceWidget *>(this->zoomTargetWidget());
+
+    QnResourceDisplayPtr display;
+    if (zoomTargetWidget /* && syncPlayEnabled() */) {
+        display = zoomTargetWidget->display();
+    } else {
+        display = QnResourceDisplayPtr(new QnResourceDisplay(m_resource, this));
+    }
+    setDisplay(display);
 }
 
 

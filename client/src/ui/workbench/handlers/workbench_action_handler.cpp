@@ -463,6 +463,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
+    data.rotation = params.rotation;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
     if(params.frameColor.isValid())
         data.dataByRole[Qn::ItemFrameColorRole] = params.frameColor;
@@ -2506,7 +2507,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             images.push_back(display->camDisplay()->getScreenshot(i));
         QSize channelSize = images[0].size();
         QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
-        QRectF zoomRect = widget->zoomRect();
+        QRectF zoomRect = widget->zoomRect().isNull() ? QRectF(0, 0, 1, 1) : widget->zoomRect();
 
         screenshot = QImage(totalSize.width() * zoomRect.width(), totalSize.height() * zoomRect.height(), QImage::Format_ARGB32);
         screenshot.fill(qRgba(0, 0, 0, 0));
@@ -3470,6 +3471,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.zoomWindow = rect;
     addParams.zoomUuid = widget->item()->uuid();
     addParams.frameColor = params.argument<QColor>(Qn::ItemFrameColorRole);
+    addParams.rotation = widget->item()->rotation();
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource(), addParams);
 }

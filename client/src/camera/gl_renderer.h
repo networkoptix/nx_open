@@ -37,8 +37,6 @@ public:
     
     Qn::RenderStatus paint(const QRectF &sourceRect, const QRectF &targetRect);
 
-    void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
-
     bool isLowQualityImage() const;
     
     qint64 lastDisplayedTime() const;
@@ -49,7 +47,8 @@ public:
     bool isYV12ToRgbShaderUsed() const;
     bool isYV12ToRgbaShaderUsed() const;
     bool isNV12ToRgbShaderUsed() const;
-
+private:
+    void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
 private:
     const DecodedPictureToOpenGLUploader& m_decodedPictureProvider;
     qreal m_brightness;

@@ -3,32 +3,16 @@
 
 #include "resource_widget.h"
 
-#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
+#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>
 
-#include <api/api_fwd.h>
-
 #include <client/client_globals.h>
-#include "camera/resource_display.h"
+#include "camera/resource_display.h" // TODO: #Elric FWD!
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 
-
-namespace detail {
-    class QnRendererGuard: public QObject {
-        Q_OBJECT;
-    public:
-        QnRendererGuard(QnAbstractRenderer *renderer): m_renderer(renderer) {}
-        virtual ~QnRendererGuard();
-
-        QnAbstractRenderer *renderer() const { return m_renderer; }
-    private:
-        QnAbstractRenderer *m_renderer;
-    };
-
-} // namespace detail
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -106,6 +90,7 @@ public:
 
 signals:
     void motionSelectionChanged();
+    void displayChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -145,12 +130,14 @@ private slots:
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
     void at_zoomWindowButton_toggled(bool checked);
-
     void at_camDisplay_liveChanged();
-    void at_updateResourceDisplay();
+
 private:
     int currentRecordingMode();
+    
+    void setDisplay(const QnResourceDisplayPtr &display);
 
+    Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
 
@@ -191,11 +178,6 @@ private:
     mutable bool m_motionSelectionCacheValid;
 
     QStaticText m_sensStaticText[10];
-
-    QnMediaResourceWidget* zoomTargetWidget;
-
-    /** List of associated renderer guards. */
-    //QList<detail::QnRendererGuard *> m_guards;
 };
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H

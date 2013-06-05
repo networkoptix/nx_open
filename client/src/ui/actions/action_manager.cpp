@@ -969,16 +969,16 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("User Settings...")).
         condition(hasFlags(QnResource::user));
 
-    factory(Qn::CameraSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Camera Settings...")).
-        requiredPermissions(Qn::WritePermission).
-        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
-
     factory(Qn::CameraIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Check Camera Issues...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+
+    factory(Qn::CameraSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Camera Settings...")).
+        requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
     factory(Qn::LayoutSettingsAction).

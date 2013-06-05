@@ -64,20 +64,18 @@ private slots:
     void at_afterPaintInstrument_activated();
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_lifetime_destroyed();
+    void at_renderer_destroyed();
 
 private:
     struct Info {
-        Info(): displayCounter(0), displaying(false), lifetime(NULL) {}
-        Info(int displayCounter, bool displaying, QObject *lifetime): displayCounter(displayCounter), displaying(displaying), lifetime(lifetime) {}
+        Info(): displayCounter(0), displaying(false) {}
+        Info(int displayCounter, bool displaying): displayCounter(displayCounter), displaying(displaying) {}
 
         int displayCounter;
         bool displaying;
-        QObject *lifetime;
     };
 
     QHash<QnAbstractRenderer *, Info> m_infoByRenderer;
-    QHash<QObject *, QnAbstractRenderer *> m_rendererByLifetime;
 };
 
 #endif // QN_WORKBENCH_RENDER_WATCHER_H
