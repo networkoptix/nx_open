@@ -20,7 +20,7 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
         mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
                                     1.0, -0.344, -0.714,  0.529,
                                     1.0,  1.772,  0.0,   -0.886,
-                                    0,    0,      0,      opacity);
+                                    0.0,  0.0,    0.0,    opacity);
 
         void main() {
             gl_FragColor = vec4(texture2D(yTexture, gl_TexCoord[0].st).p,
@@ -59,7 +59,7 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, 
         mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
                                     1.0, -0.344, -0.714,  0.529,
                                     1.0,  1.772,  0.0,   -0.886,
-                                    0,    0,      0,      opacity);
+                                    0.0,  0.0,    0.0,   opacity);
 
         void main() {
             gl_FragColor = vec4(
