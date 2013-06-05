@@ -3,14 +3,12 @@
 
 #include "resource_widget.h"
 
-#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
+#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>
 
-#include <api/api_fwd.h>
-
 #include <client/client_globals.h>
-#include "camera/resource_display.h"
+#include "camera/resource_display.h" // TODO: #Elric FWD!
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
