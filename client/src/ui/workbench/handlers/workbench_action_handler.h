@@ -34,6 +34,7 @@ class QnCameraAdditionDialog;
 class QnLoginDialog;
 class QnVideoCamera;
 class QnPopupCollectionWidget;
+class QnWorkbenchNotificationsHandler;
 
 // TODO: #Elric move out.
 struct QnThumbnailsSearchState {
@@ -223,10 +224,6 @@ protected:
         return m_businessEventsLogDialog.data();
     }
 
-    QnPopupCollectionWidget *popupCollectionWidget() const {
-        return m_popupCollectionWidget.data();
-    }
-
     QnCameraAdditionDialog *cameraAdditionDialog() const {
         return m_cameraAdditionDialog.data();
     }
@@ -234,6 +231,8 @@ protected:
     QnLoginDialog *loginDialog() const {
         return m_loginDialog.data();
     }
+
+    QnWorkbenchNotificationsHandler* notificationsHandler() const;
 
 protected slots:
     void updateCameraSettingsFromSelection();
@@ -390,8 +389,6 @@ protected slots:
 
     void at_checkSystemHealthAction_triggered();
 
-    void at_togglePopupsAction_toggled(bool checked);
-
     void at_serverSettings_received(int status, const QnKvPairList& settings, int handle);
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
@@ -427,8 +424,6 @@ private:
 
     void removeLayouts(const QnLayoutResourceList &layouts);
 
-    void ensurePopupCollectionWidget();
-
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
@@ -440,7 +435,6 @@ private:
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QWeakPointer<QnEventLogDialog> m_businessEventsLogDialog;
-    QWeakPointer<QnPopupCollectionWidget> m_popupCollectionWidget;
     QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QWeakPointer<QnLoginDialog> m_loginDialog;
 

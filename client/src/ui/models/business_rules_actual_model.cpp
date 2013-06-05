@@ -24,7 +24,7 @@ void QnBusinessRulesActualModel::reloadData()
     m_loadingHandle = QnAppServerConnectionFactory::createConnection()->getBusinessRulesAsync(
         this, SLOT(at_resources_received(int,QnBusinessEventRuleList,int)));
     m_savingRules.clear();
-    emit beforeModelChanged(m_loadingHandle);
+    emit beforeModelChanged();
 }
 
 void QnBusinessRulesActualModel::saveRule(int row) {

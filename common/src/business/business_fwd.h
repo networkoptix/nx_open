@@ -34,7 +34,7 @@ namespace QnBusiness {
         StorageIssueNotEnoughSpeed
     };
 }
-Q_DECLARE_METATYPE(QnBusiness::EventReason);
+Q_DECLARE_METATYPE(QnBusiness::EventReason)
 
 namespace BusinessEventType {
     enum Value {

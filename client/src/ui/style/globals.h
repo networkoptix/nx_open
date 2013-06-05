@@ -63,10 +63,17 @@ public:
         STATISTICS_COLORS,
         ZOOM_WINDOW_COLORS,
 
-        POPUP_FRAME_SYSTEM,
-        POPUP_FRAME_NOTIFICATION,
-        POPUP_FRAME_IMPORTANT,
-        POPUP_FRAME_WARNING,
+        /** Color of system notifications */
+        NOTIFICATION_COLOR_SYSTEM,
+
+        /** Color of notifications about common events */
+        NOTIFICATION_COLOR_COMMON,
+
+        /** Color of notifications about important events */
+        NOTIFICATION_COLOR_IMPORTANT,
+
+        /** Color of notifications about critical events */
+        NOTIFICATION_COLOR_CRITICAL,
 
         /** Maximum size of the layout background - in cells */
         LAYOUT_BACKGROUND_MAX_SIZE,
@@ -126,10 +133,10 @@ private:
         QN_DECLARE_R_PROPERTY(QnStatisticsColors,   statisticsColors,   STATISTICS_COLORS,                      QnStatisticsColors())
         QN_DECLARE_R_PROPERTY(QVector<QColor>,      zoomWindowColors,   ZOOM_WINDOW_COLORS,                     defaultZoomWindowColors())
 
-        QN_DECLARE_R_PROPERTY(QColor,   popupFrameSystem,               POPUP_FRAME_SYSTEM,                     QColor(255, 0, 0, 128))
-        QN_DECLARE_R_PROPERTY(QColor,   popupFrameNotification,         POPUP_FRAME_NOTIFICATION,               QColor(64, 130, 180, 128))
-        QN_DECLARE_R_PROPERTY(QColor,   popupFrameImportant,            POPUP_FRAME_IMPORTANT,                  QColor(255, 128, 0, 128))
-        QN_DECLARE_R_PROPERTY(QColor,   popupFrameWarning,              POPUP_FRAME_WARNING,                    QColor(255, 0, 0, 128))
+        QN_DECLARE_R_PROPERTY(QColor,   notificationColorSystem,        NOTIFICATION_COLOR_SYSTEM,              QColor(255, 0, 0))
+        QN_DECLARE_R_PROPERTY(QColor,   notificationColorCommon,        NOTIFICATION_COLOR_COMMON,              QColor(103, 237, 66))
+        QN_DECLARE_R_PROPERTY(QColor,   notificationColorImportant,     NOTIFICATION_COLOR_IMPORTANT,           QColor(237, 200, 66))
+        QN_DECLARE_R_PROPERTY(QColor,   notificationColorCritical,      NOTIFICATION_COLOR_CRITICAL,            QColor(255, 131, 48))
 
         QN_DECLARE_R_PROPERTY(QSize,    layoutBackgroundMaxSize,        LAYOUT_BACKGROUND_MAX_SIZE,             QSize(64, 64))
         QN_DECLARE_R_PROPERTY(int,      layoutBackgroundRecommendedArea,LAYOUT_BACKGROUND_RECOMMENDED_AREA,     40*40)

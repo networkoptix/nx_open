@@ -168,7 +168,7 @@ void QnBusinessRulesDialog::keyPressEvent(QKeyEvent *event) {
     base_type::keyPressEvent(event);
 }
 
-void QnBusinessRulesDialog::at_beforeModelChanged(int changeNum) {
+void QnBusinessRulesDialog::at_beforeModelChanged() {
    // bool enabled = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
     m_currentDetailsWidget->setModel(NULL);
     m_pendingDeleteRules.clear();

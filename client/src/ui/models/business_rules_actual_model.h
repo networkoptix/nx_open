@@ -19,7 +19,7 @@ public:
 
     bool isLoaded() const;
 signals:
-    void beforeModelChanged(int changeNum);
+    void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
     
     void businessRuleChanged(int id);

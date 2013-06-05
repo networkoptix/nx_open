@@ -406,12 +406,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Check System Health..."));
 
-    factory(Qn::TogglePopupsAction).
-        flags(Qn::NoTarget).
-        checkable().
-        icon(qnSkin->icon("popup.png")).
-        text(tr("Show notifications"));
-
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).
@@ -1275,6 +1269,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Slider | Qn::NoTarget | Qn::SingleTarget).
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
+
+    factory(Qn::PinNotificationsAction).
+        flags(Qn::Notifications | Qn::NoTarget).
+        text(tr("Pin Notifications")).
+        toggledText(tr("Unpin Notifications"));
 }
 
 QnActionManager::~QnActionManager() {
