@@ -183,15 +183,14 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
     text += resource->getName();
     item->setText(text);
 
-
-    connect(item, SIGNAL(actionTriggered(QnNotificationItem*)), this, SLOT(at_item_actionTriggered(QnNotificationItem*)));
+    connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
     m_list->addItem(item);
 }
 
 void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
     QString text = QnSystemHealth::toString(message);
-    if (resource) {
+    if (message != QnSystemHealth::EmailIsEmpty && resource) {
         text += QLatin1Char('\n');
         text += resource->getName();
     }
