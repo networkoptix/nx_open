@@ -326,7 +326,11 @@ void QnGLRenderer::drawYVA12VideoTexture(
     DEBUG_CODE(glCheckError("glEnable"));
 
     m_yv12ToRgbaShaderProgram->bind();
-    m_yv12ToRgbaShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
+    m_yv12ToRgbaShaderProgram->setYTexture( 0 );
+    m_yv12ToRgbaShaderProgram->setUTexture( 1 );
+    m_yv12ToRgbaShaderProgram->setVTexture( 2 );
+    m_yv12ToRgbaShaderProgram->setATexture( 3 );
+    m_yv12ToRgbaShaderProgram->setOpacity(m_decodedPictureProvider.opacity() );
 
     glActiveTexture(GL_TEXTURE3);
     DEBUG_CODE(glCheckError("glActiveTexture"));
@@ -439,7 +443,7 @@ bool QnGLRenderer::isYV12ToRgbShaderUsed() const
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_yv12ToRgbShaderProgram.get()
-        && m_yv12ToRgbShaderProgram->isValid();
+        && m_yv12ToRgbShaderProgram->isLinked();
 }
 
 bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
@@ -449,7 +453,7 @@ bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_yv12ToRgbaShaderProgram.get()
-        && m_yv12ToRgbaShaderProgram->isValid();
+        && m_yv12ToRgbaShaderProgram->isLinked();
 }
 
 bool QnGLRenderer::isNV12ToRgbShaderUsed() const
