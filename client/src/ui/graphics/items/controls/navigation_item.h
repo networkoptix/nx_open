@@ -25,6 +25,14 @@ public:
         return m_timeSlider;
     }
 
+    QnSpeedSlider *speedSlider() const {
+        return m_speedSlider;
+    }
+
+    QnVolumeSlider *volumeSlider() const {
+        return m_volumeSlider;
+    }
+
     QnTimeScrollBar *timeScrollBar() const {
         return m_timeScrollBar;
     }
