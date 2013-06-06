@@ -107,8 +107,8 @@ public:
             emit canBeDestroyed();
     }
 
-    bool isEnabled() { return true; }
-    void setEnabled(bool enabled) {}
+    bool isEnabled(int channelNumber) { return true; }
+    void setEnabled(int channelNumber, bool enabled) {}
 
 private:
     int m_useCount;
