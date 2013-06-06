@@ -50,6 +50,7 @@ signals:
     void finished(int status, const QnTimeReply &reply, int handle);
     void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
+    void finished(int status, const QImage &reply, int handle);
 
 private:
     friend class QnAbstractReplyProcessor;
@@ -69,6 +70,21 @@ public:
     QString getProxyHost() { return m_proxyAddr; }
 
     int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
+
+	/** 
+     * Get \a camera thumbnail for specified time. 
+     * 
+     * Returns immediately. On request completion \a slot of object \a target 
+     * is called with signature <tt>(int httpStatusCode, QImage > &params)</tt>.
+     * \a status is 0 in case of success, in other cases it holds error code 
+     * \p time requested time in usecs. Can be DATE_TIME_NOW for live video or -1 for request latest available image
+     * \p size can be filled partially: only width or height. At this case other dimension is auto detected
+     * \p imageFormat can be 'jpeg', 'tiff', 'png' e.t.c
+     * \p precise if false then get image from nearest I-frame
+     * 
+     * \returns                         Request handle.
+	 */
+    int getThumbnailsAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, bool precise, QObject *target, const char *slot);
 
 	/** 
      * Get \a camera params. 
