@@ -14,6 +14,7 @@ class QnNotificationListWidget : public Animated<GraphicsWidget>, public Animati
 {
     Q_OBJECT
     typedef Animated<GraphicsWidget> base_type;
+
 public:
     explicit QnNotificationListWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags flags = 0);
     ~QnNotificationListWidget();
@@ -28,6 +29,7 @@ protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
 
     virtual void tick(int deltaMSecs) override;
+
 private slots:
     void at_item_clicked(Qt::MouseButton button);
     void at_geometry_changed();

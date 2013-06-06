@@ -263,10 +263,21 @@ void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
 }
 
 void QnNotificationListWidget::at_geometry_changed() {
+    // TODO: #GDM your loop condition is not valid for a reverse loop.
+    // 
+    // what you probably need is 
+    // foreach(QnNotificationItem *item, m_items | boost::adaptors::reversed)
+    // 
+    // OR
+    // 
+    // BOOST_REVERSE_FOREACH(QnNotificationItem *item, m_items)
+    // 
+    // Let's discuss.
+
     //reverse iterating
     QLinkedList<QnNotificationItem*>::const_iterator i = m_items.constEnd();
     i--;
-    for (; i != m_items.constEnd(); --i) {
+    for (; i != m_items.constEnd(); --i) { 
         ItemData* data = m_itemDataByItem[*i];
         if (!data->isVisible())
             continue;
