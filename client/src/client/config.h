@@ -1,7 +1,7 @@
 #ifndef QN_CLIENT_CONFIG_H
 #define QN_CLIENT_CONFIG_H
 
-#include <utils/common/config.h>
+#include <common/config.h>
 
 // -------------------------------------------------------------------------- //
 // Derived definitions. Do not change.

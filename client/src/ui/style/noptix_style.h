@@ -1,12 +1,12 @@
 #ifndef QN_NOPTIX_STYLE_H
 #define QN_NOPTIX_STYLE_H
 
-#include <QProxyStyle>
-#include <QStyleOptionProgressBarV2>
+#include <QtGui/QProxyStyle>
 
 #include <ui/graphics/items/standard/graphics_style.h>
-#include <utils/common/config.h>
+#include <common/config.h>
 
+class QStyleOptionProgressBarV2;
 
 class QnNoptixStyleAnimator;
 class QnSkin;
