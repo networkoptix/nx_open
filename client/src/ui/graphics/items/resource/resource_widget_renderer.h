@@ -55,7 +55,7 @@ public:
     void setChannelScreenSize(const QSize &screenSize);
 
     Qn::RenderStatus paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity);
-    void skip(int channel);
+    void skip(int channel); // TODO: #Elric replace with setEnabled
 
     virtual qint64 getTimestampOfNextFrameToRender(int channel) const override;
     virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const  override;

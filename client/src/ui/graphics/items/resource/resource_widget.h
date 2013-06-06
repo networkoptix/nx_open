@@ -285,6 +285,7 @@ public:
     using base_type::mapRectToScene;
 
 signals:
+    void painted();
     void aspectRatioChanged();
     void aboutToBeDestroyed();
     void optionsChanged();
@@ -368,6 +369,7 @@ protected:
 
     int channelCount() const;
     QRectF channelRect(int channel) const;
+    QRectF exposedRect(int channel, bool accountForViewport = true, bool useRelativeCoordinates = false);
     Qn::RenderStatus channelRenderStatus(int channel) const;
 
     void ensureAboutToBeDestroyedEmitted();

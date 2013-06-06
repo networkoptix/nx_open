@@ -7,10 +7,11 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnResourceWidget;
-class QnAbstractRenderer;
+class QnResourceDisplay;
+class QnMediaResourceWidget;
 
 /**
- * For each renderer on the scene, this class tracks whether it is being 
+ * For each widget on the scene, this class tracks whether it is being 
  * currently displayed, or not. It provides the necessary getters and signals
  * to track changes of this state.
  */
@@ -26,56 +27,56 @@ public:
     QnWorkbenchRenderWatcher(QObject *parent = NULL);
 
     /**
-     * \param renderer                  Renderer to get displaying state for.
-     * \returns                         Whether the given renderer is currently
+     * Virtual destructor.
+     */
+    virtual ~QnWorkbenchRenderWatcher();
+
+    /**
+     * \param widget                    Widget to get displaying state for.
+     * \returns                         Whether the given widget is currently
      *                                  being displayed.
      */
-    bool isDisplaying(QnAbstractRenderer *renderer) const;
+    bool isDisplaying(QnResourceWidget *widget) const;
+
+    bool isDisplaying(QnResourceDisplay *display) const;
 
 signals:
     /**
-     * This signal is emitted whenever a renderer starts or stops
-     * being displayed. Upon registration renderer is considered as not 
+     * This signal is emitted whenever a widget starts or stops
+     * being displayed. Upon registration widget is considered as not 
      * being displayed.
      * 
-     * \param renderer                  Renderer.
-     * \param displaying                New displaying state of the renderer.
+     * \param widget                    Widget.
      */
-    void displayingChanged(QnAbstractRenderer *renderer, bool displaying);
+    void displayingChanged(QnResourceWidget *widget);
 
-protected:
-    /**
-     * Registers a renderer. Note that the actual class of the passed object
-     * must be <tt>QObject</tt>-derived so that its lifetime can be tracked.
-     * 
-     * \param renderer                  Renderer to register.
-     */
-    void registerRenderer(QnAbstractRenderer *renderer);
+    void displayingChanged(QnResourceDisplay *display);
 
-    /**
-     * Unregisters the given renderer.
-     * 
-     * \param renderer                  Renderer to unregister.
-     */
-    void unregisterRenderer(QnAbstractRenderer *renderer);
+private:
+    Q_SLOT void registerWidget(QnResourceWidget *widget);
+    Q_SLOT void unregisterWidget(QnResourceWidget *widget);
+    void setDisplaying(QnResourceWidget *widget, bool displaying);
 
 private slots:
     void at_beforePaintInstrument_activated();
     void at_afterPaintInstrument_activated();
-    void at_display_widgetAdded(QnResourceWidget *widget);
-    void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_renderer_destroyed();
+    void at_widget_displayChanged();
+    void at_widget_displayChanged(QnMediaResourceWidget *widget);
+    void at_widget_painted();
+    void at_widget_painted(QnResourceWidget *widget);
 
 private:
-    struct Info {
-        Info(): displayCounter(0), displaying(false) {}
-        Info(int displayCounter, bool displaying): displayCounter(displayCounter), displaying(displaying) {}
+    struct WidgetData {
+        WidgetData(): displaying(false), newDisplaying(false), display(NULL) {}
+        WidgetData(bool displaying, QnResourceDisplay *display): displaying(displaying), newDisplaying(false), display(display) {}
 
-        int displayCounter;
         bool displaying;
+        bool newDisplaying;
+        QnResourceDisplay *display;
     };
 
-    QHash<QnAbstractRenderer *, Info> m_infoByRenderer;
+    QHash<QnResourceWidget *, WidgetData> m_dataByWidget;
+    QHash<QnResourceDisplay *, int> m_countByDisplay;
 };
 
 #endif // QN_WORKBENCH_RENDER_WATCHER_H

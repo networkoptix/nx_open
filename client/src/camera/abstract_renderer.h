@@ -21,7 +21,7 @@ class QnAbstractRenderer: public QObject, public QnStoppable
 signals:
     void canBeDestroyed();
 public:
-    QnAbstractRenderer(QObject* parent = 0): QObject(parent), m_displayCounter(0), m_useCount(0), m_needStop(false) {}
+    QnAbstractRenderer(QObject* parent = 0): QObject(parent), m_useCount(0), m_needStop(false) {}
 
     virtual ~QnAbstractRenderer() {}
 
@@ -47,16 +47,6 @@ public:
      * \todo refactoring (some renaming?) is required when it all works as expected
      */
     virtual void finishPostedFramesRender(int channel) = 0;
-
-    /**
-     * This function is supposed to be called from <i>rendering</i> thread.
-     * It notifies the <i>decoding</i> thread that the current frame was rendered.
-     */
-    void frameDisplayed() {
-        m_displayCounter++;
-
-        doFrameDisplayed();
-    }
 
     /**
      * This function may be called from any thread.
@@ -95,15 +85,6 @@ public:
     virtual void draw( const QSharedPointer<CLVideoDecoderOutput>& image) = 0;
 
     /**
-     * \returns                         Value of this renderer's display counter.
-     *                                  This counter is incremented each time a frame
-     *                                  is rendered.
-     */
-    int displayCounter() const {
-        return m_displayCounter;
-    }
-
-    /**
      * Inform drawer about video is temporary absent
      */
     virtual void onNoVideo() {}
@@ -113,24 +94,23 @@ public:
     virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const = 0;
     virtual void unblockTimeValue(int channelNumber) const = 0;
     virtual bool isTimeBlocked(int channelNumber) const  = 0;
-
     virtual bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const = 0;
 
     void inUse() {
         QMutexLocker lock(&m_usingMutex);
         m_useCount++; 
     }
+
     void notInUse() { 
         QMutexLocker lock(&m_usingMutex);
         if (--m_useCount == 0 && m_needStop)
             emit canBeDestroyed();
     }
-protected:
-    virtual void doFrameDisplayed() {} // Not used for now.
 
+    bool isEnabled(int channelNumber) { return true; }
+    void setEnabled(int channelNumber, bool enabled) {}
 
 private:
-    int m_displayCounter;
     int m_useCount;
     bool m_needStop;
     QMutex m_usingMutex;

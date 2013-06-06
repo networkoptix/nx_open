@@ -121,9 +121,6 @@ protected:
     void ensureMotionSelectionCache();
     void invalidateMotionSelectionCache();
 
-    /** Returns displayed part of the widget in normalized coordinates. */
-    QRectF calculateDisplayedRect(int channel);
-
     QSize motionGridSize() const;
     QPoint channelGridOffset(int channel) const;
 
@@ -136,6 +133,7 @@ private slots:
     void at_zoomWindowButton_toggled(bool checked);
     void at_histogramButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
+    void at_renderWatcher_displayedChanged(QnResourceWidget *widget);
 
 private:
     int currentRecordingMode();
@@ -145,6 +143,7 @@ private:
     Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
+    Q_SLOT void updateRendererEnabled();
 
 private:
     /** Media resource. */
