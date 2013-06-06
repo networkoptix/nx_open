@@ -1,8 +1,10 @@
 
 #include "notification_item.h"
 
-#include <QApplication>
+#include <QtGui/QApplication>
 #include <QtGui/QGraphicsLinearLayout>
+
+#include <utils/math/color_transformations.h>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -105,9 +107,15 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 
     setLayout(m_layout);
 
-    setPaletteColor(this, QPalette::Window, Qt::transparent);
     setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
     setFrameWidth(0.5);
+
+    QLinearGradient gradient(1, 0, 0, 0); 
+    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
+    gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
+    gradient.setSpread(QGradient::RepeatSpread);
+    setWindowBrush(gradient);
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipItem);
@@ -170,15 +178,28 @@ void QnNotificationItem::addActionButton(const QIcon &icon, const QString &toolt
 void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     base_type::paint(painter, option, widget);
 
-    QRadialGradient gradient(margin, buttonSize*.5 + margin, buttonSize*2);
-    gradient.setColorAt(0.0, m_color);
-    QColor gradientTo(m_color);
-    gradientTo.setAlpha(64);
-    gradient.setColorAt(0.5, gradientTo);
-    gradient.setColorAt(1.0, Qt::transparent);
+    painter->setPen(QPen(QColor(110, 110, 110, 255), 0.5));
+    painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
 
-    gradient.setSpread(QGradient::PadSpread);
-    painter->fillRect(boundingRect(), QBrush(gradient));
+    QRectF rect = this->rect();
+
+    qreal side = qMin(qMin(rect.width(), rect.height()), 16.0) / 2.0;
+
+    qreal left = rect.left();
+    qreal xcenter = left + side * 0.5;
+    
+    qreal ycenter = (rect.top() + rect.bottom()) / 2;
+    qreal top = ycenter - side;
+    qreal bottom = ycenter + side;
+    
+    QPainterPath path;
+    path.moveTo(left, top);
+    path.lineTo(xcenter, top);
+    path.arcTo(xcenter - side, ycenter - side, side * 2, side * 2, 90, -180);
+    path.lineTo(left, bottom);
+    path.closeSubpath();
+
+    painter->drawPath(path);
 }
 
 void QnNotificationItem::hideToolTip() {

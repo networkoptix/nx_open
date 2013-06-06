@@ -281,7 +281,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
         gradient.setSpread(QGradient::RepeatSpread);
 
         m_treeBackgroundItem->setWindowBrush(gradient);
-
     }
     m_treeBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_treeBackgroundItem->setFrameWidth(0.5);
