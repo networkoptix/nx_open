@@ -6,6 +6,7 @@
 #include <QtGui/QGraphicsSceneEvent>
 #include <QtGui/QApplication>
 #include <QtGui/QStyle>
+#include <QtGui/QGraphicsLinearLayout>
 
 #include <utils/math/math.h>
 #include <utils/common/scoped_painter_rollback.h>

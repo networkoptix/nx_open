@@ -26,7 +26,7 @@ namespace Qn {
         /**
          * Opens server settings preferences tab.
          */
-        OpenServerSettingsAction,
+        OpenServerSettingsAction, //TODO: #GDM rename - collisions with ServerSettingsAction
 
         /**
          * Opens popup settings preferences tab.
@@ -131,12 +131,6 @@ namespace Qn {
          * Cancels Tour Mode if it is started, otherwise works as FullScreenAction.
          */
         EscapeHotkeyAction,
-
-        /**
-         * Toggles visibility of popup windows.
-         */
-        TogglePopupsAction,
-
 
         /* Main menu actions. */
 
@@ -703,6 +697,8 @@ namespace Qn {
         ToggleSliderAction,
 
 
+        PinNotificationsAction,
+
         /* Playback actions. */
         PlayPauseAction,
         SpeedDownAction,
@@ -760,6 +756,7 @@ namespace Qn {
         TreeScope               = 0x00000004,           /**< Action appears in tree context menu. */
         SliderScope             = 0x00000008,           /**< Action appears in slider context menu. */
         TitleBarScope           = 0x00000010,           /**< Action appears title bar context menu. */
+        NotificationsScope      = 0x00000020,
         ScopeMask               = 0x000000FF
     };
     Q_DECLARE_FLAGS(ActionScopes, ActionScope);
@@ -839,9 +836,11 @@ namespace Qn {
 
         /** Action can appear in title bar context menu. */
         TitleBar                = Qn::TitleBarScope | LayoutTarget,      
+
+        Notifications           = Qn::NotificationsScope | WidgetTarget
     };
 
-    Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
+    Q_DECLARE_FLAGS(ActionFlags, ActionFlag)
     
     enum ActionVisibility {
         /** Action is not in the menu. */

@@ -1,7 +1,7 @@
 #ifndef _UNIVERSAL_CLIENT_UTIL_H
 #define _UNIVERSAL_CLIENT_UTIL_H
 
-#include "config.h"
+#include <common/config.h>
 
 #include <QtCore/QString>
 
@@ -156,6 +156,7 @@ public:
     // can be deallocated from other, and vice versa.
     // Always returns true for stateless allocators.
     bool operator==(const AlignmentAllocator<T,N>& other) const {
+        Q_UNUSED(other)
         return true;
     }
 };
@@ -175,6 +176,7 @@ static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
  * \returns                             Random number in range [min, max).
  */
 int random(int min, int max);
+
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

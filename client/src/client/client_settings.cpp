@@ -4,6 +4,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QSettings>
 
+#include <client/config.h>
+
 #include <utils/common/util.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
@@ -14,7 +16,6 @@
 #include <client/client_meta_types.h>
 
 #include <version.h>
-#include "../config.h"
 
 
 namespace {

@@ -10,34 +10,36 @@
  * Note that the signal is emitted when the mouse button is released.
  */
 class QnClickableWidget: public Clickable<GraphicsWidget> {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef Clickable<GraphicsWidget> base_type;
 
 public:
     QnClickableWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0): base_type(parent, wFlags) {}
 
-    virtual ~QnClickableWidget() {};
+    virtual ~QnClickableWidget() {}
 
     using base_type::clickableButtons;
     using base_type::setClickableButtons;
 
 signals:
     void clicked();
+    void clicked(Qt::MouseButton button);
     void doubleClicked();
 
 protected:
     virtual void pressedNotify(QGraphicsSceneMouseEvent *event) {
         m_isDoubleClick = event->type() == QEvent::GraphicsSceneMouseDoubleClick;
-    };
+    }
 
-    virtual void clickedNotify(QGraphicsSceneMouseEvent *) override {
+    virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override {
         if(m_isDoubleClick) {
             emit doubleClicked();
         } else {
             emit clicked();
+            emit clicked(event->button());
         }
-    };
+    }
 
 private:
     bool m_isDoubleClick;

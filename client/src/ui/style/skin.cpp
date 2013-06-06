@@ -10,8 +10,9 @@
 
 #include <utils/common/warnings.h>
 
+#include <client/config.h>
+
 #include "noptix_style.h"
-#include "../../config.h"
 
 namespace {
     class QnIconBuilder {
@@ -175,16 +176,8 @@ QPixmap QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::S
 }
 
 QStyle *QnSkin::style() {
-    QString baseStyleName;
-#ifndef Q_OS_DARWIN
-    baseStyleName = QLatin1String("Bespin");
-#else
-    baseStyleName = QLatin1String("cleanlooks");
-#endif
-
-    QStyle *baseStyle = QStyleFactory::create(baseStyleName);
+    QStyle *baseStyle = QStyleFactory::create(QLatin1String("Bespin"));
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
-
     return style;
 }
 

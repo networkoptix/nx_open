@@ -11,10 +11,11 @@
 #include <QtGui/QFont>
 #include <QtGui/QColor>
 
+#include <client/config.h>
+
 #include <utils/common/color.h>
 #include <utils/common/module_resources.h>
 
-#include "config.h"
 
 Q_GLOBAL_STATIC(QnGlobals, qn_globals_instance);
 

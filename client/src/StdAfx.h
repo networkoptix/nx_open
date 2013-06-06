@@ -1,6 +1,6 @@
 #define QT_NO_CAST_FROM_ASCII
 
-#include "config.h"
+#include <client/config.h>
 
 /* Windows headers. */
 #ifdef _WIN32

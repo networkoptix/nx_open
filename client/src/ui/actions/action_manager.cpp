@@ -406,12 +406,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Check System Health..."));
 
-    factory(Qn::TogglePopupsAction).
-        flags(Qn::NoTarget).
-        checkable().
-        icon(qnSkin->icon("popup.png")).
-        text(tr("Show notifications"));
-
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).
@@ -975,16 +969,16 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("User Settings...")).
         condition(hasFlags(QnResource::user));
 
-    factory(Qn::CameraSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Camera Settings...")).
-        requiredPermissions(Qn::WritePermission).
-        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
-
     factory(Qn::CameraIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Check Camera Issues...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+
+    factory(Qn::CameraSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Camera Settings...")).
+        requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
     factory(Qn::LayoutSettingsAction).
@@ -1275,6 +1269,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Slider | Qn::NoTarget | Qn::SingleTarget).
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
+
+    factory(Qn::PinNotificationsAction).
+        flags(Qn::Notifications | Qn::NoTarget).
+        text(tr("Pin Notifications")).
+        toggledText(tr("Unpin Notifications"));
 }
 
 QnActionManager::~QnActionManager() {

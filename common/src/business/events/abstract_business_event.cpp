@@ -111,21 +111,17 @@ namespace BusinessEventType
         switch( val )
         {
         case Camera_Motion:
-            return true;
         case Camera_Input:
             return true;
+
         case Camera_Disconnect:
-            return false;
         case Storage_Failure:
-            return false;
         case Network_Issue:
-            return false;
         case Camera_Ip_Conflict:
-            return false;
         case MediaServer_Failure:
-            return false;
         case MediaServer_Conflict:
             return false;
+
         default:
             return false;
         }
@@ -139,21 +135,17 @@ namespace BusinessEventType
         switch( val )
         {
         case Camera_Motion:
-            return true;
         case Camera_Input:
-            return true;
         case Camera_Disconnect:
             return true;
+
         case Storage_Failure:
-            return false;
         case Network_Issue:
-            return false;
         case Camera_Ip_Conflict:
-            return false;
         case MediaServer_Failure:
-            return false;
         case MediaServer_Conflict:
             return false;
+
         default:
             return false;
         }
@@ -166,22 +158,18 @@ namespace BusinessEventType
 
         switch( val )
         {
-        case Camera_Motion:
-            return false;
-        case Camera_Input:
-            return false;
-        case Camera_Disconnect:
-            return false;
         case Storage_Failure:
             return false; //TODO: #GDM restore when will work fine
+
+        case Camera_Motion:
+        case Camera_Input:
+        case Camera_Disconnect:
         case Network_Issue:
-            return false;
         case Camera_Ip_Conflict:
-            return false;
         case MediaServer_Failure:
-            return false;
         case MediaServer_Conflict:
             return false;
+
         default:
             return false;
         }

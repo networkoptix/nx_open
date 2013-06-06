@@ -71,6 +71,9 @@ signals:
     void linkActivated(const QString &link);
     void linkHovered(const QString &link);
 
+protected:
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
+
 private:
     void init();
 

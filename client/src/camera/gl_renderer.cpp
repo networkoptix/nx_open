@@ -237,6 +237,8 @@ void QnGLRenderer::drawVideoTextureDirectly(
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
+    glEnable(GL_BLEND);
+
     //applying opacity
     if( m_decodedPictureProvider.opacity() < 1.0 )
     {
@@ -253,7 +255,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
 }
 
 void QnGLRenderer::drawYV12VideoTexture(
-    const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
+    const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
     const QRectF& tex0Coords,
     unsigned int tex0ID,
     unsigned int tex1ID,
@@ -278,6 +280,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     m_yv12ToRgbShaderProgram->setUTexture( 1 );
     m_yv12ToRgbShaderProgram->setVTexture( 2 );
     m_yv12ToRgbShaderProgram->setOpacity(m_decodedPictureProvider.opacity());
+    m_yv12ToRgbShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
 
     glActiveTexture(GL_TEXTURE2);
     DEBUG_CODE(glCheckError("glActiveTexture"));

@@ -12,8 +12,9 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
 
+#include <common/config.h>
+
 #include "fuzzy.h"
-#include "utils/common/config.h"
 
 
 #ifndef M_E

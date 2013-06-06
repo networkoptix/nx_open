@@ -45,6 +45,7 @@ class QnActionManager;
 class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
 class QnGraphicsMessageBoxItem;
+class QnNotificationsCollectionItem;
 
 class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT
@@ -70,7 +71,7 @@ public:
         TreePanel = 0x1,
         TitlePanel = 0x2,
         SliderPanel = 0x4,
-        HelpPanel = 0x8
+        NotificationsPanel = 0x8
     };
     Q_DECLARE_FLAGS(Panels, Panel)
 
@@ -109,9 +110,7 @@ public:
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
 
-    bool isHelpOpened() const {
-        return m_helpOpened;
-    }
+    bool isNotificationsOpened() const;
 
     bool isCalendarOpened() const {
         return m_calendarOpened;
@@ -129,8 +128,8 @@ public:
         return m_titleVisible;
     }
 
-    bool isHelpVisible() const {
-        return m_helpVisible;
+    bool isNotificationsVisible() const {
+        return m_notificationsVisible;
     }
 
     bool isCalendarVisible() const {
@@ -149,14 +148,13 @@ public slots:
     void setTreeVisible(bool visible = true, bool animate = true);
     void setSliderVisible(bool visible = true, bool animate = true);
     void setTitleVisible(bool visible = true, bool animate = true);
-    void setHelpVisible(bool visible = true, bool animate = true);
+    void setNotificationsVisible(bool visible = true, bool animate = true);
     void setCalendarVisible(bool visible = true, bool animate = true);
-    void setPopupsButtonVisible(bool visible = true);
 
-    void setTreeOpened(bool opened = true, bool animate = true);
-    void setSliderOpened(bool opened = true, bool animate = true);
-    void setTitleOpened(bool opened = true, bool animate = true);
-    void setHelpOpened(bool opened = true, bool animate = true);
+    void setTreeOpened(bool opened = true, bool animate = true, bool save = true);
+    void setSliderOpened(bool opened = true, bool animate = true, bool save = true);
+    void setTitleOpened(bool opened = true, bool animate = true, bool save = true);
+    void setNotificationsOpened(bool opened = true, bool animate = true, bool save = true);
     void setCalendarOpened(bool opened = true, bool animate = true);
 
     void toggleTreeOpened() {
@@ -171,8 +169,8 @@ public slots:
         setTitleOpened(!isTitleOpened());
     }
 
-    void toggleHelpOpened() {
-        setHelpOpened(!isHelpOpened());
+    void toggleNotificationsOpened() {
+        setNotificationsOpened(!isNotificationsOpened());
     }
 
 protected:
@@ -182,28 +180,25 @@ protected:
 
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
-    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpY);
+    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsY);
     void updateViewportMargins();
 
     void updateTreeGeometry();
-    void updateHelpGeometry();
+    void updateNotificationsGeometry();
     void updateFpsGeometry();
     void updateCalendarGeometry();
     Q_SLOT void updateSliderResizerGeometry();
     void updateSliderZoomButtonsGeometry();
-    void updatePopupButtonGeometry();
-    Q_SLOT void updatePopupButtonAnimation();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry);
+    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
-    QRectF updatedPopupButtonGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     void updateActivityInstrumentState();
 
     void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setSliderOpacity(qreal opacity, bool animate);
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
-    void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
+    void setNotificationsOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setCalendarOpacity(qreal opacity, bool animate);
     void setZoomButtonsOpacity(qreal opacity, bool animate);
 
@@ -212,7 +207,7 @@ protected:
 
 private:
     Panels openedPanels() const;
-    void setOpenedPanels(Panels panels);
+    void setOpenedPanels(Panels panels, bool animate = true, bool save = true);
 
     void initGraphicsMessageBox();
 private slots:
@@ -221,13 +216,13 @@ private slots:
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
-    void updateHelpOpacity(bool animate = true);
+    void updateNotificationsOpacity(bool animate = true);
     void updateCalendarOpacity(bool animate = true);
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
     void setTreeShowButtonUsed(bool used = true);
-    void setHelpShowButtonUsed(bool used = true);
+    void setNotificationsShowButtonUsed(bool used = true);
 
     void at_freespaceAction_triggered();
     void at_fullscreenAction_triggered();
@@ -245,7 +240,6 @@ private slots:
     void at_toggleThumbnailsAction_toggled(bool checked);
     void at_toggleCalendarAction_toggled(bool checked);
     void at_toggleSliderAction_toggled(bool checked);
-    void at_togglePopupsAction_toggled(bool checked);
     
     void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
@@ -254,17 +248,18 @@ private slots:
     void at_treeShowButton_toggled(bool checked);
     void at_toggleTreeAction_toggled(bool checked);
     void at_pinTreeAction_toggled(bool checked);
+    void at_pinNotificationsAction_toggled(bool checked);
 
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
     void at_titleItem_geometryChanged();
     void at_titleItem_contextMenuRequested(QObject *target, QEvent *event);
     void at_toggleTitleBarAction_toggled(bool checked);
 
-    void at_helpPinButton_toggled(bool checked);
-    void at_helpShowButton_toggled(bool checked);
-    void at_helpHidingProcessor_hoverFocusLeft();
-    void at_helpShowingProcessor_hoverEntered();
-    void at_helpItem_paintGeometryChanged();
+    void at_notificationsPinButton_toggled(bool checked);
+    void at_notificationsShowButton_toggled(bool checked);
+    void at_notificationsHidingProcessor_hoverFocusLeft();
+    void at_notificationsShowingProcessor_hoverEntered();
+    void at_notificationsItem_geometryChanged();
 
     void at_calendarShowButton_toggled(bool checked);
     void at_calendarItem_paintGeometryChanged();
@@ -310,11 +305,11 @@ private:
 
     bool m_sliderVisible;
 
-    bool m_helpPinned;
+    bool m_notificationsPinned;
 
-    bool m_helpOpened;
+    bool m_notificationsOpened;
 
-    bool m_helpVisible;
+    bool m_notificationsVisible;
 
     bool m_calendarOpened;
 
@@ -423,27 +418,25 @@ private:
     QGraphicsWidget *m_windowButtonsWidget;
 
 
-    /* Help window-related state. */
+    /* Notifications window-related state. */
 
-    QnSimpleFrameWidget *m_helpBackgroundItem;
+    QnSimpleFrameWidget *m_notificationsBackgroundItem;
 
-    QnMaskedProxyWidget *m_helpItem;
+    QnNotificationsCollectionItem *m_notificationsItem;
 
-    QWidget *m_helpWidget;
+    QnImageButtonWidget *m_notificationsPinButton;
 
-    QnImageButtonWidget *m_helpPinButton;
+    QnImageButtonWidget *m_notificationsShowButton;
 
-    QnImageButtonWidget *m_helpShowButton;
+    HoverFocusProcessor *m_notificationsOpacityProcessor;
 
-    HoverFocusProcessor *m_helpOpacityProcessor;
+    HoverFocusProcessor *m_notificationsHidingProcessor;
 
-    HoverFocusProcessor *m_helpHidingProcessor;
+    HoverFocusProcessor *m_notificationsShowingProcessor;
 
-    HoverFocusProcessor *m_helpShowingProcessor;
+    VariantAnimator *m_notificationsXAnimator;
 
-    VariantAnimator *m_helpXAnimator;
-
-    AnimatorGroup *m_helpOpacityAnimatorGroup;
+    AnimatorGroup *m_notificationsOpacityAnimatorGroup;
 
     QnWorkbenchMotionDisplayWatcher *m_motionDisplayWatcher;
 
@@ -463,10 +456,6 @@ private:
     HoverFocusProcessor *m_calendarHidingProcessor;
 
     bool m_inCalendarGeometryUpdate;
-
-    /* Notifications window-related state */
-
-    QnImageButtonWidget *m_popupShowButton;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)

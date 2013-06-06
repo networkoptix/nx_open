@@ -346,7 +346,13 @@ void QnWorkbenchDisplay::initSceneView() {
         } else {
             QGLFormat glFormat;
             glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
+#ifdef Q_OS_LINUX
+            // Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
+            // VSync will be re-enabled later in GLHardware checker if drivers are not NVidia's --gdm
+            glFormat.setSwapInterval(0); /* Turn vsync off. */
+#else
             glFormat.setSwapInterval(1); /* Turn vsync on. */
+#endif
 
             QGLWidget *glWidget = new QGLWidget(glFormat);
             new QnGlHardwareChecker(glWidget);
@@ -364,7 +370,10 @@ void QnWorkbenchDisplay::initSceneView() {
 
         /* All our items save and restore painter state. */
         m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
+#ifndef __APPLE__
+        //on macos, this flag results in QnMaskedProxyWidget::paint never called
         m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
+#endif
 
         /* Don't even try to uncomment this one, it slows everything down. */
         //m_view->setCacheMode(QGraphicsView::CacheBackground);
@@ -843,13 +852,16 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             if(item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
                 mediaWidget->display()->archiveReader()->setPlaybackRange(item->layout()->resource()->getLocalRange());
 
-            quint64 time = item->data(Qn::ItemTimeRole).toULongLong() * 1000;
-            if (time > 0)
-                mediaWidget->display()->archiveReader()->jumpTo(time, time);
-            else
-            if(startDisplay)
-                if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
-                    mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+            if(startDisplay) {
+                quint64 time = item->data(Qn::ItemTimeRole).toULongLong();
+                if (time != DATETIME_NOW)
+                    time *= 1000;
+                if (time > 0)
+                    mediaWidget->display()->archiveReader()->jumpTo(time, time);
+                else
+                    if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
+                        mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+            }
         }
     }
 
