@@ -89,9 +89,7 @@ QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent, Qt::WindowFlags windowFl
     m_shapeValid(false),
     m_tailWidth(5.0),
     m_autoSize(true)
-{
-    // setProperty(Qn::NoHandScrollOver, true); // TODO: #Elric
-}
+{}
 
 QnToolTipWidget::~QnToolTipWidget() {
     return;

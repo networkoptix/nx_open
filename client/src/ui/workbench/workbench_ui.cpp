@@ -44,6 +44,8 @@
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
+#include <ui/graphics/items/controls/speed_slider.h>
+#include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
@@ -574,7 +576,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
     m_sliderItem->setFrameWidth(0.5);
     m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
+    
     m_sliderItem->setProperty(Qn::NoHandScrollOver, true);
+    m_sliderItem->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    m_sliderItem->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    m_sliderItem->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
 
     m_sliderShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleSliderAction));
     {

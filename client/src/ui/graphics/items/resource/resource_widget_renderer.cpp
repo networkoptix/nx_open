@@ -52,6 +52,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     }
 
     m_channelRenderers.resize( channelCount );
+    m_renderingEnabled.resize( channelCount, true );
 
     for( int i = 0; i < channelCount; ++i )
     {
@@ -168,8 +169,6 @@ QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
 }
 
 Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity) {
-    frameDisplayed();
-
     RenderingTools &ctx = m_channelRenderers[channel];
     if(!ctx.renderer)
         return Qn::NothingRendered;
@@ -178,8 +177,6 @@ Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sour
 }
 
 void QnResourceWidgetRenderer::skip(int channel) {
-    frameDisplayed();
-
     RenderingTools &ctx = m_channelRenderers[channel];
     if(!ctx.renderer)
         return;
@@ -191,13 +188,40 @@ void QnResourceWidgetRenderer::setDisplayedRect(int channel, const QRectF& rect)
     m_displayRect[channel] = rect;
 }
 
-void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image) {
-    RenderingTools& ctx = m_channelRenderers[image->channel];
+bool QnResourceWidgetRenderer::isEnabled(int channelNumber) const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_renderingEnabled[channelNumber];
+}
+
+void QnResourceWidgetRenderer::setEnabled(int channelNumber, bool enabled)
+{
+    RenderingTools& ctx = m_channelRenderers[channelNumber];
     if( !ctx.uploader )
         return;
-    
+
+    QMutexLocker lk( &m_mutex );
+
+    m_renderingEnabled[channelNumber] = enabled;
+    if( !enabled )
+        ctx.uploader->discardAllFramesPostedToDisplay();
+}
+
+void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image)
+{
+    {
+        QMutexLocker lk( &m_mutex );
+
+        if( !m_renderingEnabled[image->channel] )
+            return;
+        
+        RenderingTools& ctx = m_channelRenderers[image->channel];
+        if( !ctx.uploader )
+            return;
+
     ctx.uploader->uploadDecodedPicture( image, m_displayRect[image->channel]);
-    ++ctx.framesSinceJump;
+        ++ctx.framesSinceJump;
+    }
 
     QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
     if(m_sourceSize == sourceSize) 
