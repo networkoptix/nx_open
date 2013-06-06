@@ -846,13 +846,16 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             if(item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
                 mediaWidget->display()->archiveReader()->setPlaybackRange(item->layout()->resource()->getLocalRange());
 
-            quint64 time = item->data(Qn::ItemTimeRole).toULongLong() * 1000;
-            if (time > 0)
-                mediaWidget->display()->archiveReader()->jumpTo(time, time);
-            else
-            if(startDisplay)
-                if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
-                    mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+            if(startDisplay) {
+                quint64 time = item->data(Qn::ItemTimeRole).toULongLong();
+                if (time != DATETIME_NOW)
+                    time *= 1000;
+                if (time > 0)
+                    mediaWidget->display()->archiveReader()->jumpTo(time, time);
+                else
+                    if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
+                        mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+            }
         }
     }
 
