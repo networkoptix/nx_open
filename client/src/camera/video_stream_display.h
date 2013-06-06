@@ -75,6 +75,7 @@ private:
     //!Returns timestamp of frame that will be rendered next. It can be already displayed frame (if no new frames available)
     qint64 getTimestampOfNextFrameToRender() const;
     void blockTimeValue(qint64 time);
+    void blockTimeValueSafe(qint64 time);
     void unblockTimeValue();
     bool isTimeBlocked() const;
     void afterJump();

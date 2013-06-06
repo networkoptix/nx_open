@@ -146,6 +146,7 @@ private:
     void setAudioBufferSize(int bufferSize, int prebufferMs);
 
     void blockTimeValue(qint64 time);
+    void blockTimeValueSafe(qint64 time); // can be called from other thread
     void unblockTimeValue();
     void waitForFramesDisplayed();
     void restoreVideoQueue(QnCompressedVideoDataPtr incoming, QnCompressedVideoDataPtr vd, int channel);
