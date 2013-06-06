@@ -394,20 +394,6 @@ void QnMediaResourceWidget::updateDisplay() {
     setDisplay(display);
 }
 
-QRectF QnMediaResourceWidget::calculateDisplayedRect(int channel) {
-    QRectF channelRect = this->channelRect(channel);
-    if (channelRect.isEmpty())
-        return QRectF();
-
-    if(scene()->views().empty())
-        return QRectF();
-    QGraphicsView *view = scene()->views()[0];
-
-    QRectF viewportRect = mapRectFromScene(QnSceneTransformations::mapRectToScene(view, view->viewport()->rect()));
-
-    return QnGeometry::toSubRect(channelRect, channelRect.intersected(rect()).intersected(viewportRect));
-}
-
 
 // -------------------------------------------------------------------------- //
 // Painting
@@ -421,7 +407,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         if(!m_paintedChannels[channel])
             m_renderer->skip(channel);
 
-        m_renderer->setDisplayedRect(channel, calculateDisplayedRect(channel)); 
+        m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true)); 
     }
 
     if(isOverlayVisible() && isInfoVisible())
