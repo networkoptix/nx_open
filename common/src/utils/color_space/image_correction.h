@@ -28,6 +28,8 @@ struct ImageCorrectionResult
     void processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data, const QRectF& srcRect);
 
     void reset();
+private:
+    float calcGamma(int leftPos, int rightPos, int pixels) const;
 };
 
 #endif // __IMAGE_CORRECTION_H__
