@@ -4,17 +4,14 @@
 struct ImageCorrectionParams
 {
     ImageCorrectionParams():
-enabled(false),
-blackLevel(0.0),
-whiteLevel(0.0),
-gamma(1.0),
-srcRect(0.0, 0.0, 1.0, 1.0) {}
-
-bool enabled;
-float blackLevel;
-float whiteLevel;
-float gamma;
-QRectF srcRect;
+        enabled(false),
+        blackLevel(0.0),
+        whiteLevel(0.0),
+        gamma(1.0) {}
+    bool enabled;
+    float blackLevel;
+    float whiteLevel;
+    float gamma;
 };
 
 struct ImageCorrectionResult
@@ -28,7 +25,7 @@ struct ImageCorrectionResult
     float gamma;
     int hystogram[256];
 
-    void processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data);
+    void processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data, const QRectF& srcRect);
 
     void reset();
 };

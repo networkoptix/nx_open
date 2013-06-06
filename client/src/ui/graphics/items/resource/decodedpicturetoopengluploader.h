@@ -90,8 +90,8 @@ public:
         void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
         const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
 #endif
-        void calcLevels( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data);
-        void resetHistogram();
+        void processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data);
+        void resetImageInfo();
 
         const ImageCorrectionResult& imageCorrectionResult() const;
     private:
@@ -121,6 +121,7 @@ public:
         int m_flags;
         GLFence m_glFence;
         ImageCorrectionResult m_imgCorrection;
+        QRectF m_displayedRect;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
@@ -172,7 +173,7 @@ public:
         \note Method does not save reference to \a decodedPicture, but it can save reference to \a decodedPicture->picData. 
             As soon as uploader is done with \a decodedPicture->picData it releases reference to it
     */
-    void uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture );
+    void uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture, const QRectF displayedRect = QRectF(0.0, 0.0, 1.0, 1.0));
     bool isUsingFrame( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
     //!Returns latest uploaded picture. Used by GUI thread
     /*!
@@ -268,8 +269,8 @@ private:
     bool m_terminated;
     bool m_yv12SharedUsed;
     bool m_nv12SharedUsed;
-    mutable std::deque<AsyncPicDataUploader*> m_unusedUploaders;
-    std::deque<AsyncPicDataUploader*> m_usedUploaders;
+    mutable std::deque<AsyncPicDataUploader*> m_unusedAsyncUploaders;
+    std::deque<AsyncPicDataUploader*> m_usedAsyncUploaders;
     QSharedPointer<DecodedPictureToOpenGLUploadThread> m_uploadThread;
     quint8* m_rgbaBuf;
     int m_fileNumber;

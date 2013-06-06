@@ -394,25 +394,18 @@ void QnMediaResourceWidget::updateDisplay() {
     setDisplay(display);
 }
 
-QRectF QnMediaResourceWidget::calculateDisplayedRect() {
-    QRectF result(0, 0, 1, 1);
-
-    QRectF widgetRect = mapRectToScene(rect());
-    if (widgetRect.width() <= 0 || widgetRect.height() <= 0)
-        return result;
+QRectF QnMediaResourceWidget::calculateDisplayedRect(int channel) {
+    QRectF channelRect = this->channelRect(channel);
+    if (channelRect.isEmpty())
+        return QRectF();
 
     if(scene()->views().empty())
-        return result;
+        return QRectF();
+    QGraphicsView *view = scene()->views()[0];
 
-    QGraphicsView *view = dynamic_cast<QGraphicsView *>(scene()->views()[0]);
-    if (!view)
-        return result;
+    QRectF viewportRect = mapRectFromScene(QnSceneTransformations::mapRectToScene(view, view->viewport()->rect()));
 
-    QRectF viewportRect = QnSceneTransformations::mapRectToScene(view, view->viewport()->rect());
-    result = viewportRect.intersected(widgetRect).adjusted(-widgetRect.left(), -widgetRect.top(), 0, 0);
-    result.setSize(QSizeF(result.width() / widgetRect.width(),
-                        result.height() / widgetRect.height()));
-    return result;
+    return QnGeometry::toSubRect(channelRect, channelRect.intersected(rect()).intersected(viewportRect));
 }
 
 
@@ -424,9 +417,12 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     base_type::paint(painter, option, widget);
 
-    for(int channel = 0; channel < channelCount(); channel++)
+    for(int channel = 0; channel < channelCount(); channel++) {
         if(!m_paintedChannels[channel])
             m_renderer->skip(channel);
+
+        m_renderer->setDisplayedRect(channel, calculateDisplayedRect(channel)); 
+    }
 
     if(isOverlayVisible() && isInfoVisible())
         updateInfoTextLater();
@@ -884,7 +880,6 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
     value.blackLevel = 0.01;
     value.whiteLevel = 0.01;
     value.gamma = 1.0;
-    value.srcRect = QRectF(0, 0, 1, 1);
 
     m_renderer->setImageCorrection(value);
 

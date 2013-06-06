@@ -394,8 +394,8 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
     appServerConnection->sendEmailAsync(
                 recipients,
-                action->getSubject(),
-                action->getMessageBody(),
+                QnBusinessStringsHelper::shortEventDescription(action->getRuntimeParams()),
+                QnBusinessStringsHelper::longEventDescriptionHtml(action, action->aggregationInfo()),
                 EMAIL_SEND_TIMEOUT,
                 this,
                 SLOT(at_sendEmailFinished(int,bool,int)));

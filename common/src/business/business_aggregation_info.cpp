@@ -19,6 +19,10 @@ void QnBusinessAggregationInfo::clear() {
     m_details.clear();
 }
 
+bool QnBusinessAggregationInfo::isEmpty() const {
+    return m_details.isEmpty();
+}
+
 void QnBusinessAggregationInfo::append(const QnBusinessEventParameters &runtimeParams) {
     QString key = runtimeParams.getParamsKey();
     QnInfoDetail& info = m_details[key];

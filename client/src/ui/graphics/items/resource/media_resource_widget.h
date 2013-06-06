@@ -122,7 +122,7 @@ protected:
     void invalidateMotionSelectionCache();
 
     /** Returns displayed part of the widget in normalized coordinates. */
-    QRectF calculateDisplayedRect();
+    QRectF calculateDisplayedRect(int channel);
 
     QSize motionGridSize() const;
     QPoint channelGridOffset(int channel) const;
