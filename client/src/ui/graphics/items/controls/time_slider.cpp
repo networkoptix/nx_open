@@ -1545,7 +1545,7 @@ void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color
     if(pos < m_windowStart || pos > m_windowEnd) 
         return;
     
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+    //QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
     QnScopedPainterPenRollback penRollback(painter, QPen(color, 0));
 
     qreal x = quickPositionFromValue(pos);

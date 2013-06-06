@@ -37,22 +37,22 @@ void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     QStyleOptionSlider opt;
     initStyleOption(&opt);
 
+    QnScopedPainterPenRollback penRollback(painter);
+    QnScopedPainterBrushRollback brushRollback(painter);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
 
     /* Draw frame. */
-    {
-        QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
-        QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
-        painter->drawRect(rect());
-    }
+    painter->setPen(QPen(separatorColor, 0));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(rect());
 
     /* Draw scrollbar handle. */
     QRect handleRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
-    {
-        QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
-        QnScopedPainterBrushRollback brushRollback(painter, handleColor);
-        painter->drawRect(handleRect);
-    }
+    painter->setPen(QPen(separatorColor, 0));
+    painter->setBrush(handleColor);
+    painter->drawRect(handleRect);
+
+    antialiasingRollback.rollback();
 
     /* Draw indicator. */
     if(m_indicatorPosition >= minimum() && indicatorPosition() <= maximum() + pageStep()) {
@@ -66,8 +66,8 @@ void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
         /* Paint it. */
         qreal x = handleOffset + grooveOffset;
-        QnScopedPainterPenRollback penRollback(painter, QPen(indicatorColor, 0));
-        painter->drawLine(QPointF(x, opt.rect.top()), QPointF(x, opt.rect.bottom()));
+        painter->setPen(QPen(indicatorColor, 0));
+        painter->drawLine(QPointF(x, opt.rect.top() + 1.0), QPointF(x, opt.rect.bottom()));
     }
 }
 
