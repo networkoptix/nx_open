@@ -62,7 +62,6 @@
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/system_menu_event.h>
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include <utils/common/event_processors.h>
@@ -466,14 +465,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_notificationsItem = new QnNotificationsCollectionItem(m_controlsWidget, 0, context());
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
-
-    QnWorkbenchNotificationsHandler* handler = context()->instance<QnWorkbenchNotificationsHandler>();
-    connect(handler, SIGNAL(businessActionAdded(QnAbstractBusinessActionPtr)),
-            m_notificationsItem, SLOT(showBusinessAction(QnAbstractBusinessActionPtr)));
-    connect(handler, SIGNAL(systemHealthEventAdded(QnSystemHealth::MessageType,const QnResourcePtr&)),
-            m_notificationsItem, SLOT(showSystemHealthEvent(QnSystemHealth::MessageType,const QnResourcePtr&)));
-    connect(handler, SIGNAL(cleared()),
-            m_notificationsItem, SLOT(hideAll()));
 
     m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);

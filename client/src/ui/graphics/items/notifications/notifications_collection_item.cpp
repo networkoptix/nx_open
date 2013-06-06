@@ -15,6 +15,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
 
 //TODO: #GDM remove debug
 #include <business/actions/common_business_action.h>
@@ -76,6 +77,14 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     connect(m_list, SIGNAL(itemRemoved(QnNotificationItem*)), this, SLOT(at_list_itemRemoved(QnNotificationItem*)));
 
     setLayout(layout);
+
+    QnWorkbenchNotificationsHandler* handler = this->context()->instance<QnWorkbenchNotificationsHandler>();
+    connect(handler, SIGNAL(businessActionAdded(QnAbstractBusinessActionPtr)),
+            this, SLOT(showBusinessAction(QnAbstractBusinessActionPtr)));
+    connect(handler, SIGNAL(systemHealthEventAdded(QnSystemHealth::MessageType,const QnResourcePtr&)),
+            this, SLOT(showSystemHealthEvent(QnSystemHealth::MessageType,const QnResourcePtr&)));
+    connect(handler, SIGNAL(cleared()),
+            this, SLOT(hideAll()));
 }
 
 QnNotificationsCollectionItem::~QnNotificationsCollectionItem() {
