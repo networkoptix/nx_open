@@ -346,7 +346,13 @@ void QnWorkbenchDisplay::initSceneView() {
         } else {
             QGLFormat glFormat;
             glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
+#ifdef Q_OS_LINUX
+            // Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
+            // VSync will be re-enabled later in GLHardware checker if drivers are not NVidia's --gdm
+            glFormat.setSwapInterval(0); /* Turn vsync off. */
+#else
             glFormat.setSwapInterval(1); /* Turn vsync on. */
+#endif
 
             QGLWidget *glWidget = new QGLWidget(glFormat);
             new QnGlHardwareChecker(glWidget);

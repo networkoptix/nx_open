@@ -422,8 +422,6 @@ QRectF QnMediaResourceWidget::calculateDisplayedRect() {
 void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     m_paintedChannels.fill(false);
 
-    qDebug() << "1" << calculateDisplayedRect();
-
     base_type::paint(painter, option, widget);
 
     for(int channel = 0; channel < channelCount(); channel++)
