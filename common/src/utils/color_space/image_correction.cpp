@@ -61,13 +61,19 @@ void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height,
 
     int leftPos = 0;
     int leftSum = 0;
-    for (; leftPos < 256 && leftSum < leftThreshold; ++leftPos)
+    for (; leftPos < 256; ++leftPos) {
+        if (leftSum+hystogram[leftPos] >= leftThreshold)
+            break;
         leftSum += hystogram[leftPos];
+    }
 
     int rightPos = 255;
     int rightSum = 0;
-    for (; rightPos >= leftPos && rightSum < rightThreshold; --rightPos)
+    for (; rightPos >= leftPos; --rightPos) {
+        if (rightSum+hystogram[rightPos] >= rightThreshold)
+            break;
         rightSum += hystogram[rightPos];
+    }
 
     if (rightPos - leftPos < MIN_GAMMA_RANGE) {
         reset();
