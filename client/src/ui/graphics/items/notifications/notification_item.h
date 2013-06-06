@@ -12,10 +12,10 @@ class QGraphicsLinearLayout;
 class QnToolTipWidget;
 class HoverFocusProcessor;
 
-class QnNotificationItem: public QnClickableWidget {
+class QnNotificationItem: public QnClickableFrameWidget {
     Q_OBJECT
+    typedef QnClickableFrameWidget base_type;
 
-    typedef QnClickableWidget base_type;
 public:
     explicit QnNotificationItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~QnNotificationItem();

@@ -13,7 +13,6 @@
 #include <ui/processors/hover_processor.h>
 
 namespace {
-
     class QnNotificationToolTipItem: public QnToolTipWidget {
         typedef QnToolTipWidget base_type;
     public:
@@ -106,6 +105,10 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 
     setLayout(m_layout);
 
+    setPaletteColor(this, QPalette::Window, Qt::transparent);
+    setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
+    setFrameWidth(0.5);
+
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipItem);
     m_hoverProcessor->setHoverEnterDelay(250);
@@ -123,7 +126,6 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 
     updateToolTipPosition();
     updateToolTipVisibility();
-
 }
 
 QnNotificationItem::~QnNotificationItem() {
@@ -166,8 +168,7 @@ void QnNotificationItem::addActionButton(const QIcon &icon, const QString &toolt
 }
 
 void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    Q_UNUSED(option)
-    Q_UNUSED(widget)
+    base_type::paint(painter, option, widget);
 
     QRadialGradient gradient(margin, buttonSize*.5 + margin, buttonSize*2);
     gradient.setColorAt(0.0, m_color);
