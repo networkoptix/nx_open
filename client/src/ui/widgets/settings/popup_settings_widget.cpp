@@ -34,7 +34,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QnWorkbenchContext *context, QWidge
 
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(QnSystemHealth::toString(QnSystemHealth::MessageType(i), true));
+        checkbox->setText(QnSystemHealth::messageName(QnSystemHealth::MessageType(i)));
         ui->systemHealthLayout->addWidget(checkbox);
         m_systemHealthCheckBoxes << checkbox;
     }

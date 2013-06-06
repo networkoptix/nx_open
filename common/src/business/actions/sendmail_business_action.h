@@ -19,11 +19,7 @@ public:
     explicit QnSendMailBusinessAction(const QnBusinessEventParameters &runtimeParams);
     ~QnSendMailBusinessAction() {}
 
-    QString getSubject() const;
-
-    //!Convert action to human-readable string (for inserting into email body)
-    QString getMessageBody() const;
-
+    const QnBusinessAggregationInfo &aggregationInfo() const;
     void setAggregationInfo(const QnBusinessAggregationInfo &info);
 private:
     QnBusinessAggregationInfo m_aggregationInfo;

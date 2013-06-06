@@ -17,6 +17,7 @@ public:
     QnBusinessAggregationInfo();
 
     void append(const QnBusinessEventParameters& runtimeParams);
+    bool isEmpty() const;
     int totalCount() const;
     void clear();
 
