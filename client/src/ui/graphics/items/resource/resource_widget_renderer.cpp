@@ -15,7 +15,8 @@
 QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, const QGLContext* context )
 :
     QnAbstractRenderer( parent ),
-    m_glContext( context )
+    m_glContext( context ),
+    m_displayRect(0, 0, 1, 1)
 {
     Q_ASSERT( context != NULL );
 
@@ -183,12 +184,17 @@ void QnResourceWidgetRenderer::skip(int channel) {
     ctx.uploader->discardAllFramesPostedToDisplay();
 }
 
+void QnResourceWidgetRenderer::setDisplayedRect(int channel, const QRectF& rect)
+{
+    m_displayRect = rect;
+}
+
 void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image) {
     RenderingTools& ctx = m_channelRenderers[image->channel];
     if( !ctx.uploader )
         return;
-
-    ctx.uploader->uploadDecodedPicture( image );
+    
+    ctx.uploader->uploadDecodedPicture( image, m_displayRect);
     ++ctx.framesSinceJump;
 
     QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);

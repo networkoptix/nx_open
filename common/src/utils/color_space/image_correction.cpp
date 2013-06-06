@@ -2,7 +2,7 @@
 #include "utils/math/math.h"
 
 void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height, int stride, 
-                                         const ImageCorrectionParams& data)
+                                         const ImageCorrectionParams& data, const QRectF& srcRect)
 {
     static const int MIN_GAMMA_RANGE = 6;
     static const float NORM_RANGE_RANGE = 256.0 - 16.0 - 16.0;
@@ -11,10 +11,10 @@ void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height,
     Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
     memset(hystogram, 0, sizeof(hystogram));
 
-    int left = qPower2Floor(data.srcRect.left()*width, 4);
-    int right = qPower2Floor(data.srcRect.right()*width, 4);
-    int top = data.srcRect.top()*height;
-    int bottom = data.srcRect.bottom()*height;
+    int left = qPower2Floor(srcRect.left()*width, 4);
+    int right = qPower2Floor(srcRect.right()*width, 4);
+    int top = srcRect.top()*height;
+    int bottom = srcRect.bottom()*height;
 
     int xSteps = (right-left) / 4;
 
@@ -41,7 +41,7 @@ void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height,
     }
 
     // get hystogram range
-    int pixels = width * height;
+    int pixels = (right-left) * (bottom-top);
     int leftThreshold = data.blackLevel * pixels + 0.5;
     int rightThreshold = data.whiteLevel * pixels + 0.5;
 

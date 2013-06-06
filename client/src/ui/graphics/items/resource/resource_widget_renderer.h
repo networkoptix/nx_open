@@ -75,6 +75,8 @@ public:
     bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
 
     void setImageCorrection(const ImageCorrectionParams& value);
+
+    void setDisplayedRect(int channel, const QRectF& rect);
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.
@@ -115,6 +117,8 @@ private:
     QSize m_channelScreenSize;
 
     const QGLContext* m_glContext;
+    
+    QRectF m_displayRect;
 };
 
 #endif // QN_DISPLAY_WIDGET_RENDERER_H
