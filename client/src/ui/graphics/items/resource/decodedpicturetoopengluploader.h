@@ -269,8 +269,8 @@ private:
     bool m_terminated;
     bool m_yv12SharedUsed;
     bool m_nv12SharedUsed;
-    mutable std::deque<AsyncPicDataUploader*> m_unusedUploaders;
-    std::deque<AsyncPicDataUploader*> m_usedUploaders;
+    mutable std::deque<AsyncPicDataUploader*> m_unusedAsyncUploaders;
+    std::deque<AsyncPicDataUploader*> m_usedAsyncUploaders;
     QSharedPointer<DecodedPictureToOpenGLUploadThread> m_uploadThread;
     quint8* m_rgbaBuf;
     int m_fileNumber;

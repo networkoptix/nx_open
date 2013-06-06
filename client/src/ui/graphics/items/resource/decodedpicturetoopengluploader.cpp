@@ -1211,13 +1211,13 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
     pleaseStop();
 
     for( std::deque<AsyncPicDataUploader*>::iterator
-        it = m_unusedUploaders.begin();
-        it != m_unusedUploaders.end();
+        it = m_unusedAsyncUploaders.begin();
+        it != m_unusedAsyncUploaders.end();
         ++it )
     {
         delete *it;
     }
-    m_unusedUploaders.clear();
+    m_unusedAsyncUploaders.clear();
 
     {
         //have to remove buffers in uploading thread, since it holds gl context current
@@ -1375,7 +1375,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 if( m_asyncUploadUsed )
                 {
                     //replacing newest decoded frame in the queue with new one...
-                    if( !m_usedUploaders.empty() )
+                    if( !m_usedAsyncUploaders.empty() )
                     {
                         quint64 prevPicPts = 0;
                         if( m_usedUploaders.back()->replacePicture( nextPicSequenceValue(), decodedPicture, decodedPicture->picData, displayedRect, &prevPicPts ) )
@@ -1419,18 +1419,18 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
             //posting picture to worker thread
 
             AsyncPicDataUploader* uploaderToUse = NULL;
-            if( m_unusedUploaders.empty() )
+            if( m_unusedAsyncUploaders.empty() )
             {
                 uploaderToUse = new AsyncPicDataUploader( this );
             }
             else
             {
-                uploaderToUse = m_unusedUploaders.front();
-                m_unusedUploaders.pop_front();
+                uploaderToUse = m_unusedAsyncUploaders.front();
+                m_unusedAsyncUploaders.pop_front();
             }
 
             uploaderToUse->setData( emptyPictureBuf, decodedPicture->picData );
-            m_usedUploaders.push_back( uploaderToUse );
+            m_usedAsyncUploaders.push_back( uploaderToUse );
             decodedPicture->picData.clear();    //releasing no more needed reference to picture data
             m_uploadThread->push( uploaderToUse );
         }
@@ -1570,8 +1570,8 @@ quint64 DecodedPictureToOpenGLUploader::nextFrameToDisplayTimestamp() const
         return m_framesWaitingUploadInGUIThread.front()->picture()->pts();
 #endif
     //async upload case (only when HW decoding enabled)
-    if( !m_usedUploaders.empty() )
-        return m_usedUploaders.front()->pts();
+    if( !m_usedAsyncUploaders.empty() )
+        return m_usedAsyncUploaders.front()->pts();
     if( !m_renderedPictures.empty() )
         return m_renderedPictures.back()->pts();
     return AV_NOPTS_VALUE;
@@ -1581,7 +1581,7 @@ void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 {
     QMutexLocker lk( &m_mutex );
 
-    while( !m_terminated && (!m_framesWaitingUploadInGUIThread.empty() || !m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() || !m_picturesBeingRendered.empty()) )
+    while( !m_terminated && (!m_framesWaitingUploadInGUIThread.empty() || !m_picturesWaitingRendering.empty() || !m_usedAsyncUploaders.empty() || !m_picturesBeingRendered.empty()) )
         m_cond.wait( lk.mutex() );
 }
 
@@ -1631,8 +1631,8 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
 {
     QMutexLocker lk( &m_mutex );
 
-    while( !m_usedUploaders.empty() )
-        m_cond.wait( lk.mutex() );
+    while( !m_usedAsyncUploaders.empty() )
+        m_cond.wait( lk.mutex() );  //TODO/IMPL cancel upload
 
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     cancelUploadingInGUIThread();
@@ -1757,8 +1757,8 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadSucceeded( AsyncPicDataUpl
 
     if( uploader )
     {
-        m_usedUploaders.erase( std::find( m_usedUploaders.begin(), m_usedUploaders.end(), uploader ) );
-        m_unusedUploaders.push_back( uploader );
+        m_usedAsyncUploaders.erase( std::find( m_usedAsyncUploaders.begin(), m_usedAsyncUploaders.end(), uploader ) );
+        m_unusedAsyncUploaders.push_back( uploader );
     }
     m_cond.wakeAll();   //notifying that uploading finished
 }
@@ -1777,8 +1777,8 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadFailed( AsyncPicDataUpload
 
     if( uploader )
     {
-        m_usedUploaders.erase( std::find( m_usedUploaders.begin(), m_usedUploaders.end(), uploader ) );
-        m_unusedUploaders.push_back( uploader );
+        m_usedAsyncUploaders.erase( std::find( m_usedAsyncUploaders.begin(), m_usedAsyncUploaders.end(), uploader ) );
+        m_unusedAsyncUploaders.push_back( uploader );
     }
     m_cond.wakeAll();   //notifying that uploading finished
 }
@@ -1788,8 +1788,8 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadCancelled( AsyncPicDataUpl
     QMutexLocker lk( &m_mutex );
     if( uploader )
     {
-        m_usedUploaders.erase( std::find( m_usedUploaders.begin(), m_usedUploaders.end(), uploader ) );
-        m_unusedUploaders.push_back( uploader );
+        m_usedAsyncUploaders.erase( std::find( m_usedAsyncUploaders.begin(), m_usedAsyncUploaders.end(), uploader ) );
+        m_unusedAsyncUploaders.push_back( uploader );
     }
     m_cond.wakeAll();   //notifying that uploading finished
 }

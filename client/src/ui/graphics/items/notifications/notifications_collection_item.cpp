@@ -2,6 +2,8 @@
 
 #include <QtGui/QGraphicsLinearLayout>
 
+#include <business/business_strings_helper.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -94,67 +96,6 @@ QRectF QnNotificationsCollectionItem::headerGeometry() const {
     return m_headerWidget->geometry();
 }
 
-/*
-    int eventReasonCode = QnBusinessEventRuntime::getReasonCode(eventParams);
-
-    item->setText(getResourceName(resource));
-    item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-    item->setData(QnBusinessEventRuntime::getEventResourceId(eventParams), ResourceIdRole);
-    item->setData(0, EventCountRole);
-    item->setData(getEventTime(eventParams), EventTimeRole);
-    item->setData(eventReasonCode, EventReasonRole);
-    item->setData(QnBusinessEventRuntime::getReasonText(eventParams), EventReasonTextRole);
-
-
-
- *
-QnBusiness::EventReason reasonCode = (QnBusiness::EventReason)item->data(EventReasonRole).toInt();
-    QString reasonText = item->data(EventReasonTextRole).toString();
-
-    switch (reasonCode) {
-        case QnBusiness::NetworkIssueNoFrame:
-            if (m_eventType == BusinessEventType::Network_Issue)
-                item->appendRow(new QStandardItem(tr("No video frame received\nduring last %1 seconds.")
-                                                  .arg(reasonText)));
-            break;
-        case QnBusiness::NetworkIssueConnectionClosed:
-            if (m_eventType == BusinessEventType::Network_Issue)
-                item->appendRow(new QStandardItem(tr("Connection to camera\nwas unexpectedly closed")));
-            break;
-        case QnBusiness::NetworkIssueRtpPacketLoss:
-            if (m_eventType == BusinessEventType::Network_Issue) {
-                QStringList seqs = reasonText.split(QLatin1Char(';'));
-                if (seqs.size() != 2)
-                    break;
-                QString text = tr("RTP packet loss detected.\nPrev seq.=%1 next seq.=%2")
-                        .arg(seqs[0])
-                        .arg(seqs[1]);
-                item->appendRow(new QStandardItem(text));
-            }
-            break;
-        case QnBusiness::MServerIssueTerminated:
-            if (m_eventType == BusinessEventType::MediaServer_Failure)
-                item->appendRow(new QStandardItem(tr("Server terminated.")));
-            break;
-        case QnBusiness::MServerIssueStarted:
-            if (m_eventType == BusinessEventType::MediaServer_Failure)
-                item->appendRow(new QStandardItem(tr("Server started after crash.")));
-            break;
-        case QnBusiness::StorageIssueIoError:
-            if (m_eventType == BusinessEventType::Storage_Failure)
-                item->appendRow(new QStandardItem(tr("I/O Error occured at\n%1")
-                                                  .arg(reasonText)));
-            break;
-        case QnBusiness::StorageIssueNotEnoughSpeed:
-            if (m_eventType == BusinessEventType::Storage_Failure)
-                item->appendRow(new QStandardItem(tr("Not enough HDD/SSD speed\nfor recording at\n%1.")
-                                                  .arg(reasonText)));
-            break;
-        default:
-            break;
-    }
- **/
-
 void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     int resourceId = params.getEventResourceId();
@@ -163,6 +104,10 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
         return;
 
     QnNotificationItem *item = new QnNotificationItem(m_list);
+
+    item->setText(QnBusinessStringsHelper::shortEventDescription(params));
+    item->setTooltipText(QnBusinessStringsHelper::longEventDescription(businessAction));
+
     QString name = resource->getName();
 
     BusinessEventType::Value eventType = params.getEventType();
@@ -178,7 +123,6 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         .withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000),
                         2.0
                         );
-            item->setText(tr("Motion was detected on camera %1.").arg(name));
             break;
         }
 
@@ -191,7 +135,6 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         QnActionParameters(resource),
                         2.0
                         );
-            item->setText(tr("Input signal was detected on camera %1.").arg(name));
             break;
         }
     case BusinessEventType::Camera_Disconnect: {
@@ -209,7 +152,6 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::CameraSettingsAction,
                         QnActionParameters(resource)
                         );
-            item->setText(tr("Camera %1 disconnected.").arg(name));
             break;
         }
 
@@ -227,7 +169,6 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::ServerSettingsAction,
                         QnActionParameters(resource)
                         );
-            item->setText(tr("Storage failure on %1.").arg(name));
             break;
         }
     case BusinessEventType::Network_Issue:{
@@ -245,13 +186,11 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::CameraSettingsAction,
                         QnActionParameters(resource)
                         );
-            item->setText(tr("Network issue on %1.").arg(name));
             break;
         }
 
     case BusinessEventType::Camera_Ip_Conflict: {
             item->setColor(qnGlobals->notificationColorCritical());
-            item->setText(tr("Cameras' IP conflict detected."));
             //TODO: #GDM page in browser
             break;
         }
@@ -270,11 +209,8 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
     case BusinessEventType::MediaServer_Conflict: {
             item->setColor(qnGlobals->notificationColorCritical());
             //TODO: #GDM notification
-
-            item->setText(tr("Media Servers' conflict detected."));
             break;
         }
-
     default:
         break;
     }
@@ -365,9 +301,10 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
         break;
     }
     if (item->text().isEmpty()) {
-        QString text = QnSystemHealth::toString(message, true);
+        QString text = QnSystemHealth::messageName(message);
         item->setText(text);
     }
+    item->setTooltipText(QnSystemHealth::messageDescription(message));
 
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
 

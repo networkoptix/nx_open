@@ -134,9 +134,7 @@ QString QnNotificationItem::text() const {
 }
 
 void QnNotificationItem::setText(const QString &text) {
-    //TODO: #GDM
     m_textLabel->setText(text);
-    m_tooltipItem->setText(text);
 }
 
 void QnNotificationItem::setTooltipText(const QString &text) {

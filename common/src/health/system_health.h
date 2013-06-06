@@ -23,7 +23,8 @@ namespace QnSystemHealth {
         MessageTypeCount = NotDefined
     };
 
-    QString toString(MessageType messageType, bool shortMode = false);
+    QString messageName(MessageType messageType);
+    QString messageDescription(MessageType messageType);
 }
 
 
