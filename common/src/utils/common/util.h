@@ -156,6 +156,7 @@ public:
     // can be deallocated from other, and vice versa.
     // Always returns true for stateless allocators.
     bool operator==(const AlignmentAllocator<T,N>& other) const {
+        Q_UNUSED(other)
         return true;
     }
 };

@@ -649,6 +649,16 @@ void QnCamDisplay::blockTimeValue(qint64 time)
     }
 }
 
+void QnCamDisplay::blockTimeValueSafe(qint64 time)
+{
+    if (!m_doNotChangeDisplayTime) {
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+            m_nextReverseTime[i] = AV_NOPTS_VALUE;
+            m_display[i]->blockTimeValueSafe(time);
+        }
+    }
+}
+
 void QnCamDisplay::waitForFramesDisplayed()
 {
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
@@ -670,7 +680,7 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
 
     m_lastDecodedTime = AV_NOPTS_VALUE;
-    blockTimeValue(time);
+    blockTimeValueSafe(time);
     m_doNotChangeDisplayTime = false;
 
     m_emptyPacketCounter = 0;

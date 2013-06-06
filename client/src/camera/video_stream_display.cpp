@@ -868,13 +868,13 @@ void QnVideoStreamDisplay::blockTimeValue(qint64 time)
 {
     foreach(QnAbstractRenderer* render, m_renderList)
         render->blockTimeValue(m_channelNumber, time);
-    /*
-    QMutexLocker lock(&m_timeMutex);
-    m_lastDisplayedTime = time;
-    if (m_bufferedFrameDisplayer)
-        m_bufferedFrameDisplayer->overrideTimestampOfNextFrameToRender(time);
-    m_timeChangeEnabled = false;
-    */
+}
+
+void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
+{
+    QMutexLocker lock(&m_renderListMtx);
+    foreach(QnAbstractRenderer* render, m_renderList)
+        render->blockTimeValue(m_channelNumber, time);
 }
 
 bool QnVideoStreamDisplay::isTimeBlocked() const
