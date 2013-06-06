@@ -972,10 +972,16 @@ void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
         return m_navDelegate->directJumpToNonKeyFrame(mksec);
     }
 
-    QMutexLocker mutex(&m_jumpMtx);
+    bool useMutex = !m_externalLocked;
+    if (useMutex)
+        m_jumpMtx.lock();
+    
     beforeJumpInternal(mksec);
     m_exactJumpToSpecifiedFrame = true;
     channeljumpToUnsync(mksec, 0, mksec);
+
+    if (useMutex)
+        m_jumpMtx.unlock();
 }
 
 /*
