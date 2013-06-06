@@ -1378,7 +1378,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                     if( !m_usedAsyncUploaders.empty() )
                     {
                         quint64 prevPicPts = 0;
-                        if( m_usedUploaders.back()->replacePicture( nextPicSequenceValue(), decodedPicture, decodedPicture->picData, displayedRect, &prevPicPts ) )
+                        if( m_usedAsyncUploaders.back()->replacePicture( nextPicSequenceValue(), decodedPicture, decodedPicture->picData, displayedRect, &prevPicPts ) )
                         {
                             NX_LOG( QString::fromAscii( "Cancelled upload of decoded frame with pts %1 in favor of frame with pts %2" ).
                                 arg(prevPicPts).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
