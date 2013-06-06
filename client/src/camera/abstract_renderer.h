@@ -21,7 +21,7 @@ class QnAbstractRenderer: public QObject, public QnStoppable
 signals:
     void canBeDestroyed();
 public:
-    QnAbstractRenderer(QObject* parent = 0): QObject(parent), m_displayCounter(0), m_useCount(0), m_needStop(false) {}
+    QnAbstractRenderer(QObject* parent = 0): QObject(parent), m_useCount(0), m_needStop(false) {}
 
     virtual ~QnAbstractRenderer() {}
 
@@ -85,15 +85,6 @@ public:
     virtual void draw( const QSharedPointer<CLVideoDecoderOutput>& image) = 0;
 
     /**
-     * \returns                         Value of this renderer's display counter.
-     *                                  This counter is incremented each time a frame
-     *                                  is rendered.
-     */
-    int displayCounter() const {
-        return m_displayCounter;
-    }
-
-    /**
      * Inform drawer about video is temporary absent
      */
     virtual void onNoVideo() {}
@@ -116,8 +107,10 @@ public:
             emit canBeDestroyed();
     }
 
+    bool isEnabled() { return true; }
+    void setEnabled(bool enabled) {}
+
 private:
-    int m_displayCounter;
     int m_useCount;
     bool m_needStop;
     QMutex m_usingMutex;
