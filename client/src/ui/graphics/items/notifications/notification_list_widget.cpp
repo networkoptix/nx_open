@@ -1,5 +1,7 @@
 #include "notification_list_widget.h"
 
+#include <limits>
+
 #include <QtCore/QDateTime>
 
 #include <ui/graphics/items/notifications/notification_item.h>

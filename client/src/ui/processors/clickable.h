@@ -1,8 +1,10 @@
 #ifndef QN_CLICKABLE_H
 #define QN_CLICKABLE_H
 
-#include <QGraphicsSceneMouseEvent>
-#include <ui/common/geometry.h>
+#include <QtGui/QGraphicsSceneMouseEvent>
+
+#include <utils/math/fuzzy.h>
+#include <utils/common/forward.h>
 
 /**
  * A mixin class that lets graphics items handle mouse clicks properly.
@@ -14,13 +16,8 @@
 template<class Base>
 class Clickable: public Base {
 public:
-    template<class T0>
-    Clickable(const T0 &arg0): Base(arg0), m_clickableButtons(0) {}
+    QN_FORWARD_CONSTRUCTOR(Clickable, Base, {m_clickableButtons = 0; m_isDoubleClick = false;})
 
-    template<class T0, class T1>
-    Clickable(const T0 &arg0, const T1 &arg1): Base(arg0, arg1), m_clickableButtons(0) {}
-
-protected:
     Qt::MouseButtons clickableButtons() const {
         return m_clickableButtons;
     }
@@ -35,11 +32,14 @@ protected:
         m_clickableButtons = clickableButtons;
     }
 
+protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override {
         if(!(event->button() & m_clickableButtons))
             return;
 
         event->accept();
+        m_isDoubleClick = event->type() == QEvent::GraphicsSceneMouseDoubleClick;
+        
         pressedNotify(event);
     }
 
@@ -53,6 +53,15 @@ protected:
             return; /* If the button was released outside the item boundaries, then it is not a click. */
 
         event->accept();
+
+        if(m_isDoubleClick) {
+            emit doubleClicked();
+            emit doubleClicked(event->button());
+        } else {
+            emit clicked();
+            emit clicked(event->button());
+        }
+
         clickedNotify(event);
     }
 
@@ -68,8 +77,16 @@ protected:
 
     virtual void releasedNotify(QGraphicsSceneMouseEvent *event) { Q_UNUSED(event); };
 
+    /* Virtual signals follow. These can be overridden in derived class with actual signals. */
+
+    virtual void clicked() {}
+    virtual void clicked(Qt::MouseButton button) { Q_UNUSED(button); }
+    virtual void doubleClicked() {}
+    virtual void doubleClicked(Qt::MouseButton button) { Q_UNUSED(button); }
+
 private:
     Qt::MouseButtons m_clickableButtons;
+    bool m_isDoubleClick;
 };
 
 #endif // QN_CLICKABLE_H

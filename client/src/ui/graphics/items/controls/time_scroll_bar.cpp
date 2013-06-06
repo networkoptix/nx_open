@@ -67,7 +67,7 @@ void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         /* Paint it. */
         qreal x = handleOffset + grooveOffset;
         painter->setPen(QPen(indicatorColor, 0));
-        painter->drawLine(QPointF(x, opt.rect.top() + 1.0), QPointF(x, opt.rect.bottom()));
+        painter->drawLine(QPointF(x, opt.rect.top() + 1.0), QPointF(x, opt.rect.bottom())); /* + 1.0 is to deal with AA spilling the line outside the item's boundaries. */
     }
 }
 
