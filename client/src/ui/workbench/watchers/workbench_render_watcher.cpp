@@ -71,7 +71,7 @@ void QnWorkbenchRenderWatcher::registerWidget(QnResourceWidget *widget) {
 
     QnResourceDisplay *display = NULL;
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-        display = mediaWidget->display();
+        display = mediaWidget->display().data();
 
         connect(widget, SIGNAL(displayChanged()), this, SLOT(at_widget_displayChanged()));
     }
@@ -116,7 +116,7 @@ void QnWorkbenchRenderWatcher::at_widget_displayChanged(QnMediaResourceWidget *w
     int isDisplaying = this->isDisplaying(widget);
     
     setDisplaying(widget, false);
-    m_dataByWidget[widget] = widget->display().data();
+    m_dataByWidget[widget].display = widget->display().data();
     setDisplaying(widget, isDisplaying);
 }
 

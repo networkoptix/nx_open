@@ -6,11 +6,12 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnResourceDisplay;
 class QnResourceWidget;
+class QnResourceDisplay;
+class QnMediaResourceWidget;
 
 /**
- * For each renderer on the scene, this class tracks whether it is being 
+ * For each widget on the scene, this class tracks whether it is being 
  * currently displayed, or not. It provides the necessary getters and signals
  * to track changes of this state.
  */

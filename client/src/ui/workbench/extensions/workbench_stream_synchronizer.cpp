@@ -28,7 +28,8 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_widgetCount(0),
     m_counter(NULL),
-    m_syncPlay(NULL)
+    m_syncPlay(NULL),
+    m_watcher(context()->instance<QnWorkbenchRenderWatcher>())
 {
     /* Prepare syncplay. */
     m_syncPlay = new QnArchiveSyncPlayWrapper(); // TODO: #Elric QnArchiveSyncPlayWrapper destructor doesn't get called, investigate.
@@ -45,8 +46,7 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     connect(m_counter,                  SIGNAL(reachedZero()),                                  m_counter,  SLOT(deleteLater()));
 
     /* Prepare render watcher instance. */
-    QnWorkbenchRenderWatcher *renderWatcher = context()->instance<QnWorkbenchRenderWatcher>();
-    connect(renderWatcher,              SIGNAL(displayingChanged(QnAbstractRenderer *, bool)),  this,       SLOT(at_renderWatcher_displayingChanged(QnAbstractRenderer *, bool)));
+    connect(m_watcher,                  SIGNAL(displayingChanged(QnResourceDisplay *)),         this,       SLOT(at_renderWatcher_displayingChanged(QnResourceDisplay *)));
 
     /* Run handlers for all widgets already on display. */
     foreach(QnResourceWidget *widget, display()->widgets())
@@ -136,12 +136,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
 
     m_widgetCount++;
     if(m_widgetCount == 1) 
-    {
-        //if(!mediaWidget->resource().dynamicCast<QnSecurityCamResource>())
-            //mediaWidget->display()->archiveReader()->jumpTo(0, 0); // change current position from live to left edge if it is not camera
-
         emit effectiveChanged();
-    }
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
@@ -166,12 +161,8 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
         emit effectiveChanged();
 }
 
-void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingChanged(QnAbstractRenderer *renderer, bool displaying) {
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(renderer));
-    if(mediaWidget == NULL)
-        return;
-
-    m_syncPlay->onConsumerBlocksReader(mediaWidget->display()->dataProvider(), !displaying);
+void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingChanged(QnResourceDisplay *display) {
+    m_syncPlay->onConsumerBlocksReader(display->dataProvider(), !m_watcher->isDisplaying(display));
 }
 
 void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged() {
