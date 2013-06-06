@@ -13,7 +13,6 @@
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 
-
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
     typedef QnResourceWidget base_type;
@@ -121,6 +120,9 @@ protected:
 
     void ensureMotionSelectionCache();
     void invalidateMotionSelectionCache();
+
+    /** Returns displayed part of the widget in normalized coordinates. */
+    QRectF calculateDisplayedRect();
 
     QSize motionGridSize() const;
     QPoint channelGridOffset(int channel) const;

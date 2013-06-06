@@ -394,12 +394,35 @@ void QnMediaResourceWidget::updateDisplay() {
     setDisplay(display);
 }
 
+QRectF QnMediaResourceWidget::calculateDisplayedRect() {
+    QRectF result(0, 0, 1, 1);
+
+    QRectF widgetRect = mapRectToScene(rect());
+    if (widgetRect.width() <= 0 || widgetRect.height() <= 0)
+        return result;
+
+    if(scene()->views().empty())
+        return result;
+
+    QGraphicsView *view = dynamic_cast<QGraphicsView *>(scene()->views()[0]);
+    if (!view)
+        return result;
+
+    QRectF viewportRect = QnSceneTransformations::mapRectToScene(view, view->viewport()->rect());
+    result = viewportRect.intersected(widgetRect).adjusted(-widgetRect.left(), -widgetRect.top(), 0, 0);
+    result.setSize(QSizeF(result.width() / widgetRect.width(),
+                        result.height() / widgetRect.height()));
+    return result;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
 void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     m_paintedChannels.fill(false);
+
+    qDebug() << "1" << calculateDisplayedRect();
 
     base_type::paint(painter, option, widget);
 
