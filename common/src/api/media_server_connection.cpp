@@ -38,6 +38,7 @@ namespace {
         ((CameraSearchObject,       "manualCamera/search"))
         ((CameraAddObject,          "manualCamera/add"))
         ((eventLogObject,           "events"))
+        ((ImageObject,              "image"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -357,6 +358,14 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, events, handle);
 		break;
     }
+    case ImageObject: {
+        QnApiPbSerializer serializer;
+        QImage image;
+        if (response.status == 0)
+            image.loadFromData(response.data);
+        emitFinished(this, response.status, image, handle);
+        break;
+    }
     default:
         assert(false); /* We should never get here. */
         break;
@@ -411,6 +420,23 @@ QnRequestParamList QnMediaServerConnection::createTimePeriodsRequest(const QnNet
         result << QnRequestParam("motionRegions", regionStr);
 
     return result;
+}
+
+int QnMediaServerConnection::getThumbnailsAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const 
+                                                QSize& size, const QString& imageFormat, bool precise, QObject *target, const char *slot)
+{
+    QnRequestParamList params;
+
+    params << QnRequestParam("res_id", camera->getPhysicalId());
+    params << QnRequestParam("time", timeUsec);
+    if (size.width() > 0)
+        params << QnRequestParam("width", size.width());
+    if (size.height() > 0)
+        params << QnRequestParam("height", size.height());
+    params << QnRequestParam("format", imageFormat);
+    if (precise)
+        params << QnRequestParam("precise", lit("1"));
+    return sendAsyncGetRequest(ImageObject, params, QN_REPLY_TYPE(QImage), target, slot);
 }
 
 int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot) {
