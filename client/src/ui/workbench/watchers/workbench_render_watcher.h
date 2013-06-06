@@ -6,8 +6,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+class QnResourceDisplay;
 class QnResourceWidget;
-class QnAbstractRenderer;
 
 /**
  * For each renderer on the scene, this class tracks whether it is being 
