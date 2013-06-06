@@ -15,10 +15,12 @@
 QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, const QGLContext* context )
 :
     QnAbstractRenderer( parent ),
-    m_glContext( context ),
-    m_displayRect(0, 0, 1, 1)
+    m_glContext( context )
 {
     Q_ASSERT( context != NULL );
+
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_displayRect[i] = QRectF(0, 0, 1, 1);
 
     const QGLContext* currentContextBak = QGLContext::currentContext();
     if( context && (currentContextBak != context) )
@@ -186,7 +188,7 @@ void QnResourceWidgetRenderer::skip(int channel) {
 
 void QnResourceWidgetRenderer::setDisplayedRect(int channel, const QRectF& rect)
 {
-    m_displayRect = rect;
+    m_displayRect[channel] = rect;
 }
 
 void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image) {
@@ -194,7 +196,7 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     if( !ctx.uploader )
         return;
     
-    ctx.uploader->uploadDecodedPicture( image, m_displayRect);
+    ctx.uploader->uploadDecodedPicture( image, m_displayRect[image->channel]);
     ++ctx.framesSinceJump;
 
     QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);

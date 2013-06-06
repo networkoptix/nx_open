@@ -7,6 +7,7 @@
 #include <camera/abstract_renderer.h>
 #include <camera/render_status.h>
 #include "utils/color_space/image_correction.h"
+#include "core/resource/resource_media_layout.h"
 
 
 class QThread;
@@ -118,7 +119,7 @@ private:
 
     const QGLContext* m_glContext;
     
-    QRectF m_displayRect;
+    QRectF m_displayRect[CL_MAX_CHANNELS];
 };
 
 #endif // QN_DISPLAY_WIDGET_RENDERER_H
