@@ -285,7 +285,7 @@
         <item>
          <widget class="QCheckBox" name="rememberPasswordCheckBox">
           <property name="text">
-           <string>&amp;Remember password</string>
+           <string>&amp;Auto-Login</string>
           </property>
           <property name="checked">
            <bool>false</bool>
