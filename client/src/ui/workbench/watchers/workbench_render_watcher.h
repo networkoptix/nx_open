@@ -37,6 +37,8 @@ public:
      */
     bool isDisplaying(QnResourceWidget *widget) const;
 
+    bool isDisplaying(QnResourceDisplay *display) const;
+
 signals:
     /**
      * This signal is emitted whenever a widget starts or stops
@@ -47,37 +49,33 @@ signals:
      */
     void displayingChanged(QnResourceWidget *widget);
 
-protected:
-    /**
-     * \param widget                    Widget to register.
-     */
-    void registerWidget(QnResourceWidget *widget);
+    void displayingChanged(QnResourceDisplay *display);
 
-    /**
-     * \param widget                    Widget to unregister.
-     */
-    void unregisterWidget(QnResourceWidget *widget);
+private:
+    Q_SLOT void registerWidget(QnResourceWidget *widget);
+    Q_SLOT void unregisterWidget(QnResourceWidget *widget);
+    void setDisplaying(QnResourceWidget *widget, bool displaying);
 
 private slots:
     void at_beforePaintInstrument_activated();
     void at_afterPaintInstrument_activated();
     void at_widget_displayChanged();
-    void at_widget_displayChanged(QnResourceWidget *widget);
+    void at_widget_displayChanged(QnMediaResourceWidget *widget);
     void at_widget_painted();
     void at_widget_painted(QnResourceWidget *widget);
 
 private:
-    struct Data {
-        Data(): displaying(false), newDisplaying(false) {}
-        Data(bool displaying): displaying(displaying), newDisplaying(false) {}
+    struct WidgetData {
+        WidgetData(): displaying(false), newDisplaying(false), display(NULL) {}
+        WidgetData(bool displaying, QnResourceDisplay *display): displaying(displaying), newDisplaying(false), display(display) {}
 
         bool displaying;
         bool newDisplaying;
+        QnResourceDisplay *display;
     };
 
-    QHash<QnResourceWidget *, Data> m_dataByWidget;
-    /*QHash<QnAbstractRenderer *, QnResourceDisplay *> m_displayByRenderer;
-    QHash<QnResourceDisplay *, int> m_countByDisplay;*/
+    QHash<QnResourceWidget *, WidgetData> m_dataByWidget;
+    QHash<QnResourceDisplay *, int> m_countByDisplay;
 };
 
 #endif // QN_WORKBENCH_RENDER_WATCHER_H

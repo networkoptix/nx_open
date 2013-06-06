@@ -28,6 +28,34 @@ QnWorkbenchRenderWatcher::~QnWorkbenchRenderWatcher() {
     return;
 }
 
+bool QnWorkbenchRenderWatcher::isDisplaying(QnResourceWidget *widget) const {
+    return m_dataByWidget.value(widget).displaying;
+}
+
+bool QnWorkbenchRenderWatcher::isDisplaying(QnResourceDisplay *display) const {
+    return m_countByDisplay.value(display, 0) > 0;
+}
+
+void QnWorkbenchRenderWatcher::setDisplaying(QnResourceWidget *widget, bool displaying) {
+    WidgetData &data = m_dataByWidget[widget];
+    if(data.displaying == displaying)
+        return;
+
+    data.displaying = displaying;
+
+    emit displayingChanged(widget);
+
+    if(displaying) {
+        if(++m_countByDisplay[data.display] == 1)
+            emit displayingChanged(data.display);
+    } else {
+        if(--m_countByDisplay[data.display] == 0) {
+            m_countByDisplay.remove(data.display);
+            emit displayingChanged(data.display);
+        }
+    }
+}
+
 void QnWorkbenchRenderWatcher::registerWidget(QnResourceWidget *widget) {
     if(!widget) {
         qnNullWarning(widget);
@@ -40,9 +68,15 @@ void QnWorkbenchRenderWatcher::registerWidget(QnResourceWidget *widget) {
     }
 
     connect(widget, SIGNAL(painted()), this, SLOT(at_widget_painted()));
-    connect(widget, SIGNAL(displayChanged()), this, SLOT(at_widget_displayChanged()));
 
-    m_dataByWidget[widget] = Data(false);
+    QnResourceDisplay *display = NULL;
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
+        display = mediaWidget->display();
+
+        connect(widget, SIGNAL(displayChanged()), this, SLOT(at_widget_displayChanged()));
+    }
+
+    m_dataByWidget[widget] = WidgetData(false, display);
 }
 
 void QnWorkbenchRenderWatcher::unregisterWidget(QnResourceWidget *widget) {
@@ -60,29 +94,30 @@ void QnWorkbenchRenderWatcher::unregisterWidget(QnResourceWidget *widget) {
 }
 
 
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchRenderWatcher::at_beforePaintInstrument_activated() {
-    for(QHash<QnResourceWidget *, Data>::iterator pos = m_dataByWidget.begin(); pos != m_dataByWidget.end(); pos++)
+    for(QHash<QnResourceWidget *, WidgetData>::iterator pos = m_dataByWidget.begin(); pos != m_dataByWidget.end(); pos++)
         pos->newDisplaying = false;
 }
 
 void QnWorkbenchRenderWatcher::at_afterPaintInstrument_activated() {
-    for(QHash<QnResourceWidget *, Data>::iterator pos = m_dataByWidget.begin(); pos != m_dataByWidget.end(); pos++) {
-        if(pos->displaying != pos->newDisplaying) {
-            pos->newDisplaying = pos->displaying;
-            emit displayingChanged(pos.key());
-        }
-    }
+    for(QHash<QnResourceWidget *, WidgetData>::iterator pos = m_dataByWidget.begin(); pos != m_dataByWidget.end(); pos++)
+        setDisplaying(pos.key(), pos->newDisplaying);
 }
 
 void QnWorkbenchRenderWatcher::at_widget_displayChanged() {
-    at_widget_displayChanged(checked_cast<QnResourceWidget *>(sender()));
+    at_widget_displayChanged(checked_cast<QnMediaResourceWidget *>(sender()));
 }
 
-void QnWorkbenchRenderWatcher::at_widget_displayChanged(QnResourceWidget *widget) {
+void QnWorkbenchRenderWatcher::at_widget_displayChanged(QnMediaResourceWidget *widget) {
+    int isDisplaying = this->isDisplaying(widget);
     
+    setDisplaying(widget, false);
+    m_dataByWidget[widget] = widget->display().data();
+    setDisplaying(widget, isDisplaying);
 }
 
 void QnWorkbenchRenderWatcher::at_widget_painted() {
