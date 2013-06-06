@@ -5,7 +5,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 
-#include <utils/common/config.h>
+#include <common/config.h>
 
 
 // -------------------------------------------------------------------------- //

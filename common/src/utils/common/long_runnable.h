@@ -1,7 +1,7 @@
 #ifndef QN_LONG_RUNNABLE_H
 #define QN_LONG_RUNNABLE_H
 
-#include "config.h" 
+#include <common/config.h>
 
 #include <QtCore/QThread>
 #include <QtCore/QSharedPointer>

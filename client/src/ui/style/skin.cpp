@@ -7,13 +7,14 @@
 #include <QtGui/QImage>
 #include <QtGui/QPixmapCache>
 #include <QtGui/QStyleFactory>
-#include <QPluginLoader>
-#include <QStylePlugin>
+#include <QtGui/QPluginLoader>
+#include <QtGui/QStylePlugin>
 
 #include <utils/common/warnings.h>
 
+#include <client/config.h>
+
 #include "noptix_style.h"
-#include "../../config.h"
 
 namespace {
     class QnIconBuilder {
@@ -177,9 +178,7 @@ QPixmap QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::S
 }
 
 QStyle *QnSkin::style() {
-    QString baseStyleName;
-    baseStyleName = QLatin1String("Bespin");
-    QStyle *baseStyle = QStyleFactory::create(baseStyleName);
+    QStyle *baseStyle = QStyleFactory::create(QLatin1String("Bespin"));
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
     return style;
 }

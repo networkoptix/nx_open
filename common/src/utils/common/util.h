@@ -1,7 +1,7 @@
 #ifndef _UNIVERSAL_CLIENT_UTIL_H
 #define _UNIVERSAL_CLIENT_UTIL_H
 
-#include "config.h"
+#include <common/config.h>
 
 #include <QtCore/QString>
 
