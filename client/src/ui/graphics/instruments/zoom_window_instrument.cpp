@@ -16,7 +16,7 @@
 #include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/generic/clickable_widget.h>
+#include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench.h>

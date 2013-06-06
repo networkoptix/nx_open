@@ -2,7 +2,7 @@
 #define NOTIFICATION_ITEM_H
 
 #include <ui/graphics/items/standard/graphics_widget.h>
-#include <ui/graphics/items/generic/clickable_widget.h>
+#include <ui/graphics/items/generic/clickable_widgets.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>

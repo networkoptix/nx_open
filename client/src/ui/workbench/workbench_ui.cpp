@@ -37,7 +37,7 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
-#include <ui/graphics/items/generic/clickable_widget.h>
+#include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
