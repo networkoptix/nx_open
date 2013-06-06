@@ -22,9 +22,11 @@ public:
     static const Button MotionSearchButton = static_cast<Button>(0x08);
     static const Button PtzButton = static_cast<Button>(0x10);
     static const Button ZoomWindowButton = static_cast<Button>(0x20);
+    static const Button HistogramButton = static_cast<Button>(0x40);
 #define MotionSearchButton MotionSearchButton
 #define PtzButton PtzButton
 #define ZoomWindowButton ZoomWindowButton
+#define HistogramButton HistogramButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
@@ -130,6 +132,7 @@ private slots:
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
     void at_zoomWindowButton_toggled(bool checked);
+    void at_histogramButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
 
 private:

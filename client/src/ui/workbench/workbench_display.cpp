@@ -364,7 +364,10 @@ void QnWorkbenchDisplay::initSceneView() {
 
         /* All our items save and restore painter state. */
         m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
+#ifndef __APPLE__
+        //on macos, this flag results in QnMaskedProxyWidget::paint never called
         m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
+#endif
 
         /* Don't even try to uncomment this one, it slows everything down. */
         //m_view->setCacheMode(QGraphicsView::CacheBackground);

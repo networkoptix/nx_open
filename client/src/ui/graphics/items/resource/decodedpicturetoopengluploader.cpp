@@ -457,6 +457,21 @@ QnGlRendererTexture* DecodedPictureToOpenGLUploader::UploadedPicture::texture( i
     return m_textures[index].data();
 }
 
+const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::imageCorrectionResult() const
+{
+    return m_imgCorrection;
+}
+
+void DecodedPictureToOpenGLUploader::UploadedPicture::calcLevels( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data)
+{
+    m_imgCorrection.processImage(yPlane, width, height, stride, data);
+}
+
+void DecodedPictureToOpenGLUploader::UploadedPicture::resetHistogram()
+{
+    m_imgCorrection.reset();
+}
+
 GLuint DecodedPictureToOpenGLUploader::UploadedPicture::pboID( int index ) const
 {
     return m_pbo[index].id;
@@ -706,6 +721,14 @@ public:
             m_picDataRef.clear();
             m_uploader->pictureDataUploadFailed( this, pictureBuf );
             return;
+        }
+
+        ImageCorrectionParams imCor = m_uploader->getImageCorrection();
+        if (imCor.enabled) {
+            m_pictureBuf->calcLevels(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
+        }
+        else {
+            m_pictureBuf->resetHistogram();
         }
 
 #ifdef GL_COPY_AGGREGATION
@@ -1047,6 +1070,13 @@ public:
             m_uploader->pictureDataUploadSucceeded( NULL, m_dest );
         else
             m_uploader->pictureDataUploadFailed( NULL, m_dest );
+
+        ImageCorrectionParams imCor = m_uploader->getImageCorrection();
+        if (imCor.enabled)
+            m_dest->calcLevels(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0], imCor);
+        else
+            m_dest->resetHistogram();
+
 
         m_isRunning = false;
     }
@@ -1829,6 +1859,17 @@ inline void memcpy_sse4_stream_store( __m128i* dst, __m128i* src, size_t sz )
 }
 #endif
 
+//void DecodedPictureToOpenGLUploader::setImageCorrection( bool enabled, float blackLevel, float whiteLevel, float gamma)
+void DecodedPictureToOpenGLUploader::setImageCorrection(const ImageCorrectionParams& value)
+{
+    m_imageCorrection = value;
+}
+
+ImageCorrectionParams DecodedPictureToOpenGLUploader::getImageCorrection() const {
+    return m_imageCorrection;
+}
+
+
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
     const PixelFormat format,
@@ -2314,3 +2355,4 @@ void DecodedPictureToOpenGLUploader::savePicToFile( AVFrame* const pic, int pts 
     /*if( !img.save( fileName, "bmp" ) )
         int x = 0;*/
 }
+

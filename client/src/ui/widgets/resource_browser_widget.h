@@ -2,12 +2,14 @@
 #define QN_RESOURCE_BROWSER_WIDGET_H
 
 #include <QWidget>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
+class QComboBox;
 class QLineEdit;
 class QTabWidget;
 class QToolButton;

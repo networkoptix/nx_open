@@ -177,4 +177,5 @@ static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 int random(int min, int max);
 
 
+
 #endif // _UNIVERSAL_CLIENT_UTIL_H

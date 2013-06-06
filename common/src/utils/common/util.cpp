@@ -248,5 +248,3 @@ int currentTimeZone()
 int random(int min, int max) {
     return min + static_cast<int>(static_cast<qint64>(max - min) * qrand() / (RAND_MAX + 1));
 }
-
-

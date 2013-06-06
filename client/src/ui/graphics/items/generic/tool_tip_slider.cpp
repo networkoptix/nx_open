@@ -1,5 +1,6 @@
 #include "tool_tip_slider.h"
 
+#include <QApplication>
 #include <QtGui/QStyleOptionSlider>
 #include <QtGui/QGraphicsSceneMouseEvent>
 

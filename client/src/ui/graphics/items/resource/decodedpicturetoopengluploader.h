@@ -27,6 +27,7 @@
 #include "aggregationsurface.h"
 #define UPLOAD_TO_GL_IN_GUI_THREAD
 #endif
+#include "utils/color_space/image_correction.h"
 
 
 class AsyncPicDataUploader;
@@ -89,7 +90,10 @@ public:
         void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
         const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
 #endif
+        void calcLevels( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data);
+        void resetHistogram();
 
+        const ImageCorrectionResult& imageCorrectionResult() const;
     private:
         struct PBOData
         {
@@ -116,6 +120,7 @@ public:
         bool m_skippingForbidden;
         int m_flags;
         GLFence m_glFence;
+        ImageCorrectionResult m_imgCorrection;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
@@ -210,6 +215,9 @@ public:
     //!Uploader calles this method, if picture uploading has been cancelled from outside
     void pictureDataUploadCancelled( AsyncPicDataUploader* const uploader );
 
+    void setImageCorrection(const ImageCorrectionParams& value);
+    ImageCorrectionParams getImageCorrection() const;
+
     //!Loads picture with dat stored in \a planes to opengl \a dest
     /*!
         \param glContext This context MUST be current in the current thread
@@ -238,7 +246,6 @@ public:
         int lineSizes[],
         bool /*isVideoMemory*/ );
 #endif
-
 private:
     friend class QnGlRendererTexture;
     friend class DecodedPicturesDeleter;
@@ -269,6 +276,8 @@ private:
     bool m_hardwareDecoderUsed;
     bool m_asyncUploadUsed;
     QGLContext* m_initializedCtx;
+    
+    ImageCorrectionParams m_imageCorrection;
 
     bool usingShaderYuvToRgb() const;
     bool usingShaderNV12ToRgb() const;
@@ -284,6 +293,7 @@ private:
     void savePicToFile( AVFrame* const pic, int pts );
     //!m_mutex MUST be locked before this call
     void cancelUploadingInGUIThread();
+
 };
 
 #endif  //DECODEDPICTURETOOPENGLUPLOADER_H
