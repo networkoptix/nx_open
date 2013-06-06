@@ -107,8 +107,12 @@ public:
             emit canBeDestroyed();
     }
 
-    bool isEnabled(int channelNumber) { return true; }
-    void setEnabled(int channelNumber, bool enabled) {}
+    virtual bool isEnabled(int channelNumber) const = 0;
+    /*!
+        Enable/disable frame rendering for channel \a channelNumber. true by default. 
+        Disabling causes all previously posted frames being discarded. Any subsequent frames will be ignored
+    */
+    virtual void setEnabled(int channelNumber, bool enabled) = 0;
 
 private:
     int m_useCount;

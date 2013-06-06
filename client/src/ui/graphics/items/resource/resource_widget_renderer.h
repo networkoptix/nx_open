@@ -1,6 +1,8 @@
 #ifndef QN_DISPLAY_WIDGET_RENDERER_H
 #define QN_DISPLAY_WIDGET_RENDERER_H
 
+#include <vector>
+
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
 
@@ -77,6 +79,12 @@ public:
     void setImageCorrection(const ImageCorrectionParams& value);
 
     void setDisplayedRect(int channel, const QRectF& rect);
+
+    //!Implementation of QnAbstractRenderer::isEnabled
+    virtual bool isEnabled(int channelNumber) const override;
+    //!Implementation of QnAbstractRenderer::setEnabled
+    virtual void setEnabled(int channelNumber, bool enabled) override;
+
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.
@@ -119,6 +127,8 @@ private:
     const QGLContext* m_glContext;
     
     QRectF m_displayRect;
+
+    std::vector<bool> m_renderingEnabled;
 };
 
 #endif // QN_DISPLAY_WIDGET_RENDERER_H
