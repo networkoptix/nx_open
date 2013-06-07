@@ -60,6 +60,16 @@ void QnProxyLabel::setNum(double number) {
     setText(QString::number(number));
 }
 
+void QnProxyLabel::setPixmap(const QPixmap &pixmap) {
+    m_label->setPixmap(pixmap);
+    updateGeometry();
+}
+
+void QnProxyLabel::setPicture(const QPicture &picture) {
+    m_label->setPicture(picture);
+    updateGeometry();
+}
+
 void QnProxyLabel::clear() {
     m_label->clear();
     updateGeometry();

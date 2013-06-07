@@ -9,52 +9,77 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/proxy_label.h>
-#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/processors/hover_processor.h>
 
 namespace {
-    class QnNotificationToolTipItem: public QnToolTipWidget {
-        typedef QnToolTipWidget base_type;
-    public:
-        QnNotificationToolTipItem(QGraphicsItem *parent = 0): base_type(parent)
-        {
-            // TODO: Somehow unify it with the one in tool_tip_slider.cpp?
-            // At least the styling part?
-            setContentsMargins(5.0, 5.0, 5.0, 5.0);
-            setTailWidth(5.0);
-
-            setPaletteColor(this, QPalette::WindowText, QColor(63, 159, 216));
-            setWindowBrush(QColor(0, 0, 0, 255));
-            setFrameBrush(QColor(203, 210, 233, 128));
-            setFrameWidth(1.0);
-
-            QFont fixedFont = QApplication::font();
-            fixedFont.setPixelSize(14);
-            setFont(fixedFont);
-
-            updateTailPos();
-        }
-
-    protected:
-        virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override {
-            base_type::resizeEvent(event);
-
-            updateTailPos();
-        }
-
-    private:
-        void updateTailPos() {
-            QRectF rect = this->rect();
-            setTailPos(QPointF(rect.right() + 10.0, (rect.top() + rect.bottom()) / 2));
-        }
-    };
-
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
     const qreal margin = 4;
     const qreal buttonSize = 24;
 } // anonymous namespace
+
+/********** QnNotificationToolTipItem *********************/
+
+QnNotificationToolTipItem::QnNotificationToolTipItem(QGraphicsItem *parent):
+    base_type(parent),
+    m_textLabel(new QnProxyLabel(this)),
+    m_thumbnailLabel(NULL)
+{
+    // TODO: Somehow unify it with the one in tool_tip_slider.cpp?
+    // At least the styling part?
+    setContentsMargins(5.0, 5.0, 5.0, 5.0);
+    setTailWidth(5.0);
+
+    setPaletteColor(this, QPalette::WindowText, QColor(63, 159, 216));
+    setWindowBrush(QColor(0, 0, 0, 255));
+    setFrameBrush(QColor(203, 210, 233, 128));
+    setFrameWidth(1.0);
+
+    QFont fixedFont = QApplication::font();
+    fixedFont.setPixelSize(14);
+    setFont(fixedFont);
+
+    m_textLabel->setAlignment(Qt::AlignCenter);
+    setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
+
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addItem(m_textLabel);
+    setLayout(layout);
+
+    updateTailPos();
+}
+
+void QnNotificationToolTipItem::setThumbnail(const QImage &image) {
+    if (!m_thumbnailLabel) {
+        m_thumbnailLabel = new QnProxyLabel(this);
+        m_thumbnailLabel->setAlignment(Qt::AlignCenter);
+        setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
+        QGraphicsLinearLayout *layout = dynamic_cast<QGraphicsLinearLayout*>(this->layout());
+        if (!layout)
+            return;
+        layout->insertItem(0, m_thumbnailLabel);
+    }
+
+    m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
+}
+
+void QnNotificationToolTipItem::setText(const QString &text) {
+    m_textLabel->setText(text);
+}
+
+void QnNotificationToolTipItem::resizeEvent(QGraphicsSceneResizeEvent *event)  {
+    base_type::resizeEvent(event);
+    updateTailPos();
+}
+
+void QnNotificationToolTipItem::updateTailPos()  {
+    QRectF rect = this->rect();
+    setTailPos(QPointF(rect.right() + 10.0, (rect.top() + rect.bottom()) / 2));
+}
+
+/********** QnNotificationItem *********************/
 
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
@@ -93,6 +118,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_tooltipItem->setFlag(ItemIgnoresParentOpacity, true);
     connect(m_tooltipItem, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
     connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
+    connect(this, SIGNAL(imageChanged(QImage)), m_tooltipItem, SLOT(setThumbnail(QImage)));
 
     updateToolTipPosition();
     updateToolTipVisibility();

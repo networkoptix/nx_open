@@ -4,13 +4,13 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
 
 class QnProxyLabel;
 class QGraphicsLinearLayout;
-class QnToolTipWidget;
 class HoverFocusProcessor;
 
 /**
@@ -41,6 +41,30 @@ protected:
     }
 private:
     QImage m_thumbnail;
+};
+
+class QnNotificationToolTipItem: public QnToolTipWidget {
+    Q_OBJECT
+
+    typedef QnToolTipWidget base_type;
+public:
+    QnNotificationToolTipItem(QGraphicsItem *parent = 0);
+
+    Q_SLOT void setThumbnail(const QImage &image);
+
+    /**
+     * Set tooltip text.
+     * \param text                      New text for this tool tip's label.
+     * \reimp
+     */
+    void setText(const QString &text);
+protected:
+    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+private:
+    void updateTailPos();
+
+    QnProxyLabel* m_textLabel;
+    QnProxyLabel* m_thumbnailLabel;
 };
 
 class QnNotificationItem: public QnClickableFrameWidget {
