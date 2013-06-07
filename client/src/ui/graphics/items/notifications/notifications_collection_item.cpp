@@ -68,7 +68,7 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+    layout->setContentsMargins(1.0, 0.5, 1.0, 0.5);
     layout->setSpacing(0.5);
     layout->addItem(m_headerWidget);
 
