@@ -68,8 +68,8 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->setContentsMargins(1.0, 0.5, 1.0, 0.5);
-    layout->setSpacing(0.5);
+    layout->setContentsMargins(1.0, 1.0, 1.0, 1.0);
+    layout->setSpacing(1.0);
     layout->addItem(m_headerWidget);
 
     m_list = new QnNotificationListWidget(this);
@@ -77,6 +77,7 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     layout->setStretchFactor(m_list, 1.0);
 
     connect(m_list, SIGNAL(itemRemoved(QnNotificationItem*)), this, SLOT(at_list_itemRemoved(QnNotificationItem*)));
+    connect(m_list, SIGNAL(visibleSizeChanged()), this, SIGNAL(visibleSizeChanged()));
 
     setLayout(layout);
 
@@ -94,6 +95,10 @@ QnNotificationsCollectionItem::~QnNotificationsCollectionItem() {
 
 QRectF QnNotificationsCollectionItem::headerGeometry() const {
     return m_headerWidget->geometry();
+}
+
+QRectF QnNotificationsCollectionItem::visibleGeometry() const {
+    return m_headerWidget->geometry().adjusted(0, 0, 0, m_list->visibleSize().height());
 }
 
 void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
