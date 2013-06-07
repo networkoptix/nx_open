@@ -85,7 +85,7 @@ bool AudioPlayer::playAsync( QIODevice* dataSource )
     return true;
 }
 
-bool AudioPlayer::playFileAsync( const QString& filePath )
+bool AudioPlayer::playFileAsync( const QString& filePath, QObject* target, const char *slot)
 {
 #if (GCC_VERSION >= 40700)
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
@@ -95,6 +95,8 @@ bool AudioPlayer::playFileAsync( const QString& filePath )
     if( !audioPlayer->open( filePath ) )
         return false;
 
+    if (target)
+        connect( audioPlayer.get(), SIGNAL(done()), target, slot);
     connect( audioPlayer.get(), SIGNAL(done()), audioPlayer.get(), SLOT(deleteLater()) );
     if( !audioPlayer->playAsync() )
         return false;

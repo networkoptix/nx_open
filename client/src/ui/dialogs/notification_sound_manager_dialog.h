@@ -18,6 +18,8 @@ public:
     explicit QnNotificationSoundManagerDialog(QWidget *parent = 0);
     ~QnNotificationSoundManagerDialog();
 private slots:
+    void enablePlayButton();
+
     void at_playButton_clicked();
     void at_addButton_clicked();
     void at_renameButton_clicked();

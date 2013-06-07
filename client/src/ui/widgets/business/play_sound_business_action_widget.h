@@ -25,6 +25,7 @@ protected slots:
 private slots:
     void paramsChanged();
     void updateCurrentIndex();
+    void enablePlayButton();
 
     void at_playButton_clicked();
     void at_manageButton_clicked();

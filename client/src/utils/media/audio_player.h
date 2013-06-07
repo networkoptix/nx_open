@@ -62,7 +62,7 @@ public:
         \return true if playback started, false - otherwise
         \note With this method, there is no way to receive playback done event, or cancel playback
     */
-    static bool playFileAsync( const QString& filePath );
+    static bool playFileAsync( const QString& filePath, QObject* target = NULL, const char *slot = NULL );
     //!Generates wav from \a text and plays it...
     static bool sayTextAsync( const QString& text );
     //!Reads tag \a tagName

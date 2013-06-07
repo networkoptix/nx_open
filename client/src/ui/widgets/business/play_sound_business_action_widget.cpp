@@ -67,6 +67,10 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
     model()->setActionParams(params);
 }
 
+void QnPlaySoundBusinessActionWidget::enablePlayButton() {
+    ui->playButton->setEnabled(true);
+}
+
 void QnPlaySoundBusinessActionWidget::at_playButton_clicked() {
     if (m_filename.isEmpty())
         return;
@@ -75,7 +79,9 @@ void QnPlaySoundBusinessActionWidget::at_playButton_clicked() {
     if (!QFileInfo(filePath).exists())
         return;
 
-    AudioPlayer::playFileAsync(filePath);
+    bool result = AudioPlayer::playFileAsync(filePath, this, SLOT(enablePlayButton()));
+    if (result)
+        ui->playButton->setEnabled(false);
 }
 
 void QnPlaySoundBusinessActionWidget::at_manageButton_clicked() {
