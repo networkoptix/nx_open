@@ -91,7 +91,6 @@ public:
         const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
 #endif
         void processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data);
-        void resetImageInfo();
 
         const ImageCorrectionResult& imageCorrectionResult() const;
     private:

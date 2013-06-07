@@ -47,6 +47,9 @@ public:
     bool isYV12ToRgbShaderUsed() const;
     bool isYV12ToRgbaShaderUsed() const;
     bool isNV12ToRgbShaderUsed() const;
+
+    void setImageCorrectionEnabled(bool value) { m_imageCorrectionEnabled = value; }
+    bool isImageCorrectionEnabled() const { return m_imageCorrectionEnabled; }
 private:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
 private:
@@ -65,6 +68,7 @@ private:
     std::auto_ptr<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
     bool m_timeChangeEnabled;
     mutable QMutex m_mutex;
+    bool m_imageCorrectionEnabled;
 
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen

@@ -26,6 +26,13 @@ void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height,
     Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
     memset(hystogram, 0, sizeof(hystogram));
 
+
+    if (data.blackLevel == 0 && data.whiteLevel == 0 && gamma == 1.0)
+    {
+        reset();
+        return;
+    }
+
     int left = qPower2Floor(srcRect.left()*width, 4);
     int right = qPower2Floor(srcRect.right()*width, 4);
     int top = srcRect.top()*height;
