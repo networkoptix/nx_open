@@ -20,6 +20,7 @@ extern "C"
 #endif
 #include "utils/math/math.h"
 #include "utils/network/socket.h"
+#include "utils/common/aligned_allocator.h"
 #include "utils/common/util.h"
 
 struct AVCodecContext;
@@ -210,7 +211,7 @@ struct QnMetaDataV1Light
 bool operator< (const QnMetaDataV1Light& data, const quint64 timeMs);
 bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data);
 
-typedef std::vector<QnMetaDataV1Light, AlignmentAllocator<QnMetaDataV1Light> > QnMetaDataLightVector;
+typedef std::vector<QnMetaDataV1Light, QnAlignedAllocator<QnMetaDataV1Light> > QnMetaDataLightVector;
 
 struct QnMetaDataV1 : public QnAbstractMediaData
 {

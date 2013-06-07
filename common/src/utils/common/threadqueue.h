@@ -6,7 +6,7 @@
 #include <QVariant>
 
 #include "log.h"
-#include "qnsemaphore.h"
+#include "semaphore.h"
 
 static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
 

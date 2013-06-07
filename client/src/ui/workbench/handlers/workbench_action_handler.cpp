@@ -113,6 +113,7 @@
 #include <utils/common/time.h>
 #include <utils/common/email.h>
 #include <utils/common/synctime.h>
+#include <utils/common/util.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"

@@ -7,7 +7,7 @@
 #include <QtCore/QSharedPointer>
 
 #include "singleton.h"
-#include "qnsemaphore.h"
+#include "semaphore.h"
 
 class QnLongRunnablePoolPrivate;
 
