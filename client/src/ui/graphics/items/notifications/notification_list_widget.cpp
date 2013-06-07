@@ -31,12 +31,14 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     registerAnimation(this);
     startListening();
 
+    setFlag(QGraphicsItem::ItemHasNoContents);
+
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
 
     m_collapser.item = new QnNotificationItem(this);
     m_collapser.item->setColor(QColor(Qt::white));
-    m_collapser.item->setText(tr("%1 items more").arg(0));
+    m_collapser.item->setTooltipText(tr("Some notifications have not place to be displayed."));
     m_collapser.item->setMinimumSize(QSizeF(widgetWidth, collapserHeight));
     m_collapser.item->setMaximumSize(QSizeF(widgetWidth, collapserHeight));
     m_collapser.item->setOpacity(0.0);
