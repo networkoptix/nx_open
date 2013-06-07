@@ -291,12 +291,13 @@ bool QnResourceWidgetRenderer::isDisplaying( const QSharedPointer<CLVideoDecoder
     return ctx.uploader->isUsingFrame( image );
 }
 
-void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& value)
+void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& params, bool enabled)
 {
     for (int i = 0; i < m_channelRenderers.size(); ++i){
         RenderingTools& ctx = m_channelRenderers[i];
         if( !ctx.uploader )
             continue;
-        ctx.uploader->setImageCorrection(value); 
+        ctx.uploader->setImageCorrection(params); 
+        ctx.renderer->setImageCorrectionEnabled(enabled);
     }
 }

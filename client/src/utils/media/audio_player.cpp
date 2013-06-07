@@ -191,7 +191,7 @@ bool AudioPlayer::playAsync()
             return false;
     }
     m_cond.wakeAll();
-    m_state = sSynthesizing ? sSynthesizingAutoPlay : sPlaying;
+    m_state = m_state == sSynthesizing ? sSynthesizingAutoPlay : sPlaying;
 
     return true;
 }

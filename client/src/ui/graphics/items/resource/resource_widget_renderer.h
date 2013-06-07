@@ -77,7 +77,7 @@ public:
 
     bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
 
-    void setImageCorrection(const ImageCorrectionParams& value);
+    void setImageCorrection(const ImageCorrectionParams& value, bool enabled);
 
     void setDisplayedRect(int channel, const QRectF& rect);
 

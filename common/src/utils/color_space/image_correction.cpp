@@ -13,10 +13,11 @@ float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) co
     for (; median <= rightPos && sum < pixels/2; ++median)
         sum += hystogram[median];
 
+
     // 2. calc gamma
     qreal curValue = (median - leftPos) / qreal(rightPos-leftPos+1);
-    qreal recValue = qreal(rightPos+leftPos) / 2.0 / 256.0;
-    return qBound(0.5, (qreal)log(recValue) / log(curValue), 2.0);
+    qreal recValue = 0.5;
+    return qBound(0.5, (qreal) log(recValue) / log(curValue), (qreal) 1.5);
 }
 
 void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height, int stride, 
@@ -24,6 +25,13 @@ void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height,
 {
     Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
     memset(hystogram, 0, sizeof(hystogram));
+
+
+    if (data.blackLevel == 0 && data.whiteLevel == 0 && gamma == 1.0)
+    {
+        reset();
+        return;
+    }
 
     int left = qPower2Floor(srcRect.left()*width, 4);
     int right = qPower2Floor(srcRect.right()*width, 4);

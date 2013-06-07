@@ -29,6 +29,7 @@
 #ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
 #   include <utils/common/performance.h>
 #endif
+#include "utils/color_space/image_correction.h"
 
 /**
  * \def QN_GL_RENDERER_DEBUG
@@ -90,7 +91,8 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_lastDisplayedTime( AV_NOPTS_VALUE ),
     m_lastDisplayedFlags( 0 ),
     m_prevFrameSequence( 0 ),
-    m_timeChangeEnabled(true)
+    m_timeChangeEnabled(true),
+    m_imageCorrectionEnabled(false)
 {
     Q_ASSERT( context );
 
@@ -280,7 +282,10 @@ void QnGLRenderer::drawYV12VideoTexture(
     m_yv12ToRgbShaderProgram->setUTexture( 1 );
     m_yv12ToRgbShaderProgram->setVTexture( 2 );
     m_yv12ToRgbShaderProgram->setOpacity(m_decodedPictureProvider.opacity());
-    m_yv12ToRgbShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
+    if (isImageCorrectionEnabled())
+        m_yv12ToRgbShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
+    else
+        m_yv12ToRgbShaderProgram->setImageCorrection(ImageCorrectionResult());
 
     glActiveTexture(GL_TEXTURE2);
     DEBUG_CODE(glCheckError("glActiveTexture"));
@@ -307,7 +312,7 @@ void QnGLRenderer::drawYV12VideoTexture(
 #endif
 
 void QnGLRenderer::drawYVA12VideoTexture(
-    const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
+    const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
     const QRectF& tex0Coords,
     unsigned int tex0ID,
     unsigned int tex1ID,
@@ -334,6 +339,10 @@ void QnGLRenderer::drawYVA12VideoTexture(
     m_yv12ToRgbaShaderProgram->setVTexture( 2 );
     m_yv12ToRgbaShaderProgram->setATexture( 3 );
     m_yv12ToRgbaShaderProgram->setOpacity(m_decodedPictureProvider.opacity() );
+    if (isImageCorrectionEnabled())
+        m_yv12ToRgbaShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
+    else
+        m_yv12ToRgbaShaderProgram->setImageCorrection(ImageCorrectionResult());
 
     glActiveTexture(GL_TEXTURE3);
     DEBUG_CODE(glCheckError("glActiveTexture"));

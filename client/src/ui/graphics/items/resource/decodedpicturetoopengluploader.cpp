@@ -468,11 +468,6 @@ void DecodedPictureToOpenGLUploader::UploadedPicture::processImage( quint8* yPla
     m_imgCorrection.processImage(yPlane, width, height, stride, data, m_displayedRect);
 }
 
-void DecodedPictureToOpenGLUploader::UploadedPicture::resetImageInfo()
-{
-    m_imgCorrection.reset();
-}
-
 GLuint DecodedPictureToOpenGLUploader::UploadedPicture::pboID( int index ) const
 {
     return m_pbo[index].id;
@@ -726,12 +721,7 @@ public:
         }
 
         ImageCorrectionParams imCor = m_uploader->getImageCorrection();
-        if (imCor.enabled) {
-            m_pictureBuf->processImage(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
-        }
-        else {
-            m_pictureBuf->resetImageInfo();
-        }
+        m_pictureBuf->processImage(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
 
 #ifdef GL_COPY_AGGREGATION
         if( !m_uploader->uploadDataToGlWithAggregation(
@@ -1076,11 +1066,7 @@ public:
             m_uploader->pictureDataUploadFailed( NULL, m_dest );
 
         ImageCorrectionParams imCor = m_uploader->getImageCorrection();
-        if (imCor.enabled)
-            m_dest->processImage(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0], imCor);
-        else
-            m_dest->resetImageInfo();
-
+        m_dest->processImage(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0], imCor);
 
         m_isRunning = false;
     }
