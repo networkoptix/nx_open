@@ -1,12 +1,15 @@
 #ifndef QN_DISPLAY_WIDGET_RENDERER_H
 #define QN_DISPLAY_WIDGET_RENDERER_H
 
+#include <vector>
+
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
 
 #include <camera/abstract_renderer.h>
 #include <camera/render_status.h>
 #include "utils/color_space/image_correction.h"
+#include "core/resource/resource_media_layout.h"
 
 
 class QThread;
@@ -55,7 +58,7 @@ public:
     void setChannelScreenSize(const QSize &screenSize);
 
     Qn::RenderStatus paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity);
-    void skip(int channel);
+    void skip(int channel); // TODO: #Elric replace with setEnabled
 
     virtual qint64 getTimestampOfNextFrameToRender(int channel) const override;
     virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const  override;
@@ -75,6 +78,14 @@ public:
     bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
 
     void setImageCorrection(const ImageCorrectionParams& value);
+
+    void setDisplayedRect(int channel, const QRectF& rect);
+
+    //!Implementation of QnAbstractRenderer::isEnabled
+    virtual bool isEnabled(int channelNumber) const override;
+    //!Implementation of QnAbstractRenderer::setEnabled
+    virtual void setEnabled(int channelNumber, bool enabled) override;
+
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.
@@ -115,6 +126,10 @@ private:
     QSize m_channelScreenSize;
 
     const QGLContext* m_glContext;
+    
+    QRectF m_displayRect[CL_MAX_CHANNELS];
+
+    std::vector<bool> m_renderingEnabled;
 };
 
 #endif // QN_DISPLAY_WIDGET_RENDERER_H

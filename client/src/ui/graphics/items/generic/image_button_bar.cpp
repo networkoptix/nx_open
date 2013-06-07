@@ -2,6 +2,7 @@
 
 #include <QtGui/QGraphicsLinearLayout>
 
+#include <utils/math/math.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>

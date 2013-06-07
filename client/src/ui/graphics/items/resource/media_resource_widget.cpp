@@ -33,6 +33,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <ui/workbench/watchers/workbench_render_watcher.h>
 
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
@@ -145,6 +146,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateButtonsVisibility()));
     connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateAspectRatio()));
     connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateIconButton()));
+    connect(context->instance<QnWorkbenchRenderWatcher>(), SIGNAL(displayedChanged(QnResourceWidget *)), this, SLOT(at_renderWatcher_displayedChanged(QnResourceWidget *)));
 
     at_camDisplay_liveChanged();
     updateButtonsVisibility();
@@ -394,25 +396,70 @@ void QnMediaResourceWidget::updateDisplay() {
     setDisplay(display);
 }
 
-QRectF QnMediaResourceWidget::calculateDisplayedRect() {
-    QRectF result(0, 0, 1, 1);
+void QnMediaResourceWidget::updateIconButton() {
+    if (!zoomRect().isNull()) {
+        iconButton()->setVisible(true);
+        iconButton()->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
+        iconButton()->setToolTip(tr("Zoom window"));
+        return;
+    }
 
-    QRectF widgetRect = mapRectToScene(rect());
-    if (widgetRect.width() <= 0 || widgetRect.height() <= 0)
-        return result;
+    if(!m_camera) {
+        iconButton()->setVisible(false);
+        return;
+    }
 
-    if(scene()->views().empty())
-        return result;
+    int recordingMode = Qn::RecordingType_Never;
+    if(m_camera->getStatus() == QnResource::Recording)
+        recordingMode = currentRecordingMode();
+    
+    switch(recordingMode) {
+    case Qn::RecordingType_Never:
+        iconButton()->setVisible(true);
+        iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
+        iconButton()->setToolTip(tr("Not recording"));
+        break;
+    case Qn::RecordingType_Run:
+        iconButton()->setVisible(true);
+        iconButton()->setIcon(qnSkin->icon("item/recording.png"));
+        iconButton()->setToolTip(tr("Recording everything"));
+        break;
+    case Qn::RecordingType_MotionOnly:
+        iconButton()->setVisible(true);
+        iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
+        iconButton()->setToolTip(tr("Recording motion only"));
+        break;
+    case Qn::RecordingType_MotionPlusLQ:
+        iconButton()->setVisible(true);
+        iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
+        iconButton()->setToolTip(tr("Recording motion and low quality"));
+        break;
+    default:
+        iconButton()->setVisible(false);
+        break;
+    }
+}
 
-    QGraphicsView *view = dynamic_cast<QGraphicsView *>(scene()->views()[0]);
-    if (!view)
-        return result;
+int QnMediaResourceWidget::currentRecordingMode() {
+    if(!m_camera)
+        return Qn::RecordingType_Never;
 
-    QRectF viewportRect = QnSceneTransformations::mapRectToScene(view, view->viewport()->rect());
-    result = viewportRect.intersected(widgetRect).adjusted(-widgetRect.left(), -widgetRect.top(), 0, 0);
-    result.setSize(QSizeF(result.width() / widgetRect.width(),
-                        result.height() / widgetRect.height()));
-    return result;
+    // TODO: #Elric this should be a resource parameter that is update from the server.
+
+    QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0));
+    int dayOfWeek = dateTime.date().dayOfWeek();
+    int seconds = QTime().secsTo(dateTime.time());
+
+    foreach(const QnScheduleTask &task, m_camera->getScheduleTasks())
+        if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
+            return task.getRecordingType();
+
+    return Qn::RecordingType_Never;
+}
+
+void QnMediaResourceWidget::updateRendererEnabled() {
+    for(int channel = 0; channel < channelCount(); channel++)
+        m_renderer->setEnabled(channel, !exposedRect(channel, true, false).isEmpty());
 }
 
 
@@ -420,13 +467,12 @@ QRectF QnMediaResourceWidget::calculateDisplayedRect() {
 // Painting
 // -------------------------------------------------------------------------- //
 void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    m_paintedChannels.fill(false);
-
     base_type::paint(painter, option, widget);
 
+    updateRendererEnabled();
+
     for(int channel = 0; channel < channelCount(); channel++)
-        if(!m_paintedChannels[channel])
-            m_renderer->skip(channel);
+        m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true)); 
 
     if(isOverlayVisible() && isInfoVisible())
         updateInfoTextLater();
@@ -585,67 +631,6 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channe
     } else {
         paintFilledRegionPath(painter, rect, m_motionSensitivity[channel].getMotionMaskPath(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
     }
-}
-
-void QnMediaResourceWidget::updateIconButton() {
-    if (!zoomRect().isNull()) {
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
-        iconButton()->setToolTip(tr("Zoom window"));
-        return;
-    }
-
-    if(!m_camera) {
-        iconButton()->setVisible(false);
-        return;
-    }
-
-    int recordingMode = Qn::RecordingType_Never;
-    if(m_camera->getStatus() == QnResource::Recording)
-        recordingMode = currentRecordingMode();
-    
-    switch(recordingMode) {
-    case Qn::RecordingType_Never:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
-        iconButton()->setToolTip(tr("Not recording"));
-        break;
-    case Qn::RecordingType_Run:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording.png"));
-        iconButton()->setToolTip(tr("Recording everything"));
-        break;
-    case Qn::RecordingType_MotionOnly:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
-        iconButton()->setToolTip(tr("Recording motion only"));
-        break;
-    case Qn::RecordingType_MotionPlusLQ:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
-        iconButton()->setToolTip(tr("Recording motion and low quality"));
-        break;
-    default:
-        iconButton()->setVisible(false);
-        break;
-    }
-}
-
-int QnMediaResourceWidget::currentRecordingMode() {
-    if(!m_camera)
-        return Qn::RecordingType_Never;
-
-    // TODO: #Elric this should be a resource parameter that is update from the server.
-
-    QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0));
-    int dayOfWeek = dateTime.date().dayOfWeek();
-    int seconds = QTime().secsTo(dateTime.time());
-
-    foreach(const QnScheduleTask &task, m_camera->getScheduleTasks())
-        if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
-            return task.getRecordingType();
-
-    return Qn::RecordingType_Never;
 }
 
 
@@ -883,10 +868,13 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
     value.enabled = checked;
     value.blackLevel = 0.01;
     value.whiteLevel = 0.01;
-    value.gamma = 1.0;
-    value.srcRect = QRectF(0, 0, 1, 1);
+    value.gamma = 0.0; // auto gamma
 
     m_renderer->setImageCorrection(value);
 
 }
 
+void QnMediaResourceWidget::at_renderWatcher_displayedChanged(QnResourceWidget *widget) {
+    if(widget == this)
+        updateRendererEnabled();
+}

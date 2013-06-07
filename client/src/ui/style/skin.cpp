@@ -58,14 +58,14 @@ namespace {
 
 } // anonymous namespace
 
-Q_GLOBAL_STATIC(QnSkin, qn_skinInstance);
+Q_GLOBAL_STATIC(QnSkin, qn_skin_instance);
 
 QnSkin::QnSkin() {
     QPixmapCache::setCacheLimit(64 * 1024); // 64 MB
 }
 
 QnSkin *QnSkin::instance() {
-    return qn_skinInstance();
+    return qn_skin_instance();
 }
 
 QIcon QnSkin::icon(const QString &name, const QString &checkedName) {

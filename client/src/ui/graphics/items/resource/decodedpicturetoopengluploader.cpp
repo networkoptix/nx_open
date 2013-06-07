@@ -462,12 +462,12 @@ const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::im
     return m_imgCorrection;
 }
 
-void DecodedPictureToOpenGLUploader::UploadedPicture::calcLevels( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data)
+void DecodedPictureToOpenGLUploader::UploadedPicture::processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data)
 {
-    m_imgCorrection.processImage(yPlane, width, height, stride, data);
+    m_imgCorrection.processImage(yPlane, width, height, stride, data, m_displayedRect);
 }
 
-void DecodedPictureToOpenGLUploader::UploadedPicture::resetHistogram()
+void DecodedPictureToOpenGLUploader::UploadedPicture::resetImageInfo()
 {
     m_imgCorrection.reset();
 }
@@ -506,7 +506,8 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_pts( 0 ),
     m_skippingForbidden( false ),
     m_flags( 0 ),
-    m_glFence( uploader->d.data() )
+    m_glFence( uploader->d.data() ),
+    m_displayedRect(0.0, 0.0, 1.0, 1.0)
 {
     //TODO/IMPL allocate textures when needed, because not every format require 3 planes
     for( size_t i = 0; i < MAX_TEXTURE_COUNT; ++i )
@@ -725,10 +726,10 @@ public:
 
         ImageCorrectionParams imCor = m_uploader->getImageCorrection();
         if (imCor.enabled) {
-            m_pictureBuf->calcLevels(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
+            m_pictureBuf->processImage(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
         }
         else {
-            m_pictureBuf->resetHistogram();
+            m_pictureBuf->resetImageInfo();
         }
 
 #ifdef GL_COPY_AGGREGATION
@@ -784,6 +785,7 @@ public:
         unsigned int picSequence,
         const QSharedPointer<CLVideoDecoderOutput>& decodedPicture,
         const QSharedPointer<QnAbstractPictureDataRef>& picDataRef,
+        const QRectF displayedRect,
         quint64* const prevPicPts = NULL )
     {
         QMutexLocker lk( &m_mutex );
@@ -798,6 +800,7 @@ public:
         m_pictureBuf->m_width = decodedPicture->width;
         m_pictureBuf->m_height = decodedPicture->height;
         m_pictureBuf->m_metadata = decodedPicture->metadata;
+        m_pictureBuf->m_displayedRect = displayedRect;
         m_picDataRef = picDataRef;
 
         return true;
@@ -1073,9 +1076,9 @@ public:
 
         ImageCorrectionParams imCor = m_uploader->getImageCorrection();
         if (imCor.enabled)
-            m_dest->calcLevels(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0], imCor);
+            m_dest->processImage(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0], imCor);
         else
-            m_dest->resetHistogram();
+            m_dest->resetImageInfo();
 
 
         m_isRunning = false;
@@ -1283,7 +1286,7 @@ void DecodedPictureToOpenGLUploader::pleaseStop()
     m_cond.wakeAll();
 }
 
-void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture )
+void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture, const QRectF displayedRect )
 {
     NX_LOG( QString::fromAscii( "Uploading decoded picture to gl textures. dts %1" ).arg(decodedPicture->pkt_dts), cl_logDEBUG2 );
 
@@ -1375,7 +1378,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                     if( !m_usedAsyncUploaders.empty() )
                     {
                         quint64 prevPicPts = 0;
-                        if( m_usedAsyncUploaders.back()->replacePicture( nextPicSequenceValue(), decodedPicture, decodedPicture->picData, &prevPicPts ) )
+                        if( m_usedAsyncUploaders.back()->replacePicture( nextPicSequenceValue(), decodedPicture, decodedPicture->picData, displayedRect, &prevPicPts ) )
                         {
                             NX_LOG( QString::fromAscii( "Cancelled upload of decoded frame with pts %1 in favor of frame with pts %2" ).
                                 arg(prevPicPts).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
@@ -1406,6 +1409,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
     emptyPictureBuf->m_metadata = decodedPicture->metadata;
     emptyPictureBuf->m_flags = decodedPicture->flags;
     emptyPictureBuf->m_skippingForbidden = false;
+    emptyPictureBuf->m_displayedRect = displayedRect;
 
     if( decodedPicture->picData )
     {

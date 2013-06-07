@@ -1,20 +1,34 @@
 #include "image_correction.h"
 #include "utils/math/math.h"
 
-void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height, int stride, 
-                                         const ImageCorrectionParams& data)
-{
-    static const int MIN_GAMMA_RANGE = 6;
-    static const float NORM_RANGE_RANGE = 256.0 - 16.0 - 16.0;
-    static const float NORM_RANGE_START = 16.0 / 256.0;
+static const int MIN_GAMMA_RANGE = 6;
+static const float NORM_RANGE_START = 0.0; //16.0
+static const float NORM_RANGE_RANGE = 256.0 - NORM_RANGE_START*2.0;
 
+float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) const
+{
+    // 1. calc hystogram middle point
+    int sum = 0;
+    int median = leftPos;
+    for (; median <= rightPos && sum < pixels/2; ++median)
+        sum += hystogram[median];
+
+    // 2. calc gamma
+    float curValue = (median - leftPos) / float(rightPos-leftPos+1);
+    float recValue = float(rightPos+leftPos) / 2.0 / 256.0;
+    return qBound(0.5f, log(recValue) / log(curValue), 2.0f);
+}
+
+void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height, int stride, 
+                                         const ImageCorrectionParams& data, const QRectF& srcRect)
+{
     Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
     memset(hystogram, 0, sizeof(hystogram));
 
-    int left = qPower2Floor(data.srcRect.left()*width, 4);
-    int right = qPower2Floor(data.srcRect.right()*width, 4);
-    int top = data.srcRect.top()*height;
-    int bottom = data.srcRect.bottom()*height;
+    int left = qPower2Floor(srcRect.left()*width, 4);
+    int right = qPower2Floor(srcRect.right()*width, 4);
+    int top = srcRect.top()*height;
+    int bottom = srcRect.bottom()*height;
 
     int xSteps = (right-left) / 4;
 
@@ -41,27 +55,35 @@ void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height,
     }
 
     // get hystogram range
-    int pixels = width * height;
+    int pixels = (right-left) * (bottom-top);
     int leftThreshold = data.blackLevel * pixels + 0.5;
     int rightThreshold = data.whiteLevel * pixels + 0.5;
 
     int leftPos = 0;
-    int sum = 0;
-    for (; leftPos < 256 && sum < leftThreshold; ++leftPos)
-        sum += hystogram[leftPos];
+    int leftSum = 0;
+    for (; leftPos < 256; ++leftPos) {
+        if (leftSum+hystogram[leftPos] >= leftThreshold)
+            break;
+        leftSum += hystogram[leftPos];
+    }
 
     int rightPos = 255;
-    sum = 0;
-    for (; rightPos >= leftPos && sum < rightThreshold; --rightPos)
-        sum += hystogram[rightPos];
+    int rightSum = 0;
+    for (; rightPos >= leftPos; --rightPos) {
+        if (rightSum+hystogram[rightPos] >= rightThreshold)
+            break;
+        rightSum += hystogram[rightPos];
+    }
 
     if (rightPos - leftPos < MIN_GAMMA_RANGE) {
         reset();
     }
     else {
         aCoeff = NORM_RANGE_RANGE / float(rightPos-leftPos+1);
-        bCoeff = -float(leftPos) / NORM_RANGE_RANGE + NORM_RANGE_START;
+        bCoeff = -float(leftPos) / 256.0 + NORM_RANGE_START/256.0;
         gamma = data.gamma;
+        if (gamma == 0)
+            gamma = calcGamma(leftPos, rightPos, pixels - leftSum - rightSum); // auto gamma
     }
 }
 

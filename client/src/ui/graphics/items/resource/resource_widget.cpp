@@ -4,6 +4,8 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsView>
 #include <QtGui/QGraphicsLinearLayout>
 
 #include <utils/common/warnings.h>
@@ -491,6 +493,33 @@ QRectF QnResourceWidget::channelRect(int channel) const {
     );
 }
 
+QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool useRelativeCoordinates) {
+    QRectF channelRect = this->channelRect(channel);
+    if (channelRect.isEmpty())
+        return QRectF();
+
+    QRectF result = channelRect.intersected(rect());
+    if(result.isEmpty())
+        return QRectF();
+
+    if(accountForViewport) {
+        if(scene()->views().empty())
+            return QRectF();
+        QGraphicsView *view = scene()->views()[0];
+
+        QRectF viewportRect = mapRectFromScene(QnSceneTransformations::mapRectToScene(view, view->viewport()->rect()));
+        result = result.intersected(viewportRect);
+        if(result.isEmpty())
+            return QRectF();
+    }
+
+    if(useRelativeCoordinates) {
+        return QnGeometry::toSubRect(channelRect, result);
+    } else {
+        return result;
+    }
+}
+
 Qn::RenderStatus QnResourceWidget::channelRenderStatus(int channel) const {
     return m_channelState[channel].renderStatus;
 }
@@ -810,7 +839,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     for(int i = 0; i < channelCount(); i++) {
         /* Draw content. */
         QRectF channelRect = this->channelRect(i);
-        QRectF paintRect = rect().intersected(channelRect);
+        QRectF paintRect = this->exposedRect(i, false, false);
         if(paintRect.isEmpty())
             continue;
 
@@ -838,6 +867,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         /* Draw selected / not selected overlay. */
         paintSelection(painter, paintRect);
     }
+
+    emit painted();
 }
 
 void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &) {

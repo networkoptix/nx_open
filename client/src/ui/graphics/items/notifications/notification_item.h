@@ -2,7 +2,7 @@
 #define NOTIFICATION_ITEM_H
 
 #include <ui/graphics/items/standard/graphics_widget.h>
-#include <ui/graphics/items/generic/clickable_widget.h>
+#include <ui/graphics/items/generic/clickable_widgets.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
@@ -12,10 +12,10 @@ class QGraphicsLinearLayout;
 class QnToolTipWidget;
 class HoverFocusProcessor;
 
-class QnNotificationItem: public QnClickableWidget {
+class QnNotificationItem: public QnClickableFrameWidget {
     Q_OBJECT
+    typedef QnClickableFrameWidget base_type;
 
-    typedef QnClickableWidget base_type;
 public:
     explicit QnNotificationItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~QnNotificationItem();

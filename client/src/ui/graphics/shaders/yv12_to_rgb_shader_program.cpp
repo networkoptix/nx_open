@@ -27,7 +27,10 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
 
         void main() {
             float y = texture2D(yTexture, gl_TexCoord[0].st).p;
-            gl_FragColor = vec4(pow(y * yLevels1 + yLevels2, yGamma),
+            y = (y + yLevels2) * yLevels1;
+            if (gl_TexCoord[0].x < 0.5)
+                y = pow(y, yGamma);
+            gl_FragColor = vec4(y,
                                 texture2D(uTexture, gl_TexCoord[0].st).p,
                                 texture2D(vTexture, gl_TexCoord[0].st).p,
                                 1.0) * colorTransform;
