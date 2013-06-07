@@ -369,7 +369,7 @@ protected:
 
     int channelCount() const;
     QRectF channelRect(int channel) const;
-    QRectF exposedRect(int channel, bool accountForViewport = true, bool useRelativeCoordinates = false);
+    QRectF exposedRect(int channel, bool accountForViewport = true, bool accountForVisibility = true, bool useRelativeCoordinates = false);
     Qn::RenderStatus channelRenderStatus(int channel) const;
 
     void ensureAboutToBeDestroyedEmitted();

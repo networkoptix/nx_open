@@ -459,7 +459,7 @@ int QnMediaResourceWidget::currentRecordingMode() {
 
 void QnMediaResourceWidget::updateRendererEnabled() {
     for(int channel = 0; channel < channelCount(); channel++)
-        m_renderer->setEnabled(channel, !exposedRect(channel, true, false).isEmpty());
+        m_renderer->setEnabled(channel, !exposedRect(channel, true, true, false).isEmpty());
 }
 
 
@@ -472,7 +472,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     updateRendererEnabled();
 
     for(int channel = 0; channel < channelCount(); channel++)
-        m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true)); 
+        m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true)); 
 
     if(isOverlayVisible() && isInfoVisible())
         updateInfoTextLater();
