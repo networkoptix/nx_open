@@ -50,6 +50,8 @@ QnNotificationToolTipItem::QnNotificationToolTipItem(QGraphicsItem *parent):
     setLayout(layout);
 
     updateTailPos();
+
+    setZValue(std::numeric_limits<qreal>::max());
 }
 
 void QnNotificationToolTipItem::setThumbnail(const QImage &image) {
@@ -77,7 +79,7 @@ void QnNotificationToolTipItem::resizeEvent(QGraphicsSceneResizeEvent *event)  {
 
 void QnNotificationToolTipItem::updateTailPos()  {
     QRectF rect = this->rect();
-    setTailPos(QPointF(rect.right() + 10.0, (rect.top() + rect.bottom()) / 2));
+    setTailPos(QPointF(qRound(rect.right() + 10.0), qRound((rect.top() + rect.bottom()) / 2)));
 }
 
 /********** QnNotificationItem *********************/
@@ -87,9 +89,12 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
     m_textLabel(new QnProxyLabel(this)),
     m_color(Qt::transparent),
+    m_tooltipItem(new QnNotificationToolTipItem(this)),
     m_hoverProcessor(new HoverFocusProcessor(this))
 {
-    m_tooltipItem = new QnNotificationToolTipItem(this);
+    setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
+    setFrameWidth(0.5);
+    setWindowBrush(Qt::transparent);
 
     m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignCenter);
@@ -101,17 +106,6 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 
     setLayout(m_layout);
 
-    setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
-    setFrameWidth(0.5);
-    setWindowBrush(Qt::transparent);
-
-    m_hoverProcessor->addTargetItem(this);
-    m_hoverProcessor->addTargetItem(m_tooltipItem);
-    m_hoverProcessor->setHoverEnterDelay(250);
-    m_hoverProcessor->setHoverLeaveDelay(250);
-    connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
-    connect(m_hoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(updateToolTipVisibility()));
-
     m_tooltipItem->setFocusProxy(this);
     m_tooltipItem->setOpacity(0.0);
     m_tooltipItem->setAcceptHoverEvents(true);
@@ -120,6 +114,13 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     connect(m_tooltipItem, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
     connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
     connect(this, SIGNAL(imageChanged(QImage)), m_tooltipItem, SLOT(setThumbnail(QImage)));
+
+    m_hoverProcessor->addTargetItem(this);
+    m_hoverProcessor->addTargetItem(m_tooltipItem);
+    m_hoverProcessor->setHoverEnterDelay(250);
+    m_hoverProcessor->setHoverLeaveDelay(250);
+    connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
+    connect(m_hoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(updateToolTipVisibility()));
 
     updateToolTipPosition();
     updateToolTipVisibility();
@@ -182,7 +183,6 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
 
     QRectF rect = this->rect();
-
     qreal side = qMin(qMin(rect.width(), rect.height()), 16.0) / 2.0;
 
     qreal left = rect.left();
@@ -220,7 +220,7 @@ void QnNotificationItem::updateToolTipVisibility() {
 }
 
 void QnNotificationItem::updateToolTipPosition() {
-    m_tooltipItem->pointTo(QPointF(0, geometry().height() / 2 ));
+    m_tooltipItem->pointTo(QPointF(0, qRound(geometry().height() / 2 )));
 }
 
 void QnNotificationItem::at_button_clicked() {
