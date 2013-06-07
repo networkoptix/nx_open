@@ -503,16 +503,16 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsOpacityAnimatorGroup->addAnimator(opacityAnimator(m_notificationsShowButton));
     m_notificationsOpacityAnimatorGroup->addAnimator(opacityAnimator(m_notificationsPinButton));
 
-    connect(m_notificationsPinButton,            SIGNAL(toggled(bool)),     this,   SLOT(at_notificationsPinButton_toggled(bool)));
-    connect(m_notificationsShowButton,           SIGNAL(toggled(bool)),     this,   SLOT(at_notificationsShowButton_toggled(bool)));
-    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverLeft()),       this,   SLOT(updateNotificationsOpacity()));
-    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverEntered()),    this,   SLOT(updateNotificationsOpacity()));
-    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverEntered()),    this,   SLOT(updateControlsVisibility()));
-    connect(m_notificationsOpacityProcessor,     SIGNAL(hoverLeft()),       this,   SLOT(updateControlsVisibility()));
-    connect(m_notificationsHidingProcessor,      SIGNAL(hoverFocusLeft()),  this,   SLOT(at_notificationsHidingProcessor_hoverFocusLeft()));
-    connect(m_notificationsShowingProcessor,     SIGNAL(hoverEntered()),    this,   SLOT(at_notificationsShowingProcessor_hoverEntered()));
-    connect(m_notificationsItem,                 SIGNAL(geometryChanged()), this,   SLOT(at_notificationsItem_geometryChanged()));
-
+    connect(m_notificationsPinButton,           SIGNAL(toggled(bool)),          this,   SLOT(at_notificationsPinButton_toggled(bool)));
+    connect(m_notificationsShowButton,          SIGNAL(toggled(bool)),          this,   SLOT(at_notificationsShowButton_toggled(bool)));
+    connect(m_notificationsOpacityProcessor,    SIGNAL(hoverLeft()),            this,   SLOT(updateNotificationsOpacity()));
+    connect(m_notificationsOpacityProcessor,    SIGNAL(hoverEntered()),         this,   SLOT(updateNotificationsOpacity()));
+    connect(m_notificationsOpacityProcessor,    SIGNAL(hoverEntered()),         this,   SLOT(updateControlsVisibility()));
+    connect(m_notificationsOpacityProcessor,    SIGNAL(hoverLeft()),            this,   SLOT(updateControlsVisibility()));
+    connect(m_notificationsHidingProcessor,     SIGNAL(hoverFocusLeft()),       this,   SLOT(at_notificationsHidingProcessor_hoverFocusLeft()));
+    connect(m_notificationsShowingProcessor,    SIGNAL(hoverEntered()),         this,   SLOT(at_notificationsShowingProcessor_hoverEntered()));
+    connect(m_notificationsItem,                SIGNAL(geometryChanged()),      this,   SLOT(at_notificationsItem_geometryChanged()));
+    connect(m_notificationsItem,                SIGNAL(visibleSizeChanged()),   this,   SLOT(at_notificationsItem_geometryChanged()));
 
     /* Calendar. */
     QnCalendarWidget *calendarWidget = new QnCalendarWidget();
@@ -1932,17 +1932,18 @@ void QnWorkbenchUi::at_notificationsShowingProcessor_hoverEntered() {
 
 
 void QnWorkbenchUi::at_notificationsItem_geometryChanged() {
-    QRectF geometry = m_controlsWidget->mapRectFromItem(m_notificationsItem, m_notificationsItem->headerGeometry());
+    QRectF headerGeometry = m_controlsWidget->mapRectFromItem(m_notificationsItem, m_notificationsItem->headerGeometry());
+    QRectF backgroundGeometry = m_controlsWidget->mapRectFromItem(m_notificationsItem, m_notificationsItem->visibleGeometry());
 
     /* Don't hide notifications item here. It will repaint itself when shown, which will
      * degrade performance. */
 
-    m_notificationsBackgroundItem->setGeometry(geometry);
+    m_notificationsBackgroundItem->setGeometry(backgroundGeometry);
     m_notificationsShowButton->setPos(QPointF(
-        qMin(m_controlsWidgetRect.right(), geometry.left()),
-        (geometry.top() + geometry.bottom() - m_notificationsShowButton->size().height()) / 2
+        qMin(m_controlsWidgetRect.right(), headerGeometry.left()),
+        (headerGeometry.top() + headerGeometry.bottom() - m_notificationsShowButton->size().height()) / 2
     ));
-    m_notificationsPinButton->setPos(geometry.topLeft());
+    m_notificationsPinButton->setPos(headerGeometry.topLeft());
     if (isNotificationsOpened())
         setNotificationsOpened(); //there is no check there but it will fix the X-coord animation
 

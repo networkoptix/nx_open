@@ -20,6 +20,8 @@ namespace {
     public:
         QnNotificationToolTipItem(QGraphicsItem *parent = 0): base_type(parent)
         {
+            // TODO: Somehow unify it with the one in tool_tip_slider.cpp?
+            // At least the styling part?
             setContentsMargins(5.0, 5.0, 5.0, 5.0);
             setTailWidth(5.0);
 
@@ -109,13 +111,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 
     setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
     setFrameWidth(0.5);
-
-    QLinearGradient gradient(1, 0, 0, 0); 
-    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
-    gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
-    gradient.setSpread(QGradient::RepeatSpread);
-    setWindowBrush(gradient);
+    setWindowBrush(Qt::transparent);
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipItem);
@@ -192,6 +188,7 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     qreal top = ycenter - side;
     qreal bottom = ycenter + side;
     
+    // TODO: cache the path?
     QPainterPath path;
     path.moveTo(left, top);
     path.lineTo(xcenter, top);

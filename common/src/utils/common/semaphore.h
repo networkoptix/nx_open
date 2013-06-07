@@ -1,13 +1,12 @@
-#ifndef QN_QnSemaphore_H
-#define QN_QnSemaphore_H
+#ifndef QN_SEMAPHORE_H
+#define QN_SEMAPHORE_H
 
 #include <QtCore/qglobal.h>
 
 class QnSemaphorePrivate;
 
-// TODO: #Elric rename file
-class QnSemaphore
-{
+// TODO: #AK or #VASILENKO add doxydocs: what is fixed here?
+class QnSemaphore {
 public:
     explicit QnSemaphore(int n = 0);
     ~QnSemaphore();

@@ -246,5 +246,9 @@ int currentTimeZone()
 }
 
 int random(int min, int max) {
+#ifdef __GNUC__
+    // GCC overflow warning is produced 'by design' (c)Elric
+    #pragma GCC diagnostic ignored "-Woverflow"
+#endif
     return min + static_cast<int>(static_cast<qint64>(max - min) * qrand() / (RAND_MAX + 1));
 }

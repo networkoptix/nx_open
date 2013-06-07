@@ -1,6 +1,7 @@
 #include "ffmpeg_video_transcoder.h"
 #include "decoders/video/ffmpeg.h"
 #include <utils/color_space/yuvconvert.h>
+#include <utils/common/util.h>
 
 extern "C" {
 #ifdef WIN32

@@ -1,6 +1,7 @@
 #include "notification_list_widget.h"
 
 #include <limits>
+#include <boost/range/adaptors.hpp>
 
 #include <QtCore/QDateTime>
 
@@ -222,6 +223,28 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         m_items.removeOne(item);
         emit itemRemoved(item);
     }
+
+    updateVisibleSize();
+}
+
+void QnNotificationListWidget::updateVisibleSize() {
+
+    QSizeF size(widgetWidth, 0);
+    if (!qFuzzyIsNull(m_collapser.item->opacity()))
+        size.setHeight(m_collapser.item->geometry().bottom());
+    else
+    foreach(QnNotificationItem *item, m_items | boost::adaptors::reversed) {
+        ItemData* data = m_itemDataByItem[item];
+        if (!data->isVisible())
+            continue;
+        size.setHeight(item->geometry().bottom());
+        break;
+    }
+
+    if (m_visibleSize == size)
+        return;
+    m_visibleSize = size;
+    emit visibleSizeChanged();
 }
 
 void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
@@ -253,6 +276,10 @@ void QnNotificationListWidget::clear() {
     m_collapsedItemCountChanged = true;
 }
 
+QSizeF QnNotificationListWidget::visibleSize() const {
+    return m_visibleSize;
+}
+
 void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
     if (button != Qt::RightButton)
         return;
@@ -263,23 +290,21 @@ void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
 }
 
 void QnNotificationListWidget::at_geometry_changed() {
-    //reverse iterating
-    QLinkedList<QnNotificationItem*>::const_iterator i = m_items.constEnd();
-    i--;
-    for (; i != m_items.constEnd(); --i) {
-        ItemData* data = m_itemDataByItem[*i];
+    foreach(QnNotificationItem *item, m_items | boost::adaptors::reversed) {
+        ItemData* data = m_itemDataByItem[item];
         if (!data->isVisible())
             continue;
         if (data->state == ItemData::Hiding ||
                 data->state == ItemData::Collapsing) //do not collapse item tha is already hiding
             continue;
 
-        if ((*i)->geometry().bottom() > geometry().height()) {
+        if (item->geometry().bottom() > geometry().height()) {
             data->state = ItemData::Collapsing;
             data->setAnimation(0.0, 90.0, collapseTimeoutMs);
         } else
             break;
     }
+    updateVisibleSize();
 }
 
 void QnNotificationListWidget::ItemData::hide()  {

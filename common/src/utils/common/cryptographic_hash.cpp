@@ -1,7 +1,5 @@
 #include "cryptographic_hash.h"
 
-//#ifndef __APPLE__
-
 #include <openssl/md4.h>
 #include <openssl/md5.h>
 #include <openssl/sha.h>
@@ -130,6 +128,4 @@ QByteArray QnCryptographicHash::hash(const QByteArray &data, Algorithm algorithm
     return hash.result();
 }
 
-
-//#endif
 

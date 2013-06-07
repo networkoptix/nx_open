@@ -2,6 +2,7 @@
 #include "testcamera_resource.h"
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
+#include "utils/common/util.h"
 #include "testcamera_const.h"
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;

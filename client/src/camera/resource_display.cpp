@@ -10,6 +10,7 @@
 #include <camera/abstract_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/counter.h>
+#include <utils/common/util.h>
 
 QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
     QObject(parent),

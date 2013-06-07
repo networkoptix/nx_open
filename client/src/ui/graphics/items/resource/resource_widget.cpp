@@ -493,7 +493,10 @@ QRectF QnResourceWidget::channelRect(int channel) const {
     );
 }
 
-QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool useRelativeCoordinates) {
+QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool accountForVisibility, bool useRelativeCoordinates) {
+    if(accountForVisibility && (!isVisible() || qFuzzyIsNull(effectiveOpacity())))
+        return QRectF();
+
     QRectF channelRect = this->channelRect(channel);
     if (channelRect.isEmpty())
         return QRectF();
@@ -839,7 +842,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     for(int i = 0; i < channelCount(); i++) {
         /* Draw content. */
         QRectF channelRect = this->channelRect(i);
-        QRectF paintRect = this->exposedRect(i, false, false);
+        QRectF paintRect = this->exposedRect(i, false, false, false);
         if(paintRect.isEmpty())
             continue;
 
