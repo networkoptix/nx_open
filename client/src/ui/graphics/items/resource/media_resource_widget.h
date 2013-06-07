@@ -133,7 +133,7 @@ private slots:
     void at_zoomWindowButton_toggled(bool checked);
     void at_histogramButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
-    void at_renderWatcher_displayedChanged(QnResourceWidget *widget);
+    void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
 
 private:
     int currentRecordingMode();
