@@ -1,5 +1,6 @@
-
 #include "notification_item.h"
+
+#include <limits>
 
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsLinearLayout>

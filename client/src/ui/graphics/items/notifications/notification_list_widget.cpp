@@ -1,7 +1,8 @@
 #include "notification_list_widget.h"
 
 #include <limits>
-#include <boost/range/adaptors.hpp>
+
+#include <boost/range/adaptor/reversed.hpp>
 
 #include <QtCore/QDateTime>
 
