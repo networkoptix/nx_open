@@ -471,8 +471,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_notificationsShowButton = newShowHideButton(m_controlsWidget);
     m_notificationsShowButton->setTransform(QTransform::fromScale(-1, 1));
-
     m_notificationsShowButton->setFocusProxy(m_notificationsItem);
+    m_notificationsShowButton->stackBefore(m_notificationsItem);
 
     m_notificationsOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_notificationsOpacityProcessor->addTargetItem(m_notificationsItem);
