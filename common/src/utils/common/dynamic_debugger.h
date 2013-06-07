@@ -22,4 +22,10 @@ private:
     QString m_debugString;
 };
 
+/**
+ * Macro for convinient QnDynamicDebugger usage.
+ * Sample: DYNAMIC_DEBUG(this, SIGNAL(geometryChanged()), "geometry changed");
+*/
+#define DYNAMIC_DEBUG(obj, signal, text) QObject::connect(obj, signal, new QnDynamicDebugger(QLatin1String(text), obj), SLOT(print()), Qt::DirectConnection)
+
 #endif // DYNAMIC_DEBUGGER_H
