@@ -146,7 +146,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateButtonsVisibility()));
     connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateAspectRatio()));
     connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateIconButton()));
-    connect(context->instance<QnWorkbenchRenderWatcher>(), SIGNAL(displayedChanged(QnResourceWidget *)), this, SLOT(at_renderWatcher_displayedChanged(QnResourceWidget *)));
+    connect(context->instance<QnWorkbenchRenderWatcher>(), SIGNAL(displayingChanged(QnResourceWidget *)), this, SLOT(at_renderWatcher_displayingChanged(QnResourceWidget *)));
 
     at_camDisplay_liveChanged();
     updateButtonsVisibility();
@@ -459,7 +459,7 @@ int QnMediaResourceWidget::currentRecordingMode() {
 
 void QnMediaResourceWidget::updateRendererEnabled() {
     for(int channel = 0; channel < channelCount(); channel++)
-        m_renderer->setEnabled(channel, !exposedRect(channel, true, false).isEmpty());
+        m_renderer->setEnabled(channel, !exposedRect(channel, true, true, false).isEmpty());
 }
 
 
@@ -472,7 +472,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     updateRendererEnabled();
 
     for(int channel = 0; channel < channelCount(); channel++)
-        m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true)); 
+        m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true)); 
 
     if(isOverlayVisible() && isInfoVisible())
         updateInfoTextLater();
@@ -874,7 +874,7 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
 
 }
 
-void QnMediaResourceWidget::at_renderWatcher_displayedChanged(QnResourceWidget *widget) {
+void QnMediaResourceWidget::at_renderWatcher_displayingChanged(QnResourceWidget *widget) {
     if(widget == this)
         updateRendererEnabled();
 }

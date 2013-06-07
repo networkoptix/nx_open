@@ -69,7 +69,7 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(1.0, 1.0, 1.0, 1.0);
-    layout->setSpacing(1.0);
+    layout->setSpacing(0.0);
     layout->addItem(m_headerWidget);
 
     m_list = new QnNotificationListWidget(this);
