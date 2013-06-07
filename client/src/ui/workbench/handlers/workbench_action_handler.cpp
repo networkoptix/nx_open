@@ -2530,7 +2530,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             }
 
             QFont font;
-            font.setPixelSize(screenshot.height() / 20);
+            font.setPixelSize(qMax(screenshot.height() / 20, 12));
 
             int tsWidht = QFontMetrics(font).width(timeString);
             int tsDescent = QFontMetrics(font).descent();
