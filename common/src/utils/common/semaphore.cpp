@@ -1,10 +1,9 @@
+#include "semaphore.h"
 
-#include "qnsemaphore.h"
-
-#include "qmutex.h"
-#include "qwaitcondition.h"
-#include "qelapsedtimer.h"
-#include "qdatetime.h"
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QDateTime>
 
 
 class QnSemaphorePrivate {
