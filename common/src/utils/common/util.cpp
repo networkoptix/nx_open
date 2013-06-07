@@ -245,12 +245,10 @@ int currentTimeZone()
     return res;
 }
 
-#pragma GCC diagnostic ignored "-Woverflow"
-
-/** Returns random integer number between min and max parameters. Thread-safe.
- *  Correctness of parameters is responsibility of the callee.
- *  GCC overflow warning is produced 'by design' (c)Elric
- */
 int random(int min, int max) {
+#ifdef __GNUC__
+    // GCC overflow warning is produced 'by design' (c)Elric
+    #pragma GCC diagnostic ignored "-Woverflow"
+#endif
     return min + static_cast<int>(static_cast<qint64>(max - min) * qrand() / (RAND_MAX + 1));
 }
