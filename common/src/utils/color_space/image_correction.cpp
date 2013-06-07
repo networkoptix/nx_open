@@ -13,10 +13,11 @@ float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) co
     for (; median <= rightPos && sum < pixels/2; ++median)
         sum += hystogram[median];
 
+
     // 2. calc gamma
     float curValue = (median - leftPos) / float(rightPos-leftPos+1);
-    float recValue = float(rightPos+leftPos) / 2.0 / 256.0;
-    return qBound(0.5f, log(recValue) / log(curValue), 2.0f);
+    float recValue = 0.5;
+    return qBound(0.66f, log(recValue) / log(curValue), 1.5f);
 }
 
 void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height, int stride, 

@@ -867,8 +867,8 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
     
     value.enabled = checked;
     value.blackLevel = 0.01;
-    value.whiteLevel = 0.01;
-    value.gamma = 0.0; // auto gamma
+    value.whiteLevel = 0.005;
+    value.gamma = 1.0;
 
     m_renderer->setImageCorrection(value);
 
