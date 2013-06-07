@@ -81,7 +81,7 @@ public:
 
     /**
      * \param autoSize                  Whether this tool tip should be resized automatically to match
-     *                                  the preferred size of this contents.
+     *                                  the preferred size of its contents.
      */
     void setAutoSize(bool autoSize);
 
