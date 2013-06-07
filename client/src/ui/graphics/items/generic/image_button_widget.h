@@ -76,6 +76,9 @@ public:
 
     void setCached(bool cached);
 
+    void setFixedSize(qreal size);
+    void setFixedSize(qreal width, qreal height);
+    void setFixedSize(const QSizeF &size);
 public slots:
     void setPressed(bool pressed = true);
     void setCheckable(bool checkable);

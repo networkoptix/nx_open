@@ -84,7 +84,7 @@ public:
      * 
      * \returns                         Request handle.
 	 */
-    int getThumbnailsAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, bool precise, QObject *target, const char *slot);
+    int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, bool precise, QObject *target, const char *slot);
 
 	/** 
      * Get \a camera params. 

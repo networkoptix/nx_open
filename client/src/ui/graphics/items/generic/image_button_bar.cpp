@@ -206,8 +206,7 @@ void QnImageButtonBar::submitEnabledButtons(int mask) {
 void QnImageButtonBar::submitButtonSize(QnImageButtonWidget *button) {
     if (m_uniformButtonSize.isEmpty())
         return;
-    button->setMaximumSize(m_uniformButtonSize);
-    button->setMinimumSize(m_uniformButtonSize);
+    button->setFixedSize(m_uniformButtonSize);
 }
 
 

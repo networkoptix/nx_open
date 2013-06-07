@@ -45,6 +45,7 @@ private slots:
     void at_list_itemRemoved(QnNotificationItem* item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
 private:
+    void loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource);
 
     QnNotificationListWidget *m_list;
     QGraphicsWidget* m_headerWidget;

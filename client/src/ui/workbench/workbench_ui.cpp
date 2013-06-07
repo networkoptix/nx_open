@@ -105,8 +105,7 @@ namespace {
         }
 
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
-        button->setMaximumSize(width, height);
-        button->setMinimumSize(width, height);
+        button->setFixedSize(width, height);
         button->setDefaultAction(action);
         button->setCached(true);
 
