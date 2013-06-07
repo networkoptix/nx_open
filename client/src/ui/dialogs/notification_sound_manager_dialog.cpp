@@ -32,6 +32,10 @@ QnNotificationSoundManagerDialog::~QnNotificationSoundManagerDialog()
 {
 }
 
+void QnNotificationSoundManagerDialog::enablePlayButton() {
+    ui->playButton->setEnabled(true);
+}
+
 void QnNotificationSoundManagerDialog::at_playButton_clicked() {
     if (!ui->listView->currentIndex().isValid())
         return;
@@ -45,7 +49,9 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
     if (!QFileInfo(filePath).exists())
         return;
 
-    AudioPlayer::playFileAsync(filePath);
+    bool result = AudioPlayer::playFileAsync(filePath, this, SLOT(enablePlayButton()));
+    if (result)
+        ui->playButton->setEnabled(false);
 }
 
 void QnNotificationSoundManagerDialog::at_addButton_clicked() {

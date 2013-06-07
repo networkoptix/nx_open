@@ -422,7 +422,7 @@ QnRequestParamList QnMediaServerConnection::createTimePeriodsRequest(const QnNet
     return result;
 }
 
-int QnMediaServerConnection::getThumbnailsAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const 
+int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const
                                                 QSize& size, const QString& imageFormat, bool precise, QObject *target, const char *slot)
 {
     QnRequestParamList params;

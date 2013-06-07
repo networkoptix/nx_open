@@ -4,6 +4,8 @@
 
 #include <business/business_strings_helper.h>
 
+#include <camera/single_thumbnail_loader.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -24,6 +26,12 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 
+namespace {
+
+    const int buttonSize = 24;
+
+} //anonymous namespace
+
 QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
     QnWorkbenchContextAware(context)
@@ -33,29 +41,25 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     QnImageButtonWidget* hideAllButton = new QnImageButtonWidget(m_headerWidget);
     hideAllButton->setIcon(qnSkin->icon("titlebar/exit.png"));
     hideAllButton->setToolTip(tr("Hide all"));
-    hideAllButton->setMinimumSize(QSizeF(24, 24));
-    hideAllButton->setMaximumSize(QSizeF(24, 24));
+    hideAllButton->setFixedSize(buttonSize);
     connect(hideAllButton, SIGNAL(clicked()), this, SLOT(hideAll()));
 
     QnImageButtonWidget* settingsButton = new QnImageButtonWidget(m_headerWidget);
     settingsButton->setIcon(qnSkin->icon("titlebar/connected.png"));
     settingsButton->setToolTip(tr("Settings"));
-    settingsButton->setMinimumSize(QSizeF(24, 24));
-    settingsButton->setMaximumSize(QSizeF(24, 24));
+    settingsButton->setFixedSize(buttonSize);
     connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 
     QnImageButtonWidget* eventLogButton = new QnImageButtonWidget(m_headerWidget);
     eventLogButton->setIcon(qnSkin->icon("item/info.png"));
     eventLogButton->setToolTip(tr("Event Log"));
-    eventLogButton->setMinimumSize(QSizeF(24, 24));
-    eventLogButton->setMaximumSize(QSizeF(24, 24));
+    eventLogButton->setFixedSize(buttonSize);
     connect(eventLogButton, SIGNAL(clicked()), this, SLOT(at_eventLogButton_clicked()));
 
     QnImageButtonWidget* debugButton = new QnImageButtonWidget(m_headerWidget);
     debugButton->setIcon(qnSkin->icon("item/search.png"));
     debugButton->setToolTip(tr("DEBUG"));
-    debugButton->setMinimumSize(QSizeF(24, 24));
-    debugButton->setMaximumSize(QSizeF(24, 24));
+    debugButton->setFixedSize(buttonSize);
     connect(debugButton, SIGNAL(clicked()), this, SLOT(at_debugButton_clicked()));
 
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -101,6 +105,16 @@ QRectF QnNotificationsCollectionItem::visibleGeometry() const {
     return m_headerWidget->geometry().adjusted(0, 0, 0, m_list->visibleSize().height());
 }
 
+
+void QnNotificationsCollectionItem::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource)
+{
+    QnSingleThumbnailLoader* loader = QnSingleThumbnailLoader::newInstance(resource, this);
+    connect(loader, SIGNAL(success(QImage)), item, SLOT(setImage(QImage)));
+    connect(loader, SIGNAL(finished()), loader, SLOT(deleteLater()));
+    loader->loadLatest(QSize(0, 100));
+}
+
+
 void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     int resourceId = params.getEventResourceId();
@@ -126,8 +140,9 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::OpenInNewLayoutAction,
                         QnActionParameters(resource)
                         .withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000),
-                        2.0
+                        2.0, true
                         );
+            loadThumbnailForItem(item, resource);
             break;
         }
 
@@ -138,8 +153,9 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         tr("Open Camera"),
                         Qn::OpenInNewLayoutAction,
                         QnActionParameters(resource),
-                        2.0
+                        2.0, true
                         );
+            loadThumbnailForItem(item, resource);
             break;
         }
     case BusinessEventType::Camera_Disconnect: {
@@ -149,7 +165,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         tr("Open Camera"),
                         Qn::OpenInNewLayoutAction,
                         QnActionParameters(resource),
-                        2.0
+                        2.0, true
                         );
             item->addActionButton(
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
@@ -157,6 +173,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::CameraSettingsAction,
                         QnActionParameters(resource)
                         );
+            loadThumbnailForItem(item, resource);
             break;
         }
 
@@ -183,7 +200,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         tr("Open Camera"),
                         Qn::OpenInNewLayoutAction,
                         QnActionParameters(resource),
-                        2.0
+                        2.0, true
                         );
             item->addActionButton(
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
@@ -191,6 +208,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         Qn::CameraSettingsAction,
                         QnActionParameters(resource)
                         );
+            loadThumbnailForItem(item, resource);
             break;
         }
 
@@ -394,3 +412,4 @@ void QnNotificationsCollectionItem::at_list_itemRemoved(QnNotificationItem *item
 void QnNotificationsCollectionItem::at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters) {
     menu()->trigger(actionId, parameters);
 }
+

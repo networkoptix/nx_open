@@ -439,6 +439,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     QModelIndex idx = m_connectionsModel->index(index, 0);
     m_dataWidgetMapper->setCurrentModelIndex(idx);
     ui->passwordLineEdit->clear();
+    ui->rememberPasswordCheckBox->setChecked(false);
     updateFocus();
 }
 

@@ -3,14 +3,69 @@
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
 
 class QnProxyLabel;
 class QGraphicsLinearLayout;
-class QnToolTipWidget;
 class HoverFocusProcessor;
+
+/**
+ * An image button widget that displays thumbnail behind the button.
+ */
+class QnThumbnailImageButtonWidget: public QnImageButtonWidget {
+    Q_OBJECT
+
+    typedef QnImageButtonWidget base_type;
+
+public:
+    QnThumbnailImageButtonWidget(QGraphicsItem *parent = NULL):
+        base_type(parent) {}
+
+    const QImage& thumbnail() const {
+        return m_thumbnail;
+    }
+
+    Q_SLOT void setThumbnail(const QImage &image) {
+        m_thumbnail = image;
+    }
+
+protected:
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override {
+        if (!m_thumbnail.isNull())
+            painter->drawImage(rect, m_thumbnail);
+        base_type::paint(painter, startState, endState, progress, widget, rect);
+    }
+private:
+    QImage m_thumbnail;
+};
+
+class QnNotificationToolTipItem: public QnToolTipWidget {
+    Q_OBJECT
+
+    typedef QnToolTipWidget base_type;
+public:
+    QnNotificationToolTipItem(QGraphicsItem *parent = 0);
+
+    Q_SLOT void setThumbnail(const QImage &image);
+
+    /**
+     * Set tooltip text.
+     * \param text                      New text for this tool tip's label.
+     * \reimp
+     */
+    void setText(const QString &text);
+protected:
+    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+private:
+    void updateTailPos();
+
+    QnProxyLabel* m_textLabel;
+    QnProxyLabel* m_thumbnailLabel;
+};
 
 class QnNotificationItem: public QnClickableFrameWidget {
     Q_OBJECT
@@ -21,18 +76,23 @@ public:
     virtual ~QnNotificationItem();
 
     QString text() const;
-    void setText(const QString &text);
-
-    void setTooltipText(const QString &text);
 
     void addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
-                         const QnActionParameters &parameters = QnActionParameters(), const qreal sizeMultiplier = 1.0);
+                         const QnActionParameters &parameters = QnActionParameters(),
+                         const qreal sizeMultiplier = 1.0, const bool isThumbnail = false);
 
     QColor color() const;
+
+
+public slots:
+    void setText(const QString &text);
     void setColor(const QColor &color);
+    void setTooltipText(const QString &text);
+    void setImage(const QImage &image);
 
 signals:
     void actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
+    void imageChanged(const QImage& image);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -65,6 +125,7 @@ private:
     QGraphicsLinearLayout* m_layout;
     QnProxyLabel* m_textLabel;
     QColor m_color;
+    QImage m_image;
 
     QnToolTipWidget* m_tooltipItem;
     HoverFocusProcessor* m_hoverProcessor;

@@ -609,6 +609,19 @@ void QnImageButtonWidget::setCached(bool cached) {
     m_cached = cached;
 }
 
+void QnImageButtonWidget::setFixedSize(qreal size) {
+    setFixedSize(QSizeF(size, size));
+}
+
+void QnImageButtonWidget::setFixedSize(qreal width, qreal height) {
+    setFixedSize(QSizeF(width, height));
+}
+
+void QnImageButtonWidget::setFixedSize(const QSizeF &size) {
+    setMinimumSize(size);
+    setMaximumSize(size);
+}
+
 void QnImageButtonWidget::ensurePixmapCache() const {
     if(m_pixmapCacheValid)
         return;

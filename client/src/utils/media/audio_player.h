@@ -59,10 +59,11 @@ public:
     //!Starts playing file, returns immediately
     /*!
         Creates \a AudioPlayer object, which is removed on playback finish
-        \return true if playback started, false - otherwise
-        \note With this method, there is no way to receive playback done event, or cancel playback
+        \param target       Signal will be sent to this target on play end (can be null).
+        \param slot         Slot that will be called on play end if target is not null.
+        \return             True if playback started, false - otherwise
     */
-    static bool playFileAsync( const QString& filePath );
+    static bool playFileAsync( const QString& filePath, QObject* target = NULL, const char *slot = NULL );
     //!Generates wav from \a text and plays it...
     static bool sayTextAsync( const QString& text );
     //!Reads tag \a tagName

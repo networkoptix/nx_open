@@ -65,6 +65,8 @@ public slots:
     void setText(const QString &text);
     void setNum(int number);
     void setNum(double number);
+    void setPixmap(const QPixmap &pixmap);
+    void setPicture(const QPicture &picture);
     void clear();
 
 signals:
