@@ -186,6 +186,10 @@ void QnResourceWidgetRenderer::skip(int channel) {
 void QnResourceWidgetRenderer::setDisplayedRect(int channel, const QRectF& rect)
 {
     m_displayRect[channel] = rect;
+
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( ctx.renderer)
+        ctx.renderer->setDisplayedRect(rect);
 }
 
 void QnResourceWidgetRenderer::setPaused(bool value)
@@ -231,7 +235,6 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
         if( !ctx.uploader )
             return;
 
-    ctx.renderer->setDisplayedRect(m_displayRect[image->channel]);
     ctx.uploader->uploadDecodedPicture( image, m_displayRect[image->channel]);
         ++ctx.framesSinceJump;
     }

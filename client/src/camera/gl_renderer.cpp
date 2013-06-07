@@ -500,6 +500,5 @@ bool QnGLRenderer::isNV12ToRgbShaderUsed() const
 
 void QnGLRenderer::setDisplayedRect(const QRectF& rect)
 {
-    QMutexLocker locker(&m_mutex);
     m_displayedRect = rect;
 }
