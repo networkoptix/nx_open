@@ -41,6 +41,7 @@ QnNotificationToolTipItem::QnNotificationToolTipItem(QGraphicsItem *parent):
     setFont(fixedFont);
 
     m_textLabel->setAlignment(Qt::AlignCenter);
+    m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
