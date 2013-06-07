@@ -20,6 +20,8 @@ namespace {
     public:
         QnNotificationToolTipItem(QGraphicsItem *parent = 0): base_type(parent)
         {
+            // TODO: Somehow unify it with the one in tool_tip_slider.cpp?
+            // At least the styling part?
             setContentsMargins(5.0, 5.0, 5.0, 5.0);
             setTailWidth(5.0);
 
@@ -192,6 +194,7 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     qreal top = ycenter - side;
     qreal bottom = ycenter + side;
     
+    // TODO: cache the path?
     QPainterPath path;
     path.moveTo(left, top);
     path.lineTo(xcenter, top);
