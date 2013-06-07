@@ -27,10 +27,7 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
 
         void main() {
             float y = texture2D(yTexture, gl_TexCoord[0].st).p;
-            y = (y + yLevels2) * yLevels1;
-            if (gl_TexCoord[0].x < 0.5)
-                y = pow(y, yGamma);
-            gl_FragColor = vec4(y,
+            gl_FragColor = vec4(pow((y + yLevels2) * yLevels1, yGamma),
                                 texture2D(uTexture, gl_TexCoord[0].st).p,
                                 texture2D(vTexture, gl_TexCoord[0].st).p,
                                 1.0) * colorTransform;
@@ -65,19 +62,21 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, 
         uniform sampler2D vTexture;
         uniform sampler2D aTexture;
         uniform float opacity;
+        uniform float yLevels1;
+        uniform float yLevels2;
+        uniform float yGamma;
 
-        mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
-                                    1.0, -0.344, -0.714,  0.529,
-                                    1.0,  1.772,  0.0,   -0.886,
-                                    0.0,  0.0,    0.0,   opacity);
+        mat4 colorTransform = mat4( 1.0,  0.0,    1.402,  0.0,
+                                    1.0, -0.344, -0.714,  0.0,
+                                    1.0,  1.772,  0.0,   -0.0,
+                                    0.0,  0.0,    0.0,    opacity);
 
         void main() {
-
-            gl_FragColor = vec4(
-                texture2D(yTexture, gl_TexCoord[0].st).p,
-                texture2D(uTexture, gl_TexCoord[0].st).p,
-                texture2D(vTexture, gl_TexCoord[0].st).p,
-                texture2D(aTexture, gl_TexCoord[0].st).p) * colorTransform;
+            float y = texture2D(yTexture, gl_TexCoord[0].st).p;
+            gl_FragColor = vec4(pow((y + yLevels2) * yLevels1, yGamma),
+                                texture2D(uTexture, gl_TexCoord[0].st).p-0.5,
+                                texture2D(vTexture, gl_TexCoord[0].st).p-0.5,
+                                texture2D(aTexture, gl_TexCoord[0].st).p) * colorTransform;
         }
     ));
 
@@ -88,4 +87,7 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, 
     m_vTextureLocation = uniformLocation("vTexture");
     m_aTextureLocation = uniformLocation("aTexture");
     m_opacityLocation = uniformLocation("opacity");
+    m_yLevels1Location = uniformLocation("yLevels1");
+    m_yLevels2Location = uniformLocation("yLevels2");
+    m_yGammaLocation = uniformLocation("yGamma");
 }

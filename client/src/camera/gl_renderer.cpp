@@ -307,7 +307,7 @@ void QnGLRenderer::drawYV12VideoTexture(
 #endif
 
 void QnGLRenderer::drawYVA12VideoTexture(
-    const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
+    const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
     const QRectF& tex0Coords,
     unsigned int tex0ID,
     unsigned int tex1ID,
@@ -334,6 +334,7 @@ void QnGLRenderer::drawYVA12VideoTexture(
     m_yv12ToRgbaShaderProgram->setVTexture( 2 );
     m_yv12ToRgbaShaderProgram->setATexture( 3 );
     m_yv12ToRgbaShaderProgram->setOpacity(m_decodedPictureProvider.opacity() );
+    m_yv12ToRgbaShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
 
     glActiveTexture(GL_TEXTURE3);
     DEBUG_CODE(glCheckError("glActiveTexture"));

@@ -60,13 +60,21 @@ public:
     void setOpacity(GLfloat opacity) {
         setUniformValue(m_opacityLocation, opacity);
     }
-
+    void setImageCorrection(const ImageCorrectionResult& value)
+    {
+        setUniformValue(m_yLevels1Location, value.aCoeff);
+        setUniformValue(m_yLevels2Location, value.bCoeff);
+        setUniformValue(m_yGammaLocation, value.gamma);
+    }
 private:
     int m_yTextureLocation;
     int m_uTextureLocation;
     int m_vTextureLocation;
     int m_aTextureLocation;
     int m_opacityLocation;
+    int m_yLevels1Location;
+    int m_yLevels2Location;
+    int m_yGammaLocation;
 };
 
 #endif // QN_YV12_TO_RGB_SHADER_PROGRAM_H
