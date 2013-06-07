@@ -22,14 +22,17 @@ public:
     void addItem(QnNotificationItem *item, bool locked = false);
     void clear();
 
+    QSizeF visibleSize() const;
 signals:
+    void visibleSizeChanged();
     void itemRemoved(QnNotificationItem *item);
 
 protected:
-    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
     virtual void tick(int deltaMSecs) override;
 
+    void updateVisibleSize();
 private slots:
     void at_item_clicked(Qt::MouseButton button);
     void at_geometry_changed();
@@ -85,6 +88,7 @@ private:
 
     ItemData m_collapser;
     bool m_collapsedItemCountChanged;
+    QSizeF m_visibleSize;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H

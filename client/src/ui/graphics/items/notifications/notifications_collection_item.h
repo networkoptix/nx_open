@@ -24,7 +24,14 @@ public:
     explicit QnNotificationsCollectionItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0, QnWorkbenchContext* context = NULL);
     virtual ~QnNotificationsCollectionItem();
 
+    /** Geometry of the header widget. */
     QRectF headerGeometry() const;
+
+    /** Combined geometry of all visible sub-wigdets. */
+    QRectF visibleGeometry() const;
+
+signals:
+    void visibleSizeChanged();
 
 public slots:
     void showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource);

@@ -111,13 +111,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 
     setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
     setFrameWidth(0.5);
-
-    QLinearGradient gradient(1, 0, 0, 0); 
-    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
-    gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
-    gradient.setSpread(QGradient::RepeatSpread);
-    setWindowBrush(gradient);
+    setWindowBrush(Qt::transparent);
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipItem);
