@@ -77,7 +77,7 @@ public:
 
     bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
 
-    void setImageCorrection(const ImageCorrectionParams& value, bool enabled);
+    void setImageCorrection(const ImageCorrectionParams& value);
 
     void setDisplayedRect(int channel, const QRectF& rect);
 
@@ -86,6 +86,8 @@ public:
     //!Implementation of QnAbstractRenderer::setEnabled
     virtual void setEnabled(int channelNumber, bool enabled) override;
 
+    virtual void setPaused(bool value) override;
+    virtual void setScreenshotInterface(ScreenshotInterface* value) override;
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.

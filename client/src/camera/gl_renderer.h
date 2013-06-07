@@ -19,6 +19,7 @@
 
 class CLVideoDecoderOutput;
 class DecodedPictureToOpenGLUploader;
+class ScreenshotInterface;
 
 class QnGLRenderer
 :
@@ -48,10 +49,16 @@ public:
     bool isYV12ToRgbaShaderUsed() const;
     bool isNV12ToRgbShaderUsed() const;
 
-    void setImageCorrectionEnabled(bool value) { m_imageCorrectionEnabled = value; }
-    bool isImageCorrectionEnabled() const { return m_imageCorrectionEnabled; }
+    void setImageCorrectionParams(const ImageCorrectionParams& params) { m_imgCorrectParam = params; }
+    ImageCorrectionParams getImageCorrectionParams() const { return m_imgCorrectParam; }
+    
+    void setPaused(bool value) { m_paused = value; }
+    bool isPaused() const { return m_paused; }
+    void setScreenshotInterface(ScreenshotInterface* value);
+    void setDisplayedRect(const QRectF& rect);
 private:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
+    ImageCorrectionResult calcImageCorrection();
 private:
     const DecodedPictureToOpenGLUploader& m_decodedPictureProvider;
     qreal m_brightness;
@@ -69,6 +76,11 @@ private:
     bool m_timeChangeEnabled;
     mutable QMutex m_mutex;
     bool m_imageCorrectionEnabled;
+    bool m_paused;
+    ScreenshotInterface* m_screenshotInterface;
+    ImageCorrectionResult m_imageCorrector;
+    ImageCorrectionParams m_imgCorrectParam;
+    QRectF m_displayedRect;
 
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen

@@ -25,7 +25,7 @@ static const int MAX_QUEUE_TIME = 1000 * 200;
   */
 class QnVideoStreamDisplay
 :
-    public QnStoppable
+    public QnStoppable, public ScreenshotInterface
 {
 public:
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
@@ -51,7 +51,8 @@ public:
     void setMTDecoding(bool value);
 
     void setSpeed(float value);
-    QImage getScreenshot();
+    virtual QImage getScreenshot() override;
+    virtual QImage getGrayscaleScreenshot() override; 
     void setCurrentTime(qint64 time);
     void canUseBufferedFrameDisplayer(bool value);
     qint64 nextReverseTime() const;
@@ -76,6 +77,7 @@ private:
     qint64 getTimestampOfNextFrameToRender() const;
     void blockTimeValue(qint64 time);
     void blockTimeValueSafe(qint64 time);
+    void setPausedSafe(bool value);
     void unblockTimeValue();
     bool isTimeBlocked() const;
     void afterJump();

@@ -219,6 +219,11 @@ QImage QnCamDisplay::getScreenshot(int channel)
     return m_display[channel]->getScreenshot();
 }
 
+QImage QnCamDisplay::getGrayscaleScreenshot(int channel)
+{
+    return m_display[channel]->getGrayscaleScreenshot();
+}
+
 QSize QnCamDisplay::getFrameSize(int channel) const {
     return m_display[channel]->getImageSize();
 }
@@ -803,6 +808,8 @@ void QnCamDisplay::setSingleShotMode(bool single)
         emit liveMode(false);
         pauseAudio();
     }
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
+        m_display[i]->setPausedSafe(single);
 }
 
 float QnCamDisplay::getSpeed() const

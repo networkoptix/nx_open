@@ -79,6 +79,7 @@ void QnVideoStreamDisplay::pleaseStop()
 void QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 {
     QMutexLocker lock(&m_renderListMtx);
+    renderer->setScreenshotInterface(this);
     m_newList << renderer;
     m_renderListModified = true;
 }
@@ -870,6 +871,13 @@ void QnVideoStreamDisplay::blockTimeValue(qint64 time)
         render->blockTimeValue(m_channelNumber, time);
 }
 
+void QnVideoStreamDisplay::setPausedSafe(bool value)
+{
+    QMutexLocker lock(&m_renderListMtx);
+    foreach(QnAbstractRenderer* render, m_renderList)
+        render->setPaused(value);
+}
+
 void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
 {
     QMutexLocker lock(&m_renderListMtx);
@@ -928,6 +936,23 @@ void QnVideoStreamDisplay::clearReverseQueue()
     m_reverseQueue.clear();
     m_reverseSizeInBytes = 0;
 }
+
+QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
+{
+    if (m_decoder.isEmpty())
+        return QImage();
+    QnAbstractVideoDecoder* dec = m_decoder.begin().value();
+    QMutexLocker mutex(&m_mtx);
+    const AVFrame* lastFrame = dec->lastFrame();
+    if (m_reverseMode && m_lastDisplayedFrame && m_lastDisplayedFrame->data[0])
+        lastFrame = m_lastDisplayedFrame.data();
+
+    QImage tmp(lastFrame->data[0], lastFrame->width, lastFrame->height, lastFrame->linesize[0], QImage::Format_Indexed8);
+    QImage rez( lastFrame->width, lastFrame->height, QImage::Format_Indexed8);
+    rez = tmp.copy(0,0, lastFrame->width, lastFrame->height);
+    return rez;
+}
+
 
 QImage QnVideoStreamDisplay::getScreenshot()
 {

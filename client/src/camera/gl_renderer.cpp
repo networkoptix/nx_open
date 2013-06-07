@@ -92,7 +92,9 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_lastDisplayedFlags( 0 ),
     m_prevFrameSequence( 0 ),
     m_timeChangeEnabled(true),
-    m_imageCorrectionEnabled(false)
+    m_imageCorrectionEnabled(false),
+    m_paused(false),
+    m_screenshotInterface(0)
 {
     Q_ASSERT( context );
 
@@ -256,6 +258,20 @@ void QnGLRenderer::drawVideoTextureDirectly(
     }
 }
 
+void QnGLRenderer::setScreenshotInterface(ScreenshotInterface* value) { 
+    m_screenshotInterface = value;
+}
+
+ImageCorrectionResult QnGLRenderer::calcImageCorrection()
+{
+    if (m_screenshotInterface) {
+        QImage img = m_screenshotInterface->getGrayscaleScreenshot();
+        m_imageCorrector.processImage((quint8*)img.constBits(), img.width(), img.height(), img.bytesPerLine(), m_imgCorrectParam, m_displayedRect);
+    }
+
+    return m_imageCorrector;
+}
+
 void QnGLRenderer::drawYV12VideoTexture(
     const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
     const QRectF& tex0Coords,
@@ -282,8 +298,12 @@ void QnGLRenderer::drawYV12VideoTexture(
     m_yv12ToRgbShaderProgram->setUTexture( 1 );
     m_yv12ToRgbShaderProgram->setVTexture( 2 );
     m_yv12ToRgbShaderProgram->setOpacity(m_decodedPictureProvider.opacity());
-    if (isImageCorrectionEnabled())
-        m_yv12ToRgbShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
+    if (m_imgCorrectParam.enabled) {
+        if (!isPaused())
+            m_yv12ToRgbShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
+        else
+            m_yv12ToRgbShaderProgram->setImageCorrection(calcImageCorrection());
+    }
     else
         m_yv12ToRgbShaderProgram->setImageCorrection(ImageCorrectionResult());
 
@@ -339,7 +359,7 @@ void QnGLRenderer::drawYVA12VideoTexture(
     m_yv12ToRgbaShaderProgram->setVTexture( 2 );
     m_yv12ToRgbaShaderProgram->setATexture( 3 );
     m_yv12ToRgbaShaderProgram->setOpacity(m_decodedPictureProvider.opacity() );
-    if (isImageCorrectionEnabled())
+    if (m_imgCorrectParam.enabled)
         m_yv12ToRgbaShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
     else
         m_yv12ToRgbaShaderProgram->setImageCorrection(ImageCorrectionResult());
@@ -476,4 +496,10 @@ bool QnGLRenderer::isNV12ToRgbShaderUsed() const
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_nv12ToRgbShaderProgram.get();
         //&& m_nv12ToRgbShaderProgram->isValid();
+}
+
+void QnGLRenderer::setDisplayedRect(const QRectF& rect)
+{
+    QMutexLocker locker(&m_mutex);
+    m_displayedRect = rect;
 }

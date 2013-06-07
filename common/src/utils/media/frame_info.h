@@ -242,5 +242,13 @@ struct CLVideoData
     int height;// image height 
 };
 
+class ScreenshotInterface
+{
+public:
+    virtual QImage getScreenshot() = 0; // 8 bit Y channel only
+    virtual QImage getGrayscaleScreenshot() = 0;
+};
+
+
 #endif //frame_info_1730
 

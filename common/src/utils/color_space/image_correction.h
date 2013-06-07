@@ -6,10 +6,12 @@ struct ImageCorrectionParams
     ImageCorrectionParams():
         blackLevel(0.0),
         whiteLevel(0.0),
-        gamma(1.0) {}
+        gamma(1.0),
+        enabled(false) {}
     float blackLevel;
     float whiteLevel;
     float gamma;
+    bool enabled;
 };
 
 struct ImageCorrectionResult

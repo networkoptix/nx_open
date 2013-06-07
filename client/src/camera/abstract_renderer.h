@@ -114,6 +114,13 @@ public:
     */
     virtual void setEnabled(int channelNumber, bool enabled) = 0;
 
+    /*!
+        Inform render that media stream is paused and no more frames expected
+    */
+    virtual void setPaused(bool value) = 0;
+
+    virtual void setScreenshotInterface(ScreenshotInterface* value) = 0;
+
 private:
     int m_useCount;
     bool m_needStop;

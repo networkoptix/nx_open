@@ -188,6 +188,18 @@ void QnResourceWidgetRenderer::setDisplayedRect(int channel, const QRectF& rect)
     m_displayRect[channel] = rect;
 }
 
+void QnResourceWidgetRenderer::setPaused(bool value)
+{
+    for (int i = 0; i < m_channelRenderers.size(); ++i)
+        m_channelRenderers[i].renderer->setPaused(value);
+}
+
+void QnResourceWidgetRenderer::setScreenshotInterface(ScreenshotInterface* value)
+{
+    for (int i = 0; i < m_channelRenderers.size(); ++i)
+        m_channelRenderers[i].renderer->setScreenshotInterface(value);
+}
+
 bool QnResourceWidgetRenderer::isEnabled(int channelNumber) const
 {
     QMutexLocker lk( &m_mutex );
@@ -219,6 +231,7 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
         if( !ctx.uploader )
             return;
 
+    ctx.renderer->setDisplayedRect(m_displayRect[image->channel]);
     ctx.uploader->uploadDecodedPicture( image, m_displayRect[image->channel]);
         ++ctx.framesSinceJump;
     }
@@ -291,13 +304,13 @@ bool QnResourceWidgetRenderer::isDisplaying( const QSharedPointer<CLVideoDecoder
     return ctx.uploader->isUsingFrame( image );
 }
 
-void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& params, bool enabled)
+void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& params)
 {
     for (int i = 0; i < m_channelRenderers.size(); ++i){
         RenderingTools& ctx = m_channelRenderers[i];
         if( !ctx.uploader )
             continue;
         ctx.uploader->setImageCorrection(params); 
-        ctx.renderer->setImageCorrectionEnabled(enabled);
+        ctx.renderer->setImageCorrectionParams(params);
     }
 }

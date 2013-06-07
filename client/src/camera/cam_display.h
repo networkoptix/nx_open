@@ -79,6 +79,7 @@ public:
 
     QSize getFrameSize(int channel) const;
     QImage getScreenshot(int channel);
+    QImage getGrayscaleScreenshot(int channel);
     QSize getVideoSize() const;
     bool isRealTimeSource() const;
 
