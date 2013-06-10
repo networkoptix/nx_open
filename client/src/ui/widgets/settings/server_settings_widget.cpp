@@ -6,8 +6,6 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget *parent, Qt::WindowFlags 
     ui(new Ui::ServerSettingsWidget)
 {
     ui->setupUi(this);
-
-    connect(ui->clearCacheButton, SIGNAL(clicked()), this, SIGNAL(clearCache()));
 }
 
 QnServerSettingsWidget::~QnServerSettingsWidget() {
