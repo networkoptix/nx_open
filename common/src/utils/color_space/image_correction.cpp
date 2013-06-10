@@ -113,9 +113,3 @@ void ImageCorrectionResult::clear()
     bCoeff = 0.0;
     gamma = 1.0;
 }
-
-QByteArray ImageCorrectionResult::getHystogram() const
-{
-    //QMutexLocker lock(&m_mutex);
-    return QByteArray((const char*) hystogram, sizeof(hystogram));
-}

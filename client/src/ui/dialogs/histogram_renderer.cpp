@@ -5,18 +5,14 @@ static const int LINE_OFFSET = 4;
 static const int X_OFFSET = 8;
 
 QnHistogramRenderer::QnHistogramRenderer(QWidget* parent):
-    QWidget(parent),
-    m_aCoeff(1.0),
-    m_bCoeff(0.0)
+    QWidget(parent)
 {
 
 }
 
-void QnHistogramRenderer::setHistogramData(const QByteArray& data, double aCoeff, double bCoeff)
+void QnHistogramRenderer::setHistogramData(const ImageCorrectionResult& data)
 {
-    m_histogramData = data;
-    m_aCoeff = aCoeff;
-    m_bCoeff = bCoeff*256.0;
+    m_data = data;
     update();
 }
 
@@ -33,7 +29,7 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
     p.setBrush(QBrush(Qt::Dense5Pattern));
     p.drawRect(QRect(X_OFFSET, 0, width()-X_OFFSET*2, height()-1));
 
-    const int* data = (const int*) m_histogramData.constData();
+    const int* data = m_data.hystogram;
     double yScale = INT_MAX;
     for (int i = 0; i < 256; ++i)
         yScale = qMin(yScale, height() / (double)data[i]);
@@ -63,5 +59,9 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
     p.setPen(selectionColor.lighter());
     p.setBrush(selectionColor);
     double xScale = w / 256;
-    p.drawRect(QRect(qAbs(m_bCoeff)*xScale + X_OFFSET, 1,  256.0/m_aCoeff*xScale+0.5, height()));
+    p.drawRect(QRect(qAbs(m_data.bCoeff*256.0)*xScale + X_OFFSET, 1,  256.0/m_data.aCoeff*xScale+0.5, height()));
+    
+    p.setPen(Qt::white);
+    QRect r(0,0, width() - X_OFFSET*2, height());
+    p.drawText(r, Qt::AlignRight, tr("Gamma %1").arg(m_data.gamma, 0, 'g', 3));
 }

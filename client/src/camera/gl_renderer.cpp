@@ -302,15 +302,13 @@ void QnGLRenderer::drawYV12VideoTexture(
     if (m_imgCorrectParam.enabled) {
         if (!isPaused()) {
             m_yv12ToRgbShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
-            if (m_histogramConsumer) {
-                const ImageCorrectionResult& r = picLock->imageCorrectionResult();
-                m_histogramConsumer->setHistogramData(r.getHystogram(), r.aCoeff, r.bCoeff);
-            }
+            if (m_histogramConsumer)
+                m_histogramConsumer->setHistogramData(picLock->imageCorrectionResult());
         }
         else {
             m_yv12ToRgbShaderProgram->setImageCorrection(calcImageCorrection());
             if (m_histogramConsumer) 
-                m_histogramConsumer->setHistogramData(m_imageCorrector.getHystogram(), m_imageCorrector.aCoeff, m_imageCorrector.bCoeff);
+                m_histogramConsumer->setHistogramData(m_imageCorrector);
         }
     }
     else
