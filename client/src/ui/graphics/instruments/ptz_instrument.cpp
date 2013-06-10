@@ -376,8 +376,8 @@ private:
 // -------------------------------------------------------------------------- //
 // PtzManipulatorWidget
 // -------------------------------------------------------------------------- //
-class PtzManipulatorWidget: public QGraphicsWidget {
-    typedef QGraphicsWidget base_type;
+class PtzManipulatorWidget: public GraphicsWidget {
+    typedef GraphicsWidget base_type;
 
 public:
     PtzManipulatorWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
@@ -404,8 +404,8 @@ public:
 // -------------------------------------------------------------------------- //
 // PtzOverlayWidget
 // -------------------------------------------------------------------------- //
-class PtzOverlayWidget: public QGraphicsWidget {
-    typedef QGraphicsWidget base_type;
+class PtzOverlayWidget: public GraphicsWidget {
+    typedef GraphicsWidget base_type;
 
 public:
     PtzOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 

@@ -45,10 +45,16 @@ private slots:
     void at_list_itemRemoved(QnNotificationItem* item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
 private:
-    void loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource);
+    /**
+     * @brief loadThumbnailForItem          Start async thumbnail loading
+     * @param item                          Item that will receive loaded thumbnail
+     * @param resource                      Camera resource - thumbnail provider
+     * @param usecSinceEpoch                Timestamp for the thumbnail, -1 means latest available
+     */
+    void loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
 
     QnNotificationListWidget *m_list;
-    QGraphicsWidget* m_headerWidget;
+    GraphicsWidget* m_headerWidget;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_ITEM_H

@@ -6,6 +6,7 @@
 #include <ui/common/frame_section_queryable.h>
 
 namespace {
+    // TODO: #Elric shared with resize_hover_instrument
     class GraphicsWidget: public QGraphicsWidget {
     public:
         friend class ResizingInstrument;
