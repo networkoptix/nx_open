@@ -36,9 +36,12 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
 
     double w = width() - X_OFFSET*2;
     int prevY = 0;
+
+    QVector<QLine> lines;
+    QVector<QLine> lines2;
+
     for (int x = 0; x < width() - X_OFFSET*2; ++x)
     {
-        p.setPen(Qt::white);
         double idx = x / w * 256.0;
         quint8 index = idx;
         quint8 index2 = index < 255 ? index+1 : 255;
@@ -47,13 +50,17 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
 
 
         int curY = height() - value * yScale + 0.5;
-        p.drawLine(X_OFFSET + x, height(), X_OFFSET + x, curY);
+        lines << QLine(X_OFFSET + x, height(), X_OFFSET + x, curY);
         if (x > X_OFFSET) {
-            p.setPen(QColor(0x80, 0x80, 0x80, 0x80));
-            p.drawLine(X_OFFSET + x-1, prevY-1, X_OFFSET + x-1, curY);
+            lines2 << QLine(X_OFFSET + x-1, prevY-1, X_OFFSET + x-1, curY);
         }
         prevY = curY;
     }
+
+    p.setPen(Qt::white);
+    p.drawLines(lines);
+    p.setPen(QColor(0x60, 0x60, 0x60));
+    p.drawLines(lines2);
 
     const QColor selectionColor = qnGlobals->selectionColor();
     p.setPen(selectionColor.lighter());
