@@ -63,5 +63,5 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
     p.setPen(selectionColor.lighter());
     p.setBrush(selectionColor);
     double xScale = w / 256;
-    p.drawRect(QRect(qAbs(m_bCoeff)*xScale + X_OFFSET, 1,  255.0/m_aCoeff*xScale, height()));
+    p.drawRect(QRect(qAbs(m_bCoeff)*xScale + X_OFFSET, 1,  256.0/m_aCoeff*xScale+0.5, height()));
 }
