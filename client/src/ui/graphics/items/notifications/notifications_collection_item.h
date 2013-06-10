@@ -48,7 +48,7 @@ private:
     void loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource);
 
     QnNotificationListWidget *m_list;
-    QGraphicsWidget* m_headerWidget;
+    GraphicsWidget* m_headerWidget;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_ITEM_H

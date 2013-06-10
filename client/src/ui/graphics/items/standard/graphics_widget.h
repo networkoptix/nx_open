@@ -2,10 +2,11 @@
 #define QN_GRAPHICS_WIDGET_H
 
 #include <QtGui/QGraphicsWidget>
-#include "graphics_style.h"
 
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/margins.h>
+
+#include "graphics_style.h"
 
 class GraphicsWidgetPrivate;
 

@@ -602,7 +602,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     sliderZoomButtonsLayout->addItem(sliderZoomOutButton);
     sliderZoomButtonsLayout->addItem(sliderZoomInButton);
 
-    m_sliderZoomButtonsWidget = new QGraphicsWidget(m_controlsWidget);
+    m_sliderZoomButtonsWidget = new GraphicsWidget(m_controlsWidget);
     m_sliderZoomButtonsWidget->setLayout(sliderZoomButtonsLayout);
     m_sliderZoomButtonsWidget->setOpacity(0.0);
 

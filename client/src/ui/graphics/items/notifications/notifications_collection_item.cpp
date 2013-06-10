@@ -36,7 +36,7 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
     base_type(parent, flags),
     QnWorkbenchContextAware(context)
 {
-    m_headerWidget = new QGraphicsWidget(this);
+    m_headerWidget = new GraphicsWidget(this);
 
     QnImageButtonWidget* hideAllButton = new QnImageButtonWidget(m_headerWidget);
     hideAllButton->setIcon(qnSkin->icon("titlebar/exit.png"));
