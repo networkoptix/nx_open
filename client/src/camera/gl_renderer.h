@@ -18,6 +18,7 @@
 
 class CLVideoDecoderOutput;
 class ScreenshotInterface;
+class QnHistogramConsumer;
 
 class QnGLRenderer
 :
@@ -54,6 +55,8 @@ public:
     bool isPaused() const { return m_paused; }
     void setScreenshotInterface(ScreenshotInterface* value);
     void setDisplayedRect(const QRectF& rect);
+
+    void setHystogramConsumer(QnHistogramConsumer* value);
 private:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
     ImageCorrectionResult calcImageCorrection();
@@ -79,6 +82,7 @@ private:
     ImageCorrectionResult m_imageCorrector;
     ImageCorrectionParams m_imgCorrectParam;
     QRectF m_displayedRect;
+    QnHistogramConsumer* m_histogramConsumer;
 
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen

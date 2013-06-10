@@ -1,7 +1,9 @@
 #ifndef __IMAGE_CORRECTION_H__
 #define __IMAGE_CORRECTION_H__
 
+#include <QMutex>
 #include <QRectF>
+#include <QByteArray>
 
 struct ImageCorrectionParams
 {
@@ -51,12 +53,22 @@ struct ImageCorrectionResult
     float aCoeff;
     float bCoeff;
     float gamma;
-    int hystogram[256];
 
     void analizeImage( const quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data, const QRectF& srcRect);
+    QByteArray getHystogram() const;
 private:
     float calcGamma(int leftPos, int rightPos, int pixels) const;
     void clear();
+private:
+    //mutable QMutex m_mutex;
+    int hystogram[256];
+};
+
+class QnHistogramConsumer
+{
+public:
+    virtual ~QnHistogramConsumer() {}
+    virtual void setHistogramData(const QByteArray& data, double aCoeff, double bCoeff) = 0;
 };
 
 #endif // __IMAGE_CORRECTION_H__

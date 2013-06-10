@@ -94,7 +94,8 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_timeChangeEnabled(true),
     m_imageCorrectionEnabled(false),
     m_paused(false),
-    m_screenshotInterface(0)
+    m_screenshotInterface(0),
+    m_histogramConsumer(0)
 {
     Q_ASSERT( context );
 
@@ -299,10 +300,18 @@ void QnGLRenderer::drawYV12VideoTexture(
     m_yv12ToRgbShaderProgram->setVTexture( 2 );
     m_yv12ToRgbShaderProgram->setOpacity(m_decodedPictureProvider.opacity());
     if (m_imgCorrectParam.enabled) {
-        if (!isPaused())
+        if (!isPaused()) {
             m_yv12ToRgbShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
-        else
+            if (m_histogramConsumer) {
+                const ImageCorrectionResult& r = picLock->imageCorrectionResult();
+                m_histogramConsumer->setHistogramData(r.getHystogram(), r.aCoeff, r.bCoeff);
+            }
+        }
+        else {
             m_yv12ToRgbShaderProgram->setImageCorrection(calcImageCorrection());
+            if (m_histogramConsumer) 
+                m_histogramConsumer->setHistogramData(m_imageCorrector.getHystogram(), m_imageCorrector.aCoeff, m_imageCorrector.bCoeff);
+        }
     }
     else
         m_yv12ToRgbShaderProgram->setImageCorrection(ImageCorrectionResult());
@@ -501,4 +510,9 @@ bool QnGLRenderer::isNV12ToRgbShaderUsed() const
 void QnGLRenderer::setDisplayedRect(const QRectF& rect)
 {
     m_displayedRect = rect;
+}
+
+void QnGLRenderer::setHystogramConsumer(QnHistogramConsumer* value) 
+{ 
+    m_histogramConsumer = value; 
 }

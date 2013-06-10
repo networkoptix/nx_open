@@ -127,6 +127,7 @@
 #endif
 #include "core/resource/layout_item_data.h"
 #include "ui/dialogs/adjust_video_dialog.h"
+#include "ui/graphics/items/resource/resource_widget_renderer.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -2451,6 +2452,7 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
     ImageCorrectionParams prevParams = w->contrastParams();
     dialog->setParams(prevParams);
     dialog->setWindowModality(Qt::ApplicationModal);
+    w->renderer()->setHystogramConsumer(dialog->getHystogramConsumer());
 
     connect(dialog.data(), SIGNAL(valueChanged(ImageCorrectionParams)), w, SLOT(setContrastParams(ImageCorrectionParams)));
 
@@ -2458,6 +2460,8 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
         w->setContrastParams(dialog->params());
     else
         w->setContrastParams(prevParams);
+
+    w->renderer()->setHystogramConsumer(0);
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {

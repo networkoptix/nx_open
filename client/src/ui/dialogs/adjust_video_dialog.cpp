@@ -74,6 +74,7 @@ void QnAdjustVideoDialog::uiToParams()
 
     if (!(newParams == m_params)) {
         m_params = newParams;
+        ui->histogramRenderer->setHistogramParams(m_params);
         emit valueChanged(m_params);
     }
 }
@@ -95,6 +96,7 @@ void QnAdjustVideoDialog::setParams(const ImageCorrectionParams& params)
 
     ui->gammaSlider->setEnabled(params.gamma != 0);
     ui->gammaSpinBox->setEnabled(params.gamma != 0);
+    ui->histogramRenderer->setHistogramParams(params);
 
     m_updateDisabled = false;
     at_spinboxValueChanged();
@@ -108,4 +110,9 @@ void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
         defaultParams.enabled = true;
         setParams(defaultParams);
     }
+}
+
+QnHistogramConsumer* QnAdjustVideoDialog::getHystogramConsumer() const
+{
+    return ui->histogramRenderer;
 }
