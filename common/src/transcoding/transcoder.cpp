@@ -108,7 +108,7 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
-
+    bool lineAmountSpecified = false;
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
         m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),8)); // round resolution height
@@ -118,6 +118,7 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
         m_resolution.setWidth(m_resolution.height() * ar);
         m_resolution.setWidth(qPower2Ceil((unsigned) m_resolution.width(),16)); // round resolution width
         m_resolution.setWidth(qMin(decoder.getContext()->width, m_resolution.width())); // strict to source frame width
+        lineAmountSpecified = true;
     }
     else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty()) {
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
@@ -126,11 +127,13 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
     int width = m_resolution.width();
     int height = m_resolution.height();
     if (m_layout) {
-        int maxDimension = qMax(m_layout->size().width(), m_layout->size().height());
-        width /= maxDimension;
-        height /= maxDimension;
-        width = qPower2Ceil((unsigned) width ,16);
-        height = qPower2Ceil((unsigned) height ,8);
+        if (lineAmountSpecified) {
+            int maxDimension = qMax(m_layout->size().width(), m_layout->size().height());
+            width /= maxDimension;
+            height /= maxDimension;
+        }
+        width = qPower2Ceil((unsigned) width , WIDTH_ALIGN);
+        height = qPower2Ceil((unsigned) height , HEIGHT_ALIGN);
 
         width *= m_layout->size().width();
         height *= m_layout->size().height();
@@ -139,10 +142,10 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
     if (!m_srcRectF.isEmpty())
     {
         // round srcRect
-        int srcLeft = qPower2Floor(unsigned(m_srcRectF.left() * width), 16);
-        int srcTop = qPower2Floor(unsigned(m_srcRectF.top() * height), 2);
-        int srcWidth = qPower2Ceil(unsigned(m_srcRectF.width() * width), 16);
-        int srcHeight = qPower2Ceil(unsigned(m_srcRectF.height() * height), 2);
+        int srcLeft = qPower2Floor(unsigned(m_srcRectF.left() * width), WIDTH_ALIGN);
+        int srcTop = qPower2Floor(unsigned(m_srcRectF.top() * height), HEIGHT_ALIGN);
+        int srcWidth = qPower2Ceil(unsigned(m_srcRectF.width() * width), WIDTH_ALIGN);
+        int srcHeight = qPower2Ceil(unsigned(m_srcRectF.height() * height), HEIGHT_ALIGN);
 
         m_srcRectF = QRectF(srcLeft / (qreal) width, srcTop / (qreal) height, 
                             srcWidth / (qreal) width, srcHeight / (qreal) height);
@@ -151,8 +154,8 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
         height = srcHeight;
     }
 
-    m_resolution.setWidth(qPower2Ceil((unsigned)width,16));
-    m_resolution.setHeight(qPower2Ceil((unsigned)height,2));
+    m_resolution.setWidth(qPower2Ceil((unsigned)width, WIDTH_ALIGN));
+    m_resolution.setHeight(qPower2Ceil((unsigned)height, HEIGHT_ALIGN));
 
     if (!m_srcRectF.isEmpty())
     {
