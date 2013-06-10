@@ -1,4 +1,4 @@
-#include "notifications_collection_item.h"
+#include "notifications_collection_widget.h"
 
 #include <QtGui/QGraphicsLinearLayout>
 
@@ -33,7 +33,7 @@ namespace {
 
 } //anonymous namespace
 
-QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
+QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
     QnWorkbenchContextAware(context)
 {
@@ -95,19 +95,19 @@ QnNotificationsCollectionItem::QnNotificationsCollectionItem(QGraphicsItem *pare
             this, SLOT(hideAll()));
 }
 
-QnNotificationsCollectionItem::~QnNotificationsCollectionItem() {
+QnNotificationsCollectionWidget::~QnNotificationsCollectionWidget() {
 }
 
-QRectF QnNotificationsCollectionItem::headerGeometry() const {
+QRectF QnNotificationsCollectionWidget::headerGeometry() const {
     return m_headerWidget->geometry();
 }
 
-QRectF QnNotificationsCollectionItem::visibleGeometry() const {
+QRectF QnNotificationsCollectionWidget::visibleGeometry() const {
     return m_headerWidget->geometry().adjusted(0, 0, 0, m_list->visibleSize().height());
 }
 
 
-void QnNotificationsCollectionItem::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
+void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
 {
     QnSingleThumbnailLoader* loader = QnSingleThumbnailLoader::newInstance(resource, this);
     connect(loader, SIGNAL(success(QImage)), item, SLOT(setImage(QImage)));
@@ -116,7 +116,7 @@ void QnNotificationsCollectionItem::loadThumbnailForItem(QnNotificationItem *ite
 }
 
 
-void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
+void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     int resourceId = params.getEventResourceId();
     QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
@@ -245,7 +245,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
     m_list->addItem(item);
 }
 
-void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
+void QnNotificationsCollectionWidget::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
     QnNotificationItem *item = new QnNotificationItem(m_list);
 
     QString name = resource ? resource->getName() : QString();
@@ -337,19 +337,19 @@ void QnNotificationsCollectionItem::showSystemHealthEvent(QnSystemHealth::Messag
     m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
 }
 
-void QnNotificationsCollectionItem::hideAll() {
+void QnNotificationsCollectionWidget::hideAll() {
     m_list->clear();
 }
 
-void QnNotificationsCollectionItem::at_settingsButton_clicked() {
+void QnNotificationsCollectionWidget::at_settingsButton_clicked() {
     menu()->trigger(Qn::OpenPopupSettingsAction);
 }
 
-void QnNotificationsCollectionItem::at_eventLogButton_clicked() {
+void QnNotificationsCollectionWidget::at_eventLogButton_clicked() {
     menu()->trigger(Qn::BusinessEventsLogAction);
 }
 
-void QnNotificationsCollectionItem::at_debugButton_clicked() {
+void QnNotificationsCollectionWidget::at_debugButton_clicked() {
 
     QnResourceList servers = qnResPool->getResources().filtered<QnMediaServerResource>();
     QnResourcePtr sampleServer = servers.isEmpty() ? QnResourcePtr() : servers.first();
@@ -408,11 +408,11 @@ void QnNotificationsCollectionItem::at_debugButton_clicked() {
     }
 }
 
-void QnNotificationsCollectionItem::at_list_itemRemoved(QnNotificationItem *item) {
+void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationItem *item) {
     delete item;
 }
 
-void QnNotificationsCollectionItem::at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters) {
+void QnNotificationsCollectionWidget::at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters) {
     menu()->trigger(actionId, parameters);
 }
 

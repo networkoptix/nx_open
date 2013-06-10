@@ -1,5 +1,5 @@
-#ifndef NOTIFICATIONS_COLLECTION_ITEM_H
-#define NOTIFICATIONS_COLLECTION_ITEM_H
+#ifndef NOTIFICATIONS_COLLECTION_WIDGET_H
+#define NOTIFICATIONS_COLLECTION_WIDGET_H
 
 #include <QtGui/QGraphicsItem>
 
@@ -15,14 +15,14 @@ class QGraphicsLinearLayout;
 class QnNotificationListWidget;
 class QnNotificationItem;
 
-class QnNotificationsCollectionItem : public GraphicsWidget, public QnWorkbenchContextAware
+class QnNotificationsCollectionWidget : public GraphicsWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef GraphicsWidget base_type;
 public:
-    explicit QnNotificationsCollectionItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0, QnWorkbenchContext* context = NULL);
-    virtual ~QnNotificationsCollectionItem();
+    explicit QnNotificationsCollectionWidget(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0, QnWorkbenchContext* context = NULL);
+    virtual ~QnNotificationsCollectionWidget();
 
     /** Geometry of the header widget. */
     QRectF headerGeometry() const;
@@ -57,4 +57,4 @@ private:
     GraphicsWidget* m_headerWidget;
 };
 
-#endif // NOTIFICATIONS_COLLECTION_ITEM_H
+#endif // NOTIFICATIONS_COLLECTION_WIDGET_H
