@@ -63,5 +63,5 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
     
     p.setPen(Qt::white);
     QRect r(0,0, width() - X_OFFSET*2, height());
-    p.drawText(r, Qt::AlignRight, tr("Gamma %1").arg(m_data.gamma, 0, 'g', 3));
+    p.drawText(r, Qt::AlignRight, tr("Gamma %1").arg(m_data.gamma, 0, 'f', 2));
 }
