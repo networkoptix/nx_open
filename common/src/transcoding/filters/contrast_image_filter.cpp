@@ -11,7 +11,7 @@ static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0
 
 void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
 {
-    static const float GAMMA_EPS = 0.01;
+    static const float GAMMA_EPS = 0.01f;
 
     if (!m_params.enabled)
         return;

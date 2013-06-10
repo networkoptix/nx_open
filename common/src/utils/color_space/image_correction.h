@@ -8,9 +8,9 @@ struct ImageCorrectionParams
     bool operator== (const ImageCorrectionParams& other) const;
 
     ImageCorrectionParams():
-        blackLevel(0.001),
-        whiteLevel(0.0005),
-        gamma(1.0),
+        blackLevel(0.001f),
+        whiteLevel(0.0005f),
+        gamma(1.0f),
         enabled(false) {}
 
     static ImageCorrectionParams deserialize(const QByteArray& value)
