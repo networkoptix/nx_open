@@ -30,6 +30,7 @@ message Layout {
         optional double zoomRight       = 11;
         optional double zoomBottom      = 12;
         optional string zoomTargetUuid  = 13;
+        optional string contrastParams  = 14;
     }
 
     required double cellAspectRatio         = 1;
