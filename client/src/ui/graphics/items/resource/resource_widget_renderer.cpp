@@ -320,3 +320,10 @@ void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& p
         ctx.renderer->setImageCorrectionParams(params);
     }
 }
+
+void QnResourceWidgetRenderer::setHystogramConsumer(QnHistogramConsumer* value)
+{
+    RenderingTools& ctx = m_channelRenderers[0];
+    if( ctx.renderer )
+        ctx.renderer->setHystogramConsumer(value);
+}

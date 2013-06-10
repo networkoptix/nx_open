@@ -88,6 +88,7 @@ public:
 
     virtual void setPaused(bool value) override;
     virtual void setScreenshotInterface(ScreenshotInterface* value) override;
+    void setHystogramConsumer(QnHistogramConsumer* value);
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.

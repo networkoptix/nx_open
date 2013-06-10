@@ -22,6 +22,8 @@ public:
 
     void setParams(const ImageCorrectionParams& params);
     ImageCorrectionParams params() const;
+
+    QnHistogramConsumer * getHystogramConsumer() const;
 signals:
     void valueChanged(ImageCorrectionParams params);
 private slots:
