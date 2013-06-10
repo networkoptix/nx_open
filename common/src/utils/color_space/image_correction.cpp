@@ -1,5 +1,6 @@
 #include "image_correction.h"
 #include "utils/math/math.h"
+#include <memory>
 
 static const int MIN_GAMMA_RANGE = 6;
 static const float NORM_RANGE_START = 0.0; //16.0
