@@ -58,8 +58,6 @@
 #include "openal/qtvaudiodevice.h"
 #include "ui/graphics/items/controls/volume_slider.h"
 
-//#define QN_MAIN_WINDOW_CHANGES_OPACITY
-
 namespace {
 
     QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = -1) {
@@ -114,8 +112,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_controller(0),
     m_titleVisible(true),
     m_dwm(NULL),
-    m_drawCustomFrame(false),
-    m_changeOpacity(false)
+    m_drawCustomFrame(false)
 {
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
@@ -271,12 +268,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
     setLayout(m_globalLayout);
-
-
-    /* Transparency. */
-    connect(QnVolumeSliderNotifier::instance(), SIGNAL(manipulated()), this, SLOT(at_volumeSliderNotifier_manipulated()));
-    connect(QtvAudioDevice::instance(), SIGNAL(volumeChanged()), this, SLOT(at_audioDevice_volumeChanged()));
-    at_audioDevice_volumeChanged();
 
 
     /* Post-initialize. */
@@ -610,16 +601,3 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
-void QnMainWindow::at_volumeSliderNotifier_manipulated() {
-    m_changeOpacity = true;
-}
-
-void QnMainWindow::at_audioDevice_volumeChanged() {
-#ifdef QN_MAIN_WINDOW_CHANGES_OPACITY
-    if(m_changeOpacity) {
-        qreal volume = QtvAudioDevice::instance()->volume();
-
-        setWindowOpacity(qMin(0.7 + 0.5 * volume, 1.0));
-    }
-#endif
-}

@@ -85,9 +85,6 @@ protected slots:
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
-    void at_audioDevice_volumeChanged();
-    void at_volumeSliderNotifier_manipulated();
-
 private:
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
@@ -113,8 +110,6 @@ private:
 
     Options m_options;
     QMargins m_frameMargins;
-
-    bool m_changeOpacity;
 
     /** This field is used to restore geometry after switching to fullscreen and back */
     QRect m_storedGeometry;
