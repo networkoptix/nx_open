@@ -1214,9 +1214,8 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
                 m_sliderVisible ? sliderGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0,
                 m_calendarVisible ? calendarGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0
             ) - pos.y();
-    qreal recommendedHeight = m_notificationsItem->preferredHeight();
-
-    QSizeF size(notificationsGeometry.width(), qMin(maxHeight, recommendedHeight));
+    qreal preferredHeight = m_notificationsItem->preferredHeight();
+    QSizeF size(notificationsGeometry.width(), qMin(maxHeight, preferredHeight));
     return QRectF(pos, size);
 }
 

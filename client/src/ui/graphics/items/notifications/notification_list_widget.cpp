@@ -68,15 +68,15 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
     }
 
     QSizeF result(widgetWidth, 0);
-    foreach (QnNotificationItem* item, m_items) {
+    // preferred height is height of the most bottom item + height of all hidden items
+    foreach(QnNotificationItem *item, m_items | boost::adaptors::reversed) {
         ItemData* data = m_itemDataByItem[item];
-        if (data->state == ItemData::Hidden)
-            continue;
-
-        QSizeF itemSize = item->geometry().size();
-        if (itemSize.isNull())
-            continue;
-        result.setHeight(result.height() + itemSize.height());
+        if (data->state == ItemData::Collapsed) {
+            result.setHeight(result.height() + item->geometry().height());
+        } else {
+            result.setHeight(result.height() + item->geometry().bottom());
+            break;
+        }
     }
     return result;
 }
@@ -248,6 +248,7 @@ void QnNotificationListWidget::updateVisibleSize() {
     m_visibleSize = size;
 
     emit visibleSizeChanged();
+    updateGeometry();
 }
 
 void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
