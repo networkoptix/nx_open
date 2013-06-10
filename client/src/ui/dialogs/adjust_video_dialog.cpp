@@ -103,6 +103,9 @@ void QnAdjustVideoDialog::setParams(const ImageCorrectionParams& params)
 void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
 {
     QDialogButtonBox::ButtonRole role = ui->buttonBox->buttonRole(button);
-    if (role == QDialogButtonBox::ResetRole)
-        setParams(ImageCorrectionParams());
+    if (role == QDialogButtonBox::ResetRole) {
+        ImageCorrectionParams defaultParams;
+        defaultParams.enabled = true;
+        setParams(defaultParams);
+    }
 }

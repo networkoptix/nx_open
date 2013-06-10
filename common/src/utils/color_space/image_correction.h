@@ -11,7 +11,7 @@ struct ImageCorrectionParams
         blackLevel(0.001),
         whiteLevel(0.0005),
         gamma(1.0),
-        enabled(true) {}
+        enabled(false) {}
 
     static ImageCorrectionParams deserialize(const QByteArray& value)
     {
