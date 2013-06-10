@@ -4,6 +4,7 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
+#include <QImage>
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QSharedPointer>

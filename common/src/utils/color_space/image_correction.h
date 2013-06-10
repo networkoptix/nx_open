@@ -1,7 +1,6 @@
 #ifndef __IMAGE_CORRECTION_H__
 #define __IMAGE_CORRECTION_H__
 
-#include <QMutex>
 #include <QRectF>
 #include <QByteArray>
 

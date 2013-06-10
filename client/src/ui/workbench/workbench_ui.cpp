@@ -49,7 +49,7 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
-#include <ui/graphics/items/notifications/notifications_collection_item.h>
+#include <ui/graphics/items/notifications/notifications_collection_widget.h>
 #include <ui/common/palette.h>
 #include <ui/processors/hover_processor.h>
 
@@ -463,7 +463,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_notificationsBackgroundItem->setFrameWidth(0.5);
 
-    m_notificationsItem = new QnNotificationsCollectionItem(m_controlsWidget, 0, context());
+    m_notificationsItem = new QnNotificationsCollectionWidget(m_controlsWidget, 0, context());
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
 
     m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
@@ -512,6 +512,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_notificationsShowingProcessor,    SIGNAL(hoverEntered()),         this,   SLOT(at_notificationsShowingProcessor_hoverEntered()));
     connect(m_notificationsItem,                SIGNAL(geometryChanged()),      this,   SLOT(at_notificationsItem_geometryChanged()));
     connect(m_notificationsItem,                SIGNAL(visibleSizeChanged()),   this,   SLOT(at_notificationsItem_geometryChanged()));
+    connect(m_notificationsItem,                SIGNAL(sizeHintChanged()),      this,   SLOT(updateNotificationsGeometry()));
 
     /* Calendar. */
     QnCalendarWidget *calendarWidget = new QnCalendarWidget();
@@ -1208,13 +1209,14 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
         notificationsGeometry.x(),
         ((!m_titleVisible || !m_titleUsed) && m_notificationsVisible) ? 30.0 : qMax(titleGeometry.bottom() + 30.0, 30.0)
     );
-    QSizeF size(
-        notificationsGeometry.width(),
-        qMin(
-            m_sliderVisible ? sliderGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0,
-            m_calendarVisible ? calendarGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0
-        ) - pos.y()
-    );
+
+    qreal maxHeight = qMin(
+                m_sliderVisible ? sliderGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0,
+                m_calendarVisible ? calendarGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0
+            ) - pos.y();
+    qreal recommendedHeight = m_notificationsItem->preferredHeight();
+
+    QSizeF size(notificationsGeometry.width(), qMin(maxHeight, recommendedHeight));
     return QRectF(pos, size);
 }
 
