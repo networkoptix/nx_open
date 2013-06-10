@@ -427,8 +427,11 @@ Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWi
 }
 
 Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &parameters) {
-    int nodeType = parameters.argument(Qn::NodeTypeRole).toInt();
-    return (nodeType == m_nodeType) ? Qn::EnabledAction : Qn::InvisibleAction;
+    if (parameters.hasArgument(Qn::NodeTypeRole)) {
+        int nodeType = parameters.argument(Qn::NodeTypeRole).toInt();
+        return (nodeType == m_nodeType) ? Qn::EnabledAction : Qn::InvisibleAction;
+    }
+    return Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources) {
