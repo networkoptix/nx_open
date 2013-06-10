@@ -29,6 +29,7 @@
 namespace {
 
     const int buttonSize = 24;
+    const int thumbnailHeight = 100;
 
 } //anonymous namespace
 
@@ -106,12 +107,12 @@ QRectF QnNotificationsCollectionItem::visibleGeometry() const {
 }
 
 
-void QnNotificationsCollectionItem::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource)
+void QnNotificationsCollectionItem::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
 {
     QnSingleThumbnailLoader* loader = QnSingleThumbnailLoader::newInstance(resource, this);
     connect(loader, SIGNAL(success(QImage)), item, SLOT(setImage(QImage)));
     connect(loader, SIGNAL(finished()), loader, SLOT(deleteLater()));
-    loader->loadLatest(QSize(0, 100));
+    loader->load(usecsSinceEpoch, QSize(0, thumbnailHeight)); //width is auto-calculated
 }
 
 
@@ -133,6 +134,7 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
 
     switch (eventType) {
     case BusinessEventType::Camera_Motion: {
+
             item->setColor(qnGlobals->notificationColorCommon());
             item->addActionButton(
                         qnResIconCache->icon(resource->flags(), resource->getStatus()),
@@ -142,7 +144,8 @@ void QnNotificationsCollectionItem::showBusinessAction(const QnAbstractBusinessA
                         .withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000),
                         2.0, true
                         );
-            loadThumbnailForItem(item, resource);
+//            loadThumbnailForItem(item, resource, params.getEventTimestamp());
+            loadThumbnailForItem(item, resource); //TODO: #GDM loading latest while Roma fixes mediaserver
             break;
         }
 
