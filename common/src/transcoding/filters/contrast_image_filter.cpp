@@ -53,39 +53,37 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
                 __m128i y0 = _mm_unpacklo_epi8(sse_0000_intrs, y);
                 __m128i y1 = _mm_unpackhi_epi8(sse_0000_intrs, y);
 
-                y = _mm_packus_epi16(_mm_mulhi_epu16(y0, aFactorIntr), _mm_mulhi_epu16(y1, aFactorIntr));
-                
-                quint32 tmpData = _mm_extract_epi32(y, 0);
-                quint32 newVal = m_gammaCorrection[(quint8)tmpData] + 
-                                 (m_gammaCorrection[(quint8)(tmpData>>8)] << 8)+
-                                 (m_gammaCorrection[(quint8)(tmpData>>16)] << 16)+
-                                 (m_gammaCorrection[(quint8)(tmpData>>24)] << 24);
+                typedef union
+                {
+                    __m128i v;
+                    int32_t a[4];
+                } U32;
+                U32 tmp;
+
+                tmp.v = _mm_packus_epi16(_mm_mulhi_epu16(y0, aFactorIntr), _mm_mulhi_epu16(y1, aFactorIntr));
+
+                tmp.a[0] = m_gammaCorrection[(quint8)tmp.a[0]] + 
+                                 (m_gammaCorrection[(quint8)(tmp.a[0]>>8)] << 8)+
+                                 (m_gammaCorrection[(quint8)(tmp.a[0]>>16)] << 16)+
+                                 (m_gammaCorrection[(quint8)(tmp.a[0]>>24)] << 24);
 
 
-                y = _mm_insert_epi32(y, newVal, 0);
+                tmp.a[1] = m_gammaCorrection[(quint8)tmp.a[1]] + 
+                    (m_gammaCorrection[(quint8)(tmp.a[1]>>8)] << 8)+
+                    (m_gammaCorrection[(quint8)(tmp.a[1]>>16)] << 16)+
+                    (m_gammaCorrection[(quint8)(tmp.a[1]>>24)] << 24);
 
-                tmpData = _mm_extract_epi32(y, 1);
-                newVal = m_gammaCorrection[(quint8)tmpData] + 
-                    (m_gammaCorrection[(quint8)(tmpData>>8)] << 8)+
-                    (m_gammaCorrection[(quint8)(tmpData>>16)] << 16)+
-                    (m_gammaCorrection[(quint8)(tmpData>>24)] << 24);
-                y = _mm_insert_epi32(y, newVal, 1);
+                tmp.a[2] = m_gammaCorrection[(quint8)tmp.a[2]] + 
+                    (m_gammaCorrection[(quint8)(tmp.a[2]>>8)] << 8)+
+                    (m_gammaCorrection[(quint8)(tmp.a[2]>>16)] << 16)+
+                    (m_gammaCorrection[(quint8)(tmp.a[2]>>24)] << 24);
 
-                tmpData = _mm_extract_epi32(y, 2);
-                newVal = m_gammaCorrection[(quint8)tmpData] + 
-                    (m_gammaCorrection[(quint8)(tmpData>>8)] << 8)+
-                    (m_gammaCorrection[(quint8)(tmpData>>16)] << 16)+
-                    (m_gammaCorrection[(quint8)(tmpData>>24)] << 24);
-                y = _mm_insert_epi32(y, newVal, 2);
+                tmp.a[3] = m_gammaCorrection[(quint8)tmp.a[3]] + 
+                    (m_gammaCorrection[(quint8)(tmp.a[3]>>8)] << 8)+
+                    (m_gammaCorrection[(quint8)(tmp.a[3]>>16)] << 16)+
+                    (m_gammaCorrection[(quint8)(tmp.a[3]>24)] << 24);
 
-                tmpData = _mm_extract_epi32(y, 3);
-                newVal = m_gammaCorrection[(quint8)tmpData] + 
-                    (m_gammaCorrection[(quint8)(tmpData>>8)] << 8)+
-                    (m_gammaCorrection[(quint8)(tmpData>>16)] << 16)+
-                    (m_gammaCorrection[(quint8)(tmpData>>24)] << 24);
-                y = _mm_insert_epi32(y, newVal, 3);
-
-                *srcY++ = y;
+                *srcY++ = tmp.v;
             }
             srcY += strideCoeff;
         }
