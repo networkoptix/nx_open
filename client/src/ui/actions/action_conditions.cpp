@@ -275,6 +275,21 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
     return Qn::EnabledAction;
 }
 
+Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetList &widgets) {
+    if(widgets.size() != 1)
+        return Qn::InvisibleAction;
+
+    QnResourceWidget *widget = widgets[0];
+    if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
+        return Qn::InvisibleAction;
+
+    Qn::RenderStatus renderStatus = widget->currentRenderStatus();
+    if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
+        return Qn::DisabledAction;
+
+    return Qn::EnabledAction;
+}
+
 Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters &parameters) {
     if(!parameters.hasArgument(Qn::TimePeriodRole))
         return Qn::InvisibleAction;

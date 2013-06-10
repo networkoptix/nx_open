@@ -5,6 +5,20 @@ static const int MIN_GAMMA_RANGE = 6;
 static const float NORM_RANGE_START = 0.0; //16.0
 static const float NORM_RANGE_RANGE = 256.0 - NORM_RANGE_START*2.0;
 
+bool ImageCorrectionParams::operator== (const ImageCorrectionParams& other) const
+{
+    if (!qFuzzyCompare(blackLevel, other.blackLevel))
+        return false;
+
+    if (!qFuzzyCompare(whiteLevel, other.whiteLevel))
+        return false;
+
+    if (!qFuzzyCompare(gamma, other.gamma))
+        return false;
+
+    return enabled == other.enabled;
+}
+
 float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) const
 {
     // 1. calc hystogram middle point
@@ -20,16 +34,16 @@ float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) co
     return qBound(0.5, (qreal) log(recValue) / log(curValue), (qreal) 1.5);
 }
 
-void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height, int stride, 
+void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int height, int stride, 
                                          const ImageCorrectionParams& data, const QRectF& srcRect)
 {
     Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
     memset(hystogram, 0, sizeof(hystogram));
 
 
-    if (data.blackLevel == 0 && data.whiteLevel == 0 && gamma == 1.0)
+    if (data.blackLevel == 0 && data.whiteLevel == 0 && data.gamma == 1.0 || yPlane == 0)
     {
-        reset();
+        clear();
         return;
     }
 
@@ -84,7 +98,7 @@ void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height,
     }
 
     if (rightPos - leftPos < MIN_GAMMA_RANGE) {
-        reset();
+        clear();
     }
     else {
         aCoeff = NORM_RANGE_RANGE / float(rightPos-leftPos+1);
@@ -95,7 +109,7 @@ void ImageCorrectionResult::processImage( quint8* yPlane, int width, int height,
     }
 }
 
-void ImageCorrectionResult::reset()
+void ImageCorrectionResult::clear()
 {
     aCoeff = 1.0;
     bCoeff = 0.0;

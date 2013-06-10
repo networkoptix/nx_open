@@ -71,6 +71,12 @@ QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
 
 }
 
+QnVideoTranscoder::~QnVideoTranscoder()
+{
+    foreach(QnAbstractImageFilter* filter, m_filters)
+        delete filter;
+}
+
 void QnVideoTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
 {
     m_layout = layout;
@@ -79,6 +85,17 @@ void QnVideoTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
 void QnVideoTranscoder::setResolution(const QSize& value)
 {
     m_resolution = value;
+}
+
+void QnVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
+{
+    m_filters << filter;
+}
+
+void QnVideoTranscoder::processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect)
+{
+    foreach(QnAbstractImageFilter* filter, m_filters)
+        filter->updateImage(decodedFrame, updateRect);
 }
 
 QSize QnVideoTranscoder::getResolution() const

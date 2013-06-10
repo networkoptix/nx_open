@@ -875,6 +875,13 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnTakeScreenshotActionCondition(this));
 
+    factory(Qn::AdjustVideoAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("Adjust video")).
+        shortcut(tr("Alt+J")).
+        autoRepeat(false).
+        condition(new QnAdjustVideoActionCondition(this));
+
     factory(Qn::CreateZoomWindowAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Create Zoom Window")).

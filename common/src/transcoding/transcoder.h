@@ -11,6 +11,7 @@ extern "C"
 
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/media_resource.h"
+#include "filters/abstract_filter.h"
 
 
 /*!
@@ -85,6 +86,7 @@ class QnVideoTranscoder: public QnCodecTranscoder
 {
 public:
     QnVideoTranscoder(CodecID codecId);
+    virtual ~QnVideoTranscoder();
 
     //!Set picture size (in pixels) of output video stream
     /*!
@@ -98,9 +100,14 @@ public:
     void setVideoLayout(const QnResourceVideoLayout* layout);
 
     virtual bool open(QnCompressedVideoDataPtr video);
+
+    void addFilter(QnAbstractImageFilter* filter);
+protected:
+    void processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect);
 protected:
     QSize m_resolution;
     const QnResourceVideoLayout* m_layout;
+    QList<QnAbstractImageFilter*> m_filters;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 

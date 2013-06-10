@@ -947,6 +947,9 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
     if (m_reverseMode && m_lastDisplayedFrame && m_lastDisplayedFrame->data[0])
         lastFrame = m_lastDisplayedFrame.data();
 
+    if (!lastFrame || !lastFrame->width || !lastFrame->data[0])
+        return QImage();
+
     QImage tmp(lastFrame->data[0], lastFrame->width, lastFrame->height, lastFrame->linesize[0], QImage::Format_Indexed8);
     QImage rez( lastFrame->width, lastFrame->height, QImage::Format_Indexed8);
     rez = tmp.copy(0,0, lastFrame->width, lastFrame->height);
@@ -963,6 +966,9 @@ QImage QnVideoStreamDisplay::getScreenshot()
     const AVFrame* lastFrame = dec->lastFrame();
     if (m_reverseMode && m_lastDisplayedFrame && m_lastDisplayedFrame->data[0])
         lastFrame = m_lastDisplayedFrame.data();
+
+    if (!lastFrame || !lastFrame->width || !lastFrame->data[0])
+        return QImage();
 
     // convert colorSpace
     SwsContext* convertor = sws_getContext(lastFrame->width, lastFrame->height, (PixelFormat) lastFrame->format,

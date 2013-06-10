@@ -125,6 +125,8 @@
 #ifdef Q_OS_WIN
 #include "launcher_win/nov_launcher.h"
 #endif
+#include "core/resource/layout_item_data.h"
+#include "ui/dialogs/adjust_video_dialog.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -290,6 +292,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::InstantDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_instantDropResourcesAction_triggered()));
     connect(action(Qn::DropResourcesIntoNewLayoutAction),       SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
     connect(action(Qn::MoveCameraAction),                       SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
+    connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
     connect(action(Qn::ExitAction),                             SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
     connect(action(Qn::ExportTimeSelectionAction),              SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
     connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
@@ -444,6 +447,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
     data.rotation = params.rotation;
+    data.contrastParams = params.contrastParams;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
     if(params.frameColor.isValid())
         data.dataByRole[Qn::ItemFrameColorRole] = params.frameColor;
@@ -2400,6 +2404,26 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
         qApp->closeAllWindows();
 }
 
+void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
+{
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaResourceWidget *w = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
+    if (!w)
+        return;
+
+    QScopedPointer<QnAdjustVideoDialog> dialog( new QnAdjustVideoDialog(mainWindow(), context()) );
+    ImageCorrectionParams prevParams = w->contrastParams();
+    dialog->setParams(prevParams);
+    dialog->setWindowModality(Qt::ApplicationModal);
+
+    connect(dialog.data(), SIGNAL(valueChanged(ImageCorrectionParams)), w, SLOT(setContrastParams(ImageCorrectionParams)));
+
+    if (dialog->exec() == QDialog::Accepted)
+        w->setContrastParams(dialog->params());
+    else
+        w->setContrastParams(prevParams);
+}
+
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     QnActionParameters params = menu()->currentParameters(sender());
     QnUserResourcePtr user = params.resource().dynamicCast<QnUserResource>();
@@ -2979,7 +3003,8 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
                                                       (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage, 
                                                        role, 
                                                        0, 0,
-                                                       itemData.zoomRect);
+                                                       itemData.zoomRect,
+                                                       itemData.contrastParams);
 
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->getUrl()).arg(m_layoutFileName));
@@ -3091,10 +3116,14 @@ Do you want to continue?"),
 #endif
             ;
 
+    QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
+
     QString fileName;
     QString selectedExtension;
     QString selectedFilter;
     bool withTimestamps = false;
+    ImageCorrectionParams contrastParams = itemData.contrastParams;
+    
     while (true) {
         QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
@@ -3112,6 +3141,9 @@ Do you want to continue?"),
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(false), this);
 #endif
         dialog->addCheckBox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
+        dialog->addCheckBox(tr("Video adjustment (Requires Transcoding)"), &contrastParams.enabled, delegate);
+
+
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
@@ -3174,8 +3206,6 @@ Do you want to continue?"),
     }
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
-    QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
-
 #ifdef Q_OS_WIN
     if (selectedFilter.contains(binaryFilterName(false)))
     {
@@ -3224,7 +3254,8 @@ Do you want to continue?"),
         m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1), 
                                                   QnStorageResourcePtr(), role, 
                                                   timeOffset, serverTimeZone,
-                                                  itemData.zoomRect);
+                                                  itemData.zoomRect,
+                                                  contrastParams);
         exportProgressDialog->exec();
     }
 }

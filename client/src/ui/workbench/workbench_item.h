@@ -9,6 +9,7 @@
 #include <QtCore/QVariant>
 
 #include <client/client_globals.h>
+#include "utils/color_space/image_correction.h"
 
 class QnWorkbenchLayout;
 class QnLayoutItemData;
@@ -210,6 +211,15 @@ public:
      */
     void setZoomRect(const QRectF &zoomRect);
 
+    /**
+     * \param  New contrast params for this item.
+     */
+    void setContrastParams(const ImageCorrectionParams& params);
+    
+    const ImageCorrectionParams& contrastParams() const {
+        return m_contrastParams;
+    }
+
     QnWorkbenchItem *zoomTargetItem() const;
 
     /**
@@ -223,6 +233,7 @@ public:
      * \param degrees                   New rotation value for this item, in degrees.
      */
     void setRotation(qreal rotation);
+
 
     /**
      * Marks this item as waiting for geometry adjustment. It will be placed
@@ -272,6 +283,7 @@ signals:
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
     void zoomRectChanged();
+    void contrastParamsChanged();
     void zoomTargetItemChanged();
     void rotationChanged();
     void dataChanged(int role);
@@ -301,6 +313,9 @@ private:
 
     /** Item-relative rectangle that defines the portion of the item to be shown. */
     QRectF m_zoomRect;
+
+    /** Item contrast params */
+    ImageCorrectionParams m_contrastParams;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;

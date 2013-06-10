@@ -10,6 +10,8 @@
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"
+#include "transcoding/filters/contrast_image_filter.h"
+#include "transcoding/filters/time_image_filter.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -453,7 +455,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
     bool isTranscode = m_role == Role_FileExportWithTime || 
         (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
-        !m_srcRect.isEmpty();
+        !m_srcRect.isEmpty() ||
+        m_contrastParams.enabled;
 
     const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
@@ -479,17 +482,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
 
         m_videoChannels = isTranscode ? 1 : layout->channelCount();
-        int bottomRightChannel = 0;
-        int hPos = -1, vPos = -1;
-        for (int i = 0; i < m_videoChannels; ++i) 
-        {
-            QPoint position = layout->position(i);
-            if (position.x() >= hPos && position.y() >= vPos) {
-                bottomRightChannel = i;
-                hPos = position.x();
-                vPos = position.y();
-            }
-        }
 
         for (int i = 0; i < m_videoChannels; ++i) 
         {
@@ -510,7 +502,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             else
                 videoCodecCtx->pix_fmt = PIX_FMT_YUV420P;
 
-
             if (isTranscode)
             {
                 // transcode video
@@ -518,9 +509,14 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                     m_dstVideoCodec = CODEC_ID_MPEG4; // default value
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
-                if (m_role == Role_FileExportWithTime && i == bottomRightChannel)
-                    m_videoTranscoder->setDrawDateTime(QnFfmpegVideoTranscoder::Date_RightBottom);
-                m_videoTranscoder->setOnScreenDateOffset(m_onscreenDateOffset);
+
+                if (m_contrastParams.enabled)
+                    m_videoTranscoder->addFilter(new QnContrastImageFilter(m_contrastParams));
+                if (m_role == Role_FileExportWithTime) 
+                {
+                    m_videoTranscoder->addFilter(new QnTimeImageFilter(QnTimeImageFilter::Date_RightBottom, m_onscreenDateOffset));
+                }
+
                 m_videoTranscoder->setQuality(QnQualityHighest);
                 if (!m_srcRect.isEmpty())
                     m_videoTranscoder->setSrcRect(m_srcRect);
@@ -805,4 +801,9 @@ void QnStreamRecorder::setServerTimeZoneMs(int value)
 void QnStreamRecorder::setSrcRect(const QRectF& srcRect)
 {
     m_srcRect = srcRect;
+}
+
+void QnStreamRecorder::setContrastParams(const ImageCorrectionParams& params)
+{
+    m_contrastParams = params;
 }

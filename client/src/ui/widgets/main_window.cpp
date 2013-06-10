@@ -200,6 +200,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::RemoveFromServerAction));
     addAction(action(Qn::SelectAllAction));
     addAction(action(Qn::TakeScreenshotAction));
+    addAction(action(Qn::AdjustVideoAction));
     addAction(action(Qn::TogglePanicModeAction));
     addAction(action(Qn::ToggleTourModeHotkeyAction));
     addAction(action(Qn::DebugIncrementCounterAction));

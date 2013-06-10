@@ -124,6 +124,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     histogramButton->setCheckable(true);
     histogramButton->setProperty(Qn::NoBlockMotionSelection, true);
     histogramButton->setToolTip(tr("Histogram"));
+    histogramButton->setChecked(item->contrastParams().enabled);
     connect(histogramButton, SIGNAL(toggled(bool)), this, SLOT(at_histogramButton_toggled(bool)));
 
     buttonBar()->addButton(MotionSearchButton,  searchButton);
@@ -152,6 +153,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateButtonsVisibility();
     updateIconButton();
     updateAspectRatio();
+    setContrastParams(item->contrastParams());
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() 
@@ -863,15 +865,24 @@ void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
 }
 void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) 
 {
-    ImageCorrectionParams value;
-    
-    value.blackLevel = 0.01;
-    value.whiteLevel = 0.005;
-    value.gamma = 0.0;
-    value.enabled = checked;
+    ImageCorrectionParams params = item()->contrastParams();
+    if (params.enabled == checked)
+        return;
+    params.enabled = checked;
+    setContrastParams(params);
+}
 
-    m_renderer->setImageCorrection(value);
+ImageCorrectionParams QnMediaResourceWidget::contrastParams() const
+{
+    return item()->contrastParams();
+}
 
+void QnMediaResourceWidget::setContrastParams(const ImageCorrectionParams& params)
+{
+    QnImageButtonWidget * button = buttonBar()->button(HistogramButton);
+    button->setChecked(params.enabled);
+    item()->setContrastParams(params);
+    m_renderer->setImageCorrection(params);
 }
 
 void QnMediaResourceWidget::at_renderWatcher_displayingChanged(QnResourceWidget *widget) {

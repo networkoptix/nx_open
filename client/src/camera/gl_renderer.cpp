@@ -266,7 +266,7 @@ ImageCorrectionResult QnGLRenderer::calcImageCorrection()
 {
     if (m_screenshotInterface) {
         QImage img = m_screenshotInterface->getGrayscaleScreenshot();
-        m_imageCorrector.processImage((quint8*)img.constBits(), img.width(), img.height(), img.bytesPerLine(), m_imgCorrectParam, m_displayedRect);
+        m_imageCorrector.analizeImage((quint8*)img.constBits(), img.width(), img.height(), img.bytesPerLine(), m_imgCorrectParam, m_displayedRect);
     }
 
     return m_imageCorrector;
