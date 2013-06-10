@@ -66,6 +66,27 @@ void QnTimeImageFilter::initTimeDrawing(CLVideoDecoderOutput* frame, const QStri
 
 void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
 {
+    switch(m_dateTextPos)
+    {
+    case Date_LeftTop:
+        if (updateRect.left() != 0 || updateRect.top() != 0)
+            return;
+        break;
+    case Date_RightTop:
+        if (updateRect.right() != 1 || updateRect.top() != 0)
+            return;
+        break;
+    case Date_RightBottom:
+        if (updateRect.right() != 1 || updateRect.bottom() != 1)
+            return;
+        break;
+    case Date_LeftBottom:
+    default:
+        if (updateRect.left() != 0 || updateRect.bottom() != 1)
+            return;
+        break;
+    }
+
     QString timeStr;
     qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;
     if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)

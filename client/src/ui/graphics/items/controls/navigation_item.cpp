@@ -165,7 +165,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     leftLayoutV->addItem(buttonsLayout);
     leftLayoutV->addItem(newClockItem(this));
 
-    QGraphicsWidget *leftWidget = new QGraphicsWidget();
+    GraphicsWidget *leftWidget = new GraphicsWidget();
     leftWidget->setLayout(leftLayoutV);
     setHelpTopic(leftWidget, Qn::MainWindow_Playback_Help);
 

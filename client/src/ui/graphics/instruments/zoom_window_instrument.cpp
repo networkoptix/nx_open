@@ -140,8 +140,8 @@ private:
 // -------------------------------------------------------------------------- //
 // ZoomOverlayWidget
 // -------------------------------------------------------------------------- //
-class ZoomOverlayWidget: public QGraphicsWidget {
-    typedef QGraphicsWidget base_type;
+class ZoomOverlayWidget: public GraphicsWidget {
+    typedef GraphicsWidget base_type;
 public:
     ZoomOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
         base_type(parent, windowFlags)
