@@ -29,14 +29,7 @@ void QnProxyLabel::init() {
 }
 
 QnProxyLabel::~QnProxyLabel() {
-    /* setWidget calls back into the scene, which may result in accesses to parent item,
-     * which in turn may be being destroyed at the moment, ultimately leading to a crash
-     * due to pure virtual function call. So we clean up as much state as possible before
-     * setWidget call. Note that without this call we get stack overflow. */
-
-    setVisible(false);
-    setParentItem(NULL);
-    setWidget(NULL);
+    setWidget(NULL); /* Note that without this call we get stack overflow. */
 }
 
 QString QnProxyLabel::text() const {
