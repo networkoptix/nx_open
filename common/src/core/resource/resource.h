@@ -9,7 +9,7 @@
 #include <QStringList>
 #include <QReadWriteLock>
 #include <QThreadPool>
-#include "utils/common/qnid.h"
+#include "utils/common/id.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "resource_fwd.h"
 #include "param.h"

@@ -7,7 +7,7 @@
 #include <QtCore/QSharedPointer>
 
 #include "param.h"
-#include "utils/common/qnid.h"
+#include "utils/common/id.h"
 
 class QnResourceType;
 typedef QSharedPointer<QnResourceType> QnResourceTypePtr;

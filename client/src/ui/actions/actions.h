@@ -128,6 +128,11 @@ namespace Qn {
         CheckSystemHealthAction,
 
         /**
+         * Clears application cache folders (layout backgrounds, sounds)
+         */
+        ClearCacheAction,
+
+        /**
          * Cancels Tour Mode if it is started, otherwise works as FullScreenAction.
          */
         EscapeHotkeyAction,

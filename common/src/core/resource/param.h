@@ -5,7 +5,8 @@
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QVariant>
-#include "utils/common/qnid.h"
+
+#include <utils/common/id.h>
 
 enum QN_EXPORT QnDomain
 {
