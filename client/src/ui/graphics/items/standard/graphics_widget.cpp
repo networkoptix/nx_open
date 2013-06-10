@@ -43,6 +43,8 @@ public:
     QGraphicsScene *scene;
     QHash<QGraphicsItem *, QPointF> movingItemsInitialPositions;
     QSet<QGraphicsWidget *> pendingLayoutWidgets;
+
+    QHash<QGraphicsWidget *, const char *> names;
 };
 
 Q_DECLARE_METATYPE(GraphicsWidgetSceneData *);
@@ -210,8 +212,8 @@ GraphicsWidget::~GraphicsWidget() {
     setFocusProxy(NULL); 
 
     // TODO: #Elric #Qt5.0.1 workaround for QTBUG-29684 that is fixed in Qt5.0.1
-    while(!childItems().empty())
-        delete childItems().back();
+    //while(!childItems().empty())
+        //delete childItems().back();
 }
 
 GraphicsStyle *GraphicsWidget::style() const {
@@ -322,6 +324,7 @@ void GraphicsWidget::handlePendingLayoutRequests(QGraphicsScene *scene) {
         sd->pendingLayoutWidgets.clear();
 
         foreach(QGraphicsWidget *widget, widgets) {
+            const char *name = sd->names.value(widget);
             /* This code is copied from QGraphicsWidgetPrivate::_q_relayout(). */
             bool wasResized = widget->testAttribute(Qt::WA_Resized);
             widget->resize(widget->size());
@@ -364,6 +367,7 @@ void GraphicsWidget::updateGeometry() {
                 QApplication::postEvent(sd, new QEvent(GraphicsWidgetSceneData::HandlePendingLayoutRequests));
 
             sd->pendingLayoutWidgets.insert(this);
+            sd->names.insert(this, typeid(*this).name());
         } else {
             base_type::updateGeometry();
         }
