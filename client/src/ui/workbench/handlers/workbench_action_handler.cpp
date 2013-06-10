@@ -229,6 +229,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)), this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
+    
+    // TODO: #GDM why these connect calls are here? Why not in QnAppServerNotificationCache?
     connect(QnClientMessageProcessor::instance(),               SIGNAL(fileAdded(QString)),     context()->instance<QnAppServerNotificationCache>(), SLOT(at_fileAddedEvent(QString)));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(fileUpdated(QString)),   context()->instance<QnAppServerNotificationCache>(), SLOT(at_fileUpdatedEvent(QString)));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(fileRemoved(QString)),   context()->instance<QnAppServerNotificationCache>(), SLOT(at_fileRemovedEvent(QString)));
@@ -305,7 +307,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::InstantDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_instantDropResourcesAction_triggered()));
     connect(action(Qn::DropResourcesIntoNewLayoutAction),       SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
     connect(action(Qn::MoveCameraAction),                       SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
-    connect(action(Qn::TakeScreenshotAction),                   SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
     connect(action(Qn::ExitAction),                             SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
     connect(action(Qn::ExportTimeSelectionAction),              SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
     connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
@@ -402,10 +403,6 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
 QnAppServerConnectionPtr QnWorkbenchActionHandler::connection() const {
     return QnAppServerConnectionFactory::createConnection();
-}
-
-QWidget *QnWorkbenchActionHandler::widget() const {
-    return m_widget.data();
 }
 
 QString QnWorkbenchActionHandler::newLayoutName(const QnUserResourcePtr &user, const QString &baseName) const {
@@ -534,7 +531,7 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
     bool saveAll = false;
     if(needToAsk) {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            widget(),
+            mainWindow(),
             QnResourceList(saveableResources),
             tr("Close Layouts"),
             tr("The following %n layout(s) are not saved. Do you want to save them?", "", saveableResources.size()),
@@ -564,7 +561,7 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             closeLayouts(resources, rollbackResources, saveableResources, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
             return true;
         } else {
-            QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(widget()));
+            QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
             dialog->setWindowTitle(tr("Saving Layouts"));
             dialog->setText(tr("The following %n layout(s) are being saved.", "", saveableResources.size()));
             dialog->setBottomText(tr("Please wait."));
@@ -679,8 +676,8 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     }
 
     /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
-    if(widget()) {
-        int screen = qApp->desktop()->screenNumber(widget());
+    if(mainWindow()) {
+        int screen = qApp->desktop()->screenNumber(mainWindow());
         screen = (screen + 1) % qApp->desktop()->screenCount();
 
         arguments << QLatin1String("--screen");
@@ -699,8 +696,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
         QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
-        int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
-                             QMessageBox::Retry, QMessageBox::Ignore);
+        int button = QMessageBox::warning(mainWindow(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
@@ -709,8 +705,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
         }
     } else if (checkControls && cameraSettingsDialog()->widget()->hasMotionControlsChanges()){
         QString message = tr("Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.");
-        int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
-                             QMessageBox::Retry, QMessageBox::Ignore);
+        int button = QMessageBox::warning(mainWindow(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
@@ -734,7 +729,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
     if (!helper.isValid()) {
         QString message = tr("Licenses limit exceeded. Your changes will be saved, but will not take effect.");
-        QMessageBox::warning(widget(), tr("Could not apply changes"), message);
+        QMessageBox::warning(mainWindow(), tr("Could not apply changes"), message);
         cameraSettingsDialog()->widget()->setScheduleEnabled(false);
     }
 
@@ -776,10 +771,10 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
 
         if (!failedParams.isEmpty()) {
             QMessageBox::warning(
-                widget(),
+                mainWindow(),
                 tr("Could not save parameters"),
-                tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams),
-                1, 0);
+                tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
+            );
 
             cameraSettingsDialog()->widget()->updateFromResources();
         }
@@ -947,7 +942,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 
     m_healthRequestHandle = 0; //TODO: #GDM doubling code in disconnect/reconnect
 
-    if (!widget())
+    if (!mainWindow())
         return;
 
     notificationsHandler()->clear();
@@ -1013,7 +1008,7 @@ void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
-    QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(widget()));
+    QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
     dialog->setResources(resourcePool()->getResources());
     dialog->exec();
 }
@@ -1202,7 +1197,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
 
     QString name = menu()->currentParameters(sender()).argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty()) {
-        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
+        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindow()));
         dialog->setWindowTitle(tr("Save Layout As"));
         dialog->setText(tr("Enter layout name:"));
         dialog->setName(layout->getName());
@@ -1217,9 +1212,11 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
             button = QMessageBox::Yes;
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
             if (!canRemoveLayouts(existing)) {
-                QMessageBox::warning(widget(),
-                                     tr("Layout already exists"),
-                                     tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
+                QMessageBox::warning(
+                    mainWindow(),
+                    tr("Layout already exists"),
+                    tr("Layout with the same name already exists\nand you do not have the rights to overwrite it.")
+                );
                 return;
             }
 
@@ -1235,9 +1232,11 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     } else {
         QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
         if (!canRemoveLayouts(existing)) {
-            QMessageBox::warning(widget(),
-                                 tr("Layout already exists"),
-                                 tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
+            QMessageBox::warning(
+                mainWindow(),
+                tr("Layout already exists"),
+                tr("Layout with the same name already exists\nand you do not have the rights to overwrite it.")
+            );
             return;
         }
 
@@ -1385,7 +1384,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
     if(!errorResources.empty()) {
         QnResourceListDialog::exec(
-            widget(),
+            mainWindow(),
             errorResources,
             tr("Error"),
             tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()),
@@ -1453,7 +1452,7 @@ void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(widget(), tr("Open file")));
+    QScopedPointer<QFileDialog> dialog(new QFileDialog(mainWindow(), tr("Open file")));
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
     dialog->setFileMode(QFileDialog::ExistingFiles);
     QStringList filters;
@@ -1470,7 +1469,7 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(widget(), tr("Open file")));
+    QScopedPointer<QFileDialog> dialog(new QFileDialog(mainWindow(), tr("Open file")));
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
     dialog->setFileMode(QFileDialog::ExistingFiles);
     QStringList filters;
@@ -1484,7 +1483,7 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(widget(), tr("Open file")));
+    QScopedPointer<QFileDialog> dialog(new QFileDialog(mainWindow(), tr("Open file")));
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
     dialog->setFileMode(QFileDialog::Directory);
     dialog->setOptions(QFileDialog::ShowDirsOnly);
@@ -1497,7 +1496,7 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
     QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
     if(update.isNull()) {
         if(alwaysNotify)
-            QMessageBox::information(widget(), tr("Information"), tr("No updates available."));
+            QMessageBox::information(mainWindow(), tr("Information"), tr("No updates available."));
         return;
     }
 
@@ -1508,7 +1507,7 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
         return;
 
     QnCheckableMessageBox::question(
-        widget(), 
+        mainWindow(), 
         tr("Software update is available"), 
         tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
         tr("Don't notify again about this update."),
@@ -1538,11 +1537,13 @@ QnLayoutResourceList QnWorkbenchActionHandler::alreadyExistingLayouts(const QStr
 
 QMessageBox::StandardButton QnWorkbenchActionHandler::askOverrideLayout(QMessageBox::StandardButtons buttons,
                                                                         QMessageBox::StandardButton defaultButton) {
-    return QMessageBox::warning(widget(),
-                                tr("Layout already exists"),
-                                tr("Layout with the same name already exists. Overwrite it?"),
-                                buttons,
-                                defaultButton);
+    return QMessageBox::warning(
+        mainWindow(),
+        tr("Layout already exists"),
+        tr("Layout with the same name already exists. Overwrite it?"),
+        buttons,
+        defaultButton
+    );
 }
 
 bool QnWorkbenchActionHandler::canRemoveLayouts(const QnLayoutResourceList &layouts) {
@@ -1572,7 +1573,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     if(!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
-    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(widget()));
+    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("Layout Settings"));
     dialog->readFromResource(layout);
@@ -1594,34 +1595,34 @@ void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
-    QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(widget()));
+    QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_getMoreLicensesAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->openLicensesPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_openServerSettingsAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->openServerSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_openPopupSettingsAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->openPopupSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1629,7 +1630,7 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
     bool newlyCreated = false;
     if(!businessRulesDialog()) {
-        m_businessRulesDialog = new QnBusinessRulesDialog(widget());
+        m_businessRulesDialog = new QnBusinessRulesDialog(mainWindow());
         newlyCreated = true;
     }
     QRect oldGeometry = businessRulesDialog()->geometry();
@@ -1650,7 +1651,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
     bool newlyCreated = false;
     if(!businessEventsLogDialog()) {
-        m_businessEventsLogDialog = new QnEventLogDialog(widget(), context());
+        m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
         newlyCreated = true;
     }
     QRect oldGeometry = businessEventsLogDialog()->geometry();
@@ -1666,7 +1667,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
         return;
 
     if (!loginDialog()) {
-        m_loginDialog = new QnLoginDialog(widget(), context());
+        m_loginDialog = new QnLoginDialog(mainWindow(), context());
         loginDialog()->setModal(true);
     }
     while(true) {
@@ -1839,7 +1840,7 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
     if(!resource)
         return;
 
-    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resource->getUniqueId(), widget()));
+    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resource->getUniqueId(), mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1888,7 +1889,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = 16; // TODO: #Elric take it from config?
 
     if(period.durationMs < steps[1]) {
-        QMessageBox::warning(widget(), tr("Could not perform preview search"), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
+        QMessageBox::warning(mainWindow(), tr("Could not perform preview search"), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
         return;
     }
 
@@ -2012,7 +2013,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
     bool newlyCreated = false;
     if(!cameraSettingsDialog()) {
-        m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
+        m_cameraSettingsDialog = new QnCameraSettingsDialog(mainWindow());
         newlyCreated = true;
 
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
@@ -2026,7 +2027,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
            cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
         {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-                widget(),
+                mainWindow(),
                 QnResourceList(cameraSettingsDialog()->widget()->resources()),
                 tr("Camera(s) not Saved"),
                 tr("Save changes to the following %n camera(s)?", "", cameraSettingsDialog()->widget()->resources().size()),
@@ -2049,7 +2050,7 @@ void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
 {
     bool newlyCreated = false;
     if(!businessEventsLogDialog()) {
-        m_businessEventsLogDialog = new QnEventLogDialog(widget(), context());
+        m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
         newlyCreated = true;
     }
 
@@ -2126,7 +2127,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 
     bool newlyCreated = false;
     if(!cameraAdditionDialog()) {
-        m_cameraAdditionDialog = new QnCameraAdditionDialog(widget());
+        m_cameraAdditionDialog = new QnCameraAdditionDialog(mainWindow());
         newlyCreated = true;
     }
     QRect oldGeometry = cameraAdditionDialog()->geometry();
@@ -2141,7 +2142,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
     if(!server)
         return;
 
-    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, widget()));
+    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
         return;
@@ -2174,14 +2175,14 @@ void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
     if(resource.isNull())
         return;
 
-    QnEnvironment::showInGraphicalShell(widget(), resource->getUrl());
+    QnEnvironment::showInGraphicalShell(mainWindow(), resource->getUrl());
 }
 
 void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
     QSet<QnResourcePtr> resources = menu()->currentParameters(sender()).resources().toSet();
 
     QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-        widget(), 
+        mainWindow(), 
         resources.toList(),
         tr("Delete Files"), 
         tr("Are you sure you want to permanently delete these %n file(s)?", "", resources.size()), 
@@ -2198,7 +2199,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
 
     if(items.size() > 1) {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            widget(),
+            mainWindow(),
             QnActionParameterTypes::resources(items),
             tr("Remove Items"),
             tr("Are you sure you want to remove these %n item(s) from layout?", "", items.size()),
@@ -2241,7 +2242,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
 
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty()) {
-        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
+        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
         dialog->setWindowTitle(tr("Rename"));
         dialog->setText(tr("Enter new name for the selected item:"));
         dialog->setName(resource->getName());
@@ -2259,9 +2260,11 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
 
         QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
         if (!canRemoveLayouts(existing)) {
-            QMessageBox::warning(widget(),
-                                 tr("Layout already exists"),
-                                 tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
+            QMessageBox::warning(
+                mainWindow(),
+                tr("Layout already exists"),
+                tr("Layout with the same name already exists\nand you do not have the rights to overwrite it.")
+            );
             return;
         }
 
@@ -2305,7 +2308,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     /* Ask if needed. */
     if(!okToDelete) {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            widget(), 
+            mainWindow(), 
             resources, 
             tr("Delete Resources"), 
             tr("Do you really want to delete the following %n item(s)?", "", resources.size()), 
@@ -2330,7 +2333,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     QnUserResourcePtr user(new QnUserResource());
     user->setPermissions(Qn::GlobalLiveViewerPermissions);
 
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setEditorPermissions(accessController()->globalPermissions());
     dialog->setUser(user);
@@ -2352,7 +2355,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     if(user.isNull())
         return;
 
-    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
+    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
     dialog->setName(newLayoutName(user));
@@ -2367,9 +2370,11 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
         QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user);
 
         if (!canRemoveLayouts(existing)) {
-            QMessageBox::warning(widget(),
-                                 tr("Layout already exists"),
-                                 tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
+            QMessageBox::warning(
+                mainWindow(),
+                tr("Layout already exists"),
+                tr("Layout with the same name already exists\nand you do not have the rights to overwrite it.")
+            );
             return;
         }
 
@@ -2411,155 +2416,6 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
         qApp->closeAllWindows();
 }
 
-void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
-    if (!widget)
-        return;
-
-    QnResourceDisplayPtr display = widget->display();
-    const QnResourceVideoLayout *layout = display->videoLayout();
-
-    // TODO: #Elric move out, common code
-    QString timeString;
-    qint64 time = display->camDisplay()->getCurrentTime() / 1000;
-    if(widget->resource()->flags() & QnResource::utc) {
-        timeString = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd_hh.mm.ss"));
-    } else {
-        timeString = QTime().addMSecs(time).toString(lit("hh.mm.ss"));
-    }
-
-    if (layout->channelCount() == 0) {
-        qnWarning("No channels in resource '%1' of type '%2'.", widget->resource()->getName(), widget->resource()->metaObject()->className());
-        return;
-    }
-
-    QString fileName = parameters.argument<QString>(Qn::FileNameRole);
-    bool withTimestamps = true;
-    if(fileName.isEmpty()) {
-        QString suggestion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString;
-
-        QString previousDir = qnSettings->lastScreenshotDir();
-        if (previousDir.isEmpty())
-            previousDir = qnSettings->mediaFolder();
-
-        QString filterSeparator(QLatin1String(";;"));
-        QString pngFileFilter = tr("PNG Image (*.png)");
-        QString jpegFileFilter = tr("JPEG Image(*.jpg)");
-
-        QString allowedFormatFilter =
-            pngFileFilter;
-
-        if (QImageWriter::supportedImageFormats().contains("jpg") ) {
-            allowedFormatFilter += filterSeparator;
-            allowedFormatFilter += jpegFileFilter;
-        }
-
-        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-            this->widget(),
-            tr("Save Screenshot As..."),
-            previousDir + QDir::separator() + suggestion,
-            allowedFormatFilter
-        ));
-
-        dialog->setFileMode(QFileDialog::AnyFile);
-        dialog->setAcceptMode(QFileDialog::AcceptSave);
-
-        dialog->addCheckBox(tr("Include Timestamp"), &withTimestamps);
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
-            return;
-
-        fileName = dialog->selectedFiles().value(0);
-        if (fileName.isEmpty())
-            return;
-
-        QString selectedFilter = dialog->selectedNameFilter();
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-        if (!fileName.toLower().endsWith(selectedExtension))
-            fileName += selectedExtension;
-
-        if (QFile::exists(fileName)) {
-            QMessageBox::StandardButton button = QMessageBox::information(
-                this->widget(),
-                tr("Save As"),
-                tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
-                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-            );
-            if(button == QMessageBox::Cancel || button == QMessageBox::No)
-                return;
-        }
-
-        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-            QMessageBox::critical(
-                this->widget(),
-                tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
-                QMessageBox::Ok
-            );
-            return;
-        }
-    }
-
-    QImage screenshot;
-    {
-        QList<QImage> images;
-        for (int i = 0; i < layout->channelCount(); ++i)
-            images.push_back(display->camDisplay()->getScreenshot(i));
-        QSize channelSize = images[0].size();
-        QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
-        QRectF zoomRect = widget->zoomRect().isNull() ? QRectF(0, 0, 1, 1) : widget->zoomRect();
-
-        screenshot = QImage(totalSize.width() * zoomRect.width(), totalSize.height() * zoomRect.height(), QImage::Format_ARGB32);
-        screenshot.fill(qRgba(0, 0, 0, 0));
-        QPainter p(&screenshot);
-        p.setCompositionMode(QPainter::CompositionMode_Source);
-        for (int i = 0; i < layout->channelCount(); ++i) {
-            p.drawImage(
-                QnGeometry::cwiseMul(layout->position(i), channelSize) - QnGeometry::cwiseMul(zoomRect.topLeft(), totalSize),
-                images[i]
-            );
-        }
-
-        if (withTimestamps) {
-            QString timeStamp;
-            qint64 time = display->camDisplay()->getCurrentTime() / 1000;
-            if(widget->resource()->flags() & QnResource::utc) {
-                timeStamp = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd hh:mm:ss"));
-            } else {
-                timeStamp = QTime().addMSecs(time).toString(lit("hh:mm:ss"));
-            }
-
-            QFont font;
-            font.setPixelSize(qMax(screenshot.height() / 20, 12));
-
-            int tsWidht = QFontMetrics(font).width(timeString);
-            int tsDescent = QFontMetrics(font).descent();
-            int spacing = 2;
-
-            p.setPen(Qt::black);
-            p.setBrush(Qt::white);
-            p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
-
-            QPainterPath path;
-            path.addText(screenshot.width() - tsWidht - spacing*2, screenshot.height() - tsDescent - spacing, font, timeStamp);
-
-            p.drawPath(path);
-        }
-    }
-
-    if (!screenshot.save(fileName)) {
-        QMessageBox::critical(
-            this->widget(),
-            tr("Could not save screenshot"),
-            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(fileName).baseName())
-        );
-        return;
-    }
-    addToResourcePool(fileName);
-    
-    qnSettings->setLastScreenshotDir(QFileInfo(fileName).absolutePath());
-}
-
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     QnActionParameters params = menu()->currentParameters(sender());
     QnUserResourcePtr user = params.resource().dynamicCast<QnUserResource>();
@@ -2570,7 +2426,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(!(permissions & Qn::ReadPermission))
         return;
 
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
     setHelpTopic(dialog.data(), Qn::UserSettings_Help);
@@ -2661,7 +2517,7 @@ void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()
 
     if(exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30) { // TODO: #Elric implement more precise estimation
         int button = QMessageBox::question(
-            this->widget(),
+            mainWindow(),
             tr("Warning"),
             tr("You are about to export several video sequences with a total length exceeding 30 minutes. \n\
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.\n\
@@ -2701,20 +2557,20 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
 
     if (imageExists) {
         QMessageBox::critical(
-            this->widget(), 
+            mainWindow(), 
             tr("Could not save a layout"), 
             tr("Current layout contains image files. Images are not allowed for Multi-Video export."),
             QMessageBox::Ok
-            );
+        );
         return false;
     }
     else if (nonUtcExists && utcExists) {
         QMessageBox::critical(
-            this->widget(), 
+            mainWindow(), 
             tr("Could not save a layout"), 
             tr("Current layout contains several cameras and local files. You have to keep only cameras or only local files"), 
             QMessageBox::Ok
-            );
+        );
         return false;
     }
     return true;
@@ -2796,7 +2652,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
-            this->widget(), 
+            mainWindow(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
             mediaFilter,
@@ -2818,7 +2674,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
             if (QFile::exists(fileName)) {
                 QMessageBox::StandardButton button = QMessageBox::information(
-                    this->widget(), 
+                    mainWindow(), 
                     tr("Save As"), 
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
@@ -2831,7 +2687,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
-                this->widget(), 
+                mainWindow(), 
                 tr("Could not overwrite file"), 
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
                 QMessageBox::Ok
@@ -2859,7 +2715,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     if (m_exportedCamera)
     {
         QMessageBox::critical(
-            this->widget(), 
+            mainWindow(), 
             tr("Could not save a layout"),
             tr("Another export in progress. Please wait"), 
             QMessageBox::Ok
@@ -2876,7 +2732,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
         fileName += QLatin1String(".tmp");
     }
 
-    QnProgressDialog *exportProgressDialog = new QnProgressDialog(this->widget());
+    QnProgressDialog *exportProgressDialog = new QnProgressDialog(mainWindow());
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(true);
@@ -3066,7 +2922,7 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setValue(m_exportProgressDialog.data()->maximum());
 
-        QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+        QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
     }
 }
 
@@ -3151,7 +3007,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFailed(QString errorMessage
     at_cancelExport();
     if(m_exportProgressDialog)
         m_exportProgressDialog.data()->deleteLater();
-    QMessageBox::warning(widget(), tr("Could not export layout"), errorMessage, QMessageBox::Ok);
+    QMessageBox::warning(mainWindow(), tr("Could not export layout"), errorMessage, QMessageBox::Ok);
 }
 
 void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult)
@@ -3172,10 +3028,10 @@ void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, cons
 
     if (!failedParams.isEmpty()) {
         QMessageBox::warning(
-            widget(),
+            mainWindow(),
             tr("Could not save parameters"),
-            tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams),
-            1, 0);
+            tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
+        );
 
         cameraSettingsDialog()->widget()->updateFromResources();
     }
@@ -3198,11 +3054,11 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
             widget = dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
             if (!widget) {
                 QMessageBox::critical(
-                            this->widget(),
-                            tr("Could not export file"),
-                            tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", "", parameters.size()),
-                            QMessageBox::Ok
-                            );
+                    mainWindow(),
+                    tr("Could not export file"),
+                    tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", "", parameters.size()),
+                    QMessageBox::Ok
+                );
                 return;
             }
         }
@@ -3216,7 +3072,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
 
     if(period.durationMs > 1000 * 60 * 30) { // TODO: #Elric implement more precise estimation
         int button = QMessageBox::question(
-            this->widget(),
+            mainWindow(),
             tr("Warning"),
             tr("You are about to export a video sequence that is longer than 30 minutes. \n\
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.\n\
@@ -3258,10 +3114,12 @@ Do you want to continue?"),
     while (true) {
         QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
-        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this->widget(),
-                                                                         tr("Export Video As..."),
-                                                                         previousDir + QDir::separator() + suggestion,
-                                                                         allowedFormatFilter));
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
+            mainWindow(),
+            tr("Export Video As..."),
+            previousDir + QDir::separator() + suggestion,
+            allowedFormatFilter
+        ));
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
@@ -3285,7 +3143,7 @@ Do you want to continue?"),
 
             if (QFile::exists(fileName)) {
                 QMessageBox::StandardButton button = QMessageBox::information(
-                    this->widget(), 
+                    mainWindow(), 
                     tr("Save As"), 
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
@@ -3306,7 +3164,7 @@ Do you want to continue?"),
                 if (periods.size() > 1 && archive->getDPAudioLayout()->channelCount() > 0)
                 {
                     int result = QMessageBox::warning(
-                        this->widget(), 
+                        mainWindow(), 
                         tr("AVI format is not recommended"), 
                         tr("AVI format is not recommended for camera with audio track there is some recording holes exists."\
                            "Press 'Yes' to continue export or 'No' to select other format"), // TODO: #Elric bad Engrish
@@ -3320,7 +3178,7 @@ Do you want to continue?"),
 
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
-                this->widget(), 
+                mainWindow(), 
                 tr("Could not overwrite file"), 
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
                 QMessageBox::Ok
@@ -3352,7 +3210,7 @@ Do you want to continue?"),
     else
 #endif
     {
-        QnProgressDialog *exportProgressDialog = new QnProgressDialog(this->widget());
+        QnProgressDialog *exportProgressDialog = new QnProgressDialog(mainWindow());
         exportProgressDialog->setWindowTitle(tr("Exporting Video"));
         exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
         exportProgressDialog->setRange(0, 100);
@@ -3399,7 +3257,7 @@ void QnWorkbenchActionHandler::at_camera_exportFinished(QString fileName) {
     if(m_exportProgressDialog)
         m_exportProgressDialog.data()->setValue(m_exportProgressDialog.data()->maximum());
 
-    QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+    QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
 }
 
 void QnWorkbenchActionHandler::at_cancelExport()
@@ -3424,7 +3282,7 @@ void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
     if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))
         camera->stopExport();
     m_exportedCamera = 0;
-    QMessageBox::warning(widget(), tr("Could not export video"), errorMessage, QMessageBox::Ok);
+    QMessageBox::warning(mainWindow(), tr("Could not export video"), errorMessage, QMessageBox::Ok);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
@@ -3511,7 +3369,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
 
     if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
         QMessageBox::critical(
-            widget(), 
+            mainWindow(), 
             tr("Could not get position from camera"), 
             tr("An error has occurred while trying to get current position from camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
         );
@@ -3521,7 +3379,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
     QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(camera);
     if(qIsNaN(position)) {
         QMessageBox::critical(
-            widget(), 
+            mainWindow(), 
             tr("Could not get position from camera"), 
             tr("An error has occurred while trying to get current position from camera %1.\n\nThe camera is probably in continuous movement mode. Please stop the camera and try again.").arg(camera->getName())
         );
@@ -3529,7 +3387,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
     }
 
     bool ok = false;
-    QString name = QInputDialog::getText(widget(), tr("Save Position"), tr("Enter position name:"), QLineEdit::Normal, QString(), &ok);
+    QString name = QInputDialog::getText(mainWindow(), tr("Save Position"), tr("Enter position name:"), QLineEdit::Normal, QString(), &ok);
     if(!ok)
         return;
 
@@ -3553,7 +3411,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
 
     if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
         QMessageBox::critical(
-            widget(), 
+            mainWindow(), 
             tr("Could not set position from camera"), 
             tr("An error has occurred while trying to set current position for camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
         );
@@ -3569,7 +3427,7 @@ void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
     if(!camera)
         return;
 
-    QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(widget()));
+    QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(mainWindow()));
     dialog->setCamera(camera);
     dialog->exec();
 }
@@ -3584,7 +3442,7 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
     if (workbench()->currentLayout()->resource()->locked())
         return;
 
-    QnProgressDialog *progressDialog = new QnProgressDialog(this->widget());
+    QnProgressDialog *progressDialog = new QnProgressDialog(mainWindow());
     progressDialog->setWindowTitle(tr("Updating background"));
     progressDialog->setLabelText(tr("Image processing can take a lot of time. Please be patient."));
     progressDialog->setRange(0, 0);
@@ -3612,7 +3470,7 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
         return;
 
     if (!success) {
-        QMessageBox::warning(widget(), tr("Error"), tr("Image cannot be uploaded"));
+        QMessageBox::warning(mainWindow(), tr("Error"), tr("Image cannot be uploaded"));
         return;
     }
 
@@ -3682,7 +3540,7 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceLi
 
     if(!reopeningLayoutResources.empty()) {
         int button = QnResourceListDialog::exec(
-            widget(),
+            mainWindow(),
             resources,
             tr("Error"),
             tr("Could not save the following %n layout(s) to Enterprise Controller.", "", reopeningLayoutResources.size()),
@@ -3699,7 +3557,7 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceLi
         }
     } else {
         QnResourceListDialog::exec(
-            widget(),
+            mainWindow(),
             resources,
             tr("Error"),
             tr("Could not save the following %n items to Enterprise Controller.", "", resources.size()),
@@ -3714,7 +3572,7 @@ void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& resp
     if(response.status == 0)
         return;
 
-    QMessageBox::critical(widget(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
+    QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
@@ -3722,7 +3580,7 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QnReso
         return;
 
     QnResourceListDialog::exec(
-        widget(),
+        mainWindow(),
         resources,
         tr("Error"),
         tr("Could not save changes made to the following %n resource(s).", "", resources.size()),

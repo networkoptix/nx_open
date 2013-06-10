@@ -30,6 +30,7 @@
 #include <ui/help/help_topics.h>
 #include "ui/workbench/handlers/workbench_action_handler.h"
 #include "ui/workbench/handlers/workbench_panic_handler.h"
+#include "ui/workbench/handlers/workbench_screenshot_handler.h"
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_grid_mapper.h"
 #include "ui/workbench/workbench_layout.h"
@@ -171,8 +172,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up handlers. */
-    QnWorkbenchActionHandler *actionHandler = context->instance<QnWorkbenchActionHandler>();
-    actionHandler->setWidget(this);
+    context->instance<QnWorkbenchActionHandler>();
+    context->instance<QnWorkbenchScreenshotHandler>();
 
 
     /* Set up actions. */

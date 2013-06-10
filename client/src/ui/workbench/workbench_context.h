@@ -66,6 +66,14 @@ public:
         return m_navigator.data();
     }
 
+    QWidget *mainWindow() const {
+        return m_mainWindow.data();
+    }
+
+    void setMainWindow(QWidget *mainWindow) {
+        m_mainWindow = mainWindow;
+    }
+
     QAction *action(const Qn::ActionId id) const;
 
     QnUserResourcePtr user() const;
@@ -109,6 +117,8 @@ private:
     QScopedPointer<QnActionManager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
+    
+    QWeakPointer<QWidget> m_mainWindow;
 
     QnWorkbenchUserWatcher *m_userWatcher;
     QnWorkbenchLayoutWatcher *m_layoutWatcher;

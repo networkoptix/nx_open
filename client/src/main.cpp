@@ -456,6 +456,7 @@ int main(int argc, char **argv)
 
         /* Create main window. */
         QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
+        context->setMainWindow(mainWindow.data());
         mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
         if(screen != -1) {

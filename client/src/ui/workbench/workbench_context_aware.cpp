@@ -108,4 +108,6 @@ QnWorkbenchNavigator *QnWorkbenchContextAware::navigator() const {
     return context()->navigator();
 }
 
-
+QWidget *QnWorkbenchContextAware::mainWindow() const {
+    return context()->mainWindow();
+}

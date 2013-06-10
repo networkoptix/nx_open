@@ -143,20 +143,6 @@ public:
     QnWorkbenchActionHandler(QObject *parent = NULL);
     virtual ~QnWorkbenchActionHandler();
 
-    /**
-     * \returns                         Widget that this action handler operates on.
-     */
-    QWidget *widget() const;
-
-    /**
-     * \param widget                    Widget for this action handler to operate on.
-     *                                  All dialogs and message boxes will be displayed
-     *                                  to the user relative to this widget.
-     */
-    void setWidget(QWidget *widget) {
-        m_widget = widget;
-    }
-
 protected:
     QnAppServerConnectionPtr connection() const;
 
@@ -326,7 +312,6 @@ protected slots:
     void at_newUserAction_triggered();
     void at_newUserLayoutAction_triggered();
 
-    void at_takeScreenshotAction_triggered();
     void at_exitAction_triggered();
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
