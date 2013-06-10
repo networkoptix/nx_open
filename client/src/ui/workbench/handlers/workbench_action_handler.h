@@ -344,6 +344,8 @@ protected slots:
 
     void at_checkSystemHealthAction_triggered();
 
+    void at_clearCacheAction_triggered();
+
     void at_serverSettings_received(int status, const QnKvPairList& settings, int handle);
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};

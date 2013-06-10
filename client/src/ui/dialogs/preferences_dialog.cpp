@@ -81,6 +81,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     m_serverSettingsWidget = new QnServerSettingsWidget(this);
     m_serverSettingsTabIndex = ui->tabWidget->addTab(m_serverSettingsWidget, tr("Server"));
+    connect(m_serverSettingsWidget, SIGNAL(clearCache()), action(Qn::ClearCacheAction), SLOT(trigger()));
 
     resize(1, 1); // set widget size to minimal possible
 

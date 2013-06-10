@@ -19,6 +19,10 @@ public:
     // now is used only for email setup so parameter is omitted
     void updateFocusedElement();
 
+signals:
+    //TODO: #GDM debug button, remove in release
+    void clearCache();
+
 private:
     QScopedPointer<Ui::ServerSettingsWidget> ui;
 };
