@@ -123,6 +123,7 @@ protected:
         quint64 time;
         QColor frameColor;
         qreal rotation;
+        ImageCorrectionParams contrastParams;
 
         AddToLayoutParams():
             usePosition(false),
@@ -278,6 +279,7 @@ protected slots:
     void at_newUserAction_triggered();
     void at_newUserLayoutAction_triggered();
 
+    void at_adjustVideoAction_triggered();
     void at_exitAction_triggered();
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();

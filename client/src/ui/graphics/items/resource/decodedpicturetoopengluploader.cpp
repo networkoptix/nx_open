@@ -42,6 +42,7 @@ extern "C"
 #endif
 //#define USE_SINGLE_PBO_PER_FRAME
 #endif
+#include "transcoding/filters/contrast_image_filter.h"
 
 //#define UPLOAD_SYSMEM_FRAMES_ASYNC
 #define UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
@@ -465,7 +466,7 @@ const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::im
 
 void DecodedPictureToOpenGLUploader::UploadedPicture::processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data)
 {
-    m_imgCorrection.processImage(yPlane, width, height, stride, data, m_displayedRect);
+    m_imgCorrection.analizeImage(yPlane, width, height, stride, data, m_displayedRect);
 }
 
 GLuint DecodedPictureToOpenGLUploader::UploadedPicture::pboID( int index ) const

@@ -9,6 +9,7 @@
 
 #include <client/client_globals.h>
 #include "camera/resource_display.h" // TODO: #Elric FWD!
+#include "utils/color_space/image_correction.h"
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -89,10 +90,13 @@ public:
 
     bool isMotionSensitivityEmpty() const;
 
+    ImageCorrectionParams contrastParams() const;
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
-
+public slots:
+    void setContrastParams(const ImageCorrectionParams& params);
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
 
@@ -125,7 +129,6 @@ protected:
     QPoint channelGridOffset(int channel) const;
 
     Q_SIGNAL void updateInfoTextLater();
-
 private slots:
     void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
@@ -134,7 +137,6 @@ private slots:
     void at_histogramButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
-
 private:
     int currentRecordingMode();
     

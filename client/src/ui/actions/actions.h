@@ -393,6 +393,12 @@ namespace Qn {
         TakeScreenshotAction,
 
         /**
+         * Change video contrast
+         * 
+         */
+        AdjustVideoAction,
+
+        /**
          * Opens user settings dialog.
          */
         UserSettingsAction,

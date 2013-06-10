@@ -1,7 +1,5 @@
 #include "ffmpeg_video_transcoder.h"
 #include "decoders/video/ffmpeg.h"
-#include <utils/color_space/yuvconvert.h>
-#include <utils/common/util.h>
 
 extern "C" {
 #ifdef WIN32
@@ -13,25 +11,14 @@ extern "C" {
 #endif
 };
 
-
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
-static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
-static const int MIN_TEXT_HEIGHT = 14;
 
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
-QnVideoTranscoder(codecId),
-m_decodedVideoFrame(new CLVideoDecoderOutput()),
-m_encoderCtx(0),
-m_firstEncodedPts(AV_NOPTS_VALUE),
-m_mtMode(false),
-m_dateTextPos(Date_None),
-m_imageBuffer(0),
-m_timeImg(0),
-m_dateTimeXOffs(0),
-m_dateTimeYOffs(0),
-m_onscreenDateOffset(0),
-m_bufXOffs(0),
-m_bufYOffs(0)
+    QnVideoTranscoder(codecId),
+    m_decodedVideoFrame(new CLVideoDecoderOutput()),
+    m_encoderCtx(0),
+    m_firstEncodedPts(AV_NOPTS_VALUE),
+    m_mtMode(false)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
     {
@@ -60,8 +47,6 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 
     for (int i = 0; i < m_videoDecoders.size(); ++i)
         delete m_videoDecoders[i];
-    delete m_timeImg;
-    qFreeAligned(m_imageBuffer);
 }
 
 int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch)
@@ -78,17 +63,9 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
 
     if (m_layout)
     {
-        QPoint pos = m_layout->position(ch);
-        int left = pos.x() * m_resolution.width() / m_layout->size().width();
-        int top = pos.y() * m_resolution.height() / m_layout->size().height();
-        if (!dstRectF.isEmpty()) {
-            dstRect = QRect(dstRectF.left() * m_resolution.width() + 0.5, dstRectF.top() * m_resolution.height() + 0.5,
-                            dstRectF.width() * m_resolution.width() + 0.5, dstRectF.height() * m_resolution.height() + 0.5);
-            dstRect = roundRect(dstRect);
-        }
-        else {
-            dstRect = QRect(left, top, m_resolution.width() / m_layout->size().width(), m_resolution.height() / m_layout->size().height());
-        }
+        dstRect = QRect(dstRectF.left() * m_resolution.width() + 0.5, dstRectF.top() * m_resolution.height() + 0.5,
+                        dstRectF.width() * m_resolution.width() + 0.5, dstRectF.height() * m_resolution.height() + 0.5);
+        dstRect = roundRect(dstRect);
 
         for (int i = 0; i < 3; ++i)
         {
@@ -149,7 +126,6 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     m_encoderCtx->height = m_resolution.height();
     m_encoderCtx->pix_fmt = m_codecId == CODEC_ID_MJPEG ? PIX_FMT_YUVJ420P : PIX_FMT_YUV420P;
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-    //m_encoderCtx->flags |= CODEC_FLAG_LOW_DELAY;
     if (m_bitrate == -1)
         m_bitrate = QnTranscoder::suggestMediaStreamParams( m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality );
     m_encoderCtx->bit_rate = m_bitrate;
@@ -166,10 +142,7 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
         {
             //100 - 1;
             //0 - FF_LAMBDA_MAX;
-
-            //m_encoderCtx->quality = FF_LAMBDA_MAX - ((FF_LAMBDA_MAX - 1) * it.value().toInt() / 100);
             m_encoderCtx->global_quality = INT_MAX / 50 * (it.value().toInt() - 50);
-            //compression_level;
         }
         else if( it.key() == QnCodecParams::qscale )
         {
@@ -196,84 +169,6 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     return true;
 }
 
-void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr)
-{
-    m_timeFont.setBold(true);
-    m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
-    QFontMetrics metric(m_timeFont);
-    //m_bufYOffs;
-
-    switch(m_dateTextPos)
-    {
-    case Date_LeftTop:
-        m_bufYOffs = 0;
-        m_dateTimeXOffs = metric.averageCharWidth()/2;
-        break;
-    case Date_RightTop:
-        m_bufYOffs = 0;
-        m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
-        break;
-    case Date_RightBottom:
-        m_bufYOffs = frame->height - metric.height();
-        m_dateTimeXOffs = frame->width - metric.boundingRect(timeStr).width() - metric.averageCharWidth()/2; // - metric.width(QLatin1String("0"));
-        break;
-    case Date_LeftBottom:
-    default:
-        m_bufYOffs = frame->height - metric.height();
-        m_dateTimeXOffs = metric.averageCharWidth()/2;
-        break;
-    }
-
-    m_bufYOffs = qPower2Floor(m_bufYOffs, 2);
-    m_bufXOffs = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
-
-    m_dateTimeXOffs = m_dateTimeXOffs%CL_MEDIA_ALIGNMENT;
-    m_dateTimeYOffs = metric.ascent();
-
-    int drawWidth = metric.width(timeStr);
-    int drawHeight = metric.height();
-    drawWidth = qPower2Ceil((unsigned) drawWidth + m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
-    m_imageBuffer = (uchar*) qMallocAligned(drawWidth * drawHeight * 4, CL_MEDIA_ALIGNMENT);
-    m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
-}
-
-void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
-{
-    QString timeStr;
-    qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;
-    if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)
-        timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy-MMM-dd hh:mm:ss"));
-    else
-        timeStr = QTime().addMSecs(displayTime).toString(lit("hh:mm:ss.zzz"));
-
-    if (m_timeImg == 0)
-        initTimeDrawing(frame, timeStr);
-
-    int bufPlaneYOffs  = m_bufXOffs + m_bufYOffs * frame->linesize[0];
-    int bufferUVOffs = m_bufXOffs/2 + m_bufYOffs * frame->linesize[1] / 2;
-
-    // copy and convert frame buffer to image
-    yuv420_argb32_sse2_intr(m_imageBuffer,
-        frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
-        m_timeImg->width(), m_timeImg->height(),
-        m_timeImg->bytesPerLine(), 
-        frame->linesize[0], frame->linesize[1], 255);
-
-    QPainter p(m_timeImg);
-    p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    QPainterPath path;
-    path.addText(m_dateTimeXOffs, m_dateTimeYOffs, m_timeFont, timeStr);
-    p.setBrush(Qt::white);
-    p.drawPath(path);
-    p.strokePath(path, QPen(QColor(32,32,32,80)));
-
-    // copy and convert RGBA32 image back to frame buffer
-    bgra_to_yv12_sse2_intr(m_imageBuffer, m_timeImg->bytesPerLine(), 
-        frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
-        frame->linesize[0], frame->linesize[1], 
-        m_timeImg->width(), m_timeImg->height(), false);
-}
-
 int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
 {
     if( result )
@@ -286,41 +181,43 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
 
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
     CLFFmpegVideoDecoder* decoder = m_videoDecoders[m_layout ? video->channelNumber : 0];
-    QRectF dstRectF;
+    QRectF dstRectF(0,0, 1,1);
 
     if (decoder->decode(video, &m_decodedVideoFrame)) 
     {
 
         QRect frameRect;
-        if (!m_srcRectF.isEmpty() && m_layout)
+        if (m_layout)
         {
             QPoint pos = m_layout->position(video->channelNumber);
             QSize lSize = m_layout->size();
-            QRectF srcRectF(m_srcRectF.left() * lSize.width(), m_srcRectF.top() * lSize.height(),
-                            m_srcRectF.width() * lSize.width(), m_srcRectF.height() * lSize.height());
-            QRectF channelRect(pos.x(), pos.y(), 1, 1);
+            if (!m_srcRectF.isEmpty())
+            {
+                QRectF srcRectF(m_srcRectF.left() * lSize.width(), m_srcRectF.top() * lSize.height(),
+                                m_srcRectF.width() * lSize.width(), m_srcRectF.height() * lSize.height());
+                QRectF channelRect(pos.x(), pos.y(), 1, 1);
 
-            if (!channelRect.intersects(srcRectF))
-                return 0; // channel outside bounding rect
+                if (!channelRect.intersects(srcRectF))
+                    return 0; // channel outside bounding rect
 
-            QRectF frameRectF = srcRectF.intersected(channelRect);
+                QRectF frameRectF = srcRectF.intersected(channelRect);
 
-            qreal dstWidth = frameRectF.width() / srcRectF.width();
-            qreal dstHeight = frameRectF.height() / srcRectF.height();
-            qreal dstLeft = (frameRectF.left() - srcRectF.left())/srcRectF.width();
-            qreal dstTop = (frameRectF.top() - srcRectF.top())/srcRectF.height();
-            dstRectF = QRectF(dstLeft, dstTop, dstWidth, dstHeight);
+                qreal dstWidth = frameRectF.width() / srcRectF.width();
+                qreal dstHeight = frameRectF.height() / srcRectF.height();
+                qreal dstLeft = (frameRectF.left() - srcRectF.left())/srcRectF.width();
+                qreal dstTop = (frameRectF.top() - srcRectF.top())/srcRectF.height();
+                dstRectF = QRectF(dstLeft, dstTop, dstWidth, dstHeight);
 
-
-
-            frameRectF.translate(-channelRect.left(), -channelRect.top());
-            //frameRectF.setWidth(frameRectF.width()*lSize.width());
-            //frameRectF.setHeight(frameRectF.height()*lSize.height());
-            frameRect = QRect(frameRectF.left() * decoder->getWidth() + 0.5, frameRectF.top() * decoder->getHeight() + 0.5, 
-                frameRectF.width() * decoder->getWidth() + 0.5, frameRectF.height() * decoder->getHeight() + 0.5);
-            frameRect = roundRect(frameRect);
+                frameRectF.translate(-channelRect.left(), -channelRect.top());
+                frameRect = QRect(frameRectF.left() * decoder->getWidth() + 0.5, frameRectF.top() * decoder->getHeight() + 0.5, 
+                    frameRectF.width() * decoder->getWidth() + 0.5, frameRectF.height() * decoder->getHeight() + 0.5);
+                frameRect = roundRect(frameRect);
+            }
+            else {
+                dstRectF = QRectF(pos.x() / (float) lSize.width(), pos.y() / (float) lSize.height(),
+                            1.0 / lSize.width(), 1.0 / lSize.height());
+            }
         }
-
         CLVideoDecoderOutput* decodedFrame = m_decodedVideoFrame.data();
 
         if (!frameRect.isEmpty()) 
@@ -344,11 +241,8 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             rescaleFrame(decodedFrame, dstRectF, video->channelNumber);
             decodedFrame = &m_scaledVideoFrame;
         }
-
-        if (m_dateTextPos != Date_None) {
-            decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
-            doDrawOnScreenTime(decodedFrame);
-        }
+        decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
+        processFilterChain(decodedFrame, dstRectF);
 
         static AVRational r = {1, 1000000};
         decodedFrame->pts  = av_rescale_q(m_decodedVideoFrame->pkt_dts, r, m_encoderCtx->time_base);
@@ -387,15 +281,4 @@ AVCodecContext* QnFfmpegVideoTranscoder::getCodecContext()
 void QnFfmpegVideoTranscoder::setMTMode(bool value)
 {
     m_mtMode = value;
-}
-
-
-void QnFfmpegVideoTranscoder::setDrawDateTime(OnScreenDatePos value)
-{
-    m_dateTextPos = value;
-}
-
-void QnFfmpegVideoTranscoder::setOnScreenDateOffset(int timeOffsetMs)
-{
-    m_onscreenDateOffset = timeOffsetMs;
 }

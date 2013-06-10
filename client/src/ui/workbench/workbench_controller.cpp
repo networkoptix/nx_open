@@ -1017,6 +1017,10 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, co
     widget->item()->setZoomRect(zoomRect);
 }
 
+void QnWorkbenchController::at_ContrastParamsChanged(QnMediaResourceWidget *widget, const ImageCorrectionParams& params) {
+    widget->item()->setContrastParams(params);
+}
+
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect) {
     menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect).withArgument(Qn::ItemFrameColorRole, color));
     widget->setCheckedButtons(widget->checkedButtons() & ~QnMediaResourceWidget::ZoomWindowButton);

@@ -58,6 +58,7 @@ namespace Qn {
         ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
         ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
         ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
+        ItemContrastParamsRole,                     /**< Role for item's contrast params. Value of type ImageCorrectionParams. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
         ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
         ItemFrameColorRole,                         /**< Role for item's frame color. Value of type QColor. */

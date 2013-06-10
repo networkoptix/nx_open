@@ -241,6 +241,16 @@ public:
 
 
 /**
+ * Condition for adjust video dialog of a resource widget.
+ */
+class QnAdjustVideoActionCondition: public QnActionCondition {
+public:
+    QnAdjustVideoActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
+/**
  * Condition that is based on the type of the time period provided as one
  * of the arguments of the parameters pack.
  */

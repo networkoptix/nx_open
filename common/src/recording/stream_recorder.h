@@ -16,6 +16,7 @@ extern "C"
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
+#include "utils/color_space/image_correction.h"
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
@@ -85,6 +86,8 @@ public:
     * Time difference between client and server time zone. Used for onScreen timestamp drawing
     */
     void setOnScreenDateOffset(int timeOffsetMs);
+
+    void setContrastParams(const ImageCorrectionParams& params);
 
     /*
     * Server time zone. Used for export to avi/mkv files
@@ -176,6 +179,7 @@ private:
     qint64 m_nextIFrameTime;
     qint64 m_truncateIntervalEps;
     QRectF m_srcRect;
+    ImageCorrectionParams m_contrastParams;
 };
 
 #endif // _STREAM_RECORDER_H__

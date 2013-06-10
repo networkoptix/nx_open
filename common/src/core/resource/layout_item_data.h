@@ -9,6 +9,7 @@
 
 #include <utils/math/fuzzy.h>
 #include <utils/common/qnid.h>
+#include "utils/color_space/image_correction.h"
 
 class QnLayoutItemData {
 public:
@@ -28,11 +29,13 @@ public:
     QUuid zoomTargetUuid;
     QRectF zoomRect;
     qreal rotation;
+    ImageCorrectionParams contrastParams;
 
     QHash<int, QVariant> dataByRole;
 
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
-        if (l.uuid != r.uuid || l.flags != r.flags || l.zoomTargetUuid != r.zoomTargetUuid || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || !qFuzzyCompare(l.zoomRect, r.zoomRect) || !qFuzzyCompare(l.rotation, r.rotation))
+        if (l.uuid != r.uuid || l.flags != r.flags || l.zoomTargetUuid != r.zoomTargetUuid || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || 
+            !qFuzzyCompare(l.zoomRect, r.zoomRect) || !qFuzzyCompare(l.rotation, r.rotation) || !(l.contrastParams == r.contrastParams))
             return false;
 
         if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || !l.resource.id.isValid() || !r.resource.id.isValid()))

@@ -117,6 +117,7 @@ void CLFFmpegVideoDecoder::closeDecoder()
 #endif
 
     av_free(m_frame);
+    m_frame = 0;
     if (m_deinterlaceBuffer)
         av_free(m_deinterlaceBuffer);
     av_free(m_deinterlacedFrame);
@@ -248,6 +249,7 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
     //m_context->debug |= FF_DEBUG_THREADS;
     //m_context->flags2 |= CODEC_FLAG2_FAST;
     m_motionMap.clear();
+    m_frame->data[0] = 0;
 }
 
 void CLFFmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
