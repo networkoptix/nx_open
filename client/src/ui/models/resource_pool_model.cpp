@@ -878,7 +878,12 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
-        QnMediaResourceList medias = resources.filtered<QnMediaResource>();
+        QnResourceList medias;   // = resources.filtered<QnMediaResource>();
+        foreach( QnResourcePtr res, resources )
+        {
+            if( res.dynamicCast<QnMediaResource>() )
+                medias.push_back( res );
+        }
 
         menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {

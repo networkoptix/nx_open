@@ -2,8 +2,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 
-QnFakeCamera::QnFakeCamera():
-    QnNetworkResource()
+QnFakeCamera::QnFakeCamera()
 {
     addFlags(server_live_cam);
 }

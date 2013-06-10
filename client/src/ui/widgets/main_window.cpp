@@ -523,9 +523,19 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
 void QnMainWindow::dragEnterEvent(QDragEnterEvent *event) {
     QnResourceList resources = QnWorkbenchResource::deserializeResources(event->mimeData());
 
-    QnResourceList media = resources.filtered<QnMediaResource>();
-    QnResourceList layouts = resources.filtered<QnLayoutResource>();
-    QnResourceList servers = resources.filtered<QnMediaServerResource>();
+    QnResourceList media;   // = resources.filtered<QnMediaResource>();
+    QnResourceList layouts; // = resources.filtered<QnLayoutResource>();
+    QnResourceList servers; // = resources.filtered<QnMediaServerResource>();
+
+    foreach( QnResourcePtr res, resources )
+    {
+        if( dynamic_cast<QnMediaResource*>(res.data()) )
+            media.push_back( res );
+        if( res.dynamicCast<QnLayoutResource>() )
+            layouts.push_back( res );
+        if( res.dynamicCast<QnMediaServerResource>() )
+            servers.push_back( res );
+    }
 
     m_dropResources = media;
     m_dropResources << layouts;

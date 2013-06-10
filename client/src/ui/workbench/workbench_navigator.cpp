@@ -380,7 +380,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
     }
 
     m_syncedWidgets.insert(widget);
-    m_syncedResources.insert(widget->resource(), QHashDummyValue());
+    m_syncedResources.insert(widget->resource()->toResourcePtr(), QHashDummyValue());
 
     updateCurrentWidget();
     updateSyncedPeriods();
@@ -397,10 +397,10 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
 
     /* QHash::erase does nothing when called for container's end, 
      * and is therefore perfectly safe. */
-    m_syncedResources.erase(m_syncedResources.find(widget->resource()));
+    m_syncedResources.erase(m_syncedResources.find(widget->resource()->toResourcePtr()));
     m_motionIgnoreWidgets.remove(widget);
 
-    if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
+    if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()->toResourcePtr()))
         loader->setMotionRegions(QList<QRegion>());
 
     updateCurrentWidget();
@@ -804,7 +804,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
             QVector<qint64> indicators;
             foreach(QnResourceWidget *widget, display()->widgets())
                 if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-                    if (mediaWidget != m_currentMediaWidget && mediaWidget->resource()->hasFlags(QnResource::sync))
+                    if (mediaWidget != m_currentMediaWidget && mediaWidget->resource()->toResource()->hasFlags(QnResource::sync))
                         indicators.push_back(mediaWidget->display()->camera()->getCurrentTime() / 1000);
             m_timeSlider->setIndicators(indicators);
         } else {
@@ -1264,7 +1264,7 @@ void QnWorkbenchNavigator::at_widget_motionSelectionChanged() {
 void QnWorkbenchNavigator::at_widget_motionSelectionChanged(QnMediaResourceWidget *widget) {
     /* We check that the loader can be created (i.e. that the resource is camera) 
      * just to feel safe. */
-    if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
+    if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()->toResourcePtr()))
         loader->setMotionRegions(widget->motionSelection());
 }
 

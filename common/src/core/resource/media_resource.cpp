@@ -43,10 +43,11 @@ QnStreamQuality QnStreamQualityFromString( const QString& str )
 
 //QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
-QnMediaResource::QnMediaResource():
-    QnResource()
+QnMediaResource::QnMediaResource()
+//:
+//    QnResource()
 {
-    addFlags(QnResource::media);
+    //addFlags(QnResource::media);
     m_customVideoLayout = 0;
 }
 
@@ -64,7 +65,7 @@ static QnDefaultResourceVideoLayout defaultVideoLayout;
 const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     QVariant val;
-    getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
+    toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
     QString strVal = val.toString();
     if (strVal.isEmpty())
     {

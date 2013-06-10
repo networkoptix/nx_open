@@ -7,6 +7,7 @@
 #include "media_resource.h"
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
+#include "network_resource.h"
 
 class QnAbstractArchiveDelegate;
 
@@ -18,10 +19,8 @@ public:
 };
 
 
-class QnSecurityCamResource : virtual public QnMediaResource {
+class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
-
-    typedef QnMediaResource base_type;
 
 public:
     Qn::MotionTypes supportedMotionType() const;
@@ -112,6 +111,15 @@ public:
     virtual void setGroupId(const QString& value);
 
     bool isGroupPlayOnly() const;
+
+    //!Implementation of QnMediaResource::toResource
+    virtual const QnResource* toResource() const override;
+    //!Implementation of QnMediaResource::toResource
+    virtual QnResource* toResource() override;
+    //!Implementation of QnMediaResource::toResource
+    virtual const QnResourcePtr toResourcePtr() const override;
+    //!Implementation of QnMediaResource::toResource
+    virtual QnResourcePtr toResourcePtr() override;
 
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource signals/slots

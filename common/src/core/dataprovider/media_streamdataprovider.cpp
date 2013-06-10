@@ -12,8 +12,8 @@ QnAbstractStreamDataProvider(res),
 m_numberOfchannels(0)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
-    m_mediaResource = qSharedPointerDynamicCast<QnMediaResource>(res);
-    Q_ASSERT(m_mediaResource);
+    m_mediaResource = res;
+    Q_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
     resetTimeCheck();
     m_isCamera = qSharedPointerDynamicCast<QnPhysicalCameraResource> (res) != 0;
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
@@ -33,7 +33,7 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData()
     QMutexLocker mtx(&m_mutex);
 
     if (m_numberOfchannels==0)
-        m_numberOfchannels = m_mediaResource->getVideoLayout(this)->channelCount();
+        m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
 
     
     for (int i = 0; i < m_numberOfchannels; ++i)
@@ -51,7 +51,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
     QMutexLocker mtx(&m_mutex);
 
     if (m_numberOfchannels==0)
-        m_numberOfchannels = m_mediaResource->getVideoLayout(this)->channelCount();
+        m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
 
    
     for (int i = 0; i < m_numberOfchannels; ++i)

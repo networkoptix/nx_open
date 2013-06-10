@@ -1029,8 +1029,8 @@ void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, co
 void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget) {
     QnLayoutItemData data = widget->item()->data();
     data.uuid = QUuid::createUuid();
-    data.resource.id = zoomTargetWidget->resource()->getId().toInt();
-    data.resource.path = zoomTargetWidget->resource()->getUniqueId();
+    data.resource.id = zoomTargetWidget->resource()->toResource()->getId().toInt();
+    data.resource.path = zoomTargetWidget->resource()->toResource()->getUniqueId();
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.zoomRect = zoomRect;
 

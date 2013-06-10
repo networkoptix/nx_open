@@ -68,6 +68,11 @@ QString QnResource::getGuid() const
     return m_guid;
 }
 
+QnResourcePtr QnResource::toSharedPointer() const
+{
+    return QnFromThisToShared<QnResource>::toSharedPointer();
+}
+
 void QnResource::updateInner(QnResourcePtr other)
 {
     Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
@@ -219,11 +224,6 @@ QString QnResource::toString() const
 QString QnResource::toSearchString() const
 {
     return toString();
-}
-
-QnResourcePtr QnResource::toSharedPointer() const
-{
-    return m_weakPointer.toStrongRef();
 }
 
 QnResourcePtr QnResource::getParentResource() const

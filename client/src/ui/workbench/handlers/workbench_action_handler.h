@@ -136,7 +136,7 @@ protected:
 
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, const AddToLayoutParams &params) const;
-    void addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, const AddToLayoutParams &params) const;
+    void addToLayout(const QnLayoutResourcePtr &layout, const QList<QnMediaResourcePtr>& resources, const AddToLayoutParams &params) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, const AddToLayoutParams &params) const;
     
     QnResourceList addToResourcePool(const QString &file) const;

@@ -466,9 +466,9 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
         addToLayout(layout, resource, params);
 }
 
-void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, const AddToLayoutParams &params) const {
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QList<QnMediaResourcePtr>& resources, const AddToLayoutParams &params) const {
     foreach(const QnMediaResourcePtr &resource, resources)
-        addToLayout(layout, resource, params);
+        addToLayout(layout, resource->toResourcePtr(), params);
 }
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, const AddToLayoutParams &params) const {
@@ -2831,10 +2831,10 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
             if (mediaRes) {
                 (*itr).resource.id = 0;
-                (*itr).resource.path = mediaRes->getUniqueId();
-                if (!uniqIdList.contains(mediaRes->getUniqueId())) {
+                (*itr).resource.path = mediaRes->toResource()->getUniqueId();
+                if (!uniqIdList.contains(mediaRes->toResource()->getUniqueId())) {
                     m_layoutExportResources << mediaRes;
-                    uniqIdList << mediaRes->getUniqueId();
+                    uniqIdList << mediaRes->toResource()->getUniqueId();
                 }
                 itemTimeZones << context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
             }
@@ -2878,7 +2878,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     quint32 flags = exportReadOnly ? 1 : 0;
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i) {
-        if (m_layoutExportResources[i]->hasFlags(QnResource::utc))
+        if (m_layoutExportResources[i]->toResource()->hasFlags(QnResource::utc))
             flags |= 2; 
     }
     device->write((const char*) &flags, sizeof(flags));
@@ -2892,9 +2892,9 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i)
     {
-        QString uniqId = m_layoutExportResources[i]->getUniqueId();
+        QString uniqId = m_layoutExportResources[i]->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        QnCachingTimePeriodLoader* loader = navigator()->loader(m_layoutExportResources[i]);
+        QnCachingTimePeriodLoader* loader = navigator()->loader(m_layoutExportResources[i]->toResourcePtr());
         if (loader) {
             QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()) , QIODevice::WriteOnly);
             QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(exportPeriod);
@@ -2987,7 +2987,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
             {
                 m_motionFileBuffer[i]->close();
                 
-                QString uniqId = m_exportedMediaRes->getUniqueId();
+                QString uniqId = m_exportedMediaRes->toResource()->getUniqueId();
                 uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).baseName(); // simplify name if export from existing layout
                 QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(uniqId);
                 QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
@@ -3028,11 +3028,11 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
             m_layoutExportCamera->setMotionIODevice(m_motionFileBuffer[i], i);
         }
 
-        QString uniqId = m_exportedMediaRes->getUniqueId();
+        QString uniqId = m_exportedMediaRes->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
         //QnStreamRecorder::Role role = m_exportStorage ? QnStreamRecorder::Role_FileExportWithEmptyContext : QnStreamRecorder::Role_FileExport;
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
-        if (m_exportStorage && (m_exportedMediaRes->hasFlags(QnResource::utc)))
+        if (m_exportStorage && (m_exportedMediaRes->toResource()->hasFlags(QnResource::utc)))
             role = QnStreamRecorder::Role_FileExportWithEmptyContext;
         QnLayoutItemData itemData = m_exportLayout->getItem(uniqId);
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, 
@@ -3043,7 +3043,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
                                                        itemData.contrastParams);
 
         if(m_exportProgressDialog)
-            m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->getUrl()).arg(m_layoutFileName));
+            m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->toResource()->getUrl()).arg(m_layoutFileName));
     }
 }
 
@@ -3208,7 +3208,7 @@ Do you want to continue?"),
 
         if (selectedFilter.contains(aviFileFilter))
         {
-            QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource());
+            QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
             if (loader && archive) 
             {

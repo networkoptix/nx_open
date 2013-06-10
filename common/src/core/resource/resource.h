@@ -9,6 +9,7 @@
 #include <QStringList>
 #include <QReadWriteLock>
 #include <QThreadPool>
+#include "utils/common/from_this_to_shared.h"
 #include "utils/common/qnid.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "resource_fwd.h"
@@ -32,7 +33,7 @@ public:
     }
 };
 
-class QN_EXPORT QnResource : public QObject
+class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
     Q_FLAGS(Flags Flag)
@@ -164,8 +165,6 @@ public:
     virtual QString toString() const;
     virtual QString toSearchString() const;
 
-
-    QnResourcePtr toSharedPointer() const;
     
     template<class Resource>
     static QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource);
@@ -265,6 +264,9 @@ public:
     QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }
     void lockConsumers() { m_consumersMtx.lock(); }
     void unlockConsumers() { m_consumersMtx.unlock(); }
+
+    QnResourcePtr toSharedPointer() const;
+
 protected:
     virtual void updateInner(QnResourcePtr other);
 
@@ -297,20 +299,6 @@ private:
 
     friend class InitAsyncTask;
 
-private:
-    /* Private API for QnSharedResourcePointer. */
-
-    template<class T>
-    friend class QnSharedResourcePointer;
-
-    template<class T>
-    void initWeakPointer(const QSharedPointer<T> &pointer) {
-        assert(!pointer.isNull());
-        assert(m_weakPointer.toStrongRef().isNull()); /* Error in this line means that you have created two distinct shared pointers to a single resource instance. */
-
-        m_weakPointer = pointer;
-    }
-
 protected:
     /** Mutex that is to be used when accessing a set of all consumers. */
     mutable QMutex m_consumersMtx;
@@ -327,9 +315,6 @@ protected:
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
-
-    /** Weak reference to this, to make conversion to shared pointer possible. */
-    QWeakPointer<QnResource> m_weakPointer;
 
     /** Identifier of this resource. */
     QnId m_id;

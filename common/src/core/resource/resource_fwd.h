@@ -33,8 +33,8 @@ class QnLayoutItemIndex;
 typedef QList<QnLayoutItemIndex> QnLayoutItemIndexList;
 
 class QnMediaResource;
-typedef QnSharedResourcePointer<QnMediaResource> QnMediaResourcePtr;
-typedef QnSharedResourcePointerList<QnMediaResource> QnMediaResourceList;
+typedef QSharedPointer<QnMediaResource> QnMediaResourcePtr;
+//typedef QnSharedResourcePointerList<QnMediaResource> QnMediaResourceList;
 
 class QnAbstractArchiveResource;
 typedef QnSharedResourcePointer<QnAbstractArchiveResource> QnAbstractArchiveResourcePtr;

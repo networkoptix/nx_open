@@ -3,12 +3,11 @@
 
 #include <QtCore/QMetaType>
 
-#include "network_resource.h"
 #include "security_cam_resource.h"
 
 class QnAbstractDTSFactory;
 
-class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virtual public QnSecurityCamResource
+class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
 {
     Q_OBJECT
     Q_FLAGS(Qn::CameraCapabilities)

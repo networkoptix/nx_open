@@ -51,7 +51,7 @@ protected:
     int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 
     int mFramesLost;
-    QnMediaResourcePtr m_mediaResource;
+    QnResourcePtr m_mediaResource;
 
 private:
     mutable int m_numberOfchannels;

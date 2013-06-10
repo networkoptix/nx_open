@@ -96,7 +96,7 @@ void QnRenderingWidget::ensureDisplay() {
     if(m_display || !m_resource)
         return;
 
-    m_display = new QnResourceDisplay(m_resource, this);
+    m_display = new QnResourceDisplay(m_resource->toResourcePtr(), this);
     m_renderer = new QnResourceWidgetRenderer(NULL, context());
     updateChannelScreenSize();
 

@@ -128,14 +128,14 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     else
         m_isRealTimeSource = false;
 
-    if (resource && resource->hasFlags(QnResource::still_image)) {
+    if (resource && resource->toResource()->hasFlags(QnResource::still_image)) {
         m_isStillImage = true;
 
-        QFileInfo fileInfo(resource->getUrl());
+        QFileInfo fileInfo(resource->toResource()->getUrl());
         if (fileInfo.isReadable())
-            resource->setStatus(QnResource::Online);
+            resource->toResource()->setStatus(QnResource::Online);
         else
-            resource->setStatus(QnResource::Offline);
+            resource->toResource()->setStatus(QnResource::Offline);
     }
 
     m_storedMaxQueueSize = m_dataQueue.maxSize();
@@ -1634,7 +1634,7 @@ bool QnCamDisplay::isBuffering() const
     // for offline resource at LIVE position no any data. Check it
     if (!isRealTimeSource())
         return true; // if archive position then buffering mark should be resetted event for offline resource
-    return m_resource->getStatus() == QnResource::Online || m_resource->getStatus() == QnResource::Recording;
+    return m_resource->toResource()->getStatus() == QnResource::Online || m_resource->toResource()->getStatus() == QnResource::Recording;
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

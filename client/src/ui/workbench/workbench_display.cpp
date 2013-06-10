@@ -860,7 +860,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 if (time > 0)
                     mediaWidget->display()->archiveReader()->jumpTo(time, time);
                 else
-                    if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
+                    if(m_widgets.size() == 1 && !mediaWidget->resource()->toResource()->hasFlags(QnResource::live)) 
                         mediaWidget->display()->archiveReader()->jumpTo(0, 0);
             }
         }
@@ -1594,7 +1594,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
 
         if(!thumbnailed) {
-            QnResourcePtr resource = widget->resource();
+            QnResourcePtr resource = widget->resource()->toResourcePtr();
             if(time != -1) {
                 qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
                 if(widget->display()->archiveReader())
@@ -1622,7 +1622,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             if(qnSettings->timeMode() == Qn::ServerTimeMode)
                 displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
 
-            QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
+            QString timeString = (widget->resource()->toResource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 
