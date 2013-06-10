@@ -132,6 +132,7 @@ private:
     QRectF m_displayRect[CL_MAX_CHANNELS];
 
     std::vector<bool> m_renderingEnabled;
+    ScreenshotInterface* m_screenshotInterface;
 };
 
 #endif // QN_DISPLAY_WIDGET_RENDERER_H

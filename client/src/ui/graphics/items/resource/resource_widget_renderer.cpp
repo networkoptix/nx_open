@@ -15,7 +15,8 @@
 QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, const QGLContext* context )
 :
     QnAbstractRenderer( parent ),
-    m_glContext( context )
+    m_glContext( context ),
+    m_screenshotInterface(0)
 {
     Q_ASSERT( context != NULL );
 
@@ -61,6 +62,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
             renderingTools.uploader = new DecodedPictureToOpenGLUploader( m_glContext );
             renderingTools.uploader->setForceSoftYUV( qnSettings->isSoftwareYuv() );
             renderingTools.renderer = new QnGLRenderer( m_glContext, *renderingTools.uploader );
+            renderingTools.renderer->setScreenshotInterface(m_screenshotInterface);
             renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());
             renderingTools.uploader->setNV12ToRgbShaderUsed(renderingTools.renderer->isNV12ToRgbShaderUsed());
             m_channelRenderers[i] = renderingTools;
@@ -200,6 +202,7 @@ void QnResourceWidgetRenderer::setPaused(bool value)
 
 void QnResourceWidgetRenderer::setScreenshotInterface(ScreenshotInterface* value)
 {
+    m_screenshotInterface = value;
     for (int i = 0; i < m_channelRenderers.size(); ++i)
         m_channelRenderers[i].renderer->setScreenshotInterface(value);
 }

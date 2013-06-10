@@ -4,6 +4,7 @@
 #include "graphics_widget_p.h"
 #include "abstract_graphics_slider.h"
 
+#include <QtGui/QWidget>
 #include <QtCore/QBasicTimer>
 #include <QGraphicsSceneMouseEvent>
 #ifdef QT_KEYPAD_NAVIGATION
