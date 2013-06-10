@@ -266,6 +266,8 @@ protected slots:
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_serverLogsAction_triggered();
+    void at_serverIssuesAction_triggered();
+    void at_pingAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
     void at_thumbnailsSearchAction_triggered();

@@ -1009,10 +1009,17 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Add camera(s)...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
+    factory(Qn::PingAction).
+        flags(Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Ping..."));
+
     factory(Qn::ServerLogsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Server Logs")).
-        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
+        flags(Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Server Logs"));
+
+    factory(Qn::ServerIssuesAction).
+        flags(Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Check Server Issues..."));
 
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).

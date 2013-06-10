@@ -11,6 +11,8 @@
 #include <api/media_server_connection.h>
 #include <api/media_server_statistics_manager.h>
 
+#include <ui/actions/action_parameters.h>
+#include <ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/help/help_topics.h>
@@ -513,6 +515,32 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
 
     addOverlays();
 
+    /* Setup buttons */
+    QnImageButtonWidget *pingButton = new QnImageButtonWidget();
+    pingButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+    pingButton->setCheckable(false);
+    pingButton->setProperty(Qn::NoBlockMotionSelection, true);
+    pingButton->setToolTip(tr("Ping"));
+    connect(pingButton, SIGNAL(clicked()), this, SLOT(at_pingButton_clicked()));
+    buttonBar()->addButton(PingButton, pingButton);
+
+    QnImageButtonWidget *showLogButton = new QnImageButtonWidget();
+    showLogButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+    showLogButton->setCheckable(false);
+    showLogButton->setProperty(Qn::NoBlockMotionSelection, true);
+    showLogButton->setToolTip(tr("Show Log"));
+    connect(showLogButton, SIGNAL(clicked()), this, SLOT(at_showLogButton_clicked()));
+    buttonBar()->addButton(ShowLogButton, showLogButton);
+
+    QnImageButtonWidget *checkIssuesButton = new QnImageButtonWidget();
+    checkIssuesButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+    checkIssuesButton->setCheckable(false);
+    checkIssuesButton->setProperty(Qn::NoBlockMotionSelection, true);
+    checkIssuesButton->setToolTip(tr("Check Issues"));
+    connect(checkIssuesButton, SIGNAL(clicked()), this, SLOT(at_checkIssuesButton_clicked()));
+    buttonBar()->addButton(CheckIssuesButton, checkIssuesButton);
+
+
     /* Run handlers. */
     updateButtonsVisibility();
     updateTitleText();
@@ -673,7 +701,10 @@ QString QnServerResourceWidget::calculateTitleText() const {
 }
 
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
-    return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton | InfoButton);
+    Buttons result = base_type::calculateButtonsVisibility();
+    result &= (CloseButton | RotateButton | InfoButton);
+    result |= PingButton | ShowLogButton | CheckIssuesButton;
+    return result;
 }
 
 QVariant QnServerResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
@@ -741,4 +772,16 @@ void QnServerResourceWidget::at_headerOverlayWidget_opacityChanged(const QVarian
     m_infoOpacity = value.toDouble();
     for (int i = 0; i < ButtonBarCount; i++)
         m_legendButtonBar[i]->setOpacity(m_infoOpacity);
+}
+
+void QnServerResourceWidget::at_pingButton_clicked() {
+    menu()->trigger(Qn::PingAction, QnActionParameters(m_resource));
+}
+
+void QnServerResourceWidget::at_showLogButton_clicked() {
+    menu()->trigger(Qn::ServerLogsAction, QnActionParameters(m_resource));
+}
+
+void QnServerResourceWidget::at_checkIssuesButton_clicked() {
+    menu()->trigger(Qn::ServerIssuesAction, QnActionParameters(m_resource));
 }

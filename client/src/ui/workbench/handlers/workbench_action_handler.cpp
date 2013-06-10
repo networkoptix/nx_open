@@ -277,7 +277,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SelectionChangeAction),                  SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
     connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(Qn::ServerSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
+    connect(action(Qn::PingAction),                             SIGNAL(triggered()),    this,   SLOT(at_pingAction_triggered()));
     connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
+    connect(action(Qn::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
     connect(action(Qn::YouTubeUploadAction),                    SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(action(Qn::EditTagsAction),                         SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
     connect(action(Qn::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
@@ -2146,6 +2148,40 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 
     QUrl url(server->apiConnection()->url().toString() + QLatin1String("/api/showLog"));
     QDesktopServices::openUrl(url);
+}
+
+void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
+    bool newlyCreated = false;
+    if(!businessEventsLogDialog()) {
+        m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
+        newlyCreated = true;
+    }
+
+    businessEventsLogDialog()->disableUpdateData();
+    businessEventsLogDialog()->setEventType(BusinessEventType::AnyServerIssue);
+    businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());
+    businessEventsLogDialog()->enableUpdateData();
+
+    QRect oldGeometry = businessEventsLogDialog()->geometry();
+    businessEventsLogDialog()->show();
+    businessEventsLogDialog()->raise();
+    if(!newlyCreated)
+        businessEventsLogDialog()->setGeometry(oldGeometry);
+}
+
+void QnWorkbenchActionHandler::at_pingAction_triggered() {
+    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
+    if (!resource)
+        return;
+
+#ifdef Q_OS_WIN
+    QString cmd = QLatin1String("cmd /C ping %1 -t");
+#else
+    QString cmd = QLatin1String("xterm -e ping %1");
+#endif //TODO: #GDM MacOS ping?
+    QUrl url = QUrl::fromUserInput(resource->getUrl());
+    QString host = url.host();
+    QProcess::startDetached(cmd.arg(host));
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
