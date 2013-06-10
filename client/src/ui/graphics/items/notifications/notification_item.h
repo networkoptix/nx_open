@@ -67,6 +67,7 @@ private:
     QnProxyLabel* m_thumbnailLabel;
 };
 
+//TODO: #GDM rename to QnNotificationWidget
 class QnNotificationItem: public QnClickableFrameWidget {
     Q_OBJECT
     typedef QnClickableFrameWidget base_type;

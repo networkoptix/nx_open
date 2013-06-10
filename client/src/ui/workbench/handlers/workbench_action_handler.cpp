@@ -127,6 +127,7 @@
 #endif
 #include "core/resource/layout_item_data.h"
 #include "ui/dialogs/adjust_video_dialog.h"
+#include "ui/graphics/items/resource/resource_widget_renderer.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -320,6 +321,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
+    connect(action(Qn::ClearCacheAction),                       SIGNAL(triggered()),    this,   SLOT(at_clearCacheAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -2457,6 +2459,7 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
     ImageCorrectionParams prevParams = w->contrastParams();
     dialog->setParams(prevParams);
     dialog->setWindowModality(Qt::ApplicationModal);
+    w->renderer()->setHystogramConsumer(dialog->getHystogramConsumer());
 
     connect(dialog.data(), SIGNAL(valueChanged(ImageCorrectionParams)), w, SLOT(setContrastParams(ImageCorrectionParams)));
 
@@ -2464,6 +2467,8 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
         w->setContrastParams(dialog->params());
     else
         w->setContrastParams(prevParams);
+
+    w->renderer()->setHystogramConsumer(0);
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
@@ -3766,6 +3771,10 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
         }
 
     }
+}
+
+void QnWorkbenchActionHandler::at_clearCacheAction_triggered() {
+    QnAppServerFileCache::clearLocalCache();
 }
 
 void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QnKvPairList &settings, int handle) {

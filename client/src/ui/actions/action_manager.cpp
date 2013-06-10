@@ -406,6 +406,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Check System Health..."));
 
+    factory(Qn::ClearCacheAction).
+        flags(Qn::NoTarget).
+        text(tr("Clear cache"));
+
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).

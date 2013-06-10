@@ -172,7 +172,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="hystogramSpacer" native="true">
+    <widget class="QnHistogramRenderer" name="histogramRenderer" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
@@ -196,6 +196,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnHistogramRenderer</class>
+   <extends>QWidget</extends>
+   <header>histogram_renderer.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>buttonBox</tabstop>
  </tabstops>
