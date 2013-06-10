@@ -1,4 +1,5 @@
 #include "histogram_renderer.h"
+#include "ui/style/globals.h"
 
 static const int LINE_OFFSET = 4;
 static const int X_OFFSET = 8;
@@ -28,6 +29,9 @@ void QnHistogramRenderer::setHistogramParams(const ImageCorrectionParams& params
 void QnHistogramRenderer::paintEvent( QPaintEvent * event )
 {
     QPainter p(this);
+    
+    p.setBrush(QBrush(Qt::Dense5Pattern));
+    p.drawRect(QRect(X_OFFSET, 0, width()-X_OFFSET*2, height()-1));
 
     const int* data = (const int*) m_histogramData.constData();
     double yScale = INT_MAX;
@@ -36,8 +40,6 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
 
     double w = width() - X_OFFSET*2;
     int prevY = 0;
-    int rangeStart = qAbs(m_bCoeff);
-    int rangeEnd = 255.0/m_aCoeff - m_bCoeff + 0.5;
     for (int x = 0; x < width() - X_OFFSET*2; ++x)
     {
         p.setPen(Qt::white);
@@ -50,16 +52,16 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
 
         int curY = height() - value * yScale + 0.5;
         p.drawLine(X_OFFSET + x, height(), X_OFFSET + x, curY);
-        bool inRange = index >= rangeStart && index < rangeEnd;
-        if (inRange) {
-            p.setPen(Qt::blue);
-            p.drawLine(X_OFFSET + x, curY-1, X_OFFSET + x, 0);
-        }
-
         if (x > X_OFFSET) {
             p.setPen(QColor(0x80, 0x80, 0x80, 0x80));
             p.drawLine(X_OFFSET + x-1, prevY-1, X_OFFSET + x-1, curY);
         }
         prevY = curY;
     }
+
+    const QColor selectionColor = qnGlobals->selectionColor();
+    p.setPen(selectionColor.lighter());
+    p.setBrush(selectionColor);
+    double xScale = w / 256;
+    p.drawRect(QRect(qAbs(m_bCoeff)*xScale + X_OFFSET, 1,  255.0/m_aCoeff*xScale, height()));
 }

@@ -41,7 +41,7 @@ void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int he
     Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
 
 
-    if (data.blackLevel == 0 && data.whiteLevel == 0 && data.gamma == 1.0 || yPlane == 0)
+    if (!data.enabled || yPlane == 0)
     {
         clear();
         return;
