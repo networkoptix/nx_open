@@ -62,6 +62,20 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
     p.setPen(QColor(0x60, 0x60, 0x60));
     p.drawLines(lines2);
 
+
+    QPen pen;
+    pen.setStyle(Qt::DashLine);
+    pen.setWidth(1);
+    pen.setBrush(QColor(0,255,0, 30));
+    p.setPen(pen);
+    p.drawLine(width()/4, 0, width()/4, height());
+    p.drawLine(width()/2, 0, width()/2, height());
+    p.drawLine(width()/4*3, 0, width()/4*3, height());
+    p.drawLine(X_OFFSET, height()/2, width()-X_OFFSET, height()/2);
+    //p.drawLine(X_OFFSET, height()/4, width()-X_OFFSET, height()/4);
+    //p.drawLine(X_OFFSET, height()/4*3, width()-X_OFFSET, height()/4*3);
+    
+
     const QColor selectionColor = qnGlobals->selectionColor();
     p.setPen(selectionColor.lighter());
     p.setBrush(selectionColor);
