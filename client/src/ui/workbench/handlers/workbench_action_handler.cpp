@@ -1253,8 +1253,14 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     context()->resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
+    QHash<QUuid, QUuid> newUuidByOldUuid;
+    for(int i = 0; i < items.size(); i++) {
+        QUuid newUuid = QUuid::createUuid();
+        newUuidByOldUuid[items[i].uuid] = newUuid;
+        items[i].uuid = newUuid;
+    }
     for(int i = 0; i < items.size(); i++)
-        items[i].uuid = QUuid::createUuid();
+        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QUuid());
     newLayout->setItems(items);
 
     bool isCurrent = (layout == workbench()->currentLayout()->resource());

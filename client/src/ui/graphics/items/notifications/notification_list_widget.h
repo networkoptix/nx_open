@@ -83,7 +83,7 @@ private:
 
     /**
      * @brief m_items       List of all items. Strictly ordered by item state:
-     *                      (Displayed|Hiding|Hidden)* (Displaying)? (Waiting)*
+     *                      (Displayed|Hiding|Hidden)* (Displaying)? (Collapsing)* (Collapsed)*
      *                      Item that is closer to the beginning of the list is displayed earlier.
      */
     QLinkedList<QnNotificationItem *> m_items;
