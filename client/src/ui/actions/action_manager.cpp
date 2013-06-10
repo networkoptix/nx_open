@@ -590,6 +590,24 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::PreferencesRole).
         autoRepeat(false);
 
+    factory(Qn::WebClientAction).
+        flags(Qn::Main | Qn::Tree).
+        text(tr("Open Web Client")).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+
+    factory().
+        flags(Qn::Main).
+        separator();
+
+    factory(Qn::BusinessEventsAction).
+        flags(Qn::Main | Qn::Tree).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Rules...")).
+        shortcut(tr("Ctrl+E")).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+
     factory(Qn::BusinessEventsLogAction).
         flags(Qn::Main).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
@@ -625,22 +643,6 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/exit.png"));
 
-
-    /* Tree Root Nodes actions */
-
-    factory(Qn::BusinessEventsAction).
-        flags(Qn::Tree | Qn::NoTarget).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Alarm/Event Rules...")).
-        shortcut(tr("Ctrl+E")).
-        autoRepeat(false).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
-
-    factory(Qn::WebClientAction).
-        flags(Qn::Tree | Qn::NoTarget).
-        text(tr("Open Web Client")).
-        autoRepeat(false).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     /* Tab bar actions. */
     factory().
