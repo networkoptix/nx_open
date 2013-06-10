@@ -22,6 +22,7 @@ public:
     void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void addSystemHealthEvent(QnSystemHealth::MessageType message);
     void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
+
 signals:
     void systemHealthEventAdded(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
     void businessActionAdded(const QnAbstractBusinessActionPtr& businessAction);

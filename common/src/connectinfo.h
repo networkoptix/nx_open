@@ -14,6 +14,7 @@ struct QnConnectInfo
     QString ecsGuid;
 };
 
+// TODO: #Elric remove shared pointer.
 typedef QSharedPointer<QnConnectInfo> QnConnectInfoPtr;
 
 Q_DECLARE_TYPEINFO(QnConnectInfoPtr, Q_MOVABLE_TYPE);

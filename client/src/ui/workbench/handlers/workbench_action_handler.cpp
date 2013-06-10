@@ -171,23 +171,6 @@ void detail::QnResourceReplyProcessor::at_replyReceived(int status, const QnReso
 
 
 // -------------------------------------------------------------------------- //
-// QnConnectReplyProcessor
-// -------------------------------------------------------------------------- //
-detail::QnConnectReplyProcessor::QnConnectReplyProcessor(QObject *parent): 
-    QObject(parent),
-    m_handle(0),
-    m_status(0)
-{}
-
-void detail::QnConnectReplyProcessor::at_replyReceived(int status, const QnConnectInfoPtr &connectInfo, int handle) {
-    m_status = status;
-    m_connectInfo = connectInfo;
-    m_handle = handle;
-
-    emit finished(status, connectInfo, handle);
-}
-
-// -------------------------------------------------------------------------- //
 // QnTimestampsCheckboxControlDelegate
 // -------------------------------------------------------------------------- //
 class QnTimestampsCheckboxControlDelegate: public QnCheckboxControlAbstractDelegate {
@@ -1740,17 +1723,18 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnConnectInfoPtr connectionInfo = parameters.argument<QnConnectInfoPtr>(Qn::ConnectionInfoRole);
     if(connectionInfo.isNull()) {
         QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(connectionData.url);
-        
-        QScopedPointer<detail::QnConnectReplyProcessor> processor(new detail::QnConnectReplyProcessor());
-        QScopedPointer<QEventLoop> loop(new QEventLoop());
-        connect(processor.data(), SIGNAL(finished(int, const QnConnectInfoPtr &, int)), loop.data(), SLOT(quit()));
-        connection->connectAsync(processor.data(), SLOT(at_replyReceived(int, const QnConnectInfoPtr &, int)));
-        loop->exec();
 
-        if(processor->status() != 0)
+        QnConnectionRequestResult result;
+        connection->connectAsync(&result, SLOT(processReply(int, const QVariant &, int)));
+
+        QEventLoop loop;
+        connect(&result, SIGNAL(replyProcessed()), &loop, SLOT(quit()));
+        loop.exec();
+
+        if(result.status() != 0)
             return;
 
-        connectionInfo = processor->info();
+        connectionInfo = result.reply<QnConnectInfoPtr>();
     }
 
     // TODO: #Elric maybe we need to check server-client compatibility here?
