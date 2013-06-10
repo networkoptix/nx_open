@@ -439,9 +439,19 @@ namespace Qn {
         ServerSettingsAction,
 
         /**
+         * Opens a console with ping process for the selected resource.
+         */
+        PingAction,
+
+        /**
          * Opens server logs in the default web browser.
          */
         ServerLogsAction,
+
+        /**
+         * Opens event log dialog with filter for current server(s) issues.
+         */
+        ServerIssuesAction,
 
         /**
          * Opens manual camera addition dialog.
@@ -546,12 +556,10 @@ namespace Qn {
          */
         PtzManagePresetsAction,
 
-
         /**
          * Sets the current picture as a layout background.
          */
         SetAsBackgroundAction,
-
 
 
         /* Layout actions. */

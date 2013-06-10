@@ -27,6 +27,13 @@ class QnServerResourceWidget: public QnResourceWidget {
     typedef QnResourceWidget base_type;
 
 public:
+    static const Button PingButton = static_cast<Button>(0x08);
+    static const Button ShowLogButton = static_cast<Button>(0x10);
+    static const Button CheckIssuesButton = static_cast<Button>(0x20);
+#define PingButton PingButton
+#define ShowLogButton ShowLogButton
+#define CheckIssuesButton CheckIssuesButton
+
     /**
      * Constructor.
      *
@@ -57,6 +64,10 @@ private slots:
     void at_statistics_received();
     void at_legend_checkedButtonsChanged();
     void at_headerOverlayWidget_opacityChanged(const QVariant &value);
+    void at_pingButton_clicked();
+    void at_showLogButton_clicked();
+    void at_checkIssuesButton_clicked();
+
 
 private:
     /** Background painting function. */

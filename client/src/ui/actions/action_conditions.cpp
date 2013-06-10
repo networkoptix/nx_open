@@ -387,6 +387,16 @@ Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &
     return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
+    foreach(const QnLayoutItemIndex &index, layoutItems) {
+        QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
+        if(itemData.zoomRect.isNull())
+            return QnActionCondition::check(layoutItems);
+    }
+
+    return Qn::InvisibleAction;
+}
+
 Qn::ActionVisibility QnLayoutSettingsActionCondition::check(const QnResourceList &resources) {
     if(resources.size() > 1)
         return Qn::InvisibleAction;
@@ -480,4 +490,14 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnResourceLis
     if (layout->locked())
         return Qn::DisabledAction;
     return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
+    foreach(const QnLayoutItemIndex &index, layoutItems) {
+        QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
+        if(itemData.zoomRect.isNull())
+            return QnActionCondition::check(layoutItems);
+    }
+
+    return Qn::InvisibleAction;
 }

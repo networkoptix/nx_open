@@ -15,6 +15,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/actions/action_parameters.h>
+#include <ui/actions/action_manager.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -691,14 +693,7 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const Q
 }
 
 void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
-#ifdef Q_OS_WIN
-    QString cmd = QLatin1String("cmd /C ping %1 -t");
-#else
-    QString cmd = QLatin1String("xterm -e ping %1");
-#endif
-    QUrl url = QUrl::fromUserInput(m_camera->getUrl());
-    QString host = url.host();
-    QProcess::startDetached(cmd.arg(host));
+    menu()->trigger(Qn::PingAction, QnActionParameters(m_camera));
 }
 
 void QnSingleCameraSettingsWidget::at_analogViewCheckBox_clicked() {

@@ -88,7 +88,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->eventLogButton,   SIGNAL(clicked(bool)),              
             context()->action(Qn::BusinessEventsLogAction), SIGNAL(triggered()));
 
-    connect(m_rulesViewModel,   SIGNAL(beforeModelChanged(int)), this, SLOT(at_beforeModelChanged(int)));
+    connect(m_rulesViewModel,   SIGNAL(beforeModelChanged()), this, SLOT(at_beforeModelChanged()));
 
     connect(m_rulesViewModel,   SIGNAL(afterModelChanged(QnBusinessRulesActualModelChange, bool)),
             this,               SLOT(at_afterModelChanged(QnBusinessRulesActualModelChange, bool)));
