@@ -34,20 +34,16 @@ QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(QnResourcePtr reso
     return new QnSingleThumbnailLoader(serverConnection, networkResource, parent);
 }
 
-void QnSingleThumbnailLoader::load(qint64 msecSinceEpoch, const QSize& size)
+void QnSingleThumbnailLoader::load(qint64 usecSinceEpoch, const QSize& size)
 {
-    sendRequest(msecSinceEpoch * 1000, size);
+    sendRequest(usecSinceEpoch, size);
 }
 
-void QnSingleThumbnailLoader::loadLatest(const QSize &size) {
-    sendRequest(-1, size);
-}
-
-int QnSingleThumbnailLoader::sendRequest(qint64 usecs, const QSize& size)
+int QnSingleThumbnailLoader::sendRequest(qint64 usecSinceEpoch, const QSize& size)
 {
     return m_connection->getThumbnailAsync(
                 m_resource.dynamicCast<QnNetworkResource>(),
-                usecs,
+                usecSinceEpoch,
                 size,
                 QLatin1String("png"),
                 false,

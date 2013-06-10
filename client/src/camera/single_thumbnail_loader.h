@@ -29,8 +29,7 @@ public:
      */
     static QnSingleThumbnailLoader *newInstance(QnResourcePtr resource, QObject *parent = NULL);
 
-    void load(qint64 msecSinceEpoch, const QSize& size);
-    void loadLatest(const QSize& size);
+    void load(qint64 usecSinceEpoch, const QSize& size);
 signals:
     /**
      * This signal is emitted whenever thumbnail was successfully loaded.
@@ -51,7 +50,7 @@ private slots:
     void at_replyReceived(int status, const QImage& image, int requstHandle);
 
 private:
-    int sendRequest(qint64 usecs, const QSize& size);
+    int sendRequest(qint64 usecSinceEpoch, const QSize& size);
 
 private:
     /** Resource that this loader gets thumbnail for. */
