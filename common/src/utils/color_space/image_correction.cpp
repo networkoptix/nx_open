@@ -83,7 +83,7 @@ void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int he
 
     int leftPos = 0;
     int leftSum = 0;
-    for (; leftPos < 256; ++leftPos) {
+    for (; leftPos < 256-MIN_GAMMA_RANGE; ++leftPos) {
         if (leftSum+hystogram[leftPos] >= leftThreshold)
             break;
         leftSum += hystogram[leftPos];
@@ -91,22 +91,17 @@ void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int he
 
     int rightPos = 255;
     int rightSum = 0;
-    for (; rightPos >= leftPos; --rightPos) {
+    for (; rightPos >= leftPos+MIN_GAMMA_RANGE; --rightPos) {
         if (rightSum+hystogram[rightPos] >= rightThreshold)
             break;
         rightSum += hystogram[rightPos];
     }
 
-    if (rightPos - leftPos < MIN_GAMMA_RANGE) {
-        clear();
-    }
-    else {
-        aCoeff = NORM_RANGE_RANGE / float(rightPos-leftPos+1);
-        bCoeff = -float(leftPos) / 256.0 + NORM_RANGE_START/256.0;
-        gamma = data.gamma;
-        if (gamma == 0)
-            gamma = calcGamma(leftPos, rightPos, pixels - leftSum - rightSum); // auto gamma
-    }
+    aCoeff = NORM_RANGE_RANGE / float(rightPos-leftPos+1);
+    bCoeff = -float(leftPos) / 256.0 + NORM_RANGE_START/256.0;
+    gamma = data.gamma;
+    if (gamma == 0)
+        gamma = calcGamma(leftPos, rightPos, pixels - leftSum - rightSum); // auto gamma
 }
 
 void ImageCorrectionResult::clear()
