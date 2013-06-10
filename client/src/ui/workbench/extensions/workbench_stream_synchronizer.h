@@ -1,6 +1,8 @@
 #ifndef QN_WORKBENCH_STREAM_SYNCHRONIZER_H
 #define QN_WORKBENCH_STREAM_SYNCHRONIZER_H
 
+#include <libavcodec/avcodec.h>
+
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 #include <QtCore/QSet>

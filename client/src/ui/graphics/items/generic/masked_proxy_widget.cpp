@@ -2,6 +2,7 @@
 #include "masked_proxy_widget.h"
 
 #include <QPainter>
+#include <QPaintEngine>
 #include <QStyleOptionGraphicsItem>
 
 #include <ui/common/geometry.h>
