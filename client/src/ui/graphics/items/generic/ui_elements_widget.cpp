@@ -1,5 +1,7 @@
 #include "ui_elements_widget.h"
 
+#include <QtGui/QGraphicsView>
+
 #include <utils/common/warnings.h>
 
 #include <ui/graphics/instruments/transform_listener_instrument.h>

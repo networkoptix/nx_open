@@ -474,7 +474,7 @@ bool QnGLRenderer::isYV12ToRgbShaderUsed() const
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
-        && m_yv12ToRgbShaderProgram.get()
+        && m_yv12ToRgbShaderProgram
         && m_yv12ToRgbShaderProgram->isLinked();
 }
 
@@ -484,7 +484,7 @@ bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
-        && m_yv12ToRgbaShaderProgram.get()
+        && m_yv12ToRgbaShaderProgram
         && m_yv12ToRgbaShaderProgram->isLinked();
 }
 
@@ -494,8 +494,8 @@ bool QnGLRenderer::isNV12ToRgbShaderUsed() const
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
-        && m_nv12ToRgbShaderProgram.get();
-        //&& m_nv12ToRgbShaderProgram->isValid();
+        && m_nv12ToRgbShaderProgram
+        /*&& m_nv12ToRgbShaderProgram->isValid()*/;
 }
 
 void QnGLRenderer::setDisplayedRect(const QRectF& rect)

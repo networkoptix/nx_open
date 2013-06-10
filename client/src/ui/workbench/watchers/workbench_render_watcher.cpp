@@ -45,13 +45,16 @@ void QnWorkbenchRenderWatcher::setDisplaying(QnResourceWidget *widget, bool disp
 
     emit displayingChanged(widget);
 
-    if(displaying) {
-        if(++m_countByDisplay[data.display] == 1)
-            emit displayingChanged(data.display);
-    } else {
-        if(--m_countByDisplay[data.display] == 0) {
-            m_countByDisplay.remove(data.display);
-            emit displayingChanged(data.display);
+    if(data.display) {
+        /* Not all widgets have an associated display. */
+        if(displaying) {
+            if(++m_countByDisplay[data.display] == 1)
+                emit displayingChanged(data.display);
+        } else {
+            if(--m_countByDisplay[data.display] == 0) {
+                m_countByDisplay.remove(data.display);
+                emit displayingChanged(data.display);
+            }
         }
     }
 }

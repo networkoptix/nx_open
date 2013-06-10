@@ -3,8 +3,10 @@
 
 #include <QtCore/QWeakPointer>
 #include <QtGui/QGraphicsWidget>
-#include <QGraphicsView>
 
+#include <ui/graphics/items/standard/graphics_widget.h>
+
+class QGraphicsView;
 class Instrument;
 
 /**
@@ -12,9 +14,9 @@ class Instrument;
  * 
  * Useful for placing UI controls.
  */
-class QnUiElementsWidget: public QGraphicsWidget {
+class QnUiElementsWidget: public GraphicsWidget {
     Q_OBJECT;
-    typedef QGraphicsWidget base_type;
+    typedef GraphicsWidget base_type;
 
 public:
     QnUiElementsWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);

@@ -206,7 +206,12 @@ GraphicsWidget::~GraphicsWidget() {
     if(GraphicsWidgetSceneData *sd = d_func()->ensureSceneData())
         sd->pendingLayoutWidgets.remove(this);
 
-    setFocusProxy(NULL); // TODO: #Elric #Qt5.0 workaround for a qt bug that is fixed in Qt5.0
+    // TODO: #Elric #Qt5.0 workaround for QTBUG-28321 that is fixed in Qt5.0
+    setFocusProxy(NULL); 
+
+    // TODO: #Elric #Qt5.0.1 workaround for QTBUG-29684 that is fixed in Qt5.0.1
+    while(!childItems().empty())
+        delete childItems().back();
 }
 
 GraphicsStyle *GraphicsWidget::style() const {
@@ -370,8 +375,12 @@ void GraphicsWidget::updateGeometry() {
 QVariant GraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
     QVariant result = base_type::itemChange(change, value);
 
-    if(change == ItemSceneHasChanged)
-        d_func()->sceneData.clear();
+    if(change == ItemSceneChange) {
+        if(GraphicsWidgetSceneData *sd = d_func()->ensureSceneData()) {
+            sd->pendingLayoutWidgets.remove(this);
+            d_func()->sceneData.clear();
+        }
+    }
 
     return result;
 }
