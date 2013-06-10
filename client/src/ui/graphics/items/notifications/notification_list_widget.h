@@ -25,16 +25,19 @@ public:
     QSizeF visibleSize() const;
 signals:
     void visibleSizeChanged();
+    void sizeHintChanged();
     void itemRemoved(QnNotificationItem *item);
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
     virtual void tick(int deltaMSecs) override;
+    virtual void updateGeometry() override;
 
     void updateVisibleSize();
 private slots:
     void at_item_clicked(Qt::MouseButton button);
+    void at_item_geometryChanged();
     void at_geometry_changed();
 
 private:
@@ -73,6 +76,7 @@ private:
         QnNotificationItem* item;
         State state;
         bool locked;
+        int cachedHeight;
     };
 
     HoverFocusProcessor* m_hoverProcessor;

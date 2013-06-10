@@ -184,7 +184,7 @@ protected:
     void updateViewportMargins();
 
     void updateTreeGeometry();
-    void updateNotificationsGeometry();
+    Q_SLOT void updateNotificationsGeometry();
     void updateFpsGeometry();
     void updateCalendarGeometry();
     Q_SLOT void updateSliderResizerGeometry();

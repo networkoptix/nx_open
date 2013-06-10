@@ -67,16 +67,11 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
         return QSizeF(widgetWidth, collapserHeight);
     }
 
-    bool collapserRequired = false;
     QSizeF result(widgetWidth, 0);
     foreach (QnNotificationItem* item, m_items) {
         ItemData* data = m_itemDataByItem[item];
-        if (!data->isVisible()) {
-            if (!collapserRequired)
-                result.setHeight(result.height() + collapserHeight);
-            collapserRequired = true;
+        if (data->state == ItemData::Hidden)
             continue;
-        }
 
         QSizeF itemSize = item->geometry().size();
         if (itemSize.isNull())
@@ -133,8 +128,6 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
                     item->setX(data->animation.value);
                     item->setVisible(true);
                     m_collapsedItemCountChanged = true;
-
-                    updateGeometry();
                 } else {
                     collapsedItemsCount++;
                 }
@@ -213,10 +206,9 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
             m_collapser.item->setOpacity(qMin(1.0, m_collapser.item->opacity() + opacityStep));
     }
 
+    bool updateGeometryRequested = !itemsToDelete.isEmpty();
 
     // remove unused items
-    if (!itemsToDelete.isEmpty())
-        updateGeometry();
     foreach(QnNotificationItem* item, itemsToDelete) {
         ItemData* data = m_itemDataByItem[item];
         delete data;
@@ -227,7 +219,14 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         emit itemRemoved(item);
     }
 
+    if (updateGeometryRequested)
+        updateGeometry();
     updateVisibleSize();
+}
+
+void QnNotificationListWidget::updateGeometry() {
+    base_type::updateGeometry();
+    emit sizeHintChanged();
 }
 
 void QnNotificationListWidget::updateVisibleSize() {
@@ -247,6 +246,7 @@ void QnNotificationListWidget::updateVisibleSize() {
     if (m_visibleSize == size)
         return;
     m_visibleSize = size;
+
     emit visibleSizeChanged();
 }
 
@@ -256,15 +256,18 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     item->setMaximumWidth(widgetWidth);
     item->setClickableButtons(item->clickableButtons() | Qt::RightButton);
     connect(item, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_item_clicked(Qt::MouseButton)));
+    connect(item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
 
     ItemData* data = new ItemData();
     data->item = item;
     data->state = ItemData::Collapsed;
     data->locked = locked;
+    data->cachedHeight = -1;
     m_itemDataByItem.insert(item, data);
     m_items.append(item);
 
     m_collapsedItemCountChanged = true;
+    updateGeometry();
 }
 
 void QnNotificationListWidget::clear() {
@@ -283,6 +286,7 @@ QSizeF QnNotificationListWidget::visibleSize() const {
     return m_visibleSize;
 }
 
+
 void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
     if (button != Qt::RightButton)
         return;
@@ -290,6 +294,18 @@ void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
     if (!item)
         return;
     m_itemDataByItem[item]->unlockAndHide();
+}
+
+void QnNotificationListWidget::at_item_geometryChanged() {
+    QnNotificationItem *item = dynamic_cast<QnNotificationItem *>(sender());
+    if (!item)
+        return;
+    ItemData* data = m_itemDataByItem[item];
+    QRectF geom = item->geometry();
+    if (geom.height() == data->cachedHeight)
+        return;
+    data->cachedHeight = geom.height();
+    updateGeometry();
 }
 
 void QnNotificationListWidget::at_geometry_changed() {

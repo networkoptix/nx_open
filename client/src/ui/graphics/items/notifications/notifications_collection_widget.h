@@ -29,9 +29,9 @@ public:
 
     /** Combined geometry of all visible sub-wigdets. */
     QRectF visibleGeometry() const;
-
 signals:
     void visibleSizeChanged();
+    void sizeHintChanged();
 
 public slots:
     void showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource);

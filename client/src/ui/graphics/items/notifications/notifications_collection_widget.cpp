@@ -79,10 +79,10 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 
     m_list = new QnNotificationListWidget(this);
     layout->addItem(m_list);
-    layout->setStretchFactor(m_list, 1.0);
 
     connect(m_list, SIGNAL(itemRemoved(QnNotificationItem*)), this, SLOT(at_list_itemRemoved(QnNotificationItem*)));
     connect(m_list, SIGNAL(visibleSizeChanged()), this, SIGNAL(visibleSizeChanged()));
+    connect(m_list, SIGNAL(sizeHintChanged()), this, SIGNAL(sizeHintChanged()));
 
     setLayout(layout);
 
@@ -105,7 +105,6 @@ QRectF QnNotificationsCollectionWidget::headerGeometry() const {
 QRectF QnNotificationsCollectionWidget::visibleGeometry() const {
     return m_headerWidget->geometry().adjusted(0, 0, 0, m_list->visibleSize().height());
 }
-
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
 {
