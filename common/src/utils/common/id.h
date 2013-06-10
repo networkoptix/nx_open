@@ -1,13 +1,10 @@
-#ifndef QNID_H
-#define QNID_H
+#ifndef QN_ID_H
+#define QN_ID_H
 
-#include <QString>
-#include <QMetaType>
+#include <QtCore/QString>
+#include <QtCore/QMetaType>
 
-// TODO: #Elric rename header id.h
-
-class QN_EXPORT QnId
-{
+class QnId {
 public:
     QnId() : m_id(0) {}
     QnId(const int value) : m_id(value) {}
@@ -45,4 +42,4 @@ private:
 Q_DECLARE_TYPEINFO(QnId, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(QnId);
 
-#endif // QNID_H
+#endif // QN_ID_H

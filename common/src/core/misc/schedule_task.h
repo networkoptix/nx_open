@@ -5,7 +5,7 @@
 #include <QList>
 #include <QTextStream>
 
-#include "utils/common/qnid.h"
+#include "utils/common/id.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "schedule_recording_type.h"
 

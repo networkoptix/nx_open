@@ -8,7 +8,7 @@
 #include <QtCore/QVariant>
 
 #include <utils/math/fuzzy.h>
-#include <utils/common/qnid.h>
+#include <utils/common/id.h>
 #include "utils/color_space/image_correction.h"
 
 class QnLayoutItemData {
