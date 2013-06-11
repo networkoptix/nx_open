@@ -62,8 +62,6 @@ public:
 
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
-    qint64 minSpaceForWritting() const;
-
     static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
 
     bool isArchiveTimeExists(const QString& physicalId, qint64 timeMs);
