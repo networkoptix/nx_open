@@ -14,6 +14,30 @@ static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
 
+class TestStorageThread: public QnLongRunnable
+{
+public:
+    TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
+    virtual void run() override
+    {
+        QnStorageManager::StorageMap storageRoots = m_owner->getAllStorages();
+
+        for (QnStorageManager::StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+        {
+            if (needToStop())
+                break;
+            QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+            QnResource::Status status = fileStorage->isStorageAvailable() ? QnResource::Online : QnResource::Offline;
+            if (fileStorage->getStatus() != status)
+                m_owner->changeStorageStatus(fileStorage, status);
+        }
+    }
+private:
+    QnStorageManager* m_owner;
+};
+
+TestStorageThread* QnStorageManager::m_testStorageThread;
+
 // -------------------- QnStorageManager --------------------
 
 
@@ -29,6 +53,7 @@ QnStorageManager::QnStorageManager():
 {
     m_lastTestTime.restart();
     m_storageWarnTimer.restart();
+    m_testStorageThread = new TestStorageThread(this);
 }
 
 void QnStorageManager::loadFullFileCatalog()
@@ -218,7 +243,7 @@ void QnStorageManager::removeAbsentStorages(QnAbstractStorageResourceList newSto
 
 QnStorageManager::~QnStorageManager()
 {
-
+    stopAsyncTasks();
 }
 
 QnStorageManager* QnStorageManager::instance()
@@ -261,6 +286,17 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras,
         }
     }
 }
+
+bool QnStorageManager::isArchiveTimeExists(const QString& physicalId, qint64 timeMs)
+{
+    DeviceFileCatalogPtr catalog = getFileCatalog(physicalId, QnResource::Role_LiveVideo);
+    if (catalog && catalog->containTime(timeMs))
+        return true;
+
+    catalog = getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo);
+    return catalog && catalog->containTime(timeMs);
+}
+
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
@@ -401,27 +437,33 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     return result;
 }
 
+void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status)
+{
+    QMutexLocker lock(&m_mutexStorages);
+    fileStorage->setStatus(status);
+    m_storagesStatisticsReady = false;
+    if (status == QnResource::Offline)
+        emit storageFailure(fileStorage);
+}
+
 void QnStorageManager::testOfflineStorages()
 {
     QMutexLocker lock(&m_mutexStorages);
 
-    if (m_lastTestTime.elapsed() < OFFLINE_STORAGES_TEST_INTERVAL)
+    if (m_lastTestTime.elapsed() < OFFLINE_STORAGES_TEST_INTERVAL || m_testStorageThread->isRunning())
         return;
 
-    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
-    {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
-        QnResource::Status status = fileStorage->isStorageAvailable() ? QnResource::Online : QnResource::Offline;
-        if (fileStorage->getStatus() != status)
-        {
-            fileStorage->setStatus(status);
-            m_storagesStatisticsReady = false;
-            if (status == QnResource::Offline)
-                emit storageFailure(fileStorage);
-        }
-    }
-
+    m_testStorageThread->start();
     m_lastTestTime.restart();
+}
+
+void QnStorageManager::stopAsyncTasks()
+{
+    if (m_testStorageThread) {
+        m_testStorageThread->stop();
+        delete m_testStorageThread;
+        m_testStorageThread = 0;
+    }
 }
 
 void QnStorageManager::updateStorageStatistics()
