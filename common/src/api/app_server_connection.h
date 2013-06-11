@@ -171,7 +171,7 @@ public:
     int addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot);
 
     int saveAsync(const QnResourcePtr &resource, const QnKvPairList &kvPairs, QObject *target, const char *slot);
-    int saveSettingsAsync(const QnKvPairList& kvPairs/*, QObject* target, const char* slot*/); // TODO: #GDM? why object-slot are commented out?
+    int saveSettingsAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
 
     int deleteAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
     int deleteAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
