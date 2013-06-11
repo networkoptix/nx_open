@@ -28,7 +28,6 @@ QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, QnWorkbenchContext *co
 
 QnAdjustVideoDialog::~QnAdjustVideoDialog() {
     if (m_widget) {
-        disconnect(m_widget);
         disconnect(m_widget->renderer());
         m_widget->renderer()->setHystogramConsumer(0);
     }
@@ -38,19 +37,20 @@ QnAdjustVideoDialog::~QnAdjustVideoDialog() {
 void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
 {
     if (m_widget)
-    {
-        setParams(m_backupParams);
-        disconnect(m_widget);
-        disconnect(m_widget->renderer());
         m_widget->renderer()->setHystogramConsumer(0);
-    }
+    
     m_widget = widget;
     if (m_widget) {
-        connect(this, SIGNAL(valueChanged(ImageCorrectionParams)), m_widget, SLOT(setContrastParams(ImageCorrectionParams)));
-        connect(m_widget->renderer(), SIGNAL(beforeDestroy()), this, SLOT(at_rendererDestryed()));
         m_widget->renderer()->setHystogramConsumer(getHystogramConsumer());
-        m_backupParams = widget->contrastParams();
         setParams(widget->contrastParams());
+        disconnect(m_widget->renderer());
+        connect(m_widget->renderer(), SIGNAL(beforeDestroy()), this, SLOT(at_rendererDestryed()));
+
+        if (m_backupParams.isEmpty())
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+
+        if (!m_backupParams.contains(widget))
+            m_backupParams.insert(widget,  widget->contrastParams());
     }
     QString name = m_widget ? m_widget->resource()->getName() : tr("[No item selected]");
     setWindowTitle(tr("Adjust video - %1").arg(name));
@@ -61,7 +61,19 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
 
 void QnAdjustVideoDialog::at_rendererDestryed()
 {
-    setWidget(0);
+    QObject* renderer = sender();
+
+    ParamsMap::iterator itr = m_backupParams.begin();
+    for(;itr != m_backupParams.end(); ++itr)
+    {
+        if (itr.key()->renderer() == renderer) {
+            m_backupParams.erase(itr);
+            break;
+        }
+    }
+
+    if (m_widget && renderer == m_widget->renderer())
+        setWidget(0);
 }
 
 void QnAdjustVideoDialog::at_sliderValueChanged()
@@ -108,9 +120,11 @@ void QnAdjustVideoDialog::uiToParams()
     newParams.whiteLevel = 1.0 - ui->whiteLevelsSpinBox->value()/100.0;
 
     if (!(newParams == m_params)) {
+        ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
         m_params = newParams;
         ui->histogramRenderer->setHistogramParams(m_params);
-        emit valueChanged(m_params);
+        if (m_widget)
+            m_widget->setContrastParams(m_params);
     }
 }
 
@@ -149,17 +163,20 @@ void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
             setParams(defaultParams);
             break;
         }
+        case QDialogButtonBox::RejectRole:
+            for (ParamsMap::const_iterator itr = m_backupParams.begin(); itr != m_backupParams.end(); ++itr)
+                itr.key()->setContrastParams(itr.value());
         case QDialogButtonBox::AcceptRole:
             setWidget(0);
-            hide();
-            break;
-        case QDialogButtonBox::RejectRole:
-            setParams(m_backupParams);
-            setWidget(0);
+            for (ParamsMap::const_iterator itr = m_backupParams.begin(); itr != m_backupParams.end(); ++itr)
+                disconnect(itr.key());
+            m_backupParams.clear();
             hide();
             break;
         case QDialogButtonBox::ApplyRole:
-            m_backupParams = m_params;
+            for (ParamsMap::iterator itr = m_backupParams.begin(); itr != m_backupParams.end(); ++itr)
+                itr.value() = itr.key()->contrastParams();
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
             break;
         default:
             break;

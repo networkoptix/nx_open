@@ -27,8 +27,6 @@ public:
 
     QnHistogramConsumer * getHystogramConsumer() const;
     void setWidget(QnMediaResourceWidget* widget);
-signals:
-    void valueChanged(ImageCorrectionParams params);
 private:
     void setParams(const ImageCorrectionParams& params);
 private slots:
@@ -42,9 +40,10 @@ private:
     QScopedPointer<Ui::AdjustVideoDialog> ui;
     bool m_updateDisabled;
     ImageCorrectionParams m_params;
-    ImageCorrectionParams m_backupParams;
-    //QnResourceWidgetRenderer* m_videoRenderer;
     QnMediaResourceWidget* m_widget;
+
+    typedef QMap<QnMediaResourceWidget*, ImageCorrectionParams> ParamsMap;
+    ParamsMap m_backupParams;
 };
 
 #endif // QN_ADJUST_VIDEO_DIALOG_H
