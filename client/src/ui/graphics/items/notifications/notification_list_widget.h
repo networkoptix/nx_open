@@ -24,6 +24,7 @@ public:
 
     QSizeF visibleSize() const;
 
+    /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
 signals:
     void visibleSizeChanged();

@@ -107,10 +107,7 @@ QRectF QnNotificationsCollectionWidget::visibleGeometry() const {
 }
 
 void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF &rect) {
-    qDebug() << "collection setToolTipsEnclosingRect" << rect;
-
     QRectF listRect = rect;
-    qDebug() << "list top" << m_list->geometry().topLeft().y();
     listRect.setTop(m_list->geometry().topLeft().y());
 
     m_list->setToolTipsEnclosingRect(mapRectToItem(m_list, listRect));

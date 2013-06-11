@@ -30,6 +30,7 @@ public:
     /** Combined geometry of all visible sub-wigdets. */
     QRectF visibleGeometry() const;
 
+    /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
 signals:
     void visibleSizeChanged();

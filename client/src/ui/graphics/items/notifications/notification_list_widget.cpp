@@ -255,7 +255,7 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     item->setVisible(false);
     item->setMinimumWidth(widgetWidth);
     item->setMaximumWidth(widgetWidth);
-    item->setTooltipEnclosingGeometry(m_tooltipsEnclosingRect);
+    item->setTooltipEnclosingRect(m_tooltipsEnclosingRect);
     item->setClickableButtons(item->clickableButtons() | Qt::RightButton);
     connect(item, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_item_clicked(Qt::MouseButton)));
     connect(item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
@@ -292,11 +292,10 @@ void QnNotificationListWidget::setToolTipsEnclosingRect(const QRectF &rect) {
     if (qFuzzyCompare(m_tooltipsEnclosingRect, rect))
         return;
     m_tooltipsEnclosingRect = rect;
-    qDebug() << "list setToolTipsEnclosingRect" << rect;
 
     foreach(QnNotificationItem *item, m_items)
-        item->setTooltipEnclosingGeometry(rect);
-    m_collapser.item->setTooltipEnclosingGeometry(rect);
+        item->setTooltipEnclosingRect(rect);
+    m_collapser.item->setTooltipEnclosingRect(rect);
 }
 
 void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
@@ -317,8 +316,6 @@ void QnNotificationListWidget::at_item_geometryChanged() {
     if (geom.height() == data->cachedHeight)
         return;
     data->cachedHeight = geom.height();
-
-    qDebug() << "list geometry changed" << mapRectToScene(geometry());
     updateGeometry();
 }
 

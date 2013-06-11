@@ -59,6 +59,7 @@ public:
      */
     void setText(const QString &text);
 
+    /** Rectangle where the tooltip should fit - in coordinates of list widget (parent's parent). */
     void setEnclosingGeometry(const QRectF &enclosingGeometry);
 
     //reimp
@@ -71,7 +72,7 @@ protected:
 private:
     QnProxyLabel* m_textLabel;
     QnProxyLabel* m_thumbnailLabel;
-    QRectF m_enclosingGeometry;
+    QRectF m_enclosingRect;
     QPointF m_pointTo;
 };
 
@@ -98,7 +99,9 @@ public slots:
     void setColor(const QColor &color);
     void setTooltipText(const QString &text);
     void setImage(const QImage &image);
-    void setTooltipEnclosingGeometry(const QRectF& rect);
+
+    /** Rectangle where all tooltips should fit - in parent(!) coordinates. */
+    void setTooltipEnclosingRect(const QRectF& rect);
 
 signals:
     void actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);

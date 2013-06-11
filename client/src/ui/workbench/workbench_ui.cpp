@@ -1286,9 +1286,6 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
                 m_notificationsItem->y(),
                 m_controlsWidgetRect.width(),
                 maxHeight);
-    qDebug() << "tooltipEncRect" << tooltipsEnclosingRect;
-    qDebug() << "to scene" << m_controlsWidget->mapRectToScene(tooltipsEnclosingRect);
-
     m_notificationsItem->setToolTipsEnclosingRect(m_controlsWidget->mapRectToItem(m_notificationsItem, tooltipsEnclosingRect));
 }
 

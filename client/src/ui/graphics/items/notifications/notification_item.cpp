@@ -79,44 +79,34 @@ void QnNotificationToolTipWidget::resizeEvent(QGraphicsSceneResizeEvent *event) 
 }
 
 void QnNotificationToolTipWidget::updateTailPos()  {
-    if (m_enclosingGeometry.isNull())
+    if (m_enclosingRect.isNull())
+        return;
+
+    if (!parentItem())
+        return;
+
+    if (!parentItem()->parentItem())
         return;
 
     QRectF rect = this->rect();
+    QGraphicsItem *list = parentItem()->parentItem();
 
-    QnNotificationItem* pi = dynamic_cast<QnNotificationItem*>(parentItem());
-    QGraphicsItem *list = pi->parentItem();
-
-    QRectF sceneRect = mapRectToItem(list, this->boundingRect());
-    qreal sceneHeight = sceneRect.height();
+    // half of the tooltip height in coordinates of enclosing rect
+    qreal halfHeight = mapRectToItem(list, rect).height() / 2;
 
     qreal parentPos = parentItem()->mapToItem(list, m_pointTo).y();
 
-    qDebug() << "updateTailPos" << m_textLabel->text().mid(0, 20);
-
-    qDebug() << "parent pos" << parentPos << "our height" << sceneHeight << "parent" << pi << pi->text().mid(0, 20);
-    qDebug() << "encrect" << m_enclosingGeometry.top() << m_enclosingGeometry.bottom();
-    qDebug() << "scerect" << sceneRect.top() << sceneRect.bottom();
-
-    if (parentPos - (sceneHeight / 2) < m_enclosingGeometry.top()) {
+    if (parentPos - halfHeight < m_enclosingRect.top())
         setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.top())));
-        qDebug() << "top position" << tailPos();
-        return;
-    }
-
-    if (parentPos + (sceneHeight / 2) > m_enclosingGeometry.bottom()) {
+    else
+    if (parentPos + halfHeight > m_enclosingRect.bottom())
         setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.bottom())));
-        qDebug() << "bottom position"<< tailPos();
-        return;
-    }
-
-    setTailPos(QPointF(qRound(rect.right() + 10.0), qRound((rect.top() + rect.bottom()) / 2)));
-    qDebug() << "middle position"<< tailPos();
+    else
+        setTailPos(QPointF(qRound(rect.right() + 10.0), qRound((rect.top() + rect.bottom()) / 2)));
 }
 
 void QnNotificationToolTipWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
-    m_enclosingGeometry = enclosingGeometry;
-    qDebug() << "tooltip enc geom" << enclosingGeometry.top() << enclosingGeometry.bottom();
+    m_enclosingRect = enclosingGeometry;
     updateTailPos();
 }
 
@@ -183,7 +173,7 @@ void QnNotificationItem::setText(const QString &text) {
 }
 
 void QnNotificationItem::setTooltipText(const QString &text) {
-    m_tooltipWidget->setText(text + text + text + text + text);
+    m_tooltipWidget->setText(text);
 }
 
 QColor QnNotificationItem::color() const {
@@ -199,7 +189,7 @@ void QnNotificationItem::setImage(const QImage &image) {
     emit imageChanged(image);
 }
 
-void QnNotificationItem::setTooltipEnclosingGeometry(const QRectF &rect) {
+void QnNotificationItem::setTooltipEnclosingRect(const QRectF &rect) {
     m_tooltipWidget->setEnclosingGeometry(rect);
 }
 
