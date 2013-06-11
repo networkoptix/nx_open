@@ -1,3 +1,4 @@
+#include <qglobal.h>
 
 #ifdef Q_OS_LINUX
 
