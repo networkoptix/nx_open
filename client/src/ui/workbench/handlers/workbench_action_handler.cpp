@@ -2448,27 +2448,20 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
         qApp->closeAllWindows();
 }
 
+QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
+{
+    if (!m_adjustVideoDialog)
+        m_adjustVideoDialog = new QnAdjustVideoDialog(mainWindow(), context());
+    return m_adjustVideoDialog.data();
+}
+
 void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
 {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *w = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
-    if (!w)
-        return;
 
-    QScopedPointer<QnAdjustVideoDialog> dialog( new QnAdjustVideoDialog(mainWindow(), context()) );
-    ImageCorrectionParams prevParams = w->contrastParams();
-    dialog->setParams(prevParams);
-    dialog->setWindowModality(Qt::ApplicationModal);
-    w->renderer()->setHystogramConsumer(dialog->getHystogramConsumer());
-
-    connect(dialog.data(), SIGNAL(valueChanged(ImageCorrectionParams)), w, SLOT(setContrastParams(ImageCorrectionParams)));
-
-    if (dialog->exec() == QDialog::Accepted)
-        w->setContrastParams(dialog->params());
-    else
-        w->setContrastParams(prevParams);
-
-    w->renderer()->setHystogramConsumer(0);
+    adjustVideoDialog()->setWidget(w);
+    adjustVideoDialog()->show();
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
@@ -3721,9 +3714,16 @@ void QnWorkbenchActionHandler::at_tourTimer_timeout() {
 }
 
 void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
-    Q_UNUSED(role)
     if(!workbench()->item(Qn::ZoomedRole))
         action(Qn::ToggleTourModeAction)->setChecked(false);
+
+    if (role == Qn::CentralRole && adjustVideoDialog()->isVisible())
+    {
+        QnWorkbenchItem *item = context()->workbench()->item(Qn::CentralRole);
+        QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*> (context()->display()->widget(item));
+        if (widget)
+            adjustVideoDialog()->setWidget(widget);
+    }
 }
 
 void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {

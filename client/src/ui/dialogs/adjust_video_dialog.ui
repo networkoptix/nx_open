@@ -18,12 +18,22 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="enableAdjustment">
+    <widget class="QCheckBox" name="enableAdjustment">
+     <property name="text">
+      <string>enableAdjustment</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Enable adjustment</string>
+      <string/>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
      </property>
      <property name="checkable">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">

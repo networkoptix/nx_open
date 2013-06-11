@@ -840,6 +840,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if(widgets(widget->resource()).size() == 1)
         connect(widget->resource(),     SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_resource_disabledChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 
+    QColor frameColor = item->data(Qn::ItemFrameColorRole).value<QColor>();
+    if(frameColor.isValid())
+        widget->setFrameColor(frameColor);
+
     emit widgetAdded(widget);
 
     for(int i = 0; i < Qn::ItemRoleCount; i++)
@@ -865,10 +869,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             }
         }
     }
-
-    QColor frameColor = item->data(Qn::ItemFrameColorRole).value<QColor>();
-    if(frameColor.isValid())
-        widget->setFrameColor(frameColor);
 
     return true;
 }

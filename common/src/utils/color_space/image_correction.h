@@ -46,18 +46,16 @@ Q_DECLARE_METATYPE(ImageCorrectionParams);
 struct ImageCorrectionResult
 {
 
-    ImageCorrectionResult(): aCoeff(1.0), bCoeff(0.0), gamma(1.0) {     
-        memset(hystogram, 0, sizeof(hystogram)); 
-    }
+    ImageCorrectionResult(): aCoeff(1.0), bCoeff(0.0), gamma(1.0), filled(false) { }
     float aCoeff;
     float bCoeff;
     float gamma;
     int hystogram[256];
+    bool filled;
 
     void analizeImage( const quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data, const QRectF& srcRect);
 private:
     float calcGamma(int leftPos, int rightPos, int pixels) const;
-    void clear();
 private:
     //mutable QMutex m_mutex;
 };

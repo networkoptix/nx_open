@@ -43,7 +43,7 @@ void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int he
 
     if (!data.enabled || yPlane == 0)
     {
-        clear();
+        filled = false;
         return;
     }
 
@@ -105,11 +105,5 @@ void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int he
     gamma = data.gamma;
     if (gamma == 0)
         gamma = calcGamma(leftPos, rightPos, pixels - leftSum - rightSum); // auto gamma
-}
-
-void ImageCorrectionResult::clear()
-{
-    aCoeff = 1.0;
-    bCoeff = 0.0;
-    gamma = 1.0;
+    filled = true;
 }
