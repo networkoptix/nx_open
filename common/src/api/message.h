@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/qnid.h>
+#include <utils/common/id.h>
 
 #include <core/resource/resource_type.h>
 #include <core/resource/resource.h>

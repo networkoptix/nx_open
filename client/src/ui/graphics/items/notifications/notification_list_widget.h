@@ -25,16 +25,19 @@ public:
     QSizeF visibleSize() const;
 signals:
     void visibleSizeChanged();
+    void sizeHintChanged();
     void itemRemoved(QnNotificationItem *item);
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
     virtual void tick(int deltaMSecs) override;
+    virtual void updateGeometry() override;
 
     void updateVisibleSize();
 private slots:
     void at_item_clicked(Qt::MouseButton button);
+    void at_item_geometryChanged();
     void at_geometry_changed();
 
 private:
@@ -73,13 +76,14 @@ private:
         QnNotificationItem* item;
         State state;
         bool locked;
+        int cachedHeight;
     };
 
     HoverFocusProcessor* m_hoverProcessor;
 
     /**
      * @brief m_items       List of all items. Strictly ordered by item state:
-     *                      (Displayed|Hiding|Hidden)* (Displaying)? (Waiting)*
+     *                      (Displayed|Hiding|Hidden)* (Displaying)? (Collapsing)* (Collapsed)*
      *                      Item that is closer to the beginning of the list is displayed earlier.
      */
     QLinkedList<QnNotificationItem *> m_items;

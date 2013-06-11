@@ -145,6 +145,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_manager(display()->instrumentManager()),
     m_selectionOverlayHackInstrumentDisabled(false),
+    m_selectionOverlayHackInstrumentDisabled2(false),
     m_cursorPos(invalidCursorPos()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
@@ -295,8 +296,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
 
-    connect(m_moveInstrument,           SIGNAL(moveStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               selectionOverlayHackInstrument, SLOT(recursiveDisable()));
-    connect(m_moveInstrument,           SIGNAL(moveFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              selectionOverlayHackInstrument, SLOT(recursiveEnable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandStarted(QGraphicsView *)),                                                 selectionOverlayHackInstrument, SLOT(recursiveDisable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandFinished(QGraphicsView *)),                                                selectionOverlayHackInstrument, SLOT(recursiveEnable()));
 
@@ -867,6 +866,9 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
     if(m_draggedWorkbenchItems.empty())
         return;
 
+    m_selectionOverlayHackInstrumentDisabled2 = true;
+    display()->selectionOverlayHackInstrument()->recursiveDisable();
+
     /* Bring to front preserving relative order. */
     display()->bringToFront(items);
     display()->setLayer(items, Qn::FrontLayer);
@@ -995,6 +997,11 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
     m_draggedWorkbenchItems.clear();
     m_replacedWorkbenchItems.clear();
     m_dragGeometries.clear();
+
+    if(m_selectionOverlayHackInstrumentDisabled2) {
+        display()->selectionOverlayHackInstrument()->recursiveEnable();
+        m_selectionOverlayHackInstrumentDisabled2 = false;
+    }
 }
 
 void QnWorkbenchController::at_rotationStarted(QGraphicsView *, QGraphicsWidget *widget) {

@@ -1,10 +1,8 @@
 #ifndef __IMAGE_CORRECTION_H__
 #define __IMAGE_CORRECTION_H__
 
-#include <cstring>
-
-#include <QtGlobal>
 #include <QRectF>
+#include <QByteArray>
 
 struct ImageCorrectionParams
 {
@@ -60,6 +58,15 @@ struct ImageCorrectionResult
 private:
     float calcGamma(int leftPos, int rightPos, int pixels) const;
     void clear();
+private:
+    //mutable QMutex m_mutex;
+};
+
+class QnHistogramConsumer
+{
+public:
+    virtual ~QnHistogramConsumer() {}
+    virtual void setHistogramData(const ImageCorrectionResult& data) = 0;
 };
 
 #endif // __IMAGE_CORRECTION_H__

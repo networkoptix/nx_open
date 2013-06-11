@@ -45,7 +45,7 @@ class QnActionManager;
 class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
 class QnGraphicsMessageBoxItem;
-class QnNotificationsCollectionItem;
+class QnNotificationsCollectionWidget;
 
 class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT
@@ -184,7 +184,7 @@ protected:
     void updateViewportMargins();
 
     void updateTreeGeometry();
-    void updateNotificationsGeometry();
+    Q_SLOT void updateNotificationsGeometry();
     void updateFpsGeometry();
     void updateCalendarGeometry();
     Q_SLOT void updateSliderResizerGeometry();
@@ -422,7 +422,7 @@ private:
 
     QnSimpleFrameWidget *m_notificationsBackgroundItem;
 
-    QnNotificationsCollectionItem *m_notificationsItem;
+    QnNotificationsCollectionWidget *m_notificationsItem;
 
     QnImageButtonWidget *m_notificationsPinButton;
 

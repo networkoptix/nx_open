@@ -12,7 +12,7 @@
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
 
-#include <utils/common/qnid.h>
+#include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
 #include <recording/time_period_list.h>

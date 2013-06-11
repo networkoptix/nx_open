@@ -38,6 +38,8 @@ public:
     void uploadFile(const QString &filename);
 
     void deleteFile(const QString &filename);
+
+    static void clearLocalCache();
 protected:
     void ensureCacheFolder();
 signals:

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>825</height>
+    <height>846</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -381,6 +381,19 @@
            <widget class="QCheckBox" name="isHardwareDecodingCheckBox">
             <property name="text">
              <string>Use advanced hardware acceleration</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="clearCacheButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Clear local cache</string>
             </property>
            </widget>
           </item>

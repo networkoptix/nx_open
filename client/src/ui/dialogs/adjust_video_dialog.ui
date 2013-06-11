@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>431</width>
-    <height>325</height>
+    <width>432</width>
+    <height>367</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -172,7 +172,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="hystogramSpacer" native="true">
+    <widget class="QnHistogramRenderer" name="histogramRenderer" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
@@ -187,7 +187,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
      </property>
      <property name="centerButtons">
       <bool>false</bool>
@@ -196,6 +196,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnHistogramRenderer</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/dialogs/histogram_renderer.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>buttonBox</tabstop>
  </tabstops>

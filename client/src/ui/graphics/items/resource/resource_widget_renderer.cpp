@@ -72,6 +72,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
 
 void QnResourceWidgetRenderer::destroyAsync() 
 {
+    emit beforeDestroy();
     QnAbstractRenderer::destroyAsync();
     foreach(RenderingTools ctx, m_channelRenderers)
     {
@@ -319,4 +320,11 @@ void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& p
         ctx.uploader->setImageCorrection(params); 
         ctx.renderer->setImageCorrectionParams(params);
     }
+}
+
+void QnResourceWidgetRenderer::setHystogramConsumer(QnHistogramConsumer* value)
+{
+    RenderingTools& ctx = m_channelRenderers[0];
+    if( ctx.renderer )
+        ctx.renderer->setHystogramConsumer(value);
 }

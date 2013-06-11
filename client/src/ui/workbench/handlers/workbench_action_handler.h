@@ -35,6 +35,7 @@ class QnLoginDialog;
 class QnVideoCamera;
 class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
+class QnAdjustVideoDialog;
 
 // TODO: #Elric move out.
 struct QnThumbnailsSearchState {
@@ -344,6 +345,8 @@ protected slots:
 
     void at_checkSystemHealthAction_triggered();
 
+    void at_clearCacheAction_triggered();
+
     void at_serverSettings_received(int status, const QnKvPairList& settings, int handle);
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
@@ -380,6 +383,8 @@ private:
     void removeLayouts(const QnLayoutResourceList &layouts);
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
+
+    QnAdjustVideoDialog* adjustVideoDialog();
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
@@ -392,6 +397,8 @@ private:
     QWeakPointer<QnEventLogDialog> m_businessEventsLogDialog;
     QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QWeakPointer<QnLoginDialog> m_loginDialog;
+    QWeakPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
+
 
     /** Whether the set of selected resources was changed and settings
      * dialog is waiting to be updated. */

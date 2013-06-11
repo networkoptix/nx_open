@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
-#include <utils/common/qnid.h>
+#include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>

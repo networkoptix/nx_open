@@ -1,5 +1,6 @@
 #include "image_correction.h"
 #include "utils/math/math.h"
+#include <memory>
 
 static const int MIN_GAMMA_RANGE = 6;
 static const float NORM_RANGE_START = 0.0; //16.0
@@ -38,10 +39,9 @@ void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int he
                                          const ImageCorrectionParams& data, const QRectF& srcRect)
 {
     Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
-    memset(hystogram, 0, sizeof(hystogram));
 
 
-    if (data.blackLevel == 0 && data.whiteLevel == 0 && data.gamma == 1.0 || yPlane == 0)
+    if (!data.enabled || yPlane == 0)
     {
         clear();
         return;
@@ -55,6 +55,8 @@ void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int he
     int xSteps = (right-left) / 4;
 
     // prepare hystogram
+    //m_mutex.lock();
+    memset(hystogram, 0, sizeof(hystogram));
     for (int y = top; y < bottom; ++y)
     {
         quint32* line = (quint32*) (yPlane + stride * y + left);
@@ -75,6 +77,7 @@ void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int he
             hystogram[(quint8) value]++;
         }
     }
+    //m_mutex.unlock();
 
     // get hystogram range
     int pixels = (right-left) * (bottom-top);

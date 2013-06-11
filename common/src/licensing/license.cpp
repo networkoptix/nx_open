@@ -1,7 +1,6 @@
 #include "license.h"
 
 #include <cassert>
-#include <numeric> // TODO: #Elric where does this header come from?
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QSettings>

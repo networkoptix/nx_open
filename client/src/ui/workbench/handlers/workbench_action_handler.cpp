@@ -127,6 +127,7 @@
 #endif
 #include "core/resource/layout_item_data.h"
 #include "ui/dialogs/adjust_video_dialog.h"
+#include "ui/graphics/items/resource/resource_widget_renderer.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -320,6 +321,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
+    connect(action(Qn::ClearCacheAction),                       SIGNAL(triggered()),    this,   SLOT(at_clearCacheAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -1252,8 +1254,14 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     context()->resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
+    QHash<QUuid, QUuid> newUuidByOldUuid;
+    for(int i = 0; i < items.size(); i++) {
+        QUuid newUuid = QUuid::createUuid();
+        newUuidByOldUuid[items[i].uuid] = newUuid;
+        items[i].uuid = newUuid;
+    }
     for(int i = 0; i < items.size(); i++)
-        items[i].uuid = QUuid::createUuid();
+        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QUuid());
     newLayout->setItems(items);
 
     bool isCurrent = (layout == workbench()->currentLayout()->resource());
@@ -2440,24 +2448,32 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
         qApp->closeAllWindows();
 }
 
+QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
+{
+    if (!m_adjustVideoDialog)
+        m_adjustVideoDialog = new QnAdjustVideoDialog(mainWindow(), context());
+    return m_adjustVideoDialog.data();
+}
+
 void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
 {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *w = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
-    if (!w)
-        return;
 
-    QScopedPointer<QnAdjustVideoDialog> dialog( new QnAdjustVideoDialog(mainWindow(), context()) );
+    adjustVideoDialog()->setWidget(w);
+    adjustVideoDialog()->show();
+
+    /*
+    if (!w)
+    return;
     ImageCorrectionParams prevParams = w->contrastParams();
     dialog->setParams(prevParams);
-    dialog->setWindowModality(Qt::ApplicationModal);
-
-    connect(dialog.data(), SIGNAL(valueChanged(ImageCorrectionParams)), w, SLOT(setContrastParams(ImageCorrectionParams)));
-
+    dialog->setWidget(w);
     if (dialog->exec() == QDialog::Accepted)
         w->setContrastParams(dialog->params());
     else
         w->setContrastParams(prevParams);
+    */
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
@@ -3710,9 +3726,15 @@ void QnWorkbenchActionHandler::at_tourTimer_timeout() {
 }
 
 void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
-    Q_UNUSED(role)
     if(!workbench()->item(Qn::ZoomedRole))
         action(Qn::ToggleTourModeAction)->setChecked(false);
+
+    if (role == Qn::SingleSelectedRole && adjustVideoDialog()->isVisible())
+    {
+        QnWorkbenchItem *item = context()->workbench()->item(Qn::SingleSelectedRole);
+        QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*> (context()->display()->widget(item));
+        adjustVideoDialog()->setWidget(widget);
+    }
 }
 
 void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
@@ -3760,6 +3782,10 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
         }
 
     }
+}
+
+void QnWorkbenchActionHandler::at_clearCacheAction_triggered() {
+    QnAppServerFileCache::clearLocalCache();
 }
 
 void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QnKvPairList &settings, int handle) {

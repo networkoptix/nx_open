@@ -14,7 +14,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/qnid.h>
+#include <utils/common/id.h>
 
 namespace QnBusiness {
     enum Columns {

@@ -4,7 +4,7 @@
 #include <QtCore/QStringList>
 
 #include <business/business_fwd.h>
-#include <utils/common/qnid.h>
+#include <utils/common/id.h>
 
 class QnBusinessEventParameters
 {

@@ -81,7 +81,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     m_serverSettingsWidget = new QnServerSettingsWidget(this);
     m_serverSettingsTabIndex = ui->tabWidget->addTab(m_serverSettingsWidget, tr("Server"));
-
     resize(1, 1); // set widget size to minimal possible
 
     /* Set up context help. */
@@ -109,6 +108,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this,   SLOT(reject()));
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
     connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
+    connect(ui->clearCacheButton,                       SIGNAL(clicked()),                    action(Qn::ClearCacheAction), SLOT(trigger()));
 
     initLanguages();
     updateFromSettings();
