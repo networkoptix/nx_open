@@ -287,17 +287,6 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras,
     }
 }
 
-bool QnStorageManager::isArchiveTimeExists(const QString& physicalId, qint64 timeMs)
-{
-    DeviceFileCatalogPtr catalog = getFileCatalog(physicalId, QnResource::Role_LiveVideo);
-    if (catalog && catalog->containTime(timeMs))
-        return true;
-
-    catalog = getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo);
-    return catalog && catalog->containTime(timeMs);
-}
-
-
 QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
     QVector<QnTimePeriodList> periods;
