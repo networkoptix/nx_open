@@ -234,7 +234,12 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                         Qn::OpenInNewLayoutAction,
                         QnActionParameters(resource)
                         );
-            // TODO: #GDM second action : ping
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Ping"),
+                        Qn::PingAction,
+                        QnActionParameters(resource)
+                        );
             item->setText(tr("Failure on %1.").arg(name));
             break;
         }
