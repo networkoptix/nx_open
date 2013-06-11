@@ -61,7 +61,7 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
         m_widget->renderer()->disconnect(this);
         connect(m_widget->renderer(), SIGNAL(beforeDestroy()), this, SLOT(at_rendererDestryed()));
 
-        ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+        //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
         m_backupParams = widget->contrastParams();
     }
     QString name = m_widget ? m_widget->resource()->getName() : tr("[No item selected]");
@@ -69,6 +69,7 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
 
     ui->histogramRenderer->setEnabled(m_widget != 0);
     ui->enableAdjustment->setEnabled(m_widget != 0);
+    ui->groupBox->setEnabled(m_widget != 0);
 }
 
 void QnAdjustVideoDialog::at_rendererDestryed()
@@ -120,7 +121,7 @@ void QnAdjustVideoDialog::uiToParams()
     newParams.whiteLevel = 1.0 - ui->whiteLevelsSpinBox->value()/100.0;
 
     if (!(newParams == m_params)) {
-        ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
+        //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
         m_params = newParams;
         ui->histogramRenderer->setHistogramParams(m_params);
         if (m_widget)
@@ -173,7 +174,7 @@ void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
         case QDialogButtonBox::ApplyRole:
             if (m_widget)
                 m_backupParams = m_widget->contrastParams();
-            ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+            //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
             break;
         default:
             break;
@@ -183,4 +184,12 @@ void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
 QnHistogramConsumer* QnAdjustVideoDialog::getHystogramConsumer() const
 {
     return ui->histogramRenderer;
+}
+
+void QnAdjustVideoDialog::closeEvent( QCloseEvent * e )
+{
+    if (m_widget)
+        m_widget->setContrastParams(m_backupParams);
+    setWidget(0);
+    QDialog::closeEvent(e);
 }

@@ -27,6 +27,8 @@ public:
 
     QnHistogramConsumer * getHystogramConsumer() const;
     void setWidget(QnMediaResourceWidget* widget);
+protected:
+    virtual void closeEvent ( QCloseEvent * e ) override;
 private:
     void setParams(const ImageCorrectionParams& params);
 private slots:
