@@ -24,6 +24,9 @@ enum QnStreamQuality {
 QString QnStreamQualityToString(QnStreamQuality value);
 QnStreamQuality QnStreamQualityFromString( const QString& str );
 
+/*!
+    \note Derived class MUST call \a init() just after object instanciation
+*/
 class QnMediaResource /*: virtual public QnResource*/
 //:
 //    public QnFromThisToShared<QnMediaResource>
@@ -52,6 +55,8 @@ public:
 
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
+
+    void init();
 };
 
 #endif // QN_MEDIA_RESOURCE_H

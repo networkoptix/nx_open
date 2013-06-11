@@ -44,10 +44,7 @@ QnStreamQuality QnStreamQualityFromString( const QString& str )
 //QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
 QnMediaResource::QnMediaResource()
-//:
-//    QnResource()
 {
-    //addFlags(QnResource::media);
     m_customVideoLayout = 0;
 }
 
@@ -86,4 +83,9 @@ static QnEmptyResourceAudioLayout audioLayout;
 const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
     return &audioLayout;
+}
+
+void QnMediaResource::init()
+{
+    toResource()->addFlags(QnResource::media);
 }

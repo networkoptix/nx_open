@@ -17,6 +17,8 @@ QnSecurityCamResource::QnSecurityCamResource():
     addFlags(live_cam);
 
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
+
+    QnMediaResource::init();
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const
