@@ -1,11 +1,14 @@
 #include "adjust_video_dialog.h"
 #include "ui_adjust_video_dialog.h"
+#include "ui/graphics/items/resource/resource_widget_renderer.h"
+#include "ui/graphics/items/resource/media_resource_widget.h"
 
 QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::AdjustVideoDialog),
-    m_updateDisabled(false)
+    m_updateDisabled(false),
+    m_widget(0)
 {
     ui->setupUi(this);
 
@@ -21,13 +24,45 @@ QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, QnWorkbenchContext *co
     connect(ui->enableAdjustment, SIGNAL(toggled(bool)), this, SLOT(at_sliderValueChanged()));
     
     connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonClicked(QAbstractButton*)));
-    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 QnAdjustVideoDialog::~QnAdjustVideoDialog() {
+    if (m_widget) {
+        disconnect(m_widget);
+        disconnect(m_widget->renderer());
+        m_widget->renderer()->setHystogramConsumer(0);
+    }
 }
 
+
+void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
+{
+    if (m_widget)
+    {
+        setParams(m_backupParams);
+        disconnect(m_widget);
+        disconnect(m_widget->renderer());
+        m_widget->renderer()->setHystogramConsumer(0);
+    }
+    m_widget = widget;
+    if (m_widget) {
+        connect(this, SIGNAL(valueChanged(ImageCorrectionParams)), m_widget, SLOT(setContrastParams(ImageCorrectionParams)));
+        connect(m_widget->renderer(), SIGNAL(beforeDestroy()), this, SLOT(at_rendererDestryed()));
+        m_widget->renderer()->setHystogramConsumer(getHystogramConsumer());
+        m_backupParams = widget->contrastParams();
+        setParams(widget->contrastParams());
+    }
+    QString name = m_widget ? m_widget->resource()->getName() : tr("[No item selected]");
+    setWindowTitle(tr("Adjust video - %1").arg(name));
+
+    ui->histogramRenderer->setEnabled(m_widget != 0);
+    ui->enableAdjustment->setEnabled(m_widget != 0);
+}
+
+void QnAdjustVideoDialog::at_rendererDestryed()
+{
+    setWidget(0);
+}
 
 void QnAdjustVideoDialog::at_sliderValueChanged()
 {
@@ -105,10 +140,29 @@ void QnAdjustVideoDialog::setParams(const ImageCorrectionParams& params)
 void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
 {
     QDialogButtonBox::ButtonRole role = ui->buttonBox->buttonRole(button);
-    if (role == QDialogButtonBox::ResetRole) {
-        ImageCorrectionParams defaultParams;
-        defaultParams.enabled = true;
-        setParams(defaultParams);
+    switch( role)
+    {
+        case QDialogButtonBox::ResetRole:
+        {
+            ImageCorrectionParams defaultParams;
+            defaultParams.enabled = true;
+            setParams(defaultParams);
+            break;
+        }
+        case QDialogButtonBox::AcceptRole:
+            setWidget(0);
+            hide();
+            break;
+        case QDialogButtonBox::RejectRole:
+            setParams(m_backupParams);
+            setWidget(0);
+            hide();
+            break;
+        case QDialogButtonBox::ApplyRole:
+            m_backupParams = m_params;
+            break;
+        default:
+            break;
     }
 }
 
