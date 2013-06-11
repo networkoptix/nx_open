@@ -12,8 +12,10 @@ QnHistogramRenderer::QnHistogramRenderer(QWidget* parent):
 
 void QnHistogramRenderer::setHistogramData(const ImageCorrectionResult& data)
 {
-    m_data = data;
-    update();
+    if (data.filled) {
+        m_data = data;
+        update();
+    }
 }
 
 void QnHistogramRenderer::setHistogramParams(const ImageCorrectionParams& params)
