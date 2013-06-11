@@ -471,12 +471,12 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr &resource, const QnKvPa
     return addObjectAsync(KvPairObject, data, QN_STRINGIZE_TYPE(QnKvPairs), target, slot);
 }
 
-int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs/*, QObject *target, const char *slot*/)
+int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs, QObject *target, const char *slot)
 {
     QByteArray data;
     m_serializer.serializeSettings(kvPairs, data);
 
-    return addObjectAsync(SettingObject, data, QN_STRINGIZE_TYPE(QnKvPairList), NULL, NULL); // TODO: #Elric
+    return addObjectAsync(SettingObject, data, QN_STRINGIZE_TYPE(QnKvPairList), target, slot);
 }
 
 int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)

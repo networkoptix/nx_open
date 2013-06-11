@@ -245,6 +245,7 @@ private:
     ClickInstrument *m_itemLeftClickInstrument;
 
     bool m_selectionOverlayHackInstrumentDisabled;
+    bool m_selectionOverlayHackInstrumentDisabled2; // TODO: use toggles?
 
 
     /* Keyboard control-related state. */

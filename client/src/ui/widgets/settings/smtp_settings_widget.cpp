@@ -89,7 +89,7 @@ void QnSmtpSettingsWidget::update() {
 
 void QnSmtpSettingsWidget::submit() {
     QnEmail::Settings result = settings();
-    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized());
+    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized(), this, SLOT(at_settings_saved(int, QnKvPairList, int)));
 }
 
 void QnSmtpSettingsWidget::updateFocusedElement() {
@@ -323,4 +323,8 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &
                                        : SimplePage);
 
     m_settingsReceived = true;
+}
+
+void QnSmtpSettingsWidget::at_settings_saved(int, const QnKvPairList &, int) {
+    return;
 }
