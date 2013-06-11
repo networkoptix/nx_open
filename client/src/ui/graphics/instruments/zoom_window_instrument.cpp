@@ -343,6 +343,10 @@ void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget) {
     connect(widget, SIGNAL(frameColorChanged()), this, SLOT(at_widget_frameColorChanged()));
     connect(widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_widget_aboutToBeDestroyed()));
     connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
+
+    // TODO: #Elric hack =(
+    if(!widget->zoomRect().isNull() && widget->frameColor() == qnGlobals->frameColor())
+        widget->setFrameColor(nextZoomWindowColor());
 }
 
 void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget *widget) {

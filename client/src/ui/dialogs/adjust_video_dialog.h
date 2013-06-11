@@ -8,6 +8,9 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include "utils/color_space/image_correction.h"
 
+class QnResourceWidgetRenderer;
+class QnMediaResourceWidget;
+
 namespace Ui {
     class AdjustVideoDialog;
 }
@@ -20,22 +23,28 @@ public:
     explicit QnAdjustVideoDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnAdjustVideoDialog();
 
-    void setParams(const ImageCorrectionParams& params);
     ImageCorrectionParams params() const;
 
     QnHistogramConsumer * getHystogramConsumer() const;
-signals:
-    void valueChanged(ImageCorrectionParams params);
+    void setWidget(QnMediaResourceWidget* widget);
+protected:
+    virtual void closeEvent ( QCloseEvent * e ) override;
+private:
+    void setParams(const ImageCorrectionParams& params);
 private slots:
     void at_sliderValueChanged();
     void at_spinboxValueChanged();
     void at_buttonClicked(QAbstractButton* button);
+    void at_rendererDestryed();
 private:
     void uiToParams();
 private:
     QScopedPointer<Ui::AdjustVideoDialog> ui;
     bool m_updateDisabled;
     ImageCorrectionParams m_params;
+    QnMediaResourceWidget* m_widget;
+
+    ImageCorrectionParams m_backupParams;
 };
 
 #endif // QN_ADJUST_VIDEO_DIALOG_H

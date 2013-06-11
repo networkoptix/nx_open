@@ -1,11 +1,14 @@
 #include "adjust_video_dialog.h"
 #include "ui_adjust_video_dialog.h"
+#include "ui/graphics/items/resource/resource_widget_renderer.h"
+#include "ui/graphics/items/resource/media_resource_widget.h"
 
 QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::AdjustVideoDialog),
-    m_updateDisabled(false)
+    m_updateDisabled(false),
+    m_widget(0)
 {
     ui->setupUi(this);
 
@@ -21,13 +24,45 @@ QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, QnWorkbenchContext *co
     connect(ui->enableAdjustment, SIGNAL(toggled(bool)), this, SLOT(at_sliderValueChanged()));
     
     connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonClicked(QAbstractButton*)));
-    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 QnAdjustVideoDialog::~QnAdjustVideoDialog() {
+    if (m_widget) {
+        m_widget->renderer()->disconnect(this);
+        m_widget->renderer()->setHystogramConsumer(0);
+    }
 }
 
+
+void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
+{
+    if (m_widget) {
+        m_widget->renderer()->disconnect(this);
+        m_widget->renderer()->setHystogramConsumer(0);
+    }
+    
+    m_widget = widget;
+    if (m_widget) {
+        m_widget->renderer()->setHystogramConsumer(getHystogramConsumer());
+        setParams(widget->contrastParams());
+        m_widget->renderer()->disconnect(this);
+        connect(m_widget->renderer(), SIGNAL(beforeDestroy()), this, SLOT(at_rendererDestryed()));
+
+        //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+        m_backupParams = widget->contrastParams();
+    }
+    QString name = m_widget ? m_widget->resource()->getName() : tr("[No item selected]");
+    setWindowTitle(tr("Adjust video - %1").arg(name));
+
+    ui->histogramRenderer->setEnabled(m_widget != 0);
+    ui->enableAdjustment->setEnabled(m_widget != 0);
+    ui->groupBox->setEnabled(m_widget != 0);
+}
+
+void QnAdjustVideoDialog::at_rendererDestryed()
+{
+    setWidget(0);
+}
 
 void QnAdjustVideoDialog::at_sliderValueChanged()
 {
@@ -73,9 +108,11 @@ void QnAdjustVideoDialog::uiToParams()
     newParams.whiteLevel = 1.0 - ui->whiteLevelsSpinBox->value()/100.0;
 
     if (!(newParams == m_params)) {
+        //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
         m_params = newParams;
         ui->histogramRenderer->setHistogramParams(m_params);
-        emit valueChanged(m_params);
+        if (m_widget)
+            m_widget->setContrastParams(m_params);
     }
 }
 
@@ -105,14 +142,41 @@ void QnAdjustVideoDialog::setParams(const ImageCorrectionParams& params)
 void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
 {
     QDialogButtonBox::ButtonRole role = ui->buttonBox->buttonRole(button);
-    if (role == QDialogButtonBox::ResetRole) {
-        ImageCorrectionParams defaultParams;
-        defaultParams.enabled = true;
-        setParams(defaultParams);
+    switch( role)
+    {
+        case QDialogButtonBox::ResetRole:
+        {
+            ImageCorrectionParams defaultParams;
+            defaultParams.enabled = true;
+            setParams(defaultParams);
+            break;
+        }
+        case QDialogButtonBox::RejectRole:
+            if (m_widget)
+                m_widget->setContrastParams(m_backupParams);
+        case QDialogButtonBox::AcceptRole:
+            setWidget(0);
+            hide();
+            break;
+        case QDialogButtonBox::ApplyRole:
+            if (m_widget)
+                m_backupParams = m_widget->contrastParams();
+            //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+            break;
+        default:
+            break;
     }
 }
 
 QnHistogramConsumer* QnAdjustVideoDialog::getHystogramConsumer() const
 {
     return ui->histogramRenderer;
+}
+
+void QnAdjustVideoDialog::closeEvent( QCloseEvent * e )
+{
+    if (m_widget)
+        m_widget->setContrastParams(m_backupParams);
+    setWidget(0);
+    QDialog::closeEvent(e);
 }
