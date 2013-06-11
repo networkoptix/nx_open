@@ -191,7 +191,11 @@ protected:
     void updateSliderZoomButtonsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry);
+    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry,
+                                        const QRectF &titleGeometry,
+                                        const QRectF &sliderGeometry,
+                                        const QRectF &calendarGeometry,
+                                        qreal *maxHeight);
     QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
     void updateActivityInstrumentState();
 

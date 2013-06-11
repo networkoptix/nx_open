@@ -20,9 +20,9 @@ namespace {
     const qreal buttonSize = 24;
 } // anonymous namespace
 
-/********** QnNotificationToolTipItem *********************/
+/********** QnNotificationToolTipWidget *********************/
 
-QnNotificationToolTipItem::QnNotificationToolTipItem(QGraphicsItem *parent):
+QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     base_type(parent),
     m_textLabel(new QnProxyLabel(this)),
     m_thumbnailLabel(NULL)
@@ -55,7 +55,7 @@ QnNotificationToolTipItem::QnNotificationToolTipItem(QGraphicsItem *parent):
     setZValue(std::numeric_limits<qreal>::max());
 }
 
-void QnNotificationToolTipItem::setThumbnail(const QImage &image) {
+void QnNotificationToolTipWidget::setThumbnail(const QImage &image) {
     if (!m_thumbnailLabel) {
         m_thumbnailLabel = new QnProxyLabel(this);
         m_thumbnailLabel->setAlignment(Qt::AlignCenter);
@@ -69,19 +69,63 @@ void QnNotificationToolTipItem::setThumbnail(const QImage &image) {
     m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
 }
 
-void QnNotificationToolTipItem::setText(const QString &text) {
+void QnNotificationToolTipWidget::setText(const QString &text) {
     m_textLabel->setText(text);
 }
 
-void QnNotificationToolTipItem::resizeEvent(QGraphicsSceneResizeEvent *event)  {
+void QnNotificationToolTipWidget::resizeEvent(QGraphicsSceneResizeEvent *event)  {
     base_type::resizeEvent(event);
     updateTailPos();
 }
 
-void QnNotificationToolTipItem::updateTailPos()  {
+void QnNotificationToolTipWidget::updateTailPos()  {
+    if (m_enclosingGeometry.isNull())
+        return;
+
     QRectF rect = this->rect();
+
+    QnNotificationItem* pi = dynamic_cast<QnNotificationItem*>(parentItem());
+    QGraphicsItem *list = pi->parentItem();
+
+    QRectF sceneRect = mapRectToItem(list, this->boundingRect());
+    qreal sceneHeight = sceneRect.height();
+
+    qreal parentPos = parentItem()->mapToItem(list, m_pointTo).y();
+
+    qDebug() << "updateTailPos" << m_textLabel->text().mid(0, 20);
+
+    qDebug() << "parent pos" << parentPos << "our height" << sceneHeight << "parent" << pi << pi->text().mid(0, 20);
+    qDebug() << "encrect" << m_enclosingGeometry.top() << m_enclosingGeometry.bottom();
+    qDebug() << "scerect" << sceneRect.top() << sceneRect.bottom();
+
+    if (parentPos - (sceneHeight / 2) < m_enclosingGeometry.top()) {
+        setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.top())));
+        qDebug() << "top position" << tailPos();
+        return;
+    }
+
+    if (parentPos + (sceneHeight / 2) > m_enclosingGeometry.bottom()) {
+        setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.bottom())));
+        qDebug() << "bottom position"<< tailPos();
+        return;
+    }
+
     setTailPos(QPointF(qRound(rect.right() + 10.0), qRound((rect.top() + rect.bottom()) / 2)));
+    qDebug() << "middle position"<< tailPos();
 }
+
+void QnNotificationToolTipWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
+    m_enclosingGeometry = enclosingGeometry;
+    qDebug() << "tooltip enc geom" << enclosingGeometry.top() << enclosingGeometry.bottom();
+    updateTailPos();
+}
+
+void QnNotificationToolTipWidget::pointTo(const QPointF &pos) {
+    m_pointTo = pos;
+    base_type::pointTo(pos);
+    updateTailPos();
+}
+
 
 /********** QnNotificationItem *********************/
 
@@ -90,7 +134,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
     m_textLabel(new QnProxyLabel(this)),
     m_color(Qt::transparent),
-    m_tooltipItem(new QnNotificationToolTipItem(this)),
+    m_tooltipWidget(new QnNotificationToolTipWidget(this)),
     m_hoverProcessor(new HoverFocusProcessor(this))
 {
     setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
@@ -107,17 +151,17 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 
     setLayout(m_layout);
 
-    m_tooltipItem->setFocusProxy(this);
-    m_tooltipItem->setOpacity(0.0);
-    m_tooltipItem->setAcceptHoverEvents(true);
-    m_tooltipItem->installEventFilter(this);
-    m_tooltipItem->setFlag(ItemIgnoresParentOpacity, true);
-    connect(m_tooltipItem, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
+    m_tooltipWidget->setFocusProxy(this);
+    m_tooltipWidget->setOpacity(0.0);
+    m_tooltipWidget->setAcceptHoverEvents(true);
+    m_tooltipWidget->installEventFilter(this);
+    m_tooltipWidget->setFlag(ItemIgnoresParentOpacity, true);
+    connect(m_tooltipWidget, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
     connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
-    connect(this, SIGNAL(imageChanged(QImage)), m_tooltipItem, SLOT(setThumbnail(QImage)));
+    connect(this, SIGNAL(imageChanged(QImage)), m_tooltipWidget, SLOT(setThumbnail(QImage)));
 
     m_hoverProcessor->addTargetItem(this);
-    m_hoverProcessor->addTargetItem(m_tooltipItem);
+    m_hoverProcessor->addTargetItem(m_tooltipWidget);
     m_hoverProcessor->setHoverEnterDelay(250);
     m_hoverProcessor->setHoverLeaveDelay(250);
     connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
@@ -139,7 +183,7 @@ void QnNotificationItem::setText(const QString &text) {
 }
 
 void QnNotificationItem::setTooltipText(const QString &text) {
-    m_tooltipItem->setText(text);
+    m_tooltipWidget->setText(text + text + text + text + text);
 }
 
 QColor QnNotificationItem::color() const {
@@ -153,6 +197,10 @@ void QnNotificationItem::setColor(const QColor &color) {
 void QnNotificationItem::setImage(const QImage &image) {
     m_image = image;
     emit imageChanged(image);
+}
+
+void QnNotificationItem::setTooltipEnclosingGeometry(const QRectF &rect) {
+    m_tooltipWidget->setEnclosingGeometry(rect);
 }
 
 void QnNotificationItem::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
@@ -205,11 +253,11 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 }
 
 void QnNotificationItem::hideToolTip() {
-    opacityAnimator(m_tooltipItem, 2.0)->animateTo(0.0);
+    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(0.0);
 }
 
 void QnNotificationItem::showToolTip() {
-    opacityAnimator(m_tooltipItem, 2.0)->animateTo(1.0);
+    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
 }
 
 void QnNotificationItem::updateToolTipVisibility() {
@@ -221,7 +269,8 @@ void QnNotificationItem::updateToolTipVisibility() {
 }
 
 void QnNotificationItem::updateToolTipPosition() {
-    m_tooltipItem->pointTo(QPointF(0, qRound(geometry().height() / 2 )));
+    m_tooltipWidget->updateTailPos();
+    m_tooltipWidget->pointTo(QPointF(0, qRound(geometry().height() / 2 )));
 }
 
 void QnNotificationItem::at_button_clicked() {

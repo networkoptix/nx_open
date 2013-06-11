@@ -1204,24 +1204,26 @@ void QnWorkbenchUi::updateTreeGeometry() {
     m_treeItem->resize(geometry.size());
 }
 
-QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry) {
+QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry, qreal *maxHeight) {
     QPointF pos(
         notificationsGeometry.x(),
         ((!m_titleVisible || !m_titleUsed) && m_notificationsVisible) ? 30.0 : qMax(titleGeometry.bottom() + 30.0, 30.0)
     );
 
-    qreal maxHeight = qMin(
+    *maxHeight = qMin(
                 m_sliderVisible ? sliderGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0,
                 m_calendarVisible ? calendarGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0
             ) - pos.y();
     qreal preferredHeight = m_notificationsItem->preferredHeight();
-    QSizeF size(notificationsGeometry.width(), qMin(maxHeight, preferredHeight));
+    QSizeF size(notificationsGeometry.width(), qMin(*maxHeight, preferredHeight));
     return QRectF(pos, size);
 }
 
 void QnWorkbenchUi::updateNotificationsGeometry() {
+    qreal maxHeight = 0;
+
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedNotificationsGeometry(m_notificationsItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry(), m_calendarItem->paintGeometry());
+    QRectF geometry = updatedNotificationsGeometry(m_notificationsItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry(), m_calendarItem->paintGeometry(), &maxHeight);
     //m_notificationsItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
@@ -1264,7 +1266,11 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
     }
 
     /* Calculate target geometry. */
-    geometry = updatedNotificationsGeometry(m_notificationsItem->geometry(), QRectF(titlePos, m_titleItem->size()), QRectF(sliderPos, m_sliderItem->size()), QRectF(calendarPos, m_calendarItem->paintSize()));
+    geometry = updatedNotificationsGeometry(m_notificationsItem->geometry(),
+                                            QRectF(titlePos, m_titleItem->size()),
+                                            QRectF(sliderPos, m_sliderItem->size()),
+                                            QRectF(calendarPos, m_calendarItem->paintSize()),
+                                            &maxHeight);
     if(qFuzzyCompare(geometry, m_notificationsItem->geometry()))
         return;
 
@@ -1273,6 +1279,17 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
         return;
 
     m_notificationsItem->resize(geometry.size());
+
+    /* All tooltips should fit to rect of maxHeight */
+    QRectF tooltipsEnclosingRect (
+                m_controlsWidgetRect.left(),
+                m_notificationsItem->y(),
+                m_controlsWidgetRect.width(),
+                maxHeight);
+    qDebug() << "tooltipEncRect" << tooltipsEnclosingRect;
+    qDebug() << "to scene" << m_controlsWidget->mapRectToScene(tooltipsEnclosingRect);
+
+    m_notificationsItem->setToolTipsEnclosingRect(m_controlsWidget->mapRectToItem(m_notificationsItem, tooltipsEnclosingRect));
 }
 
 QRectF QnWorkbenchUi::updatedCalendarGeometry(const QRectF &sliderGeometry) {

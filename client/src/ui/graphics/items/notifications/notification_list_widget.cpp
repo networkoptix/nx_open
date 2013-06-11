@@ -187,7 +187,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
         qreal targetY = (previous == NULL ? 0 : previous->item->geometry().bottom());
         qreal currentY = item->y();
-        qreal stepY = currentY * (qreal) deltaMSecs / (qreal) moveUpTimeoutMs;
+        qreal stepY = qMax(currentY, item->geometry().height()) * (qreal) deltaMSecs / (qreal) moveUpTimeoutMs;
         if (currentY > targetY) {
             item->setY(qMax(currentY - stepY, targetY));
         }
@@ -243,7 +243,7 @@ void QnNotificationListWidget::updateVisibleSize() {
         break;
     }
 
-    if (m_visibleSize == size)
+    if (qFuzzyCompare(m_visibleSize, size))
         return;
     m_visibleSize = size;
 
@@ -255,6 +255,7 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     item->setVisible(false);
     item->setMinimumWidth(widgetWidth);
     item->setMaximumWidth(widgetWidth);
+    item->setTooltipEnclosingGeometry(m_tooltipsEnclosingRect);
     item->setClickableButtons(item->clickableButtons() | Qt::RightButton);
     connect(item, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_item_clicked(Qt::MouseButton)));
     connect(item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
@@ -287,6 +288,16 @@ QSizeF QnNotificationListWidget::visibleSize() const {
     return m_visibleSize;
 }
 
+void QnNotificationListWidget::setToolTipsEnclosingRect(const QRectF &rect) {
+    if (qFuzzyCompare(m_tooltipsEnclosingRect, rect))
+        return;
+    m_tooltipsEnclosingRect = rect;
+    qDebug() << "list setToolTipsEnclosingRect" << rect;
+
+    foreach(QnNotificationItem *item, m_items)
+        item->setTooltipEnclosingGeometry(rect);
+    m_collapser.item->setTooltipEnclosingGeometry(rect);
+}
 
 void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
     if (button != Qt::RightButton)
@@ -306,6 +317,8 @@ void QnNotificationListWidget::at_item_geometryChanged() {
     if (geom.height() == data->cachedHeight)
         return;
     data->cachedHeight = geom.height();
+
+    qDebug() << "list geometry changed" << mapRectToScene(geometry());
     updateGeometry();
 }
 

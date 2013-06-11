@@ -106,6 +106,16 @@ QRectF QnNotificationsCollectionWidget::visibleGeometry() const {
     return m_headerWidget->geometry().adjusted(0, 0, 0, m_list->visibleSize().height());
 }
 
+void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF &rect) {
+    qDebug() << "collection setToolTipsEnclosingRect" << rect;
+
+    QRectF listRect = rect;
+    qDebug() << "list top" << m_list->geometry().topLeft().y();
+    listRect.setTop(m_list->geometry().topLeft().y());
+
+    m_list->setToolTipsEnclosingRect(mapRectToItem(m_list, listRect));
+}
+
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
 {
     QnSingleThumbnailLoader* loader = QnSingleThumbnailLoader::newInstance(resource, this);
