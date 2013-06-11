@@ -443,6 +443,8 @@ int serverMain(int argc, char *argv[])
     QString dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
 
+    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+
     QDir dataDirectory;
     dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
 
@@ -479,24 +481,7 @@ int serverMain(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
-    // TODO: #Elric use QnPlatformProcess here.
-#ifdef Q_OS_WIN
-    int priority = REALTIME_PRIORITY_CLASS;
-    int hrez = SetPriorityClass(GetCurrentProcess(), priority);
-    if (hrez == 0)
-        qWarning() << "Error increasing process priority. " << strerror(errno);
-    else
-        qDebug() << "Successfully increasing process priority to" << priority;
-#endif
-#ifdef Q_OS_LINUX
-    errno = 0;
-    int newNiceVal = nice( -20 );
-    if( newNiceVal == -1 && errno != 0 )
-        qWarning() << "Error increasing process priority. " << strerror(errno);
-    else
-        qDebug() << "Successfully increasing process priority to" << newNiceVal;
-#endif
-
+    platform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
 
     ffmpegInit();
 
