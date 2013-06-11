@@ -55,7 +55,8 @@ private slots:
 
     void at_timer_timeout();
 
-    void at_settings_received(int status, const QnKvPairList& values, int handle);
+    void at_settings_received(int status, const QnKvPairList &values, int handle);
+    void at_settings_saved(int status, const QnKvPairList &values, int handle);
 
     void at_finishedTestEmailSettings(int status, bool result, int handle);
 
