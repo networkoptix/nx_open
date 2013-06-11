@@ -187,7 +187,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
      </property>
      <property name="centerButtons">
       <bool>false</bool>
@@ -200,7 +200,7 @@
   <customwidget>
    <class>QnHistogramRenderer</class>
    <extends>QWidget</extends>
-   <header>histogram_renderer.h</header>
+   <header location="global">ui/dialogs/histogram_renderer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

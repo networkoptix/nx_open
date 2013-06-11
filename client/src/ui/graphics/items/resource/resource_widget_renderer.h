@@ -96,6 +96,7 @@ signals:
      * \param newSourceSize             New source size.
      */
     void sourceSizeChanged();
+    void beforeDestroy();
 private:
     struct RenderingTools
     {

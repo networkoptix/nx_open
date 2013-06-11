@@ -72,6 +72,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
 
 void QnResourceWidgetRenderer::destroyAsync() 
 {
+    emit beforeDestroy();
     QnAbstractRenderer::destroyAsync();
     foreach(RenderingTools ctx, m_channelRenderers)
     {
