@@ -39,19 +39,6 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
     if (m_widget) {
         m_widget->renderer()->disconnect(this);
         m_widget->renderer()->setHystogramConsumer(0);
-        if (!(m_widget->contrastParams() == m_backupParams))
-        {
-            /*
-            if (QMessageBox::question(this,
-                tr("Settings was changed"),
-                tr("Save new settings for camera %1").arg(m_widget->resource()->getName()),
-                QMessageBox::Ok,
-                QMessageBox::Cancel) == QMessageBox::Cancel)
-            {
-                m_widget->setContrastParams(m_params);
-            }
-            */
-        }
     }
     
     m_widget = widget;
