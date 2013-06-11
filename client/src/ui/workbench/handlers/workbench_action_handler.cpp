@@ -2462,18 +2462,6 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
 
     adjustVideoDialog()->setWidget(w);
     adjustVideoDialog()->show();
-
-    /*
-    if (!w)
-    return;
-    ImageCorrectionParams prevParams = w->contrastParams();
-    dialog->setParams(prevParams);
-    dialog->setWidget(w);
-    if (dialog->exec() == QDialog::Accepted)
-        w->setContrastParams(dialog->params());
-    else
-        w->setContrastParams(prevParams);
-    */
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
@@ -3729,11 +3717,12 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
     if(!workbench()->item(Qn::ZoomedRole))
         action(Qn::ToggleTourModeAction)->setChecked(false);
 
-    if (role == Qn::SingleSelectedRole && adjustVideoDialog()->isVisible())
+    if (role == Qn::CentralRole && adjustVideoDialog()->isVisible())
     {
-        QnWorkbenchItem *item = context()->workbench()->item(Qn::SingleSelectedRole);
+        QnWorkbenchItem *item = context()->workbench()->item(Qn::CentralRole);
         QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*> (context()->display()->widget(item));
-        adjustVideoDialog()->setWidget(widget);
+        if (widget)
+            adjustVideoDialog()->setWidget(widget);
     }
 }
 
