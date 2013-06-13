@@ -99,13 +99,15 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
 
 #ifdef Q_OS_WIN
     reply.storageProtocols.push_back(lit("smb"));
+    /* Coldstore is not supported for now as nobody uses it. */
 #endif
-    // TODO: #Elric check for other plugins, e.g. coldstore
 
     result.setReply(reply);
     return CODE_OK;
 }
 
 QString QnStorageSpaceHandler::description() const {
-    return QString(); // TODO: #Elric
+    return 
+        "Returns a list of all server storages.<br>"
+        "No parameters.<br>";
 }
