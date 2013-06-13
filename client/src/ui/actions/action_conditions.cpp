@@ -268,7 +268,7 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
     if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
         return Qn::InvisibleAction;
 
-    Qn::RenderStatus renderStatus = widget->currentRenderStatus();
+    Qn::RenderStatus renderStatus = widget->renderStatus();
     if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
         return Qn::DisabledAction;
 
@@ -283,7 +283,7 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
     if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
         return Qn::InvisibleAction;
 
-    Qn::RenderStatus renderStatus = widget->currentRenderStatus();
+    Qn::RenderStatus renderStatus = widget->renderStatus();
     if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
         return Qn::DisabledAction;
 

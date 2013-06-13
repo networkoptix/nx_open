@@ -639,9 +639,8 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channe
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-int QnMediaResourceWidget::helpTopicAt(const QPointF &pos) const {
-    Q_UNUSED(pos)
-    if(calculateChannelOverlay(0) == AnalogWithoutLicenseOverlay) {
+int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
+    if(calculateStatusOverlay() == Qn::AnalogWithoutLicenseOverlay) {
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
     } else if(options() & ControlPtz) {
         return Qn::MainWindow_MediaItem_Ptz_Help;
@@ -777,37 +776,37 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     return result;
 }
 
-QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int channel) const {
+Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
     QnResourcePtr resource = m_display->resource();
 
     if (resource->hasFlags(QnResource::SINGLE_SHOT)) {
         if (resource->getStatus() == QnResource::Offline)
-            return NoDataOverlay;
+            return Qn::NoDataOverlay;
         if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
-            return NoDataOverlay;
-        return EmptyOverlay;
+            return Qn::NoDataOverlay;
+        return Qn::EmptyOverlay;
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
-        return NoDataOverlay;
+        return Qn::NoDataOverlay;
     } else if (m_camera && m_camera->isAnalog() && m_camera->isScheduleDisabled()) {
-        return AnalogWithoutLicenseOverlay;
-    } else if (m_display->isPaused() && (options() & DisplayActivityOverlay)) {
-        return PausedOverlay;
+        return Qn::AnalogWithoutLicenseOverlay;
+    } else if (m_display->isPaused() && (options() & DisplayActivity)) {
+        return Qn::PausedOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
-        return OfflineOverlay;
+        return Qn::OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Unauthorized) {
-        return UnauthorizedOverlay;
+        return Qn::UnauthorizedOverlay;
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
-            return NoDataOverlay;
+            return Qn::NoDataOverlay;
         QnCachingTimePeriodLoader *loader = context()->navigator()->loader(m_resource);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
-            return base_type::calculateChannelOverlay(channel, QnResource::Online);
+            return base_type::calculateStatusOverlay(QnResource::Online);
         else
-            return NoDataOverlay;
+            return Qn::NoDataOverlay;
     } else if (m_display->isPaused()) {
-        return EmptyOverlay;
+        return Qn::EmptyOverlay;
     } else {
-        return base_type::calculateChannelOverlay(channel, QnResource::Online);
+        return base_type::calculateStatusOverlay(QnResource::Online);
     }
 }
 

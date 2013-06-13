@@ -275,7 +275,6 @@ namespace Qn {
         ClientTimeMode  
     };
 
-    // TODO: #GDM this enum belongs to resource tree model as it's not used outside its context.
     /**
      * Columns in the resource tree model.
      */
@@ -283,6 +282,19 @@ namespace Qn {
         NameColumn,
         CheckColumn,
         ColumnCount
+    };
+
+    /**
+     * Overlay for resource widgets.
+     */
+    enum ResourceStatusOverlay {
+        EmptyOverlay,
+        PausedOverlay,
+        LoadingOverlay,
+        NoDataOverlay,
+        UnauthorizedOverlay,
+        OfflineOverlay,
+        AnalogWithoutLicenseOverlay
     };
 
     /**
