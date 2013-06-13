@@ -371,11 +371,6 @@ Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters 
     return (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) ? Qn::InvisibleAction : Qn::EnabledAction;
 }
 
-
-Qn::ActionVisibility QnDisconnectActionCondition::check(const QnActionParameters &) {
-    return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
-}
-
 Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &resources) {
     if(resources.size() != 1)
         return Qn::InvisibleAction;
@@ -500,4 +495,9 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
     }
 
     return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+    return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
