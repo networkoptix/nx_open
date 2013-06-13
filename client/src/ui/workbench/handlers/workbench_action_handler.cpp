@@ -1389,8 +1389,14 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     }
 
 
-    if (!parameters.resources().empty())
-        menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
+    if (!parameters.resources().empty()) {
+        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
+            menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
+        else
+            QMessageBox::warning(mainWindow(),
+                                 tr("Cannot add item"),
+                                 tr("Cannot add a local file to Multi-Video"));
+    }
     if(!layouts.empty())
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
 }
