@@ -35,7 +35,7 @@ namespace Qn {
         /**
          * Reconnects to the Enterprise Controller using the last used URL
          * set in <tt>QnSettings</tt>.
-         * 
+         *
          * Parameters.
          * <tt>QnConnectInfoPtr ConnectionInfoRole</tt> --- a connection info
          * to use. If not provided, action handler will try to send a connect
@@ -61,18 +61,18 @@ namespace Qn {
         /**
          * Drops provided resources on the workbench, opening them in a new
          * layout if necessary.
-         */ 
+         */
         DropResourcesIntoNewLayoutAction,
 
         /**
-         * Drops provided serialized resources on the current layout after 
+         * Drops provided serialized resources on the current layout after
          * connection to Enterprise Controller was established.
-         * 
+         *
          * Parameters:
-         * 
+         *
          * <tt>QByteArray SerializedDataRole</tt> --- a serialized
          * QnMimeData representation of a set of resources.
-         */ 
+         */
         DelayedDropResourcesAction,
 
         /**
@@ -87,9 +87,9 @@ namespace Qn {
 
         /**
          * Moves cameras from one server to another.
-         * 
+         *
          * Parameters.
-         * 
+         *
          * <tt>QnMediaServerResourcePtr MediaServerResourceRole</tt> --- video server to
          * move cameras to.
          */
@@ -149,7 +149,7 @@ namespace Qn {
          * Opens the provided url in the default browser.
          *
          * Parameters:
-         * <tt>QString UrlRole</tt> --- target url.
+         * <tt>QUrl UrlRole</tt> --- target url.
          */
         BrowseUrlAction,
 
@@ -194,7 +194,7 @@ namespace Qn {
         OpenFileAction,
 
         /**
-         * Opens a file dialog and adds all files from selected folder 
+         * Opens a file dialog and adds all files from selected folder
          * to the current layout.
          */
         OpenFolderAction,
@@ -206,7 +206,7 @@ namespace Qn {
 
         /**
          * Maximizes/restores client's main window.
-         */ 
+         */
         MaximizeAction,
 
         /**
@@ -215,7 +215,7 @@ namespace Qn {
         FullscreenAction,
 
         /**
-         * Action to be invoked to toggle fullscreen/maximized state. 
+         * Action to be invoked to toggle fullscreen/maximized state.
          * Actual action that will be invoked is platform-dependent.
          */
         EffectiveMaximizeAction,
@@ -227,7 +227,7 @@ namespace Qn {
 
         /**
          * Minimizes client's main window.
-         */ 
+         */
         MinimizeAction,
 
         /**
@@ -294,23 +294,23 @@ namespace Qn {
 
         /**
          * Opens selected resources in provided layout.
-         * 
+         *
          * Parameters:
-         * 
-         * <tt>QPointF ItemPositionRole</tt> --- drop position, in grid coordinates. 
+         *
+         * <tt>QPointF ItemPositionRole</tt> --- drop position, in grid coordinates.
          * If not provided, Items will be dropped at the center of the layout.
          * <tt>QnLayoutResourcePtr LayoutResourceRole</tt> --- layout to drop at.
-         */ 
+         */
         OpenInLayoutAction,
 
         /**
          * Opens selected resources in current layout.
-         * 
+         *
          * Parameters:
-         * 
-         * <tt>QPointF ItemPositionRole</tt> --- drop position, in grid coordinates. 
+         *
+         * <tt>QPointF ItemPositionRole</tt> --- drop position, in grid coordinates.
          * If not provided, Items will be dropped at the center of the layout.
-         */ 
+         */
         OpenInCurrentLayoutAction,
 
         /**
@@ -355,7 +355,7 @@ namespace Qn {
 
         /**
          * Saves selected layout under another name.
-         * 
+         *
          * Parameters:
          * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to assign layout to.
          * <tt>QString ResourceNameRole</tt> --- name for the new layout.
@@ -364,7 +364,7 @@ namespace Qn {
 
         /**
          * Saves selected layout under another name in current user's layouts list.
-         * 
+         *
          * Parameters:
          * <tt>QString ResourceNameRole</tt> --- name for the new layout.
          */
@@ -412,7 +412,7 @@ namespace Qn {
 
         /**
          * Takes screenshot of an item.
-         * 
+         *
          * Parameters:
          * <tt>QString FileNameRole</tt> --- name for the screenshot. If not provided,
          * a file selection dialog will pop up.
@@ -421,7 +421,7 @@ namespace Qn {
 
         /**
          * Change video contrast
-         * 
+         *
          */
         AdjustVideoAction,
 
@@ -572,7 +572,7 @@ namespace Qn {
 
         /**
          * Moves camera to the given PTZ preset.
-         * 
+         *
          * Parameters:
          * <tt>QString ResourceNameRole</tt> --- name of the PTZ preset.
          */
@@ -608,9 +608,9 @@ namespace Qn {
 
         /**
          * Changes resource name.
-         * 
+         *
          * Parameters:
-         * 
+         *
          * <tt>QString ResourceNameRole</tt> --- new name for the resource. If not
          * supplied, name dialog will pop up.
          */
@@ -700,9 +700,9 @@ namespace Qn {
 
         /**
          * Opens new layout for Quick Search.
-         * 
+         *
          * Parameters:
-         * 
+         *
          * <tt>QnTimePeriod TimePeriodRole</tt> --- time period for quick search.
          */
         ThumbnailsSearchAction,
@@ -717,7 +717,7 @@ namespace Qn {
          */
         ToggleCalendarAction,
 
-        /** 
+        /**
          * Shows/hides title bar.
          */
         ToggleTitleBarAction,
@@ -785,9 +785,9 @@ namespace Qn {
 
     /**
      * Scope of an action.
-     * 
+     *
      * Scope defines the menus in which an action can appear, and target
-     * for getting the action's parameters in case it was triggered with a 
+     * for getting the action's parameters in case it was triggered with a
      * hotkey.
      */
     enum ActionScope {
@@ -804,12 +804,12 @@ namespace Qn {
 
     /**
      * Type of an action parameter.
-     * 
-     * Note that some of these types are convertible to other types. 
+     *
+     * Note that some of these types are convertible to other types.
      */
     enum ActionParameterType {
         ResourceType            = 0x00000100,           /**< Resource, <tt>QnResourcePtr</tt>. */
-        LayoutItemType          = 0x00000200,           /**< Layout item, <tt>QnLayoutItemIndex</tt>. Convertible to resource. */    
+        LayoutItemType          = 0x00000200,           /**< Layout item, <tt>QnLayoutItemIndex</tt>. Convertible to resource. */
         WidgetType              = 0x00000400,           /**< Resource widget, <tt>QnResourceWidget *</tt>. Convertible to layout item and resource. */
         LayoutType              = 0x00000800,           /**< Workbench layout, <tt>QnWorkbenchLayout *</tt>. Convertible to resource. */
         OtherType               = 0x00001000,           /**< Some other type. */
@@ -819,35 +819,35 @@ namespace Qn {
 
     enum ActionFlag {
         /** Action can be applied when there are no targets. */
-        NoTarget                = 0x00010000,           
+        NoTarget                = 0x00010000,
 
         /** Action can be applied to a single target. */
-        SingleTarget            = 0x00020000,           
+        SingleTarget            = 0x00020000,
 
         /** Action can be applied to multiple targets. */
-        MultiTarget             = 0x00040000,           
+        MultiTarget             = 0x00040000,
 
         /** Action accepts resources as target. */
-        ResourceTarget          = ResourceType,   
+        ResourceTarget          = ResourceType,
 
         /** Action accepts layout items as target. */
-        LayoutItemTarget        = LayoutItemType, 
+        LayoutItemTarget        = LayoutItemType,
 
         /** Action accepts resource widgets as target. */
-        WidgetTarget            = WidgetType,     
+        WidgetTarget            = WidgetType,
 
         /** Action accepts workbench layouts as target. */
-        LayoutTarget            = LayoutType,     
+        LayoutTarget            = LayoutType,
 
 
-        /** Action has a hotkey that is intentionally ambiguous. 
-         * It is up to the user to ensure that proper action conditions make it 
+        /** Action has a hotkey that is intentionally ambiguous.
+         * It is up to the user to ensure that proper action conditions make it
          * impossible for several actions to be triggered by this hotkey. */
-        IntentionallyAmbiguous  = 0x00100000,          
+        IntentionallyAmbiguous  = 0x00100000,
 
-        /** When the action is activated via hotkey, its scope should not be compared to the current one. 
+        /** When the action is activated via hotkey, its scope should not be compared to the current one.
          * Action can be executed from any scope, and its target will be taken from its scope. */
-        ScopelessHotkey         = 0x00200000,       
+        ScopelessHotkey         = 0x00200000,
 
         /** Action can be pulled into enclosing menu if it is the only one in
          * its submenu. It may have different text in this case. */
@@ -864,25 +864,25 @@ namespace Qn {
 
 
         /** Action can appear in main menu. */
-        Main                    = Qn::MainScope | NoTarget,                     
+        Main                    = Qn::MainScope | NoTarget,
 
         /** Action can appear in scene context menu. */
-        Scene                   = Qn::SceneScope | WidgetTarget,                      
+        Scene                   = Qn::SceneScope | WidgetTarget,
 
         /** Action can appear in tree context menu. */
-        Tree                    = Qn::TreeScope,                                
+        Tree                    = Qn::TreeScope,
 
         /** Action can appear in slider context menu. */
-        Slider                  = Qn::SliderScope | WidgetTarget,    
+        Slider                  = Qn::SliderScope | WidgetTarget,
 
         /** Action can appear in title bar context menu. */
-        TitleBar                = Qn::TitleBarScope | LayoutTarget,      
+        TitleBar                = Qn::TitleBarScope | LayoutTarget,
 
         Notifications           = Qn::NotificationsScope | WidgetTarget
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag)
-    
+
     enum ActionVisibility {
         /** Action is not in the menu. */
         InvisibleAction,
