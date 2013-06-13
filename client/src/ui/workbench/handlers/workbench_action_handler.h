@@ -37,16 +37,6 @@ class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
 
-// TODO: #Elric move out.
-struct QnThumbnailsSearchState {
-    QnThumbnailsSearchState(): step(0) {}
-    QnThumbnailsSearchState(const QnTimePeriod &period, qint64 step): period(period), step(step) {}
-
-    QnTimePeriod period;
-    qint64 step;
-};
-Q_DECLARE_METATYPE(QnThumbnailsSearchState)
-
 
 namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {

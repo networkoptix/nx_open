@@ -296,13 +296,17 @@ signals:
     void rotationStopRequested();
 
 protected:
+    /**
+     * Note that the order is important here. When overlay is drawn atop the
+     * widget, the largest one is picked from per-channel overlays.
+     */
     enum Overlay {
         EmptyOverlay,
         PausedOverlay,
         LoadingOverlay,
         NoDataOverlay,
-        OfflineOverlay,
         UnauthorizedOverlay,
+        OfflineOverlay,
         AnalogWithoutLicenseOverlay
     };
 

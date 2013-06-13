@@ -838,6 +838,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     setChannelScreenSize(painter->combinedTransform().mapRect(channelRect(0)).size().toSize());
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+    Overlay overlay = EmptyOverlay;
 
     for(int i = 0; i < channelCount(); i++) {
         /* Draw content. */
@@ -854,21 +855,26 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
         updateChannelOverlay(i);
 
-        /* Draw overlay icon. */
-        qreal overlayOpacity = 1.0;
-        if(m_channelState[i].fadeInNeeded)
-            overlayOpacity *= qBound(0.0, static_cast<qreal>(currentTimeMSec - m_channelState[i].changeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0);
-        
-        qreal opacity = painter->opacity();
-        painter->setOpacity(opacity * overlayOpacity);
-        paintOverlay(painter, paintRect, m_channelState[i].overlay);
-        painter->setOpacity(opacity);
+        /* Calculate overlay to be drawn. */
+        overlay = qMax(overlay, m_channelState[i].overlay);
 
         /* Draw foreground. */
         paintChannelForeground(painter, i, paintRect);
 
         /* Draw selected / not selected overlay. */
         paintSelection(painter, paintRect);
+    }
+
+    /* Draw overlay. */
+    if(overlay != EmptyOverlay) {
+        qreal overlayOpacity = 1.0;
+        if(m_channelState[0].fadeInNeeded)
+            overlayOpacity *= qBound(0.0, static_cast<qreal>(currentTimeMSec - m_channelState[0].changeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0); // TODO: 0 index? wtf?
+        
+        qreal opacity = painter->opacity();
+        painter->setOpacity(opacity * overlayOpacity);
+        paintOverlay(painter, this->rect(), overlay);
+        painter->setOpacity(opacity);
     }
 
     emit painted();
