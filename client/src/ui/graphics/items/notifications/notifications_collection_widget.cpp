@@ -223,7 +223,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     case BusinessEventType::Camera_Ip_Conflict: {
             item->setColor(qnGlobals->notificationColorCritical());
-            //TODO: #GDM page in browser
+            //TODO: #GDM pages in browser for each conflicting ip address
             break;
         }
     case BusinessEventType::MediaServer_Failure: {
@@ -278,7 +278,7 @@ void QnNotificationsCollectionWidget::showSystemHealthEvent(QnSystemHealth::Mess
         item->addActionButton(
                     qnResIconCache->icon(QnResourceIconCache::Servers),
                     tr("Licenses"),
-                    Qn::GetMoreLicensesAction
+                    Qn::PreferencesLicensesTabAction
                     );
         //default text
         break;
@@ -286,7 +286,7 @@ void QnNotificationsCollectionWidget::showSystemHealthEvent(QnSystemHealth::Mess
         item->addActionButton(
                     qnResIconCache->icon(QnResourceIconCache::Servers),
                     tr("SMTP Settings"),
-                    Qn::OpenServerSettingsAction
+                    Qn::PreferencesServerTabAction
                     );
         //default text
         break;
@@ -312,7 +312,7 @@ void QnNotificationsCollectionWidget::showSystemHealthEvent(QnSystemHealth::Mess
         item->addActionButton(
                     qnResIconCache->icon(QnResourceIconCache::Servers),
                     tr("SMTP Settings"),
-                    Qn::OpenServerSettingsAction
+                    Qn::PreferencesServerTabAction
                     );
         //default text
         break;
@@ -353,7 +353,7 @@ void QnNotificationsCollectionWidget::hideAll() {
 }
 
 void QnNotificationsCollectionWidget::at_settingsButton_clicked() {
-    menu()->trigger(Qn::OpenPopupSettingsAction);
+    menu()->trigger(Qn::PreferencesNotificationTabAction);
 }
 
 void QnNotificationsCollectionWidget::at_eventLogButton_clicked() {

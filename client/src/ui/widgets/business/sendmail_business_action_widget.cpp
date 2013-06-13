@@ -49,6 +49,6 @@ void QnSendmailBusinessActionWidget::paramsChanged() {
 
 
 void QnSendmailBusinessActionWidget::at_settingsButton_clicked() {
-    menu()->trigger(Qn::OpenServerSettingsAction);
+    menu()->trigger(Qn::PreferencesServerTabAction);
 }
 
