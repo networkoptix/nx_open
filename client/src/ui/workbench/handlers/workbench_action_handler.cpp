@@ -3135,13 +3135,10 @@ Do you want to continue?"),
     QnNetworkResourcePtr networkResource = widget->resource().dynamicCast<QnNetworkResource>();
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 
-    QSettings settings;
-    settings.beginGroup(QLatin1String("export")); // TODO: #Elric replace with QnSettings
-    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
-    if (!previousDir.length()){
+    QString previousDir = qnSettings->lastExportDir();
+    if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    }
-
+    
     QString filterSeparator(QLatin1String(";;"));
     QString aviFileFilter = tr("AVI (*.avi)");
     QString mkvFileFilter = tr("Matroska (*.mkv)");
@@ -3244,7 +3241,7 @@ Do you want to continue?"),
 
         break;
     }
-    settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
+    qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
 #ifdef Q_OS_WIN
     if (selectedFilter.contains(binaryFilterName(false)))

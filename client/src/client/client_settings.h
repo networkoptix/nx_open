@@ -36,6 +36,7 @@ public:
         LAST_DATABASE_BACKUP_DIR,
         LAST_SCREENSHOT_DIR,
         LAST_RECORDING_DIR,
+        LAST_EXPORT_DIR,
 
         BACKGROUND_EDITABLE,
         BACKGROUND_ANIMATED,
@@ -112,6 +113,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastDatabaseBackupDir,  setLastDatabaseBackupDir,   LAST_DATABASE_BACKUP_DIR,   QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastScreenshotDir,      setLastScreenshotDir,       LAST_SCREENSHOT_DIR,        QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastRecordingDir,       setLastRecordingDir,        LAST_RECORDING_DIR,         QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     lastExportDir,          setLastExportDir,           LAST_EXPORT_DIR,            QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isBackgroundEditable,   setBackgroundEditable,      BACKGROUND_EDITABLE,        false)
         QN_DECLARE_RW_PROPERTY(bool,                        isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true)
         QN_DECLARE_RW_PROPERTY(QColor,                      backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())

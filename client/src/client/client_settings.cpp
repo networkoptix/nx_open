@@ -67,6 +67,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
     setName(DOWNMIX_AUDIO,          lit("downmixAudio"));
     setName(OPEN_LAYOUTS_ON_LOGIN,  lit("openLayoutsOnLogin"));
     setName(LAST_RECORDING_DIR,     lit("videoRecording/previousDir"));
+    setName(LAST_EXPORT_DIR,        lit("export/previousDir"));
 
     /* Set command line switch names. */
     addArgumentName(SOFTWARE_YUV,          "--soft-yuv");
