@@ -30,7 +30,7 @@ QnStorageSpaceHandler::QnStorageSpaceHandler():
 int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList &, JsonResult &result) {
     QnStorageSpaceReply reply;
 
-    QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo();
+    QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo(QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition);
     for(int i = 0; i < partitions.size(); i++)
         partitions[i].path = toNativeDirPath(partitions[i].path);
 
