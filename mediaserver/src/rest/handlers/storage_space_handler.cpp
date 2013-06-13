@@ -38,10 +38,10 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
     foreach(const QnStorageResourcePtr &storage, qnStorageMan->getStorages()) {
         QString path = toNativeDirPath(storage->getUrl());
         
-        bool hasPartition = false;
+        bool isExternal = true;
         foreach(const QnPlatformMonitor::PartitionSpace &partition, partitions) {
             if(path.startsWith(partition.path)) {
-                hasPartition = true;
+                isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
                 break;
             }
         }
@@ -52,7 +52,7 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
         data.totalSpace = storage->getTotalSpace();
         data.freeSpace = storage->getFreeSpace();
         data.reservedSpace = storage->getSpaceLimit();
-        data.isExternal = !hasPartition;
+        data.isExternal = isExternal;
         data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
 
@@ -83,7 +83,7 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
         data.reservedSpace = -1;
-        data.isExternal = false;
+        data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.isUsedForWriting = false;
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));
