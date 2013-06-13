@@ -328,32 +328,14 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
-    //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: #Elric not needed?
 
     context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
 
-    /*
-    SignalingInstrument *activityInstrument = new SignalingInstrument(
-        Instrument::makeSet(QEvent::MouseButtonRelease), 
-        Instrument::makeSet(QEvent::KeyRelease),
-        Instrument::makeSet(),
-        Instrument::makeSet(),
-        this
-    );
-    foreach(InstrumentManager *manager, InstrumentManager::managersOf(display()->scene())) {
-        manager->installInstrument(activityInstrument);
-        break;
-    }
-    connect(activityInstrument, SIGNAL(activated(QGraphicsView *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
-    connect(activityInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
-    */
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
     at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
-
-
     at_updateWatcher_availableUpdateChanged();
 }
 
@@ -772,7 +754,6 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         return;
     }
 
-    qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >"); // TODO: #Elric evil!
     serverConnectionPtr->setParamsAsync(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
@@ -1573,8 +1554,6 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("Layout Settings"));
     dialog->readFromResource(layout);
-    //TODO: #Elric Who should add help topics? - asked GDM
-//    setHelpTopic(dialog.data(), Qn::UserSettings_Help);
 
     if(!dialog->exec() || !dialog->submitToResource(layout))
         return;
