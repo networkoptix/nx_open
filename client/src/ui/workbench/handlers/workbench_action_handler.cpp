@@ -2308,8 +2308,6 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         bool changed = snapshotManager()->isChanged(layout);
 
         resource->setName(name);
-        if(QnWorkbenchLayout::instance(layout))
-            QnWorkbenchLayout::instance(layout)->setName(name); // TODO: #Elric hack
 
         if(!changed)
             snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
