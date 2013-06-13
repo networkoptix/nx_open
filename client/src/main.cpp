@@ -81,6 +81,7 @@
 
 #ifdef Q_OS_WIN
     #include "ui/workaround/iexplore_url_handler.h"
+    #include "common/systemexcept_win32.h"
 #endif
 
 #include "ui/help/help_handler.h"
@@ -258,6 +259,7 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
+    win32_exception::install_handler();
 #endif
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));

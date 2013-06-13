@@ -7,7 +7,9 @@
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 
-#ifndef _WIN32
+#ifdef _WIN32
+#include "common/systemexcept_win32.h"
+#else
 #include <sys/types.h>
 #include <linux/unistd.h>
 
@@ -205,6 +207,10 @@ void QnLongRunnable::stop() {
 void QnLongRunnable::at_started() {
     if(m_pool)
         m_pool->startedNotify(this);
+
+#ifdef _WIN32
+    win32_exception::install_handler();
+#endif
 }
 
 void QnLongRunnable::at_finished() {
