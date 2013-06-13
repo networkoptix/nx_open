@@ -136,6 +136,24 @@ namespace Qn {
          */
         EscapeHotkeyAction,
 
+        /**
+         * Displays messagebox with the text provided.
+         *
+         * Parameters:
+         * <tt>QString TitleRole</tt> --- title for the messagebox.
+         * <tt>QString TextRole</tt> --- displayed text. If not provided, title will be used.
+         */
+        MessageBoxAction,
+
+        /**
+         * Opens the provided url in the default browser.
+         *
+         * Parameters:
+         * <tt>QString UrlRole</tt> --- target url.
+         */
+        BrowseUrlAction,
+
+
         /* Main menu actions. */
 
         /**

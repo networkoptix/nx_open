@@ -84,7 +84,10 @@ namespace Qn {
         TimePeriodsRole,
         MergedTimePeriodsRole,
         AutoConnectRole,
-        FileNameRole,
+        FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
+        TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
+        TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
+        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
 
 
         /* Others. */
