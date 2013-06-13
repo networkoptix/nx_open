@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include <QtCore/QProcess>
-#include <QtCore/QSettings>
 
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
@@ -2657,6 +2656,8 @@ void QnWorkbenchActionHandler::removeLayoutFromPool(QnLayoutResourcePtr existing
 
 bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode)
 {
+    // TODO: #Elric we have a lot of copypasta with at_exportTimeSelectionAction_triggered
+
     if (!validateItemTypes(layout))
         return false;
 
@@ -2668,12 +2669,9 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     else
         return false; // not used
 
-    QSettings settings; // TODO: #Elric replace with QnSettings
-    settings.beginGroup(QLatin1String("export"));
-    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
-    if (!previousDir.length()){
+    QString previousDir = qnSettings->lastExportDir();
+    if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    }
 
     QString suggestion = layout->getName();
 
@@ -2710,9 +2708,9 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         exportReadOnly = selectedFilter.contains(mediaFileROFilter)
-        #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
                 || selectedFilter.contains(binaryFilterName(true))
-        #endif
+#endif
                 ;
         if (fileName.isEmpty())
             return false;
@@ -2745,7 +2743,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
         break;
     }
-    settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
+    qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
     QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
     if (!existingLayout)
