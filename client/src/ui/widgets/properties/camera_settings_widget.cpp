@@ -294,7 +294,7 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
 }
 
 void QnCameraSettingsWidget::at_moreLicensesRequested() {
-    menu()->trigger(Qn::GetMoreLicensesAction);
+    menu()->trigger(Qn::PreferencesLicensesTabAction);
 }
 
 void QnCameraSettingsWidget::at_advancedSettingChanged() {

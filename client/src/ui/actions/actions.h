@@ -20,18 +20,17 @@ namespace Qn {
         /**
          * Opens licenses preferences tab.
          */
-        GetMoreLicensesAction,
-
+        PreferencesLicensesTabAction,
 
         /**
          * Opens server settings preferences tab.
          */
-        OpenServerSettingsAction, //TODO: #GDM rename - collisions with ServerSettingsAction
+        PreferencesServerTabAction,
 
         /**
-         * Opens popup settings preferences tab.
+         * Opens notifications settings preferences tab.
          */
-        OpenPopupSettingsAction,
+        PreferencesNotificationTabAction,
 
         /**
          * Reconnects to the Enterprise Controller using the last used URL
@@ -216,7 +215,7 @@ namespace Qn {
         /**
          * Opens system settings dialog.
          */
-        SystemSettingsAction,
+        PreferencesGeneralTabAction,
 
 
         /**

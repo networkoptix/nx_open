@@ -375,15 +375,15 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Selection Changed"));
 
-    factory(Qn::GetMoreLicensesAction).
+    factory(Qn::PreferencesLicensesTabAction).
         flags(Qn::NoTarget).
         text(tr("Get More Licenses..."));
 
-    factory(Qn::OpenServerSettingsAction).
+    factory(Qn::PreferencesServerTabAction).
         flags(Qn::NoTarget).
         text(tr("Settings..."));
 
-    factory(Qn::OpenPopupSettingsAction).
+    factory(Qn::PreferencesNotificationTabAction).
         flags(Qn::NoTarget).
         text(tr("Settings..."));
 
@@ -436,7 +436,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         text(tr("Logout")).
         autoRepeat(false).
-        condition(new QnDisconnectActionCondition(this));
+        condition(new QnLoggedInCondition(this));
 
     factory().
         flags(Qn::Main).
@@ -587,7 +587,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: #Elric icon?
 
-    factory(Qn::SystemSettingsAction).
+    factory(Qn::PreferencesAction).
         flags(Qn::Main).
         text(tr("System Settings...")).
         //shortcut(tr("Ctrl+P")).
@@ -785,7 +785,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Resolution..."));
+        text(tr("Change Resolution...")).
+        condition(new QnLoggedInCondition(this));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
