@@ -4,11 +4,8 @@
 #include <QtCore/QWeakPointer>
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
-#include <QtGui/QStaticText>
 
 #include <core/resource/resource_fwd.h>
-
-#include <camera/render_status.h>
 
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
@@ -25,10 +22,7 @@ class QGraphicsLinearLayout;
 class QnViewportBoundWidget;
 class QnResourceVideoLayout;
 class QnWorkbenchItem;
-
 class QnStatusOverlayWidget;
-class QnLoadingProgressPainter;
-class QnPausedPainter;
 class QnImageButtonWidget;
 class QnImageButtonBar;
 
@@ -370,34 +364,6 @@ private:
     Q_SLOT void at_iconButton_visibleChanged();
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
-#if 0
-    struct ChannelState {
-        ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
-
-        /** Current overlay. */
-        StatusOverlay overlay;
-
-        /** Time when the last icon change has occurred, in milliseconds since epoch. */
-        qint64 changeTimeMSec;
-
-        /** Whether the icon should fade in on change. */
-        bool fadeInNeeded;
-
-        /** Last time when new frame was rendered, in milliseconds since epoch. */
-        qint64 lastNewFrameTimeMSec;
-
-        /** Last render status. */
-        Qn::RenderStatus renderStatus;
-    };
-#endif
-
-    /** Current overlay. */
-    Qn::ResourceStatusOverlay m_statusOverlay;
-
-    Qn::RenderStatus m_renderStatus;
-
-    qint64 m_lastNewFrameTimeMSec;
-
     struct OverlayWidget {
         OverlayVisibility visibility;
         QGraphicsWidget *widget;
@@ -469,9 +435,6 @@ private:
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
 
-    /** Additional per-channel state. */
-    //QVector<ChannelState> m_channelState;
-
     /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
     bool m_mouseInWidget;
 
@@ -479,6 +442,14 @@ private:
     Qn::FixedRotation m_overlayRotation;
 
     QRectF m_zoomRect;
+
+    /** Current overlay. */
+    Qn::ResourceStatusOverlay m_statusOverlay;
+
+    Qn::RenderStatus m_renderStatus;
+
+    qint64 m_lastNewFrameTimeMSec;
+
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

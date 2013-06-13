@@ -295,6 +295,20 @@ namespace Qn {
     };
 
     /**
+     * Result of a frame rendering operation. 
+     * 
+     * Note that the order is important here --- higher values are prioritized
+     * when calculating cumulative status of several rendering operations.
+     */
+    enum RenderStatus {
+        NothingRendered,    /**< No frames to render, so nothing was rendered. */
+        CannotRender,       /**< Something went wrong. */
+        OldFrameRendered,   /**< No new frames available, old frame was rendered. */
+        NewFrameRendered    /**< New frame was rendered. */
+    };
+
+
+    /**
      * Video resolution adjustment mode for RADASS.
      */
     enum ResolutionMode {

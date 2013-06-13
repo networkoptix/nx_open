@@ -6,8 +6,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
 
+#include <client/client_globals.h>
+
 #include <camera/abstract_renderer.h>
-#include <camera/render_status.h>
 #include "utils/color_space/image_correction.h"
 #include "core/resource/resource_media_layout.h"
 
