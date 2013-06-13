@@ -157,22 +157,6 @@ bool QnPlAreconVisionResource::setHostAddress(const QString& hostAddr, QnDomain 
     return QnNetworkResource::setHostAddress(hostAddr, QnDomainMemory);
 }
 
-QString QnPlAreconVisionResource::toSearchString() const
-{
-    QString result;
-
-    const QnParamList params = getResourceParamList();
-    const QString firmware = params.value(QLatin1String("Firmware version")).value().toString();
-    const QString hardware = params.value(QLatin1String("Image engine")).value().toString();
-    const QString net = params.value(QLatin1String("Net version")).value().toString();
-
-    result += QnNetworkResource::toSearchString() + QLatin1String(" live fw=") + firmware + QLatin1String(" hw=") + hardware + QLatin1String(" net=") + net;
-    if (!m_description.isEmpty())
-        result += QLatin1String(" dsc=") + m_description;
-
-    return result;
-}
-
 bool QnPlAreconVisionResource::unknownResource() const
 {
     return (getName() == QLatin1String("ArecontVision_Abstract"));
