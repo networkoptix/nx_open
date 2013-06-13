@@ -27,12 +27,16 @@ public:
     virtual ~QnCameraListDialog();
 private slots:
     void at_searchStringChanged(const QString& text);
+    void at_customContextMenuRequested(const QPoint&);
+    void at_copyToClipboard();
 private:
     Q_DISABLE_COPY(QnCameraListDialog)
  
     QScopedPointer<Ui::CameraListDialog> ui;
     QnCameraListModel *m_model;
     QnResourceSearchProxyModel* m_resourceSearch;
+    QAction* m_clipboardAction;
+    QnWorkbenchContext* m_context;
 };
 
 #endif // __CAMERA_LIST_DIALOG_H__

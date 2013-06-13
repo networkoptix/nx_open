@@ -43,6 +43,7 @@
 #include "camera/caching_time_period_loader.h"
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
+#include "ui/common/recording_status_helper.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -413,50 +414,11 @@ void QnMediaResourceWidget::updateIconButton() {
 
     int recordingMode = Qn::RecordingType_Never;
     if(m_camera->getStatus() == QnResource::Recording)
-        recordingMode = currentRecordingMode();
-    
-    switch(recordingMode) {
-    case Qn::RecordingType_Never:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
-        iconButton()->setToolTip(tr("Not recording"));
-        break;
-    case Qn::RecordingType_Run:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording.png"));
-        iconButton()->setToolTip(tr("Recording everything"));
-        break;
-    case Qn::RecordingType_MotionOnly:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
-        iconButton()->setToolTip(tr("Recording motion only"));
-        break;
-    case Qn::RecordingType_MotionPlusLQ:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
-        iconButton()->setToolTip(tr("Recording motion and low quality"));
-        break;
-    default:
-        iconButton()->setVisible(false);
-        break;
-    }
-}
-
-int QnMediaResourceWidget::currentRecordingMode() {
-    if(!m_camera)
-        return Qn::RecordingType_Never;
-
-    // TODO: #Elric this should be a resource parameter that is update from the server.
-
-    QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0));
-    int dayOfWeek = dateTime.date().dayOfWeek();
-    int seconds = QTime().secsTo(dateTime.time());
-
-    foreach(const QnScheduleTask &task, m_camera->getScheduleTasks())
-        if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
-            return task.getRecordingType();
-
-    return Qn::RecordingType_Never;
+        recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
+    QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
+    iconButton()->setVisible(!recIcon.isNull());
+    iconButton()->setIcon(recIcon);
+    iconButton()->setToolTip(QnRecordingStatusHelper::tooltip(recordingMode));
 }
 
 void QnMediaResourceWidget::updateRendererEnabled() {
