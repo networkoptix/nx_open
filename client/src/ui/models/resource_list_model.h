@@ -32,7 +32,7 @@ public:
 private slots:
     void at_resource_resourceChanged(const QnResourcePtr &resource);
 
-private:
+protected:
     bool m_readOnly;
     QnResourceList m_resources;
     QStringList m_names;

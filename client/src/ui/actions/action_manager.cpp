@@ -619,6 +619,13 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+L")).
         autoRepeat(false);
 
+    factory(Qn::CameraListAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Cameras list...")).
+        shortcut(tr("Ctrl+M")).
+        autoRepeat(false);
+
     factory().
         flags(Qn::Main).
         separator();

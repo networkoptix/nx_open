@@ -14,6 +14,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 #include "ui/dialogs/event_log_dialog.h"
+#include "ui/dialogs/camera_list_dialog.h"
 
 class QAction;
 class QMenu;
@@ -178,6 +179,10 @@ protected:
         return m_businessEventsLogDialog.data();
     }
 
+    QnCameraListDialog *cameraListDialog() const {
+        return m_cameraListDialog.data();
+    }
+
     QnCameraAdditionDialog *cameraAdditionDialog() const {
         return m_cameraAdditionDialog.data();
     }
@@ -246,6 +251,7 @@ protected slots:
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
     void at_businessEventsLogAction_triggered();
+    void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
     void at_getMoreLicensesAction_triggered();
     void at_openServerSettingsAction_triggered();
@@ -395,6 +401,7 @@ private:
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QWeakPointer<QnEventLogDialog> m_businessEventsLogDialog;
+    QWeakPointer<QnCameraListDialog> m_cameraListDialog;
     QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QWeakPointer<QnLoginDialog> m_loginDialog;
     QWeakPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
