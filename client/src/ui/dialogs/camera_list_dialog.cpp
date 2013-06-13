@@ -29,6 +29,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     m_model->setColumns(columns);
 
     m_resourceSearch = new QnResourceSearchProxyModel(this);
+    connect(m_resourceSearch,  SIGNAL(criteriaChanged()), this, SLOT(at_modelChanged()) );
     m_resourceSearch->setSourceModel(m_model);
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(lit("*"),Qt::CaseInsensitive, QRegExp::Wildcard)));
     
@@ -162,3 +163,8 @@ void QnCameraListDialog::at_copyToClipboard()
     QApplication::clipboard()->setMimeData(mimeData);
 }
 
+void QnCameraListDialog::at_modelChanged()
+{
+    
+    setWindowTitle(QString(lit("Cameras list - %1 camera(s) found")).arg(m_resourceSearch->rowCount()));
+}
