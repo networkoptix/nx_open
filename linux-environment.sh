@@ -7,7 +7,7 @@ chmod 755 ./get_buildenv.sh
 ./get_buildenv.sh
 
 echo 'export environment=~/environment' >> ~/.profile
-echo 'export PATH=$environment/maven/bin:'$PATH >> ~/.profile
+echo 'export PATH=$environment/maven/bin:$environment/python/bin:'$PATH >> ~/.profile
 #echo 'export JAVA_HOME=/usr' >> ~/.profile
 
 cd ~/environment

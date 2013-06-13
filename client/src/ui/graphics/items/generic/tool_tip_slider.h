@@ -63,9 +63,9 @@ private:
     friend class QnToolTipSliderVisibilityAccessor;
 
     QScopedPointer<QnToolTipSliderAnimationListener> m_animationListener;
-    QWeakPointer<QnToolTipWidget> m_toolTipItem;
-    VariantAnimator *m_toolTipItemVisibilityAnimator;
-    qreal m_toolTipItemVisibility;
+    QWeakPointer<QnToolTipWidget> m_tooltipWidget;
+    VariantAnimator *m_tooltipWidgetVisibilityAnimator;
+    qreal m_tooltipWidgetVisibility;
     QBasicTimer m_hideTimer;
     bool m_autoHideToolTip;
     bool m_sliderUnderMouse;

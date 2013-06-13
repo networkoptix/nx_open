@@ -29,16 +29,18 @@ public:
 
     /** Combined geometry of all visible sub-wigdets. */
     QRectF visibleGeometry() const;
+
+    /** Rectangle where all tooltips should fit - in local coordinates. */
+    void setToolTipsEnclosingRect(const QRectF &rect);
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
 
-public slots:
+private slots:
     void showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideAll();
 
-private slots:
     void at_settingsButton_clicked();
     void at_eventLogButton_clicked();
     void at_debugButton_clicked();

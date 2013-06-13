@@ -43,12 +43,12 @@ private:
     QImage m_thumbnail;
 };
 
-class QnNotificationToolTipItem: public QnToolTipWidget {
+class QnNotificationToolTipWidget: public QnToolTipWidget {
     Q_OBJECT
 
     typedef QnToolTipWidget base_type;
 public:
-    QnNotificationToolTipItem(QGraphicsItem *parent = 0);
+    QnNotificationToolTipWidget(QGraphicsItem *parent = 0);
 
     Q_SLOT void setThumbnail(const QImage &image);
 
@@ -58,13 +58,22 @@ public:
      * \reimp
      */
     void setText(const QString &text);
+
+    /** Rectangle where the tooltip should fit - in coordinates of list widget (parent's parent). */
+    void setEnclosingGeometry(const QRectF &enclosingGeometry);
+
+    //reimp
+    void pointTo(const QPointF &pos);
+
+    void updateTailPos();
 protected:
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
-private:
-    void updateTailPos();
 
+private:
     QnProxyLabel* m_textLabel;
     QnProxyLabel* m_thumbnailLabel;
+    QRectF m_enclosingRect;
+    QPointF m_pointTo;
 };
 
 //TODO: #GDM rename to QnNotificationWidget
@@ -90,6 +99,9 @@ public slots:
     void setColor(const QColor &color);
     void setTooltipText(const QString &text);
     void setImage(const QImage &image);
+
+    /** Rectangle where all tooltips should fit - in parent(!) coordinates. */
+    void setTooltipEnclosingRect(const QRectF& rect);
 
 signals:
     void actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
@@ -128,7 +140,7 @@ private:
     QColor m_color;
     QImage m_image;
 
-    QnToolTipWidget* m_tooltipItem;
+    QnNotificationToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
     bool m_pendingPositionUpdate;
     bool m_instantPositionUpdate;

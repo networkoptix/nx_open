@@ -9,11 +9,33 @@
 #include <QtCore/QDataStream>
 
 #include <utils/common/struct_functions.h>
+#include <recording/time_period.h>
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchState
 // -------------------------------------------------------------------------- //
-// TODO: #Elric doxydocs
+/**
+ * Additional data for a thumbnails search layout.
+ */
+struct QnThumbnailsSearchState {
+    QnThumbnailsSearchState(): step(0) {}
+    QnThumbnailsSearchState(const QnTimePeriod &period, qint64 step): period(period), step(step) {}
+
+    QnTimePeriod period;
+    qint64 step;
+};
+
+Q_DECLARE_METATYPE(QnThumbnailsSearchState)
+
+
+// -------------------------------------------------------------------------- //
+// QnWorkbenchState
+// -------------------------------------------------------------------------- //
+/**
+ * Serialized workbench state. Does not contain the actual layout data, so
+ * suitable for restoring the state once layouts are loaded.
+ */
 class QnWorkbenchState {
 public:
     QnWorkbenchState(): currentLayoutIndex(-1) {}
