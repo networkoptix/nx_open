@@ -931,8 +931,8 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM use conditional texts?
 
-    notificationsHandler()->clear();
-    at_checkSystemHealthAction_triggered(); //TODO: #GDM place to corresponding place
+//    notificationsHandler()->clear();
+//    at_checkSystemHealthAction_triggered(); //TODO: #GDM place to corresponding place
     context()->instance<QnAppServerNotificationCache>()->getFileList();
 }
 
@@ -3735,11 +3735,11 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
     if (!context()->user())
         return;
 
-    notificationsHandler()->clear();
+//    notificationsHandler()->clear();
 
-    if (!QnEmail::isValid(context()->user()->getEmail())) {
-        notificationsHandler()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
-    }
+//    if (!QnEmail::isValid(context()->user()->getEmail())) {
+//        notificationsHandler()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
+//    }
 
     if (qnLicensePool->isEmpty() &&
             (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
@@ -3750,19 +3750,19 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
         m_healthRequestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
                        this, SLOT(at_serverSettings_received(int,QnKvPairList,int)));
 
-        QnUserResourceList users = qnResPool->getResources().filtered<QnUserResource>();
-        foreach (const QnUserResourcePtr &user, users) {
-            if (user == context()->user())
-                continue; // we are displaying separate notification for us
-            if (QnEmail::isValid(user->getEmail()))
-                continue;
+//        QnUserResourceList users = qnResPool->getResources().filtered<QnUserResource>();
+//        foreach (const QnUserResourcePtr &user, users) {
+//            if (user == context()->user())
+//                continue; // we are displaying separate notification for us
+//            if (QnEmail::isValid(user->getEmail()))
+//                continue;
 
-            if ((accessController()->globalPermissions(user) & Qn::GlobalProtectedPermission) &&
-                (!(accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission)))
-                    continue; // usual admins can not edit other admins, owner can
+//            if ((accessController()->globalPermissions(user) & Qn::GlobalProtectedPermission) &&
+//                (!(accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission)))
+//                    continue; // usual admins can not edit other admins, owner can
 
-            notificationsHandler()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, user);
-        }
+//            notificationsHandler()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, user);
+//        }
 
     }
 }
