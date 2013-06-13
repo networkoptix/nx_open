@@ -9,6 +9,7 @@
 #include "core/resource_managment/resource_pool.h"
 #include "ui/models/resource_search_proxy_model.h"
 #include "ui/actions/action_manager.h"
+#include "ui/workbench/workbench.h"
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -33,6 +34,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     
     connect(ui->SearchString, SIGNAL(textChanged(const QString&)), this, SLOT(at_searchStringChanged(const QString&)));
     connect(ui->gridCameras,  SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(at_customContextMenuRequested(const QPoint&)) );
+    connect(ui->gridCameras,  SIGNAL(doubleClicked(const QModelIndex& )), this, SLOT(at_gridDoublelClicked(const QModelIndex&)) );
 
     ui->gridCameras->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->gridCameras->setModel(m_resourceSearch);
@@ -54,6 +56,16 @@ void QnCameraListDialog::at_searchStringChanged(const QString& text)
     QString searchString = QString(lit("*%1*")).arg(text);
     m_resourceSearch->clearCriteria();
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
+}
+
+void QnCameraListDialog::at_gridDoublelClicked(const QModelIndex& idx)
+{
+    if (idx.isValid()) 
+    {
+        QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
+        if (resource)
+            m_context->menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnActionParameters(resource));
+    }
 }
 
 void QnCameraListDialog::at_customContextMenuRequested(const QPoint&)
