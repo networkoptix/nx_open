@@ -26,6 +26,7 @@ class QnViewportBoundWidget;
 class QnResourceVideoLayout;
 class QnWorkbenchItem;
 
+class QnStatusOverlayWidget;
 class QnLoadingProgressPainter;
 class QnPausedPainter;
 class QnImageButtonWidget;
@@ -220,9 +221,7 @@ public:
     /**
      * \returns                         Status of the last rendering operation.
      */
-    Qn::RenderStatus currentRenderStatus() const {
-        return m_channelState[0].renderStatus;
-    }
+    Qn::RenderStatus renderStatus() const;
 
     /**
      * \returns                         Text of this window's title.
@@ -296,20 +295,6 @@ signals:
     void rotationStopRequested();
 
 protected:
-    /**
-     * Note that the order is important here. When overlay is drawn atop the
-     * widget, the largest one is picked from per-channel overlays.
-     */
-    enum Overlay {
-        EmptyOverlay,
-        PausedOverlay,
-        LoadingOverlay,
-        NoDataOverlay,
-        UnauthorizedOverlay,
-        OfflineOverlay,
-        AnalogWithoutLicenseOverlay
-    };
-
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
@@ -323,10 +308,8 @@ protected:
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) = 0;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
-    virtual void paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay);
     
     void paintSelection(QPainter *painter, const QRectF &rect);
-    void paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
 
     virtual QSizeF constrainedSize(const QSizeF constraint) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
@@ -335,11 +318,11 @@ protected:
     void setChannelScreenSize(const QSize &size);
     virtual void channelScreenSizeChangedNotify() {}
 
-    Overlay channelOverlay(int channel) const;
-    void setChannelOverlay(int channel, Overlay overlay);
-    Overlay calculateChannelOverlay(int channel, int resourceStatus) const;
-    virtual Overlay calculateChannelOverlay(int channel) const;
-    Q_SLOT void updateChannelOverlay(int channel);
+    Qn::ResourceStatusOverlay statusOverlay() const;
+    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay);
+    Qn::ResourceStatusOverlay calculateStatusOverlay(int resourceStatus) const;
+    virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const;
+    Q_SLOT void updateStatusOverlay();
 
     virtual QString calculateTitleText() const;
     Q_SLOT void updateTitleText();
@@ -374,7 +357,6 @@ protected:
     int channelCount() const;
     QRectF channelRect(int channel) const;
     QRectF exposedRect(int channel, bool accountForViewport = true, bool accountForVisibility = true, bool useRelativeCoordinates = false);
-    Qn::RenderStatus channelRenderStatus(int channel) const;
 
     void ensureAboutToBeDestroyedEmitted();
 
@@ -388,11 +370,12 @@ private:
     Q_SLOT void at_iconButton_visibleChanged();
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
+#if 0
     struct ChannelState {
         ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
 
         /** Current overlay. */
-        Overlay overlay;
+        StatusOverlay overlay;
 
         /** Time when the last icon change has occurred, in milliseconds since epoch. */
         qint64 changeTimeMSec;
@@ -406,6 +389,14 @@ private:
         /** Last render status. */
         Qn::RenderStatus renderStatus;
     };
+#endif
+
+    /** Current overlay. */
+    Qn::ResourceStatusOverlay m_statusOverlay;
+
+    Qn::RenderStatus m_renderStatus;
+
+    qint64 m_lastNewFrameTimeMSec;
 
     struct OverlayWidget {
         OverlayVisibility visibility;
@@ -417,12 +408,6 @@ private:
 
 private:
     friend class QnWorkbenchDisplay;
-
-    /** Paused painter. */
-    QSharedPointer<QnPausedPainter> m_pausedPainter;
-
-    /** Loading progress painter. */
-    QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
 
     /** Layout item. */
     QWeakPointer<QnWorkbenchItem> m_item;
@@ -478,18 +463,14 @@ private:
     GraphicsLabel *m_footerLeftLabel;
     GraphicsLabel *m_footerRightLabel;
 
+    QnStatusOverlayWidget *m_statusOverlayWidget;
+
+
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
 
     /** Additional per-channel state. */
-    QVector<ChannelState> m_channelState;
-
-    QStaticText m_noDataStaticText;
-    QStaticText m_offlineStaticText;
-    QStaticText m_unauthorizedStaticText;
-    QStaticText m_unauthorizedStaticText2;
-    QStaticText m_loadingStaticText;
-    QStaticText m_analogLicenseStaticText;
+    //QVector<ChannelState> m_channelState;
 
     /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
     bool m_mouseInWidget;
