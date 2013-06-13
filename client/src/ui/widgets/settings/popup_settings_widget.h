@@ -10,12 +10,12 @@ namespace Ui {
     class QnPopupSettingsWidget;
 }
 
-class QnUint64KvPairUsageHelper;
+class QnShowBusinessEventsHelper;
 
 class QnPopupSettingsWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    
+
 public:
     explicit QnPopupSettingsWidget(QnWorkbenchContext *context, QWidget *parent = 0);
     ~QnPopupSettingsWidget();
@@ -32,7 +32,7 @@ private:
     QList<QCheckBox* > m_businessRulesCheckBoxes;
     QList<QCheckBox* > m_systemHealthCheckBoxes;
 
-    QnUint64KvPairUsageHelper* m_showBusinessEventsHelper;
+    QnShowBusinessEventsHelper* m_showBusinessEventsHelper;
 };
 
 #endif // POPUP_SETTINGS_WIDGET_H

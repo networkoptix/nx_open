@@ -43,6 +43,7 @@
 #include "camera/caching_time_period_loader.h"
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
+#include "ui/common/recording_status_helper.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -413,50 +414,11 @@ void QnMediaResourceWidget::updateIconButton() {
 
     int recordingMode = Qn::RecordingType_Never;
     if(m_camera->getStatus() == QnResource::Recording)
-        recordingMode = currentRecordingMode();
-    
-    switch(recordingMode) {
-    case Qn::RecordingType_Never:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
-        iconButton()->setToolTip(tr("Not recording"));
-        break;
-    case Qn::RecordingType_Run:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording.png"));
-        iconButton()->setToolTip(tr("Recording everything"));
-        break;
-    case Qn::RecordingType_MotionOnly:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
-        iconButton()->setToolTip(tr("Recording motion only"));
-        break;
-    case Qn::RecordingType_MotionPlusLQ:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
-        iconButton()->setToolTip(tr("Recording motion and low quality"));
-        break;
-    default:
-        iconButton()->setVisible(false);
-        break;
-    }
-}
-
-int QnMediaResourceWidget::currentRecordingMode() {
-    if(!m_camera)
-        return Qn::RecordingType_Never;
-
-    // TODO: #Elric this should be a resource parameter that is update from the server.
-
-    QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0));
-    int dayOfWeek = dateTime.date().dayOfWeek();
-    int seconds = QTime().secsTo(dateTime.time());
-
-    foreach(const QnScheduleTask &task, m_camera->getScheduleTasks())
-        if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
-            return task.getRecordingType();
-
-    return Qn::RecordingType_Never;
+        recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
+    QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
+    iconButton()->setVisible(!recIcon.isNull());
+    iconButton()->setIcon(recIcon);
+    iconButton()->setToolTip(QnRecordingStatusHelper::tooltip(recordingMode));
 }
 
 void QnMediaResourceWidget::updateRendererEnabled() {
@@ -639,9 +601,8 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channe
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-int QnMediaResourceWidget::helpTopicAt(const QPointF &pos) const {
-    Q_UNUSED(pos)
-    if(calculateChannelOverlay(0) == AnalogWithoutLicenseOverlay) {
+int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
+    if(calculateStatusOverlay() == Qn::AnalogWithoutLicenseOverlay) {
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
     } else if(options() & ControlPtz) {
         return Qn::MainWindow_MediaItem_Ptz_Help;
@@ -777,37 +738,37 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     return result;
 }
 
-QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int channel) const {
+Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
     QnResourcePtr resource = m_display->resource();
 
     if (resource->hasFlags(QnResource::SINGLE_SHOT)) {
         if (resource->getStatus() == QnResource::Offline)
-            return NoDataOverlay;
+            return Qn::NoDataOverlay;
         if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
-            return NoDataOverlay;
-        return EmptyOverlay;
+            return Qn::NoDataOverlay;
+        return Qn::EmptyOverlay;
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
-        return NoDataOverlay;
+        return Qn::NoDataOverlay;
     } else if (m_camera && m_camera->isAnalog() && m_camera->isScheduleDisabled()) {
-        return AnalogWithoutLicenseOverlay;
-    } else if (m_display->isPaused() && (options() & DisplayActivityOverlay)) {
-        return PausedOverlay;
+        return Qn::AnalogWithoutLicenseOverlay;
+    } else if (m_display->isPaused() && (options() & DisplayActivity)) {
+        return Qn::PausedOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
-        return OfflineOverlay;
+        return Qn::OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Unauthorized) {
-        return UnauthorizedOverlay;
+        return Qn::UnauthorizedOverlay;
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
-            return NoDataOverlay;
+            return Qn::NoDataOverlay;
         QnCachingTimePeriodLoader *loader = context()->navigator()->loader(m_resource);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
-            return base_type::calculateChannelOverlay(channel, QnResource::Online);
+            return base_type::calculateStatusOverlay(QnResource::Online);
         else
-            return NoDataOverlay;
+            return Qn::NoDataOverlay;
     } else if (m_display->isPaused()) {
-        return EmptyOverlay;
+        return Qn::EmptyOverlay;
     } else {
-        return base_type::calculateChannelOverlay(channel, QnResource::Online);
+        return base_type::calculateStatusOverlay(QnResource::Online);
     }
 }
 

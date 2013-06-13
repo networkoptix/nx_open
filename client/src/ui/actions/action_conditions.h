@@ -328,13 +328,6 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
-class QnDisconnectActionCondition: public QnActionCondition {
-public:
-    QnDisconnectActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
-
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-};
-
 class QnOpenInFolderActionCondition: public QnActionCondition {
 public:
     QnOpenInFolderActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
@@ -391,6 +384,14 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+};
+
+/** Display action only if user is logged in. */
+class QnLoggedInCondition: public QnActionCondition {
+public:
+    QnLoggedInCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters);
+
 };
 
 #endif // QN_ACTION_CONDITIONS_H
