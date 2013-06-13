@@ -12,6 +12,7 @@
 
 class QnCameraListModel;
 class QnWorkbenchContext;
+class QnResourceSearchProxyModel;
 
 namespace Ui {
     class CameraListDialog;
@@ -25,11 +26,13 @@ public:
     explicit QnCameraListDialog(QWidget *parent, QnWorkbenchContext *context);
     virtual ~QnCameraListDialog();
 private slots:
+    void at_searchStringChanged(const QString& text);
 private:
     Q_DISABLE_COPY(QnCameraListDialog)
  
     QScopedPointer<Ui::CameraListDialog> ui;
     QnCameraListModel *m_model;
+    QnResourceSearchProxyModel* m_resourceSearch;
 };
 
 #endif // __CAMERA_LIST_DIALOG_H__

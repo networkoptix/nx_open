@@ -7,6 +7,7 @@
 #include "ui/models/camera_list_model.h"
 #include "ui/workbench/workbench_context.h"
 #include "core/resource_managment/resource_pool.h"
+#include "ui/models/resource_search_proxy_model.h"
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -23,9 +24,23 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
                QnCameraListModel::FirmwareColumn << QnCameraListModel::IPColumn << QnCameraListModel::UniqIdColumn;
 
     m_model->setColumns(columns);
-    ui->gridCameras->setModel(m_model);
+
+    m_resourceSearch = new QnResourceSearchProxyModel(this);
+    m_resourceSearch->setSourceModel(m_model);
+    m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(lit("*"),Qt::CaseInsensitive, QRegExp::Wildcard)));
+    
+    connect(ui->SearchString, SIGNAL(textChanged(const QString&)), this, SLOT(at_searchStringChanged(const QString&)));
+
+    ui->gridCameras->setModel(m_resourceSearch);
 }
 
 QnCameraListDialog::~QnCameraListDialog()
 {
+}
+
+void QnCameraListDialog::at_searchStringChanged(const QString& text)
+{
+    QString searchString = QString(lit("*%1*")).arg(text);
+    m_resourceSearch->clearCriteria();
+    m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
 }

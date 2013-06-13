@@ -24,19 +24,25 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
         switch ((Column) index.column())
         {
             case NameColumn:
-                return camera->getName();
+                result = camera->getName();
+                break;
             case VendorColumn: {
                 QnResourceTypePtr resourceType = qnResTypePool->getResourceType(camera->getTypeId());
-                return resourceType ? QVariant(resourceType->getManufacture()) : QVariant();
+                result = resourceType ? QVariant(resourceType->getManufacture()) : QVariant();
+                break;
             }
             case ModelColumn:
-                return camera->getModel();
+                result = camera->getModel();
+                break;
             case FirmwareColumn:
-                return camera->getFirmware();
+                result = camera->getFirmware();
+                break;
             case IPColumn:
-                return camera->getHostAddress();
+                result = camera->getHostAddress();
+                break;
             case UniqIdColumn:
-                return camera->getPhysicalId();
+                result = camera->getPhysicalId();
+                break;
             default:
                 result = QnResourceListModel::data(index, role);
         }
@@ -65,16 +71,6 @@ QString QnCameraListModel::columnTitle(Column column) const
 
 void QnCameraListModel::setColumns(const QList<Column>& columns) 
 {
-    if(m_columns == columns)
-        return;
-
-    foreach(Column column, columns) {
-        if(column < 0 || column >= ColumnCount) {
-            qnWarning("Invalid column '%1'.", static_cast<int>(column));
-            return;
-        }
-    }
-
     m_columns = columns;
 }
 
@@ -85,7 +81,6 @@ int QnCameraListModel::columnCount(const QModelIndex &parent) const
 
 QVariant QnCameraListModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    Q_UNUSED(orientation);
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
         return columnTitle(m_columns[section]);
     return QnResourceListModel::headerData(section, orientation, role);
