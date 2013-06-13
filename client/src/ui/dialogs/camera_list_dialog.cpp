@@ -10,6 +10,7 @@
 #include "ui/models/resource_search_proxy_model.h"
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench.h"
+#include "core/resource/camera_resource.h"
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -21,6 +22,8 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
 
     m_model = new QnCameraListModel(context, this);
     m_model->setResources(context->resourcePool()->getAllEnabledCameras());
+    connect(context->resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
+    connect(context->resourcePool(),  SIGNAL(resourceAdded(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceAdded(const QnResourcePtr &)));
 
     QList<QnCameraListModel::Column> columns;
     columns << QnCameraListModel::RecordingColumn << QnCameraListModel::NameColumn << QnCameraListModel::VendorColumn << QnCameraListModel::ModelColumn <<
@@ -30,6 +33,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
 
     m_resourceSearch = new QnResourceSearchProxyModel(this);
     connect(m_resourceSearch,  SIGNAL(criteriaChanged()), this, SLOT(at_modelChanged()) );
+    connect(m_resourceSearch,  SIGNAL(modelReset()), this, SLOT(at_modelChanged()) );
     m_resourceSearch->setSourceModel(m_model);
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(lit("*"),Qt::CaseInsensitive, QRegExp::Wildcard)));
     
@@ -165,6 +169,17 @@ void QnCameraListDialog::at_copyToClipboard()
 
 void QnCameraListDialog::at_modelChanged()
 {
-    
     setWindowTitle(QString(lit("Cameras list - %1 camera(s) found")).arg(m_resourceSearch->rowCount()));
+}
+
+void QnCameraListDialog::at_resPool_resourceRemoved(const QnResourcePtr & resource)
+{
+    m_model->removeResource(resource);
+}
+
+void QnCameraListDialog::at_resPool_resourceAdded(const QnResourcePtr & resource)
+{
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (camera)
+        m_model->addResource(camera);
 }

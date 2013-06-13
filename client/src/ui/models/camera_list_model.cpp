@@ -34,8 +34,11 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
         }
         else if (index.column() == NameColumn)
             result = qnResIconCache->icon(camera->flags(), camera->getStatus());
-        else if (index.column() == ServerColumn)
-            result = qnResIconCache->icon(camera->getParentResource()->flags(), camera->getParentResource()->getStatus());
+        else if (index.column() == ServerColumn) {
+            QnResourcePtr server = camera->getParentResource();
+            if (server)
+                result = qnResIconCache->icon(server->flags(), server->getStatus());
+        }
         break;
     case Qt::DisplayRole:
         switch ((Column) index.column())

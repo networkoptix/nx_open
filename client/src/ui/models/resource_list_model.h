@@ -16,6 +16,8 @@ public:
 
     const QnResourceList &resouces() const;
     void setResources(const QnResourceList &resouces);
+    void addResource(const QnResourcePtr &resource);
+    void removeResource(const QnResourcePtr &resource);
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);

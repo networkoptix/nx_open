@@ -31,6 +31,8 @@ private slots:
     void at_copyToClipboard();
     void at_gridDoublelClicked(const QModelIndex& idx);
     void at_modelChanged();
+    void at_resPool_resourceRemoved(const QnResourcePtr & resource);
+    void at_resPool_resourceAdded(const QnResourcePtr & resource);
 private:
     Q_DISABLE_COPY(QnCameraListDialog)
  
