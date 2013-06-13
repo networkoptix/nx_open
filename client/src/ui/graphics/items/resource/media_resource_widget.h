@@ -138,8 +138,6 @@ private slots:
     void at_camDisplay_liveChanged();
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
 private:
-    int currentRecordingMode();
-    
     void setDisplay(const QnResourceDisplayPtr &display);
 
     Q_SLOT void updateDisplay();
