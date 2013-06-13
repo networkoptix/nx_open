@@ -87,7 +87,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
 QString QnCameraListModel::columnTitle(Column column) const
 {
     switch(column) {
-    case RecordingColumn: return tr("REC");
+    case RecordingColumn: return tr("Recording");
     case NameColumn:      return tr("Name");
     case VendorColumn:    return tr("Manufacturer");
     case ModelColumn:     return tr("Model");
