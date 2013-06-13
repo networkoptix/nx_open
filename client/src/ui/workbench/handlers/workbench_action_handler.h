@@ -14,6 +14,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 #include "ui/dialogs/event_log_dialog.h"
+#include "ui/dialogs/camera_list_dialog.h"
 
 class QAction;
 class QMenu;
@@ -129,10 +130,10 @@ protected:
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, const AddToLayoutParams &params) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, const AddToLayoutParams &params) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, const AddToLayoutParams &params) const;
-    
+
     QnResourceList addToResourcePool(const QString &file) const;
     QnResourceList addToResourcePool(const QList<QString> &files) const;
-    
+
     void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot);
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
@@ -155,7 +156,7 @@ protected:
     void rotateItems(int degrees);
 
     void setResolutionMode(Qn::ResolutionMode resolutionMode);
-    
+
     QnCameraSettingsDialog *cameraSettingsDialog() const {
         return m_cameraSettingsDialog.data();
     }
@@ -166,6 +167,10 @@ protected:
 
     QnEventLogDialog *businessEventsLogDialog() const {
         return m_businessEventsLogDialog.data();
+    }
+
+    QnCameraListDialog *cameraListDialog() const {
+        return m_cameraListDialog.data();
     }
 
     QnCameraAdditionDialog *cameraAdditionDialog() const {
@@ -222,7 +227,7 @@ protected slots:
     void at_saveCurrentLayoutAsAction_triggered();
     void at_closeLayoutAction_triggered();
     void at_closeAllButThisLayoutAction_triggered();
-    
+
     void at_moveCameraAction_triggered();
     void at_dropResourcesAction_triggered();
     void at_delayedDropResourcesAction_triggered();
@@ -236,6 +241,7 @@ protected slots:
     void at_PreferencesGeneralTabAction_triggered();
     void at_businessEventsAction_triggered();
     void at_businessEventsLogAction_triggered();
+    void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
     void at_PreferencesLicensesTabAction_triggered();
     void at_PreferencesServerTabAction_triggered();
@@ -268,7 +274,7 @@ protected slots:
     void at_removeLayoutItemAction_triggered();
     void at_renameAction_triggered();
     void at_removeFromServerAction_triggered();
-    
+
     void at_newUserAction_triggered();
     void at_newUserLayoutAction_triggered();
 
@@ -337,6 +343,10 @@ protected slots:
 
     void at_clearCacheAction_triggered();
 
+    void at_messageBoxAction_triggered();
+
+    void at_browseUrlAction_triggered();
+
     void at_serverSettings_received(int status, const QnKvPairList& settings, int handle);
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
@@ -381,10 +391,11 @@ private:
     QWeakPointer<QWidget> m_widget;
     QWeakPointer<QMenu> m_mainMenu;
     QWeakPointer<QMenu> m_currentUserLayoutsMenu;
-    
+
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QWeakPointer<QnEventLogDialog> m_businessEventsLogDialog;
+    QWeakPointer<QnCameraListDialog> m_cameraListDialog;
     QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QWeakPointer<QnLoginDialog> m_loginDialog;
     QWeakPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
@@ -407,8 +418,8 @@ private:
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
     QWeakPointer<QnProgressDialog> m_exportProgressDialog;
-    QnLayoutResourcePtr m_exportLayout;  
-    QnStorageResourcePtr m_exportStorage;  
+    QnLayoutResourcePtr m_exportLayout;
+    QnStorageResourcePtr m_exportStorage;
     QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
     QnMediaResourcePtr m_exportedMediaRes;
     //QString m_layoutExportMessage;
