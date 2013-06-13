@@ -8,7 +8,7 @@
 
 int QnRecordingStatusHelper::currentRecordingMode(QnWorkbenchContext *context, QnVirtualCameraResourcePtr camera) 
 {
-    if(camera)
+    if(!camera)
         return Qn::RecordingType_Never;
 
     // TODO: #Elric this should be a resource parameter that is update from the server.
