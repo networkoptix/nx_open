@@ -223,7 +223,16 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     case BusinessEventType::Camera_Ip_Conflict: {
             item->setColor(qnGlobals->notificationColorCritical());
-            //TODO: #GDM pages in browser for each conflicting ip address
+            QString webPageAddress = params.getSource();
+
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Open camera web page..."),
+                        Qn::BrowseUrlAction,
+                        QnActionParameters().
+                        withArgument(Qn::UrlRole, webPageAddress)
+                        );
+
             break;
         }
     case BusinessEventType::MediaServer_Failure: {
@@ -245,7 +254,15 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         }
     case BusinessEventType::MediaServer_Conflict: {
             item->setColor(qnGlobals->notificationColorCritical());
-            //TODO: #GDM notification
+            item->addActionButton(
+                        qnResIconCache->icon(resource->flags(), resource->getStatus()),
+                        tr("Description"),
+                        Qn::MessageBoxAction,
+                        QnActionParameters().
+                        withArgument(Qn::TitleRole, tr("Information")).
+                        withArgument(Qn::TextRole, tr("There is another mediaserver in your network "\
+                                                      "that watches your cameras."))
+                        );
             break;
         }
     default:
