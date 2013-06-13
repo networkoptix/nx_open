@@ -7,13 +7,14 @@
 
 #include <utils/media/frame_info.h>
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
+
+#include <client/client_globals.h>
+
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
-
-#include "render_status.h"
 
 
 class CLVideoDecoderOutput;

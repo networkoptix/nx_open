@@ -38,16 +38,6 @@ class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
 
-// TODO: #Elric move out.
-struct QnThumbnailsSearchState {
-    QnThumbnailsSearchState(): step(0) {}
-    QnThumbnailsSearchState(const QnTimePeriod &period, qint64 step): period(period), step(step) {}
-
-    QnTimePeriod period;
-    qint64 step;
-};
-Q_DECLARE_METATYPE(QnThumbnailsSearchState)
-
 
 namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
@@ -248,14 +238,14 @@ protected slots:
     void at_openFolderAction_triggered();
     void at_checkForUpdatesAction_triggered();
     void at_aboutAction_triggered();
-    void at_systemSettingsAction_triggered();
+    void at_PreferencesGeneralTabAction_triggered();
     void at_businessEventsAction_triggered();
     void at_businessEventsLogAction_triggered();
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
-    void at_getMoreLicensesAction_triggered();
-    void at_openServerSettingsAction_triggered();
-    void at_openPopupSettingsAction_triggered();
+    void at_PreferencesLicensesTabAction_triggered();
+    void at_PreferencesServerTabAction_triggered();
+    void at_PreferencesNotificationTabAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();

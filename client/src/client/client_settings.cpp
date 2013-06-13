@@ -59,13 +59,15 @@ QnClientSettings::QnClientSettings(QObject *parent):
 #endif
 
     /* Set names. */
-    setName(MEDIA_FOLDER,           QLatin1String("mediaRoot"));
-    setName(EXTRA_MEDIA_FOLDERS,    QLatin1String("auxMediaRoot"));
-    setName(BACKGROUND_ANIMATED,    QLatin1String("animateBackground"));
-    setName(BACKGROUND_COLOR,       QLatin1String("backgroundColor"));
-    setName(MAX_VIDEO_ITEMS,        QLatin1String("maxVideoItems"));
-    setName(DOWNMIX_AUDIO,          QLatin1String("downmixAudio"));
-    setName(OPEN_LAYOUTS_ON_LOGIN,  QLatin1String("openLayoutsOnLogin"));
+    setName(MEDIA_FOLDER,           lit("mediaRoot"));
+    setName(EXTRA_MEDIA_FOLDERS,    lit("auxMediaRoot"));
+    setName(BACKGROUND_ANIMATED,    lit("animateBackground"));
+    setName(BACKGROUND_COLOR,       lit("backgroundColor"));
+    setName(MAX_VIDEO_ITEMS,        lit("maxVideoItems"));
+    setName(DOWNMIX_AUDIO,          lit("downmixAudio"));
+    setName(OPEN_LAYOUTS_ON_LOGIN,  lit("openLayoutsOnLogin"));
+    setName(LAST_RECORDING_DIR,     lit("videoRecording/previousDir"));
+    setName(LAST_EXPORT_DIR,        lit("export/previousDir"));
 
     /* Set command line switch names. */
     addArgumentName(SOFTWARE_YUV,          "--soft-yuv");

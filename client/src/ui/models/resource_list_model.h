@@ -7,8 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 class QnResourceListModel: public QAbstractListModel {
-    Q_OBJECT;
-
+    Q_OBJECT
     typedef QAbstractListModel base_type;
 
 public:

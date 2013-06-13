@@ -294,6 +294,7 @@ int main(int argc, char **argv)
         QString translationPath = qnSettings->translationPath();
         bool devBackgroundEditable = false;
         bool skipMediaFolderScan = false;
+        bool noFullScreen = false;
         
         QnCommandLineParser commandLineParser;
         commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -306,6 +307,7 @@ int main(int argc, char **argv)
         commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
         commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
         commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
+        commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
         commandLineParser.parse(argc, argv, stderr);
 
         /* Dev mode. */
@@ -469,7 +471,8 @@ int main(int argc, char **argv)
         }
 
         mainWindow->show();
-        context->action(Qn::EffectiveMaximizeAction)->trigger();
+        if (!noFullScreen)
+            context->action(Qn::EffectiveMaximizeAction)->trigger();
 
         //initializing plugin manager. TODO supply plugin dir (from settings)
         PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );

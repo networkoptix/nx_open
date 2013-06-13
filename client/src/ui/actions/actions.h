@@ -20,18 +20,17 @@ namespace Qn {
         /**
          * Opens licenses preferences tab.
          */
-        GetMoreLicensesAction,
-
+        PreferencesLicensesTabAction,
 
         /**
          * Opens server settings preferences tab.
          */
-        OpenServerSettingsAction, //TODO: #GDM rename - collisions with ServerSettingsAction
+        PreferencesServerTabAction,
 
         /**
-         * Opens popup settings preferences tab.
+         * Opens notifications settings preferences tab.
          */
-        OpenPopupSettingsAction,
+        PreferencesNotificationTabAction,
 
         /**
          * Reconnects to the Enterprise Controller using the last used URL
@@ -137,6 +136,24 @@ namespace Qn {
          */
         EscapeHotkeyAction,
 
+        /**
+         * Displays messagebox with the text provided.
+         *
+         * Parameters:
+         * <tt>QString TitleRole</tt> --- title for the messagebox.
+         * <tt>QString TextRole</tt> --- displayed text. If not provided, title will be used.
+         */
+        MessageBoxAction,
+
+        /**
+         * Opens the provided url in the default browser.
+         *
+         * Parameters:
+         * <tt>QString UrlRole</tt> --- target url.
+         */
+        BrowseUrlAction,
+
+
         /* Main menu actions. */
 
         /**
@@ -216,7 +233,7 @@ namespace Qn {
         /**
          * Opens system settings dialog.
          */
-        SystemSettingsAction,
+        PreferencesGeneralTabAction,
 
 
         /**

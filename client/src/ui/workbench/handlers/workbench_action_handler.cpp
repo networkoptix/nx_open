@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include <QtCore/QProcess>
-#include <QtCore/QSettings>
 
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
@@ -236,14 +235,14 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugCalibratePtzAction),                SIGNAL(triggered()),    this,   SLOT(at_debugCalibratePtzAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
-    connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
+    connect(action(Qn::PreferencesGeneralTabAction),                   SIGNAL(triggered()),    this,   SLOT(at_PreferencesGeneralTabAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
-    connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
-    connect(action(Qn::OpenServerSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_openServerSettingsAction_triggered()));
-    connect(action(Qn::OpenPopupSettingsAction),                SIGNAL(triggered()),    this,   SLOT(at_openPopupSettingsAction_triggered()));
+    connect(action(Qn::PreferencesLicensesTabAction),                  SIGNAL(triggered()),    this,   SLOT(at_PreferencesLicensesTabAction_triggered()));
+    connect(action(Qn::PreferencesServerTabAction),               SIGNAL(triggered()),    this,   SLOT(at_PreferencesServerTabAction_triggered()));
+    connect(action(Qn::PreferencesNotificationTabAction),                SIGNAL(triggered()),    this,   SLOT(at_PreferencesNotificationTabAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
@@ -330,32 +329,14 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
-    //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: #Elric not needed?
 
     context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
 
-    /*
-    SignalingInstrument *activityInstrument = new SignalingInstrument(
-        Instrument::makeSet(QEvent::MouseButtonRelease), 
-        Instrument::makeSet(QEvent::KeyRelease),
-        Instrument::makeSet(),
-        Instrument::makeSet(),
-        this
-    );
-    foreach(InstrumentManager *manager, InstrumentManager::managersOf(display()->scene())) {
-        manager->installInstrument(activityInstrument);
-        break;
-    }
-    connect(activityInstrument, SIGNAL(activated(QGraphicsView *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
-    connect(activityInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
-    */
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
     at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
-
-
     at_updateWatcher_availableUpdateChanged();
 }
 
@@ -774,7 +755,6 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         return;
     }
 
-    qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >"); // TODO: #Elric evil!
     serverConnectionPtr->setParamsAsync(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
@@ -1410,8 +1390,14 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     }
 
 
-    if (!parameters.resources().empty())
-        menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
+    if (!parameters.resources().empty()) {
+        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
+            menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
+        else
+            QMessageBox::warning(mainWindow(),
+                                 tr("Cannot add item"),
+                                 tr("Cannot add a local file to Multi-Video"));
+    }
     if(!layouts.empty())
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
 }
@@ -1575,8 +1561,6 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("Layout Settings"));
     dialog->readFromResource(layout);
-    //TODO: #Elric Who should add help topics? - asked GDM
-//    setHelpTopic(dialog.data(), Qn::UserSettings_Help);
 
     if(!dialog->exec() || !dialog->submitToResource(layout))
         return;
@@ -1598,28 +1582,28 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_getMoreLicensesAction_triggered() {
+void QnWorkbenchActionHandler::at_PreferencesLicensesTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->openLicensesPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_openServerSettingsAction_triggered() {
+void QnWorkbenchActionHandler::at_PreferencesServerTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->openServerSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_openPopupSettingsAction_triggered() {
+void QnWorkbenchActionHandler::at_PreferencesNotificationTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->openPopupSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
+void QnWorkbenchActionHandler::at_PreferencesGeneralTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
@@ -2323,8 +2307,6 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         bool changed = snapshotManager()->isChanged(layout);
 
         resource->setName(name);
-        if(QnWorkbenchLayout::instance(layout))
-            QnWorkbenchLayout::instance(layout)->setName(name); // TODO: #Elric hack
 
         if(!changed)
             snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
@@ -2671,6 +2653,8 @@ void QnWorkbenchActionHandler::removeLayoutFromPool(QnLayoutResourcePtr existing
 
 bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode)
 {
+    // TODO: #Elric we have a lot of copypasta with at_exportTimeSelectionAction_triggered
+
     if (!validateItemTypes(layout))
         return false;
 
@@ -2682,12 +2666,9 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     else
         return false; // not used
 
-    QSettings settings; // TODO: #Elric replace with QnSettings
-    settings.beginGroup(QLatin1String("export"));
-    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
-    if (!previousDir.length()){
+    QString previousDir = qnSettings->lastExportDir();
+    if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    }
 
     QString suggestion = layout->getName();
 
@@ -2724,9 +2705,9 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         exportReadOnly = selectedFilter.contains(mediaFileROFilter)
-        #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
                 || selectedFilter.contains(binaryFilterName(true))
-        #endif
+#endif
                 ;
         if (fileName.isEmpty())
             return false;
@@ -2759,7 +2740,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
         break;
     }
-    settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
+    qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
     QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
     if (!existingLayout)
@@ -3149,13 +3130,10 @@ Do you want to continue?"),
     QnNetworkResourcePtr networkResource = widget->resource().dynamicCast<QnNetworkResource>();
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 
-    QSettings settings;
-    settings.beginGroup(QLatin1String("export")); // TODO: #Elric replace with QnSettings
-    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
-    if (!previousDir.length()){
+    QString previousDir = qnSettings->lastExportDir();
+    if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    }
-
+    
     QString filterSeparator(QLatin1String(";;"));
     QString aviFileFilter = tr("AVI (*.avi)");
     QString mkvFileFilter = tr("Matroska (*.mkv)");
@@ -3258,7 +3236,7 @@ Do you want to continue?"),
 
         break;
     }
-    settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
+    qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
 #ifdef Q_OS_WIN
     if (selectedFilter.contains(binaryFilterName(false)))
