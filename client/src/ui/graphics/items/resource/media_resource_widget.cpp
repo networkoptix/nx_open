@@ -790,7 +790,7 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
         return NoDataOverlay;
     } else if (m_camera && m_camera->isAnalog() && m_camera->isScheduleDisabled()) {
         return AnalogWithoutLicenseOverlay;
-    } else if (m_display->isPaused() && (options() & DisplayActivityOverlay)) {
+    } else if (m_display->isPaused() && (options() & DisplayActivity)) {
         return PausedOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
         return OfflineOverlay;

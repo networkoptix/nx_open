@@ -121,7 +121,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
-    m_options(DisplaySelectionOverlay | DisplayButtons),
+    m_options(DisplaySelection | DisplayButtons),
     m_localActive(false),
     m_channelsLayout(NULL),
     m_aspectRatio(-1.0),
@@ -936,7 +936,7 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     if(!isSelected())
         return;
 
-    if(!(m_options & DisplaySelectionOverlay))
+    if(!(m_options & DisplaySelection))
         return;
 
     painter->fillRect(rect, qnGlobals->selectionColor());

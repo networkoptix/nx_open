@@ -48,8 +48,8 @@ class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnW
 
 public:
     enum Option {
-        DisplayActivityOverlay      = 0x001,    /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelectionOverlay     = 0x002,    /**< Whether selected / not selected state should be displayed. */
+        DisplayActivity             = 0x001,    /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelection            = 0x002,    /**< Whether selected / not selected state should be displayed. */
         DisplayMotion               = 0x004,    /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
         DisplayButtons              = 0x008,    /**< Whether item buttons are to be displayed. */
         DisplayMotionSensitivity    = 0x010,    /**< Whether a grid with motion region sensitivity is to be displayed. */
