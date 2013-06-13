@@ -72,6 +72,7 @@ private:
     unsigned int m_prevFrameSequence;
     QScopedPointer<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
     QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
+    QScopedPointer<QnYv12ToRgbWithGammaShaderProgram> m_yv12ToRgbWithGammaShaderProgram;
     QScopedPointer<QnYv12ToRgbaShaderProgram> m_yv12ToRgbaShaderProgram;
     QScopedPointer<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
     bool m_timeChangeEnabled;
