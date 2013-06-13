@@ -269,6 +269,11 @@ namespace Qn {
          */
         BusinessEventsLogAction,
 
+        /**
+         * Opens camera list dialog.
+         */
+        CameraListAction,
+
         //ShowMediaServerLogs,
 
 
