@@ -70,18 +70,24 @@ void QnCameraListDialog::at_gridDoublelClicked(const QModelIndex& idx)
 
 void QnCameraListDialog::at_customContextMenuRequested(const QPoint&)
 {
-    QMenu* menu = 0;
-    QModelIndex idx = ui->gridCameras->currentIndex();
-    if (idx.isValid()) 
+    QModelIndexList list = ui->gridCameras->selectionModel()->selectedRows();
+    QnResourceList resList;
+    foreach(QModelIndex idx, list)
     {
         QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
-        QnActionManager* manager = m_context->menu();
-        if (resource) {
-            menu = manager->newMenu(Qn::TreeScope, QnActionParameters(resource));
-            foreach(QAction* action, menu->actions())
-                action->setShortcut(QKeySequence());
-        }
+        if (resource)
+            resList << resource;
     }
+
+    QMenu* menu = 0;
+    QnActionManager* manager = m_context->menu();
+
+    if (!resList.isEmpty()) {
+        menu = manager->newMenu(Qn::TreeScope, QnActionParameters(resList));
+        foreach(QAction* action, menu->actions())
+            action->setShortcut(QKeySequence());
+    }
+
     if (menu)
         menu->addSeparator();
     else
