@@ -33,6 +33,8 @@
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 
+#include "client/client_settings.h"
+
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -640,10 +642,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     if (suggetion.isEmpty())
         suggetion = tr("recorded_video");
 
-    QSettings settings; // TODO: #Elric replace with QnSettings
-    settings.beginGroup(QLatin1String("videoRecording"));
-
-    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    QString previousDir = qnSettings->lastRecordingDir();
     QString selectedFilter;
     while (true) {
         QString filePath = QFileDialog::getSaveFileName(
@@ -669,13 +668,12 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 
             QnFileProcessor::createResourcesForFile(filePath);
 
-            settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
+            qnSettings->setLastRecordingDir(QFileInfo(filePath).absolutePath());
         } else {
             QFile::remove(recordedFileName);
         }
         break;
     }
-    settings.endGroup();
 }
 
 

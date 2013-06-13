@@ -10,8 +10,10 @@ class QLabel;
 
 /**
  * A <tt>QLabel</tt> wrapped in <tt>QGraphicsProxyWidget</tt>. Presents an
- * interface similar to that of <tt>QLabel</tt> and fixes size hint problems of 
- * <tt>QGraphicsProxyWidget</tt> (https://bugreports.qt-project.org/browse/QTBUG-14622).
+ * interface similar to that of <tt>QLabel</tt> and fixes some problems of 
+ * <tt>QGraphicsProxyWidget</tt>.
+ * 
+ * See https://bugreports.qt-project.org/browse/QTBUG-14622.
  */
 class QnProxyLabel: public Connective<QGraphicsProxyWidget> {
     Q_OBJECT
@@ -61,6 +63,8 @@ public:
     QString selectedText() const;
     int selectionStart() const;
 
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
+
 public slots:
     void setText(const QString &text);
     void setNum(int number);
@@ -74,6 +78,7 @@ signals:
     void linkHovered(const QString &link);
 
 protected:
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
 
 private:

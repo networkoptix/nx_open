@@ -6,20 +6,31 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <utils/kvpair_usage_helper.h>
+QnShowBusinessEventsHelper::QnShowBusinessEventsHelper(QObject *parent) :
+    base_type(QnResourcePtr(),
+              QLatin1String("showBusinessEvents"),
+              0xFFFFFFFFFFFFFFFFull,
+              parent)
+{
+}
+
+QnShowBusinessEventsHelper::~QnShowBusinessEventsHelper(){}
+
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    m_showBusinessEventsHelper = new QnUint64KvPairUsageHelper(
-                context()->user(),
-                QLatin1String("showBusinessEvents"),            //TODO: #GDM move out common consts
-                0xFFFFFFFFFFFFFFFFull,                          //TODO: #GDM move out common consts
-                this);
+    m_showBusinessEventsHelper = context()->instance<QnShowBusinessEventsHelper>();
+    m_showBusinessEventsHelper->setResource(context()->user());
+
+    m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
+    connect(m_userEmailWatcher, SIGNAL(userEmailValidityChanged(const QnUserResourcePtr &, bool)),
+            this,               SLOT(at_userEmailValidityChanged(const QnUserResourcePtr &, bool)));
 
     connect(context(),        SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()));
 }
@@ -84,5 +95,10 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
     m_showBusinessEventsHelper->setResource(context()->user());
+}
+
+void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid) {
+    if (!isValid)
+        addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, user);
 }
 

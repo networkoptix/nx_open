@@ -15,7 +15,7 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    QString getPassword() const;    
+    QString getPassword() const;
     void setPassword(const QString &password);
 
     quint64 getPermissions() const;
@@ -26,6 +26,10 @@ public:
 
     QString getEmail() const;
     void setEmail(const QString &email);
+
+signals:
+    void emailChanged(const QnUserResourcePtr &user);
+
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 

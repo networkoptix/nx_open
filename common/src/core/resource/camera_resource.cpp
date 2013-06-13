@@ -240,3 +240,9 @@ void QnVirtualCameraResource::save()
     }
 }
 
+QString QnVirtualCameraResource::toSearchString() const
+{
+    QString result;
+    QTextStream(&result) << QnResource::toSearchString() << " " << getModel() << " " << getFirmware(); //TODO: #Elric evil!
+    return result;
+}

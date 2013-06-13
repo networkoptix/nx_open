@@ -1,6 +1,6 @@
 #include "user_resource.h"
 
-QnUserResource::QnUserResource(): 
+QnUserResource::QnUserResource():
     m_permissions(0),
     m_isAdmin(false)
 {
@@ -57,11 +57,16 @@ QString QnUserResource::getEmail() const
 
 void QnUserResource::setEmail(const QString& email)
 {
-    QMutexLocker locker(&m_mutex);
-    m_email = email.trimmed();
+    {
+        QMutexLocker locker(&m_mutex);
+        if (email.trimmed() == m_email)
+            return;
+        m_email = email.trimmed();
+    }
+    emit emailChanged(::toSharedPointer(this));
 }
 
-void QnUserResource::updateInner(QnResourcePtr other) 
+void QnUserResource::updateInner(QnResourcePtr other)
 {
     base_type::updateInner(other);
 

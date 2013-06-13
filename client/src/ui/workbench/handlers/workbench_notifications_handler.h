@@ -9,8 +9,20 @@
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <utils/kvpair_usage_helper.h>
 
-class QnUint64KvPairUsageHelper;
+class QnWorkbenchUserEmailWatcher;
+
+class QnShowBusinessEventsHelper : public QnUint64KvPairUsageHelper {
+    Q_OBJECT
+
+    typedef QnUint64KvPairUsageHelper base_type;
+public:
+    explicit QnShowBusinessEventsHelper(QObject *parent = 0);
+    virtual ~QnShowBusinessEventsHelper();
+
+};
+
 
 class QnWorkbenchNotificationsHandler : public QObject, public QnWorkbenchContextAware
 {
@@ -18,7 +30,7 @@ class QnWorkbenchNotificationsHandler : public QObject, public QnWorkbenchContex
 public:
     explicit QnWorkbenchNotificationsHandler(QObject *parent = 0);
     virtual ~QnWorkbenchNotificationsHandler();
-    
+
     void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void addSystemHealthEvent(QnSystemHealth::MessageType message);
     void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
@@ -33,9 +45,11 @@ public slots:
 
 private slots:
     void at_context_userChanged();
+    void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
 
 private:
     QnUint64KvPairUsageHelper* m_showBusinessEventsHelper;
+    QnWorkbenchUserEmailWatcher* m_userEmailWatcher;
 };
 
 #endif // WORKBENCH_NOTIFICATIONS_HANDLER_H
