@@ -27,7 +27,7 @@ QnImageHandler::QnImageHandler()
 
 }
 
-QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serverDelegate)
+QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serverDelegate, qint64 ceilTime)
 {
     QnCompressedVideoDataPtr video;
     for (int i = 0; i < 20 && !video; ++i) 
@@ -37,6 +37,22 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
             break;
         video = media.dynamicCast<QnCompressedVideoData>();
     }
+
+    // if ceilTime specified try frame with time > requested time (round time to ceil)
+    if (ceilTime != AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
+    {
+        QnCompressedVideoDataPtr video2;
+        for (int i = 0; i < 50 && !video; ++i) 
+        {
+            QnAbstractMediaDataPtr media = serverDelegate.getNextData();
+            if (!media || media->dataType == QnAbstractMediaData::EMPTY_DATA)
+                break;
+            video2 = media.dynamicCast<QnCompressedVideoData>();
+            if (video2->flags & AV_PKT_FLAG_KEY)
+                return video2;
+        }
+    }
+
     return video;
 }
 
@@ -140,15 +156,14 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         if (!video) {
             serverDelegate.open(res);
             serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
-            video = getNextArchiveVideoPacket(serverDelegate);
+            video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
         }
     }
     else {
         // get archive data
         serverDelegate.open(res);
         serverDelegate.seek(time, true);
-        video = getNextArchiveVideoPacket(serverDelegate);
-
+        video = getNextArchiveVideoPacket(serverDelegate, precise ? AV_NOPTS_VALUE : time);
         if (!precise) {
             if (!video)
                 video = camera->getFrameByTime(useHQ, time); // try approx frame from GOP keeper
@@ -171,7 +186,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
             gotFrame = decoder.decode(video, &outFrame) && (!precise || video->timestamp >= time);
             if (gotFrame)
                 break;
-            video = getNextArchiveVideoPacket(serverDelegate);
+            video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
         }
     }
     if (!gotFrame)
