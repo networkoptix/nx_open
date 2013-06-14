@@ -365,7 +365,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_tabBarItem = new QGraphicsProxyWidget(m_controlsWidget);
     m_tabBarItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-    
+
     m_tabBarWidget = new QnLayoutTabBar(NULL, context());
     m_tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBarItem->setWidget(m_tabBarWidget);
@@ -381,7 +381,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction), 1.0, Qn::MainWindow_Fullscreen_Help));
     windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
-    
+
     m_windowButtonsWidget = new GraphicsWidget();
     m_windowButtonsWidget->setLayout(windowButtonsLayout);
 
@@ -469,10 +469,15 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
 
-    m_notificationsShowButton = newShowHideButton(m_controlsWidget);
+    m_notificationsShowButton = new QnBlinkingImageButtonWidget(m_controlsWidget);
+    m_notificationsShowButton->resize(15, 45);
+    m_notificationsShowButton->setCheckable(true);
+    m_notificationsShowButton->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
+    m_notificationsShowButton->setProperty(Qn::NoHandScrollOver, true);
     m_notificationsShowButton->setTransform(QTransform::fromScale(-1, 1));
     m_notificationsShowButton->setFocusProxy(m_notificationsItem);
     m_notificationsShowButton->stackBefore(m_notificationsItem);
+    setHelpTopic(m_notificationsShowButton, Qn::MainWindow_Pin_Help);
 
     m_notificationsOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_notificationsOpacityProcessor->addTargetItem(m_notificationsItem);
@@ -575,7 +580,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
     m_sliderItem->setFrameWidth(0.5);
     m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
-    
+
     m_sliderItem->setProperty(Qn::NoHandScrollOver, true);
     m_sliderItem->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     m_sliderItem->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
@@ -625,7 +630,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderYAnimator->setTargetObject(m_sliderItem);
     m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
     //m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0); // TODO: #Elric why height is zero at this point?
-    m_sliderYAnimator->setSpeed(70.0 * 2.0); 
+    m_sliderYAnimator->setSpeed(70.0 * 2.0);
     m_sliderYAnimator->setTimeLimit(500);
 
     m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
@@ -923,7 +928,7 @@ void QnWorkbenchUi::setTitleUsed(bool used) {
 
         at_titleItem_geometryChanged();
 
-        /* For reasons unknown, tab bar's size gets messed up when it is shown 
+        /* For reasons unknown, tab bar's size gets messed up when it is shown
          * after new items were added to it. Re-embedding notificationss, probably there is
          * a simpler workaround. */
         QTabBar *widget = checked_cast<QTabBar *>(m_tabBarItem->widget());
@@ -1125,8 +1130,8 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
-    bool sliderVisible = 
-        navigator()->currentWidget() != NULL && 
+    bool sliderVisible =
+        navigator()->currentWidget() != NULL &&
         !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server)) &&
         ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & QnResource::live)) &&
         !action(Qn::ToggleTourModeAction)->isChecked();
@@ -1348,7 +1353,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
     );
     sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, 8));
     sliderResizerGeometry.setHeight(16);
-    
+
     if(!qFuzzyCompare(sliderResizerGeometry, m_sliderResizerItem->geometry())) {
         QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges2, true);
 
@@ -1528,7 +1533,7 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
 }
 
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const {
-    return 
+    return
         (isTreeOpened() ? TreePanel : NoPanel) |
         (isTitleOpened() ? TitlePanel : NoPanel) |
         (isSliderOpened() ? SliderPanel : NoPanel) |
@@ -1617,7 +1622,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
     if(!m_inFreespace) {
         if(!isFullscreen)
             fullScreenAction->setChecked(true);
-        
+
         setTreeOpened(false, isFullscreen, false);
         setTitleOpened(false, isFullscreen, false);
         setSliderOpened(false, isFullscreen, false);
@@ -1686,7 +1691,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
                 m_unzoomedOpenedPanels = openedPanels();
             setOpenedPanels(openedPanels() & SliderPanel, true, false); /* Leave slider open. */
         } else {
-            /* User may have opened some panels while zoomed, 
+            /* User may have opened some panels while zoomed,
              * we want to leave them opened even if they were closed before. */
             setOpenedPanels(m_unzoomedOpenedPanels | openedPanels(), true, false);
 
@@ -1773,7 +1778,7 @@ void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
     qreal minHeight = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height();
     qreal jmpHeight = minHeight + 48.0;
     qreal maxHeight = minHeight + 196.0;
-    
+
     if(targetHeight < (minHeight + jmpHeight) / 2) {
         targetHeight = minHeight;
     } else if(targetHeight < jmpHeight) {
@@ -1900,7 +1905,7 @@ void QnWorkbenchUi::at_titleItem_contextMenuRequested(QObject *, QEvent *event) 
     m_tabBarItem->setFocus();
 
     QGraphicsSceneContextMenuEvent *menuEvent = static_cast<QGraphicsSceneContextMenuEvent *>(event);
-    
+
     /* Redirect context menu event to tab bar. */
     QPointF pos = menuEvent->pos();
     menuEvent->setPos(m_tabBarItem->mapFromItem(m_titleItem, pos));
