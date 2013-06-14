@@ -85,7 +85,7 @@ const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractStr
     return &audioLayout;
 }
 
-void QnMediaResource::init()
+void QnMediaResource::initMediaResource()
 {
     toResource()->addFlags(QnResource::media);
 }

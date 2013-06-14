@@ -56,7 +56,7 @@ public:
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
 
-    void init();
+    void initMediaResource();
 };
 
 #endif // QN_MEDIA_RESOURCE_H

@@ -1,7 +1,10 @@
 #ifndef __HISTOGRAM_RENDERER_H__
 #define __HISTOGRAM_RENDERER_H__
 
+#include <QWidget>
+
 #include "utils/color_space/image_correction.h"
+
 
 class QnHistogramRenderer: public QWidget, public QnHistogramConsumer
 {

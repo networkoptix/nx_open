@@ -98,9 +98,9 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
     QString timeStr;
     qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;
     if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)
-        timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy-MMM-dd hh:mm:ss"));
+        timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
     else
-        timeStr = QTime().addMSecs(displayTime).toString(lit("hh:mm:ss.zzz"));
+        timeStr = QTime().addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
 
     if (m_timeImg == 0)
         initTimeDrawing(frame, timeStr);

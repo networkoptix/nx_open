@@ -1,4 +1,8 @@
 #include "histogram_renderer.h"
+
+#include <QPainter>
+#include <QPen>
+
 #include "ui/style/globals.h"
 
 static const int LINE_OFFSET = 4;

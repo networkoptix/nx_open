@@ -462,7 +462,7 @@ void RTPSession::updateTrackNum()
         else if (m_sdpTracks[i]->trackType == TT_AUDIO)
             m_sdpTracks[i]->trackNum = videoNum + curAudio++;
         else if (m_sdpTracks[i]->trackType == TT_METADATA) {
-            if (m_sdpTracks[i]->codecName == lit("ffmpeg-metadata"))
+            if (m_sdpTracks[i]->codecName == QLatin1String("ffmpeg-metadata"))
                 m_sdpTracks[i]->trackNum = METADATA_TRACK_NUM; // use fixed track num for our proprietary format
             else
                 m_sdpTracks[i]->trackNum = videoNum + audioNum + curMetadata++;
@@ -1005,7 +1005,7 @@ bool RTPSession::sendSetup()
                 else if (tmpList[k].startsWith(QLatin1String("interleaved"))) {
                     QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
                     if (tmpParams.size() > 1) {
-                        tmpParams = tmpParams[1].split(lit("-"));
+                        tmpParams = tmpParams[1].split(QLatin1String("-"));
                         if (tmpParams.size() == 2) {
                             trackInfo->interleaved = QPair<int,int>(tmpParams[0].toInt(), tmpParams[1].toInt());
                             registerRTPChannel(trackInfo->interleaved.first, trackInfo);

@@ -3,7 +3,7 @@
 
 QnAbstractArchiveResource::QnAbstractArchiveResource()
 {
-    QnMediaResource::init();
+    QnMediaResource::initMediaResource();
 
     addFlags(QnResource::ARCHIVE);
     setStatus(Online, true);

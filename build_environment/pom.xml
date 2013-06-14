@@ -50,13 +50,6 @@
 			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>		
 		<dependency>
-			<groupId>com.sourceforge.cloudcity</groupId>
-			<artifactId>bespin</artifactId>
-			<version>1.1-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}-${compiler}</classifier>
-		</dependency>                               	
-		<dependency>
 			<groupId>org.hyperic</groupId>
 			<artifactId>sigar</artifactId>
 			<version>${sigar.version}</version>
@@ -350,6 +343,13 @@
 					<type>zip</type>
 					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>
+				<dependency>
+					<groupId>com.sourceforge.cloudcity</groupId>
+					<artifactId>bespin</artifactId>
+					<version>1.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>                               	
 			</dependencies>			
 			<properties>
 				<compiler>msvc2008</compiler>
@@ -422,6 +422,13 @@
 					<type>zip</type>
 					<classifier>${platform}-${arch}</classifier>
 				</dependency>
+				<dependency>
+					<groupId>com.sourceforge.cloudcity</groupId>
+					<artifactId>bespin</artifactId>
+					<version>1.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>                               	
 			</dependencies>
 			<build>	
 				<plugins>
@@ -527,6 +534,13 @@
 					<type>zip</type>
 					<classifier>${platform}-${arch}-qt484</classifier>
 				</dependency>
+				<dependency>
+					<groupId>com.sourceforge.cloudcity</groupId>
+					<artifactId>bespin</artifactId>
+					<version>1.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-qt484</classifier>
+				</dependency>                               	
 			</dependencies>
 
 			<build>

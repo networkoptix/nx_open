@@ -3,6 +3,8 @@
 
 #include "resource_widget.h"
 
+#include <QStaticText>
+
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>

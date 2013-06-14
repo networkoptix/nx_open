@@ -18,7 +18,7 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 
-    QnMediaResource::init();
+    QnMediaResource::initMediaResource();
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const

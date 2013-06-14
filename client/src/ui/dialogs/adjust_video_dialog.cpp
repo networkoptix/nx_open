@@ -51,7 +51,7 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
         //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
         m_backupParams = widget->contrastParams();
     }
-    QString name = m_widget ? m_widget->resource()->getName() : tr("[No item selected]");
+    QString name = m_widget ? m_widget->resource()->toResource()->getName() : tr("[No item selected]");
     setWindowTitle(tr("Adjust video - %1").arg(name));
 
     ui->histogramRenderer->setEnabled(m_widget != 0);
