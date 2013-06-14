@@ -25,6 +25,7 @@ compatibility_info.cpp
 Debug
 Release
 
+build_environment/python/packages/*/build
 build_environment/x86
 build_environment/x64
 
@@ -44,9 +45,6 @@ appserver/setup/version.py
 appserver/entcontroller.conf
 appserver/setup/build
 appserver/version_maven.py
-appserver/packages/llutil/build
-appserver/packages/llutil/dist
-appserver/packages/llutil/llutil.egg-info
 
 applauncher/bin
 applauncher/build
