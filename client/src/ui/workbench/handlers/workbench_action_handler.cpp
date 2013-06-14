@@ -1555,8 +1555,25 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     dialog->setWindowTitle(tr("Layout Settings"));
     dialog->readFromResource(layout);
 
+    bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
     if(!dialog->exec() || !dialog->submitToResource(layout))
         return;
+
+    /* Move layout items to grid center to best fit the background */
+    if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty()) {
+        QnWorkbenchLayout* wlayout = QnWorkbenchLayout::instance(layout);
+        if (wlayout) {
+            QRect brect = wlayout->boundingRect();
+            int xdiff = -brect.center().x();
+            int ydiff = -brect.center().y();
+
+            QList<QnWorkbenchItem*> items = wlayout->items().toList();
+            QList<QRect> geometries;
+            foreach (QnWorkbenchItem* item, items)
+                geometries << item->geometry().adjusted(xdiff, ydiff, xdiff, ydiff);
+            wlayout->moveItems(items, geometries);
+        }
+    }
 
     snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
 }
