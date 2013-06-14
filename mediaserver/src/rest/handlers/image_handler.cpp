@@ -33,7 +33,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
     for (int i = 0; i < 20 && !video; ++i) 
     {
         QnAbstractMediaDataPtr media = serverDelegate.getNextData();
-        if (!media || media->dataType == QnAbstractMediaData::EMPTY_DATA)
+        if (!media || media->timestamp == DATETIME_NOW)
             break;
         video = media.dynamicCast<QnCompressedVideoData>();
     }
@@ -41,13 +41,12 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
     // if ceilTime specified try frame with time > requested time (round time to ceil)
     if (ceilTime != AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
     {
-        QnCompressedVideoDataPtr video2;
-        for (int i = 0; i < 50 && !video; ++i) 
+        for (int i = 0; i < MAX_GOP_LEN; ++i) 
         {
-            QnAbstractMediaDataPtr media = serverDelegate.getNextData();
-            if (!media || media->dataType == QnAbstractMediaData::EMPTY_DATA)
+            QnAbstractMediaDataPtr media2 = serverDelegate.getNextData();
+            if (!media2 || media2->timestamp == DATETIME_NOW)
                 break;
-            video2 = media.dynamicCast<QnCompressedVideoData>();
+            QnCompressedVideoDataPtr video2 = media2.dynamicCast<QnCompressedVideoData>();
             if (video2->flags & AV_PKT_FLAG_KEY)
                 return video2;
         }
