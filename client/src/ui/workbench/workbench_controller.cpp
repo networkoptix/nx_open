@@ -33,6 +33,8 @@
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 
+#include "client/client_settings.h"
+
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -554,8 +556,7 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
 // -------------------------------------------------------------------------- //
 // Screen recording
 // -------------------------------------------------------------------------- //
-void QnWorkbenchController::startRecording()
-{
+void QnWorkbenchController::startRecording() {
     if (!m_screenRecorder) {
         action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
@@ -581,8 +582,7 @@ void QnWorkbenchController::startRecording()
     connect(m_recordingCountdownLabel, SIGNAL(tick(int)), this, SLOT(at_recordingAnimation_tick(int)));
 }
 
-void QnWorkbenchController::stopRecording()
-{
+void QnWorkbenchController::stopRecording() {
     if (!m_screenRecorder)
         return;
 
@@ -596,8 +596,7 @@ void QnWorkbenchController::stopRecording()
     m_screenRecorder->stopRecording();
 }
 
-void QnWorkbenchController::at_recordingAnimation_finished()
-{
+void QnWorkbenchController::at_recordingAnimation_finished() {
     if (m_recordingCountdownLabel)
         m_recordingCountdownLabel->setOpacity(0.0);
     m_recordingCountdownLabel = NULL;
@@ -609,8 +608,7 @@ void QnWorkbenchController::at_recordingAnimation_finished()
     m_countdownCanceled = false;
 }
 
-void QnWorkbenchController::at_recordingAnimation_tick(int tick)
-{
+void QnWorkbenchController::at_recordingAnimation_tick(int tick) {
     if (!m_recordingCountdownLabel)
         return;
 
@@ -640,10 +638,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     if (suggetion.isEmpty())
         suggetion = tr("recorded_video");
 
-    QSettings settings; // TODO: #Elric replace with QnSettings
-    settings.beginGroup(QLatin1String("videoRecording"));
-
-    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    QString previousDir = qnSettings->lastRecordingDir();
     QString selectedFilter;
     while (true) {
         QString filePath = QFileDialog::getSaveFileName(
@@ -669,13 +664,12 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 
             QnFileProcessor::createResourcesForFile(filePath);
 
-            settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
+            qnSettings->setLastRecordingDir(QFileInfo(filePath).absolutePath());
         } else {
             QFile::remove(recordedFileName);
         }
         break;
     }
-    settings.endGroup();
 }
 
 

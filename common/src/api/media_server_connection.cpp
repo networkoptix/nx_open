@@ -566,7 +566,7 @@ int QnMediaServerConnection::ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &
     return sendAsyncGetRequest(PtzSpaceMapperObject, params, QN_REPLY_TYPE(QnPtzSpaceMapper), target, slot);
 }
 
-int QnMediaServerConnection::asyncEventLog(
+int QnMediaServerConnection::getEventLogAsync(
                   qint64 dateFrom, qint64 dateTo, 
                   QnResourceList camList,
                   BusinessEventType::Value eventType, 

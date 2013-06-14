@@ -268,7 +268,7 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
     if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
         return Qn::InvisibleAction;
 
-    Qn::RenderStatus renderStatus = widget->currentRenderStatus();
+    Qn::RenderStatus renderStatus = widget->renderStatus();
     if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
         return Qn::DisabledAction;
 
@@ -283,7 +283,7 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
     if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
         return Qn::InvisibleAction;
 
-    Qn::RenderStatus renderStatus = widget->currentRenderStatus();
+    Qn::RenderStatus renderStatus = widget->renderStatus();
     if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
         return Qn::DisabledAction;
 
@@ -369,11 +369,6 @@ Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParame
 
 Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters &) {
     return (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) ? Qn::InvisibleAction : Qn::EnabledAction;
-}
-
-
-Qn::ActionVisibility QnDisconnectActionCondition::check(const QnActionParameters &) {
-    return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &resources) {
@@ -500,4 +495,9 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
     }
 
     return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+    return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
 }

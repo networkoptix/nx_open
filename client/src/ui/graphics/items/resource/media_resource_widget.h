@@ -106,7 +106,7 @@ protected:
 
     virtual QString calculateInfoText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
-    virtual Overlay calculateChannelOverlay(int channel) const override;
+    virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
@@ -138,8 +138,6 @@ private slots:
     void at_camDisplay_liveChanged();
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
 private:
-    int currentRecordingMode();
-    
     void setDisplay(const QnResourceDisplayPtr &display);
 
     Q_SLOT void updateDisplay();

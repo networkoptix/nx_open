@@ -72,11 +72,11 @@ private:
 class QnToolTipSliderVisibilityAccessor: public AbstractAccessor {
 public:
     virtual QVariant get(const QObject *object) const override {
-        return checked_cast<const QnToolTipSlider *>(object)->m_toolTipItemVisibility;
+        return checked_cast<const QnToolTipSlider *>(object)->m_tooltipWidgetVisibility;
     }
 
     virtual void set(QObject *object, const QVariant &value) const override {
-        checked_cast<QnToolTipSlider *>(object)->m_toolTipItemVisibility = value.toReal();
+        checked_cast<QnToolTipSlider *>(object)->m_tooltipWidgetVisibility = value.toReal();
     }
 };
 
@@ -96,18 +96,18 @@ QnToolTipSlider::QnToolTipSlider(GraphicsSliderPrivate &dd, QGraphicsItem *paren
 void QnToolTipSlider::init() {
     setOrientation(Qt::Horizontal);
 
-    m_toolTipItemVisibility = 0.0;
+    m_tooltipWidgetVisibility = 0.0;
     m_autoHideToolTip = true;
     m_sliderUnderMouse = false;
     m_toolTipUnderMouse = false;
     m_pendingPositionUpdate = false;
     m_instantPositionUpdate = false;
 
-    m_toolTipItemVisibilityAnimator = new VariantAnimator(this);
-    m_toolTipItemVisibilityAnimator->setSpeed(2.0);
-    m_toolTipItemVisibilityAnimator->setAccessor(new QnToolTipSliderVisibilityAccessor());
-    m_toolTipItemVisibilityAnimator->setTargetObject(this);
-    registerAnimation(m_toolTipItemVisibilityAnimator);
+    m_tooltipWidgetVisibilityAnimator = new VariantAnimator(this);
+    m_tooltipWidgetVisibilityAnimator->setSpeed(2.0);
+    m_tooltipWidgetVisibilityAnimator->setAccessor(new QnToolTipSliderVisibilityAccessor());
+    m_tooltipWidgetVisibilityAnimator->setTargetObject(this);
+    registerAnimation(m_tooltipWidgetVisibilityAnimator);
 
     m_animationListener.reset(new QnToolTipSliderAnimationListener(this));
     registerAnimation(m_animationListener.data());
@@ -123,7 +123,7 @@ QnToolTipSlider::~QnToolTipSlider() {
 }
 
 QnToolTipWidget *QnToolTipSlider::toolTipItem() const {
-    return m_toolTipItem.data();
+    return m_tooltipWidget.data();
 }
 
 void QnToolTipSlider::setToolTipItem(QnToolTipWidget *newToolTipItem) {
@@ -133,7 +133,7 @@ void QnToolTipSlider::setToolTipItem(QnToolTipWidget *newToolTipItem) {
         delete toolTipItem();
     }
 
-    m_toolTipItem = newToolTipItem;
+    m_tooltipWidget = newToolTipItem;
 
     if(toolTipItem()) {
         toolTipItem()->setParent(this); /* Claim ownership, but not in graphics item sense. */
@@ -162,11 +162,11 @@ void QnToolTipSlider::setAutoHideToolTip(bool autoHideToolTip) {
 }
 
 void QnToolTipSlider::hideToolTip() {
-    m_toolTipItemVisibilityAnimator->animateTo(0.0);
+    m_tooltipWidgetVisibilityAnimator->animateTo(0.0);
 }
 
 void QnToolTipSlider::showToolTip() {
-    m_toolTipItemVisibilityAnimator->animateTo(1.0);
+    m_tooltipWidgetVisibilityAnimator->animateTo(1.0);
 }
 
 void QnToolTipSlider::updateToolTipVisibility() {
@@ -188,7 +188,7 @@ void QnToolTipSlider::updateToolTipOpacity() {
     if(!toolTipItem())
         return;
 
-    toolTipItem()->setOpacity(effectiveOpacity() * m_toolTipItemVisibility);
+    toolTipItem()->setOpacity(effectiveOpacity() * m_tooltipWidgetVisibility);
 }
 
 void QnToolTipSlider::updateToolTipText() {

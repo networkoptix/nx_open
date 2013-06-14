@@ -28,6 +28,8 @@ public:
 
     QnHistogramConsumer * getHystogramConsumer() const;
     void setWidget(QnMediaResourceWidget* widget);
+protected:
+    virtual void closeEvent ( QCloseEvent * e ) override;
 private:
     void setParams(const ImageCorrectionParams& params);
 private slots:
@@ -43,8 +45,7 @@ private:
     ImageCorrectionParams m_params;
     QnMediaResourceWidget* m_widget;
 
-    typedef QMap<QnMediaResourceWidget*, ImageCorrectionParams> ParamsMap;
-    ParamsMap m_backupParams;
+    ImageCorrectionParams m_backupParams;
 };
 
 #endif // QN_ADJUST_VIDEO_DIALOG_H

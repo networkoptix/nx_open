@@ -165,6 +165,20 @@ int QnProxyLabel::selectionStart() const {
     return m_label->selectionStart();
 }
 
+bool QnProxyLabel::eventFilter(QObject *object, QEvent *event) {
+    if(object == widget() && (event->type() == QEvent::Show || event->type() == QEvent::Hide))
+        return QGraphicsWidget::eventFilter(object, event); /* Skip QGraphicsProxyWidget's implementation. */
+    
+    return base_type::eventFilter(object, event);
+}
+
+QVariant QnProxyLabel::itemChange(GraphicsItemChange change, const QVariant &value) {
+    if(change == ItemVisibleChange || change == ItemVisibleHasChanged)
+        return QGraphicsWidget::itemChange(change, value); /* Skip QGraphicsProxyWidget's implementation. */
+
+    return base_type::itemChange(change, value);
+}
+
 QSizeF QnProxyLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
     /* QGraphicsProxyWidget doesn't take heightForWidth into account.
      * So we implement sizeHint our own way. */

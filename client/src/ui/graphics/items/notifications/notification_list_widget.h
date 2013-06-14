@@ -20,9 +20,14 @@ public:
     ~QnNotificationListWidget();
 
     void addItem(QnNotificationItem *item, bool locked = false);
+    void removeItem(QnNotificationItem *item);
+
     void clear();
 
     QSizeF visibleSize() const;
+
+    /** Rectangle where all tooltips should fit - in local coordinates. */
+    void setToolTipsEnclosingRect(const QRectF &rect);
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
@@ -93,6 +98,7 @@ private:
     ItemData m_collapser;
     bool m_collapsedItemCountChanged;
     QSizeF m_visibleSize;
+    QRectF m_tooltipsEnclosingRect;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H

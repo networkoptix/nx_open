@@ -10,7 +10,7 @@
 
 #include <health/system_health.h>
 
-#include <utils/kvpair_usage_helper.h>
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -39,17 +39,13 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QnWorkbenchContext *context, QWidge
         m_systemHealthCheckBoxes << checkbox;
     }
 
-    m_showBusinessEventsHelper = new QnUint64KvPairUsageHelper(
-                context->user(),
-                QLatin1String("showBusinessEvents"),    //TODO: #GDM move out common consts
-                0xFFFFFFFFFFFFFFFFull,                  //TODO: #GDM move out common consts
-                this);
+    m_showBusinessEventsHelper = this->context()->instance<QnShowBusinessEventsHelper>();
 
     connect(ui->showAllCheckBox, SIGNAL(toggled(bool)),                             this,   SLOT(at_showAllCheckBox_toggled(bool)));
     connect(context,             SIGNAL(userChanged(const QnUserResourcePtr &)),    this,   SLOT(at_context_userChanged()));
     connect(m_showBusinessEventsHelper, SIGNAL(valueChanged(quint64)),              this,   SLOT(at_showBusinessEvents_valueChanged(quint64)));
 
-    at_showBusinessEvents_valueChanged(0xFFFFFFFFFFFFFFFFull);
+    at_showBusinessEvents_valueChanged(m_showBusinessEventsHelper->value());
 }
 
 QnPopupSettingsWidget::~QnPopupSettingsWidget()

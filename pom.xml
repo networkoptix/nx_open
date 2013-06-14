@@ -217,7 +217,7 @@
 			</modules>
 			<properties>
 				<environment.dir>${env.environment}</environment.dir>
-				<python.dir>/usr/bin/</python.dir>				
+                <python.dir>${env.environment}/python/bin</python.dir>				
 				<qt.dir>${env.QTDIR}</qt.dir>				
 				<platform>linux</platform>
 				<compiler>gcc</compiler>
@@ -269,7 +269,7 @@
 			</modules>
 			<properties>
 				<environment.dir>${env.environment}</environment.dir>
-				<python.dir>/usr/bin/</python.dir>				
+                <python.dir>${env.environment}/python/bin/</python.dir>				
 				<qt.dir></qt.dir>
 				<platform>macosx</platform>
 				<compiler>gcc</compiler>

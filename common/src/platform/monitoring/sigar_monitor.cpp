@@ -76,19 +76,39 @@ public:
         return result;
     }
 
-    QnPlatformMonitor::PartitionSpace partitionUsage(const QString &path) {
+    QnPlatformMonitor::PartitionType partitionType(sigar_file_system_type_e type) {
+        switch(type) {
+        case SIGAR_FSTYPE_LOCAL_DISK:
+            return QnPlatformMonitor::LocalDiskPartition;
+        case SIGAR_FSTYPE_NETWORK:
+            return QnPlatformMonitor::NetworkPartition;
+        case SIGAR_FSTYPE_RAM_DISK:
+            return QnPlatformMonitor::RamDiskPartition;
+        case SIGAR_FSTYPE_CDROM:
+            return QnPlatformMonitor::OpticalDiskPartition;
+        case SIGAR_FSTYPE_SWAP:
+            return QnPlatformMonitor::SwapPartition;
+        case SIGAR_FSTYPE_UNKNOWN:
+        case SIGAR_FSTYPE_NONE:
+        default:
+            return QnPlatformMonitor::UnknownPartition;
+        }
+    }
+
+    QnPlatformMonitor::PartitionSpace partitionUsage(const sigar_file_system_t &fileSystem) {
         QnPlatformMonitor::PartitionSpace result;
 
         if(!sigar)
             return result;
 
         sigar_file_system_usage_t usage;
-        if(INVOKE(sigar_file_system_usage_get(sigar, path.toLatin1().constData(), &usage)) != SIGAR_OK)
+        if(INVOKE(sigar_file_system_usage_get(sigar, fileSystem.dir_name, &usage)) != SIGAR_OK)
             return result;
 
-        result.path = path; // TODO
+        result.path = QLatin1String(fileSystem.dir_name);
         result.freeBytes = usage.free * 1024;
         result.sizeBytes = usage.total * 1024;
+        result.type = partitionType(fileSystem.type);
 
         return result;
     }
@@ -243,13 +263,8 @@ QList<QnPlatformMonitor::PartitionSpace> QnSigarMonitor::totalPartitionSpaceInfo
     if(INVOKE(sigar_file_system_list_get(d->sigar, &fileSystems)) != SIGAR_OK)
         return result;
 
-    for(uint i = 0; i < fileSystems.number; i++) {
-        const sigar_file_system_t &fileSystem = fileSystems.data[i];
-        if(fileSystem.type != SIGAR_FSTYPE_LOCAL_DISK)
-            continue; /* Skip non-hdds. */
-
-        result.push_back(d->partitionUsage(QLatin1String(fileSystem.dir_name)));
-    }
+    for(uint i = 0; i < fileSystems.number; i++)
+        result.push_back(d->partitionUsage(fileSystems.data[i]));
 
     INVOKE(sigar_file_system_list_destroy(d->sigar, &fileSystems));
     return result;

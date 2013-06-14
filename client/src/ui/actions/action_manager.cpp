@@ -375,15 +375,15 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Selection Changed"));
 
-    factory(Qn::GetMoreLicensesAction).
+    factory(Qn::PreferencesLicensesTabAction).
         flags(Qn::NoTarget).
         text(tr("Get More Licenses..."));
 
-    factory(Qn::OpenServerSettingsAction).
+    factory(Qn::PreferencesServerTabAction).
         flags(Qn::NoTarget).
         text(tr("Settings..."));
 
-    factory(Qn::OpenPopupSettingsAction).
+    factory(Qn::PreferencesNotificationTabAction).
         flags(Qn::NoTarget).
         text(tr("Settings..."));
 
@@ -401,10 +401,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Help")).
         icon(qnSkin->icon("titlebar/whats_this.png"));
-
-    factory(Qn::CheckSystemHealthAction).
-        flags(Qn::NoTarget).
-        text(tr("Check System Health..."));
 
     factory(Qn::ClearCacheAction).
         flags(Qn::NoTarget).
@@ -436,7 +432,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         text(tr("Logout")).
         autoRepeat(false).
-        condition(new QnDisconnectActionCondition(this));
+        condition(new QnLoggedInCondition(this));
 
     factory().
         flags(Qn::Main).
@@ -587,7 +583,16 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: #Elric icon?
 
-    factory(Qn::SystemSettingsAction).
+    factory(Qn::MessageBoxAction).
+        flags(Qn::NoTarget).
+        text(tr("Show message"));
+
+    factory(Qn::BrowseUrlAction).
+        flags(Qn::NoTarget).
+        text(tr("Open in browser..."));
+
+
+    factory(Qn::PreferencesGeneralTabAction).
         flags(Qn::Main).
         text(tr("System Settings...")).
         //shortcut(tr("Ctrl+P")).
@@ -617,6 +622,13 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Log...")).
         shortcut(tr("Ctrl+L")).
+        autoRepeat(false);
+
+    factory(Qn::CameraListAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Cameras list...")).
+        shortcut(tr("Ctrl+M")).
         autoRepeat(false);
 
     factory().
@@ -785,7 +797,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Resolution..."));
+        text(tr("Change Resolution...")).
+        condition(new QnLoggedInCondition(this));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
@@ -1009,7 +1022,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Clear Camera Settings Dialog"));
 
     factory(Qn::ServerAddCameraManuallyAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Add camera(s)...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
@@ -1018,12 +1031,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Ping..."));
 
     factory(Qn::ServerLogsAction).
-        flags(Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Server Logs"));
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Server Logs")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory(Qn::ServerIssuesAction).
-        flags(Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Check Server Issues..."));
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Check Server Issues...")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).

@@ -46,5 +46,5 @@ void QnPopupBusinessActionWidget::paramsChanged() {
 }
 
 void QnPopupBusinessActionWidget::at_settingsButton_clicked() {
-    menu()->trigger(Qn::OpenPopupSettingsAction);
+    menu()->trigger(Qn::PreferencesNotificationTabAction);
 }
