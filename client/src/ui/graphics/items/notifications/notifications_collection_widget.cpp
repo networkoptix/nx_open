@@ -12,7 +12,6 @@
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/style/skin.h>
