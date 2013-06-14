@@ -166,7 +166,6 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
-    qDebug() << "userChaged" << context()->user();
     m_showBusinessEventsHelper->setResource(context()->user());
 
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
@@ -189,13 +188,11 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
     setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, false);
-    qDebug() << "connectionOPened";
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
     clear();
     setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);
-    qDebug() << "connectionClosed";
 }
 
 void QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged() {
