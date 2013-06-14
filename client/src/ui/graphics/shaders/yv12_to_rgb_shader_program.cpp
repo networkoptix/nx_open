@@ -53,7 +53,7 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, 
         void main() {
             gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
             gl_TexCoord[0] = gl_MultiTexCoord0;
-    }
+        }
     ));
 
     addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(

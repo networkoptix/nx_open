@@ -12,9 +12,11 @@ public:
     void setYTexture(int target) {
         setUniformValue(m_yTextureLocation, target);
     }
+
     void setUTexture(int target) {
         setUniformValue(m_uTextureLocation, target);
     }
+
     void setVTexture(int target) {
         setUniformValue(m_vTextureLocation, target);
     }
@@ -23,8 +25,7 @@ public:
         setUniformValue(m_opacityLocation, opacity);
     }
 
-    void setImageCorrection(const ImageCorrectionResult& value)
-    {
+    void setImageCorrection(const ImageCorrectionResult &value) {
         setUniformValue(m_yLevels1Location, value.aCoeff);
         setUniformValue(m_yLevels2Location, value.bCoeff);
         setUniformValue(m_yGammaLocation, value.gamma);
@@ -48,24 +49,29 @@ public:
     void setYTexture(int target) {
         setUniformValue(m_yTextureLocation, target);
     }
+
     void setUTexture(int target) {
         setUniformValue(m_uTextureLocation, target);
     }
+
     void setVTexture(int target) {
         setUniformValue(m_vTextureLocation, target);
     }
+
     void setATexture(int target) {
         setUniformValue(m_aTextureLocation, target);
     }
+
     void setOpacity(GLfloat opacity) {
         setUniformValue(m_opacityLocation, opacity);
     }
-    void setImageCorrection(const ImageCorrectionResult& value)
-    {
+
+    void setImageCorrection(const ImageCorrectionResult &value) {
         setUniformValue(m_yLevels1Location, value.aCoeff);
         setUniformValue(m_yLevels2Location, value.bCoeff);
         setUniformValue(m_yGammaLocation, value.gamma);
     }
+
 private:
     int m_yTextureLocation;
     int m_uTextureLocation;
