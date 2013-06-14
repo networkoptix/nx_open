@@ -20,6 +20,8 @@ public:
     ~QnNotificationListWidget();
 
     void addItem(QnNotificationItem *item, bool locked = false);
+    void removeItem(QnNotificationItem *item);
+
     void clear();
 
     QSizeF visibleSize() const;

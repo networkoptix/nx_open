@@ -37,6 +37,8 @@ public:
 
 signals:
     void systemHealthEventAdded(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
+    void systemHealthEventRemoved(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
+
     void businessActionAdded(const QnAbstractBusinessActionPtr& businessAction);
     void cleared();
 
@@ -46,6 +48,8 @@ public slots:
 private slots:
     void at_context_userChanged();
     void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
+
+    void setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
 
 private:
     QnUint64KvPairUsageHelper* m_showBusinessEventsHelper;

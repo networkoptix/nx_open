@@ -93,12 +93,22 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     emit systemHealthEventAdded(message, resource);
 }
 
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool visible) {
+    bool canShow = qnSettings->popupSystemHealth() & (1 << message);
+    if (visible && canShow)
+        emit systemHealthEventAdded(message, resource);
+    else
+        emit systemHealthEventRemoved(message, resource);
+}
+
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
     m_showBusinessEventsHelper->setResource(context()->user());
 }
 
 void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid) {
-    if (!isValid)
-        addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, user);
+    if (context()->user() == user)
+        setSystemHealthEventVisible(QnSystemHealth::EmailIsEmpty, user, !isValid);
+    else
+        setSystemHealthEventVisible(QnSystemHealth::UsersEmailIsEmpty, user, !isValid);
 }
 

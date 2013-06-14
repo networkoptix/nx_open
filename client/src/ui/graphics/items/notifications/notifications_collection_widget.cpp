@@ -31,6 +31,8 @@ namespace {
     const int buttonSize = 24;
     const int thumbnailHeight = 100;
 
+    const char *itemResourcePropertyName = "_qn_itemResource";
+
 } //anonymous namespace
 
 QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
@@ -89,10 +91,12 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     QnWorkbenchNotificationsHandler* handler = this->context()->instance<QnWorkbenchNotificationsHandler>();
     connect(handler, SIGNAL(businessActionAdded(QnAbstractBusinessActionPtr)),
             this, SLOT(showBusinessAction(QnAbstractBusinessActionPtr)));
-    connect(handler, SIGNAL(systemHealthEventAdded(QnSystemHealth::MessageType,const QnResourcePtr&)),
-            this, SLOT(showSystemHealthEvent(QnSystemHealth::MessageType,const QnResourcePtr&)));
-    connect(handler, SIGNAL(cleared()),
-            this, SLOT(hideAll()));
+    connect(handler,    SIGNAL(systemHealthEventAdded   (QnSystemHealth::MessageType, const QnResourcePtr&)),
+            this,       SLOT(showSystemHealthMessage    (QnSystemHealth::MessageType, const QnResourcePtr&)));
+    connect(handler,    SIGNAL(systemHealthEventRemoved (QnSystemHealth::MessageType, const QnResourcePtr&)),
+            this,       SLOT(hideSystemHealthMessage    (QnSystemHealth::MessageType, const QnResourcePtr&)));
+    connect(handler,    SIGNAL(cleared()),
+            this,       SLOT(hideAll()));
 }
 
 QnNotificationsCollectionWidget::~QnNotificationsCollectionWidget() {
@@ -273,8 +277,22 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     m_list->addItem(item);
 }
 
-void QnNotificationsCollectionWidget::showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
-    QnNotificationItem *item = new QnNotificationItem(m_list);
+QnNotificationItem* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
+    QList<QnNotificationItem*> items = m_itemsByMessageType.values(message);
+    foreach (QnNotificationItem* item, items) {
+        if (resource != item->property(itemResourcePropertyName).value<QnResourcePtr>())
+            continue;
+        return item;
+    }
+    return NULL;
+}
+
+void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
+    QnNotificationItem *item = findItem(message, resource);
+    if (item)
+        return;
+
+    item = new QnNotificationItem(m_list);
 
     QString name = resource ? resource->getName() : QString();
 
@@ -363,10 +381,23 @@ void QnNotificationsCollectionWidget::showSystemHealthEvent(QnSystemHealth::Mess
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
 
     m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
+
+    item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
+    m_itemsByMessageType.insert(message, item);
+
+}
+
+void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
+    QnNotificationItem* target = findItem(message, resource);
+    if (!target)
+        return;
+    m_list->removeItem(target);
+    m_itemsByMessageType.remove(message, target);
 }
 
 void QnNotificationsCollectionWidget::hideAll() {
     m_list->clear();
+    m_itemsByMessageType.clear();
 }
 
 void QnNotificationsCollectionWidget::at_settingsButton_clicked() {
@@ -403,7 +434,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         default:
             break;
         }
-        showSystemHealthEvent(message, resource);
+        showSystemHealthMessage(message, resource);
     }
 
     //TODO: #GDM REMOVE DEBUG
@@ -437,6 +468,11 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
 }
 
 void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationItem *item) {
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
+        if (m_itemsByMessageType.remove(message, item) > 0)
+            break;
+    }
     delete item;
 }
 

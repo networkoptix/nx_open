@@ -37,7 +37,8 @@ signals:
     void sizeHintChanged();
 
 private slots:
-    void showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+    void showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+    void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideAll();
 
@@ -55,8 +56,12 @@ private:
      */
     void loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
 
+    QnNotificationItem* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
+
+    QMultiHash<QnSystemHealth::MessageType, QnNotificationItem*> m_itemsByMessageType;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H
