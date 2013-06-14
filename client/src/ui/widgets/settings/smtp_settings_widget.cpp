@@ -12,7 +12,9 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
 
 namespace {
     enum WidgetPages {
@@ -84,12 +86,14 @@ void QnSmtpSettingsWidget::update() {
     m_settingsReceived = false;
 
     m_requestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                this, SLOT(at_settings_received(int,QnKvPairList,int)));
+                this, SLOT(at_settings_received(int, const QnKvPairList&, int)));
 }
 
 void QnSmtpSettingsWidget::submit() {
     QnEmail::Settings result = settings();
-    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized(), this, SLOT(at_settings_saved(int, QnKvPairList, int)));
+    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized(),
+                                                                        context()->instance<QnWorkbenchNotificationsHandler>(),
+                                                                        SLOT(updateSmtpSettings(int, const QnKvPairList&, int)));
 }
 
 void QnSmtpSettingsWidget::updateFocusedElement() {
@@ -301,11 +305,12 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &
         return;
 
     m_requestHandle = -1;
+    m_settingsReceived = true;
+    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(status, values, handle);
 
     bool success = (status == 0);
     if(!success) {
         QMessageBox::critical(this, tr("Error"), tr("Error while receiving settings"));
-        m_settingsReceived = true;
         return;
     }
 
@@ -321,10 +326,4 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &
     ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
                                        ? AdvancedPage
                                        : SimplePage);
-
-    m_settingsReceived = true;
-}
-
-void QnSmtpSettingsWidget::at_settings_saved(int, const QnKvPairList &, int) {
-    return;
 }

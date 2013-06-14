@@ -1,9 +1,16 @@
 #include "camera_list_model.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/resource_type.h"
 
-QnCameraListModel::QnCameraListModel(QObject *parent):
-    QnResourceListModel(parent)
+#include <core/resource/camera_resource.h>
+#include <core/resource/resource_type.h>
+#include <core/resource/media_server_resource.h>
+
+#include <ui/common/recording_status_helper.h>
+#include <ui/style/resource_icon_cache.h>
+#include <ui/workbench/workbench_context.h>
+
+QnCameraListModel::QnCameraListModel(QObject *parent, QnWorkbenchContext *context):
+    QnResourceListModel(parent),
+    QnWorkbenchContextAware(parent, context)
 {
 
 }
@@ -20,9 +27,31 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     switch(role) {
+    case Qt::DecorationRole:
+        if (index.column() == RecordingColumn) {
+            int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
+            if(camera->getStatus() == QnResource::Recording)
+                recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), camera);
+            result =  QnRecordingStatusHelper::icon(recordingMode);
+        }
+        else if (index.column() == NameColumn)
+            result = qnResIconCache->icon(camera->flags(), camera->getStatus());
+        else if (index.column() == ServerColumn) {
+            QnResourcePtr server = camera->getParentResource();
+            if (server)
+                result = qnResIconCache->icon(server->flags(), server->getStatus());
+        }
+        break;
     case Qt::DisplayRole:
         switch ((Column) index.column())
         {
+            case RecordingColumn: {
+                int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
+                if(camera->getStatus() == QnResource::Recording)
+                    recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), camera);
+                result =  QnRecordingStatusHelper::shortTooltip(recordingMode);
+                break;
+            }
             case NameColumn:
                 result = camera->getName();
                 break;
@@ -43,6 +72,12 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
             case UniqIdColumn:
                 result = camera->getPhysicalId();
                 break;
+            case ServerColumn: {
+                QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+                if (server)
+                    result = QString(lit("%1 (%2)")).arg(server->getName()).arg(QUrl(server->getApiUrl()).host());
+                break;
+            }
             default:
                 result = QnResourceListModel::data(index, role);
         }
@@ -57,19 +92,21 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
 QString QnCameraListModel::columnTitle(Column column) const
 {
     switch(column) {
+    case RecordingColumn: return tr("Recording");
     case NameColumn:      return tr("Name");
     case VendorColumn:    return tr("Manufacturer");
     case ModelColumn:     return tr("Model");
     case FirmwareColumn:  return tr("Firmware");
-    case IPColumn:        return tr("Host");
+    case IPColumn:        return tr("IP/Name");
     case UniqIdColumn:    return tr("ID/MAC");
+    case ServerColumn:    return tr("Server");
     default:
         assert(false);
         return QString();
     }
 }
 
-void QnCameraListModel::setColumns(const QList<Column>& columns) 
+void QnCameraListModel::setColumns(const QList<Column>& columns)
 {
     m_columns = columns;
 }
