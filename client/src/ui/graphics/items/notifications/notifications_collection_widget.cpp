@@ -154,8 +154,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                         .withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000),
                         2.0, true
                         );
-//            loadThumbnailForItem(item, resource, params.getEventTimestamp());
-            loadThumbnailForItem(item, resource); //TODO: #GDM loading latest while Roma fixes mediaserver
+            loadThumbnailForItem(item, resource, params.getEventTimestamp());
             break;
         }
 

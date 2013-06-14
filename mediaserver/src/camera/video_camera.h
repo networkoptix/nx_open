@@ -19,6 +19,7 @@ public:
     //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
     //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);
     QnCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream);
+    QnCompressedVideoDataPtr getFrameByTime(bool primaryLiveStream, qint64 time);
     QnCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream);
 
     void beforeStop();
