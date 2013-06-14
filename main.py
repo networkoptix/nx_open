@@ -10,6 +10,7 @@ def get_build_environment():
     parser = argparse.ArgumentParser()
     parser.add_argument("--cfg", help="configuration, default - release")
     parser.add_argument("--cst", help="customization, default - HD Witness")
+    #parser.add_argument("command")
     args = parser.parse_args()
     if platform.architecture()[0] == '64bit':
         config.build_arch = 'x64'
@@ -36,8 +37,7 @@ def get_build_environment():
         config.build_platform = 'linux'
     elif sys.platform == 'darwin':
         config.build_platform = 'macosx'    
-        
-    return config    
+    return config
     
 def get_environment_variable(variable):
     if variable == 'platform':
