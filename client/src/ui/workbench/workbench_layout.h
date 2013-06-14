@@ -28,7 +28,7 @@ class QnWorkbenchLayout: public QObject {
     Q_OBJECT;
 public:
     /**
-     * Helper struct for obtaining detailed information on move operations. 
+     * Helper struct for obtaining detailed information on move operations.
      */
     struct Disposition {
         /** Set of free slots that the moved items will occupy. */
@@ -48,7 +48,7 @@ public:
 
     /**
      * Constructor.
-     * 
+     *
      * \param resource                  Layout resource that this layout will
      *                                  be in sync with.
      * \param parent                    Parent object for this layout.
@@ -56,7 +56,7 @@ public:
     QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObject *parent = NULL);
 
     /**
-     * \returns                         Resource associated with this layout, if any. 
+     * \returns                         Resource associated with this layout, if any.
      */
     QnLayoutResourcePtr resource() const;
 
@@ -71,15 +71,15 @@ public:
     virtual ~QnWorkbenchLayout();
 
     /**
-     * \returns                         Name of this layout. 
+     * \returns                         Name of this layout.
      */
     const QString &name() const;
 
     /**
-     * \param name                      New name for this layout. 
+     * \param name                      New name for this layout.
      */
     void setName(const QString &name);
-    
+
     /**
      * \param resource                  Resource to update layout from.
      * \returns                         Whether there were no errors during loading.
@@ -89,7 +89,7 @@ public:
     /**
      * \param[out] layoutData           Resource to submit layout to.
      */
-    void submit(const QnLayoutResourcePtr &resource) const; 
+    void submit(const QnLayoutResourcePtr &resource) const;
 
     /**
      * \param item                      Item to check.
@@ -215,7 +215,7 @@ public:
     }
 
     /**
-     * \returns                         Cell aspect ratio of this layout. 
+     * \returns                         Cell aspect ratio of this layout.
      */
     qreal cellAspectRatio() const {
         return m_cellAspectRatio;
@@ -227,7 +227,7 @@ public:
     void setCellAspectRatio(qreal cellAspectRatio);
 
     /**
-     * \returns                         Spacing between cells of this layout, 
+     * \returns                         Spacing between cells of this layout,
      *                                  relative to cell width.
      */
     const QSizeF &cellSpacing() const {
@@ -235,7 +235,7 @@ public:
     }
 
     /**
-     * \param cellSpacing               New spacing between cells for this layout, 
+     * \param cellSpacing               New spacing between cells for this layout,
      *                                  relative to cell width.
      */
     void setCellSpacing(const QSizeF &cellSpacing);
@@ -286,6 +286,12 @@ public:
         return m_dataByRole;
     }
 
+    /**
+     * @brief centralizeItems           Move all items to the center of the grid coordinates
+     *                                  (relative position is not changed).
+     */
+    void centralizeItems();
+
 signals:
     /**
      * This signal is emitted when this layout is about to be destroyed
@@ -321,12 +327,12 @@ signals:
     void boundingRectChanged(const QRect& oldRect, const QRect &newRect);
 
     /**
-     * This signal is emitted whenever name of this layout changes. 
+     * This signal is emitted whenever name of this layout changes.
      */
     void nameChanged();
 
     /**
-     * This signal is emitted whenever cell aspect ratio of this layout changes. 
+     * This signal is emitted whenever cell aspect ratio of this layout changes.
      */
     void cellAspectRatioChanged();
 
@@ -339,7 +345,7 @@ signals:
 
     /**
      * This signal is emitted whenever data associated with the provided role is changed.
-     * 
+     *
      * \param role                      Role of the changed data.
      */
     void dataChanged(int role);
@@ -350,7 +356,7 @@ private:
 
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);
     void updateBoundingRectInternal();
-    
+
     void addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem);
     void removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem);
     QUuid zoomTargetUuidInternal(QnWorkbenchItem *item) const;
