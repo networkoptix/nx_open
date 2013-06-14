@@ -26,7 +26,7 @@
 #include <utils/license_usage_helper.h>
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
-    QWidget(parent), 
+    QWidget(parent),
     ui(new Ui::CameraScheduleWidget),
     m_disableUpdateGridParams(false),
     m_motionAvailable(true),
@@ -65,7 +65,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     connect(ui->recordBeforeSpinBox,    SIGNAL(valueChanged(int)),          this,   SIGNAL(recordingSettingsChanged()));
     connect(ui->recordAfterSpinBox,     SIGNAL(valueChanged(int)),          this,   SIGNAL(recordingSettingsChanged()));
-    
+
     connect(ui->licensesButton,         SIGNAL(clicked()),                  this,   SLOT(at_licensesButton_clicked()));
     connect(ui->displayQualityCheckBox, SIGNAL(stateChanged(int)),          this,   SLOT(at_displayQualiteCheckBox_stateChanged(int)));
     connect(ui->displayFpsCheckBox,     SIGNAL(stateChanged(int)),          this,   SLOT(at_displayFpsCheckBox_stateChanged(int)));
@@ -90,9 +90,9 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     gridMouseReleaseSignalizer->setEventType(QEvent::MouseButtonRelease);
     connect(gridMouseReleaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SIGNAL(controlsChangesApplied()));
     ui->gridWidget->installEventFilter(gridMouseReleaseSignalizer);
-    
+
     connectToGridWidget();
-    
+
     updateGridEnabledState();
     updateLicensesLabelText();
     updateMotionButtons();
@@ -102,13 +102,13 @@ QnCameraScheduleWidget::~QnCameraScheduleWidget() {
     return;
 }
 
-void QnCameraScheduleWidget::connectToGridWidget() 
+void QnCameraScheduleWidget::connectToGridWidget()
 {
     connect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
 
 }
 
-void QnCameraScheduleWidget::disconnectFromGridWidget() 
+void QnCameraScheduleWidget::disconnectFromGridWidget()
 {
     disconnect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
 }
@@ -132,7 +132,7 @@ void QnCameraScheduleWidget::endUpdate() {
 void QnCameraScheduleWidget::setChangesDisabled(bool val)
 {
     m_changesDisabled = val;
-    
+
     updateGridEnabledState(); /* Update controls' enabled states. */
 }
 
@@ -141,7 +141,7 @@ bool QnCameraScheduleWidget::isChangesDisabled() const
     return m_changesDisabled;
 }
 
-bool QnCameraScheduleWidget::isReadOnly() const 
+bool QnCameraScheduleWidget::isReadOnly() const
 {
     return m_readOnly;
 }
@@ -190,8 +190,8 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     updateLicensesLabelText();
 }
 
-void QnCameraScheduleWidget::setContext(QnWorkbenchContext *context) { 
-    m_context = context; 
+void QnCameraScheduleWidget::setContext(QnWorkbenchContext *context) {
+    m_context = context;
 
     if(context) {
         connect(context->instance<QnWorkbenchPanicWatcher>(), SIGNAL(panicModeChanged()), this, SLOT(updatePanicLabelText()));
@@ -313,7 +313,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
         QString shortQuality = QLatin1String("-");
         if (task.m_recordType != Qn::RecordingType_Never)
         {
-            switch (task.m_streamQuality) 
+            switch (task.m_streamQuality)
             {
                 case QnQualityLow: shortQuality = QLatin1String("Lo"); break;
                 case QnQualityNormal: shortQuality = QLatin1String("Me"); break;
@@ -370,7 +370,7 @@ static inline QString getLongText(const QString &text)
         return QLatin1String("Best");
     return QLatin1String("-");
 }
- 
+
 int QnCameraScheduleWidget::qualityTextToIndex(const QString &text)
 {
     for (int i = 0; i < ui->qualityComboBox->count(); ++i)
@@ -446,14 +446,14 @@ void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
     {
         QMessageBox::warning(this, tr("FPS value is too high"),
             tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2").arg(currentMaxFps).arg(value));
-		emit scheduleTasksChanged();
+        emit scheduleTasksChanged();
     }
     if (currentMaxDualStreamingFps > dualStreamValue)
     {
         QMessageBox::warning(this, tr("FPS value is too high"),
             tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2")
                              .arg(currentMaxDualStreamingFps).arg(dualStreamValue));
-		emit scheduleTasksChanged();
+        emit scheduleTasksChanged();
     }
 
     updateMaxFpsValue(ui->recordMotionPlusLQButton->isChecked());
@@ -488,7 +488,7 @@ bool QnCameraScheduleWidget::isMotionAvailable() {
 }
 
 
-void QnCameraScheduleWidget::updateGridEnabledState() 
+void QnCameraScheduleWidget::updateGridEnabledState()
 {
     bool enabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
 
@@ -498,7 +498,7 @@ void QnCameraScheduleWidget::updateGridEnabledState()
     ui->gridWidget->setEnabled(enabled && !m_changesDisabled);
 }
 
-void QnCameraScheduleWidget::updateLicensesLabelText() 
+void QnCameraScheduleWidget::updateLicensesLabelText()
 {
     QnLicenseUsageHelper helper;
 
@@ -686,7 +686,7 @@ void QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
     ui->gridWidget->setShowFirstParam(state);
 }
 
-void QnCameraScheduleWidget::at_licensesButton_clicked() 
+void QnCameraScheduleWidget::at_licensesButton_clicked()
 {
     emit moreLicensesRequested();
 }
@@ -710,9 +710,11 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     if(m_cameras.size() > 1) {
         QMessageBox::warning(this, tr("Warning"), tr("Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras' motion setup page to ensure it is supported and enabled."));
     } else {
-        if(!(hasMotion && hasDualStreaming)) {
+        if (hasMotion && !hasDualStreaming) {
+            QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming is not supported by this camera."));
+        } else if(!hasMotion && !hasDualStreaming) {
             QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming and Motion Detection are not available for this camera."));
-        } else {
+        } else /* Has dual streaming but not motion */ {
             QMessageBox::warning(this, tr("Warning"), tr("Motion Recording is disabled. Please go to the motion setup page to setup the camera's motion area and sensitivity."));
         }
     }
