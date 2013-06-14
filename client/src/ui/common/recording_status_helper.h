@@ -2,7 +2,7 @@
 #define __RECORDING_STATUS_HELPER_H__
 
 #include <QIcon>
-#include "core/resource/camera_resource.h"
+#include <core/resource/resource_fwd.h>
 
 class QnWorkbenchContext;
 

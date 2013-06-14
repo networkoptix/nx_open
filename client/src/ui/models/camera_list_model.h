@@ -1,11 +1,12 @@
 #ifndef __CAMERA_LIST_MODEL_H__
 #define __CAMERA_LIST_MODEL_H__
 
-#include "resource_list_model.h"
+#include <ui/models/resource_list_model.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchContext;
 
-class QnCameraListModel: public QnResourceListModel
+class QnCameraListModel: public QnResourceListModel, public QnWorkbenchContextAware
 {
 public:
 
@@ -21,7 +22,7 @@ public:
         ColumnCount
     };
 
-    QnCameraListModel(QnWorkbenchContext* context, QObject *parent = NULL);
+    QnCameraListModel(QObject *parent = NULL, QnWorkbenchContext* context = NULL);
     virtual QVariant data(const QModelIndex &index, int role) const override;
 
     void setColumns(const QList<Column>& columns);
@@ -31,7 +32,6 @@ private:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 private:
     QList<Column> m_columns;
-    QnWorkbenchContext* m_context;
 };
 
 #endif // __CAMERA_LIST_MODEL_H__

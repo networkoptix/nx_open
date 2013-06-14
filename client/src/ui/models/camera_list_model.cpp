@@ -1,14 +1,16 @@
 #include "camera_list_model.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/resource_type.h"
-#include "ui/style/resource_icon_cache.h"
-#include "ui/workbench/workbench_context.h"
-#include "ui/common/recording_status_helper.h"
-#include "core/resource/media_server_resource.h"
 
-QnCameraListModel::QnCameraListModel(QnWorkbenchContext* context, QObject *parent):
-    m_context(context),
-    QnResourceListModel(parent)
+#include <core/resource/camera_resource.h>
+#include <core/resource/resource_type.h>
+#include <core/resource/media_server_resource.h>
+
+#include <ui/common/recording_status_helper.h>
+#include <ui/style/resource_icon_cache.h>
+#include <ui/workbench/workbench_context.h>
+
+QnCameraListModel::QnCameraListModel(QObject *parent, QnWorkbenchContext *context):
+    QnResourceListModel(parent),
+    QnWorkbenchContextAware(parent, context)
 {
 
 }
@@ -29,7 +31,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
         if (index.column() == RecordingColumn) {
             int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
             if(camera->getStatus() == QnResource::Recording)
-                recordingMode =  QnRecordingStatusHelper::currentRecordingMode(m_context, camera);
+                recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), camera);
             result =  QnRecordingStatusHelper::icon(recordingMode);
         }
         else if (index.column() == NameColumn)
@@ -43,7 +45,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
             case RecordingColumn: {
                 int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
                 if(camera->getStatus() == QnResource::Recording)
-                    recordingMode =  QnRecordingStatusHelper::currentRecordingMode(m_context, camera);
+                    recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), camera);
                 result =  QnRecordingStatusHelper::shortTooltip(recordingMode);
                 break;
             }
@@ -101,7 +103,7 @@ QString QnCameraListModel::columnTitle(Column column) const
     }
 }
 
-void QnCameraListModel::setColumns(const QList<Column>& columns) 
+void QnCameraListModel::setColumns(const QList<Column>& columns)
 {
     m_columns = columns;
 }

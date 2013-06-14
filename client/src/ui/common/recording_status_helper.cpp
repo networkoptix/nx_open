@@ -1,12 +1,16 @@
 #include "recording_status_helper.h"
-#include "ui/workbench/workbench_context.h"
-#include "core/resource/media_resource.h"
-#include "core/misc/schedule_recording_type.h"
-#include "utils/common/synctime.h"
-#include "ui/workbench/watchers/workbench_server_time_watcher.h"
-#include "ui/style/skin.h"
 
-int QnRecordingStatusHelper::currentRecordingMode(QnWorkbenchContext *context, QnVirtualCameraResourcePtr camera) 
+#include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/misc/schedule_recording_type.h>
+
+#include <ui/style/skin.h>
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <ui/workbench/workbench_context.h>
+
+#include <utils/common/synctime.h>
+
+int QnRecordingStatusHelper::currentRecordingMode(QnWorkbenchContext *context, QnVirtualCameraResourcePtr camera)
 {
     if(!camera)
         return Qn::RecordingType_Never;
