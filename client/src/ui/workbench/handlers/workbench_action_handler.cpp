@@ -204,7 +204,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_layoutExportCamera(0),
     m_exportedCamera(0),
     m_exportRetryCount(0),
-    m_healthRequestHandle(0),
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
@@ -319,7 +318,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
-    connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
     connect(action(Qn::ClearCacheAction),                       SIGNAL(triggered()),    this,   SLOT(at_clearCacheAction_triggered()));
     connect(action(Qn::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
@@ -914,13 +912,8 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Server..."));
 
-    m_healthRequestHandle = 0; //TODO: #GDM doubling code in disconnect/reconnect
-
     if (!mainWindow())
         return;
-
-    notificationsHandler()->clear();
-    notificationsHandler()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
 
     if (cameraAdditionDialog())
         cameraAdditionDialog()->hide();
@@ -931,8 +924,6 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM use conditional texts?
 
-//    notificationsHandler()->clear();
-//    at_checkSystemHealthAction_triggered(); //TODO: #GDM place to corresponding place
     context()->instance<QnAppServerNotificationCache>()->getFileList();
 }
 
@@ -3731,42 +3722,6 @@ void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
         menu()->trigger(Qn::FullscreenAction);
 }
 
-void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
-    if (!context()->user())
-        return;
-
-//    notificationsHandler()->clear();
-
-//    if (!QnEmail::isValid(context()->user()->getEmail())) {
-//        notificationsHandler()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
-//    }
-
-    if (qnLicensePool->isEmpty() &&
-            (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        notificationsHandler()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
-    }
-
-    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
-        m_healthRequestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                       this, SLOT(at_serverSettings_received(int,QnKvPairList,int)));
-
-//        QnUserResourceList users = qnResPool->getResources().filtered<QnUserResource>();
-//        foreach (const QnUserResourcePtr &user, users) {
-//            if (user == context()->user())
-//                continue; // we are displaying separate notification for us
-//            if (QnEmail::isValid(user->getEmail()))
-//                continue;
-
-//            if ((accessController()->globalPermissions(user) & Qn::GlobalProtectedPermission) &&
-//                (!(accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission)))
-//                    continue; // usual admins can not edit other admins, owner can
-
-//            notificationsHandler()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, user);
-//        }
-
-    }
-}
-
 void QnWorkbenchActionHandler::at_clearCacheAction_triggered() {
     QnAppServerFileCache::clearLocalCache();
 }
@@ -3788,18 +3743,4 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
         return;
 
     QDesktopServices::openUrl(QUrl::fromUserInput(url));
-}
-
-void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QnKvPairList &settings, int handle) {
-    if (handle != m_healthRequestHandle)
-        return;
-
-    if(status != 0)
-        return;
-
-    QnEmail::Settings email(settings);
-    if (!email.server.isEmpty() && !email.user.isEmpty() && !email.password.isEmpty())
-        return;
-
-    notificationsHandler()->addSystemHealthEvent(QnSystemHealth::SmtpIsNotSet);
 }

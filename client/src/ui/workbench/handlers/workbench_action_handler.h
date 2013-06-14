@@ -339,15 +339,11 @@ protected slots:
 
     void at_escapeHotkeyAction_triggered();
 
-    void at_checkSystemHealthAction_triggered();
-
     void at_clearCacheAction_triggered();
 
     void at_messageBoxAction_triggered();
 
     void at_browseUrlAction_triggered();
-
-    void at_serverSettings_received(int status, const QnKvPairList& settings, int handle);
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
@@ -426,7 +422,6 @@ private:
     LayoutExportMode m_layoutExportMode;
     int m_exportRetryCount; // anitvirus sometimes block exe file. workaround
     QString m_exportTmpFileName;
-    int m_healthRequestHandle;
 
     QTimer *m_tourTimer;
 };

@@ -3,7 +3,6 @@
 
 #include <QObject>
 
-//#include <api/model/kvpair.h>
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
 #include <core/resource/resource_fwd.h>
@@ -20,7 +19,6 @@ class QnShowBusinessEventsHelper : public QnUint64KvPairUsageHelper {
 public:
     explicit QnShowBusinessEventsHelper(QObject *parent = 0);
     virtual ~QnShowBusinessEventsHelper();
-
 };
 
 
@@ -44,11 +42,22 @@ signals:
 
 public slots:
     void clear();
+    void updateSmtpSettings(int status, const QnKvPairList &settings, int handle);
 
 private slots:
     void at_context_userChanged();
     void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
+    void at_eventManager_connectionOpened();
+    void at_eventManager_connectionClosed();
+    void at_licensePool_licensesChanged();
+private:
 
+    /**
+     * Check that system health message can be displayed to admins only.
+     */
+    bool adminOnlyMessage(QnSystemHealth::MessageType message);
+
+    void setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible);
     void setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
 
 private:
