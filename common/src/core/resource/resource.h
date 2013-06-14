@@ -8,7 +8,8 @@
 #include <QSet>
 #include <QStringList>
 #include <QReadWriteLock>
-#include "utils/common/qnid.h"
+#include <QThreadPool>
+#include "utils/common/id.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "resource_fwd.h"
 #include "param.h"
@@ -56,7 +57,11 @@ public:
         Offline,
         Unauthorized,
         Online,
-        Recording };
+        Recording,
+
+        /** Locked status used in layouts only */
+        Locked = Recording
+    };
 
     enum Flag {
         network = 0x01,         /**< Has ip and mac. */
@@ -112,7 +117,7 @@ public:
     QnId getParentId() const;
     void setParentId(QnId parent);
 
-    void setGuid(const QString& guid); // TODO: UUID! 
+    void setGuid(const QString& guid); // TODO: #Elric UUID!
     QString getGuid() const;
 
     // device unique identifier
@@ -218,8 +223,9 @@ public:
     bool hasUnprocessedCommands() const;
     bool isInitialized() const;
 
-    virtual QnAbstractPtzController* getPtzController(); // TODO: #VASILENKO: OMG what is THIS doing here???
+    virtual QnAbstractPtzController* getPtzController(); // TODO: #vasilenko: OMG what is THIS doing here???
 
+    static void stopAsyncTasks();
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
@@ -245,8 +251,6 @@ signals:
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
     void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
-
-    void parameterValueChangedQueued(const QnResourcePtr &resource, const QnParam &param);
 
 public:
     // this is thread to process commands like setparam
@@ -319,6 +323,7 @@ protected:
 
     mutable QnParamList m_resourceParamList;
 
+    static bool m_appStopping;
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
@@ -360,6 +365,8 @@ private:
 
     bool m_initialized;    
     QMutex m_initMutex;
+
+    static QThreadPool m_initAsyncPool;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
@@ -369,7 +376,7 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
         return QnSharedResourcePointer<Resource>();
     } else {
-        return resource->toSharedPointer().template dynamicCast<Resource>(); // TODO: replace with staticCast once we deal with virtual inheritance
+        return resource->toSharedPointer().template dynamicCast<Resource>(); // TODO: #Elric replace with staticCast once we deal with virtual inheritance
     }
 }
 

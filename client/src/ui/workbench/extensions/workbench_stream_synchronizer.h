@@ -1,6 +1,8 @@
 #ifndef QN_WORKBENCH_STREAM_SYNCHRONIZER_H
 #define QN_WORKBENCH_STREAM_SYNCHRONIZER_H
 
+#include <libavcodec/avcodec.h>
+
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 #include <QtCore/QSet>
@@ -12,9 +14,10 @@
 
 class QnCounter;
 class QnResourceWidget;
+class QnResourceDisplay;
 class QnMediaResourceWidget;
 class QnArchiveSyncPlayWrapper;
-class QnAbstractRenderer;
+class QnWorkbenchRenderWatcher;
 
 
 struct QnStreamSynchronizationState {
@@ -76,7 +79,7 @@ signals:
 protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_renderWatcher_displayingChanged(QnAbstractRenderer *renderer, bool displaying);
+    void at_renderWatcher_displayingChanged(QnResourceDisplay *display);
 
     void at_workbench_currentLayoutChanged();
 
@@ -92,6 +95,9 @@ private:
 
     /** Syncplay instance that performs the actual stream synchronization. */
     QnArchiveSyncPlayWrapper *m_syncPlay;
+
+    /** Display state watcher. */
+    QnWorkbenchRenderWatcher *m_watcher;
 
     QSet<QnMediaResourceWidget *> m_queuedWidgets;
 };

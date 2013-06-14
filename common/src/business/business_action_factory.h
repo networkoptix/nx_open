@@ -2,11 +2,17 @@
 #define BUSINESS_ACTION_FACTORY_H
 
 #include <business/actions/abstract_business_action.h>
+#include <business/business_aggregation_info.h>
+#include <business/business_event_rule.h>
 
 class QnBusinessActionFactory
 {
 public:
-    static QnAbstractBusinessActionPtr createAction(const BusinessActionType::Value actionType, const QnBusinessParams &runtimeParams);
+    static QnAbstractBusinessActionPtr instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, Qn::ToggleState state = Qn::UndefinedState);
+
+    static QnAbstractBusinessActionPtr instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, const QnBusinessAggregationInfo& aggregationInfo);
+
+    static QnAbstractBusinessActionPtr createAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters &runtimeParams);
 };
 
 #endif // BUSINESS_ACTION_FACTORY_H

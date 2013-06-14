@@ -127,17 +127,23 @@ void QnAxisStreamReader::openStream()
     // ------------------- determine stream parameters ----------------------------
     float fps = getFps();
     float ar = res->getResolutionAspectRatio(res->getMaxResolution());
-    QString resolution = (role == QnResource::Role_LiveVideo) 
-        ? QLatin1String(res->getMaxResolution()) 
-        : res->getNearestResolution("480x316", ar);
-    if (resolution.isEmpty()) 
+    QnPlAxisResource::AxisResolution resolution;
+    if (role == QnResource::Role_LiveVideo) {
+        resolution =  res->getMaxResolution();
+    }
+    else {
+        resolution =  res->getNearestResolution(QSize(480,316), ar);
+        if (resolution.size.isEmpty())
+            resolution =  res->getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
+    }
+    if (resolution.size.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
     QnStreamQuality quality = getQuality();
 
     QByteArray paramsStr;
     paramsStr.append("videocodec=h264");
-    if (!resolution.isEmpty())
-        paramsStr.append("&resolution=").append(resolution);
+    if (!resolution.size.isEmpty())
+        paramsStr.append("&resolution=").append(resolution.resolutionStr);
     //paramsStr.append("&text=0"); // do not use onscreen text message (fps e.t.c)
     paramsStr.append("&fps=").append(QByteArray::number(fps));
     if (quality != QnQualityPreSet)

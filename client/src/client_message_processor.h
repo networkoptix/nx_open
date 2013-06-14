@@ -26,6 +26,10 @@ signals:
     void businessRuleDeleted(int id);
 
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
+
+    void fileAdded(const QString &filename);
+    void fileUpdated(const QString &filename);
+    void fileRemoved(const QString &filename);
 public slots:
     void run();
 

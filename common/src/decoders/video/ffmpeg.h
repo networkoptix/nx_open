@@ -67,7 +67,7 @@ private:
     void openDecoder(const QnCompressedVideoDataPtr data);
     void closeDecoder();
     int findMotionInfo(qint64 pkt_dts);
-
+    void reallocateDeinterlacedFrame();
 private:
     AVCodecContext *m_passedContext;
 

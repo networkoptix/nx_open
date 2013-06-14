@@ -25,7 +25,6 @@ protected:
 private:
     QList<QSharedPointer<QUdpSocket> > m_socketList;
     qint64 m_lastReadSocketTime;
-    QnDroidControlPortListener m_controlPortListener;
 };
 
 #endif // droid_device_server_h_1755

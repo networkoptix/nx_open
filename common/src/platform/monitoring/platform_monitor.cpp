@@ -1,19 +1,16 @@
 #include "platform_monitor.h"
 
-#ifdef Q_OS_WIN
-#include "monitor_win.h"
-#elif defined(Q_OS_LINUX)
-#include "monitor_unix.h"
-#else
-#include "sigar_monitor.h"
-#endif
+#include "sys_dependent_monitor.h"
 
 QnPlatformMonitor *QnPlatformMonitor::newInstance(QObject *parent) {
-#if defined(Q_OS_WIN)
-    return new QnWindowsMonitor(parent);
-#elif defined(Q_OS_LINUX)
-    return new QnLinuxMonitor(parent);
-#else
-    return new QnSigarMonitor(parent);
-#endif
+    return new QnSysDependentMonitor(parent);
 }
+
+QList<QnPlatformMonitor::PartitionSpace> QnPlatformMonitor::totalPartitionSpaceInfo(PartitionTypes types) {
+    QList<PartitionSpace> result;
+    foreach(const PartitionSpace &partition, totalPartitionSpaceInfo())
+        if(partition.type & types)
+            result.push_back(partition);
+    return result;
+}
+

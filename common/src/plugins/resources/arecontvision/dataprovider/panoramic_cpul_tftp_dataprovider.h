@@ -31,7 +31,7 @@ protected:
     
     bool m_panoramic;
     bool m_dualsensor;
-    QString m_name;
+    QString m_model;
 
     CLSimpleTFTPClient* m_tftp_client;
 

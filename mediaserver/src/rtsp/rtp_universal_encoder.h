@@ -15,7 +15,8 @@ public:
     * param transcodeToCodec - if codec specified, all media packets are transcoded to specified codec.
     * param videoSize - transcoded video size
     */
-    QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, CodecID transcodeToCodec = CODEC_ID_NONE, const QSize& videoSize = QSize(640,480));
+    QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, CodecID transcodeToCodec = CODEC_ID_NONE, const QSize& videoSize = QSize(640,480),
+                          const QnResourceVideoLayout* layout = 0);
 
     virtual QByteArray getAdditionSDP() override;
 

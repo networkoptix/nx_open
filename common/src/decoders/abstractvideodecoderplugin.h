@@ -8,7 +8,10 @@
 #include <QGLContext>
 #include <QList>
 
-#include <libavcodec/avcodec.h>
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
 
 #include "abstractclientplugin.h"
 #include "../core/datapacket/media_data_packet.h"

@@ -1,11 +1,10 @@
 #include "warning_style.h"
 
+#include <ui/common/palette.h>
 #include <ui/style/globals.h>
 
 void setWarningStyle(QWidget *widget) {
-    QPalette palette = widget->palette();
-    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    widget->setPalette(palette);
+    setPaletteColor(widget, QPalette::WindowText, qnGlobals->errorTextColor());
 }
 
 void setWarningStyle(QPalette *palette) {

@@ -10,16 +10,18 @@
 class QnTimePeriodStorage {
 public: 
     QnTimePeriodStorage(): m_aggregationMSecs(0) {}
-    QnTimePeriodList periods(Qn::TimePeriodRole type) const;
-    QnTimePeriodList aggregated(Qn::TimePeriodRole type) const;
-    void setPeriods( Qn::TimePeriodRole type, const QnTimePeriodList &timePeriods );
+    QnTimePeriodList periods(Qn::TimePeriodContent type) const;
+    QnTimePeriodList aggregated(Qn::TimePeriodContent type) const;
+    void setPeriods( Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods );
     void setAggregationMSecs(int value);
     int aggregationMSecs() const;
+
 protected:
-    void updateAggregated(Qn::TimePeriodRole type);    
+    void updateAggregated(Qn::TimePeriodContent type);
+
 private:
-    QnTimePeriodList m_normalPeriods[Qn::TimePeriodRoleCount];
-    QnTimePeriodList m_aggregatedPeriods[Qn::TimePeriodRoleCount];
+    QnTimePeriodList m_normalPeriods[Qn::TimePeriodContentCount];
+    QnTimePeriodList m_aggregatedPeriods[Qn::TimePeriodContentCount];
     int m_aggregationMSecs;
 };
 

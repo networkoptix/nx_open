@@ -14,21 +14,29 @@ class QnSimpleFrameWidget: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 
 public:
-    QnSimpleFrameWidget(QGraphicsItem *parent = NULL);
+    QnSimpleFrameWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnSimpleFrameWidget();
 
     qreal frameWidth() const;
     void setFrameWidth(qreal frameWidth);
 
+    QBrush frameBrush() const;
+    void setFrameBrush(const QBrush &frameBrush);
+
     QColor frameColor() const;
     void setFrameColor(const QColor &frameColor);
+
+    QBrush windowBrush() const;
+    void setWindowBrush(const QBrush &windowBrush);
+
+    QColor windowColor() const;
+    void setWindowColor(const QColor &windowColor);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
     qreal m_frameWidth;
-    QColor m_frameColor;
 };
 
 #endif // QN_SIMPLE_FRAME_WIDGET_H

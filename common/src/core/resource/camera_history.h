@@ -75,6 +75,8 @@ private:
 typedef QSharedPointer<QnCameraHistory> QnCameraHistoryPtr;
 typedef QList<QnCameraHistoryPtr> QnCameraHistoryList;
 
+Q_DECLARE_METATYPE(QnCameraHistoryList)
+
 class QnCameraHistoryPool: public QObject {
     Q_OBJECT;
 public:

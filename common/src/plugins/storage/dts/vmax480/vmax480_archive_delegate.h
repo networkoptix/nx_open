@@ -31,6 +31,7 @@ public:
     virtual void setGroupId(const QByteArray& data) override;
     virtual QnTimePeriodList chunks() override;
     virtual void beforeSeek(qint64 time) override;
+    virtual bool isStopping() const override;
 private:
     void calcSeekPoints(qint64 startTime, qint64 endTime, qint64 frameStep);
     qint64 seekInternal(qint64 time, bool findIFrame);

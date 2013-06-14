@@ -81,7 +81,7 @@ public:
             m_icon = qnResIconCache->icon(QnResourceIconCache::Local);
             break;
         case Qn::ServersNode:
-            m_displayName = m_name = tr("Servers");
+            m_displayName = m_name = tr("System");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
             break;
         case Qn::UsersNode:
@@ -89,13 +89,13 @@ public:
             m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
             break;
         case Qn::BastardNode:
-            m_displayName = m_name = QLatin1String("_HIDDEN_"); // this node is always hidden
+            m_displayName = m_name = QLatin1String("_HIDDEN_"); /* This node is always hidden. */
             m_bastard = true;
             break;
         case Qn::RecorderNode:
             m_displayName = m_name = name;
-            m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
-            m_bastard = true; // invisible by default until have children
+            m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
+            m_bastard = true; /* Invisible by default until has children. */
             break;
         default:
             break;
@@ -201,7 +201,7 @@ public:
             if(!bastard)
                 bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
             if(!bastard)
-                bastard = (m_flags & QnResource::local_media) == QnResource::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); // TODO: hack hack hack
+                bastard = (m_flags & QnResource::local_media) == QnResource::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); //TODO: #Elric hack hack hack
             break;
         case Qn::UsersNode:
             bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
@@ -442,7 +442,7 @@ public:
         if(role != Qt::EditRole)
             return false;
 
-        m_model->context()->menu()->trigger(Qn::RenameAction, QnActionParameters(m_resource).withArgument(Qn::NameParameter, value.toString()));
+        m_model->context()->menu()->trigger(Qn::RenameAction, QnActionParameters(m_resource).withArgument(Qn::ResourceNameRole, value.toString()));
         return true;
     }
 
@@ -459,6 +459,12 @@ public:
         changeInternal();
     }
 
+    // TODO: #GDM
+    // This is a node construction method, so it does not really belong here.
+    // See other node construction methods, QnResourcePoolModel::node(...).
+    // 
+    // I see we already have a m_recorderNodeByResource for that, we only need
+    // a better type for it, e.g. QHash<QPair<QnResource *, QString>, Node *>.
     Node *recorder(const QString &groupId, const QString &groupName) {
         if (m_recorders.contains(groupId))
             return m_recorders[groupId];
@@ -574,7 +580,7 @@ private:
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourcePoolModel::QnResourcePoolModel(QObject *parent, Qn::NodeType rootNodeType, bool isFlat):
+QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, bool isFlat, QObject *parent):
     QAbstractItemModel(parent), 
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
@@ -668,7 +674,7 @@ void QnResourcePoolModel::deleteNode(Node *node) {
            node->type() == Qn::ItemNode ||
            node->type() == Qn::RecorderNode);
 
-    // TODO: implement this in Node's destructor.
+    // TODO: #Elric implement this in Node's destructor.
 
     foreach(Node *childNode, node->children())
         deleteNode(childNode);
@@ -718,16 +724,14 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
 
         Node* parent = this->node(parentResource);
 
-        QnSecurityCamResourcePtr camRes = node->resource().dynamicCast<QnSecurityCamResource>();
-        QString groupId;
-        QString groupName;
-        if (camRes) {
-            groupName = camRes->getGroupName();
-            groupId = camRes->getGroupId();
+        if (QnSecurityCamResourcePtr camera = node->resource().dynamicCast<QnSecurityCamResource>()) {
+            QString groupName = camera->getGroupName();
+            QString groupId = camera->getGroupId();
+            if(!groupId.isEmpty())
+                parent = parent->recorder(groupId, groupName.isEmpty() ? groupId : groupName);
         }
-        if (groupId.isEmpty())
-            return parent;
-        return parent->recorder(groupId, groupName.isEmpty() ? groupId : groupName);
+
+        return parent;
     }
 }
 
@@ -760,9 +764,8 @@ QModelIndex QnResourcePoolModel::buddy(const QModelIndex &index) const {
 }
 
 QModelIndex QnResourcePoolModel::parent(const QModelIndex &index) const {
-    if(!index.isValid())
+    if (!index.isValid() || index.model() != this)
         return QModelIndex();
-
     return node(index)->parent()->index(Qn::NameColumn);
 }
 
@@ -788,7 +791,7 @@ Qt::ItemFlags QnResourcePoolModel::flags(const QModelIndex &index) const {
 }
 
 QVariant QnResourcePoolModel::data(const QModelIndex &index, int role) const {
-    if(!index.isValid())
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
     return node(index)->data(role, index.column());
@@ -831,7 +834,6 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
                         if (child->resource() && !resources.contains(child->resource()))
                             resources.append(child->resource());
                     }
-                    pureTreeResourcesOnly = false;
                 }
 
                 if(node && node->resource() && !resources.contains(node->resource()))
@@ -878,7 +880,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
         QnMediaResourceList medias = resources.filtered<QnMediaResource>();
 
-        menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutParameter, layout));
+        menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
             if(resource->getParentId() == user->getId())
@@ -891,8 +893,8 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
             menu()->trigger(
                 Qn::SaveLayoutAsAction, 
                 QnActionParameters(layout).
-                    withArgument(Qn::UserParameter, user).
-                    withArgument(Qn::NameParameter, layout->getName())
+                    withArgument(Qn::UserResourceRole, user).
+                    withArgument(Qn::ResourceNameRole, layout->getName())
             );
         }
     } else if(QnMediaServerResourcePtr server = node->resource().dynamicCast<QnMediaServerResource>()) {
@@ -901,7 +903,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
 
             QnNetworkResourceList cameras = resources.filtered<QnNetworkResource>();
             if(!cameras.empty())
-                menu()->trigger(Qn::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::ServerParameter, server));
+                menu()->trigger(Qn::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::MediaServerResourceRole, server));
         }
     }
     

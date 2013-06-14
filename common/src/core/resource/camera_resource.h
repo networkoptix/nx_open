@@ -11,26 +11,26 @@ class QnAbstractDTSFactory;
 class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virtual public QnSecurityCamResource
 {
     Q_OBJECT
-    Q_FLAGS(QnCommonGlobals::CameraCapabilities)
-    Q_PROPERTY(QnCommonGlobals::CameraCapabilities cameraCapabilities READ getCameraCapabilities WRITE setCameraCapabilities)
+    Q_FLAGS(Qn::CameraCapabilities)
+    Q_PROPERTY(Qn::CameraCapabilities cameraCapabilities READ getCameraCapabilities WRITE setCameraCapabilities)
 
 public:
     QnVirtualCameraResource();
 
     virtual void updateInner(QnResourcePtr other) override;
 
-    // TODO: move to QnSecurityCamResource
+    // TODO: #Elric move to QnSecurityCamResource
     void setScheduleDisabled(bool blocked);
     bool isScheduleDisabled() const;
 
-    // TODO: move to QnSecurityCamResource
+    // TODO: #Elric move to QnSecurityCamResource
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
 
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
 
-    // TODO: move to QnSecurityCamResource
+    // TODO: #Elric move to QnSecurityCamResource
     bool isAdvancedWorking() const;
     void setAdvancedWorking(bool value);
 
@@ -39,17 +39,19 @@ public:
     void lockDTSFactory();
     void unLockDTSFactory();
 
-    // TODO: move to QnSecurityCamResource
+    // TODO: #Elric move to QnSecurityCamResource
     QString getModel() const;
     void setModel(QString model);
 
-    // TODO: move to QnSecurityCamResource
+    // TODO: #Elric move to QnSecurityCamResource
     QString getFirmware() const;
     void setFirmware(QString firmware);
 
 	virtual QString getUniqueId() const override;
 
     void deserialize(const QnResourceParameters& parameters);
+
+    QString toSearchString() const override;
 protected:
     void save();
 // -------------------------------------------------------------------------- //
@@ -89,6 +91,9 @@ private:
     QnAbstractDTSFactory* m_dtsFactory;
 };
 
+const QSize EMPTY_RESOLUTION_PAIR(0, 0);
+const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
+const QSize SECONDARY_STREAM_MAX_RESOLUTION(1280, 720);
 
 class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResource
 {
@@ -103,6 +108,10 @@ public:
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
+
+protected:
+    static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
+    static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList); // find resolution helper function
 private:
     int m_channelNumer; // video/audio source number
 };

@@ -9,6 +9,9 @@
 class CLAbstractAudioDecoder;
 struct QnCompressedAudioData;
 
+/*!
+    \note On source data end \a playCurrentBuffer method MUST be called to avoid media data loss
+*/
 class QnAudioStreamDisplay : public QObject
 {
     Q_OBJECT
@@ -16,8 +19,8 @@ public:
     QnAudioStreamDisplay(int buffMs, int prebufferMs);
     ~QnAudioStreamDisplay();
 
-    void putData(QnCompressedAudioDataPtr data, qint64 minTime);
-    void enqueueData(QnCompressedAudioDataPtr data, qint64 minTime);
+    void putData(QnCompressedAudioDataPtr data, qint64 minTime = 0);
+    void enqueueData(QnCompressedAudioDataPtr data, qint64 minTime = 0);
     void suspend();
 
     void resume();
@@ -42,6 +45,7 @@ public:
 
     bool isDownmixForced() const { return m_forceDownmix; }
 
+    //!Plays current buffer to the end
     void playCurrentBuffer();
 
     int getAudioBufferSize() const;
@@ -49,10 +53,6 @@ public:
 private:
     int msInQueue() const;
 
-    static QnCodecAudioFormat downmix(QnByteArray& audio, QnCodecAudioFormat format);
-    static QnCodecAudioFormat float2int16(QnByteArray& audio, QnCodecAudioFormat format);
-    static QnCodecAudioFormat float2int32(QnByteArray& audio, QnCodecAudioFormat format);
-    static QnCodecAudioFormat int32Toint16(QnByteArray& audio, QnCodecAudioFormat format);
     bool initFormatConvertRule(QnAudioFormat format);
 
 private:

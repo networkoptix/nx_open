@@ -1,4 +1,12 @@
+
+#include <QCoreApplication>
+#include <QtConcurrentMap>
 #include <QHostInfo>
+#include <QTime>
+#include <QSettings>
+#include <QStringList>
+#include <QThreadPool>
+
 #include "nettools.h"
 #include "ping.h"
 #include "netstate.h"
@@ -18,7 +26,8 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
 
 #ifdef Q_OS_LINUX
     Q_UNUSED(mode)
-    sock.bind(port);
+    if( !sock.bind(port) )
+        return false;
     res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length());
 #else
     res = !sock.bind(iface.address, port, mode);
@@ -59,9 +68,8 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                 static QList<QHostAddress> allowedInterfaces;
                 if (!allowedInterfaceReady)
                 {
-                    for (int j = 1; j < qApp->argc(); ++j)
+                    foreach(QString arg, qApp->arguments()) // TODO: #Elric totally evil! This is NOT a place to access application arguments
                     {
-                        QString arg = QLatin1String(qApp->argv()[j]);
                         arg = arg.toLower();
                         while (arg.startsWith(QLatin1Char('-')))
                             arg = arg.mid(1);
@@ -141,10 +149,8 @@ QString MACToString (const unsigned char* mac)
     return result;
 }
 
-unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
+unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep)
 {
-
-    const char cSep = '-';
     QByteArray arr = macs.toLatin1();
     const char *pszMACAddress = arr.data();
 
@@ -559,4 +565,23 @@ QHostAddress resolveAddress(const QString& addr)
         return hi.addresses()[0];
     else
         return QHostAddress();
+}
+
+int strEqualAmount(const char* str1, const char* str2)
+{
+    int rez = 0;
+    while (*str1 && *str1 == *str2)
+    {
+        rez++;
+        str1++;
+        str2++;
+    }
+    return rez;
+}
+
+bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress)
+{
+    int eq1 = strEqualAmount(host.toLocal8Bit().constData(), newAddress.toLocal8Bit().constData());
+    int eq2 = strEqualAmount(host.toLocal8Bit().constData(), oldAddress.toLocal8Bit().constData());
+    return eq1 > eq2;
 }

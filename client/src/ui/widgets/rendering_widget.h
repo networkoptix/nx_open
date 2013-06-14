@@ -21,6 +21,8 @@ public:
     QnMediaResourcePtr resource() const;
     void setResource(const QnMediaResourcePtr &resource);
 
+    void stopPlayback();
+
 protected:
     void updateChannelScreenSize();
 

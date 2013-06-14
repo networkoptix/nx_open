@@ -19,6 +19,12 @@ QnSecurityCamResource::QnSecurityCamResource():
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 }
 
+bool QnSecurityCamResource::isGroupPlayOnly() const
+{
+    return hasParam(lit("groupplay"));
+
+};
+
 QnSecurityCamResource::~QnSecurityCamResource()
 {
 }
@@ -32,7 +38,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     {
 
         const QnResourceVideoLayout* layout = getVideoLayout();
-        int numChannels = layout->numberOfChannels();
+        int numChannels = layout->channelCount();
 
         m_motionType = other_casted->m_motionType;
 
@@ -44,9 +50,9 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     }
 }
 
-QString QnSecurityCamResource::oemName() const
+QString QnSecurityCamResource::getVendorName() const
 {
-    return manufacture();
+    return getDriverName();
 }
 
 int QnSecurityCamResource::getMaxFps()
@@ -225,7 +231,7 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
         }
         else 
         {
-            for (int i = 0; i < getVideoLayout()->numberOfChannels(); ++i)
+            for (int i = 0; i < getVideoLayout()->channelCount(); ++i)
                 setMotionMaskPhysical(i);
         }
     }
@@ -479,7 +485,7 @@ void QnSecurityCamResource::at_disabledChanged()
 Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 {
     QVariant mediaVariant;
-    const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: const_cast? get rid of it!
+    const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: #Elric const_cast? get rid of it!
     return Qn::undeprecate(static_cast<Qn::CameraCapabilities>(mediaVariant.toInt()));
 }
 
@@ -499,7 +505,7 @@ void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability,
 bool QnSecurityCamResource::setParam(const QString &name, const QVariant &val, QnDomain domain) {
     bool result = base_type::setParam(name, val, domain);
     if(result && name == lit("cameraCapabilities"))
-        emit cameraCapabilitiesChanged(::toSharedPointer(this)); // TODO: we don't check whether they have actually changed. This better be fixed.
+        emit cameraCapabilitiesChanged(::toSharedPointer(this)); // TODO: #Elric we don't check whether they have actually changed. This better be fixed.
     return result;
 }
 

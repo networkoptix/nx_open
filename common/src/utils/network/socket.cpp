@@ -8,6 +8,9 @@
 #  include <iphlpapi.h>
 #endif
 
+#include <QElapsedTimer>
+
+#include "socket_impl.h"
 #include "../common/systemerror.h"
 
 
@@ -15,7 +18,8 @@
 typedef int socklen_t;
 typedef char raw_type;       // Type used for raw data on this platform
 #else
-#include <sys/select.h>
+#include <poll.h>
+//#include <sys/select.h>
 #include <sys/types.h>       // For data types
 #include <sys/socket.h>      // For socket(), connect(), send(), and recv()
 #include <netdb.h>           // For getaddrinfo()
@@ -36,6 +40,8 @@ static const int ERR_TIMEOUT = ETIMEDOUT;
 static const int ERR_WOULDBLOCK = EWOULDBLOCK;
 #endif
 
+//TODO/IMPL set prevErrorCode to noError in case of success
+
 int getSystemErrCode()
 {
 #ifdef WIN32
@@ -51,6 +57,10 @@ int getSystemErrCode()
 #endif
 
 // SocketException Code
+
+//////////////////////////////////////////////////////////
+// SocketException implementation
+//////////////////////////////////////////////////////////
 
 SocketException::SocketException(const QString &message, bool inclSysMsg)
 throw() {
@@ -74,84 +84,15 @@ const char *SocketException::what() const throw() {
     return m_message;
 }
 
-// Function to fill in address structure given an address and port
-bool Socket::fillAddr(const QString &address, unsigned short port,
-                     sockaddr_in &addr) {
 
-    m_lastError.clear();
-    memset(&addr, 0, sizeof(addr));  // Zero out address structure
-    addr.sin_family = AF_INET;       // Internet address
-
-    addrinfo hints;
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET;    /* Allow only IPv4 */
-    hints.ai_socktype = 0; /* Any socket */
-    hints.ai_flags = AI_ALL;    /* For wildcard IP address */
-    hints.ai_protocol = 0;          /* Any protocol */
-    hints.ai_canonname = NULL;
-    hints.ai_addr = NULL;
-    hints.ai_next = NULL;
-
-    addrinfo *addressInfo;
-    int status = getaddrinfo(address.toAscii(), 0, &hints, &addressInfo);
-    if (status != 0) {
-#ifdef UNICODE
-        QString errorMessage = QString::fromWCharArray(gai_strerror(status));
-#else
-        QString errorMessage = QString::fromLocal8Bit(gai_strerror(status));
-#endif  /* UNICODE */
-
-        m_lastError = tr("Couldn't resolve %1: %2.").arg(address).arg(errorMessage);
-        return false;
-    }
-
-    addr.sin_addr.s_addr = ((struct sockaddr_in *) (addressInfo->ai_addr))->sin_addr.s_addr;
-    addr.sin_port = htons(port);     // Assign port in network byte order
-
-    freeaddrinfo(addressInfo);
-
-    return true;
-}
-
-// Socket Code
-
-Socket::Socket(int type, int protocol)
-:
-    m_nonBlockingMode( false )
-{
-    createSocket(type, protocol);
-}
-
-void Socket::createSocket(int type, int protocol)
-{
-#ifdef WIN32
-    if (!initialized) {
-        WORD wVersionRequested;
-        WSADATA wsaData;
-
-        wVersionRequested = MAKEWORD(2, 0);              // Request WinSock v2.0
-        if (WSAStartup(wVersionRequested, &wsaData) != 0) {  // Load WinSock DLL
-            throw SocketException(tr("Unable to load WinSock DLL."));
-        }
-        initialized = true;
-    }
-#endif
-
-    // Make a new socket
-    if ((sockDesc = socket(PF_INET, type, protocol)) < 0) {
-        throw SocketException(tr("Socket creation failed (socket())."), true);
-    }
-}
-
-Socket::Socket(int sockDesc)
-:
-    m_nonBlockingMode( false )
-{
-    this->sockDesc = sockDesc;
-}
+//////////////////////////////////////////////////////////
+// Socket implementation
+//////////////////////////////////////////////////////////
 
 Socket::~Socket() {
     close();
+    delete m_impl;
+    m_impl = NULL;
 }
 
 QString Socket::lastError() const
@@ -161,6 +102,9 @@ QString Socket::lastError() const
 
 void Socket::close()
 {
+    if( sockDesc == -1 )
+        return;
+
 #ifdef WIN32
     ::closesocket(sockDesc);
 #else
@@ -233,12 +177,7 @@ bool Socket::setLocalPort(unsigned short localPort)  {
     localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     localAddr.sin_port = htons(localPort);
 
-    if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0)
-    {
-        //error
-        return false;
-    }
-    return true;
+    return bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) == 0;
 }
 
 bool Socket::setLocalAddressAndPort(const QString &localAddress,
@@ -250,13 +189,7 @@ bool Socket::setLocalAddressAndPort(const QString &localAddress,
     if (!fillAddr(localAddress, localPort, localAddr))
         return false;
 
-    if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) {
-        SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        m_lastError = tr("Set of local address and port failed (bind()). %1").arg(SystemError::toString(errorCode));
-        return false;
-    }
-
-    return true;
+    return bind(sockDesc, (sockaddr *) &localAddr, sizeof(localAddr)) == 0;
 }
 
 void Socket::cleanUp()  {
@@ -277,6 +210,186 @@ unsigned short Socket::resolveService(const QString &service,
         return ntohs(serv->s_port);    /* Found port (network byte order) by name */
 }
 
+
+bool Socket::setReuseAddrFlag(bool reuseAddr)
+{
+    int reuseAddrVal = reuseAddr;
+
+    if (::setsockopt(sockDesc, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuseAddrVal, sizeof(reuseAddrVal))) {
+        m_prevErrorCode = SystemError::getLastOSErrorCode();
+        m_lastError = SystemError::getLastOSErrorText();
+        qnWarning("Can't set SO_REUSEADDR flag to socket: %1.", strerror(errno));
+        return false;
+    }
+    return true;
+}
+
+//!if, \a val is \a true, turns non-blocking mode on, else turns it off
+bool Socket::setNonBlockingMode(bool val)
+{
+    if( val == m_nonBlockingMode )
+        return true;
+
+#ifdef _WIN32
+    u_long _val = val ? 1 : 0;
+    if( ioctlsocket( sockDesc, FIONBIO, &_val ) == 0 )
+    {
+        m_nonBlockingMode = val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#else
+    long currentFlags = fcntl( sockDesc, F_GETFL, 0 );
+    if( currentFlags == -1 )
+        return false;
+    if( val )
+        currentFlags |= O_NONBLOCK;
+    else
+        currentFlags &= ~O_NONBLOCK;
+    if( fcntl( sockDesc, F_SETFL, currentFlags ) == 0 )
+    {
+        m_nonBlockingMode = val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#endif
+}
+
+//!Returns true, if in non-blocking mode
+bool Socket::isNonBlockingMode() const
+{
+    return m_nonBlockingMode;
+}
+
+bool Socket::failed() const
+{
+    return (m_status & sbFailed) != 0;
+}
+
+SystemError::ErrorCode Socket::prevErrorCode() const
+{
+    return m_prevErrorCode;
+}
+
+SocketImpl* Socket::impl()
+{
+    return m_impl;
+}
+
+const SocketImpl* Socket::impl() const
+{
+    return m_impl;
+}
+
+Socket::Socket(int type, int protocol)
+:
+    sockDesc( -1 ),
+    m_impl( NULL ),
+    m_nonBlockingMode( false ),
+    m_status( 0 ),
+    m_prevErrorCode( SystemError::noError )
+{
+    if( !createSocket(type, protocol) )
+    {
+        saveErrorInfo();
+        setStatusBit( sbFailed );
+    }
+
+    m_impl = new SocketImpl();
+}
+
+Socket::Socket(int _sockDesc)
+:
+    sockDesc( -1 ),
+    m_impl( NULL ),
+    m_nonBlockingMode( false ),
+    m_status( 0 ),
+    m_prevErrorCode( SystemError::noError )
+{
+    this->sockDesc = _sockDesc;
+    m_impl = new SocketImpl();
+}
+
+// Function to fill in address structure given an address and port
+bool Socket::fillAddr(const QString &address, unsigned short port,
+                     sockaddr_in &addr) {
+
+    m_lastError.clear();
+    memset(&addr, 0, sizeof(addr));  // Zero out address structure
+    addr.sin_family = AF_INET;       // Internet address
+
+    addrinfo hints;
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;    /* Allow only IPv4 */
+    hints.ai_socktype = 0; /* Any socket */
+    hints.ai_flags = AI_ALL;    /* For wildcard IP address */
+    hints.ai_protocol = 0;          /* Any protocol */
+    hints.ai_canonname = NULL;
+    hints.ai_addr = NULL;
+    hints.ai_next = NULL;
+
+    addrinfo *addressInfo;
+    int status = getaddrinfo(address.toAscii(), 0, &hints, &addressInfo);
+    if (status != 0) {
+#ifdef UNICODE
+        QString errorMessage = QString::fromWCharArray(gai_strerror(status));
+#else
+        QString errorMessage = QString::fromLocal8Bit(gai_strerror(status));
+#endif  /* UNICODE */
+
+        m_lastError = tr("Couldn't resolve %1: %2.").arg(address).arg(errorMessage);
+        return false;
+    }
+
+    addr.sin_addr.s_addr = ((struct sockaddr_in *) (addressInfo->ai_addr))->sin_addr.s_addr;
+    addr.sin_port = htons(port);     // Assign port in network byte order
+
+    freeaddrinfo(addressInfo);
+
+    return true;
+}
+
+bool Socket::createSocket(int type, int protocol)
+{
+#ifdef WIN32
+    if (!initialized) {
+        WORD wVersionRequested;
+        WSADATA wsaData;
+
+        wVersionRequested = MAKEWORD(2, 0);              // Request WinSock v2.0
+        if (WSAStartup(wVersionRequested, &wsaData) != 0)  // Load WinSock DLL
+            return false;
+        initialized = true;
+    }
+#endif
+
+    // Make a new socket
+    return (sockDesc = socket(PF_INET, type, protocol)) > 0;
+}
+
+
+void Socket::setStatusBit( StatusBit _status )
+{
+    m_status |= _status;
+}
+
+void Socket::clearStatusBit( StatusBit _status )
+{
+    m_status &= ~_status;
+}
+
+void Socket::saveErrorInfo()
+{
+    m_prevErrorCode = SystemError::getLastOSErrorCode();
+    m_lastError = SystemError::toString(m_prevErrorCode);
+}
+
 // CommunicatingSocket Code
 
 #ifndef _WIN32
@@ -288,11 +401,14 @@ namespace
     template<class Func>
     int doInterruptableSystemCallWithTimeout( const Func& func, unsigned int timeout )
     {
-        struct timespec waitStartTime;
-        memset( &waitStartTime, 0, sizeof(waitStartTime) );
+        QElapsedTimer et;
+        et.start();
+
+        //struct timespec waitStartTime;
+        //memset( &waitStartTime, 0, sizeof(waitStartTime) );
         bool waitStartTimeActual = false;
         if( timeout > 0 )
-            waitStartTimeActual = clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
+            waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
         for( ;; )
         {
             int result = func();
@@ -304,14 +420,15 @@ namespace
                 {
                     continue;
                 }
-                struct timespec waitStopTime;
-                memset( &waitStopTime, 0, sizeof(waitStopTime) );
-                if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
-                    continue;   //not updating timeout value
-                const int millisAlreadySlept = 
-                    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
-                    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
-                if( (unsigned int)millisAlreadySlept < timeout )
+                //struct timespec waitStopTime;
+                //memset( &waitStopTime, 0, sizeof(waitStopTime) );
+                //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
+                //    continue;   //not updating timeout value
+                //const int millisAlreadySlept = 
+                //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
+                //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
+                //if( (unsigned int)millisAlreadySlept < timeout )
+                if( et.elapsed() < timeout )
                     continue;
                 errno = ERR_TIMEOUT;    //operation timedout
             }
@@ -376,15 +493,16 @@ bool CommunicatingSocket::connect(
             return true;        //async connect started
     }
 
+    int iSelRet = 0;
+
+#ifdef _WIN32
     timeval timeVal;
     fd_set wrtFDS;
-    int iSelRet = 0;
 
     /* monitor for incomming connections */
     FD_ZERO(&wrtFDS);
     FD_SET(sockDesc, &wrtFDS);
 
-#ifdef _WIN32
     /* set timeout values */
     timeVal.tv_sec  = timeoutMs/1000;
     timeVal.tv_usec = timeoutMs%1000;
@@ -396,16 +514,29 @@ bool CommunicatingSocket::connect(
         timeoutMs >= 0 ? &timeVal : NULL );
 #else
     //handling interruption by a signal
-    struct timespec waitStartTime;
-    memset( &waitStartTime, 0, sizeof(waitStartTime) );
+    //struct timespec waitStartTime;
+    //memset( &waitStartTime, 0, sizeof(waitStartTime) );
+    QElapsedTimer et;
+    et.start();
     bool waitStartTimeActual = false;
     if( timeoutMs >= 0 )
-        waitStartTimeActual = clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
+        waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
     for( ;; )
     {
-        timeVal.tv_sec  = timeoutMs/1000;
-        timeVal.tv_usec = timeoutMs%1000;
-        iSelRet = ::select( sockDesc + 1, NULL, &wrtFDS, NULL, timeoutMs >= 0 ? &timeVal : NULL );
+        struct pollfd sockPollfd;
+        memset( &sockPollfd, 0, sizeof(sockPollfd) );
+        sockPollfd.fd = sockDesc;
+        sockPollfd.events = POLLOUT;
+#ifdef _GNU_SOURCE
+        sockPollfd.events |= POLLRDHUP;
+#endif
+        iSelRet = ::poll( &sockPollfd, 1, timeoutMs );
+
+
+        //timeVal.tv_sec  = timeoutMs/1000;
+        //timeVal.tv_usec = timeoutMs%1000;
+
+        //iSelRet = ::select( sockDesc + 1, NULL, &wrtFDS, NULL, timeoutMs >= 0 ? &timeVal : NULL );
         if( iSelRet == -1 && errno == EINTR )
         {
             //modifying timeout for time we've already spent in select
@@ -415,18 +546,21 @@ bool CommunicatingSocket::connect(
                 //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)
                 continue;
             }
-            struct timespec waitStopTime;
-            memset( &waitStopTime, 0, sizeof(waitStopTime) );
-            if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
-                continue;   //not updating timeout value
-            const int millisAlreadySlept = 
-                ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
-                ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
+            //struct timespec waitStopTime;
+            //memset( &waitStopTime, 0, sizeof(waitStopTime) );
+            //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
+            //    continue;   //not updating timeout value
+            const int millisAlreadySlept = et.elapsed();
+            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
+            //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
             if( millisAlreadySlept >= timeoutMs )
                 break;
             timeoutMs -= millisAlreadySlept;
             continue;
         }
+
+        if( (sockPollfd.revents & POLLOUT) == 0 )
+            iSelRet = 0;
         break;
     }
 #endif
@@ -458,7 +592,7 @@ bool CommunicatingSocket::setReadTimeOut( unsigned int ms )
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const void *)&tv,sizeof(struct timeval)) < 0)
 #endif
     {
-        qnWarning("Timeout function failed.");
+        qWarning()<<"handle("<<sockDesc<<"). setReadTimeOut("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
         return false;
     }
     m_readTimeoutMS = ms;
@@ -477,11 +611,21 @@ bool CommunicatingSocket::setWriteTimeOut( unsigned int ms )
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_SNDTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
 #endif
     {
-        qnWarning("Timeout function failed.");
+        qWarning()<<"handle("<<sockDesc<<"). setWriteTimeOut("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
         return false;
     }
     m_writeTimeoutMS = ms;
     return true;
+}
+
+bool CommunicatingSocket::setSendBufferSize(int buff_size)
+{
+    return ::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
+}
+
+bool CommunicatingSocket::setReadBufferSize(int buff_size)
+{
+    return ::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
 }
 
 int CommunicatingSocket::send(const QnByteArray& data)
@@ -500,15 +644,19 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
     int sended = ::send(sockDesc, (raw_type *) buffer, bufferLen, 0);
     if (sended < 0) {
         int errCode = getSystemErrCode();
-        if (/*errCode != ERR_TIMEOUT &&*/ errCode != ERR_WOULDBLOCK)    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
+        if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)
             mConnected = false;
     }
+    else if (sended == 0)
+        mConnected = false;
     return sended;
 #else
     int sended = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen, 0),
         m_writeTimeoutMS );
-    if( sended == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
+    if( sended == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
+        mConnected = false;
+    else if (sended == 0)
         mConnected = false;
     return sended;
 #endif
@@ -524,12 +672,16 @@ int CommunicatingSocket::recv(void *buffer, int bufferLen, int flags)
         if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)
             mConnected = false;
     }
+    else if (rtn == 0)
+        mConnected = false;
     return rtn;
 #else
     int bytesRead = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::recv, sockDesc, (void*)buffer, (size_t)bufferLen, flags),
         m_readTimeoutMS );
     if( bytesRead == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
+        mConnected = false;
+    else if (bytesRead == 0)
         mConnected = false;
     return bytesRead;
 #endif
@@ -553,7 +705,7 @@ unsigned short CommunicatingSocket::getForeignPort()  {
 
     if (getpeername(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
     {
-        qnWarning("Fetch of foreign port failed (getpeername()).");
+        qWarning()<<"Fetch of foreign port failed (getpeername()). "<<SystemError::getLastOSErrorText();
         return -1;
     }
     return ntohs(addr.sin_port);
@@ -574,13 +726,13 @@ TCPSocket::TCPSocket(const QString &foreignAddress, unsigned short foreignPort)
 bool TCPSocket::reopen()
 {
     close();
-    try {
-        createSocket(SOCK_STREAM, IPPROTO_TCP);
+    if( createSocket(SOCK_STREAM, IPPROTO_TCP) ) {
+        clearStatusBit( Socket::sbFailed );
         return true;
     }
-    catch(...) {
-        return false;
-    }
+    saveErrorInfo();
+    setStatusBit( Socket::sbFailed );
+    return false;
 }
 
 int TCPSocket::setNoDelay(bool value)
@@ -598,60 +750,114 @@ TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {
 
 // TCPServerSocket Code
 
-TCPServerSocket::TCPServerSocket(unsigned short localPort, int queueLen)
-    : Socket(SOCK_STREAM, IPPROTO_TCP) {
-    setLocalPort(localPort);
-    setListen(queueLen);
-}
-
-TCPServerSocket::TCPServerSocket(const QString &localAddress,
-                                 unsigned short localPort, int queueLen, bool reuseAddr)
-    : Socket(SOCK_STREAM, IPPROTO_TCP) {
-    setReuseAddrFlag(reuseAddr);
-    if (!setLocalAddressAndPort(localAddress, localPort))
+TCPServerSocket::TCPServerSocket( unsigned short localPort, int queueLen )
+:
+    Socket(SOCK_STREAM, IPPROTO_TCP)
+{
+    if( !setLocalPort(localPort) ||
+        !setListen(queueLen) )
     {
-        qnWarning("Can't create socket: %1.", m_lastError);
+        saveErrorInfo();
+        setStatusBit( Socket::sbFailed );
         return;
     }
-
-    setListen(queueLen);
 }
 
-TCPSocket *TCPServerSocket::accept()  {
+TCPServerSocket::TCPServerSocket(
+    const QString &localAddress,
+    unsigned short localPort,
+    int queueLen,
+    bool reuseAddr )
+:
+    Socket(SOCK_STREAM, IPPROTO_TCP)
+{
+    if( !setReuseAddrFlag(reuseAddr) ||
+        !setLocalAddressAndPort(localAddress, localPort) ||
+        !setListen(queueLen) )
+    {
+        saveErrorInfo();
+        setStatusBit( Socket::sbFailed );
+        return;
+    }
+}
+
+TCPSocket *TCPServerSocket::accept()
+{
+    int newConnSD = acceptWithTimeout(sockDesc);
+    if( newConnSD >= 0 )
+    {
+        clearStatusBit( Socket::sbFailed );
+        TCPSocket* result = new TCPSocket(newConnSD);
+        result->mConnected = true;
+        return result;
+    }
+    else if( newConnSD == -2 )
+    {
+        return NULL;    //timeout
+    }
+    else
+    {
+        //error
+        saveErrorInfo();
+        setStatusBit( Socket::sbFailed );
+        return NULL;
+    }
+}
+
+int TCPServerSocket::accept(int sockDesc)
+{
+    int result = acceptWithTimeout( sockDesc );
+    return result == -2 ? -1 : result;
+}
+
+int TCPServerSocket::acceptWithTimeout( int sockDesc )
+{
+    static const int ACCEPT_TIMEOUT_MSEC = 250;
+
+    int result = 0;
+
+#ifdef _WIN32
     fd_set read_set;
     struct timeval timeout;
     FD_ZERO(&read_set);
     FD_SET(sockDesc, &read_set);
     timeout.tv_sec = 0;
-    timeout.tv_usec = 250 * 1000;
+    timeout.tv_usec = ACCEPT_TIMEOUT_MSEC * 1000;
 
-    if (::select(sockDesc + 1, &read_set, NULL, NULL, &timeout) <= 0)
-        return 0;
+    result = ::select(sockDesc + 1, &read_set, NULL, NULL, &timeout);
+#else
+    struct pollfd sockPollfd;
+    memset( &sockPollfd, 0, sizeof(sockPollfd) );
+    sockPollfd.fd = sockDesc;
+    sockPollfd.events = POLLIN;
+#ifdef _GNU_SOURCE
+    sockPollfd.events |= POLLRDHUP;
+#endif
+    result = ::poll( &sockPollfd, 1, ACCEPT_TIMEOUT_MSEC );
+    if( result == 1 && (sockPollfd.revents & POLLIN) == 0 )
+        result = 0;
+#endif
 
-    int newConnSD;
-    if ((newConnSD = ::accept(sockDesc, NULL, 0)) < 0)
-    {
-        return 0;
-    }
-
-    TCPSocket* result = new TCPSocket(newConnSD);
-    result->mConnected = true;
-    return result;
+    if( result == 0 )
+        return -2;  //timed out
+    else if( result < 0 )
+        return -1;
+    return ::accept(sockDesc, NULL, NULL);
 }
 
-void TCPServerSocket::setListen(int queueLen)  {
-    if (listen(sockDesc, queueLen) < 0) {
-        throw SocketException(tr("Set listening socket failed (listen())."), true);
-    }
+bool TCPServerSocket::setListen(int queueLen)
+{
+    return ::listen(sockDesc, queueLen) == 0;
 }
 
 // UDPSocket Code
 
-UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
-                                              IPPROTO_UDP)
+UDPSocket::UDPSocket()
+:
+    CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP)
 {
+    memset( &m_destAddr, 0, sizeof(m_destAddr) );
     setBroadcast();
-    m_destAddr = new sockaddr_in();
     int buff_size = 1024*512;
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
     {
@@ -659,21 +865,13 @@ UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
     }
 }
 
-bool CommunicatingSocket::setSendBufferSize(int buff_size)
+UDPSocket::UDPSocket(unsigned short localPort)
+:
+    CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP)
 {
-    return ::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
-}
-
-bool CommunicatingSocket::setReadBufferSize(int buff_size)
-{
-    return ::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
-}
-
-UDPSocket::UDPSocket(unsigned short localPort)   :
-    CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) {
+    memset( &m_destAddr, 0, sizeof(m_destAddr) );
     setLocalPort(localPort);
     setBroadcast();
-    m_destAddr = new sockaddr_in();
 
     int buff_size = 1024*512;
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
@@ -683,27 +881,26 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
 }
 
 UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
-    : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP),
-      m_destAddr( NULL )
+:
+    CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP)
 {
+    memset( &m_destAddr, 0, sizeof(m_destAddr) );
+
     if (!setLocalAddressAndPort(localAddress, localPort))
     {
-        qnWarning("Can't create socket: %1.", m_lastError);
-        throw SocketException( QString::fromAscii("Failed to bind socket to address %1:%2. %3").arg(localAddress).arg(localPort).arg(m_lastError) );
+        saveErrorInfo();
+        setStatusBit(Socket::sbFailed);
+        qWarning() << "Can't create UDP socket: " << m_lastError;
+        return;
     }
 
     setBroadcast();
-    m_destAddr = new sockaddr_in();
     int buff_size = 1024*512;
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
     {
-        //error
+        saveErrorInfo();
+        setStatusBit( Socket::sbFailed );
     }
-}
-
-UDPSocket::~UDPSocket()
-{
-    delete m_destAddr;
 }
 
 void UDPSocket::setBroadcast() {
@@ -734,12 +931,12 @@ void UDPSocket::disconnect()  {
 
 void UDPSocket::setDestPort(unsigned short foreignPort)
 {
-    m_destAddr->sin_port = htons(foreignPort);
+    m_destAddr.sin_port = htons(foreignPort);
 }
 
 bool UDPSocket::setDestAddr(const QString &foreignAddress, unsigned short foreignPort)
 {
-    return fillAddr(foreignAddress, foreignPort, *m_destAddr);
+    return fillAddr(foreignAddress, foreignPort, m_destAddr);
 }
 
 bool UDPSocket::sendTo(const void *buffer, int bufferLen, const QString &foreignAddress, unsigned short foreignPort)
@@ -755,10 +952,10 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 
 #ifdef _WIN32
     return sendto(sockDesc, (raw_type *) buffer, bufferLen, 0,
-               (sockaddr *) m_destAddr, sizeof(sockaddr_in)) == bufferLen;
+               (sockaddr *) &m_destAddr, sizeof(m_destAddr)) == bufferLen;
 #else
     return doInterruptableSystemCallWithTimeout<>(
-        stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const    sockaddr *) m_destAddr, (socklen_t)sizeof(sockaddr_in)),
+        stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
         m_writeTimeoutMS ) == bufferLen;
 #endif
 }
@@ -792,6 +989,12 @@ bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
 #else
     bool res = setLocalAddressAndPort(iface.address.toString(), 0);
 #endif
+
+    if( !res )
+    {
+        saveErrorInfo();
+        setStatusBit( Socket::sbFailed );
+    }
 
     //if (!res)
     //    qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
@@ -827,7 +1030,7 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         (raw_type *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
-            qnWarning("Multicast group join failed (setsockopt()).");
+            qWarning() << "failed to join multicast group" << multicastGroup;
             return false;
     }
     return true;
@@ -841,7 +1044,7 @@ bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicas
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         (raw_type *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
-            qnWarning("Multicast group join failed (setsockopt()).");
+            qWarning() << "failed to join multicast group" << multicastGroup << "from IF" << multicastIF;
             return false;
     }
     return true;
@@ -878,6 +1081,7 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multica
 
 bool UDPSocket::hasData() const
 {
+#ifdef _WIN32
     fd_set read_set;
     struct timeval timeout;
     FD_ZERO(&read_set);
@@ -886,74 +1090,20 @@ bool UDPSocket::hasData() const
     timeout.tv_usec = 0;
     switch( ::select(FD_SETSIZE, &read_set, NULL, NULL, &timeout))
     {
-    case 0:             // timeout expired
-    {
-        return false;
-    }
-    case SOCKET_ERROR:  // error occured
-    {
-        return false;
-    }
+        case 0:             // timeout expired
+            return false;
+        case SOCKET_ERROR:  // error occured
+            return false;
     }
     return true;
-}
-
-bool Socket::setReuseAddrFlag(bool reuseAddr)
-{
-    int reuseAddrVal = reuseAddr;
-
-    if (::setsockopt(sockDesc, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuseAddrVal, sizeof(reuseAddrVal))) {
-        qnWarning("Can't set SO_REUSEADDR flag to socket: %1.", strerror(errno));
-        return false;
-    }
-    return true;
-}
-
-//!if, \a val is \a true, turns non-blocking mode on, else turns it off
-bool Socket::setNonBlockingMode(bool val)
-{
-    if( val == m_nonBlockingMode )
-        return true;
-
-#ifdef _WIN32
-    u_long _val = val ? 1 : 0;
-    if( ioctlsocket( sockDesc, FIONBIO, &_val ) == 0 )
-    {
-        m_nonBlockingMode = val;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
 #else
-    long currentFlags = fcntl( sockDesc, F_GETFL, 0 );
-    if( currentFlags == -1 )
-        return false;
-    if( val )
-        currentFlags |= O_NONBLOCK;
-    else
-        currentFlags &= ~O_NONBLOCK;
-    if( fcntl( sockDesc, F_SETFL, currentFlags ) == 0 )
-    {
-        m_nonBlockingMode = val;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    struct pollfd sockPollfd;
+    memset( &sockPollfd, 0, sizeof(sockPollfd) );
+    sockPollfd.fd = sockDesc;
+    sockPollfd.events = POLLIN;
+#ifdef _GNU_SOURCE
+    sockPollfd.events |= POLLRDHUP;
 #endif
-}
-
-//!Returns true, if in non-blocking mode
-bool Socket::isNonBlockingMode() const
-{
-    return m_nonBlockingMode;
-}
-
-SystemError::ErrorCode Socket::prevErrorCode() const
-{
-    //TODO/IMPL
-    return 0;
+    return (::poll( &sockPollfd, 1, 0 ) == 1) && ((sockPollfd.revents & POLLIN) != 0);
+#endif
 }

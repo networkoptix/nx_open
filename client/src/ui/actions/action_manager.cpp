@@ -132,7 +132,7 @@ public:
         return *this;
     }
 
-    QnActionBuilder requiredPermissions(const QString &key, Qn::Permissions permissions) {
+    QnActionBuilder requiredPermissions(int key, Qn::Permissions permissions) {
         m_action->setRequiredPermissions(key, permissions);
 
         return *this;
@@ -144,7 +144,7 @@ public:
         return *this;
     }
 
-    QnActionBuilder forbiddenPermissions(const QString &key, Qn::Permissions permissions) {
+    QnActionBuilder forbiddenPermissions(int key, Qn::Permissions permissions) {
         m_action->setForbiddenPermissions(key, permissions);
 
         return *this;
@@ -375,15 +375,15 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Selection Changed"));
 
-    factory(Qn::GetMoreLicensesAction).
+    factory(Qn::PreferencesLicensesTabAction).
         flags(Qn::NoTarget).
         text(tr("Get More Licenses..."));
 
-    factory(Qn::OpenServerSettingsAction).
+    factory(Qn::PreferencesServerTabAction).
         flags(Qn::NoTarget).
         text(tr("Settings..."));
 
-    factory(Qn::OpenPopupSettingsAction).
+    factory(Qn::PreferencesNotificationTabAction).
         flags(Qn::NoTarget).
         text(tr("Settings..."));
 
@@ -402,15 +402,9 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Help")).
         icon(qnSkin->icon("titlebar/whats_this.png"));
 
-    factory(Qn::CheckSystemHealthAction).
+    factory(Qn::ClearCacheAction).
         flags(Qn::NoTarget).
-        text(tr("Check System Health..."));
-
-    factory(Qn::TogglePopupsAction).
-        flags(Qn::NoTarget).
-        checkable().
-        icon(qnSkin->icon("popup.png")).
-        text(tr("Show notifications"));
+        text(tr("Clear cache"));
 
     /* Context menu actions. */
 
@@ -438,20 +432,20 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         text(tr("Logout")).
         autoRepeat(false).
-        condition(new QnDisconnectActionCondition(this));
+        condition(new QnLoggedInCondition(this));
 
     factory().
         flags(Qn::Main).
         separator();
 
     factory(Qn::TogglePanicModeAction).
-        flags(Qn::Main).
+        flags(Qn::NoTarget).
         text(tr("Start Panic Recording")).
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
         icon(qnSkin->icon("titlebar/panic.png")).
-        //requiredPermissions(Qn::AllMediaServersParameter, Qn::ReadWriteSavePermission).
+        //requiredPermissions(Qn::CurrentMediaServerResourcesRole, Qn::ReadWriteSavePermission).
         condition(new QnPanicActionCondition(this));
 
     factory().
@@ -487,7 +481,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(Qn::NewUserAction).
             flags(Qn::Main | Qn::Tree | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditUsersPermission).
+            requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
             text(tr("User...")).
             pulledText(tr("New User..."));
     } factory.endSubMenu();
@@ -505,7 +499,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory.beginSubMenu(); {
         factory(Qn::OpenFileAction).
             flags(Qn::Main | Qn::Scene).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("File(s)...")).
             shortcut(tr("Ctrl+O")).
             autoRepeat(false).
@@ -513,27 +507,27 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(Qn::OpenLayoutAction).
             //flags(Qn::Main | Qn::Scene). // TODO
-            forbiddenPermissions(Qn::CurrentLayoutParameter, Qn::AddRemoveItemsPermission).
+            forbiddenPermissions(Qn::CurrentLayoutResourceRole, Qn::AddRemoveItemsPermission).
             text(tr("Layout(s)...")).
             autoRepeat(false);
 
         factory(Qn::OpenFolderAction).
             flags(Qn::Main | Qn::Scene).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("Folder..."));
     } factory.endSubMenu();
 
     factory(Qn::SaveCurrentLayoutAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
-        requiredPermissions(Qn::CurrentLayoutParameter, Qn::SavePermission).
+        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::SavePermission).
         text(tr("Save Current Layout")).
         shortcut(tr("Ctrl+S")).
         autoRepeat(false). /* There is no point in saving the same layout many times in a row. */
         condition(new QnSaveLayoutActionCondition(true, this));
 
     factory(Qn::SaveCurrentLayoutAsAction).
-        requiredPermissions(Qn::CurrentUserParameter, Qn::CreateLayoutPermission).
-        requiredPermissions(Qn::CurrentLayoutParameter, Qn::SavePermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::CreateLayoutPermission).
+        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::SavePermission).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Alt+S")).
@@ -587,21 +581,54 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: icon?
+        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: #Elric icon?
+
+    factory(Qn::MessageBoxAction).
+        flags(Qn::NoTarget).
+        text(tr("Show message"));
+
+    factory(Qn::BrowseUrlAction).
+        flags(Qn::NoTarget).
+        text(tr("Open in browser..."));
 
 
-    factory(Qn::BusinessEventsAction).
-        flags(Qn::Main).
-        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
-        text(tr("Alarm/Event Rules...")).
-        shortcut(tr("Ctrl+E")).
-        autoRepeat(false);
-
-    factory(Qn::SystemSettingsAction).
+    factory(Qn::PreferencesGeneralTabAction).
         flags(Qn::Main).
         text(tr("System Settings...")).
         //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
+        autoRepeat(false);
+
+    factory(Qn::WebClientAction).
+        flags(Qn::Main | Qn::Tree).
+        text(tr("Open Web Client")).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+
+    factory().
+        flags(Qn::Main).
+        separator();
+
+    factory(Qn::BusinessEventsAction).
+        flags(Qn::Main | Qn::Tree).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Rules...")).
+        shortcut(tr("Ctrl+E")).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+
+    factory(Qn::BusinessEventsLogAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Log...")).
+        shortcut(tr("Ctrl+L")).
+        autoRepeat(false);
+
+    factory(Qn::CameraListAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Cameras list...")).
+        shortcut(tr("Ctrl+M")).
         autoRepeat(false);
 
     factory().
@@ -654,27 +681,27 @@ QnActionManager::QnActionManager(QObject *parent):
     /* Resource actions. */
     factory(Qn::OpenInLayoutAction).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredPermissions(Qn::LayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
+        requiredPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
         text(tr("Open in Layout"));
 
     factory(Qn::OpenInCurrentLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
+        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
         text(tr("Open")).
         conditionalText(tr("Monitor"), hasFlags(QnResource::server), Qn::All).
-        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
+        condition(new QnOpenInCurrentLayoutActionCondition(this));
 
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Tab")).
         conditionalText(tr("Monitor in a New Tab"), hasFlags(QnResource::server), Qn::All).
-        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
+        condition(new QnOpenInNewEntityActionCondition(this));
 
     factory(Qn::OpenInNewWindowAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Window")).
         conditionalText(tr("Monitor in a New Window"), hasFlags(QnResource::server), Qn::All).
-        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
+        condition(new QnOpenInNewEntityActionCondition(this));
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -688,7 +715,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenNewWindowLayoutsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Open Layout(s) in a New Window")). // TODO: split into sinle- & multi- action
+        text(tr("Open Layout(s) in a New Window")). // TODO: #Elric split into sinle- & multi- action
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
@@ -718,14 +745,14 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SaveLayoutAsAction).
         flags(Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::SavePermission).
-        requiredPermissions(Qn::UserParameter, Qn::CreateLayoutPermission).
+        requiredPermissions(Qn::UserResourceRole, Qn::CreateLayoutPermission).
         text(tr("Save Layout As...")).
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::SaveLayoutForCurrentUserAsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::SavePermission).
-        requiredPermissions(Qn::CurrentUserParameter, Qn::CreateLayoutPermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::CreateLayoutPermission).
         text(tr("Save Layout As...")).
         condition(hasFlags(QnResource::layout));
 
@@ -770,7 +797,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Resolution..."));
+        text(tr("Change Resolution...")).
+        condition(new QnLoggedInCondition(this));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
@@ -866,9 +894,21 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnTakeScreenshotActionCondition(this));
 
+    factory(Qn::AdjustVideoAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("Adjust video")).
+        shortcut(tr("Alt+J")).
+        autoRepeat(false).
+        condition(new QnAdjustVideoActionCondition(this));
+
+    factory(Qn::CreateZoomWindowAction).
+        flags(Qn::SingleTarget | Qn::WidgetTarget).
+        text(tr("Create Zoom Window")).
+        condition(new QnCreateZoomWindowActionCondition(this));
+
     factory().
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-         text(tr("Rotate to..."));
+        text(tr("Rotate to..."));
 
     factory.beginSubMenu();{
         factory(Qn::Rotate0Action).
@@ -919,6 +959,10 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("F2")).
         autoRepeat(false);
 
+    factory().
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        separator();
+
     factory(Qn::YouTubeUploadAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Upload to YouTube...")).
@@ -939,16 +983,35 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(hasFlags(QnResource::url | QnResource::local | QnResource::media));
 
+    factory(Qn::SetAsBackgroundAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission).
+        text(tr("Set as Layout Background")).
+        autoRepeat(false).
+        condition(new QnSetAsBackgroundActionCondition(this));
+
     factory(Qn::UserSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("User Settings...")).
         condition(hasFlags(QnResource::user));
+
+    factory(Qn::CameraIssuesAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Check Camera Issues...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Camera Settings...")).
         requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+
+    factory(Qn::LayoutSettingsAction).
+       flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+       text(tr("Layout Settings...")).
+       requiredPermissions(Qn::EditLayoutSettingsPermission);
+//       condition(new QnLayoutSettingsActionCondition(this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -959,8 +1022,22 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Clear Camera Settings Dialog"));
 
     factory(Qn::ServerAddCameraManuallyAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Add camera(s)...")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
+
+    factory(Qn::PingAction).
+        flags(Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Ping..."));
+
+    factory(Qn::ServerLogsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Server Logs")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
+
+    factory(Qn::ServerIssuesAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Check Server Issues...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory(Qn::ServerSettingsAction).
@@ -978,14 +1055,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(Qn::SetCurrentLayoutAspectRatio4x3Action).
             flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("4:3")).
             checkable().
             checked(qnGlobals->defaultLayoutCellAspectRatio() == 4.0/3.0);
 
         factory(Qn::SetCurrentLayoutAspectRatio16x9Action).
             flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("16:9")).
             checkable().
             checked(qnGlobals->defaultLayoutCellAspectRatio() == 16.0/9.0);
@@ -1002,28 +1079,28 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(Qn::SetCurrentLayoutItemSpacing0Action).
             flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("None")).
             checkable().
             checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.0);
 
         factory(Qn::SetCurrentLayoutItemSpacing10Action).
             flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Small")).
             checkable().
             checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.1);
 
         factory(Qn::SetCurrentLayoutItemSpacing20Action).
             flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Medium")).
             checkable().
             checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.2);
 
         factory(Qn::SetCurrentLayoutItemSpacing30Action).
             flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Large")).
             checkable().
             checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.3);
@@ -1042,6 +1119,16 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+T")).
         autoRepeat(false).
         condition(new QnToggleTourActionCondition(this));
+
+    factory().
+        flags(Qn::Scene | Qn::NoTarget).
+        separator();
+
+    factory(Qn::CurrentLayoutSettingsAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission).
+        text(tr("Layout Settings..."));
+//        condition(new QnLayoutSettingsActionCondition(this));
 
     factory(Qn::ToggleTourModeHotkeyAction).
         flags(Qn::Scene  | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly ).
@@ -1077,13 +1164,13 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget). 
         text(tr("Export Multi-Video...")).
-        requiredPermissions(Qn::CurrentLayoutMediaItemsParameter, Qn::ExportPermission).
+        requiredPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission).
         condition(new QnExportActionCondition(false, this));
 
     factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Preview Search...")).
-        condition(new QnExportActionCondition(true, this));
+        condition(new QnPreviewActionCondition(this));
 
 
 
@@ -1101,6 +1188,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget | Qn::DevMode).
         shortcut(tr("Ctrl+Alt+Shift+R")).
         text(tr("Show Resource Pool"));
+
+    factory(Qn::DebugCalibratePtzAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::DevMode).
+        text(tr("Calibrate PTZ"));
 
 
     factory(Qn::PlayPauseAction).
@@ -1200,17 +1291,24 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::PinTreeAction).
         flags(Qn::Tree | Qn::NoTarget).
         text(tr("Pin Tree")).
-        toggledText(tr("Unpin Tree"));
+        toggledText(tr("Unpin Tree")).
+        condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
     factory(Qn::ToggleTreeAction).
         flags(Qn::Tree | Qn::NoTarget).
         text(tr("Show Tree")).
-        toggledText(tr("Hide Tree"));
+        toggledText(tr("Hide Tree")).
+        condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
     factory(Qn::ToggleSliderAction).
         flags(Qn::Slider | Qn::NoTarget | Qn::SingleTarget).
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
+
+    factory(Qn::PinNotificationsAction).
+        flags(Qn::Notifications | Qn::NoTarget).
+        text(tr("Pin Notifications")).
+        toggledText(tr("Unpin Notifications"));
 }
 
 QnActionManager::~QnActionManager() {

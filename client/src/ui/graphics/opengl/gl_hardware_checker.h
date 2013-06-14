@@ -3,7 +3,6 @@
 
 #include <QtCore/QObject>
 
-class QGLContext;
 class QGLWidget;
 
 class QnGlHardwareChecker: public QObject {
@@ -14,7 +13,7 @@ public:
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
-    const QGLContext* m_context;
+    QGLWidget* m_widget;
 };
 
 #endif // QN_HARDWARE_CHECK_EVENT_FILTER_H

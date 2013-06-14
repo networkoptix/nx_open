@@ -13,6 +13,7 @@ static const QSize TO_LOWQ_SCREEN_SIZE(320/1.4,240/1.4);      // put item to LQ 
 static const int TIMER_TICK_INTERVAL = 500; // at ms
 static const int TOHQ_ADDITIONAL_TRY = 10*60*1000 / TIMER_TICK_INTERVAL; // every 10 min
 static const double FPS_EPS = 0.0001;
+static const double LQ_HQ_THRESHOLD = 1.34;
 
 QnRedAssController* QnRedAssController::instance()
 {
@@ -21,7 +22,7 @@ QnRedAssController* QnRedAssController::instance()
 
 QnRedAssController::QnRedAssController(): m_mutex(QMutex::Recursive), m_mode(Qn::AutoResolution)
 {
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     m_timer.start(TIMER_TICK_INTERVAL);
     m_hiQualityRetryCounter = 0;
     m_timerTicks = 0;
@@ -59,7 +60,7 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality fi
         if (!isSupportedDisplay(display))
             continue; // ommit cameras without dual streaming, offline and non-authorized cameras
 
-        QSize size = display->getScreenSize();
+        QSize size = display->getMaxScreenSize();
         QSize res = display->getVideoSize();
         qint64 screenSquare = size.width() * size.height();
         int pps = res.width()*res.height()*display->getAvarageFps(); // pps - pixels per second
@@ -169,7 +170,7 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
     if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
         return; // Some item stuck after HQ switching. Do not switch to HQ any more
 
-    if (isSmallItem(display))
+    if (isSmallItem2(display))
         return; // do not try HQ for small items
 
     if (m_redAssInfo[display].lqReason == Reason_Small)
@@ -188,7 +189,7 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
     if (existstBufferingDisplay())
         return; // do not go to HQ if some display perform opening...
 
-    display = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::isNotSmallItem);
+    display = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::isNotSmallItem2);
     if (display) {
         display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
         m_lastSwitchTimer.restart();
@@ -197,13 +198,24 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
 
 bool QnRedAssController::isSmallItem(QnCamDisplay* display)
 {
-    QSize sz = display->getScreenSize();
+    QSize sz = display->getMaxScreenSize();
     return sz.height() <= TO_LOWQ_SCREEN_SIZE.height();
+}
+
+bool QnRedAssController::isSmallItem2(QnCamDisplay* display)
+{
+    QSize sz = display->getMaxScreenSize();
+    return sz.height() <= TO_LOWQ_SCREEN_SIZE.height() * LQ_HQ_THRESHOLD;
 }
 
 bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
 {
     return !isSmallItem(display);
+}
+
+bool QnRedAssController::isNotSmallItem2(QnCamDisplay* display)
+{
+    return !isSmallItem2(display);
 }
 
 bool QnRedAssController::isFFSpeed(QnCamDisplay* display) const
@@ -271,7 +283,7 @@ void QnRedAssController::onTimer()
             qnSyncTime->currentMSecsSinceEpoch() - m_redAssInfo[display].lqTime > QUALITY_SWITCH_INTERVAL &&  // no drop report several last seconds
             display->queueSize() < 2 && // there are no a lot of packets in the queue (it is possible if CPU slow)
             m_lastSwitchTimer.elapsed() >= QUALITY_SWITCH_INTERVAL && // no recently slow report by any camera
-            !isSmallItem(display))  // is big enough item for HQ
+            !isSmallItem2(display))  // is big enough item for HQ
         {
             streamBackToNormal(display->getArchiveReader());
         }

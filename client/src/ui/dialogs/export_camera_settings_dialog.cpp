@@ -1,4 +1,9 @@
+
 #include "export_camera_settings_dialog.h"
+
+#include <QKeyEvent>
+#include <QPushButton>
+
 #include "ui_export_camera_settings_dialog.h"
 
 #include <core/resource_managment/resource_pool.h>
@@ -13,9 +18,9 @@
 #include <utils/license_usage_helper.h>
 
 
-QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWorkbenchContext *context) :
+QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnExportCameraSettingsDialog()),
     m_recordingEnabled(true),
     m_motionUsed(false),
@@ -26,7 +31,7 @@ QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWo
 {
     ui->setupUi(this);
 
-    m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
+    m_resourceModel = new QnResourcePoolModel(Qn::ServersNode, false, this);
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
@@ -104,12 +109,10 @@ void QnExportCameraSettingsDialog::updateLicensesStatus(){
         setWarningStyle(&palette);
     ui->licenseLabel->setPalette(palette);
 
-    QString usageText = tr("%1 digital license(s) will be used out of %2.\n"\
-                           "%3 analog  license(s) will be used out of %4.")
-            .arg(helper.usedDigital())
-            .arg(helper.totalDigital())
-            .arg(helper.usedAnalog())
-            .arg(helper.totalAnalog());
+    QString usageText =
+            tr("%n digital license(s) will be used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital()) +
+            QLatin1Char('\n') +
+            tr("%n analog  license(s) will be used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
     ui->licenseLabel->setText(usageText);
 
     updateOkStatus();

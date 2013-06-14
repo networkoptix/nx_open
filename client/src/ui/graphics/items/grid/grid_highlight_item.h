@@ -4,8 +4,8 @@
 #include <QGraphicsObject>
 
 class QnGridHighlightItem: public QGraphicsObject {
-    Q_OBJECT;
-    Q_PROPERTY(QColor color READ color WRITE setColor);
+    Q_OBJECT
+    Q_PROPERTY(QColor color READ color WRITE setColor)
 
 public:
     QnGridHighlightItem(QGraphicsItem *parent = NULL);

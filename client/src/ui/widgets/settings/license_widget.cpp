@@ -33,6 +33,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
 
     ui->serialKeyEdit->setInputMask(QLatin1String(">NNNN-NNNN-NNNN-NNNN"));
     ui->serialKeyEdit->setFocus();
+    ui->activateFreeLicenseButton->setText(qnProductFeatures().freeLicenseIsTrial ? tr("Activate Trial License") : tr("Activate Free License"));
 
     ui->manualActivationInfoLabel->setText(tr(
         "Please send E-Mail with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "

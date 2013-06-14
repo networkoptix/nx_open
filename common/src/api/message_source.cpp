@@ -87,6 +87,7 @@ QnMessageSource::QnMessageSource(QUrl url, int retryTimeout):
 }
 
 QnMessageSource::~QnMessageSource() {
+    // qWarning is issued here: QObject::startTimer: QTimer can only be used with threads started with QThread
     return;
 }
 
@@ -140,6 +141,7 @@ void QnMessageSource::httpFinished()
 
         /** Operation was cancelled intentionally */
         if (m_timeoutFlag) {
+            m_seqNumber = -1;
             m_reply->deleteLater();
             startRequest();
             return;

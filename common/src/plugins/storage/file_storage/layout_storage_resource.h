@@ -3,7 +3,10 @@
 
 #include <QFile>
 
-#include <libavformat/avio.h>
+extern "C"
+{
+    #include <libavformat/avio.h>
+}
 #include "core/resource/storage_resource.h"
 #include "recording/time_period_list.h"
 

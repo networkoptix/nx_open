@@ -5,6 +5,7 @@
 #include <QtGui/QBoxLayout>
 #include <QtGui/QFileDialog>
 #include <QtGui/QToolButton>
+#include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
 #include <QtGui/QFileOpenEvent>
@@ -20,6 +21,7 @@
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 
+#include "ui/common/palette.h"
 #include "ui/common/frame_section.h"
 #include "ui/actions/action_manager.h"
 #include "ui/graphics/view/graphics_view.h"
@@ -28,6 +30,7 @@
 #include <ui/help/help_topics.h>
 #include "ui/workbench/handlers/workbench_action_handler.h"
 #include "ui/workbench/handlers/workbench_panic_handler.h"
+#include "ui/workbench/handlers/workbench_screenshot_handler.h"
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_grid_mapper.h"
 #include "ui/workbench/workbench_layout.h"
@@ -45,7 +48,7 @@
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "file_processor.h"
-#include "utils/settings.h"
+#include "client/client_settings.h"
 
 #include "resource_browser_widget.h"
 #include "dwm.h"
@@ -54,8 +57,6 @@
 
 #include "openal/qtvaudiodevice.h"
 #include "ui/graphics/items/controls/volume_slider.h"
-
-//#define QN_MAIN_WINDOW_CHANGES_OPACITY
 
 namespace {
 
@@ -111,8 +112,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_controller(0),
     m_titleVisible(true),
     m_dwm(NULL),
-    m_drawCustomFrame(false),
-    m_changeOpacity(false)
+    m_drawCustomFrame(false)
 {
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
@@ -128,25 +128,21 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
 
-    connect(m_dwm,                          SIGNAL(compositionChanged(bool)),               this,                                   SLOT(updateDwmState()));
+    connect(m_dwm,                          SIGNAL(compositionChanged()),                   this,                                   SLOT(updateDwmState()));
 
     /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
     setAcceptDrops(true);
     setMinimumWidth(minimalWindowWidth);
     setMinimumHeight(minimalWindowHeight);
-    {
-        QPalette palette = this->palette();
-        palette.setColor(QPalette::Window, Qt::black);
-        setPalette(palette);
-    }
+    setPaletteColor(this, QPalette::Window, Qt::black);
 
 
     /* Set up scene & view. */
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    setHelpTopic(scene, Qn::MainWindow_Scene_Help);
+    m_scene.reset(new QGraphicsScene(this));
+    setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 
-    m_view = new QnGraphicsView(scene);
+    m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
@@ -163,18 +159,18 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up model & control machinery. */
-    display()->setScene(scene);
-    display()->setView(m_view);
+    display()->setScene(m_scene.data());
+    display()->setView(m_view.data());
     display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
-    m_controller = new QnWorkbenchController(this);
-    m_ui = new QnWorkbenchUi(this);
+    m_controller.reset(new QnWorkbenchController(this));
+    m_ui.reset(new QnWorkbenchUi(this));
     m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
 
     /* Set up handlers. */
-    QnWorkbenchActionHandler *actionHandler = context->instance<QnWorkbenchActionHandler>();
-    actionHandler->setWidget(this);
+    context->instance<QnWorkbenchActionHandler>();
+    context->instance<QnWorkbenchScreenshotHandler>();
 
 
     /* Set up actions. */
@@ -186,8 +182,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::EscapeHotkeyAction));
     addAction(action(Qn::FullscreenAction));
     addAction(action(Qn::AboutAction));
-    addAction(action(Qn::SystemSettingsAction));
+    addAction(action(Qn::PreferencesGeneralTabAction));
+    addAction(action(Qn::BusinessEventsLogAction));
+    addAction(action(Qn::CameraListAction));
     addAction(action(Qn::BusinessEventsAction));
+    addAction(action(Qn::WebClientAction));
     addAction(action(Qn::OpenFileAction));
     addAction(action(Qn::ConnectToServerAction));
     addAction(action(Qn::OpenNewTabAction));
@@ -201,9 +200,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::RemoveFromServerAction));
     addAction(action(Qn::SelectAllAction));
     addAction(action(Qn::TakeScreenshotAction));
+    addAction(action(Qn::AdjustVideoAction));
     addAction(action(Qn::TogglePanicModeAction));
     addAction(action(Qn::ToggleTourModeHotkeyAction));
-    addAction(action(Qn::TogglePopupsAction));
     addAction(action(Qn::DebugIncrementCounterAction));
     addAction(action(Qn::DebugDecrementCounterAction));
     addAction(action(Qn::DebugShowResourcePoolAction));
@@ -212,7 +211,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
 
-    menu()->setTargetProvider(m_ui);
+    menu()->setTargetProvider(m_ui.data());
 
 
     /* Tab bar. */
@@ -261,7 +260,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_viewLayout = new QVBoxLayout();
     m_viewLayout->setContentsMargins(0, 0, 0, 0);
     m_viewLayout->setSpacing(0);
-    m_viewLayout->addWidget(m_view);
+    m_viewLayout->addWidget(m_view.data());
 
     m_globalLayout = new QVBoxLayout();
     m_globalLayout->setContentsMargins(0, 0, 0, 0);
@@ -270,12 +269,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
     setLayout(m_globalLayout);
-
-
-    /* Transparency. */
-    connect(QnVolumeSliderNotifier::instance(), SIGNAL(manipulated()), this, SLOT(at_volumeSliderNotifier_manipulated()));
-    connect(QtvAudioDevice::instance(), SIGNAL(volumeChanged()), this, SLOT(at_audioDevice_volumeChanged()));
-    at_audioDevice_volumeChanged();
 
 
     /* Post-initialize. */
@@ -471,7 +464,7 @@ bool QnMainWindow::event(QEvent *event) {
         if(m_mainMenuButton->isVisible())
             m_mainMenuButton->click();
             
-        QApplication::sendEvent(m_ui, event);
+        QApplication::sendEvent(m_ui.data(), event);
         result = true;
     }
 
@@ -576,7 +569,8 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
 #ifdef Q_OS_WIN
 bool QnMainWindow::winEvent(MSG *message, long *result)
 {
-    if(m_dwm->widgetWinEvent(message, result))
+    /* Note that we may get here from destructor, so check for dwm is needed. */
+    if(m_dwm && m_dwm->widgetWinEvent(message, result))
         return true;
 
     return base_type::winEvent(message, result);
@@ -608,16 +602,3 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
-void QnMainWindow::at_volumeSliderNotifier_manipulated() {
-    m_changeOpacity = true;
-}
-
-void QnMainWindow::at_audioDevice_volumeChanged() {
-#ifdef QN_MAIN_WINDOW_CHANGES_OPACITY
-    if(m_changeOpacity) {
-        qreal volume = QtvAudioDevice::instance()->volume();
-
-        setWindowOpacity(qMin(0.7 + 0.5 * volume, 1.0));
-    }
-#endif
-}

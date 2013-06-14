@@ -12,6 +12,7 @@
 #include "core/resource/storage_resource.h"
 
 class QnAbstractMediaStreamDataProvider;
+class TestStorageThread;
 
 class QnStorageManager: public QObject
 {
@@ -61,15 +62,18 @@ public:
 
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
-    qint64 minSpaceForWritting() const;
-    qint64 isBigStorageExists() const;
-
     static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
+
+    bool isArchiveTimeExists(const QString& physicalId, qint64 timeMs);
+    void stopAsyncTasks();
 signals:
     void noStoragesAvailable();
+    void storageFailure(QnResourcePtr storageRes);
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
+    friend class TestStorageThread;
+
     void clearSpace(QnStorageResourcePtr storage);
     int detectStorageIndex(const QString& path);
     QSet<int> getDeprecateIndexList(const QString& p);
@@ -80,12 +84,14 @@ private:
     void getTimePeriodInternal(QVector<QnTimePeriodList>& cameras, QnNetworkResourcePtr camera, qint64 startTime, qint64 endTime, qint64 detailLevel, DeviceFileCatalogPtr catalog);
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const;
     void updateStorageStatistics();
+    void testOfflineStorages();
 
     int getFileNumFromCache(const QString& base, const QString& folder);
     void putFileNumToCache(const QString& base, int fileNum);
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
     QSet<QnStorageResourcePtr> getWritableStorages() const;
+    void changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
@@ -105,7 +111,9 @@ private:
     bool m_catalogLoaded;
     bool m_warnSended;
     bool m_isWritableStorageAvail;
-    bool m_bigStorageExists;
+    QTime m_lastTestTime;
+    QTime m_storageWarnTimer;
+    static TestStorageThread* m_testStorageThread;
 };
 
 #define qnStorageMan QnStorageManager::instance()

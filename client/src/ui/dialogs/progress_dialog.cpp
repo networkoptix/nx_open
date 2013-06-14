@@ -53,6 +53,8 @@
 #include "qtimer.h"
 #include "qelapsedtimer.h"
 #include <limits.h>
+#include <QPointer>
+
 
 #if defined(QT_SOFTKEYS_ENABLED)
 #include <qaction.h>

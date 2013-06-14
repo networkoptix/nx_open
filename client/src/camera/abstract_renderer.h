@@ -15,12 +15,13 @@ class CLVideoDecoderOutput;
  * 
  * Note that it is owned by the rendering thread.
  */
-class QnAbstractRenderer
-:
-    public QnStoppable
+class QnAbstractRenderer: public QObject, public QnStoppable
 {
+    Q_OBJECT
+signals:
+    void canBeDestroyed();
 public:
-    QnAbstractRenderer(): m_displayCounter(0) {}
+    QnAbstractRenderer(QObject* parent = 0): QObject(parent), m_useCount(0), m_needStop(false) {}
 
     virtual ~QnAbstractRenderer() {}
 
@@ -48,20 +49,16 @@ public:
     virtual void finishPostedFramesRender(int channel) = 0;
 
     /**
-     * This function is supposed to be called from <i>rendering</i> thread.
-     * It notifies the <i>decoding</i> thread that the current frame was rendered.
-     */
-    void frameDisplayed() {
-        m_displayCounter++;
-
-        doFrameDisplayed();
-    }
-
-    /**
      * This function may be called from any thread.
      * It is called just before this object is destroyed.
      */
-    virtual void beforeDestroy() = 0;
+    virtual void destroyAsync() 
+    {
+        QMutexLocker lock(&m_usingMutex);
+        m_needStop = true;
+        if (m_useCount == 0)
+            emit canBeDestroyed();
+    }
 
     /**
      * This function is supposed to be called from <i>decoding</i> thread.
@@ -88,15 +85,6 @@ public:
     virtual void draw( const QSharedPointer<CLVideoDecoderOutput>& image) = 0;
 
     /**
-     * \returns                         Value of this renderer's display counter.
-     *                                  This counter is incremented each time a frame
-     *                                  is rendered.
-     */
-    int displayCounter() const {
-        return m_displayCounter;
-    }
-
-    /**
      * Inform drawer about video is temporary absent
      */
     virtual void onNoVideo() {}
@@ -106,13 +94,37 @@ public:
     virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const = 0;
     virtual void unblockTimeValue(int channelNumber) const = 0;
     virtual bool isTimeBlocked(int channelNumber) const  = 0;
+    virtual bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const = 0;
 
-protected:
-    virtual void doFrameDisplayed() {} // Not used for now.
+    void inUse() {
+        QMutexLocker lock(&m_usingMutex);
+        m_useCount++; 
+    }
 
+    void notInUse() { 
+        QMutexLocker lock(&m_usingMutex);
+        if (--m_useCount == 0 && m_needStop)
+            emit canBeDestroyed();
+    }
+
+    virtual bool isEnabled(int channelNumber) const = 0;
+    /*!
+        Enable/disable frame rendering for channel \a channelNumber. true by default. 
+        Disabling causes all previously posted frames being discarded. Any subsequent frames will be ignored
+    */
+    virtual void setEnabled(int channelNumber, bool enabled) = 0;
+
+    /*!
+        Inform render that media stream is paused and no more frames expected
+    */
+    virtual void setPaused(bool value) = 0;
+
+    virtual void setScreenshotInterface(ScreenshotInterface* value) = 0;
 
 private:
-    int m_displayCounter;
+    int m_useCount;
+    bool m_needStop;
+    QMutex m_usingMutex;
 };
 
 #endif // QN_ABSTRACT_RENDERER_H

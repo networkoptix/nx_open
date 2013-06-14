@@ -1,6 +1,7 @@
 #include "time_period.h"
 
 #include <QtCore/QDebug>
+#include <QDateTime>
 
 #include <utils/common/util.h>
 

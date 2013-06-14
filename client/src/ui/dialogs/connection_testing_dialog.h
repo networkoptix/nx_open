@@ -26,7 +26,7 @@ public slots:
 
     void timeout();
 
-    void testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
+    void testResults(int status, QnConnectInfoPtr connectInfo, int requestHandle);
 
 private:
     void testSettings();
@@ -36,7 +36,7 @@ private:
      *
      * \param success - Status of the connection test
      */
-    void updateUi(bool success);
+    void updateUi(bool success, const QString &details);
 
 private:
     Q_DISABLE_COPY(QnConnectionTestingDialog)

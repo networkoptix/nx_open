@@ -1,11 +1,18 @@
+
 #include "vmax480_live_reader.h"
+
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
+
 #include "core/resource/network_resource.h"
 #include "core/datapacket/media_data_packet.h"
-#include "libavcodec/avcodec.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 
 #include "vmax480_resource.h"
+
 
 static const QByteArray GROUP_ID("{347E1C92-4627-405d-99B3-5C7EF78B0055}");
 
@@ -45,8 +52,28 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
 
     if (!result)
         closeStream();
+
+    if (!m_needStop) 
+    {
+        QnAbstractMediaDataPtr media = result.dynamicCast<QnAbstractMediaData>();
+        if (media && (media->dataType != QnAbstractMediaData::EMPTY_DATA)) {
+            m_lastMediaTimer.restart();
+            if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
+                getResource()->setStatus(QnResource::Online);
+        }
+        else if (m_lastMediaTimer.elapsed() > MAX_FRAME_DURATION * 2) {
+            m_resource->setStatus(QnResource::Offline);
+        }
+    }
+
     return result.dynamicCast<QnAbstractMediaData>();
 }
+
+bool QnVMax480LiveProvider::canChangeStatus() const
+{
+    return false; // do not allow to ancessor update status
+}
+
 
 void QnVMax480LiveProvider::openStream()
 {
@@ -59,9 +86,9 @@ void QnVMax480LiveProvider::openStream()
 
 
     if (m_maxStream == 0)
-        m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, m_resource, true);
+        m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, m_resource.data(), true);
     m_opened = m_maxStream->registerConsumer(this); 
-
+    m_lastMediaTimer.restart();
     /*
     vmaxDisconnect();
     vmaxConnect(true, channel);
@@ -75,7 +102,7 @@ void QnVMax480LiveProvider::closeStream()
         m_maxStream->unregisterConsumer(this);
     }
     if (m_maxStream)
-        m_maxStream->freeInstance(GROUP_ID, m_resource, true);
+        m_maxStream->freeInstance(GROUP_ID, m_resource.data(), true);
     m_maxStream = 0;
 
     //vmaxDisconnect();
@@ -88,6 +115,7 @@ bool QnVMax480LiveProvider::isStreamOpened() const
 
 void QnVMax480LiveProvider::beforeRun()
 {
+    CLServerPushStreamreader::beforeRun();
     //msleep(300);
 }
 

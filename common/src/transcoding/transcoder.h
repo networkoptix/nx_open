@@ -3,9 +3,31 @@
 
 #include <QString>
 #include <QSharedPointer>
-#include "libavcodec/avcodec.h"
+
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
+
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/media_resource.h"
+#include "filters/abstract_filter.h"
+
+
+/*!
+    \note All constants (except \a quality) in this namespace refer to libavcodec CodecContex field names
+*/
+namespace QnCodecParams
+{
+    typedef QMap<QString, QVariant> Value;
+
+    static const QLatin1String quality( "quality" );
+
+    static const QLatin1String qmin( "qmin" );
+    static const QLatin1String qmax( "qmax" );
+    static const QLatin1String qscale( "qscale" );
+    static const QLatin1String global_quality( "global_quality" );
+}
 
 
 //!Base class for all raw media stream transcoders
@@ -16,8 +38,6 @@
 class QnCodecTranscoder
 {
 public:
-    typedef QMap<QString, QVariant> Params;
-
     QnCodecTranscoder(CodecID codecId);
     virtual ~QnCodecTranscoder() {}
     
@@ -29,9 +49,9 @@ public:
     //virtual AVCodecContext* getCodecContext();
 
     //!Set codec-specific params for output stream. For list of supported params please refer to derived class' doc
-    virtual void setParams(const Params& params);
+    virtual void setParams(const QnCodecParams::Value& params);
     //!Returns coded-specific params
-    const Params& getParams() const;
+    const QnCodecParams::Value& getParams() const;
     //!Set output stream bitrate (bps)
     virtual void setBitrate(int value);
     //!Get output bitrate bitrate (bps)
@@ -42,17 +62,22 @@ public:
         Transcoder is allowed to return NULL coded picture for non-NULL input and return coded output pictures with some delay from input.
         To empty transcoder'a coded picture buffer one should provide NULL as input until receiving NULL at output.
         \param media Coded picture of the input stream. May be NULL
-        \param result Coded picture of the output stream. May be NULL
+        \param result Coded picture of the output stream. If NULL, only decoding is done
         \return return Return error code or 0 if no error
     */
-    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) = 0;
+    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) = 0;
     QString getLastError() const;
-
+    virtual void setQuality( QnStreamQuality quality );
+    void setSrcRect(const QRectF& srcRect);
+protected:
+    QRect roundRect(const QRect& srcRect) const;
 protected:
     QString m_lastErrMessage;
-    Params m_params;
+    QnCodecParams::Value m_params;
     int m_bitrate;
     CodecID m_codecId;
+    QnStreamQuality m_quality;
+    QRectF m_srcRectF;
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 
@@ -61,6 +86,7 @@ class QnVideoTranscoder: public QnCodecTranscoder
 {
 public:
     QnVideoTranscoder(CodecID codecId);
+    virtual ~QnVideoTranscoder();
 
     //!Set picture size (in pixels) of output video stream
     /*!
@@ -71,10 +97,20 @@ public:
     virtual void setResolution( const QSize& value );
     //!Returns picture size (in pixels) of output video stream
     QSize getResolution() const;
+    void setVideoLayout(const QnResourceVideoLayout* layout);
 
     virtual bool open(QnCompressedVideoDataPtr video);
+
+    void addFilter(QnAbstractImageFilter* filter);
+protected:
+    static const int WIDTH_ALIGN = 32;
+    static const int HEIGHT_ALIGN = 2;
+        
+    void processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect);
 protected:
     QSize m_resolution;
+    const QnResourceVideoLayout* m_layout;
+    QList<QnAbstractImageFilter*> m_filters;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 
@@ -107,6 +143,8 @@ public:
     */
     virtual int setContainer(const QString& value) = 0;
 
+    void setVideoLayout(const QnResourceVideoLayout* layout);
+
     /*
     * Set ffmpeg video codec and params
     * @return Returns 0 if no error or error code
@@ -116,7 +154,13 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected. Not used if transcode method TM_NoTranscode
     * @param addition codec params. Not used if transcode method TM_NoTranscode
     */
-    virtual int setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution = QSize(1024,768), int bitrate = -1, const QnCodecTranscoder::Params& params = QnCodecTranscoder::Params());
+    virtual int setVideoCodec(
+        CodecID codec,
+        TranscodeMethod method,
+        QnStreamQuality quality,
+        const QSize& resolution = QSize(1024,768),
+        int bitrate = -1,
+        QnCodecParams::Value params = QnCodecParams::Value());
 
 
     /*
@@ -131,10 +175,16 @@ public:
 
     /*
     * Transcode media data and write it to specified QnByteArray
-    * @param transcoded data block
+    * @param result transcoded data block. If NULL, only decoding is done
     * @return Returns 0 if no error or error code
     */
-    int transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result);
+    int transcodePacket(QnAbstractMediaDataPtr media, QnByteArray* const result);
+    //!Adds tag to the file. Maximum langth of tags and allowed names are format dependent
+    /*!
+        This implementation always returns \a false
+        \return true on success
+    */
+    virtual bool addTag( const QString& name, const QString& value );
 
     /*
     * Return description of the last error code
@@ -145,7 +195,20 @@ public:
     int writeBuffer(const char* data, int size);
     void setPacketizedMode(bool value);
     const QVector<int>& getPacketsSize();
-    static int suggestBitrate(QSize resolution, QnStreamQuality quality = QnQualityNormal);
+
+    //!Selects media stream parameters based on \a resolution and \a quality
+    /*!
+        Can add parameters to \a params
+        \parm codec 
+        \return bitrate in kbps
+        \note Does not modify existing parameters in \a params
+    */
+    static int suggestMediaStreamParams(
+        CodecID codec,
+        QSize resolution,
+        QnStreamQuality quality,
+        QnCodecParams::Value* const params = NULL );
+
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -154,7 +217,7 @@ protected:
     */
     virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) = 0;
 
-    virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result) = 0;
+    virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray* const result) = 0;
 
     QnVideoTranscoderPtr m_vTranscoder;
     QnAudioTranscoderPtr m_aTranscoder;
@@ -165,8 +228,10 @@ protected:
     QnByteArray m_internalBuffer;
     QVector<int> m_outputPacketSize;
     qint64 m_firstTime;
+
 protected:
     bool m_initialized;
+    const QnResourceVideoLayout* m_vLayout;
 private:
     QString m_lastErrMessage;
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;

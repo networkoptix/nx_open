@@ -2,13 +2,17 @@
 #include "ui_database_management_widget.h"
 
 #include <QMessageBox>
+#include <QtGui/QFileDialog>
+#include <QtCore/QFileInfo>
 
-#include "utils/settings.h"
+#include "client/client_settings.h"
 #include "api/app_server_connection.h"
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -19,6 +23,8 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent, Qt::Wind
 {
     ui->setupUi(this);
     
+    setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
+
     connect(ui->backupButton, SIGNAL(clicked()), this, SLOT(at_backupButton_clicked()));
     connect(ui->restoreButton, SIGNAL(clicked()), this, SLOT(at_restoreButton_clicked()));
 }
@@ -49,7 +55,7 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     QScopedPointer<QnDatabaseManagementWidgetReplyProcessor> processor(new QnDatabaseManagementWidgetReplyProcessor());
     connect(processor, SIGNAL(activated()), dialog, SLOT(reset()));
     
-    QnAppServerConnectionFactory::createConnection()->dumpDatabase(processor.data(), SLOT(activate(const QnHTTPRawResponse &, int)));
+    QnAppServerConnectionFactory::createConnection()->dumpDatabaseAsync(processor.data(), SLOT(activate(const QnHTTPRawResponse &, int)));
     dialog->exec();
     if(dialog->wasCanceled())
         return;
@@ -92,7 +98,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     QScopedPointer<QnDatabaseManagementWidgetReplyProcessor> processor(new QnDatabaseManagementWidgetReplyProcessor());
     connect(processor, SIGNAL(activated()), dialog, SLOT(reset()));
 
-    QnAppServerConnectionFactory::createConnection()->restoreDatabase(data, processor.data(), SLOT(activate(const QnHTTPRawResponse &, int)));
+    QnAppServerConnectionFactory::createConnection()->restoreDatabaseAsync(data, processor.data(), SLOT(activate(const QnHTTPRawResponse &, int)));
     dialog->exec();
     if(dialog->wasCanceled())
         return; // TODO: #Elric make non-cancellable.

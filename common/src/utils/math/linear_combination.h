@@ -85,7 +85,7 @@ public:
 
     void combine(qreal a, const void *x, void *result) const;
 
-    QVariant zero() const {
+    const QVariant &zero() const {
         return m_zero;
     }
 

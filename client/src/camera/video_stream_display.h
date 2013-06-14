@@ -2,10 +2,14 @@
 #ifndef QN_VIDEO_STREAM_DISPLAY_H
 #define QN_VIDEO_STREAM_DISPLAY_H
 
+extern "C"
+{
+    #include <libswscale/swscale.h>
+}
+
 #include "decoders/video/abstractdecoder.h"
-#include "decoders/frame_scaler.h"
-#include "../ui/workbench/workbench_context_aware.h"
 #include <utils/common/stoppable.h>
+#include "frame_scaler.h"
 
 
 class QnAbstractVideoDecoder;
@@ -21,7 +25,7 @@ static const int MAX_QUEUE_TIME = 1000 * 200;
   */
 class QnVideoStreamDisplay
 :
-    public QnStoppable
+    public QnStoppable, public ScreenshotInterface
 {
 public:
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
@@ -32,7 +36,9 @@ public:
     //!Implementation of QnStoppable::pleaseStop()
     virtual void pleaseStop() override;
 
-    void setDrawer(QnAbstractRenderer* draw);
+    void addRenderer(QnAbstractRenderer* draw);
+    void removeRenderer(QnAbstractRenderer* draw);
+    
     FrameDisplayStatus display(
         QnCompressedVideoDataPtr data,
         bool draw,
@@ -45,37 +51,46 @@ public:
     void setMTDecoding(bool value);
 
     void setSpeed(float value);
-    //!Returns timestamp of frame that will be rendered next. It can be already displayed frame (if no new frames available)
-    qint64 getTimestampOfNextFrameToRender() const;
-    void overrideTimestampOfNextFrameToRender(qint64 value);
-    void afterJump();
-    QImage getScreenshot();
-    void blockTimeValue(qint64 time);
-    void unblockTimeValue();
-    bool isTimeBlocked() const;
+    virtual QImage getScreenshot() override;
+    virtual QImage getGrayscaleScreenshot() override; 
     void setCurrentTime(qint64 time);
-    void waitForFramesDisplayed();
-    void onNoVideo();
     void canUseBufferedFrameDisplayer(bool value);
     qint64 nextReverseTime() const;
     QSize getImageSize() const;
 
+    QSize getMaxScreenSize() const;
+    bool selfSyncUsed() const;
+
+private:
+    friend class QnCamDisplay;
+
+    void waitForFramesDisplayed();
     /**
       * Return last decoded frame
       */
     QSharedPointer<CLVideoDecoderOutput> flush(QnFrameScaler::DownscaleFactor force_factor, int channelNum);
-    QSize getScreenSize() const;
     QnVideoStreamDisplay::FrameDisplayStatus flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor);
-    bool selfSyncUsed() const;
-
     //!Blocks until all frames passed to \a display have been rendered
     void flushFramesToRenderer();
+    void overrideTimestampOfNextFrameToRender(qint64 value);
+    //!Returns timestamp of frame that will be rendered next. It can be already displayed frame (if no new frames available)
+    qint64 getTimestampOfNextFrameToRender() const;
+    void blockTimeValue(qint64 time);
+    void blockTimeValueSafe(qint64 time);
+    void setPausedSafe(bool value);
+    void unblockTimeValue();
+    bool isTimeBlocked() const;
+    void afterJump();
+    void onNoVideo();
 
+    void updateRenderList();
 private:
     mutable QMutex m_mtx;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
 
-    QnAbstractRenderer* m_drawer;
+    QSet<QnAbstractRenderer*> m_newList;
+    QSet<QnAbstractRenderer*> m_renderList;
+    bool m_renderListModified;
 
     /**
       * to reduce image size for weak video cards 
@@ -117,6 +132,7 @@ private:
     int m_prevSrcWidth;
     int m_prevSrcHeight;
     qint64 m_lastIgnoreTime;
+    mutable QMutex m_renderListMtx;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
@@ -125,6 +141,7 @@ private:
 
     QnFrameScaler::DownscaleFactor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
     QnFrameScaler::DownscaleFactor determineScaleFactor(
+        QnAbstractRenderer* render,
         int channelNumber, 
         int srcWidth, 
         int srcHeight, 

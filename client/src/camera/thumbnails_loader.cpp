@@ -1,8 +1,12 @@
 #include "thumbnails_loader.h"
 
 #include <cassert>
-
 #include <limits>
+
+extern "C"
+{
+    #include <libswscale/swscale.h>
+}
 
 #include <QtCore/QTimer>
 #include <QtGui/QImage>
@@ -262,7 +266,7 @@ void QnThumbnailsLoader::updateProcessingLocked() {
         return; /* We'll be called again from the event loop. */
     }
 
-    // TODO: there probably is a better place for checking size restrictions.
+    // TODO: #Elric there probably is a better place for checking size restrictions.
     if(m_thumbnailByTime.size() * m_scaleTargetSize.width() * m_scaleTargetSize.width() * 4 > maxThumbnailCacheSize) {
         invalidateThumbnailsLocked();
         return; /* We'll be called again from the event loop. */
@@ -278,11 +282,11 @@ void QnThumbnailsLoader::updateProcessingLocked() {
     /* Trim at live. */
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if(processingEnd > currentTime)
-        processingEnd = currentTime + defaultUpdateInterval;
+        processingEnd = qCeil(currentTime + defaultUpdateInterval, m_timeStep);
 
     /* Adjust for the chunks near live that could not be loaded at the last request. */
     if(m_processingStart < m_maxLoadedTime && m_maxLoadedTime < m_processingEnd && processingEnd > m_maxLoadedTime) {
-        processingStart = qMin(processingStart, m_maxLoadedTime + m_timeStep);
+        processingStart = qMin(processingStart, qFloor(m_maxLoadedTime, m_timeStep) + m_timeStep);
         m_processingEnd = m_maxLoadedTime;
     }
 
@@ -315,10 +319,14 @@ void QnThumbnailsLoader::updateProcessingLocked() {
 void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 endTime) {
     m_processingStack.push(QnTimePeriod(startTime, endTime - startTime));
 
+#ifdef QN_THUMBNAILS_LOADER_DEBUG
+    qDebug() << "QnThumbnailsLoader::enqueueForProcessingLocked [" << startTime << "," << endTime << ") STEP" << m_timeStep;
+#endif
+
     while(m_processingStack.size() > maxStackSize)
         m_processingStack.pop();
 
-    // if(m_processingStack.size() == 1) // TODO: for some reason, this doesn't work in some cases.
+    // if(m_processingStack.size() == 1) // TODO: #Elric for some reason, this doesn't work in some cases.
         emit processingRequested();
 }
 
@@ -449,7 +457,7 @@ void QnThumbnailsLoader::process() {
                 frame = qSharedPointerDynamicCast<QnCompressedVideoData>(client->getNextData());
             }
 
-            if(!invalidated && m_decode) { // TODO: m_decode check may be wrong here.
+            if(!invalidated && m_decode) { // TODO: #Elric m_decode check may be wrong here.
                 /* Make sure decoder's buffer is empty. */
                 QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1, 0));
                 while (decoder.decode(emptyData, &outFrame)) 
@@ -478,7 +486,7 @@ void QnThumbnailsLoader::process() {
 #endif
 
     /* Go on with processing. */
-    QMetaObject::invokeMethod(m_helper, "process", Qt::QueuedConnection); // TODO: use connections.
+    QMetaObject::invokeMethod(m_helper, "process", Qt::QueuedConnection); // TODO: #Elric use connections.
 }
 
 void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
@@ -535,7 +543,7 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_scaleTargetSize.width()), 8), m_scaleTargetSize.height());
         m_scaleBuffer = static_cast<quint8 *>(qMallocAligned(numBytes, 32));
         m_scaleContext = sws_getContext(m_scaleSourceSize.width(), m_scaleSourceSize.height(), static_cast<PixelFormat>(m_scaleSourceFormat), m_scaleTargetSize.width(), m_scaleTargetSize.height(), PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
-        // TODO: sws_getContext may fail and return NULL.
+        // TODO: #Elric sws_getContext may fail and return NULL.
     }
 }
 

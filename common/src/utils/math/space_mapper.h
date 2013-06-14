@@ -41,6 +41,8 @@ public:
     const QnInterpolator<qreal> &logicalToPhysical() const { return m_logicalToPhysical; }
     const QnInterpolator<qreal> &physicalToLogical() const { return m_physicalToLogical; }
 
+    QnScalarSpaceMapper flipped(bool flipLogical, bool flipPhysical, qreal logicalCenter, qreal physicalCenter) const;
+
 private:
     void init(const QVector<QPair<qreal, qreal> > &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode);
 

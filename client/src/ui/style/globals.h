@@ -1,13 +1,17 @@
 #ifndef QN_GLOBALS_H
 #define QN_GLOBALS_H
 
-#include <QObject>
-#include <QVariant>
-#include <QSizeF>
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
+#include <QtCore/QSizeF>
+#include <QtGui/QFont>
+#include <QtGui/QColor>
+
+#include <utils/common/property_storage.h>
 
 #include <ui/style/statistics_colors.h>
 
-#include <utils/common/property_storage.h>
+#include <client/client_meta_types.h>
 
 /**
  * Global style settings.
@@ -18,7 +22,6 @@
  */
 class QnGlobals: public QnPropertyStorage {
     Q_OBJECT
-
     typedef QnPropertyStorage base_type;
 
 public:
@@ -38,6 +41,7 @@ public:
         RECORD_ALWAYS_COLOR,
         
         PTZ_COLOR,
+        ZOOM_WINDOW_COLOR,
 
         OPACITY_CHANGE_PERIOD,
 
@@ -57,11 +61,31 @@ public:
         BACKGROUD_GRADIENT_COLOR,
 
         STATISTICS_COLORS,
+        ZOOM_WINDOW_COLORS,
 
-        POPUP_FRAME_SYSTEM,
-        POPUP_FRAME_NOTIFICATION,
-        POPUP_FRAME_IMPORTANT,
-        POPUP_FRAME_WARNING,
+        /** Color of system notifications */
+        NOTIFICATION_COLOR_SYSTEM,
+
+        /** Color of notifications about common events */
+        NOTIFICATION_COLOR_COMMON,
+
+        /** Color of notifications about important events */
+        NOTIFICATION_COLOR_IMPORTANT,
+
+        /** Color of notifications about critical events */
+        NOTIFICATION_COLOR_CRITICAL,
+
+        /** Maximum size of the layout background - in cells */
+        LAYOUT_BACKGROUND_MAX_SIZE,
+
+        /** Recommended area of the layout background - in square cells */
+        LAYOUT_BACKGROUND_RECOMMENDED_AREA,
+
+        /** Color of the cone that points to the raised widget origin if layout background is present. */
+        RAISED_CONE_COLOR,
+
+        /** Opacity of the raised widget if layout background is present. */
+        RAISED_WIDGET_OPACITY,
 
         VARIABLE_COUNT
     };
@@ -71,9 +95,12 @@ public:
 
     static QnGlobals *instance();
 
-
 protected:
     virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
+    virtual QVariant readValueFromJson(const QVariantMap &json, int id, const QVariant &defaultValue) override;
+
+    static QVector<QColor> defaultZoomWindowColors();
+
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_R_PROPERTY(QFont,    settingsFont,                   SETTINGS_FONT,                          QFont())
@@ -86,6 +113,7 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196))
         QN_DECLARE_R_PROPERTY(QColor,   selectedFrameColor,             SELECTED_FRAME_COLOR,                   QColor(64, 130, 180, 128))
         QN_DECLARE_R_PROPERTY(QColor,   ptzColor,                       PTZ_COLOR,                              QColor(128, 196, 255, 255))
+        QN_DECLARE_R_PROPERTY(QColor,   zoomWindowColor,                ZOOM_WINDOW_COLOR,                      QColor(128, 196, 255, 255))
 
         QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250)
         QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64))
@@ -103,11 +131,18 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   backgroundGradientColor,        BACKGROUD_GRADIENT_COLOR,               QColor(5, 5, 50))
 
         QN_DECLARE_R_PROPERTY(QnStatisticsColors,   statisticsColors,   STATISTICS_COLORS,                      QnStatisticsColors())
+        QN_DECLARE_R_PROPERTY(QVector<QColor>,      zoomWindowColors,   ZOOM_WINDOW_COLORS,                     defaultZoomWindowColors())
 
-        QN_DECLARE_R_PROPERTY(QColor,   popupFrameSystem,               POPUP_FRAME_SYSTEM,                     QColor(255, 0, 0, 128))
-        QN_DECLARE_R_PROPERTY(QColor,   popupFrameNotification,         POPUP_FRAME_NOTIFICATION,               QColor(64, 130, 180, 128))
-        QN_DECLARE_R_PROPERTY(QColor,   popupFrameImportant,            POPUP_FRAME_IMPORTANT,                  QColor(255, 128, 0, 128))
-        QN_DECLARE_R_PROPERTY(QColor,   popupFrameWarning,              POPUP_FRAME_WARNING,                    QColor(255, 0, 0, 128))
+        QN_DECLARE_R_PROPERTY(QColor,   notificationColorSystem,        NOTIFICATION_COLOR_SYSTEM,              QColor(255, 0, 0))
+        QN_DECLARE_R_PROPERTY(QColor,   notificationColorCommon,        NOTIFICATION_COLOR_COMMON,              QColor(103, 237, 66))
+        QN_DECLARE_R_PROPERTY(QColor,   notificationColorImportant,     NOTIFICATION_COLOR_IMPORTANT,           QColor(237, 200, 66))
+        QN_DECLARE_R_PROPERTY(QColor,   notificationColorCritical,      NOTIFICATION_COLOR_CRITICAL,            QColor(255, 131, 48))
+
+        QN_DECLARE_R_PROPERTY(QSize,    layoutBackgroundMaxSize,        LAYOUT_BACKGROUND_MAX_SIZE,             QSize(64, 64))
+        QN_DECLARE_R_PROPERTY(int,      layoutBackgroundRecommendedArea,LAYOUT_BACKGROUND_RECOMMENDED_AREA,     40*40)
+
+        QN_DECLARE_R_PROPERTY(QColor,   raisedConeColor,                RAISED_CONE_COLOR,                      QColor(64, 130, 180, 128))
+        QN_DECLARE_R_PROPERTY(qreal,    raisedWigdetOpacity,            RAISED_WIDGET_OPACITY,                  0.7)
     QN_END_PROPERTY_STORAGE()
 };
 

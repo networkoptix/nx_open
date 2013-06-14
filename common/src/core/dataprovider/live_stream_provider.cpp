@@ -108,7 +108,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
 {
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
     {
-        for (int i = 0; i < m_layout->numberOfChannels(); ++i)
+        for (int i = 0; i < m_layout->channelCount(); ++i)
         {
             QnMotionRegion region = m_cameraRes->getMotionRegion(i);
             m_motionEstimation[i].setMotionMask(region);
@@ -174,7 +174,7 @@ bool QnLiveStreamProvider::needMetaData()
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
     {
         if (getRole() == roleForMotionEstimation()) {
-            for (int i = 0; i < m_layout->numberOfChannels(); ++i)
+            for (int i = 0; i < m_layout->channelCount(); ++i)
             {
                 bool rez = m_motionEstimation[i].existsMetadata();
                 if (rez) {

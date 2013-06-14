@@ -34,18 +34,42 @@ namespace {
 
 } // anonymous namespace
 
+
+// -------------------------------------------------------------------------- //
+// ResizingInfo
+// -------------------------------------------------------------------------- //
 Qt::WindowFrameSection ResizingInfo::frameSection() const {
     return m_instrument->m_section;
 }
 
+QPoint ResizingInfo::mouseScreenPos() const {
+    return m_info->mouseScreenPos();
+}
+
+QPoint ResizingInfo::mouseViewportPos() const {
+    return m_info->mouseViewportPos();
+}
+
+QPointF ResizingInfo::mouseScenePos() const {
+    return m_info->mouseScenePos();
+}
+
+
+// -------------------------------------------------------------------------- //
+// ResizingInstrument
+// -------------------------------------------------------------------------- //
 ResizingInstrument::ResizingInstrument(QObject *parent):
     base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_resizeHoverInstrument(new ResizeHoverInstrument(this)),
-    m_effectiveDistance(0)
+    m_effectRadius(0.0)
 {}
 
 ResizingInstrument::~ResizingInstrument() {
     ensureUninstalled();
+}
+
+Instrument *ResizingInstrument::resizeHoverInstrument() const {
+    return m_resizeHoverInstrument;
 }
 
 void ResizingInstrument::enabledNotify() {
@@ -73,11 +97,11 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
 
     /* Find the item to resize. */
     QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item(view, event->pos(), ItemIsResizableWidget()));
-    if (widget == NULL)
+    if (widget == NULL || !satisfiesItemConditions(widget))
         return false;
 
     /* Check frame section. */
-    FrameSectionQuearyable *queryable = dynamic_cast<FrameSectionQuearyable *>(widget);
+    FrameSectionQueryable *queryable = dynamic_cast<FrameSectionQueryable *>(widget);
     if(!queryable && !((widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint)))
         return false; /* Has no decorations and not queryable for frame sections. */
 
@@ -86,19 +110,29 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     if(queryable == NULL) {
         section = open(widget)->getWindowFrameSectionAt(itemPos);
     } else {
-        QRectF effectiveRect = widget->mapRectFromScene(mapRectToScene(view, QRect(0, 0, m_effectiveDistance, m_effectiveDistance)));
-        qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
-        section = queryable->windowFrameSectionAt(QRectF(itemPos - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
+        QRectF effectRect = widget->mapRectFromScene(mapRectToScene(view, QRectF(0, 0, m_effectRadius, m_effectRadius)));
+        qreal effectRadius = qMax(effectRect.width(), effectRect.height());
+        section = queryable->windowFrameSectionAt(QRectF(itemPos - QPointF(effectRadius, effectRadius), QSizeF(2 * effectRadius, 2 * effectRadius)));
     }
-    if(!isResizeGrip(section))
+    if(section == Qt::NoSection)
         return false;
 
     /* Ok to go. */
     m_startSize = widget->size();
-    m_startPinPoint = widget->mapToParent(Qn::calculatePinPoint(widget->rect(), section));
     m_section = section;
     m_widget = widget;
-    m_resizable = dynamic_cast<ConstrainedResizable *>(widget);
+    m_constrained = dynamic_cast<ConstrainedGeometrically *>(widget);
+    if(section == Qt::TitleBarArea) {
+        m_startPinPoint = cwiseDiv(itemPos, m_startSize);
+
+        /* Make sure we don't get NaNs in startPinPoint. */
+        if(qFuzzyIsNull(m_startSize.width()))
+            m_startPinPoint.setX(0.0);
+        if(qFuzzyIsNull(m_startSize.height()))
+            m_startPinPoint.setY(0.0);
+    } else {
+        m_startPinPoint = widget->mapToParent(Qn::calculatePinPoint(widget->rect(), section));
+    }
 
     dragProcessor()->mousePressEvent(viewport, event);
 
@@ -109,15 +143,16 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
 bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
     QGraphicsView *view = this->view(viewport);
 
-    QRectF effectiveRect = mapRectToScene(view, QRect(0, 0, m_effectiveDistance, m_effectiveDistance));
-    qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
-    m_resizeHoverInstrument->setEffectiveDistance(effectiveDistance);
+    QRectF effectRect = mapRectToScene(view, QRectF(0, 0, m_effectRadius, m_effectRadius));
+    qreal effectRadius = qMax(effectRect.width(), effectRect.height());
+    m_resizeHoverInstrument->setEffectRadius(effectRadius);
 
     return base_type::paintEvent(viewport, event);
 }
 
 void ResizingInstrument::startDragProcess(DragInfo *info) {
-    emit resizingProcessStarted(info->view(), m_widget.data(), ResizingInfo(this));
+    ResizingInfo resizingInfo(info, this);
+    emit resizingProcessStarted(info->view(), m_widget.data(), &resizingInfo);
 }
 
 void ResizingInstrument::startDrag(DragInfo *info) {
@@ -129,7 +164,8 @@ void ResizingInstrument::startDrag(DragInfo *info) {
         return;
     }
 
-    emit resizingStarted(info->view(), m_widget.data(), ResizingInfo(this));
+    ResizingInfo resizingInfo(info, this);
+    emit resizingStarted(info->view(), m_widget.data(), &resizingInfo);
     m_resizingStartedEmitted = true;
 }
 
@@ -142,36 +178,56 @@ void ResizingInstrument::dragMove(DragInfo *info) {
     }
 
     /* Calculate new size. */
-    QSizeF newSize = m_startSize + Qn::calculateSizeDelta(
-        widget->mapFromScene(info->mouseScenePos()) - widget->mapFromScene(info->mousePressScenePos()), 
-        m_section
-    );
-    QSizeF minSize = widget->effectiveSizeHint(Qt::MinimumSize);
-    QSizeF maxSize = widget->effectiveSizeHint(Qt::MaximumSize);
-    newSize = QSizeF(
-        qBound(minSize.width(), newSize.width(), maxSize.width()),
-        qBound(minSize.height(), newSize.height(), maxSize.height())
-    );
-    /* We don't handle heightForWidth. */
+    QSizeF newSize;
+    if(m_section == Qt::TitleBarArea) {
+        newSize = widget->size();
+    } else {
+        newSize = m_startSize + Qn::calculateSizeDelta(
+            widget->mapFromScene(info->mouseScenePos()) - widget->mapFromScene(info->mousePressScenePos()), 
+            m_section
+        );
+        QSizeF minSize = widget->effectiveSizeHint(Qt::MinimumSize);
+        QSizeF maxSize = widget->effectiveSizeHint(Qt::MaximumSize);
+        newSize = QSizeF(
+            qBound(minSize.width(), newSize.width(), maxSize.width()),
+            qBound(minSize.height(), newSize.height(), maxSize.height())
+        );
+        /* We don't handle heightForWidth. */
+    }
 
-    if(m_resizable != NULL)
-        newSize = m_resizable->constrainedSize(newSize);
+    QPointF newPos;
+    if(m_section == Qt::TitleBarArea) {
+        QPointF itemPos = widget->mapFromScene(info->mouseScenePos());
+        newPos = widget->mapToParent(itemPos - QnGeometry::cwiseMul(m_startPinPoint, newSize));
+    } else {
+        newPos = widget->pos() + m_startPinPoint - widget->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), m_section));
+    }
+
+    if(m_constrained != NULL) {
+        QRectF newGeometry = m_constrained->constrainedGeometry(QRectF(newPos, newSize), Qn::calculatePinPoint(m_section));
+        newSize = newGeometry.size();
+        newPos = newGeometry.topLeft();
+    }
 
     /* Change size & position. */
     widget->resize(newSize);
-    widget->setPos(widget->pos() + m_startPinPoint - widget->mapToParent(Qn::calculatePinPoint(widget->rect(), m_section)));
+    widget->setPos(newPos);
 
-    emit resizing(info->view(), widget, ResizingInfo(this));
+    ResizingInfo resizingInfo(info, this);
+    emit resizing(info->view(), widget, &resizingInfo);
 }
 
 void ResizingInstrument::finishDrag(DragInfo *info) {
-    if(m_resizingStartedEmitted)
-        emit resizingFinished(info->view(), m_widget.data(), ResizingInfo(this));
+    if(m_resizingStartedEmitted) {
+        ResizingInfo resizingInfo(info, this);
+        emit resizingFinished(info->view(), m_widget.data(), &resizingInfo);
+    }
 
     m_widget.clear();
-    m_resizable = NULL;
+    m_constrained = NULL;
 }
 
 void ResizingInstrument::finishDragProcess(DragInfo *info) {
-    emit resizingProcessFinished(info->view(), m_widget.data(), ResizingInfo(this));
+    ResizingInfo resizingInfo(info, this);
+    emit resizingProcessFinished(info->view(), m_widget.data(), &resizingInfo);
 }

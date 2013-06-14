@@ -10,6 +10,8 @@
 
 #include <utils/common/warnings.h>
 
+#include <client/config.h>
+
 #include "noptix_style.h"
 
 namespace {
@@ -56,14 +58,14 @@ namespace {
 
 } // anonymous namespace
 
-Q_GLOBAL_STATIC(QnSkin, qn_skinInstance);
+Q_GLOBAL_STATIC(QnSkin, qn_skin_instance);
 
 QnSkin::QnSkin() {
     QPixmapCache::setCacheLimit(64 * 1024); // 64 MB
 }
 
 QnSkin *QnSkin::instance() {
-    return qn_skinInstance();
+    return qn_skin_instance();
 }
 
 QIcon QnSkin::icon(const QString &name, const QString &checkedName) {
@@ -174,16 +176,8 @@ QPixmap QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::S
 }
 
 QStyle *QnSkin::style() {
-    QString baseStyleName;
-#ifndef Q_OS_DARWIN
-    baseStyleName = QLatin1String("Bespin");
-#else
-    baseStyleName = QLatin1String("cleanlooks");
-#endif
-
-    QStyle *baseStyle = QStyleFactory::create(baseStyleName);
+    QStyle *baseStyle = QStyleFactory::create(QLatin1String("Bespin"));
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
-
     return style;
 }
 

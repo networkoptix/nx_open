@@ -6,7 +6,10 @@
 #endif
 #include <QAtomicInt>
 
-#include "libavcodec/avcodec.h"
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
 #include "core/datapacket/media_data_packet.h"
 
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
@@ -149,11 +152,11 @@ public:
     static bool isPixelFormatSupported(PixelFormat format);
     void setUseExternalData(bool value);
     bool isExternalData() const { return m_useExternalData; }
-    void setDisplaying(bool value) {m_displaying = value; }
-    bool isDisplaying() const { return m_displaying; }
+    //void setDisplaying(bool value) {m_displaying = value; }
+    //bool isDisplaying() const { return m_displaying; }
     void reallocate(int newWidth, int newHeight, int format);
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
-
+    void memZerro();
 public:
     int flags;
 
@@ -172,7 +175,7 @@ private:
 
 private:
     bool m_useExternalData; // pointers only copied to this frame
-    bool m_displaying;
+    //bool m_displaying;
 
     CLVideoDecoderOutput( const CLVideoDecoderOutput& );
     const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
@@ -238,6 +241,14 @@ struct CLVideoData
     int width; // image width 
     int height;// image height 
 };
+
+class ScreenshotInterface
+{
+public:
+    virtual QImage getScreenshot() = 0; // 8 bit Y channel only
+    virtual QImage getGrayscaleScreenshot() = 0;
+};
+
 
 #endif //frame_info_1730
 

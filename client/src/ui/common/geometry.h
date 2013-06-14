@@ -4,8 +4,10 @@
 #include <QtCore/Qt>
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
+#include <QPolygonF>
 
 #include <utils/math/math.h>
+#include <common/common_globals.h>
 
 #include "margins.h"
 
@@ -18,11 +20,16 @@ class QnGeometry {
 public:
     /* Some coefficient-wise arithmetic functions follow. */
     static QPointF cwiseMul(const QPointF &l, const QPointF &r);
+    static QPoint cwiseMul(const QPoint &l, const QPoint &r);
     static QPointF cwiseDiv(const QPointF &l, const QPointF &r);
     static QPointF cwiseMul(const QPointF &l, const QSizeF &r);
+    static QPoint cwiseMul(const QPoint &l, const QSize &r);
     static QPointF cwiseDiv(const QPointF &l, const QSizeF &r);
     static QSizeF cwiseMul(const QSizeF &l, const QSizeF &r);
+    static QSize cwiseMul(const QSize &l, const QSize &r);
     static QSizeF cwiseDiv(const QSizeF &l, const QSizeF &r);
+    static QSizeF cwiseMin(const QSizeF &l, const QSizeF &r);
+    static QSizeF cwiseMax(const QSizeF &l, const QSizeF &r);
     static MarginsF cwiseMul(const MarginsF &l, const QSizeF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const QSizeF &r);
     static MarginsF cwiseMul(const QSizeF &l, const MarginsF &r);
@@ -106,11 +113,19 @@ public:
         return QSize(point.x(), point.y());
     }
 
+    static qreal dotProduct(const QPointF &a, const QPointF &b);
+
     /**
      * \param point                     Point, treated as a vector.
      * \returns                         Length of the given vector.
      */
     static qreal length(const QPointF &point);
+
+    /**
+     * \param point                     Point, treated as a vector.
+     * \returns                         Squared length of the given vector.
+     */
+    static qreal lengthSquared(const QPointF &point);
 
     /**
      * \param size                      Size, treated as a vector.
@@ -201,6 +216,10 @@ public:
      * \param alignment                 Alignment of the result relative to minimal rectangle.
      */
     static QRectF expanded(qreal aspectRatio, const QRectF &minRect, Qt::AspectRatioMode mode, Qt::Alignment alignment = Qt::AlignCenter);
+
+    static QRectF expanded(qreal aspectRatio, const QSizeF &minSize, const QPointF &center, Qt::AspectRatioMode mode);
+
+    static QRectF scaled(const QRectF &rect, const QSizeF &size, const QPointF &fixedPoint, Qt::AspectRatioMode mode);
 
     static QRectF aligned(const QSizeF &size, const QRectF &rect, Qt::Alignment alignment = Qt::AlignCenter);
 
@@ -303,6 +322,14 @@ public:
 
     static QRectF movedInto(const QRectF &rect, const QRectF &target);
 
+    static QRectF subRect(const QRectF &rect, const QRectF &relativeSubRect);
+    static QRectF unsubRect(const QRectF &rect, const QRectF &relativeSubRect);
+    static QRectF toSubRect(const QRectF &rect, const QRectF &absoluteSubRect);
+
+    static QPointF corner(const QRectF &rect, Qn::Corner corner);
+
+    static QPointF closestPoint(const QRectF &rect, const QPointF &point);
+    static QPointF closestPoint(const QPointF &a, const QPointF &b, const QPointF &point, qreal *t);
 };
 
 #endif // QN_GEOMETRY_H

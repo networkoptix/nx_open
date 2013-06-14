@@ -12,8 +12,10 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
 
-#include "fuzzy.h"
+#include <common/config.h>
 
+#include "fuzzy.h"
+#include "limits.h"
 
 #ifndef M_E
 #   define M_E 2.71828182845904523536
@@ -25,14 +27,6 @@
 
 #ifndef M_PI
 #   define M_PI 3.14159265358979323846
-#endif
-
-#ifndef INT64_MAX
-#   define INT64_MAX 0x7fffffffffffffffll
-#endif
-
-#ifndef INT64_MIN
-#   define INT64_MIN 0x8000000000000000ll
 #endif
 
 

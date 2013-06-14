@@ -2,7 +2,12 @@
 #define cold_store_storage_h_1800
 
 #include "coldstore_api/sfs-client.h"
-#include "libavformat/avio.h"
+
+extern "C"
+{
+    #include "libavformat/avio.h"
+}
+
 #include "core/resource/storage_resource.h"
 #include "coldstore_connection_pool.h"
 #include "coldstore_storage_helper.h"

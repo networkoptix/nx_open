@@ -6,7 +6,6 @@
 
 class QnSpeedSlider;
 class QnVolumeSlider;
-class GraphicsLabel;
 class QnImageButtonWidget;
 class QnTimeSlider;
 class QnTimeScrollBar;
@@ -14,7 +13,7 @@ class QnWorkbenchNavigator;
 class QGraphicsProxyWidget;
 
 class QnNavigationItem : public QnSimpleFrameWidget, public QnWorkbenchContextAware {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef QnSimpleFrameWidget base_type;
 
@@ -24,6 +23,14 @@ public:
 
     QnTimeSlider *timeSlider() const {
         return m_timeSlider;
+    }
+
+    QnSpeedSlider *speedSlider() const {
+        return m_speedSlider;
+    }
+
+    QnVolumeSlider *volumeSlider() const {
+        return m_volumeSlider;
     }
 
     QnTimeScrollBar *timeScrollBar() const {
@@ -69,8 +76,6 @@ private:
     QnImageButtonWidget *m_syncButton;
     QnImageButtonWidget *m_thumbnailsButton;
     QnImageButtonWidget *m_calendarButton;
-
-    GraphicsLabel *m_timeLabel;
 
     bool m_updatingSpeedSliderFromNavigator;
     bool m_updatingNavigatorFromSpeedSlider;

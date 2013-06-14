@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.4.3-SNAPSHOT</version>
+		<version>1.5.2-SNAPSHOT</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.3-SNAPSHOT</version>
+	<version>1.5.2-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>mediaserver</artifactId>
 	<packaging>pom</packaging>
@@ -27,7 +27,8 @@
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
 		<linux.oslibs>-lz</linux.oslibs>
-		<mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+                <postfix.libs>unix: !mac: LIBS += -lcrypto</postfix.libs>
+		<mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lavcodec -lswscale -lavutil -lavformat</mac.oslibs>
 		<!--Global defines-->
 		<global.defines/>
 		<!--Specific os defines-->

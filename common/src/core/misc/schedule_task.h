@@ -5,7 +5,7 @@
 #include <QList>
 #include <QTextStream>
 
-#include "utils/common/qnid.h"
+#include "utils/common/id.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "schedule_recording_type.h"
 
@@ -112,7 +112,7 @@ private:
 
     Data m_data;
 
-    friend class QnCameraScheduleWidget; // TODO: what the hell?
+    friend class QnCameraScheduleWidget; // TODO: #vasilenko what the hell?
 };
 
 inline bool operator<(qint64 first, const QnScheduleTask &other)

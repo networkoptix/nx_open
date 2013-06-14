@@ -1,11 +1,17 @@
 #include "utils/common/util.h"
 
 #ifndef Q_OS_WIN
-#include <sys/statvfs.h>
-#include <sys/time.h>
+#   include <sys/statvfs.h>
+#   include <sys/time.h>
 #endif
 
+#include <QDateTime>
+#include <QDesktopServices>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QHostInfo>
+
 
 bool removeDir(const QString &dirName)
 {
@@ -237,4 +243,8 @@ int currentTimeZone()
     dt1.setTimeSpec(Qt::UTC);
     int res = dt2.secsTo(dt1);
     return res;
+}
+
+int random(int min, int max) {
+    return min + static_cast<int>(static_cast<qint64>(max - min) * qrand() / (static_cast<qint64>(RAND_MAX) + 1));
 }

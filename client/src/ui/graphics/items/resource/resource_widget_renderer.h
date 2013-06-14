@@ -1,11 +1,16 @@
 #ifndef QN_DISPLAY_WIDGET_RENDERER_H
 #define QN_DISPLAY_WIDGET_RENDERER_H
 
+#include <vector>
+
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
 
+#include <client/client_globals.h>
+
 #include <camera/abstract_renderer.h>
-#include <camera/render_status.h>
+#include "utils/color_space/image_correction.h"
+#include "core/resource/resource_media_layout.h"
 
 
 class QThread;
@@ -15,7 +20,6 @@ class QnGLRenderer;
 
 class QnResourceWidgetRenderer
 :
-    public QObject,
     public QnAbstractRenderer
 {
     Q_OBJECT;
@@ -24,7 +28,9 @@ public:
     /*!
         \param context MUST not be NULL
     */
-    QnResourceWidgetRenderer( int channelCount, QObject* parent, const QGLContext* context );
+    QnResourceWidgetRenderer(QObject* parent, const QGLContext* context );
+    void setChannelCount(int channelCount);
+
 
     virtual ~QnResourceWidgetRenderer();
 
@@ -44,7 +50,7 @@ public:
     //!Implementation of finishPostedFramesRender QnAbstractRenderer::finishPostedFramesRender
     virtual void finishPostedFramesRender(int channel) override;
 
-    virtual void beforeDestroy() override;
+    virtual void destroyAsync() override;
 
     virtual QSize sizeOnScreen(unsigned int channel) const override;
 
@@ -52,7 +58,8 @@ public:
 
     void setChannelScreenSize(const QSize &screenSize);
 
-    Qn::RenderStatus paint(int channel, const QRectF &rect, qreal opacity);
+    Qn::RenderStatus paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity);
+    void skip(int channel); // TODO: #Elric replace with setEnabled
 
     virtual qint64 getTimestampOfNextFrameToRender(int channel) const override;
     virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const  override;
@@ -69,14 +76,28 @@ public:
 
     const QGLContext* glContext() const;
 
+    bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
+
+    void setImageCorrection(const ImageCorrectionParams& value);
+
+    void setDisplayedRect(int channel, const QRectF& rect);
+
+    //!Implementation of QnAbstractRenderer::isEnabled
+    virtual bool isEnabled(int channelNumber) const override;
+    //!Implementation of QnAbstractRenderer::setEnabled
+    virtual void setEnabled(int channelNumber, bool enabled) override;
+
+    virtual void setPaused(bool value) override;
+    virtual void setScreenshotInterface(ScreenshotInterface* value) override;
+    void setHystogramConsumer(QnHistogramConsumer* value);
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.
      * 
      * \param newSourceSize             New source size.
      */
-    void sourceSizeChanged(const QSize &newSourceSize);
-
+    void sourceSizeChanged();
+    void beforeDestroy();
 private:
     struct RenderingTools
     {
@@ -110,6 +131,11 @@ private:
     QSize m_channelScreenSize;
 
     const QGLContext* m_glContext;
+    
+    QRectF m_displayRect[CL_MAX_CHANNELS];
+
+    std::vector<bool> m_renderingEnabled;
+    ScreenshotInterface* m_screenshotInterface;
 };
 
 #endif // QN_DISPLAY_WIDGET_RENDERER_H

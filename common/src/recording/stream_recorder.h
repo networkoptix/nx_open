@@ -2,7 +2,12 @@
 #define _STREAM_RECORDER_H__
 
 #include <QBuffer>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
+
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
 
 #include <utils/common/cryptographic_hash.h>
 
@@ -11,6 +16,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
+#include "utils/color_space/image_correction.h"
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
@@ -56,7 +62,7 @@ public:
     */
     void setNeedCalcSignature(bool value);
 
-    void setSignLogo(QPixmap logo);
+    void setSignLogo(const QImage& logo);
 
     /*
     * Return hash value 
@@ -81,11 +87,14 @@ public:
     */
     void setOnScreenDateOffset(int timeOffsetMs);
 
+    void setContrastParams(const ImageCorrectionParams& params);
+
     /*
     * Server time zone. Used for export to avi/mkv files
     */
     void setServerTimeZoneMs(int value);
 
+    void setSrcRect(const QRectF& srcRect);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -150,7 +159,7 @@ private:
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     
     QnCryptographicHash m_mdctx;
-    QPixmap m_logo;
+    QImage m_logo;
     QString m_container;
     int m_videoChannels;
     QnCodecAudioFormat m_prevAudioFormat;
@@ -169,6 +178,8 @@ private:
 
     qint64 m_nextIFrameTime;
     qint64 m_truncateIntervalEps;
+    QRectF m_srcRect;
+    ImageCorrectionParams m_contrastParams;
 };
 
 #endif // _STREAM_RECORDER_H__

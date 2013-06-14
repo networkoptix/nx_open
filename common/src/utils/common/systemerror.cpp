@@ -36,7 +36,7 @@ namespace SystemError
             (LPTSTR) &msgBuf,
             sizeof(msgBuf),
             NULL );
-        //удаляем переводы строки
+        
         size_t msgLen = strlen( msgBuf );
         if( msgLen > 0 )
         {

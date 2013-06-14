@@ -90,6 +90,7 @@ static const int SOAP_CONNECTION_ACCEPT_TIMEOUT = 1;    //one second
 
 void QnSoapServer::run()
 {
+    saveSysThreadID();
     strcpy( m_service.soap->endpoint, m_path.c_str() );
     strcpy( m_service.soap->path, m_path.c_str() );
 

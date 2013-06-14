@@ -107,10 +107,8 @@ public:
 signals:
     /**
      * This signal is emitted whenever windows composition mode gets enabled or disabled.
-     * 
-     * \param enabled                   Whether composition mode is enabled.
      */
-    void compositionChanged(bool enabled);
+    void compositionChanged();
 
 private:
     friend class QnDwmPrivate;

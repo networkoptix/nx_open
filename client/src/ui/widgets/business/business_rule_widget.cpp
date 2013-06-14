@@ -10,11 +10,13 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QMessageBox>
 #include <QtGui/QIcon>
+#include <QtGui/QDragEnterEvent>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/common/palette.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/resource_icon_cache.h>
@@ -24,7 +26,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
 
 // TODO: #GDM 
@@ -32,14 +34,14 @@
 // Why don't just use QWidget?
 
 namespace {
-    QString toggleStateToString(ToggleState::Value value, bool prolonged) {
+    QString toggleStateToString(Qn::ToggleState value, bool prolonged) {
         switch( value )
         {
-            case ToggleState::Off:
+            case Qn::OffState:
                 return QObject::tr("Stops");
-            case ToggleState::On:
+            case Qn::OnState:
                 return QObject::tr("Starts");
-            case ToggleState::NotDefined:
+            case Qn::UndefinedState:
             if (prolonged)
                 return QObject::tr("Starts/Stops");
             else
@@ -48,7 +50,7 @@ namespace {
         return QString();
     }
 
-    // TODO: #gdm fill aggregationComboBox in cpp file so that
+    // TODO: #GDM fill aggregationComboBox in cpp file so that
     // names & numbers are in one place. Store steps in userData.
 
     // make sure size is equal to ui->aggregationComboBox->count()
@@ -75,9 +77,7 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
     ui->eventDefinitionGroupBox->installEventFilter(this);
     ui->actionDefinitionGroupBox->installEventFilter(this);
 
-    QPalette pal = this->palette();
-    pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
-    this->setPalette(pal);
+    setPaletteColor(this, QPalette::Window, palette().color(QPalette::Window).lighter());
 
     connect(ui->eventTypeComboBox,          SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
     connect(ui->eventStatesComboBox,        SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
@@ -145,9 +145,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
                     m_model->eventTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventType(), 1, Qt::MatchExactly);
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
-        bool prolonged = BusinessEventType::hasToggleState(m_model->eventType());
-        ui->eventStatesComboBox->setVisible(prolonged);
-
         bool isResourceRequired = BusinessEventType::isResourceRequired(m_model->eventType());
         ui->eventResourcesFrame->setVisible(isResourceRequired);
 
@@ -178,6 +175,11 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->actionAggregationFrame->setVisible(actionIsInstant);
 
         initActionParameters();
+    }
+
+    if (fields & (QnBusiness::EventTypeField | QnBusiness::ActionTypeField)) {
+        bool prolonged = BusinessEventType::hasToggleState(m_model->eventType()) && !BusinessActionType::hasToggleState(m_model->actionType());
+        ui->eventStatesComboBox->setVisible(prolonged);
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
@@ -243,7 +245,7 @@ void QnBusinessRuleWidget::initActionParameters() {
     if (m_actionWidgetsByType.contains(m_model->actionType())) {
         m_actionParameters = m_actionWidgetsByType.find(m_model->actionType()).value();
     } else {
-        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(m_model->actionType(), this, context());
+        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(m_model->actionType(), this);
         m_actionWidgetsByType[m_model->actionType()] = m_actionParameters;
     }
 
@@ -322,8 +324,12 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     if (!m_model || m_updating)
         return;
 
+    bool prolonged = BusinessEventType::hasToggleState(m_model->eventType()) && !BusinessActionType::hasToggleState(m_model->actionType());
+    if (!prolonged)
+        return;
+
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
-    ToggleState::Value val = (ToggleState::Value)typeIdx;
+    Qn::ToggleState val = (Qn::ToggleState) typeIdx;
     m_model->setEventState(val);
 }
 
@@ -385,7 +391,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)
         dialog.setDelegate(new QnRecordingEnabledDelegate(this));
-    else if (actionType == BusinessActionType::CameraOutput)
+    else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant)
         dialog.setDelegate(new QnOutputEnabledDelegate(this));
     else if (actionType == BusinessActionType::SendMail)
         dialog.setDelegate(new QnEmailValidDelegate(this));

@@ -1,8 +1,16 @@
+
 #include "rtsp_client_archive_delegate.h"
+
+#include <QBuffer>
+
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
+
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource_managment/resource_pool.h"
 #include "utils/network/rtp_stream_parser.h"
-#include "libavcodec/avcodec.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/common/util.h"
@@ -11,8 +19,11 @@
 #include "core/resource/camera_history.h"
 #include "core/resource/media_server_resource.h"
 #include "redass/redass_controller.h"
+#include "device_plugins/server_camera/server_camera.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
+
+static const int REOPEN_TIMEOUT = 1000;
 
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader):
     QnAbstractArchiveDelegate(),
@@ -158,19 +169,15 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
 
 QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64 time)
 {
-    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (!netRes)
+    QnServerCameraPtr camRes = qSharedPointerDynamicCast<QnServerCamera>(resource);
+    if (!camRes)
         return resource;
-    QString physicalId = netRes->getPhysicalId();
+    QString physicalId = camRes->getPhysicalId();
 
     if (time == DATETIME_NOW)
     {
-        QnNetworkResourceList cameraList = qnResPool->getAllNetResourceByPhysicalId(physicalId);
-        foreach(QnNetworkResourcePtr camera, cameraList) {
-            if (!camera->isDisabled())
-                return camera;
-        }
-        return resource;
+        QnServerCameraPtr activeCam = camRes->findEnabledSubling();
+        return activeCam ? activeCam : camRes;
     }
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
@@ -194,7 +201,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 {
     bool rez = openInternal(resource);
     if (!rez) {
-        for (int i = 0; i < 50 && !m_closing; ++i)
+        for (int i = 0; i < REOPEN_TIMEOUT/10 && !m_closing; ++i)
             QnSleep::msleep(10);
     }
     return rez;
@@ -334,7 +341,7 @@ void QnRtspClientArchiveDelegate::reopen()
     if (m_blockReopening)
         return;
 
-    for (int i = 0; i < 50 && !m_closing; ++i)
+    for (int i = 0; i < REOPEN_TIMEOUT/10 && !m_closing; ++i)
         QnSleep::msleep(10);
 
     if (m_resource)
@@ -916,7 +923,7 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
     if (mediaRes) {
         const QnResourceVideoLayout* videoLayout = mediaRes->getVideoLayout(0);
         if (videoLayout)
-            numOfVideoChannels = videoLayout->numberOfChannels();
+            numOfVideoChannels = videoLayout->channelCount();
     }
     m_rtspSession.setUsePredefinedTracks(numOfVideoChannels); // ommit DESCRIBE and SETUP requests
 }

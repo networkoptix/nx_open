@@ -1,5 +1,6 @@
 #include "AVJpegHeader.h"
 #include <string>
+#include <cstring>
 
 #undef HIBYTE
 #undef LOBYTE

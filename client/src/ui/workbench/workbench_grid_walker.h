@@ -1,6 +1,8 @@
 #ifndef QN_WORKBENCH_GRID_WALKER_H
 #define QN_WORKBENCH_GRID_WALKER_H
 
+#include <cassert>
+
 #include <QtCore/QRect>
 #include <QtCore/QPoint>
 
@@ -14,11 +16,11 @@ public:
     /**
      * Constructor. 
      */
-    QnWorkbenchGridWalker() {
-        m_rect = QRect(0, 0, 1, 1);
-        m_pos = QPoint(0, 0);
-        m_delta = QPoint(0, 1);
-    }
+    QnWorkbenchGridWalker():
+        m_rect(0.0, 0.0, 1.0, 1.0),
+        m_pos(0, 0),
+        m_delta(0, 1)
+    {}
 
     /**
      * Returns current position and moves to the next one. Next position must exist.
@@ -26,7 +28,7 @@ public:
      * \returns                         Current position.
      */
     QPoint next() {
-        Q_ASSERT(hasNext());
+        assert(hasNext());
 
         QPoint result = m_pos;
         m_pos += m_delta;
@@ -51,7 +53,7 @@ public:
      * \param border                    Border to expand iteration region into.
      */
     void expand(Qn::Border border) {
-        Q_ASSERT(!hasNext());
+        assert(!hasNext());
 
         switch(border) {
         case Qn::LeftBorder:

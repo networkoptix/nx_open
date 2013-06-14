@@ -14,8 +14,8 @@ namespace Ui {
 }
 
 class QVBoxLayout;
-
 class QnCameraMotionMaskWidget;
+class QnCameraSettingsWidgetPrivate;
 
 class QnSingleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -46,10 +46,26 @@ public:
         return m_hasDbChanges;
     }
 
-    /** Checks if user changed controls but not applied them to the schedule */
-    bool hasControlsChanges() const {
-        return m_hasControlsChanges;
+    /** Checks if user changed schedule controls but not applied them */
+    bool hasScheduleControlsChanges() const {
+        return m_hasScheduleControlsChanges;
     }
+
+    /** Clear flag that user changed schedule controls but not applied them */
+    void clearScheduleControlsChanges() {
+        m_hasScheduleControlsChanges = false;
+    }
+
+    /** Checks if user changed motion controls but not applied them */
+    bool hasMotionControlsChanges() const {
+        return m_hasMotionControlsChanges;
+    }
+
+    /** Clear flag that  user changed motion controls but not applied them */
+    void clearMotionControlsChanges() {
+        m_hasMotionControlsChanges = false;
+    }
+
 
 
     QnMediaServerConnectionPtr getServerConnection() const;
@@ -83,6 +99,8 @@ protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void hideEvent(QHideEvent *event) override;
 
+    QnCameraSettingsWidgetPrivate* d_ptr;
+
 private slots:
     void at_tabWidget_currentChanged();
     void at_dbDataChanged();
@@ -95,7 +113,8 @@ private slots:
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
-    void at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params);
+    void at_motionRegionListChanged();
+    void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
     void at_pingButton_clicked();
     void at_analogViewCheckBox_clicked();
 
@@ -124,6 +143,7 @@ private:
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
+    Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
     QnVirtualCameraResourcePtr m_camera;
@@ -136,8 +156,11 @@ private:
     /** Indicates that schedule was changed */
     bool m_hasScheduleChanges;
 
-    /** Indicates that the user changed controls but not applied them to the schedule */
-    bool m_hasControlsChanges;
+    /** Indicates that the user changed schedule controls but not applied them */
+    bool m_hasScheduleControlsChanges;
+
+    /** Indicates that the user changed motion sensitivity controls but not applied them */
+    bool m_hasMotionControlsChanges;
 
     bool m_readOnly;
 

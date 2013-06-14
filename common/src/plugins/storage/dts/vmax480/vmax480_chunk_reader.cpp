@@ -15,9 +15,10 @@ QnVMax480ChunkReader::QnVMax480ChunkReader(QnResourcePtr res):
     m_state(State_Started),
     m_firstRange(true),
     m_streamFetcher(0),
-    m_res(res)
+    m_res(res.data()),
+    m_gotAllData(false)
 {
-    m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, res, false);
+    m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, m_res, false);
 }
 
 QnVMax480ChunkReader::~QnVMax480ChunkReader()
@@ -28,6 +29,7 @@ QnVMax480ChunkReader::~QnVMax480ChunkReader()
 
 void QnVMax480ChunkReader::run()
 {
+    saveSysThreadID();
     bool registered = false;
     while (!needToStop() && !registered)
         registered = m_streamFetcher->registerConsumer(this);
@@ -56,10 +58,21 @@ void QnVMax480ChunkReader::run()
         if (m_waitingAnswer) 
         {
             if (m_waitTimer.elapsed() > 1000*30) {
-                m_state = State_Started;
+                if (m_gotAllData) {
+                    m_state = State_UpdateData;
+                }
+                else {
+                    m_state = State_Started;
+                    m_firstRange = true; // read all again
+                }
                 m_waitTimer.restart();
                 m_waitingAnswer = false;
-                m_firstRange = true;
+
+                m_streamFetcher->unregisterConsumer(this);
+                m_streamFetcher->freeInstance(GROUP_ID, m_res, false);
+
+                m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, m_res, false);
+                m_streamFetcher->registerConsumer(this);
             }
             msleep(1);
             continue;
@@ -70,10 +83,12 @@ void QnVMax480ChunkReader::run()
         switch (m_state)
         {
         case State_Started:
-            if (m_streamFetcher->vmaxRequestRange())
-                m_state = State_ReadRange;
-            else
-                m_state = State_Started;
+            if (m_streamFetcher->vmaxRequestRange()) 
+            {
+                m_state = State_ReadDays;
+                m_waitTimer.restart();
+                m_waitingAnswer = true;
+            }
             break;
         case State_ReadDays:
             if (!m_monthToRequest.isEmpty()) {
@@ -110,7 +125,8 @@ void QnVMax480ChunkReader::run()
             m_state = State_UpdateData;
             break;
             
-        case State_UpdateData: 
+        case State_UpdateData:
+            m_gotAllData = true;
             if (m_updateTimer.elapsed() > 60*1000)
             {
                 QDate date = qnSyncTime->currentDateTime().date();
@@ -140,7 +156,6 @@ void QnVMax480ChunkReader::updateRecordedDays(quint32 startDateTime, quint32 end
     endDate = QDateTime::fromMSecsSinceEpoch(endDateTime*1000ll).date();
 
     startDate = startDate.addDays(-(startDate.day()-1));
-    endDate = endDate.addDays(-(endDate.day()-1));
 
     while (startDate <= endDate) {
         m_monthToRequest << startDate;

@@ -15,7 +15,9 @@ class QnBufferedFrameDisplayer: public QnLongRunnable
     Q_OBJECT;
 
 public:
-    QnBufferedFrameDisplayer(QnAbstractRenderer *drawer);
+    QnBufferedFrameDisplayer();
+
+    void setRenderList(QSet<QnAbstractRenderer*> renderList);
 
     virtual ~QnBufferedFrameDisplayer();
 
@@ -29,7 +31,7 @@ public:
 
     void clear();
 
-    qint64 getTimestampOfNextFrameToRender();
+    qint64 getTimestampOfNextFrameToRender() const;
 
     void overrideTimestampOfNextFrameToRender(qint64 value);
 
@@ -38,13 +40,16 @@ protected:
 
 private:
     CLThreadQueue<QSharedPointer<CLVideoDecoderOutput>> m_queue;
-    QnAbstractRenderer *m_drawer;
+    QSet<QnAbstractRenderer*> m_renderList;
     qint64 m_lastQueuedTime;
     qint64 m_expectedTime;
     QTime m_timer;
     QTime m_alignedTimer;
     qint64 m_currentTime;
-    QMutex m_sync;
+    mutable QMutex m_sync;
+    //!This mutex is used for clearing frame queue only
+    QMutex m_processFrameMutex;
+    QMutex m_renderMtx;
     qint64 m_lastDisplayedTime;
 };
 

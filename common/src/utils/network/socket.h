@@ -50,16 +50,25 @@ private:
     char m_message[MAX_ERROR_MSG_LENGTH];
 };
 
+
+class SocketImpl;
+
 /**
  *   Base class representing basic communication endpoint
  */
 class Socket {
     Q_DECLARE_TR_FUNCTIONS(Socket)
 public:
+    //TODO/IMPL draft refactoring of socket operation result receiving. Enum introduced like in std stream bits
+    enum StatusBit
+    {
+        sbFailed = 1
+    };
+
     /**
      *   Close and deallocate this socket
      */
-    ~Socket();
+    virtual ~Socket();
 
     QString lastError() const;
 
@@ -147,7 +156,11 @@ public:
     bool setNonBlockingMode(bool val);
     //!Returns true, if in non-blocking mode
     bool isNonBlockingMode() const;
+    bool failed() const;
     SystemError::ErrorCode prevErrorCode() const;
+
+    SocketImpl* impl();
+    const SocketImpl* impl() const;
 
 protected:
     int sockDesc;              // Socket descriptor
@@ -156,10 +169,16 @@ protected:
     Socket(int type, int protocol) ;
     Socket(int sockDesc);
     bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
-    void createSocket(int type, int protocol);
+    bool createSocket(int type, int protocol);
+    void setStatusBit( StatusBit _status );
+    void clearStatusBit( StatusBit _status );
+    void saveErrorInfo();
 
 private:
+    SocketImpl* m_impl;
     bool m_nonBlockingMode;
+    unsigned int m_status;
+    SystemError::ErrorCode m_prevErrorCode;
 
     // Prevent the user from trying to use value semantics on this object
     Socket(const Socket &sock);
@@ -186,13 +205,13 @@ public:
     void shutdown();
     virtual void close();
     /*!
-        \param ms. New timeout value. 0 - no timeout
+        \param ms. New timeout value (in millis). 0 - no timeout
         \return true. if timeout has been changed
         By default, there is no timeout
     */
     bool setReadTimeOut( unsigned int ms );
     /*!
-        \param ms. New timeout value. 0 - no timeout
+        \param ms. New timeout value (in millis). 0 - no timeout
         \return true. if timeout has been changed
         By default, there is no timeout
     */
@@ -314,10 +333,16 @@ public:
      *   @return new connection socket
      *   @exception SocketException thrown if attempt to accept a new connection fails
      */
-    TCPSocket *accept() ;
+    static int accept(int sockDesc);
+    TCPSocket* accept() ;
 
 private:
-    void setListen(int queueLen) ;
+    /*! 
+        \return fd (>=0) on success, <0 on error (-2 if timed out)
+    */
+    static int acceptWithTimeout( int sockDesc );
+
+    bool setListen(int queueLen) ;
 };
 
 /**
@@ -347,10 +372,7 @@ public:
      *   @param localPort local port
      *   @exception SocketException thrown if unable to create UDP socket
      */
-    UDPSocket(const QString &localAddress, unsigned short localPort)
-    ;
-
-    ~UDPSocket();
+    UDPSocket(const QString &localAddress, unsigned short localPort);
 
     bool setDestAddr(const QString &foreignAddress, unsigned short foreignPort);
 
@@ -421,7 +443,7 @@ private:
     void setBroadcast();
 
 private:
-    sockaddr_in* m_destAddr;
+    sockaddr_in m_destAddr;
 };
 
 #endif

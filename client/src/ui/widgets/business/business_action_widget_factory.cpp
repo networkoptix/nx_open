@@ -5,19 +5,22 @@
 #include <ui/widgets/business/recording_business_action_widget.h>
 #include <ui/widgets/business/sendmail_business_action_widget.h>
 #include <ui/widgets/business/popup_business_action_widget.h>
+#include <ui/widgets/business/play_sound_business_action_widget.h>
 
-QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(BusinessActionType::Value actionType, QWidget *parent,
-                                                                            QnWorkbenchContext *context) {
+QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(BusinessActionType::Value actionType, QWidget *parent) {
     switch (actionType) {
-        case BusinessActionType::CameraOutput:
-            return new QnCameraOutputBusinessActionWidget(parent);
-        case BusinessActionType::CameraRecording:
-            return new QnRecordingBusinessActionWidget(parent);
-        case BusinessActionType::SendMail:
-            return new QnSendmailBusinessActionWidget(parent, context);
-        case BusinessActionType::ShowPopup:
-            return new QnPopupBusinessActionWidget(parent, context);
-        default:
-            return new QnEmptyBusinessActionWidget(parent);
+    case BusinessActionType::CameraOutput:
+    case BusinessActionType::CameraOutputInstant:
+        return new QnCameraOutputBusinessActionWidget(parent);
+    case BusinessActionType::CameraRecording:
+        return new QnRecordingBusinessActionWidget(parent);
+    case BusinessActionType::SendMail:
+        return new QnSendmailBusinessActionWidget(parent);
+    case BusinessActionType::ShowPopup:
+        return new QnPopupBusinessActionWidget(parent);
+    case BusinessActionType::PlaySound:
+        return new QnPlaySoundBusinessActionWidget(parent);
+    default:
+        return new QnEmptyBusinessActionWidget(parent);
     }
 }

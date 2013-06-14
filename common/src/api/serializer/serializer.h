@@ -1,8 +1,9 @@
-#ifndef _API_SERIALIZER_H_
-#define _API_SERIALIZER_H_
+#ifndef QN_API_SERIALIZER_H
+#define QN_API_SERIALIZER_H
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 
+#include <utils/common/exception.h>
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/media_server_resource.h"
@@ -14,10 +15,10 @@
 #include "licensing/license.h"
 #include "connectinfo.h"
 
+/*
+ * Helper serialization functions. Not related to any specific serializarion format.
+ */
 
-/**
-  * Helper serialize functions. Not related to any specific serializarion format.
-  */
 void parseRegion(QRegion& region, const QString& regionString);
 void parseRegionList(QList<QRegion>& regions, const QString& regionsString);
 
@@ -30,35 +31,26 @@ QString serializeMotionRegionList(const QList<QnMotionRegion>& regions);
 QString serializeRegion(const QRegion& region);
 QString serializeRegionList(const QList<QRegion>& regions);
 
+
 /**
-  * Base exception class for serialization related errors
-  */
-class QnSerializeException : public std::exception
-{
+ * Base exception class for serialization-related errors.
+ */
+class QnSerializationException : public QnException {
 public:
-    QnSerializeException(const QByteArray& errorString)
-        : m_errorString(errorString)
-    {
-    }
-
-    ~QnSerializeException() throw() {}
-
-    const QByteArray& errorString() const { return m_errorString; }
-
-private:
-    QByteArray m_errorString;
+    QnSerializationException(const QString &message): QnException(message) {}
 };
 
+
 /**
-  * Serialize resource
-  */
+ * Serialize resource.
+ */
 class QnApiSerializer
 {
 public:
     void serialize(const QnResourcePtr& resource, QByteArray& data);
 
     virtual const char* format() const = 0;
-    virtual void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
+    virtual void deserializeCameras(QnNetworkResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeServers(QnMediaServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data) = 0;
     virtual void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data) = 0;
@@ -68,9 +60,10 @@ public:
     virtual void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) = 0;
     virtual void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) = 0;
     virtual void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) = 0;
-    virtual void deserializeBusinessRules(QnBusinessEventRules&, const QByteArray& data) = 0;
+    virtual void deserializeBusinessRules(QnBusinessEventRuleList&, const QByteArray& data) = 0;
     virtual void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) = 0;
-    virtual void deserializeKvPairs(QnKvPairList& kvPairs, const QByteArray& data) = 0;
+    virtual void deserializeBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const QByteArray& data) = 0;
+    virtual void deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data) = 0;
     virtual void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data) = 0;
 
     virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
@@ -79,12 +72,13 @@ public:
     virtual void serializeLicense(const QnLicensePtr& license, QByteArray& data) = 0;
 	virtual void serializeLicenses(const QList<QnLicensePtr>& licenses, QByteArray& data) = 0;
     virtual void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) = 0;
-    virtual void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) = 0;
+    virtual void serializeBusinessRules(const QnBusinessEventRuleList&, QByteArray& data) = 0;
     virtual void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) = 0;
     virtual void serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data) = 0;
     virtual void serializeBusinessAction(const QnAbstractBusinessActionPtr&, QByteArray& data) = 0;
-    virtual void serializeKvPair(const QnKvPair& kvPair, QByteArray& data) = 0;
-    virtual void serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data) = 0;
+    virtual void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) = 0;
+    virtual void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data) = 0;
+    virtual void serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data) = 0;
     virtual void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data) = 0;
 
 protected:
@@ -93,4 +87,4 @@ protected:
     virtual void serializeUser(const QnUserResourcePtr& resource, QByteArray& data) = 0;
 };
 
-#endif // _API_SERIALIZER_H_
+#endif // QN_API_SERIALIZER_H

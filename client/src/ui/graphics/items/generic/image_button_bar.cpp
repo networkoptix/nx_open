@@ -2,6 +2,7 @@
 
 #include <QtGui/QGraphicsLinearLayout>
 
+#include <utils/math/math.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -9,7 +10,7 @@
 #include "image_button_widget.h"
 
 
-QnImageButtonBar::QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+QnImageButtonBar::QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags windowFlags, Qt::Orientation orientation):
     base_type(parent, windowFlags),
     m_visibleButtons(0),
     m_checkedButtons(0),
@@ -18,7 +19,7 @@ QnImageButtonBar::QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags window
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-    m_layout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_layout = new QGraphicsLinearLayout(orientation);
     m_layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_layout->setSpacing(0.0);
     setLayout(m_layout);
@@ -117,7 +118,7 @@ void QnImageButtonBar::setCheckedButtons(int checkedButtons) {
     int changedButtons = m_checkedButtons ^ checkedButtons;
     m_checkedButtons = checkedButtons;
 
-    // TODO: We have a problem here.
+    // TODO: #Elric We have a problem here.
     // if checked state changes during submit, we won't catch it.
     submitCheckedButtons(changedButtons);
 
@@ -203,8 +204,9 @@ void QnImageButtonBar::submitEnabledButtons(int mask) {
 }
 
 void QnImageButtonBar::submitButtonSize(QnImageButtonWidget *button) {
-    button->setMaximumSize(m_uniformButtonSize);
-    button->setMinimumSize(m_uniformButtonSize);
+    if (m_uniformButtonSize.isEmpty())
+        return;
+    button->setFixedSize(m_uniformButtonSize);
 }
 
 

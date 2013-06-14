@@ -17,7 +17,7 @@
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
 
-// TODO: replace with QnRenderingWidget
+// TODO: #Elric replace with QnRenderingWidget
 class QnSignDialogGlWidget: public QGLWidget
 {
 public:
@@ -56,7 +56,7 @@ public:
         QPainter painter(this);
         painter.beginNativePainting();
         if (m_renderer)
-            m_renderer->paint(0, m_videoRect, 1.0);
+            m_renderer->paint(0, QRectF(0.0, 0.0, 1.0, 1.0), m_videoRect, 1.0);
         painter.endNativePainting();
     }
     
@@ -111,9 +111,9 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
 
     connect(m_camDispay, SIGNAL(gotImageSize(int, int)), this, SLOT(at_gotImageSize(int, int)));
 
-    m_renderer = new QnResourceWidgetRenderer(1, 0, m_glWindow->context());
+    m_renderer = new QnResourceWidgetRenderer(0, m_glWindow->context());
     m_glWindow->setRenderer(m_renderer);
-    m_camDispay->addVideoChannel(0, m_renderer, true);
+    m_camDispay->addVideoRenderer(1, m_renderer, true);
     m_camDispay->setSpeed(1024*1024);
     m_reader->addDataProcessor(m_camDispay);
     m_reader->start();
@@ -126,7 +126,8 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
 
 SignDialog::~SignDialog()
 {
-    m_renderer->beforeDestroy();
+    m_camDispay->removeVideoRenderer(m_renderer);
+    m_renderer->destroyAsync();
 
     m_reader->pleaseStop();
     m_camDispay->pleaseStop();
@@ -137,7 +138,6 @@ SignDialog::~SignDialog()
     
     delete m_camDispay;
     delete m_reader;
-    delete m_renderer;
     delete m_glWindow;
 }
 

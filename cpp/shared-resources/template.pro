@@ -4,6 +4,11 @@ TARGET = ${project.artifactId}
 VERSION = ${release.version}
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
+
+CONFIG(release, debug|release) {
+  CONFIG += flat silent
+}
+
 CONFIG -= flat app_bundle
 DEFINES += __STDC_CONSTANT_MACROS
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-common.qrc
@@ -57,8 +62,10 @@ include(${environment.dir}/qt-custom/QtCore/private/qtcore.pri)
 INCLUDEPATH += ${environment.dir}/qt/include ${environment.dir}/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt-custom ${environment.dir}/qt-custom/QtCore
 DEPENDPATH *= $${INCLUDEPATH}
 
-PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
-PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
+!mac {
+  PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
+  PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
+}
 
 win* {
   isEmpty(BUILDLIB) {
@@ -71,6 +78,10 @@ win* {
   DEFINES += ${windows.defines}  
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
+	# /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
+	QMAKE_CFLAGS_RELEASE += /Zi
+	QMAKE_CXXFLAGS_RELEASE += /Zi
+	QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF
   }
   
   !staticlib {
@@ -84,20 +95,32 @@ win* {
   QMAKE_MOC = $$QMAKE_MOC -DQ_OS_WIN
 }
 
-unix {
+unix:!mac {
   LIBS += ${linux.oslibs}
   DEFINES += QN_EXPORT=
   QMAKE_CXXFLAGS += -msse2 -std=c++0x -fpermissive
-  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas
+  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC = $$QMAKE_MOC -DQ_OS_LINUX
   DEFINES += override=
 }
 
 mac {
+  QMAKE_CXXFLAGS += -msse4.1 -std=c++0x -fpermissive
+  QMAKE_CFLAGS += -msse4.1
   DEFINES += QN_EXPORT=  
   LIBS += ${mac.oslibs}
-  DEFINES += ${mac.defines}
+  DEFINES += ${mac.defines} override=
+  CONFIG -= app_bundle objective_c
+  INCLUDEPATH +=  ${environment.dir}/include/glext/
+  QMAKE_CFLAGS_PPC_64     -= -arch ppc64 -Xarch_ppc64 -mmacosx-version-min=10.5
+  QMAKE_OBJECTIVE_CFLAGS_PPC_64  -= -arch ppc64 -Xarch_ppc64 -mmacosx-version-min=10.5
+  QMAKE_CFLAGS_X86_64     -= -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5
+  QMAKE_OBJECTIVE_CFLAGS_X86_64  -= -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5
+  QMAKE_CXXFLAGS_PPC_64   -= -arch ppc64 -Xarch_ppc64 -mmacosx-version-min=10.5
+  QMAKE_CXXFLAGS_X86_64   -= -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5
+  QMAKE_LFLAGS_PPC_64     -= -arch ppc64 -Xarch_ppc64 -mmacosx-version-min=10.5
+  QMAKE_LFLAGS_X86_64     -= -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5
 }
 
 

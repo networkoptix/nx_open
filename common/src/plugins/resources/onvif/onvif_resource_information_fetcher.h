@@ -54,22 +54,27 @@ public:
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const;
     void findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const;
     static QnPlOnvifResourcePtr createOnvifResourceByManufacture (const QString& manufacture);
+    QnId getOnvifResourceType(const QString& manufacturer, const QString&  model) const;
 
     void pleaseStop();
+
 private:
 
 
     bool findSpecialResource(const EndpointAdditionalInfo& info, const QHostAddress& sender, const QString& manufacturer, QnResourceList& result) const;
 
-    QnPlOnvifResourcePtr createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& name, const QString& mac,
+    QnPlOnvifResourcePtr createResource(const QString& manufacturer, const QString& firmware, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& model, const QString& mac,
         const QString& uniqId, const QString& login, const QString& passwd, const QString& deviceUrl) const;
 
     bool isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const;
     QString fetchSerial(const DeviceInfoResp& response) const;
-
+    static bool isAnalogOnvifResource(const QString& vendor, const QString& model);
+    static bool isModelContainVendor(const QString& vendor, const QString& model);
+    bool ignoreCamera(const EndpointAdditionalInfo& info) const;
 private:
     static const char *ONVIF_RT;
     QnId onvifTypeId;
+    QnId onvifAnalogTypeId;
     //PasswordHelper& passwordsData;
     NameHelper &camersNamesData;
     bool m_shouldStop;

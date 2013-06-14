@@ -1,24 +1,25 @@
 #ifndef QN_GL_RENDERER_H
 #define QN_GL_RENDERER_H
 
-#include <QtOpenGL>
-#include <QScopedPointer>
-#include <QSharedPointer>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QSharedPointer>
+#include <QtOpenGL/QGLContext>
 
-#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/media/frame_info.h>
+#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
+
+#include <client/client_globals.h>
+
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
-
-#include "render_status.h"
-#include "core/resource/resource_media_layout.h"
-#include "../ui/graphics/items/resource/decodedpicturetoopengluploader.h"
+#include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 
 
 class CLVideoDecoderOutput;
-class DecodedPictureToOpenGLUploader;
+class ScreenshotInterface;
+class QnHistogramConsumer;
 
 class QnGLRenderer
 :
@@ -35,9 +36,7 @@ public:
     */
     void beforeDestroy();
     
-    Qn::RenderStatus paint(const QRectF &r);
-
-    void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
+    Qn::RenderStatus paint(const QRectF &sourceRect, const QRectF &targetRect);
 
     bool isLowQualityImage() const;
     
@@ -47,8 +46,21 @@ public:
     bool isHardwareDecoderUsed() const;
 
     bool isYV12ToRgbShaderUsed() const;
+    bool isYV12ToRgbaShaderUsed() const;
     bool isNV12ToRgbShaderUsed() const;
 
+    void setImageCorrectionParams(const ImageCorrectionParams& params) { m_imgCorrectParam = params; }
+    ImageCorrectionParams getImageCorrectionParams() const { return m_imgCorrectParam; }
+    
+    void setPaused(bool value) { m_paused = value; }
+    bool isPaused() const { return m_paused; }
+    void setScreenshotInterface(ScreenshotInterface* value);
+    void setDisplayedRect(const QRectF& rect);
+
+    void setHystogramConsumer(QnHistogramConsumer* value);
+private:
+    void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
+    ImageCorrectionResult calcImageCorrection();
 private:
     const DecodedPictureToOpenGLUploader& m_decodedPictureProvider;
     qreal m_brightness;
@@ -56,14 +68,22 @@ private:
     qreal m_hue;
     qreal m_saturation;
     qint64 m_lastDisplayedTime;
-    QnMetaDataV1Ptr m_lastDisplayedMetadata; // TODO: get rid of this
+    QnMetaDataV1Ptr m_lastDisplayedMetadata; // TODO: #Elric get rid of this
     unsigned m_lastDisplayedFlags;
     unsigned int m_prevFrameSequence;
-    std::auto_ptr<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
-    std::auto_ptr<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
-    std::auto_ptr<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
+    QScopedPointer<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
+    QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
+    QScopedPointer<QnYv12ToRgbaShaderProgram> m_yv12ToRgbaShaderProgram;
+    QScopedPointer<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
     bool m_timeChangeEnabled;
     mutable QMutex m_mutex;
+    bool m_imageCorrectionEnabled;
+    bool m_paused;
+    ScreenshotInterface* m_screenshotInterface;
+    ImageCorrectionResult m_imageCorrector;
+    ImageCorrectionParams m_imgCorrectParam;
+    QRectF m_displayedRect;
+    QnHistogramConsumer* m_histogramConsumer;
 
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen
@@ -79,6 +99,15 @@ private:
     	unsigned int tex1ID,
     	unsigned int tex2ID,
     	const float* v_array );
+    //!Draws YUV420 with alpha channel
+    void drawYVA12VideoTexture(
+        const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
+	    const QRectF& tex0Coords,
+	    unsigned int tex0ID,
+	    unsigned int tex1ID,
+	    unsigned int tex2ID,
+	    unsigned int tex3ID,
+	    const float* v_array );
     //!Draws to the screen NV12 image represented with two textures (Y-plane and UV-plane) using shader which mixes both planes to RGB
     void drawNV12VideoTexture(
     	const QRectF& tex0Coords,
@@ -94,8 +123,6 @@ private:
     void updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     bool isYuvFormat() const;
     int glRGBFormat() const;
-    
-    static int maxTextureSize();
 };
 
 #endif //QN_GL_RENDERER_H

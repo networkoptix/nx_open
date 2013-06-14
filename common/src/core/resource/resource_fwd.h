@@ -76,6 +76,14 @@ class QnPlAxisResource;
 typedef QnSharedResourcePointer<QnPlAxisResource> QnPlAxisResourcePtr;
 typedef QnSharedResourcePointerList<QnPlAxisResource> QnPlAxisResourceList;
 
+class QnActiResource;
+typedef QnSharedResourcePointer<QnActiResource> QnActiResourcePtr;
+typedef QnSharedResourcePointerList<QnActiResource> QnActiResourceList;
+
+class QnStardotResource;
+typedef QnSharedResourcePointer<QnStardotResource> QnStardotResourcePtr;
+typedef QnSharedResourcePointerList<QnStardotResource> QnStardotResourceList;
+
 class QnPlOnvifResource;
 typedef QnSharedResourcePointer<QnPlOnvifResource> QnPlOnvifResourcePtr;
 typedef QnSharedResourcePointerList<QnPlOnvifResource> QnPlOnvifResourceList;

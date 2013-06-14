@@ -1,6 +1,7 @@
 #include <QUrl>
 #include <qDebug>
 #include <QThread>
+#include <QElapsedTimer>
 
 #include "vmax480_reader.h"
 #include "socket.h"
@@ -149,7 +150,8 @@ QnVMax480Provider::QnVMax480Provider(TCPSocket* socket):
     m_archivePlayProcessing(false),
     m_pointsPlayMode(false),
     //m_pointsNeedFrame(false)
-    m_ppState(PP_None)
+    m_ppState(PP_None),
+    m_needStop(false)
 {
 }
 
@@ -221,6 +223,15 @@ void QnVMax480Provider::disconnect()
         return;
 
     QMutexLocker lock(&m_callbackMutex);
+    m_needStop = true;
+    QElapsedTimer t;
+    t.restart();
+    while (m_archivePlayProcessing && t.elapsed() < 1000 * 5)
+    {
+        qDebug() << "wait for play request finished...";
+        m_callbackCond.wait(&m_callbackMutex, 200);
+    }
+
 
     m_ACSStream->disconnect();
 
@@ -427,6 +438,7 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
     //qDebug() << "receiveVideoStream" << _stream->mCh;
     quint8 VMaxHeader[16];
     bool isIFrame = false;
+    bool buildinSps = false;
     {
         QMutexLocker lock(&m_callbackMutex);
 
@@ -435,7 +447,7 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 
         if (m_reqSequence != m_curSequence) {
             qDebug() << "m_reqSequence != m_curSequence" << m_reqSequence << "!=" << m_curSequence;
-            QnSleep::msleep(10);
+            QnSleep::msleep(20);
             return;
         }
 
@@ -454,9 +466,17 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
             m_spsPpsWidth = _stream->mWidth;
             m_spsPpsHeight = _stream->mHeight;
         }
-        isIFrame = _stream->mSrcSize >= 5 && (_stream->mSrc[4] & 0x1f) == 5;
 
-        int dataSize = _stream->mSrcSize + (isIFrame ? m_spsPpsBufferLen : 0);
+        if (_stream->mSrcSize >= 5) {
+            quint8 nalType = _stream->mSrc[4] & 0x1f;
+            buildinSps =  nalType == 7;
+            if (buildinSps)
+                isIFrame = true;
+            else
+                isIFrame = nalType == 5;
+        }
+
+        int dataSize = _stream->mSrcSize + (isIFrame && !buildinSps ? m_spsPpsBufferLen : 0);
 
         VMaxHeader[0] = m_reqSequence;
         VMaxHeader[1] = VMAXDT_GotVideoPacket;
@@ -473,7 +493,7 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
     }
 
     m_socket->send(VMaxHeader, sizeof(VMaxHeader));
-    if (isIFrame)
+    if (isIFrame && !buildinSps)
         m_socket->send(m_spsPpsBuffer, m_spsPpsBufferLen);
     m_socket->send(_stream->mSrc, _stream->mSrcSize);
 
@@ -599,6 +619,10 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
     case RESULT_SEARCH_PLAY:
         {
             m_archivePlayProcessing = false;
+            if (m_needStop) {
+                m_callbackCond.wakeOne();
+                return;
+            }
             //m_pointsNeedFrame = true;
             if (m_pointsPlayMode) {
                 m_curSequence = m_reqSequence;

@@ -121,8 +121,11 @@ namespace nx_http
         if( headerSepPos == BufferNpos )
             return false;
         const size_t headerValueStart = find_first_not_of( data, ": ", headerSepPos );
-        if( headerValueStart == BufferNpos )
-            return false;
+        if( headerValueStart == BufferNpos ) {
+            *headerName = data.mid( headerNameStart, headerNameEnd-headerNameStart );
+            *headerValue = "";
+            return true;
+        }
 
         //skipping whitespaces after headerValue
         const size_t headerValueEnd = find_last_not_of( data, " ", headerValueStart );

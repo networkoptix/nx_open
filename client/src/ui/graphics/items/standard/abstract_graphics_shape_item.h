@@ -2,6 +2,7 @@
 #define QN_ABSTRACT_GRAPHICS_SHAPE_ITEM_H
 
 #include <QtGui/QGraphicsItem>
+#include <QPen>
 
 /**
  * Abstract shape item. Like a <tt>QAbstractGraphicsShapeItem</tt>, but is a 
@@ -15,6 +16,9 @@ class AbstractGraphicsShapeItem: public QGraphicsObject {
 public:
     AbstractGraphicsShapeItem(QGraphicsItem *parent = NULL);
     virtual ~AbstractGraphicsShapeItem();
+
+    QColor color() const;
+    void setColor(const QColor &color);
 
     QPen pen() const;
     void setPen(const QPen &pen);

@@ -42,6 +42,7 @@ QN_HELP_TOPIC(MainWindow_MediaItem_Help,                        "viewing_camera_
 QN_HELP_TOPIC(MainWindow_MediaItem_Local_Help,                  "playing_back_local_files_in_hd_witness.htm")
 QN_HELP_TOPIC(MainWindow_MediaItem_Ptz_Help,                    "setting_up_ptz.htm")
 QN_HELP_TOPIC(MainWindow_MediaItem_SmartSearch_Help,            "performing_smart_search.htm")
+QN_HELP_TOPIC(MainWindow_MediaItem_AnalogLicense_Help,          "obtaining_and_activating_hd_witness_licenses.htm")
 QN_HELP_TOPIC(MainWindow_MonitoringItem_Help,                   "monitoring_media_servers.htm")
 
 QN_HELP_TOPIC(Login_Help,                                       "connecting_to_enterprise_contr.htm")
@@ -57,6 +58,9 @@ QN_HELP_TOPIC(SystemSettings_General_Language_Help,             "changing_interf
 QN_HELP_TOPIC(SystemSettings_General_NetworkInterfaces_Help,    "obtaining_the_current_network_configuration.htm")
 QN_HELP_TOPIC(SystemSettings_ScreenRecording_Help,              "setting_up_screen_recording.htm")
 QN_HELP_TOPIC(SystemSettings_Licenses_Help,                     "obtaining_and_activating_hd_witness_licenses.htm")
+QN_HELP_TOPIC(SystemSettings_Server_Mail_Help,                  "configuring_mail_server_for_e-.htm")
+QN_HELP_TOPIC(SystemSettings_Server_Backup_Help,                "backing_up_and_restoring_produ.htm")
+QN_HELP_TOPIC(SystemSettings_Notifications_Help,				"disabling_and_enabling_specifi.htm")
 
 QN_HELP_TOPIC(ServerSettings_General_Help,                      "configuring_media_servers_additional_settings_(ad.htm")
 QN_HELP_TOPIC(ServerSettings_Panic_Help,                        "panic_recording.htm")
@@ -78,5 +82,8 @@ QN_HELP_TOPIC(CameraSettings_Recording_Help,                    "editing_recordi
 QN_HELP_TOPIC(CameraSettings_Recording_Export_Help,             "copying_recording_schedule_fro.htm")
 QN_HELP_TOPIC(CameraSettings_Motion_Help,                       "setting_up_motion_mask_and_motion_sensitivity_(adm.htm")
 QN_HELP_TOPIC(CameraSettings_Advanced_Help,                     "configuring_proprietary_camera_parameters.htm")
+
+QN_HELP_TOPIC(EventsActions_Help,								"configuring_events_and_actions.htm")
+
 
 #undef QN_HELP_TOPIC

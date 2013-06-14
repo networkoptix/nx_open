@@ -1,42 +1,51 @@
------------------------------------------------ 1.4.4 - RC -----------------------------------------------
+----------------------------------------------- 1.5.1 -----------------------------------------------
+
 NEW CAMERAS AND RECORDERS SUPPORTED:
+ - More D-Link cameras
+ - Arecont AV3256PM
+ 
+IMPROVEMENTS: 
+ - Live view is smoother
+ - ACTI cameras can be added manually even if UPNP port is not opened. Only one HTTP port can be used for discovery
+ - Second stream quality is improved for some onvif cameras 
+ - IOs Client support improved on the server side
+ - DW cameras can have different HTTP port (had to be 80)   
+ - Linux Media Server is more stable if record 80+ cameras and view more than 60
+ - Camera discovery is much faster
+ - Linux: improved external storages (NAS) support
+ - ONVIF support is improved
+ - VMAX fixes and improvements:
+   - Improved VMAX channels playback in Web-client and Android (fixed IE freezes as well)
+   - VMAX playback improved 
+   - VMAX could hang sometimes during navigation. Fixed
+   - VMAX having HTTP port other than 80 is supported
+   - VMAX channels now can go offline if cameras are not plugged into them
+   - Preview Search is disabled for VMAX in order to save connection pool
+
+BUGS FIXED:   
+ - Multi-video Export. Exported file could not play if one item had no data. Fixed
+ - Resolution was switching constantly sometimes during playback if first and second streams from a camera had different aspect ratios. Fixed
+ - Sometimes cameras were displaying video and NO SIGNAL at the same time. Fixed
+ - If change admin password camera statuses could not be changed. Fixed
+ - Motion was displayed incorrectly during Smart Search if time zone had been changed. Fixed
+ - Some analog encoders were discovered as digital cameras. Fixed
+ - Linux upgrade improved - libgl-mesa-dev is not needed if upgrading Media Server
+ - If Media Server is disconnected and reconnected to EC, then event rules were duplicated. Fixed.
+ 
+----------------------------------------------- 1.5 -----------------------------------------------
+
+NEW CAMERAS AND RECORDERS SUPPORTED:
+ - Digital Watchdog VMAX 480 Encoders
+ - Axis Encoders (incl. PTZ)
+ - Flex Watch Encoders (incl. PTZ)
+ - Vivotek Encoders 
  - Arecont 12186 and 20365
-
-BUGS FIXED:
-
-Since 1.4
- - If perform search and then clear all search criterias all available items were placed on scene causing freezes. Now search results are removed in this case
- - Progress indicator was displayed incorrectly in some cases during file export. Fixed
-
-Since previous version (1.4.3)
- - if press fix button on storage notification it didn't disappear
- - If switch between layouts RADASS setting (if had been set manually) remained the same. Fixed: now it is reset to "Auto"
- - If upgrade from the previous version storages are not active by default. Fixed.
- - If licenses count is insufficient it is suggested to activate the approproate number of licenses. This number calculated incorrectly sometimes. Fixed
- - If license name contained national characters licenses could work incorrectly. Fixed
- - PTZ Controls were shown/hidden in the incorrect manner. Fixed
- - Cameras that reported to have digital PTZ are discovered as non-PTZ (i.e. Vivotek and Dahua)
- 
-IMPROVEMENTS:
-
-Since 1.4
- - If several cameras are played back asynchronously (sync is off and positions are in different places in the archives) playback position is indicated for each item on Time Line.
- - Preview Search Layout looks more compact: celss' Aspect Ratio are equal to source video's aspect ratio
- - Health Monitoring colors can be customized
-
-Since previous version (1.4.3)
- - E-mail signature can be specified. This signature will be attached to all outgoing E-mails that are produced by the software
- - Recorders in Tree can be swapped between servers and put on Scene. Context Menu is introdused as well
- - New license scheme is improved
- - Popup notification are collapsed by default and the icon is blinking if one is received. They can be expanded and collapsed again
- - VMAX playback is improved
- - Custom storages (those have been added manually) can be removed
- 
------------------------------------------------ 1.4.3 - Beta2 -----------------------------------------------
-NEW CAMERAS AND RECORDERS SUPPORTED:
  - AXISP1354
-
-NEW FEATURES (since 1.4):  
+ - ACTI product line
+ - Canon product line 
+ - Stardot product line
+ 
+NEW FEATURES:  
  - New license type is introduced. It will be used for analog cameras. Analog cameras are divided into 2 types:
    - DTS Based (i.e. VMAX Channels). For those cameras analog license is required for view live stream and archive (set on camera settings on the "General" tab). Recording is performed on DTS so the software only acruires recorded data from it.
    - Encoder channels (i.e. Flex Watch channels). Those cameras require a license for recording and may be viewed live without one. Recording is configured as usual. Such cameras are recorded directly by Media server.
@@ -44,63 +53,10 @@ NEW FEATURES (since 1.4):
    - Licensed To - License Name and the provider the license has been obtained from
    - Type (analog/digital)
    - Expiration Date - specified only for trial licenses, "never" for permanent-ones
-
-IMPROVEMENTS:
-
-Since 1.4
- - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming
- - Manual Camera Addition Dialog is improved:
-   - Last entered data is filled automatically
-   - It is possible to perform other actions while manual camera addition is in progress
-
-Since previous Beta (1.4.2)
- - It is possible to switch resolution manually (Scene's Context Menu). Available options: Auto (default), Low, High. Changes are applied to all items on Scene
- - Simple mode is always suggested for E-mail presets for the first time
- - Some E-Mail Server fixes:
-   - password is not displayed
-   - presets were adjusted
- - Storage dialog is improved:
-   - Free space setting is removed to make the dialog simpler. Now server always tries to keep 5 Gb free per storage
-   - Storage capacity is displayed more accurately
-   - If storages are not configured (no storage is selected for writing) the corresponding notification is fired
- - Notifications look more neat: borders are added around them
- - Tour can be stopped by any key.The corresponding info message is displayed if start Tour
- - Recorders and its analog cameras are displayed as tree structure
- - VMAX channels are named properly
- - PTZ is improved 
-   - PTZ OSD color is customized
-   - If select a small zoom area it is ignored. Used to try zooming in this area causing incorrect zoom
-   - Zoom area selection can be canceled any time by right click
-
-BUGS FIXED:
-
-Since 1.4
- - If restart screen recording quickly, it is not started. Fixed
- - If click ESC many times, main window was getting bigger
- - If create a layout for viewer and assign him cameras the viewer could not perform search in tree: cameras were not searchable. Fixed
- - If physically delete a file that was containing in a saved layout it was displayed incorrectly (Loading... was drawn). Fixed
- - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously
-
-Since previous Beta (1.4.2)
- - If restore database from backup, then statuses were incorrect sometimes. Fixed for most cases however media server and client restart may be required 
- - Actions did not work in certain cases i.e. if event is received from one media server and action should be performed on another media server. Fixed
- - VMAX Proxy was installed in the "client only" mode. Fixed
- - "No Licenses" notification appeared sometimes even if the licenses were activated. Fixed
- - It was possible to drop a user to tab navigator. In this case an empty layout was opened. Fixed
- - Playback could stuck if seeking through VMAX archive. Fixed
- 
------------------------------------------------ 1.4.2 - Beta -----------------------------------------------
-
-NEW CAMERAS AND RECORDERS SUPPORTED:
- - Digital Waychdog VMAX 480 Encoders
- - Axis Encoders (incl. PTZ)
- - Flex Watch Encoders (incl. PTZ)
- - Vivotek Encoders 
-
-NEW FEATURES:  
  - Windows 8 is supported
  - E-Mails are introduced for Users. Each user is advised to have an e-mail. These e-mails will be used for notifications (see below)
- - Intuitive Mail Server settings. It is necessary to specify e-mail address and password of the account that is intended to be used for mail notifications. The system will do the rest. Additional parameters are available as well.
+ - Intuitive Mail Server settings. It is necessary to specify e-mail address and password of the account that is intended to be used for mail notifications. The system will do the rest. Additional parameters are available as well
+ - client of any version can talk to any EC version
  - Events and Actions:
    - Events: 
      - Motion (camera(s) must be specified). Camera(s) must have Recording enabled
@@ -114,7 +70,7 @@ NEW FEATURES:
 	 - EC Connection Lost (results in notifications only)
 	 - Licenses are not configured (results in notifications only for Admin)
 	 - E-mail is not set (results in notifications only). Admin gets notifications about all users that have not emails specified
-	 - Storages are not configure properly (results in notifications only for Admin)
+	 - Storages are not configured properly (results in notifications only for Admin)
    - Actions: 
      - Camera Recording (camera(s) must be specified). Camera(s) must have Recording enabled
      - Panic Recording
@@ -130,6 +86,7 @@ NEW FEATURES:
    - The current view can be zoomed in a specific position (just draw a rectangle to zoom into or use Double Click to zoom out). Must be supported by the camera.
  
 IMPROVEMENTS:
+ - Onvif support is improved so more ONVIF compliant cameras are supported
  - Storage Dialog is significantly redesigned. Now it is not necessary to specify the folder for the recording data, it is necessary to select the disks the recording will be performed to and the amount of free space to preserve. The software will do the last.
  - CTRL can be used in Calendar Search to select multiple dates
  - Both upper and low case sensitive characters are now accepted by the system as user name ('admin' and 'Admin' used to be different)
@@ -137,12 +94,22 @@ IMPROVEMENTS:
  - The "Do not show again" checkbox is added to the upgrade form. To re-enable it use "Check For Upgrade" Main Menu item
  - It is possible to view EC and Mediaserver logs via Web Interface. Use https://<EC IP>:<EC Port>/web/servers URL (i.e. https://127.0.0.1:7001/web/servers)
  - Auto storage selection is improved. While installing a media server, every available partition in the system must be added (if the partition has >100 GB free)
- - Manual RADASS Switch is added to the interface but not implemented in the code. We will think about it and maybe remove it
+ - Manual RADASS Switch is added to the interface. It applies to the whole layout one time only. After the layout is closed and reopened resolution is set back to Auto
  - If max fps has been reduced for motion+low, it will be reduced for all record modes in schedule (Arecont cameras only)
  - Now it is not necessary to select an item before export. Last selected item will be exported
  - Screen Recording form was redesigned
+ - If several cameras are played back asynchronously (sync is off and positions are in different places in the archives) playback position is indicated for each item on Time Line.
+ - Preview Search Layout looks more compact: cells' Aspect Ratio are equal to source video's aspect ratio
+ - Health Monitoring colors can be customized
+ - Now non-admin users (viewers) can create own layouts based on cameras that have been assigned to them 
+ - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming
+ - Camera Firmware is shown in Camera Properties
+ - Manual Camera Addition Dialog is improved:
+   - Last entered data is filled automatically
+   - It is possible to perform other actions while manual camera addition is in progress 
  
 BUGS FIXED:
+ - If a camera is being viewed via Web/Android Client timeout is introduced (15 minutes). After this it is necessary to reconnect. This is done in order to reduce Media Server load.
  - If several cameras had different recording parameters it was not possible to set "Do not record" to them simultaneously
  - Identically named items were sorted randomly in Tree each time Client was started. Fixed
  - If the password for admin was changed, no changes were applied toEC until system restart. Fixed
@@ -159,6 +126,16 @@ BUGS FIXED:
  - Arecont. If choose Motion + Lo-Res Recording and choose Max FPS, then click Cancel then warning message was appeared severel times. Fixed
  - If save a layout as... and specify the existing name, this layout was saved as new. Fixed
  - Thumbnails are drawn on top of chunks holes in multi-video exported file. Fixed
+ - If restart screen recording quickly, it is not started. Fixed
+ - If click ESC many times, main window was getting bigger
+ - If create a layout for viewer and assign him cameras the viewer could not perform search in tree: cameras were not searchable. Fixed
+ - If physically delete a file that was containing in a saved layout it was displayed incorrectly (Loading... was drawn). Fixed
+ - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously 
+ - If more than 64 cameras are being recorded and in the same time opened for viewing, Linux Media Server could crash. Fixed
+ - Arecont Vision panoramic cameras now work at full resolutuion. It used to work in quarter resolution if medium or low quality was pulled
+ - Resolved all issues with Arecont Spartan-6
+ - Arecont FPS jumping issue is fixed
+ - If an error is returned from EC, the client displayed EC password in the error message. Fixed
  
 ----------------------------------------------- 1.4 Patch -----------------------------------------------
 

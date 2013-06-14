@@ -1,6 +1,10 @@
 #ifndef __QN_REDASS_CONTROLLER_H__
 #define __QN_REDASS_CONTROLLER_H__
 
+#include <QTime>
+#include <QTimer>
+#include <QThread>
+
 #include "core/datapacket/media_data_packet.h"
 #include "utils/common/synctime.h"
 
@@ -35,7 +39,10 @@ private slots:
 private:
     QnCamDisplay* getDisplayByReader(QnArchiveStreamReader* reader);
     bool isSmallItem(QnCamDisplay* display);
+    bool isSmallItem2(QnCamDisplay* display);
     bool isNotSmallItem(QnCamDisplay* display);
+    bool isNotSmallItem2(QnCamDisplay* display);
+
     bool isSupportedDisplay(QnCamDisplay* display) const;
 
     /** try LQ->HQ once more */

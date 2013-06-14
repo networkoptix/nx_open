@@ -1,13 +1,13 @@
 #ifndef QN_LONG_RUNNABLE_H
 #define QN_LONG_RUNNABLE_H
 
-#include "config.h" 
+#include <common/config.h>
 
 #include <QtCore/QThread>
-#include <QtCore/QSemaphore>
 #include <QtCore/QSharedPointer>
 
 #include "singleton.h"
+#include "semaphore.h"
 
 class QnLongRunnablePoolPrivate;
 
@@ -27,6 +27,8 @@ public:
 
     void smartSleep(int ms);
 
+    size_t sysThreadID() const;
+
 public slots:
     virtual void start(Priority priority = InheritPriority);
     virtual void pleaseStop();
@@ -39,9 +41,12 @@ private slots:
 protected:
     volatile bool m_needStop;
     volatile bool m_onPause;
-    QSemaphore m_semaphore;
+    QnSemaphore m_semaphore;
+    size_t m_sysThreadID;
     QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
     DEBUG_CODE(const std::type_info *m_type;)
+
+    void saveSysThreadID();
 };
 
 

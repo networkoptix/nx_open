@@ -10,72 +10,8 @@
 #include "../../vmaxproxy/src/vmax480_helper.h"
 
 
-extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
-
-extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
-
-QHostAddress groupAddress(QLatin1String("239.255.255.250"));
-
-
-static const int API_PORT = 9010;
 static const int TCP_TIMEOUT = 3000;
 static const QString NAME_PREFIX(QLatin1String("VMAX-"));
-
-//!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
-class UpnpDeviceDescriptionSaxHandler
-:
-    public QXmlDefaultHandler
-{
-public:
-    virtual bool startDocument()
-    {
-        return true;
-    }
-
-    virtual bool startElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName, const QXmlAttributes& /*atts*/ )
-    {
-        m_currentElementName = qName;
-        return true;
-    }
-
-    virtual bool characters( const QString& ch )
-    {
-        if( m_currentElementName == QLatin1String("friendlyName") )
-            m_friendlyName = ch;
-        else if( m_currentElementName == QLatin1String("manufacturer") )
-            m_manufacturer = ch;
-        else if( m_currentElementName == QLatin1String("modelName") )
-            m_modelName = ch;
-        else if( m_currentElementName == QLatin1String("serialNumber") )
-            m_serialNumber = ch;
-
-        return true;
-    }
-
-    virtual bool endElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& /*qName*/ )
-    {
-        m_currentElementName.clear();
-        return true;
-    }
-
-    virtual bool endDocument()
-    {
-        return true;
-    }
-
-    QString friendlyName() const { return m_friendlyName; }
-    QString manufacturer() const { return m_manufacturer; }
-    QString modelName() const { return m_modelName; }
-    QString serialNumber() const { return m_serialNumber; }
-
-private:
-    QString m_currentElementName;
-    QString m_friendlyName;
-    QString m_manufacturer;
-    QString m_modelName;
-    QString m_serialNumber;
-};
-
 
 //====================================================================
 QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher()
@@ -85,273 +21,110 @@ QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher()
 
 QnPlVmax480ResourceSearcher::~QnPlVmax480ResourceSearcher()
 {
-    foreach(QUdpSocket* sock, m_socketList)
-        delete sock;
 }
 
-QnPlVmax480ResourceSearcher& QnPlVmax480ResourceSearcher::instance()
+static QnPlVmax480ResourceSearcher* inst;
+
+void QnPlVmax480ResourceSearcher::initStaticInstance( QnPlVmax480ResourceSearcher* _instance )
 {
-    static QnPlVmax480ResourceSearcher inst;
+    inst = _instance;
+}
+
+QnPlVmax480ResourceSearcher* QnPlVmax480ResourceSearcher::instance()
+{
     return inst;
 }
 
-QUdpSocket* QnPlVmax480ResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
+
+void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAddr,
+                                                const QString& host, 
+                                                const UpnpDeviceInfo& devInfo,
+                                                const QByteArray& /*xmlDevInfo*/,
+                                                QnResourceList& result)
 {
-    QMap<QString, QUdpSocket*>::iterator it = m_socketList.find(iface.address.toString());
-    if (it == m_socketList.end())
-    {
-        QUdpSocket* sock = new QUdpSocket();
-        if (!bindToInterface(*sock, iface,1900, QUdpSocket::ReuseAddressHint))
-        {
-            delete sock;
-            return 0;
-        }
-
-        if (!multicastJoinGroup(*sock, groupAddress, iface.address))
-        {
-            delete sock;
-            return 0;
-        }
-
-        m_socketList.insert(iface.address.toString(), sock);
-
-        return sock;
-    }
-    return it.value();
-}
-
-#if 1
-
-QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
-{
+    QnMacAddress mac(devInfo.serialNumber);
+    const int channelCountEndIndex = devInfo.modelName.indexOf( QLatin1String("CH") );
+    if( channelCountEndIndex == -1 )
+        return;
+    int channelCountStartIndex = devInfo.modelName.lastIndexOf( QLatin1String(" "), channelCountEndIndex );
+    if( channelCountStartIndex == -1 )
+        return;
+    ++channelCountStartIndex;
+    if( channelCountStartIndex >= channelCountEndIndex )
+        return;
+    int channles = devInfo.modelName.mid( channelCountStartIndex, channelCountEndIndex-channelCountStartIndex ).toInt();
+    QString name = QLatin1String("DW-VF") + QString::number(channles);  //DW-VF is a registered resource type
     
-    QnResourceList result;
-    QSet<QString> processedMac;
+    int apiPort = VMAX_API_PORT;
+    int httpPort = QUrl(devInfo.presentationUrl).port(80);
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+
+    QAuthenticator auth;
+    auth.setUser(QLatin1String("admin"));
+
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    if (!rt.isValid())
+        return;
+
+
+    QMap<int, QByteArray> camNames;
+    bool camNamesReaded = false;
+
+    QString groupName = QString(QLatin1String("VMAX %1")).arg(host);
+
+    for (int i = 0; i < channles; ++i)
     {
-        QUdpSocket* sock = sockByName(iface);
+        QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
 
-        QString tmp = iface.address.toString();
-        
-        
-        if (!sock)
-            continue;
+        resource->setTypeId(rt);
 
+        QString uniqId = QString(QLatin1String("%1_%2")).arg(mac.toString()).arg(i+1);
+        bool needHttpData = true;
 
-
-        //QByteArray requestDatagram;
-        //socket.writeDatagram(requestDatagram.data(), requestDatagram.size(), groupAddress, 1900);
-
-        while(sock->hasPendingDatagrams())
+        QnPlVmax480ResourcePtr existsRes = qnResPool->getResourceByUniqId(uniqId).dynamicCast<QnPlVmax480Resource>();
+        if (existsRes && (existsRes->getStatus() == QnResource::Online || existsRes->getStatus() == QnResource::Recording)) 
         {
-            QByteArray reply;
-            reply.resize(sock->pendingDatagramSize());
-
-            QHostAddress sender;
-            quint16 senderPort;
-            sock->readDatagram(reply.data(), reply.size(),    &sender, &senderPort);
-
-            int index = reply.indexOf("Upnp-DW-VF");
-
-            QString mac;
-            QString name;
-            int channles = 0;
-            if( !(index < 0 || index + 25 > reply.size()) )
-            {
-                index += 10;
-
-                int index2 = reply.indexOf("-", index);
-                if (index2 < 0)
-                    continue;
-
-                QByteArray channelsstr = reply.mid(index, index2 - index);
-
-                name = QString(QLatin1String("DW-VF")) + QString(QLatin1String(channelsstr));
-
-                channles = channelsstr.toInt();
-
-                index = index2 + 1;
-                index2 = reply.indexOf(":", index);
-
-                if (index2 < 0)
-                    continue;
-
-                QByteArray macstr = reply.mid(index, index2 - index);
-
-                mac = QnMacAddress(QString(QLatin1String(macstr))).toString();
-            }
-            else
-            {
-                nx_http::Request foundDeviceReply;
-                if( !foundDeviceReply.parse( reply ) )
-                    continue;
-                nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
-                if( locationHeader == foundDeviceReply.headers.end() )
-                    continue;
-
-                const QUrl descritionUrl( QLatin1String(locationHeader->second) );
-
-                CLSimpleHTTPClient http( descritionUrl.host(), descritionUrl.port(nx_http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator() );
-                CLHttpStatus status = http.doGET( descritionUrl.path() );
-                if (status != CL_HTTP_SUCCESS)
-                    continue;
-                QByteArray foundDeviceDescription;
-                http.readAll( foundDeviceDescription );
-                //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
-
-                //parsing description xml
-                UpnpDeviceDescriptionSaxHandler xmlHandler;
-                QXmlSimpleReader xmlReader;
-                xmlReader.setContentHandler( &xmlHandler );
-                xmlReader.setErrorHandler( &xmlHandler );
-
-                QXmlInputSource input;
-                input.setData( foundDeviceDescription );
-                if( !xmlReader.parse( &input ) )
-                    continue;
-
-                if( xmlHandler.manufacturer().indexOf(QLatin1String("VMAX480")) == -1 )
-                    continue;
-
-                mac = xmlHandler.serialNumber();
-                //name = xmlHandler.friendlyName();
-                //reading channel number from xml
-                    //<modelName>VMAX480-8 - 08CH H.264 DVR</modelName>
-                const QString& modelName = xmlHandler.modelName();
-                const int channelCountEndIndex = modelName.indexOf( QLatin1String("CH") );
-                if( channelCountEndIndex == -1 )
-                    continue;
-                int channelCountStartIndex = modelName.lastIndexOf( QLatin1String(" "), channelCountEndIndex );
-                if( channelCountStartIndex == -1 )
-                    continue;
-                ++channelCountStartIndex;
-                if( channelCountStartIndex >= channelCountEndIndex )
-                    continue;
-                channles = modelName.mid( channelCountStartIndex, channelCountEndIndex-channelCountStartIndex ).toInt();
-                name = QLatin1String("DW-VF") + QString::number(channles);  //DW-VF is a registered resource type
-            }
-
-            if (processedMac.contains(mac))
-                continue;
-            processedMac << mac;
-
-            QString host = sender.toString();
-
-            QAuthenticator auth;
-            auth.setUser(QLatin1String("admin"));
-
-            QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-            if (!rt.isValid())
-                continue;
-
-
-            QMap<int, QByteArray> camNames;
-            bool camNamesReaded = false;
-
-            QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(host).arg(API_PORT);
-            QString groupName = QString(QLatin1String("VMAX %1")).arg(host);
-
-            for (int i = 0; i < channles; ++i)
-            {
-                QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
-
-                resource->setTypeId(rt);
-
-                QString uniqId = QString(QLatin1String("%1_%2")).arg(mac).arg(i+1);
-                QnPlVmax480ResourcePtr existsRes = qnResPool->getResourceByUniqId(uniqId).dynamicCast<QnPlVmax480Resource>();
-                if (existsRes)
-                    resource->setName(existsRes->getName());
-                else {
-                    if (!camNamesReaded) {
-                        CLSimpleHTTPClient client(host, 80, TCP_TIMEOUT, QAuthenticator());
-                        if (vmaxAuthenticate(client, auth))
-                            camNames = getCamNames(client);
-                        camNamesReaded = true;
+            resource->setName(existsRes->getName());
+            int existHttpPort = QUrl(existsRes->getUrl()).queryItemValue(lit("http_port")).toInt();
+            existHttpPort = existHttpPort ? existHttpPort : 80;
+            apiPort = QUrl(existsRes->getUrl()).port(VMAX_API_PORT);
+            // Prevent constant http pullig. But if http port is changed update api port as well.
+            needHttpData = existHttpPort != httpPort;
+        }
+        
+        if (needHttpData)
+        {
+            if (!camNamesReaded) {
+                CLSimpleHTTPClient client(host, httpPort, TCP_TIMEOUT, QAuthenticator());
+                if (vmaxAuthenticate(client, auth)) {
+                    QByteArray descrPage = readDescriptionPage(client);
+                    if (!descrPage.isEmpty()) {
+                        camNames = getCamNames(descrPage);
+                        apiPort = getApiPort(descrPage);
                     }
-                    if (camNames.value(i+1).isEmpty())
-                        resource->setName(name + QString(QLatin1String("-ch%1")).arg(i+1,2));
-                    else
-                        resource->setName(NAME_PREFIX + QString::fromUtf8(camNames.value(i+1)));
                 }
-
-                (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
-                resource->setMAC(mac);
-
-                resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(API_PORT).arg(i+1));
-                resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(mac).arg(i+1));
-                resource->setDiscoveryAddr(iface.address);
-                resource->setAuth(auth);
-                resource->setGroupName(groupName);
-                resource->setGroupId(groupId);
-
-                result << resource;
+                camNamesReaded = true;
             }
-
-
-        }
-    }
-
-
-    return result;
-}
-
-#else
-QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
-{
-    QnResourceList result;
-
-    QFile file(QLatin1String("c:/vmax.txt")); // Create a file handle for the file named
-    if (!file.exists())
-        return result;
-
-    QString line;
-
-    if (!file.open(QIODevice::ReadOnly)) // Open the file
-        return result;
-
-    QTextStream stream(&file); // Set the stream to read from myFile
-
-    QnInterfaceAndAddr iface = getAllIPv4Interfaces().first();
-
-    while(1)
-    {
-        line = stream.readLine(); // this reads a line (QString) from the file
-
-        if (line.trimmed().isEmpty())
-            break;
-
-        QStringList params = line.split(QLatin1Char(';'), QString::SkipEmptyParts);
-
-        QString name = params[0];
-        QString mac =  params[1];
-        QString host =  params[2];
-        QString port =  params[3];
-        QAuthenticator auth;
-        auth.setUser(QLatin1String("admin"));
-
-        for (int i = 0; i < 8; ++i)
-        {
-            QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
-            QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-
-            resource->setTypeId(rt);
-            resource->setName(name);
-            (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
-            resource->setMAC(mac);
-            resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(port).arg(i+1));
-            resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(mac).arg(i+1));
-            resource->setDiscoveryAddr(iface.address);
-            resource->setAuth(auth);
-
-            result << resource;
+            if (camNames.value(i+1).isEmpty())
+                resource->setName(name + QString(QLatin1String("-ch%1")).arg(i+1,2));
+            else
+                resource->setName(NAME_PREFIX + QString::fromUtf8(camNames.value(i+1)));
         }
 
-    }
+        (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
+        resource->setMAC(mac);
 
-    return result;
+        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(host).arg(apiPort).arg(i+1).arg(httpPort));
+        resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(resource->getMAC().toString()).arg(i+1));
+        resource->setDiscoveryAddr(discoveryAddr);
+        resource->setAuth(auth);
+        resource->setGroupName(groupName);
+        QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(host).arg(apiPort);
+        resource->setGroupId(groupId);
+
+        result << resource;
+    }
 }
-#endif
 
 QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
@@ -375,7 +148,7 @@ QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, c
     result = QnVirtualCameraResourcePtr( new QnPlVmax480Resource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create test camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create Vmax480 resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
     result->deserialize(parameters);
 
     return result;
@@ -406,31 +179,49 @@ QByteArray extractCamName(const QByteArray& request, int pos)
     return rez;
 }
 
-QMap<int, QByteArray> QnPlVmax480ResourceSearcher::getCamNames(CLSimpleHTTPClient& client)
+QByteArray QnPlVmax480ResourceSearcher::readDescriptionPage(CLSimpleHTTPClient& client)
+{
+    CLHttpStatus status = client.doGET(QLatin1String("cgi-bin/design/html_template/Camera.cgi"));
+    QByteArray answer;
+    if (status == CL_HTTP_SUCCESS)
+        client.readAll(answer);
+    return answer;
+}
+
+int QnPlVmax480ResourceSearcher::getApiPort(const QByteArray& answer) const
+{
+    int result = 0;
+    int portIndex = answer.indexOf("param name=\\\"port\\\"");
+    if (portIndex > 0) 
+    {
+        static const QByteArray VALUE_PATTERN("value=\\\"");
+        int valIndex = answer.indexOf(VALUE_PATTERN, portIndex);
+        if (valIndex > 0) {
+            result = extractNum(answer, valIndex + VALUE_PATTERN.length());
+        }
+    }
+    return result ? result : VMAX_API_PORT;
+}
+
+QMap<int, QByteArray> QnPlVmax480ResourceSearcher::getCamNames(const QByteArray& answer)
 {
     QMap<int, QByteArray> camNames;
 
-    CLHttpStatus status = client.doGET(QLatin1String("cgi-bin/design/html_template/Camera.cgi"));
-    if (status == CL_HTTP_SUCCESS)
-    {
-        QByteArray answer;
-        client.readAll(answer);
-        QByteArray pattern1("\"hid_camera_info_");
-        QByteArray pattern2("value=\"");
-        int pos = answer.indexOf(pattern1);
-        while (pos >= 0) {
-            int chNum = extractNum(answer, pos + pattern1.length());
-            if (chNum > 0) 
-            {
-                int valuePos = answer.indexOf(pattern2, pos);
-                if (valuePos > 0) {
-                    QByteArray value = extractCamName(answer, valuePos + pattern2.length());
-                    if (!value.isEmpty())
-                        camNames[chNum] = value;
-                }
+    QByteArray pattern1("\"hid_camera_info_");
+    QByteArray pattern2("value=\"");
+    int pos = answer.indexOf(pattern1);
+    while (pos >= 0) {
+        int chNum = extractNum(answer, pos + pattern1.length());
+        if (chNum > 0) 
+        {
+            int valuePos = answer.indexOf(pattern2, pos);
+            if (valuePos > 0) {
+                QByteArray value = extractCamName(answer, valuePos + pattern2.length());
+                if (!value.isEmpty())
+                    camNames[chNum] = value;
             }
-            pos = answer.indexOf(pattern1, pos+1);
         }
+        pos = answer.indexOf(pattern1, pos+1);
     }
 
     return camNames;
@@ -474,7 +265,26 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
 {
     QList<QnResourcePtr> result;
 
+
     int channels = -1;
+    int apiPort = VMAX_API_PORT;
+    int httpPort = 80;
+    QString httpPortStr = url.queryItemValue(lit("http_port"));
+    if (httpPortStr.isEmpty())
+    {
+        // first discovery: port used as http port, API port is unknown
+        httpPort = url.port(80);
+    }
+    else {
+        // repeat discovery process. port used as API port, http port paced in url parameters. I did it for compatibility with previous version:
+        // port in URL parameter must be used as API port
+
+        apiPort = url.port(VMAX_API_PORT);
+        httpPort = httpPortStr.toInt();
+        if (!httpPort)
+            httpPort = 80;
+    }
+
 
     if (!doMultichannelCheck)
     {
@@ -486,15 +296,21 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
             if (existsRes)
                 break;
         }
-        if (existsRes && (existsRes->getStatus() == QnResource::Online || existsRes->getStatus() == QnResource::Recording))
+        if (existsRes && (existsRes->getStatus() == QnResource::Online || existsRes->getStatus() == QnResource::Recording)) {
             channels = extractChannelCount(existsRes->getModel().toUtf8()); // avoid real requests
+            QUrl url(existsRes->getUrl());
+            apiPort = url.port(VMAX_API_PORT);
+            int existHttpPort = url.queryItemValue(lit("http_port")).toInt();
+            if (existHttpPort > 0)
+                httpPort = existHttpPort;
+        }
     }
 
     QMap<int, QByteArray> camNames;
 
     if (channels == -1)
     {
-        CLSimpleHTTPClient client(url.host(), 80, TCP_TIMEOUT, QAuthenticator());
+        CLSimpleHTTPClient client(url.host(), httpPort, TCP_TIMEOUT, QAuthenticator());
 
         if (!vmaxAuthenticate(client, auth))
             return result;
@@ -514,8 +330,11 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         }
 
         client.close();
-
-        camNames = getCamNames(client);
+        QByteArray descrPage = readDescriptionPage(client);
+        if (!descrPage.isEmpty()) {
+            camNames = getCamNames(descrPage);
+            apiPort = getApiPort(descrPage);
+        }
     }
 
     QString baseName = QString(QLatin1String("DW-VF")) + QString::number(channels);
@@ -524,7 +343,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     if (!rt.isValid())
         return result;
 
-    QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(url.host()).arg(API_PORT);
+    QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(url.host()).arg(apiPort);
     QString groupName = QString(QLatin1String("VMAX %1")).arg(url.host());
 
     for (int i = 0; i < channels; ++i)
@@ -539,7 +358,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         (resource.dynamicCast<QnPlVmax480Resource>())->setModel(baseName);
         //resource->setMAC(mac);
 
-        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(url.host()).arg(API_PORT).arg(i+1));
+        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(url.host()).arg(apiPort).arg(i+1).arg(httpPort));
         resource->setPhysicalId(QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(i+1));
         resource->setAuth(auth);
         resource->setGroupId(groupId);
@@ -551,77 +370,6 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
 
     return result;
 }
-
-/*
-QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
-{
-    QList<QnResourcePtr> result;
-
-    
-
-    CLHttpStatus status;
-    QByteArray reply = downloadFile(status, QLatin1String("dvrdevicedesc.xml"),  url.host(), 49152, 1000, auth);
-
-    if (status != CL_HTTP_SUCCESS)
-        return result;
-
-
-    int index = reply.indexOf("Upnp-DW-VF");
-
-    if (index < 0 || index + 25 > reply.size())
-        return result;
-
-    index += 10;
-
-    int index2 = reply.indexOf("-", index);
-    if (index2 < 0)
-        return result;
-
-    QByteArray channelsstr = reply.mid(index, index2 - index);
-
-    QString name = QString(QLatin1String("DW-VF")) + QString(QLatin1String(channelsstr));
-
-    int channles = channelsstr.toInt();
-
-    index = index2 + 1;
-    index2 = reply.indexOf("<", index);
-
-    if (index2 < 0)
-        return result;
-
-
-    QByteArray macstr = reply.mid(index, index2 - index);
-
-    QString mac = QnMacAddress(QString(QLatin1String(macstr))).toString();
-    QString host = url.host();
-
-
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
-        return result;
-
-
-
-    for (int i = 0; i < channles; ++i)
-    {
-        QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
-
-        resource->setTypeId(rt);
-        resource->setName(name + QString(QLatin1String("-ch%1")).arg(i+1,2));
-        (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
-        resource->setMAC(mac);
-
-        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(API_PORT).arg(i+1));
-        resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(mac).arg(i+1));
-        resource->setAuth(auth);
-
-        result << resource;
-    }
-
-
-    return result;
-}
-*/
 
 QString QnPlVmax480ResourceSearcher::manufacture() const
 {

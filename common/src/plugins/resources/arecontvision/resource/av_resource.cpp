@@ -25,13 +25,13 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
 
 bool QnPlAreconVisionResource::isPanoramic() const
 {
-    return QnPlAreconVisionResource::isPanoramic(getName());
+    return QnPlAreconVisionResource::isPanoramic(getModel());
 }
 
 bool QnPlAreconVisionResource::isDualSensor() const
 {
-    const QString name = getName();
-    return name.contains(QLatin1String("3130")) || name.contains(QLatin1String("3135"));
+    const QString model = getModel();
+    return model.contains(QLatin1String("3130")) || model.contains(QLatin1String("3135"));
 }
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
@@ -157,22 +157,6 @@ bool QnPlAreconVisionResource::setHostAddress(const QString& hostAddr, QnDomain 
     return QnNetworkResource::setHostAddress(hostAddr, QnDomainMemory);
 }
 
-QString QnPlAreconVisionResource::toSearchString() const
-{
-    QString result;
-
-    const QnParamList params = getResourceParamList();
-    const QString firmware = params.value(QLatin1String("Firmware version")).value().toString();
-    const QString hardware = params.value(QLatin1String("Image engine")).value().toString();
-    const QString net = params.value(QLatin1String("Net version")).value().toString();
-
-    result += QnNetworkResource::toSearchString() + QLatin1String(" live fw=") + firmware + QLatin1String(" hw=") + hardware + QLatin1String(" net=") + net;
-    if (!m_description.isEmpty())
-        result += QLatin1String(" dsc=") + m_description;
-
-    return result;
-}
-
 bool QnPlAreconVisionResource::unknownResource() const
 {
     return (getName() == QLatin1String("ArecontVision_Abstract"));
@@ -267,13 +251,17 @@ bool QnPlAreconVisionResource::initInternal()
     if (zone_size<1)
         zone_size = 1;
 
+    const QString firmware = getResourceParamList().value(QLatin1String("Firmware version")).value().toString();
+    setFirmware(firmware);
+    save();
+
     setParam(QLatin1String("Zone size"), zone_size, QnDomainPhysical);
     setMotionMaskPhysical(0);
 
     return true;
 }
 
-QString QnPlAreconVisionResource::manufacture() const
+QString QnPlAreconVisionResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }

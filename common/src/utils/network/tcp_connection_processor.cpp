@@ -1,7 +1,11 @@
 #include "tcp_connection_processor.h"
+
+#include <openssl/ssl.h>
+
+#include <QTime>
+
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
-#include "ssl.h"
 #include "err.h"
 
 #ifndef Q_OS_WIN
@@ -160,20 +164,29 @@ void QnTCPConnectionProcessor::clearBuffer()
     d->sendBuffer.clear();
 }
 */
-void QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
-{
-    //Q_D(QnTCPConnectionProcessor);
-    sendData(sendBuffer.data(), sendBuffer.size());
-}
-
-int QnTCPConnectionProcessor::sendData(const char* data, int size)
+bool QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
 {
     Q_D(QnTCPConnectionProcessor);
+
+    QMutexLocker lock(&d->sockMutex);
+    return sendData(sendBuffer.data(), sendBuffer.size());
+}
+
+bool QnTCPConnectionProcessor::sendBuffer(const QByteArray& sendBuffer)
+{
+    Q_D(QnTCPConnectionProcessor);
+
     QMutexLocker lock(&d->sockMutex);
     int bytesSent = 0;
+    return sendData(sendBuffer.data(), sendBuffer.size());
+}
+
+bool QnTCPConnectionProcessor::sendData(const char* data, int size)
+{
+    Q_D(QnTCPConnectionProcessor);
     while (!needToStop() && size > 0 && d->socket->isConnected())
     {
-        int sended;
+        int sended = 0;
         if (d->ssl)
             sended = SSL_write(d->ssl, data, size);
         else
@@ -188,8 +201,7 @@ int QnTCPConnectionProcessor::sendData(const char* data, int size)
         size -= sended;
         bytesSent += sended;
     }
-
-    return bytesSent > 0 ? bytesSent : -1;
+    return d->socket->isConnected();
 }
 
 
@@ -243,7 +255,7 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     if (d->ssl)
         SSL_write(d->ssl, response.data(), response.size());
     else
-        d->socket->send(response.data(), response.size());
+        sendData(response.data(), response.size());
 }
 
 bool QnTCPConnectionProcessor::sendChunk( const QnByteArray& chunk )
@@ -298,6 +310,18 @@ void QnTCPConnectionProcessor::pleaseStop()
     if (d->socket)
         d->socket->close();
     QnLongRunnable::pleaseStop();
+}
+
+void* QnTCPConnectionProcessor::ssl() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->ssl;
+}
+
+TCPSocket* QnTCPConnectionProcessor::socket() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->socket;
 }
 
 int QnTCPConnectionProcessor::getSocketTimeout()

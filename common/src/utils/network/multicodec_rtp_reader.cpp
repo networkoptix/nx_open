@@ -1,4 +1,11 @@
 #include "multicodec_rtp_reader.h"
+
+#include <QSettings>
+
+#ifdef __GNUC__
+#include <sys/select.h>
+#endif
+
 #include "utils/network/rtp_stream_parser.h"
 #include "core/resource/network_resource.h"
 #include "utils/network/h264_rtp_parser.h"
@@ -13,9 +20,10 @@
 #include <business/events/reasoned_business_event.h>
 #include "utils/common/synctime.h"
 
-extern QSettings qSettings;
 static const int RTSP_RETRY_COUNT = 6;
 static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
+
+static RtpTransport::Value defaultTransportToUse( RtpTransport::_auto );
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     QnResourceConsumer(res),
@@ -33,7 +41,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     else
         m_RtpSession.setTCPTimeout(1000 * 5);
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
-    m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
+    m_numberOfVideoChannels = mr->getVideoLayout()->channelCount();
     m_gotKeyData.resize(m_numberOfVideoChannels);
 
     connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)),
@@ -356,6 +364,12 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
     }
+    else if (codecName == QLatin1String("L16")) {
+        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        audioParser->setCodecId(CODEC_ID_PCM_S16BE);
+        audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
+        result = audioParser;
+    }
     
     if (result)
         connect(result, SIGNAL(packetLostDetected(quint32, quint32)), this, SLOT(at_packetLost(quint32, quint32)));
@@ -385,19 +399,31 @@ void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* pa
     }
 }
 
-void QnMulticodecRtpReader::openStream()
+static int TCP_READ_BUFFER_SIZE = 512*1024;
+
+bool QnMulticodecRtpReader::openStream()
 {
     m_pleaseStop = false;
     if (isStreamOpened())
-        return;
+        return true;
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
-    QString transport = qSettings.value(QLatin1String("rtspTransport"), QLatin1String("AUTO")).toString().toUpper();
-    if (transport != QLatin1String("AUTO") && transport != QLatin1String("UDP") && transport != QLatin1String("TCP"))
-        transport = QLatin1String("AUTO");
+    QString transport;
+    QVariant val;
+    m_resource->getParam(lit("rtpTransport"), val, QnDomainMemory);
+    transport = val.toString();
+
+    if (transport.isEmpty()) {
+        // if not defined, try transport from registry
+        transport = defaultTransportToUse;
+    }
+
+    if (transport != RtpTransport::_auto && transport != RtpTransport::udp && transport != RtpTransport::tcp)
+        transport = RtpTransport::_auto;
+
     m_RtpSession.setTransport(transport);
-    if (transport != QLatin1String("UDP"))
-        m_RtpSession.setTCPReadBufferSize(1024*512);
+    if (transport != RtpTransport::udp)
+        m_RtpSession.setTCPReadBufferSize(TCP_READ_BUFFER_SIZE);
 
 
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
@@ -448,6 +474,11 @@ void QnMulticodecRtpReader::openStream()
         if (!m_videoIO && !m_audioIO)
             m_RtpSession.stop();
         m_rtcpReportTimer.restart();
+        return m_videoIO || m_audioIO;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -478,4 +509,9 @@ const QnResourceAudioLayout* QnMulticodecRtpReader::getAudioLayout() const
 void QnMulticodecRtpReader::pleaseStop()
 {
     m_pleaseStop = true;
+}
+
+void QnMulticodecRtpReader::setDefaultTransport( const RtpTransport::Value& _defaultTransportToUse )
+{
+    defaultTransportToUse = _defaultTransportToUse;
 }

@@ -1,10 +1,12 @@
 #ifndef __BUSINESS_EVENT_CONNECTOR_H__
 #define __BUSINESS_EVENT_CONNECTOR_H__
 
+#include <QHostAddress>
+
 #include <core/resource/resource_fwd.h>
 #include <core/datapacket/abstract_data_packet.h>
 
-#include <business/business_logic_common.h>
+#include <business/business_fwd.h>
 
 /*
 * This class listening various logic events, covert these events to business events and send it to businessRuleProcessor

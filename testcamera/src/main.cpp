@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     if (argc == 1)
     {
         qDebug() << "usage:";
-        qDebug() << "testCamera <cameraSet1> <cameraSet2> ... <cameraSetN>";
+        qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
         qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
         qDebug() << "count=N";
         qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
@@ -61,15 +61,44 @@ int main(int argc, char *argv[])
         qDebug() << "example:";
         QString str = QFileInfo(argv[0]).baseName() + QString(" files=\"c:/test.264\";count=20");
         qDebug() << str;
+        qDebug() << "\n[options]: ";
+        qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
         return 1;
     }
 
+    QStringList localInterfacesToListen;
+    for( int i = 1; i < argc; ++i )
+    {
+        QString param = argv[i];
+        if( param.startsWith("--local-interface=") )
+        {
+            localInterfacesToListen.push_back( param.mid(sizeof("--local-interface=")-1) );
+        }
+        else if( param == "-I" )
+        {
+            //value in the next arg
+            ++i;
+            if( i >= argc )
+                continue;
+            localInterfacesToListen.push_back( QString(argv[i]) );
+        }
+    }
+
+    QnCameraPool::initGlobalInstance( new QnCameraPool( localInterfacesToListen ) );
     QnCameraPool::instance()->start();
 
     for (int i = 1; i < argc; ++i)
     {
         QString param = argv[i];
         QStringList params = param.split(';');
+
+        if( param.startsWith("--") )
+            continue;
+        if( param.startsWith("-") )
+        {
+            ++i;    //skipping next argument
+            continue;
+        }
 
         int offlineFreq = 0;
         int count = 0;
@@ -130,6 +159,10 @@ int main(int argc, char *argv[])
         QnCameraPool::instance()->addCameras(count, primaryFiles, secondaryFiles, offlineFreq);
     }
 
+    int appResult = app.exec();
 
-    return app.exec();
+    delete QnCameraPool::instance();
+    QnCameraPool::initGlobalInstance( NULL );
+
+    return appResult;
 }

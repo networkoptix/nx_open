@@ -15,12 +15,7 @@ bool QnPlIqResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-bool QnPlIqResource::updateMACAddress()
-{
-    return true;
-}
-
-QString QnPlIqResource::manufacture() const
+QString QnPlIqResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }

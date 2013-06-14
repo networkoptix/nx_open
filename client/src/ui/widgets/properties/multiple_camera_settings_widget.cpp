@@ -5,7 +5,7 @@
 
 #include <QtGui/QMessageBox>
 
-//TODO: #elric #gdm asked: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+//TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
@@ -16,6 +16,7 @@
 #include <ui/style/warning_style.h>
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
+#include <ui/widgets/properties/camera_settings_widget_p.h>
 
 #include <utils/license_usage_helper.h>
 
@@ -23,10 +24,11 @@
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
     QnWorkbenchContextAware(parent),
+    d_ptr(new QnCameraSettingsWidgetPrivate()),
     ui(new Ui::MultipleCameraSettingsWidget),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
-    m_hasControlsChanges(false),
+    m_hasScheduleControlsChanges(false),
     m_readOnly(false),
     m_inUpdateMaxFps(false)
 {
@@ -70,6 +72,8 @@ void QnMultipleCameraSettingsWidget::setCameras(const QnVirtualCameraResourceLis
         return;
 
     m_cameras = cameras;
+    Q_D(QnCameraSettingsWidget);
+    d->setCameras(cameras);
 
     updateFromResources();
 }
@@ -261,7 +265,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
     updateLicenseText();
 
     setHasDbChanges(false);
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 bool QnMultipleCameraSettingsWidget::isReadOnly() const {
@@ -308,7 +312,7 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChange
     at_dbDataChanged();
 
     m_hasScheduleChanges = true;
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
@@ -332,11 +336,11 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChan
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged() {
-    m_hasControlsChanges = true;
+    m_hasScheduleControlsChanges = true;
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied() {
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked() {
@@ -366,18 +370,10 @@ void QnMultipleCameraSettingsWidget::updateMaxFPS(){
     m_inUpdateMaxFps = true;
 
     int maxFps = std::numeric_limits<int>::max();
-    int maxDualStreamingFps  = maxFps;
+    int maxDualStreamingFps = maxFps;
 
-    foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
-    {
-        int cameraFps = camera->getMaxFps();
-        int cameraDualStreamingFps = cameraFps;
-        if ((((camera->supportedMotionType() & Qn::MT_SoftwareGrid))
-            || ui->cameraScheduleWidget->isSecondaryStreamReserver()) && camera->streamFpsSharingMethod() == Qn::shareFps)
-            cameraDualStreamingFps -= MIN_SECOND_STREAM_FPS;
-        maxFps = qMin(maxFps, cameraFps);
-        maxDualStreamingFps = qMin(maxFps, cameraDualStreamingFps);
-    }
+    Q_D(QnCameraSettingsWidget);
+    d->calculateMaxFps(&maxFps, &maxDualStreamingFps);
 
     ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
@@ -388,11 +384,9 @@ void QnMultipleCameraSettingsWidget::updateLicenseText() {
     if (ui->analogViewCheckBox->checkState() != Qt::PartiallyChecked)
         helper.propose(m_cameras, ui->analogViewCheckBox->checkState() == Qt::Checked);
 
-    //TODO: refactor duplicated code
+    //TODO: #GDM refactor duplicated code
     { // digital licenses
-        QString usageText = tr("%1 digital license(s) are used out of %2.")
-                .arg(helper.usedDigital())
-                .arg(helper.totalDigital());
+        QString usageText = tr("%n digital license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
         ui->digitalLicensesLabel->setText(usageText);
         QPalette palette = this->palette();
         if (!helper.isValid() && helper.requiredDigital() > 0)
@@ -401,9 +395,7 @@ void QnMultipleCameraSettingsWidget::updateLicenseText() {
     }
 
     { // analog licenses
-        QString usageText = tr("%1 analog license(s) are used out of %2.")
-                .arg(helper.usedAnalog())
-                .arg(helper.totalAnalog());
+        QString usageText = tr("%n analog license(s) are used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
         ui->analogLicensesLabel->setText(usageText);
         QPalette palette = this->palette();
         if (!helper.isValid() && helper.requiredAnalog() > 0)

@@ -23,8 +23,8 @@ public:
     virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
     // TODO: #Elric need to implement this one properly.
-    const QMatrix4x4 &speedTransform() const;
-    void setSpeedTransform(const QMatrix4x4 &speedTransform);
+    void setFlipped(bool horizontal, bool vertical);
+    void getFlipped(bool *horizontal, bool *vertical);
 
     QString getPtzConfigurationToken();
     void setMediaProfileToken(const QString& value);
@@ -43,7 +43,7 @@ private:
     QPair<qreal, qreal> m_zoomNativeVelocityCoeff;
     mutable QMutex m_mutex;
 
-    QMatrix4x4 m_speedTransform;
+    bool m_verticalFlipped, m_horizontalFlipped;
 };
 
 #endif // QN_ONVIF_PTZ_CONTROLLER_H

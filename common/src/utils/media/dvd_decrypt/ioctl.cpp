@@ -87,9 +87,6 @@
 #   include <sys/scsi/scsi_types.h>
 #   include <sys/scsi/impl/uscsi.h>
 #endif
-#ifdef Q_OS_MAC
-#   include <IOKit/storage/IODVDMediaBSDClient.h>
-#endif
 #ifdef __QNXNTO__
 #   include <sys/mman.h>
 #   include <sys/dcmd_cam.h>
@@ -98,6 +95,10 @@
 #include "common.h"
 
 #include "ioctl.h"
+
+#ifdef Q_OS_MAC
+#   include <IOKit/storage/IODVDMediaBSDClient.h>
+#endif
 
 /*****************************************************************************
  * Local prototypes, BeOS specific

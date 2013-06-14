@@ -1,6 +1,8 @@
 #ifndef QnPlAreconVisionResource_h_1252
 #define QnPlAreconVisionResource_h_1252
 
+#include <QImage>
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -27,8 +29,6 @@ public:
 
     virtual bool setHostAddress(const QString& ip, QnDomain domain);
 
-    QString toSearchString() const;
-
     virtual bool getDescription() {return true;};
 
     //========
@@ -36,7 +36,7 @@ public:
     virtual QnResourcePtr updateResource();
     //========
 
-    virtual QString manufacture() const;
+    virtual QString getDriverName() const override;
     virtual bool isResourceAccessible();
     virtual bool updateMACAddress();
 

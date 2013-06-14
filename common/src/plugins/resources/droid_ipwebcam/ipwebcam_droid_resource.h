@@ -17,9 +17,7 @@ public:
 
     virtual bool isResourceAccessible();
 
-    virtual bool updateMACAddress();
-
-    virtual QString manufacture() const;
+    virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 

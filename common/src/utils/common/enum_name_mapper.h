@@ -9,6 +9,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/mpl/bool.hpp>
 
+#include <QMetaEnum>
 #include <QtCore/QMetaObject>
 
 #include <utils/common/warnings.h>

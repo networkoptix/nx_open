@@ -2,12 +2,14 @@
 #define QN_RESOURCE_BROWSER_WIDGET_H
 
 #include <QWidget>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
+class QComboBox;
 class QLineEdit;
 class QTabWidget;
 class QToolButton;
@@ -54,11 +56,9 @@ public:
 
     virtual Qn::ActionScope currentScope() const override;
 
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
+    QComboBox *typeComboBox() const;
 
-    QPalette comboBoxPalette() const;
-
-    void setComboBoxPalette(const QPalette &palette);
+    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
 
 signals:
     void activated(const QnResourcePtr &resource);
@@ -73,6 +73,8 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
+
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     QnResourceTreeWidget *currentItemView() const;
     QItemSelectionModel *currentSelectionModel() const;

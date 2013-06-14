@@ -28,10 +28,11 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_widgetCount(0),
     m_counter(NULL),
-    m_syncPlay(NULL)
+    m_syncPlay(NULL),
+    m_watcher(context()->instance<QnWorkbenchRenderWatcher>())
 {
     /* Prepare syncplay. */
-    m_syncPlay = new QnArchiveSyncPlayWrapper(); // TODO: QnArchiveSyncPlayWrapper destructor doesn't get called, investigate.
+    m_syncPlay = new QnArchiveSyncPlayWrapper(); // TODO: #Elric QnArchiveSyncPlayWrapper destructor doesn't get called, investigate.
 
     /* Connect to display. */
     connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                this,       SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -39,14 +40,13 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     connect(workbench(),                SIGNAL(currentLayoutChanged()),                         this,       SLOT(at_workbench_currentLayoutChanged()));
     
     /* Prepare counter. */
-    m_counter = new QnCounter(1); // TODO: this one also doesn't get destroyed.
+    m_counter = new QnCounter(1); // TODO: #Elric this one also doesn't get destroyed.
     connect(this,                       SIGNAL(destroyed()),                                    m_counter,  SLOT(decrement()));
     connect(m_counter,                  SIGNAL(reachedZero()),                                  m_syncPlay, SLOT(deleteLater()));
     connect(m_counter,                  SIGNAL(reachedZero()),                                  m_counter,  SLOT(deleteLater()));
 
     /* Prepare render watcher instance. */
-    QnWorkbenchRenderWatcher *renderWatcher = context()->instance<QnWorkbenchRenderWatcher>();
-    connect(renderWatcher,              SIGNAL(displayingChanged(QnAbstractRenderer *, bool)),  this,       SLOT(at_renderWatcher_displayingChanged(QnAbstractRenderer *, bool)));
+    connect(m_watcher,                  SIGNAL(displayingChanged(QnResourceDisplay *)),         this,       SLOT(at_renderWatcher_displayingChanged(QnResourceDisplay *)));
 
     /* Run handlers for all widgets already on display. */
     foreach(QnResourceWidget *widget, display()->widgets())
@@ -84,7 +84,7 @@ QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const {
     
     result.started = m_syncPlay->isEnabled();
     if(result.started) {
-        result.speed = 1.0; // TODO: need getSpeed() here.
+        result.speed = 1.0; // TODO: #Elric need getSpeed() here.
         result.time = m_syncPlay->getCurrentTime();
     }
     
@@ -129,19 +129,14 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     QnVideoCamera *camera = mediaWidget->display()->camera();
     m_syncPlay->addArchiveReader(mediaWidget->display()->archiveReader(), camera->getCamDisplay());
     camera->setExternalTimeSource(m_syncPlay);
-    camera->getCamDisplay()->setExternalTimeSource(m_syncPlay); // TODO: two setExternalTimeSource calls, WTF?
+    camera->getCamDisplay()->setExternalTimeSource(m_syncPlay); // TODO: #Elric two setExternalTimeSource calls, WTF?
 
     m_counter->increment();
     connect(mediaWidget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));
 
     m_widgetCount++;
     if(m_widgetCount == 1) 
-    {
-        //if(!mediaWidget->resource().dynamicCast<QnSecurityCamResource>())
-            //mediaWidget->display()->archiveReader()->jumpTo(0, 0); // change current position from live to left edge if it is not camera
-
         emit effectiveChanged();
-    }
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
@@ -166,12 +161,8 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
         emit effectiveChanged();
 }
 
-void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingChanged(QnAbstractRenderer *renderer, bool displaying) {
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(renderer));
-    if(mediaWidget == NULL)
-        return;
-
-    m_syncPlay->onConsumerBlocksReader(mediaWidget->display()->dataProvider(), !displaying);
+void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingChanged(QnResourceDisplay *display) {
+    m_syncPlay->onConsumerBlocksReader(display->dataProvider(), !m_watcher->isDisplaying(display));
 }
 
 void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged() {
@@ -181,7 +172,7 @@ void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged() {
 
 void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr &resource) {
     if(!(resource->flags() & QnResource::sync))
-        return; // TODO: implement reverse handling?
+        return; // TODO: #Elric implement reverse handling?
 
     foreach(QnMediaResourceWidget *widget, m_queuedWidgets) {
         if(widget->resource() == resource) {

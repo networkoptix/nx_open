@@ -9,7 +9,7 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "dualstreaming_helper.h"
 
-#include <business/business_logic_common.h>
+#include <business/business_fwd.h>
 
 class QnServerStreamRecorder: public QnStreamRecorder
 {

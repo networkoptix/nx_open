@@ -6,6 +6,8 @@
 #ifndef POLLSET_H
 #define POLLSET_H
 
+#include <cstddef>
+
 
 class Socket;
 class PollSetImpl;
@@ -29,7 +31,8 @@ public:
         etRead = 1,
         etWrite = 2,
         //!Error occured on socket. Output only event
-        etError = 4
+        etError = 4,
+        etCount = 5
     };
 
     /*!
@@ -50,12 +53,13 @@ public:
         //!Selects next socket which state has been changed with previous \a poll call
         const_iterator& operator++();       //++it
 
-        Socket* socket() const;
+        Socket* socket();
+        const Socket* socket() const;
         /*!
             \return Triggered event
         */
         PollSet::EventType eventType() const;
-        void* userData() const;
+        void* userData();
 
         bool operator==( const const_iterator& right ) const;
         bool operator!=( const const_iterator& right ) const;

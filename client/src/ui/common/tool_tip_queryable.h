@@ -2,6 +2,7 @@
 #define QN_TOOL_TIP_QUERYABLE_H
 
 #include <QtCore/QString>
+#include <QPointF>
 
 /**
  * This class is a workaround for a problem with total impossibility of
@@ -18,7 +19,7 @@ class ToolTipQueryable {
 public:
     virtual ~ToolTipQueryable() {}
 
-    // TODO: bool toolTipAt(const QPointF &pos, QString *toolTip, QRectF *area) const
+    // TODO: #Elric bool toolTipAt(const QPointF &pos, QString *toolTip, QRectF *area) const
     /**
      * \param pos                       Position inside an item.
      * \returns                         Tooltip at the given position.

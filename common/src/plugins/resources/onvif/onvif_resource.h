@@ -20,8 +20,6 @@
 #include "core/resource/interface/abstract_ptz_controller.h"
 #include "onvif_ptz_controller.h"
 #include "utils/common/timermanager.h"
-#include "utils/common/systemtimer.h"
-
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -39,10 +37,6 @@ typedef onvifXsd__VideoSourceConfiguration VideoSource;
 class VideoOptionsLocal;
 
 //first = width, second = height
-const QSize EMPTY_RESOLUTION_PAIR(0, 0);
-const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
-const QSize SECONDARY_STREAM_MAX_RESOLUTION(1280, 720);
-
 
 class QDomElement;
 
@@ -83,6 +77,7 @@ public:
         G726,
         G711,
         AAC,
+        AMR,
         SIZE_OF_AUDIO_CODECS
     };
 
@@ -110,8 +105,8 @@ public:
 
 
     virtual bool isResourceAccessible() override;
-    virtual bool updateMACAddress() override;
-    virtual QString manufacture() const override;
+    virtual QString getDriverName() const override;
+    virtual QString getVendorName() const override;
 
     virtual int getMaxFps() override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
@@ -127,6 +122,9 @@ public:
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
+    /*!
+        Actual request is performed asynchronously. This method only posts task to the queue
+    */
     virtual bool setRelayOutputState(
         const QString& ouputID,
         bool activate,
@@ -193,6 +191,10 @@ public:
 
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool secondaryResolutionIsLarge() const;
+    virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;
+
+    void setVendorName( const QString& vendorName );
+
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -208,6 +210,7 @@ signals:
         qint64 timestamp);
 
 protected:
+    int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 
@@ -247,8 +250,6 @@ private:
 
     int round(float value);
     QSize getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const;
-    static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList);
-    static float getResolutionAspectRatio(const QSize& resolution);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int  getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
@@ -272,6 +273,8 @@ protected:
     virtual void stopInputPortMonitoring() override;
     virtual bool isInputPortMonitored() const override;
 
+    qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
+    int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
 private slots:
     void onRenewSubscriptionTimer();
 
@@ -348,6 +351,32 @@ private:
         std::stack<State> m_parseStateStack;
     };
 
+    class TriggerOutputTask
+    {
+    public:
+        QString outputID;
+        bool active;
+        unsigned int autoResetTimeoutMS;
+
+        TriggerOutputTask()
+        :
+            active( false ),
+            autoResetTimeoutMS( 0 )
+        {
+        }
+
+        TriggerOutputTask(
+            const QString _outputID,
+            const bool _active,
+            const unsigned int _autoResetTimeoutMS )
+        :
+            outputID( _outputID ),
+            active( _active ),
+            autoResetTimeoutMS( _autoResetTimeoutMS )
+        {
+        }
+    };
+
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
     static const int DEFAULT_IFRAME_DISTANCE;
@@ -393,6 +422,8 @@ private:
     quint64 m_timerID;
     quint64 m_renewSubscriptionTaskID;
     int m_maxChannels;
+    std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
+    QString m_vendorName;
 	
     bool createPullPointSubscription();
     bool pullMessages();
@@ -404,6 +435,10 @@ private:
     bool fetchRelayInputInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
+    bool setRelayOutputStateNonSafe(
+        const QString& outputID,
+        bool active,
+        unsigned int autoResetTimeoutMS );
 };
 
 #endif //onvif_resource_h

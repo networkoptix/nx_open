@@ -23,6 +23,7 @@ enum QnStreamQuality {
 };
 
 QString QnStreamQualityToString(QnStreamQuality value);
+QnStreamQuality QnStreamQualityFromString( const QString& str );
 
 class QnMediaResource : virtual public QnResource
 {

@@ -1,50 +1,54 @@
 #include "license.h"
 
+#include <cassert>
+
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QSettings>
 #include <QtCore/QUuid>
 #include <QtCore/QStringList>
 
-#include <numeric>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
 
 #include "version.h"
-
-QT_STATIC_CONST char networkOptixRSAPublicKey[] = QN_RSA_PUBLIC_KEY;
-
-static bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
-{
-    // Calculate SHA1 hash
-    QCryptographicHash hash(QCryptographicHash::Sha1);
-    hash.addData(data);
-    QByteArray dataHash = hash.result();
-
-    // Load RSA public key
-    BIO *bp = BIO_new_mem_buf(const_cast<char *>(publicKey.data()), publicKey.size());
-    RSA* publicRSAKey = PEM_read_bio_RSA_PUBKEY(bp, 0, 0, 0);
-    BIO_free(bp);
-
-    if (publicRSAKey == 0 || signature.size() != RSA_size(publicRSAKey))
-        return false;
-
-    // Decrypt data
-    QScopedArrayPointer<unsigned char> decrypted(new unsigned char[signature.size()]);
-    int ret = RSA_public_decrypt(signature.size(), (const unsigned char*)signature.data(), decrypted.data(), publicRSAKey, RSA_PKCS1_PADDING);
-    RSA_free(publicRSAKey);
-
-    // Verify signature is correct
-    return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
-}
+#include "common/customization.h"
+#include "utils/common/synctime.h"
 
 namespace {
-    class QnLicensePoolInstance: public QnLicensePool {};
-}
+    const char *networkOptixRSAPublicKey = QN_RSA_PUBLIC_KEY;
 
-Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
+    bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
+    {
+        // Calculate SHA1 hash
+        QCryptographicHash hash(QCryptographicHash::Sha1);
+        hash.addData(data);
+        QByteArray dataHash = hash.result();
 
+        // Load RSA public key
+        BIO *bp = BIO_new_mem_buf(const_cast<char *>(publicKey.data()), publicKey.size());
+        RSA* publicRSAKey = PEM_read_bio_RSA_PUBKEY(bp, 0, 0, 0);
+        BIO_free(bp);
+
+        if (publicRSAKey == 0 || signature.size() != RSA_size(publicRSAKey))
+            return false;
+
+        // Decrypt data
+        QScopedArrayPointer<unsigned char> decrypted(new unsigned char[signature.size()]);
+        int ret = RSA_public_decrypt(signature.size(), (const unsigned char*)signature.data(), decrypted.data(), publicRSAKey, RSA_PKCS1_PADDING);
+        RSA_free(publicRSAKey);
+
+        // Verify signature is correct
+        return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
+    }
+
+} // anonymous namespace
+
+
+// -------------------------------------------------------------------------- //
+// QnLicense
+// -------------------------------------------------------------------------- //
 QnLicense::QnLicense(const QByteArray &licenseBlock)
     : m_rawLicense(licenseBlock),
       m_isValid1(false),
@@ -115,6 +119,27 @@ QnLicense::QnLicense(const QByteArray &licenseBlock)
     }
 }
 
+QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
+{
+    QByteArray licenseBlock;
+    while (!stream.atEnd()) {
+        QString line = stream.readLine();
+        if (line.isEmpty()) {
+            if (!licenseBlock.isEmpty())
+                return QnLicensePtr(new QnLicense(licenseBlock));
+            else
+                continue;
+        }
+
+        licenseBlock.append(line.toUtf8() + "\n");
+    }
+
+    if (licenseBlock.isEmpty())
+        return QnLicensePtr();
+
+    return QnLicensePtr(new QnLicense(licenseBlock));
+}
+
 const QString &QnLicense::name() const
 {
     return m_name;
@@ -177,88 +202,44 @@ QByteArray QnLicense::toString() const
     return m_rawLicense;
 }
 
-QnLicensePtr readLicenseFromStream(QTextStream& stream)
-{
-    QByteArray licenseBlock;
-    while (!stream.atEnd()) {
-        QString line = stream.readLine();
-        if (line.isEmpty()) {
-            if (!licenseBlock.isEmpty())
-                return QnLicensePtr(new QnLicense(licenseBlock));
-            else
-                continue;
-        }
+qint64 QnLicense::expirationTime() const {
+    if(m_expiration.isEmpty())
+        return -1;
 
-        licenseBlock.append(line.toUtf8() + "\n");
-    }
-
-    if (licenseBlock.isEmpty())
-        return QnLicensePtr();
-
-    return QnLicensePtr(new QnLicense(licenseBlock));
+    QDateTime result = QDateTime::fromString(m_expiration, QLatin1String("yyyy-MM-dd hh:mm:ss"));
+    result.setTimeSpec(Qt::UTC); /* Expiration is stored as UTC date-time. */
+    return result.toMSecsSinceEpoch();
 }
 
-QnLicensePool *QnLicensePool::instance()
-{
-    return qn_licensePool_instance();
+QnLicense::Type QnLicense::type() const {
+    if (key() == qnProductFeatures().freeLicenseKey.toAscii())
+        return FreeLicense;
+
+    if (!expiration().isEmpty())
+        return TrialLicense;
+
+    if (xclass().toLower() == QLatin1String("analog"))
+        return AnalogLicense;
+
+    return EnterpriseLicense;
 }
 
-const QnLicenseList &QnLicensePool::getLicenses() const
-{
-    QMutexLocker locker(&m_mutex);
-
-    return m_licenses;
-}
-
-void QnLicensePool::addLicenses(const QnLicenseList &licenses)
-{
-    QMutexLocker locker(&m_mutex);
-
-    m_licenses.append(licenses);
-
-    emit licensesChanged();
-}
-
-void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
-{
-    QMutexLocker locker(&m_mutex);
-
-    m_licenses.setHardwareId(licenses.hardwareId());
-    m_licenses.setOldHardwareId(licenses.oldHardwareId());
-    m_licenses.clear();
-    foreach (QnLicensePtr license, licenses.licenses())
-        m_licenses.append(license);
-
-    emit licensesChanged();
-}
-
-void QnLicensePool::addLicense(const QnLicensePtr &license)
-{
-    QMutexLocker locker(&m_mutex);
-
-    if (license) {
-        m_licenses.append(license);
-
-        emit licensesChanged();
+QString QnLicense::typeName() const {
+    switch(type()) {
+    case FreeLicense:       return tr("Free");
+    case TrialLicense:      return tr("Trial");
+    case AnalogLicense:     return tr("Analog");
+    case EnterpriseLicense: return tr("Enterprise");
+    default:
+        assert(false);
+        return QString();
     }
 }
 
-void QnLicensePool::reset()
-{
-    QMutexLocker locker(&m_mutex);
 
-    m_licenses = QnLicenseList();
-
-    emit licensesChanged();
-}
-
-bool QnLicensePool::isEmpty() const
-{
-    QMutexLocker locker(&m_mutex);
-
-    return m_licenses.isEmpty();
-}
-
+// -------------------------------------------------------------------------- //
+// QnLicenseList
+// -------------------------------------------------------------------------- //
 QList<QnLicensePtr> QnLicenseList::licenses() const
 {
     return m_licenses.values();
@@ -327,12 +308,14 @@ void QnLicenseList::clear()
 
 int QnLicenseList::totalCamerasByClass(bool analog) const
 {
-    int n = 0;
-    foreach (QnLicensePtr license, m_licenses.values())
-        if (license->isAnalog() == analog)
-            n += license->cameraCount();
+    int result = 0;
 
-    return n;
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    foreach (QnLicensePtr license, m_licenses.values())
+        if (license->isAnalog() == analog && (license->expirationTime() < 0 || currentTime < license->expirationTime())) // TODO: #Elric make NEVER an INT64_MAX
+            result += license->cameraCount();
+
+    return result;
 }
 
 bool QnLicenseList::haveLicenseKey(const QByteArray &key) const
@@ -348,8 +331,76 @@ QnLicensePtr QnLicenseList::getLicenseByKey(const QByteArray& key) const
         return QnLicensePtr();
 }
 
-QnLicensePool::QnLicensePool()
-    : m_mutex(QMutex::Recursive)
+
+// -------------------------------------------------------------------------- //
+// QnLicensePool
+// -------------------------------------------------------------------------- //
+class QnLicensePoolInstance: public QnLicensePool {};
+Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
+
+QnLicensePool::QnLicensePool(): 
+    m_mutex(QMutex::Recursive)
+{}
+
+QnLicensePool *QnLicensePool::instance()
 {
+    return qn_licensePool_instance();
 }
+
+const QnLicenseList &QnLicensePool::getLicenses() const
+{
+    QMutexLocker locker(&m_mutex);
+
+    return m_licenses;
+}
+
+void QnLicensePool::addLicense(const QnLicensePtr &license)
+{
+    QMutexLocker locker(&m_mutex);
+
+    if (license) {
+        m_licenses.append(license);
+
+        emit licensesChanged();
+    }
+}
+
+void QnLicensePool::addLicenses(const QnLicenseList &licenses)
+{
+    QMutexLocker locker(&m_mutex);
+
+    m_licenses.append(licenses);
+
+    emit licensesChanged();
+}
+
+void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
+{
+    QMutexLocker locker(&m_mutex);
+
+    m_licenses.setHardwareId(licenses.hardwareId());
+    m_licenses.setOldHardwareId(licenses.oldHardwareId());
+    m_licenses.clear();
+    foreach (QnLicensePtr license, licenses.licenses())
+        m_licenses.append(license);
+
+    emit licensesChanged();
+}
+
+void QnLicensePool::reset()
+{
+    QMutexLocker locker(&m_mutex);
+
+    m_licenses = QnLicenseList();
+
+    emit licensesChanged();
+}
+
+bool QnLicensePool::isEmpty() const
+{
+    QMutexLocker locker(&m_mutex);
+
+    return m_licenses.isEmpty();
+}
+
 

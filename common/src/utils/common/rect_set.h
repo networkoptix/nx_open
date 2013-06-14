@@ -25,7 +25,7 @@ public:
     }
 
     int size() const {
-        return m_xSet.size() / 2;
+        return (int) m_xSet.size() / 2;
     }
 
     void insert(const QRect &rect) {

@@ -8,24 +8,17 @@
 #include "workbench_layout_snapshot_storage.h"
 #include "workbench_layout_synchronizer.h"
 #include "workbench_layout.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutReplyProcessor
 // -------------------------------------------------------------------------- //
-void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &, int handle) {
-    /* Note that we may get reply of size 0 if appserver is down.
+void QnWorkbenchLayoutReplyProcessor::processReply(int status, const QnResourceList &, int handle) {
+    /* Note that we may get reply of size 0 if EC is down.
      * This is why we use stored list of layouts. */
-    if(m_manager) {
-        if(status == 0) {
-            m_manager.data()->at_layouts_saved(m_resources);
-        } else {
-            m_manager.data()->at_layouts_saveFailed(m_resources);
-        }
-    }
+    if(m_manager)
+        m_manager.data()->processReply(status, m_resources, handle);
 
-    emit finished(status, errorString, QnResourceList(m_resources), handle);
-
+    emitFinished(this, status, QnResourceList(m_resources), handle);
     deleteLater();
 }
 
@@ -34,7 +27,7 @@ void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByt
 // QnWorkbenchLayoutSnapshotManager
 // -------------------------------------------------------------------------- //
 QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *parent):    
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_storage(new QnWorkbenchLayoutSnapshotStorage(this))
 {
@@ -127,9 +120,9 @@ void QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resource
         if(QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
             synchronizer->submit();
 
-    detail::QnWorkbenchLayoutReplyProcessor *processor = new detail::QnWorkbenchLayoutReplyProcessor(this, resources);
-    connect(processor, SIGNAL(finished(int, const QByteArray &, const QnResourceList &, int)), object, slot);
-    connection()->saveAsync(resources, processor, SLOT(at_finished(int, const QByteArray &, const QnResourceList &, int)));
+    QnWorkbenchLayoutReplyProcessor *processor = new QnWorkbenchLayoutReplyProcessor(this, resources);
+    processor->connect(SIGNAL(finished(int, const QnResourceList &, int)), object, slot);
+    connection()->saveAsync(resources, processor, SLOT(processReply(int, const QnResourceList &, int)));
 
     foreach(const QnLayoutResourcePtr &resource, resources)
         setFlags(resource, flags(resource) | Qn::ResourceIsBeingSaved);
@@ -196,6 +189,20 @@ Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnL
     return result;
 }
 
+void QnWorkbenchLayoutSnapshotManager::processReply(int status, const QnLayoutResourceList &resources, int handle) {
+    Q_UNUSED(handle);
+
+    if(status == 0) {
+        foreach(const QnLayoutResourcePtr &resource, resources) {
+            m_storage->store(resource);
+            setFlags(resource, 0); /* Not local, not being saved, not changed. */
+        }
+    } else {
+        foreach(const QnLayoutResourcePtr &resource, resources)
+            setFlags(resource, flags(resource) & ~Qn::ResourceIsBeingSaved);
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -205,43 +212,13 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
     if(!layoutResource)
         return;
 
-    //todo #Sasha: moved from resourcePool. check it
-    foreach(QnLayoutItemData data, layoutResource->getItems()) 
-    {
-        if(!data.resource.id.isValid()) {
-            QnResourcePtr resource = qnResPool->getResourceByUniqId(data.resource.path);
-            if(!resource) {
-                if(data.resource.path.isEmpty()) {
-                    qnWarning("Invalid item with empty id and path in layout '%1'.", layoutResource->getName());
-                } else {
-                    resource = QnResourcePtr(new QnAviResource(data.resource.path));
-                    qnResPool->addResource(resource);
-                }
-            }
-
-            if(resource) {
-                data.resource.id = resource->getId();
-                layoutResource->updateItem(data.uuid, data);
-            }
-        } else if(data.resource.path.isEmpty()) {
-            QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
-            if(!resource) {
-                qnWarning("Invalid resource id '%1'.", data.resource.id.toString());
-            } else {
-                data.resource.path = resource->getUniqueId();
-                layoutResource->updateItem(data.uuid, data);
-            }
-        }
-    }
-
-
     /* Consider it saved by default. */
     m_storage->store(layoutResource);
     
     Qn::ResourceSavingFlags flags = defaultFlags(layoutResource);
     setFlags(layoutResource, flags);
 
-    layoutResource->setFlags(flags & Qn::ResourceIsLocal ? layoutResource->flags() & ~QnResource::remote : layoutResource->flags() | QnResource::remote); // TODO: this code does not belong here.
+    layoutResource->setFlags(flags & Qn::ResourceIsLocal ? layoutResource->flags() & ~QnResource::remote : layoutResource->flags() | QnResource::remote); // TODO: #Elric this code does not belong here.
     
     /* Subscribe to changes to track changed status. */
     connectTo(layoutResource);
@@ -256,19 +233,6 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnR
     m_flagsByLayout.remove(layoutResource);
 
     disconnectFrom(layoutResource);
-}
-
-void QnWorkbenchLayoutSnapshotManager::at_layouts_saved(const QnLayoutResourceList &resources) {
-    foreach(const QnLayoutResourcePtr &resource, resources) {
-        m_storage->store(resource);
-
-        setFlags(resource, 0); /* Not local, not being saved, not changed. */
-    }
-}
-
-void QnWorkbenchLayoutSnapshotManager::at_layouts_saveFailed(const QnLayoutResourceList &resources) {
-    foreach(const QnLayoutResourcePtr &resource, resources)
-        setFlags(resource, flags(resource) & ~Qn::ResourceIsBeingSaved);
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_layout_storeRequested(const QnLayoutResourcePtr &resource) {

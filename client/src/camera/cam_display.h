@@ -1,6 +1,8 @@
 #ifndef QN_CAM_DISPLAY_H
 #define QN_CAM_DISPLAY_H
 
+#include <QTime>
+
 #include "decoders/video/abstractdecoder.h"
 #include "video_stream_display.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
@@ -43,7 +45,9 @@ public:
     QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* reader);
     ~QnCamDisplay();
 
-    void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
+    void addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bool canDownscale);
+    void removeVideoRenderer(QnAbstractRenderer* vw);
+
     virtual bool processData(QnAbstractDataPacketPtr data);
 
     virtual void pleaseStop() override;
@@ -75,6 +79,7 @@ public:
 
     QSize getFrameSize(int channel) const;
     QImage getScreenshot(int channel);
+    QImage getGrayscaleScreenshot(int channel);
     QSize getVideoSize() const;
     bool isRealTimeSource() const;
 
@@ -85,7 +90,7 @@ public:
     bool isEOFReached() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
-    QSize getScreenSize() const;
+    QSize getMaxScreenSize() const;
     QnArchiveStreamReader* getArchiveReader() const;
     bool isFullScreen() const;
     void setFullScreen(bool fullScreen);
@@ -142,8 +147,11 @@ private:
     void setAudioBufferSize(int bufferSize, int prebufferMs);
 
     void blockTimeValue(qint64 time);
+    void blockTimeValueSafe(qint64 time); // can be called from other thread
     void unblockTimeValue();
     void waitForFramesDisplayed();
+    void restoreVideoQueue(QnCompressedVideoDataPtr incoming, QnCompressedVideoDataPtr vd, int channel);
+    template <class T> void markIgnoreBefore(const T& queue, qint64 time);
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -184,7 +192,7 @@ protected:
     int m_storedMaxQueueSize;
     QnAbstractVideoDecoder::DecodeMode m_lightCpuMode;
     QnVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
-    int m_realTimeHurryUp;
+    bool m_realTimeHurryUp;
     int m_delayedFrameCount;
     QnlTimeSource* m_extTimeSrc;
     
@@ -218,6 +226,7 @@ protected:
     QnFpsStatistics m_fpsStat;
     int m_prevLQ;
     bool m_doNotChangeDisplayTime;
+    bool m_firstLivePacket;
 };
 
 #endif //QN_CAM_DISPLAY_H

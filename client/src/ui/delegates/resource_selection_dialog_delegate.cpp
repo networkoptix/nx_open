@@ -1,4 +1,7 @@
+
 #include "resource_selection_dialog_delegate.h"
+
+#include <QLayout>
 
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>

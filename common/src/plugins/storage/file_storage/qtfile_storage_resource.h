@@ -1,7 +1,11 @@
 #ifndef _QTFILE_STORAGE_PROTOCOL_H__
 #define _QTFILE_STORAGE_PROTOCOL_H__
 
-#include <libavformat/avio.h>
+extern "C"
+{
+    #include <libavformat/avio.h>
+}
+
 #include "core/resource/storage_resource.h"
 
 /*

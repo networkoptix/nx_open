@@ -16,8 +16,7 @@ public:
 
     virtual int getMaxFps() override; 
     virtual bool isResourceAccessible() override;
-    virtual bool updateMACAddress() override;
-    virtual QString manufacture() const override;
+    virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
 

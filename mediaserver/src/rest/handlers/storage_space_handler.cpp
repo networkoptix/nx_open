@@ -13,6 +13,16 @@
 
 #include <version.h>
 
+namespace {
+    QString toNativeDirPath(const QString &dirPath) {
+        QString result = QDir::toNativeSeparators(dirPath);
+        if(!result.endsWith(QDir::separator()))
+            result.append(QDir::separator());
+        return result;
+    }
+
+} // anonymous namespace
+
 QnStorageSpaceHandler::QnStorageSpaceHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
@@ -20,22 +30,18 @@ QnStorageSpaceHandler::QnStorageSpaceHandler():
 int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList &, JsonResult &result) {
     QnStorageSpaceReply reply;
 
-    QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo();
-    for(int i = 0; i < partitions.size(); i++) {
-        QString path = QDir::toNativeSeparators(partitions[i].path);
-        if(!path.endsWith(QDir::separator()))
-            path.append(QDir::separator());
-        partitions[i].path = path;
-    }
+    QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo(QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition);
+    for(int i = 0; i < partitions.size(); i++)
+        partitions[i].path = toNativeDirPath(partitions[i].path);
 
     QList<QString> storagePaths;
     foreach(const QnStorageResourcePtr &storage, qnStorageMan->getStorages()) {
-        QString path = QDir::toNativeSeparators(storage->getUrl());
+        QString path = toNativeDirPath(storage->getUrl());
         
-        bool hasPartition = false;
+        bool isExternal = true;
         foreach(const QnPlatformMonitor::PartitionSpace &partition, partitions) {
             if(path.startsWith(partition.path)) {
-                hasPartition = true;
+                isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
                 break;
             }
         }
@@ -46,7 +52,7 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
         data.totalSpace = storage->getTotalSpace();
         data.freeSpace = storage->getFreeSpace();
         data.reservedSpace = storage->getSpaceLimit();
-        data.isExternal = !hasPartition;
+        data.isExternal = isExternal;
         data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
 
@@ -72,12 +78,12 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
             continue;
 
         QnStorageSpaceData data;
-        data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME);
+        data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME) + QDir::separator();
         data.storageId = -1;
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
         data.reservedSpace = -1;
-        data.isExternal = false;
+        data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.isUsedForWriting = false;
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));
@@ -93,25 +99,15 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
 
 #ifdef Q_OS_WIN
     reply.storageProtocols.push_back(lit("smb"));
+    /* Coldstore is not supported for now as nobody uses it. */
 #endif
-    // if storage total amount is low, and large storages is presents, remove small storages from the user control
-    // (writer ommits these storages too)
-    if (qnStorageMan->isBigStorageExists()) {
-        for (int i = 0; i < reply.storages.size(); ++i)
-        {
-            if (reply.storages[i].totalSpace < QnStorageManager::BIG_STORAGE_THRESHOLD) {
-                reply.storages[i].isWritable = false;
-                reply.storages[i].isUsedForWriting = false;
-            }
-        }
-    }
-
-    // TODO: #Elric check for other plugins, e.g. coldstore
 
     result.setReply(reply);
     return CODE_OK;
 }
 
-QString QnStorageSpaceHandler::description(TCPSocket *) const {
-    return QString(); // TODO: #Elric
+QString QnStorageSpaceHandler::description() const {
+    return 
+        "Returns a list of all server storages.<br>"
+        "No parameters.<br>";
 }

@@ -18,12 +18,7 @@ bool QnTestCameraResource::isResourceAccessible()
     return true;
 }
 
-bool QnTestCameraResource::updateMACAddress()
-{
-    return true;
-}
-
-QString QnTestCameraResource::manufacture() const
+QString QnTestCameraResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }

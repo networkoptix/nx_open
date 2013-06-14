@@ -7,27 +7,49 @@
 #include "api/app_server_connection.h"
 #include "core/resource_managment/resource_pool.h"
 
+QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRuleProcessor()
+{
+    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
+}
+
+QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
+{
+
+}
+
+void QnMServerBusinessRuleProcessor::onRemoveResource(const QnResourcePtr &resource)
+{
+    QnEventsDB::instance()->removeLogForRes(resource->getId());
+}
+
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (QnBusinessRuleProcessor::executeActionInternal(action, res))
-        return true;
-
-    switch(action->actionType())
-    {
-    case BusinessActionType::Bookmark:
-        // TODO: implement me
-        break;
-    case BusinessActionType::CameraOutput:
-        return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
-        break;
-    case BusinessActionType::CameraRecording:
-        return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
-    case BusinessActionType::PanicRecording:
-        return executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
-    default:
-        break;
+    bool result = QnBusinessRuleProcessor::executeActionInternal(action, res);
+    if (!result) {
+        switch(action->actionType())
+        {
+        case BusinessActionType::Bookmark:
+            // TODO: implement me
+            break;
+        case BusinessActionType::CameraOutput:
+        case BusinessActionType::CameraOutputInstant:
+            result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
+            break;
+        case BusinessActionType::CameraRecording:
+            result = executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
+            break;
+        case BusinessActionType::PanicRecording:
+            result = executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
+            break;
+        default:
+            break;
+        }
     }
-    return false;
+    
+    if (result)
+        QnEventsDB::instance()->saveActionToDB(action, res);
+
+    return result;
 }
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)
@@ -40,7 +62,7 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr
 
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
     QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
-    if (action->getToggleState() == ToggleState::On)
+    if (action->getToggleState() == Qn::OnState)
         val =  QnMediaServerResource::PM_BusinessEvents;
     conn->setPanicMode(val);
     mediaServer->setPanicMode(val);
@@ -55,7 +77,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessA
     bool rez = false;
     if (camera) {
         // todo: if camera is offline function return false. Need some tries on timer event
-        if (action->getToggleState() == ToggleState::On)
+        if (action->getToggleState() == Qn::OnState)
             rez = qnRecordingManager->startForcedRecording(camera, action->getStreamQuality(), action->getFps(), 
                                                             action->getRecordBefore(), action->getRecordAfter(), 
                                                             action->getRecordDuration());
@@ -91,10 +113,18 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     //    return false;
     //}
 
-    int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
+    bool instant = action->actionType() == BusinessActionType::CameraOutputInstant;
+
+    int autoResetTimeout = instant
+            ? 30*1000
+            : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
+    bool on = instant
+            ? true
+            : action->getToggleState() == Qn::OnState;
+
     return securityCam->setRelayOutputState(
-        relayOutputId,
-        action->getToggleState() == ToggleState::On,
-        autoResetTimeout );
+                relayOutputId,
+                on,
+                autoResetTimeout );
 }
 

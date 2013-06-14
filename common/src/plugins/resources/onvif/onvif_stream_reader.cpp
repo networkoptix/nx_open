@@ -87,7 +87,7 @@ void QnOnvifStreamReader::openStream()
 
     m_multiCodec.setRequest(streamUrl);
     m_multiCodec.openStream();
-    if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
+    if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())
         m_resource->setStatus(QnResource::Unauthorized);
 }
 
@@ -319,7 +319,7 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
         qCritical() << "QnOnvifStreamReader::fetchUpdateVideoEncoder: can't get video encoders from camera (" 
             << (isPrimary? "primary": "secondary") << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
             << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
-        if (soapWrapper.isNotAuthenticated()) {
+        if (soapWrapper.isNotAuthenticated() && canChangeStatus()) {
             m_onvifRes->setStatus(QnResource::Unauthorized);
         }
         return false;
@@ -328,7 +328,7 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
     VideoEncoder* result = fetchVideoEncoder(response, isPrimary);
 
     if (result) {
-        //TODO:UTF unuse std::string
+        //TODO: #vasilenko UTF unuse std::string
         info.videoEncoderId = QString::fromStdString(result->token);
         updateVideoEncoder(*result, isPrimary);
 
@@ -354,7 +354,7 @@ VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response,
     for (;iter != response.Configurations.end(); ++iter) 
     {
         VideoEncoder* conf = *iter;
-        //TODO:UTF unuse std::string
+        //TODO: #vasilenko UTF unuse std::string
         if (conf && id == QString::fromStdString(conf->token)) {
             /*
             if (!isPrimary && m_onvifRes->forcePrimaryEncoderCodec())
@@ -471,9 +471,10 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile* p
         if (soapRes != SOAP_OK) {
             qCritical() << "QnOnvifStreamReader::addVideoSourceConfiguration: can't add video source to profile. Gsoap error: " 
                 << soapRes << ", description: " << soapWrapper.getLastError() 
-                << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
-
-            return false;
+                << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId() <<
+                "current vSourceID=" << profile->VideoSourceConfiguration->token.data() << "requested vSourceID=" << info.videoSourceId;
+            if (m_onvifRes->getMaxChannels() > 1)
+                return false;
         }
     }
 
@@ -499,7 +500,7 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile* p
 
     if (getRole() == QnResource::Role_LiveVideo)
     {
-        if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(m_onvifRes->getPtzController())) // TODO: EVIL!
+        if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(m_onvifRes->getPtzController())) // TODO: #Elric EVIL!
         {
             bool ptzMatched = profile && profile->PTZConfiguration;
             if (!ptzMatched)
@@ -590,7 +591,7 @@ bool QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper,
     AudioEncoder* result = fetchAudioEncoder(response, isPrimary);
 
     if (result) {
-        //TODO:UTF unuse std::string
+        //TODO: #vasilenko UTF unuse std::string
         info.audioEncoderId = QString::fromStdString(result->token);
         updateAudioEncoder(*result, isPrimary);
         return sendAudioEncoderToCamera(*result);
@@ -608,7 +609,7 @@ AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response,
 
     std::vector<onvifXsd__AudioEncoderConfiguration*>::const_iterator iter = response.Configurations.begin();
     for (; iter != response.Configurations.end(); ++iter) {
-        //TODO:UTF unuse std::string
+        //TODO: #vasilenko UTF unuse std::string
         if (*iter && id == QString::fromStdString((*iter)->token)) {
             return *iter;
         }
@@ -640,6 +641,9 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrima
             break;
         case QnPlOnvifResource::AAC:
             encoder.Encoding = onvifXsd__AudioEncoding__AAC;
+            break;
+        case QnPlOnvifResource::AMR:
+            encoder.Encoding = onvifXsd__AudioEncoding__AMR;
             break;
         default:
             qWarning() << "QnOnvifStreamReader::updateAudioEncoder: codec type is unknown: " << codec
@@ -690,7 +694,7 @@ AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response
 
     std::vector<AudioSource*>::const_iterator it = response.Configurations.begin();
     for (; it != response.Configurations.end(); ++it) {
-        //TODO:UTF unuse std::string
+        //TODO: #vasilenko UTF unuse std::string
         if (*it && id == QString::fromStdString((*it)->token)) {
             return *it;
         }

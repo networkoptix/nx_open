@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QSet>
 #include <QtCore/QModelIndex>
 #include <QtCore/QMetaType>
 

@@ -1,0 +1,12 @@
+////////////////////////////////////////////////////////////
+// 13 mar 2013    Andrey Kolesnikov
+////////////////////////////////////////////////////////////
+
+#include "critical_error_message.h"
+
+
+CriticalErrorMessage::CriticalErrorMessage( QState* const parent )
+:
+    QState( parent )
+{
+}

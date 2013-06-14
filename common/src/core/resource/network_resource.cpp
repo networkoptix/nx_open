@@ -61,7 +61,14 @@ bool QnNetworkResource::setHostAddress(const QString &ip, QnDomain domain)
 {
     //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;
-    setUrl(ip);
+    QUrl currentValue(getUrl());
+    if (currentValue.scheme().isEmpty()) {
+        setUrl(ip);
+    }
+    else {
+        currentValue.setHost(ip);
+        setUrl(currentValue.toString());
+    }
     return (domain == QnDomainMemory);
 }
 
@@ -142,7 +149,7 @@ QString QnNetworkResource::toString() const
 QString QnNetworkResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId(); // TODO: evil!
+    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId(); //TODO: #Elric evil!
     return result;
 }
 
@@ -201,9 +208,9 @@ bool QnNetworkResource::shoudResolveConflicts() const
 
 bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
 {
-    if (source->getHostAddress() != getHostAddress())
+    if (source->getUrl() != getUrl())
     {
-        setHostAddress(source->getHostAddress());
+        setUrl(source->getUrl());
         return true;
     }
 

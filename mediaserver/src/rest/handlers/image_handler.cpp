@@ -1,4 +1,10 @@
+
 #include <QBuffer>
+
+extern "C"
+{
+    #include <libswscale/swscale.h>
+}
 
 #include "image_handler.h"
 #include "utils/network/tcp_connection_priv.h"
@@ -11,7 +17,6 @@
 #include "device_plugins/server_archive/server_archive_delegate.h"
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
-#include "libswscale/swscale.h"
 #include "camera/camera_pool.h"
 
 static const int MAX_GOP_LEN = 100;
@@ -127,8 +132,11 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     else if (time == LATEST_IMAGE)
     {
         // get latest data
-        if (camera)
+        if (camera) {
             video = camera->getLastVideoFrame(useHQ);
+            if (!video)
+                video = camera->getLastVideoFrame(!useHQ);
+        }
         if (!video) {
             serverDelegate.open(res);
             serverDelegate.seek(serverDelegate.endTime()-1000*100, true);

@@ -182,10 +182,9 @@ QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layo
 {
     QString rez;
     QTextStream ost(&rez);
-    ost << layout->width() << ',' << layout->height();
-    for (int i = 0; i < layout->numberOfChannels(); ++i) {
-        ost << ';' << layout->h_position(i) << ',' << layout->v_position(i);
-    }
+    ost << layout->size().width() << ',' << layout->size().height();
+    for (int i = 0; i < layout->channelCount(); ++i)
+        ost << ';' << layout->position(i).x() << ',' << layout->position(i).y();
     ost.flush();
     return rez;
 }
@@ -239,8 +238,11 @@ bool QnArchiveStreamReader::init()
         }
     }
 
-    if (!m_delegate->open(m_resource))
+    if (!m_delegate->open(m_resource)) {
+        if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
+            emit jumpOccured(requiredJumpTime); 
         return false;
+    }
     m_delegate->setAudioChannel(m_selectedAudioChannel);
 
     // Alloc common resources
@@ -386,7 +388,7 @@ begin_label:
         m_prevSendMotion = sendMotion;
     }
 
-    int channelCount = m_delegate->getVideoLayout()->numberOfChannels();
+    int channelCount = m_delegate->getVideoLayout()->channelCount();
 
     m_jumpMtx.lock();
     bool reverseMode = m_reverseMode;
@@ -742,10 +744,13 @@ begin_label:
 
 
     // Do not display archive in a future
-    if (videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) && videoData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+    if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_UnsyncTime)) 
     {
-        m_outOfPlaybackMask = true;
-        return createEmptyPacket(reverseMode); // EOF reached
+        if (videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) && videoData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+        {
+            m_outOfPlaybackMask = true;
+            return createEmptyPacket(reverseMode); // EOF reached
+        }
     }
 
     // ensure Pos At playback mask
@@ -756,7 +761,8 @@ begin_label:
         qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(m_currentData->timestamp, !reverseMode);
         m_playbackMaskSync.unlock();
 
-        if (newTime == DATETIME_NOW || newTime == -1) {
+        qint64 maxTime = m_delegate->endTime();
+        if (newTime == DATETIME_NOW || newTime == -1 || (maxTime != (qint64)AV_NOPTS_VALUE && newTime > maxTime)) {
             //internalJumpTo(qMax(0ll, newTime)); // seek to end or BOF.
             m_outOfPlaybackMask = true;
             return createEmptyPacket(reverseMode); // EOF reached
@@ -887,7 +893,7 @@ unsigned int QnArchiveStreamReader::getCurrentAudioChannel() const
 QStringList QnArchiveStreamReader::getAudioTracksInfo() const
 {
     QStringList rez;
-    for (int i = 0; i < m_delegate->getAudioLayout()->numberOfChannels(); ++i)
+    for (int i = 0; i < m_delegate->getAudioLayout()->channelCount(); ++i)
         rez << m_delegate->getAudioLayout()->getAudioTrackInfo(i).description;
     return rez;
 }
@@ -918,7 +924,7 @@ void QnArchiveStreamReader::setReverseMode(bool value, qint64 currentTimeHint)
 
 bool QnArchiveStreamReader::isNegativeSpeedSupported() const
 {
-    return true; //!m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->numberOfChannels() == 1;
+    return true; //!m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->channelCount() == 1;
 }
 
 bool QnArchiveStreamReader::isSingleShotMode() const
@@ -968,10 +974,16 @@ void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
         return m_navDelegate->directJumpToNonKeyFrame(mksec);
     }
 
-    QMutexLocker mutex(&m_jumpMtx);
+    bool useMutex = !m_externalLocked;
+    if (useMutex)
+        m_jumpMtx.lock();
+    
     beforeJumpInternal(mksec);
     m_exactJumpToSpecifiedFrame = true;
     channeljumpToUnsync(mksec, 0, mksec);
+
+    if (useMutex)
+        m_jumpMtx.unlock();
 }
 
 /*

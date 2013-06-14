@@ -15,15 +15,18 @@
 #include "core/resource/abstract_storage_resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/dataprovider/live_stream_provider.h"
+#include "business/business_event_connector.h"
 
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 
-QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager():
-    QnResourceDiscoveryManager(),
+QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager( const CameraDriverRestrictionList& cameraDriverRestrictionList )
+:
+    QnResourceDiscoveryManager( &cameraDriverRestrictionList ),
     m_foundSmth(false)
 {
     netStateTime.restart();
+    connect(this, SIGNAL(cameraDisconnected(QnResourcePtr, qint64)), qnBusinessRuleConnector, SLOT(at_cameraDisconnected(const QnResourcePtr&, qint64)));
 }
 
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
@@ -85,7 +88,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                         // do not count 2--N channels of multichannel cameras as conflict
                         quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
                         if (ips)
-                            ipsList[ips].insert(newNetRes->getMAC().toString());
+                            ipsList[ips].insert(newNetRes->getMAC().toString().toAscii());
                     }
                 }
 
@@ -433,14 +436,24 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             // resource is not found
             m_resourceDiscoveryCounter[uniqId]++;
 
-            if (m_resourceDiscoveryCounter[uniqId] >= 5 && !QnLiveStreamProvider::hasRunningLiveProvider(netRes))
+
+            if (m_resourceDiscoveryCounter[uniqId] >= 5)
             {
-                res->setStatus(QnResource::Offline);
-                m_resourceDiscoveryCounter[uniqId] = 0;
+                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)) {
+                    if (res->getStatus() == QnResource::Offline && !m_disconnectSended[uniqId]) {
+                        emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
+                        m_disconnectSended[uniqId] = true;
+                    }
+                } else {
+                    res->setStatus(QnResource::Offline);
+                    m_resourceDiscoveryCounter[uniqId] = 0;
+                    m_disconnectSended[uniqId] = false;
+                }
             }
         }
         else {
             m_resourceDiscoveryCounter[uniqId] = 0;
+            m_disconnectSended[uniqId] = false;
         }
      
 

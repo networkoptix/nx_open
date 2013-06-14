@@ -1,3 +1,6 @@
+
+#include <iostream>
+
 #include <QDir>
 
 #include "file_storage_resource.h"
@@ -111,6 +114,9 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
 
 bool QnFileStorageResource::isStorageAvailableForWriting()
 {
+    if( !isStorageDirMounted() )
+        return false;
+
     QDir dir(getUrl());
 
     bool needRemoveDir = false;
@@ -137,6 +143,9 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
 
 bool QnFileStorageResource::isStorageAvailable()
 {
+    if( !isStorageDirMounted() )
+        return false;
+
     QString tmpDir = closeDirPath(getUrl()) + QString("tmp") + QString::number(rand());
     QDir dir(tmpDir);
     if (dir.exists()) {
@@ -187,4 +196,69 @@ void QnFileStorageResource::setStorageBitrateCoeff(float value)
 float QnFileStorageResource::getStorageBitrateCoeff() const
 {
     return m_storageBitrateCoeff;
+}
+
+bool QnFileStorageResource::isStorageDirMounted()
+{
+#ifdef _WIN32
+    return true;    //common check is enough on mswin
+#else
+    //on unix, checking that storage directory is mounted, if it is to be mounted
+    const QString& storagePath = QDir(closeDirPath(getUrl())).canonicalPath();   //following symbolic link
+
+    QStringList mountPoints;
+    if( !readTabFile( QLatin1String("/etc/fstab"), &mountPoints ) )
+    {
+        NX_LOG( QString::fromLatin1("Could not read /etc/fstab file while checking storage %1 availability").arg(storagePath), cl_logWARNING );
+        return false;
+    }
+
+    //checking if storage dir is to be mounted
+    QString storageMountPoint;
+    foreach( QString mountPoint, mountPoints )
+    {
+        const QString& mountPointCanonical = QDir(closeDirPath(mountPoint)).canonicalPath();
+        if( storagePath.startsWith(mountPointCanonical) )
+            storageMountPoint = mountPointCanonical;
+    }
+
+    //checking, if it has been mounted
+    if( !storageMountPoint.isEmpty() )
+    {
+        QStringList mountedDirectories;
+        //reading /etc/mtab
+        if( !readTabFile( QLatin1String("/etc/mtab"), &mountedDirectories ) )
+        {
+            NX_LOG( QString::fromLatin1("Could not read /etc/mtab file while checking storage %1 availability").arg(storagePath), cl_logWARNING );
+            return false;
+        }
+        if( !mountedDirectories.contains(storageMountPoint) )
+        {
+            NX_LOG( QString::fromLatin1("Storage %1 mount directory has not been mounted yet (mount point %2)").arg(storagePath).arg(storageMountPoint), cl_logWARNING );
+            return false;  //storage directory has not been mounted yet
+        }
+    }
+
+    return true;
+#endif    // _WIN32
+}
+
+bool QnFileStorageResource::readTabFile( const QString& filePath, QStringList* const mountPoints )
+{
+    QFile tabFile( filePath );
+    if( !tabFile.open(QIODevice::ReadOnly) )
+        return false;
+
+    while( !tabFile.atEnd() )
+    {
+        QString line = QString::fromAscii(tabFile.readLine().trimmed());
+        if( line.isEmpty() || line.startsWith('#') )
+            continue;
+
+        const QStringList& fields = line.split( QRegExp(QLatin1String("[\\s\\t]+")), QString::SkipEmptyParts );
+        if( fields.size() >= 2 )
+            mountPoints->push_back( fields[1] );
+    }
+
+    return true;
 }

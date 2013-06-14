@@ -41,7 +41,7 @@ namespace {
         QnGlHardwareCheckerPrivate(): m_checked(false) {}
         ~QnGlHardwareCheckerPrivate() {}
 
-        void check(const QGLContext* context);
+        void check(QGLWidget *widget);
         
         bool isChecked() const { return m_checked; }
         void setChecked(bool checked = true) { m_checked = checked; }
@@ -51,9 +51,11 @@ namespace {
     };
 
 
-    void QnGlHardwareCheckerPrivate::check(const QGLContext* context) {
+    void QnGlHardwareCheckerPrivate::check(QGLWidget* widget) {
         if(m_checked)
             return;
+
+        const QGLContext* context = widget->context();
 
         setChecked(true);
 
@@ -68,6 +70,16 @@ namespace {
         cl_log.log(QString(QLatin1String("OpenGL version: %1.")).arg(QLatin1String(version.constData())), cl_logINFO);
         cl_log.log(QString(QLatin1String("OpenGL renderer: %1.")).arg(QLatin1String(renderer.constData())), cl_logINFO);
         cl_log.log(QString(QLatin1String("OpenGL vendor: %1.")).arg(QLatin1String(vendor.constData())), cl_logINFO);
+
+#ifdef Q_OS_LINUX
+        // Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
+        // Therefore VSync is off by default in linux and is enabled only here.
+        if (!vendor.toLower().contains("nvidia")) {
+            QGLFormat format = widget->format();
+            format.setSwapInterval(1); /* Turn vsync on. */
+            widget->setFormat(format);
+        }
+#endif
 
         bool softwareTrouble = false;
         bool hardwareTrouble = false;
@@ -104,13 +116,13 @@ namespace {
 
 QnGlHardwareChecker::QnGlHardwareChecker(QGLWidget *parent):
     QObject(parent),
-    m_context(parent->context())
+    m_widget(parent)
 {
     parent->installEventFilter(this);
 }
 
 QnGlHardwareChecker::~QnGlHardwareChecker() {
-    qn_hardwareCheckerPrivate_instance()->check(m_context);
+    qn_hardwareCheckerPrivate_instance()->check(m_widget);
 }
 
 bool QnGlHardwareChecker::eventFilter(QObject *, QEvent *event) {

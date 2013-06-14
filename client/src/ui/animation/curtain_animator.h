@@ -1,6 +1,7 @@
 #ifndef QN_CURTAIN_ANIMATOR_H
 #define QN_CURTAIN_ANIMATOR_H
 
+#include <QColor>
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 

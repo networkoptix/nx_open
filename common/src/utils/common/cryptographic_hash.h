@@ -6,6 +6,10 @@
 
 class QnCryptographicHashPrivate;
 
+/**
+ * Just like <tt>QCryptographicHash</tt>, but works MUCH faster. 
+ * Uses OpenSSL internally.
+ */
 class QnCryptographicHash {
 public:
     enum Algorithm {
@@ -32,7 +36,5 @@ public:
 private:
     QScopedPointer<QnCryptographicHashPrivate> d;
 };
-
-
 
 #endif // QN_CRYPTOGRAPHIC_HASH_H

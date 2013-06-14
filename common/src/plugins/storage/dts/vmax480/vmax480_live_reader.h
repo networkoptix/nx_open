@@ -5,6 +5,9 @@
 #include "core/resource/resource_fwd.h"
 #include "vmax480_stream_fetcher.h"
 
+#include <QElapsedTimer>
+
+
 class QnVMax480ConnectionProcessor;
 class VMaxStreamFetcher;
 
@@ -27,11 +30,14 @@ protected:
     virtual void beforeRun() override;
     virtual void afterRun() override;
 
+    virtual bool canChangeStatus() const override;
+
 private:
     QnNetworkResourcePtr m_networkRes;
 
     VMaxStreamFetcher* m_maxStream;
     bool m_opened;
+    QElapsedTimer m_lastMediaTimer;
     //QnVMax480ConnectionProcessor* m_processor;
 };
 

@@ -2,6 +2,7 @@
 #include "ui_ptz_presets_dialog.h"
 
 #include <QtGui/QPushButton>
+#include <QStandardItem>
 
 #include <core/resource/camera_resource.h>
 
@@ -128,7 +129,7 @@ void QnPtzPresetsDialog::at_activateButton_clicked() {
     if(!item)
         return;
 
-    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(m_camera).withArgument(Qn::NameParameter, item->text()));
+    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(m_camera).withArgument(Qn::ResourceNameRole, item->text()));
 }
 
 

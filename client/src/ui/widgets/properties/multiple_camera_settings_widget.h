@@ -11,6 +11,8 @@ namespace Ui {
     class MultipleCameraSettingsWidget;
 }
 
+class QnCameraSettingsWidgetPrivate;
+
 class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -36,8 +38,13 @@ public:
     }
 
     /** Checks if user changed controls but not applied them to the schedule */
-    bool hasControlsChanges() const {
-        return m_hasControlsChanges;
+    bool hasScheduleControlsChanges() const {
+        return m_hasScheduleControlsChanges;
+    }
+
+    /** Clear flag that user changed schedule controls but not applied them */
+    void clearScheduleControlsChanges() {
+        m_hasScheduleControlsChanges = false;
     }
 
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
@@ -74,11 +81,15 @@ private slots:
 
     void updateMaxFPS();
     void updateLicenseText();
+protected:
+    QnCameraSettingsWidgetPrivate* d_ptr;
+
 private:
     void setHasDbChanges(bool hasChanges);
 
 private:
     Q_DISABLE_COPY(QnMultipleCameraSettingsWidget)
+    Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
     QnVirtualCameraResourceList m_cameras;
@@ -87,7 +98,7 @@ private:
     bool m_hasScheduleEnabledChanges;
 
     /** Indicates that the user changed controls but not applied them to the schedule */
-    bool m_hasControlsChanges;
+    bool m_hasScheduleControlsChanges;
 
     bool m_readOnly;
     bool m_inUpdateMaxFps;

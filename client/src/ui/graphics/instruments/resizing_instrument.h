@@ -6,7 +6,7 @@
 
 #include "drag_processing_instrument.h"
 
-class ConstrainedResizable;
+class ConstrainedGeometrically;
 class ResizeHoverInstrument;
 class ResizingInstrument;
 
@@ -14,14 +14,20 @@ class ResizingInfo {
 public:
     Qt::WindowFrameSection frameSection() const;
 
+    QPoint mouseScreenPos() const;
+    QPoint mouseViewportPos() const;
+    QPointF mouseScenePos() const;
+
 protected:
     friend class ResizingInstrument;
 
-    ResizingInfo(ResizingInstrument *instrument): m_instrument(instrument) {}
+    ResizingInfo(DragInfo *info, ResizingInstrument *instrument): m_info(info), m_instrument(instrument) {}
 
 private:
+    DragInfo *m_info;
     ResizingInstrument *m_instrument;
 };
+
 
 /**
  * This instrument implements resizing of QGraphicsWidget. 
@@ -51,24 +57,22 @@ public:
     ResizingInstrument(QObject *parent = NULL);
     virtual ~ResizingInstrument();
 
-    ResizeHoverInstrument *resizeHoverInstrument() const {
-        return m_resizeHoverInstrument;
+    Instrument *resizeHoverInstrument() const;
+
+    qreal effectRadius() const {
+        return m_effectRadius;
     }
 
-    int effectiveDistance() const {
-        return m_effectiveDistance;
-    }
-
-    void setEffectiveDistance(int effectiveDistance) {
-        m_effectiveDistance = effectiveDistance;
+    void setEffectRadius(qreal effectRadius) {
+        m_effectRadius = effectRadius;
     }
 
 signals:
-    void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
-    void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void resizing(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
 
 protected:
     virtual void enabledNotify() override;
@@ -87,14 +91,14 @@ private:
     friend class ResizingInfo;
 
     ResizeHoverInstrument *m_resizeHoverInstrument;
-    int m_effectiveDistance;
+    qreal m_effectRadius;
     QPointF m_startPinPoint;
     QSizeF m_startSize;
     QTransform m_startTransform;
     bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;
     QWeakPointer<QGraphicsWidget> m_widget;
-    ConstrainedResizable *m_resizable;
+    ConstrainedGeometrically *m_constrained;
 };
 
 #endif // QN_RESIZING_INSTRUMENT_H

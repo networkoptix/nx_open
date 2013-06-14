@@ -16,12 +16,7 @@ bool QnPlPulseResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-bool QnPlPulseResource::updateMACAddress()
-{
-    return true;
-}
-
-QString QnPlPulseResource::manufacture() const
+QString QnPlPulseResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }

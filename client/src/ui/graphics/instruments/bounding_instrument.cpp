@@ -141,9 +141,9 @@ namespace {
 
 class BoundingInstrument::ViewData: protected QnSceneTransformations {
 public:
-    ViewData(): m_view(NULL) {}
-
-    ViewData(QGraphicsView *view): m_view(NULL) {
+    ViewData(): 
+        m_view(NULL) 
+    {
         qreal d = 1.0e3;
         setPositionBounds(QRectF(QPointF(-d, -d), QPointF(d, d)));
         setPositionBoundsExtension(MarginsF(0.0, 0.0, 0.0, 0.0));
@@ -153,7 +153,7 @@ public:
         setScalingSpeed(1.0);
         setPositionEnforced(false);
         setSizeEnforced(false);
-        setView(view);
+        setView(NULL);
 
         m_isSizeCorrected = false;
         m_isPositionCorrected = true;
@@ -523,7 +523,7 @@ public:
 BoundingInstrument::BoundingInstrument(QObject *parent):
     Instrument(Viewport, makeSet(QEvent::Paint, AnimationEvent::Animation), parent)
 {
-    m_data[NULL] = new ViewData(NULL);
+    m_data[NULL] = new ViewData();
 }
 
 BoundingInstrument::~BoundingInstrument() {

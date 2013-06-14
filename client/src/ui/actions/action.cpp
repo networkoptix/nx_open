@@ -15,7 +15,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h> // TODO: this one does not belong here.
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include "action_manager.h"
 #include "action_target_provider.h"
@@ -41,19 +41,19 @@ QnAction::~QnAction() {
 
 
 void QnAction::setRequiredPermissions(Qn::Permissions requiredPermissions) {
-    setRequiredPermissions(QString(), requiredPermissions);
+    setRequiredPermissions(-1, requiredPermissions);
 }
 
-void QnAction::setRequiredPermissions(const QString &target, Qn::Permissions requiredPermissions) {
+void QnAction::setRequiredPermissions(int target, Qn::Permissions requiredPermissions) {
     m_permissions[target].required = requiredPermissions;
 }
 
-void QnAction::setForbiddenPermissions(const QString &target, Qn::Permissions forbiddenPermissions) {
+void QnAction::setForbiddenPermissions(int target, Qn::Permissions forbiddenPermissions) {
     m_permissions[target].forbidden = forbiddenPermissions;
 }
 
 void QnAction::setForbiddenPermissions(Qn::Permissions forbiddenPermissions) {
-    setForbiddenPermissions(QString(), forbiddenPermissions);
+    setForbiddenPermissions(-1, forbiddenPermissions);
 }
 
 void QnAction::setFlags(Qn::ActionFlags flags) {
@@ -127,7 +127,7 @@ void QnAction::setToolTipFormat(const QString &toolTipFormat) {
 
 Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const {
     if(!isVisible())
-        return Qn::InvisibleAction; // TODO: cheat!
+        return Qn::InvisibleAction; // TODO: #Elric cheat!
 
     if(!(this->scope() & scope) && scope != this->scope())
         return Qn::InvisibleAction;
@@ -151,21 +151,21 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
         return Qn::InvisibleAction;
 
     if(!m_permissions.empty()) {
-        for(QHash<QString, Permissions>::const_iterator pos = m_permissions.begin(), end = m_permissions.end(); pos != end; pos++) {
-            const QString &key = pos.key();
+        for(QHash<int, Permissions>::const_iterator pos = m_permissions.begin(), end = m_permissions.end(); pos != end; pos++) {
+            int key = pos.key();
             Qn::Permissions required = pos->required;
             Qn::Permissions forbidden = pos->forbidden;
 
             QnResourceList resources;
             if(parameters.hasArgument(key)) {
                 resources = QnActionParameterTypes::resources(parameters.argument(key));
-            } else if(key == Qn::CurrentLayoutParameter) {
+            } else if(key == Qn::CurrentLayoutResourceRole) {
                 resources.push_back(context()->workbench()->currentLayout()->resource());
-            } else if(key == Qn::CurrentUserParameter) {
+            } else if(key == Qn::CurrentUserResourceRole) {
                 resources.push_back(context()->user());
-            } else if(key == Qn::AllMediaServersParameter) {
+            } else if(key == Qn::CurrentMediaServerResourcesRole) {
                 resources = context()->resourcePool()->getResources().filtered<QnMediaServerResource>();
-            } else if(key == Qn::CurrentLayoutMediaItemsParameter) {
+            } else if(key == Qn::CurrentLayoutMediaItemsRole) {
                 resources = QnActionParameterTypes::resources(context()->display()->widgets()).filtered<QnMediaResource>();
             }
 
@@ -215,11 +215,11 @@ bool QnAction::event(QEvent *event) {
         QnActionTargetProvider *targetProvider = QnWorkbenchContextAware::menu()->targetProvider();
         if(targetProvider != NULL) {
             if(flags() & Qn::ScopelessHotkey) {
-                parameters.setItems(targetProvider->currentTarget(static_cast<Qn::ActionScope>(static_cast<int>(scope()))));
+                parameters = targetProvider->currentParameters(static_cast<Qn::ActionScope>(static_cast<int>(scope())));
             } else {
                 Qn::ActionScope scope = targetProvider->currentScope();
                 if(this->scope() & scope)
-                    parameters.setItems(targetProvider->currentTarget(scope));
+                    parameters = targetProvider->currentParameters(scope);
             }
         }
 

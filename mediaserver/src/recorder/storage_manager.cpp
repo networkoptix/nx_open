@@ -10,8 +10,33 @@
 #include "core/resource/camera_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
+static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
+
+class TestStorageThread: public QnLongRunnable
+{
+public:
+    TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
+    virtual void run() override
+    {
+        QnStorageManager::StorageMap storageRoots = m_owner->getAllStorages();
+
+        for (QnStorageManager::StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+        {
+            if (needToStop())
+                break;
+            QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+            QnResource::Status status = fileStorage->isStorageAvailable() ? QnResource::Online : QnResource::Offline;
+            if (fileStorage->getStatus() != status)
+                m_owner->changeStorageStatus(fileStorage, status);
+        }
+    }
+private:
+    QnStorageManager* m_owner;
+};
+
+TestStorageThread* QnStorageManager::m_testStorageThread;
 
 // -------------------- QnStorageManager --------------------
 
@@ -23,9 +48,12 @@ QnStorageManager::QnStorageManager():
     m_storagesStatisticsReady(false),
     m_catalogLoaded(false),
     m_warnSended(false),
-    m_isWritableStorageAvail(false),
-    m_bigStorageExists(false)
+    m_isWritableStorageAvail(false)
+
 {
+    m_lastTestTime.restart();
+    m_storageWarnTimer.restart();
+    m_testStorageThread = new TestStorageThread(this);
 }
 
 void QnStorageManager::loadFullFileCatalog()
@@ -215,7 +243,7 @@ void QnStorageManager::removeAbsentStorages(QnAbstractStorageResourceList newSto
 
 QnStorageManager::~QnStorageManager()
 {
-
+    stopAsyncTasks();
 }
 
 QnStorageManager* QnStorageManager::instance()
@@ -258,6 +286,17 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras,
         }
     }
 }
+
+bool QnStorageManager::isArchiveTimeExists(const QString& physicalId, qint64 timeMs)
+{
+    DeviceFileCatalogPtr catalog = getFileCatalog(physicalId, QnResource::Role_LiveVideo);
+    if (catalog && catalog->containTime(timeMs))
+        return true;
+
+    catalog = getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo);
+    return catalog && catalog->containTime(timeMs);
+}
+
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
@@ -375,14 +414,10 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 }
 
-qint64 QnStorageManager::minSpaceForWritting() const
-{
-    return m_bigStorageExists ? BIG_STORAGE_THRESHOLD : 0;
-}
-
 QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 {
     QSet<QnStorageResourcePtr> result;
+    QSet<QnStorageResourcePtr> smallStorages;
 
     for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
@@ -390,12 +425,45 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
         if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-            if (available > minSpaceForWritting())
+            if (available > BIG_STORAGE_THRESHOLD)
                 result << fileStorage;
+            else
+                smallStorages << fileStorage;
         }
     }
+    if (result.isEmpty())
+        return smallStorages; // try small storages if no big storages
+    else
+        return result;
+}
 
-    return result;
+void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status)
+{
+    QMutexLocker lock(&m_mutexStorages);
+    fileStorage->setStatus(status);
+    m_storagesStatisticsReady = false;
+    if (status == QnResource::Offline)
+        emit storageFailure(fileStorage);
+}
+
+void QnStorageManager::testOfflineStorages()
+{
+    QMutexLocker lock(&m_mutexStorages);
+
+    if (m_lastTestTime.elapsed() < OFFLINE_STORAGES_TEST_INTERVAL || m_testStorageThread->isRunning())
+        return;
+
+    m_testStorageThread->start();
+    m_lastTestTime.restart();
+}
+
+void QnStorageManager::stopAsyncTasks()
+{
+    if (m_testStorageThread) {
+        m_testStorageThread->stop();
+        delete m_testStorageThread;
+        m_testStorageThread = 0;
+    }
 }
 
 void QnStorageManager::updateStorageStatistics()
@@ -407,13 +475,11 @@ void QnStorageManager::updateStorageStatistics()
     double totalSpace = 0;
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
     m_isWritableStorageAvail = !storages.isEmpty();
-    m_bigStorageExists = false;
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
-        m_bigStorageExists |= storageSpace > BIG_STORAGE_THRESHOLD;
     }
 
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
@@ -433,6 +499,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     QnStorageResourcePtr result;
     float minBitrate = (float) INT_MAX;
 
+    testOfflineStorages();
     updateStorageStatistics();
 
     QVector<QPair<float, QnStorageResourcePtr> > bitrateInfo;
@@ -502,7 +569,10 @@ void QnStorageManager::putFileNumToCache(const QString& base, int fileNum)
 QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr camera, const QString& prefix, QnStorageResourcePtr& storage)
 {
     if (!storage) {
-        qWarning() << "No disk storages";
+        if (m_storageWarnTimer.elapsed() > 5000) {
+            qWarning() << "No disk storages";
+            m_storageWarnTimer.restart();
+        }
         return QString();
     }
     Q_ASSERT(camera != 0);
@@ -623,10 +693,4 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
         return false;
     catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QFileInfo(fileName).baseName().toInt(), -1, (qint16) timeZone));
     return true;
-}
-
-qint64 QnStorageManager::isBigStorageExists() const 
-{
-    QMutexLocker lock(&m_mutexStorages);
-    return m_bigStorageExists; 
 }

@@ -2,11 +2,13 @@
 
 #include <cassert>
 
+#include <QtCore/QDate>
 #include <QtGui/QApplication>
 #include <QtGui/QPainter>
+#include <QtGui/QMouseEvent>
 
 #include "ui/style/globals.h"
-#include "utils/settings.h"
+#include "client/client_settings.h"
 #include "utils/math/color_transformations.h"
 
 namespace {

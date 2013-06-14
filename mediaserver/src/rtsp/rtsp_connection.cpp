@@ -406,7 +406,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
     const QnResourceVideoLayout* layout = d->mediaRes->getVideoLayout(currentDP.data());
-    return layout ? layout->numberOfChannels() : -1;
+    return layout ? layout->channelCount() : -1;
 }
 
 QString QnRtspConnectionProcessor::getRangeStr()
@@ -469,7 +469,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     }
 };
 
-QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractMediaDataPtr media, QSize resolution)
+QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout)
 {
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
@@ -509,7 +509,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
         case CODEC_ID_VP8:
         case CODEC_ID_ADPCM_G722:
         case CODEC_ID_ADPCM_G726:
-            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution)); // transcode src codec to MPEG4/AAC
+            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, vLayout)); // transcode src codec to MPEG4/AAC
             if (universalEncoder->isOpened())
                 return universalEncoder;
             else
@@ -550,7 +550,7 @@ QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaD
         return rez;
     if (d->startTime != DATETIME_NOW)
         archive.seek(d->startTime, true);
-    if (archive.getAudioLayout()->numberOfChannels() == 0 && dataType == QnAbstractMediaData::AUDIO)
+    if (archive.getAudioLayout()->channelCount() == 0 && dataType == QnAbstractMediaData::AUDIO)
         return rez;
 
     for (int i = 0; i < 20; ++i)
@@ -593,10 +593,10 @@ int QnRtspConnectionProcessor::composeDescribe()
     else {
         const QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
         if (audioLayout)
-            numAudio = audioLayout->numberOfChannels();
+            numAudio = audioLayout->channelCount();
     }
 
-    int numVideo = videoLayout ? videoLayout->numberOfChannels() : 1;
+    int numVideo = videoLayout && d->useProprietaryFormat ? videoLayout->channelCount() : 1;
 
     addResponseRangeHeader();
 
@@ -625,7 +625,7 @@ int QnRtspConnectionProcessor::composeDescribe()
             QnAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
             if (media) 
             {
-                encoder = createEncoderByMediaData(media, d->transcodedVideoSize);
+                encoder = createEncoderByMediaData(media, d->transcodedVideoSize, d->mediaRes->getVideoLayout(d->getCurrentDP().data()));
                 if (encoder)
                     encoder->setMediaData(media);
                 else 
@@ -713,10 +713,10 @@ int QnRtspConnectionProcessor::composeSetup()
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
     const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
-    if (trackId >= videoLayout->numberOfChannels()) {
+    if (trackId >= videoLayout->channelCount()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         if (d->archiveDP)
-            d->archiveDP->setAudioChannel(trackId - videoLayout->numberOfChannels());
+            d->archiveDP->setAudioChannel(trackId - videoLayout->channelCount());
     }
 
     if (trackId >= 0)
@@ -927,7 +927,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks()
 
     const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
     int trackNum = 0;
-    for (; trackNum < videoLayout->numberOfChannels(); ++trackNum)
+    for (; trackNum < videoLayout->channelCount(); ++trackNum)
     {
         RtspServerTrackInfoPtr vTrack(new RtspServerTrackInfo());
         vTrack->encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());
@@ -963,8 +963,8 @@ int QnRtspConnectionProcessor::composePlay()
         d->clientGuid = d->requestHeaders.value("x-guid").toUtf8();
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
-        d->socket->setReadTimeOut(LARGE_RTSP_TIMEOUT);
-        d->socket->setWriteTimeOut(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
+        //d->socket->setReadTimeOut(LARGE_RTSP_TIMEOUT);
+        //d->socket->setWriteTimeOut(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
         createPredefinedTracks();
     }
 
@@ -984,6 +984,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor = new QnRtspDataConsumer(this);
         d->dataProcessor->pauseNetwork();
         d->dataProcessor->setUseRealTimeStreamingMode(!d->useProprietaryFormat);
+        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
     }
     else 
         d->dataProcessor->clearUnprocessedData();
@@ -1279,10 +1280,13 @@ int QnRtspConnectionProcessor::isFullBinaryMessage(const QByteArray& data)
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
+
+    saveSysThreadID();
+
     //d->socket->setNoDelay(true);
     d->socket->setSendBufferSize(16*1024);
-    d->socket->setReadTimeOut(1000*1000);
-    d->socket->setWriteTimeOut(1000*1000);
+    //d->socket->setReadTimeOut(1000*1000);
+    //d->socket->setWriteTimeOut(1000*1000);
 
     if (!d->clientRequest.isEmpty()) {
         parseRequest();
@@ -1331,8 +1335,11 @@ void QnRtspConnectionProcessor::run()
         }
     }
 
+    t.restart();
+
     d->deleteDP();
     d->socket->close();
+
     d->trackInfo.clear();
     //deleteLater(); // does not works for this thread
 }

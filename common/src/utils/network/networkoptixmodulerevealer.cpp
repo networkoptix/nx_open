@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include <QDateTime>
+
 #include "socket.h"
 #include "../common/log.h"
 #include "../common/systemerror.h"
@@ -25,7 +27,7 @@ NetworkOptixModuleRevealer::NetworkOptixModuleRevealer(
     m_revealResponse.version = moduleVersion;
     m_revealResponse.typeSpecificParameters = moduleSpecificParameters;
     //generating random seed
-    m_revealResponse.seed = QString::fromAscii("%1_%2_%3").arg(QCoreApplication::applicationPid()).arg(rand()).arg(QDateTime::currentMSecsSinceEpoch());
+    m_revealResponse.seed = QString::fromAscii("%1_%2_%3").arg(QCoreApplication::applicationPid()).arg(qrand()).arg(QDateTime::currentMSecsSinceEpoch());
 
     const QList<QHostAddress>& interfaceAddresses = QNetworkInterface::allAddresses();
     for( QList<QHostAddress>::const_iterator
@@ -84,6 +86,7 @@ static const unsigned int MULTICAST_GROUP_JOIN_TIMEOUT_MS = 60000;
 
 void NetworkOptixModuleRevealer::run()
 {
+    saveSysThreadID();
     cl_log.log( QString::fromAscii("NetworkOptixModuleRevealer started"), cl_logDEBUG1 );
 
     static const unsigned int REVEAL_PACKET_RESPONSE_LENGTH = 256;

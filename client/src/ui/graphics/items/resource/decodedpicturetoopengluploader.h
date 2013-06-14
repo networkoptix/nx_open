@@ -19,7 +19,6 @@
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/common/safepool.h>
 #include <utils/common/stoppable.h>
-#include <utils/gl/glcontext.h>
 #include <ui/graphics/opengl/gl_fence.h>
 #include <utils/media/frame_info.h>
 
@@ -28,13 +27,13 @@
 #include "aggregationsurface.h"
 #define UPLOAD_TO_GL_IN_GUI_THREAD
 #endif
+#include "utils/color_space/image_correction.h"
 
 
 class AsyncPicDataUploader;
 class CLVideoDecoderOutput;
 class DecodedPictureToOpenGLUploaderPrivate;
 class DecodedPictureToOpenGLUploadThread;
-class GLContext;
 class QnGlRendererTexture;
 class AVPacketUploader;
 
@@ -91,7 +90,9 @@ public:
         void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
         const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
 #endif
+        void processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data);
 
+        const ImageCorrectionResult& imageCorrectionResult() const;
     private:
         struct PBOData
         {
@@ -101,13 +102,13 @@ public:
             PBOData();
         };
 
-        static const size_t TEXTURE_COUNT = 3;
+        static const size_t MAX_TEXTURE_COUNT = 4;
 
         PixelFormat m_colorFormat;
         int m_width;
         int m_height;
         mutable std::vector<GLuint> m_picTextures;
-        QScopedPointer<QnGlRendererTexture> m_textures[TEXTURE_COUNT];
+        QScopedPointer<QnGlRendererTexture> m_textures[MAX_TEXTURE_COUNT];
         unsigned int m_sequence;
         quint64 m_pts;
         QnMetaDataV1Ptr m_metadata;
@@ -118,6 +119,8 @@ public:
         bool m_skippingForbidden;
         int m_flags;
         GLFence m_glFence;
+        ImageCorrectionResult m_imgCorrection;
+        QRectF m_displayedRect;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
@@ -169,7 +172,8 @@ public:
         \note Method does not save reference to \a decodedPicture, but it can save reference to \a decodedPicture->picData. 
             As soon as uploader is done with \a decodedPicture->picData it releases reference to it
     */
-    void uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture );
+    void uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture, const QRectF displayedRect = QRectF(0.0, 0.0, 1.0, 1.0));
+    bool isUsingFrame( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
     //!Returns latest uploaded picture. Used by GUI thread
     /*!
         \return Uploaded picture data, NULL if no picture. Returned object memory is managed by \a DecodedPictureToOpenGLUploader, and MUST NOT be deleted
@@ -179,7 +183,12 @@ public:
     quint64 nextFrameToDisplayTimestamp() const;
     //!Blocks until all submitted frames have been rendered
     void waitForAllFramesDisplayed();
+    //!Marks all posted frames as non-ignorable
     void ensureAllFramesWillBeDisplayed();
+    //!Clears display queue
+    /*!
+        This method will not block if called from GUI thread. Otherwise, it can block till GUI thread finishes rendering of a picture
+    */
     void discardAllFramesPostedToDisplay();
     //!Blocks till frame currently being rendered is done
     void waitForCurrentFrameDisplayed();
@@ -205,6 +214,9 @@ public:
     void pictureDataUploadFailed( AsyncPicDataUploader* const uploader, UploadedPicture* const picture );
     //!Uploader calles this method, if picture uploading has been cancelled from outside
     void pictureDataUploadCancelled( AsyncPicDataUploader* const uploader );
+
+    void setImageCorrection(const ImageCorrectionParams& value);
+    ImageCorrectionParams getImageCorrection() const;
 
     //!Loads picture with dat stored in \a planes to opengl \a dest
     /*!
@@ -234,7 +246,6 @@ public:
         int lineSizes[],
         bool /*isVideoMemory*/ );
 #endif
-
 private:
     friend class QnGlRendererTexture;
     friend class DecodedPicturesDeleter;
@@ -257,12 +268,16 @@ private:
     bool m_terminated;
     bool m_yv12SharedUsed;
     bool m_nv12SharedUsed;
-    mutable std::deque<AsyncPicDataUploader*> m_unusedUploaders;
-    std::deque<AsyncPicDataUploader*> m_usedUploaders;
+    mutable std::deque<AsyncPicDataUploader*> m_unusedAsyncUploaders;
+    std::deque<AsyncPicDataUploader*> m_usedAsyncUploaders;
     QSharedPointer<DecodedPictureToOpenGLUploadThread> m_uploadThread;
     quint8* m_rgbaBuf;
     int m_fileNumber;
     bool m_hardwareDecoderUsed;
+    bool m_asyncUploadUsed;
+    QGLContext* m_initializedCtx;
+    
+    ImageCorrectionParams m_imageCorrection;
 
     bool usingShaderYuvToRgb() const;
     bool usingShaderNV12ToRgb() const;
@@ -274,7 +289,11 @@ private:
         unsigned int pboIndex,
         size_t sizeInBytes );
     void releasePictureBuffers();
+    void releasePictureBuffersNonSafe();
     void savePicToFile( AVFrame* const pic, int pts );
+    //!m_mutex MUST be locked before this call
+    void cancelUploadingInGUIThread();
+
 };
 
 #endif  //DECODEDPICTURETOOPENGLUPLOADER_H

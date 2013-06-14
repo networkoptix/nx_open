@@ -7,6 +7,7 @@
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
+#include <QMessageBox>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QSpacerItem>

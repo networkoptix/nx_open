@@ -2,8 +2,17 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
+#include <utils/math/math.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+
+//#define QN_TIME_PERIOD_LOADER_DEBUG
+
+#ifdef QN_TIME_PERIOD_LOADER_DEBUG
+#   define TRACE(...) qDebug() << __VA_ARGS__
+#else
+#   define TRACE(...)
+#endif
 
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
@@ -113,7 +122,7 @@ void QnTimePeriodLoader::discardCachedData() {
 
 int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
 {
-    return m_connection->asyncRecordedTimePeriods(
+    return m_connection->getTimePeriodsAsync(
         QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
         periodToLoad.startTimeMs, 
         periodToLoad.startTimeMs + periodToLoad.durationMs, 
@@ -126,7 +135,7 @@ int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
 
 void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle)
 {
-    // TODO: I don't see a mutex here.
+    // TODO: #Elric I don't see a mutex here.
 
     for (int i = 0; i < m_loading.size(); ++i)
     {
@@ -137,15 +146,15 @@ void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &ti
                 {
                     QVector<QnTimePeriodList> allPeriods;
                     if (!timePeriods.isEmpty() && !m_loadedData.isEmpty() && m_loadedData.last().durationMs == -1) 
-                    {
-                        if (timePeriods.last().startTimeMs >= m_loadedData.last().startTimeMs)
+                        if (timePeriods.last().startTimeMs >= m_loadedData.last().startTimeMs) // TODO: #Elric should be timePeriods.last().startTimeMs?
                             m_loadedData.last().durationMs = 0;
-                    }
                     allPeriods << m_loadedData << timePeriods;
                     m_loadedData = QnTimePeriod::mergeTimePeriods(allPeriods); // union data
 
                     QnTimePeriod loadedPeriod = m_loading[i].period;
-                    loadedPeriod.durationMs = qMax(0ll, loadedPeriod.durationMs - 60 * 1000); /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: cut off near live only
+                    loadedPeriod.durationMs -= 60 * 1000; /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: #Elric cut off near live only
+                    if(!m_loadedData.isEmpty())
+                        loadedPeriod.durationMs = qMin(loadedPeriod.durationMs, m_loadedData.back().startTimeMs - loadedPeriod.startTimeMs);
                     if(loadedPeriod.durationMs > 0) {
                         QnTimePeriodList loadedPeriods;
                         loadedPeriods.push_back(loadedPeriod);
@@ -182,5 +191,11 @@ void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &ti
             break;
         }
     }
+
+    TRACE(
+        "CHUNKS LOADED FOR" << resource()->getName() << 
+        "LOADED END =" << (m_loadedPeriods.isEmpty() ? 0 : m_loadedPeriods.back().endTimeMs()) <<
+        "DATA END =" << (m_loadedData.isEmpty() ? 0 : m_loadedData.back().endTimeMs())
+    );
 }
 

@@ -3,6 +3,9 @@
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
+#include <QtCore/QString>
+
+#include <utils/math/limits.h> /* For INT64_MAX. */
 
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
@@ -14,13 +17,10 @@
     extern const QMetaObject &getStaticMetaObject();                            \
 
 
-namespace QnCommonGlobals {}
-namespace Qn { using namespace QnCommonGlobals; }
-
 #ifdef Q_MOC_RUN
-class QnCommonGlobals
+class Qn
 #else
-namespace QnCommonGlobals
+namespace Qn
 #endif
 {
 #ifdef Q_MOC_RUN
@@ -31,6 +31,35 @@ public:
 #else
     Q_NAMESPACE
 #endif
+
+    /**
+     * Generic enumeration describing borders of a rectangle.
+     */
+    enum Border {
+        NoBorders = 0,
+        LeftBorder = 0x1,
+        RightBorder = 0x2,
+        TopBorder = 0x4,
+        BottomBorder = 0x8,
+        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
+    };
+    Q_DECLARE_FLAGS(Borders, Border)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
+
+
+    /**
+     * Generic enumeration describing corners of a rectangle.
+     */
+    enum Corner {
+        NoCorner = 0,
+        TopLeftCorner = 0x1,
+        TopRightCorner = 0x2,
+        BottomLeftCorner = 0x4,
+        BottomRightCorner = 0x8,
+        AllCorners = TopLeftCorner | TopRightCorner | BottomLeftCorner | BottomRightCorner
+    };
+    Q_DECLARE_FLAGS(Corners, Corner)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Corners)
 
     enum ExtrapolationMode {
         ConstantExtrapolation,
@@ -94,6 +123,62 @@ public:
     };
     Q_DECLARE_FLAGS(MotionTypes, MotionType);
 
-} // namespace QnCommonGlobals
+
+    enum TimePeriodType {
+        NullTimePeriod      = 0x1,  /**< No period. */
+        EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
+        NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
+    };
+    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
+
+    enum TimePeriodContent {
+        RecordingContent,
+        MotionContent,
+        TimePeriodContentCount
+    };
+
+    enum ToggleState {
+        OffState,
+        OnState,
+        UndefinedState /**< Also used in event rule to associate non-toggle action with event with any toggle state. */
+    };
+
+    /**
+     * Invalid value for a timezone UTC offset.
+     */
+    static const qint64 InvalidUtcOffset = INT64_MAX;
+#define InvalidUtcOffset InvalidUtcOffset
+
+
+    /** 
+     * Helper function that can be used to 'place' macros into Qn namespace. 
+     */
+    template<class T>
+    const T &_id(const T &value) { return value; }
+
+} // namespace Qn
+
+
+/** Helper function to mark strings that are not to be translated. */
+inline QString lit(const QByteArray &data) {
+    return QLatin1String(data);
+}
+
+/** Helper function to mark strings that are not to be translated. */
+inline QString lit(const char *s) {
+    return QLatin1String(s);
+}
+
+/** Helper function to mark characters that are not to be translated. */
+inline QChar lit(char c) {
+    return QLatin1Char(c);
+}
+
+
+Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
+Q_DECLARE_METATYPE(Qn::TimePeriodType);
+Q_DECLARE_METATYPE(Qn::TimePeriodContent);
+
 
 #endif // QN_COMMON_GLOBALS_H

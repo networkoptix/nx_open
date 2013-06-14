@@ -1,6 +1,8 @@
 #ifndef onvif_soap_wrapper_h
 #define onvif_soap_wrapper_h
 
+#include <QSharedPointer>
+
 #include "onvif_helper.h"
 
 struct soap;
@@ -286,7 +288,7 @@ class DeviceSoapWrapper: public SoapWrapper<DeviceBindingProxy>
 
 public:
 
-    //TODO:UTF unuse std::string
+    //TODO: #vasilenko UTF unuse std::string
     DeviceSoapWrapper(
         const std::string& endpoint,
         const std::string& login,

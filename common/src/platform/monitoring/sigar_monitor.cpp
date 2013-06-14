@@ -2,10 +2,16 @@
 
 #include <cassert>
 
+#include <QtCore/QElapsedTimer>
+#include <QStringList>
+
 #include <utils/common/warnings.h>
 
-#include <sigar.h>
-#include <sigar_format.h>
+extern "C"
+{
+    #include <sigar.h>
+    #include <sigar_format.h>
+}
 
 #ifdef _MSC_VER
 #   pragma comment(lib, "sigar.lib")
@@ -70,33 +76,94 @@ public:
         return result;
     }
 
-    QnPlatformMonitor::PartitionSpace partitionUsage(const QString &path) {
+    QnPlatformMonitor::PartitionType partitionType(sigar_file_system_type_e type) {
+        switch(type) {
+        case SIGAR_FSTYPE_LOCAL_DISK:
+            return QnPlatformMonitor::LocalDiskPartition;
+        case SIGAR_FSTYPE_NETWORK:
+            return QnPlatformMonitor::NetworkPartition;
+        case SIGAR_FSTYPE_RAM_DISK:
+            return QnPlatformMonitor::RamDiskPartition;
+        case SIGAR_FSTYPE_CDROM:
+            return QnPlatformMonitor::OpticalDiskPartition;
+        case SIGAR_FSTYPE_SWAP:
+            return QnPlatformMonitor::SwapPartition;
+        case SIGAR_FSTYPE_UNKNOWN:
+        case SIGAR_FSTYPE_NONE:
+        default:
+            return QnPlatformMonitor::UnknownPartition;
+        }
+    }
+
+    QnPlatformMonitor::PartitionSpace partitionUsage(const sigar_file_system_t &fileSystem) {
         QnPlatformMonitor::PartitionSpace result;
 
         if(!sigar)
             return result;
 
         sigar_file_system_usage_t usage;
-        if(INVOKE(sigar_file_system_usage_get(sigar, path.toLatin1().constData(), &usage)) != SIGAR_OK)
+        if(INVOKE(sigar_file_system_usage_get(sigar, fileSystem.dir_name, &usage)) != SIGAR_OK)
             return result;
 
-        result.path = path; // TODO
+        result.path = QLatin1String(fileSystem.dir_name);
         result.freeBytes = usage.free * 1024;
         result.sizeBytes = usage.total * 1024;
+        result.type = partitionType(fileSystem.type);
 
         return result;
     }
 
+    QnPlatformMonitor::NetworkLoad networkLoad(const QString &interfaceName) {
+        QnPlatformMonitor::NetworkLoad result;
+        result.interfaceName = interfaceName;
+
+        if(!sigar)
+            return result;
+
+        sigar_net_interface_stat_t current;
+        if (INVOKE(sigar_net_interface_stat_get(sigar, interfaceName.toLatin1().constData(), &current) != SIGAR_OK))
+            return result;
+
+        if(!lastNetworkStatByInterfaceName.contains(interfaceName)) { /* Is this the first call? */
+            NetworkStat stat;
+            stat.stat = current;
+            stat.timer.start();
+            lastNetworkStatByInterfaceName[interfaceName] = stat;
+            return result;
+        }
+
+        NetworkStat &last = lastNetworkStatByInterfaceName[interfaceName];
+        quint64 elapsed = last.timer.isValid()
+                ? last.timer.elapsed()
+                : 0;
+        result.bytesPerSecIn = elapsed > 0
+                ? qMax(current.rx_bytes - last.stat.rx_bytes, sigar_uint64_t(0)) * 1000 / elapsed
+                : 0;
+        result.bytesPerSecOut = elapsed > 0
+                ? qMax(current.tx_bytes - last.stat.tx_bytes, sigar_uint64_t(0)) * 1000 / elapsed
+                : 0;
+        last.stat = current;
+        last.timer.restart();
+        return result;
+    }
+
+
 private:
     const QnSigarMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
+
+    struct NetworkStat {
+        QElapsedTimer timer;
+        sigar_net_interface_stat_t stat;
+    };
 
 private:
     sigar_t *sigar;
     sigar_cpu_t cpu;
     QHash<QString, sigar_disk_usage_t> lastUsageByHddName;
+    QHash<QString, NetworkStat> lastNetworkStatByInterfaceName;
 
 private:
-    Q_DECLARE_PUBLIC(QnSigarMonitor);
+    Q_DECLARE_PUBLIC(QnSigarMonitor)
     QnSigarMonitor *q_ptr;
 };
 
@@ -196,14 +263,43 @@ QList<QnPlatformMonitor::PartitionSpace> QnSigarMonitor::totalPartitionSpaceInfo
     if(INVOKE(sigar_file_system_list_get(d->sigar, &fileSystems)) != SIGAR_OK)
         return result;
 
-    for(uint i = 0; i < fileSystems.number; i++) {
-        const sigar_file_system_t &fileSystem = fileSystems.data[i];
-        if(fileSystem.type != SIGAR_FSTYPE_LOCAL_DISK)
-            continue; /* Skip non-hdds. */
-
-        result.push_back(d->partitionUsage(QLatin1String(fileSystem.dir_name)));
-    }
+    for(uint i = 0; i < fileSystems.number; i++)
+        result.push_back(d->partitionUsage(fileSystems.data[i]));
 
     INVOKE(sigar_file_system_list_destroy(d->sigar, &fileSystems));
+    return result;
+}
+
+QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
+    Q_D(QnSigarMonitor);
+
+    QList<NetworkLoad> result;
+
+    sigar_net_interface_list_t networkInterfaces;
+
+    if(INVOKE(sigar_net_interface_list_get(d->sigar, &networkInterfaces)) != SIGAR_OK)
+        return result;
+
+    QStringList interfacesNames;
+    for(uint i = 0; i < networkInterfaces.number; i++) {
+        QString interfaceName = QLatin1String(networkInterfaces.data[i]);
+        
+        // remove duplicating entries
+        if (interfacesNames.contains(interfaceName))
+            continue;
+        interfacesNames.append(interfaceName);
+
+        sigar_net_interface_config_t config;
+        if (INVOKE(sigar_net_interface_config_get(d->sigar, interfaceName.toLatin1().constData(), &config) != SIGAR_OK))
+            continue;
+        if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) == 0)
+            continue;
+        if ((config.flags & SIGAR_IFF_LOOPBACK) > 0)
+            continue;
+
+        result.push_back(d->networkLoad(interfaceName));
+    }
+
+    INVOKE(sigar_net_interface_list_destroy(d->sigar, &networkInterfaces));
     return result;
 }

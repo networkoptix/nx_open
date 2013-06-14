@@ -1,4 +1,7 @@
-#include <utils/common/config.h>
+#include <common/config.h>
+#ifdef __cplusplus
+    #include <common/common_globals.h>
+#endif
 
 /* Boost headers. */
 #include <boost/foreach.hpp>

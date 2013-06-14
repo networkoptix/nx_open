@@ -22,6 +22,7 @@ public:
         Servers,
         Layout,
         Camera,
+        Recorder,
         Image,
         Media,
         User,
@@ -31,6 +32,7 @@ public:
         Offline = (QnResource::Offline + 1) << 8,
         Unauthorized = (QnResource::Unauthorized + 1) << 8,
         Online = (QnResource::Online + 1) << 8,
+        Locked = (QnResource::Locked + 1) << 8,
         StatusMask = 0xFF00
     };
     Q_DECLARE_FLAGS(Key, KeyPart);

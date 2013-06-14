@@ -16,7 +16,7 @@ class QnPopupBusinessActionWidget : public QnAbstractBusinessParamsWidget, publi
     typedef QnAbstractBusinessParamsWidget base_type;
     
 public:
-    explicit QnPopupBusinessActionWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnPopupBusinessActionWidget(QWidget *parent = 0);
     ~QnPopupBusinessActionWidget();
     
 protected slots:

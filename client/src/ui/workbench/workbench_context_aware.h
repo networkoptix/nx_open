@@ -72,6 +72,8 @@ protected:
 
     QnWorkbenchNavigator *navigator() const;
 
+    QWidget *mainWindow() const;
+
 private:
     void init(QObject *parent);
     void init(QnWorkbenchContext *context);

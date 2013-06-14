@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export buildlib=${buildLib}
-export QTDIR=`qmake -query QT_INSTALL_PREFIX`
+export QTDIR=`qmake -query QT_INSTALL_LIBS`
 
 if [[ -z $buildlib ]]; then
 

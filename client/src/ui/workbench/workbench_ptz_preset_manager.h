@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <QVector3D>
 
 #include <api/model/kvpair.h>
 #include <core/resource/resource_fwd.h>
@@ -39,9 +40,8 @@ public:
 
 private slots:
     void at_context_userChanged();
-    void at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairList &kvPairs, int handle);
+    void at_presetsLoaded(const QString &value);
 
-    void loadPresets();
     void savePresets();
 
 private:

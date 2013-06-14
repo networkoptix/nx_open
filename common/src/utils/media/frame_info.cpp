@@ -10,7 +10,7 @@ extern "C" {
 #ifdef WIN32
 #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
-#include "libavutil/pixdesc.h"
+#include <libavutil/pixdesc.h>
 #ifdef WIN32
 #undef AVPixFmtDescriptor
 #endif
@@ -83,9 +83,12 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
     if (src->width != dst->width || src->height != dst->height || src->format != dst->format)
     {
         // need to reallocate dst memory
+        //rounding width and height to 32 and 16 bytes respectively
+        const int roundedWidth = (src->width & 0x1f) != 0 ? ((src->width & 0xffffffe0) + 0x20) : src->width;
+        const int roundedHeight = (src->height & 0x0f) != 0 ? ((src->height & 0xfffffff0) + 0x10) : src->height;
         dst->setUseExternalData(false);
-        int numBytes = avpicture_get_size((PixelFormat) src->format, src->width, src->height);
-        avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, src->width, src->height);
+        int numBytes = avpicture_get_size((PixelFormat) src->format, roundedWidth, roundedHeight);
+        avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, roundedWidth, roundedHeight);
 
         dst->width = src->width;
         dst->height = src->height;
@@ -136,7 +139,6 @@ int CLVideoDecoderOutput::getCapacity()
 
 void CLVideoDecoderOutput::copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride,  int src_stride, int height)
 {
-
     for (int i = 0; i < height; ++i)
     {
         memcpy(dst, src, width);
@@ -169,6 +171,23 @@ void CLVideoDecoderOutput::fillRightEdge()
             w >>= descr->log2_chroma_w;
             h >>= descr->log2_chroma_h;
         }
+    }
+}
+
+void CLVideoDecoderOutput::memZerro()
+{
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    quint8 filler = 0;
+    for (int i = 0; i < descr->nb_components && data[i]; ++i)
+    {
+        int w = linesize[i];
+        int h = height;
+        if (i > 0)
+            h >>= descr->log2_chroma_h;
+
+        int bpp = descr->comp[i].step_minus1 + 1;
+        int fillLen = h*w*bpp;
+        memset(data[i], i == 0 ? 0 : 0x80, fillLen);
     }
 }
 

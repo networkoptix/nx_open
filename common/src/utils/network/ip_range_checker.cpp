@@ -1,8 +1,14 @@
+
 #include "ip_range_checker.h"
+
 #include <QTcpSocket>
+#include <QThreadPool>
+#include <QtConcurrentMap>
+
 #include "../common/sleep.h"
 #include "socket.h"
 #include "simple_http_client.h"
+
 
 struct QnIprangeCheckerHelper 
 {

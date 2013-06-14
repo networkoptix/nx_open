@@ -75,7 +75,7 @@ private:
     QMutex m_channelMutex;
     QWaitCondition m_channelCond;
     bool m_channelProcessed;
-    //bool m_pointsNeedFrame;
+    bool m_needStop;
 };
 
 #endif // _VMAX480_READER_H__

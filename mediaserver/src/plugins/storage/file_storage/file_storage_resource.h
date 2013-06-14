@@ -47,6 +47,10 @@ private:
 private:
     // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
     float m_storageBitrateCoeff;
+
+    bool isStorageDirMounted();
+    //!Reads mount points (local dirs) from /etc/fstab or /etc/mtab
+    bool readTabFile( const QString& filePath, QStringList* const mountPoints );
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

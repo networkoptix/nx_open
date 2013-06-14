@@ -7,6 +7,15 @@
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 
+#ifdef _WIN32
+#elif defined(__APPLE__)
+  #include <pthread.h>
+#else
+  #include <sys/types.h>
+  #include <linux/unistd.h>
+  static pid_t gettid(void) { return syscall(__NR_gettid); }
+#endif
+
 
 // -------------------------------------------------------------------------- //
 // QnLongRunnablePoolPrivate
@@ -100,7 +109,8 @@ void QnLongRunnablePool::waitAll() {
 // -------------------------------------------------------------------------- //
 QnLongRunnable::QnLongRunnable(): 
     m_needStop(false),
-    m_onPause(false)
+    m_onPause(false),
+    m_sysThreadID(0)
 {
     DEBUG_CODE(m_type = NULL);
 
@@ -111,7 +121,8 @@ QnLongRunnable::QnLongRunnable():
         connect(this, SIGNAL(started()), this, SLOT(at_started()), Qt::DirectConnection);
         connect(this, SIGNAL(finished()), this, SLOT(at_finished()), Qt::DirectConnection);
     } else {
-        qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
+        // todo: #Roman add QnLongRunnable initialization to mediaServer and mediaProxy
+        //qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
     }
 }
 
@@ -146,6 +157,11 @@ void QnLongRunnable::pauseDelay() {
         m_semaphore.tryAcquire(1, 50);
 }
 
+size_t QnLongRunnable::sysThreadID() const
+{
+    return m_sysThreadID;
+}
+
 void QnLongRunnable::smartSleep(int ms) {
     int n = ms / 100;
 
@@ -165,7 +181,6 @@ void QnLongRunnable::start(Priority priority) {
 
     m_needStop = false;
     QThread::start(priority);
-    assert(isRunning());
 }
 
 void QnLongRunnable::pleaseStop() {
@@ -198,14 +213,13 @@ void QnLongRunnable::at_finished() {
         m_pool->finishedNotify(this);
 }
 
-
-
-
-
-
-
-
-
-
-
-
+void QnLongRunnable::saveSysThreadID()
+{
+#ifdef _WIN32
+    //TODO
+#elif defined(__APPLE__)
+    m_sysThreadID = (size_t)pthread_self();
+#else
+    m_sysThreadID = gettid();
+#endif
+}

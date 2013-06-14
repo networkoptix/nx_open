@@ -5,6 +5,8 @@
 
 #include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QStandardItemModel>
+#include <QKeyEvent>
+#include <QPushButton>
 
 #include "core/resource/resource.h"
 #include "core/resource_managment/resource_pool.h"

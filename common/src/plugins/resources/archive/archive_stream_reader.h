@@ -1,11 +1,15 @@
 #ifndef avi_stream_reader_h1901
 #define avi_stream_reader_h1901
 
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
 #include <QWaitCondition>
 #include "abstract_archive_stream_reader.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
-#include <libavformat/avformat.h>
 #include "playbackmask_helper.h"
 
 struct AVFormatContext;

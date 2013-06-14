@@ -15,7 +15,6 @@
 #include <ui/workbench/workbench_context.h>
 
 //#define QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
-
 #ifdef QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
 #else
@@ -152,11 +151,11 @@ void QnWorkbenchPtzController::sendGetPosition(const QnVirtualCameraResourcePtr 
     if(!server)
         return; // TODO. This really does happen
 
-    int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, const QVector3D &, int)));
-    m_cameraByHandle[handle] = camera;
-
     PtzData &data = m_dataByCamera[camera];
     data.attemptCount[GetPositionRequest]++;
+
+    int handle = server->apiConnection()->ptzGetPosAsync(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, const QVector3D &, int)));
+    m_cameraByHandle[handle] = camera;
 }
 
 void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position) {
@@ -166,12 +165,13 @@ void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr 
 
     TRACE("SENT POSITION" << position);
 
-    int handle = server->apiConnection()->asyncPtzMoveTo(camera, position.x(), position.y(), position.z(), this, SLOT(at_ptzSetPosition_replyReceived(int, int)));
+    PtzData &data = m_dataByCamera[camera];
+    data.sequenceNumber++;
+    data.attemptCount[SetPositionRequest]++;
+
+    int handle = server->apiConnection()->ptzMoveToAsync(camera, position, data.sequenceId, data.sequenceNumber, this, SLOT(at_ptzSetPosition_replyReceived(int, int)));
     m_cameraByHandle[handle] = camera;
     m_requestByHandle[handle] = position;
-
-    PtzData &data = m_dataByCamera[camera];
-    data.attemptCount[SetPositionRequest]++;
 }
 
 void QnWorkbenchPtzController::sendSetMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement) {
@@ -179,17 +179,18 @@ void QnWorkbenchPtzController::sendSetMovement(const QnVirtualCameraResourcePtr 
     if(!server)
         return; // TODO. This really does happen
 
+    PtzData &data = m_dataByCamera[camera];
+    data.sequenceNumber++;
+    data.attemptCount[SetMovementRequest]++;
+
     int handle;
     if(qFuzzyIsNull(movement)) {
-        handle = server->apiConnection()->asyncPtzStop(camera, this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
+        handle = server->apiConnection()->ptzStopAsync(camera, data.sequenceId, data.sequenceNumber, this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
     } else {
-        handle = server->apiConnection()->asyncPtzMove(camera, movement.x(), movement.y(), movement.z(), this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
+        handle = server->apiConnection()->ptzMoveAsync(camera, movement, data.sequenceId, data.sequenceNumber, this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
     }
     m_cameraByHandle[handle] = camera;
     m_requestByHandle[handle] = movement;
-
-    PtzData &data = m_dataByCamera[camera];
-    data.attemptCount[SetMovementRequest]++;
 }
 
 void QnWorkbenchPtzController::tryInitialize(const QnVirtualCameraResourcePtr &camera) {
@@ -202,6 +203,8 @@ void QnWorkbenchPtzController::tryInitialize(const QnVirtualCameraResourcePtr &c
         return;
 
     data.initialized = true;
+    data.sequenceId = QUuid::createUuid();
+    data.sequenceNumber = 0;
     sendGetPosition(camera);
     sendSetMovement(camera, QVector3D());
 }
@@ -260,7 +263,7 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, const
         emitChanged(camera, positionChanged, false);
     } else {
         if(data.attemptCount[GetPositionRequest] > maxAttempts) {
-            qnWarning("Could not get PTZ position from '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
+//            qnWarning("Could not get PTZ position from '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
         } else {
             sendGetPosition(camera);
         }
@@ -290,7 +293,7 @@ void QnWorkbenchPtzController::at_ptzSetPosition_replyReceived(int status, int h
         emitChanged(camera, positionChanged, movementChanged);
     } else {
         if(data.attemptCount[SetPositionRequest] > maxAttempts) {
-            qnWarning("Could not set PTZ position for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
+//            qnWarning("Could not set PTZ position for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
         } else {
             sendSetPosition(camera, position);
         }
@@ -324,7 +327,7 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
         emitChanged(camera, positionChanged, movementChanged);
     } else {
         if(data.attemptCount[SetMovementRequest] > maxAttempts) {
-            qnWarning("Could not set PTZ movement for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
+//            qnWarning("Could not set PTZ movement for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
         } else {
             sendSetMovement(camera, movement);
         }

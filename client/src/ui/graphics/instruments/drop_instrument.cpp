@@ -146,7 +146,7 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
     if(!m_intoNewLayout) {
         context->menu()->trigger(
             Qn::DropResourcesAction, 
-            QnActionParameters(m_resources).withArgument(Qn::GridPositionParameter, context->workbench()->mapper()->mapToGridF(event->scenePos()))
+            QnActionParameters(m_resources).withArgument(Qn::ItemPositionRole, context->workbench()->mapper()->mapToGridF(event->scenePos()))
         );
     } else {
         context->menu()->trigger(

@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.4.3-SNAPSHOT</version>
+		<version>1.5.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.3-SNAPSHOT</version>
+	<version>1.5.2-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>build_environment</artifactId>
 	<packaging>pom</packaging>
@@ -36,20 +36,6 @@
 			<classifier>${platform}</classifier>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge</groupId>
-			<artifactId>qjson</artifactId>
-			<version>0.7.1-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}-${compiler}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.openssl</groupId>
-			<artifactId>openssl</artifactId>
-			<version>${openssl.version}</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}-${compiler}</classifier>
-		</dependency>
-		<dependency>
 			<groupId>org.ffmpeg</groupId>
 			<artifactId>ffmpeg</artifactId>
 			<version>${ffmpeg.version}</version>
@@ -64,20 +50,6 @@
 			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>		
 		<dependency>
-			<groupId>com.google</groupId>
-			<artifactId>protobuf</artifactId>
-			<version>2.4.1</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}-${compiler}</classifier>
-		</dependency>                           
-		<dependency>
-			<groupId>com.nokia.qt.addons</groupId>
-			<artifactId>qtcolorpicker</artifactId>
-			<version>2.6.1-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>
-		<dependency>
 			<groupId>com.sourceforge.cloudcity</groupId>
 			<artifactId>bespin</artifactId>
 			<version>1.1-SNAPSHOT</version>
@@ -90,6 +62,13 @@
 			<version>${sigar.version}</version>
 			<type>zip</type>
 			<classifier>${platform}-${arch}-${compiler}</classifier>
+		</dependency>                               	
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>festival</artifactId>
+			<version>${festival.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
 		</dependency>                               	
 	</dependencies>		
 
@@ -241,6 +220,25 @@
 										<exclude>**/*.lib</exclude>
 									</excludes>
 								</resource>
+								
+								<!-- for Linux -->
+								
+								<resource>
+									<targetPaths>
+										<targetPath>${project.build.directory}/bin/debug</targetPath>
+										<targetPath>${project.build.directory}/bin/release</targetPath>
+									</targetPaths>
+									<directory>${environment.dir}/qt/plugins</directory>
+									<preservePath>true</preservePath>
+									<includes>
+										<include>**/${qtplugin1}/**</include>
+										<include>**/${qtplugin2}/**</include>
+										<include>**/${qtplugin3}/**</include>
+									</includes>								
+								</resource>	
+								
+								<!-- for Windows -->
+																										
 								<resource>
 									<targetPath>${project.build.directory}/bin</targetPath>
 									<directory>${environment.dir}/qt/plugins/${arch}</directory>
@@ -250,7 +248,8 @@
 										<include>*/${qtplugin2}/**</include>
 										<include>*/${qtplugin3}/**</include>
 									</includes>										
-								</resource>																			
+								</resource>																		
+
 								<resource>
 									<targetPaths>
 										<targetPath>${project.build.directory}/bin/debug</targetPath>
@@ -274,6 +273,27 @@
 				</os>
 			</activation>
 			<dependencies>
+				<dependency>
+					<groupId>com.google</groupId>
+					<artifactId>protobuf</artifactId>
+					<version>2.4.1</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>                           
+				<dependency>
+					<groupId>org.openssl</groupId>
+					<artifactId>openssl</artifactId>
+					<version>${openssl.version}</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>
+				<dependency>
+					<groupId>com.nokia.qt.addons</groupId>
+					<artifactId>qtcolorpicker</artifactId>
+					<version>2.6.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>
 				<dependency>
 					<groupId>com.digitalwatchdog.dvr</groupId>
 					<artifactId>vmax-integration</artifactId>
@@ -323,6 +343,13 @@
 					<type>zip</type>
 					<classifier>${platform}-${arch}</classifier>
 				</dependency>		
+				<dependency>
+					<groupId>net.sourceforge</groupId>
+					<artifactId>qjson</artifactId>
+					<version>0.7.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>
 			</dependencies>			
 			<properties>
 				<compiler>msvc2008</compiler>
@@ -366,6 +393,36 @@
 				<compiler>gcc</compiler>
 				<rename-skip>false</rename-skip>
 			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>com.google</groupId>
+					<artifactId>protobuf</artifactId>
+					<version>2.4.1</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>                           
+				<dependency>
+					<groupId>org.openssl</groupId>
+					<artifactId>openssl</artifactId>
+					<version>${openssl.version}</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>
+				<dependency>
+					<groupId>net.sourceforge</groupId>
+					<artifactId>qjson</artifactId>
+					<version>0.7.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>
+				<dependency>
+					<groupId>com.nokia.qt.addons</groupId>
+					<artifactId>qtcolorpicker</artifactId>
+					<version>2.6.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>
+			</dependencies>
 			<build>	
 				<plugins>
 					<plugin>
@@ -428,6 +485,9 @@
 										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
 											<arg line="-a -u *.zip *.a"/>
 										</exec>
+										<exec dir="${libdir}" executable="rm" failifexecutionfails="false">
+											<arg line="*.zip"/>
+										</exec>
 									</target>										
 								</configuration>
 							</execution>				
@@ -436,5 +496,93 @@
 				</plugins>	
 			</build>			
 		</profile>		
+
+                <profile>
+                        <id>macosx</id>
+                        <activation>
+                                <os>
+                                        <family>mac</family>
+                                </os>
+                        </activation>
+
+			<dependencies>
+				<dependency>
+					<groupId>com.google</groupId>
+					<artifactId>protobuf</artifactId>
+					<version>2.5.0</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>
+	             		<dependency>
+				        <groupId>net.sourceforge</groupId>
+            				<artifactId>qjson</artifactId>
+		 			<version>0.8.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>
+				<dependency>
+					<groupId>com.nokia.qt.addons</groupId>
+					<artifactId>qtcolorpicker</artifactId>
+					<version>2.6.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>
+			</dependencies>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>copy-platform-libs</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+								</configuration>
+							</execution>							
+						</executions>
+					</plugin>
+
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.7</version>
+						<executions>
+							<execution>
+								<id>generate-qt-project</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<failOnError>false</failOnError>
+									<target>							
+										<chmod file="${project.build.directory}/*.sh" perm="755"/>
+										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
+											<arg line="-a -u *.zip -x **/include/** *.a"/>
+										</exec>
+										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
+											<arg line="-a -u *.zip **/include/**"/>
+										</exec>
+										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
+											<arg line="-a -u *.zip *.a"/>
+										</exec>
+										<exec dir="${libdir}" executable="rm" failifexecutionfails="false">
+											<arg line="*.zip"/>
+										</exec>
+									</target>										
+								</configuration>
+							</execution>				
+						</executions>
+					</plugin>					
+				</plugins>
+			</build>
+                </profile>
+
 	</profiles>	
 </project>

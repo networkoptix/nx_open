@@ -1,6 +1,12 @@
+
 #include "masked_proxy_widget.h"
+
+#include <QPainter>
+#include <QPaintEngine>
 #include <QStyleOptionGraphicsItem>
+
 #include <ui/common/geometry.h>
+
 
 namespace {
     template<class Base>
@@ -40,7 +46,9 @@ void QnMaskedProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
         return;
 
     /* Filter out repaints on the window frame. */
-    QRectF renderRectF = option->exposedRect & rect();
+    QRectF renderRectF = option->exposedRect.isEmpty()
+        ? rect()
+        : option->exposedRect & rect();
 
     /* Filter out areas that are masked out. */
     if(!m_paintRect.isNull())
@@ -53,14 +61,17 @@ void QnMaskedProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
     if(m_pixmapDirty && m_updatesEnabled) {
         m_pixmap = QPixmap::grabWidget(this->widget(), this->widget()->rect());
+#ifndef __APPLE__
         m_pixmapDirty = false;
+#endif
     }
 
     painter->drawPixmap(renderRect, m_pixmap, QRectF(renderRect.topLeft() - rect().topLeft(), renderRect.size()));
 }
 
 bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {
-    if(object == widget()) {
+    if(object == widget())
+    {
         if(event->type() == QEvent::UpdateRequest) {
             m_pixmapDirty = true;
             /*open(object)->processEvent(event);
@@ -68,6 +79,10 @@ bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {
             qDebug() << QGraphicsItem::d_ptr->needsRepaint;
             return true;*/
         }
+#ifdef __APPLE__
+        if(event->type() == QEvent::Paint)
+            m_pixmapDirty = true;
+#endif
     }
 
     return base_type::eventFilter(object, event);

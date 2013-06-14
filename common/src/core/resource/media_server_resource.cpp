@@ -1,6 +1,8 @@
 #include "media_server_resource.h"
 
 #include <QtCore/QUrl>
+#include <QCoreApplication>
+#include <QTimer>
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 #include "utils/common/sleep.h"
@@ -19,7 +21,7 @@ QnLocalMediaServerResource::QnLocalMediaServerResource():
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
     addFlags(QnResource::server | QnResource::local);
-    removeFlags(QnResource::media); // TODO: is this call needed here?
+    removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
 
     setName(QLatin1String("Local"));
     setStatus(Online);
@@ -38,7 +40,7 @@ QnMediaServerResource::QnMediaServerResource():
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
-    removeFlags(QnResource::media); // TODO: is this call needed here?
+    removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
     setName(tr("Server"));
 
     m_primaryIFSelected = false;
@@ -64,10 +66,7 @@ void QnMediaServerResource::setApiUrl(const QString& restUrl)
     if (restUrl != m_apiUrl)
     {
         m_apiUrl = restUrl;
-
-        /* We want the video server connection to be deleted in its associated thread, 
-         * no matter where the reference count reached zero. Hence the custom deleter. */
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(getApiUrl()), &qnDeleteLater);
+        m_restConnection.clear();
     }
 }
 
@@ -103,6 +102,13 @@ QList<QHostAddress> QnMediaServerResource::getNetAddrList()
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 {
+    QMutexLocker lock(&m_mutex);
+
+    /* We want the video server connection to be deleted in its associated thread, 
+     * no matter where the reference count reached zero. Hence the custom deleter. */
+    if (!m_restConnection && !m_apiUrl.isEmpty())
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(getApiUrl()), &qnDeleteLater);
+
     return m_restConnection;
 }
 
@@ -225,7 +231,7 @@ void QnMediaServerResource::setPanicMode(PanicMode panicMode) {
 
     m_panicMode = panicMode;
 
-    emit panicModeChanged(::toSharedPointer(this)); // TODO: emit it AFTER mutex unlock.
+    emit panicModeChanged(::toSharedPointer(this)); // TODO: #Elric emit it AFTER mutex unlock.
 }
 
 void QnMediaServerResource::determineOptimalNetIF()
@@ -306,14 +312,17 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
         determineOptimalNetIF();
 }
 
-QString QnMediaServerResource::getProxyHost() const
+
+QString QnMediaServerResource::getProxyHost()
 {
-    return m_restConnection->getProxyHost();
+    QnMediaServerConnectionPtr connection = apiConnection();
+    return connection ? connection->getProxyHost() : QString();
 }
 
-int QnMediaServerResource::getProxyPort() const
+int QnMediaServerResource::getProxyPort()
 {
-    return m_restConnection->getProxyPort();
+    QnMediaServerConnectionPtr connection = apiConnection();
+    return connection ? connection->getProxyPort() : 0;
 }
 
 QString QnMediaServerResource::getVersion() const

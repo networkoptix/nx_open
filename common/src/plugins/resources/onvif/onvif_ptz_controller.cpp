@@ -13,7 +13,9 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     QnAbstractPtzController(resource),
     m_resource(resource),
     m_capabilities(0),
-    m_ptzMapper(NULL)
+    m_ptzMapper(NULL),
+    m_verticalFlipped(false),
+    m_horizontalFlipped(false)
 {
     m_xNativeVelocityCoeff.first = 1.0;
     m_yNativeVelocityCoeff.first = 1.0;
@@ -86,19 +88,24 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     m_ptzMapper = qnCommon->ptzMapperPool()->mapper(m_resource->getModel());
 
     // TODO: #Elric make configurable
-    if(m_resource->getModel() == lit("FW3471-PS-E")) {
+    QString model = m_resource->getModel();
+    if(model == lit("FW3471-PS-E")) {
         m_capabilities |= Qn::OctagonalPtzCapability;
         m_capabilities &= ~Qn::AbsolutePtzCapability;
     }
-    if(m_resource->getModel() == lit("FD8162")) {
+    if(model == lit("FD8162")) {
         m_capabilities = Qn::NoCapabilities;
     }
-    if(m_resource->getModel() == lit("IPC-HDB3200C")) {
+    if(model == lit("IPC-HDB3200C")) {
         m_capabilities = Qn::NoCapabilities;
     }
-    if(m_resource->getModel() == lit("DWC-MPTZ20X")) {
+    if(model == lit("DWC-MPTZ20X")) {
         m_capabilities |= Qn::OctagonalPtzCapability;
     }
+    if(model == lit("FD8372") || model == lit("FD8135H") || model == lit("IP8151") || model == lit("IP8335H") || model == lit("IP8362") || model == lit("MD8562")) {
+        m_capabilities = Qn::NoCapabilities;
+    }
+
 
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }
@@ -136,10 +143,10 @@ double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qre
 
 int QnOnvifPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity)
 {
-    QVector3D velocity = m_speedTransform * QVector3D(xVelocity, yVelocity, zoomVelocity);
-    xVelocity = velocity.x();
-    yVelocity = velocity.y();
-    zoomVelocity = velocity.z();
+    if(m_horizontalFlipped)
+        xVelocity = -xVelocity;
+    if(m_verticalFlipped)
+        yVelocity = -yVelocity;
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
@@ -272,14 +279,18 @@ const QnPtzSpaceMapper *QnOnvifPtzController::getSpaceMapper()
     return m_ptzMapper;
 }
 
-const QMatrix4x4 &QnOnvifPtzController::speedTransform() const 
+void QnOnvifPtzController::setFlipped(bool horizontal, bool vertical) 
 {
-    return m_speedTransform;
+    m_horizontalFlipped = horizontal;
+    m_verticalFlipped = vertical;
 }
 
-void QnOnvifPtzController::setSpeedTransform(const QMatrix4x4 &speedTransform) 
+void QnOnvifPtzController::getFlipped(bool *horizontal, bool *vertical) 
 {
-    m_speedTransform = speedTransform;
+    if(horizontal)
+        *horizontal = m_horizontalFlipped;
+    if(vertical)
+        *vertical = m_verticalFlipped;
 }
 
 

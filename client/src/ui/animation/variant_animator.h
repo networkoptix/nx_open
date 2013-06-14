@@ -23,7 +23,7 @@ class AbstractConverter;
  * be Qt properties, as they can be set and read using specialized accessor.
  */
 class VariantAnimator: public AbstractAnimator {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef AbstractAnimator base_type;
 
@@ -140,6 +140,12 @@ public:
         start();
     }
 
+signals:
+    /**
+     * This signals is emitted whenever animated value changed.
+     */
+    void valueChanged(const QVariant &value);
+
 protected:
     MagnitudeCalculator *magnitudeCalculator() const {
         return m_magnitudeCalculator;
@@ -169,7 +175,7 @@ protected:
 
     virtual QVariant currentValue() const;
 
-    virtual void updateCurrentValue(const QVariant &value) const;
+    virtual void updateCurrentValue(const QVariant &value);
 
     virtual void updateTargetValue(const QVariant &newTargetValue);
 

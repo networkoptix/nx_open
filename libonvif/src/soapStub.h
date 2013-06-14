@@ -114,7 +114,7 @@ enum onvifXsd__H264Profile {onvifXsd__H264Profile__Baseline = 0, onvifXsd__H264P
 #ifndef SOAP_TYPE_onvifXsd__AudioEncoding
 #define SOAP_TYPE_onvifXsd__AudioEncoding (1169)
 /* onvifXsd:AudioEncoding */
-enum onvifXsd__AudioEncoding {onvifXsd__AudioEncoding__G711 = 0, onvifXsd__AudioEncoding__G726 = 1, onvifXsd__AudioEncoding__AAC = 2};
+enum onvifXsd__AudioEncoding {onvifXsd__AudioEncoding__G711 = 0, onvifXsd__AudioEncoding__G726 = 1, onvifXsd__AudioEncoding__AAC = 2, onvifXsd__AudioEncoding__AMR = 3};
 #endif
 
 #ifndef SOAP_TYPE_onvifXsd__StreamType

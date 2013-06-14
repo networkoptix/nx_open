@@ -4,6 +4,11 @@
 #include <QSharedPointer>
 #include "../abstract_archive_delegate.h"
 
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
 class QnAviAudioLayout;
@@ -44,10 +49,13 @@ public:
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
     
     //void setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel);
+    virtual bool findStreams();
+
+    const char* getTagValue( const char* tagName );
+
 protected:
     void packetTimestamp(QnCompressedAudioData* audio, const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
-    virtual bool findStreams();
     void initLayoutStreams();
     AVFormatContext* getFormatContext();
 private:
@@ -79,7 +87,6 @@ private:
     QMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
     bool m_fastStreamFind;
-
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

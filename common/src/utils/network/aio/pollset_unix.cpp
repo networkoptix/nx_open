@@ -4,6 +4,8 @@
 * PollSet class implementation for linux
 ***********************************************************/
 
+#include <qglobal.h>
+
 #ifdef Q_OS_LINUX
 
 #include "pollset.h"
@@ -214,10 +216,16 @@ PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
     return *this;
 }
 
-Socket* PollSet::const_iterator::socket() const
+const Socket* PollSet::const_iterator::socket() const
 {
     return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
 }
+
+Socket* PollSet::const_iterator::socket()
+{
+    return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
+}
+
 
 /*!
     \return bit mask of \a EventType
@@ -234,10 +242,10 @@ PollSet::EventType PollSet::const_iterator::eventType() const
     return (PollSet::EventType)revents;
 }
 
-void* PollSet::const_iterator::userData() const
+void* PollSet::const_iterator::userData()
 {
     //TODO: #AK gcc warning: invalid conversion from 'const void*' to 'void*' [-fpermissive]
-    return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.userData( eventType() );
+    return static_cast<PollSetImpl::MonitoredEventMap::pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.userData( eventType() );
 }
 
 bool PollSet::const_iterator::operator==( const const_iterator& right ) const

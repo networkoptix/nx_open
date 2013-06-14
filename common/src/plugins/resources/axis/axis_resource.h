@@ -18,6 +18,16 @@ class QnPlAxisResource : public QnPhysicalCameraResource
     Q_OBJECT
 
 public:
+
+    struct AxisResolution
+    {
+        AxisResolution() {}
+        AxisResolution(const QSize& _size, const QByteArray& _resolutionStr): size(_size), resolutionStr(_resolutionStr ) {}
+
+        QSize size;
+        QByteArray resolutionStr;
+    };
+
     static const char* MANUFACTURE;
 
     QnPlAxisResource();
@@ -25,9 +35,7 @@ public:
 
     virtual bool isResourceAccessible();
 
-    virtual bool updateMACAddress();
-
-    virtual QString manufacture() const;
+    virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
@@ -35,9 +43,9 @@ public:
 
     virtual bool shoudResolveConflicts() const override;
 
-    QByteArray getMaxResolution() const;
-    QString getNearestResolution(const QByteArray& resolution, float aspectRatio) const;
-    float getResolutionAspectRatio(const QByteArray& resolution) const;
+    AxisResolution getMaxResolution() const;
+    AxisResolution getNearestResolution(const QSize& resolution, float aspectRatio) const;
+    float getResolutionAspectRatio(const AxisResolution& resolution) const;
 
     QRect getMotionWindow(int num) const;
     QMap<int, QRect>  getMotionWindows() const;
@@ -99,8 +107,7 @@ private:
     int toAxisMotionSensitivity(int sensitivity);
 
 private:
-    QList<QByteArray> m_resolutionList;
-    bool m_palntscRes;
+    QList<AxisResolution> m_resolutionList;
 
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;

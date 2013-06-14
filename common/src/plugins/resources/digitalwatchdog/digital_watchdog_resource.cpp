@@ -1,6 +1,7 @@
 #include "digital_watchdog_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "dw_zoom_ptz_controller.h"
+#include "utils/math/space_mapper.h"
 
 const QString CAMERA_SETTINGS_ID_PARAM = QString::fromLatin1("cameraSettingsId");
 static const int HTTP_PORT = 80;
@@ -57,9 +58,10 @@ bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
     {
         unauth = true;
         setStatus(Unauthorized);
+        return false;
     }
-
-    return false;
+    
+    return true; // ignore other error (for cameras with non standart HTTP port)
 }
 
 bool QnPlWatchDogResource::initInternal() 
@@ -80,21 +82,30 @@ bool QnPlWatchDogResource::initInternal()
     QByteArray data;
     http.readAll(data);
 
-    qreal speedX = 1.0, speedY = 1.0;
-    if(getModel() == QLatin1String("DWC-MPTZ20X"))
-        speedX *= -1.0;
+    bool flipVertical = false, flipHorizontal = false;
     if(data.contains("flipmode1: 1")) {
-        speedX *= -1.0;
-        speedY *= -1.0;
+        flipHorizontal = !flipHorizontal;
+        flipVertical = !flipVertical;
     }
     if(data.contains("mirrormode1: 1"))
-        speedX *= -1.0;
-    if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(base_type::getPtzController())) 
-    {
-        QMatrix4x4 transform;
-        transform(0, 0) = speedX;
-        transform(1, 1) = speedY;
-        ptzController->setSpeedTransform(transform);
+        flipHorizontal = !flipHorizontal;
+
+    // TODO: #Elric evil hacks here =(
+    if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(base_type::getPtzController())) {
+        ptzController->setFlipped(flipHorizontal, flipVertical);
+
+        if(QnPtzSpaceMapper *mapper = const_cast<QnPtzSpaceMapper *>(ptzController->getSpaceMapper())) {
+            QnVectorSpaceMapper &fromCamera = const_cast<QnVectorSpaceMapper &>(mapper->fromCamera());
+            QnVectorSpaceMapper &toCamera = const_cast<QnVectorSpaceMapper &>(mapper->toCamera());
+            if(flipHorizontal) {
+                fromCamera.setMapper(QnVectorSpaceMapper::X, fromCamera.mapper(QnVectorSpaceMapper::X).flipped(false, true, 0.0, 0.0));
+                toCamera.setMapper(QnVectorSpaceMapper::X, toCamera.mapper(QnVectorSpaceMapper::X).flipped(false, true, 0.0, 0.0));
+            }
+            if(flipVertical) {
+                fromCamera.setMapper(QnVectorSpaceMapper::Y, fromCamera.mapper(QnVectorSpaceMapper::Y).flipped(false, true, 0.0, 0.0));
+                toCamera.setMapper(QnVectorSpaceMapper::Y, toCamera.mapper(QnVectorSpaceMapper::Y).flipped(false, true, 0.0, 0.0));
+            }
+        }
     }
 
     return result;
@@ -170,19 +181,19 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
     //Put base model in list
     m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
-        getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth(), baseIdStr)));
+        getHostAddress(), 80, getNetworkTimeout(), getAuth(), baseIdStr)));
 
     //Put expanded model in list
     if (!suffix.isEmpty()) {
         m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
-            getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth(), baseIdStr + suffix)));
+            getHostAddress(), 80, getNetworkTimeout(), getAuth(), baseIdStr + suffix)));
     }
 }
 
 QString QnPlWatchDogResource::fetchCameraModel()
 {
     QAuthenticator auth(getAuth());
-    //TODO:UTF unuse StdString
+    //TODO: #vasilenko UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), getTimeDrift());
 
     DeviceInfoReq request;

@@ -11,6 +11,9 @@
 // -------------------------------------------------------------------------- //
 class QnCryptographicHashPrivate {
 public:
+    QnCryptographicHashPrivate() {}
+    virtual ~QnCryptographicHashPrivate() {}
+
     virtual void init() = 0;
     virtual void update(const char *data, int length) = 0;
     virtual void final(unsigned char *result) = 0;

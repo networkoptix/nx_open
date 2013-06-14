@@ -45,7 +45,7 @@ m_black_white(false)
 
     m_panoramic = avRes->isPanoramic();
     m_dualsensor = avRes->isDualSensor();
-    m_name = avRes->getName();
+    m_model = avRes->getModel();
     m_tftp_client = 0;
 }
 
@@ -296,7 +296,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         arr[0] & 4 ? resolutionFULL = true: false;
         size = ExtractSize(&arr[2]);
 
-        if(!size.width && m_name.contains(QLatin1String("3100")))
+        if(!size.width && m_model.contains(QLatin1String("3100")))
             size.width = 2048;
 
         if(!resolutionFULL)
@@ -371,7 +371,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     else
     {
         // writes JPEG header at very begining
-        AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality, m_name.toLatin1().data());
+        AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality, m_model.toLatin1().data());
     }
 
 

@@ -2,6 +2,10 @@
 #ifndef DVD_READER_H_INCLUDED
 #define DVD_READER_H_INCLUDED
 
+#include <stdint.h>
+
+#include <QtGlobal>
+
 #ifndef ssize_t
 #define ssize_t qint64
 #endif

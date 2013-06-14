@@ -6,6 +6,7 @@
 
 #include "client_globals.h"
 #include "client_model_types.h"
+#include "utils/color_space/image_correction.h"
 
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
@@ -21,19 +22,26 @@ void QnClientMetaTypes::initialize() {
 
     QnCommonMetaTypes::initilize();
 
-    qRegisterMetaType<Qn::ItemRole>();
-    qRegisterMetaType<QnThumbnail>();
     qRegisterMetaType<QVector<QUuid> >();
+    qRegisterMetaType<QVector<QColor> >();
+
+    qRegisterMetaType<Qn::ItemRole>();
+    qRegisterMetaType<QnThumbnail>();    
     qRegisterMetaType<QnWorkbenchState>();
     qRegisterMetaTypeStreamOperators<QnWorkbenchState>();
     qRegisterMetaType<QnWorkbenchStateHash>();
     qRegisterMetaTypeStreamOperators<QnWorkbenchStateHash>();
+    qRegisterMetaType<QnLicenseWarningState>();
+    qRegisterMetaTypeStreamOperators<QnLicenseWarningState>();
+    qRegisterMetaType<QnLicenseWarningStateHash>();
+    qRegisterMetaTypeStreamOperators<QnLicenseWarningStateHash>();
     qRegisterMetaType<QnServerStorageKey>();
     qRegisterMetaTypeStreamOperators<QnServerStorageKey>();
     qRegisterMetaType<QnServerStorageStateHash>();
     qRegisterMetaTypeStreamOperators<QnServerStorageStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
+    qRegisterMetaType<ImageCorrectionParams>();
 
     qn_clientMetaTypes_initialized = true;
 }

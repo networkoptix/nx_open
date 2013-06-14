@@ -48,6 +48,21 @@ appserver/packages/llutil/build
 appserver/packages/llutil/dist
 appserver/packages/llutil/llutil.egg-info
 
+applauncher/bin
+applauncher/build
+applauncher/src/Info.plist
+applauncher/src/client.pro
+applauncher/src/common.pro
+applauncher/src/version.h
+applauncher/src/ipch
+applauncher/src/client.vcproj
+applauncher/client.mak*
+applauncher/x86
+applauncher/x64
+
+axiscamplugin/x86
+axiscamplugin/x64
+
 client/bin
 client/build
 client/src/Info.plist
@@ -98,6 +113,9 @@ debsetup/client-deb/x64
 debsetup/appserver-deb/package
 debsetup/appserver-deb/x86
 debsetup/appserver-deb/x64
+
+genericrtspplugin/x86
+genericrtspplugin/x64
 
 mediaserver/bin
 mediaserver/build
@@ -165,8 +183,27 @@ android-client/**/bin/**
 android-client/**/*.prefs
 android-client/**/gen/*
 
+ios-client/build
+ios-client/dist
+ios-client/target
+
 launcher/x86
 launcher/x64
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
 android-client/android-dw/**
+
+
+axiscamplugin/x86
+axiscamplugin/x64
+axiscamplugin/docs/
+appserver/hostedfiles/*
+
+genericrtspplugin/x86
+genericrtspplugin/x64
+
+
+nx_sdk/nx_sdk 
+
+
+libonvif/.build/

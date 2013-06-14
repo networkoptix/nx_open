@@ -1,0 +1,12 @@
+////////////////////////////////////////////////////////////
+// 13 mar 2013    Andrey Kolesnikov
+////////////////////////////////////////////////////////////
+
+#include "user_chooses_what_to_launch.h"
+
+
+UserChoosesWhatToLaunch::UserChoosesWhatToLaunch( QState* const parent )
+:
+    QState( parent )
+{
+}

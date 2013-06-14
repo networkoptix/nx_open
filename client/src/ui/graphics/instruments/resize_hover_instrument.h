@@ -3,18 +3,18 @@
 
 #include "instrument.h"
 
-class FrameSectionQuearyable;
+class FrameSectionQueryable;
 
 class ResizeHoverInstrument: public Instrument {
 public:
     ResizeHoverInstrument(QObject *parent = NULL);
 
-    qreal effectiveDistance() const {
-        return m_effectiveDistance;
+    qreal effectRadius() const {
+        return m_effectRadius;
     }
 
-    void setEffectiveDistance(qreal effectiveDistance) {
-        m_effectiveDistance = effectiveDistance;
+    void setEffectRadius(qreal effectRadius) {
+        m_effectRadius = effectRadius;
     }
 
 protected:
@@ -25,8 +25,9 @@ protected:
     virtual bool hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
 
 private:
-    qreal m_effectiveDistance;
-    QHash<QGraphicsItem *, FrameSectionQuearyable *> m_queryableByItem;
+    qreal m_effectRadius;
+    QHash<QGraphicsItem *, FrameSectionQueryable *> m_queryableByItem;
+    QSet<QGraphicsItem *> m_affectedItems;
 };
 
 

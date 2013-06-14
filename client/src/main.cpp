@@ -4,22 +4,32 @@
 #   include <vld.h>
 #endif
 
+#include <qglobal.h>
+
 #ifdef Q_OS_LINUX
 #   include <unistd.h>
 #endif
 
 #include "version.h"
 #include "ui/widgets/main_window.h"
-#include "utils/settings.h"
+#include "client/client_settings.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QTranslator>
+#include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
+#include <QtGui/QDesktopServices>
 
 #include <QtSingleApplication>
+
+extern "C"
+{
+    #include <libavformat/avformat.h>
+    #include <libavformat/avio.h>
+}
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -31,7 +41,6 @@
 #ifdef Q_OS_WIN
     #include "device_plugins/desktop_win/device/desktop_resource_searcher.h"
 #endif
-#include "libavformat/avio.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_discovery_manager.h"
@@ -40,7 +49,6 @@
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "device_plugins/server_camera/appserver.h"
-#include "utils/util.h"
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
@@ -49,7 +57,7 @@
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
-#include "plugins/pluginmanager.h"
+#include "plugins/plugin_manager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
@@ -148,6 +156,7 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
+    //QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("memory"), QnLayoutFileStorageResource::instance);
 
     /*
     extern URLProtocol ufile_protocol;
@@ -273,14 +282,6 @@ int main(int argc, char **argv)
         QTextStream out(stdout);
         QThread::currentThread()->setPriority(QThread::HighestPriority);
 
-        /* Set up application parameters so that QSettings know where to look for settings. */
-        QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
-        QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
-        QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
-
-        /* We don't want changes in desktop color settings to mess up our custom style. */
-        QApplication::setDesktopSettingsAware(false);
-
         /* Parse command line. */
         QnAutoTester autoTester(argc, argv);
 
@@ -293,6 +294,7 @@ int main(int argc, char **argv)
         QString translationPath = qnSettings->translationPath();
         bool devBackgroundEditable = false;
         bool skipMediaFolderScan = false;
+        bool noFullScreen = false;
         
         QnCommandLineParser commandLineParser;
         commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -305,6 +307,7 @@ int main(int argc, char **argv)
         commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
         commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
         commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
+        commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
         commandLineParser.parse(argc, argv, stderr);
 
         /* Dev mode. */
@@ -319,7 +322,8 @@ int main(int argc, char **argv)
         /* Set authentication parameters from command line. */
         QUrl authentication = QUrl::fromUserInput(authenticationString);
         if(authentication.isValid()) {
-            out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
+            // do not print password in plaintext
+            //out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
             qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
         }
 
@@ -367,7 +371,7 @@ int main(int argc, char **argv)
 
 
         /* Initialize log. */
-        const QString dataLocation = getDataDirectory();
+        const QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
         if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
             return 0;
         if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
@@ -445,6 +449,7 @@ int main(int argc, char **argv)
 #endif // Q_OS_WIN
         QnResourceDiscoveryManager::instance()->start();
 
+        // here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
         qApp->setStyle(qnSkin->style());
 
         /* Create workbench context. */
@@ -453,6 +458,7 @@ int main(int argc, char **argv)
 
         /* Create main window. */
         QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
+        context->setMainWindow(mainWindow.data());
         mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
         if(screen != -1) {
@@ -465,10 +471,11 @@ int main(int argc, char **argv)
         }
 
         mainWindow->show();
-        context->action(Qn::EffectiveMaximizeAction)->trigger();
+        if (!noFullScreen)
+            context->action(Qn::EffectiveMaximizeAction)->trigger();
 
         //initializing plugin manager. TODO supply plugin dir (from settings)
-        PluginManager::instance()->loadPlugins();
+        PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
 
         /* Process input files. */
         for (int i = 1; i < argc; ++i)
@@ -490,8 +497,9 @@ int main(int argc, char **argv)
 
         if (argc <= 1) {
             /* If no input files were supplied --- open connection settings dialog. */
-            if(!authentication.isValid()) {
-                context->menu()->trigger(Qn::ConnectToServerAction);
+            if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
+                context->menu()->trigger(Qn::ConnectToServerAction,
+                                         QnActionParameters().withArgument(Qn::AutoConnectRole, true));
             } else {
                 context->menu()->trigger(Qn::ReconnectAction);
             }
@@ -502,14 +510,14 @@ int main(int argc, char **argv)
             qnSettings->setLayoutsOpenedOnLogin(false);
 
             QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
-            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
         }
 
         if (!instantDrop.isEmpty()){
             qnSettings->setLayoutsOpenedOnLogin(false);
 
             QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
-            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
         }
 
 #ifdef _DEBUG
@@ -540,6 +548,7 @@ int main(int argc, char **argv)
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
 
+//    qApp->processEvents(); //TODO: #Elric crashes
     return result;
 }
 

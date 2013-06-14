@@ -3,6 +3,7 @@
 
 #include <typeinfo>
 
+#include <QtCore/QHash>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
@@ -19,6 +20,7 @@ class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
+class QnWorkbenchLayoutWatcher;
 class QnActionManager;
 
 /**
@@ -64,6 +66,14 @@ public:
         return m_navigator.data();
     }
 
+    QWidget *mainWindow() const {
+        return m_mainWindow.data();
+    }
+
+    void setMainWindow(QWidget *mainWindow) {
+        m_mainWindow = mainWindow;
+    }
+
     QAction *action(const Qn::ActionId id) const;
 
     QnUserResourcePtr user() const;
@@ -87,7 +97,7 @@ signals:
      * 
      * \param user                      New user that was logged in. May be null.
      */
-    void userChanged(const QnUserResourcePtr &user);
+    void userChanged(const QnUserResourcePtr &user); // TODO: #Elric remove user parameter
 
     /**
      * This signal is emitted when this workbench context is about to be destroyed,
@@ -107,9 +117,12 @@ private:
     QScopedPointer<QnActionManager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
+    
+    QWeakPointer<QWidget> m_mainWindow;
 
     QnWorkbenchUserWatcher *m_userWatcher;
-    QHash<QByteArray, QObject *> m_instanceByTypeName; // TODO: use std::type_index
+    QnWorkbenchLayoutWatcher *m_layoutWatcher;
+    QHash<QByteArray, QObject *> m_instanceByTypeName; // TODO: #Elric use std::type_index
     QList<QObject *> m_instances;
 };
 

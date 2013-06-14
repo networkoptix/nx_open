@@ -1,7 +1,9 @@
 #ifndef QN_SSE_HELPER_H
 #define QN_SSE_HELPER_H
 
+#include <QtCore/QString>
 #include <QtCore/private/qsimd_p.h>
+
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
@@ -125,7 +127,7 @@ static inline bool useSSE42()
 #endif
 }
 
-// TODO: function too large for inlining. Move to cpp file.
+// TODO: #vasilenko function too large for inlining. Move to cpp file.
 static inline QString getCPUString()
 {
     char CPUBrandString[0x40]; 

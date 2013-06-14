@@ -16,6 +16,7 @@ bool QnClientPullMediaStreamProvider::canChangeStatus() const
 
 void QnClientPullMediaStreamProvider::run()
 {
+    saveSysThreadID();
     setPriority(QThread::HighPriority);
     qDebug() << "stream reader started.";
 
@@ -23,7 +24,7 @@ void QnClientPullMediaStreamProvider::run()
 
     if (QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>())
     {
-        numberOfChnnels = mr->getVideoLayout()->numberOfChannels();
+        numberOfChnnels = mr->getVideoLayout()->channelCount();
     }
 
     beforeRun();

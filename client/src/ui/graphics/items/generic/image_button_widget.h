@@ -2,6 +2,7 @@
 #define QN_IMAGE_BUTTON_WIDGET_H
 
 #include <QtGui/QPixmap>
+#include <QGLWidget>
 
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>
@@ -75,6 +76,9 @@ public:
 
     void setCached(bool cached);
 
+    void setFixedSize(qreal size);
+    void setFixedSize(qreal width, qreal height);
+    void setFixedSize(const QSizeF &size);
 public slots:
     void setPressed(bool pressed = true);
     void setCheckable(bool checkable);
@@ -105,7 +109,7 @@ protected:
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget);
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect);
 
 protected:
     void updateState(StateFlags state);
@@ -168,7 +172,7 @@ public:
     }
     
 protected:
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) override;
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
     
     virtual void tick(int deltaMSecs) override;
     

@@ -1,9 +1,12 @@
 #include "email.h"
 
+#include <QApplication>
+#include <QDebug>
 #include <QRegExp>
 #include <QHash>
 #include <QFile>
-#include <QApplication>
+#include <QThread>
+
 
 namespace {
     typedef QHash<QString, QnEmail::SmtpServerPreset> QnSmtpPresets;
@@ -156,9 +159,7 @@ void QnEmail::initSmtpPresets() const {
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
-    QByteArray serialized = file.readAll();
-    bool ok = QJson::deserialize(serialized, &smtpServerPresetPresets);
-    if (!ok)
+    if(!QJson::deserialize(file.readAll(), &smtpServerPresetPresets))
         qWarning() << "Smtp Presets file could not be parsed!";
     smtpInitialized = true;
 }

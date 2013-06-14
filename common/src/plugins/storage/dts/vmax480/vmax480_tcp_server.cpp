@@ -1,4 +1,8 @@
 #include "vmax480_tcp_server.h"
+
+#include <QElapsedTimer>
+#include <QUuid>
+
 #include "vmax480_stream_fetcher.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
@@ -20,7 +24,9 @@ public:
     QnMediaContextPtr context;
     VMaxStreamFetcher* streamFetcher;
     int openedChannels;
+    static QMutex connectMutex;
 };
+QMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
 QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner)
@@ -40,6 +46,8 @@ void QnVMax480ConnectionProcessor::vMaxConnect(const QString& url, int channel, 
 {
     Q_D(QnVMax480ConnectionProcessor);
 
+    QMutexLocker lock(&d->connectMutex);
+
     VMaxParamList params;
     params["url"] = url.toUtf8();
     params["channel"] = QByteArray::number(channel);
@@ -55,6 +63,19 @@ void QnVMax480ConnectionProcessor::vMaxConnect(const QString& url, int channel, 
 void QnVMax480ConnectionProcessor::vMaxDisconnect()
 {
     Q_D(QnVMax480ConnectionProcessor);
+
+    QMutexLocker lock(&d->connectMutex);
+
+    QElapsedTimer t;
+    t.restart();
+    if (d->socket->isConnected() && !d->tcpID.isEmpty()) 
+    {
+        QByteArray data = QnVMax480Helper::serializeCommand(Command_CloseConnect, 0, VMaxParamList());
+        d->socket->send(data);
+        quint8 dummy[1];
+        d->socket->recv(dummy, sizeof(dummy));
+    }
+    int waitTime = t.elapsed();
     d->socket->close();
 }
 
@@ -174,6 +195,7 @@ bool QnVMax480ConnectionProcessor::readBuffer(quint8* buffer, int size)
 void QnVMax480ConnectionProcessor::run()
 {
     Q_D(QnVMax480ConnectionProcessor);
+    saveSysThreadID();
 
     char uuidBuffer[UUID_LEN+1];
 
@@ -195,8 +217,7 @@ void QnVMax480ConnectionProcessor::run()
 
         if (!readBuffer(vMaxHeader, sizeof(vMaxHeader)))
         {
-            int elapsed = t.elapsed();
-            if (elapsed < 100)
+            if (!d->socket->isConnected())
                 break;    // connection closed
             else
                 continue; // read timeout
@@ -258,7 +279,7 @@ void QnVMax480ConnectionProcessor::run()
                     break;
             }
         }
-        else if (dataSize == VMAXDT_GotAudioPacket)
+        else if (dataType == VMAXDT_GotAudioPacket)
         {
             quint8 vMaxAudioHeader[4];
             if (!readBuffer(vMaxAudioHeader, sizeof(vMaxAudioHeader)))

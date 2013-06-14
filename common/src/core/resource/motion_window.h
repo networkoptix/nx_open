@@ -1,6 +1,7 @@
 #ifndef __MOTION_WINDOW_H__
 #define __MOTION_WINDOW_H__
 
+#include <QMetaType>
 #include <QtCore/QMultiMap>
 #include <QtGui/QRegion>
 #include <QtGui/QPainterPath>
@@ -19,7 +20,7 @@ struct QnMotionWindow
 
 //typedef QnMotionWindow[QnMotionWindow::MAX_SENSITIVITY-QnMotionWindow::MIN_SENSITIVITY+1] QnMotionRegion;
 
-// TODO: rename header
+// TODO: #Elric rename header
 
 class QnMotionRegion
 {

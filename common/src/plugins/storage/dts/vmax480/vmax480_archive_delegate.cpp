@@ -3,6 +3,8 @@
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
 
+static const QByteArray FIXED_GROUP_ID("{6A7E6407-73A9-4042-B599-0B82CD726CF4}");
+
 static const int EMPTY_PACKET_REPEAT_INTERVAL = 100;
 
 QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
@@ -17,11 +19,13 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     m_lastMediaTime(0),
     m_noDataCounter(0)
 {
+    m_groupId = FIXED_GROUP_ID; 
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanOfflineLayout;
+    m_flags |= Flag_UnsyncTime;
     //m_flags |= Flag_CanSeekImmediatly;
 }
 
@@ -43,9 +47,9 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
     qDebug() << "before vmaxConnect";
 
     if (m_maxStream == 0)
-        m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res, false);
+        m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res.data(), false);
     int consumerCount = 0;
-    m_isOpened = m_maxStream->registerConsumer(this, &consumerCount, !m_thumbnailsMode);
+    m_isOpened = m_maxStream->registerConsumer(this, &consumerCount, !m_thumbnailsMode, !m_thumbnailsMode);
     m_ignoreNextSeek = consumerCount > 1;
     m_noDataCounter = 0;
     return m_isOpened;
@@ -96,7 +100,7 @@ void QnVMax480ArchiveDelegate::close()
         m_isOpened = false;
     }
     if (m_maxStream)
-        VMaxStreamFetcher::freeInstance(m_groupId, m_res, false);
+        VMaxStreamFetcher::freeInstance(m_groupId, m_res.data(), false);
     m_maxStream = 0;
 }
 
@@ -127,6 +131,11 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         open(m_res);
     }
 
+    if (m_maxStream->isEOF()) {
+        QnSleep::msleep(50);
+        return m_maxStream->createEmptyPacket(DATETIME_NOW);
+    }
+
     if (m_thumbnailsMode) {
         if (m_ThumbnailsSeekPoints.isEmpty()) {
             close();
@@ -150,8 +159,10 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         }
 
         if (m_thumbnailsMode) {
-            if (getTimer.elapsed() > MAX_FRAME_DURATION*2)
-                return result; // tell error
+            if (getTimer.elapsed() > MAX_FRAME_DURATION*2) {
+                m_ThumbnailsSeekPoints.clear();
+                break; // tell error
+            }
         }
         else {
             if (getTimer.elapsed() > EMPTY_PACKET_REPEAT_INTERVAL) {
@@ -232,8 +243,9 @@ void QnVMax480ArchiveDelegate::calcSeekPoints(qint64 startTime, qint64 endTime, 
 
 void QnVMax480ArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64 frameStep)
 {
-    if ((startTime-endTime)/frameStep > 60) {
-        qWarning() << "Too large thumbnails range. requested" << (startTime-endTime)/frameStep << "thumbnails. Ignoring";
+    if ((endTime-startTime)/frameStep > 60) {
+        qWarning() << "Too large thumbnails range. requested" << (endTime-endTime)/frameStep << "thumbnails. Ignoring";
+        return;
     }
 
     qDebug() << "getThumbnails range" << startTime << endTime << frameStep;
@@ -268,4 +280,9 @@ void QnVMax480ArchiveDelegate::beforeSeek(qint64 time)
 { 
     Q_UNUSED(time)
     m_beforeSeek = true;
+}
+
+bool QnVMax480ArchiveDelegate::isStopping() const
+{
+    return m_needStop;
 }

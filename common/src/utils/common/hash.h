@@ -12,6 +12,8 @@ inline uint qHash(const QPoint &value) {
     return qHash(qMakePair(value.x(), value.y()));
 }
 
+/* This one is commented out because if it's not included then we'll likely have ODR violations. */
+#if 0
 inline uint qHash(const QUuid &uuid) {
 #if defined(_MSC_VER) && _MSC_VER >= 1600
     static_assert(sizeof(QUuid) == 4 * sizeof(uint), "Size of QUuid is expected to be four times the size of uint.");
@@ -20,6 +22,7 @@ inline uint qHash(const QUuid &uuid) {
     const uint *u = reinterpret_cast<const uint *>(&uuid);
     return u[0] ^ u[1] ^ u[2] ^ u[3];
 }
+#endif
 
 inline uint qHash(const QColor &color) {
     using ::qHash;

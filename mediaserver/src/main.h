@@ -23,13 +23,16 @@ public:
 
     void stopObjects();
     void run();
-
+public slots:
+    void stopAsync();
+    void stopSync();
 private slots:
     void loadResourcesFromECS();
     void at_localInterfacesChanged();
-    void at_serverSaved(int, const QByteArray&, const QnResourceList&, int);
+    void at_serverSaved(int, const QnResourceList&, int);
     void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
     void at_noStorages();
+    void at_storageFailure(QnResourcePtr storage);
     void at_timer();
 private:
     void initTcpListener();
@@ -39,13 +42,11 @@ private:
     char** m_argv;
     bool m_waitExtIpFinished;
 
-    QnAppserverResourceProcessor* m_processor;
     QnRtspListener* m_rtspListener;
     QnRestServer* m_restServer;
     QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
-    QTimer m_timer;
 };
 
 #endif // MAIN_H

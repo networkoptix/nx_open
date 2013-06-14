@@ -12,6 +12,8 @@
 #include <errno.h>
 #endif
 
+#include <QString>
+
 
 namespace SystemError
 {
@@ -21,6 +23,7 @@ namespace SystemError
     typedef int ErrorCode;
 #endif
 
+    static const ErrorCode noError = 0;
 #ifdef _WIN32
     static const ErrorCode wouldBlock = WSAEWOULDBLOCK;
     static const ErrorCode inProgress = WSAEWOULDBLOCK;

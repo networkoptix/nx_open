@@ -77,7 +77,7 @@ void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
     qnLicensePool->replaceLicenses(licenses);
 }
 
-bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool insert) // TODO: 'insert' parameter is hacky. Get rid of it and write some nicer code.
+bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool insert) // TODO: #Elric 'insert' parameter is hacky. Get rid of it and write some nicer code.
 {
     bool result = false;
     QnResourcePtr ownResource;
@@ -97,7 +97,16 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
             determineOptimalIF(mediaServer.data());
     } 
     else {
+        bool mserverStatusChanged = false;
+        QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>();
+        if (mediaServer)
+            mserverStatusChanged = ownResource->getStatus() != resource->getStatus();
+
         ownResource->update(resource);
+
+        if (mserverStatusChanged && mediaServer)
+            determineOptimalIF(mediaServer.data());
+
         result = true;
     }
 
@@ -129,67 +138,93 @@ void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &
 
 void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 {
-    if (message.eventType == Qn::Message_Type_License)
-    {
-        qnLicensePool->addLicense(message.license);
-    }
-    else if (message.eventType == Qn::Message_Type_ResourceDisabledChange)
-    {
-        QnResourcePtr resource;
-        if (!message.resourceGuid.isEmpty())
-            resource = qnResPool->getResourceByGuid(message.resourceGuid);
-        else
-            resource = qnResPool->getResourceById(message.resourceId);
+    switch(message.eventType) {
+    case Qn::Message_Type_Initial:
+    case Qn::Message_Type_Ping:
+        break;
 
-        if (resource)
+    case Qn::Message_Type_License:
         {
-            resource->setDisabled(message.resourceDisabled);
+            qnLicensePool->addLicense(message.license);
+            break;
+        }
+    case Qn::Message_Type_ResourceDisabledChange:
+        {
+            QnResourcePtr resource;
+            if (!message.resourceGuid.isEmpty())
+                resource = qnResPool->getResourceByGuid(message.resourceGuid);
+            else
+                resource = qnResPool->getResourceById(message.resourceId);
+
+            if (resource)
+                resource->setDisabled(message.resourceDisabled);
+            break;
+        }
+    case Qn::Message_Type_ResourceStatusChange:
+        {
+            QnResourcePtr resource;
+            if (!message.resourceGuid.isEmpty())
+                resource = qnResPool->getResourceByGuid(message.resourceGuid);
+            else
+                resource = qnResPool->getResourceById(message.resourceId);
+
+            if (resource)
+                resource->setStatus(message.resourceStatus);
+            break;
+        }
+    case Qn::Message_Type_CameraServerItem:
+        {
+            QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
+            break;
+        }
+    case Qn::Message_Type_ResourceChange:
+        {
+            if (!message.resource)
+            {
+                qWarning() << "Got Message_Type_ResourceChange with empty resource in it";
+                return;
+            }
+            updateResource(message.resource);
+            break;
+        }
+    case Qn::Message_Type_ResourceDelete:
+        {
+            QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId);
+            qnResPool->removeResource(ownResource);
+            break;
+        }
+    case Qn::Message_Type_BusinessRuleInsertOrUpdate:
+        {
+            emit businessRuleChanged(message.businessRule);
+            break;
+        }
+    case Qn::Message_Type_BusinessRuleDelete:
+        {
+            emit businessRuleDeleted(message.resourceId.toInt());
+            break;
+        }
+    case Qn::Message_Type_BroadcastBusinessAction:
+        {
+            emit businessActionReceived(message.businessAction);
+            break;
+        }
+    case Qn::Message_Type_FileAdd:
+        {
+            emit fileAdded(message.filename);
+            break;
+        }
+    case Qn::Message_Type_FileRemove:
+        {
+            emit fileRemoved(message.filename);
+            break;
+        }
+    case Qn::Message_Type_FileUpdate:
+        {
+            emit fileUpdated(message.filename);
+            break;
         }
     }
-    else if (message.eventType == Qn::Message_Type_ResourceStatusChange)
-    {
-        QnResourcePtr resource;
-        if (!message.resourceGuid.isEmpty())
-            resource = qnResPool->getResourceByGuid(message.resourceGuid);
-        else
-            resource = qnResPool->getResourceById(message.resourceId);
-
-        if (resource)
-        {
-            resource->setStatus(message.resourceStatus);
-        }
-    }
-    else if (message.eventType == Qn::Message_Type_CameraServerItem)
-    {
-        QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
-    }
-    else if (message.eventType == Qn::Message_Type_ResourceChange)
-    {
-        if (!message.resource)
-        {
-            qWarning() << "Got Message_Type_ResourceChange with empty resource in it";
-            return;
-        }
-
-        updateResource(message.resource);
-    }
-    else if (message.eventType == Qn::Message_Type_ResourceDelete)
-    {
-        QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId);
-        qnResPool->removeResource(ownResource);
-    }
-    else if (message.eventType == Qn::Message_Type_BusinessRuleInsertOrUpdate)
-    {
-        emit businessRuleChanged(message.businessRule);
-    }
-    else if (message.eventType == Qn::Message_Type_BusinessRuleDelete)
-    {
-        emit businessRuleDeleted(message.resourceId.toInt());
-    }
-    else if (message.eventType == Qn::Message_Type_BroadcastBusinessAction)
-    {
-        emit businessActionReceived(message.businessAction);
-    }
+    // default-case is not used for a reason
 
 }
 

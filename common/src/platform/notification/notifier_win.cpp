@@ -97,7 +97,8 @@ LRESULT CALLBACK qn_windowsNotifierWidgetProc(HWND hWnd, UINT message, WPARAM wP
 // QnWindowsNotifier
 // -------------------------------------------------------------------------- //
 QnWindowsNotifier::QnWindowsNotifier(QObject *parent): 
-    base_type(parent)
+    base_type(parent),
+    m_timeZoneOffset(0)
 {
     if(qn_windowsNotifierWindow()) /* It will be NULL if application is being shut down. */
         qn_windowsNotifierWindow()->installEventFilter(this);
