@@ -1,7 +1,9 @@
 #ifndef QN_SSE_HELPER_H
 #define QN_SSE_HELPER_H
 
+#include <QtCore/QString>
 #include <QtCore/private/qsimd_p.h>
+
 #include <xmmintrin.h>
 #include <emmintrin.h>
 

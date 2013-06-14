@@ -120,12 +120,6 @@ namespace Qn {
          */
         WhatsThisAction,
 
-
-        /**
-         * Checks system health: licences, storages, email settings, etc.
-         */
-        CheckSystemHealthAction,
-
         /**
          * Clears application cache folders (layout backgrounds, sounds)
          */

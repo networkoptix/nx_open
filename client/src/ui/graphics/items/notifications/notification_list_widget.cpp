@@ -272,6 +272,15 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     updateGeometry();
 }
 
+void QnNotificationListWidget::removeItem(QnNotificationItem *item) {
+    ItemData* data = m_itemDataByItem[item];
+    if (data->isVisible())
+        data->hide();
+    else
+        data->state = ItemData::Hidden;
+    m_collapsedItemCountChanged = true;
+}
+
 void QnNotificationListWidget::clear() {
     foreach (QnNotificationItem* item, m_items) {
         ItemData* data = m_itemDataByItem[item];
@@ -338,6 +347,9 @@ void QnNotificationListWidget::at_geometry_changed() {
 }
 
 void QnNotificationListWidget::ItemData::hide()  {
+    if (state == Hiding)
+        return;
+
     state = Hiding;
     setAnimation(1.0, 0.0, hideTimeoutMs);
 }

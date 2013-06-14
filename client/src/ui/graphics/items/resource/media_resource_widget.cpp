@@ -18,6 +18,7 @@
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 
+#include <ui/common/recording_status_helper.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
@@ -43,7 +44,6 @@
 #include "camera/caching_time_period_loader.h"
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
-#include "ui/common/recording_status_helper.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -68,7 +68,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_binaryMotionMaskValid(false)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
-    if(!m_resource) 
+    if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
     m_camera = m_resource.dynamicCast<QnVirtualCameraResource>();
 
@@ -132,10 +132,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     buttonBar()->addButton(PtzButton,           ptzButton);
     buttonBar()->addButton(ZoomWindowButton,    zoomWindowButton);
     buttonBar()->addButton(HistogramButton,    histogramButton);
-    
+
     if(m_camera) {
         QTimer *timer = new QTimer(this);
-        
+
         connect(timer,              SIGNAL(timeout()),                                                  this,   SLOT(updateIconButton()));
         connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),            this,   SLOT(updateIconButton()));
         connect(m_camera.data(),    SIGNAL(statusChanged(const QnResourcePtr &)),                       this,   SLOT(updateIconButton()));
@@ -157,7 +157,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     setContrastParams(item->contrastParams());
 }
 
-QnMediaResourceWidget::~QnMediaResourceWidget() 
+QnMediaResourceWidget::~QnMediaResourceWidget()
 {
     ensureAboutToBeDestroyedEmitted();
 
@@ -213,9 +213,9 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect) {
 
     for (int i = 0; i < channelCount(); ++i) {
         QRect rect = gridRect.translated(-channelGridOffset(i)).intersected(QRect(0, 0, MD_WIDTH, MD_HEIGHT));
-        if (rect.isEmpty()) 
+        if (rect.isEmpty())
             continue;
-        
+
         QRegion selection;
         selection += rect;
         selection -= m_motionSensitivity[i].getMotionMask();
@@ -223,7 +223,7 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect) {
         if(!selection.isEmpty()) {
             if(changed) {
                 /* In this case we don't need to bother comparing old & new selection regions. */
-                m_motionSelection[i] += selection; 
+                m_motionSelection[i] += selection;
             } else {
                 QRegion oldSelection = m_motionSelection[i];
                 m_motionSelection[i] += selection;
@@ -375,7 +375,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
     if(m_display) {
         connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
         connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
-        
+
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
@@ -436,7 +436,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     updateRendererEnabled();
 
     for(int channel = 0; channel < channelCount(); channel++)
-        m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true)); 
+        m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
     if(isOverlayVisible() && isInfoVisible())
         updateInfoTextLater();
@@ -456,7 +456,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     QRectF sourceRect = toSubRect(channelRect, paintRect);
     Qn::RenderStatus result = m_renderer->paint(channel, sourceRect, paintRect, effectiveOpacity());
     m_paintedChannels[channel] = true;
-    
+
     /* There is no need to restore blending state before invoking endNativePainting. */
     painter->endNativePainting();
 
@@ -692,7 +692,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
 
         timeString = tr("\t%1").arg(
-            m_display->camDisplay()->isRealTimeSource() ? 
+            m_display->camDisplay()->isRealTimeSource() ?
             tr("LIVE") :
             QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"))
         );
@@ -785,7 +785,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
         setAspectRatio(-1);
     } else {
         setAspectRatio(
-            QnGeometry::aspectRatio(m_renderer->sourceSize()) * 
+            QnGeometry::aspectRatio(m_renderer->sourceSize()) *
             QnGeometry::aspectRatio(channelLayout()->size()) *
             (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
         );
@@ -824,7 +824,7 @@ void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     if(checked)
         buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
 }
-void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) 
+void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
 {
     ImageCorrectionParams params = item()->contrastParams();
     if (params.enabled == checked)

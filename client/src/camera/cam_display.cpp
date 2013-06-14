@@ -121,7 +121,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_fullScreen(false),
     m_prevLQ(-1),
     m_doNotChangeDisplayTime(false),
-    m_firstLivePacket(true)
+    m_firstLivePacket(true),
+    m_multiView(false)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -202,15 +203,18 @@ void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bo
     {
         if (!m_display[i])
             m_display[i] = new QnVideoStreamDisplay(canDownscale, i);
-        m_display[i]->addRenderer(vw);
+        int rendersCount = m_display[i]->addRenderer(vw);
+        m_multiView = rendersCount > 1;
     }
 }
 
 void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        if (m_display[i])
-            m_display[i]->removeRenderer(vw);
+        if (m_display[i]) {
+            int rendersCount = m_display[i]->removeRenderer(vw);
+            m_multiView = rendersCount > 1;
+        }
     }
 }
 
@@ -1610,6 +1614,11 @@ QSize QnCamDisplay::getVideoSize() const
         return m_display[0]->getImageSize();
     else
         return QSize();
+}
+
+bool QnCamDisplay::isZoomWindow() const
+{
+    return m_multiView;
 }
 
 bool QnCamDisplay::isFullScreen() const

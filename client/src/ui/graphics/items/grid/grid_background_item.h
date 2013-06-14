@@ -9,18 +9,19 @@
 #include <camera/gl_renderer.h>
 
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/app_server_image_cache.h>
 
 class QnWorkbenchGridMapper;
 
-class QnGridBackgroundItem : public QGraphicsObject
+class QnGridBackgroundItem : public QGraphicsObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QRectF viewportRect READ viewportRect WRITE setViewportRect)
 
 public:
-    explicit QnGridBackgroundItem(QGraphicsItem *parent = NULL);
+    explicit QnGridBackgroundItem(QGraphicsItem *parent = NULL, QnWorkbenchContext* context = NULL);
     virtual ~QnGridBackgroundItem();
 
     virtual QRectF boundingRect() const override;
@@ -43,6 +44,7 @@ public:
 
     QRect sceneBoundingRect() const;
 
+public slots:
     void updateDisplay();
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

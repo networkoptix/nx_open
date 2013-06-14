@@ -9,9 +9,9 @@
 #include "business/actions/abstract_business_action.h"
 #include "business/events/abstract_business_event.h"
 #include "core/resource/network_resource.h"
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnEventLogModel;
-class QnWorkbenchContext;
 class QnBusinessRulesActualModel;
 class QnBusinessRuleViewModel;
 
@@ -19,7 +19,7 @@ namespace Ui {
     class EventLogDialog;
 }
 
-class QnEventLogDialog: public QDialog
+class QnEventLogDialog: public QDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -34,9 +34,9 @@ public:
     * \param camRes optional camera resource
     * \param businessRuleId optional business rule id
     */
-    void query(qint64 fromMsec, qint64 toMsec, 
+    void query(qint64 fromMsec, qint64 toMsec,
                QnResourceList camList,
-               BusinessEventType::Value eventType, 
+               BusinessEventType::Value eventType,
                BusinessActionType::Value actionType,
                QnId businessRuleId);
 
@@ -72,11 +72,10 @@ private:
     bool isCameraMatched(QnBusinessRuleViewModel* ruleModel) const;
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
- 
+
     QScopedPointer<Ui::EventLogDialog> ui;
     QnEventLogModel *m_model;
     QSet<int> m_requests;
-    QnWorkbenchContext* m_context;
 
     QVector <QnBusinessActionDataListPtr> m_allEvents;
     QnResourceList m_filterCameraList;

@@ -96,7 +96,8 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags 
     m_skipNextHoverEvents(false),
     m_hoverProgress(0.0),
     m_action(NULL),
-    m_actionIconOverridden(false)
+    m_actionIconOverridden(false),
+    m_baseColor(Qt::white)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
@@ -208,7 +209,7 @@ void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
     }
     if(!self)
         return;
-    
+
     emit clicked(isChecked());
     if(!self)
         return;
@@ -231,11 +232,15 @@ void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
         menu->exec(pos);
         updateState(m_state & ~PRESSED);
 
-        /* Cannot use QMenu::setNoReplayFor, as it will block click events for the whole scene. 
+        /* Cannot use QMenu::setNoReplayFor, as it will block click events for the whole scene.
          * This is why we resort to nasty hacks with mouse position comparisons. */
         m_skipNextMenuEvents = 1;
         m_nextMenuEventPos = QCursor::pos();
     }
+}
+
+void QnImageButtonWidget::setBaseColor(const QColor &color) {
+    m_baseColor = color;
 }
 
 void QnImageButtonWidget::click() {
@@ -258,7 +263,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor(1.0, 1.0, 1.0, painter->opacity());
+    glColor(m_baseColor.redF(), m_baseColor.greenF(), m_baseColor.blueF(), painter->opacity());
 
     bool isZero = qFuzzyIsNull(progress);
     bool isOne = qFuzzyCompare(progress, 1.0);
@@ -303,8 +308,8 @@ void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *) {
 void QnImageButtonWidget::releasedNotify(QGraphicsSceneMouseEvent *event) {
     setPressed(false);
 
-    /* Next hover events that we will receive are enter and move converted from 
-     * release event, skip them. */ 
+    /* Next hover events that we will receive are enter and move converted from
+     * release event, skip them. */
     m_skipNextHoverEvents = 2;
     m_nextHoverEventPos = event->screenPos();
 
@@ -408,7 +413,7 @@ bool QnImageButtonWidget::event(QEvent *event) {
     QActionEvent *actionEvent = static_cast<QActionEvent *>(event);
 
     switch (event->type()) {
-        /* We process hover events here because they don't get forwarded to event 
+        /* We process hover events here because they don't get forwarded to event
          * handlers for graphics widgets without decorations. */
     case QEvent::GraphicsSceneHoverEnter:
         hoverEnterEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
@@ -552,7 +557,7 @@ void QnImageButtonWidget::updateState(StateFlags state) {
          * and in this case we shouldn't do any back-sync. */
         bool newDisabled = m_state & DISABLED;
         if(newDisabled != isDisabled())
-            setDisabled(newDisabled); 
+            setDisabled(newDisabled);
     }
 
     if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED)) /* !HOVERED -> HOVERED transition */

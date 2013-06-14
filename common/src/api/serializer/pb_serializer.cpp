@@ -1131,13 +1131,11 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QB
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
 {
-    //TODO: #vasilenko UTF unuse std::string
     historyItem = QnCameraHistoryItemPtr(new QnCameraHistoryItem(
                                             QString::fromUtf8(pb_cameraServerItem.physicalid().c_str()),
                                             pb_cameraServerItem.timestamp(),
                                             QString::fromUtf8(pb_cameraServerItem.serverguid().c_str())
                                         ));
-
 }
 
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule)
