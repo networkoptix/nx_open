@@ -38,14 +38,13 @@ float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) co
 void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int height, int stride, 
                                          const ImageCorrectionParams& data, const QRectF& srcRect)
 {
-    Q_ASSERT(width % 4 == 0 && stride % 4 == 0);
-
-
     if (!data.enabled || yPlane == 0)
     {
         filled = false;
         return;
     }
+
+    Q_ASSERT(stride % 4 == 0);
 
     int left = qPower2Floor(srcRect.left()*width, 4);
     int right = qPower2Floor(srcRect.right()*width, 4);
