@@ -103,6 +103,7 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     /* Prepare shaders. */
     m_yuy2ToRgbShaderProgram.reset( new QnYuy2ToRgbShaderProgram(context) );
     m_yv12ToRgbShaderProgram.reset( new QnYv12ToRgbShaderProgram(context) );
+    m_yv12ToRgbWithGammaShaderProgram.reset( new QnYv12ToRgbWithGammaShaderProgram(context) );
     m_yv12ToRgbaShaderProgram.reset( new QnYv12ToRgbaShaderProgram(context) );
     //m_nv12ToRgbShaderProgram.reset( new QnNv12ToRgbShaderProgram(context) );
 
@@ -273,6 +274,9 @@ ImageCorrectionResult QnGLRenderer::calcImageCorrection()
     return m_imageCorrector;
 }
 
+static qint64 gggCnt = 0;
+static qint64 gggTime = 0;
+
 void QnGLRenderer::drawYV12VideoTexture(
     const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
     const QRectF& tex0Coords,
@@ -294,25 +298,28 @@ void QnGLRenderer::drawYV12VideoTexture(
     glEnable(GL_TEXTURE_2D);
     DEBUG_CODE(glCheckError("glEnable"));
 
-    m_yv12ToRgbShaderProgram->bind();
-    m_yv12ToRgbShaderProgram->setYTexture( 0 );
-    m_yv12ToRgbShaderProgram->setUTexture( 1 );
-    m_yv12ToRgbShaderProgram->setVTexture( 2 );
-    m_yv12ToRgbShaderProgram->setOpacity(m_decodedPictureProvider.opacity());
+    QnAbstractYv12ToRgbShaderProgram* shader;
+    if (m_imgCorrectParam.enabled)
+        shader = m_yv12ToRgbWithGammaShaderProgram.data();
+    else
+        shader = m_yv12ToRgbShaderProgram.data();
+    shader->bind();
+    shader->setYTexture( 0 );
+    shader->setUTexture( 1 );
+    shader->setVTexture( 2 );
+    shader->setOpacity(m_decodedPictureProvider.opacity());
     if (m_imgCorrectParam.enabled) {
         if (!isPaused()) {
-            m_yv12ToRgbShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
+            m_yv12ToRgbWithGammaShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
             if (m_histogramConsumer)
                 m_histogramConsumer->setHistogramData(picLock->imageCorrectionResult());
         }
         else {
-            m_yv12ToRgbShaderProgram->setImageCorrection(calcImageCorrection());
+            m_yv12ToRgbWithGammaShaderProgram->setImageCorrection(calcImageCorrection());
             if (m_histogramConsumer) 
                 m_histogramConsumer->setHistogramData(m_imageCorrector);
         }
     }
-    else
-        m_yv12ToRgbShaderProgram->setImageCorrection(ImageCorrectionResult());
 
     glActiveTexture(GL_TEXTURE2);
     DEBUG_CODE(glCheckError("glActiveTexture"));
@@ -331,7 +338,7 @@ void QnGLRenderer::drawYV12VideoTexture(
 
     drawBindedTexture( v_array, tx_array );
 
-    m_yv12ToRgbShaderProgram->release();
+    shader->release();
 }
 
 #ifndef GL_TEXTURE3
@@ -366,10 +373,6 @@ void QnGLRenderer::drawYVA12VideoTexture(
     m_yv12ToRgbaShaderProgram->setVTexture( 2 );
     m_yv12ToRgbaShaderProgram->setATexture( 3 );
     m_yv12ToRgbaShaderProgram->setOpacity(m_decodedPictureProvider.opacity() );
-    if (m_imgCorrectParam.enabled)
-        m_yv12ToRgbaShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
-    else
-        m_yv12ToRgbaShaderProgram->setImageCorrection(ImageCorrectionResult());
 
     glActiveTexture(GL_TEXTURE3);
     DEBUG_CODE(glCheckError("glActiveTexture"));
