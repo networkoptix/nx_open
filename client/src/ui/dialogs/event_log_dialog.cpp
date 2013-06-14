@@ -26,8 +26,8 @@
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
-    m_context(context),
     m_updateDisabled(false),
     m_dirty(false),
     m_lastMouseButton(Qt::NoButton)
@@ -100,13 +100,13 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(ui->eventComboBox,      SIGNAL(currentIndexChanged(int)),   this, SLOT(updateData()) );
     connect(ui->actionComboBox,     SIGNAL(currentIndexChanged(int)),   this, SLOT(updateData()) );
     connect(ui->refreshButton,      SIGNAL(clicked(bool)),              this, SLOT(updateData()) );
-    connect(ui->eventRulesButton,   SIGNAL(clicked(bool)),              m_context->action(Qn::BusinessEventsAction), SIGNAL(triggered()));
+    connect(ui->eventRulesButton,   SIGNAL(clicked(bool)),              this->context()->action(Qn::BusinessEventsAction), SIGNAL(triggered()));
 
     connect(ui->cameraButton,       SIGNAL(clicked(bool)),              this, SLOT(at_cameraButtonClicked()) );
     connect(ui->gridEvents,         SIGNAL(clicked(const QModelIndex&)),this, SLOT(at_itemClicked(const QModelIndex&)) );
     connect(ui->gridEvents,         SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(at_customContextMenuRequested(const QPoint&)) );
     connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), m_model, SLOT(rebuild()) );
-    
+
     ui->mainGridLayout->activate();
     updateHeaderWidth();
 
@@ -194,7 +194,7 @@ void QnEventLogDialog::updateData()
 QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
 {
     QList<QnMediaServerResourcePtr> result;
-    QnResourceList resList = m_context->resourcePool()->getAllResourceByTypeName(lit("Server"));
+    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
     foreach(const QnResourcePtr& r, resList) {
         QnMediaServerResourcePtr mServer = r.dynamicCast<QnMediaServerResource>();
         if (mServer)
@@ -204,7 +204,7 @@ QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
     return result;
 }
 
-void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec, 
+void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                              QnResourceList camList,  //TODO: #vasilenko why parameter is not used?
                              BusinessEventType::Value eventType,
                              BusinessActionType::Value actionType,
@@ -212,19 +212,19 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 {
     m_requests.clear();
     m_allEvents.clear();
-    
+
 
     QList<QnMediaServerResourcePtr> mediaServerList = getServerList();
     foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
     {
-        if (mserver->getStatus() == QnResource::Online) 
+        if (mserver->getStatus() == QnResource::Online)
         {
             m_requests << mserver->apiConnection()->asyncEventLog(
-                fromMsec, toMsec, 
-                m_filterCameraList, 
+                fromMsec, toMsec,
+                m_filterCameraList,
                 eventType,
                 actionType,
-                businessRuleId, 
+                businessRuleId,
                 this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
         }
     }
@@ -251,7 +251,7 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataLi
         m_allEvents << events;
     if (m_requests.isEmpty()) {
         requestFinished();
-        if (m_model->rowCount() == 0 && isFilterExist() && !isRuleExistByCond()) 
+        if (m_model->rowCount() == 0 && isFilterExist() && !isRuleExistByCond())
         {
             QMessageBox::information(this, tr("No rule(s) for current filter"), tr("You have not configured business rules to match current filter condition."));
         }
@@ -292,13 +292,13 @@ bool QnEventLogDialog::isRuleExistByCond() const
     if (ui->actionComboBox->currentIndex() > 0)
         actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
-    
+
     for (int i = 0; i < m_rulesModel->rowCount(); ++i)
     {
         QnBusinessRuleViewModel* ruleModel = m_rulesModel->getRuleModel(i);
         if (ruleModel->disabled())
             continue;
-        bool isEventMatch = eventType == BusinessEventType::NotDefined || 
+        bool isEventMatch = eventType == BusinessEventType::NotDefined ||
                             eventType == BusinessEventType::AnyBusinessEvent ||
                             ruleModel->eventType() == eventType ||
                             BusinessEventType::parentEvent(ruleModel->eventType()) == eventType;
@@ -308,7 +308,7 @@ bool QnEventLogDialog::isRuleExistByCond() const
                 return true;
         }
     }
-    
+
     return false;
 }
 
@@ -339,8 +339,8 @@ void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
         QnActionParameters params(resource);
         params.setArgument(Qn::ItemTimeRole, pos);
 
-        m_context->menu()->trigger(Qn::OpenInNewLayoutAction, params);
-        
+        context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+
         if (isMaximized())
             showNormal();
     }
@@ -374,7 +374,7 @@ QString QnEventLogDialog::getTextForNCameras(int n) const
         return tr("< Any camera >");
     else if (n == 1)
         return tr("< 1 camera >");
-    else 
+    else
         return tr("< %1 cameras >").arg(n);
 }
 
@@ -422,7 +422,7 @@ void QnEventLogDialog::at_filterAction()
     BusinessEventType::Value parentEventType = BusinessEventType::parentEvent(eventType);
     if (parentEventType != BusinessEventType::AnyBusinessEvent && parentEventType != BusinessEventType::NotDefined)
         eventType = parentEventType;
-    
+
     QnSecurityCamResourcePtr cameraResource = m_model->eventResource(idx.row()).dynamicCast<QnSecurityCamResource>();
     QnResourceList camList;
     if (cameraResource)
@@ -439,10 +439,10 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
 {
     QMenu* menu = 0;
     QModelIndex idx = ui->gridEvents->currentIndex();
-    if (idx.isValid()) 
+    if (idx.isValid())
     {
         QnResourcePtr resource = m_model->getResource(idx);
-        QnActionManager *manager = m_context->menu();
+        QnActionManager *manager = context()->menu();
         if (resource) {
             menu = manager->newMenu(Qn::TreeScope, QnActionParameters(resource));
             foreach(QAction* action, menu->actions())
