@@ -44,6 +44,44 @@ void QnResourceListModel::setResources(const QnResourceList &resouces) {
     endResetModel();
 }
 
+void QnResourceListModel::addResource(const QnResourcePtr &resource) 
+{
+
+    foreach(const QnResourcePtr &r, m_resources) {
+        if (r->getId() == resource->getId())
+            return;
+    }
+
+    beginResetModel();
+
+    connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    m_resources << resource;
+
+    endResetModel();
+}
+
+void QnResourceListModel::removeResource(const QnResourcePtr &resource) 
+{
+    if (!resource)
+        return;
+
+    beginResetModel();
+
+    for (int i = 0; i < m_resources.size(); ++i)
+    {
+        if (m_resources[i]->getId() == resource->getId())
+        {
+            disconnect(m_resources[i].data(), NULL, this, NULL);
+            m_resources.removeAt(i);
+            break;
+        }
+    }
+
+    endResetModel();
+}
+
 void QnResourceListModel::updateFromResources() {
     QStringList names = m_names;
     m_names.clear();

@@ -84,7 +84,10 @@ namespace Qn {
         TimePeriodsRole,
         MergedTimePeriodsRole,
         AutoConnectRole,
-        FileNameRole,
+        FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
+        TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
+        TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
+        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
 
 
         /* Others. */
@@ -272,7 +275,6 @@ namespace Qn {
         ClientTimeMode  
     };
 
-    // TODO: #GDM this enum belongs to resource tree model as it's not used outside its context.
     /**
      * Columns in the resource tree model.
      */
@@ -281,6 +283,33 @@ namespace Qn {
         CheckColumn,
         ColumnCount
     };
+
+    /**
+     * Overlay for resource widgets.
+     */
+    enum ResourceStatusOverlay {
+        EmptyOverlay,
+        PausedOverlay,
+        LoadingOverlay,
+        NoDataOverlay,
+        UnauthorizedOverlay,
+        OfflineOverlay,
+        AnalogWithoutLicenseOverlay
+    };
+
+    /**
+     * Result of a frame rendering operation. 
+     * 
+     * Note that the order is important here --- higher values are prioritized
+     * when calculating cumulative status of several rendering operations.
+     */
+    enum RenderStatus {
+        NothingRendered,    /**< No frames to render, so nothing was rendered. */
+        CannotRender,       /**< Something went wrong. */
+        OldFrameRendered,   /**< No new frames available, old frame was rendered. */
+        NewFrameRendered    /**< New frame was rendered. */
+    };
+
 
     /**
      * Video resolution adjustment mode for RADASS.

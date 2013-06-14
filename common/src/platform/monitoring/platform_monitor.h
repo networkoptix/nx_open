@@ -61,6 +61,19 @@ public:
     };
 
     /**
+     * Type of a partition.
+     */
+    enum PartitionType {
+        LocalDiskPartition      = 0x01,
+        RamDiskPartition        = 0x02,
+        OpticalDiskPartition    = 0x04,
+        SwapPartition           = 0x08,
+        NetworkPartition        = 0x10,
+        UnknownPartition        = 0x20,
+    };
+    Q_DECLARE_FLAGS(PartitionTypes, PartitionType)
+
+    /**
      * Partition space entry.
      */
     struct PartitionSpace {
@@ -70,6 +83,9 @@ public:
 
         /** Partition's root path. */
         QString path;
+
+        /** Partition's type. */
+        PartitionType type;
 
         /** Free space of this partition in bytes */
         quint64 freeBytes;
@@ -128,10 +144,14 @@ public:
     virtual QList<NetworkLoad> totalNetworkLoad() = 0;
 
     /**
-     * @returns                         A list of partition space entries for all partitions on
-     *                                  all HDDs on this PC.
+     * @returns                         A list of partition space entries for all partitions on this PC.
      */
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() = 0;
+
+    /**
+     * @returns                         A list of partition space entries for all partitions of the given types on this PC.
+     */
+    QList<PartitionSpace> totalPartitionSpaceInfo(PartitionTypes types);
 
     /**
      * @brief partitionByPath           Get partition name by path to some folder located on this partition.
@@ -145,5 +165,7 @@ public:
 private:
     Q_DISABLE_COPY(QnPlatformMonitor)
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnPlatformMonitor::PartitionTypes);
 
 #endif // QN_PLATFORM_MONITOR_H

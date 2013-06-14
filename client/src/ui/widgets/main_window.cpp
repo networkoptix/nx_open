@@ -182,8 +182,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::EscapeHotkeyAction));
     addAction(action(Qn::FullscreenAction));
     addAction(action(Qn::AboutAction));
-    addAction(action(Qn::SystemSettingsAction));
+    addAction(action(Qn::PreferencesGeneralTabAction));
     addAction(action(Qn::BusinessEventsLogAction));
+    addAction(action(Qn::CameraListAction));
     addAction(action(Qn::BusinessEventsAction));
     addAction(action(Qn::WebClientAction));
     addAction(action(Qn::OpenFileAction));
