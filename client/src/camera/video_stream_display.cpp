@@ -76,19 +76,21 @@ void QnVideoStreamDisplay::pleaseStop()
     //    render->pleaseStop();
 }
 
-void QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
+int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 {
     QMutexLocker lock(&m_renderListMtx);
     renderer->setScreenshotInterface(this);
     m_newList << renderer;
     m_renderListModified = true;
+    return m_newList.size();
 }
 
-void QnVideoStreamDisplay::removeRenderer(QnAbstractRenderer* renderer)
+int QnVideoStreamDisplay::removeRenderer(QnAbstractRenderer* renderer)
 {
     QMutexLocker lock(&m_renderListMtx);
     m_newList.remove(renderer);
     m_renderListModified = true;
+    return m_newList.size();
 }
 
 QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::getCurrentDownscaleFactor() const
