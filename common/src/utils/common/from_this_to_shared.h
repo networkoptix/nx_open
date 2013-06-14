@@ -26,11 +26,11 @@ private:
 
     /* Private API for QnSharedResourcePointer. */
 
-    template<class T>
+    template<class T1>
     friend class QnSharedResourcePointer;
 
-    template<class T>
-    void initWeakPointer(const QSharedPointer<T>& pointer)
+    template<class T2>
+    void initWeakPointer(const QSharedPointer<T2>& pointer)
     {
         assert(!pointer.isNull());
         assert(m_weakPointer.toStrongRef().isNull()); /* Error in this line means that you have created two distinct shared pointers to a single resource instance. */

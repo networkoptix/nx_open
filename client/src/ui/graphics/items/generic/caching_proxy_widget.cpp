@@ -1,5 +1,9 @@
+
 #include "caching_proxy_widget.h"
+
 #include <cassert>
+#include <Glu.h>
+
 #include <QEvent>
 #include <QSysInfo>
 #include <ui/graphics/opengl/gl_shortcuts.h>

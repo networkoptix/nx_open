@@ -1,8 +1,13 @@
 #ifndef __IMAGE_CORRECTION_H__
 #define __IMAGE_CORRECTION_H__
 
-#include <QRectF>
+#include <cstring>
+
+#include <QtGlobal>
 #include <QByteArray>
+#include <QList>
+#include <QRectF>
+#include <QMetaType>
 
 struct ImageCorrectionParams
 {

@@ -2,6 +2,7 @@
 #define QN_ADJUST_VIDEO_DIALOG_H
 
 #include <QtGui/QDialog>
+#include <QAbstractButton>
 
 #include <client/client_settings.h>
 #include <utils/network/networkoptixmodulefinder.h>

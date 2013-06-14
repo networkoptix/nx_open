@@ -1,5 +1,13 @@
+
 #include "time_image_filter.h"
+
+#include <QDateTime>
+#include <QFontMetrics>
+#include <QImage>
+#include <QPainter>
+
 #include "utils/color_space/yuvconvert.h"
+
 
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
 static const int MIN_TEXT_HEIGHT = 14;
