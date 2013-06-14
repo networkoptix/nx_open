@@ -1,10 +1,10 @@
 #include "camera_list_dialog.h"
 
-#include <QClipboard>
-#include <QMenu>
+#include <QtGui/QClipboard>
+#include <QtGui/QMenu>
 
 #include <core/resource_managment/resource_pool.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <ui_camera_list_dialog.h>
 #include <ui/models/camera_list_model.h>
@@ -37,9 +37,9 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     m_resourceSearch->setSourceModel(m_model);
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(lit("*"),Qt::CaseInsensitive, QRegExp::Wildcard)));
 
-    connect(ui->SearchString, SIGNAL(textChanged(const QString&)), this, SLOT(at_searchStringChanged(const QString&)));
-    connect(ui->gridCameras,  SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(at_customContextMenuRequested(const QPoint&)) );
-    connect(ui->gridCameras,  SIGNAL(doubleClicked(const QModelIndex& )), this, SLOT(at_gridDoublelClicked(const QModelIndex&)) );
+    connect(ui->SearchString, SIGNAL(textChanged(const QString &)), this, SLOT(at_searchStringChanged(const QString &)));
+    connect(ui->gridCameras,  SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(at_customContextMenuRequested(const QPoint &)));
+    connect(ui->gridCameras,  SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(at_gridDoubleClicked(const QModelIndex &)));
 
     ui->gridCameras->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->gridCameras->setModel(m_resourceSearch);
@@ -63,17 +63,17 @@ void QnCameraListDialog::at_searchStringChanged(const QString& text)
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
 }
 
-void QnCameraListDialog::at_gridDoublelClicked(const QModelIndex& idx)
+void QnCameraListDialog::at_gridDoubleClicked(const QModelIndex &index)
 {
-    if (idx.isValid())
+    if (index.isValid())
     {
-        QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         if (resource)
             context()->menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnActionParameters(resource));
     }
 }
 
-void QnCameraListDialog::at_customContextMenuRequested(const QPoint&)
+void QnCameraListDialog::at_customContextMenuRequested(const QPoint &)
 {
     QModelIndexList list = ui->gridCameras->selectionModel()->selectedRows();
     QnResourceList resList;

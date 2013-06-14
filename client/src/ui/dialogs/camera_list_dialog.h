@@ -1,12 +1,13 @@
-#ifndef __CAMERA_LIST_DIALOG_H__
-#define __CAMERA_LIST_DIALOG_H__
+#ifndef QN_CAMERA_LIST_DIALOG_H
+#define QN_CAMERA_LIST_DIALOG_H
 
-#include <QDialog>
-#include <QStandardItem>
-#include <QAbstractItemModel>
-#include <QModelIndex>
+#include <QtCore/QAbstractItemModel>
+#include <QtCore/QModelIndex>
+#include <QtGui/QDialog>
+#include <QtGui/QStandardItem>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <core/resource/resource_fwd.h>
 
 class QnCameraListModel;
 class QnWorkbenchContext;
@@ -16,21 +17,22 @@ namespace Ui {
     class CameraListDialog;
 }
 
-class QnCameraListDialog: public QDialog, public QnWorkbenchContextAware
-{
+class QnCameraListDialog: public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 
 public:
     explicit QnCameraListDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnCameraListDialog();
+
 private slots:
-    void at_searchStringChanged(const QString& text);
-    void at_customContextMenuRequested(const QPoint&);
+    void at_searchStringChanged(const QString &text);
+    void at_customContextMenuRequested(const QPoint &pos);
     void at_copyToClipboard();
-    void at_gridDoublelClicked(const QModelIndex& idx);
+    void at_gridDoubleClicked(const QModelIndex &index);
     void at_modelChanged();
-    void at_resPool_resourceRemoved(const QnResourcePtr & resource);
-    void at_resPool_resourceAdded(const QnResourcePtr & resource);
+    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
+    void at_resPool_resourceAdded(const QnResourcePtr &resource);
+
 private:
     Q_DISABLE_COPY(QnCameraListDialog)
 
@@ -40,4 +42,4 @@ private:
     QAction* m_clipboardAction;
 };
 
-#endif // __CAMERA_LIST_DIALOG_H__
+#endif // QN_CAMERA_LIST_DIALOG_H
