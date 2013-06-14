@@ -1,6 +1,7 @@
 #define QT_NO_CAST_FROM_ASCII
 
 #include <common/config.h>
+#include <common/common_globals.h>
 
 #ifdef _WIN32
 #include <winsock2.h>

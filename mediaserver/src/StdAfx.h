@@ -1,4 +1,5 @@
 #include <common/config.h>
+#include <common/common_globals.h>
 
 /* Boost headers. */
 #include <boost/foreach.hpp>

@@ -219,7 +219,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
     {
         if (mserver->getStatus() == QnResource::Online) 
         {
-            m_requests << mserver->apiConnection()->asyncEventLog(
+            m_requests << mserver->apiConnection()->getEventLogAsync(
                 fromMsec, toMsec, 
                 m_filterCameraList, 
                 eventType,

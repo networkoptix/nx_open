@@ -75,13 +75,16 @@ public:
      * Get \a camera thumbnail for specified time. 
      * 
      * Returns immediately. On request completion \a slot of object \a target 
-     * is called with signature <tt>(int httpStatusCode, QImage > &params)</tt>.
-     * \a status is 0 in case of success, in other cases it holds error code 
-     * \p time requested time in usecs. Can be DATE_TIME_NOW for live video or -1 for request latest available image
-     * \p size can be filled partially: only width or height. At this case other dimension is auto detected
-     * \p imageFormat can be 'jpeg', 'tiff', 'png' e.t.c
-     * \p precise if false then get image from nearest I-frame
+     * is called with signature <tt>(int status, QImage reply, int handle)</tt>.
+     * Status is 0 in case of success, in other cases it holds error code.
      * 
+     * \param camera
+     * \param timeUsec                  Requested time in usecs. Can be DATE_TIME_NOW for live video or -1 for request latest available image.
+     * \param size                      Can be filled partially: only width or height. In this case other dimension is auto detected.
+     * \param imageFormat               Can be 'jpeg', 'tiff', 'png', etc...
+     * \param precise                   If false then get image from nearest I-frame.
+     * \param target
+     * \param slot
      * \returns                         Request handle.
 	 */
     int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, bool precise, QObject *target, const char *slot);
@@ -97,7 +100,6 @@ public:
 	 */
     int getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot);
 
-    // TODO: #Elric rename getEventLogAsync
 	/** 
      * Get \a event log. 
      * 
@@ -105,20 +107,22 @@ public:
      * is called with signature <tt>(int handle, int httpStatusCode, const QList<QnAbstractBusinessAction> &events)</tt>.
      * \a status is 0 in case of success, in other cases it holds error code 
      * 
-     * \param camRes filter events by camera. Optional.
-     * \param dateFrom  start timestamp in msec
-     * \param dateTo end timestamp in msec. Can be DATETIME_NOW
-     * \param businessRuleId filter events by specified business rule. Optional.
+     * \param dateFrom                  Start timestamp in msec.
+     * \param dateTo                    End timestamp in msec. Can be <tt>DATETIME_NOW</tt>.
+     * \param cameras                   Filter events by camera. Optional.
+     * \param businessRuleId            Filter events by specified business rule. Optional.
      * 
      * \returns                         Request handle.
 	 */
-    int asyncEventLog(
-        qint64 dateFrom, qint64 dateTo, 
-        QnResourceList camList,
+    int getEventLogAsync(
+        qint64 dateFrom, 
+        qint64 dateTo, 
+        QnResourceList cameras,
         BusinessEventType::Value eventType, 
         BusinessActionType::Value actionType,
         QnId businessRuleId, 
-        QObject *target, const char *slot);
+        QObject *target, 
+        const char *slot);
 
     /**
      * \returns                         Http response status (200 in case of success).
