@@ -402,10 +402,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Help")).
         icon(qnSkin->icon("titlebar/whats_this.png"));
 
-    factory(Qn::CheckSystemHealthAction).
-        flags(Qn::NoTarget).
-        text(tr("Check System Health..."));
-
     factory(Qn::ClearCacheAction).
         flags(Qn::NoTarget).
         text(tr("Clear cache"));
