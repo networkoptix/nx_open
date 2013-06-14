@@ -343,7 +343,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
                 BusinessActionType::Value actionType = action.actionType();
                 if (actionType == BusinessActionType::SendMail) {
                     if (!action.getParams().getEmailAddress().isEmpty()) {
-                        if (action.getParams().getEmailAddress().indexOf(L';') > 0)
+                        if (action.getParams().getEmailAddress().count(L'@') > 1)
                             return qnResIconCache->icon(QnResourceIconCache::Users);
                         else
                             return qnResIconCache->icon(QnResourceIconCache::User);
