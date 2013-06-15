@@ -32,7 +32,7 @@ public:
     //QnMediaContextPtr getVideoCodecContext();
     //QnMediaContextPtr getAudioCodecContext();
     QnCompressedVideoDataPtr getLastVideoFrame();
-    QnCompressedVideoDataPtr GetIFrameByTime(qint64 time);
+    QnCompressedVideoDataPtr GetIFrameByTime(qint64 time, bool iFrameAfterTime);
     QnCompressedAudioDataPtr getLastAudioFrame();
     void updateCameraActivity();
 private:
@@ -149,7 +149,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
 }
 
 
-QnCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time)
+QnCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time, bool iFrameAfterTime)
 {
     QnCompressedVideoDataPtr result;
 
@@ -163,11 +163,17 @@ QnCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time)
 
     for (int i = 0; i < m_lastKeyFrames.size(); ++i)
     {
-        if (m_lastKeyFrames[i]->timestamp >= time)
-            return m_lastKeyFrames[i];
+        if (m_lastKeyFrames[i]->timestamp >= time) {
+            if (iFrameAfterTime || m_lastKeyFrames[i]->timestamp == time || i == 0)
+                return m_lastKeyFrames[i];
+            else
+                return m_lastKeyFrames[i-1];
+        }
     }
-
-    return m_lastKeyFrame;
+    if (iFrameAfterTime || m_lastKeyFrames.empty())
+        return m_lastKeyFrame;
+    else
+        return m_lastKeyFrames.back();
 }
 
 
@@ -312,11 +318,11 @@ QnMediaContextPtr QnVideoCamera::getAudioCodecContext(bool primaryLiveStream)
 }
 */
 
-QnCompressedVideoDataPtr QnVideoCamera::getFrameByTime(bool primaryLiveStream, qint64 time)
+QnCompressedVideoDataPtr QnVideoCamera::getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime)
 {
     QnVideoCameraGopKeeper* gopKeeper = primaryLiveStream ? m_primaryGopKeeper : m_secondaryGopKeeper;
     if (gopKeeper)
-        return gopKeeper->GetIFrameByTime(time);
+        return gopKeeper->GetIFrameByTime(time, iFrameAfterTime);
     else
         return QnCompressedVideoDataPtr();
 }

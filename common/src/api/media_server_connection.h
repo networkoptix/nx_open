@@ -71,6 +71,8 @@ public:
 
     int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
 
+
+    enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
 	/** 
      * Get \a camera thumbnail for specified time. 
      * 
@@ -82,12 +84,12 @@ public:
      * \param timeUsec                  Requested time in usecs. Can be DATE_TIME_NOW for live video or -1 for request latest available image.
      * \param size                      Can be filled partially: only width or height. In this case other dimension is auto detected.
      * \param imageFormat               Can be 'jpeg', 'tiff', 'png', etc...
-     * \param precise                   If false then get image from nearest I-frame.
+     * \param method                    If parameter is 'before' or 'after' server returns nearest I-frame before or after time.
      * \param target
      * \param slot
      * \returns                         Request handle.
 	 */
-    int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, bool precise, QObject *target, const char *slot);
+    int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot);
 
 	/** 
      * Get \a camera params. 
