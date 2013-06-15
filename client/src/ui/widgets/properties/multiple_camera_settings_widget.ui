@@ -163,6 +163,16 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Advanced</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QnAdvancedSettingsWidget" name="advancedSettingsWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -172,6 +182,12 @@
    <class>QnCameraScheduleWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/camera_schedule_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnAdvancedSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/properties/advanced_settings_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

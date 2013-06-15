@@ -492,8 +492,18 @@
      </widget>
      <widget class="QWidget" name="advancedTab">
       <attribute name="title">
+       <string>Settings</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
        <string>Advanced</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QnAdvancedSettingsWidget" name="advancedSettingsWidget" native="true"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -510,6 +520,12 @@
    <class>QnTextTickSlider</class>
    <extends>QSlider</extends>
    <header>ui/widgets/properties/text_tick_slider.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnAdvancedSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/properties/advanced_settings_widget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
