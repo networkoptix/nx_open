@@ -9,7 +9,9 @@
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
     m_motionType(Qn::MT_Default),
-    m_recActionCnt(0)
+    m_recActionCnt(0),
+    m_secondaryQuality(SSQualityMedium),
+    m_cameraControlDisabled(false)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionMaskList << QnMotionRegion();
@@ -546,4 +548,24 @@ void QnSecurityCamResource::setGroupId(const QString& value)
 {
     QMutexLocker lk( &m_mutex );
     m_groupId = value;
+}
+
+void QnSecurityCamResource::setSecondaryStreamQuality(SecondaryStreamQuality quality)
+{
+    m_secondaryQuality = quality;
+}
+
+QnSecurityCamResource::SecondaryStreamQuality QnSecurityCamResource::secondaryStreamQuality() const
+{
+    return m_secondaryQuality;
+}
+
+void QnSecurityCamResource::setCameraControlDisabled(bool value)
+{
+    m_cameraControlDisabled = value;
+}
+
+bool QnSecurityCamResource::isCameraControlDisabled() const
+{
+    return m_cameraControlDisabled;
 }

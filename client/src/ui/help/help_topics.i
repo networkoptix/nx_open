@@ -81,7 +81,8 @@ QN_HELP_TOPIC(CameraSettings_General_Auth_Help,                 "configuring_cam
 QN_HELP_TOPIC(CameraSettings_Recording_Help,                    "editing_recording_schedule.htm")
 QN_HELP_TOPIC(CameraSettings_Recording_Export_Help,             "copying_recording_schedule_fro.htm")
 QN_HELP_TOPIC(CameraSettings_Motion_Help,                       "setting_up_motion_mask_and_motion_sensitivity_(adm.htm")
-QN_HELP_TOPIC(CameraSettings_Advanced_Help,                     "configuring_proprietary_camera_parameters.htm")
+QN_HELP_TOPIC(CameraSettings_Properties_Help,                   "configuring_proprietary_camera_parameters.htm")
+QN_HELP_TOPIC(CameraSettings_Advanced_Help,                     "advanced_camera_parameters.htm")
 
 QN_HELP_TOPIC(EventsActions_Help,								"configuring_events_and_actions.htm")
 
