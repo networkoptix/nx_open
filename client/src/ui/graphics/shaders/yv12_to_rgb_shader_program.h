@@ -1,10 +1,12 @@
 #ifndef QN_YV12_TO_RGB_SHADER_PROGRAM_H
 #define QN_YV12_TO_RGB_SHADER_PROGRAM_H
 
-#include "arb_shader_program.h"
 #include "utils/color_space/image_correction.h"
+#include <QtOpenGL/QGLShaderProgram>
+#include <QtOpenGL/QtOpenGL>
+#include "shader_source.h"
 
-class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram 
+class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram
 {
 public:
     QnAbstractYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
