@@ -474,7 +474,7 @@ void QnWorkbenchController::displayWidgetInfo(const QList<QnResourceWidget *> &w
         widget->setOption(QnResourceWidget::DisplayInfo, display);
 }
 
-void QnWorkbenchController::moveCursor(const QPoint &direction) {
+void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis) {
     QnWorkbenchItem *centerItem = m_cursorItem.data();
     if(!centerItem)
         centerItem = workbench()->currentLayout()->item(m_cursorPos);
@@ -483,66 +483,35 @@ void QnWorkbenchController::moveCursor(const QPoint &direction) {
     if(centerItem && !centerItem->geometry().contains(center))
         center = centerItem->geometry().topLeft();
 
-    QRect centerRect;
-    if(centerItem) {
-        centerRect = centerItem->geometry();
-    } else {
-        centerRect = QRect(center, QSize(1, 1));
-    }
-    
-    QPoint aAxis = direction; /* Direction axis (a-axis) */
-    QPoint bAxis = QPoint(-aAxis.y(), aAxis.x()); /* Axis perpendicular to direction (b-axis). */
-
-    int aCenterRectL = dot(centerRect.topLeft(), aAxis);
-    int aCenterRectH = dot(centerRect.bottomRight(), aAxis);
-    int bCenterRectL = dot(centerRect.topLeft(), bAxis);
-    int bCenterRectH = dot(centerRect.bottomRight(), bAxis);
-
     QRect boundingRect = workbench()->currentLayout()->boundingRect();
-    int aBoundingSize = qAbs(dot(toPoint(boundingRect.size()), aAxis)); /* Size of the bounding rect projected to the a-axis. */
+    QPoint aReturn = -aAxis * qAbs(dot(toPoint(boundingRect.size()), aAxis) / dot(aAxis, aAxis));
+    QPoint bReturn = -bAxis * qAbs(dot(toPoint(boundingRect.size()), bAxis) / dot(bAxis, bAxis));
 
-    int bestDistance = std::numeric_limits<int>::max();
-    QPoint bestPos = center;
+    QPoint pos = center;
+    QnWorkbenchItem *item = NULL;
+    while(true) {
+        pos += aAxis;
+        if(!boundingRect.contains(pos))
+            pos += aReturn + bAxis;
+        if(!boundingRect.contains(pos))
+            pos += bReturn;
+        if(pos == center)
+            return; /* No other items on layout. */
 
-    foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items()) {
-        if(item == centerItem)
-            continue;
-
-        const QRect &geometry = item->geometry();
-        for (int r = geometry.top(); r <= geometry.bottom(); r++) {
-            for (int c = geometry.left(); c <= geometry.right(); c++) {
-                QPoint pos(c, r);
-
-                int arDistance = distance(aCenterRectL, aCenterRectH, dot(pos, aAxis));
-                int brDistance = distance(bCenterRectL, bCenterRectH, dot(pos, bAxis));
-                if(brDistance > arDistance)
-                    continue;
-
-                int aDistance = (dot(pos - center, aAxis) + aBoundingSize) % aBoundingSize;
-                int bDistance = qAbs(dot(pos - center, bAxis));
-
-                int distance = (aDistance << 16) + bDistance;
-                if(distance < bestDistance) {
-                    bestDistance = distance;
-                    bestPos = pos;
-                }
-            }
-        }
+        item = workbench()->currentLayout()->item(pos);
+        if(item && item != centerItem)
+            break;
     }
-
-    if(bestPos == center)
-        return;
 
     Qn::ItemRole role = Qn::ZoomedRole;
     if(!workbench()->item(role))
         role = Qn::RaisedRole;
 
-    QnWorkbenchItem *bestItem = workbench()->currentLayout()->item(bestPos);
     display()->scene()->clearSelection();
-    display()->widget(bestItem)->setSelected(true);
-    workbench()->setItem(role, bestItem);
-    m_cursorPos = bestPos;
-    m_cursorItem = bestItem;
+    display()->widget(item)->setSelected(true);
+    workbench()->setItem(role, item);
+    m_cursorPos = pos;
+    m_cursorItem = item;
 }
 
 void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
@@ -698,25 +667,25 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     }
     case Qt::Key_Up:
         if(e->modifiers() == 0)
-            moveCursor(QPoint(0, -1));
+            moveCursor(QPoint(0, -1), QPoint(-1, 0));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, -15));
         return;
     case Qt::Key_Down:
         if(e->modifiers() == 0)
-            moveCursor(QPoint(0, 1));
+            moveCursor(QPoint(0, 1), QPoint(1, 0));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, 15));
         return;
     case Qt::Key_Left:
         if(e->modifiers() == 0)
-            moveCursor(QPoint(-1, 0));
+            moveCursor(QPoint(-1, 0), QPoint(0, -1));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(-15, 0));
         return;
     case Qt::Key_Right:
         if(e->modifiers() == 0)
-            moveCursor(QPoint(1, 0));
+            moveCursor(QPoint(1, 0), QPoint(0, 1));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(15, 0));
         return;
