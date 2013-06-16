@@ -24,15 +24,14 @@ QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
 QnSecurityCamResource::SecondaryStreamQuality QnAdvancedSettingsWidget::secondaryStreamQuality() const
 {
     int val = ui->qualitySlider->value();
-    bool dontChangeUsed = ui->qualitySlider->maximum() == 3;
-    if (dontChangeUsed) {
+    if (isKeepQualityVisible()) {
         if (val == 0)
             return QnSecurityCamResource::SSQualityDontChange;
         val--;
     }
-    if (val == 0)
+    if (val == Quality_Low)
         return QnSecurityCamResource::SSQualityLow;
-    else if (val == 1)
+    else if (val == Quality_Medium)
         return QnSecurityCamResource::SSQualityMedium;
     else 
         return QnSecurityCamResource::SSQualityHigh;
@@ -45,13 +44,13 @@ Qt::CheckState QnAdvancedSettingsWidget::getCameraControl() const
 
 void QnAdvancedSettingsWidget::setQualitySlider(QnSecurityCamResource::SecondaryStreamQuality quality)
 {
-    int offset = ui->qualitySlider->maximum() - 2;
+    int offset = isKeepQualityVisible() ? 1 : 0;
     if (quality == QnSecurityCamResource::SSQualityLow)
-        ui->qualitySlider->setValue(0 + offset);
+        ui->qualitySlider->setValue(Quality_Low + offset);
     else if (quality == QnSecurityCamResource::SSQualityHigh)
-        ui->qualitySlider->setValue(2 + offset);
+        ui->qualitySlider->setValue(Quality_High + offset);
     else
-        ui->qualitySlider->setValue(1 + offset);
+        ui->qualitySlider->setValue(Quality_Medium + offset);
 }
 
 void QnAdvancedSettingsWidget::updateFromResource(QnSecurityCamResourcePtr camera)
@@ -98,10 +97,15 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
     m_disableUpdate = false;
 }
 
+bool QnAdvancedSettingsWidget::isKeepQualityVisible() const
+{
+    return ui->keepQualityLabel->isVisible();
+}
+
 void QnAdvancedSettingsWidget::setKeepQualityVisible(bool value)
 {
     ui->keepQualityLabel->setVisible(value);
-    ui->qualitySlider->setMaximum(2 + (value ? 1 : 0));
+    ui->qualitySlider->setMaximum(Quality_High + (value ? 1 : 0));
 }
 
 void QnAdvancedSettingsWidget::at_ui_DataChanged()
@@ -114,5 +118,5 @@ void QnAdvancedSettingsWidget::at_restoreDefault()
 {
     setKeepQualityVisible(false);
     ui->checkBoxDisableControl->setChecked(false);
-    ui->qualitySlider->setValue(1);
+    ui->qualitySlider->setValue(Quality_Medium);
 }

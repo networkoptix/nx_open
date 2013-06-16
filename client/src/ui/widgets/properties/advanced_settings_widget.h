@@ -28,7 +28,10 @@ private slots:
 private:
     void setKeepQualityVisible(bool value);
     void setQualitySlider(QnSecurityCamResource::SecondaryStreamQuality quality);
+    bool isKeepQualityVisible() const;
 private:
+    enum SliderQuality {Quality_Low, Quality_Medium, Quality_High};
+
 	Q_DISABLE_COPY(QnAdvancedSettingsWidget)
     QScopedPointer<Ui::AdvancedSettingsWidget> ui;
 private:
