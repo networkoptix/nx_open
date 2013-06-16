@@ -115,7 +115,7 @@ protected:
     void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
     void displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool display);
 
-    void moveCursor(const QPoint &direction);
+    void moveCursor(const QPoint &aAxis, const QPoint &bAxis);
     void showContextMenuAt(const QPoint &pos);
 
 protected slots:
