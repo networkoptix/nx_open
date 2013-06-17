@@ -121,6 +121,9 @@ public:
     void setCameraControlDisabled(bool value);
     bool isCameraControlDisabled() const;
 
+    int desiredSecondStreamFps() const;
+    QnStreamQuality getSecondaryStreamQuality() const;
+
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource signals/slots
 // -------------------------------------------------------------------------- //
