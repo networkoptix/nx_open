@@ -201,6 +201,8 @@ QnBusinessActionParameters QnBusinessActionParameters::deserialize(const QByteAr
             case keyParam:
                 result.m_keyParam = QString::fromUtf8(field.data(), field.size());
                 break;
+            default:
+                break;
         }
         prevPos = nextPos;
         i++;
@@ -368,6 +370,8 @@ QnBusinessActionParameters QnBusinessActionParameters::fromBusinessParams(const 
             break;
         case keyParam:
             result.m_keyParam = itr.value().toString();
+            break;
+        default:
             break;
         }
     }
