@@ -130,7 +130,9 @@ namespace {
 
     QnImageButtonWidget *newPinButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
-        button->resize(24, 24);
+
+        int size = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
+        button->resize(size, size);
         if (action)
             button->setDefaultAction(action);
         else

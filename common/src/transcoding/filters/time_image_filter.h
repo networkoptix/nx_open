@@ -9,7 +9,7 @@ class QnTimeImageFilter: public QnAbstractImageFilter
 public:
     enum OnScreenDatePos {Date_None, Date_LeftTop, Date_RightTop, Date_RightBottom, Date_LeftBottom};
 
-    QnTimeImageFilter(OnScreenDatePos datePos, int timeOffsetMs);
+    QnTimeImageFilter(OnScreenDatePos datePos, qint64 timeOffsetMs);
     virtual ~QnTimeImageFilter();
     virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) override;
 private:
@@ -21,7 +21,7 @@ private:
     int m_bufXOffs;
     int m_bufYOffs;
     QImage* m_timeImg;
-    int m_onscreenDateOffset;
+    qint64 m_onscreenDateOffset;
     quint8* m_imageBuffer;
     OnScreenDatePos m_dateTextPos;
 };
