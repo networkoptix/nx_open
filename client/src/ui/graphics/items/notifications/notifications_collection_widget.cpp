@@ -41,19 +41,19 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     m_headerWidget = new GraphicsWidget(this);
 
     QnImageButtonWidget* hideAllButton = new QnImageButtonWidget(m_headerWidget);
-    hideAllButton->setIcon(qnSkin->icon("titlebar/exit.png"));
+    hideAllButton->setIcon(qnSkin->icon("events/hide_all.png"));
     hideAllButton->setToolTip(tr("Hide all"));
     hideAllButton->setFixedSize(buttonSize);
     connect(hideAllButton, SIGNAL(clicked()), this, SLOT(hideAll()));
 
     QnImageButtonWidget* settingsButton = new QnImageButtonWidget(m_headerWidget);
-    settingsButton->setIcon(qnSkin->icon("titlebar/connected.png"));
+    settingsButton->setIcon(qnSkin->icon("events/settings.png"));
     settingsButton->setToolTip(tr("Settings"));
     settingsButton->setFixedSize(buttonSize);
     connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 
     QnImageButtonWidget* eventLogButton = new QnImageButtonWidget(m_headerWidget);
-    eventLogButton->setIcon(qnSkin->icon("item/info.png"));
+    eventLogButton->setIcon(qnSkin->icon("events/log.png"));
     eventLogButton->setToolTip(tr("Event Log"));
     eventLogButton->setFixedSize(buttonSize);
     connect(eventLogButton, SIGNAL(clicked()), this, SLOT(at_eventLogButton_clicked()));
