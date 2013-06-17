@@ -92,7 +92,6 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_lastDisplayedFlags( 0 ),
     m_prevFrameSequence( 0 ),
     m_timeChangeEnabled(true),
-    m_imageCorrectionEnabled(false),
     m_paused(false),
     m_screenshotInterface(0),
     m_histogramConsumer(0)
