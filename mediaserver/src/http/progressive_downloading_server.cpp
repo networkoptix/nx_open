@@ -109,8 +109,11 @@ protected:
 
         QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
 
-        if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
+        if (media->dataType == QnAbstractMediaData::EMPTY_DATA) {
+            if (media->timestamp == DATETIME_NOW)
+                m_needStop = true; // EOF reached
             return true;
+        }
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
         {
