@@ -54,19 +54,22 @@ protected:
             }
         } else {
             m_blinkProgress -= step;
-            if (m_blinkProgress <= 0.6) {
-                m_blinkProgress = 0.6;
+            if (m_blinkProgress <= 0.2) {
+                m_blinkProgress = 0.2;
                 m_blinkUp = true;
             }
         }
     }
 
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override {
-        if (!(startState & CHECKED) && m_blinking)
-            setBaseColor(QColor(255 * m_blinkProgress, 0, 0));
-        else
-            setBaseColor(QColor(Qt::white));
+        if (!(startState & CHECKED) && m_blinking) {
+            int blinkColor = 255 * m_blinkProgress;
+            QRadialGradient gradient(0.0, rect.height() / 2, rect.width()* 1.5);
+            gradient.setColorAt(0.0, QColor(blinkColor, blinkColor, 0, 255));
+            gradient.setColorAt(1.0,  QColor(0, 0, 0, 0));
+            painter->fillRect(rect, gradient);
 
+        }
         base_type::paint(painter, startState, endState, progress, widget, rect);
     }
 private:
