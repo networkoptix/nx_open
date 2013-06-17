@@ -10,11 +10,13 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
 class QnNotificationItem;
+class HoverFocusProcessor;
 
 /**
  * An image button widget that displays thumbnail behind the button.
@@ -25,60 +27,35 @@ class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationT
     typedef QnImageButtonWidget base_type;
 
 public:
-    QnBlinkingImageButtonWidget(QGraphicsItem *parent = NULL):
-        base_type(parent),
-        m_blinking(true),
-        m_blinkUp(true),
-        m_blinkProgress(0.0)
-    {
-        registerAnimation(this);
-        startListening();
-    }
+    QnBlinkingImageButtonWidget(QGraphicsItem *parent = NULL);
 
-    Q_SLOT void startBlinking() {
+public slots:
+    void startBlinking() {
         m_blinking = true;
     }
 
-    Q_SLOT void stopBlinking() {
+    void stopBlinking() {
         m_blinking = false;
     }
 
-protected:
-    virtual void tick(int deltaMSecs) override {
-        qreal step = (qreal)deltaMSecs / 1000;
-        if (m_blinkUp) {
-            m_blinkProgress += step;
-            if (m_blinkProgress >= 1.0) {
-                m_blinkProgress = 1.0;
-                m_blinkUp = false;
-            }
-        } else {
-            m_blinkProgress -= step;
-            if (m_blinkProgress <= 0.2) {
-                m_blinkProgress = 0.2;
-                m_blinkUp = true;
-            }
-        }
-    }
+    void updateToolTipVisibility();
+    void updateToolTipPosition();
 
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override {
-        base_type::paint(painter, startState, endState, progress, widget, rect);
-        if (!(startState & CHECKED) && m_blinking) {
-            int blinkColor = 255 * m_blinkProgress;
-            QRadialGradient gradient(0.0, rect.height() / 2, rect.width()* 1.5);
-            gradient.setColorAt(0.0, QColor(blinkColor, blinkColor, 0, 196));
-            gradient.setColorAt(1.0,  QColor(0, 0, 0, 0));
-            qreal opacity = painter->opacity();
-            painter->setOpacity(1.0);
-            painter->fillRect(rect, gradient);
-            painter->setOpacity(opacity);
-        }
-    }
+protected:
+    virtual void tick(int deltaMSecs) override;
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
+private:
+    void hideToolTip();
+    void showToolTip();
+
 private:
     bool m_blinking;
 
     bool m_blinkUp;
     qreal m_blinkProgress;
+
+    HoverFocusProcessor* m_hoverProcessor;
+    QnToolTipWidget* m_tooltipWidget;
 };
 
 
