@@ -77,7 +77,7 @@ private:
 };
 
 
-class QnNotificationsCollectionWidget : public GraphicsWidget, public QnWorkbenchContextAware
+class QnNotificationsCollectionWidget: public GraphicsWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
 

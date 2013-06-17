@@ -260,7 +260,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setFpsVisible(false);
 
 
-    /* Tree widget. */
+    /* Tree panel. */
     m_treeWidget = new QnResourceBrowserWidget(NULL, context());
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
     setPaletteColor(m_treeWidget, QPalette::Window, Qt::transparent);
@@ -448,7 +448,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(action(Qn::ToggleTitleBarAction), SIGNAL(toggled(bool)),                                                                this,                           SLOT(at_toggleTitleBarAction_toggled(bool)));
 
 
-    /* Notifications window. */
+    /* Notifications panel. */
     m_notificationsBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
     m_notificationsBackgroundItem->setAutoFillBackground(true);
     {
