@@ -85,14 +85,14 @@ public:
     /*
     * Time difference between client and server time zone. Used for onScreen timestamp drawing
     */
-    void setOnScreenDateOffset(int timeOffsetMs);
+    void setOnScreenDateOffset(qint64 timeOffsetMs);
 
     void setContrastParams(const ImageCorrectionParams& params);
 
     /*
     * Server time zone. Used for export to avi/mkv files
     */
-    void setServerTimeZoneMs(int value);
+    void setServerTimeZoneMs(qint64 value);
 
     void setSrcRect(const QRectF& srcRect);
 signals:
@@ -172,7 +172,7 @@ private:
     QnFfmpegVideoTranscoder* m_videoTranscoder;
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
-    int m_onscreenDateOffset;
+    qint64 m_onscreenDateOffset;
     Role m_role;
     qint64 m_serverTimeZoneMs;
 

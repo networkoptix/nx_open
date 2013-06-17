@@ -5,7 +5,6 @@
 
 #include "ui/style/globals.h"
 
-static const int LINE_OFFSET = 4;
 static const int X_OFFSET = 8;
 
 QnHistogramRenderer::QnHistogramRenderer(QWidget* parent):
@@ -33,6 +32,7 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
     QPainter p(this);
     
     p.setBrush(QBrush(Qt::Dense5Pattern));
+    p.setPen(Qt::NoPen);
     p.drawRect(QRect(X_OFFSET, 0, width()-X_OFFSET*2, height()-1));
 
     double w = width() - X_OFFSET*2;
@@ -92,4 +92,9 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
     p.drawLine(X_OFFSET, height()/2, width()-X_OFFSET, height()/2);
     //p.drawLine(X_OFFSET, height()/4, width()-X_OFFSET, height()/4);
     //p.drawLine(X_OFFSET, height()/4*3, width()-X_OFFSET, height()/4*3);
+    // 
+
+    p.setBrush(Qt::NoBrush);
+    p.setPen(Qt::white);
+    p.drawRect(QRect(X_OFFSET, 0, width()-X_OFFSET*2, height()-1));
 }

@@ -24,11 +24,11 @@ public:
     static const Button MotionSearchButton = static_cast<Button>(0x08);
     static const Button PtzButton = static_cast<Button>(0x10);
     static const Button ZoomWindowButton = static_cast<Button>(0x20);
-    static const Button HistogramButton = static_cast<Button>(0x40);
+    static const Button EnhancementButton = static_cast<Button>(0x40);
 #define MotionSearchButton MotionSearchButton
 #define PtzButton PtzButton
 #define ZoomWindowButton ZoomWindowButton
-#define HistogramButton HistogramButton
+#define EnhancementButton EnhancementButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
@@ -92,13 +92,13 @@ public:
 
     bool isMotionSensitivityEmpty() const;
 
-    ImageCorrectionParams contrastParams() const;
+    ImageCorrectionParams imageEnhancement() const;
+    void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
 
 signals:
     void motionSelectionChanged();
     void displayChanged();
-public slots:
-    void setContrastParams(const ImageCorrectionParams& params);
+
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
 

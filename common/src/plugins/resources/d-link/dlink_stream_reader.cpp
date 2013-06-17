@@ -77,9 +77,11 @@ void PlDlinkStreamReader::openStream()
     if (cam_info_file.length()==0)
         return;
 
-    if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
-    {
-        res->setMotionMaskPhysical(0);
+    if (!res->isCameraControlDisabled()) {
+        if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
+        {
+            res->setMotionMaskPhysical(0);
+        }
     }
 
     //=====requesting a video
@@ -271,50 +273,51 @@ QString PlDlinkStreamReader::composeVideoProfile()
     QString result;
     QTextStream t(&result);
 
-    t << "config/video.cgi?profileid=" << profileNum << "&";
-    t << "resolution=" << resolution.width() << "x" << resolution.height() << "&";
-
-    int fps = info.frameRateCloseTo( qMin((int)getFps(), res->getMaxFps()) );
-    t << "framerate=" << fps << "&";
-    t << "codec=";
-
-
-    
-    m_mpeg4 = false;
-    m_h264 = false;
-
-    //bool hasSdp = false; 
-    bool hasSdp = info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains(QLatin1String("sdp")); //look_for_this_comment
-
-    if (!info.hasH264.isEmpty() && !hasSdp)
+    t << "config/video.cgi?profileid=" << profileNum;
+    if (!res->isCameraControlDisabled())
     {
-        t << info.hasH264 << "&";
-        m_h264 = true;
+        t << "&resolution=" << resolution.width() << "x" << resolution.height() << "&";
+
+        int fps = info.frameRateCloseTo( qMin((int)getFps(), res->getMaxFps()) );
+        t << "framerate=" << fps << "&";
+        t << "codec=";
+
+
         
-    }
-    else if (info.hasMPEG4 && !hasSdp)
-    {
-        t << "MPEG4&";
-        m_mpeg4 = true;
-    }
-    else
-    {
-        t << "MJPEG&";
-    }
+        m_mpeg4 = false;
+        m_h264 = false;
 
+        //bool hasSdp = false; 
+        bool hasSdp = info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains(QLatin1String("sdp")); //look_for_this_comment
 
+        if (!info.hasH264.isEmpty() && !hasSdp)
+        {
+            t << info.hasH264 << "&";
+            m_h264 = true;
+            
+        }
+        else if (info.hasMPEG4 && !hasSdp)
+        {
+            t << "MPEG4&";
+            m_mpeg4 = true;
+        }
+        else
+        {
+            t << "MJPEG&";
+        }
 
-    if (m_mpeg4 || m_h264)
-    {
-        // just CBR fo mpeg so far
-        t << "qualitymode=CBR" << "&";
-        t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(getQuality(), resolution, fps));
-    }
-    else
-    {
-        t << "qualitymode=Fixquality" << "&";
-        
-        t << "quality=" << getQualityString();
+        if (m_mpeg4 || m_h264)
+        {
+            // just CBR fo mpeg so far
+            t << "qualitymode=CBR" << "&";
+            t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(getQuality(), resolution, fps));
+        }
+        else
+        {
+            t << "qualitymode=Fixquality" << "&";
+            
+            t << "quality=" << getQualityString();
+        }
     }
 
     t.flush();

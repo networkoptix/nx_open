@@ -5,6 +5,7 @@
 
 #include "utils/color_space/image_correction.h"
 
+// TODO: #Elric a widget, not a renderer!!!
 
 class QnHistogramRenderer: public QWidget, public QnHistogramConsumer
 {

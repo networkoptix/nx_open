@@ -12,7 +12,7 @@
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
 static const int MIN_TEXT_HEIGHT = 14;
 
-QnTimeImageFilter::QnTimeImageFilter(OnScreenDatePos datePos, int timeOffsetMs):
+QnTimeImageFilter::QnTimeImageFilter(OnScreenDatePos datePos, qint64 timeOffsetMs):
     m_dateTimeXOffs(0),
     m_dateTimeYOffs(0),
     m_bufXOffs(0),

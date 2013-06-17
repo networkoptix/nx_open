@@ -9,13 +9,57 @@
 #include <health/system_health.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
 class QnNotificationItem;
+class HoverFocusProcessor;
 
-class QnNotificationsCollectionWidget : public GraphicsWidget, public QnWorkbenchContextAware
+/**
+ * An image button widget that displays thumbnail behind the button.
+ */
+class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationTimerListener {
+    Q_OBJECT
+
+    typedef QnImageButtonWidget base_type;
+
+public:
+    QnBlinkingImageButtonWidget(QGraphicsItem *parent = NULL);
+
+public slots:
+    void startBlinking() {
+        m_blinking = true;
+    }
+
+    void stopBlinking() {
+        m_blinking = false;
+    }
+
+    void updateToolTipVisibility();
+    void updateToolTipPosition();
+
+protected:
+    virtual void tick(int deltaMSecs) override;
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
+private:
+    void hideToolTip();
+    void showToolTip();
+
+private:
+    bool m_blinking;
+
+    bool m_blinkUp;
+    qreal m_blinkProgress;
+
+    HoverFocusProcessor* m_hoverProcessor;
+    QnToolTipWidget* m_tooltipWidget;
+};
+
+
+class QnNotificationsCollectionWidget: public GraphicsWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -32,6 +76,8 @@ public:
 
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
+
+    void setBlinker(QnBlinkingImageButtonWidget* blinker);
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
@@ -58,10 +104,13 @@ private:
 
     QnNotificationItem* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
 
+    void updateBlinker();
+
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 
     QMultiHash<QnSystemHealth::MessageType, QnNotificationItem*> m_itemsByMessageType;
+    QnBlinkingImageButtonWidget* m_blinker;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

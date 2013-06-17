@@ -152,31 +152,34 @@ void QnAxisStreamReader::openStream()
 
     // --------------- update or insert new profile ----------------------
     
-    QString streamProfile;
-    QTextStream str(&streamProfile);
-
-    str << "/axis-cgi/param.cgi?action=" << action;
-    str << "&template=streamprofile";
-    str << "&group=StreamProfile";
-    str << "&StreamProfile." << profileNumber << ".Name=" << profileName;
-    str << "&StreamProfile." << profileNumber << ".Description=" << QUrl::toPercentEncoding(QLatin1String(profileDescription));
-    str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(QLatin1String(paramsStr));
-    str.flush();
-
-    CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
-    CLHttpStatus status = http.doGET(streamProfile);
-
-    if (status == CL_HTTP_AUTH_REQUIRED)
+    if (action == QByteArray("add") || !m_axisRes->isCameraControlDisabled())
     {
-        getResource()->setStatus(QnResource::Unauthorized);
-        return;
-    }
-    else if (status != CL_HTTP_SUCCESS)
-        return;
+        QString streamProfile;
+        QTextStream str(&streamProfile);
 
-    if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
-    {
-        res->setMotionMaskPhysical(0);
+        str << "/axis-cgi/param.cgi?action=" << action;
+        str << "&template=streamprofile";
+        str << "&group=StreamProfile";
+        str << "&StreamProfile." << profileNumber << ".Name=" << profileName;
+        str << "&StreamProfile." << profileNumber << ".Description=" << QUrl::toPercentEncoding(QLatin1String(profileDescription));
+        str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(QLatin1String(paramsStr));
+        str.flush();
+
+        CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
+        CLHttpStatus status = http.doGET(streamProfile);
+
+        if (status == CL_HTTP_AUTH_REQUIRED)
+        {
+            getResource()->setStatus(QnResource::Unauthorized);
+            return;
+        }
+        else if (status != CL_HTTP_SUCCESS)
+            return;
+
+        if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
+        {
+            res->setMotionMaskPhysical(0);
+        }
     }
 
     QString request;

@@ -61,7 +61,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->authenticationGroupBox,                                  Qn::CameraSettings_General_Auth_Help);
     setHelpTopic(ui->recordingTab,                                            Qn::CameraSettings_Recording_Help);
     setHelpTopic(ui->motionTab,                                               Qn::CameraSettings_Motion_Help);
-    setHelpTopic(ui->advancedTab,                                             Qn::CameraSettings_Advanced_Help);
+    setHelpTopic(ui->cameraPropertiesTab,                                     Qn::CameraSettings_Properties_Help);
+    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Advanced_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
@@ -96,6 +97,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
+    connect(ui->advancedSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+
     updateFromResource();
 }
 
@@ -128,10 +131,10 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
     {
         if (!m_widgetsRecreator)
         {
-            QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->advancedTab->layout());
+            QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->cameraPropertiesTab->layout());
             if(!layout) {
-                delete ui->advancedTab->layout();
-                ui->advancedTab->setLayout(layout = new QHBoxLayout());
+                delete ui->cameraPropertiesTab->layout();
+                ui->cameraPropertiesTab->setLayout(layout = new QHBoxLayout());
             }
             
             QSplitter* advancedSplitter = new QSplitter();
@@ -251,8 +254,10 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
         return Qn::RecordingSettingsTab;
     } else if(tab == ui->motionTab) {
         return Qn::MotionSettingsTab;
-    } else if(tab == ui->advancedTab) {
-        return Qn::AdvancedSettingsTab;
+    } else if(tab == ui->cameraPropertiesTab) {
+        return Qn::CameraPropertiesTab;
+    } else if(tab == ui->tabAdvancedSettings) {
+        return Qn::AdvancedCameraSettingsTab;
     } else {
         qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
         return Qn::GeneralSettingsTab;
@@ -272,8 +277,11 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     case Qn::MotionSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->motionTab);
         break;
-    case Qn::AdvancedSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->advancedTab);
+    case Qn::CameraPropertiesTab:
+        ui->tabWidget->setCurrentWidget(ui->cameraPropertiesTab);
+        break;
+    case Qn::AdvancedCameraSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->tabAdvancedSettings);
         break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
@@ -320,6 +328,14 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
             submitMotionWidgetToResource();
         }
+
+        QnSecondaryStreamQuality sQuality = ui->advancedSettingsWidget->secondaryStreamQuality();
+        if (sQuality != SSQualityNotDefined)
+            m_camera->setSecondaryStreamQuality(sQuality);
+        Qt::CheckState cs = ui->advancedSettingsWidget->getCameraControl();
+        if (cs != Qt::PartiallyChecked)
+            m_camera->setCameraControlDisabled(cs == Qt::Checked);
+        
 
         setHasDbChanges(false);
     }
@@ -383,7 +399,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         bool dtsBased = m_camera->isDtsBased();
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
-        ui->tabWidget->setTabEnabled(Qn::AdvancedSettingsTab, !dtsBased);
+        ui->tabWidget->setTabEnabled(Qn::CameraPropertiesTab, !dtsBased);
+        ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased);
 
         ui->analogGroupBox->setVisible(m_camera->isAnalog());
         ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
@@ -423,6 +440,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             m_cameraSupportsMotion = m_camera->supportedMotionType() != Qn::MT_NoMotion;
             ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
             ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
+
+            ui->advancedSettingsWidget->updateFromResource(m_camera);
         }
     }
 

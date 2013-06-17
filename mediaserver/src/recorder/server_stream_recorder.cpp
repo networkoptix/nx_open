@@ -130,19 +130,21 @@ QnScheduleTask QnServerStreamRecorder::currentScheduleTask() const
 
 void QnServerStreamRecorder::updateStreamParams()
 {
-    if (m_mediaProvider && m_role == QnResource::Role_LiveVideo)
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
+    if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-
-        if (m_currentScheduleTask.getRecordingType() != Qn::RecordingType_Never) {
-            liveProvider->setFps(m_currentScheduleTask.getFps());
-            liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
-        }
-        else {
-            QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-            Q_ASSERT(camera);
-            liveProvider->setFps(camera->getMaxFps()-5);
-            liveProvider->setQuality(QnQualityHighest);
+        if (m_role == QnResource::Role_LiveVideo) {
+            if (m_currentScheduleTask.getRecordingType() != Qn::RecordingType_Never) {
+                liveProvider->setFps(m_currentScheduleTask.getFps());
+                liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
+            }
+            else {
+                Q_ASSERT(camera);
+                liveProvider->setFps(camera->getMaxFps()-5);
+                liveProvider->setQuality(QnQualityHighest);
+            }
+            liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? SSQualityNotDefined : camera->secondaryStreamQuality());
         }
     }
 }
@@ -259,14 +261,14 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
         if (m_role == QnResource::Role_LiveVideo)
             return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;
         else
-            return fps ? qMax(2, qMin(DESIRED_SECOND_STREAM_FPS, camera->getMaxFps()-fps)) : 2;
+            return fps ? qMax(2, qMin(camera->desiredSecondStreamFps(), camera->getMaxFps()-fps)) : 2;
     }
     else
     {
         if (m_role == QnResource::Role_LiveVideo)
             return fps ? fps : camera->getMaxFps();
         else
-            return DESIRED_SECOND_STREAM_FPS;
+            return camera->desiredSecondStreamFps();
     }
 }
 

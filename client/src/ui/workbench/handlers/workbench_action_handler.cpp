@@ -1372,18 +1372,19 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
+    QnResourceList resources = parameters.resources();
+    QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
     foreach(QnLayoutResourcePtr r, layouts)
-        parameters.resources().removeOne(r);
+        resources.removeOne(r);
 
     if (workbench()->currentLayout()->resource()->locked() &&
-            !parameters.resources().empty() &&
+            !resources.empty() &&
             layouts.empty()) {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
     }
 
-
-    if (!parameters.resources().empty()) {
+    if (!resources.empty()) {
+        parameters.setResources(resources);
         if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
         else
@@ -1555,8 +1556,16 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     dialog->setWindowTitle(tr("Layout Settings"));
     dialog->readFromResource(layout);
 
+    bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
     if(!dialog->exec() || !dialog->submitToResource(layout))
         return;
+
+    /* Move layout items to grid center to best fit the background */
+    if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty()) {
+        QnWorkbenchLayout* wlayout = QnWorkbenchLayout::instance(layout);
+        if (wlayout)
+            wlayout->centralizeItems();
+    }
 
     snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
 }
@@ -2858,6 +2867,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     localLayout->setGuid(layout->getGuid());
     localLayout->update(layout);
     localLayout->setItems(items);
+
     serializer.serializeLayout(localLayout, layoutData);
     device->write(layoutData);
     delete device;
@@ -2893,6 +2903,16 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             QByteArray data;
             periods.encode(data);
             device->write(data);
+            delete device;
+        }
+    }
+
+    if (!layout->backgroundImageFilename().isEmpty()) {
+        QnAppServerImageCache cache(this);
+        QImage backround(cache.getFullPath(layout->backgroundImageFilename()));
+        if (!backround.isNull()) {
+            device = m_exportStorage->open(layout->backgroundImageFilename(), QIODevice::WriteOnly);
+            backround.save(device, "png");
             delete device;
         }
     }
@@ -3500,13 +3520,21 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename, bool success) {
-    if (!context()->user() || !workbench()->currentLayout()->resource())
+    if (!context()->user())
         return; // action should not be triggered while we are not connected
 
-    if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
+    QnWorkbenchLayout* wlayout = workbench()->currentLayout();
+    if (!wlayout)
+        return; //security check
+
+    QnLayoutResourcePtr layout = wlayout->resource();
+    if (!layout)
+        return; //security check
+
+    if(!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
-    if (workbench()->currentLayout()->resource()->locked())
+    if (layout->locked())
         return;
 
     if (!success) {
@@ -3514,54 +3542,44 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
         return;
     }
 
-    // if no background is set then size should be auto-calculated
-    bool shouldUpdateSize = workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty();
-
-    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
     layout->setBackgroundImageFilename(filename);
     if (qFuzzyCompare(layout->backgroundOpacity(), 0.0))
         layout->setBackgroundOpacity(0.7);
 
-    if (shouldUpdateSize) {
-        QRect bounds;
-        QList<QnWorkbenchItem *> items = workbench()->currentLayout()->items().toList();
-        foreach(QnWorkbenchItem *item, items)
-            bounds = bounds.united(item->geometry());
-        if (bounds.isNull())
-            bounds = QRect(0, 0, 1, 1); // paranoia security check
+    wlayout->centralizeItems();
+    QRect brect = wlayout->boundingRect();
 
-        int minWidth = bounds.width();
-        int minHeight = bounds.height();
+    int minWidth = brect.width();
+    int minHeight = brect.height();
 
-        qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
-        if (layout->cellAspectRatio() > 0) {
-            qreal cellWidth = 1.0 + layout->cellSpacing().width();
-            qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
-            cellAspectRatio = cellWidth / cellHeight;
-        }
-
-        qreal aspectRatio = sender()->property(uploadingImageARPropertyName).toReal();
-
-        int w, h;
-        qreal targetAspectRatio = aspectRatio / cellAspectRatio;
-        if (targetAspectRatio >= 1.0) { // width is greater than height
-            h = minHeight;
-            w = qRound((qreal)h * targetAspectRatio);
-            if (w > qnGlobals->layoutBackgroundMaxSize().width()) {
-                w = qnGlobals->layoutBackgroundMaxSize().width();
-                h = qRound((qreal)w / targetAspectRatio);
-            }
-
-        } else {
-            w = minWidth;
-            h = qRound((qreal)w / targetAspectRatio);
-            if (h > qnGlobals->layoutBackgroundMaxSize().height()) {
-                h = qnGlobals->layoutBackgroundMaxSize().height();
-                w = qRound((qreal)h * targetAspectRatio);
-            }
-        }
-        layout->setBackgroundSize(QSize(w, h));
+    qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+    if (layout->cellAspectRatio() > 0) {
+        qreal cellWidth = 1.0 + layout->cellSpacing().width();
+        qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
+        cellAspectRatio = cellWidth / cellHeight;
     }
+
+    qreal aspectRatio = sender()->property(uploadingImageARPropertyName).toReal();
+
+    int w, h;
+    qreal targetAspectRatio = aspectRatio / cellAspectRatio;
+    if (targetAspectRatio >= 1.0) { // width is greater than height
+        h = minHeight;
+        w = qRound((qreal)h * targetAspectRatio);
+        if (w > qnGlobals->layoutBackgroundMaxSize().width()) {
+            w = qnGlobals->layoutBackgroundMaxSize().width();
+            h = qRound((qreal)w / targetAspectRatio);
+        }
+
+    } else {
+        w = minWidth;
+        h = qRound((qreal)w / targetAspectRatio);
+        if (h > qnGlobals->layoutBackgroundMaxSize().height()) {
+            h = qnGlobals->layoutBackgroundMaxSize().height();
+            w = qRound((qreal)h * targetAspectRatio);
+        }
+    }
+    layout->setBackgroundSize(QSize(w, h));
 
     snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
 }

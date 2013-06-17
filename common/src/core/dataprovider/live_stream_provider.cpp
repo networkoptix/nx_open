@@ -10,7 +10,8 @@ m_qualityUpdatedAtLeastOnce(false),
 m_fps(-1.0),
 m_framesSinceLastMetaData(0),
 m_softMotionRole(QnResource::Role_Default),
-m_softMotionLastChannel(0)
+m_softMotionLastChannel(0),
+m_secondaryQuality(SSQualityNotDefined)
 {
     m_role = QnResource::Role_LiveVideo;
     m_timeSinceLastMetaData.restart();
@@ -36,14 +37,15 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
 
         if (role == QnResource::Role_SecondaryLiveVideo)
         {
-            if (m_quality != QnQualityLowest)
+            QnStreamQuality newQuality = m_cameraRes->getSecondaryStreamQuality();
+            if (newQuality != m_quality)
             {
-                m_quality = QnQualityLowest;
+                m_quality = newQuality;
                 needUpdate = true;
             }
 
             int oldFps = m_fps;
-            int newFps = qMin(DESIRED_SECOND_STREAM_FPS, m_cameraRes->getMaxFps()); //ss; target for secind stream fps is 5 
+            int newFps = qMin(m_cameraRes->desiredSecondStreamFps(), m_cameraRes->getMaxFps()); //ss; target for secind stream fps is 5 
             newFps = qMax(1, newFps);
 
             if (newFps != oldFps)
@@ -66,6 +68,30 @@ QnResource::ConnectionRole QnLiveStreamProvider::getRole() const
     return m_role;
 }
 
+void QnLiveStreamProvider::setSecondaryQuality(QnSecondaryStreamQuality  quality)
+{
+    {
+        QMutexLocker mtx(&m_livemutex);
+        if (m_secondaryQuality == quality)
+            return; // same quality
+        m_secondaryQuality = quality;
+    }
+
+    if (getRole() != QnResource::Role_SecondaryLiveVideo)
+    {
+        // must be primary, so should inform secondary
+        m_cameraRes->lockConsumers();
+        foreach(QnResourceConsumer* consumer, m_cameraRes->getAllConsumers())
+        {
+            QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
+            if (lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo)
+                lp->onPrimaryFpsUpdated(m_fps);
+        }
+        m_cameraRes->unlockConsumers();
+
+        updateStreamParamsBasedOnFps();
+    }
+}
 
 void QnLiveStreamProvider::setQuality(QnStreamQuality q)
 {
@@ -84,7 +110,6 @@ void QnLiveStreamProvider::setQuality(QnStreamQuality q)
     }
 
     updateStreamParamsBasedOnQuality();
-
 }
 
 QnStreamQuality QnLiveStreamProvider::getQuality() const
@@ -223,15 +248,15 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
         newSecFps = MIN_SECOND_STREAM_FPS;
     else if (sharingMethod == Qn::sharePixels)
     {
-        newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps); //minimum between DESIRED_SECOND_STREAM_FPS and what is left;
+        newSecFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxFps); //minimum between DESIRED_SECOND_STREAM_FPS and what is left;
         if (maxFps - newFps < 2 )
-            newSecFps = qMin(DESIRED_SECOND_STREAM_FPS/2,MIN_SECOND_STREAM_FPS);
+            newSecFps = qMin(m_cameraRes->desiredSecondStreamFps()/2,MIN_SECOND_STREAM_FPS);
 
     }
     else if (sharingMethod == Qn::shareFps)
-        newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps - newFps); //ss; minimum between 5 and what is left;
+        newSecFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxFps - newFps); //ss; minimum between 5 and what is left;
     else// noSharing
-        newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps);
+        newSecFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxFps);
 
 
 
