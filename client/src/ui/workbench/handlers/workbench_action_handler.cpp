@@ -1372,18 +1372,19 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
+    QnResourceList resources = parameters.resources();
+    QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
     foreach(QnLayoutResourcePtr r, layouts)
-        parameters.resources().removeOne(r);
+        resources.removeOne(r);
 
     if (workbench()->currentLayout()->resource()->locked() &&
-            !parameters.resources().empty() &&
+            !resources.empty() &&
             layouts.empty()) {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
     }
 
-
-    if (!parameters.resources().empty()) {
+    if (!resources.empty()) {
+        //TODO: #Elric should be trigger(.., resources), but some keys will be lost in that case; parameters.setResources() method is required
         if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
         else
