@@ -102,6 +102,12 @@ const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl()
     int currentFps = getFps();
     QnStreamQuality currentQuality = getQuality();
 
+    if (!m_streamUrl.isEmpty() && m_onvifRes->isCameraControlDisabled())
+    {
+        m_cachedFps = -1;
+        return m_streamUrl;
+    }
+
     if (!m_streamUrl.isEmpty() && currentFps == m_cachedFps && currentQuality == m_cachedQuality && m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
     {
         return m_streamUrl;
