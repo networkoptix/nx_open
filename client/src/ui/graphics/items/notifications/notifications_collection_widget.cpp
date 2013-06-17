@@ -12,13 +12,17 @@
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
+#include <ui/animation/opacity_animator.h>
+#include <ui/graphics/items/generic/styled_tooltip_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
+#include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+
 
 //TODO: #GDM remove debug
 #include <business/actions/common_business_action.h>
@@ -27,12 +31,116 @@
 
 namespace {
 
+    class QnBlinkerTooltipWidget: public QnStyledTooltipWidget {
+        typedef QnStyledTooltipWidget base_type;
+    public:
+        QnBlinkerTooltipWidget(QGraphicsItem *parent = NULL): base_type(parent)
+        {
+            setTransform(QTransform::fromScale(-1, 1));
+        }
+
+    protected:
+        virtual void updateTailPos() override {
+            QRectF rect = this->rect();
+            setTailPos(QPointF(qRound(rect.left()), qRound(rect.bottom())));
+        }
+    };
+
+
     const int buttonSize = 24;
     const int thumbnailHeight = 100;
 
     const char *itemResourcePropertyName = "_qn_itemResource";
 
 } //anonymous namespace
+
+QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
+    base_type(parent),
+    m_blinking(true),
+    m_blinkUp(true),
+    m_blinkProgress(0.0),
+    m_hoverProcessor(new HoverFocusProcessor(this))
+{
+    registerAnimation(this);
+    startListening();
+
+    m_tooltipWidget = new QnBlinkerTooltipWidget(this);
+    m_tooltipWidget->setText(tr("New notifications arrived!"));
+    m_tooltipWidget->setFocusProxy(this);
+    m_tooltipWidget->setOpacity(0.0);
+    m_tooltipWidget->setAcceptHoverEvents(true);
+    m_tooltipWidget->installEventFilter(this);
+    m_tooltipWidget->setFlag(ItemIgnoresParentOpacity, true);
+    connect(m_tooltipWidget, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
+    connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
+    connect(this, SIGNAL(imageChanged(QImage)), m_tooltipWidget, SLOT(setThumbnail(QImage)));
+
+    m_hoverProcessor->addTargetItem(this);
+    m_hoverProcessor->addTargetItem(m_tooltipWidget);
+    m_hoverProcessor->setHoverEnterDelay(250);
+    m_hoverProcessor->setHoverLeaveDelay(250);
+    connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
+    connect(m_hoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(updateToolTipVisibility()));
+
+    updateToolTipPosition();
+    updateToolTipVisibility();
+
+}
+
+void QnBlinkingImageButtonWidget::updateToolTipVisibility() {
+    if(m_hoverProcessor->isHovered()) {
+        showToolTip();
+    } else {
+        hideToolTip();
+    }
+}
+
+void QnBlinkingImageButtonWidget::updateToolTipPosition() {
+    m_tooltipWidget->pointTo(QPointF(qRound(geometry().left() / 2 ), 0));
+}
+
+void QnBlinkingImageButtonWidget::tick(int deltaMSecs) {
+    qreal step = (qreal)deltaMSecs / 1000;
+    if (m_blinkUp) {
+        m_blinkProgress += step;
+        if (m_blinkProgress >= 1.0) {
+            m_blinkProgress = 1.0;
+            m_blinkUp = false;
+        }
+    } else {
+        m_blinkProgress -= step;
+        if (m_blinkProgress <= 0.2) {
+            m_blinkProgress = 0.2;
+            m_blinkUp = true;
+        }
+    }
+}
+
+void QnBlinkingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect)  {
+    base_type::paint(painter, startState, endState, progress, widget, rect);
+    if (!(startState & CHECKED) && m_blinking) {
+        int blinkColor = 255 * m_blinkProgress;
+        QRadialGradient gradient(0.0, rect.height() / 2, rect.width()* 1.5);
+        gradient.setColorAt(0.0, QColor(blinkColor, blinkColor, 0, 196));
+        gradient.setColorAt(1.0,  QColor(0, 0, 0, 0));
+        qreal opacity = painter->opacity();
+        painter->setOpacity(1.0);
+        painter->fillRect(rect, gradient);
+        painter->setOpacity(opacity);
+    }
+}
+
+void QnBlinkingImageButtonWidget::showToolTip() {
+    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
+}
+
+void QnBlinkingImageButtonWidget::hideToolTip() {
+    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(0.0);
+}
+
+
+// ---------------------- QnNotificationsCollectionWidget -------------------
+
 
 QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
