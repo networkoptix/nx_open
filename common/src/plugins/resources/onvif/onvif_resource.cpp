@@ -220,7 +220,8 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_eventMonitorType( emtNone ),
     m_timerID( 0 ),
     m_renewSubscriptionTaskID(0),
-    m_maxChannels(1)
+    m_maxChannels(1),
+    m_streamConfCounter(0)
 {
     connect(
         this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
@@ -2846,4 +2847,32 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
     cl_log.log( QString::fromAscii("Successfully set relay %1 output state to %2. endpoint %3").
         arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
     return true;
+}
+
+QMutex* QnPlOnvifResource::getStreamConfMutex()
+{
+    return &m_streamConfMutex;
+}
+
+void QnPlOnvifResource::beforeConfigureStream()
+{
+    qWarning() << "before configure stream started";
+    QMutexLocker lock (&m_streamConfMutex);
+    ++m_streamConfCounter;
+    while (m_streamConfCounter > 1)
+        m_streamConfCond.wait(&m_streamConfMutex);
+    qWarning() << "before configure stream finished";
+}
+
+void QnPlOnvifResource::afterConfigureStream()
+{
+    qWarning() << "after configure stream started";
+
+    QMutexLocker lock (&m_streamConfMutex);
+    --m_streamConfCounter;
+    m_streamConfCond.wakeAll();
+    while (m_streamConfCounter > 0)
+        m_streamConfCond.wait(&m_streamConfMutex);
+
+    qWarning() << "after configure stream finished";
 }

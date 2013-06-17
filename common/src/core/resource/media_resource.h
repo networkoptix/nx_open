@@ -16,7 +16,8 @@ enum QnStreamQuality {
     QnQualityNormal,
     QnQualityHigh,
     QnQualityHighest,
-    QnQualityPreSet
+    QnQualityPreSet,
+    QnQualityNotDefined
 };
 
 QString QnStreamQualityToString(QnStreamQuality value);

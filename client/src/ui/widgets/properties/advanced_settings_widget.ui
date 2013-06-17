@@ -73,7 +73,7 @@
       <item>
        <widget class="QCheckBox" name="checkBoxDisableControl">
         <property name="text">
-         <string>Do not control camera settings</string>
+         <string>Do not control media stream parameters on a camera</string>
         </property>
        </widget>
       </item>

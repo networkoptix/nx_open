@@ -569,3 +569,28 @@ bool QnSecurityCamResource::isCameraControlDisabled() const
 {
     return m_cameraControlDisabled;
 }
+
+int QnSecurityCamResource::desiredSecondStreamFps() const
+{
+    switch (secondaryStreamQuality())
+    {
+    case SSQualityMedium:
+        return 7;
+    case SSQualityLow: 
+        return 2;
+    case SSQualityHigh:
+        return 12;
+    default:
+        break;
+    }
+
+    return 7;
+}
+
+QnStreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const
+{
+    if (secondaryStreamQuality() != SSQualityHigh)
+        return QnQualityLowest;
+    else
+        return QnQualityNormal;
+}

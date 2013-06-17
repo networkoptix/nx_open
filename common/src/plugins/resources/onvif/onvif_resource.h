@@ -195,6 +195,10 @@ public:
 
     void setVendorName( const QString& vendorName );
 
+    QMutex* getStreamConfMutex();
+    void beforeConfigureStream();
+    void afterConfigureStream();
+
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -425,6 +429,10 @@ private:
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     QString m_vendorName;
 	
+    QMutex m_streamConfMutex;
+    QWaitCondition m_streamConfCond;
+    int m_streamConfCounter;
+
     bool createPullPointSubscription();
     bool pullMessages();
     //!Registeres local NotificationConsumer in resource's NotificationProducer
