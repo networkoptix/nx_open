@@ -24,8 +24,6 @@ class QnSecurityCamResource : virtual public QnMediaResource {
     typedef QnMediaResource base_type;
 
 public:
-    enum SecondaryStreamQuality { SSQualityLow, SSQualityMedium, SSQualityHigh, SSQualityDontChange};
-
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     Qn::MotionType getCameraBasedMotionType() const;
@@ -115,8 +113,8 @@ public:
 
     bool isGroupPlayOnly() const;
 
-    void setSecondaryStreamQuality(SecondaryStreamQuality quality);
-    SecondaryStreamQuality secondaryStreamQuality() const;
+    void setSecondaryStreamQuality(QnSecondaryStreamQuality  quality);
+    QnSecondaryStreamQuality  secondaryStreamQuality() const;
 
     void setCameraControlDisabled(bool value);
     bool isCameraControlDisabled() const;
@@ -181,7 +179,7 @@ private:
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
-    SecondaryStreamQuality m_secondaryQuality;
+    QnSecondaryStreamQuality  m_secondaryQuality;
     bool m_cameraControlDisabled;
 };
 

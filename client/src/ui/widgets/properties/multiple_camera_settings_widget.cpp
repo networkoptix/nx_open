@@ -166,8 +166,8 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         if (m_hasScheduleChanges)
             camera->setScheduleTasks(scheduleTasks);
 
-        QnSecurityCamResource::SecondaryStreamQuality sQuality = ui->advancedSettingsWidget->secondaryStreamQuality();
-        if (sQuality != QnSecurityCamResource::SSQualityDontChange)
+        QnSecondaryStreamQuality sQuality = ui->advancedSettingsWidget->secondaryStreamQuality();
+        if (sQuality != SSQualityNotDefined)
             camera->setSecondaryStreamQuality(sQuality);
         Qt::CheckState cs = ui->advancedSettingsWidget->getCameraControl();
         if (cs != Qt::PartiallyChecked)

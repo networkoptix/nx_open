@@ -49,6 +49,8 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
         m_scheduleTasks = other_casted->m_scheduleTasks;
         m_groupId = other_casted->m_groupId;
         m_groupName = other_casted->m_groupName;
+        m_secondaryQuality = other_casted->m_secondaryQuality;
+        m_cameraControlDisabled = other_casted->m_cameraControlDisabled;
     }
 }
 
@@ -550,12 +552,12 @@ void QnSecurityCamResource::setGroupId(const QString& value)
     m_groupId = value;
 }
 
-void QnSecurityCamResource::setSecondaryStreamQuality(SecondaryStreamQuality quality)
+void QnSecurityCamResource::setSecondaryStreamQuality(QnSecondaryStreamQuality  quality)
 {
     m_secondaryQuality = quality;
 }
 
-QnSecurityCamResource::SecondaryStreamQuality QnSecurityCamResource::secondaryStreamQuality() const
+QnSecondaryStreamQuality QnSecurityCamResource::secondaryStreamQuality() const
 {
     return m_secondaryQuality;
 }

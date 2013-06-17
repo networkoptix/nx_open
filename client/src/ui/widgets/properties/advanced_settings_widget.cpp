@@ -21,20 +21,20 @@ QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
 
 }
 
-QnSecurityCamResource::SecondaryStreamQuality QnAdvancedSettingsWidget::secondaryStreamQuality() const
+QnSecondaryStreamQuality QnAdvancedSettingsWidget::secondaryStreamQuality() const
 {
     int val = ui->qualitySlider->value();
     if (isKeepQualityVisible()) {
         if (val == 0)
-            return QnSecurityCamResource::SSQualityDontChange;
+            return SSQualityNotDefined;
         val--;
     }
     if (val == Quality_Low)
-        return QnSecurityCamResource::SSQualityLow;
+        return SSQualityLow;
     else if (val == Quality_Medium)
-        return QnSecurityCamResource::SSQualityMedium;
+        return SSQualityMedium;
     else 
-        return QnSecurityCamResource::SSQualityHigh;
+        return SSQualityHigh;
 }
 
 Qt::CheckState QnAdvancedSettingsWidget::getCameraControl() const
@@ -42,12 +42,12 @@ Qt::CheckState QnAdvancedSettingsWidget::getCameraControl() const
     return ui->checkBoxDisableControl->checkState();
 }
 
-void QnAdvancedSettingsWidget::setQualitySlider(QnSecurityCamResource::SecondaryStreamQuality quality)
+void QnAdvancedSettingsWidget::setQualitySlider(QnSecondaryStreamQuality quality)
 {
     int offset = isKeepQualityVisible() ? 1 : 0;
-    if (quality == QnSecurityCamResource::SSQualityLow)
+    if (quality == SSQualityLow)
         ui->qualitySlider->setValue(Quality_Low + offset);
-    else if (quality == QnSecurityCamResource::SSQualityHigh)
+    else if (quality == SSQualityHigh)
         ui->qualitySlider->setValue(Quality_High + offset);
     else
         ui->qualitySlider->setValue(Quality_Medium + offset);
@@ -73,7 +73,7 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
 
     bool sameQuality = true;
     bool sameControlState = true;
-    QnSecurityCamResource::SecondaryStreamQuality quality = cameras[0]->secondaryStreamQuality();
+    QnSecondaryStreamQuality quality = cameras[0]->secondaryStreamQuality();
     bool controlState = cameras[0]->isCameraControlDisabled();
     for (int i = 1; i < cameras.size(); ++i)
     {

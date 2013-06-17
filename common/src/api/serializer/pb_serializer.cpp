@@ -122,7 +122,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
 
     vCamera->setGroupId(QString::fromUtf8(pb_camera.groupid().c_str()));
     vCamera->setGroupName(QString::fromUtf8(pb_camera.groupname().c_str()));
-    vCamera->setSecondaryStreamQuality(static_cast<QnSecurityCamResource::SecondaryStreamQuality>(pb_camera.secondaryquality()));
+    vCamera->setSecondaryStreamQuality(static_cast<QnSecondaryStreamQuality>(pb_camera.secondaryquality()));
     vCamera->setCameraControlDisabled(pb_camera.controldisabled());
 
     if (pb_camera.has_region())

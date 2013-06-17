@@ -8,6 +8,7 @@
 #include <QtCore/QWaitCondition>
 
 #ifdef _WIN32
+#include "common/systemexcept_win32.h"
 #elif defined(__APPLE__)
   #include <pthread.h>
 #else
@@ -206,6 +207,10 @@ void QnLongRunnable::stop() {
 void QnLongRunnable::at_started() {
     if(m_pool)
         m_pool->startedNotify(this);
+
+#ifdef _WIN32
+    win32_exception::install_handler();
+#endif
 }
 
 void QnLongRunnable::at_finished() {
