@@ -135,38 +135,4 @@
 #endif
 
 
-/* Helper function that can be used to 'place' macros into Qn namespace. */
-#ifdef __cplusplus
-namespace Qn {
-    template<class T>
-    const T &_id(const T &value) { return value; }
-}
-#endif // __cplusplus
-
-// TODO: #Elric move to client_globals
-#define InvalidUtcOffset _id(INT64_MAX)
-
-// TODO: #Elric move out
-#ifdef __cplusplus
-#include <QtCore/QString>
-
-/** Helper function to mark strings that are not to be translated. */
-inline QString lit(const QByteArray &data) {
-    return QLatin1String(data);
-}
-
-/** Helper function to mark strings that are not to be translated. */
-inline QString lit(const char *s) {
-    return QLatin1String(s);
-}
-
-/** Helper function to mark characters that are not to be translated. */
-inline QChar lit(char c) {
-    return QLatin1Char(c);
-}
-
-#endif // __cplusplus
-
-
-
 #endif // QN_COMMON_CONFIG_H

@@ -18,6 +18,7 @@
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 
+#include <ui/common/recording_status_helper.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
@@ -67,7 +68,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_binaryMotionMaskValid(false)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
-    if(!m_resource) 
+    if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
     m_camera = m_resource.dynamicCast<QnVirtualCameraResource>();
 
@@ -119,22 +120,22 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     zoomWindowButton->setToolTip(tr("Create Zoom Window"));
     connect(zoomWindowButton, SIGNAL(toggled(bool)), this, SLOT(at_zoomWindowButton_toggled(bool)));
 
-    QnImageButtonWidget *histogramButton = new QnImageButtonWidget();
-    histogramButton->setIcon(qnSkin->icon("item/zoom_window.png"));
-    histogramButton->setCheckable(true);
-    histogramButton->setProperty(Qn::NoBlockMotionSelection, true);
-    histogramButton->setToolTip(tr("Histogram"));
-    histogramButton->setChecked(item->contrastParams().enabled);
-    connect(histogramButton, SIGNAL(toggled(bool)), this, SLOT(at_histogramButton_toggled(bool)));
+    QnImageButtonWidget *enhancementButton = new QnImageButtonWidget();
+    enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
+    enhancementButton->setCheckable(true);
+    enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
+    enhancementButton->setToolTip(tr("Image Enhancement"));
+    enhancementButton->setChecked(item->imageEnhancement().enabled);
+    connect(enhancementButton, SIGNAL(toggled(bool)), this, SLOT(at_histogramButton_toggled(bool)));
 
     buttonBar()->addButton(MotionSearchButton,  searchButton);
     buttonBar()->addButton(PtzButton,           ptzButton);
     buttonBar()->addButton(ZoomWindowButton,    zoomWindowButton);
-    buttonBar()->addButton(HistogramButton,    histogramButton);
-    
+    buttonBar()->addButton(EnhancementButton,   enhancementButton);
+
     if(m_camera) {
         QTimer *timer = new QTimer(this);
-        
+
         connect(timer,              SIGNAL(timeout()),                                                  this,   SLOT(updateIconButton()));
         connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),            this,   SLOT(updateIconButton()));
         connect(m_camera.data(),    SIGNAL(statusChanged(const QnResourcePtr &)),                       this,   SLOT(updateIconButton()));
@@ -153,10 +154,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateButtonsVisibility();
     updateIconButton();
     updateAspectRatio();
-    setContrastParams(item->contrastParams());
+    setImageEnhancement(item->imageEnhancement());
 }
 
-QnMediaResourceWidget::~QnMediaResourceWidget() 
+QnMediaResourceWidget::~QnMediaResourceWidget()
 {
     ensureAboutToBeDestroyedEmitted();
 
@@ -212,9 +213,9 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect) {
 
     for (int i = 0; i < channelCount(); ++i) {
         QRect rect = gridRect.translated(-channelGridOffset(i)).intersected(QRect(0, 0, MD_WIDTH, MD_HEIGHT));
-        if (rect.isEmpty()) 
+        if (rect.isEmpty())
             continue;
-        
+
         QRegion selection;
         selection += rect;
         selection -= m_motionSensitivity[i].getMotionMask();
@@ -222,7 +223,7 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect) {
         if(!selection.isEmpty()) {
             if(changed) {
                 /* In this case we don't need to bother comparing old & new selection regions. */
-                m_motionSelection[i] += selection; 
+                m_motionSelection[i] += selection;
             } else {
                 QRegion oldSelection = m_motionSelection[i];
                 m_motionSelection[i] += selection;
@@ -374,7 +375,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
     if(m_display) {
         connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
         connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
-        
+
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
@@ -413,56 +414,28 @@ void QnMediaResourceWidget::updateIconButton() {
 
     int recordingMode = Qn::RecordingType_Never;
     if(m_camera->getStatus() == QnResource::Recording)
-        recordingMode = currentRecordingMode();
-    
-    switch(recordingMode) {
-    case Qn::RecordingType_Never:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
-        iconButton()->setToolTip(tr("Not recording"));
-        break;
-    case Qn::RecordingType_Run:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording.png"));
-        iconButton()->setToolTip(tr("Recording everything"));
-        break;
-    case Qn::RecordingType_MotionOnly:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
-        iconButton()->setToolTip(tr("Recording motion only"));
-        break;
-    case Qn::RecordingType_MotionPlusLQ:
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
-        iconButton()->setToolTip(tr("Recording motion and low quality"));
-        break;
-    default:
-        iconButton()->setVisible(false);
-        break;
-    }
-}
-
-int QnMediaResourceWidget::currentRecordingMode() {
-    if(!m_camera)
-        return Qn::RecordingType_Never;
-
-    // TODO: #Elric this should be a resource parameter that is update from the server.
-
-    QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0));
-    int dayOfWeek = dateTime.date().dayOfWeek();
-    int seconds = QTime().secsTo(dateTime.time());
-
-    foreach(const QnScheduleTask &task, m_camera->getScheduleTasks())
-        if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
-            return task.getRecordingType();
-
-    return Qn::RecordingType_Never;
+        recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
+    QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
+    iconButton()->setVisible(!recIcon.isNull());
+    iconButton()->setIcon(recIcon);
+    iconButton()->setToolTip(QnRecordingStatusHelper::tooltip(recordingMode));
 }
 
 void QnMediaResourceWidget::updateRendererEnabled() {
     for(int channel = 0; channel < channelCount(); channel++)
         m_renderer->setEnabled(channel, !exposedRect(channel, true, true, false).isEmpty());
 }
+
+ImageCorrectionParams QnMediaResourceWidget::imageEnhancement() const {
+    return item()->imageEnhancement();
+}
+
+void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &imageEnhancement) {
+    buttonBar()->button(EnhancementButton)->setChecked(imageEnhancement.enabled);
+    item()->setImageEnhancement(imageEnhancement);
+    m_renderer->setImageCorrection(imageEnhancement);
+}
+
 
 
 // -------------------------------------------------------------------------- //
@@ -474,7 +447,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     updateRendererEnabled();
 
     for(int channel = 0; channel < channelCount(); channel++)
-        m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true)); 
+        m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
     if(isOverlayVisible() && isInfoVisible())
         updateInfoTextLater();
@@ -494,7 +467,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     QRectF sourceRect = toSubRect(channelRect, paintRect);
     Qn::RenderStatus result = m_renderer->paint(channel, sourceRect, paintRect, effectiveOpacity());
     m_paintedChannels[channel] = true;
-    
+
     /* There is no need to restore blending state before invoking endNativePainting. */
     painter->endNativePainting();
 
@@ -730,7 +703,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
 
         timeString = tr("\t%1").arg(
-            m_display->camDisplay()->isRealTimeSource() ? 
+            m_display->camDisplay()->isRealTimeSource() ?
             tr("LIVE") :
             QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"))
         );
@@ -750,7 +723,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
-    result |= HistogramButton;
+    result |= EnhancementButton;
 
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
@@ -823,7 +796,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
         setAspectRatio(-1);
     } else {
         setAspectRatio(
-            QnGeometry::aspectRatio(m_renderer->sourceSize()) * 
+            QnGeometry::aspectRatio(m_renderer->sourceSize()) *
             QnGeometry::aspectRatio(channelLayout()->size()) *
             (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
         );
@@ -862,26 +835,14 @@ void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     if(checked)
         buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
 }
-void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) 
+void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
 {
-    ImageCorrectionParams params = item()->contrastParams();
+    ImageCorrectionParams params = item()->imageEnhancement();
     if (params.enabled == checked)
         return;
+
     params.enabled = checked;
-    setContrastParams(params);
-}
-
-ImageCorrectionParams QnMediaResourceWidget::contrastParams() const
-{
-    return item()->contrastParams();
-}
-
-void QnMediaResourceWidget::setContrastParams(const ImageCorrectionParams& params)
-{
-    QnImageButtonWidget * button = buttonBar()->button(HistogramButton);
-    button->setChecked(params.enabled);
-    item()->setContrastParams(params);
-    m_renderer->setImageCorrection(params);
+    setImageEnhancement(params);
 }
 
 void QnMediaResourceWidget::at_renderWatcher_displayingChanged(QnResourceWidget *widget) {

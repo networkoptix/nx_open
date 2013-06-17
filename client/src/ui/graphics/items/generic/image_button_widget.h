@@ -17,7 +17,7 @@ class QnTextureTransitionShaderProgram;
 class QnGlFunctions;
 
 /**
- * A lightweight button widget that does not use styles for painting. 
+ * A lightweight button widget that does not use styles for painting.
  */
 class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> > {
     Q_OBJECT
@@ -124,6 +124,7 @@ protected:
 
     void clickInternal(QGraphicsSceneMouseEvent *event);
 
+    void setBaseColor(const QColor &color);
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
@@ -144,6 +145,7 @@ private:
 
     QAction *m_action;
     bool m_actionIconOverridden;
+    QColor m_baseColor;
 
     QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
     QScopedPointer<QnGlFunctions> m_gl;
@@ -157,25 +159,25 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)
  */
 class QnRotatingImageButtonWidget: public QnImageButtonWidget, public AnimationTimerListener {
     Q_OBJECT
-    
+
     typedef QnImageButtonWidget base_type;
-    
+
 public:
     QnRotatingImageButtonWidget(QGraphicsItem *parent = NULL);
-    
+
     qreal rotationSpeed() const {
         return m_rotationSpeed;
     }
-    
+
     void setRotationSpeed(qreal rotationSpeed) {
         m_rotationSpeed = rotationSpeed;
     }
-    
+
 protected:
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
-    
+
     virtual void tick(int deltaMSecs) override;
-    
+
 private:
     qreal m_rotationSpeed;
     qreal m_rotation;

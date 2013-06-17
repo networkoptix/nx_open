@@ -274,7 +274,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
 
     m_view = view;
 
-    if(m_scene && m_view) 
+    if(m_scene && m_view)
         initSceneView();
 }
 
@@ -323,10 +323,10 @@ void QnWorkbenchDisplay::initSceneView() {
     /* Init scene. */
     m_instrumentManager->registerScene(m_scene);
 
-    /* Note that selection often changes there and back, and we don't want such changes to 
+    /* Note that selection often changes there and back, and we don't want such changes to
      * affect our logic, so we use queued connections here. */ // TODO: #Elric I don't see queued connections
     connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
-    connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged())); 
+    connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged()));
     connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
 
     /* Scene indexing will only slow everything down. */
@@ -415,7 +415,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
 
-    m_gridBackgroundItem = new QnGridBackgroundItem();
+    m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
     m_scene->addItem(gridBackgroundItem());
     setLayer(gridBackgroundItem(), Qn::EMappingLayer);
     gridBackgroundItem()->setOpacity(0.0);
@@ -636,7 +636,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
                 oldCamDisplay->playAudio(false);
         }
 
-        if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) { 
+        if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) {
             QnCamDisplay *newCamDisplay = newMediaWidget ? newMediaWidget->display()->camDisplay() : NULL;
             if(newCamDisplay)
                 newCamDisplay->playAudio(true);
@@ -760,7 +760,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
     QnResourceWidget *widget = this->widget(item);
     if(widget == NULL)
         return; /* Widget was not created for the given item. */
-    
+
     bringToFront(widget);
 }
 
@@ -822,7 +822,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     m_widgetByItem.insert(item, widget);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         m_widgetByRenderer.insert(mediaWidget->renderer(), widget);
-    
+
     /* Note that it is important to query resource from the widget as it may differ from the one passed
      * here because of enabled / disabled state effects. */
     QList<QnResourceWidget *> &widgetsForResource = m_widgetsByResource[widget->resource()];
@@ -864,7 +864,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 if (time > 0)
                     mediaWidget->display()->archiveReader()->jumpTo(time, time);
                 else
-                    if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
+                    if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live))
                         mediaWidget->display()->archiveReader()->jumpTo(0, 0);
             }
         }
@@ -1040,8 +1040,8 @@ void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity) {
         return;
 
     m_frameOpacity = opacity;
-    
-    foreach(QnResourceWidget *widget, m_widgets) 
+
+    foreach(QnResourceWidget *widget, m_widgets)
         widget->setFrameOpacity(opacity);
 }
 
@@ -1556,7 +1556,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
 
         if(QnResourcePtr resource = resourcePool()->getResourceByUniqId((**layout->items().begin()).resourceUid())) {
             m_loader = new QnThumbnailsLoader(resource, false);
-            
+
             connect(m_loader, SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(at_loader_thumbnailLoaded(const QnThumbnail &)));
             connect(m_loader, SIGNAL(finished()), m_loader, SLOT(deleteLater()));
 
@@ -1617,7 +1617,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         if(hasTimeLabels) {
             widget->setOverlayVisible(true, false);
             widget->setInfoVisible(true, false);
-            
+
             qint64 displayTime = time;
             if(qnSettings->timeMode() == Qn::ServerTimeMode)
                 displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
@@ -1734,20 +1734,20 @@ void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStarted() {
 }
 
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStopped() {
-    foreach(QnResourceWidget *widget, m_widgets) 
+    foreach(QnResourceWidget *widget, m_widgets)
         widget->setOption(QnResourceWidget::DisplayActivity, true);
 }
 
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted() {
-    foreach(QnResourceWidget *widget, m_widgets) 
+    foreach(QnResourceWidget *widget, m_widgets)
         widget->setOption(QnResourceWidget::DisplayActivity, false);
 }
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
     QnResourceWidget *widget = checked_cast<QnResourceWidget *>(sender());
     if (widget && widget->item()) {
-        /* We can get here only when the widget is destroyed directly 
-         * (not by destroying or removing its corresponding item). 
+        /* We can get here only when the widget is destroyed directly
+         * (not by destroying or removing its corresponding item).
          * Therefore the widget's item must be destroyed. */
         removeItemInternal(widget->item(), false, true);
     }

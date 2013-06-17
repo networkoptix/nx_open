@@ -402,10 +402,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Help")).
         icon(qnSkin->icon("titlebar/whats_this.png"));
 
-    factory(Qn::CheckSystemHealthAction).
-        flags(Qn::NoTarget).
-        text(tr("Check System Health..."));
-
     factory(Qn::ClearCacheAction).
         flags(Qn::NoTarget).
         text(tr("Clear cache"));
@@ -587,6 +583,15 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: #Elric icon?
 
+    factory(Qn::MessageBoxAction).
+        flags(Qn::NoTarget).
+        text(tr("Show message"));
+
+    factory(Qn::BrowseUrlAction).
+        flags(Qn::NoTarget).
+        text(tr("Open in browser..."));
+
+
     factory(Qn::PreferencesGeneralTabAction).
         flags(Qn::Main).
         text(tr("System Settings...")).
@@ -613,11 +618,20 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(Qn::BusinessEventsLogAction).
-        flags(Qn::Main).
+        flags(Qn::Main | Qn::Tree).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Log...")).
         shortcut(tr("Ctrl+L")).
-        autoRepeat(false);
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+
+    factory(Qn::CameraListAction).
+        flags(Qn::Main | Qn::Tree).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Cameras list...")).
+        shortcut(tr("Ctrl+M")).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory().
         flags(Qn::Main).
@@ -1010,7 +1024,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Clear Camera Settings Dialog"));
 
     factory(Qn::ServerAddCameraManuallyAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Add camera(s)...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
@@ -1019,12 +1033,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Ping..."));
 
     factory(Qn::ServerLogsAction).
-        flags(Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Server Logs"));
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Server Logs")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory(Qn::ServerIssuesAction).
-        flags(Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Check Server Issues..."));
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Check Server Issues...")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).

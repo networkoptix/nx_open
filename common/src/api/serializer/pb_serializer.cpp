@@ -122,6 +122,8 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
 
     vCamera->setGroupId(QString::fromUtf8(pb_camera.groupid().c_str()));
     vCamera->setGroupName(QString::fromUtf8(pb_camera.groupname().c_str()));
+    vCamera->setSecondaryStreamQuality(static_cast<QnSecurityCamResource::SecondaryStreamQuality>(pb_camera.secondaryquality()));
+    vCamera->setCameraControlDisabled(pb_camera.controldisabled());
 
     if (pb_camera.has_region())
     {
@@ -425,6 +427,9 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_motiontype(static_cast<pb::Camera_MotionType>(cameraPtr->getMotionType()));
     pb_camera.set_groupid(cameraPtr->getGroupId().toUtf8().constData());
     pb_camera.set_groupname(cameraPtr->getGroupName().toUtf8().constData());
+
+    pb_camera.set_secondaryquality(static_cast<pb::Camera_SecondaryQuality>(cameraPtr->secondaryStreamQuality()));
+    pb_camera.set_controldisabled(cameraPtr->isCameraControlDisabled());
 
     QnParamList params = cameraPtr->getResourceParamList();
     foreach(QString key, params.keys())
@@ -1131,13 +1136,11 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QB
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
 {
-    //TODO: #vasilenko UTF unuse std::string
     historyItem = QnCameraHistoryItemPtr(new QnCameraHistoryItem(
                                             QString::fromUtf8(pb_cameraServerItem.physicalid().c_str()),
                                             pb_cameraServerItem.timestamp(),
                                             QString::fromUtf8(pb_cameraServerItem.serverguid().c_str())
                                         ));
-
 }
 
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule)

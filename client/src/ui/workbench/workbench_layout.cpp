@@ -31,7 +31,7 @@ namespace {
 
 } // anonymous namespace
 
-QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent): 
+QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
     QObject(parent)
 {
     // TODO: #Elric this does not belong here.
@@ -57,7 +57,7 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
     synchronizer->setAutoDeleting(true);
     synchronizer->update();
 }
-    
+
 QnWorkbenchLayout::~QnWorkbenchLayout() {
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
@@ -110,7 +110,7 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
 
     bool result = true;
 
-    /* Unpin all items so that pinned state does not interfere with 
+    /* Unpin all items so that pinned state does not interfere with
      * incrementally moving the items. */
     foreach(QnWorkbenchItem *item, m_items)
         item->setPinned(false);
@@ -215,7 +215,7 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
         removeZoomLink(item, zoomTargetItem);
     foreach(QnWorkbenchItem *zoomItem, this->zoomItems(item))
         removeZoomLink(zoomItem, item);
-#else 
+#else
     if(QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item))
         removeZoomLink(item, zoomTargetItem);
     foreach(QnWorkbenchItem *zoomItem, this->zoomItems(item))
@@ -288,7 +288,7 @@ void QnWorkbenchLayout::removeZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *z
         qnNullWarning(zoomTargetItem);
         return;
     }
-    
+
     if(item->layout() != this || zoomTargetItem->layout() != this) {
         qnWarning("Cannot remove a zoom link between items that do not belong to this layout.");
         return;
@@ -611,13 +611,13 @@ void QnWorkbenchLayout::updateBoundingRectInternal() {
 
 void QnWorkbenchLayout::setCellAspectRatio(qreal cellAspectRatio) {
     if(cellAspectRatio < 0.0 || qFuzzyIsNull(cellAspectRatio)) /* Negative means 'use default value'. */
-        cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio(); 
+        cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
 
     if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
         return;
 
     m_cellAspectRatio = cellAspectRatio;
-    
+
     emit cellAspectRatioChanged();
     emit dataChanged(Qn::LayoutCellAspectRatioRole);
 }
@@ -632,7 +632,7 @@ void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
         return;
 
     m_cellSpacing = cellSpacing;
-    
+
     emit cellSpacingChanged();
     emit dataChanged(Qn::LayoutCellSpacingRole);
 }
@@ -709,4 +709,16 @@ bool QnWorkbenchLayout::setData(int role, const QVariant &value) {
         }
         return true;
     }
+}
+
+void QnWorkbenchLayout::centralizeItems() {
+    QRect brect = boundingRect();
+    int xdiff = -brect.center().x();
+    int ydiff = -brect.center().y();
+
+    QList<QnWorkbenchItem*> itemsList = m_items.toList();
+    QList<QRect> geometries;
+    foreach (QnWorkbenchItem* item, itemsList)
+        geometries << item->geometry().adjusted(xdiff, ydiff, xdiff, ydiff);
+    moveItems(itemsList, geometries);
 }

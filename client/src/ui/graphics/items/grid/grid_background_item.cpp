@@ -2,7 +2,10 @@
 
 #include <QPainter>
 
+#include <core/resource/user_resource.h>
+
 #include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <utils/threaded_image_loader.h>
 #include <utils/color_space/yuvconvert.h>
@@ -17,8 +20,9 @@
 #endif
 
 
-QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
+QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent, QnWorkbenchContext *context):
     QGraphicsObject(parent),
+    QnWorkbenchContextAware(NULL, context),
     m_imageSize(1, 1),
     m_imageOpacity(0.7),
     m_cache(new QnAppServerImageCache(this)),
@@ -28,6 +32,8 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
     setAcceptedMouseButtons(0);
 
     connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    connect(this->context(), SIGNAL(userChanged(QnUserResourcePtr)), this, SLOT(updateDisplay()));
+
     /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }
@@ -44,7 +50,7 @@ QRectF QnGridBackgroundItem::boundingRect() const {
 }
 
 void QnGridBackgroundItem::updateDisplay() {
-    if (m_imageFilename.isEmpty()) {
+    if (m_imageFilename.isEmpty() || !context()->user()) {
         setOpacity(0.0);
         return;
     } else {

@@ -44,12 +44,12 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
     m_widget = widget;
     if (m_widget) {
         m_widget->renderer()->setHystogramConsumer(getHystogramConsumer());
-        setParams(widget->contrastParams());
+        setParams(widget->imageEnhancement());
         m_widget->renderer()->disconnect(this);
         connect(m_widget->renderer(), SIGNAL(beforeDestroy()), this, SLOT(at_rendererDestryed()));
 
         //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
-        m_backupParams = widget->contrastParams();
+        m_backupParams = widget->imageEnhancement();
     }
     QString name = m_widget ? m_widget->resource()->getName() : tr("[No item selected]");
     setWindowTitle(tr("Adjust video - %1").arg(name));
@@ -112,7 +112,7 @@ void QnAdjustVideoDialog::uiToParams()
         m_params = newParams;
         ui->histogramRenderer->setHistogramParams(m_params);
         if (m_widget)
-            m_widget->setContrastParams(m_params);
+            m_widget->setImageEnhancement(m_params);
     }
 }
 
@@ -153,14 +153,14 @@ void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
         }
         case QDialogButtonBox::RejectRole:
             if (m_widget)
-                m_widget->setContrastParams(m_backupParams);
+                m_widget->setImageEnhancement(m_backupParams);
         case QDialogButtonBox::AcceptRole:
             setWidget(0);
             hide();
             break;
         case QDialogButtonBox::ApplyRole:
             if (m_widget)
-                m_backupParams = m_widget->contrastParams();
+                m_backupParams = m_widget->imageEnhancement();
             //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
             break;
         default:
@@ -176,7 +176,7 @@ QnHistogramConsumer* QnAdjustVideoDialog::getHystogramConsumer() const
 void QnAdjustVideoDialog::closeEvent( QCloseEvent * e )
 {
     if (m_widget)
-        m_widget->setContrastParams(m_backupParams);
+        m_widget->setImageEnhancement(m_backupParams);
     setWidget(0);
     QDialog::closeEvent(e);
 }

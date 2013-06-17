@@ -93,6 +93,7 @@ public:
     QSize getMaxScreenSize() const;
     QnArchiveStreamReader* getArchiveReader() const;
     bool isFullScreen() const;
+    bool isZoomWindow() const;
     void setFullScreen(bool fullScreen);
     int getAvarageFps() const;
     virtual bool isBuffering() const override;
@@ -227,6 +228,7 @@ protected:
     int m_prevLQ;
     bool m_doNotChangeDisplayTime;
     bool m_firstLivePacket;
+    bool m_multiView;
 };
 
 #endif //QN_CAM_DISPLAY_H

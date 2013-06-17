@@ -3,6 +3,9 @@
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
+#include <QtCore/QString>
+
+#include <utils/math/limits.h> /* For INT64_MAX. */
 
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
@@ -141,7 +144,36 @@ public:
         UndefinedState /**< Also used in event rule to associate non-toggle action with event with any toggle state. */
     };
 
+    /**
+     * Invalid value for a timezone UTC offset.
+     */
+    static const qint64 InvalidUtcOffset = INT64_MAX;
+#define InvalidUtcOffset InvalidUtcOffset
+
+
+    /** 
+     * Helper function that can be used to 'place' macros into Qn namespace. 
+     */
+    template<class T>
+    const T &_id(const T &value) { return value; }
+
 } // namespace Qn
+
+
+/** Helper function to mark strings that are not to be translated. */
+inline QString lit(const QByteArray &data) {
+    return QLatin1String(data);
+}
+
+/** Helper function to mark strings that are not to be translated. */
+inline QString lit(const char *s) {
+    return QLatin1String(s);
+}
+
+/** Helper function to mark characters that are not to be translated. */
+inline QChar lit(char c) {
+    return QLatin1Char(c);
+}
 
 
 Q_DECLARE_METATYPE(Qn::TimePeriodTypes);

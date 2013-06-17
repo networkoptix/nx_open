@@ -424,7 +424,7 @@ QnRequestParamList QnMediaServerConnection::createTimePeriodsRequest(const QnNet
 }
 
 int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const
-                                                QSize& size, const QString& imageFormat, bool precise, QObject *target, const char *slot)
+                                                QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot)
 {
     QnRequestParamList params;
 
@@ -435,8 +435,12 @@ int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camer
     if (size.height() > 0)
         params << QnRequestParam("height", size.height());
     params << QnRequestParam("format", imageFormat);
-    if (precise)
-        params << QnRequestParam("precise", lit("1"));
+    QString methodStr(lit("before"));
+    if (method == Precise)
+        methodStr = lit("precise");
+    else if (method == IFrameAfterTime)
+        methodStr = lit("after");
+    params << QnRequestParam("method", methodStr);
     return sendAsyncGetRequest(ImageObject, params, QN_REPLY_TYPE(QImage), target, slot);
 }
 
@@ -566,7 +570,7 @@ int QnMediaServerConnection::ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &
     return sendAsyncGetRequest(PtzSpaceMapperObject, params, QN_REPLY_TYPE(QnPtzSpaceMapper), target, slot);
 }
 
-int QnMediaServerConnection::asyncEventLog(
+int QnMediaServerConnection::getEventLogAsync(
                   qint64 dateFrom, qint64 dateTo, 
                   QnResourceList camList,
                   BusinessEventType::Value eventType, 

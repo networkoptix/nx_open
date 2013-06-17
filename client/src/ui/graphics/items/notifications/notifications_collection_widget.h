@@ -9,11 +9,73 @@
 #include <health/system_health.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
 class QnNotificationItem;
+
+/**
+ * An image button widget that displays thumbnail behind the button.
+ */
+class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationTimerListener {
+    Q_OBJECT
+
+    typedef QnImageButtonWidget base_type;
+
+public:
+    QnBlinkingImageButtonWidget(QGraphicsItem *parent = NULL):
+        base_type(parent),
+        m_blinking(true),
+        m_blinkUp(true),
+        m_blinkProgress(0.0)
+    {
+        registerAnimation(this);
+        startListening();
+    }
+
+    Q_SLOT void startBlinking() {
+        m_blinking = true;
+    }
+
+    Q_SLOT void stopBlinking() {
+        m_blinking = false;
+    }
+
+protected:
+    virtual void tick(int deltaMSecs) override {
+        qreal step = (qreal)deltaMSecs / 1000;
+        if (m_blinkUp) {
+            m_blinkProgress += step;
+            if (m_blinkProgress >= 1.0) {
+                m_blinkProgress = 1.0;
+                m_blinkUp = false;
+            }
+        } else {
+            m_blinkProgress -= step;
+            if (m_blinkProgress <= 0.6) {
+                m_blinkProgress = 0.6;
+                m_blinkUp = true;
+            }
+        }
+    }
+
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override {
+        if (!(startState & CHECKED) && m_blinking)
+            setBaseColor(QColor(255 * m_blinkProgress, 0, 0));
+        else
+            setBaseColor(QColor(Qt::white));
+
+        base_type::paint(painter, startState, endState, progress, widget, rect);
+    }
+private:
+    bool m_blinking;
+
+    bool m_blinkUp;
+    qreal m_blinkProgress;
+};
+
 
 class QnNotificationsCollectionWidget : public GraphicsWidget, public QnWorkbenchContextAware
 {
@@ -37,7 +99,8 @@ signals:
     void sizeHintChanged();
 
 private slots:
-    void showSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+    void showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+    void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideAll();
 
@@ -55,8 +118,12 @@ private:
      */
     void loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
 
+    QnNotificationItem* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
+
+    QMultiHash<QnSystemHealth::MessageType, QnNotificationItem*> m_itemsByMessageType;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

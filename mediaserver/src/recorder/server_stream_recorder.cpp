@@ -259,14 +259,14 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
         if (m_role == QnResource::Role_LiveVideo)
             return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;
         else
-            return fps ? qMax(2, qMin(DESIRED_SECOND_STREAM_FPS, camera->getMaxFps()-fps)) : 2;
+            return fps ? qMax(2, qMin(camera->desiredSecondStreamFps(), camera->getMaxFps()-fps)) : 2;
     }
     else
     {
         if (m_role == QnResource::Role_LiveVideo)
             return fps ? fps : camera->getMaxFps();
         else
-            return DESIRED_SECOND_STREAM_FPS;
+            return camera->desiredSecondStreamFps();
     }
 }
 

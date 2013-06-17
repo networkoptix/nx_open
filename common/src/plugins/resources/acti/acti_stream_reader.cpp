@@ -56,30 +56,32 @@ void QnActiStreamReader::openStream()
     QString encoderStr(QLatin1String("H264"));
     QString audioStr = m_actiRes->isAudioEnabled() ? QLatin1String("1") : QLatin1String("0");
 
-    CLHttpStatus status;
-    QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(fps), status);
-    if (status != CL_HTTP_SUCCESS)
-        return;
-
-    result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_RESOLUTION.arg(ch).arg(resolutionStr), status);
-    if (status != CL_HTTP_SUCCESS)
-        return;
-
-    result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_BITRATE.arg(ch).arg(bitrateStr), status);
-    if (status != CL_HTTP_SUCCESS)
-        return;
-
-    result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_ENCODER.arg(ch).arg(encoderStr), status);
-    if (status != CL_HTTP_SUCCESS)
-        return;
-
-    if (m_actiRes->isAudioSupported())
+    if (!m_actiRes->isCameraControlDisabled())
     {
-        result = m_actiRes->makeActiRequest(QLatin1String("system"), SET_AUDIO.arg(ch).arg(audioStr), status);
+        CLHttpStatus status;
+        QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(fps), status);
         if (status != CL_HTTP_SUCCESS)
             return;
-    }
 
+        result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_RESOLUTION.arg(ch).arg(resolutionStr), status);
+        if (status != CL_HTTP_SUCCESS)
+            return;
+
+        result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_BITRATE.arg(ch).arg(bitrateStr), status);
+        if (status != CL_HTTP_SUCCESS)
+            return;
+
+        result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_ENCODER.arg(ch).arg(encoderStr), status);
+        if (status != CL_HTTP_SUCCESS)
+            return;
+
+        if (m_actiRes->isAudioSupported())
+        {
+            result = m_actiRes->makeActiRequest(QLatin1String("system"), SET_AUDIO.arg(ch).arg(audioStr), status);
+            if (status != CL_HTTP_SUCCESS)
+                return;
+        }
+    }
 
     // get URL
 

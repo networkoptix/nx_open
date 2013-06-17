@@ -11,7 +11,6 @@
 #include <client/client_globals.h>
 
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
@@ -71,8 +70,8 @@ private:
     QnMetaDataV1Ptr m_lastDisplayedMetadata; // TODO: #Elric get rid of this
     unsigned m_lastDisplayedFlags;
     unsigned int m_prevFrameSequence;
-    QScopedPointer<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
     QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
+    QScopedPointer<QnYv12ToRgbWithGammaShaderProgram> m_yv12ToRgbWithGammaShaderProgram;
     QScopedPointer<QnYv12ToRgbaShaderProgram> m_yv12ToRgbaShaderProgram;
     QScopedPointer<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
     bool m_timeChangeEnabled;

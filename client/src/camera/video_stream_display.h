@@ -36,8 +36,8 @@ public:
     //!Implementation of QnStoppable::pleaseStop()
     virtual void pleaseStop() override;
 
-    void addRenderer(QnAbstractRenderer* draw);
-    void removeRenderer(QnAbstractRenderer* draw);
+    int addRenderer(QnAbstractRenderer* draw);
+    int removeRenderer(QnAbstractRenderer* draw);
     
     FrameDisplayStatus display(
         QnCompressedVideoDataPtr data,

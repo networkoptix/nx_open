@@ -212,12 +212,12 @@ public:
     void setZoomRect(const QRectF &zoomRect);
 
     /**
-     * \param  New contrast params for this item.
+     * \param                           New image enhancement params for this item.
      */
-    void setContrastParams(const ImageCorrectionParams& params);
+    void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
     
-    const ImageCorrectionParams& contrastParams() const {
-        return m_contrastParams;
+    const ImageCorrectionParams &imageEnhancement() const {
+        return m_imageEnhancement;
     }
 
     QnWorkbenchItem *zoomTargetItem() const;
@@ -283,7 +283,7 @@ signals:
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
     void zoomRectChanged();
-    void contrastParamsChanged();
+    void imageEnhancementChanged();
     void zoomTargetItemChanged();
     void rotationChanged();
     void dataChanged(int role);
@@ -314,8 +314,8 @@ private:
     /** Item-relative rectangle that defines the portion of the item to be shown. */
     QRectF m_zoomRect;
 
-    /** Item contrast params */
-    ImageCorrectionParams m_contrastParams;
+    /** Item image enhancement params. */
+    ImageCorrectionParams m_imageEnhancement;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;

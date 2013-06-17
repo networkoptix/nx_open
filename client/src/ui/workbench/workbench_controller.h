@@ -115,7 +115,7 @@ protected:
     void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
     void displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool display);
 
-    void moveCursor(const QPoint &direction);
+    void moveCursor(const QPoint &aAxis, const QPoint &bAxis);
     void showContextMenuAt(const QPoint &pos);
 
 protected slots:
@@ -131,7 +131,6 @@ protected slots:
     void at_rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
     void at_zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect);
-    void at_ContrastParamsChanged(QnMediaResourceWidget *widget, const ImageCorrectionParams& params);
     void at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect);
     void at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget);
 

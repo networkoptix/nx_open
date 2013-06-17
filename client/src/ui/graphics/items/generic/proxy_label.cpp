@@ -20,7 +20,15 @@ QnProxyLabel::QnProxyLabel(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
 
 void QnProxyLabel::init() {
     m_label.reset(new QLabel());
-    setWidget(m_label.data());
+
+    /* Prevent QWidgetPrivate::show_helper from closing the currently shown menu. */
+    if(QWidget *popupWidget = qApp->activePopupWidget()) {
+        popupWidget->installEventFilter(this);
+        setWidget(m_label.data());
+        popupWidget->removeEventFilter(this);
+    } else {
+        setWidget(m_label.data());
+    }
 
     connect(m_label, SIGNAL(linkActivated(const QString &)), this, SIGNAL(linkActivated(const QString &)));
     connect(m_label, SIGNAL(linkHovered(const QString &)), this, SIGNAL(linkHovered(const QString &)));
@@ -163,6 +171,29 @@ QString QnProxyLabel::selectedText() const {
 
 int QnProxyLabel::selectionStart() const {
     return m_label->selectionStart();
+}
+
+bool QnProxyLabel::eventFilter(QObject *object, QEvent *event) {
+    if(object == widget()) {
+        // TODO: #Elric we can do without stopping show/hide state propagation. 
+        // Just need to filter all close events that were caused by visibility changes.
+        if(event->type() == QEvent::Show || event->type() == QEvent::Hide)
+            return QGraphicsWidget::eventFilter(object, event); /* Skip QGraphicsProxyWidget's implementation. */
+    } else if(object == qApp->activePopupWidget()) {
+        if(event->type() == QEvent::Close) {
+            event->ignore();
+            return true;
+        }
+    }
+    
+    return base_type::eventFilter(object, event);
+}
+
+QVariant QnProxyLabel::itemChange(GraphicsItemChange change, const QVariant &value) {
+    if(change == ItemVisibleChange || change == ItemVisibleHasChanged)
+        return QGraphicsWidget::itemChange(change, value); /* Skip QGraphicsProxyWidget's implementation. */
+
+    return base_type::itemChange(change, value);
 }
 
 QSizeF QnProxyLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
