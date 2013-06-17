@@ -1384,7 +1384,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     }
 
     if (!resources.empty()) {
-        //TODO: #Elric should be trigger(.., resources), but some keys will be lost in that case; parameters.setResources() method is required
+        parameters.setResources(resources);
         if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
         else
