@@ -133,6 +133,7 @@ private:
     int m_prevSrcHeight;
     qint64 m_lastIgnoreTime;
     mutable QMutex m_renderListMtx;
+    bool m_isPaused;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);

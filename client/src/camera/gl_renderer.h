@@ -76,7 +76,6 @@ private:
     QScopedPointer<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
     bool m_timeChangeEnabled;
     mutable QMutex m_mutex;
-    bool m_imageCorrectionEnabled;
     bool m_paused;
     ScreenshotInterface* m_screenshotInterface;
     ImageCorrectionResult m_imageCorrector;
