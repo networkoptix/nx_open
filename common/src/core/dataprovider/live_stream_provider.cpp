@@ -76,7 +76,21 @@ void QnLiveStreamProvider::setSecondaryQuality(QnSecondaryStreamQuality  quality
             return; // same quality
         m_secondaryQuality = quality;
     }
-    updateStreamParamsBasedOnQuality();
+
+    if (getRole() != QnResource::Role_SecondaryLiveVideo)
+    {
+        // must be primary, so should inform secondary
+        m_cameraRes->lockConsumers();
+        foreach(QnResourceConsumer* consumer, m_cameraRes->getAllConsumers())
+        {
+            QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
+            if (lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo)
+                lp->onPrimaryFpsUpdated(m_fps);
+        }
+        m_cameraRes->unlockConsumers();
+
+        updateStreamParamsBasedOnFps();
+    }
 }
 
 void QnLiveStreamProvider::setQuality(QnStreamQuality q)
