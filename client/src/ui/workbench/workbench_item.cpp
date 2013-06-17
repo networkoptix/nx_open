@@ -41,7 +41,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     setRotation(data.rotation);
     setCombinedGeometry(data.combinedGeometry);
     setZoomRect(data.zoomRect);
-    setContrastParams(data.contrastParams);
+    setImageEnhancement(data.contrastParams);
 
     m_dataByRole = data.dataByRole; // TODO: #Elric
 }
@@ -63,7 +63,7 @@ QnLayoutItemData QnWorkbenchItem::data() const {
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
     data.zoomRect = zoomRect();
-    data.contrastParams = contrastParams();
+    data.contrastParams = imageEnhancement();
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QUuid();
     data.dataByRole = m_dataByRole;
 
@@ -88,7 +88,7 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
     result &= setCombinedGeometry(data.combinedGeometry);
     setRotation(data.rotation);
     setZoomRect(data.zoomRect);
-    setContrastParams(data.contrastParams);
+    setImageEnhancement(data.contrastParams);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
     m_dataByRole = data.dataByRole; // TODO
@@ -109,7 +109,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
     data.flags = flags();
     data.rotation = rotation();
     data.zoomRect = zoomRect();
-    data.contrastParams = contrastParams();
+    data.contrastParams = imageEnhancement();
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QUuid();
     data.combinedGeometry = combinedGeometry();
     data.dataByRole = m_dataByRole;
@@ -229,15 +229,15 @@ void QnWorkbenchItem::setZoomRect(const QRectF &zoomRect) {
     emit dataChanged(Qn::ItemZoomRectRole);
 }
 
-void QnWorkbenchItem::setContrastParams(const ImageCorrectionParams& params)
+void QnWorkbenchItem::setImageEnhancement(const ImageCorrectionParams& imageEnhancement)
 {
-    if(m_contrastParams == params)
+    if(m_imageEnhancement == imageEnhancement)
         return;
 
-    m_contrastParams = params;
+    m_imageEnhancement = imageEnhancement;
 
-    emit contrastParamsChanged();
-    emit dataChanged(Qn::ItemContrastParamsRole);
+    emit imageEnhancementChanged();
+    emit dataChanged(Qn::ItemImageEnhancementRole);
 }
 
 
@@ -297,8 +297,8 @@ QVariant QnWorkbenchItem::data(int role) const {
         return combinedGeometry();
     case Qn::ItemZoomRectRole:
         return zoomRect();
-    case Qn::ItemContrastParamsRole:
-        return QVariant::fromValue<ImageCorrectionParams>(contrastParams());
+    case Qn::ItemImageEnhancementRole:
+        return QVariant::fromValue<ImageCorrectionParams>(imageEnhancement());
     case Qn::ItemFlagsRole:
         return static_cast<int>(flags());
     case Qn::ItemRotationRole:
@@ -355,9 +355,9 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
             return false;
         }
     }
-    case Qn::ItemContrastParamsRole: {
+    case Qn::ItemImageEnhancementRole: {
         if(value.canConvert<ImageCorrectionParams>()) {
-            setContrastParams(value.value<ImageCorrectionParams>());
+            setImageEnhancement(value.value<ImageCorrectionParams>());
             return true;
         } else {
             qnWarning("Provided zoom rect value '%1' is not convertible to QRectF.", value);

@@ -517,7 +517,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
 
     /* Setup buttons */
     QnImageButtonWidget *pingButton = new QnImageButtonWidget();
-    pingButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+    pingButton->setIcon(qnSkin->icon("item/ping.png"));
     pingButton->setCheckable(false);
     pingButton->setProperty(Qn::NoBlockMotionSelection, true);
     pingButton->setToolTip(tr("Ping"));
@@ -525,7 +525,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     buttonBar()->addButton(PingButton, pingButton);
 
     QnImageButtonWidget *showLogButton = new QnImageButtonWidget();
-    showLogButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+    showLogButton->setIcon(qnSkin->icon("item/log.png"));
     showLogButton->setCheckable(false);
     showLogButton->setProperty(Qn::NoBlockMotionSelection, true);
     showLogButton->setToolTip(tr("Show Log"));
@@ -533,7 +533,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     buttonBar()->addButton(ShowLogButton, showLogButton);
 
     QnImageButtonWidget *checkIssuesButton = new QnImageButtonWidget();
-    checkIssuesButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+    checkIssuesButton->setIcon(qnSkin->icon("item/issues.png"));
     checkIssuesButton->setCheckable(false);
     checkIssuesButton->setProperty(Qn::NoBlockMotionSelection, true);
     checkIssuesButton->setToolTip(tr("Check Issues"));
