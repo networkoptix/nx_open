@@ -78,6 +78,12 @@ void QnVideoStreamDisplay::pleaseStop()
 
 int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 {
+    {
+        QMutexLocker lock(&m_mtx);
+        if (m_lastDisplayedFrame)
+            renderer->draw(m_lastDisplayedFrame);
+    }
+
     QMutexLocker lock(&m_renderListMtx);
     renderer->setScreenshotInterface(this);
     m_newList << renderer;
