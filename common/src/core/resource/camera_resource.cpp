@@ -242,7 +242,10 @@ void QnVirtualCameraResource::save()
 
 QString QnVirtualCameraResource::toSearchString() const
 {
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
+    QString manufacturer = resourceType ? resourceType->getManufacture() : QString();
+
     QString result;
-    QTextStream(&result) << QnResource::toSearchString() << " " << getModel() << " " << getFirmware(); //TODO: #Elric evil!
+    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << manufacturer; //TODO: #Elric evil!
     return result;
 }

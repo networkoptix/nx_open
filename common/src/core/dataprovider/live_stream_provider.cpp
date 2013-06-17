@@ -10,7 +10,8 @@ m_qualityUpdatedAtLeastOnce(false),
 m_fps(-1.0),
 m_framesSinceLastMetaData(0),
 m_softMotionRole(QnResource::Role_Default),
-m_softMotionLastChannel(0)
+m_softMotionLastChannel(0),
+m_secondaryQuality(SSQualityNotDefined)
 {
     m_role = QnResource::Role_LiveVideo;
     m_timeSinceLastMetaData.restart();
@@ -67,6 +68,30 @@ QnResource::ConnectionRole QnLiveStreamProvider::getRole() const
     return m_role;
 }
 
+void QnLiveStreamProvider::setSecondaryQuality(QnSecondaryStreamQuality  quality)
+{
+    {
+        QMutexLocker mtx(&m_livemutex);
+        if (m_secondaryQuality == quality)
+            return; // same quality
+        m_secondaryQuality = quality;
+    }
+
+    if (getRole() != QnResource::Role_SecondaryLiveVideo)
+    {
+        // must be primary, so should inform secondary
+        m_cameraRes->lockConsumers();
+        foreach(QnResourceConsumer* consumer, m_cameraRes->getAllConsumers())
+        {
+            QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
+            if (lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo)
+                lp->onPrimaryFpsUpdated(m_fps);
+        }
+        m_cameraRes->unlockConsumers();
+
+        updateStreamParamsBasedOnFps();
+    }
+}
 
 void QnLiveStreamProvider::setQuality(QnStreamQuality q)
 {
@@ -85,7 +110,6 @@ void QnLiveStreamProvider::setQuality(QnStreamQuality q)
     }
 
     updateStreamParamsBasedOnQuality();
-
 }
 
 QnStreamQuality QnLiveStreamProvider::getQuality() const

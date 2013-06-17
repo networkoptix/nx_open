@@ -15,7 +15,7 @@ public:
     QnAdvancedSettingsWidget(QWidget* parent = 0);
     virtual ~QnAdvancedSettingsWidget();
 
-    QnSecurityCamResource::SecondaryStreamQuality secondaryStreamQuality() const;
+    QnSecondaryStreamQuality secondaryStreamQuality() const;
     Qt::CheckState getCameraControl() const;
 
     void updateFromResource(QnSecurityCamResourcePtr camera);
@@ -27,7 +27,7 @@ private slots:
     void at_restoreDefault();
 private:
     void setKeepQualityVisible(bool value);
-    void setQualitySlider(QnSecurityCamResource::SecondaryStreamQuality quality);
+    void setQualitySlider(QnSecondaryStreamQuality quality);
     bool isKeepQualityVisible() const;
 private:
     enum SliderQuality {Quality_Low, Quality_Medium, Quality_High};

@@ -329,8 +329,8 @@ void QnSingleCameraSettingsWidget::submitToResource() {
             submitMotionWidgetToResource();
         }
 
-        QnSecurityCamResource::SecondaryStreamQuality sQuality = ui->advancedSettingsWidget->secondaryStreamQuality();
-        if (sQuality != QnSecurityCamResource::SSQualityDontChange)
+        QnSecondaryStreamQuality sQuality = ui->advancedSettingsWidget->secondaryStreamQuality();
+        if (sQuality != SSQualityNotDefined)
             m_camera->setSecondaryStreamQuality(sQuality);
         Qt::CheckState cs = ui->advancedSettingsWidget->getCameraControl();
         if (cs != Qt::PartiallyChecked)
