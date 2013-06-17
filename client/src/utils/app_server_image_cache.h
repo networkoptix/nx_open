@@ -13,11 +13,12 @@ class QnAppServerImageCache : public QnAppServerFileCache
 public:
     explicit QnAppServerImageCache(QObject *parent = 0);
     ~QnAppServerImageCache();
-    
+
     QSize getMaxImageSize() const;
 
-
     void storeImage(const QString &filePath, bool cropImageToMonitorAspectRatio = false);
+
+    void storeLocalImage(const QString &fileName, const QByteArray &image);
 private slots:
     void at_imageConverted(const QString &filePath);
 

@@ -36,7 +36,8 @@ namespace {
 
 QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
-    QnWorkbenchContextAware(context)
+    QnWorkbenchContextAware(context),
+    m_blinker(NULL)
 {
     m_headerWidget = new GraphicsWidget(this);
 
@@ -114,6 +115,11 @@ void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF &rec
     listRect.setTop(m_list->geometry().topLeft().y());
 
     m_list->setToolTipsEnclosingRect(mapRectToItem(m_list, listRect));
+}
+
+void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *blinker) {
+    m_blinker = blinker;
+    updateBlinker();
 }
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
@@ -273,6 +279,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
     m_list->addItem(item);
+    updateBlinker();
 }
 
 QnNotificationItem* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
@@ -283,6 +290,16 @@ QnNotificationItem* QnNotificationsCollectionWidget::findItem(QnSystemHealth::Me
         return item;
     }
     return NULL;
+}
+
+void QnNotificationsCollectionWidget::updateBlinker() {
+    if (!m_blinker)
+        return;
+
+    if (m_list->isEmpty())
+        m_blinker->stopBlinking();
+    else
+        m_blinker->startBlinking();
 }
 
 void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {

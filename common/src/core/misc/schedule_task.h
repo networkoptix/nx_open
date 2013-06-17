@@ -85,7 +85,7 @@ public:
     void setAfterThreshold(int value) { m_data.m_afterThreshold= value; }
     QnStreamQuality getStreamQuality() const { return m_data.m_streamQuality; }
     void setStreamQuality(QnStreamQuality value) { m_data.m_streamQuality = value; }
-    
+
     int getFps() const { return m_data.m_fps; }
     void setFps(int value) { m_data.m_fps = value; }
     bool getDoRecordAudio() const { return m_data.m_doRecordAudio; }
@@ -177,6 +177,8 @@ inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
         break;
     case QnQualityPreSet:
         qualityString = QLatin1String("preset");
+        break;
+    case QnQualityNotDefined:
         break;
     }
 

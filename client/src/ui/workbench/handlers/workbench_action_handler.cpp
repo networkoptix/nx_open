@@ -1384,7 +1384,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     }
 
     if (!resources.empty()) {
-        //TODO: #Elric should be trigger(.., resources), but some keys will be lost in that case; parameters.setResources() method is required
+        parameters.setResources(resources);
         if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
         else
@@ -2867,6 +2867,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     localLayout->setGuid(layout->getGuid());
     localLayout->update(layout);
     localLayout->setItems(items);
+
     serializer.serializeLayout(localLayout, layoutData);
     device->write(layoutData);
     delete device;
@@ -2902,6 +2903,16 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             QByteArray data;
             periods.encode(data);
             device->write(data);
+            delete device;
+        }
+    }
+
+    if (!layout->backgroundImageFilename().isEmpty()) {
+        QnAppServerImageCache cache(this);
+        QImage backround(cache.getFullPath(layout->backgroundImageFilename()));
+        if (!backround.isNull()) {
+            device = m_exportStorage->open(layout->backgroundImageFilename(), QIODevice::WriteOnly);
+            backround.save(device, "png");
             delete device;
         }
     }
