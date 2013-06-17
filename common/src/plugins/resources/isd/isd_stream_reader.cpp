@@ -28,31 +28,35 @@ void QnISDStreamReader::openStream()
 
     QnResource::ConnectionRole role = getRole();
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
-
+    CLHttpStatus status;
 
     CLSimpleHTTPClient http (res->getHostAddress(), 80, 3000, res->getAuth());
-    QByteArray request;
-    QString result;
-    QTextStream t(&result);
 
-    if (role == QnResource::Role_SecondaryLiveVideo)
+    if (!res->isCameraControlDisabled())
     {
-        t << "VideoInput.1.h264.2.Resolution=" << res->getSecondaryResolution().width() << "x" << res->getSecondaryResolution().height() << "\r\n";
-        t << "VideoInput.1.h264.2.FrameRate=5" << "\r\n";
-        t << "VideoInput.1.h264.2.BitRate=128" << "\r\n";
-    }
-    else
-    {
-        t << "VideoInput.1.h264.1.Resolution=" << res->getPrimaryResolution().width() << "x" << res->getPrimaryResolution().height() << "\r\n";
-        t << "VideoInput.1.h264.1.FrameRate=" << getFps() << "\r\n";
-        t << "VideoInput.1.h264.1.BitRate=" << res->suggestBitrateKbps(getQuality(), res->getPrimaryResolution(), getFps()) << "\r\n";
-    }
+        QByteArray request;
+        QString result;
+        QTextStream t(&result);
 
+        if (role == QnResource::Role_SecondaryLiveVideo)
+        {
+            t << "VideoInput.1.h264.2.Resolution=" << res->getSecondaryResolution().width() << "x" << res->getSecondaryResolution().height() << "\r\n";
+            t << "VideoInput.1.h264.2.FrameRate=5" << "\r\n";
+            t << "VideoInput.1.h264.2.BitRate=128" << "\r\n";
+        }
+        else
+        {
+            t << "VideoInput.1.h264.1.Resolution=" << res->getPrimaryResolution().width() << "x" << res->getPrimaryResolution().height() << "\r\n";
+            t << "VideoInput.1.h264.1.FrameRate=" << getFps() << "\r\n";
+            t << "VideoInput.1.h264.1.BitRate=" << res->suggestBitrateKbps(getQuality(), res->getPrimaryResolution(), getFps()) << "\r\n";
+        }
+        t.flush();
 
-    
-    request.append(result.toLatin1());
-    CLHttpStatus status = http.doPOST(QByteArray("/api/param.cgi"), QLatin1String(request));
-    QnSleep::msleep(100);
+        
+        request.append(result.toLatin1());
+        status = http.doPOST(QByteArray("/api/param.cgi"), QLatin1String(request));
+        QnSleep::msleep(100);
+    }
 
     QString urlrequest = (role == QnResource::Role_SecondaryLiveVideo)
         ? QLatin1String("api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath")

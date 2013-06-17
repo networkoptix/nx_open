@@ -9,9 +9,11 @@
 #include "core/resource/resource_fwd.h"
 #include "media_streamdataprovider.h"
 
-#define META_DATA_DURATION_MS 300
-#define DESIRED_SECOND_STREAM_FPS (7)
-#define MIN_SECOND_STREAM_FPS (2)
+static const int  META_DATA_DURATION_MS = 300;
+static const int MIN_SECOND_STREAM_FPS = 2;
+//#define DESIRED_SECOND_STREAM_FPS (7)
+//#define MIN_SECOND_STREAM_FPS (2)
+
 
 class QnLiveStreamProvider: public QnAbstractMediaStreamDataProvider
 {
