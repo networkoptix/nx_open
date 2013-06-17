@@ -28,6 +28,8 @@ public:
 
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
+
+    bool isEmpty() const;
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();

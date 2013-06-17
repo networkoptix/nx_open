@@ -62,15 +62,17 @@ protected:
     }
 
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override {
+        base_type::paint(painter, startState, endState, progress, widget, rect);
         if (!(startState & CHECKED) && m_blinking) {
             int blinkColor = 255 * m_blinkProgress;
             QRadialGradient gradient(0.0, rect.height() / 2, rect.width()* 1.5);
-            gradient.setColorAt(0.0, QColor(blinkColor, blinkColor, 0, 255));
+            gradient.setColorAt(0.0, QColor(blinkColor, blinkColor, 0, 196));
             gradient.setColorAt(1.0,  QColor(0, 0, 0, 0));
+            qreal opacity = painter->opacity();
+            painter->setOpacity(1.0);
             painter->fillRect(rect, gradient);
-
+            painter->setOpacity(opacity);
         }
-        base_type::paint(painter, startState, endState, progress, widget, rect);
     }
 private:
     bool m_blinking;
@@ -97,6 +99,8 @@ public:
 
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
+
+    void setBlinker(QnBlinkingImageButtonWidget* blinker);
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
@@ -123,10 +127,13 @@ private:
 
     QnNotificationItem* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
 
+    void updateBlinker();
+
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 
     QMultiHash<QnSystemHealth::MessageType, QnNotificationItem*> m_itemsByMessageType;
+    QnBlinkingImageButtonWidget* m_blinker;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

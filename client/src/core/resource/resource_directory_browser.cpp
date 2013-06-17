@@ -14,6 +14,8 @@
 #include "client/client_globals.h"
 #include "ui/workbench/watchers/workbench_server_time_watcher.h"
 
+#include <utils/app_server_image_cache.h>
+
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {
     m_resourceReady = false;
@@ -203,6 +205,17 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         //layout->setLocalRange(QnTimePeriod().deserialize(data));
     }
 
+    if (!layout->backgroundImageFilename().isEmpty()) {
+        QIODevice* backgroundFile = layoutStorage.open(layout->backgroundImageFilename(), QIODevice::ReadOnly);
+        if (backgroundFile) {
+            QByteArray data = backgroundFile->readAll();
+
+            QnAppServerImageCache cache;
+            cache.storeLocalImage(layout->backgroundImageFilename(), data);
+        }
+    }
+
+
     layout->setParentId(0);
     layout->setId(QnId::generateSpecialId());
     layout->setName(QFileInfo(xfile).fileName());
@@ -297,7 +310,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
     if (FileTypeSupport::isMovieFileExt(xfile))
         return QnResourcePtr(new QnAviResource(xfile));
 
-    if (FileTypeSupport::isImageFileExt(xfile)) 
+    if (FileTypeSupport::isImageFileExt(xfile))
     {
         QnResourcePtr rez = QnResourcePtr(new QnAviResource(xfile));
         rez->addFlags(QnResource::still_image);
