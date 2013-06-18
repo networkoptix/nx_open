@@ -96,8 +96,7 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags 
     m_skipNextHoverEvents(false),
     m_hoverProgress(0.0),
     m_action(NULL),
-    m_actionIconOverridden(false),
-    m_baseColor(Qt::white)
+    m_actionIconOverridden(false)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
@@ -239,10 +238,6 @@ void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
     }
 }
 
-void QnImageButtonWidget::setBaseColor(const QColor &color) {
-    m_baseColor = color;
-}
-
 void QnImageButtonWidget::click() {
     clickInternal(NULL);
 }
@@ -263,7 +258,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor(m_baseColor.redF(), m_baseColor.greenF(), m_baseColor.blueF(), painter->opacity());
+    glColor(1.0, 1.0, 1.0, painter->opacity());
 
     bool isZero = qFuzzyIsNull(progress);
     bool isOne = qFuzzyCompare(progress, 1.0);

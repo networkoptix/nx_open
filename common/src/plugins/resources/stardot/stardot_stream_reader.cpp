@@ -31,17 +31,20 @@ void QnStardotStreamReader::openStream()
 
     // get URL
 
-    QString request(lit("admin.cgi?image&h264_bitrate=%2&h264_framerate=%3"));
-    int bitrate = m_stardotRes->suggestBitrateKbps(getQuality(), m_stardotRes->getResolution(), getFps());
-    request = request.arg(bitrate).arg(getFps());
-
-    CLHttpStatus status;
-    m_stardotRes->makeStardotRequest(request, status);
-    if (status != CL_HTTP_SUCCESS) 
+    if (!m_stardotRes->isCameraControlDisabled())
     {
-        if (status == CL_HTTP_AUTH_REQUIRED) 
-            m_resource->setStatus(QnResource::Unauthorized);
-        return;
+        QString request(lit("admin.cgi?image&h264_bitrate=%2&h264_framerate=%3"));
+        int bitrate = m_stardotRes->suggestBitrateKbps(getQuality(), m_stardotRes->getResolution(), getFps());
+        request = request.arg(bitrate).arg(getFps());
+
+        CLHttpStatus status;
+        m_stardotRes->makeStardotRequest(request, status);
+        if (status != CL_HTTP_SUCCESS) 
+        {
+            if (status == CL_HTTP_AUTH_REQUIRED) 
+                m_resource->setStatus(QnResource::Unauthorized);
+            return;
+        }
     }
 
     QString streamUrl = m_stardotRes->getRtspUrl();

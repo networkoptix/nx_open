@@ -8,7 +8,7 @@ class QnImageHandler: public QnRestRequestHandler
 {
 public:
     QnImageHandler();
-
+    enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
 protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);

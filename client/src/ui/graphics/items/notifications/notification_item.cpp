@@ -27,20 +27,6 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     m_textLabel(new QnProxyLabel(this)),
     m_thumbnailLabel(NULL)
 {
-    // TODO: Somehow unify it with the one in tool_tip_slider.cpp?
-    // At least the styling part?
-    setContentsMargins(5.0, 5.0, 5.0, 5.0);
-    setTailWidth(5.0);
-
-    setPaletteColor(this, QPalette::WindowText, QColor(63, 159, 216));
-    setWindowBrush(QColor(0, 0, 0, 255));
-    setFrameBrush(QColor(203, 210, 233, 128));
-    setFrameWidth(1.0);
-
-    QFont fixedFont = QApplication::font();
-    fixedFont.setPixelSize(14);
-    setFont(fixedFont);
-
     m_textLabel->setAlignment(Qt::AlignCenter);
     m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
@@ -51,8 +37,6 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     setLayout(layout);
 
     updateTailPos();
-
-    setZValue(std::numeric_limits<qreal>::max());
 }
 
 void QnNotificationToolTipWidget::setThumbnail(const QImage &image) {
@@ -71,11 +55,6 @@ void QnNotificationToolTipWidget::setThumbnail(const QImage &image) {
 
 void QnNotificationToolTipWidget::setText(const QString &text) {
     m_textLabel->setText(text);
-}
-
-void QnNotificationToolTipWidget::resizeEvent(QGraphicsSceneResizeEvent *event)  {
-    base_type::resizeEvent(event);
-    updateTailPos();
 }
 
 void QnNotificationToolTipWidget::updateTailPos()  {
@@ -226,11 +205,11 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
     qreal left = rect.left();
     qreal xcenter = left + side * 0.5;
-    
+
     qreal ycenter = (rect.top() + rect.bottom()) / 2;
     qreal top = ycenter - side;
     qreal bottom = ycenter + side;
-    
+
     // TODO: cache the path?
     QPainterPath path;
     path.moveTo(left, top);

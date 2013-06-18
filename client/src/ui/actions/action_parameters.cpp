@@ -60,14 +60,18 @@ void QnActionParameters::setArguments(const ArgumentHash &arguments) {
 }
 
 void QnActionParameters::setArgument(int key, const QVariant &value) {
-    if(key == -1 && !checkType(value)) 
+    if(key == -1 && !checkType(value))
         return;
-    
+
     m_arguments[key] = value;
 }
 
 void QnActionParameters::setItems(const QVariant &items) {
     setArgument(-1, items);
+}
+
+void QnActionParameters::setResources(const QnResourceList &resources) {
+    setItems(QVariant::fromValue<QnResourceList>(resources));
 }
 
 Qn::ActionParameterType QnActionParameters::type(int key) const {

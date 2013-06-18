@@ -92,7 +92,6 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_lastDisplayedFlags( 0 ),
     m_prevFrameSequence( 0 ),
     m_timeChangeEnabled(true),
-    m_imageCorrectionEnabled(false),
     m_paused(false),
     m_screenshotInterface(0),
     m_histogramConsumer(0)
@@ -101,7 +100,6 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
 
     applyMixerSettings( m_brightness, m_contrast, m_hue, m_saturation );
     /* Prepare shaders. */
-    m_yuy2ToRgbShaderProgram.reset( new QnYuy2ToRgbShaderProgram(context) );
     m_yv12ToRgbShaderProgram.reset( new QnYv12ToRgbShaderProgram(context) );
     m_yv12ToRgbWithGammaShaderProgram.reset( new QnYv12ToRgbWithGammaShaderProgram(context) );
     m_yv12ToRgbaShaderProgram.reset( new QnYv12ToRgbaShaderProgram(context) );
@@ -116,7 +114,6 @@ QnGLRenderer::~QnGLRenderer()
 
 void QnGLRenderer::beforeDestroy()
 {
-    m_yuy2ToRgbShaderProgram.reset();
     m_yv12ToRgbShaderProgram.reset();
     m_yv12ToRgbaShaderProgram.reset();
     m_nv12ToRgbShaderProgram.reset();

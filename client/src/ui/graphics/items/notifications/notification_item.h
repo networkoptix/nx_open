@@ -4,7 +4,7 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/generic/tool_tip_widget.h>
+#include <ui/graphics/items/generic/styled_tooltip_widget.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
@@ -43,10 +43,10 @@ private:
     QImage m_thumbnail;
 };
 
-class QnNotificationToolTipWidget: public QnToolTipWidget {
+class QnNotificationToolTipWidget: public QnStyledTooltipWidget {
     Q_OBJECT
 
-    typedef QnToolTipWidget base_type;
+    typedef QnStyledTooltipWidget base_type;
 public:
     QnNotificationToolTipWidget(QGraphicsItem *parent = 0);
 
@@ -64,10 +64,7 @@ public:
 
     //reimp
     void pointTo(const QPointF &pos);
-
-    void updateTailPos();
-protected:
-    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+    virtual void updateTailPos() override;
 
 private:
     QnProxyLabel* m_textLabel;

@@ -113,6 +113,15 @@ public:
 
     bool isGroupPlayOnly() const;
 
+    void setSecondaryStreamQuality(QnSecondaryStreamQuality  quality);
+    QnSecondaryStreamQuality  secondaryStreamQuality() const;
+
+    void setCameraControlDisabled(bool value);
+    bool isCameraControlDisabled() const;
+
+    int desiredSecondStreamFps() const;
+    QnStreamQuality getSecondaryStreamQuality() const;
+
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource signals/slots
 // -------------------------------------------------------------------------- //
@@ -170,6 +179,8 @@ private:
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
+    QnSecondaryStreamQuality  m_secondaryQuality;
+    bool m_cameraControlDisabled;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

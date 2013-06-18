@@ -7,6 +7,8 @@
 #include "onvif/soapMediaBindingProxy.h"
 #include "utils/network/tcp_connection_priv.h"
 
+static const int MAX_CAHCE_URL_TIME = 1000 * 300;
+
 struct CameraInfoParams
 {
     CameraInfoParams() {}
@@ -24,7 +26,9 @@ struct CameraInfoParams
 
 QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
-    m_multiCodec(res)
+    m_multiCodec(res),
+    m_cachedFps(-1),
+    m_cachedQuality(QnQualityNotDefined)
 {
     m_onvifRes = getResource().dynamicCast<QnPlOnvifResource>();
     m_tmpH264Conf = new onvifXsd__H264Configuration();
@@ -91,9 +95,36 @@ void QnOnvifStreamReader::openStream()
         m_resource->setStatus(QnResource::Unauthorized);
 }
 
-const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl() const
+const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl()
 {
-    return updateCameraAndFetchStreamUrl(getRole() == QnResource::Role_LiveVideo);
+    //QMutexLocker lock(m_onvifRes->getStreamConfMutex());
+
+    int currentFps = getFps();
+    QnStreamQuality currentQuality = getQuality();
+
+    if (!m_streamUrl.isEmpty() && m_onvifRes->isCameraControlDisabled())
+    {
+        m_cachedFps = -1;
+        return m_streamUrl;
+    }
+
+    if (!m_streamUrl.isEmpty() && currentFps == m_cachedFps && currentQuality == m_cachedQuality && m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
+    {
+        return m_streamUrl;
+    }
+
+    m_onvifRes->beforeConfigureStream();
+    QString result = updateCameraAndFetchStreamUrl(getRole() == QnResource::Role_LiveVideo);
+    m_onvifRes->afterConfigureStream();
+
+    if (!result.isEmpty()) {
+        // cache value
+        m_streamUrl = result;
+        m_cachedQuality = currentQuality;
+        m_cachedFps = currentFps;
+        m_cachedTimer.restart();
+    }
+    return result;
 }
 
 const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl(bool isPrimary) const
@@ -330,6 +361,10 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
     if (result) {
         //TODO: #vasilenko UTF unuse std::string
         info.videoEncoderId = QString::fromStdString(result->token);
+
+        if (m_onvifRes->isCameraControlDisabled())
+            return true; // do not update video encoder params
+
         updateVideoEncoder(*result, isPrimary);
 
         int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
@@ -545,7 +580,8 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile* p
             if (soapRes != SOAP_OK) {
                 qCritical() << "QnOnvifStreamReader::addAudioSourceConfiguration: can't add audio source to profile. Gsoap error: " 
                     << soapRes << ", description: " << soapWrapper.getLastError() 
-                    << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+                    << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId()
+                    << "profile=" << info.profileToken << "audioSourceId=" << info.audioSourceId;
                 // return false; // ignore audio error
             }
         }
@@ -564,7 +600,8 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile* p
             if (soapRes != SOAP_OK) {
                 qCritical() << "QnOnvifStreamReader::addAudioEncoderConfiguration: can't add audio encoder to profile. Gsoap error: " 
                     << soapRes << ", description: " << soapWrapper.getEndpointUrl() 
-                    << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+                    << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId()
+                    << "profile=" << info.profileToken << "audioEncoderId=" << info.audioEncoderId;
 
                 //result = false; //Sound can be absent, so ignoring;
 
@@ -593,6 +630,10 @@ bool QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper,
     if (result) {
         //TODO: #vasilenko UTF unuse std::string
         info.audioEncoderId = QString::fromStdString(result->token);
+
+        if (m_onvifRes->isCameraControlDisabled())
+            return true; // do not update audio encoder params
+
         updateAudioEncoder(*result, isPrimary);
         return sendAudioEncoderToCamera(*result);
     }
@@ -678,7 +719,8 @@ bool QnOnvifStreamReader::sendAudioEncoderToCamera(AudioEncoder& encoder) const
     if (soapRes != SOAP_OK) {
         qWarning() << "QnOnvifStreamReader::sendAudioEncoderToCamera: can't set required values into ONVIF physical device (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << m_onvifRes->getUniqueId() 
-            << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+            << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError()
+            << "configuration token=" << request.Configuration->token.c_str();
         return false;
     }
 

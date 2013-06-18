@@ -46,7 +46,7 @@ int QnSingleThumbnailLoader::sendRequest(qint64 usecSinceEpoch, const QSize& siz
                 usecSinceEpoch,
                 size,
                 QLatin1String("png"),
-                false,
+                QnMediaServerConnection::IFrameAfterTime,
                 this,
                 SLOT(at_replyReceived(int, const QImage&, int))
                 );

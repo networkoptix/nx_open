@@ -788,12 +788,12 @@ void QnStreamRecorder::setAudioCodec(CodecID codec)
     m_dstAudioCodec = codec;
 }
 
-void QnStreamRecorder::setOnScreenDateOffset(int timeOffsetMs)
+void QnStreamRecorder::setOnScreenDateOffset(qint64 timeOffsetMs)
 {
     m_onscreenDateOffset = timeOffsetMs;
 }
 
-void QnStreamRecorder::setServerTimeZoneMs(int value)
+void QnStreamRecorder::setServerTimeZoneMs(qint64 value)
 {
     m_serverTimeZoneMs = value;
 }

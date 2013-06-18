@@ -86,6 +86,7 @@ win* {
   
   !staticlib {
     DEFINES += QN_EXPORT=Q_DECL_EXPORT
+    LIBS += DbgHelp.lib
   }
 
   staticlib {

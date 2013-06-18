@@ -16,8 +16,18 @@ enum QnStreamQuality {
     QnQualityNormal,
     QnQualityHigh,
     QnQualityHighest,
-    QnQualityPreSet
+    QnQualityPreSet,
+    QnQualityNotDefined
 };
+
+enum QnSecondaryStreamQuality 
+{ 
+    SSQualityLow, 
+    SSQualityMedium, 
+    SSQualityHigh, 
+    SSQualityNotDefined
+};
+
 
 QString QnStreamQualityToString(QnStreamQuality value);
 QnStreamQuality QnStreamQualityFromString( const QString& str );

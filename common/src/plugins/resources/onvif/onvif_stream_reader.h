@@ -53,7 +53,7 @@ private:
 
     bool isGotFrame(QnCompressedVideoDataPtr videoData);
 
-    const QString updateCameraAndFetchStreamUrl() const;
+    const QString updateCameraAndFetchStreamUrl();
     const QString updateCameraAndFetchStreamUrl(bool isPrimary) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
@@ -94,6 +94,11 @@ private:
     QByteArray NETOPTIX_PRIMARY_TOKEN;
     QByteArray NETOPTIX_SECONDARY_TOKEN;
     onvifXsd__H264Configuration* m_tmpH264Conf;
+
+    QString m_streamUrl;
+    int m_cachedFps;
+    QnStreamQuality m_cachedQuality;
+    QElapsedTimer m_cachedTimer;
 };
 
 #endif // onvif_stream_reader_h

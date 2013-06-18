@@ -1372,18 +1372,19 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
+    QnResourceList resources = parameters.resources();
+    QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
     foreach(QnLayoutResourcePtr r, layouts)
-        parameters.resources().removeOne(r);
+        resources.removeOne(r);
 
     if (workbench()->currentLayout()->resource()->locked() &&
-            !parameters.resources().empty() &&
+            !resources.empty() &&
             layouts.empty()) {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
     }
 
-
-    if (!parameters.resources().empty()) {
+    if (!resources.empty()) {
+        parameters.setResources(resources);
         if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
         else
@@ -2866,6 +2867,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     localLayout->setGuid(layout->getGuid());
     localLayout->update(layout);
     localLayout->setItems(items);
+
     serializer.serializeLayout(localLayout, layoutData);
     device->write(layoutData);
     delete device;
@@ -2901,6 +2903,16 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             QByteArray data;
             periods.encode(data);
             device->write(data);
+            delete device;
+        }
+    }
+
+    if (!layout->backgroundImageFilename().isEmpty()) {
+        QnAppServerImageCache cache(this);
+        QImage backround(cache.getFullPath(layout->backgroundImageFilename()));
+        if (!backround.isNull()) {
+            device = m_exportStorage->open(layout->backgroundImageFilename(), QIODevice::WriteOnly);
+            backround.save(device, "png");
             delete device;
         }
     }

@@ -45,7 +45,8 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber)
     m_lastDisplayedFrame(NULL),
     m_prevSrcWidth(0),
     m_prevSrcHeight(0),
-    m_lastIgnoreTime(AV_NOPTS_VALUE)
+    m_lastIgnoreTime(AV_NOPTS_VALUE),
+    m_isPaused(false)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
@@ -78,6 +79,13 @@ void QnVideoStreamDisplay::pleaseStop()
 
 int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 {
+    {
+        QMutexLocker lock(&m_mtx);
+        renderer->setPaused(m_isPaused);
+        if (m_lastDisplayedFrame)
+            renderer->draw(m_lastDisplayedFrame);
+    }
+
     QMutexLocker lock(&m_renderListMtx);
     renderer->setScreenshotInterface(this);
     m_newList << renderer;
@@ -878,6 +886,7 @@ void QnVideoStreamDisplay::setPausedSafe(bool value)
     QMutexLocker lock(&m_renderListMtx);
     foreach(QnAbstractRenderer* render, m_renderList)
         render->setPaused(value);
+    m_isPaused = value;
 }
 
 void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)

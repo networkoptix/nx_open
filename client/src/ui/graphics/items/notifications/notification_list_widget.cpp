@@ -307,6 +307,10 @@ void QnNotificationListWidget::setToolTipsEnclosingRect(const QRectF &rect) {
     m_collapser.item->setTooltipEnclosingRect(rect);
 }
 
+bool QnNotificationListWidget::isEmpty() const {
+    return m_items.isEmpty();
+}
+
 void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
     if (button != Qt::RightButton)
         return;
