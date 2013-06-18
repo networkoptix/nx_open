@@ -42,6 +42,8 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
             this, SLOT(at_eventManager_connectionOpened()));
     connect(QnClientMessageProcessor::instance(), SIGNAL(connectionClosed()),
             this, SLOT(at_eventManager_connectionClosed()));
+
+    connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), SIGNAL(valueChanged(int)), this, SLOT(at_settings_valueChanged(int)));
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
@@ -197,4 +199,16 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
 
 void QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged() {
     setSystemHealthEventVisible(QnSystemHealth::NoLicenses, qnLicensePool->isEmpty());
+}
+
+void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
+    if (id != QnClientSettings::POPUP_SYSTEM_HEALTH)
+        return;
+    quint64 visible = qnSettings->popupSystemHealth();
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        if (visible & (1 << i))
+            continue;
+        QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
+        emit systemHealthEventRemoved(message, QnResourcePtr());
+    }
 }

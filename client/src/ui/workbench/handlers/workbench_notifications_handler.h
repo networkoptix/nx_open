@@ -50,6 +50,7 @@ private slots:
     void at_eventManager_connectionOpened();
     void at_eventManager_connectionClosed();
     void at_licensePool_licensesChanged();
+    void at_settings_valueChanged(int id);
 private:
 
     /**

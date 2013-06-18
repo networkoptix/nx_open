@@ -451,6 +451,13 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
 }
 
 void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
+    if (!resource) {
+        foreach (QnNotificationItem* item, m_itemsByMessageType.values(message))
+            m_list->removeItem(item);
+        m_itemsByMessageType.remove(message);
+        return;
+    }
+
     QnNotificationItem* target = findItem(message, resource);
     if (!target)
         return;
