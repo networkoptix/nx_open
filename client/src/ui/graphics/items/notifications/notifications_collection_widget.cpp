@@ -10,6 +10,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <client/client_settings.h>
+
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/notifications/notification_item.h>
@@ -93,38 +95,47 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-    QnImageButtonWidget *hideAllButton = new QnImageButtonWidget(m_headerWidget);
-    hideAllButton->setIcon(qnSkin->icon("events/hide_all.png"));
-    hideAllButton->setToolTip(tr("Hide all"));
-    hideAllButton->setFixedSize(buttonSize);
-    connect(hideAllButton, SIGNAL(clicked()), this, SLOT(hideAll()));
-
     QnImageButtonWidget *settingsButton = new QnImageButtonWidget(m_headerWidget);
     settingsButton->setIcon(qnSkin->icon("events/settings.png"));
     settingsButton->setToolTip(tr("Settings"));
     settingsButton->setFixedSize(buttonSize);
+    settingsButton->setCached(true);
     connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 
     QnImageButtonWidget *eventLogButton = new QnImageButtonWidget(m_headerWidget);
     eventLogButton->setIcon(qnSkin->icon("events/log.png"));
     eventLogButton->setToolTip(tr("Event Log"));
     eventLogButton->setFixedSize(buttonSize);
+    eventLogButton->setCached(true);
     connect(eventLogButton, SIGNAL(clicked()), this, SLOT(at_eventLogButton_clicked()));
 
-    QnImageButtonWidget *debugButton = new QnImageButtonWidget(m_headerWidget);
-    debugButton->setIcon(qnSkin->icon("item/search.png"));
-    debugButton->setToolTip(tr("DEBUG"));
-    debugButton->setFixedSize(buttonSize);
-    connect(debugButton, SIGNAL(clicked()), this, SLOT(at_debugButton_clicked()));
+    QnImageButtonWidget *debugButton = NULL;
+    if(qnSettings->isDevMode()) {
+        debugButton = new QnImageButtonWidget(m_headerWidget);
+        debugButton->setIcon(qnSkin->icon("item/search.png"));
+        debugButton->setToolTip(tr("DEBUG"));
+        debugButton->setFixedSize(buttonSize);
+        debugButton->setCached(true);
+        connect(debugButton, SIGNAL(clicked()), this, SLOT(at_debugButton_clicked()));
+    }
+
+    QnImageButtonWidget *hideAllButton = new QnImageButtonWidget(m_headerWidget);
+    hideAllButton->setIcon(qnSkin->icon("events/hide_all.png"));
+    hideAllButton->setToolTip(tr("Hide all"));
+    hideAllButton->setFixedSize(buttonSize);
+    hideAllButton->setCached(true);
+    connect(hideAllButton, SIGNAL(clicked()), this, SLOT(hideAll()));
 
     qreal margin = (widgetHeight - buttonSize) / 2.0;
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    controlsLayout->setContentsMargins(0.0, margin, 0.0, margin);
+    controlsLayout->setSpacing(2.0);
+    controlsLayout->setContentsMargins(2.0, margin, 2.0, margin);
     controlsLayout->addStretch();
+    if(debugButton)
+        controlsLayout->addItem(debugButton);
     controlsLayout->addItem(eventLogButton);
-    controlsLayout->addItem(hideAllButton);
     controlsLayout->addItem(settingsButton);
-    controlsLayout->addItem(debugButton);
+    controlsLayout->addItem(hideAllButton);
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);

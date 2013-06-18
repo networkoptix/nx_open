@@ -123,7 +123,10 @@ namespace {
         else
             button->setCheckable(true);
         button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
+        
         button->setProperty(Qn::NoHandScrollOver, true);
+        button->setCached(true);
+
         setHelpTopic(button, Qn::MainWindow_Pin_Help);
         return button;
     }
@@ -138,6 +141,7 @@ namespace {
         else
             button->setCheckable(true);
         button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
+        button->setCached(true);
         setHelpTopic(button, Qn::MainWindow_Pin_Help);
         return button;
     }
