@@ -1,4 +1,4 @@
-#include "histogram_renderer.h"
+#include "histogram_widget.h"
 
 #include <ui/style/globals.h>
 

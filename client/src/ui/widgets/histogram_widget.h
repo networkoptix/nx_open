@@ -1,9 +1,10 @@
-#ifndef __HISTOGRAM_RENDERER_H__
-#define __HISTOGRAM_RENDERER_H__
+#ifndef QN_HISTOGRAM_WIDGET_H
+#define QN_HISTOGRAM_WIDGET_H
 
-#include "utils/color_space/image_correction.h"
+#include <QtGui/QWidget>
 
-// TODO: #Elric a widget, not a renderer!!!
+#include <utils/color_space/image_correction.h>
+
 
 class QnHistogramWidget: public QWidget, public QnHistogramConsumer {
 public:
@@ -20,4 +21,4 @@ private:
     ImageCorrectionParams m_params;
 };
 
-#endif // __HISTOGRAM_RENDERER_H__
+#endif // QN_HISTOGRAM_WIDGET_H

@@ -2449,7 +2449,7 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
 QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
 {
     if (!m_adjustVideoDialog)
-        m_adjustVideoDialog = new QnAdjustVideoDialog(mainWindow(), context());
+        m_adjustVideoDialog = new QnAdjustVideoDialog(mainWindow());
     return m_adjustVideoDialog.data();
 }
 
