@@ -2,7 +2,6 @@ import io, sys, os, platform
 import ConfigParser
 import argparse
 from os.path import dirname, join
-
     
 #class Config:
 #    pass
