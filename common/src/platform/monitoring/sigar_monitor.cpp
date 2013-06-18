@@ -3,19 +3,34 @@
 #include <cassert>
 
 #include <QtCore/QElapsedTimer>
-#include <QStringList>
+#include <QtCore/QStringList>
 
 #include <utils/common/warnings.h>
+#include <utils/common/util.h>
 
 extern "C"
 {
-    #include <sigar.h>
-    #include <sigar_format.h>
+#include <sigar.h>
+#include <sigar_format.h>
 }
 
 #ifdef _MSC_VER
 #   pragma comment(lib, "sigar.lib")
 #endif
+
+namespace {
+    const char *virtualMacs[] = {
+        "\x00\x05\x69",     /* vmware1 */
+        "\x00\x0C\x29",     /* vmware2 */
+        "\x00\x50\x56",     /* vmware3 */
+        "\x00\x1C\x42",     /* parallels1 */
+        "\x00\x03\xFF",     /* microsoft virtual pc */
+        "\x00\x0F\x4B",     /* virtual iron 4 */
+        "\x00\x16\x3E",     /* red hat xen , oracle vm , xen source, novell xen */
+        "\x08\x00\x27"      /* virtualbox */
+    };
+
+} // anonymous namespace
 
 #define INVOKE(expression)                                                      \
     (d_func()->checkError(#expression, expression))
@@ -280,24 +295,40 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
     if(INVOKE(sigar_net_interface_list_get(d->sigar, &networkInterfaces)) != SIGAR_OK)
         return result;
 
-    QStringList interfacesNames;
+    QStringList interfaceNames;
     for(uint i = 0; i < networkInterfaces.number; i++) {
         QString interfaceName = QLatin1String(networkInterfaces.data[i]);
         
         // remove duplicating entries
-        if (interfacesNames.contains(interfaceName))
+        if (interfaceNames.contains(interfaceName))
             continue;
-        interfacesNames.append(interfaceName);
+        interfaceNames.append(interfaceName);
 
         sigar_net_interface_config_t config;
         if (INVOKE(sigar_net_interface_config_get(d->sigar, interfaceName.toLatin1().constData(), &config) != SIGAR_OK))
             continue;
         if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) == 0)
             continue;
-        if ((config.flags & SIGAR_IFF_LOOPBACK) > 0)
-            continue;
 
-        result.push_back(d->networkLoad(interfaceName));
+        NetworkLoad load = d->networkLoad(interfaceName);
+        if(config.flags & SIGAR_IFF_LOOPBACK) {
+            load.type = LoopbackInterface;
+        } else if(config.hwaddr.family == sigar_net_address_t::SIGAR_AF_LINK) {
+            load.macAddress = QnMacAddress(config.hwaddr.addr.mac);
+
+            for(int i = 0; i < arraysize(virtualMacs); i++) {
+                if(memcmp(load.macAddress.bytes(), virtualMacs[i], 3) == 0) {
+                    load.type = VirtualInterface;
+                    break;
+                }
+            }
+            if(load.type != VirtualInterface)
+                load.type = PhysicalInterface;
+        } else {
+            load.type = PhysicalInterface;
+        }
+
+        result.push_back(load);
     }
 
     INVOKE(sigar_net_interface_list_destroy(d->sigar, &networkInterfaces));
