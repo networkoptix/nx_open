@@ -1567,7 +1567,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
             wlayout->centralizeItems();
     }
 
-    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+    at_saveLayoutAction_triggered(layout);  //TODO: #GDM add background to snapshot manager and set modified flag instead
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
@@ -3581,7 +3581,7 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
     }
     layout->setBackgroundSize(QSize(w, h));
 
-    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+    at_saveLayoutAction_triggered(layout);  //TODO: #GDM add background to snapshot manager and set modified flag instead
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceList &resources, int handle) {
