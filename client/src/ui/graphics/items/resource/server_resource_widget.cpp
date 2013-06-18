@@ -6,6 +6,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <client/client_settings.h>
 #include <core/resource/media_server_resource.h>
 
 #include <api/media_server_connection.h>
@@ -106,18 +107,18 @@ namespace {
         qreal maxValue = -1;
         qreal lastValue = 0;
         const qreal x_step2 = x_step*.5;
-        
+
         qreal x1, y1;
         x1 = -x_step * elapsedStep;
 
         qreal baseAngle = elapsedStep >= 0.5
-            ? radiansToDegrees(qAcos(2 * (1 - elapsedStep))) 
+            ? radiansToDegrees(qAcos(2 * (1 - elapsedStep)))
             : radiansToDegrees(qAcos(2 * elapsedStep));
 
         bool first = true;
         bool last = false;
         *currentValue = -1;
-        
+
         QLinkedList<qreal>::const_iterator backPos = values.end();
         backPos--;
 
@@ -242,7 +243,18 @@ public:
     {
         setCheckable(true);
         setProperty(Qn::NoBlockMotionSelection, true);
-        setToolTip(key);
+
+        switch (deviceType) {
+        case NETWORK_IN:
+            setToolTip(QString(QLatin1String("%1 (incoming)")).arg(key));
+            break;
+        case NETWORK_OUT:
+            setToolTip(QString(QLatin1String("%1 (outgoing)")).arg(key));
+            break;
+        default:
+            setToolTip(key);
+            break;
+        }
         setIcon(qnSkin->icon("item/check.png"));
     }
 
@@ -502,14 +514,16 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
         m_maxMaskUsed[i] = 1;
 
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
-    if(!m_resource) 
+    if(!m_resource)
         qnCritical("Server resource widget was created with a non-server resource.");
 
+    m_manager->setFlagsFilter(NETWORK_OUT, qnSettings->statisticsNetworkFilter());
+    m_manager->setFlagsFilter(NETWORK_IN, qnSettings->statisticsNetworkFilter());
     m_pointsLimit = m_manager->pointsLimit();
-    m_manager->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
+    m_manager->registerConsumer(m_resource, this, SLOT(at_statistics_received()));
     m_updatePeriod = m_manager->updatePeriod(m_resource);
 
-    /* Note that this slot is already connected to nameChanged signal in 
+    /* Note that this slot is already connected to nameChanged signal in
      * base class's constructor.*/
     connect(m_resource.data(), SIGNAL(urlChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
 
@@ -548,7 +562,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
 }
 
 QnServerResourceWidget::~QnServerResourceWidget() {
-    m_manager->unregisterServerWidget(m_resource, this);
+    m_manager->unregisterConsumer(m_resource, this);
 
     ensureAboutToBeDestroyedEmitted();
 }

@@ -38,10 +38,6 @@ public:
         LAST_RECORDING_DIR,
         LAST_EXPORT_DIR,
 
-        BACKGROUND_EDITABLE,
-        BACKGROUND_ANIMATED,
-        BACKGROUND_COLOR,
-
         DEFAULT_CONNECTION,
         LAST_USED_CONNECTION,
         CUSTOM_CONNECTIONS,
@@ -80,9 +76,12 @@ public:
 
         POPUP_SYSTEM_HEALTH,
 
+        /** Filter value for network connections in the statistics widget */
+        STATISTICS_NETWORK_FILTER,
+
         VARIABLE_COUNT
     };
-    
+
     QnClientSettings(QObject *parent = NULL);
     virtual ~QnClientSettings();
 
@@ -114,9 +113,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastScreenshotDir,      setLastScreenshotDir,       LAST_SCREENSHOT_DIR,        QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastRecordingDir,       setLastRecordingDir,        LAST_RECORDING_DIR,         QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportDir,          setLastExportDir,           LAST_EXPORT_DIR,            QString())
-        QN_DECLARE_RW_PROPERTY(bool,                        isBackgroundEditable,   setBackgroundEditable,      BACKGROUND_EDITABLE,        false)
-        QN_DECLARE_RW_PROPERTY(bool,                        isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true)
-        QN_DECLARE_RW_PROPERTY(QColor,                      backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())
         QN_DECLARE_RW_PROPERTY(bool,                        isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false)
         QN_DECLARE_RW_PROPERTY(bool,                        isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false)
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateHash,        userWorkbenchStates,    setUserWorkbenchStates,     USER_WORKBENCH_STATES,      QnWorkbenchStateHash())
@@ -148,6 +144,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockSecondsOn,       setClockSecondsOn,          CLOCK_SECONDS,              true)
         QN_DECLARE_RW_PROPERTY(quint64,                     popupSystemHealth,      setPopupSystemHealth,       POPUP_SYSTEM_HEALTH,        0xFFFFFFFFFFFFFFFFull)
+        QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)
     QN_END_PROPERTY_STORAGE()
 
 private:

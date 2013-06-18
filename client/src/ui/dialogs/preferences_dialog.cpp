@@ -29,12 +29,12 @@
 #include <ui/widgets/settings/server_settings_widget.h>
 
 
-QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
+QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent):
     QDialog(parent),
     QnWorkbenchContextAware(context),
     ui(new Ui::PreferencesDialog()),
-    m_recordingSettingsWidget(NULL), 
-    m_youTubeSettingsWidget(NULL), 
+    m_recordingSettingsWidget(NULL),
+    m_youTubeSettingsWidget(NULL),
     m_popupSettingsWidget(NULL),
     m_licenseManagerWidget(NULL),
     m_serverSettingsWidget(NULL),
@@ -47,16 +47,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     ui->maxVideoItemsLabel->hide();
     ui->maxVideoItemsSpinBox->hide(); // TODO: #Elric Cannot edit max number of items on the scene.
-
-    if(m_settings->isBackgroundEditable()) {
-        ui->backgroundColorPicker->setAutoFillBackground(false);
-        initColorPicker();
-    } else {
-        ui->animateBackgroundLabel->hide();
-        ui->animateBackgroundCheckBox->hide();
-        ui->backgroundColorLabel->hide();
-        ui->backgroundColorWidget->hide();
-    }
 
     ui->timeModeComboBox->addItem(tr("Server Time"), Qn::ServerTimeMode);
     ui->timeModeComboBox->addItem(tr("Client Time"), Qn::ClientTimeMode);
@@ -102,8 +92,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
     connect(ui->removeExtraMediaFolderButton,           SIGNAL(clicked()),                                          this,   SLOT(at_removeExtraMediaFolderButton_clicked()));
     connect(ui->extraMediaFoldersList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),   this,   SLOT(at_extraMediaFoldersList_selectionChanged()));
-    connect(ui->animateBackgroundCheckBox,              SIGNAL(stateChanged(int)),                                  this,   SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
-    connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this,   SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
     connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this,   SLOT(accept()));
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this,   SLOT(reject()));
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
@@ -135,28 +123,6 @@ QnPreferencesDialog::~QnPreferencesDialog() {
     return;
 }
 
-void QnPreferencesDialog::initColorPicker() {
-    QtColorPicker *w = ui->backgroundColorPicker;
-
-    /* No black here. */
-    w->insertColor(Qt::white,         tr("White"));
-    w->insertColor(Qt::red,           tr("Red"));
-    w->insertColor(Qt::darkRed,       tr("Dark red"));
-    w->insertColor(Qt::green,         tr("Green"));
-    w->insertColor(Qt::darkGreen,     tr("Dark green"));
-    w->insertColor(Qt::blue,          tr("Blue"));
-    w->insertColor(Qt::darkBlue,      tr("Dark blue"));
-    w->insertColor(Qt::cyan,          tr("Cyan"));
-    w->insertColor(Qt::darkCyan,      tr("Dark cyan"));
-    w->insertColor(Qt::magenta,       tr("Magenta"));
-    w->insertColor(Qt::darkMagenta,   tr("Dark magenta"));
-    w->insertColor(Qt::yellow,        tr("Yellow"));
-    w->insertColor(Qt::darkYellow,    tr("Dark yellow"));
-    w->insertColor(Qt::gray,          tr("Gray"));
-    w->insertColor(Qt::darkGray,      tr("Dark gray"));
-    w->insertColor(Qt::lightGray,     tr("Light gray"));
-}
-
 void QnPreferencesDialog::initLanguages() {
     QnWorkbenchTranslationManager *translationManager = context()->instance<QnWorkbenchTranslationManager>();
 
@@ -181,8 +147,6 @@ void QnPreferencesDialog::accept() {
 }
 
 void QnPreferencesDialog::submitToSettings() {
-    m_settings->setBackgroundAnimated(ui->animateBackgroundCheckBox->isChecked());
-    m_settings->setBackgroundColor(ui->backgroundColorPicker->currentColor());
     m_settings->setMediaFolder(ui->mainMediaFolderLabel->text());
     m_settings->setMaxVideoItems(ui->maxVideoItemsSpinBox->value());
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
@@ -213,8 +177,6 @@ void QnPreferencesDialog::submitToSettings() {
 }
 
 void QnPreferencesDialog::updateFromSettings() {
-    ui->animateBackgroundCheckBox->setChecked(m_settings->isBackgroundAnimated());
-    ui->backgroundColorPicker->setCurrentColor(m_settings->backgroundColor());
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(m_settings->mediaFolder()));
     ui->maxVideoItemsSpinBox->setValue(m_settings->maxVideoItems());
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
@@ -296,20 +258,6 @@ void QnPreferencesDialog::at_removeExtraMediaFolderButton_clicked() {
 
 void QnPreferencesDialog::at_extraMediaFoldersList_selectionChanged() {
     ui->removeExtraMediaFolderButton->setEnabled(!ui->extraMediaFoldersList->selectedItems().isEmpty());
-}
-
-void QnPreferencesDialog::at_animateBackgroundCheckBox_stateChanged(int state) {
-    bool enabled = state == Qt::Checked;
-
-    ui->backgroundColorLabel->setEnabled(enabled);
-    ui->backgroundColorPicker->setEnabled(enabled);
-}
-
-void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &color) {
-    if(color == Qt::black) {
-        ui->backgroundColorPicker->setCurrentColor(Qt::white);
-        ui->animateBackgroundCheckBox->setChecked(false);
-    }
 }
 
 void QnPreferencesDialog::at_context_userChanged() {

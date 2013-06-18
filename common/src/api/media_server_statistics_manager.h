@@ -7,7 +7,8 @@
 #include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <api/model/statistics_reply.h>
-#include <api/media_server_statistics_storage.h>
+
+class QnMediaServerStatisticsStorage;
 
 /**
   * Class that receives, parses and stores statistics data from all servers.
@@ -24,21 +25,21 @@ public:
     QnMediaServerStatisticsManager(QObject *parent = NULL);
 
     /**
-     *  Register the consumer object (usually widget).
+     *  Register the consumer object.
      *
      * \param resource          Server resource whous history we want to receive.
      * \param target            Object that will be notified about new data.
      * \param slot              Slot that will be called when new data will be received.
      */
-    void registerServerWidget(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
+    void registerConsumer(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
 
     /**
-     *  Unregister the consumer object (usually widget).
+     *  Unregister the consumer object.
      *
      * \param resource          Server resource whous history we do not want to receive anymore.
      * \param target            Object that will not be notified about new data anymore.
      */
-    void unregisterServerWidget(const QnMediaServerResourcePtr &resource, QObject *target);
+    void unregisterConsumer(const QnMediaServerResourcePtr &resource, QObject *target);
 
     QnStatisticsHistory history(const QnMediaServerResourcePtr &resource) const;
     qint64 historyId(const QnMediaServerResourcePtr &resource) const;
@@ -49,8 +50,11 @@ public:
     /** Number of data points that are stored simultaneously. */
     int pointsLimit() const;
 
+    /** Filter statistics items of some deviceType by flags (ignore all replies that do not contain flags provided). */
+    void setFlagsFilter(QnStatisticsDeviceType deviceType, int flags);
 private:
     QHash<QString, QnMediaServerStatisticsStorage *> m_statistics;
+    QHash<QnStatisticsDeviceType, int> m_flagsFilter;
 };
 
 #endif // QN_STATISTICS_MANAGER
