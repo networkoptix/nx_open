@@ -80,9 +80,12 @@ public:
 
         POPUP_SYSTEM_HEALTH,
 
+        /** Filter value for network connections in the statistics widget */
+        STATISTICS_NETWORK_FILTER,
+
         VARIABLE_COUNT
     };
-    
+
     QnClientSettings(QObject *parent = NULL);
     virtual ~QnClientSettings();
 
@@ -148,6 +151,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockSecondsOn,       setClockSecondsOn,          CLOCK_SECONDS,              true)
         QN_DECLARE_RW_PROPERTY(quint64,                     popupSystemHealth,      setPopupSystemHealth,       POPUP_SYSTEM_HEALTH,        0xFFFFFFFFFFFFFFFFull)
+        QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)
     QN_END_PROPERTY_STORAGE()
 
 private:

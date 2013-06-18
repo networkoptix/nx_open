@@ -16,11 +16,19 @@ enum QnStatisticsDeviceType {
 
 struct QnStatisticsDataItem {
     QnStatisticsDataItem() {}
-    QnStatisticsDataItem(const QString &description, qreal value, QnStatisticsDeviceType deviceType): description(description), value(value), deviceType(deviceType) {}
+    QnStatisticsDataItem(const QString &description,
+                         qreal value,
+                         QnStatisticsDeviceType deviceType,
+                         int deviceFlags = 0):
+        description(description),
+        value(value),
+        deviceType(deviceType),
+        deviceFlags(deviceFlags){}
 
     QString description;
     qreal value;
     QnStatisticsDeviceType deviceType;
+    int deviceFlags;
 };
 
 typedef QList<QnStatisticsDataItem> QnStatisticsDataList;
