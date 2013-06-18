@@ -1,6 +1,7 @@
 #include "advanced_settings_widget.h"
 #include "ui_advanced_settings_widget.h"
-#include "ui/style/skin.h"
+
+#include <ui/style/skin.h>
 
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     QWidget(parent),
@@ -120,3 +121,4 @@ void QnAdvancedSettingsWidget::at_restoreDefault()
     ui->checkBoxDisableControl->setChecked(false);
     ui->qualitySlider->setValue(Quality_Medium);
 }
+
