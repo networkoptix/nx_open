@@ -23,6 +23,8 @@ namespace std { typedef __int32 intptr_t; }
  */
 class QnPlatformMonitor: public QObject {
     Q_OBJECT
+    Q_FLAGS(PartitionTypes NetworkInterfaceTypes)
+
 public:
     /**
      * Description of an HDD.
