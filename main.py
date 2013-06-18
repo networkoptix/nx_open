@@ -51,3 +51,9 @@ def get_environment_variable(variable):
             config = ConfigParser.RawConfigParser(allow_no_value=True)
             config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/build-' + customization + '.properties'))
             return config.get("basic", variable)  
+
+def get_executable_extension():
+    if get_environment_variable('platform') == 'windows':
+        return 'bat'
+    else:
+        return 'sh'            

@@ -27,6 +27,7 @@ Debug
 Release
 
 build_environment/python/packages/*/build
+build_environment/build
 build_environment/x86
 build_environment/x64
 
@@ -41,7 +42,7 @@ appserver/test/executions
 appserver/static
 appserver/setup/static
 appserver/setup/stage-env
-appserver/setup/version.py
+appserver/setup/*.properties
 appserver/entcontroller.conf
 appserver/setup/build
 appserver/version_maven.py
