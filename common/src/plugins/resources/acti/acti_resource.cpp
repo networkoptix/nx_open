@@ -164,6 +164,7 @@ bool QnActiResource::initInternal()
     QMap<QByteArray, QByteArray> report = parseReport(serverReport);
     setFirmware(QString::fromUtf8(report.value("firmware version")));
     setMAC(QString::fromUtf8(report.value("mac address")));
+    m_platform = report.value("platform").trimmed().toUpper();
 
     bool dualStreaming = report.value("channels").toInt() > 1;
 
@@ -207,7 +208,8 @@ bool QnActiResource::initInternal()
     if (m_rtspPort == 0)
         m_rtspPort = DEFAULT_RTSP_PORT;
 
-    m_hasAudio = report.value("audio").toInt() > 0;
+    bool rtspAudioSupported = m_platform == "T" || m_platform == "K" || m_platform == "A1";
+    m_hasAudio = report.value("audio").toInt() > 0 && rtspAudioSupported;
 
     QByteArray bitrateCap = report.value("video_bitrate_cap");
     if (!bitrateCap.isEmpty())

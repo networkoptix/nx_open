@@ -471,7 +471,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
 
-    m_notificationsShowButton = new QnBlinkingImageButtonWidget(m_controlsWidget);
+    QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
+    m_notificationsShowButton = blinker;
     m_notificationsShowButton->resize(15, 45);
     m_notificationsShowButton->setCheckable(true);
     m_notificationsShowButton->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
@@ -480,6 +481,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsShowButton->setFocusProxy(m_notificationsItem);
     m_notificationsShowButton->stackBefore(m_notificationsItem);
     setHelpTopic(m_notificationsShowButton, Qn::MainWindow_Pin_Help);
+    m_notificationsItem->setBlinker(blinker);
 
     m_notificationsOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_notificationsOpacityProcessor->addTargetItem(m_notificationsItem);
@@ -668,6 +670,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Init fields. */
+    m_pinOffset = (24 - QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL)) / 2.0;
+
     setFlags(HideWhenNormal | HideWhenZoomed | AdjustMargins);
 
     setSliderVisible(false, false);
@@ -1822,8 +1826,8 @@ void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {
         (paintGeometry.top() + paintGeometry.bottom() - m_treeShowButton->size().height()) / 2
     ));
     m_treePinButton->setPos(QPointF(
-        paintGeometry.right() - m_treePinButton->size().width(),
-        paintGeometry.top()
+        paintGeometry.right() - m_treePinButton->size().width() - m_pinOffset,
+        paintGeometry.top() + m_pinOffset
     ));
 
     updateViewportMargins();
@@ -1964,7 +1968,7 @@ void QnWorkbenchUi::at_notificationsItem_geometryChanged() {
         qMin(m_controlsWidgetRect.right(), headerGeometry.left()),
         (headerGeometry.top() + headerGeometry.bottom() - m_notificationsShowButton->size().height()) / 2
     ));
-    m_notificationsPinButton->setPos(headerGeometry.topLeft());
+    m_notificationsPinButton->setPos(headerGeometry.topLeft() + QPointF(m_pinOffset, m_pinOffset));
     if (isNotificationsOpened())
         setNotificationsOpened(); //there is no check there but it will fix the X-coord animation
 

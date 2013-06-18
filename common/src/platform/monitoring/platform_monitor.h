@@ -16,11 +16,15 @@ namespace std { typedef __int32 intptr_t; }
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
+#include <utils/network/mac_address.h>
+
 /**
  * Interface for monitoring performance in a platform-independent way.
  */
 class QnPlatformMonitor: public QObject {
     Q_OBJECT
+    Q_FLAGS(PartitionTypes NetworkInterfaceTypes)
+
 public:
     /**
      * Description of an HDD.
@@ -77,9 +81,9 @@ public:
      * Partition space entry.
      */
     struct PartitionSpace {
-        PartitionSpace(): freeBytes(0), sizeBytes(0) {}
+        PartitionSpace(): type(UnknownPartition), freeBytes(0), sizeBytes(0) {}
         PartitionSpace(const QString &path, quint64 freeBytes, quint64 sizeBytes):
-            path(path), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
+            path(path), type(UnknownPartition), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
 
         /** Partition's root path. */
         QString path;
@@ -94,14 +98,28 @@ public:
         quint64 sizeBytes;
     };
 
+    enum NetworkInterfaceType {
+        PhysicalInterface = 0x1,
+        LoopbackInterface = 0x2,
+        VirtualInterface  = 0x4,
+        UnknownInterface  = 0x8
+    };
+    Q_DECLARE_FLAGS(NetworkInterfaceTypes, NetworkInterfaceType)
+
     /**
      * Network load entry
      */
     struct NetworkLoad {
-        NetworkLoad(): bytesPerSecIn(0), bytesPerSecOut(0) {}
+        NetworkLoad(): type(UnknownInterface), bytesPerSecIn(0), bytesPerSecOut(0) {}
 
         /** Network interface name */
         QString interfaceName;
+
+        /** Mac address. */
+        QnMacAddress macAddress;
+
+        /** Type of the network interface. */
+        NetworkInterfaceType type;
 
         /** Current download speed in bytes per second */
         quint64 bytesPerSecIn;
@@ -142,6 +160,11 @@ public:
      * \returns                         A list of network load entries for all network interfaces on this PC.
      */
     virtual QList<NetworkLoad> totalNetworkLoad() = 0;
+
+    /**
+     * @returns                         A list of network load entries for all network interfaces of the given types on this PC.
+     */
+    QList<NetworkLoad> totalNetworkLoad(NetworkInterfaceTypes types);
 
     /**
      * @returns                         A list of partition space entries for all partitions on this PC.

@@ -56,7 +56,7 @@ public:
     void setScreenshotInterface(ScreenshotInterface* value);
     void setDisplayedRect(const QRectF& rect);
 
-    void setHystogramConsumer(QnHistogramConsumer* value);
+    void setHistogramConsumer(QnHistogramConsumer* value);
 private:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
     ImageCorrectionResult calcImageCorrection();

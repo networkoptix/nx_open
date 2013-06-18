@@ -14,7 +14,7 @@
 #include "client/client_globals.h"
 #include "ui/workbench/watchers/workbench_server_time_watcher.h"
 
-#include <utils/app_server_image_cache.h>
+#include <utils/local_file_cache.h>
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {
@@ -210,8 +210,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         if (backgroundFile) {
             QByteArray data = backgroundFile->readAll();
 
-            QnAppServerImageCache cache;
-            cache.storeLocalImage(layout->backgroundImageFilename(), data);
+            QnLocalFileCache cache;
+            cache.storeImage(layout->backgroundImageFilename(), data);
         }
     }
 

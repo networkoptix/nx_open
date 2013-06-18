@@ -81,6 +81,7 @@ private:
     int m_rtspPort;
     bool m_hasAudio;
     QScopedPointer<QnActiPtzController> m_ptzController;
+    QByteArray m_platform;
 };
 
 #endif // __ACTI_RESOURCE_H__

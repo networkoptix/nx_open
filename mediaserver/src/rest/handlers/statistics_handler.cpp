@@ -48,6 +48,7 @@ int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamLis
     foreach(const QnPlatformMonitor::NetworkLoad &networkLoad, m_monitor->totalNetworkLoad()) {
         result.append("<interface>\n");
         result.append(QString("<name>%1</name>\n").arg(networkLoad.interfaceName));
+        result.append(QString("<type>%1</type>\n").arg(static_cast<int>(networkLoad.type)));
         result.append(QString("<in>%1</in>\n").arg(networkLoad.bytesPerSecIn));
         result.append(QString("<out>%1</out>\n").arg(networkLoad.bytesPerSecOut));
         result.append("</interface>\n");
