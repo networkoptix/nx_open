@@ -43,3 +43,7 @@ void QnLocalFileCache::downloadFile(const QString &filename) {
     QFileInfo info(getFullPath(filename));
     emit fileDownloaded(filename, info.exists());
 }
+
+void QnLocalFileCache::uploadFile(const QString &filename) {
+    emit fileUploaded(filename, true);
+}

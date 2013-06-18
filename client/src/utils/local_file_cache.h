@@ -25,6 +25,7 @@ public:
     void storeImage(const QString &fileName, const QByteArray &image);
 
     virtual void downloadFile(const QString &filename) override;
+    virtual void uploadFile(const QString &filename) override;
 };
 
 #endif // LOCAL_FILE_CACHE_H
