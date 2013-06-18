@@ -239,7 +239,20 @@ void QnEventLogDialog::updateHeaderWidth()
     ui->gridEvents->horizontalHeader()->resizeSection(1, ui->eventComboBox->width() + space);
     ui->gridEvents->horizontalHeader()->resizeSection(2, ui->cameraButton->width() + space);
     ui->gridEvents->horizontalHeader()->resizeSection(3, ui->actionComboBox->width() + space);
-    ui->gridEvents->horizontalHeader()->resizeSection(4, ui->cameraButton->width() + space);
+
+    int w = 0;
+    QFontMetrics fm(ui->gridEvents->font());
+    for (int i = 0; i < m_model->rowCount(); ++i)
+    {
+        QModelIndex idx = m_model->index(i, (int) QnEventLogModel::ActionCameraColumn);
+        QString targetText = m_model->data(idx).toString();
+        int spaceIdx = targetText.indexOf(L' ');
+        if (spaceIdx >= 0)
+            w = qMax(w, fm.size(0, targetText.left(spaceIdx)).width());
+        else
+            w = qMax(w, fm.size(0, targetText).width());
+    }
+    ui->gridEvents->horizontalHeader()->resizeSection(4, qMax(w + 32, ui->cameraButton->width() + space));
 }
 
 void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataListPtr& events, int requestNum)
