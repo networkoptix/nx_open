@@ -38,6 +38,7 @@ private:
 
     QScopedPointer<Ui::AdvancedSettingsWidget> ui;
     bool m_disableUpdate;
+    bool m_hasDualStreaming;
 };
 
 #endif // QN_ADVANCED_SETTINGS_WIDGET_H
