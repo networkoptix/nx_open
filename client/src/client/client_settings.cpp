@@ -52,7 +52,6 @@ QnClientSettings::QnClientSettings(QObject *parent):
     init();
 
     /* Set default values. */
-    setBackgroundColor(qnGlobals->backgroundGradientColor());
     setMediaFolder(getMoviesDirectory() + QLatin1String(QN_MEDIA_FOLDER_NAME));
 #ifdef Q_OS_DARWIN
     setAudioDownmixed(true); /* Mac version uses SPDIF by default for multichannel audio. */
@@ -61,8 +60,6 @@ QnClientSettings::QnClientSettings(QObject *parent):
     /* Set names. */
     setName(MEDIA_FOLDER,           lit("mediaRoot"));
     setName(EXTRA_MEDIA_FOLDERS,    lit("auxMediaRoot"));
-    setName(BACKGROUND_ANIMATED,    lit("animateBackground"));
-    setName(BACKGROUND_COLOR,       lit("backgroundColor"));
     setName(MAX_VIDEO_ITEMS,        lit("maxVideoItems"));
     setName(DOWNMIX_AUDIO,          lit("downmixAudio"));
     setName(OPEN_LAYOUTS_ON_LOGIN,  lit("openLayoutsOnLogin"));
@@ -152,7 +149,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
             QString result = xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
             return result;
         }
-    case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
     case DEV_MODE:
         return defaultValue; /* Not to be read from settings. */
@@ -201,7 +197,6 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             base_type::writeValueToSettings(settings, id, xorEncrypt(value.toString(), xorKey));
             break;
         }
-    case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
     case UPDATE_FEED_URL:
     case DEV_MODE:

@@ -186,11 +186,11 @@ void addTestData()
     resource->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource));
     */
- 
+
     /*
     QnFakeCameraPtr testCamera(new QnFakeCamera());
     testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00000"));    
+    testCamera->setMAC(QnMacAddress("00000"));
     testCamera->setUrl("00000");
     testCamera->setName("testCamera");
     qnResPool->addResource(QnResourcePtr(testCamera));
@@ -278,7 +278,7 @@ int main(int argc, char **argv)
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
     int result = 0;
-    {   //do not remove! needed to make QnResourcePool life time controlled 
+    {   //do not remove! needed to make QnResourcePool life time controlled
             //(refactoring to QnResourcePool instanciation was required to make mediaserver exit without segfault)
 
         QTextStream out(stdout);
@@ -297,7 +297,7 @@ int main(int argc, char **argv)
         bool devBackgroundEditable = false;
         bool skipMediaFolderScan = false;
         bool noFullScreen = false;
-        
+
         QnCommandLineParser commandLineParser;
         commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
         commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
@@ -315,10 +315,6 @@ int main(int argc, char **argv)
         /* Dev mode. */
         if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
             qnSettings->setDevMode(true);
-            qnSettings->setBackgroundEditable(devBackgroundEditable);
-        } else {
-            qnSettings->setBackgroundAnimated(true);
-            qnSettings->setBackgroundColor(qnGlobals->backgroundGradientColor());
         }
 
         /* Set authentication parameters from command line. */
@@ -367,7 +363,7 @@ int main(int argc, char **argv)
         QnWorkbenchTranslationManager::installTranslation(translationPath);
         QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
-        
+
         /* Initialize sound. */
         QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
 
