@@ -7,6 +7,7 @@
 #include <QGraphicsObject>
 
 #include <camera/gl_renderer.h>
+#include <core/resource/resource_fwd.h>
 
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -14,6 +15,7 @@
 #include <utils/app_server_image_cache.h>
 
 class QnWorkbenchGridMapper;
+class QnGridBackgroundItemPrivate;
 
 class QnGridBackgroundItem : public QGraphicsObject, public QnWorkbenchContextAware
 {
@@ -32,50 +34,29 @@ public:
     QnWorkbenchGridMapper *mapper() const;
     void setMapper(QnWorkbenchGridMapper *mapper);
 
-    QString imageFilename() const;
-    void setImageFilename(const QString &imageFilename);
-
-    QSize imageSize() const;
-    void setImageSize(const QSize &imageSize);
-
-    /** Image opacity value in range [0.0 .. 1.0] */
-    qreal imageOpacity() const;
-    void setImageOpacity(qreal value);
+    void update(const QnLayoutResourcePtr &layout);
 
     QRect sceneBoundingRect() const;
 
-public slots:
-    void updateDisplay();
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QnGridBackgroundItemPrivate* const d_ptr;
 
 private slots:
     void updateGeometry();
+    void updateDisplay();
 
+    void at_context_userChanged();
     void at_imageLoaded(const QString& filename, bool ok);
     void setImage(const QImage& image);
 
 private:
-    enum ImageStatus {
-        None,
-        Loading,
-        Loaded
-    };
-
-    QRectF m_rect;
-    QImage m_image;
-    QString m_imageFilename;
-    QSize m_imageSize;
-    qreal m_imageOpacity;
-    QRect m_sceneBoundingRect;
-    QWeakPointer<QnWorkbenchGridMapper> m_mapper;
+    Q_DECLARE_PRIVATE(QnGridBackgroundItem)
     QnAppServerImageCache *m_cache;
+    QWeakPointer<QnWorkbenchGridMapper> m_mapper;
     std::auto_ptr<DecodedPictureToOpenGLUploader> m_imgUploader;
     std::auto_ptr<QnGLRenderer> m_renderer;
     QSharedPointer<CLVideoDecoderOutput> m_imgAsFrame;
-    bool m_imgUploaded;
-    ImageStatus m_imageStatus;
-    QHash<QString, QImage> m_imagesMemCache;
 };
 
 
