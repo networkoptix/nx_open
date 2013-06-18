@@ -28,6 +28,8 @@ namespace {
         Loading,
         Loaded
     };
+
+    const char *loaderFilenamePropertyName = "_qn_loaderFilename";
 }
 
 class QnGridBackgroundItemPrivate {
@@ -155,20 +157,20 @@ void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
             (d->imageFilename != layout->backgroundImageFilename()) ||
             (d->imageSize != layout->backgroundSize()) ||
             (!qFuzzyCompare(d->imageOpacity, opacity));
-    if (!hasChanges)
-        return;
 
-    d->imageIsLocal = isExportedLayout;
-    d->imageFilename = layout->backgroundImageFilename();
-    d->imageSize = layout->backgroundSize();
-    d->imageOpacity = opacity;
-    d->imageStatus = ImageStatus::None;
-
+    if (hasChanges) {
+        d->imageIsLocal = isExportedLayout;
+        d->imageFilename = layout->backgroundImageFilename();
+        d->imageSize = layout->backgroundSize();
+        d->imageOpacity = opacity;
+        d->imageStatus = ImageStatus::None;
 #ifdef NATIVE_PAINT_BACKGROUND
-    m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
+        m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
 #else
-    d->image = QImage();
+        d->image = QImage();
 #endif
+    }
+
     updateDisplay();
 }
 
@@ -214,6 +216,7 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(cache()->getFullPath(filename));
     loader->setSize(cache()->getMaxImageSize());
+    loader->setProperty(loaderFilenamePropertyName, d->imageFilename);
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setImage(QImage)));
     loader->start();
 }
@@ -228,6 +231,14 @@ QnAppServerImageCache* QnGridBackgroundItem::cache() {
 
 void QnGridBackgroundItem::setImage(const QImage &image) {
     Q_D(QnGridBackgroundItem);
+
+    QString filename = sender()
+            ? sender()->property(loaderFilenamePropertyName).toString()
+            : QString();
+
+    if (!filename.isEmpty() && filename != d->imageFilename)
+        return; // race condition
+
     if (d->imageStatus != ImageStatus::Loaded)    // image name was changed during load
         return;
 
