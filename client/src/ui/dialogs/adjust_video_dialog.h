@@ -3,41 +3,41 @@
 
 #include <QtGui/QDialog>
 
-#include <client/client_settings.h>
-#include <utils/network/networkoptixmodulefinder.h>
-#include <ui/workbench/workbench_context_aware.h>
-#include "utils/color_space/image_correction.h"
+#include <utils/color_space/image_correction.h>
 
-class QnResourceWidgetRenderer;
 class QnMediaResourceWidget;
 
 namespace Ui {
     class AdjustVideoDialog;
 }
 
-class QnAdjustVideoDialog : public QDialog, public QnWorkbenchContextAware {
+class QnAdjustVideoDialog : public QDialog {
     Q_OBJECT
-
     typedef QDialog base_type;
+
 public:
-    explicit QnAdjustVideoDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
+    explicit QnAdjustVideoDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnAdjustVideoDialog();
 
     ImageCorrectionParams params() const;
 
-    QnHistogramConsumer * getHystogramConsumer() const;
-    void setWidget(QnMediaResourceWidget* widget);
+    QnHistogramConsumer *histogramConsumer() const;
+    
+    void setWidget(QnMediaResourceWidget *widget);
+
 protected:
-    virtual void closeEvent ( QCloseEvent * e ) override;
+    virtual void closeEvent(QCloseEvent *e) override;
+
 private:
-    void setParams(const ImageCorrectionParams& params);
+    void setParams(const ImageCorrectionParams &params);
+    void submit();
+
 private slots:
     void at_sliderValueChanged();
     void at_spinboxValueChanged();
     void at_buttonClicked(QAbstractButton* button);
     void at_rendererDestryed();
-private:
-    void uiToParams();
+
 private:
     QScopedPointer<Ui::AdjustVideoDialog> ui;
     bool m_updateDisabled;

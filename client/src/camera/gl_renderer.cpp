@@ -510,7 +510,7 @@ void QnGLRenderer::setDisplayedRect(const QRectF& rect)
     m_displayedRect = rect;
 }
 
-void QnGLRenderer::setHystogramConsumer(QnHistogramConsumer* value) 
+void QnGLRenderer::setHistogramConsumer(QnHistogramConsumer* value) 
 { 
     m_histogramConsumer = value; 
 }

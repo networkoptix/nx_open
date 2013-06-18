@@ -1,6 +1,5 @@
 TEMPLATE = app
 DEFINES += CL_FORCE_LOGO
-DEFINES += QT_QTCOLORPICKER_IMPORT
 TRANSLATIONS += ${basedir}/translations/client_en.ts \
 				${basedir}/translations/client_ru.ts \
 				${basedir}/translations/client_zh-CN.ts \

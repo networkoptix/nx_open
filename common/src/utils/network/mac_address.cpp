@@ -1,20 +1,17 @@
 #include "mac_address.h"
 #include "nettools.h"
 
-
-
-
 QnMacAddress::QnMacAddress()
 {
     memset(m_data, 0, 6);
 }
 
-QnMacAddress::QnMacAddress(const unsigned char* mac)
+QnMacAddress::QnMacAddress(const unsigned char *mac)
 {
     memcpy(m_data, mac, 6);
 }
 
-QnMacAddress::QnMacAddress(const QString& mac)
+QnMacAddress::QnMacAddress(const QString &mac)
 {
     if (mac.contains(QLatin1Char('-')))
         MACsToByte(mac, m_data, '-');
@@ -22,7 +19,6 @@ QnMacAddress::QnMacAddress(const QString& mac)
         MACsToByte(mac, m_data, ':');
     else
         MACsToByte2(mac, m_data);
-
 }
 
 QnMacAddress::~QnMacAddress()
@@ -30,11 +26,10 @@ QnMacAddress::~QnMacAddress()
     
 }
 
-bool QnMacAddress::isEmpty() const
+bool QnMacAddress::isNull() const
 {
-    for(int i = 0; i < 6; ++i)
-    {
-        if (m_data[i]!=0)
+    for(int i = 0; i < 6; ++i) {
+        if (m_data[i] != 0)
             return false;
     }
 
@@ -46,7 +41,7 @@ QString QnMacAddress::toString() const
     return MACToString(m_data);
 }
 
-const unsigned char* QnMacAddress::toBytes() const
+const unsigned char *QnMacAddress::bytes() const
 {
     return m_data;
 }
@@ -61,39 +56,19 @@ unsigned char QnMacAddress::getByte(int number) const
     return m_data[number];
 }
 
-QnMacAddress& QnMacAddress::operator = ( const QnMacAddress& other )
+QnMacAddress& QnMacAddress::operator=(const QnMacAddress &other)
 {
     memcpy(m_data, other.m_data, 6);
     return *this;
 }
 
-bool QnMacAddress::operator == ( const QnMacAddress& other ) const
+bool QnMacAddress::operator==(const QnMacAddress &other) const
 {
-    return (memcmp(m_data, other.m_data, 6) == 0);
+    return memcmp(m_data, other.m_data, 6) == 0;
 }
 
-bool QnMacAddress::operator != ( const QnMacAddress& other ) const
+bool QnMacAddress::operator<(const QnMacAddress &other) const
 {
-    return (memcmp(m_data, other.m_data, 6) != 0);
-}
-
-bool QnMacAddress::operator < ( const QnMacAddress& other ) const
-{
-    return toString() < other.toString();
-}
-
-bool QnMacAddress::operator <= ( const QnMacAddress& other ) const
-{
-    return toString() <= other.toString();
-}
-
-bool QnMacAddress::operator > ( const QnMacAddress& other ) const
-{
-    return toString() > other.toString();
-}
-
-bool QnMacAddress::operator >= ( const QnMacAddress& other ) const
-{
-    return toString() >= other.toString();
+    return memcmp(m_data, other.m_data, 6) < 0;
 }
 

@@ -94,7 +94,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="labelQuality">
         <property name="text">
          <string>Secondary stream quality</string>
         </property>

@@ -382,13 +382,6 @@
                     <type>zip</type>
                     <classifier>${platform}-${compiler}</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>com.nokia.qt.addons</groupId>
-                    <artifactId>qtcolorpicker</artifactId>
-                    <version>2.6.1-SNAPSHOT</version>
-                    <type>zip</type>
-                    <classifier>${platform}-${arch}</classifier>
-                </dependency>
             </dependencies>
             <build>	
                 <plugins>			
@@ -449,13 +442,6 @@
                     <version>0.8.1-SNAPSHOT</version>
                     <type>zip</type>
                     <classifier>${platform}-${arch}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>com.nokia.qt.addons</groupId>
-                    <artifactId>qtcolorpicker</artifactId>
-                    <version>2.6.1-SNAPSHOT</version>
-                    <type>zip</type>
-                    <classifier>${platform}-${arch}</classifier>
                 </dependency>
             </dependencies>
 

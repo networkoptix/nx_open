@@ -1,10 +1,6 @@
 
 #include "security_cam_resource.h"
-
 #include <QMutexLocker>
-
-#include "plugins/resources/archive/archive_stream_reader.h"
-
 
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
@@ -122,25 +118,13 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
         result->setRole(role);
-        /*
-        if (QnLiveStreamProvider* lsp = dynamic_cast<QnLiveStreamProvider*>(result))
-        {
-                lsp->setRole(role);
-        }
-        */
         return result;
 
     }
     else if (role == QnResource::Role_Archive) {
-        
-        QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
-        if (archiveDelegate) {
-            QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
-            archiveReader->setArchiveDelegate(archiveDelegate);
-            if (hasFlags(still_image) || hasFlags(utc))
-                archiveReader->setCycleMode(false);
-            return archiveReader;
-        }
+        QnAbstractStreamDataProvider* result = createArchiveDataProvider();
+        if (result)
+            return result;
     }
 
     if (m_dpFactory)

@@ -17,6 +17,8 @@
 #include <ui/style/globals.h>
 
 #include <utils/threaded_image_loader.h>
+#include <utils/app_server_image_cache.h>
+#include <utils/local_file_cache.h>
 
 namespace {
     const int labelFrameWidth = 4;  // in pixels
@@ -78,7 +80,7 @@ private:
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
-    m_cache(new QnAppServerImageCache(this)),
+    m_cache(NULL),
     m_cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio()),
     m_estimatePending(false),
     m_cropImage(false)
@@ -106,9 +108,6 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
     connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
     connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(at_opacitySpinBox_valueChanged(int)));
-
-    connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
-    connect(m_cache, SIGNAL(fileUploaded(QString, bool)), this, SLOT(at_imageStored(QString, bool)));
 
     updateControls();
 }
@@ -140,6 +139,9 @@ bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
 
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
     m_cachedFilename = layout->backgroundImageFilename();
+
+    updateCache(layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout));
+
     if (!m_cachedFilename.isEmpty()) {
         m_newFilePath = m_cache->getFullPath(m_cachedFilename);
         m_cache->downloadFile(m_cachedFilename);
@@ -186,6 +188,22 @@ bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
     QSize newSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
     return (!m_cachedFilename.isEmpty() && newSize != layout->backgroundSize());
 }
+
+void QnLayoutSettingsDialog::updateCache(bool local) {
+    if (m_cache && ((dynamic_cast<QnLocalFileCache *>(m_cache) != NULL) == local))
+        return;
+
+    if (m_cache)
+        disconnect(m_cache, 0, this, 0);
+
+    m_cache = local
+            ? new QnLocalFileCache(this)
+            : new QnAppServerImageCache(this);
+
+    connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    connect(m_cache, SIGNAL(fileUploaded(QString, bool)), this, SLOT(at_imageStored(QString, bool)));
+}
+
 
 void QnLayoutSettingsDialog::updateControls() {
     bool imagePresent = !m_newFilePath.isEmpty();

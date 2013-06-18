@@ -3,7 +3,7 @@
 
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 
-class QnStyledTooltipWidget : public QnToolTipWidget {
+class QnStyledTooltipWidget: public QnToolTipWidget {
     Q_OBJECT
     typedef QnToolTipWidget base_type;
 public:
