@@ -105,6 +105,7 @@ public:
     bool isRecordingEventAttached() const;
 
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
+    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
     virtual QString getGroupName() const;
     virtual void setGroupName(const QString& value);

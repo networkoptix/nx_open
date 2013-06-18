@@ -98,6 +98,16 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
     return new QnVMax480LiveProvider(toSharedPointer());
 }
 
+QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()
+{
+    QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
+    QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
+    archiveReader->setArchiveDelegate(archiveDelegate);
+    if (hasFlags(still_image) || hasFlags(utc))
+        archiveReader->setCycleMode(false);
+    return archiveReader;
+}
+
 QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate() 
 { 
     return new QnVMax480ArchiveDelegate(toSharedPointer());
