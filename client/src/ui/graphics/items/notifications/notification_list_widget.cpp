@@ -206,7 +206,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
             m_collapser.item->setOpacity(qMin(1.0, m_collapser.item->opacity() + opacityStep));
     }
 
-    bool updateGeometryRequested = !itemsToDelete.isEmpty();
+    bool itemCountChange = !itemsToDelete.isEmpty();
 
     // remove unused items
     foreach(QnNotificationItem* item, itemsToDelete) {
@@ -219,8 +219,10 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         emit itemRemoved(item);
     }
 
-    if (updateGeometryRequested)
+    if (itemCountChange) {
         updateGeometry();
+        emit itemCountChanged(m_items.size());
+    }
     updateVisibleSize();
 }
 
@@ -269,6 +271,7 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     m_items.append(item);
 
     m_collapsedItemCountChanged = true;
+    emit itemCountChanged(m_items.size());
     updateGeometry();
 }
 
@@ -297,6 +300,10 @@ QSizeF QnNotificationListWidget::visibleSize() const {
     return m_visibleSize;
 }
 
+int QnNotificationListWidget::itemCount() const {
+    return m_items.size();
+}
+
 void QnNotificationListWidget::setToolTipsEnclosingRect(const QRectF &rect) {
     if (qFuzzyCompare(m_tooltipsEnclosingRect, rect))
         return;
@@ -305,10 +312,6 @@ void QnNotificationListWidget::setToolTipsEnclosingRect(const QRectF &rect) {
     foreach(QnNotificationItem *item, m_items)
         item->setTooltipEnclosingRect(rect);
     m_collapser.item->setTooltipEnclosingRect(rect);
-}
-
-bool QnNotificationListWidget::isEmpty() const {
-    return m_items.isEmpty();
 }
 
 void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {

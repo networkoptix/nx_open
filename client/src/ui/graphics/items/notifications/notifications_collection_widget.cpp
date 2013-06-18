@@ -12,11 +12,8 @@
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
-#include <ui/animation/opacity_animator.h>
-#include <ui/graphics/items/generic/styled_tooltip_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
-#include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/globals.h>
@@ -30,23 +27,6 @@
 #include <core/resource/camera_resource.h>
 
 namespace {
-
-    class QnBlinkerTooltipWidget: public QnStyledTooltipWidget {
-        typedef QnStyledTooltipWidget base_type;
-    public:
-        QnBlinkerTooltipWidget(QGraphicsItem *parent = NULL): base_type(parent)
-        {
-            setTransform(QTransform::fromScale(-1, 1));
-        }
-
-    protected:
-        virtual void updateTailPos() override {
-            QRectF rect = this->rect();
-            setTailPos(QPointF(qRound(rect.left()), qRound(rect.bottom())));
-        }
-    };
-
-
     const qreal widgetHeight = 24;
     const int thumbnailHeight = 100;
 
@@ -56,46 +36,18 @@ namespace {
 
 QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
     base_type(parent),
-    m_blinking(true),
+    m_blinking(false),
     m_blinkUp(true),
-    m_blinkProgress(0.0),
-    m_hoverProcessor(new HoverFocusProcessor(this))
+    m_blinkProgress(0.0)
 {
     registerAnimation(this);
     startListening();
-
-    m_tooltipWidget = new QnBlinkerTooltipWidget(this);
-    m_tooltipWidget->setText(tr("New notifications arrived!"));
-    m_tooltipWidget->setFocusProxy(this);
-    m_tooltipWidget->setOpacity(0.0);
-    m_tooltipWidget->setAcceptHoverEvents(true);
-    m_tooltipWidget->installEventFilter(this);
-    m_tooltipWidget->setFlag(ItemIgnoresParentOpacity, true);
-    connect(m_tooltipWidget, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
-    connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
-
-    m_hoverProcessor->addTargetItem(this);
-    m_hoverProcessor->addTargetItem(m_tooltipWidget);
-    m_hoverProcessor->setHoverEnterDelay(250);
-    m_hoverProcessor->setHoverLeaveDelay(250);
-    connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
-    connect(m_hoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(updateToolTipVisibility()));
-
-    updateToolTipPosition();
-    updateToolTipVisibility();
-
+    setNotificationCount(0);
 }
 
-void QnBlinkingImageButtonWidget::updateToolTipVisibility() {
-    if(m_hoverProcessor->isHovered()) {
-        showToolTip();
-    } else {
-        hideToolTip();
-    }
-}
-
-void QnBlinkingImageButtonWidget::updateToolTipPosition() {
-    m_tooltipWidget->pointTo(QPointF(qRound(geometry().left() / 2 ), 0));
+void QnBlinkingImageButtonWidget::setNotificationCount(int count) {
+    m_blinking = count > 0;
+    setToolTip(tr("You have %n notifications", "", count));
 }
 
 void QnBlinkingImageButtonWidget::tick(int deltaMSecs) {
@@ -128,15 +80,6 @@ void QnBlinkingImageButtonWidget::paint(QPainter *painter, StateFlags startState
         painter->setOpacity(opacity);
     }
 }
-
-void QnBlinkingImageButtonWidget::showToolTip() {
-    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
-}
-
-void QnBlinkingImageButtonWidget::hideToolTip() {
-    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(0.0);
-}
-
 
 // ---------------------- QnNotificationsCollectionWidget -------------------
 
@@ -207,6 +150,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
             this,       SLOT(hideSystemHealthMessage    (QnSystemHealth::MessageType, const QnResourcePtr&)));
     connect(handler,    SIGNAL(cleared()),
             this,       SLOT(hideAll()));
+
 }
 
 QnNotificationsCollectionWidget::~QnNotificationsCollectionWidget() {
@@ -228,8 +172,13 @@ void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF &rec
 }
 
 void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *blinker) {
+    if (m_blinker)
+        disconnect(m_list, 0, m_blinker, 0);
     m_blinker = blinker;
-    updateBlinker();
+    if (m_blinker) {
+        connect(m_list, SIGNAL(itemCountChanged(int)), m_blinker, SLOT(setNotificationCount(int)));
+        m_blinker->setNotificationCount(m_list->itemCount());
+    }
 }
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
@@ -389,7 +338,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
     m_list->addItem(item);
-    updateBlinker();
 }
 
 QnNotificationItem* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
@@ -400,16 +348,6 @@ QnNotificationItem* QnNotificationsCollectionWidget::findItem(QnSystemHealth::Me
         return item;
     }
     return NULL;
-}
-
-void QnNotificationsCollectionWidget::updateBlinker() {
-    if (!m_blinker)
-        return;
-
-    if (m_list->isEmpty())
-        m_blinker->stopBlinking();
-    else
-        m_blinker->startBlinking();
 }
 
 void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
