@@ -668,6 +668,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Init fields. */
+    m_pinOffset = (24 - QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL)) / 2.0;
+
     setFlags(HideWhenNormal | HideWhenZoomed | AdjustMargins);
 
     setSliderVisible(false, false);
@@ -1822,8 +1824,8 @@ void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {
         (paintGeometry.top() + paintGeometry.bottom() - m_treeShowButton->size().height()) / 2
     ));
     m_treePinButton->setPos(QPointF(
-        paintGeometry.right() - m_treePinButton->size().width(),
-        paintGeometry.top()
+        paintGeometry.right() - m_treePinButton->size().width() - m_pinOffset,
+        paintGeometry.top() + m_pinOffset
     ));
 
     updateViewportMargins();
@@ -1964,7 +1966,7 @@ void QnWorkbenchUi::at_notificationsItem_geometryChanged() {
         qMin(m_controlsWidgetRect.right(), headerGeometry.left()),
         (headerGeometry.top() + headerGeometry.bottom() - m_notificationsShowButton->size().height()) / 2
     ));
-    m_notificationsPinButton->setPos(headerGeometry.topLeft());
+    m_notificationsPinButton->setPos(headerGeometry.topLeft() + QPointF(m_pinOffset, m_pinOffset));
     if (isNotificationsOpened())
         setNotificationsOpened(); //there is no check there but it will fix the X-coord animation
 
