@@ -10,6 +10,8 @@
 
 #include <utils/threaded_image_loader.h>
 #include <utils/color_space/yuvconvert.h>
+#include <utils/local_file_cache.h>
+#include <utils/app_server_image_cache.h>
 
 #ifdef _WIN32
 //if defined, background is drawn with native API (as gl texture), else - QPainter::drawImage is used
@@ -74,12 +76,12 @@ public:
 QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent, QnWorkbenchContext *context):
     QGraphicsObject(parent),
     QnWorkbenchContextAware(NULL, context),
-    d_ptr(new QnGridBackgroundItemPrivate()),
-    m_cache(new QnAppServerImageCache(this))
+    d_ptr(new QnGridBackgroundItemPrivate())
 {
     setAcceptedMouseButtons(0);
 
-    connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    connect(this->context()->instance<QnLocalFileCache>(), SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    connect(this->context()->instance<QnAppServerImageCache>(), SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
     connect(this->context(), SIGNAL(userChanged(QnUserResourcePtr)), this, SLOT(at_context_userChanged()));
 
     /* Don't disable this item here. When disabled, it starts accepting wheel events
@@ -112,7 +114,7 @@ void QnGridBackgroundItem::updateDisplay() {
     if (d->imageStatus != ImageStatus::None)
         return;
     d->imageStatus = ImageStatus::Loading;
-    m_cache->downloadFile(d->imageFilename);
+    cache()->downloadFile(d->imageFilename);
 }
 
 const QRectF& QnGridBackgroundItem::viewportRect() const {
@@ -210,10 +212,18 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
     }
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
-    loader->setInput(m_cache->getFullPath(filename));
-    loader->setSize(m_cache->getMaxImageSize());
+    loader->setInput(cache()->getFullPath(filename));
+    loader->setSize(cache()->getMaxImageSize());
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setImage(QImage)));
     loader->start();
+}
+
+QnAppServerImageCache* QnGridBackgroundItem::cache() {
+    Q_D(const QnGridBackgroundItem);
+
+    if (d->imageIsLocal)
+        return context()->instance<QnLocalFileCache>();
+    return context()->instance<QnAppServerImageCache>();
 }
 
 void QnGridBackgroundItem::setImage(const QImage &image) {

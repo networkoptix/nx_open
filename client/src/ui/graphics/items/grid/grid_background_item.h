@@ -12,10 +12,9 @@
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/app_server_image_cache.h>
-
 class QnWorkbenchGridMapper;
 class QnGridBackgroundItemPrivate;
+class QnAppServerImageCache;
 
 class QnGridBackgroundItem : public QGraphicsObject, public QnWorkbenchContextAware
 {
@@ -51,8 +50,9 @@ private slots:
     void setImage(const QImage& image);
 
 private:
+    QnAppServerImageCache* cache();
+
     Q_DECLARE_PRIVATE(QnGridBackgroundItem)
-    QnAppServerImageCache *m_cache;
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;
     std::auto_ptr<DecodedPictureToOpenGLUploader> m_imgUploader;
     std::auto_ptr<QnGLRenderer> m_renderer;

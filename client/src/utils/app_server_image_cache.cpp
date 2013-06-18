@@ -41,18 +41,6 @@ void QnAppServerImageCache::storeImage(const QString &filePath, bool cropImageTo
     loader->start();
 }
 
-void QnAppServerImageCache::storeLocalImage(const QString &fileName, const QByteArray &image) {
-    ensureCacheFolder();
-    QString fullPath = getFullPath(fileName);
-    if (QFileInfo(fullPath).exists())
-        return;
-
-    QFile file(fullPath);
-    file.open(QIODevice::WriteOnly);
-    file.write(image);
-    file.close();
-}
-
 void QnAppServerImageCache::at_imageConverted(const QString &filePath) {
     uploadFile(QFileInfo(filePath).fileName());
 }
