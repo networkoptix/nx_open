@@ -1,7 +1,12 @@
+
 #include "styled_tooltip_widget.h"
 
-#include <ui/common/palette.h>
 #include <limits>
+
+#include <QApplication>
+
+#include <ui/common/palette.h>
+
 
 QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem *parent):
     base_type(parent)
