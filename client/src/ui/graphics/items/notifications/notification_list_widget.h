@@ -29,11 +29,12 @@ public:
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
 
-    bool isEmpty() const;
+    int itemCount() const;
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
     void itemRemoved(QnNotificationItem *item);
+    void itemCountChanged(int count);
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
