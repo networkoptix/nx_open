@@ -6,13 +6,12 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/app_server_image_cache.h>
-
 namespace Ui {
     class QnLayoutSettingsDialog;
 }
 
 class QnFramedLabel;
+class QnAppServerImageCache;
 
 class QnLayoutSettingsDialog : public QDialog
 {
@@ -22,7 +21,7 @@ class QnLayoutSettingsDialog : public QDialog
 public:
     explicit QnLayoutSettingsDialog(QWidget *parent = 0);
     ~QnLayoutSettingsDialog();
-    
+
     void readFromResource(const QnLayoutResourcePtr &layout);
     bool submitToResource(const QnLayoutResourcePtr &layout);
 
@@ -41,6 +40,8 @@ private slots:
 
     void setPreview(const QImage& image);
     void setProgress(bool value);
+
+    void updateCache(bool local);
 
     void updateControls();
 

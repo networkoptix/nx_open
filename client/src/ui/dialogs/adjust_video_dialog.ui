@@ -182,14 +182,27 @@
     </widget>
    </item>
    <item>
-    <widget class="QnHistogramRenderer" name="histogramRenderer" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
      </property>
-    </widget>
+     <property name="leftMargin">
+      <number>8</number>
+     </property>
+     <property name="rightMargin">
+      <number>8</number>
+     </property>
+     <item>
+      <widget class="QnHistogramWidget" name="histogramWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -208,9 +221,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnHistogramRenderer</class>
+   <class>QnHistogramWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/dialogs/histogram_renderer.h</header>
+   <header location="global">ui/widgets/histogram_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

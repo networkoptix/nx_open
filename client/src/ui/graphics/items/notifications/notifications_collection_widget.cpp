@@ -47,7 +47,7 @@ namespace {
     };
 
 
-    const int buttonSize = 24;
+    const qreal widgetHeight = 24;
     const int thumbnailHeight = 100;
 
     const char *itemResourcePropertyName = "_qn_itemResource";
@@ -73,7 +73,6 @@ QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
     m_tooltipWidget->setFlag(ItemIgnoresParentOpacity, true);
     connect(m_tooltipWidget, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
     connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
-    connect(this, SIGNAL(imageChanged(QImage)), m_tooltipWidget, SLOT(setThumbnail(QImage)));
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
@@ -149,6 +148,8 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 {
     m_headerWidget = new GraphicsWidget(this);
 
+    qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
+
     QnImageButtonWidget* hideAllButton = new QnImageButtonWidget(m_headerWidget);
     hideAllButton->setIcon(qnSkin->icon("events/hide_all.png"));
     hideAllButton->setToolTip(tr("Hide all"));
@@ -173,8 +174,9 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     debugButton->setFixedSize(buttonSize);
     connect(debugButton, SIGNAL(clicked()), this, SLOT(at_debugButton_clicked()));
 
+    qreal margin = (widgetHeight - buttonSize) / 2.0;
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    controlsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    controlsLayout->setContentsMargins(0.0, margin, 0.0, margin);
     controlsLayout->addStretch();
     controlsLayout->addItem(eventLogButton);
     controlsLayout->addItem(hideAllButton);

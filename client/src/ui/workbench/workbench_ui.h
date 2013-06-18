@@ -460,6 +460,8 @@ private:
     HoverFocusProcessor *m_calendarHidingProcessor;
 
     bool m_inCalendarGeometryUpdate;
+
+    qreal m_pinOffset;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)

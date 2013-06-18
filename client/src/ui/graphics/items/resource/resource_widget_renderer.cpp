@@ -328,6 +328,6 @@ void QnResourceWidgetRenderer::setHystogramConsumer(QnHistogramConsumer* value)
     {
         RenderingTools& ctx = m_channelRenderers[i];
         if( ctx.renderer )
-            ctx.renderer->setHystogramConsumer(value);
+            ctx.renderer->setHistogramConsumer(value);
     }
 }
