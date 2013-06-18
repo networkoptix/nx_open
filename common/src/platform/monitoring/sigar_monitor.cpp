@@ -19,6 +19,9 @@ extern "C"
 #endif
 
 namespace {
+    /**
+     * See http://stackoverflow.com/questions/3062594/differentiate-vmware-network-adapter-from-physical-network-adapters.
+     */
     const char *virtualMacs[] = {
         "\x00\x05\x69",     /* vmware1 */
         "\x00\x0C\x29",     /* vmware2 */
