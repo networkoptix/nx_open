@@ -1,15 +1,14 @@
 #include "histogram_renderer.h"
-#include "ui/style/globals.h"
+
+#include <ui/style/globals.h>
 
 static const int X_OFFSET = 8;
 
-QnHistogramRenderer::QnHistogramRenderer(QWidget* parent):
-    QWidget(parent)
-{
+QnHistogramWidget::QnHistogramWidget(QWidget *parent, Qt::WindowFlags windowFlags):
+    QWidget(parent, windowFlags)
+{}
 
-}
-
-void QnHistogramRenderer::setHistogramData(const ImageCorrectionResult& data)
+void QnHistogramWidget::setHistogramData(const ImageCorrectionResult& data)
 {
     if (data.filled) {
         m_data = data;
@@ -17,13 +16,13 @@ void QnHistogramRenderer::setHistogramData(const ImageCorrectionResult& data)
     }
 }
 
-void QnHistogramRenderer::setHistogramParams(const ImageCorrectionParams& params)
+void QnHistogramWidget::setHistogramParams(const ImageCorrectionParams& params)
 {
     m_params = params;
     update();
 }
 
-void QnHistogramRenderer::paintEvent( QPaintEvent * event )
+void QnHistogramWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
     

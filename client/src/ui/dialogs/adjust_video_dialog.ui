@@ -182,7 +182,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QnHistogramRenderer" name="histogramRenderer" native="true">
+    <widget class="QnHistogramWidget" name="histogramWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
@@ -208,9 +208,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnHistogramRenderer</class>
+   <class>QnHistogramWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/dialogs/histogram_renderer.h</header>
+   <header location="global">ui/widgets/histogram_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
