@@ -150,25 +150,25 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-    QnImageButtonWidget* hideAllButton = new QnImageButtonWidget(m_headerWidget);
+    QnImageButtonWidget *hideAllButton = new QnImageButtonWidget(m_headerWidget);
     hideAllButton->setIcon(qnSkin->icon("events/hide_all.png"));
     hideAllButton->setToolTip(tr("Hide all"));
     hideAllButton->setFixedSize(buttonSize);
     connect(hideAllButton, SIGNAL(clicked()), this, SLOT(hideAll()));
 
-    QnImageButtonWidget* settingsButton = new QnImageButtonWidget(m_headerWidget);
+    QnImageButtonWidget *settingsButton = new QnImageButtonWidget(m_headerWidget);
     settingsButton->setIcon(qnSkin->icon("events/settings.png"));
     settingsButton->setToolTip(tr("Settings"));
     settingsButton->setFixedSize(buttonSize);
     connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 
-    QnImageButtonWidget* eventLogButton = new QnImageButtonWidget(m_headerWidget);
+    QnImageButtonWidget *eventLogButton = new QnImageButtonWidget(m_headerWidget);
     eventLogButton->setIcon(qnSkin->icon("events/log.png"));
     eventLogButton->setToolTip(tr("Event Log"));
     eventLogButton->setFixedSize(buttonSize);
     connect(eventLogButton, SIGNAL(clicked()), this, SLOT(at_eventLogButton_clicked()));
 
-    QnImageButtonWidget* debugButton = new QnImageButtonWidget(m_headerWidget);
+    QnImageButtonWidget *debugButton = new QnImageButtonWidget(m_headerWidget);
     debugButton->setIcon(qnSkin->icon("item/search.png"));
     debugButton->setToolTip(tr("DEBUG"));
     debugButton->setFixedSize(buttonSize);
@@ -184,7 +184,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     controlsLayout->addItem(debugButton);
     m_headerWidget->setLayout(controlsLayout);
 
-    QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     layout->setSpacing(0.0);
     layout->addItem(m_headerWidget);
@@ -198,7 +198,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 
     setLayout(layout);
 
-    QnWorkbenchNotificationsHandler* handler = this->context()->instance<QnWorkbenchNotificationsHandler>();
+    QnWorkbenchNotificationsHandler *handler = this->context()->instance<QnWorkbenchNotificationsHandler>();
     connect(handler, SIGNAL(businessActionAdded(QnAbstractBusinessActionPtr)),
             this, SLOT(showBusinessAction(QnAbstractBusinessActionPtr)));
     connect(handler,    SIGNAL(systemHealthEventAdded   (QnSystemHealth::MessageType, const QnResourcePtr&)),

@@ -84,8 +84,10 @@ void QnLiveStreamProvider::setSecondaryQuality(QnSecondaryStreamQuality  quality
         foreach(QnResourceConsumer* consumer, m_cameraRes->getAllConsumers())
         {
             QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-            if (lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo)
+            if (lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo) {
+                lp->setQuality(m_cameraRes->getSecondaryStreamQuality());
                 lp->onPrimaryFpsUpdated(m_fps);
+            }
         }
         m_cameraRes->unlockConsumers();
 
@@ -99,9 +101,6 @@ void QnLiveStreamProvider::setQuality(QnStreamQuality q)
         QMutexLocker mtx(&m_livemutex);
         if (m_quality == q && m_qualityUpdatedAtLeastOnce)
             return; // same quality
-
-
-        Q_ASSERT(m_role != QnResource::Role_SecondaryLiveVideo || q == QnQualityLowest); // trying to play with quality for second stream by yourself 
 
         m_quality = q;
 
