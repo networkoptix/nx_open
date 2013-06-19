@@ -15,6 +15,10 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/media/audio_player.h>
 
+namespace {
+    QString speechPrefix = QLatin1String("speech://");
+}
+
 
 QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -32,6 +36,13 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
 
     connect(soundModel, SIGNAL(listLoaded()), this, SLOT(updateCurrentIndex()));
     connect(ui->soundRadioButton, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));  // one radiobutton toggle signal is enough
+
+    connect(ui->soundRadioButton, SIGNAL(toggled(bool)), ui->pathComboBox, SLOT(setEnabled(bool)));
+    connect(ui->soundRadioButton, SIGNAL(toggled(bool)), ui->manageButton, SLOT(setEnabled(bool)));
+    connect(ui->soundRadioButton, SIGNAL(toggled(bool)), ui->speechLineEdit, SLOT(setDisabled(bool)));
+
+    connect(ui->speechRadioButton, SIGNAL(toggled(bool)), ui->speechLineEdit, SLOT(setEnabled(bool)));
+
     connect(ui->pathComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
     connect(ui->speechLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
     connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
@@ -56,9 +67,24 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
     if (!model)
         return;
 
+    QnScopedValueRollback<bool> guard(&m_updating, true);
+    Q_UNUSED(guard)
+
     if (fields & QnBusiness::ActionParamsField) {
-        m_filename = model->actionParams().getSoundUrl();
-        updateCurrentIndex();
+        QString soundUrl = model->actionParams().getSoundUrl();
+        qDebug() << "sound url changed" << soundUrl;
+
+        bool speech = soundUrl.startsWith(speechPrefix);
+        ui->speechRadioButton->setChecked(speech);
+        ui->soundRadioButton->setChecked(!speech);
+        if (speech) {
+            ui->speechLineEdit->setText(soundUrl.mid(speechPrefix.size()));
+        } else {
+            m_filename = soundUrl;
+
+            QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+            ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
+        }
     }
 }
 
@@ -66,13 +92,20 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
-    if (!soundModel->loaded())
-        return;
+    QString soundUrl;
+    if (ui->soundRadioButton->isChecked()) {
+        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+        if (soundModel->loaded())
+            return;
 
-    QString filename = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
+        soundUrl = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
+    } else {
+        soundUrl = speechPrefix + ui->speechLineEdit->text();
+    }
+
     QnBusinessActionParameters params;
-    params.setSoundUrl(filename);
+    params.setSoundUrl(soundUrl);
+    qDebug() << "sound url stored" << soundUrl;
     model()->setActionParams(params);
 }
 
