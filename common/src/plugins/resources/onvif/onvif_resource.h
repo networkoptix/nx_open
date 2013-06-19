@@ -9,6 +9,7 @@
 #include <QMap>
 #include <QPair>
 #include <QSharedPointer>
+#include <QWaitCondition>
 #include <QXmlDefaultHandler>
 
 #include "core/resource/security_cam_resource.h"

@@ -1,5 +1,9 @@
 #include "histogram_widget.h"
 
+#include <QPainter>
+#include <QPen>
+
+
 #include <ui/style/globals.h>
 
 QnHistogramWidget::QnHistogramWidget(QWidget *parent, Qt::WindowFlags windowFlags):

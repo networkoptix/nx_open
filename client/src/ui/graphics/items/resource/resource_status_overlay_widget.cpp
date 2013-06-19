@@ -2,6 +2,8 @@
 
 #include <cmath> /* For std::sin. */
 
+#include <QDateTime>
+
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/graphics/painters/loading_progress_painter.h>

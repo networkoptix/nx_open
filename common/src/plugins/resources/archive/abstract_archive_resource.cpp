@@ -3,6 +3,8 @@
 
 QnAbstractArchiveResource::QnAbstractArchiveResource()
 {
+    QnMediaResource::initMediaResource();
+
     addFlags(QnResource::ARCHIVE);
     setStatus(Online, true);
 }
@@ -27,4 +29,24 @@ void QnAbstractArchiveResource::setStatus(QnResource::Status newStatus, bool sil
 {
     QnResource::setStatus(newStatus, silenceMode);
     return;
+}
+
+const QnResource* QnAbstractArchiveResource::toResource() const
+{
+    return this;
+}
+
+QnResource* QnAbstractArchiveResource::toResource()
+{
+    return this;
+}
+
+const QnResourcePtr QnAbstractArchiveResource::toResourcePtr() const
+{
+    return toSharedPointer();
+}
+
+QnResourcePtr QnAbstractArchiveResource::toResourcePtr()
+{
+    return toSharedPointer();
 }

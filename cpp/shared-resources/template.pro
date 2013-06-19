@@ -58,7 +58,9 @@ DEFINES += ${global.defines}
 
 QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
 
-include(${environment.dir}/qt-custom/QtCore/private/qtcore.pri)
+!mac {
+    include(${environment.dir}/qt-custom/QtCore/private/qtcore.pri)
+}
 INCLUDEPATH += ${environment.dir}/qt/include ${environment.dir}/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt-custom ${environment.dir}/qt-custom/QtCore
 DEPENDPATH *= $${INCLUDEPATH}
 

@@ -35,7 +35,7 @@ QnGlobals::QnGlobals(QObject *parent):
         if(!QJson::deserialize(file.readAll(), &json)) {
             qWarning() << "Client settings file could not be parsed!";
         } else {
-            updateFromJson(json.value(lit("style")).toMap());
+            updateFromJson(json.value(QLatin1String("style")).toMap());
         }
     }
 }
