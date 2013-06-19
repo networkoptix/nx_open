@@ -72,13 +72,13 @@
             <type>tar.gz</type>
             <classifier>${platform}</classifier>
         </dependency>                               	
-		<!--<dependency>
+		<dependency>
 			<groupId>org</groupId>
 			<artifactId>festival-vox</artifactId>
 			<version>${festival.version}</version>
 			<type>tar.gz</type>
 			<classifier>all-os</classifier>
-		</dependency>                         -->
+		</dependency>                         
     </dependencies>		
 
     <build>
@@ -130,7 +130,7 @@
                 <version>2.4</version>
                 <executions>
                     <execution>
-                        <id>copy-platform-libs</id>
+                        <id>unpack-platform-libs</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
@@ -257,9 +257,9 @@
 				<dependency>                 
 					<groupId>com.nokia.qt.addons</groupId>
 					<artifactId>qtcolorpicker</artifactId>
-					<version>2.6.1-SNAPSHOT</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}</classifier>
+					<version>2.6.1-1.5.2-SNAPSHOT</version>
+					<type>tar.gz</type>
+					<classifier>${platform}</classifier>
 				</dependency>              
 				<dependency>
                     <groupId>com.microsoft.directx</groupId>
@@ -303,13 +303,6 @@
                     <type>tar.gz</type>
                     <classifier>${platform}-${compiler}</classifier>
                 </dependency>
-				<dependency>
-					<groupId>com.sourceforge.cloudcity</groupId>
-					<artifactId>bespin</artifactId>
-					<version>1.1-SNAPSHOT</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>
             </dependencies>			
             <properties>
                 <compiler>msvc2008</compiler>

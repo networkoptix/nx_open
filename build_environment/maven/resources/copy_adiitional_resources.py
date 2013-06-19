@@ -1,8 +1,9 @@
-import io, sys, os, errno, platform, shutil
+import io, sys, os, errno, platform, shutil, fnmatch, distutils.core
 from os.path import dirname, join, exists, isfile
 #from main import get_environment_variable, cd
 
-qtlibs = ['core', 'gui', 'network', 'opengl', 'xml', 'multimedia', 'sql', '']
+qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}']
+qtplugins = ['${qtplugin1}', '${qtplugin2}', '${qtplugin3}']
 
 def mkdir_p(path):
     try:
@@ -12,11 +13,32 @@ def mkdir_p(path):
             pass
         else: raise
 
-for x in ('x86', 'x64'):
-    for d in ('debug', 'release'):
-        if not os.path.exists(join('c:\\develop\\projects\\netoptix_vms\\build_environment\\target', x, 'bin', d)):
-            mkdir_p(join('c:\\develop\\projects\\netoptix_vms\\build_environment\\target', x, 'bin', d))
+for arch in ('x86', 'x64'):
+    
+    distutils.dir_util.copy_tree('help', join('${project.build.directory}', arch, 'bin'))                        
+    shutils.rmtree('help')
+    
+    for config in ('debug', 'release'):
 
-#for qtlib in qtlibs:
-#    if qtlib != '':
+        target_dir = join('${project.build.directory}', arch, 'bin', config)
+        bin_source_dir = join('${environment.dir}/qt/bin', arch, config)
+        plugin_source_dir = join('${environment.dir}/qt/plugins', arch, config)
+
+        if not os.path.exists(target_dir):
+            mkdir_p(target_dir)        
         
+        for qtlib in qtlibs:
+            if qtlib != '':
+                for file in os.listdir(bin_source_dir):
+                    if fnmatch.fnmatch(file, 'qt%s*.dll' % qtlib):
+                        shutil.copy2(join(bin_source_dir, file), target_dir)
+        
+        shutil.copy2('${root.dir}/quicksyncdecoder/hw_decoding_conf.xml', target_dir)   
+                        
+        for qtplugin in qtplugins:
+            if qtplugin != '':
+                print join(plugin_source_dir, qtplugin)
+                distutils.dir_util.copy_tree(join(plugin_source_dir, qtplugin), join(target_dir, qtplugin))                        
+        
+        distutils.dir_util.copy_tree('festival.vox', target_dir)                        
+        shutil.rmtree('festival.vox')
