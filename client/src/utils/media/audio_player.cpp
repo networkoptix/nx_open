@@ -104,7 +104,7 @@ bool AudioPlayer::playFileAsync( const QString& filePath, QObject* target, const
     return true;
 }
 
-bool AudioPlayer::sayTextAsync( const QString& text )
+bool AudioPlayer::sayTextAsync( const QString& text, QObject* target, const char *slot)
 {
 #if (GCC_VERSION >= 40700)
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
@@ -114,6 +114,8 @@ bool AudioPlayer::sayTextAsync( const QString& text )
     if( !audioPlayer->prepareTextPlayback( text ) )
         return false;
 
+    if (target)
+        connect( audioPlayer.get(), SIGNAL(done()), target, slot);
     connect( audioPlayer.get(), SIGNAL(done()), audioPlayer.get(), SLOT(deleteLater()) );
     if( !audioPlayer->playAsync() )
         return false;

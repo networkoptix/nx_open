@@ -5,6 +5,8 @@
 
 #include <business/business_action_parameters.h>
 
+#include <openal/qtvaudiodevice.h>
+
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
@@ -21,14 +23,21 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
 {
     ui->setupUi(this);
 
-    connect(ui->pathComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
-    connect(ui->playButton, SIGNAL(clicked()), this, SLOT(at_playButton_clicked()));
-    connect(ui->manageButton, SIGNAL(clicked()), this, SLOT(at_manageButton_clicked()));
+
+
+    ui->volumeSlider->setValue(qRound(QtvAudioDevice::instance()->volume() * 100));
 
     QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
     ui->pathComboBox->setModel(soundModel);
 
     connect(soundModel, SIGNAL(listLoaded()), this, SLOT(updateCurrentIndex()));
+    connect(ui->soundRadioButton, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));  // one radiobutton toggle signal is enough
+    connect(ui->pathComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
+    connect(ui->speechLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
+    connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
+    connect(ui->manageButton, SIGNAL(clicked()), this, SLOT(at_manageButton_clicked()));
+    connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(at_volumeSlider_valueChanged(int)));
+
 }
 
 QnPlaySoundBusinessActionWidget::~QnPlaySoundBusinessActionWidget()
@@ -67,21 +76,27 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
     model()->setActionParams(params);
 }
 
-void QnPlaySoundBusinessActionWidget::enablePlayButton() {
-    ui->playButton->setEnabled(true);
+void QnPlaySoundBusinessActionWidget::enableTestButton() {
+    ui->testButton->setEnabled(true);
 }
 
-void QnPlaySoundBusinessActionWidget::at_playButton_clicked() {
-    if (m_filename.isEmpty())
-        return;
+void QnPlaySoundBusinessActionWidget::at_testButton_clicked() {
+    if (ui->soundRadioButton->isChecked()) {
+        if (m_filename.isEmpty())
+            return;
 
-    QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(m_filename);
-    if (!QFileInfo(filePath).exists())
-        return;
+        QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(m_filename);
+        if (!QFileInfo(filePath).exists())
+            return;
 
-    bool result = AudioPlayer::playFileAsync(filePath, this, SLOT(enablePlayButton()));
-    if (result)
-        ui->playButton->setEnabled(false);
+        if (AudioPlayer::playFileAsync(filePath, this, SLOT(enableTestButton())))
+            ui->testButton->setEnabled(false);
+    } else {
+        if (ui->speechLineEdit->text().isEmpty())
+            return;
+        if (AudioPlayer::sayTextAsync(ui->speechLineEdit->text(), this, SLOT(enableTestButton())))
+            ui->testButton->setEnabled(false);
+    }
 }
 
 void QnPlaySoundBusinessActionWidget::at_manageButton_clicked() {
@@ -92,6 +107,8 @@ void QnPlaySoundBusinessActionWidget::at_manageButton_clicked() {
 void QnPlaySoundBusinessActionWidget::at_soundModel_itemChanged(const QString &filename) {
     if (m_filename != filename)
         return;
+}
 
-
+void QnPlaySoundBusinessActionWidget::at_volumeSlider_valueChanged(int value) {
+    QtvAudioDevice::instance()->setVolume((qreal)value * 0.01);
 }

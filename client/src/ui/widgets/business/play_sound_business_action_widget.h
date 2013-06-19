@@ -14,22 +14,23 @@ class QnPlaySoundBusinessActionWidget : public QnAbstractBusinessParamsWidget, p
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
-    
+
 public:
     explicit QnPlaySoundBusinessActionWidget(QWidget *parent = 0);
     ~QnPlaySoundBusinessActionWidget();
-    
+
 protected slots:
     virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
 
 private slots:
     void paramsChanged();
     void updateCurrentIndex();
-    void enablePlayButton();
+    void enableTestButton();
 
-    void at_playButton_clicked();
+    void at_testButton_clicked();
     void at_manageButton_clicked();
     void at_soundModel_itemChanged(const QString &filename);
+    void at_volumeSlider_valueChanged(int value);
 private:
     QScopedPointer<Ui::QnPlaySoundBusinessActionWidget> ui;
 
