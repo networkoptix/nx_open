@@ -32,7 +32,7 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(margin, 0, 0, 0);
     layout->addItem(m_textLabel);
     setLayout(layout);
 
