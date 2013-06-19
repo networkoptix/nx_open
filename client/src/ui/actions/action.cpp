@@ -166,7 +166,13 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             } else if(key == Qn::CurrentMediaServerResourcesRole) {
                 resources = context()->resourcePool()->getResources().filtered<QnMediaServerResource>();
             } else if(key == Qn::CurrentLayoutMediaItemsRole) {
-                resources = QnActionParameterTypes::resources(context()->display()->widgets()).filtered<QnMediaResource>();
+                const QnResourceList& resList = QnActionParameterTypes::resources(context()->display()->widgets());
+                foreach( QnResourcePtr res, resList )
+                {
+                    if( res.dynamicCast<QnMediaResource>() )
+                        resources.push_back( res );
+                }
+                //resources = QnActionParameterTypes::resources(context()->display()->widgets()).filtered<QnMediaResource>();
             }
 
             if((accessController()->permissions(resources) & required) != required)

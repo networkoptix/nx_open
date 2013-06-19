@@ -1,5 +1,10 @@
+
 #include "media_resource.h"
+
+#include <QImage>
+
 #include "resource_media_layout.h"
+
 
 QString QnStreamQualityToString(QnStreamQuality value) {
     switch(value) {
@@ -41,10 +46,8 @@ QnStreamQuality QnStreamQualityFromString( const QString& str )
 
 //QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
-QnMediaResource::QnMediaResource():
-    QnResource()
+QnMediaResource::QnMediaResource()
 {
-    addFlags(QnResource::media);
     m_customVideoLayout = 0;
 }
 
@@ -62,7 +65,7 @@ static QnDefaultResourceVideoLayout defaultVideoLayout;
 const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     QVariant val;
-    getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
+    toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
     QString strVal = val.toString();
     if (strVal.isEmpty())
     {
@@ -79,4 +82,9 @@ static QnEmptyResourceAudioLayout audioLayout;
 const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
     return &audioLayout;
+}
+
+void QnMediaResource::initMediaResource()
+{
+    toResource()->addFlags(QnResource::media);
 }

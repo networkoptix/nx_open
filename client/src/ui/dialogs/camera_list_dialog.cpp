@@ -2,6 +2,7 @@
 
 #include <QtGui/QClipboard>
 #include <QtGui/QMenu>
+#include <QMimeData>
 
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>

@@ -80,7 +80,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
-    connect(m_resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
+    connect(m_resource->toResource(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
     connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(updateDisplay()));
     updateDisplay();
 
@@ -264,7 +264,7 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
             qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", m_camera->getName());
             resizeList(m_motionSensitivity, channelCount());
         }
-    } else if(m_resource->hasFlags(QnResource::motion)) {
+    } else if(m_resource->toResource()->hasFlags(QnResource::motion)) {
         for(int i = 0, count = channelCount(); i < count; i++)
             m_motionSensitivity.push_back(QnMotionRegion());
     } else {
@@ -394,7 +394,7 @@ void QnMediaResourceWidget::updateDisplay() {
     if (zoomTargetWidget /* && syncPlayEnabled() */) {
         display = zoomTargetWidget->display();
     } else {
-        display = QnResourceDisplayPtr(new QnResourceDisplay(m_resource, this));
+        display = QnResourceDisplayPtr(new QnResourceDisplay(m_resource->toResourcePtr(), this));
     }
     setDisplay(display);
 }
@@ -459,7 +459,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
     // always use blending for images --gdm
-    if(!opaque || (resource()->flags() & QnResource::still_image)) {
+    if(!opaque || (resource()->toResource()->flags() & QnResource::still_image)) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -621,7 +621,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::CameraSettings_Motion_Help;
     } else if(options() & DisplayMotion) {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
-    } else if(m_resource->flags() & QnResource::local) {
+    } else if(m_resource->toResource()->flags() & QnResource::local) {
         return Qn::MainWindow_MediaItem_Local_Help;
     } else {
         return Qn::MainWindow_MediaItem_Help;
@@ -697,7 +697,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 #endif
 
     QString timeString;
-    if (m_resource->flags() & QnResource::utc) { /* Do not show time for regular media files. */
+    if (m_resource->toResource()->flags() & QnResource::utc) { /* Do not show time for regular media files. */
         qint64 utcTime = m_renderer->getTimestampOfNextFrameToRender(0) / 1000;
         if(qnSettings->timeMode() == Qn::ServerTimeMode)
             utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
@@ -725,18 +725,18 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
     result |= EnhancementButton;
 
-    if(!(resource()->flags() & QnResource::still_image))
+    if(!(resource()->toResource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
     if (!zoomRect().isNull())
         return result;
 
-    if (resource()->hasFlags(QnResource::motion))
+    if (resource()->toResource()->hasFlags(QnResource::motion))
         result |= MotionSearchButton;
 
     if(m_camera
             && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability))
-            && accessController()->hasPermissions(m_resource, Qn::WritePtzPermission)
+            && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
             )
         result |= PtzButton;
 
@@ -771,7 +771,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
-        QnCachingTimePeriodLoader *loader = context()->navigator()->loader(m_resource);
+        QnCachingTimePeriodLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(QnResource::Online);
         else

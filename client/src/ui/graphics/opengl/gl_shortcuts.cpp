@@ -1,5 +1,10 @@
+
 #include "gl_shortcuts.h"
+
+#include <Glu.h>
+
 #include <utils/common/warnings.h>
+
 
 int glCheckError(const char *context) {
     int error = glGetError();

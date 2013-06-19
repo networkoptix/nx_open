@@ -1,6 +1,7 @@
 
 #include "proxy_label.h"
 
+#include <QApplication>
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
 

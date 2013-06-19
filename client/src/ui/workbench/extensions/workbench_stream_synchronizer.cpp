@@ -116,9 +116,9 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     if(!mediaWidget)
         return;
 
-    connect(mediaWidget->resource().data(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
+    connect(mediaWidget->resource()->toResource(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
 
-    if(!mediaWidget->resource()->hasFlags(QnResource::sync)) {
+    if(!mediaWidget->resource()->toResource()->hasFlags(QnResource::sync)) {
         m_queuedWidgets.insert(mediaWidget);
         return;
     }
@@ -144,11 +144,11 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
     if(!mediaWidget)
         return;
 
-    disconnect(mediaWidget->resource().data(), NULL, this, NULL);
+    disconnect(mediaWidget->resource()->toResource(), NULL, this, NULL);
 
     m_queuedWidgets.remove(mediaWidget);
 
-    if(!mediaWidget->resource()->hasFlags(QnResource::sync))
+    if(!mediaWidget->resource()->toResource()->hasFlags(QnResource::sync))
         return;
 
     if(mediaWidget->display()->archiveReader() == NULL) 
@@ -175,7 +175,7 @@ void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr
         return; // TODO: #Elric implement reverse handling?
 
     foreach(QnMediaResourceWidget *widget, m_queuedWidgets) {
-        if(widget->resource() == resource) {
+        if(widget->resource()->toResourcePtr() == resource) {
             m_queuedWidgets.remove(widget);
 
             m_widgetCount++;

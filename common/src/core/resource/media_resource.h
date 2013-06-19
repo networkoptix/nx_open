@@ -5,6 +5,8 @@
 #include <QSize>
 #include "resource.h"
 #include "resource_media_layout.h"
+#include "utils/common/from_this_to_shared.h"
+
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
@@ -32,9 +34,14 @@ enum QnSecondaryStreamQuality
 QString QnStreamQualityToString(QnStreamQuality value);
 QnStreamQuality QnStreamQualityFromString( const QString& str );
 
-class QnMediaResource : virtual public QnResource
+/*!
+    \note Derived class MUST call \a init() just after object instanciation
+*/
+class QnMediaResource /*: virtual public QnResource*/
+//:
+//    public QnFromThisToShared<QnMediaResource>
 {
-    Q_OBJECT
+    //Q_OBJECT
 
 public:
     QnMediaResource();
@@ -50,8 +57,16 @@ public:
     // resource can use DataProvider for addition info (optional)
     virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
+
+    virtual const QnResource* toResource() const = 0;
+    virtual QnResource* toResource() = 0;
+    virtual const QnResourcePtr toResourcePtr() const = 0;
+    virtual QnResourcePtr toResourcePtr() = 0;
+
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
+
+    void initMediaResource();
 };
 
 #endif // QN_MEDIA_RESOURCE_H

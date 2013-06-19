@@ -5,6 +5,8 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <QWidget>
+
 namespace Ui {
     class AdvancedSettingsWidget;
 }
