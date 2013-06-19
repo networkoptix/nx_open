@@ -23,6 +23,12 @@ QnPopupBusinessActionWidget::~QnPopupBusinessActionWidget()
 {
 }
 
+void QnPopupBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
+    setTabOrder(before, ui->adminsCheckBox);
+    setTabOrder(ui->adminsCheckBox, ui->settingsButton);
+    setTabOrder(ui->settingsButton, after);
+}
+
 void QnPopupBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
     if (!model)
         return;

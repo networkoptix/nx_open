@@ -13,11 +13,13 @@ class QnRecordingBusinessActionWidget : public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
-    
+
 public:
     explicit QnRecordingBusinessActionWidget(QWidget *parent = 0);
     ~QnRecordingBusinessActionWidget();
-    
+
+     virtual void updateTabOrder(QWidget *before, QWidget *after) override;
+
 protected slots:
     virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
 private slots:

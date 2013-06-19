@@ -34,6 +34,13 @@ QnRecordingBusinessActionWidget::~QnRecordingBusinessActionWidget()
 {
 }
 
+void QnRecordingBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
+    setTabOrder(before,                 ui->qualityComboBox);
+    setTabOrder(ui->qualityComboBox,    ui->fpsSpinBox);
+    setTabOrder(ui->fpsSpinBox,         ui->afterSpinBox);
+    setTabOrder(ui->afterSpinBox,       after);
+}
+
 void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
     if (!model)
         return;
