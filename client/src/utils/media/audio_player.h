@@ -64,8 +64,15 @@ public:
         \return             True if playback started, false - otherwise
     */
     static bool playFileAsync( const QString& filePath, QObject* target = NULL, const char *slot = NULL );
+
     //!Generates wav from \a text and plays it...
-    static bool sayTextAsync( const QString& text );
+    /*!
+        Creates \a AudioPlayer object, which is removed on playback finish
+        \param target       Signal will be sent to this target on play end (can be null).
+        \param slot         Slot that will be called on play end if target is not null.
+        \return             True if playback started, false - otherwise
+    */
+    static bool sayTextAsync( const QString& text, QObject* target = NULL, const char *slot = NULL );
     //!Reads tag \a tagName
     /*!
         This method is synchronous

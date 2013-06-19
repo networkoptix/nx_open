@@ -42,14 +42,14 @@ void QnSingleThumbnailLoader::load(qint64 usecSinceEpoch, const QSize& size)
 int QnSingleThumbnailLoader::sendRequest(qint64 usecSinceEpoch, const QSize& size)
 {
     return m_connection->getThumbnailAsync(
-                m_resource.dynamicCast<QnNetworkResource>(),
-                usecSinceEpoch,
-                size,
-                QLatin1String("png"),
-                QnMediaServerConnection::IFrameAfterTime,
-                this,
-                SLOT(at_replyReceived(int, const QImage&, int))
-                );
+        m_resource.dynamicCast<QnNetworkResource>(),
+        usecSinceEpoch,
+        size,
+        QLatin1String("png"),
+        QnMediaServerConnection::IFrameAfterTime,
+        this,
+        SLOT(at_replyReceived(int, const QImage&, int))
+    );
 }
 
 void QnSingleThumbnailLoader::at_replyReceived(int status, const QImage &image, int requstHandle)

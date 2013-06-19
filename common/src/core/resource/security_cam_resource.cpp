@@ -15,13 +15,34 @@ QnSecurityCamResource::QnSecurityCamResource():
     addFlags(live_cam);
 
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
+
+    QnMediaResource::initMediaResource();
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const
 {
     return hasParam(lit("groupplay"));
+}
 
-};
+const QnResource* QnSecurityCamResource::toResource() const
+{
+    return this;
+}
+
+QnResource* QnSecurityCamResource::toResource()
+{
+    return this;
+}
+
+const QnResourcePtr QnSecurityCamResource::toResourcePtr() const
+{
+    return toSharedPointer();
+}
+
+QnResourcePtr QnSecurityCamResource::toResourcePtr()
+{
+    return toSharedPointer();
+}
 
 QnSecurityCamResource::~QnSecurityCamResource()
 {
@@ -29,7 +50,7 @@ QnSecurityCamResource::~QnSecurityCamResource()
 
 void QnSecurityCamResource::updateInner(QnResourcePtr other)
 {
-    base_type::updateInner(other);
+    QnNetworkResource::updateInner(other);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
@@ -491,7 +512,7 @@ void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability,
 }
 
 bool QnSecurityCamResource::setParam(const QString &name, const QVariant &val, QnDomain domain) {
-    bool result = base_type::setParam(name, val, domain);
+    bool result = QnResource::setParam(name, val, domain);
     if(result && name == lit("cameraCapabilities"))
         emit cameraCapabilitiesChanged(::toSharedPointer(this)); // TODO: #Elric we don't check whether they have actually changed. This better be fixed.
     return result;

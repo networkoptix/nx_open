@@ -2,6 +2,7 @@
 #define WORKBENCH_USER_EMAIL_WATCHER_H
 
 #include <QtCore/QObject>
+#include <QHash>
 
 #include <core/resource/resource_fwd.h>
 

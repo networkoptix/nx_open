@@ -2,8 +2,9 @@
 #define abstract_archive_device_h1838
 
 #include "core/resource/media_resource.h"
+#include "core/resource/resource.h"
 
-class QnAbstractArchiveResource : public QnMediaResource
+class QnAbstractArchiveResource : public QnResource, public QnMediaResource
 {
     Q_OBJECT;
 
@@ -11,10 +12,22 @@ public:
     QnAbstractArchiveResource();
     ~QnAbstractArchiveResource();
 
-    virtual QString getUniqueId() const;
+    //!Implementation of QnResource::getUniqueId
+    virtual QString getUniqueId() const override;
+    //!Implementation of QnResource::setUniqId
     virtual void setUniqId(const QString& value) override;
 
+    //!Implementation of QnResource::setStatus
     virtual void setStatus(Status newStatus, bool silenceMode = false) override;
+
+    //!Implementation of QnMediaResource::toResource
+    virtual const QnResource* toResource() const override;
+    //!Implementation of QnMediaResource::toResource
+    virtual QnResource* toResource() override;
+    //!Implementation of QnMediaResource::toResource
+    virtual const QnResourcePtr toResourcePtr() const override;
+    //!Implementation of QnMediaResource::toResource
+    virtual QnResourcePtr toResourcePtr() override;
 };
 
 #endif //abstract_archive_device_h1838

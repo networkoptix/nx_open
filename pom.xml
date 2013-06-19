@@ -39,6 +39,7 @@
         <libdir>${root.dir}/build_environment/target</libdir>
         <customization.dir>${basedir}/customization</customization.dir>
         <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
+        <ClientVoxSourceDir>${libdir}/bin/${build.configuration}/festival.vox</ClientVoxSourceDir>		                                  	
         <unpack.skip>false</unpack.skip>
         <ffmpeg.version>N-39672-g40b7a27-faac-1.5.2-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-1.5.2-SNAPSHOT</openssl.version>
@@ -259,7 +260,7 @@
             </modules>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${env.environment}/python/bin/</python.dir>				
+                <python.dir>/usr/bin/</python.dir>				
                 <qt.dir/>
                 <platform>macosx</platform>
                 <compiler>gcc</compiler>

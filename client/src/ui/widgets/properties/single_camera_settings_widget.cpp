@@ -51,7 +51,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     m_motionLayout = new QVBoxLayout(ui->motionWidget);
     m_motionLayout->setContentsMargins(0, 0, 0, 0);
-    
+
     ui->cameraScheduleWidget->setContext(context());
 
     /* Set up context help. */
@@ -136,7 +136,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
                 delete ui->cameraPropertiesTab->layout();
                 ui->cameraPropertiesTab->setLayout(layout = new QHBoxLayout());
             }
-            
+
             QSplitter* advancedSplitter = new QSplitter();
             advancedSplitter->setChildrenCollapsible(false);
 
@@ -164,7 +164,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             }
 
             if (id == m_widgetsRecreator->getId()) {
-                
+
                 //ToDo: disable all and return. Currently, will do the same as for another type of cameras
                 //disable;
                 //return;
@@ -219,7 +219,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
                 tmp->deserializeFromStr(setting);
                 m_cameraSettings.insert(tmp->getId(), tmp);
             }
-            
+
             m_widgetsRecreator->proceed(&m_cameraSettings);
         }
 #endif
@@ -239,7 +239,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     m_camera = camera;
     Q_D(QnCameraSettingsWidget);
     d->setCameras(QnVirtualCameraResourceList() << camera);
-    
+
     updateFromResource();
 }
 
@@ -247,7 +247,7 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
     /* Using field names here so that changes in UI file will lead to compilation errors. */
 
     QWidget *tab = ui->tabWidget->currentWidget();
-    
+
     if(tab == ui->generalTab) {
         return Qn::GeneralSettingsTab;
     } else if(tab == ui->recordingTab) {
@@ -312,7 +312,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         } else {
             m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
         }
-            
+
         if (!m_camera->isDtsBased()) {
             if (m_hasScheduleChanges) {
                 QnScheduleTaskList scheduleTasks;
@@ -335,7 +335,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         Qt::CheckState cs = ui->advancedSettingsWidget->getCameraControl();
         if (cs != Qt::PartiallyChecked)
             m_camera->setCameraControlDisabled(cs == Qt::Checked);
-        
+
 
         setHasDbChanges(false);
     }
@@ -430,7 +430,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
                 ui->cameraScheduleWidget->setFps(currentCameraFps);
             else
                 ui->cameraScheduleWidget->setFps(m_camera->getMaxFps()/2);
-            ui->cameraScheduleWidget->endUpdate();
+
 
             // TODO #Elric: wrong, need to get camera-specific web page
             ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
@@ -440,6 +440,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             m_cameraSupportsMotion = m_camera->supportedMotionType() != Qn::MT_NoMotion;
             ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
             ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
+
+            ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
             ui->advancedSettingsWidget->updateFromResource(m_camera);
         }
@@ -605,7 +607,7 @@ void QnSingleCameraSettingsWidget::updateLicenseText() {
 }
 
 bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
-    if (!m_motionWidget) 
+    if (!m_motionWidget)
         return true;
     return m_motionWidget->isValidMotionRegion();
 }
@@ -628,7 +630,7 @@ void QnSingleCameraSettingsWidget::hideEvent(QHideEvent *event) {
 
 void QnSingleCameraSettingsWidget::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
-    
+
     if(m_motionWidget) {
         updateMotionWidgetFromResource();
         connectToMotionWidget();
@@ -739,16 +741,6 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
             : Qn::MT_SoftwareGrid;
 
     d->calculateMaxFps(&maxFps, &maxDualStreamingFps, motionType);
-/*
-    int maxFps = m_camera->getMaxFps();
-    if (ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
-        maxFps -= MIN_SECOND_STREAM_FPS;
-
-    int maxDualStreamingFps;
-    if (m_camera->streamFpsSharingMethod() == Qn::shareFps)
-        maxDualStreamingFps = m_camera->getMaxFps() - MIN_SECOND_STREAM_FPS;
-    else
-        maxDualStreamingFps = maxFps;*/
 
     ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
@@ -782,11 +774,11 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
 
     m_motionWidget = new QnCameraMotionMaskWidget(this);
     updateMotionWidgetFromResource();
-    
+
     using ::setReadOnly;
     setReadOnly(m_motionWidget, m_readOnly);
     //m_motionWidget->setReadOnly(m_readOnly);
-    
+
     m_motionLayout->addWidget(m_motionWidget);
 
     connectToMotionWidget();

@@ -108,9 +108,19 @@ bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
 
 bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
     QnResourceList resources = QnWorkbenchResource::deserializeResources(event->mimeData());
-    QnResourceList media = resources.filtered<QnMediaResource>();
-    QnResourceList layouts = resources.filtered<QnLayoutResource>();
-    QnResourceList servers = resources.filtered<QnMediaServerResource>();
+    QnResourceList media;   // = resources.filtered<QnMediaResource>();
+    QnResourceList layouts; // = resources.filtered<QnLayoutResource>();
+    QnResourceList servers; // = resources.filtered<QnMediaServerResource>();
+
+    foreach( QnResourcePtr res, resources )
+    {
+        if( dynamic_cast<QnMediaResource*>(res.data()) )
+            media.push_back( res );
+        if( res.dynamicCast<QnLayoutResource>() )
+            layouts.push_back( res );
+        if( res.dynamicCast<QnMediaServerResource>() )
+            servers.push_back( res );
+    }
 
     m_resources = media;
     m_resources << layouts;

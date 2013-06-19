@@ -7,7 +7,7 @@
 #include "resource.h"
 #include "recording/time_period_list.h"
 
-class QN_EXPORT QnNetworkResource : virtual public QnResource
+class QN_EXPORT QnNetworkResource : public QnResource
 {
     Q_OBJECT
     //Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)
