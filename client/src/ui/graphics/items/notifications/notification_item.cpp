@@ -17,7 +17,6 @@ namespace {
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
     const qreal margin = 4;
-    const qreal buttonSize = 16;
 } // anonymous namespace
 
 /********** QnNotificationToolTipWidget *********************/
@@ -174,9 +173,11 @@ void QnNotificationItem::setTooltipEnclosingRect(const QRectF &rect) {
 
 void QnNotificationItem::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
                                          const QnActionParameters &parameters,
-                                         const qreal sizeMultiplier, const bool isThumbnail) {
-    QnImageButtonWidget *button;
-
+                                         const qreal sizeMultiplier, const bool isThumbnail) 
+{
+    qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
+    
+    QnImageButtonWidget *button = NULL;
     if (isThumbnail) {
         button = new QnThumbnailImageButtonWidget(this);
         connect(this, SIGNAL(imageChanged(QImage)), button, SLOT(setThumbnail(QImage)));
