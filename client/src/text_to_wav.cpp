@@ -8,7 +8,7 @@
 
 #include <version.h>
 #include <EST_wave_aux.h>
-#include <festivalP.h>
+//#include <festivalP.h>
 
 #include "text_to_wav.h"
 
