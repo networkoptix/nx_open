@@ -14,7 +14,7 @@
 
 
 /** @def QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
- * 
+ *
  * When defined, makes loading overlay much more 'flashy', drawing loading circles
  * and reducing timeout after which overlay is drawn.
  */
@@ -153,14 +153,7 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
 
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(testFlashingPeriodMSec * 2) * M_PI)));
-
-    painter->translate(rect().center());
-    /*painter->rotate(-1.0 * m_overlayRotation);
-    painter->translate(offset * unit);
-    if (m_overlayRotation % 180 != 0) {
-        qreal ratio = 1 / ( m_aspectRatio > 0.0 ? m_aspectRatio : m_enclosingAspectRatio);
-        painter->scale(ratio, ratio);
-    }*/
+    painter->translate(rect().center() + offset*unit);
 
     painter->drawStaticText(-toPoint(text.size() / 2), text);
     painter->setOpacity(opacity);
