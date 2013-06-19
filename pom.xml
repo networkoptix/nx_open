@@ -35,6 +35,9 @@
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <license.environment>production</license.environment>
 
+        <root.dir>${basedir}</root.dir>
+        <libdir>${root.dir}/build_environment/target</libdir>
+        <customization.dir>${basedir}/customization</customization.dir>
         <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
         <unpack.skip>false</unpack.skip>
         <ffmpeg.version>N-39672-g40b7a27-faac-1.5.2-SNAPSHOT</ffmpeg.version>
@@ -76,7 +79,26 @@
     <build>
         <defaultGoal>install</defaultGoal>
         <plugins>
-
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <id>read</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${root.dir}/rsa-key-${license.environment}.properties</file>
+                                <file>${root.dir}/build-${customization}.properties</file>								
+                            </files>
+                        </configuration>
+                    </execution>                   
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -117,7 +139,7 @@
                 <executions>
                     <execution>
                         <id>copy-common-resources</id>
-                        <phase>initialize</phase>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -125,9 +147,17 @@
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>          
                                 <resource>
-                                    <directory>${basedir}/maven</directory>
+                                    <directory>${basedir}/maven/resources</directory>
                                     <filtering>true</filtering>
-                                </resource>		
+                                </resource>	
+                                <resource>
+                                    <directory>${basedir}/maven/bin-resources</directory>
+                                    <filtering>false</filtering>
+                                </resource>                                
+                                <resource>
+                                    <directory>${root.dir}/customization/${customization}/${project.artifactId}</directory>
+                                    <filtering>false</filtering>
+                                </resource>		                                
                             </resources>              
                             <encoding>UTF-8</encoding>
                         </configuration>            
@@ -160,28 +190,6 @@
                 <arch>x86</arch>
                 <platform>windows</platform>
             </properties>
-            <!--	<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>unpack-platform-libs</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>unpack-dependencies</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-									<skip>${unpack.skip}</skip>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build> -->
         </profile>
         <profile>
             <id>linux</id>

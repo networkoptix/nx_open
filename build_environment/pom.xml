@@ -15,7 +15,9 @@
     <name>Build Environment for QT projects</name>
 
     <properties>
-        <libdir>${project.build.directory}/${arch}</libdir>
+        <!-- Change it to point relatively to the root-->
+        <root.dir>${basedir}/..</root.dir>
+        <!-- Change it to true to skip buildenv synchronization (can save time)-->
         <rsync.skip>false</rsync.skip>
         <buildLib/>
     </properties>
@@ -74,37 +76,47 @@
 
     <build>
         <defaultGoal>compile</defaultGoal>
-        <plugins>
+        <plugins>		
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
                 <executions>
                     <execution>
-                        <id>read</id>
-                        <phase>validate</phase>
+                        <id>configure</id>
+                        <phase>initialize</phase>
                         <goals>
-                            <goal>read-project-properties</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <files>
-                                <file>../rsa-key-${license.environment}.properties</file>
-                                <file>../build-${customization}.properties</file>								
-                            </files>
+                            <executable>${python.dir}/python</executable>
+                            <arguments>
+                                <argument>configure.py</argument>
+                                <argument>--cst</argument>
+                                <argument>${customization}</argument>
+                                <argument>--cfg</argument>
+                                <argument>${build.configuration}</argument>                                
+                            </arguments>
+                            <workingDirectory>${root.dir}</workingDirectory>		
                         </configuration>
                     </execution>
                     <execution>
-                        <id>write</id>
-                        <phase>initialize</phase>
+                        <id>update-buildenv</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>write-project-properties</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <outputFile>${project.build.directory}/libdir.properties</outputFile>
+                            <executable>${python.dir}/python</executable>
+                            <arguments>
+                                <argument>buildenv.py</argument>
+                            </arguments>
+                            <workingDirectory>${basedir}/python</workingDirectory>		
+                            <skip>${rsync.skip}</skip>
                         </configuration>
                     </execution>                    
                 </executions>
-            </plugin>		
+            </plugin>	
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -121,57 +133,7 @@
                         </configuration>
                     </execution>							
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1.1</version>
-                <executions>
-                    <execution>
-                        <id>update-buildenv</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${python.dir}/python</executable>
-                            <arguments>
-                                <argument>buildenv.py</argument>
-                            </arguments>
-                            <workingDirectory>${basedir}/python</workingDirectory>		
-                            <skip>${rsync.skip}</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>	
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.5</version>
-                <executions>
-                    <execution>
-                        <id>version.h</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <resources>          								
-                                <resource>
-                                    <targetPath>${project.build.directory}/build/include</targetPath>
-                                    <directory>${basedir}/../cpp/shared-resources</directory>
-                                    <includes>
-                                        <include>version.h</include>
-                                    </includes>
-                                    <filtering>true</filtering>
-                                </resource>												
-                            </resources>              
-                            <encoding>UTF-8</encoding>
-                        </configuration>            
-                    </execution>
-                </executions>
-            </plugin>		
+            </plugin>            	
 
             <plugin>
                 <groupId>com.goldin.plugins</groupId>
@@ -185,7 +147,6 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <runIf>{{ buildLib != "staticlib" }}</runIf>
                             <failIfNotFound>false</failIfNotFound>
                             <resources>
                                 <resource>
@@ -381,42 +342,7 @@
                     <type>zip</type>
                     <classifier>${platform}-${compiler}</classifier>
                 </dependency>
-            </dependencies>
-            <build>	
-                <plugins>			
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.7</version>
-                        <executions>
-                            <execution>
-                                <id>generate-qt-project</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <failOnError>false</failOnError>
-                                    <target>							
-                                        <chmod file="${project.build.directory}/*.sh" perm="755"/>
-                                        <exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-                                            <arg line="-a -u *.zip -x **/include/** *.a"/>
-                                        </exec>
-                                        <exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-                                            <arg line="-a -u *.zip **/include/**"/>
-                                        </exec>
-                                        <exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-                                            <arg line="-a -u *.zip *.a"/>
-                                        </exec>
-                                        <exec dir="${libdir}" executable="rm" failifexecutionfails="false">
-                                            <arg line="*.zip"/>
-                                        </exec>
-                                    </target>										
-                                </configuration>
-                            </execution>				
-                        </executions>
-                    </plugin>					
-                </plugins>	
-            </build>			
+            </dependencies>		
         </profile>		
 
         <profile>
@@ -443,42 +369,6 @@
                     <classifier>${platform}-${arch}-${compiler}</classifier>
                 </dependency>
             </dependencies>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.7</version>
-                        <executions>
-                            <execution>
-                                <id>generate-qt-project</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <failOnError>false</failOnError>
-                                    <target>							
-                                        <chmod file="${project.build.directory}/*.sh" perm="755"/>
-                                        <exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-                                            <arg line="-a -u *.zip -x **/include/** *.a"/>
-                                        </exec>
-                                        <exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-                                            <arg line="-a -u *.zip **/include/**"/>
-                                        </exec>
-                                        <exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-                                            <arg line="-a -u *.zip *.a"/>
-                                        </exec>
-                                        <exec dir="${libdir}" executable="rm" failifexecutionfails="false">
-                                            <arg line="*.zip"/>
-                                        </exec>
-                                    </target>										
-                                </configuration>
-                            </execution>				
-                        </executions>
-                    </plugin>					
-                </plugins>
-            </build>
         </profile>
 
     </profiles>	

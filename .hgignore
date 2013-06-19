@@ -27,7 +27,7 @@ Debug
 Release
 
 build_environment/python/packages/*/build
-build_environment/build
+build_environment/target
 build_environment/x86
 build_environment/x64
 
