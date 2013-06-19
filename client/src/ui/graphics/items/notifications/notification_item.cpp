@@ -16,8 +16,9 @@
 namespace {
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
-    const qreal margin = 4;
-    const qreal buttonSize = 16;
+    const qreal margin = 4.0;
+    const qreal colorSignSize = 16.0; // TODO: #Elric real color size is 12px (calculated froim screenshot)
+    const qreal buttonSize = 16.0;
 } // anonymous namespace
 
 /********** QnNotificationToolTipWidget *********************/
@@ -114,7 +115,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_textLabel->setAlignment(Qt::AlignCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
-    m_layout->setContentsMargins(margin*2, margin, margin, margin);
+    m_layout->setContentsMargins(colorSignSize, margin, margin, margin);
     m_layout->addItem(m_textLabel);
     m_layout->setStretchFactor(m_textLabel, 1.0);
 
@@ -174,9 +175,11 @@ void QnNotificationItem::setTooltipEnclosingRect(const QRectF &rect) {
 
 void QnNotificationItem::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
                                          const QnActionParameters &parameters,
-                                         const qreal sizeMultiplier, const bool isThumbnail) {
-    QnImageButtonWidget *button;
-
+                                         const qreal sizeMultiplier, const bool isThumbnail) 
+{
+    qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
+    
+    QnImageButtonWidget *button = NULL;
     if (isThumbnail) {
         button = new QnThumbnailImageButtonWidget(this);
         connect(this, SIGNAL(imageChanged(QImage)), button, SLOT(setThumbnail(QImage)));
@@ -208,7 +211,7 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
 
     QRectF rect = this->rect();
-    qreal side = qMin(qMin(rect.width(), rect.height()), 16.0) / 2.0;
+    qreal side = qMin(qMin(rect.width(), rect.height()), colorSignSize) / 2.0;
 
     qreal left = rect.left();
     qreal xcenter = left + side * 0.5;

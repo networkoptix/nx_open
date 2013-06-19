@@ -227,7 +227,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 tr("Browse Archive"),
                 Qn::OpenInNewLayoutAction,
                 QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000),
-                2.0, 
+                2.0,
                 true
             );
             loadThumbnailForItem(item, resource, params.getEventTimestamp());
@@ -241,7 +241,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 tr("Open Camera"),
                 Qn::OpenInNewLayoutAction,
                 QnActionParameters(resource),
-                2.0, 
+                2.0,
                 true
             );
             loadThumbnailForItem(item, resource);
@@ -254,7 +254,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 tr("Open Camera"),
                 Qn::OpenInNewLayoutAction,
                 QnActionParameters(resource),
-                2.0, 
+                2.0,
                 true
             );
             item->addActionButton(
@@ -290,7 +290,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 tr("Open Camera"),
                 Qn::OpenInNewLayoutAction,
                 QnActionParameters(resource),
-                2.0, 
+                2.0,
                 true
             );
             item->addActionButton(
@@ -320,16 +320,11 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             item->setColor(qnGlobals->notificationColorCritical());
             item->addActionButton(
                 qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Open Monitor"),
-                Qn::OpenInNewLayoutAction,
+                tr("Settings"),
+                Qn::ServerSettingsAction,
                 QnActionParameters(resource)
             );
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Ping"),
-                Qn::PingAction,
-                QnActionParameters(resource)
-            );
+
             item->setText(tr("Failure on %1.").arg(name));
             break;
         }

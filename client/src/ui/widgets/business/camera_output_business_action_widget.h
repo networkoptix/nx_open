@@ -12,10 +12,12 @@ class QnCameraOutputBusinessActionWidget : public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
-    
+
 public:
     explicit QnCameraOutputBusinessActionWidget(QWidget *parent = 0);
     ~QnCameraOutputBusinessActionWidget();
+
+    virtual void updateTabOrder(QWidget *before, QWidget *after) override;
 
 protected slots:
     virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;

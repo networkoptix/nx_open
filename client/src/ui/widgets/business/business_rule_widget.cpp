@@ -29,7 +29,7 @@
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
 
-// TODO: #GDM 
+// TODO: #GDM
 // Why are you using QFrame as container for subwidgets of QnBusinessRuleWidget?
 // Why don't just use QWidget?
 
@@ -227,8 +227,11 @@ void QnBusinessRuleWidget::initEventParameters() {
     }
     if (m_eventParameters) {
         ui->eventParamsLayout->addWidget(m_eventParameters);
+        m_eventParameters->updateTabOrder(ui->eventResourcesHolder,  ui->scheduleButton);
         m_eventParameters->setVisible(true);
         m_eventParameters->setModel(m_model);
+    } else {
+        setTabOrder(ui->eventResourcesHolder, ui->scheduleButton);
     }
 }
 
@@ -251,8 +254,11 @@ void QnBusinessRuleWidget::initActionParameters() {
 
     if (m_actionParameters) {
         ui->actionParamsLayout->addWidget(m_actionParameters);
+        m_actionParameters->updateTabOrder(ui->aggregationPeriodComboBox,  ui->commentsLineEdit);
         m_actionParameters->setVisible(true);
         m_actionParameters->setModel(m_model);
+    } else {
+        setTabOrder(ui->aggregationPeriodComboBox, ui->commentsLineEdit);
     }
 }
 
