@@ -76,6 +76,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>soundRadioButton</tabstop>
+  <tabstop>pathComboBox</tabstop>
+  <tabstop>manageButton</tabstop>
+  <tabstop>speechRadioButton</tabstop>
+  <tabstop>speechLineEdit</tabstop>
+  <tabstop>volumeSlider</tabstop>
+  <tabstop>testButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

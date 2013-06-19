@@ -14,11 +14,13 @@ class QnPopupBusinessActionWidget : public QnAbstractBusinessParamsWidget, publi
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
-    
+
 public:
     explicit QnPopupBusinessActionWidget(QWidget *parent = 0);
     ~QnPopupBusinessActionWidget();
-    
+
+    virtual void updateTabOrder(QWidget *before, QWidget *after) override;
+
 protected slots:
     virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
 private slots:

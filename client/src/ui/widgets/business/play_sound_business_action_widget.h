@@ -19,6 +19,8 @@ public:
     explicit QnPlaySoundBusinessActionWidget(QWidget *parent = 0);
     ~QnPlaySoundBusinessActionWidget();
 
+    virtual void updateTabOrder(QWidget *before, QWidget *after) override;
+
 protected slots:
     virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
 
