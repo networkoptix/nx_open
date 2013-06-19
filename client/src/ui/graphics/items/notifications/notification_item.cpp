@@ -17,7 +17,7 @@ namespace {
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
     const qreal margin = 4;
-    const qreal buttonSize = 24;
+    const qreal buttonSize = 16;
 } // anonymous namespace
 
 /********** QnNotificationToolTipWidget *********************/
@@ -180,15 +180,22 @@ void QnNotificationItem::addActionButton(const QIcon &icon, const QString &toolt
     if (isThumbnail) {
         button = new QnThumbnailImageButtonWidget(this);
         connect(this, SIGNAL(imageChanged(QImage)), button, SLOT(setThumbnail(QImage)));
-    }
-    else
+    } else {
         button = new QnImageButtonWidget(this);
+    }
     button->setIcon(icon);
     button->setToolTip(tooltip);
-
+    button->setCached(true);
     button->setFixedSize(buttonSize * sizeMultiplier);
     button->setProperty(actionIndexPropertyName, m_actions.size());
-    m_layout->addItem(button);
+
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    layout->setSpacing(0.0);
+    layout->addStretch(1);
+    layout->addItem(button);
+    layout->addStretch(1);
+    m_layout->addItem(layout);
 
     connect(button, SIGNAL(clicked()), this, SLOT(at_button_clicked()));
     m_actions << ActionData(actionId, parameters);
