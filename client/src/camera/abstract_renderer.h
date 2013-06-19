@@ -15,11 +15,9 @@ class CLVideoDecoderOutput;
  * 
  * Note that it is owned by the rendering thread.
  */
-class QnAbstractRenderer: public QObject, public QnStoppable
-{
+class QnAbstractRenderer: public QObject, public QnStoppable {
     Q_OBJECT
-signals:
-    void canBeDestroyed();
+
 public:
     QnAbstractRenderer(QObject* parent = 0): QObject(parent), m_useCount(0), m_needStop(false) {}
 
@@ -120,6 +118,9 @@ public:
     virtual void setPaused(bool value) = 0;
 
     virtual void setScreenshotInterface(ScreenshotInterface* value) = 0;
+
+signals:
+    void canBeDestroyed();
 
 private:
     int m_useCount;

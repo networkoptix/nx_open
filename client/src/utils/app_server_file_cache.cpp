@@ -37,6 +37,10 @@ void QnAppServerFileCache::ensureCacheFolder() {
     QDir().mkpath(folderPath);
 }
 
+QString QnAppServerFileCache::folderName() const {
+    return m_folderName;
+}
+
 void QnAppServerFileCache::clearLocalCache() {
     QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QString dir = QDir::toNativeSeparators(QString(QLatin1String("%1/cache/")).arg(path));

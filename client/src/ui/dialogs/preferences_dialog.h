@@ -41,12 +41,9 @@ private:
     void updateFromSettings();
     void submitToSettings();
 
-    void initColorPicker();
     void initLanguages();
 
 private slots:
-    void at_animateBackgroundCheckBox_stateChanged(int state);
-    void at_backgroundColorPicker_colorChanged(const QColor &color);
     void at_browseMainMediaFolderButton_clicked();
     void at_addExtraMediaFolderButton_clicked();
     void at_removeExtraMediaFolderButton_clicked();

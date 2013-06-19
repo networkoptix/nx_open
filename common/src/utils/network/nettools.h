@@ -23,7 +23,7 @@ struct QnInterfaceAndAddr
     QHostAddress address;
 };
 
-QN_EXPORT QString MACToString (const unsigned char* mac);
+QN_EXPORT QString MACToString(const unsigned char *mac);
 
 QN_EXPORT unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
 QN_EXPORT unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);

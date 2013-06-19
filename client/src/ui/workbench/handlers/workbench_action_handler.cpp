@@ -1567,7 +1567,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
             wlayout->centralizeItems();
     }
 
-    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+    at_saveLayoutAction_triggered(layout);  //TODO: #GDM add background to snapshot manager and set modified flag instead
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
@@ -2449,7 +2449,7 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
 QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
 {
     if (!m_adjustVideoDialog)
-        m_adjustVideoDialog = new QnAdjustVideoDialog(mainWindow(), context());
+        m_adjustVideoDialog = new QnAdjustVideoDialog(mainWindow());
     return m_adjustVideoDialog.data();
 }
 
@@ -2623,20 +2623,13 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
 }
 
 #ifdef Q_OS_WIN
-QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
+QString QnWorkbenchActionHandler::binaryFilterName() const
 {
-    if (readOnly) {
-        if (sizeof(char*) == 4)
-            return tr("Executable %1 Media File (x86, read only) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
-        else
-            return tr("Executable %1 Media File (x64, read only) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
-    }
-    else {
-        if (sizeof(char*) == 4)
-            return tr("Executable %1 Media File (x86) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
-        else
-            return tr("Executable %1 Media File (x64) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
-    }
+    if (sizeof(char*) == 4) //TODO: #Elric why not using define here?
+        return tr("Executable %1 Media File (x86) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
+    else
+        return tr("Executable %1 Media File (x64) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
+
 }
 #endif
 
@@ -2673,44 +2666,40 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         previousDir = qnSettings->mediaFolder();
 
     QString suggestion = layout->getName();
-
-    bool exportReadOnly = false;
-
     QString fileName;
-    QString selectedExtension;
-    QString filterSeparator(QLatin1String(";;"));
-    QString mediaFileFilter = tr("Media File (*.nov)");
-    QString mediaFileROFilter = tr("Media File (read only) (*.nov)");
+    bool readOnly = false;
 
+#ifdef Q_OS_WIN
+    QString filterSeparator(QLatin1String(";;"));
+#endif
+    QString mediaFileFilter = tr("Media File (*.nov)");
     QString mediaFilter =
             QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileFilter
-            + filterSeparator
-            + QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileROFilter
         #ifdef Q_OS_WIN
             + filterSeparator
-            + binaryFilterName(false)
-            + filterSeparator
-            + binaryFilterName(true)
+            + binaryFilterName()
         #endif
             ;
 
     while (true) {
-        QString selectedFilter;
-        fileName = QFileDialog::getSaveFileName(
+
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            mediaFilter,
-            &selectedFilter,
-            QFileDialog::DontUseNativeDialog
-        );
+            mediaFilter
+        ));
+        dialog->setFileMode(QFileDialog::AnyFile);
+        dialog->setAcceptMode(QFileDialog::AcceptSave);
+        dialog->addCheckBox(tr("Make file read-only"), &readOnly);
 
-        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-        exportReadOnly = selectedFilter.contains(mediaFileROFilter)
-#ifdef Q_OS_WIN
-                || selectedFilter.contains(binaryFilterName(true))
-#endif
-                ;
+        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+            return false;
+
+        fileName = dialog->selectedFiles().value(0);
+        QString selectedFilter = dialog->selectedNameFilter();
+        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+
         if (fileName.isEmpty())
             return false;
 
@@ -2750,7 +2739,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     if (existingLayout)
         removeLayoutFromPool(existingLayout);
 
-    saveLayoutToLocalFile(exportPeriod, layout, fileName, mode, exportReadOnly);
+    saveLayoutToLocalFile(exportPeriod, layout, fileName, mode, readOnly);
 
     return true;
 }
@@ -3141,7 +3130,6 @@ Do you want to continue?"),
     }
 
     QnNetworkResourcePtr networkResource = widget->resource().dynamicCast<QnNetworkResource>();
-    QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 
     QString previousDir = qnSettings->lastExportDir();
     if (previousDir.isEmpty())
@@ -3157,7 +3145,7 @@ Do you want to continue?"),
             + mkvFileFilter
 #ifdef Q_OS_WIN
             + filterSeparator
-            + binaryFilterName(false)
+            + binaryFilterName()
 #endif
             ;
 
@@ -3183,7 +3171,7 @@ Do you want to continue?"),
 
         QnCheckboxControlAbstractDelegate* delegate = NULL;
 #ifdef Q_OS_WIN
-        delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(false), this);
+        delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
         dialog->addCheckBox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
         dialog->addCheckBox(tr("Video adjustment (Requires Transcoding)"), &contrastParams.enabled, delegate);
@@ -3252,7 +3240,7 @@ Do you want to continue?"),
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
 #ifdef Q_OS_WIN
-    if (selectedFilter.contains(binaryFilterName(false)))
+    if (selectedFilter.contains(binaryFilterName()))
     {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
@@ -3581,7 +3569,7 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
     }
     layout->setBackgroundSize(QSize(w, h));
 
-    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+    at_saveLayoutAction_triggered(layout);  //TODO: #GDM add background to snapshot manager and set modified flag instead
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceList &resources, int handle) {

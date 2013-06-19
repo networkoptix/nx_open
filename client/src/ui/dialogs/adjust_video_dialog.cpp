@@ -1,11 +1,11 @@
 #include "adjust_video_dialog.h"
 #include "ui_adjust_video_dialog.h"
-#include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include "ui/graphics/items/resource/media_resource_widget.h"
 
-QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, QnWorkbenchContext *context) :
-    base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+
+QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, Qt::WindowFlags windowFlags) :
+    base_type(parent, windowFlags),
     ui(new Ui::AdjustVideoDialog),
     m_updateDisabled(false),
     m_widget(0)
@@ -43,7 +43,7 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
     
     m_widget = widget;
     if (m_widget) {
-        m_widget->renderer()->setHystogramConsumer(getHystogramConsumer());
+        m_widget->renderer()->setHystogramConsumer(histogramConsumer());
         setParams(widget->imageEnhancement());
         m_widget->renderer()->disconnect(this);
         connect(m_widget->renderer(), SIGNAL(beforeDestroy()), this, SLOT(at_rendererDestryed()));
@@ -54,7 +54,7 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
     QString name = m_widget ? m_widget->resource()->toResource()->getName() : tr("[No item selected]");
     setWindowTitle(tr("Adjust video - %1").arg(name));
 
-    ui->histogramRenderer->setEnabled(m_widget != 0);
+    ui->histogramWidget->setEnabled(m_widget != 0);
     ui->enableAdjustment->setEnabled(m_widget != 0);
     ui->groupBox->setEnabled(m_widget != 0);
 }
@@ -81,7 +81,7 @@ void QnAdjustVideoDialog::at_sliderValueChanged()
     ui->whiteLevelsSpinBox->setValue(ui->whiteLevelsSlider->value() / (float) ui->whiteLevelsSlider->maximum() * ui->whiteLevelsSpinBox->maximum());
 
     m_updateDisabled = false;
-    uiToParams();
+    submit();
 }
 
 void QnAdjustVideoDialog::at_spinboxValueChanged()
@@ -96,10 +96,10 @@ void QnAdjustVideoDialog::at_spinboxValueChanged()
     ui->whiteLevelsSlider->setValue(ui->whiteLevelsSpinBox->value() / (float) ui->whiteLevelsSpinBox->maximum() * ui->whiteLevelsSlider->maximum());
 
     m_updateDisabled = false;
-    uiToParams();
+    submit();
 }
 
-void QnAdjustVideoDialog::uiToParams()
+void QnAdjustVideoDialog::submit()
 {
     ImageCorrectionParams newParams;
     newParams.enabled = ui->enableAdjustment->isChecked();
@@ -110,7 +110,7 @@ void QnAdjustVideoDialog::uiToParams()
     if (!(newParams == m_params)) {
         //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
         m_params = newParams;
-        ui->histogramRenderer->setHistogramParams(m_params);
+        ui->histogramWidget->setHistogramParams(m_params);
         if (m_widget)
             m_widget->setImageEnhancement(m_params);
     }
@@ -133,7 +133,7 @@ void QnAdjustVideoDialog::setParams(const ImageCorrectionParams& params)
 
     ui->gammaSlider->setEnabled(params.gamma != 0);
     ui->gammaSpinBox->setEnabled(params.gamma != 0);
-    ui->histogramRenderer->setHistogramParams(params);
+    ui->histogramWidget->setHistogramParams(params);
 
     m_updateDisabled = false;
     at_spinboxValueChanged();
@@ -142,7 +142,7 @@ void QnAdjustVideoDialog::setParams(const ImageCorrectionParams& params)
 void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
 {
     QDialogButtonBox::ButtonRole role = ui->buttonBox->buttonRole(button);
-    switch( role)
+    switch(role)
     {
         case QDialogButtonBox::ResetRole:
         {
@@ -168,15 +168,15 @@ void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
     }
 }
 
-QnHistogramConsumer* QnAdjustVideoDialog::getHystogramConsumer() const
+QnHistogramConsumer* QnAdjustVideoDialog::histogramConsumer() const
 {
-    return ui->histogramRenderer;
+    return ui->histogramWidget;
 }
 
-void QnAdjustVideoDialog::closeEvent( QCloseEvent * e )
+void QnAdjustVideoDialog::closeEvent(QCloseEvent *e)
 {
     if (m_widget)
         m_widget->setImageEnhancement(m_backupParams);
     setWidget(0);
-    QDialog::closeEvent(e);
+    base_type::closeEvent(e);
 }

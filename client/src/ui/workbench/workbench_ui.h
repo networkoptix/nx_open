@@ -56,10 +56,10 @@ class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAwa
 public:
     enum Flag {
         /** Whether controls should be hidden after a period without activity in zoomed mode. */
-        HideWhenZoomed = 0x1, 
+        HideWhenZoomed = 0x1,
 
         /** Whether controls should be hidden after a period without activity in normal mode. */
-        HideWhenNormal = 0x2, 
+        HideWhenNormal = 0x2,
 
         /** Whether controls affect viewport margins. */
         AdjustMargins = 0x4
@@ -216,7 +216,7 @@ private:
     void initGraphicsMessageBox();
 private slots:
     void updateHelpContext();
-    
+
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
@@ -244,7 +244,7 @@ private slots:
     void at_toggleThumbnailsAction_toggled(bool checked);
     void at_toggleCalendarAction_toggled(bool checked);
     void at_toggleSliderAction_toggled(bool checked);
-    
+
     void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
@@ -460,6 +460,8 @@ private:
     HoverFocusProcessor *m_calendarHidingProcessor;
 
     bool m_inCalendarGeometryUpdate;
+
+    qreal m_pinOffset;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)

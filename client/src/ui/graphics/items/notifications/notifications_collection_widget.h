@@ -16,7 +16,6 @@
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
 class QnNotificationItem;
-class HoverFocusProcessor;
 
 /**
  * An image button widget that displays thumbnail behind the button.
@@ -30,32 +29,14 @@ public:
     QnBlinkingImageButtonWidget(QGraphicsItem *parent = NULL);
 
 public slots:
-    void startBlinking() {
-        m_blinking = true;
-    }
-
-    void stopBlinking() {
-        m_blinking = false;
-    }
-
-    void updateToolTipVisibility();
-    void updateToolTipPosition();
-
+    void setNotificationCount(int count);
 protected:
     virtual void tick(int deltaMSecs) override;
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
 private:
-    void hideToolTip();
-    void showToolTip();
-
-private:
     bool m_blinking;
-
     bool m_blinkUp;
     qreal m_blinkProgress;
-
-    HoverFocusProcessor* m_hoverProcessor;
-    QnToolTipWidget* m_tooltipWidget;
 };
 
 
@@ -103,8 +84,6 @@ private:
     void loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
 
     QnNotificationItem* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
-
-    void updateBlinker();
 
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;

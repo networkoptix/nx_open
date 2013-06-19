@@ -41,8 +41,8 @@ namespace {
         return button;
     }
 
-    GraphicsLabel* newClockItem(QGraphicsItem *parent = NULL) {
-        GraphicsLabel* label = new GraphicsLabel(parent);
+    GraphicsLabel *newClockItem(QGraphicsItem *parent = NULL) {
+        GraphicsLabel *label = new GraphicsLabel(parent);
 
         QFont font;
         font.setPixelSize(30);
@@ -52,7 +52,7 @@ namespace {
         palette.setColor(QPalette::WindowText, qnGlobals->selectedFrameColor());
         label->setPalette(palette);
 
-        QnClockDataProvider* dp = new QnClockDataProvider(label);
+        QnClockDataProvider *dp = new QnClockDataProvider(label);
         QObject::connect(dp, SIGNAL(timeChanged(QString)), label, SLOT(setText(QString)));
         return label;
     }

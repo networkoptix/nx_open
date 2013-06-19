@@ -1,7 +1,5 @@
 #include "media_resource.h"
 #include "resource_media_layout.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-
 
 QString QnStreamQualityToString(QnStreamQuality value) {
     switch(value) {
@@ -66,11 +64,7 @@ const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractStr
     QString strVal = val.toString();
     if (strVal.isEmpty())
     {
-        const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*>(dataProvider);
-        if (archive == 0)
-            return &defaultVideoLayout;
-        else
-            return archive->getDPVideoLayout();
+        return &defaultVideoLayout;
     }
     else {
         if (m_customVideoLayout == 0)

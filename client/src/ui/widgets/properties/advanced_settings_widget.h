@@ -1,7 +1,9 @@
-#ifndef __ADVANCED_SETTINGS_WIDGET_H__
-#define __ADVANCED_SETTINGS_WIDGET_H__
+#ifndef QN_ADVANCED_SETTINGS_WIDGET_H
+#define QN_ADVANCED_SETTINGS_WIDGET_H
 
-#include "core/resource/camera_resource.h"
+#include <QtGui/QWidget>
+
+#include <core/resource/camera_resource.h>
 
 #include <QWidget>
 
@@ -9,9 +11,7 @@ namespace Ui {
     class AdvancedSettingsWidget;
 }
 
-
-class QnAdvancedSettingsWidget : public QWidget
-{
+class QnAdvancedSettingsWidget : public QWidget {
     Q_OBJECT
 public:
     QnAdvancedSettingsWidget(QWidget* parent = 0);
@@ -22,22 +22,25 @@ public:
 
     void updateFromResource(QnSecurityCamResourcePtr camera);
     void updateFromResources(QnVirtualCameraResourceList camera);
+
 signals:
     void dataChanged();
+
 private slots:
     void at_ui_DataChanged();
     void at_restoreDefault();
+
 private:
     void setKeepQualityVisible(bool value);
     void setQualitySlider(QnSecondaryStreamQuality quality);
     bool isKeepQualityVisible() const;
+
 private:
     enum SliderQuality {Quality_Low, Quality_Medium, Quality_High};
 
-	Q_DISABLE_COPY(QnAdvancedSettingsWidget)
     QScopedPointer<Ui::AdvancedSettingsWidget> ui;
-private:
     bool m_disableUpdate;
+    bool m_hasDualStreaming;
 };
 
-#endif // __ADVANCED_SETTINGS_WIDGET_H__
+#endif // QN_ADVANCED_SETTINGS_WIDGET_H

@@ -431,7 +431,7 @@ bool QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return false;
 
-    if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isEmpty() || m_needUpdateOnvifUrl)
+    if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isNull() || m_needUpdateOnvifUrl)
     {
         if (!fetchAndSetDeviceInformation(false) && getMediaUrl().isEmpty())
         {

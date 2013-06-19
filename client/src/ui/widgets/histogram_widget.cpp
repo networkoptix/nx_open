@@ -1,19 +1,16 @@
-#include "histogram_renderer.h"
+#include "histogram_widget.h"
 
 #include <QPainter>
 #include <QPen>
 
-#include "ui/style/globals.h"
 
-static const int X_OFFSET = 8;
+#include <ui/style/globals.h>
 
-QnHistogramRenderer::QnHistogramRenderer(QWidget* parent):
-    QWidget(parent)
-{
+QnHistogramWidget::QnHistogramWidget(QWidget *parent, Qt::WindowFlags windowFlags):
+    QWidget(parent, windowFlags)
+{}
 
-}
-
-void QnHistogramRenderer::setHistogramData(const ImageCorrectionResult& data)
+void QnHistogramWidget::setHistogramData(const ImageCorrectionResult& data)
 {
     if (data.filled) {
         m_data = data;
@@ -21,24 +18,24 @@ void QnHistogramRenderer::setHistogramData(const ImageCorrectionResult& data)
     }
 }
 
-void QnHistogramRenderer::setHistogramParams(const ImageCorrectionParams& params)
+void QnHistogramWidget::setHistogramParams(const ImageCorrectionParams& params)
 {
     m_params = params;
     update();
 }
 
-void QnHistogramRenderer::paintEvent( QPaintEvent * event )
+void QnHistogramWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
     
     p.setBrush(QBrush(Qt::Dense5Pattern));
     p.setPen(Qt::NoPen);
-    p.drawRect(QRect(X_OFFSET, 0, width()-X_OFFSET*2, height()-1));
+    p.drawRect(rect());
 
-    double w = width() - X_OFFSET*2;
+    double w = width();
     if (isEnabled() && m_params.enabled)
     {
-        const int* data = m_data.hystogram;
+        const int *data = m_data.hystogram;
         double yScale = INT_MAX;
         for (int i = 0; i < 256; ++i)
             yScale = qMin(yScale, height() / (double)data[i]);
@@ -48,20 +45,19 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
         QVector<QLine> lines;
         QVector<QLine> lines2;
 
-        for (int x = 0; x < width() - X_OFFSET*2; ++x)
+        for (int x = 0; x < width(); ++x)
         {
             double idx = x / w * 256.0;
             quint8 index = idx;
             quint8 index2 = index < 255 ? index+1 : 255;
             double idxFraq = (idx - index) * 100;
-            double value = (data[index]*(100-idxFraq) + data[index2]*idxFraq) / 100.0;
+            double value = (data[index] * (100 - idxFraq) + data[index2] * idxFraq) / 100.0;
 
 
             int curY = height() - value * yScale + 0.5;
-            lines << QLine(X_OFFSET + x, height(), X_OFFSET + x, curY);
-            if (x > X_OFFSET) {
-                lines2 << QLine(X_OFFSET + x-1, prevY-1, X_OFFSET + x-1, curY);
-            }
+            lines << QLine(x, height(), x, curY);
+            if (x > 0)
+                lines2 << QLine(x - 1, prevY - 1, x - 1, curY);
             prevY = curY;
         }
 
@@ -74,11 +70,10 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
         p.setPen(selectionColor.lighter());
         p.setBrush(selectionColor);
         double xScale = w / 256;
-        p.drawRect(QRect(qAbs(m_data.bCoeff*256.0)*xScale + X_OFFSET, 1,  256.0/m_data.aCoeff*xScale+0.5, height()));
+        p.drawRect(QRect(qAbs(m_data.bCoeff * 256.0) * xScale, 1,  256.0 / m_data.aCoeff * xScale + 0.5, height()));
         
         p.setPen(Qt::white);
-        QRect r(0,0, width() - X_OFFSET*2, height());
-        p.drawText(r, Qt::AlignRight, tr("Gamma %1").arg(m_data.gamma, 0, 'f', 2));
+        p.drawText(QRect(2, 2, width() - 4, height() - 4), Qt::AlignRight, tr("Gamma %1").arg(m_data.gamma, 0, 'f', 2));
     }
 
     QPen pen;
@@ -89,12 +84,9 @@ void QnHistogramRenderer::paintEvent( QPaintEvent * event )
     p.drawLine(width()/4, 0, width()/4, height());
     p.drawLine(width()/2, 0, width()/2, height());
     p.drawLine(width()/4*3, 0, width()/4*3, height());
-    p.drawLine(X_OFFSET, height()/2, width()-X_OFFSET, height()/2);
-    //p.drawLine(X_OFFSET, height()/4, width()-X_OFFSET, height()/4);
-    //p.drawLine(X_OFFSET, height()/4*3, width()-X_OFFSET, height()/4*3);
-    // 
+    p.drawLine(0, height()/2, width(), height()/2);
 
     p.setBrush(Qt::NoBrush);
     p.setPen(Qt::white);
-    p.drawRect(QRect(X_OFFSET, 0, width()-X_OFFSET*2, height()-1));
+    p.drawRect(QRect(0, 0, width() - 1, height() - 1));
 }
