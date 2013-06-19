@@ -72,7 +72,6 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     if (fields & QnBusiness::ActionParamsField) {
         QString soundUrl = model->actionParams().getSoundUrl();
-        qDebug() << "sound url changed" << soundUrl;
 
         bool speech = soundUrl.startsWith(speechPrefix);
         ui->speechRadioButton->setChecked(speech);
@@ -105,7 +104,6 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
 
     QnBusinessActionParameters params;
     params.setSoundUrl(soundUrl);
-    qDebug() << "sound url stored" << soundUrl;
     model()->setActionParams(params);
 }
 
