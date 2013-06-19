@@ -8,6 +8,7 @@
 
 #include <version.h>
 #include <EST_wave_aux.h>
+#include <festivalP.h>
 
 #include "text_to_wav.h"
 
@@ -229,14 +230,40 @@ public:
 
 Q_GLOBAL_STATIC( FestivalInitializer, festivalInitializer )
 
+static int my_festival_text_to_wave(const EST_String &text,EST_Wave &wave)
+{
+#if 0
+    /* Convert text to waveform */
+    LISP lutt;
+    EST_Wave *w;
+    
+    EST_String commandText = EST_String("(set! wave_utt (SynthText ")+
+					    quote_string(text,"\"","\\",1)+
+					    "))";
+    if (!festival_eval_command(commandText))
+	return FALSE;
+    lutt = siod_get_lval("wave_utt",NULL);
+    if (!utterance_p(lutt))
+	return FALSE;
+    w = get_utt_wave(utterance(lutt));
+    if (w == 0)
+	return FALSE;
+    wave = *w;
+    return TRUE;
+#else
+    return festival_text_to_wave( text, wave );
+#endif
+}
+
 static bool textToWavInternal( const QString& text, QIODevice* const dest )
 {
-    //festivalInitializer();
-    initFestival();
+    festivalInitializer();
+    //initFestival();
 
     // Convert to a waveform
     EST_Wave wave;
-    bool result = festival_text_to_wave( text.toAscii().constData(), wave );
+    EST_String srcText( text.toAscii().constData() );
+    bool result = my_festival_text_to_wave( srcText, wave );
 
     if( result )
     {
@@ -268,7 +295,7 @@ static bool textToWavInternal( const QString& text, QIODevice* const dest )
 #endif
     }
 
-    festival_tidy_up();
+    //festival_tidy_up();
 
     return result;
 }
@@ -285,6 +312,7 @@ TextToWaveServer::TextToWaveServer()
 
 TextToWaveServer::~TextToWaveServer()
 {
+    stop();
 }
 
 void TextToWaveServer::pleaseStop()
