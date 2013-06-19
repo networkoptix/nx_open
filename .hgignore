@@ -42,7 +42,6 @@ appserver/test/executions
 appserver/static
 appserver/setup/static
 appserver/setup/stage-env
-appserver/setup/*.properties
 appserver/entcontroller.conf
 appserver/setup/build
 appserver/version_maven.py
