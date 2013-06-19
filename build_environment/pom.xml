@@ -15,7 +15,7 @@
     <name>Build Environment for QT projects</name>
 
     <properties>
-        <libdir>${project.build.directory}</libdir>
+        <libdir>${project.build.directory}/${arch}</libdir>
         <rsync.skip>false</rsync.skip>
         <buildLib/>
     </properties>
@@ -74,7 +74,6 @@
 
     <build>
         <defaultGoal>compile</defaultGoal>
-        <directory>build</directory>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
