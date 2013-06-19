@@ -1,5 +1,10 @@
+
 #include "media_resource.h"
+
+#include <QImage>
+
 #include "resource_media_layout.h"
+
 
 QString QnStreamQualityToString(QnStreamQuality value) {
     switch(value) {

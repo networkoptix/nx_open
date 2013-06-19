@@ -1,5 +1,7 @@
+
 #include "notifications_collection_widget.h"
 
+#include <QApplication>
 #include <QtGui/QGraphicsLinearLayout>
 
 #include <business/business_strings_helper.h>
