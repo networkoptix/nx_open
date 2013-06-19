@@ -15,7 +15,7 @@ class QnAppServerNotificationCache : public QnAppServerFileCache
 public:
     explicit QnAppServerNotificationCache(QObject *parent = 0);
     ~QnAppServerNotificationCache();
-    
+
     bool storeSound(const QString &filePath, int maxLengthMSecs = -1, const QString &customTitle = QString());
     bool updateTitle(const QString &filename, const QString &title);
     void clear();
@@ -33,6 +33,7 @@ private slots:
     void at_fileRemoved(const QString &filename, bool ok);
 private:
     QnNotificationSoundModel* m_model;
+    QHash<QString, int> m_updatingFiles;
 };
 
 #endif // APP_SERVER_NOTIFICATION_CACHE_H
