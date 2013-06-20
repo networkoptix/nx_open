@@ -15,6 +15,8 @@ mac {
 }
 
 
+DEFINES += USE_NX_HTTP
+
 pb.name = Generating code from ${QMAKE_FILE_IN} to ${QMAKE_FILE_BASE}
 pb.input = PB_FILES
 pb.output = $${MOC_DIR}/${QMAKE_FILE_BASE}.pb.cc

@@ -1,6 +1,6 @@
 QT += widgets
 TEMPLATE = app
-DEFINES += CL_FORCE_LOGO
+DEFINES += CL_FORCE_LOGO USE_NX_HTTP
 TRANSLATIONS += ${basedir}/translations/client_en.ts \
 				${basedir}/translations/client_ru.ts \
 				${basedir}/translations/client_zh-CN.ts \
