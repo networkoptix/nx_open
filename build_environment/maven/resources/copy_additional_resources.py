@@ -15,8 +15,8 @@ def mkdir_p(path):
 
 for arch in ('x86', 'x64'):
     
-    distutils.dir_util.copy_tree('help', join('${project.build.directory}', arch, 'bin'))                        
-    shutils.rmtree('help')
+    distutils.dir_util.copy_tree('help', join('${project.build.directory}', arch, 'bin/help'))                        
+    #shutil.rmtree('help')
     
     for config in ('debug', 'release'):
 
@@ -40,5 +40,5 @@ for arch in ('x86', 'x64'):
                 print join(plugin_source_dir, qtplugin)
                 distutils.dir_util.copy_tree(join(plugin_source_dir, qtplugin), join(target_dir, qtplugin))                        
         
-        distutils.dir_util.copy_tree('festival.vox', target_dir)                        
-        shutil.rmtree('festival.vox')
+        distutils.dir_util.copy_tree('festival-vox', join(target_dir, 'festival-vox'))                        
+        #shutil.rmtree('festival-vox')
