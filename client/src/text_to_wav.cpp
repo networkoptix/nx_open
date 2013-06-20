@@ -210,7 +210,7 @@ static void initFestival()
 {
     //initializing festival engine
     //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
-    sprintf( festivalVoxPath, "%s/festival.vox/lib/", QCoreApplication::applicationDirPath().toLatin1().constData() );
+    sprintf( festivalVoxPath, "%s/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
     festival_libdir = festivalVoxPath;
 
     const int heap_size = 1510000;  // default scheme heap size

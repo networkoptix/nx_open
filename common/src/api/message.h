@@ -41,6 +41,8 @@ namespace Qn {
 
 struct QnMessage
 {
+    QnMessage(): eventType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online) {}
+
     Qn::Message_Type eventType;
     quint32 seqNumber;
 

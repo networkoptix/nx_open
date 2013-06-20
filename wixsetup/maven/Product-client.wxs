@@ -627,6 +627,9 @@
 									</Shortcut> -->
                                 </File>
                             </Component>
+                            <Component Id="TrayToolQjson" Guid="{df26c618-5a4a-4687-8c90-fac228c34d85}">
+                                <File Id="TrayToolQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
+                            </Component>			                            
                             <Component Id="TrayToolQTLibraries" Guid="b3bbeb5b-310a-4b10-b0bb-0e1193de80f5">
                                 <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll"  />
                                 <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll"  />

@@ -627,6 +627,9 @@
                                     </Shortcut>
                                 </File>
                             </Component>
+                            <Component Id="TrayToolQjson" Guid="{df26c618-5a4a-4687-8c90-fac228c34d85}">
+                                <File Id="TrayToolQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
+                            </Component>						                            
                             <Component Id="TrayToolQTLibraries" Guid="b3bbeb5b-310a-4b10-b0bb-0e1193de80f5">
                                 <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll"  />
                                 <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll"  />
@@ -842,7 +845,7 @@
                                     </Component>
                                 </Directory>	
 
-                                <Directory Id="${installer.customization}VoxDir" Name="festival.vox"/>                                
+                                <Directory Id="${installer.customization}VoxDir" Name="vox"/>                                
 
                                 <Component Id="ClientExecutable" Guid="{77621eff-6d51-4809-b41e-e605172e77ab}">
                                     <File Id="client.exe" Name="${product.name}.exe" Source="${libdir}/bin/${build.configuration}/client.exe" KeyPath="yes">
@@ -1059,6 +1062,7 @@
             <ComponentRef Id="traytool.exe"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
             <ComponentRef Id="TrayToolOpenSSL"/>
+            <ComponentRef Id="TrayToolQjson"/>
         </Feature>
 
         <Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
