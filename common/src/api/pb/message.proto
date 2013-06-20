@@ -90,6 +90,7 @@ message InitialMessage {
     repeated CameraServerItem cameraServerItem = 4;
     optional string hardwareId = 5;
     optional string oldHardwareId = 6;
+    optional string hardwareId2 = 7;
 }
 
 message FileAddMessage {
