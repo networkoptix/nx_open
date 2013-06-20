@@ -158,6 +158,9 @@
                                 <resource>
                                     <directory>${root.dir}/customization/${customization}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
+                                    <excludes>
+                                        <exclude>**/_unused/**</exclude>
+                                    </excludes>
                                 </resource>		                                
                             </resources>              
                             <encoding>UTF-8</encoding>

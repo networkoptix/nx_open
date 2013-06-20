@@ -29,6 +29,30 @@
         <defaultGoal>compile</defaultGoal>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>copy-cpp-resources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <directory>${root.dir}/cpp/maven/resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>	                      
+                            </resources>              
+                            <encoding>UTF-8</encoding>
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
