@@ -1,6 +1,6 @@
 #include "mserver_resource_discovery_manager.h"
 
-#include <QtCore/QtConcurrentMap>
+#include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
 #include "utils/common/sleep.h"
 #include "core/resource_managment/resource_searcher.h"

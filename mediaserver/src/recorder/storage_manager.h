@@ -1,11 +1,11 @@
 #ifndef __STORAGE_MANAGER_H__
 #define __STORAGE_MANAGER_H__
 
-#include <QString>
-#include <QMap>
-#include <QFile>
-#include <QMutex>
-#include <QTimer>
+#include <QtCore/QString>
+#include <QtCore/QMap>
+#include <QtCore/QFile>
+#include <QtCore/QMutex>
+#include <QtCore/QTimer>
 
 #include "recording/time_period_list.h"
 #include "device_file_catalog.h"

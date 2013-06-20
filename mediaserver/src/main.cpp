@@ -4,7 +4,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
 #include <QtCore/QUuid>
-#include <QThreadPool>
+#include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QHostAddress>

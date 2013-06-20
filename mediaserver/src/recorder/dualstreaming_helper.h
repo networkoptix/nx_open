@@ -1,7 +1,7 @@
 #ifndef __DUAL_STREAMING_HELPER_H__
 #define __DUAL_STREAMING_HELPER_H__
 
-#include <QMutex>
+#include <QtCore/QMutex>
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/resource_fwd.h"
 #include "core/resource/resource_media_layout.h"

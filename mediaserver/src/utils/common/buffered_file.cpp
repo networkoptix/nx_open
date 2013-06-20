@@ -1,4 +1,4 @@
-#include <QDir>
+#include <QtCore/QDir>
 
 extern "C"
 {

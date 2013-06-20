@@ -2,13 +2,13 @@
 #define _DEVICE_FILE_CATALOG_H___
 
 #include <QSharedPointer>
-#include <QFile>
-#include <QVector>
-#include <QMap>
+#include <QtCore/QFile>
+#include <QtCore/QVector>
+#include <QtCore/QMap>
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period.h"
-#include <QFileInfo>
+#include <QtCore/QFileInfo>
 
 class DeviceFileCatalog: public QObject
 {

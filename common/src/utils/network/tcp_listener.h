@@ -1,8 +1,6 @@
 #ifndef __TCP_LISTENER_H__
 #define __TCP_LISTENER_H__
 
-#define USE_NX_HTTP
-
 #include <QtCore/QObject>
 #ifdef USE_NX_HTTP
 #include "utils/network/http/httptypes.h"

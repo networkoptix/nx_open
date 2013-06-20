@@ -1,8 +1,6 @@
 #ifndef __TCP_CONNECTION_PROCESSOR_H__
 #define __TCP_CONNECTION_PROCESSOR_H__
 
-#define USE_NX_HTTP
-
 #include <QtCore/QMutex>
 #include <QtCore/QUrl>
 

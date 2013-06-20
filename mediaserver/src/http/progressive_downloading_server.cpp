@@ -1,8 +1,8 @@
 
 #include <memory>
 
-#include <QFileInfo>
-#include <QSettings>
+#include <QtCore/QFileInfo>
+#include <QtCore/QSettings>
 #include "progressive_downloading_server.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"

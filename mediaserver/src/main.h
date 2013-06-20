@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <QTimer>
+#include <QtCore/QTimer>
 #include "utils/common/long_runnable.h"
 #include "core/resource/media_server_resource.h"
 #include "http/progressive_downloading_server.h"

@@ -1,4 +1,4 @@
-#include <QMap>
+#include <QtCore/QMap>
 #include "rtsp_data_consumer.h"
 #include "core/datapacket/media_data_packet.h"
 #include "rtsp_connection.h"

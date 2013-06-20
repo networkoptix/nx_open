@@ -1,4 +1,4 @@
-#include <QDir>
+#include <QtCore/QDir>
 #include "storage_manager.h"
 #include "utils/common/util.h"
 #include "core/resource_managment/resource_pool.h"

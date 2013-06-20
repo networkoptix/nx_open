@@ -1,7 +1,7 @@
-#include <QString>
-#include <QUuid>
-#include <QDesktopServices>
-#include <QDir>
+#include <QtCore/QString>
+#include <QtCore/QUuid>
+#include <QtGui/QDesktopServices>
+#include <QtCore/QDir>
 
 #include "serverutil.h"
 #include "settings.h"

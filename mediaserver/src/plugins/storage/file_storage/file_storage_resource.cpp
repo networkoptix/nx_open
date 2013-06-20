@@ -1,7 +1,7 @@
 
 #include <iostream>
 
-#include <QDir>
+#include <QtCore/QDir>
 
 #include "file_storage_resource.h"
 #include "utils/common/util.h"

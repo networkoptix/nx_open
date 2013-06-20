@@ -511,7 +511,7 @@
             				<artifactId>qjson</artifactId>
 		 			<version>0.8.1-SNAPSHOT</version>
 					<type>zip</type>
-					<classifier>${platform}-${arch}-qt484</classifier>
+					<classifier>${platform}-${arch}-qt502</classifier>
 				</dependency>
 				<dependency>
 					<groupId>com.sourceforge.cloudcity</groupId>

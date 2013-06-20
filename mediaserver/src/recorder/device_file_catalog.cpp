@@ -1,4 +1,4 @@
-#include <QDir>
+#include <QtCore/QDir>
 #include "device_file_catalog.h"
 #include "storage_manager.h"
 #include "utils/common/util.h"
@@ -8,7 +8,7 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "motion/motion_helper.h"
-#include <QDebug>
+#include <QtCore/QDebug>
 #include "recording_manager.h"
 #include "serverutil.h"
 

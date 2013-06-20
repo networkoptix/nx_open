@@ -1,13 +1,13 @@
 
-#include <QUuid>
-#include <QSet>
-#include <QTextStream>
+#include <QtCore/QUuid>
+#include <QtCore/QSet>
+#include <QtCore/QTextStream>
 #ifndef USE_NX_HTTP
 #include <QHttpRequestHeader>
 #endif
-#include <QDebug>
-#include <QRegion>
-#include <QBuffer>
+#include <QtCore/QDebug>
+#include <QtGui/QRegion>
+#include <QtCore/QBuffer>
 
 #include "libavutil/avutil.h"
 #include "libavcodec/avcodec.h"

@@ -1,15 +1,15 @@
 #ifndef __FILE_DELETOR_H__
 #define __FILE_DELETOR_H__
 
-#include <QTime>
-#include <QDir>
-#include <QQueue>
-#include <QFile>
-#include <QString>
-#include <QMutex>
-#include <QStringList>
-#include <QThread>
-#include <QTimer>
+#include <QtCore/QTime>
+#include <QtCore/QDir>
+#include <QtCore/QQueue>
+#include <QtCore/QFile>
+#include <QtCore/QString>
+#include <QtCore/QMutex>
+#include <QtCore/QStringList>
+#include <QtCore/QThread>
+#include <QtCore/QTimer>
 #include "utils/common/long_runnable.h"
 
 class QnFileDeletor: public QnLongRunnable

@@ -1,6 +1,6 @@
 #include "motion_archive.h"
-#include <QDateTime>
-#include <QDir>
+#include <QtCore/QDateTime>
+#include <QtCore/QDir>
 #include "utils/common/util.h"
 #include "motion_helper.h"
 

@@ -1,9 +1,9 @@
 #ifndef __MOTION_HELPER_H__
 #define __MOTION_HELPER_H__
 
-#include <QObject>
-#include <QRegion>
-#include <QMap>
+#include <QtCore/QObject>
+#include <QtGui/QRegion>
+#include <QtCore/QMap>
 #include "utils/media/sse_helper.h"
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/network_resource.h"
