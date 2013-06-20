@@ -256,14 +256,14 @@ QList<QByteArray> QnLicenseList::allLicenseKeys() const
     return result;
 }
 
-void QnLicenseList::setHardwareId(const QByteArray &hardwareId)
+void QnLicenseList::setHardwareId1(const QByteArray &hardwareId1)
 {
-    m_hardwareId = hardwareId;
+    m_hardwareId1 = hardwareId1;
 }
 
-QByteArray QnLicenseList::hardwareId() const
+QByteArray QnLicenseList::hardwareId1() const
 {
-    return m_hardwareId;
+    return m_hardwareId1;
 }
 
 void QnLicenseList::setOldHardwareId(const QByteArray &oldHardwareId)
@@ -289,14 +289,20 @@ QByteArray QnLicenseList::hardwareId2() const
 void QnLicenseList::append(QnLicensePtr license)
 {
     if (m_licenses.contains(license->key())) {
-        // Update if resulting license is valid with newHardwareId
-        if (license->isValid(m_hardwareId))
+        // Update if resulting license is valid with current hardwareId
+        if (license->isValid(m_hardwareId2))
             m_licenses[license->key()] = license;
 
         return;
     }
 
-    if (license->isValid(m_hardwareId) || license->isValid(m_oldHardwareId))
+    // We allow adding any valid license by now.
+    // So, user can game us as follows:
+    // 1. Activate license with v1.4, 
+    //    activation will be bound to the old hardware id, which is stored in registry
+    // 2. Clone the system
+    // 3. Re-Activate the license on all clones
+    if (license->isValid(m_hardwareId2) || license->isValid(m_hardwareId1) || license->isValid(m_oldHardwareId))
         m_licenses.insert(license->key(), license);
 }
 
@@ -388,8 +394,9 @@ void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
 {
     QMutexLocker locker(&m_mutex);
 
-    m_licenses.setHardwareId(licenses.hardwareId());
+    m_licenses.setHardwareId1(licenses.hardwareId1());
     m_licenses.setOldHardwareId(licenses.oldHardwareId());
+    m_licenses.setHardwareId2(licenses.hardwareId2());
     m_licenses.clear();
     foreach (QnLicensePtr license, licenses.licenses())
         m_licenses.append(license);

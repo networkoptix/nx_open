@@ -91,8 +91,8 @@ private:
 class QnLicenseList
 {
 public:
-    void setHardwareId(const QByteArray& hardwareId);
-    QByteArray hardwareId() const;
+    void setHardwareId1(const QByteArray& hardwareId);
+    QByteArray hardwareId1() const;
 
     void setOldHardwareId(const QByteArray& oldHardwareId);
     QByteArray oldHardwareId() const;
@@ -128,8 +128,13 @@ private:
     int totalCamerasByClass(bool analog) const;
 
     QMap<QByteArray, QnLicensePtr> m_licenses;
-    QByteArray m_hardwareId;
+    // The one 1.5 uses
+    QByteArray m_hardwareId1;
+
+    // Pre 1.5
 	QByteArray m_oldHardwareId;
+
+    // The one 1.6 uses
     QByteArray m_hardwareId2;
 };
 
