@@ -148,7 +148,7 @@ public:
         delete dataProcessor;
         dataProcessor = 0;
 
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes->toResourcePtr());
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes->toResourcePtr()); // crashed here with access vialation reading loacation 0x000000000... (mediaRes = 0)
         if (camera)
             camera->notInUse(this);
     }
