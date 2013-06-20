@@ -23,7 +23,7 @@ public:
         FreeLicense,
         TrialLicense,
         AnalogLicense,
-        EnterpriseLicense,
+        ProfessionalLicense,
         TypeCount
     };
 
