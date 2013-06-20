@@ -536,7 +536,6 @@ bool QnDesktopFileEncoder::init()
     if (m_encodeQualuty == 1)
     {
         m_videoCodecCtx->has_b_frames = 1;
-        m_videoCodecCtx->max_b_frames = 2;
         m_videoCodecCtx->level = 50;
         //m_videoCodecCtx->me_threshold = 0;
         //m_videoCodecCtx->intra_dc_precision = 0;
