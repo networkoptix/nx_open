@@ -188,10 +188,7 @@
 								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="false">
 									<filelist dir="${project.build.directory}" files="template.pro"/>
 								</concat>	
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}</echo>
-								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="true">
-									<filelist dir="${project.build.directory}" files="${project.artifactId}-specifics.pro"/>
-								</concat>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}</echo>							
 
 								<dirset id="includes_path" dir="${libdir}/build/include" includes="*" erroronmissingdir="false"/>
 								<pathconvert pathsep="${line.separator}" property="includes" refid="includes_path">
@@ -306,7 +303,11 @@
 									<map from="" to="PB_FILES += "/>
 								</pathconvert>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${proto}</echo>
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}</echo>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}</echo>			
+
+								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="true">
+									<filelist dir="${project.build.directory}" files="${project.artifactId}-specifics.pro"/>
+								</concat>	                                
 							</target>
 						</configuration>
 					</execution>				

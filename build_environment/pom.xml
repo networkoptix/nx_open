@@ -73,10 +73,10 @@
             <classifier>${platform}</classifier>
         </dependency>                               	
 		<dependency>
-			<groupId>org</groupId>
+			<groupId>org.festival</groupId>
 			<artifactId>festival-vox</artifactId>
 			<version>${festival.version}</version>
-			<type>tar.gz</type>
+			<type>zip</type>
 			<classifier>all-os</classifier>
 		</dependency>                         
     </dependencies>		
