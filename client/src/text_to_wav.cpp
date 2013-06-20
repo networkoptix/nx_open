@@ -8,7 +8,6 @@
 
 #include <version.h>
 #include <EST_wave_aux.h>
-#include <festivalP.h>
 
 #include "text_to_wav.h"
 
@@ -209,14 +208,14 @@ namespace
 
 static void initFestival()
 {
-        //initializing festival engine
-        //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
-        sprintf( festivalVoxPath, "%s/festival.vox/lib/", QCoreApplication::applicationDirPath().toLatin1().constData() );
-        festival_libdir = festivalVoxPath;
+    //initializing festival engine
+    //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
+    sprintf( festivalVoxPath, "%s/festival.vox/lib/", QCoreApplication::applicationDirPath().toLatin1().constData() );
+    festival_libdir = festivalVoxPath;
 
-        const int heap_size = 210000;  // default scheme heap size
-        const int load_init_files = 1; // we want the festival init files loaded
-        festival_initialize( load_init_files, heap_size );
+    const int heap_size = 1510000;  // default scheme heap size
+    const int load_init_files = 1; // we want the festival init files loaded
+    festival_initialize( load_init_files, heap_size );
 }
 
 class FestivalInitializer
@@ -226,40 +225,20 @@ public:
     {
         initFestival();
     }
-};
 
-Q_GLOBAL_STATIC( FestivalInitializer, festivalInitializer )
+    ~FestivalInitializer()
+    {
+        festival_tidy_up();
+    }
+};
 
 static int my_festival_text_to_wave(const EST_String &text,EST_Wave &wave)
 {
-#if 0
-    /* Convert text to waveform */
-    LISP lutt;
-    EST_Wave *w;
-    
-    EST_String commandText = EST_String("(set! wave_utt (SynthText ")+
-					    quote_string(text,"\"","\\",1)+
-					    "))";
-    if (!festival_eval_command(commandText))
-	return FALSE;
-    lutt = siod_get_lval("wave_utt",NULL);
-    if (!utterance_p(lutt))
-	return FALSE;
-    w = get_utt_wave(utterance(lutt));
-    if (w == 0)
-	return FALSE;
-    wave = *w;
-    return TRUE;
-#else
     return festival_text_to_wave( text, wave );
-#endif
 }
 
 static bool textToWavInternal( const QString& text, QIODevice* const dest )
 {
-    festivalInitializer();
-    //initFestival();
-
     // Convert to a waveform
     EST_Wave wave;
     EST_String srcText( text.toAscii().constData() );
@@ -294,8 +273,6 @@ static bool textToWavInternal( const QString& text, QIODevice* const dest )
         result = save_wave_riff( dest, wave.values().memory(), 0, wave.num_samples(), wave.num_channels(), wave.sample_rate(), st_short, EST_NATIVE_BO ) == write_ok;
 #endif
     }
-
-    //festival_tidy_up();
 
     return result;
 }
@@ -352,6 +329,8 @@ void TextToWaveServer::run()
 {
     saveSysThreadID();
 
+    FestivalInitializer festivalInitializer;
+
     while( !needToStop() )
     {
         QSharedPointer<SynthetiseSpeechTask> task;
@@ -370,8 +349,6 @@ void TextToWaveServer::run()
         emit done( task->id, task->result );
     }
 }
-
-//Motion has been detected on TestCameraLive
 
 QSharedPointer<TextToWaveServer::SynthetiseSpeechTask> TextToWaveServer::addTaskToQueue( const QString& text, QIODevice* const dest )
 {

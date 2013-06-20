@@ -999,10 +999,12 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.resource.path = zoomTargetWidget->resource()->toResource()->getUniqueId();
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.zoomRect = zoomRect;
-
+    
+    QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;
 
     workbench()->currentLayout()->resource()->addItem(data);
+    display()->widget(data.uuid)->setCheckedButtons(buttons);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
