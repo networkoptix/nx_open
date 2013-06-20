@@ -221,15 +221,15 @@ QnLicense::Type QnLicense::type() const {
     if (xclass().toLower() == QLatin1String("analog"))
         return AnalogLicense;
 
-    return EnterpriseLicense;
+    return ProfessionalLicense;
 }
 
 QString QnLicense::typeName() const {
     switch(type()) {
-    case FreeLicense:       return tr("Free");
-    case TrialLicense:      return tr("Trial");
-    case AnalogLicense:     return tr("Analog");
-    case EnterpriseLicense: return tr("Enterprise");
+    case FreeLicense:           return tr("Free");
+    case TrialLicense:          return tr("Trial");
+    case AnalogLicense:         return tr("Analog");
+    case ProfessionalLicense:   return tr("Professional");
     default:
         assert(false);
         return QString();
