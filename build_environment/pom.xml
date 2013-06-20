@@ -63,13 +63,13 @@
 			<type>zip</type>
 			<classifier>${platform}-${arch}</classifier>
 		</dependency>                               	
-		<!--<dependency>
-			<groupId>org</groupId>
+		<dependency>
+			<groupId>org.festival</groupId>
 			<artifactId>festival-vox</artifactId>
 			<version>${festival.version}</version>
-			<type>tar.gz</type>
+			<type>zip</type>
 			<classifier>all-os</classifier>
-		</dependency>                         -->
+		</dependency>                         
 	</dependencies>		
 
 	<build>
@@ -238,14 +238,7 @@
 										<targetPath>${project.build.directory}/bin/release</targetPath>
 									</targetPaths>
 									<file>${basedir}/../quicksyncdecoder/hw_decoding_conf.xml</file>
-								</resource>								
-								<resource>
-									<targetPaths>
-										<targetPath>${project.build.directory}/bin/debug/festival.vox</targetPath>
-										<targetPath>${project.build.directory}/bin/release/festival.vox</targetPath>
-									</targetPaths>
-									<directory>${environment.dir}/festival.vox/lib</directory>
-								</resource>                                
+								</resource>								                             
 							</resources>						
 						</configuration>
 					</execution>
