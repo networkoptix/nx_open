@@ -76,7 +76,7 @@
 			<groupId>org.festival</groupId>
 			<artifactId>festival-vox</artifactId>
 			<version>${festival.version}</version>
-			<type>zip</type>
+			<type>tar.gz</type>
 			<classifier>all-os</classifier>
 		</dependency>                         
     </dependencies>		
@@ -109,7 +109,7 @@
                     </execution>
                     <execution>
                         <id>update-buildenv</id>
-                        <phase>process-sources</phase>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -124,7 +124,7 @@
                     </execution>          
                     <execution>
                         <id>copy-additional-resources</id>
-                        <phase>generate-resources</phase>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -145,7 +145,7 @@
                 <executions>
                     <execution>
                         <id>unpack-platform-libs</id>
-                        <phase>process-sources</phase>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
                         </goals>

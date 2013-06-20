@@ -20,7 +20,7 @@
 	<packaging>pom</packaging>
 	<name>HD Witness Client</name>
 
-	<properties>
+	<properties>  
 		<product.title>${client.name}</product.title>
 		<!--Global libs-->
 		<global.libs/>

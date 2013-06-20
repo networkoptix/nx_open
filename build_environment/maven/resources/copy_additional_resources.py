@@ -40,5 +40,5 @@ for arch in ('x86', 'x64'):
                 print join(plugin_source_dir, qtplugin)
                 distutils.dir_util.copy_tree(join(plugin_source_dir, qtplugin), join(target_dir, qtplugin))                        
         
-        distutils.dir_util.copy_tree('festival-vox', join(target_dir, 'festival-vox'))                        
+        distutils.dir_util.copy_tree('vox', join(target_dir, 'vox'))                        
         #shutil.rmtree('festival-vox')
