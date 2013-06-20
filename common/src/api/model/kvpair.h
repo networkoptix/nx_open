@@ -4,7 +4,7 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QMetaType>
+#include <QtCore/QMetaType>
 
 
 class QnKvPair {

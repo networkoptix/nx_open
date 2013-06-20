@@ -3,8 +3,8 @@
 
 #include <QtCore/QAbstractItemModel>
 
-#include <QtGui/QWidget>
-#include <QtGui/QItemSelectionModel>
+#include <QtWidgets/QWidget>
+#include <QtCore/QItemSelectionModel>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_managment/resource_criterion.h>

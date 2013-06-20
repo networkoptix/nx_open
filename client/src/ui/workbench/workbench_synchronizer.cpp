@@ -54,7 +54,7 @@ void QnWorkbenchSynchronizer::submit() {
         if(resource.isNull()) { 
             /* This actually is a newly created layout. */
             resource = QnLayoutResourcePtr(new QnLayoutResource());
-            resource->setGuid(QUuid::createUuid());
+            resource->setGuid(QUuid::createUuid().toString());
 
             QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(layout, resource, this);
             synchronizer->setAutoDeleting(true);

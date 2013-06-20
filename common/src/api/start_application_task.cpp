@@ -4,7 +4,7 @@
 
 #include "start_application_task.h"
 
-#include <QList>
+#include <QtCore/QList>
 
 
 namespace applauncher

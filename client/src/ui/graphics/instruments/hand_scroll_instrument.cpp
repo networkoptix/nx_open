@@ -1,11 +1,11 @@
 #include "hand_scroll_instrument.h"
 
 #include <QtGui/QMouseEvent>
-#include <QtGui/QWidget>
-#include <QtGui/QScrollBar>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QApplication>
-#include <QtGui/QGraphicsObject>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QScrollBar>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsObject>
 
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/animation/animation_event.h>

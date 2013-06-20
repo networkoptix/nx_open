@@ -1,4 +1,4 @@
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "axis_resource.h"
 #include "axis_stream_reader.h"
 #include "axis_resource.h"

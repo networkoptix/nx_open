@@ -1,7 +1,7 @@
 #ifndef QN_CAM_DISPLAY_H
 #define QN_CAM_DISPLAY_H
 
-#include <QTime>
+#include <QtCore/QTime>
 
 #include "decoders/video/abstractdecoder.h"
 #include "video_stream_display.h"

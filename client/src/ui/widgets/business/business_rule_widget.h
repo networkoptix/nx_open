@@ -1,7 +1,7 @@
 #ifndef BUSINESS_RULE_WIDGET_H
 #define BUSINESS_RULE_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include <business/business_fwd.h>
 #include <business/business_event_rule.h>

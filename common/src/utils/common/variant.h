@@ -11,9 +11,11 @@ inline T qvariant_cast(const QVariant &v, const T &defaultValue) {
     if (vid == v.userType())
         return *reinterpret_cast<const T *>(v.constData());
     if (vid < int(QMetaType::User)) {
-        T t;
-        if (qvariant_cast_helper(v, QVariant::Type(vid), &t))
-            return t;
+        //T t;
+        //if (qvariant_cast_helper(v, QVariant::Type(vid), &t))
+        //    return t;
+        if( v.canConvert(QVariant::Type(vid)) )
+            return v.value<T>();
     }
     return defaultValue;
 }

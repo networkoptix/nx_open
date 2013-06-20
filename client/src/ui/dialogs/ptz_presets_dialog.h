@@ -1,7 +1,7 @@
 #ifndef QN_PTZ_PRESETS_DIALOG_H
 #define QN_PTZ_PRESETS_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 #include <core/resource/resource_fwd.h>
 

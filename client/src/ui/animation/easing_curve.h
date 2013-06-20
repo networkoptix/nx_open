@@ -1,7 +1,7 @@
 #ifndef QN_EASING_CURVE_H
 #define QN_EASING_CURVE_H
 
-#include <QEasingCurve>
+#include <QtCore/QEasingCurve>
 
 enum QnEasingCurve
 {

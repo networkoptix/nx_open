@@ -2,7 +2,7 @@
 
 #include <QtCore/QAbstractEventDispatcher>
 #include <QtCore/QCoreApplication>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>

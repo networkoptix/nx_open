@@ -1,9 +1,9 @@
 
 #include "ip_range_checker.h"
 
-#include <QTcpSocket>
-#include <QThreadPool>
-#include <QtConcurrentMap>
+#include <QtNetwork/QTcpSocket>
+#include <QtCore/QThreadPool>
+#include <QtConcurrent/QtConcurrentMap>
 
 #include "../common/sleep.h"
 #include "socket.h"

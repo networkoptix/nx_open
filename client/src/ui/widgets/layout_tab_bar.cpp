@@ -3,8 +3,8 @@
 #include <QtCore/QVariant>
 
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QStyle>
-#include <QtGui/QMenu>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QMenu>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>

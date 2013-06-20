@@ -594,7 +594,11 @@ void QnProgressiveDownloadingConsumer::run()
 
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
+#ifdef USE_NX_HTTP
+        d->response.headers["Cache-Control"] = "no-cache";
+#else
         d->responseHeaders.setValue("Cache-Control", "no-cache");
+#endif
         sendResponse("HTTP", CODE_OK, mimeType);
 
         //dataConsumer.sendResponse();

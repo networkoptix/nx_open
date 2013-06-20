@@ -1,7 +1,7 @@
 #include "histogram_widget.h"
 
-#include <QPainter>
-#include <QPen>
+#include <QtGui/QPainter>
+#include <QtGui/QPen>
 
 
 #include <ui/style/globals.h>

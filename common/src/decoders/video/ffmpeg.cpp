@@ -1,6 +1,6 @@
 #include "ffmpeg.h"
 
-#include <QThread>
+#include <QtCore/QThread>
 
 #include "utils/media/nalUnits.h"
 

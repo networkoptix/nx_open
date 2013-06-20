@@ -1,7 +1,7 @@
 #ifndef QN_HISTOGRAM_WIDGET_H
 #define QN_HISTOGRAM_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <utils/color_space/image_correction.h>
 

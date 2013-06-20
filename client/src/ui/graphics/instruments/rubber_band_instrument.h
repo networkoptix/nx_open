@@ -1,10 +1,10 @@
 #ifndef QN_RUBBER_BAND_INSTRUMENT_H
 #define QN_RUBBER_BAND_INSTRUMENT_H
 
-#include <QScopedPointer>
-#include <QPoint>
-#include <QRect>
-#include <QSet>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QPoint>
+#include <QtCore/QRect>
+#include <QtCore/QSet>
 #include "drag_processing_instrument.h"
 
 class QGraphicsItem;

@@ -1,7 +1,7 @@
 #ifndef SELECT_CAMERAS_DIALOG_H
 #define SELECT_CAMERAS_DIALOG_H
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 #include <core/resource/resource_fwd.h>
 

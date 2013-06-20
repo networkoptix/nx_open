@@ -1,6 +1,6 @@
 #include "viewport_geometry_accessor.h"
-#include <QGraphicsView>
-#include <QVariant>
+#include <QtWidgets/QGraphicsView>
+#include <QtCore/QVariant>
 #include <utils/common/checked_cast.h>
 #include <ui/common/scene_transformations.h>
 

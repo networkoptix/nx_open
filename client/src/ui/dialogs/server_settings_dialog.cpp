@@ -5,14 +5,14 @@
 
 #include <QtCore/QUuid>
 #include <QtCore/QDir>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QStandardItemModel>
-#include <QtGui/QStyledItemDelegate>
-#include <QtGui/QSlider>
-#include <QtGui/QLabel>
-#include <QPainter>
-#include <QMenu>
-#include <QMouseEvent>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QLabel>
+#include <QtGui/QPainter>
+#include <QtWidgets/QMenu>
+#include <QtGui/QMouseEvent>
 
 #include <utils/common/counter.h>
 #include <utils/common/string.h>

@@ -3,7 +3,7 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 #include <QtGui/QStandardItem>
 
 #include <ui/workbench/workbench_context_aware.h>

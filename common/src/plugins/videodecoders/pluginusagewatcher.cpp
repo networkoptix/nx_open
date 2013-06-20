@@ -4,8 +4,8 @@
 
 #include "pluginusagewatcher.h"
 
-#include <QDateTime>
-#include <QMutexLocker>
+#include <QtCore/QDateTime>
+#include <QtCore/QMutexLocker>
 
 
 static const size_t SHARED_MEMORY_SIZE = 16*1024;

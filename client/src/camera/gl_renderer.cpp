@@ -11,7 +11,7 @@
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QScopedPointer>
 #include <QtCore/QMutex>
-#include <QtGui/QErrorMessage>
+#include <QtWidgets/QErrorMessage>
 
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>

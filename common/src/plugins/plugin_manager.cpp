@@ -10,9 +10,9 @@
 #include <algorithm>
 #include <set>
 
-#include <QAtomicPointer>
-#include <QCoreApplication>
-#include <QDir>
+#include <QtCore/QAtomicPointer>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QDir>
 
 #include "../decoders/abstractclientplugin.h"
 #include "../decoders/abstractvideodecoderplugin.h"
@@ -31,13 +31,13 @@ public:
 
     ~PluginManagerWrapper()
     {
-        delete m_pluginManager;
-        m_pluginManager = NULL;
+        delete m_pluginManager.load();
+        m_pluginManager.store(NULL);
     }
 
     PluginManager* getPluginManager( const QString& pluginDir )
     {
-        if( !m_pluginManager )
+        if( !m_pluginManager.load() )
         {
             PluginManager* newInstance = new PluginManager( pluginDir );
             if( !m_pluginManager.testAndSetOrdered( NULL, newInstance ) )
@@ -45,7 +45,7 @@ public:
             //else
             //    newInstance->loadPlugins();
         }
-        return m_pluginManager;
+        return m_pluginManager.load();
     }
 
 private:

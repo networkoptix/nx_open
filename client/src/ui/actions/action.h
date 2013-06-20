@@ -3,7 +3,7 @@
 
 #include <QtCore/QWeakPointer>
 #include <QtCore/QMetaType>
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>

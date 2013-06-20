@@ -4,7 +4,7 @@
 #include <QtCore/QProcess>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
 
 QString QnEnvironment::searchInPath(QString executable) {

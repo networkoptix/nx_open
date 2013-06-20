@@ -7,7 +7,7 @@
 
 #include <algorithm>
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #ifdef _WIN32
 #include <D3D9.h>
@@ -697,7 +697,7 @@ public:
 
     virtual void run()
     {
-        DecodedPictureToOpenGLUploader::UploadedPicture* const pictureBuf = m_pictureBuf;
+        DecodedPictureToOpenGLUploader::UploadedPicture* const pictureBuf = m_pictureBuf.load();
 
         {
             QMutexLocker lk( &m_mutex );
@@ -722,7 +722,7 @@ public:
         }
 
         ImageCorrectionParams imCor = m_uploader->getImageCorrection();
-        m_pictureBuf->processImage(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
+        m_pictureBuf.load()->processImage(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
 
 #ifdef GL_COPY_AGGREGATION
         if( !m_uploader->uploadDataToGlWithAggregation(
@@ -782,17 +782,17 @@ public:
     {
         QMutexLocker lk( &m_mutex );
 
-        if( !m_pictureBuf )
+        if( !m_pictureBuf.load() )
             return false;
 
         if( prevPicPts )
-            *prevPicPts = m_pictureBuf->m_pts;
-        m_pictureBuf->m_sequence = picSequence;
-        m_pictureBuf->m_pts = decodedPicture->pkt_dts;
-        m_pictureBuf->m_width = decodedPicture->width;
-        m_pictureBuf->m_height = decodedPicture->height;
-        m_pictureBuf->m_metadata = decodedPicture->metadata;
-        m_pictureBuf->m_displayedRect = displayedRect;
+            *prevPicPts = m_pictureBuf.load()->m_pts;
+        m_pictureBuf.load()->m_sequence = picSequence;
+        m_pictureBuf.load()->m_pts = decodedPicture->pkt_dts;
+        m_pictureBuf.load()->m_width = decodedPicture->width;
+        m_pictureBuf.load()->m_height = decodedPicture->height;
+        m_pictureBuf.load()->m_metadata = decodedPicture->metadata;
+        m_pictureBuf.load()->m_displayedRect = displayedRect;
         m_picDataRef = picDataRef;
 
         return true;

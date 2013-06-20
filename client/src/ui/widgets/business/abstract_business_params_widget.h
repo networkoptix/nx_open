@@ -1,7 +1,7 @@
 #ifndef ABSTRACT_BUSINESS_PARAMS_WIDGET_H
 #define ABSTRACT_BUSINESS_PARAMS_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include <business/business_fwd.h>
 #include <ui/models/business_rules_view_model.h>

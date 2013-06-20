@@ -7,7 +7,7 @@
 
 #include <algorithm>
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 
 using namespace std;
@@ -126,7 +126,7 @@ QModelIndex	FoundEnterpriseControllersModel::parent( const QModelIndex& index ) 
     if( foundModuleIndex >= static_cast<int>(m_foundModules.size()) )
         return QModelIndex();
 
-    return createIndex( foundModuleIndex, 0, 0 );
+    return createIndex( foundModuleIndex, 0, (void*)0 );
 }
 
 int FoundEnterpriseControllersModel::columnCount( const QModelIndex& index ) const
@@ -262,7 +262,7 @@ QModelIndex	FoundEnterpriseControllersModel::indexNonSafe( int row, int column, 
     {
         if( row >= static_cast<int>(m_foundModules.size()) )
             return QModelIndex();
-        return createIndex( row, column, 0 );
+        return createIndex( row, column, (void*)0 );
     }
     else
     {

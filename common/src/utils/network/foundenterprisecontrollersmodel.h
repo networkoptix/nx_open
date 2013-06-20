@@ -8,8 +8,8 @@
 
 #include <vector>
 
-#include <QAbstractListModel>
-#include <QMutex>
+#include <QtCore/QAbstractListModel>
+#include <QtCore/QMutex>
 
 #include <utils/network/networkoptixmodulefinder.h>
 

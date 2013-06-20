@@ -2,8 +2,8 @@
 
 #include <cmath> /* For std::sqrt. */
 
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsScale>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsScale>
 
 #include <utils/math/fuzzy.h>
 #include <utils/common/scoped_value_rollback.h>

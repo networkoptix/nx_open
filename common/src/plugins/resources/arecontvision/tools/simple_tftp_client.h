@@ -1,6 +1,6 @@
 #ifndef __SIMPLE_TFTP_CLIENT__1117
 #define __SIMPLE_TFTP_CLIENT__1117
-#include <QString>
+#include <QtCore/QString>
 #include "utils/network/socket.h"
 
 class QnByteArray;

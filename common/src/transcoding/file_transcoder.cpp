@@ -5,10 +5,10 @@
 
 #include "file_transcoder.h"
 
-#include <QDir>
-#include <QMutexLocker>
-#include <QDir>
-#include <QFileInfo>
+#include <QtCore/QDir>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 
 #include <core/resource/resource.h>
 

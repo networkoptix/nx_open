@@ -1,7 +1,7 @@
 #ifndef RESOURCE_TREE_DIALOG_H
 #define RESOURCE_TREE_DIALOG_H
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 #include "core/resource/resource_fwd.h"
 

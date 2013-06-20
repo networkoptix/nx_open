@@ -2,7 +2,7 @@
 #define VIDEORECORDINGDIALOG_H
 
 #include <QtCore/QScopedPointer>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include "ui/screen_recording/video_recorder_settings.h"
 

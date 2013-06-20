@@ -1,8 +1,8 @@
 #ifndef TREEVIEWCOMBOBOX_H
 #define TREEVIEWCOMBOBOX_H
 
-#include <QtGui/QComboBox>
-#include <QtGui/QTreeView>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QTreeView>
 
 class QnTreeViewComboBox : public QComboBox 
 {

@@ -1,6 +1,6 @@
 
 #include "security_cam_resource.h"
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
@@ -157,7 +157,7 @@ void QnSecurityCamResource::initializationDone()
 {
     QMutexLocker lk( &m_mutex );
 
-    if( m_inputPortListenerCount > 0 )
+    if( m_inputPortListenerCount.load() > 0 )
         startInputPortMonitoring();
 }
 
@@ -352,7 +352,7 @@ void QnSecurityCamResource::inputPortListenerDetached()
 {
     QMutexLocker lk( &m_mutex );
  
-    if( m_inputPortListenerCount <= 0 )
+    if( m_inputPortListenerCount.load() <= 0 )
         return;
 
     int result = m_inputPortListenerCount.fetchAndAddOrdered( -1 );

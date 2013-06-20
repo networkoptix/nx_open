@@ -2,7 +2,7 @@
 #define SERVER_SETTINGS_DIALOG_H
 
 #include <QtCore/QWeakPointer>
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 #include <core/resource/resource_fwd.h>
 

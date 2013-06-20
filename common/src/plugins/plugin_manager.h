@@ -8,13 +8,13 @@
 #ifndef PLUGIN_MANAGER_H
 #define PLUGIN_MANAGER_H
 
-#include <QObject>
-#include <QList>
-#include <QMutex>
-#include <QMutexLocker>
-#include <QPluginLoader>
+#include <QtCore/QObject>
+#include <QtCore/QList>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QPluginLoader>
 #include <QSharedPointer>
-#include <QString>
+#include <QtCore/QString>
 
 #include "plugin_api.h"
 

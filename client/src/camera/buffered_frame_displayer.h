@@ -1,8 +1,8 @@
 #ifndef QN_BUFFERED_FRAME_DISPLAYER_H
 #define QN_BUFFERED_FRAME_DISPLAYER_H
 
-#include <QTime>
-#include <QMutex>
+#include <QtCore/QTime>
+#include <QtCore/QMutex>
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
 

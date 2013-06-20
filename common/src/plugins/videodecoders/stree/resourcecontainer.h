@@ -7,7 +7,7 @@
 
 #include <map>
 
-#include <QVariant>
+#include <QtCore/QVariant>
 
 
 namespace stree

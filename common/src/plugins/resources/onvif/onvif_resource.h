@@ -4,13 +4,13 @@
 #include <list>
 #include <stack>
 
-#include <QDateTime>
-#include <QList>
-#include <QMap>
-#include <QPair>
+#include <QtCore/QDateTime>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QPair>
 #include <QSharedPointer>
-#include <QWaitCondition>
-#include <QXmlDefaultHandler>
+#include <QtCore/QWaitCondition>
+#include <QtXml/QXmlDefaultHandler>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"

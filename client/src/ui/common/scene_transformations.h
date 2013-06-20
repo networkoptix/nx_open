@@ -1,7 +1,7 @@
 #ifndef QN_SCENE_TRANSFORMATIONS_H
 #define QN_SCENE_TRANSFORMATIONS_H
 
-#include <QtGui/QGraphicsView>
+#include <QtWidgets/QGraphicsView>
 
 class QnSceneTransformations {
 public:

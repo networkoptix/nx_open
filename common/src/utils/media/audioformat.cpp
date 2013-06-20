@@ -38,7 +38,7 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#include <QDebug>
+#include <QtCore/QDebug>
 #include "audioformat.h"
 
 

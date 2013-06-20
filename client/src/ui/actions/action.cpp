@@ -2,7 +2,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtGui/QShortcutEvent>
-#include <QtGui/QGraphicsWidget>
+#include <QtWidgets/QGraphicsWidget>
 
 #include <utils/common/warnings.h>
 #include <core/resource/user_resource.h>

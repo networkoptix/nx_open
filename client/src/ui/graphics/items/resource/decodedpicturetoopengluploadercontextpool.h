@@ -8,11 +8,11 @@
 
 #include <deque>
 
-#include <QGLWidget>
-#include <QMutex>
-#include <QRunnable>
-#include <QThread>
-#include <QWaitCondition>
+#include <QtOpenGL/QGLWidget>
+#include <QtCore/QMutex>
+#include <QtCore/QRunnable>
+#include <QtCore/QThread>
+#include <QtCore/QWaitCondition>
 
 #include <utils/common/safepool.h>
 #include <utils/common/threadqueue.h>

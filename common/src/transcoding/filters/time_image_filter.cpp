@@ -1,10 +1,10 @@
 
 #include "time_image_filter.h"
 
-#include <QDateTime>
-#include <QFontMetrics>
-#include <QImage>
-#include <QPainter>
+#include <QtCore/QDateTime>
+#include <QtGui/QFontMetrics>
+#include <QtGui/QImage>
+#include <QtGui/QPainter>
 
 #include "utils/color_space/yuvconvert.h"
 

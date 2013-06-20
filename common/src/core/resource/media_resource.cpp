@@ -1,7 +1,7 @@
 
 #include "media_resource.h"
 
-#include <QImage>
+#include <QtGui/QImage>
 
 #include "resource_media_layout.h"
 

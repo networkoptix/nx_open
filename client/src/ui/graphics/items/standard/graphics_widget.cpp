@@ -4,12 +4,12 @@
 #include <cassert>
 
 #include <QtCore/QVariant>
-#include <QtGui/QWidget>
-#include <QtGui/QGraphicsSceneMouseEvent>
-#include <QtGui/QGraphicsScene>
-#include <QtGui/QGraphicsLayout>
-#include <QtGui/QStyleOptionTitleBar>
-#include <QtGui/QApplication>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsLayout>
+#include <QtWidgets/QStyleOptionTitleBar>
+#include <QtWidgets/QApplication>
 
 #include <utils/common/warnings.h>
 
@@ -19,35 +19,8 @@
 #include <ui/common/geometry.h>
 #include <ui/common/cursor_cache.h>
 
-class GraphicsWidgetSceneData: public QObject {
-public:
-    /** Event type for scene-wide layout requests. */
-    static const QEvent::Type HandlePendingLayoutRequests = static_cast<QEvent::Type>(QEvent::User + 0x19FA);
+#include "graphics_widget_scene_data.h"
 
-    GraphicsWidgetSceneData(QGraphicsScene *scene, QObject *parent = NULL): 
-        QObject(parent), 
-        scene(scene) 
-    {
-        assert(scene);
-    }
-
-    virtual bool event(QEvent *event) override {
-        if(event->type() == HandlePendingLayoutRequests) {
-            GraphicsWidget::handlePendingLayoutRequests(scene);
-            return true;
-        } else {
-            return QObject::event(event);
-        }
-    }
-
-    QGraphicsScene *scene;
-    QHash<QGraphicsItem *, QPointF> movingItemsInitialPositions;
-    QSet<QGraphicsWidget *> pendingLayoutWidgets;
-
-    QHash<QGraphicsWidget *, const char *> names;
-};
-
-Q_DECLARE_METATYPE(GraphicsWidgetSceneData *);
 
 namespace {
     const char *qn_sceneDataPropertyName = "_qn_sceneData";

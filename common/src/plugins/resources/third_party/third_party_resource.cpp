@@ -8,7 +8,7 @@
 #include <functional>
 #include <memory>
 
-#include <QStringList>
+#include <QtCore/QStringList>
 
 #include <business/business_event_connector.h>
 

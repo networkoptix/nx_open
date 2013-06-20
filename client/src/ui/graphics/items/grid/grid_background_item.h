@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include <QObject>
-#include <QGraphicsObject>
+#include <QtCore/QObject>
+#include <QtWidgets/QGraphicsObject>
 
 #include <camera/gl_renderer.h>
 #include <core/resource/resource_fwd.h>

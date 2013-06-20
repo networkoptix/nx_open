@@ -1,7 +1,7 @@
 #ifndef settings_widgets_h_1820
 #define settings_widgets_h_1820
 
-#include <QtGui/QSlider>
+#include <QtWidgets/QSlider>
 
 #include <core/resource/param.h>
 
@@ -124,7 +124,7 @@ private Q_SLOTS:
 
 
 //==============================================
-#include <QtGui/QItemEditorFactory>
+#include <QtWidgets/QItemEditorFactory>
 
 class SettingsEditorFactory : public QItemEditorFactory
 {

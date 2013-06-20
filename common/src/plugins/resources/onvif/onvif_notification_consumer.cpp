@@ -5,7 +5,7 @@
 
 #include "onvif_notification_consumer.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include "onvif_resource.h"
 #include "../../../utils/common/log.h"

@@ -2,8 +2,8 @@
 #ifndef TEXT_TO_WAV_H
 #define TEXT_TO_WAV_H
 
-#include <QIODevice>
-#include <QString>
+#include <QtCore/QIODevice>
+#include <QtCore/QString>
 
 
 //!Synthesizes wav based on \a text. Uses festival engine

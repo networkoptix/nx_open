@@ -1,4 +1,4 @@
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
 #include "utils/common/sleep.h"

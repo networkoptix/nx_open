@@ -8,7 +8,7 @@
 #include <deque>
 #include <memory>
 
-#include <QAtomicInt>
+#include <QtCore/QAtomicInt>
 
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
@@ -158,7 +158,7 @@ namespace aio
                         //cancelling remove task
                         void* userData = pollSet.getUserData( sock.data(), eventType );
                         Q_ASSERT( userData );
-                        static_cast<AIOEventHandlingDataHolder*>(userData)->data->markedForRemoval = 0;
+                        static_cast<AIOEventHandlingDataHolder*>(userData)->data->markedForRemoval.store(0);
                     }
                     pollSetModificationQueue.erase( it );
                     return true;
@@ -231,7 +231,7 @@ namespace aio
         if( userData == NULL )
             return false;   //assert ???
         QSharedPointer<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(userData)->data;
-        if( handlingData->markedForRemoval > 0 )
+        if( handlingData->markedForRemoval.load() > 0 )
             return false; //socket already marked for removal
         handlingData->markedForRemoval.ref();
         m_impl->pollSetModificationQueue.push_back( SocketAddRemoveTask(sock, eventType, NULL, SocketAddRemoveTask::tRemoving) );
@@ -239,11 +239,11 @@ namespace aio
         {
             m_impl->pollSet.interrupt();
 
-            if( handlingData->beingProcessed > 0 )
+            if( handlingData->beingProcessed.load() > 0 )
             {
                 m_impl->mutex->unlock();
                 //waiting for event handler to return
-                while( handlingData->beingProcessed > 0 )
+                while( handlingData->beingProcessed.load() > 0 )
                 {
                     m_impl->processEventsMutex.lock();
                     m_impl->processEventsMutex.unlock();
@@ -302,7 +302,7 @@ namespace aio
                 QSharedPointer<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(it.userData())->data;
                 QMutexLocker lk( &m_impl->processEventsMutex );
                 handlingData->beingProcessed.ref();
-                if( handlingData->markedForRemoval > 0 ) //socket has been removed from watch
+                if( handlingData->markedForRemoval.load() > 0 ) //socket has been removed from watch
                 {
                     handlingData->beingProcessed.deref();
                     continue;

@@ -21,6 +21,7 @@ namespace std { typedef __int32 intptr_t; }
 #include <QtCore/QDebug>
 #include <QtCore/QVariant>
 #include <QtCore/QUrl>
+#include <QtCore/QUuid>
 
 namespace detail {
     inline void debugInternal(const char *functionName, const QString &s) {
@@ -46,6 +47,10 @@ namespace detail {
         template<class T>
         QString operator<<(const QString &s, const T &arg) {
             return s.arg(arg);
+        }
+
+        inline QString operator<<(const QString &s, const QUuid &arg) {
+            return s.arg(arg.toString());
         }
 
         inline QString operator<<(const QString &s, const QUrl &arg) {

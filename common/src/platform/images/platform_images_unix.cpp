@@ -6,7 +6,7 @@
 #include <QtGui/QCursor>
 #include <QtGui/QPixmap>
 #include <QtGui/QX11Info>
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/Xfixes.h>

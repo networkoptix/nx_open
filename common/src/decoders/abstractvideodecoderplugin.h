@@ -5,8 +5,8 @@
 #ifndef ABSTRACTVIDEODECODERPLUGIN_H
 #define ABSTRACTVIDEODECODERPLUGIN_H
 
-#include <QGLContext>
-#include <QList>
+#include <QtOpenGL/QGLContext>
+#include <QtCore/QList>
 
 extern "C"
 {

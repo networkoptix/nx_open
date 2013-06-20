@@ -2,7 +2,7 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QDateTime>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 InstrumentPaintSyncer::InstrumentPaintSyncer(QObject *parent):
     QObject(parent),

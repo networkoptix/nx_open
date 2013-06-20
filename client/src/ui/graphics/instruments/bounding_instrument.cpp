@@ -4,7 +4,7 @@
 #include <cmath> /* For std::log, std::exp, std::abs. */
 #include <limits>
 
-#include <QtGui/QGraphicsView>
+#include <QtWidgets/QGraphicsView>
 #include <QtCore/QDateTime>
 #include <QtGui/QMatrix4x4>
 

@@ -1,6 +1,6 @@
 #include "grid_background_item.h"
 
-#include <QPainter>
+#include <QtGui/QPainter>
 
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>

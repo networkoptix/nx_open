@@ -4,10 +4,10 @@
 #include <cmath>
 #include <sstream>
 
-#include <QBuffer>
-#include <QDebug>
+#include <QtCore/QBuffer>
+#include <QtCore/QDebug>
 #include <QHash>
-#include <QTimer>
+#include <QtCore/QTimer>
 
 #include <onvif/soapDeviceBindingProxy.h>
 #include <onvif/soapMediaBindingProxy.h>

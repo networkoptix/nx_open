@@ -1,7 +1,7 @@
 #ifndef QN_LICENSE_MANAGER_WIDGET_H
 #define QN_LICENSE_MANAGER_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QtCore/QModelIndex>
 
 #include "licensing/license.h"

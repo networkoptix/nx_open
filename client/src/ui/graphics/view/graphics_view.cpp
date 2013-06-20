@@ -1,6 +1,6 @@
 #include "graphics_view.h"
 
-#include <QtOpenGL>
+#include <QtOpenGL/QtOpenGL>
 
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>

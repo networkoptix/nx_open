@@ -5,14 +5,14 @@
 #include <QtCore/QSettings>
 #include <QtCore/QTimer>
 
-#include <QtGui/QComboBox>
-#include <QtGui/QGraphicsScene>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsProxyWidget>
-#include <QtGui/QGraphicsLinearLayout>
-#include <QtGui/QStyle>
-#include <QtGui/QApplication>
-#include <QtGui/QMenu>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMenu>
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>

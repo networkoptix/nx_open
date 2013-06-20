@@ -1,11 +1,11 @@
 #ifndef BUSINESS_RULES_VIEW_MODEL_H
 #define BUSINESS_RULES_VIEW_MODEL_H
 
-#include <QAbstractItemModel>
-#include <QStandardItemModel>
-#include <QModelIndex>
-#include <QVariant>
-#include <QList>
+#include <QtCore/QAbstractItemModel>
+#include <QtGui/QStandardItemModel>
+#include <QtCore/QModelIndex>
+#include <QtCore/QVariant>
+#include <QtCore/QList>
 
 #include <core/resource/resource_fwd.h>
 

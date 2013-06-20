@@ -2,8 +2,8 @@
 
 #include <limits>
 
-#include <QtGui/QGraphicsSceneDragDropEvent>
-#include <QtGui/QGraphicsItem>
+#include <QtWidgets/QGraphicsSceneDragDropEvent>
+#include <QtWidgets/QGraphicsItem>
 #include <QtCore/QMimeData>
 
 #include <core/resource/media_resource.h>

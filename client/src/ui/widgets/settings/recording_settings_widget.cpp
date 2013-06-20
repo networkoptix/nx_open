@@ -1,9 +1,9 @@
 #include "recording_settings_widget.h"
 #include "ui_recording_settings_widget.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QFileDialog>
 
 #include <QtMultimedia/QAudioDeviceInfo>
 

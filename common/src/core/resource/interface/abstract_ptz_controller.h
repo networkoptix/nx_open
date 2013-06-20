@@ -1,7 +1,7 @@
 #ifndef QN_ABSTRACT_PTZ_CONTROLLER_H
 #define QN_ABSTRACT_PTZ_CONTROLLER_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #include <common/common_globals.h>
 

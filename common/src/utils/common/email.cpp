@@ -1,11 +1,11 @@
 #include "email.h"
 
-#include <QApplication>
-#include <QDebug>
-#include <QRegExp>
+#include <QtWidgets/QApplication>
+#include <QtCore/QDebug>
+#include <QtCore/QRegExp>
 #include <QHash>
-#include <QFile>
-#include <QThread>
+#include <QtCore/QFile>
+#include <QtCore/QThread>
 
 
 namespace {

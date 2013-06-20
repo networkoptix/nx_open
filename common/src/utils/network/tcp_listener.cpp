@@ -35,6 +35,25 @@ public:
 
 // ------------------------ QnRtspListener ---------------------------
 
+#ifdef USE_NX_HTTP
+bool QnTcpListener::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response) const
+{
+    Q_D(const QnTcpListener);
+    if (d->authDigest.isEmpty())
+        return true;
+    nx_http::HttpHeaders::const_iterator authorizationIter = request.headers.find( "Authorization" );
+    if( authorizationIter == request.headers.end() )
+        return false;
+
+    QList<QByteArray> data = authorizationIter->second.split(' ');
+    bool rez = false;
+    if (data[0].toLower() == "basic" && data.size() > 1)
+        rez = data[1] == d->authDigest;
+    if (!rez)
+        response.headers["WWW-Authenticate"] = "Basic realm=\"Secure Area\"";
+    return rez;
+}
+#else
 bool QnTcpListener::authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders) const
 {
     Q_D(const QnTcpListener);
@@ -49,6 +68,7 @@ bool QnTcpListener::authenticate(const QHttpRequestHeader& headers, QHttpRespons
     }
     return rez;
 }
+#endif
 
 void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& password)
 {

@@ -1,7 +1,7 @@
 #ifndef SYSTEM_HEALTH_H
 #define SYSTEM_HEALTH_H
 
-#include <QString>
+#include <QtCore/QString>
 
 namespace QnSystemHealth {
 

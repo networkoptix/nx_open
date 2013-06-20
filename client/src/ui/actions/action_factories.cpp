@@ -1,6 +1,6 @@
 #include "action_factories.h"
 
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 
 #include <utils/common/string.h>
 

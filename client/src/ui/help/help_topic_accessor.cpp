@@ -2,11 +2,11 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QAbstractItemModel>
-#include <QtGui/QWidget>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsScene>
-#include <QtGui/QGraphicsProxyWidget>
-#include <QtGui/QAbstractItemView>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QAbstractItemView>
 
 #include <utils/common/warnings.h>
 #include <utils/common/variant.h>

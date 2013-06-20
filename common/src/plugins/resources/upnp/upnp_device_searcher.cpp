@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <memory>
 
-#include <QMutexLocker>
-#include <QXmlDefaultHandler>
+#include <QtCore/QMutexLocker>
+#include <QtXml/QXmlDefaultHandler>
 
 #include <utils/network/aio/aioservice.h>
 

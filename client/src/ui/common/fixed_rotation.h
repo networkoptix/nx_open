@@ -2,7 +2,7 @@
 #define QN_FIXED_ROTATION_H
 
 #include <QtCore/QWeakPointer>
-#include <QtGui/QGraphicsRotation>
+#include <QtWidgets/QGraphicsRotation>
 
 class QGraphicsWidget;
 

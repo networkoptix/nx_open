@@ -7,7 +7,7 @@
 
 #ifdef NX_GLCONTEXT_PRESENT
 
-#include <QGLContext>
+#include <QtOpenGL/QGLContext>
 
 #include <utils/common/log.h>
 

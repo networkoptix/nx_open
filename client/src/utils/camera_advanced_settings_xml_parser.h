@@ -4,8 +4,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QSet>
-#include <QtGui/QTreeWidgetItem>
-#include <QtGui/QStackedLayout>
+#include <QtWidgets/QTreeWidgetItem>
+#include <QtWidgets/QStackedLayout>
 
 #include "plugins/resources/camera_settings/camera_settings.h"
 

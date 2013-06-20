@@ -3,8 +3,8 @@
 
 #include <QtCore/QEventLoop>
 
-#include <QtGui/QDialog>
-#include <QtGui/QHeaderView>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QHeaderView>
 
 #include <core/resource/resource_fwd.h>
 #include <api/media_server_cameras_data.h>

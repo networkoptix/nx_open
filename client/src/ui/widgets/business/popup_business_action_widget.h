@@ -1,7 +1,7 @@
 #ifndef POPUP_BUSINESS_ACTION_WIDGET_H
 #define POPUP_BUSINESS_ACTION_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include <ui/widgets/business/abstract_business_params_widget.h>
 #include <ui/workbench/workbench_context_aware.h>

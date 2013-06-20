@@ -4,9 +4,9 @@
 
 #include "utils/media/sse_helper.h"
 
-#include <QImage>
-#include <QTime>
-#include <QDebug>
+#include <QtGui/QImage>
+#include <QtCore/QTime>
+#include <QtCore/QDebug>
 #include "utils/network/socket.h"
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"

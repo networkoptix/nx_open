@@ -6,7 +6,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>

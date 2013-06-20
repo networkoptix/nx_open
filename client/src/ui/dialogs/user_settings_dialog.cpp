@@ -1,8 +1,8 @@
 #include "user_settings_dialog.h"
 #include "ui_user_settings_dialog.h"
 
-#include <QtGui/QPushButton>
-#include <QtGui/QCheckBox>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QCheckBox>
 #include <QtGui/QKeyEvent>
 
 #include <core/resource/user_resource.h>

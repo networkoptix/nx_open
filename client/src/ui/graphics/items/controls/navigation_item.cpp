@@ -2,10 +2,10 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QCoreApplication>
-#include <QtGui/QAction>
-#include <QtGui/QGraphicsLinearLayout>
-#include <QtGui/QMessageBox>
-#include <QtGui/QGraphicsProxyWidget>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>

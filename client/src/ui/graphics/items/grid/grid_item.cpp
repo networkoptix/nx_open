@@ -4,7 +4,7 @@
 #include <limits>
 
 #include <QtGui/QPainter>
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>

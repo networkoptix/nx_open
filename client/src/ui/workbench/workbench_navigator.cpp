@@ -4,10 +4,10 @@
 
 #include <QtCore/QTimer>
 
-#include <QtGui/QAction>
-#include <QtGui/QMenu>
-#include <QtGui/QGraphicsSceneContextMenuEvent>
-#include <QtGui/QApplication>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QGraphicsSceneContextMenuEvent>
+#include <QtWidgets/QApplication>
 
 extern "C"
 {

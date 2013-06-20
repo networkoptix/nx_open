@@ -5,8 +5,8 @@
 
 #include <QtCore/QWeakPointer>
 
-#include <QtGui/QMenu>
-#include <QtGui/QGraphicsSceneContextMenuEvent>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QGraphicsSceneContextMenuEvent>
 
 #include "qapplication.h"
 #include "qcursor.h"

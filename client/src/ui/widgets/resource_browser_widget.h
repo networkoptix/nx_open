@@ -1,7 +1,7 @@
 #ifndef QN_RESOURCE_BROWSER_WIDGET_H
 #define QN_RESOURCE_BROWSER_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>

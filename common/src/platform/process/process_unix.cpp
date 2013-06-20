@@ -4,8 +4,8 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
-#include <QProcess>
-#include <QWeakPointer>
+#include <QtCore/QProcess>
+#include <QtCore/QWeakPointer>
 
 #include <utils/common/warnings.h>
 

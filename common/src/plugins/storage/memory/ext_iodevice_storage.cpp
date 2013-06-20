@@ -5,7 +5,7 @@
 
 #include "ext_iodevice_storage.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 
 QnExtIODeviceStorageResource::QnExtIODeviceStorageResource()

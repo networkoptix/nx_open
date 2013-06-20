@@ -3,7 +3,7 @@
 #include <boost/type_traits/remove_pointer.hpp>
 
 #include <QtCore/QLibrary>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <utils/common/warnings.h>
 

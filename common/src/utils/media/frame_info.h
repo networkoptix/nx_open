@@ -4,7 +4,7 @@
 #ifdef _WIN32
 #include <D3D9.h>
 #endif
-#include <QAtomicInt>
+#include <QtCore/QAtomicInt>
 
 extern "C"
 {
@@ -54,7 +54,7 @@ public:
     QnAbstractPictureDataRef( SynchronizationContext* const syncCtx )
     :
         m_syncCtx( syncCtx ),
-        m_initialSequence( syncCtx->sequence )
+        m_initialSequence( syncCtx->sequence.loadAcquire() )
     {
     }
     virtual ~QnAbstractPictureDataRef() {}
@@ -75,7 +75,7 @@ public:
     //!If return value is \a false, access to picture data can lead to undefined behavour
     bool isValid() const
     {
-        return m_syncCtx->sequence == m_initialSequence;
+        return m_syncCtx->sequence.load() == m_initialSequence;
     }
 
 private:

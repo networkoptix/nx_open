@@ -1,7 +1,7 @@
 #ifndef NOTIFICATIONS_COLLECTION_WIDGET_H
 #define NOTIFICATIONS_COLLECTION_WIDGET_H
 
-#include <QtGui/QGraphicsItem>
+#include <QtWidgets/QGraphicsItem>
 
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>

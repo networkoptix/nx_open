@@ -11,10 +11,10 @@
 #include <set>
 #include <vector>
 
-#include <QGLContext>
-#include <QMutex>
+#include <QtOpenGL/QGLContext>
+#include <QtCore/QMutex>
 #include <QSharedPointer>
-#include <QWaitCondition>
+#include <QtCore/QWaitCondition>
 
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/common/safepool.h>

@@ -1,7 +1,7 @@
 #ifndef __TIME_IMAGE_FILTER_H__
 #define __TIME_IMAGE_FILTER_H__
 
-#include <QFont>
+#include <QtGui/QFont>
 #include "abstract_filter.h"
 
 class QnTimeImageFilter: public QnAbstractImageFilter

@@ -1,7 +1,7 @@
 #ifndef QN_RESOURCE_LIST_DIALOG_H
 #define QN_RESOURCE_LIST_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 #include <core/resource/resource_fwd.h>
 

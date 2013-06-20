@@ -1,7 +1,7 @@
 #ifndef __BITSTREAM_H
 #define __BITSTREAM_H
 
-#include <QString>
+#include <QtCore/QString>
 
 #include <assert.h>
 #include <limits.h>

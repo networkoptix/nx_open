@@ -8,9 +8,9 @@
 
 #include <map>
 
-#include <QByteArray>
-#include <QMap>
-#include <QUrl>
+#include <QtCore/QByteArray>
+#include <QtCore/QMap>
+#include <QtCore/QUrl>
 
 #include "qnbytearrayref.h"
 
@@ -43,6 +43,12 @@ namespace nx_http
 
     typedef std::map<StringType, StringType> HttpHeaders;
     typedef HttpHeaders::value_type HttpHeader;
+
+    /*!
+        This is convinient method for simplify transition from QHttp
+        \return Value of header \a headerName (if found), empty string otherwise
+    */
+    StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName );
 
     static const size_t BufferNpos = size_t(-1);
 
@@ -186,6 +192,9 @@ namespace nx_http
         StatusLine statusLine;
         HttpHeaders headers;
         BufferType messageBody;
+
+        void serialize( BufferType* const dstBuffer ) const;
+        BufferType toString() const;
     };
 
     namespace MessageType

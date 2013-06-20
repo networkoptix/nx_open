@@ -1,8 +1,8 @@
 #ifndef QN_INSTRUMENT_PAINT_SYNCER_H
 #define QN_INSTRUMENT_PAINT_SYNCER_H
 
-#include <QObject>
-#include <QWeakPointer>
+#include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
 #include <ui/animation/animation_timer.h>
 
 class InstrumentPaintSyncer: public QObject, public AnimationTimer, public AnimationTimerListener {

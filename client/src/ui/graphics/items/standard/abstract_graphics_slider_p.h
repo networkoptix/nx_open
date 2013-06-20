@@ -4,14 +4,14 @@
 #include "graphics_widget_p.h"
 #include "abstract_graphics_slider.h"
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QtCore/QBasicTimer>
-#include <QGraphicsSceneMouseEvent>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
 #ifdef QT_KEYPAD_NAVIGATION
 #  include <QtCore/QElapsedTimer>
 #endif
 
-#include <QtGui/QStyle>
+#include <QtWidgets/QStyle>
 
 class AbstractGraphicsSliderPrivate: public GraphicsWidgetPrivate
 {

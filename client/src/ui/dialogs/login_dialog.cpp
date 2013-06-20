@@ -2,12 +2,12 @@
 #include "ui_login_dialog.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QDataWidgetMapper>
-#include <QtGui/QMessageBox>
-#include <QtGui/QInputDialog>
+#include <QtWidgets/QDataWidgetMapper>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QInputDialog>
 #include <QtGui/QStandardItemModel>
-#include <QDesktopWidget>
-#include <QDir>
+#include <QtWidgets/QDesktopWidget>
+#include <QtCore/QDir>
 
 #include <QtNetwork/QLocalSocket>
 

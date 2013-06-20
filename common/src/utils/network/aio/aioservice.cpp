@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include "aiothread.h"
 #include "qglobal.h"

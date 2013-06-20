@@ -3,14 +3,14 @@
 #include <limits>
 
 #include <QtCore/QBasicTimer>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleOption>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QStyleOption>
 #include <QtGui/QPainter>
-#include <QtGui/QToolTip>
-#include <QtGui/QGraphicsScene>
+#include <QtWidgets/QToolTip>
+#include <QtWidgets/QGraphicsScene>
 #include <QtGui/QTextDocument>
-#include <QtGui/QGraphicsDropShadowEffect>
-#include <QtGui/QApplication>
+#include <QtWidgets/QGraphicsDropShadowEffect>
+#include <QtWidgets/QApplication>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/weak_graphics_item_pointer.h>

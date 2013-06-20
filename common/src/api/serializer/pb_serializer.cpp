@@ -17,7 +17,7 @@
 #include "core/resource_managment/resource_pool.h"
 #include <business/business_action_factory.h>
 
-#include <QSqlRecord>
+#include <QtSql/QSqlRecord>
 
 /* Prohibit the usage of std::string-QString conversion functions that do not 
  * explicitly state the encoding used for conversion. 

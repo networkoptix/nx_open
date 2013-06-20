@@ -1,8 +1,8 @@
 #include "instrument_manager.h"
 #include "instrument_manager_p.h"
 #include <cassert>
-#include <QGraphicsView>
-#include <QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsScene>
 #include <utils/common/warnings.h>
 #include <ui/animation/animation_event.h>
 #include "instrument.h"

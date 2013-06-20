@@ -2,7 +2,7 @@
 
 #ifdef Q_OS_WIN
 
-#include <QScreen>
+#include <QtGui/QScreen>
 #include <QtCore/QLibrary>
 #include "utils/common/log.h"
 #include <emmintrin.h>

@@ -1,8 +1,8 @@
 #ifndef QN_AVI_BLURAY_ARCHIVE_DELEGATE_H
 #define QN_AVI_BLURAY_ARCHIVE_DELEGATE_H
 
-#include <QStringList>
-#include <QFile>
+#include <QtCore/QStringList>
+#include <QtCore/QFile>
 
 #include "avi_playlist_archive_delegate.h"
 

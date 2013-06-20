@@ -1,11 +1,11 @@
 
 #include "event_log_dialog.h"
 
-#include <QClipboard>
-#include <QMenu>
-#include <QtGui/QMessageBox>
+#include <QtGui/QClipboard>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QMouseEvent>
-#include <QMimeData>
+#include <QtCore/QMimeData>
 
 #include "ui_event_log_dialog.h"
 #include "ui/models/event_log_model.h"

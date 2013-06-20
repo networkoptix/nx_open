@@ -1,9 +1,9 @@
 #ifndef QN_LAYOUT_ITEM_INDEX_H
 #define QN_LAYOUT_ITEM_INDEX_H
 
-#include <QMetaType>
-#include <QUuid>
-#include <QList>
+#include <QtCore/QMetaType>
+#include <QtCore/QUuid>
+#include <QtCore/QList>
 #include "resource_fwd.h"
 #include "layout_resource.h"
 

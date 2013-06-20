@@ -2,6 +2,7 @@
 
 #include <QtGui/QMouseEvent>
 #include <QtGui/QDrag>
+#include <QtCore/QMimeData>
 
 #include <core/resource/resource.h>
 

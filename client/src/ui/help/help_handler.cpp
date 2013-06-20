@@ -4,8 +4,8 @@
 #include <QtGui/QDesktopServices>
 #include <QtGui/QCursor>
 #include <QtGui/QHelpEvent>
-#include <QtGui/QWhatsThis>
-#include <QWidget>
+#include <QtWidgets/QWhatsThis>
+#include <QtWidgets/QWidget>
 
 #include "help_topic_accessor.h"
 

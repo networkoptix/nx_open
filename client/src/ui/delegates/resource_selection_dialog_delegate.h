@@ -2,7 +2,7 @@
 #define QN_RESOURCE_SELECTION_DIALOG_DELEGATE_H
 
 #include <QtCore/QObject>
-#include <QtGui/QLabel>
+#include <QtWidgets/QLabel>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>

@@ -1,6 +1,6 @@
 #include "universal_tcp_listener.h"
 #include "utils/network/tcp_connection_priv.h"
-#include <QUrl>
+#include <QtCore/QUrl>
 
 class QnUniversalRequestProcessorPrivate;
 

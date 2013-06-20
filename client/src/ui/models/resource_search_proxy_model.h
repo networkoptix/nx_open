@@ -2,7 +2,7 @@
 #define QN_RESOURCE_SEARCH_PROXY_MODEL_H
 
 #include <QtCore/QMetaType>
-#include <QtGui/QSortFilterProxyModel>
+#include <QtCore/QSortFilterProxyModel>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_managment/resource_criterion.h>

@@ -3,11 +3,11 @@
 
 #include <cstring>
 
-#include <QtGlobal>
-#include <QByteArray>
-#include <QList>
-#include <QRectF>
-#include <QMetaType>
+#include <QtCore/QtGlobal>
+#include <QtCore/QByteArray>
+#include <QtCore/QList>
+#include <QtCore/QRectF>
+#include <QtCore/QMetaType>
 
 struct ImageCorrectionParams
 {

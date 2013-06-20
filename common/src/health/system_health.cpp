@@ -1,6 +1,6 @@
 #include "system_health.h"
 
-#include <QObject>
+#include <QtCore/QObject>
 
 
 namespace QnSystemHealth {

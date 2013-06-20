@@ -1,4 +1,4 @@
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "stardot_resource.h"
 #include "stardot_stream_reader.h"
 #include "utils/common/sleep.h"

@@ -1,6 +1,6 @@
 #include "image_button_bar.h"
 
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/math/math.h>
 #include <utils/common/warnings.h>

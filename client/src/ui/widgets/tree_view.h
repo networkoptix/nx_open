@@ -2,7 +2,7 @@
 #define QN_TREE_VIEW_H
 
 #include <QtCore/QBasicTimer>
-#include <QtGui/QTreeView>
+#include <QtWidgets/QTreeView>
 
 /**
  * This class fixes some bugs in <tt>QTreeView</tt> related to drag and drop

@@ -18,9 +18,9 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QTranslator>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
 
 #include <QtSingleApplication>
@@ -258,6 +258,8 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #include <X11/Xlib.h>
 #endif
 
+#include <iostream>
+
 #ifndef API_TEST_MAIN
 
 int main(int argc, char **argv)
@@ -270,6 +272,15 @@ int main(int argc, char **argv)
     AllowSetForegroundWindow(ASFW_ANY);
     win32_exception::install_handler();
 #endif
+
+    QApplication::setGraphicsSystem(QLatin1String("raster"));
+    //QApplication::setColorSpec(QApplication::ManyColor);
+
+    QStringList pluginDirs = QApplication::libraryPaths();
+    pluginDirs << QString::fromLatin1("/usr/local/Qt-5.0.2//plugins/");
+    QApplication::setLibraryPaths( pluginDirs );
+//    foreach( QString str, QApplication::libraryPaths() )
+//        std::cout << str.toStdString()<<"\n";
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
     QnClientModule client(argc, argv);

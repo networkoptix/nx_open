@@ -20,7 +20,7 @@
 #include <stdint.h>
 #endif
 
-#include <QDebug>
+#include <QtCore/QDebug>
 
 #include "dvd_reader.h"
 #include "dvd_udf.h"

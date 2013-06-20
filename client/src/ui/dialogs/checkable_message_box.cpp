@@ -1,16 +1,16 @@
 #include "checkable_message_box.h"
 
-#include <QDebug>
-#include <QVariant>
+#include <QtCore/QDebug>
+#include <QtCore/QVariant>
 
-#include <QPushButton>
-#include <QCheckBox>
-#include <QDialogButtonBox>
-#include <QHBoxLayout>
-#include <QMessageBox>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QSpacerItem>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QSpacerItem>
 
 class QnCheckableMessageBoxPrivate {
 public:

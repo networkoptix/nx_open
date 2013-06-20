@@ -1,7 +1,7 @@
 
-#include <QString>
-#include <QStringList>
-#include <QTime>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QTime>
 
 #include "coldstore_dts_resource_searcher.h"
 #include "utils/network/nettools.h"

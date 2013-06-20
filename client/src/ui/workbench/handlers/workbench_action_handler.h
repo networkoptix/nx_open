@@ -5,8 +5,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>

@@ -1,7 +1,7 @@
 #ifndef QN_BYTE_ARRAY_H
 #define QN_BYTE_ARRAY_H
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 #include <QtCore/qglobal.h>
 
 class QByteArray;

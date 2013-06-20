@@ -1,7 +1,7 @@
 #include "graphics_message_box.h"
 
-#include <QtGui/QStyle>
-#include <QtGui/QStyleOption>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QStyleOption>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 

@@ -1,8 +1,8 @@
 #ifndef QN_EVENT_PROCESSORS_H
 #define QN_EVENT_PROCESSORS_H
 
-#include <QObject>
-#include <QEvent>
+#include <QtCore/QObject>
+#include <QtCore/QEvent>
 #include "warnings.h"
 
 // TODO: #Elric add syntax: connect(QObject *, QEvent::Type, QObject *, const char * /* slot (QObject *, QEvent *) */)

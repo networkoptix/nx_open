@@ -1,7 +1,7 @@
 #ifndef QN_GRAPHICS_STYLE_H
 #define QN_GRAPHICS_STYLE_H
 
-#include <QtGui/QStyle>
+#include <QtWidgets/QStyle>
 
 class QStyle;
 class QGraphicsWidget;

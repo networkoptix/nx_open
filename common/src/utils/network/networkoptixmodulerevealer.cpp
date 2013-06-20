@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <QDateTime>
+#include <QtCore/QDateTime>
 
 #include "socket.h"
 #include "../common/log.h"

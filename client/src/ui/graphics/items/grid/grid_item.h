@@ -2,7 +2,7 @@
 #define QN_GRID_ITEM_H
 
 #include <QtCore/QWeakPointer>
-#include <QtGui/QGraphicsObject>
+#include <QtWidgets/QGraphicsObject>
 
 #include <utils/common/hash.h> /* For qHash(QPoint). */
 

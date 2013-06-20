@@ -1,10 +1,10 @@
 #ifndef __REST_SERVER_H__
 #define __REST_SERVER_H__
 
-#include <QList>
-#include <QPair>
-#include <QString>
-#include <QByteArray>
+#include <QtCore/QList>
+#include <QtCore/QPair>
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
 #include "request_handler.h"
 #include "utils/network/tcp_listener.h"
 

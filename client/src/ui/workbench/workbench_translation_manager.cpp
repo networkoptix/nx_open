@@ -2,7 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QTranslator>
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 
 #include "client/client_settings.h"
 

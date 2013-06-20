@@ -1,8 +1,8 @@
 #include "ptz_presets_dialog.h"
 #include "ui_ptz_presets_dialog.h"
 
-#include <QtGui/QPushButton>
-#include <QStandardItem>
+#include <QtWidgets/QPushButton>
+#include <QtGui/QStandardItem>
 
 #include <core/resource/camera_resource.h>
 

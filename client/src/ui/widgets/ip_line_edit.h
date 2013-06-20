@@ -1,7 +1,7 @@
 #ifndef IP_LINE_EDIT_H
 #define IP_LINE_EDIT_H
 
-#include <QtGui/QLineEdit>
+#include <QtWidgets/QLineEdit>
 
 class QnIpLineEdit: public QLineEdit{
     Q_OBJECT

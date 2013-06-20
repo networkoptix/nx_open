@@ -2,9 +2,9 @@
 #define onvif_helper_h
 
 #include <QHash>
-#include <QString>
-#include <QSet>
-#include <QPair>
+#include <QtCore/QString>
+#include <QtCore/QSet>
+#include <QtCore/QPair>
 
 //first - login, second - password
 typedef QSet<QPair<const char*, const char*> > PasswordList;

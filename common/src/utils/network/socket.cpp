@@ -8,7 +8,7 @@
 #  include <iphlpapi.h>
 #endif
 
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 
 #include "socket_impl.h"
 #include "../common/systemerror.h"

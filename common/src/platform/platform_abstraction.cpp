@@ -1,7 +1,7 @@
 #include "platform_abstraction.h"
 
 #include <QtCore/QCoreApplication>
-#include <QProcess>
+#include <QtCore/QProcess>
 
 #include <utils/common/warnings.h>
 

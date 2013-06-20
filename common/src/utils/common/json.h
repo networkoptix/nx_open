@@ -3,12 +3,14 @@
 
 #include <cassert>
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
+#endif
 
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>

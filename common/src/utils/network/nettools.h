@@ -1,9 +1,9 @@
 #ifndef cl_net_tools_1232
 #define cl_net_tools_1232
 
-#include <QHostAddress>
-#include <QUdpSocket>
-#include <QNetworkAddressEntry>
+#include <QtNetwork/QHostAddress>
+#include <QtNetwork/QUdpSocket>
+#include <QtNetwork/QNetworkAddressEntry>
 
 static const int ping_timeout = 300;
 

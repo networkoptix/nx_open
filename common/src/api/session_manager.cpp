@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include <QMetaEnum>
+#include <QtCore/QMetaEnum>
 #include <QtCore/QUrl>
 #include <QtCore/QBuffer>
 #include <QtCore/QThread>

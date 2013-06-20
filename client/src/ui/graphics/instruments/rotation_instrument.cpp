@@ -5,8 +5,8 @@
 #include <limits>
 
 #include <QtGui/QMouseEvent>
-#include <QtGui/QGraphicsWidget>
-#include <QtGui/QApplication>
+#include <QtWidgets/QGraphicsWidget>
+#include <QtWidgets/QApplication>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>

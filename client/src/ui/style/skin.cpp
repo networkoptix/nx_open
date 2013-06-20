@@ -6,7 +6,7 @@
 
 #include <QtGui/QImage>
 #include <QtGui/QPixmapCache>
-#include <QtGui/QStyleFactory>
+#include <QtWidgets/QStyleFactory>
 
 #include <utils/common/warnings.h>
 

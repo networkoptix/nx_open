@@ -2,8 +2,8 @@
 
 #include <cassert>
 
-#include <QtGui/QApplication>
-#include <QtGui/QStyle>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyle>
 
 #include <utils/common/scoped_painter_rollback.h>
 

@@ -1,8 +1,8 @@
 #ifndef POPUP_SETTINGS_WIDGET_H
 #define POPUP_SETTINGS_WIDGET_H
 
-#include <QWidget>
-#include <QtGui/QCheckBox>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QCheckBox>
 
 #include <ui/workbench/workbench_context_aware.h>
 

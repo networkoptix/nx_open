@@ -1,8 +1,8 @@
 #include "camera_list_dialog.h"
 
 #include <QtGui/QClipboard>
-#include <QtGui/QMenu>
-#include <QMimeData>
+#include <QtWidgets/QMenu>
+#include <QtCore/QMimeData>
 
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>

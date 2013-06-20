@@ -42,7 +42,7 @@
 
 
 /* Don't use deprecated Qt functions. */
-#define QT_NO_DEPRECATED
+//#define QT_NO_DEPRECATED
 
 
 /* Use variadic macros in boost even for older GCC versions. */

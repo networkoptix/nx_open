@@ -1,11 +1,11 @@
 #ifndef __REQUEST_HANDLER_H__
 #define __REQUEST_HANDLER_H__
 
-#include <QObject>
-#include <QPair>
-#include <QString>
-#include <QList>
-#include <QByteArray>
+#include <QtCore/QObject>
+#include <QtCore/QPair>
+#include <QtCore/QString>
+#include <QtCore/QList>
+#include <QtCore/QByteArray>
 #include "utils/common/request_param.h"
 #include <QSharedPointer>
 

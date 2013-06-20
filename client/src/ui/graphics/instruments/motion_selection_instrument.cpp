@@ -2,10 +2,10 @@
 
 #include <cassert>
 
-#include <QtGui/QGraphicsObject>
+#include <QtWidgets/QGraphicsObject>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QApplication>
-#include <QtGui/QStyle>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyle>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/warnings.h>

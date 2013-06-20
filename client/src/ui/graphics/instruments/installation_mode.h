@@ -1,7 +1,7 @@
 #ifndef QN_INSTALLATION_MODE_H
 #define QN_INSTALLATION_MODE_H
 
-#include <QList>
+#include <QtCore/QList>
 
 class Instrument;
 

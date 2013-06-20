@@ -1,7 +1,7 @@
 #ifndef QnExternalTimeSource_h_1919
 #define QnExternalTimeSource_h_1919
 
-#include <QtGlobal> /* For Q_UNUSED. */
+#include <QtCore/QtGlobal> /* For Q_UNUSED. */
 
 class QnlTimeSource
 {

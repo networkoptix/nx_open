@@ -3,10 +3,10 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
-#include <QtGui/QGraphicsSceneEvent>
-#include <QtGui/QApplication>
-#include <QtGui/QStyle>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsSceneEvent>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/math/math.h>
 #include <utils/common/scoped_painter_rollback.h>

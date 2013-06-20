@@ -1,3 +1,4 @@
+QT += widgets
 TEMPLATE = app
 DEFINES += CL_FORCE_LOGO
 TRANSLATIONS += ${basedir}/translations/client_en.ts \

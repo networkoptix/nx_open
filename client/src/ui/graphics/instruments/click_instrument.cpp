@@ -1,7 +1,7 @@
 #include "click_instrument.h"
-#include <QGraphicsSceneMouseEvent>
-#include <QWeakPointer>
-#include <QApplication>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
+#include <QtCore/QWeakPointer>
+#include <QtWidgets/QApplication>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
 #include <ui/common/weak_graphics_item_pointer.h>

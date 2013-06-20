@@ -6,8 +6,8 @@
 #  include <winsock2.h>
 #endif
 
-#include <QFile>
-#include <QUuid>
+#include <QtCore/QFile>
+#include <QtCore/QUuid>
 
 #include "utils/common/util.h"
 #include "../common/sleep.h"

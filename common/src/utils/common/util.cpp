@@ -5,12 +5,12 @@
 #   include <sys/time.h>
 #endif
 
-#include <QDateTime>
-#include <QDesktopServices>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QHostInfo>
+#include <QtCore/QDateTime>
+#include <QtGui/QDesktopServices>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtNetwork/QHostInfo>
 
 
 bool removeDir(const QString &dirName)

@@ -1,7 +1,7 @@
 #ifndef QN_PERFORMANCE_H
 #define QN_PERFORMANCE_H
 
-#include <QtGlobal>
+#include <QtCore/QtGlobal>
 
 class QnPerformance {
 public:

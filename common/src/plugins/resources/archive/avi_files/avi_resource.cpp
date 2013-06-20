@@ -1,6 +1,6 @@
 #include "avi_resource.h"
 
-#include <QDir>
+#include <QtCore/QDir>
 
 #include "avi_archive_delegate.h"
 

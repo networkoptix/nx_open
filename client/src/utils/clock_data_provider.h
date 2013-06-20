@@ -1,8 +1,8 @@
 #ifndef CLOCK_DATA_PROVIDER_H
 #define CLOCK_DATA_PROVIDER_H
 
-#include <QObject>
-#include <QTimer>
+#include <QtCore/QObject>
+#include <QtCore/QTimer>
 
 class QnClockDataProvider : public QObject
 {

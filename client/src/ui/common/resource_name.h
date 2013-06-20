@@ -1,7 +1,7 @@
 #ifndef RESOURCE_NAME_H
 #define RESOURCE_NAME_H
 
-#include <QString>
+#include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
 

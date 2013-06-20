@@ -3,10 +3,10 @@
 
 #include <QtCore/QMap>
 
-#include <QtGui/QFileDialog>
-#include <QtGui/QCheckBox>
-#include <QtGui/QSpinBox>
-#include <QtGui/QLineEdit>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QLineEdit>
 
 class QnCheckboxControlAbstractDelegate: public QObject
 {

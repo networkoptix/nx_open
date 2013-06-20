@@ -1,6 +1,6 @@
 #include "resize_hover_instrument.h"
-#include <QGraphicsItem>
-#include <QGraphicsWidget>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsWidget>
 #include <QGraphicsSceneHoverEvent>
 #include <ui/common/geometry.h>
 #include <ui/common/frame_section_queryable.h>

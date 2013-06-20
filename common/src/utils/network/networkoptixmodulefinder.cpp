@@ -7,9 +7,9 @@
 
 #include <memory>
 
-#include <QDateTime>
-#include <QNetworkInterface>
-#include <QScopedArrayPointer>
+#include <QtCore/QDateTime>
+#include <QtNetwork/QNetworkInterface>
+#include <QtCore/QScopedArrayPointer>
 
 #include "socket.h"
 #include "../common/log.h"

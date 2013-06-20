@@ -1,7 +1,7 @@
 #ifndef __AAC_CODEC_H
 #define __AAC_CODEC_H
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 
 const static int AAC_HEADER_LEN = 7;
 

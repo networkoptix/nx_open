@@ -1,9 +1,9 @@
 
 #include "proxy_label.h"
 
-#include <QApplication>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLayout>
 
 
 QnProxyLabel::QnProxyLabel(const QString &text, QGraphicsItem *parent, Qt::WindowFlags windowFlags):

@@ -1,8 +1,8 @@
 #include "custom_file_dialog.h"
 
-#include <QtGui/QGridLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent,
                                        const QString &caption,

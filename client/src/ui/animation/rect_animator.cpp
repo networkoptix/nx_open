@@ -1,6 +1,6 @@
 #include "rect_animator.h"
 #include <cmath> /* For std::abs, std::exp & std::log. */
-#include <QRectF>
+#include <QtCore/QRectF>
 #include <utils/common/warnings.h>
 #include <ui/common/geometry.h>
 

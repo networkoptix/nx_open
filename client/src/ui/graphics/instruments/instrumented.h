@@ -3,7 +3,7 @@
 
 #include <boost/type_traits/is_base_of.hpp>
 
-#include <QtGui/QGraphicsItem>
+#include <QtWidgets/QGraphicsItem>
 
 #include <utils/common/forward.h>
 

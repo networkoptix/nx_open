@@ -5,7 +5,7 @@
 #include "utils/network/http/httptypes.h"
 #include "utils/network/simple_http_client.h"
 
-#include <QXmlDefaultHandler>
+#include <QtXml/QXmlDefaultHandler>
 #include "core/resource_managment/resource_pool.h"
 #include "../../vmaxproxy/src/vmax480_helper.h"
 

@@ -1,7 +1,7 @@
 #ifndef TABLE_VIEW_H
 #define TABLE_VIEW_H
 
-#include <QtGui/QTableView>
+#include <QtWidgets/QTableView>
 
 /** The event-forwarder is needed to forward the entered() event from the header and scrool bars
 *   controls to the widgets. The widgets set the cursor to the default when the header control is entered.

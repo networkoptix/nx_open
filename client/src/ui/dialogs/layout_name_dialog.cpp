@@ -1,5 +1,5 @@
 #include "layout_name_dialog.h"
-#include <QPushButton>
+#include <QtWidgets/QPushButton>
 #include "ui_layout_name_dialog.h"
 
 QnLayoutNameDialog::QnLayoutNameDialog(const QString &caption, const QString &text, const QString &name, QDialogButtonBox::StandardButtons buttons, QWidget *parent):

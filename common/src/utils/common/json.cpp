@@ -5,7 +5,7 @@
 
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
-#include <QUuid>
+#include <QtCore/QUuid>
 
 #include <qjson/serializer.h>
 #include <qjson/parser.h>

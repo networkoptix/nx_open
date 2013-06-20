@@ -1,8 +1,8 @@
 #ifndef QN_MAIN_WINDOW_H
 #define QN_MAIN_WINDOW_H
 
-#include <QWidget>
-#include <QScopedPointer>
+#include <QtWidgets/QWidget>
+#include <QtCore/QScopedPointer>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>

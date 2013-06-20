@@ -1,7 +1,7 @@
 #ifndef __RECORDING_STATUS_HELPER_H__
 #define __RECORDING_STATUS_HELPER_H__
 
-#include <QIcon>
+#include <QtGui/QIcon>
 #include <core/resource/resource_fwd.h>
 
 class QnWorkbenchContext;

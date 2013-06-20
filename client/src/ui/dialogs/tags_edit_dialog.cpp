@@ -3,10 +3,10 @@
 
 #include <QtCore/QSet>
 
-#include <QtGui/QSortFilterProxyModel>
+#include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QStandardItemModel>
-#include <QKeyEvent>
-#include <QPushButton>
+#include <QtGui/QKeyEvent>
+#include <QtWidgets/QPushButton>
 
 #include "core/resource/resource.h"
 #include "core/resource_managment/resource_pool.h"

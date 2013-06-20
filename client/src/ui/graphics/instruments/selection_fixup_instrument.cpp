@@ -1,7 +1,7 @@
 #include "selection_fixup_instrument.h"
 #include <limits>
-#include <QGraphicsItem>
-#include <QGraphicsSceneMouseEvent>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
 
 class SelectionPreFixupInstrument: public Instrument {
 public:

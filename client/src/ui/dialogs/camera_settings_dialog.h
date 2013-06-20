@@ -1,8 +1,8 @@
 #ifndef QN_CAMERA_SETTINGS_DIALOG_H
 #define QN_CAMERA_SETTINGS_DIALOG_H
 
-#include <QtGui/QDialog>
-#include <QtGui/QDialogButtonBox>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QDialogButtonBox>
 
 #include <core/resource/resource_fwd.h>
 

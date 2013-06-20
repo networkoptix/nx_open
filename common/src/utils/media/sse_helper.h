@@ -156,7 +156,7 @@ static inline QString getCPUString()
     if(nExIds >= 0x80000004)
     {
         //printf_s("\nCPU Brand String: %s\n", CPUBrandString);
-        return QString::fromAscii( CPUBrandString ).trimmed();
+        return QString::fromLatin1( CPUBrandString ).trimmed();
     }
     return QString();
 }

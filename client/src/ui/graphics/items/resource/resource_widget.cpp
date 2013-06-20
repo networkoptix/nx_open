@@ -4,9 +4,9 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
-#include <QtGui/QGraphicsScene>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>

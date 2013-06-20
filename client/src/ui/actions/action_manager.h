@@ -1,10 +1,10 @@
 #ifndef QN_ACTION_MANAGER_H
 #define QN_ACTION_MANAGER_H
 
-#include <QObject>
+#include <QtCore/QObject>
 #include <QHash>
-#include <QSet>
-#include <QVariant>
+#include <QtCore/QSet>
+#include <QtCore/QVariant>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <ui/workbench/workbench_context_aware.h>

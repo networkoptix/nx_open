@@ -3,7 +3,7 @@
 
 #include <QtCore/QStringList>
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 class QSortFilterProxyModel;
 class QStandardItemModel;

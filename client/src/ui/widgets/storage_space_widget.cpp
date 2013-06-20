@@ -2,7 +2,7 @@
 
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
-#include <QtGui/QStyleOption>
+#include <QtWidgets/QStyleOption>
 
 #include <ui/style/skin.h>
 

@@ -1,7 +1,7 @@
 
 #include "text_to_wav.h"
 
-#include <QFile>
+#include <QtCore/QFile>
 
 #include <festival.h>
 

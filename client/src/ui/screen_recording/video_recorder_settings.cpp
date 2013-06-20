@@ -1,9 +1,9 @@
 #include "video_recorder_settings.h"
 
 #include <QtCore/QSettings>
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QFileDialog>
 #ifdef Q_OS_WIN32
 #   include "device_plugins/desktop_win/win_audio_helper.h"
 #endif

@@ -2,13 +2,13 @@
 #define QN_RESOURCE_H
 
 #include <cassert>
-#include <QDateTime>
-#include <QMap>
-#include <QMetaType>
-#include <QSet>
-#include <QStringList>
-#include <QReadWriteLock>
-#include <QThreadPool>
+#include <QtCore/QDateTime>
+#include <QtCore/QMap>
+#include <QtCore/QMetaType>
+#include <QtCore/QSet>
+#include <QtCore/QStringList>
+#include <QtCore/QReadWriteLock>
+#include <QtCore/QThreadPool>
 #include "utils/common/from_this_to_shared.h"
 #include "utils/common/id.h"
 #include "core/datapacket/abstract_data_packet.h"

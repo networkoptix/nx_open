@@ -1,4 +1,4 @@
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "acti_resource.h"
 #include "acti_stream_reader.h"
 #include "utils/common/sleep.h"

@@ -1,8 +1,8 @@
 #include "camera_settings_dialog.h"
 
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QPushButton>
 
 #include <ui/actions/action_manager.h>
 #include <ui/widgets/properties/camera_settings_widget.h>

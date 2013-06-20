@@ -1,8 +1,9 @@
 #ifndef _COMMON_COMPATIBILITY_H
 #define _COMMON_COMPATIBILITY_H
 
-#include <QSet>
-#include <QList>
+#include <QtCore/QSet>
+#include <QtCore/QString>
+#include <QtCore/QList>
 
 // Presense of an entry in global table means
 // that component of ver1 is compatible (or has compatibility mode)

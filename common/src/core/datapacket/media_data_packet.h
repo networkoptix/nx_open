@@ -1,8 +1,8 @@
 #ifndef abstract_media_data_h_112
 #define abstract_media_data_h_112
 
-#include <QVector>
-#include <QRect>
+#include <QtCore/QVector>
+#include <QtCore/QRect>
 
 extern "C"
 {

@@ -1,7 +1,7 @@
 #ifndef QN_GRID_HIGHLIGHT_ITEM_H
 #define QN_GRID_HIGHLIGHT_ITEM_H
 
-#include <QGraphicsObject>
+#include <QtWidgets/QGraphicsObject>
 
 class QnGridHighlightItem: public QGraphicsObject {
     Q_OBJECT

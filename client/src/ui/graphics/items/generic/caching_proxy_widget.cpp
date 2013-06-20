@@ -6,8 +6,8 @@
 #include <Glu.h>
 #endif
 
-#include <QEvent>
-#include <QSysInfo>
+#include <QtCore/QEvent>
+#include <QtCore/QSysInfo>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/warnings.h>

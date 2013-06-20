@@ -7,8 +7,8 @@
 
 #include <memory>
 
-#include <QBuffer>
-#include <QMutexLocker>
+#include <QtCore/QBuffer>
+#include <QtCore/QMutexLocker>
 
 #include <core/resource/resource.h>
 #include <plugins/resources/archive/avi_files/avi_archive_delegate.h>

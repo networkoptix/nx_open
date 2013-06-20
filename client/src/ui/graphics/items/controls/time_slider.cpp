@@ -12,7 +12,7 @@
 #include <QtCore/qmath.h>
 
 #include <QtGui/QPainter>
-#include <QtGui/QGraphicsSceneWheelEvent>
+#include <QtWidgets/QGraphicsSceneWheelEvent>
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>

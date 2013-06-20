@@ -1,7 +1,7 @@
 #ifndef QN_SYSTEM_MENU_EVENT_H
 #define QN_SYSTEM_MENU_EVENT_H
 
-#include <QEvent>
+#include <QtCore/QEvent>
 
 /**
  * This class implements a workaround for QTBUG-806: 

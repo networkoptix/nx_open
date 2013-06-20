@@ -9,7 +9,7 @@ extern "C"
 #include "utils/media/sse_helper.h"
 #include "utils/common/synctime.h"
 
-#include <QRegion>
+#include <QtGui/QRegion>
 
 #ifdef Q_OS_MAC
 #include <smmintrin.h>

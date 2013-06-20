@@ -2,7 +2,7 @@
 #define QN_IMAGE_BUTTON_WIDGET_H
 
 #include <QtGui/QPixmap>
-#include <QGLWidget>
+#include <QtOpenGL/QGLWidget>
 
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>

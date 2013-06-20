@@ -4,9 +4,9 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
-#include <QImage>
-#include <QNetworkProxy>
-#include <QNetworkReply>
+#include <QtGui/QImage>
+#include <QtNetwork/QNetworkProxy>
+#include <QtNetwork/QNetworkReply>
 #include <QSharedPointer>
 
 #include "utils/common/util.h"

@@ -1,7 +1,7 @@
 #ifndef QN_LOGIN_DIALOG_H
 #define QN_LOGIN_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 #include <client/client_settings.h>
 #include <utils/network/networkoptixmodulefinder.h>

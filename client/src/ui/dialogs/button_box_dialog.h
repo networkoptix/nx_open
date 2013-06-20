@@ -3,8 +3,8 @@
 
 #include <QtCore/QWeakPointer>
 
-#include <QtGui/QDialog>
-#include <QtGui/QDialogButtonBox>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QDialogButtonBox>
 
 #include <utils/common/connective.h>
 

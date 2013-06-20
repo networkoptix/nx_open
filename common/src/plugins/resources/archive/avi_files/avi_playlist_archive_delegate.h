@@ -1,8 +1,8 @@
 #ifndef QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H
 #define QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H
 
-#include <QStringList>
-#include <QFile>
+#include <QtCore/QStringList>
+#include <QtCore/QFile>
 #include "avi_archive_delegate.h"
 #include "core/resource/resource_media_layout.h"
 

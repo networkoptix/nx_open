@@ -1,7 +1,7 @@
 #ifndef QN_LICENSE_NOTIFICATION_DIALOG_H
 #define QN_LICENSE_NOTIFICATION_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 #include <licensing/license.h> // TODO: #Elric fwd
 
 class QnLicenseListModel;

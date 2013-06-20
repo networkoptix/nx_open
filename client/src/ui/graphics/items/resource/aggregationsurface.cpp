@@ -5,7 +5,7 @@
 
 #include "aggregationsurface.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/glext.h>
@@ -535,7 +535,7 @@ bool AggregationSurface::lockRect( const QRect& rect )
     totalLockedRectCount.ref();
 
     NX_LOG( QString::fromAscii("AggregationSurface::lockRect. Locked rect %1. Total locked bounding rect %2, total locked rects %3").
-        arg(rectToString(rect)).arg(rectToString(m_lockedSysMemBufferRegion.boundingRect())).arg(totalLockedRectCount), cl_logDEBUG1 );
+        arg(rectToString(rect)).arg(rectToString(m_lockedSysMemBufferRegion.boundingRect())).arg(totalLockedRectCount.load()), cl_logDEBUG1 );
 
     ++m_lockedRectCount;
 
@@ -570,7 +570,7 @@ QRect AggregationSurface::findAndLockRect( const QSize& requestedRectSize )
 
             NX_LOG( QString::fromAscii("AggregationSurface::findAndLockRect. Locked rect %1 of size %2x%3. Total locked bounding rect %4, total locked rects %5").
                 arg(rectToString(unusedRect)).arg(requestedRectSize.width()).arg(requestedRectSize.height()).
-                arg(rectToString(m_lockedSysMemBufferRegion.boundingRect())).arg(totalLockedRectCount), cl_logDEBUG1 );
+                arg(rectToString(m_lockedSysMemBufferRegion.boundingRect())).arg(totalLockedRectCount.load()), cl_logDEBUG1 );
 
             ++m_lockedRectCount;
 
@@ -593,7 +593,7 @@ void AggregationSurface::unlockRect( const QRect& rect )
     m_lockedSysMemBufferRegion -= rect;
     totalLockedRectCount.deref();
     NX_LOG( QString::fromAscii("AggregationSurface::unlockRect. Unlocked rect %1. Total locked bounding rect %2, total locked rects %3").
-        arg(rectToString(rect)).arg(rectToString(m_lockedSysMemBufferRegion.boundingRect())).arg(totalLockedRectCount), cl_logDEBUG1 );
+        arg(rectToString(rect)).arg(rectToString(m_lockedSysMemBufferRegion.boundingRect())).arg(totalLockedRectCount.load()), cl_logDEBUG1 );
 
     --m_lockedRectCount;
 #endif

@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include <QPalette>
+#include <QtGui/QPalette>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -304,7 +304,7 @@ QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnBusiness
     if (column == DescriptionColumn && action.hasFlags(QnBusinessActionData::MotionExists)) {
         BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
         if (eventType == BusinessEventType::Camera_Motion)
-            return Qt::PointingHandCursor;
+            return (int)Qt::PointingHandCursor;	//according to Qt5 QVariant comment this is the same as 4.x QVariant(Qt::CursorShape) constructor
     }
 
     return QVariant();

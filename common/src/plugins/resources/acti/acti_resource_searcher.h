@@ -1,9 +1,9 @@
 #ifndef _ACTI_RESOURCE_SEARCHER_H__
 #define _ACTI_RESOURCE_SEARCHER_H__
 
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QElapsedTimer>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
+#include <QtCore/QElapsedTimer>
 #include "plugins/resources/upnp/upnp_resource_searcher.h"
 
 

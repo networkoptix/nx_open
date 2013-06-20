@@ -8,8 +8,8 @@
 
 #include "asynchttpclient.h"
 
-#include <QWaitCondition>
-#include <QMutex>
+#include <QtCore/QWaitCondition>
+#include <QtCore/QMutex>
 
 
 /*!

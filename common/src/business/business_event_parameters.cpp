@@ -1,7 +1,7 @@
 
 #include "business_event_parameters.h"
 
-#include <QVariant>
+#include <QtCore/QVariant>
 
 #include "events/abstract_business_event.h"
 

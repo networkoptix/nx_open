@@ -1,8 +1,8 @@
 #include "tool_tip_slider.h"
 
-#include <QApplication>
-#include <QtGui/QStyleOptionSlider>
-#include <QtGui/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyleOptionSlider>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
 
 #include <utils/common/checked_cast.h>
 

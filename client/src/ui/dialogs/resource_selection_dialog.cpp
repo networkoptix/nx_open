@@ -1,8 +1,8 @@
 
 #include "resource_selection_dialog.h"
 
-#include <QKeyEvent>
-#include <QPushButton>
+#include <QtGui/QKeyEvent>
+#include <QtWidgets/QPushButton>
 
 #include "ui_resource_selection_dialog.h"
 

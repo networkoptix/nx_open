@@ -4,8 +4,8 @@
 
 #include <QtGui/QPainter>
 #include <QtGui/QIcon>
-#include <QtGui/QAction>
-#include <QtGui/QStyle>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QStyle>
 #include <QtOpenGL/QGLContext>
 
 #include <utils/common/warnings.h>

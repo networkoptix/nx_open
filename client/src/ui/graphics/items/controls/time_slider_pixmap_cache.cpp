@@ -1,6 +1,6 @@
 #include "time_slider_pixmap_cache.h"
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QFont>
 

@@ -1,6 +1,6 @@
 #include "business_rule_processor.h"
 
-#include <QList>
+#include <QtCore/QList>
 
 #include <api/app_server_connection.h>
 

@@ -3,7 +3,7 @@
 
 #include <QtCore/QPointer>
 
-#include <QtGui/QStyle>
+#include <QtWidgets/QStyle>
 
 /**
  * This class implements a proxy style that doesn't affect its base style in any way,

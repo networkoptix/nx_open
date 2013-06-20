@@ -1,8 +1,8 @@
 #include "resource_tree_widget.h"
 #include "ui_resource_tree_widget.h"
 
-#include <QtGui/QStyledItemDelegate>
-#include <QtGui/QScrollBar>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QScrollBar>
 #include <QtGui/QContextMenuEvent>
 
 #include <common/common_meta_types.h>

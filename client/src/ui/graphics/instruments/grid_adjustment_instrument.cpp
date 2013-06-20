@@ -1,7 +1,7 @@
 #include "grid_adjustment_instrument.h"
 #include <cassert>
-#include <QGraphicsSceneWheelEvent>
-#include <QWheelEvent>
+#include <QtWidgets/QGraphicsSceneWheelEvent>
+#include <QtGui/QWheelEvent>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_grid_mapper.h>

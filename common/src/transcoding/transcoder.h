@@ -1,7 +1,7 @@
 #ifndef __TRANSCODER_H
 #define __TRANSCODER_H
 
-#include <QString>
+#include <QtCore/QString>
 #include <QSharedPointer>
 
 extern "C"

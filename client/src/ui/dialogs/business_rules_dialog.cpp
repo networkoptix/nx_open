@@ -3,10 +3,10 @@
 
 #include <QtCore/QEvent>
 
-#include <QtGui/QMessageBox>
-#include <QtGui/QStyledItemDelegate>
-#include <QtGui/QItemEditorFactory>
-#include <QtGui/QComboBox>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QItemEditorFactory>
+#include <QtWidgets/QComboBox>
 #include <QtGui/QPainter>
 #include <QtGui/QKeyEvent>
 

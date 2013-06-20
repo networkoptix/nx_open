@@ -6,8 +6,8 @@
 #include "decoders/audio/ffmpeg_audio.h"
 #include "utils/common/synctime.h"
 
-#include <QDateTime>
-#include <QFileInfo>
+#include <QtCore/QDateTime>
+#include <QtCore/QFileInfo>
 
 #if defined(Q_OS_MAC)
 #include <CoreServices/CoreServices.h>

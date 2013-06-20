@@ -6,9 +6,9 @@
 #ifndef NETWORKOPTIXMODULEREVEALCOMMON_H
 #define NETWORKOPTIXMODULEREVEALCOMMON_H
 
-#include <QHostAddress>
-#include <QMetaType>
-#include <QString>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QMetaType>
+#include <QtCore/QString>
 
 
 static const char* NX_ENTERPISE_CONTROLLER_ID = "Enterprise Controller";

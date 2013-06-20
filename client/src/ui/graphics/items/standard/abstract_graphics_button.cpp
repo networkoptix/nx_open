@@ -4,14 +4,14 @@
 #include <QtCore/QEvent>
 #include <QtCore/QPointer>
 
-#include <QtGui/QAbstractItemView>
+#include <QtWidgets/QAbstractItemView>
 #ifndef QT_NO_ACCESSIBILITY
 #  include <QtGui/QAccessible>
 #endif
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QGraphicsSceneEvent>
-#include <QtGui/QStyle>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsSceneEvent>
+#include <QtWidgets/QStyle>
 
 #define AUTO_REPEAT_DELAY  300
 #define AUTO_REPEAT_INTERVAL 100
@@ -334,8 +334,9 @@ void AbstractGraphicsButtonPrivate::moveFocus(int key)
     QRectF target = f->rect().translated(f->mapToScene(QPoint(0,0)));
     QPointF goal = target.center();
 
-    Q_GUI_EXPORT extern bool qt_tab_all_widgets;
-    uint focus_flag = qt_tab_all_widgets ? Qt::TabFocus : Qt::StrongFocus;
+    //Q_GUI_EXPORT extern bool qt_tab_all_widgets;
+    //uint focus_flag = qt_tab_all_widgets ? Qt::TabFocus : Qt::StrongFocus;
+    uint focus_flag = Qt::StrongFocus;
 
     for (int i = 0; i < buttonList.count(); ++i) {
         AbstractGraphicsButton *button = buttonList.at(i);

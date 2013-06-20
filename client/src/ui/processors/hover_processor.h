@@ -1,7 +1,7 @@
 #ifndef QN_HOVER_FOCUS_PROCESSOR_H
 #define QN_HOVER_FOCUS_PROCESSOR_H
 
-#include <QtGui/QGraphicsObject>
+#include <QtWidgets/QGraphicsObject>
 
 #include <ui/common/weak_graphics_item_pointer.h>
 

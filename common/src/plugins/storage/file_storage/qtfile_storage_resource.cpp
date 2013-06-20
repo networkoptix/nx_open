@@ -1,6 +1,6 @@
 #include "qtfile_storage_resource.h"
 
-#include <QDir>
+#include <QtCore/QDir>
 
 #include "utils/common/util.h"
 

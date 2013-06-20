@@ -1,10 +1,10 @@
 #include "connection_testing_dialog.h"
 #include "ui_connection_testing_dialog.h"
 
-#include <QtGui/QDataWidgetMapper>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QDataWidgetMapper>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QStandardItemModel>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QPushButton>
 
 #include <api/session_manager.h>
 #include <utils/common/warnings.h>

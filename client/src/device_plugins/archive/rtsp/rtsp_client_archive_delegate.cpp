@@ -1,7 +1,7 @@
 
 #include "rtsp_client_archive_delegate.h"
 
-#include <QBuffer>
+#include <QtCore/QBuffer>
 
 extern "C"
 {

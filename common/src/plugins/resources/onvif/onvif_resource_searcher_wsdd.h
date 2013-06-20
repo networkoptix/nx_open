@@ -5,7 +5,7 @@
 
 #include <map>
 
-#include <QString>
+#include <QtCore/QString>
 
 #include "onvif/soapwsddProxy.h"
 

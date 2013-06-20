@@ -7,10 +7,10 @@
 #include <QtCore/QUrl>
 #include <QtCore/QTextStream>
 
-#include <QtGui/QAbstractItemView>
-#include <QtGui/QTreeWidgetItem>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QTreeWidgetItem>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>

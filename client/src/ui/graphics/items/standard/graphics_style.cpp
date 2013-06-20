@@ -1,9 +1,9 @@
 
 #include "graphics_style.h"
 #include <cassert>
-#include <QtGui/QApplication>
-#include <QGraphicsWidget>
-#include <QWidget>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsWidget>
+#include <QtWidgets/QWidget>
 #include <utils/common/scoped_value_rollback.h>
 
 

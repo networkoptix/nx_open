@@ -6,7 +6,7 @@
 #include <functional> /* For std::binary_function. */
 
 #include <QtCore/QtAlgorithms>
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 #include <QtOpenGL/QGLContext>
 #include <QtOpenGL/QGLWidget>
 

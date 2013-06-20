@@ -1,9 +1,9 @@
 #include "ip_line_edit.h"
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtGui/QValidator>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QStyleOptionFrameV2>
+#include <QtWidgets/QStyleOptionFrameV2>
 
 #define DOT QLatin1Char('.')
 

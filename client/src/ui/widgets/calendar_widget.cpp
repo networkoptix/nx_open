@@ -1,9 +1,9 @@
 #include "calendar_widget.h"
 
 #include <QtGui/QPainter>
-#include <QtGui/QTableView>
-#include <QtGui/QHeaderView>
-#include <QtGui/QToolButton>
+#include <QtWidgets/QTableView>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QToolButton>
 #include <QtGui/QWheelEvent>
 #include <QtGui/QMouseEvent>
 

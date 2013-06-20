@@ -46,7 +46,7 @@
 #define QN_PROGRESS_DIALOG_H
 
 #include <QtCore/QScopedPointer>
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 class QPushButton;
 class QLabel;

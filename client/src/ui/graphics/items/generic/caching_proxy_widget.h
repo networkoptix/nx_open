@@ -1,8 +1,8 @@
 #ifndef QN_CACHING_PROXY_WIDGET_H
 #define QN_CACHING_PROXY_WIDGET_H
 
-#include <QGraphicsProxyWidget>
-#include <QImage>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtGui/QImage>
 
 /**
  * Proxy widget that caches the widget's surface.

@@ -1,11 +1,11 @@
 #ifndef QN_ADVANCED_SETTINGS_WIDGET_H
 #define QN_ADVANCED_SETTINGS_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <core/resource/camera_resource.h>
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 namespace Ui {
     class AdvancedSettingsWidget;

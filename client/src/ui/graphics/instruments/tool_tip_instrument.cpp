@@ -2,8 +2,8 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QHelpEvent>
-#include <QtGui/QGraphicsProxyWidget>
-#include <QtGui/QAbstractItemView>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QAbstractItemView>
 
 #include <ui/graphics/items/standard/graphics_tool_tip.h>
 #include <ui/common/tool_tip_queryable.h>

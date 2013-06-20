@@ -108,9 +108,9 @@ void QDnsLookupRunnable::query(const int requestType, const QByteArray &requestN
 {
     // Load dn_expand, res_ninit and res_nquery on demand.
     static QBasicAtomicInt triedResolve = Q_BASIC_ATOMIC_INITIALIZER(false);
-    if (!triedResolve) {
+    if (!triedResolve.load()) {
         QMutexLocker locker(QMutexPool::globalInstanceGet(&local_res_ninit));
-        if (!triedResolve) {
+        if (!triedResolve.load()) {
             resolveLibrary();
             triedResolve.fetchAndStoreRelease(true);
         }

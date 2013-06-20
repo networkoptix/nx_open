@@ -1,5 +1,5 @@
 #include "resource_criterion.h"
-#include <QRegExp>
+#include <QtCore/QRegExp>
 #include <utils/common/warnings.h>
 #include <core/resource/resource.h>
 
