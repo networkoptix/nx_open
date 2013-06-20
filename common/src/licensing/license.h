@@ -97,6 +97,9 @@ public:
     void setOldHardwareId(const QByteArray& oldHardwareId);
     QByteArray oldHardwareId() const;
 
+    void setHardwareId2(const QByteArray& hardwareId);
+    QByteArray hardwareId2() const;
+
     QList<QnLicensePtr> licenses() const;
 	QList<QByteArray> allLicenseKeys() const;
     void append(QnLicensePtr license);
@@ -127,6 +130,7 @@ private:
     QMap<QByteArray, QnLicensePtr> m_licenses;
     QByteArray m_hardwareId;
 	QByteArray m_oldHardwareId;
+    QByteArray m_hardwareId2;
 };
 
 Q_DECLARE_METATYPE(QnLicenseList)

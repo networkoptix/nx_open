@@ -118,6 +118,7 @@ bool QnMessage::load(const pb::Message &message)
             const pb::InitialMessage& initialMessage = message.GetExtension(pb::InitialMessage::message);
             licenses.setHardwareId(initialMessage.hardwareid().c_str());
 			licenses.setOldHardwareId(initialMessage.oldhardwareid().c_str());
+			licenses.setHardwareId2(initialMessage.hardwareid2().c_str());
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());
             qnResTypePool->replaceResourceTypeList(resourceTypes);
 

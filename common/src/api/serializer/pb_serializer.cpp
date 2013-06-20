@@ -718,6 +718,7 @@ void QnApiPbSerializer::deserializeLicenses(QnLicenseList &licenses, const QByte
 
     licenses.setHardwareId(pb_licenses.hwid().c_str());
     licenses.setOldHardwareId(pb_licenses.oldhardwareid().c_str());
+    licenses.setHardwareId2(pb_licenses.hardwareid2().c_str());
     parseLicenses(licenses, pb_licenses.license());
 }
 

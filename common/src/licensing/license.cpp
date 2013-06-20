@@ -276,6 +276,16 @@ QByteArray QnLicenseList::oldHardwareId() const
     return m_oldHardwareId;
 }
 
+void QnLicenseList::setHardwareId2(const QByteArray &hardwareId2)
+{
+    m_hardwareId2 = hardwareId2;
+}
+
+QByteArray QnLicenseList::hardwareId2() const
+{
+    return m_hardwareId2;
+}
+
 void QnLicenseList::append(QnLicensePtr license)
 {
     if (m_licenses.contains(license->key())) {
