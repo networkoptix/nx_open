@@ -174,7 +174,7 @@
 			<properties>
 				<environment.dir>${env.ENVIRONMENT}</environment.dir>
 				<python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
-				<compiler>msvc2008</compiler>
+				<compiler>msvc2012</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
 			</properties>
