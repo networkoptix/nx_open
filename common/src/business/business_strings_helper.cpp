@@ -123,13 +123,13 @@ QString QnBusinessStringsHelper::timestampString(const QnBusinessEventParameters
 
 QString QnBusinessStringsHelper::resourceUrl(const QnBusinessEventParameters &params) {
     int id = params.getEventResourceId();
-    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
+    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::AllResources) : QnResourcePtr();
     return res ? QString(QLatin1String("%1 (%2)")).arg(res->getName()).arg(res->getUrl()) : QString();
 }
 
 QString QnBusinessStringsHelper::resourceName(const QnBusinessEventParameters &params) {
     int id = params.getEventResourceId();
-    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
+    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::AllResources) : QnResourcePtr();
     return res ? res->getName() : QString();
 }
 
@@ -234,7 +234,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnAbstractBusinessActionPtr&
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params) {
     int id = params.getEventResourceId();
     QnNetworkResourcePtr res = id > 0 ? 
-                            qnResPool->getResourceById(id, QnResourcePool::rfAllResources).dynamicCast<QnNetworkResource>() : 
+                            qnResPool->getResourceById(id, QnResourcePool::AllResources).dynamicCast<QnNetworkResource>() : 
                             QnNetworkResourcePtr();
     if (!res)
         return QString();

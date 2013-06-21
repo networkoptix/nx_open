@@ -324,21 +324,12 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="actionParamsFrame">
+         <widget class="QWidget" name="actionParamsWidget" native="true">
           <property name="minimumSize">
            <size>
             <width>0</width>
             <height>30</height>
            </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>0</number>
           </property>
           <layout class="QVBoxLayout" name="actionParamsLayout">
            <property name="spacing">

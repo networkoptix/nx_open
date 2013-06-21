@@ -447,7 +447,6 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                 } else {
                     res->setStatus(QnResource::Offline);
                     m_resourceDiscoveryCounter[uniqId] = 0;
-                    m_disconnectSended[uniqId] = false;
                 }
             }
         }

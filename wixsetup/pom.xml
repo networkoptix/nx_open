@@ -171,6 +171,21 @@
 									<workingDirectory>${project.build.directory}</workingDirectory>
 								</configuration>                    
 							</execution>
+                            
+							<execution>
+								<id>vox-heat</id>
+								<phase>process-sources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${python.dir}/python</executable>
+									<arguments>
+										<argument>generate-vox-wxs.py</argument>
+									</arguments>
+									<workingDirectory>${project.build.directory}</workingDirectory>
+								</configuration>                    
+							</execution>                            
 
 							<execution>
 								<id>package-CustomActions-with-msbuild</id>
@@ -196,6 +211,7 @@
 									<arguments>
 										<argument>-dAppServerSourceDir="${AppServerDir}"</argument>
 										<argument>-dClientHelpSourceDir="${ClientHelpSourceDir}"</argument>
+                                        <argument>-dClientVoxSourceDir="${ClientVoxSourceDir}"</argument>
 										<argument>-arch</argument>
 										<argument>${arch}</argument>
 										<argument>-out</argument>
@@ -229,6 +245,7 @@
 										<argument>Product-${install.type}.wxs</argument>
 										<argument>AppServerFiles.wxs</argument>
 										<argument>ClientHelp.wxs</argument>
+                                        <argument>ClientVox.wxs</argument>
 										<argument>AppServerDlg.wxs</argument> 
 									</arguments>
 								</configuration>                    

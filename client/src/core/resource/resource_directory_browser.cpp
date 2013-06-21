@@ -16,22 +16,22 @@
 
 #include <utils/local_file_cache.h>
 
-QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
-{
+namespace {
+    const int maxResourceCount = 1024;
+}
+
+QnResourceDirectoryBrowser::QnResourceDirectoryBrowser() {
     m_resourceReady = false;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
-{
+QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QnResourceParameters &parameters) {
     QnResourcePtr result;
 
-    if (!isResourceTypeSupported(resourceTypeId))
-    {
+    if (!isResourceTypeSupported(resourceTypeId)) {
         return result;
     }
 
-    if (parameters.contains(QLatin1String("file")))
-    {
+    if (parameters.contains(QLatin1String("file"))) {
         result = createArchiveResource(parameters[QLatin1String("file")]);
         result->setTypeId(resourceTypeId);
         result->deserialize(parameters);
@@ -40,34 +40,29 @@ QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, co
     return result;
 }
 
-QString QnResourceDirectoryBrowser::manufacture() const
-{
+QString QnResourceDirectoryBrowser::manufacture() const {
     return QLatin1String("DirectoryBrowser");
 }
 
-QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance()
-{
+QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance() {
     // TODO: #Elric this causes heap corruption, investigate
     //return *qnResourceDirectoryBrowserInstance();
     static QnResourceDirectoryBrowser inst;
     return inst;
 }
 
-void QnResourceDirectoryBrowser::cleanup()
-{
+void QnResourceDirectoryBrowser::cleanup() {
     m_resourceReady = false;
 }
 
 QnResourceList QnResourceDirectoryBrowser::findResources()
 {
-    if (m_resourceReady) // TODO: #Elric if path check list is changed, this check will prevent us from re-updating the resource list.
-    {
+    if (m_resourceReady)
         return QnResourceList();
-    }
 
     setShouldBeUsed(false);
 
-    QThread::Priority old_priority = QThread::currentThread()->priority();
+    QThread::Priority oldPriority = QThread::currentThread()->priority();
     QThread::currentThread()->setPriority(QThread::IdlePriority);
 
     qDebug() << "Browsing directories....";
@@ -79,29 +74,25 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
 
     QStringList dirs = getPathCheckList();
 
-    foreach (const QString &dir, dirs)
-    {
-        QnResourceList dev_lst = findResources(dir);
-
-        qDebug() << "found " << dev_lst.count() << " devices";
-
-        result.append(dev_lst);
-
+    foreach (const QString &dir, dirs) {
+        findResources(dir, &result);
         if (shouldStop())
-            return result;
+            break;
     }
 
     qDebug() << "Done(Browsing directories). Time elapsed = " << time.elapsed();
 
-    QThread::currentThread()->setPriority(old_priority);
+    QThread::currentThread()->setPriority(oldPriority);
 
     m_resourceReady = true;
+
+    while(result.size() > maxResourceCount)
+        result.pop_back();
 
     return result;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) const
-{
+QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) const {
     QFile file(filename);
     if (!file.exists())
         return QnResourcePtr(0);
@@ -110,43 +101,29 @@ QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) con
 }
 
 //=============================================================================================
-QnResourceList QnResourceDirectoryBrowser::findResources(const QString& directory)
-{
+void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResourceList *result) {
     qDebug() << "Checking " << directory;
-
-    QnResourceList result;
-
     if (shouldStop())
-        return result;
+        return;
 
-    QDir dir(directory);
-    const QList<QFileInfo> flist = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks);
-    foreach (const QFileInfo &fi, flist)
-    {
+    const QList<QFileInfo> files = QDir(directory).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks);
+    foreach (const QFileInfo &file, files) {
         if (shouldStop())
-            return result;
+            return;
 
-        QString absoluteFilePath = fi.absoluteFilePath();
-        if (fi.isDir())
-        {
+        QString absoluteFilePath = file.absoluteFilePath();
+        if (file.isDir()) {
             if (absoluteFilePath != directory)
-                result.append(findResources(absoluteFilePath));
-        }
-        else
-        {
+                findResources(absoluteFilePath, result);
+        } else {
             QnResourcePtr res = createArchiveResource(absoluteFilePath);
             if (res)
-            {
-                result.append(res);
-            }
+                result->append(res);
         }
     }
-
-    return result;
 }
 
-QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xfile)
-{
+QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xfile) {
     QnLayoutResourcePtr layout;
     QnLayoutFileStorageResource layoutStorage;
     layoutStorage.setUrl(xfile);
@@ -165,22 +142,19 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     }
 
     QIODevice* uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
-    if (uuidFile)
-    {
+    if (uuidFile) {
         QByteArray data = uuidFile->readAll();
         delete uuidFile;
         layout->setGuid(QUuid(data.data()).toString());
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
         if (existingLayout)
             return existingLayout;
-    }
-    else {
+    } else {
         layout->setGuid(QUuid::createUuid().toString());
     }
 
     QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);
-    if (rangeFile)
-    {
+    if (rangeFile) {
         QByteArray data = rangeFile->readAll();
         delete rangeFile;
         layout->setLocalRange(QnTimePeriod().deserialize(data));
@@ -188,8 +162,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
     QIODevice* miscFile = layoutStorage.open(QLatin1String("misc.bin"), QIODevice::ReadOnly);
     bool layoutWithCameras = false;
-    if (miscFile)
-    {
+    if (miscFile) {
         QByteArray data = miscFile->readAll();
         delete miscFile;
         if (data.size() >= (int)sizeof(quint32))
@@ -232,8 +205,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QTextStream itemTimeZones(itemTimeZonesIO);
 
     // TODO: #Elric here is bad place to add resources to pool. need refactor
-    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
-    {
+    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr) {
         QnLayoutItemData& item = itr.value();
         QString path = item.resource.path;
         item.uuid = QUuid::createUuid();
@@ -266,8 +238,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         }
         item.resource.id = aviResource->getId();
 
-        for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel)
-        {
+        for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel) {
             QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
             QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(QFileInfo(normMotionName).baseName()), QIODevice::ReadOnly);
             if (motionIO) {
@@ -298,8 +269,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     return layout;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& xfile)
-{
+QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& xfile) {
     //if (FileTypeSupport::isImageFileExt(xfile))
     //    return QnResourcePtr(new QnLocalFileResource(xfile));
 
@@ -310,16 +280,14 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
     if (FileTypeSupport::isMovieFileExt(xfile))
         return QnResourcePtr(new QnAviResource(xfile));
 
-    if (FileTypeSupport::isImageFileExt(xfile))
-    {
+    if (FileTypeSupport::isImageFileExt(xfile)) {
         QnResourcePtr rez = QnResourcePtr(new QnAviResource(xfile));
         rez->addFlags(QnResource::still_image);
         rez->removeFlags(QnResource::video | QnResource::audio);
         return rez;
     }
 
-    if (FileTypeSupport::isLayoutFileExt(xfile))
-    {
+    if (FileTypeSupport::isLayoutFileExt(xfile)) {
         QnLayoutResourcePtr layout = layoutFromFile(xfile);
         return layout;
     }

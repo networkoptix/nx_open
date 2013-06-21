@@ -75,6 +75,8 @@ void QnLiveStreamProvider::setSecondaryQuality(QnSecondaryStreamQuality  quality
         if (m_secondaryQuality == quality)
             return; // same quality
         m_secondaryQuality = quality;
+        if (m_secondaryQuality == SSQualityNotDefined)
+            return;
     }
 
     if (getRole() != QnResource::Role_SecondaryLiveVideo)

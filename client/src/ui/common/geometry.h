@@ -38,6 +38,10 @@ public:
     static MarginsF cwiseDiv(const MarginsF &l, const MarginsF &r);
     static QRectF cwiseMul(const QRectF &l, const QSizeF &r);
     static QRectF cwiseDiv(const QRectF &l, const QSizeF &r);
+    static QRectF cwiseSub(const QRectF &l, const QRectF &r);
+    static QRectF cwiseAdd(const QRectF &l, const QRectF &r);
+    static QRectF cwiseDiv(const QRectF &l, qreal r);
+    static QRectF cwiseMul(const QRectF &l, qreal r);
     static QMargins cwiseSub(const QMargins &l, const QMargins &r);
     static QMargins cwiseAdd(const QMargins &l, const QMargins &r);
 

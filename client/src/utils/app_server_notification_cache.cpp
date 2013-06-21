@@ -66,6 +66,10 @@ bool QnAppServerNotificationCache::updateTitle(const QString &filename, const QS
     bool result = FileTranscoder::setTagValue( getFullPath(filename), titleTag, title );
     if (result) {
         m_model->updateTitle(filename, title);
+        if (m_updatingFiles.contains(filename))
+            m_updatingFiles[filename] += 1;
+        else
+            m_updatingFiles[filename] = 1;
         uploadFile(filename);
     }
     return result;
@@ -82,6 +86,10 @@ void QnAppServerNotificationCache::at_fileAddedEvent(const QString &filename) {
     QString localFilename = filename.mid(QString(folder).size() + 1);
 
     // will do nothing if we have added this file
+    if (m_model->rowByFilename(localFilename) > 0)
+        return;
+
+    m_model->addDownloading(localFilename);
     downloadFile(localFilename);
 }
 
@@ -90,12 +98,15 @@ void QnAppServerNotificationCache::at_fileUpdatedEvent(const QString &filename) 
         return;
 
     QString localFilename = filename.mid(QString(folder).size() + 1);
+    if (m_updatingFiles.contains(localFilename)) {
+        m_updatingFiles[localFilename] -= 1;
+        if (m_updatingFiles[localFilename] <= 0)
+            m_updatingFiles.remove(localFilename);
+        return;
+    }
 
-    // how and when should we redownload the file? check if we have modified the file by ourselves!
-
-    QString title = AudioPlayer::getTagValue(getFullPath(localFilename), titleTag);
-    if (!title.isEmpty())
-        m_model->updateTitle(localFilename, title);
+    QFile::remove(getFullPath(localFilename));
+    downloadFile(localFilename);
 }
 
 void QnAppServerNotificationCache::at_fileRemovedEvent(const QString &filename) {
@@ -106,6 +117,9 @@ void QnAppServerNotificationCache::at_fileRemovedEvent(const QString &filename) 
 
     // double removing is quite safe
     QFile::remove(getFullPath(localFilename));
+    int row = m_model->rowByFilename(localFilename);
+    if (row > 0)
+        m_model->removeRow(row);
 }
 
 void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {
@@ -138,6 +152,6 @@ void QnAppServerNotificationCache::at_fileRemoved(const QString &filename, bool 
     if (!ok)
         return;
     int row = m_model->rowByFilename(filename);
-    if (row >= 0)
+    if (row > 0)
         m_model->removeRow(row);
 }

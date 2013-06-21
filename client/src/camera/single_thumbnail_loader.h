@@ -6,8 +6,7 @@
 #include <api/media_server_connection.h>
 #include <core/resource/network_resource.h>
 
-class QnSingleThumbnailLoader : public QObject
-{
+class QnSingleThumbnailLoader : public QObject {
     Q_OBJECT
 public:
     /**
@@ -29,7 +28,8 @@ public:
      */
     static QnSingleThumbnailLoader *newInstance(QnResourcePtr resource, QObject *parent = NULL);
 
-    void load(qint64 usecSinceEpoch, const QSize& size);
+    void load(qint64 usecSinceEpoch, const QSize &size);
+
 signals:
     /**
      * This signal is emitted whenever thumbnail was successfully loaded.
@@ -46,6 +46,7 @@ signals:
     void failed(int status);
 
     void finished();
+
 private slots:
     void at_replyReceived(int status, const QImage& image, int requstHandle);
 

@@ -1,12 +1,15 @@
 
-#include "text_to_wav.h"
 
 #include <QtCore/QFile>
+
+#include <memory>
 
 #include <festival.h>
 
 #include <version.h>
 #include <EST_wave_aux.h>
+
+#include "text_to_wav.h"
 
 
 static char festivalVoxPath[256];
@@ -203,57 +206,158 @@ namespace
 }
 #endif
 
+static void initFestival()
+{
+    //initializing festival engine
+    //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
+    sprintf( festivalVoxPath, "%s/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
+    festival_libdir = festivalVoxPath;
+
+    const int heap_size = 1510000;  // default scheme heap size
+    const int load_init_files = 1; // we want the festival init files loaded
+    festival_initialize( load_init_files, heap_size );
+}
+
 class FestivalInitializer
 {
 public:
     FestivalInitializer()
     {
-        //initializing festival engine
-        sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
-        festival_libdir = festivalVoxPath;
+        initFestival();
+    }
 
-        const int heap_size = 210000;  // default scheme heap size
-        const int load_init_files = 1; // we want the festival init files loaded
-        festival_initialize( load_init_files, heap_size );
+    ~FestivalInitializer()
+    {
+        festival_tidy_up();
     }
 };
 
-Q_GLOBAL_STATIC( FestivalInitializer, festivalInitializer )
-
-
-bool textToWav( const QString& text, QIODevice* const dest )
+static int my_festival_text_to_wave(const EST_String &text,EST_Wave &wave)
 {
-    festivalInitializer();
+    return festival_text_to_wave( text, wave );
+}
 
+static bool textToWavInternal( const QString& text, QIODevice* const dest )
+{
     // Convert to a waveform
     EST_Wave wave;
-    if( !festival_text_to_wave( text.toAscii().constData(), wave ) )
-        return false;
+    EST_String srcText( text.toAscii().constData() );
+    bool result = my_festival_text_to_wave( srcText, wave );
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
-    //open_memstream is present
-    char* buf = NULL;
-    size_t bufSize = 0;
-    FILE* f = open_memstream( &buf, &bufSize );
-    if( !f )
-        return false;
-    if( wave.save( f, "riff" ) != write_ok )
+    if( result )
     {
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+        //open_memstream is present
+        char* buf = NULL;
+        size_t bufSize = 0;
+        FILE* f = open_memstream( &buf, &bufSize );
+        if( !f )
+            return false;
+        if( wave.save( f, "riff" ) != write_ok )
+        {
+            if( buf )
+                free( buf );
+            result = false;
+        }
+        else
+        {
+            result = (buf && (bufSize > 0))
+                ? dest->write( buf, bufSize ) == bufSize
+                : false;
+            if( buf )
+                free( buf );
+        }
         fflush( f );
         fclose( f );
-        if( buf )
-            free( buf );
-        return false;
-    }
-    fflush( f );
-    fclose( f );
-    const bool result = (buf && (bufSize > 0))
-        ? dest->write( buf, bufSize ) == bufSize
-        : false;
-    if( buf )
-        free( buf );
-    return result;
 #else
-    return save_wave_riff( dest, wave.values().memory(), 0, wave.num_samples(), wave.num_channels(), wave.sample_rate(), st_short, EST_NATIVE_BO ) == write_ok;
+        result = save_wave_riff( dest, wave.values().memory(), 0, wave.num_samples(), wave.num_channels(), wave.sample_rate(), st_short, EST_NATIVE_BO ) == write_ok;
 #endif
+    }
+
+    return result;
+}
+
+
+
+
+
+TextToWaveServer::TextToWaveServer()
+:
+    m_prevTaskID( 1 )
+{
+}
+
+TextToWaveServer::~TextToWaveServer()
+{
+    stop();
+}
+
+void TextToWaveServer::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    m_textQueue.push( QSharedPointer<SynthetiseSpeechTask>(new SynthetiseSpeechTask()) );
+}
+
+int TextToWaveServer::generateSoundAsync( const QString& text, QIODevice* const dest )
+{
+    QSharedPointer<SynthetiseSpeechTask> task = addTaskToQueue( text, dest );
+    return task ? task->id : 0;
+}
+
+bool TextToWaveServer::generateSoundSync( const QString& text, QIODevice* const dest )
+{
+    QMutexLocker lk( &m_mutex );
+    QSharedPointer<SynthetiseSpeechTask> task = addTaskToQueue( text, dest );
+    while( !task->done )
+        m_cond.wait( lk.mutex() );
+    return task->result;
+}
+
+static TextToWaveServer* _staticInstance = NULL;
+
+void TextToWaveServer::initStaticInstance( TextToWaveServer* _instance )
+{
+    _staticInstance = _instance;
+}
+
+TextToWaveServer* TextToWaveServer::instance()
+{
+    return _staticInstance;
+}
+
+void TextToWaveServer::run()
+{
+    saveSysThreadID();
+
+    FestivalInitializer festivalInitializer;
+
+    while( !needToStop() )
+    {
+        QSharedPointer<SynthetiseSpeechTask> task;
+        if( !m_textQueue.pop( task ) )
+            continue;
+        if( !task->dest )
+            continue;
+
+        const bool result = textToWavInternal( task->text, task->dest );
+        {
+            QMutexLocker lk( &m_mutex );
+            task->done = true;
+            task->result = result;
+            m_cond.wakeAll();
+        }
+        emit done( task->id, task->result );
+    }
+}
+
+QSharedPointer<TextToWaveServer::SynthetiseSpeechTask> TextToWaveServer::addTaskToQueue( const QString& text, QIODevice* const dest )
+{
+    QSharedPointer<SynthetiseSpeechTask> task( new SynthetiseSpeechTask() );
+    int taskID = m_prevTaskID.fetchAndAddAcquire(1);
+    if( taskID == 0 )
+        taskID = m_prevTaskID.fetchAndAddAcquire(1);
+    task->id = taskID;
+    task->text = text;
+    task->dest = dest;
+    return m_textQueue.push( task ) ? task : QSharedPointer<SynthetiseSpeechTask>();
 }

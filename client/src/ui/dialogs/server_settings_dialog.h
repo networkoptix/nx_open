@@ -6,6 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 #include "button_box_dialog.h"
 
 class QLabel;
@@ -17,7 +19,7 @@ namespace Ui {
     class ServerSettingsDialog;
 }
 
-class QnServerSettingsDialog: public QnButtonBoxDialog {
+class QnServerSettingsDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware {
     Q_OBJECT;
 
     typedef QnButtonBoxDialog base_type;
@@ -43,10 +45,11 @@ private:
     QString bottomLabelText() const;
     int dataRowCount() const;
 
-private slots: 
+private slots:
     void at_tableBottomLabel_linkActivated();
     void at_storagesTable_cellChanged(int row, int column);
     void at_storagesTable_contextMenuEvent(QObject *watched, QEvent *event);
+    void at_pingButton_clicked();
 
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
 

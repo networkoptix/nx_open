@@ -18,6 +18,7 @@ CONFIG(debug, debug|release) {
 
 win32 {
   QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
+  INCLUDEPATH +=  ${environment.dir}/qt/include/QtGui
 }
 
 mac {

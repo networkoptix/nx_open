@@ -98,6 +98,8 @@ extern "C"
 #include "platform/platform_abstraction.h"
 #include "utils/common/long_runnable.h"
 
+#include "text_to_wav.h"
+
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -287,6 +289,9 @@ int main(int argc, char **argv)
 
     QnSessionManager::instance();
     QnResourcePool::initStaticInstance( new QnResourcePool() );
+
+    TextToWaveServer::initStaticInstance( new TextToWaveServer() );
+    TextToWaveServer::instance()->start();
 
     int result = 0;
     {   //do not remove! needed to make QnResourcePool life time controlled
@@ -556,6 +561,9 @@ int main(int argc, char **argv)
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
+
+    delete TextToWaveServer::instance();
+    TextToWaveServer::initStaticInstance( NULL );
 
 //    qApp->processEvents(); //TODO: #Elric crashes
     return result;

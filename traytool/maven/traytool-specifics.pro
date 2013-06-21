@@ -7,6 +7,8 @@ CONFIG(debug, debug|release) {
   CONFIG += console
 }
 
+#LIBS -= -lqjson
+
 win32 {
   QMAKE_LFLAGS += /MACHINE:${arch}  
 }

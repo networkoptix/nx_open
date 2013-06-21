@@ -15,7 +15,7 @@
 #include "drag_processing_instrument.h"
 
 class FixedArSelectionItem;
-class PtzSplashItem;
+class QnSplashItem;
 class PtzOverlayWidget;
 class PtzElementsWidget;
 class PtzManipulatorWidget;
@@ -88,7 +88,7 @@ private:
         return m_manipulator.data();
     }
 
-    PtzSplashItem *newSplashItem(QGraphicsItem *parentItem);
+    QnSplashItem *newSplashItem(QGraphicsItem *parentItem);
 
     FixedArSelectionItem *selectionItem() const {
         return m_selectionItem.data();
@@ -148,10 +148,10 @@ private:
 
     struct SplashItemAnimation {
         SplashItemAnimation(): item(NULL), fadingIn(true), expansionMultiplier(0.0), opacityMultiplier(0.0) {}
-        SplashItemAnimation(PtzSplashItem *item): item(item), fadingIn(true), expansionMultiplier(0.0), opacityMultiplier(0.0) {}
-        SplashItemAnimation(PtzSplashItem *item, qreal expansionMultiplier, qreal opacityMultiplier): item(item), fadingIn(true), expansionMultiplier(expansionMultiplier), opacityMultiplier(opacityMultiplier) {}
+        SplashItemAnimation(QnSplashItem *item): item(item), fadingIn(true), expansionMultiplier(0.0), opacityMultiplier(0.0) {}
+        SplashItemAnimation(QnSplashItem *item, qreal expansionMultiplier, qreal opacityMultiplier): item(item), fadingIn(true), expansionMultiplier(expansionMultiplier), opacityMultiplier(opacityMultiplier) {}
 
-        PtzSplashItem *item;
+        QnSplashItem *item;
         bool fadingIn;
         qreal expansionMultiplier; /**< Expansion speed relative to standard expansion speed. */
         qreal opacityMultiplier;

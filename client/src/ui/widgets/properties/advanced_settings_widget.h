@@ -34,7 +34,7 @@ private:
     void setKeepQualityVisible(bool value);
     void setQualitySlider(QnSecondaryStreamQuality quality);
     bool isKeepQualityVisible() const;
-
+    void updateControlsState();
 private:
     enum SliderQuality {Quality_Low, Quality_Medium, Quality_High};
 

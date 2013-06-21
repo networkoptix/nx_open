@@ -232,6 +232,9 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 
 void QnEventLogDialog::updateHeaderWidth()
 {
+    if (ui->dateEditFrom->width() == 0)
+        return;
+
     int space = ui->mainGridLayout->horizontalSpacing();
     int offset = ui->gridEvents->verticalHeader()->sizeHint().width();
     space--; // grid line delimiter

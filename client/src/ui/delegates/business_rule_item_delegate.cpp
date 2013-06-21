@@ -134,6 +134,10 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                     connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     return comboBox;
                 } else if (actionType == BusinessActionType::PlaySound) {
+                    QString soundUrl = index.data(Qt::EditRole).toString();
+                    if (soundUrl.startsWith(QLatin1String("speech://")))
+                        return NULL;
+
                     QComboBox* comboBox = new QComboBox(parent);
                     comboBox->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
                     connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));

@@ -150,9 +150,11 @@ public:
         delete dataProcessor;
         dataProcessor = 0;
 
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes->toResourcePtr()); // crashed here with access vialation reading loacation 0x000000000... (mediaRes = 0)
-        if (camera)
-            camera->notInUse(this);
+        if (mediaRes) {
+            QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes->toResourcePtr());
+            if (camera)
+                camera->notInUse(this);
+        }
     }
 
     ~QnRtspConnectionProcessorPrivate()
@@ -579,7 +581,9 @@ QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaD
     bool canCheckLive = (dataType == QnAbstractMediaData::VIDEO) || (d->startTime == DATETIME_NOW);
     if (canCheckLive)
     {
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+        QnVideoCamera* camera = 0;
+        if (getResource())
+            camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
         if (camera) {
             if (dataType == QnAbstractMediaData::VIDEO)
                 rez =  camera->getLastVideoFrame(isHQ);
@@ -922,7 +926,9 @@ void QnRtspConnectionProcessor::at_camera_disabledChanged()
 void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
+    QnVideoCamera* camera = 0;
+    if (d->mediaRes)
+        camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
     if (camera && d->liveMode == Mode_Live)
     {
         if (!d->liveDpHi && !d->mediaRes->toResource()->isDisabled()) {
@@ -1069,7 +1075,9 @@ int QnRtspConnectionProcessor::composePlay()
     else 
         d->dataProcessor->clearUnprocessedData();
 
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
+    QnVideoCamera* camera = 0;
+    if (d->mediaRes)
+        camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
     if (d->liveMode == Mode_Live) {
         if (camera)
             camera->inUse(d);

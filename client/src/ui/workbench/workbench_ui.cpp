@@ -1815,6 +1815,10 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
     if(resource.isNull())
         return;
 
+    // user resources cannot be dropped on the scene
+    if (resource.dynamicCast<QnUserResource>())
+        return;
+
     menu()->trigger(Qn::DropResourcesAction, resource);
 }
 

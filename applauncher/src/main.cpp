@@ -6,6 +6,7 @@
 
 #include <QtSingleApplication>
 #include <qtservice.h>
+#include <QDir>
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
@@ -121,6 +122,7 @@ int main( int argc, char* argv[] )
     return service.exec();
 #else
     QtSingleApplication app( SERVICE_NAME, argc, argv );
+    QDir::setCurrent( QCoreApplication::applicationDirPath() );
     LauncherFSM fsm( quitMode );
     QObject::connect( &fsm, SIGNAL(finished()), &app, SLOT(quit()) );
     QObject::connect( &fsm, SIGNAL(stopped()), &app, SLOT(quit()) );

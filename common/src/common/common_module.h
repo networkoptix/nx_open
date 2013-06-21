@@ -3,7 +3,9 @@
 
 #include <QtCore/QObject>
 
-class QnPtzMapperPool;
+#include <utils/common/singleton.h>
+#include <utils/common/instance_storage.h>
+
 class QnSessionManager;
 
 /**
@@ -11,31 +13,20 @@ class QnSessionManager;
  * 
  * All singletons and initialization/deinitialization code goes here.
  */
-class QnCommonModule: public QObject {
+class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule> {
     Q_OBJECT
 public:
     QnCommonModule(int &argc, char **argv, QObject *parent = NULL);
     virtual ~QnCommonModule();
 
-    /**
-     * \returns                         Global instance of common module.
-     *                                  Note that this instance must be created first (e.g. on the stack, like a <tt>QApplication</tt>).
-     */
-    static QnCommonModule *instance() {
-        return s_instance;
-    }
-
-    QnPtzMapperPool *ptzMapperPool() const {
-        return m_ptzMapperPool;
-    }
-
     QnSessionManager *sessionManager() const {
         return m_sessionManager;
     }
 
+    using Singleton<QnCommonModule>::instance;
+    using QnInstanceStorage::instance;
+
 private:
-    static QnCommonModule *s_instance;
-    QnPtzMapperPool *m_ptzMapperPool;
     QnSessionManager *m_sessionManager;
 };
 

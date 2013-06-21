@@ -95,7 +95,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         if (isServer)
             resource->setStatus(QnResource::Online);
 
-        QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::rfAllResources);
+        QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::AllResources);
         if (ownResource)
         {
             ownResource->update(resource);
@@ -122,7 +122,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         }
     } else if (event.eventType == Qn::Message_Type_ResourceDelete)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId, QnResourcePool::rfAllResources);
+        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId, QnResourcePool::AllResources);
 
         if (resource)
         {

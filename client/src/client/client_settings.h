@@ -16,7 +16,7 @@
 
 class QSettings;
 
-class QnClientSettings: public QnPropertyStorage, public QnSingleton<QnClientSettings> {
+class QnClientSettings: public QnPropertyStorage, public Singleton<QnClientSettings> {
     Q_OBJECT
     typedef QnPropertyStorage base_type;
 

@@ -169,7 +169,6 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     foreach(__m128i *data, m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
-
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {

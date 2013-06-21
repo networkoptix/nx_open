@@ -248,7 +248,7 @@ QnResourcePtr QnResourcePool::getResourceById(QnId id, Filter searchFilter) cons
     if( resIter != m_resources.end() )
         return resIter.value();
 
-    if( searchFilter == rfOnlyFriends )
+    if( searchFilter == OnlyFriends )
         return QnResourcePtr(NULL);
 
     //looking through foreign resources

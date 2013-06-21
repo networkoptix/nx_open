@@ -14,6 +14,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
 #include <utils/math/math.h>
+#include <utils/math/color_transformations.h>
 #include <utils/common/toggle.h>
 #include <utils/common/util.h>
 #include <client/client_meta_types.h>
@@ -47,6 +48,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
 #include <ui/graphics/items/grid/grid_raised_cone_item.h>
@@ -70,6 +72,8 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
+
 #include "camera/thumbnails_loader.h" // TODO: remove?
 #include "../../ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "watchers/workbench_server_time_watcher.h"
@@ -243,6 +247,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Connect to context. */
     connect(accessController(),             SIGNAL(permissionsChanged(const QnResourcePtr &)),          this,                   SLOT(at_context_permissionsChanged(const QnResourcePtr &)));
+    connect(context()->instance<QnWorkbenchNotificationsHandler>(), SIGNAL(businessActionAdded(const QnAbstractBusinessActionPtr &)), this, SLOT(at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &)));
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
@@ -1832,4 +1837,22 @@ void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resour
     }
 }
 
+void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction) {
+    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().getEventResourceId(), QnResourcePool::AllResources);
+    if (!resource)
+        return;
 
+    foreach(QnResourceWidget *widget, this->widgets(resource)) {
+        QRectF rect = widget->rect();
+        qreal expansion = qMin(rect.width(), rect.height()) / 2.0;
+        
+
+        QnSplashItem *splashItem = new QnSplashItem(widget);
+        splashItem->setSplashType(QnSplashItem::Rectangular);
+        splashItem->setPos(rect.center());
+        splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
+        splashItem->setColor(withAlpha(qnGlobals->errorTextColor(), 128));
+        splashItem->setOpacity(0.0);
+        splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
+    }
+}

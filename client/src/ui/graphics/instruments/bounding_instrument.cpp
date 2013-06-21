@@ -158,6 +158,7 @@ public:
         m_isSizeCorrected = false;
         m_isPositionCorrected = true;
 
+        m_lastTickTime = 0;
         m_stickyLogScaleHi = 1.0;
         m_stickyLogScaleLo = -1.0;
     }

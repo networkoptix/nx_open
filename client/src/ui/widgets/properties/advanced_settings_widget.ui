@@ -125,7 +125,7 @@
          <number>0</number>
         </property>
         <item row="0" column="1">
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="labelLowQuality">
           <property name="text">
            <string>Low quality</string>
           </property>
@@ -135,7 +135,7 @@
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="labelMedQuality">
           <property name="text">
            <string>Medium quality</string>
           </property>
@@ -145,7 +145,7 @@
          </widget>
         </item>
         <item row="0" column="3">
-         <widget class="QLabel" name="label_5">
+         <widget class="QLabel" name="labelHiQuality">
           <property name="text">
            <string>High quality</string>
           </property>
@@ -162,6 +162,38 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>16</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelWarn">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Your combined cameras with and without dual streaming. Stream quality control is disabled</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="verticalSpacer_4">

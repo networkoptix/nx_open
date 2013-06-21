@@ -3738,9 +3738,7 @@ void QnWorkbenchActionHandler::at_messageBoxAction_triggered() {
     if (text.isEmpty())
         text = title;
 
-    QMessageBox::information(mainWindow(),
-                             title,
-                             text);
+    QMessageBox::information(mainWindow(), title, text);
 }
 
 void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {

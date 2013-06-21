@@ -484,6 +484,9 @@ void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis)
         center = centerItem->geometry().topLeft();
 
     QRect boundingRect = workbench()->currentLayout()->boundingRect();
+    if(boundingRect.isEmpty())
+        return;
+
     QPoint aReturn = -aAxis * qAbs(dot(toPoint(boundingRect.size()), aAxis) / dot(aAxis, aAxis));
     QPoint bReturn = -bAxis * qAbs(dot(toPoint(boundingRect.size()), bAxis) / dot(bAxis, bAxis));
 
@@ -999,10 +1002,12 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.resource.path = zoomTargetWidget->resource()->toResource()->getUniqueId();
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.zoomRect = zoomRect;
-
+    
+    QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;
 
     workbench()->currentLayout()->resource()->addItem(data);
+    display()->widget(data.uuid)->setCheckedButtons(buttons);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
