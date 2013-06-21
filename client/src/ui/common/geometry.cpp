@@ -121,6 +121,42 @@ QRectF QnGeometry::cwiseDiv(const QRectF &l, const QSizeF &r) {
     );
 }
 
+QRectF QnGeometry::cwiseSub(const QRectF &l, const QRectF &r) {
+    return QRectF(
+        l.left() - r.left(),
+        l.top() - r.top(),
+        l.width() - r.width(),
+        l.height() - r.height()
+    );
+}
+
+QRectF QnGeometry::cwiseAdd(const QRectF &l, const QRectF &r) {
+    return QRectF(
+        l.left() + r.left(),
+        l.top() + r.top(),
+        l.width() + r.width(),
+        l.height() + r.height()
+    );
+}
+
+QRectF QnGeometry::cwiseDiv(const QRectF &l, qreal r) {
+    return QRectF(
+        l.left() / r,
+        l.top() / r,
+        l.width() / r,
+        l.height() / r
+    );
+}
+
+QRectF QnGeometry::cwiseMul(const QRectF &l, qreal r) {
+    return QRectF(
+        l.left() * r,
+        l.top() * r,
+        l.width() * r,
+        l.height() * r
+    );
+}
+
 QMargins QnGeometry::cwiseSub(const QMargins &l, const QMargins &r) {
     return QMargins(
         l.left()   - r.left(), 

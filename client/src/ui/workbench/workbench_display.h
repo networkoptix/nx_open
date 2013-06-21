@@ -8,6 +8,7 @@
 #include <utils/common/connective.h>
 
 #include <core/resource/resource_fwd.h>
+#include <business/business_fwd.h>
 #include <recording/time_period.h>
 
 #include <ui/common/geometry.h>
@@ -394,6 +395,8 @@ protected slots:
     void at_resource_disabledChanged(const QnResourcePtr &resource);
 
     void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
+
+    void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
 
 private:
     /* Directly visible state */

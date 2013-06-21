@@ -3,8 +3,7 @@
 
 QnMotionRegion::QnMotionRegion()
 {
-    addRect(8, QRect(0,0,MD_WIDTH, MD_HEIGHT));
-    //addRect(0, QRect(0,0,MD_WIDTH, MD_HEIGHT));
+    addRect(DEFAULT_SENSITIVITY, QRect(0,0,MD_WIDTH, MD_HEIGHT));
 }
 
 void QnMotionRegion::removeDefaultMotion()
