@@ -2,6 +2,7 @@
 #include "ui_advanced_settings_widget.h"
 
 #include <ui/style/skin.h>
+#include "core/resource/resource_type.h"
 
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     QWidget(parent),
@@ -69,6 +70,11 @@ void QnAdvancedSettingsWidget::updateFromResource(QnSecurityCamResourcePtr camer
     updateControlsState();
     m_disableUpdate = false;
     ui->labelWarn->setVisible(false);
+    bool arecontCameraExists = false;
+    QnResourceTypePtr cameraType = qnResTypePool->getResourceType(camera->getTypeId());
+    if (cameraType && cameraType->getManufacture() == lit("ArecontVision"))
+        arecontCameraExists = true;
+    ui->checkBoxDisableControl->setEnabled(!arecontCameraExists);
 }
 
 void QnAdvancedSettingsWidget::updateControlsState()
@@ -95,6 +101,7 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
     bool controlState = cameras[0]->isCameraControlDisabled();
     m_hasDualStreaming = true;
     bool existDualStreaming = false;
+    bool arecontCameraExists = false;
     for (int i = 1; i < cameras.size(); ++i)
     {
         if (cameras[i]->secondaryStreamQuality() != quality)
@@ -106,8 +113,10 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
             m_hasDualStreaming = false;
         else
             existDualStreaming = true;
+        QnResourceTypePtr cameraType = qnResTypePool->getResourceType(cameras[i]->getTypeId());
+        if (cameraType && cameraType->getManufacture() == lit("ArecontVision"))
+            arecontCameraExists = true;
     }
-    bool mixedDualStreaming = !m_hasDualStreaming && existDualStreaming;
     setKeepQualityVisible(!sameQuality);
     
     if (sameQuality)
@@ -122,7 +131,9 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
 
     updateControlsState();
     m_disableUpdate = false;
+    bool mixedDualStreaming = !m_hasDualStreaming && existDualStreaming;
     ui->labelWarn->setVisible(mixedDualStreaming);
+    ui->checkBoxDisableControl->setEnabled(!arecontCameraExists);
 }
 
 bool QnAdvancedSettingsWidget::isKeepQualityVisible() const
