@@ -940,7 +940,8 @@ QColor QnResourceWidget::activeFrameColor() const {
 }
 
 QColor QnResourceWidget::selectedFrameColor() const {
-    qreal a = 0.7; //magic const --gdm
-    return linearCombine(1.0 - a, m_frameColor, a, qnGlobals->selectedFrameColor());
+    //qreal a = 0.7;
+    //return linearCombine(1.0 - a, m_frameColor, a, qnGlobals->selectedFrameColor());
+    return qnGlobals->selectedFrameColor();
 }
 
