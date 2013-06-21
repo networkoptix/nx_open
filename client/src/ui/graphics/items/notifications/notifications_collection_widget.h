@@ -59,6 +59,7 @@ public:
     void setToolTipsEnclosingRect(const QRectF &rect);
 
     void setBlinker(QnBlinkingImageButtonWidget* blinker);
+
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
@@ -74,6 +75,7 @@ private slots:
     void at_debugButton_clicked();
     void at_list_itemRemoved(QnNotificationItem* item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
+
 private:
     /**
      * @brief loadThumbnailForItem          Start async thumbnail loading

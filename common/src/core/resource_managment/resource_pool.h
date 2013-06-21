@@ -32,10 +32,10 @@ class QN_EXPORT QnResourcePool : public QObject
 public:
     enum Filter
     {
-        //!do not check resources, omwned by another entites
-        rfOnlyFriends,
-        //!check all resources
-        rfAllResources
+        /** Do not check resources owned by another entites. */
+        OnlyFriends,
+        /** Check all resources. */
+        AllResources
     };
 
     QnResourcePool();
@@ -57,7 +57,7 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QnId id, Filter searchFilter = rfOnlyFriends) const;
+    QnResourcePtr getResourceById(QnId id, Filter searchFilter = OnlyFriends) const;
     QnResourcePtr getResourceByGuid(QString guid) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
