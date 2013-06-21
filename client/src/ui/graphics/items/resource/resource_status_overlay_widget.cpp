@@ -152,7 +152,7 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
     font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
 
     QnScopedPainterFontRollback fontRollback(painter, font);
-    QnScopedPainterPenRollback penRollback(painter, QColor(255, 128, 128, 128));
+    QnScopedPainterPenRollback penRollback(painter, QColor(255, 96, 96, 128));
     QnScopedPainterTransformRollback transformRollback(painter);
 
     qreal opacity = painter->opacity();
