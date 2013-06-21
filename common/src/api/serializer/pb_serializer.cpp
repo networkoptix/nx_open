@@ -1157,7 +1157,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
 
     QnResourceList eventResources;
     for (int i = 0; i < pb_businessRule.eventresource_size(); i++) {
-        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i), QnResourcePool::rfAllResources);
+        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i), QnResourcePool::AllResources);
         if (resource)
             eventResources << resource;
         else
@@ -1171,7 +1171,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
     businessRule->setActionType(parsePbBusinessActionType(pb_businessRule.actiontype()));
     QnResourceList actionResources;
     for (int i = 0; i < pb_businessRule.actionresource_size(); i++) {//destination resource can belong to another server
-        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.actionresource(i), QnResourcePool::rfAllResources);
+        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.actionresource(i), QnResourcePool::AllResources);
         if (resource)
             actionResources << resource;
         else
@@ -1198,7 +1198,7 @@ void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::
 
     QnResourceList resources;
     for (int i = 0; i < pb_businessAction.actionresource_size(); i++) //destination resource can belong to another server
-        resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
+        resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::AllResources);
     businessAction->setResources(resources);
 
     businessAction->setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
@@ -1222,7 +1222,7 @@ void parseBusinessActionList(QnAbstractBusinessActionList& businessActionList, c
 
         QnResourceList resources;
         for (int i = 0; i < pb_businessAction.actionresource_size(); i++) //destination resource can belong to another server
-            resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
+            resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::AllResources);
         businessAction->setResources(resources);
 
         businessAction->setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
@@ -1250,7 +1250,7 @@ void parseBusinessActionVector(QnBusinessActionDataListPtr& businessActionVector
 
         QnResourceList resources;
         //for (int i = 0; i < pb_businessAction.actionresource_size(); i++) //destination resource can belong to another server
-        //    resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
+        //    resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::AllResources);
         //businessAction.setResources(resources);
 
         //businessAction.setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));

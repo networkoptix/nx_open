@@ -64,4 +64,5 @@ message Camera {
     optional string            groupName        = 14;
     optional SecondaryQuality  secondaryQuality = 15;
     optional bool              controlDisabled  = 16;
+    optional int32             statusFlags      = 17;
 }

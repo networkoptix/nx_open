@@ -25,6 +25,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/animation/animation_event.h>
 #include <ui/style/globals.h>
@@ -59,120 +60,6 @@ namespace {
 
     const double minPtzZoomRectSize = 0.08;
 }
-
-
-// -------------------------------------------------------------------------- //
-// PtzSplashItem
-// -------------------------------------------------------------------------- //
-class PtzSplashItem: public QGraphicsObject {
-    typedef QGraphicsObject base_type;
-
-public:
-    enum SplashType {
-        Circular,
-        Rectangular,
-        Invalid = -1
-    };
-
-    PtzSplashItem(QGraphicsItem *parent = NULL):
-        base_type(parent),
-        m_splashType(Invalid)
-    {
-        setAcceptedMouseButtons(0);
-
-        QGradient gradients[5];
-
-        /* Sector numbering for rectangular splash:
-         *       1
-         *      0 2
-         *       3                                                              */
-        gradients[0] = QLinearGradient(1.0, 0.0, 0.0, 0.0);
-        gradients[1] = QLinearGradient(0.0, 1.0, 0.0, 0.0);
-        gradients[2] = QLinearGradient(0.0, 0.0, 1.0, 0.0);
-        gradients[3] = QLinearGradient(0.0, 0.0, 0.0, 1.0);
-        gradients[4] = QRadialGradient(0.5, 0.5, 0.5);
-
-        for(int i = 0; i < 5; i++) {
-            gradients[i].setCoordinateMode(QGradient::ObjectBoundingMode);
-            gradients[i].setColorAt(0.8, toTransparent(ptzColor));
-            gradients[i].setColorAt(0.9, toTransparent(ptzColor, 0.5));
-            gradients[i].setColorAt(1.0, toTransparent(ptzColor));
-            m_brushes[i] = QBrush(gradients[i]);
-        }
-    }
-
-    SplashType splashType() const {
-        return m_splashType;
-    }
-    
-    void setSplashType(SplashType splashType) {
-        assert(splashType == Circular || splashType == Rectangular || splashType == Invalid);
-
-        m_splashType = splashType;
-    }
-
-    virtual QRectF boundingRect() const override {
-        return rect();
-    }
-
-    const QRectF &rect() const {
-        return m_rect;
-    }
-
-    void setRect(const QRectF &rect) {
-        if(qFuzzyCompare(m_rect, rect))
-            return;
-
-        prepareGeometryChange();
-
-        m_rect = rect;
-    }
-
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
-        if(m_splashType == Circular) {
-            painter->fillRect(m_rect, m_brushes[4]);
-        } else if(splashType() == Rectangular) {
-            QPointF points[5] = {
-                m_rect.bottomLeft(),
-                m_rect.topLeft(),
-                m_rect.topRight(),
-                m_rect.bottomRight(),
-                m_rect.bottomLeft()
-            };
-            
-            qreal d = qMin(m_rect.width(), m_rect.height()) / 2;
-            QPointF centers[5] = {
-                m_rect.bottomLeft()     + QPointF( d, -d),
-                m_rect.topLeft()        + QPointF( d,  d),
-                m_rect.topRight()       + QPointF(-d,  d),
-                m_rect.bottomRight()    + QPointF(-d, -d),
-                m_rect.bottomLeft()     + QPointF( d, -d)
-            };
-
-            for(int i = 0; i < 4; i++) {
-                QPainterPath path;
-
-                path = QPainterPath();
-                path.moveTo(centers[i]);
-                path.lineTo(points[i]);
-                path.lineTo(points[i + 1]);
-                path.lineTo(centers[i + 1]);
-                path.closeSubpath();
-                painter->fillPath(path, m_brushes[i]);
-            }
-        }
-    }
-        
-private:
-    /** Splash type. */
-    SplashType m_splashType;
-
-    /** Brushes that are used for painting. 0-3 for rectangular splash, 4 for circular. */
-    QBrush m_brushes[5];
-
-    /** Bounding rectangle of the splash. */
-    QRectF m_rect;
-};
 
 
 // -------------------------------------------------------------------------- //
@@ -574,14 +461,15 @@ PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
 }
 
-PtzSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
-    PtzSplashItem *result;
+QnSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
+    QnSplashItem *result;
     if(!m_freeAnimations.empty()) {
         result = m_freeAnimations.back().item;
         m_freeAnimations.pop_back();
         result->setParentItem(parentItem);
     } else {
-        result = new PtzSplashItem(parentItem);
+        result = new QnSplashItem(parentItem);
+        result->setColor(toTransparent(ptzColor, 0.5));
         connect(result, SIGNAL(destroyed()), this, SLOT(at_splashItem_destroyed()));
     }
 
@@ -765,8 +653,8 @@ void PtzInstrument::processPtzClick(const QPointF &pos) {
     if(!target() || m_skipNextAction)
         return;
 
-    PtzSplashItem *splashItem = newSplashItem(target());
-    splashItem->setSplashType(PtzSplashItem::Circular);
+    QnSplashItem *splashItem = newSplashItem(target());
+    splashItem->setSplashType(QnSplashItem::Circular);
     splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
     splashItem->setPos(pos);
     m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
@@ -778,8 +666,8 @@ void PtzInstrument::processPtzDrag(const QRectF &rect) {
     if(!target() || m_skipNextAction)
         return;
 
-    PtzSplashItem *splashItem = newSplashItem(target());
-    splashItem->setSplashType(PtzSplashItem::Rectangular);
+    QnSplashItem *splashItem = newSplashItem(target());
+    splashItem->setSplashType(QnSplashItem::Rectangular);
     splashItem->setPos(rect.center());
     splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
     m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
@@ -791,8 +679,8 @@ void PtzInstrument::processPtzDoubleClick() {
     if(!target() || m_skipNextAction)
         return;
 
-    PtzSplashItem *splashItem = newSplashItem(target());
-    splashItem->setSplashType(PtzSplashItem::Rectangular);
+    QnSplashItem *splashItem = newSplashItem(target());
+    splashItem->setSplashType(QnSplashItem::Rectangular);
     splashItem->setPos(target()->rect().center());
     QSizeF size = target()->size() * 1.1;
     splashItem->setRect(QRectF(-toPoint(size) / 2, size));
@@ -1098,7 +986,7 @@ void PtzInstrument::at_mapperWatcher_mapperChanged(const QnVirtualCameraResource
 }
 
 void PtzInstrument::at_splashItem_destroyed() {
-    PtzSplashItem *item = static_cast<PtzSplashItem *>(sender());
+    QnSplashItem *item = static_cast<QnSplashItem *>(sender());
 
     m_freeAnimations.removeAll(item);
     m_activeAnimations.removeAll(item);

@@ -325,6 +325,8 @@ public:
     }
 
     void paintChunk(qint64 length, Qn::TimePeriodContent content) {
+        assert(length >= 0);
+
         if(m_pendingLength > 0 && m_pendingLength + length > m_minChunkLength) {
             qint64 delta = m_minChunkLength - m_pendingLength;
             length -= delta;
@@ -1569,7 +1571,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
     for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
-         pos[i] = periods[i].findNearestPeriod(minimumValue, false);
+         pos[i] = periods[i].findNearestPeriod(minimumValue, true);
          end[i] = periods[i].findNearestPeriod(maximumValue, true);
          if(end[i] != periods[i].end() && end[i]->contains(maximumValue))
              end[i]++;
@@ -1590,12 +1592,12 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
                 continue;
             
             if(!inside[i]) {
-                nextValue[i] = pos[i]->startTimeMs;
+                nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs);
                 continue;
             }
             
             if(pos[i]->durationMs != -1)
-                nextValue[i] = pos[i]->startTimeMs + pos[i]->durationMs;
+                nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 
         qint64 bestValue = qMin(nextValue[0], nextValue[1]);
