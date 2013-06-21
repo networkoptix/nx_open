@@ -3,8 +3,11 @@
 
 #include <QGraphicsObject>
 
-class QnSplashItem: public QGraphicsObject {
-    typedef QGraphicsObject base_type;
+#include <ui\animation\animated.h>
+#include <ui\animation\animation_timer_listener.h>
+
+class QnSplashItem: public Animated<QGraphicsObject>, public AnimationTimerListener {
+    typedef Animated<QGraphicsObject> base_type;
 
 public:
     enum SplashType {
@@ -43,8 +46,20 @@ public:
     void setRect(const QRectF &rect);
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-        
+    
+    void animate(qint64 endTimeMSec, const QRectF &endRect, qreal endOpacity, bool destroy = false, qint64 midTimeMSec = -1, qreal midOpacity = 1.0);
+
+protected:
+    virtual void tick(int deltaMSecs) override;
+
 private:
+    struct AnimationData {
+        qint64 time, midTime, endTime;
+        qreal startOpacity, midOpacity, endOpacity;
+        QRectF startRect, endRect;
+        bool destroy;
+    };
+
     /** Splash type. */
     SplashType m_splashType;
 
@@ -56,6 +71,9 @@ private:
 
     /** Bounding rectangle of the splash. */
     QRectF m_rect;
+
+    /** Whether this splash item is animated. */
+    QScopedPointer<AnimationData> m_animation;
 };
 
 

@@ -1,7 +1,9 @@
 #include "splash_item.h"
 
+#include <utils/common/delete_later.h>
 #include <utils/math/color_transformations.h>
 #include <utils/math/fuzzy.h>
+#include <utils/math/linear_combination.h>
 
 QnSplashItem::QnSplashItem(QGraphicsItem *parent):
     base_type(parent),
@@ -85,3 +87,50 @@ void QnSplashItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     }
 }
         
+void QnSplashItem::animate(qint64 endTimeMSec, const QRectF &endRect, qreal endOpacity, bool destroy, qint64 midTimeMSec, qreal midOpacity) {
+    if(!m_animation) {
+        m_animation.reset(new AnimationData());
+        registerAnimation(this);
+    }
+        
+    startListening();
+
+    AnimationData *a = m_animation.data();
+    a->time = 0;
+    a->midTime = midTimeMSec;
+    a->endTime = endTimeMSec;
+    a->startOpacity = opacity();
+    a->midOpacity = midOpacity;
+    a->endOpacity = endOpacity;
+    a->startRect = rect();
+    a->endRect = endRect;
+    a->destroy = destroy;
+}
+
+void QnSplashItem::tick(int deltaMSecs) {
+    AnimationData *a = m_animation.data();
+    a->time = qMin(a->time + deltaMSecs, a->endTime);
+
+    qreal progress = static_cast<qreal>(a->time) / a->endTime;
+    setRect(linearCombine(1.0 - progress, a->startRect, progress, a->endRect));
+
+    if(a->midTime < 0) {
+        setOpacity(linearCombine(1.0 - progress, a->startOpacity, progress, a->endOpacity));
+    } else {
+        if(a->time < a->midTime) {
+            qreal progress = static_cast<qreal>(a->time) / a->midTime;
+            setOpacity(linearCombine(1.0 - progress, a->startOpacity, progress, a->midOpacity));
+        } else {
+            qreal progress = static_cast<qreal>(a->time - a->midTime) / (a->endTime - a->midTime);
+            setOpacity(linearCombine(1.0 - progress, a->midOpacity, progress, a->endOpacity));
+        }
+    }
+
+    if(a->time >= a->endTime) {
+        stopListening();
+
+        if(a->destroy)
+            qnDeleteLater(this);
+    }
+}
+
