@@ -45,7 +45,7 @@
 				</os>
 			</activation>
 			<properties>
-				<compiler>msvc2008</compiler>
+				<!-- <compiler>msvc2008</compiler> -->
 				<arch>x86</arch>
 				<platform>windows</platform>
 			</properties>
