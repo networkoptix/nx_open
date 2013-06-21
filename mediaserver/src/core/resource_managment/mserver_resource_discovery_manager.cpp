@@ -61,7 +61,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     QSet<QString> discoveredResources;
 
     //assemble list of existing ip
-    QMap<quint32, QSet<QString> > ipsList;
+    QMap<quint32, QSet<QnNetworkResourcePtr> > ipsList;
 
 
     //excluding already existing resources
@@ -88,7 +88,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                         // do not count 2--N channels of multichannel cameras as conflict
                         quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
                         if (ips)
-                            ipsList[ips].insert(newNetRes->getMAC().toString().toAscii());
+                            ipsList[ips].insert(newNetRes);
                     }
                 }
 
@@ -147,12 +147,20 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
     // ========================= send conflict info =====================
-    for (QMap<quint32, QSet<QString> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
+    for (QMap<quint32, QSet<QnNetworkResourcePtr> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
     {
         if (itr.value().size() > 1) 
         {
             QHostAddress hostAddr(itr.key());
-            emit CameraIPConflict(hostAddr, itr.value().toList());
+            QStringList conflicts;
+            foreach(QnNetworkResourcePtr camRes, itr.value()) 
+            {
+                conflicts << camRes->getMAC().toString();
+                QnVirtualCameraResourcePtr cam = camRes.dynamicCast<QnVirtualCameraResource>();
+                if (cam)
+                    cam->issueOccured();
+            }
+            emit CameraIPConflict(hostAddr, conflicts);
         }
     }
 
@@ -441,6 +449,9 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             {
                 if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)) {
                     if (res->getStatus() == QnResource::Offline && !m_disconnectSended[uniqId]) {
+                        QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
+                        if (cam)
+                            cam->issueOccured();
                         emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
                         m_disconnectSended[uniqId] = true;
                     }

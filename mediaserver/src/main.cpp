@@ -721,7 +721,14 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 
 void QnMain::at_timer()
 {
-    qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+	qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras()) 
+    {
+        QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
+        if (cam)
+            cam->noCameraIssues(); // decrease issue counter
+    }
+    
 }
 
 void QnMain::at_noStorages()
