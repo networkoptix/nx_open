@@ -66,9 +66,20 @@ void QnAdvancedSettingsWidget::updateFromResource(QnSecurityCamResourcePtr camer
     setQualitySlider(camera->secondaryStreamQuality());
     ui->checkBoxDisableControl->setChecked(camera->isCameraControlDisabled());
     m_hasDualStreaming = camera->hasDualStreaming();
-    ui->qualitySlider->setEnabled(m_hasDualStreaming && ui->checkBoxDisableControl->checkState() == Qt::Unchecked);
-    ui->labelQuality->setEnabled(ui->qualitySlider->isEnabled());
+    updateControlsState();
     m_disableUpdate = false;
+    ui->labelWarn->setVisible(false);
+}
+
+void QnAdvancedSettingsWidget::updateControlsState()
+{
+    bool val = m_hasDualStreaming && ui->checkBoxDisableControl->checkState() == Qt::Unchecked;
+    ui->qualitySlider->setEnabled(val);
+    ui->labelQuality->setEnabled(val);
+    ui->keepQualityLabel->setEnabled(val);
+    ui->labelLowQuality->setEnabled(val);
+    ui->labelMedQuality->setEnabled(val);
+    ui->labelHiQuality->setEnabled(val);
 }
 
 void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList cameras)
@@ -83,6 +94,7 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
     QnSecondaryStreamQuality quality = cameras[0]->secondaryStreamQuality();
     bool controlState = cameras[0]->isCameraControlDisabled();
     m_hasDualStreaming = true;
+    bool existDualStreaming = false;
     for (int i = 1; i < cameras.size(); ++i)
     {
         if (cameras[i]->secondaryStreamQuality() != quality)
@@ -92,7 +104,10 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
 
         if (!cameras[i]->hasDualStreaming())
             m_hasDualStreaming = false;
+        else
+            existDualStreaming = true;
     }
+    bool mixedDualStreaming = !m_hasDualStreaming && existDualStreaming;
     setKeepQualityVisible(!sameQuality);
     
     if (sameQuality)
@@ -105,10 +120,9 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
     else
         ui->checkBoxDisableControl->setCheckState(Qt::PartiallyChecked);
 
-    ui->qualitySlider->setEnabled(m_hasDualStreaming && ui->checkBoxDisableControl->checkState() == Qt::Unchecked);
-    ui->labelQuality->setEnabled(ui->qualitySlider->isEnabled());
-
+    updateControlsState();
     m_disableUpdate = false;
+    ui->labelWarn->setVisible(mixedDualStreaming);
 }
 
 bool QnAdvancedSettingsWidget::isKeepQualityVisible() const
@@ -124,8 +138,7 @@ void QnAdvancedSettingsWidget::setKeepQualityVisible(bool value)
 
 void QnAdvancedSettingsWidget::at_ui_DataChanged()
 {
-    ui->qualitySlider->setEnabled(m_hasDualStreaming && ui->checkBoxDisableControl->checkState() == Qt::Unchecked);
-    ui->labelQuality->setEnabled(ui->qualitySlider->isEnabled());
+    updateControlsState();
     if (!m_disableUpdate)
         emit dataChanged();
 }
