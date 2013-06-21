@@ -8,7 +8,7 @@
 #include <QtGui/QPixmapCache>
 #include <QtWidgets/QStyleFactory>
 
-//#include <iostream>
+#include <iostream>
 
 #include <utils/common/warnings.h>
 
@@ -179,8 +179,8 @@ QPixmap QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::S
 
 QStyle *QnSkin::style() {
     QStyle *baseStyle = QStyleFactory::create(QLatin1String("Bespin"));
-//    if( !baseStyle )
-//        std::cout<<"HUUUUUUUUUUUUUUUUUUUUUUUUY!!!!!!!!!!!!!!!\n";
+    if( !baseStyle )
+        std::cout<<"HUUUUUUUUUUUUUUUUUUUUUUUUY!!!!!!!!!!!!!!!\n";
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
     return style;
 }
