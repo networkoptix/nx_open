@@ -75,7 +75,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     int healthMessage = eventType - BusinessEventType::SystemHealthMessage;
     if (healthMessage >= 0) {
         int resourceId = params.getEventResourceId();
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
+        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
         if (resource) //all incoming systemhealth events should contain source resource
            addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
         return;
@@ -87,7 +87,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     }
 
     int id = businessAction->getRuntimeParams().getEventResourceId();
-    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::rfAllResources);
+    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::AllResources);
     QString resource = res ? res->getName() : QString();
 
     qDebug() << "popup received" << eventType << BusinessEventType::toString(eventType) << "from" << resource << "(" << id << ")";

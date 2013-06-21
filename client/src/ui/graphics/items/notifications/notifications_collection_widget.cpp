@@ -206,7 +206,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *i
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     int resourceId = params.getEventResourceId();
-    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
     if (!resource)
         return;
 
@@ -221,125 +221,122 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     switch (eventType) {
     case BusinessEventType::Camera_Motion: {
-            item->setColor(qnGlobals->notificationColorCommon());
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Browse Archive"),
-                Qn::OpenInNewLayoutAction,
-                QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000),
-                2.0,
-                true
-            );
-            loadThumbnailForItem(item, resource, params.getEventTimestamp());
-            break;
-        }
-
+        item->setColor(qnGlobals->notificationColorCommon());
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Browse Archive"),
+            Qn::OpenInNewLayoutAction,
+            QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000),
+            2.0,
+            true
+        );
+        loadThumbnailForItem(item, resource, params.getEventTimestamp());
+        break;
+    }
     case BusinessEventType::Camera_Input: {
-            item->setColor(qnGlobals->notificationColorCommon());
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Open Camera"),
-                Qn::OpenInNewLayoutAction,
-                QnActionParameters(resource),
-                2.0,
-                true
-            );
-            loadThumbnailForItem(item, resource);
-            break;
-        }
+        item->setColor(qnGlobals->notificationColorCommon());
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Open Camera"),
+            Qn::OpenInNewLayoutAction,
+            QnActionParameters(resource),
+            2.0,
+            true
+        );
+        loadThumbnailForItem(item, resource);
+        break;
+    }
     case BusinessEventType::Camera_Disconnect: {
-            item->setColor(qnGlobals->notificationColorImportant());
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Open Camera"),
-                Qn::OpenInNewLayoutAction,
-                QnActionParameters(resource),
-                2.0,
-                true
-            );
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Camera Settings"),
-                Qn::CameraSettingsAction,
-                QnActionParameters(resource)
-            );
-            loadThumbnailForItem(item, resource);
-            break;
-        }
-
+        item->setColor(qnGlobals->notificationColorImportant());
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Open Camera"),
+            Qn::OpenInNewLayoutAction,
+            QnActionParameters(resource),
+            2.0,
+            true
+        );
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Camera Settings"),
+            Qn::CameraSettingsAction,
+            QnActionParameters(resource)
+        );
+        loadThumbnailForItem(item, resource);
+        break;
+    }
     case BusinessEventType::Storage_Failure: {
-            item->setColor(qnGlobals->notificationColorImportant());
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Open Monitor"),
-                Qn::OpenInNewLayoutAction,
-                QnActionParameters(resource)
-            );
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Server settings"),
-                Qn::ServerSettingsAction,
-                QnActionParameters(resource)
-            );
-            break;
-        }
+        item->setColor(qnGlobals->notificationColorImportant());
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Open Monitor"),
+            Qn::OpenInNewLayoutAction,
+            QnActionParameters(resource)
+        );
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Server settings"),
+            Qn::ServerSettingsAction,
+            QnActionParameters(resource)
+        );
+        break;
+    }
     case BusinessEventType::Network_Issue:{
-            item->setColor(qnGlobals->notificationColorImportant());
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Open Camera"),
-                Qn::OpenInNewLayoutAction,
-                QnActionParameters(resource),
-                2.0,
-                true
-            );
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Camera Settings"),
-                Qn::CameraSettingsAction,
-                QnActionParameters(resource)
-            );
-            loadThumbnailForItem(item, resource);
-            break;
-        }
-
+        item->setColor(qnGlobals->notificationColorImportant());
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Open Camera"),
+            Qn::OpenInNewLayoutAction,
+            QnActionParameters(resource),
+            2.0,
+            true
+        );
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Camera Settings"),
+            Qn::CameraSettingsAction,
+            QnActionParameters(resource)
+        );
+        loadThumbnailForItem(item, resource);
+        break;
+    }
     case BusinessEventType::Camera_Ip_Conflict: {
-            item->setColor(qnGlobals->notificationColorCritical());
-            QString webPageAddress = params.getSource();
+        item->setColor(qnGlobals->notificationColorCritical());
+        QString webPageAddress = params.getSource();
 
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Open camera web page..."),
-                Qn::BrowseUrlAction,
-                QnActionParameters().withArgument(Qn::UrlRole, webPageAddress)
-            );
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Open camera web page..."),
+            Qn::BrowseUrlAction,
+            QnActionParameters().withArgument(Qn::UrlRole, webPageAddress)
+        );
 
-            break;
-        }
+        break;
+    }
     case BusinessEventType::MediaServer_Failure: {
-            item->setColor(qnGlobals->notificationColorCritical());
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Settings"),
-                Qn::ServerSettingsAction,
-                QnActionParameters(resource)
-            );
+        item->setColor(qnGlobals->notificationColorCritical());
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Settings"),
+            Qn::ServerSettingsAction,
+            QnActionParameters(resource)
+        );
 
-            item->setText(tr("Failure on %1.").arg(name));
-            break;
-        }
+        item->setText(tr("Failure on %1.").arg(name));
+        break;
+    }
     case BusinessEventType::MediaServer_Conflict: {
-            item->setColor(qnGlobals->notificationColorCritical());
-            item->addActionButton(
-                qnResIconCache->icon(resource->flags(), resource->getStatus()),
-                tr("Description"),
-                Qn::MessageBoxAction,
-                QnActionParameters().
-                    withArgument(Qn::TitleRole, tr("Information")).
-                    withArgument(Qn::TextRole, tr("There is another mediaserver in your network that watches your cameras."))
-            );
-            break;
-        }
+        item->setColor(qnGlobals->notificationColorCritical());
+        item->addActionButton(
+            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            tr("Description"),
+            Qn::MessageBoxAction,
+            QnActionParameters().
+                withArgument(Qn::TitleRole, tr("Information")).
+                withArgument(Qn::TextRole, tr("There is another mediaserver in your network that watches your cameras."))
+        );
+        break;
+    }
     default:
         break;
     }
