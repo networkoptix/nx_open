@@ -209,7 +209,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_calendar,                         SIGNAL(currentPageChanged(int,int)),                this,   SLOT(updateTargetPeriod()));
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
-    connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),                 this,   SLOT(updateLocalOffset()));
+    connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
 
     updateLines();
     updateCalendar();
@@ -220,18 +220,20 @@ void QnWorkbenchNavigator::initialize() {
 void QnWorkbenchNavigator::deinitialize() {
     assert(isValid());
 
-    disconnect(action(Qn::SelectionChangeAction),   NULL, this, NULL);
+    disconnect(workbench(),                         NULL, this, NULL);
 
     disconnect(display(),                           NULL, this, NULL);
     disconnect(display()->beforePaintInstrument(),  NULL, this, NULL);
     
     disconnect(m_timeSlider,                        NULL, this, NULL);
-    m_timeSlider->removeEventFilter(this);
 
     disconnect(m_timeScrollBar,                     NULL, this, NULL);
     m_timeScrollBar->removeEventFilter(this);
 
+    disconnect(m_calendar,                          NULL, this, NULL);
+
     disconnect(context()->instance<QnWorkbenchServerTimeWatcher>(), NULL, this, NULL);
+    disconnect(qnSettings->notifier(QnClientSettings::TIME_MODE), NULL, this, NULL);
 
     m_currentWidget = NULL;
     m_currentWidgetFlags = 0;
