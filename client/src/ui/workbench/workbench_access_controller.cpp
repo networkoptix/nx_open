@@ -128,6 +128,8 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     if(permissions.isValid() && permissions.canConvert<int>()) {
         return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: #Elric listen to changes
     } else if (QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
+        if (layout->locked())
+            return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission;
     } else if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
         if (layout->locked())
