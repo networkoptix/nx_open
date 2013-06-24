@@ -3439,7 +3439,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
     if(!ok)
         return;
 
-    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, name, position);
+    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, -1, name, position);
 }
 
 void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
