@@ -23,7 +23,6 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
-
     enum StatusFlag { 
         HasIssuesFlag = 0x1
     };
