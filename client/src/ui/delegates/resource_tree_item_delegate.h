@@ -25,7 +25,7 @@ protected:
 
 private:
     QWeakPointer<QnWorkbench> m_workbench;
-    QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon;
+    QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon, m_buggyIcon;
 };
 
 #endif // QN_RESOURCE_TREE_ITEM_DELEGATE_H

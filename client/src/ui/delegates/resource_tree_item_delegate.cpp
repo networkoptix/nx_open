@@ -19,6 +19,7 @@ QnResourceTreeItemDelegate::QnResourceTreeItemDelegate(QObject *parent):
     m_recordingIcon = qnSkin->icon("tree/recording.png");
     m_raisedIcon = qnSkin->icon("tree/raised.png");
     m_scheduledIcon = qnSkin->icon("tree/scheduled.png");
+    m_buggyIcon = qnSkin->icon("tree/buggy.png");
 }
 
 void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
@@ -65,6 +66,7 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
 
     QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
 
+    /* Draw 'raised' icon */
     if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
         m_raisedIcon.paint(painter, decorationRect);
 
@@ -81,6 +83,27 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
         optionV4.rect = skipRect;
         style->drawPrimitive(QStyle::PE_PanelItemViewItem, &optionV4, painter, optionV4.widget);
         optionV4.rect = rect;
+    }
+
+    /* Draw 'problems' icon. */
+    if(QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>()) {
+        if(camera->statusFlags() & QnSecurityCamResource::HasIssuesFlag) {
+            m_buggyIcon.paint(painter, decorationRect);
+
+            QRect rect = optionV4.rect;
+            QRect skipRect(
+                rect.topLeft(),
+                QPoint(
+                    decorationRect.right() + decorationRect.left() - rect.left(),
+                    rect.bottom()
+                )
+            );
+            rect.setLeft(skipRect.right() + 1);
+
+            optionV4.rect = skipRect;
+            style->drawPrimitive(QStyle::PE_PanelItemViewItem, &optionV4, painter, optionV4.widget);
+            optionV4.rect = rect;
+        }
     }
 
     /* Draw 'recording' icon. */
