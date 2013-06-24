@@ -24,7 +24,6 @@ void QnLayoutNameDialog::init(QDialogButtonBox::StandardButtons buttons) {
     ui->setupUi(this);
 
     ui->buttonBox->setStandardButtons(buttons);
-    setButtonBox(ui->buttonBox);
 
     connect(ui->nameLineEdit,   SIGNAL(textChanged(const QString &)),   this,   SLOT(at_nameLineEdit_textChanged(const QString &)));
     at_nameLineEdit_textChanged(ui->nameLineEdit->text());

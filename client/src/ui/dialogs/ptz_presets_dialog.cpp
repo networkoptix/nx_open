@@ -28,7 +28,6 @@ QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFl
     ui(new Ui::PtzPresetsDialog)
 {
     ui->setupUi(this);
-    setButtonBox(ui->buttonBox);
 
     m_removeButton = new QPushButton(tr("Remove"));
     m_activateButton = new QPushButton(tr("Activate"));
