@@ -27,6 +27,7 @@
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <ui/widgets/settings/popup_settings_widget.h>
 #include <ui/widgets/settings/server_settings_widget.h>
+#include <ui/workbench/workbench_auto_starter.h>
 
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent):
@@ -51,6 +52,11 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     if (QnScreenRecorder::isSupported()) {
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
+    }
+
+    if(!context->instance<QnWorkbenchAutoStarter>()->isSupported()) {
+        ui->autoStartCheckBox->hide();
+        ui->autoStartLabel->hide();
     }
 
     m_popupSettingsWidget = new QnPopupSettingsWidget(context, this);
@@ -148,8 +154,9 @@ void QnPreferencesDialog::submitToSettings() {
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     m_settings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
     m_settings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
-    m_settings->setUseHardwareDecoding(ui->isHardwareDecodingCheckBox->isChecked());
+    m_settings->setUseHardwareDecoding(ui->hardwareDecodingCheckBox->isChecked());
     m_settings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
+    m_settings->setAutoStart(ui->autoStartCheckBox->isChecked());
 
     QStringList extraMediaFolders;
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
@@ -177,8 +184,9 @@ void QnPreferencesDialog::updateFromSettings() {
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
     ui->tourCycleTimeSpinBox->setValue(m_settings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(m_settings->isIpShownInTree());
-    ui->isHardwareDecodingCheckBox->setChecked( m_settings->isHardwareDecodingUsed() );
+    ui->hardwareDecodingCheckBox->setChecked(m_settings->isHardwareDecodingUsed());
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(m_settings->timeMode()));
+    ui->autoStartCheckBox->setChecked(m_settings->autoStart());
 
     ui->extraMediaFoldersList->clear();
     foreach (const QString &extraMediaFolder, m_settings->extraMediaFolders())
@@ -279,10 +287,11 @@ void QnPreferencesDialog::at_onDecoderPluginsListChanged()
     {
         if( plugin->isHardwareAccelerated() )
         {
-            ui->isHardwareDecodingCheckBox->show();
+            ui->hardwareDecodingCheckBox->show();
             return;
         }
     }
 
-    ui->isHardwareDecodingCheckBox->hide();
+    ui->hardwareDecodingCheckBox->hide();
+    ui->hardwareDecodingLabel->hide();
 }

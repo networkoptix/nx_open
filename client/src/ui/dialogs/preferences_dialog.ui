@@ -257,7 +257,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QCheckBox" name="isHardwareDecodingCheckBox">
+           <widget class="QCheckBox" name="hardwareDecodingCheckBox">
             <property name="text">
              <string/>
             </property>
@@ -314,7 +314,7 @@
            </layout>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_3">
+           <widget class="QLabel" name="hardwareDecodingLabel">
             <property name="text">
              <string>Use Hardware Acceleration:</string>
             </property>
@@ -359,7 +359,7 @@
            </layout>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="label_6">
+           <widget class="QLabel" name="autoStartLabel">
             <property name="text">
              <string>Run Applicaion when the PC Boots Up:</string>
             </property>
