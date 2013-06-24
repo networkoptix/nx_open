@@ -45,9 +45,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 {
     ui->setupUi(this);
 
-    ui->maxVideoItemsLabel->hide();
-    ui->maxVideoItemsSpinBox->hide(); // TODO: #Elric Cannot edit max number of items on the scene.
-
     ui->timeModeComboBox->addItem(tr("Server Time"), Qn::ServerTimeMode);
     ui->timeModeComboBox->addItem(tr("Client Time"), Qn::ClientTimeMode);
 
@@ -148,7 +145,6 @@ void QnPreferencesDialog::accept() {
 
 void QnPreferencesDialog::submitToSettings() {
     m_settings->setMediaFolder(ui->mainMediaFolderLabel->text());
-    m_settings->setMaxVideoItems(ui->maxVideoItemsSpinBox->value());
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     m_settings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
     m_settings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
@@ -178,7 +174,6 @@ void QnPreferencesDialog::submitToSettings() {
 
 void QnPreferencesDialog::updateFromSettings() {
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(m_settings->mediaFolder()));
-    ui->maxVideoItemsSpinBox->setValue(m_settings->maxVideoItems());
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
     ui->tourCycleTimeSpinBox->setValue(m_settings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(m_settings->isIpShownInTree());
