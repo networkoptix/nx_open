@@ -37,7 +37,7 @@ public:
     QList<QnPtzPreset> ptzPresets(const QnVirtualCameraResourcePtr &camera) const;
     void setPtzPresets(const QnVirtualCameraResourcePtr &camera, const QList<QnPtzPreset> &presets);
 
-    void addPtzPreset(const QnVirtualCameraResourcePtr &camera, int hotkey, const QString &name, const QVector3D &logicalPosition);
+    void addPtzPreset(const QnVirtualCameraResourcePtr &camera, const QnPtzPreset &preset);
     void removePtzPreset(const QnVirtualCameraResourcePtr &camera, const QString &name);
 
 private slots:

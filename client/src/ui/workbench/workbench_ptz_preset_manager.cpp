@@ -198,18 +198,18 @@ void QnWorkbenchPtzPresetManager::setPtzPresets(const QnVirtualCameraResourcePtr
     savePresets();
 }
 
-void QnWorkbenchPtzPresetManager::addPtzPreset(const QnVirtualCameraResourcePtr &camera, int hotkey, const QString &name, const QVector3D &logicalPosition) {
+void QnWorkbenchPtzPresetManager::addPtzPreset(const QnVirtualCameraResourcePtr &camera, const QnPtzPreset &preset) {
     if(!camera) {
         qnNullWarning(camera);
         return;
     }
 
-    if(name.isEmpty()) {
-        qnNullWarning(name);
+    if(preset.isNull()) {
+        qnNullWarning(preset);
         return;
     }
 
-    PtzPresetData data(camera->getPhysicalId(), hotkey, name, logicalPosition);
+    PtzPresetData data(camera->getPhysicalId(), preset.hotkey, preset.name, preset.logicalPosition);
     QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetNamePredicate(data));
     if(pos != d->presets.end()) {
         *pos = data; /* Replace existing. */

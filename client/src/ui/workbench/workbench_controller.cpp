@@ -90,6 +90,7 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
+#include "workbench_ptz_preset_manager.h"
 
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
@@ -658,47 +659,45 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     switch(e->key()) {
     case Qt::Key_Enter:
     case Qt::Key_Return: {
-        QList<QGraphicsItem *> items = display()->scene()->selectedItems();
-        if(items.size() == 1 && dynamic_cast<QnResourceWidget *>(items[0])) {
-            if(items[0] == display()->widget(Qn::ZoomedRole)) {
-                menu()->trigger(Qn::UnmaximizeItemAction, items);
-            } else {
-                menu()->trigger(Qn::MaximizeItemAction, items);
-            }
+        QnResourceWidget *widget = display()->widget(Qn::CentralRole);
+        if(widget && widget == display()->widget(Qn::ZoomedRole)) {
+            menu()->trigger(Qn::UnmaximizeItemAction, widget);
+        } else {
+            menu()->trigger(Qn::MaximizeItemAction, widget);
         }
-        return;
+        break;
     }
     case Qt::Key_Up:
         if(e->modifiers() == 0)
             moveCursor(QPoint(0, -1), QPoint(-1, 0));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, -15));
-        return;
+        break;
     case Qt::Key_Down:
         if(e->modifiers() == 0)
             moveCursor(QPoint(0, 1), QPoint(1, 0));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, 15));
-        return;
+        break;
     case Qt::Key_Left:
         if(e->modifiers() == 0)
             moveCursor(QPoint(-1, 0), QPoint(0, -1));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(-15, 0));
-        return;
+        break;
     case Qt::Key_Right:
         if(e->modifiers() == 0)
             moveCursor(QPoint(1, 0), QPoint(0, 1));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(15, 0));
-        return;
+        break;
     case Qt::Key_Plus:
     case Qt::Key_Equal:
         m_wheelZoomInstrument->emulate(30);
-        return;
+        break;
     case Qt::Key_Minus:
         m_wheelZoomInstrument->emulate(-30);
-        return;
+        break;
     case Qt::Key_PageUp:
     case Qt::Key_PageDown:
         break; /* Don't let the view handle these and scroll. */
@@ -714,6 +713,31 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
             showContextMenuAt(offset + testRect.bottomRight());
         }
         break;
+    }
+    case Qt::Key_0:
+    case Qt::Key_1:
+    case Qt::Key_2:
+    case Qt::Key_3:
+    case Qt::Key_4:
+    case Qt::Key_5:
+    case Qt::Key_6:
+    case Qt::Key_7:
+    case Qt::Key_8:
+    case Qt::Key_9: {
+        QnResourceWidget *widget = display()->widget(Qn::CentralRole);
+        if(!widget)
+            break;
+
+        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+        if(!camera)
+            break;
+
+        int hotkey = e->key() - Qt::Key_0;
+        QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, hotkey);
+        if(preset.isNull())
+            break;
+
+        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, preset.name));
     }
     default:
         event->ignore(); /* Wasn't recognized? Ignore. */
