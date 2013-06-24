@@ -1,3 +1,97 @@
+----------------------------------------------- 1.5.2 (1.6 beta) -----------------------------------------------
+
+NEW CAMERAS AND RECORDERS SUPPORTED:
+  - Avigilon cameras: 2.0-H3-D1-IR, 2.0-H3-DO1-IR, 2.0-H3M-DO1, 2.0W-H3-BO1-IR
+  - AXIS M3005, AXIS M3007
+  - Vivotek: SD8362E, FD8372, IP8335H, FD8134, IP8362, MD8562, IP8151, IP8133, FD8135H, FE8172V
+  - DAHUA IPC-HFW3200S
+  - Any RTSP stream can be added as a camera. Just enter the desired RTSP URL instead of camera's IP in the manual addition form.
+
+NEW FEATURES:
+ - Events and actions:
+    - Notifications are redesigned. They appear in the left panel.
+    - New actions are added: 
+      - "Play sound" - ability to play sound if an event occur. Sound can be chosen from the library or uploaded by a user
+      - "Text to speech" - ability to say something if an event occur. Extends "Play Sound" action
+      - "Instant output". Earlier it was not possible to bound output action to instant events (like motion start)  
+ - Zoom windows. Just press the zoom button on the item and draw the rectangle - its contents will be expanded in the new item. 
+   It is possible to create several zoom windows from a single item
+ - E-mapping. Now it is possible to set a picture (map or building plan) as layout's background and bound items to it. 
+ - History of events and actions is implemented. All events and actions are displayed in the table that provides 
+   the ability to sort and filter data. Additionally "Check server issues..", "Check camera issues.." are added to 
+   Media Servers' and Cameras' Context Menus.
+ - Cameras List is introduced. It displays all Cameras in the table that provides the ability to sort and filter data
+ - Video color correction. Just press the correction button on the item to activate it. Try this feature in dark scenes to 
+   estimate its power. Use context menu to adjust this feature's settings
+ - It is possible to adjust second stream quality in cameras' settings. This is not recommended in general but may be needed for some reasons
+ - Autoconnection can be activated on the login page. It will use the pre-entered user name and password to connect to the server automatically
+ - If motion is occured on an item, it is indicated by the visual effect
+ - Email notification about motion now contains a video link. If click on this link, video for this camera will be opened in a browser
+ - IOs client can work on IOs 5
+ 
+IMPROVEMENTS:  
+ - UI state (pinned or hidden tabs) are always saved between Client launches
+ - Added ping button to Media Server settings dialog. It may be useful to check computer state: if the computer is pinging but 
+   Media Server appears offline, then this is software problem. Otherwise it is likely to be hardware problem and hard reset may be needed
+ - Health monitor improvements:
+    - Added ping, show log and server issues button.
+    - Added checkbox graphs enabling/disabling.
+    - Added network usage in Health Monitoring.
+ - Added timestamp option to screenshot, export selected area and multi-view
+ - Current time is always displayed under playback buttons
+ - Changed default motion sensitivity for motion dialog to 5 (used to be 8)
+ - Main window is Repainted when aero is turned on/off
+ - User settings dialog can be resized horizontally
+ - Improved behavior if local files are saved on a layout
+ - PTZ Controls are rotated automatically if rotate the item in order to remain in proper positions
+ - Screen Recording is improved:
+   - Recorded files are displayed correctly in Windows Media Player even if had been recorded with high quality
+   - Recorded files are displayed better if recording "Application Window"
+ - It is possible to traverse all items without mouse (UP, LEFT, RIGHT, DOWN). In previous versions the navigation worked a bit differently
+ - Local files are not allowed in Multi-Videos
+ - If camera has issues, it is marked by the exclamation point in the tree
+ - Events and Actions can be called from the tree Context menu (System)
+ - Web Client can be opened from the tree Context menu (System)
+ - IOs Client displays sorted cameras list 
+ - IOs Client displays a camera name on the top left corner
+ - Enterprise license type is replaced with Professional
+ - Free licenses are replaced with 4 trial licenses (45 days)
+ - Notifications settings are stored in the database so they are same for all computers the user logs from. Used to be stored independently in the registry
+  
+BUGS FIXED:  
+
+ - Panic recording could not be stopped if recording for all cameras had been turned off
+ - Fixed issues with inactive external storages (incorrect recording status)
+ - Storages that was mounted as local disks were not displayed in the storage list (Linux)
+ - Removed "FPS value is too high" message that occured sometimes when opening camera settings
+ - If the same camera without archive was opened twice, the streams were synchronized incorrectly on live
+ - Thumbnails are displayed correctly for panoramic cameras (1st sensor is displayed)
+ - Audio was not exported properly in AC3 format if trying to export Multi-Video
+ - Fixed visual chunks flickering in some cases (especally while zooming)
+ - If run client after installation (check the flag), it was not possible to delete the directory the installer was downloaded to. Fixed
+ - Tooltips' were popping up on incorrect positions sometimes. Fixed
+ - If log out and open a local file in a new window, Client tried connected to EC. Fixed 
+ - Events/Actions bugs:
+   - Auto-reset for camera output didn't work for some cameras
+   - If press Add and Apply on the Events/Actions dialog, event rule could be duplicated incorrectly that might cause improper work. Fixed.
+   - If an external storages was unplugged, HDD/SSD error was produced every minute. Fixed
+   - It was not possible to change notification from "All users" to "For Administrators only". Fixed
+ - If stop tour by double-click, side panels did not come back. Fixed
+ - It was possible to resize recording icon on the item sometimes. Fixed
+ - Camera's web page could not be opened if its http-port differed from 80. Fixed
+ - On panoramic cameras "NO SIGNAL" and other texts were drawn multiple times. Fixed
+ - If delete an offline server in multi-server environment, all its active cameras disappeared and could not be discovered. 
+   Now the active cameras are distributed to other servers
+ - Sometimes the following error was displayed for manual camera addition: "This server version supports only searching by IP address". Fixed
+ - If resize rotated item arrows were drawn incorrectly. Fixed
+ - If two resources next to each other both had text the overlays could interfere. Fixed
+ - Client could hang if add a media folder containing too many files (>100k). Now no more than 1000 files are added in this case
+ - Fixed incorrect tab order in Events and Actions form
+ - If zoom to an item and then close client (ALT + F4), all panels will be hidden after restarting
+ - If resize an item all text on it was the same size. Now it is resized as well
+ - If disconnect Media Server from EC and reconnect it back its cameras are displaying NO SIGNAL. Fixed
+ - If Media Server's IP was changed in all-in-one installation, then the server's ip was not updated in the tree unless it was reconnected to EC. Fixed
+ 
 ----------------------------------------------- 1.5.1 -----------------------------------------------
 
 NEW CAMERAS AND RECORDERS SUPPORTED:
