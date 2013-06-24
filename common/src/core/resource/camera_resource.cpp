@@ -268,16 +268,12 @@ void QnVirtualCameraResource::issueOccured()
 void QnVirtualCameraResource::noCameraIssues()
 {
     QMutexLocker lock(&m_mutex);
-    if (!m_issueTimes.empty()) {
-        qint64 threshold = getUsecTimer() - ISSUE_KEEP_TIMEOUT;
-        while(!m_issueTimes.empty() && m_issueTimes.front() < threshold)
-            m_issueTimes.pop_front();
+    qint64 threshold = getUsecTimer() - ISSUE_KEEP_TIMEOUT;
+    while(!m_issueTimes.empty() && m_issueTimes.front() < threshold)
+        m_issueTimes.pop_front();
 
-        if (m_issueTimes.empty()) {
-            if (hasStatusFlags(HasIssuesFlag)) {
-                removeStatusFlags(HasIssuesFlag);
-                save();
-            }
-        }
+    if (m_issueTimes.empty() && hasStatusFlags(HasIssuesFlag)) {
+        removeStatusFlags(HasIssuesFlag);
+        save();
     }
 }
