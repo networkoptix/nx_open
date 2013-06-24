@@ -64,8 +64,7 @@
 #include <ui/dialogs/ptz_presets_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
-
-//#include <youtube/youtubeuploaddialog.h>
+#include <ui/dialogs/ptz_preset_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -3434,12 +3433,18 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
         return;
     }
 
-    bool ok = false;
-    QString name = QInputDialog::getText(mainWindow(), tr("Save Position"), tr("Enter position name:"), QLineEdit::Normal, QString(), &ok);
-    if(!ok)
+    QList<int> forbiddenHotkeys;
+    foreach(const QnPtzPreset &preset, context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera))
+        forbiddenHotkeys.push_back(preset.hotkey);
+
+    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
+    dialog->setForbiddenHotkeys(forbiddenHotkeys);
+    dialog->setPreset(QnPtzPreset(-1, QString(), position));
+    dialog->setWindowTitle(tr("Save Position"));
+    if(dialog->exec() != QDialog::Accepted)
         return;
 
-    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, name, position);
+    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, dialog->preset());
 }
 
 void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
