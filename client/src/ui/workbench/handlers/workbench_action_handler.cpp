@@ -3433,14 +3433,12 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
         return;
     }
 
-    QList<int> hotkeys;
-    for(int i = 0; i < 10; i++)
-        hotkeys.push_back(i);
+    QList<int> forbiddenHotkeys;
     foreach(const QnPtzPreset &preset, context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera))
-        hotkeys.removeOne(preset.hotkey);
+        forbiddenHotkeys.push_back(preset.hotkey);
 
     QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
-    dialog->setHotkeys(hotkeys);
+    dialog->setForbiddenHotkeys(forbiddenHotkeys);
     dialog->setPreset(QnPtzPreset(-1, QString(), position));
     dialog->setWindowTitle(tr("Save Position"));
     if(dialog->exec() != QDialog::Accepted)

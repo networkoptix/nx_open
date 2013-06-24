@@ -20,17 +20,20 @@ public:
     QnPtzPreset preset() const;
     void setPreset(const QnPtzPreset &preset);
 
-    const QList<int> &hotkeys() const;
-    void setHotkeys(const QList<int> &hotkeys);
+    const QList<int> &forbiddenHotkeys() const;
+    void setForbiddenHotkeys(const QList<int> &forbiddenHotkeys);
 
 protected:
     int currentHotkey() const;
     void setCurrentHotkey(int hotkey);
+    void setForbiddenHotkeys(const QList<int> &forbiddenHotkeys, bool force);
+
+    Q_SLOT void updateOkButtonEnabled();
 
 private:
     QScopedPointer<Ui::PtzPresetDialog> ui;
     QnPtzPreset m_preset;
-    QList<int> m_hotkeys;
+    QList<int> m_forbiddenHotkeys;
 };
 
 #endif // QN_PTZ_PRESET_DIALOG_H

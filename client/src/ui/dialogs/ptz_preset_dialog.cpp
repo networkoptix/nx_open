@@ -9,10 +9,10 @@ QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlag
 {
     ui->setupUi(this);
 
-    QList<int> hotkeys;
-    for(int i = 0; i < 10; i++)
-        hotkeys.push_back(i);
-    setHotkeys(hotkeys);
+    connect(ui->nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateOkButtonEnabled()));
+
+    setForbiddenHotkeys(QList<int>(), false);
+    updateOkButtonEnabled();
 }
 
 QnPtzPresetDialog::~QnPtzPresetDialog() {
@@ -32,17 +32,27 @@ void QnPtzPresetDialog::setPreset(const QnPtzPreset &preset) {
     setCurrentHotkey(preset.hotkey);
 }
 
-const QList<int> &QnPtzPresetDialog::hotkeys() const {
-    return m_hotkeys;
+const QList<int> &QnPtzPresetDialog::forbiddenHotkeys() const {
+    return m_forbiddenHotkeys;
 }
 
-void QnPtzPresetDialog::setHotkeys(const QList<int> &hotkeys) {
-    if(m_hotkeys == hotkeys)
+void QnPtzPresetDialog::setForbiddenHotkeys(const QList<int> &forbiddenHotkeys) {
+    setForbiddenHotkeys(forbiddenHotkeys, false);
+}
+
+void QnPtzPresetDialog::setForbiddenHotkeys(const QList<int> &forbiddenHotkeys, bool force) {
+    if(!force && m_forbiddenHotkeys == forbiddenHotkeys)
         return;
 
-    m_hotkeys = hotkeys;
+    m_forbiddenHotkeys = forbiddenHotkeys;
 
-    bool haveHotkeys = !m_hotkeys.isEmpty();
+    QList<int> hotkeys;
+    for(int i = 0; i < 10; i++)
+        hotkeys.push_back(i);
+    foreach(int forbiddenHotkey, m_forbiddenHotkeys)
+        hotkeys.removeOne(forbiddenHotkey);
+
+    bool haveHotkeys = !hotkeys.isEmpty();
     ui->hotkeyComboBox->setVisible(haveHotkeys);
     ui->hotkeyLabel->setVisible(haveHotkeys);
     if(!haveHotkeys)
@@ -52,7 +62,7 @@ void QnPtzPresetDialog::setHotkeys(const QList<int> &hotkeys) {
 
     ui->hotkeyComboBox->clear();
     ui->hotkeyComboBox->addItem(tr("None"), -1);
-    foreach(int hotkey, m_hotkeys)
+    foreach(int hotkey, hotkeys)
         ui->hotkeyComboBox->addItem(QString::number(hotkey), hotkey);
 
     setCurrentHotkey(currentHotkey);
@@ -67,4 +77,8 @@ void QnPtzPresetDialog::setCurrentHotkey(int hotkey) {
     if(index < 0)
         index = ui->hotkeyComboBox->findData(-1);
     ui->hotkeyComboBox->setCurrentIndex(index);
+}
+
+void QnPtzPresetDialog::updateOkButtonEnabled() {
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!ui->nameEdit->text().isEmpty());
 }
