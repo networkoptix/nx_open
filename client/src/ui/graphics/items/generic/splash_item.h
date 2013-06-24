@@ -3,8 +3,8 @@
 
 #include <QGraphicsObject>
 
-#include <ui\animation\animated.h>
-#include <ui\animation\animation_timer_listener.h>
+#include <ui/animation/animated.h>
+#include <ui/animation/animation_timer_listener.h>
 
 class QnSplashItem: public Animated<QGraphicsObject>, public AnimationTimerListener {
     typedef Animated<QGraphicsObject> base_type;
