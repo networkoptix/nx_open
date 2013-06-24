@@ -14,7 +14,7 @@ namespace {
 }
 
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
-void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& hardwareId, const QByteArray& oldHardwareId);
+void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& oldHardwareId);
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
@@ -104,7 +104,7 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_License:
         {
             const pb::LicenseMessage& licenseMessage = message.GetExtension(pb::LicenseMessage::message);
-			parseLicense(license, licenseMessage.license(), qnLicensePool->getLicenses().hardwareId(), qnLicensePool->getLicenses().oldHardwareId());
+			parseLicense(license, licenseMessage.license(), qnLicensePool->getLicenses().oldHardwareId());
             break;
         }
         case pb::Message_Type_CameraServerItem:
@@ -116,8 +116,9 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_Initial:
         {
             const pb::InitialMessage& initialMessage = message.GetExtension(pb::InitialMessage::message);
-            licenses.setHardwareId(initialMessage.hardwareid().c_str());
+            licenses.setHardwareId1(initialMessage.hardwareid1().c_str());
 			licenses.setOldHardwareId(initialMessage.oldhardwareid().c_str());
+			licenses.setHardwareId2(initialMessage.hardwareid2().c_str());
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());
             qnResTypePool->replaceResourceTypeList(resourceTypes);
 

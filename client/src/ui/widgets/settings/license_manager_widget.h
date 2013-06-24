@@ -35,7 +35,7 @@ private slots:
     void at_licenseWidget_stateChanged();
 
 private:
-    void updateFromServer(const QByteArray &licenseKey, const QString &hardwareId, const QString &oldHardwareId);
+    void updateFromServer(const QByteArray &licenseKey, const QString &hardwareId, const QString &oldHardwareId, const QString &hardwareId2);
     void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses);
     void showLicenseDetails(const QnLicensePtr &license);
 
