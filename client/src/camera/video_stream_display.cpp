@@ -738,7 +738,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
                 foreach(QnAbstractRenderer* render, m_renderList)
                     render->draw(outFrame); // send new one
             }
-            m_lastDisplayedFrame = outFrame;
             m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
             m_queueUsed = true;
         }
@@ -748,6 +747,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
             foreach(QnAbstractRenderer* render, m_renderList)
                 render->waitForFrameDisplayed(outFrame->channel);
         }
+        m_lastDisplayedFrame = outFrame;
         return true; //!m_bufferedFrameDisplayer;
     }
     else
