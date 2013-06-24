@@ -124,6 +124,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
     vCamera->setGroupName(QString::fromUtf8(pb_camera.groupname().c_str()));
     vCamera->setSecondaryStreamQuality(static_cast<QnSecondaryStreamQuality>(pb_camera.secondaryquality()));
     vCamera->setCameraControlDisabled(pb_camera.controldisabled());
+    vCamera->setStatusFlags((QnSecurityCamResource::StatusFlags) pb_camera.statusflags());
 
     if (pb_camera.has_region())
     {
@@ -430,6 +431,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
 
     pb_camera.set_secondaryquality(static_cast<pb::Camera_SecondaryQuality>(cameraPtr->secondaryStreamQuality()));
     pb_camera.set_controldisabled(cameraPtr->isCameraControlDisabled());
+    pb_camera.set_statusflags((int) cameraPtr->statusFlags());
 
     QnParamList params = cameraPtr->getResourceParamList();
     foreach(QString key, params.keys())
@@ -1152,7 +1154,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
 
     QnResourceList eventResources;
     for (int i = 0; i < pb_businessRule.eventresource_size(); i++) {
-        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i), QnResourcePool::rfAllResources);
+        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i), QnResourcePool::AllResources);
         if (resource)
             eventResources << resource;
         else
@@ -1166,7 +1168,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
     businessRule->setActionType(parsePbBusinessActionType(pb_businessRule.actiontype()));
     QnResourceList actionResources;
     for (int i = 0; i < pb_businessRule.actionresource_size(); i++) {//destination resource can belong to another server
-        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.actionresource(i), QnResourcePool::rfAllResources);
+        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.actionresource(i), QnResourcePool::AllResources);
         if (resource)
             actionResources << resource;
         else
@@ -1193,7 +1195,7 @@ void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::
 
     QnResourceList resources;
     for (int i = 0; i < pb_businessAction.actionresource_size(); i++) //destination resource can belong to another server
-        resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
+        resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::AllResources);
     businessAction->setResources(resources);
 
     businessAction->setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
@@ -1217,7 +1219,7 @@ void parseBusinessActionList(QnAbstractBusinessActionList& businessActionList, c
 
         QnResourceList resources;
         for (int i = 0; i < pb_businessAction.actionresource_size(); i++) //destination resource can belong to another server
-            resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
+            resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::AllResources);
         businessAction->setResources(resources);
 
         businessAction->setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
@@ -1245,7 +1247,7 @@ void parseBusinessActionVector(QnBusinessActionDataListPtr& businessActionVector
 
         QnResourceList resources;
         //for (int i = 0; i < pb_businessAction.actionresource_size(); i++) //destination resource can belong to another server
-        //    resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
+        //    resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::AllResources);
         //businessAction.setResources(resources);
 
         //businessAction.setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));

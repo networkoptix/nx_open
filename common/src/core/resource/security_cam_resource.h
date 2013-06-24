@@ -23,6 +23,11 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
+    enum StatusFlag { 
+        HasIssuesFlag = 0x1
+    };
+    Q_DECLARE_FLAGS(StatusFlags, StatusFlag)
+
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     Qn::MotionType getCameraBasedMotionType() const;
@@ -130,6 +135,12 @@ public:
     int desiredSecondStreamFps() const;
     QnStreamQuality getSecondaryStreamQuality() const;
 
+    StatusFlags statusFlags() const;
+    bool hasStatusFlags(StatusFlags value) const;
+    void setStatusFlags(StatusFlags value);
+    void addStatusFlags(StatusFlags value);
+    void removeStatusFlags(StatusFlags value);
+
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource signals/slots
 // -------------------------------------------------------------------------- //
@@ -141,7 +152,6 @@ public slots:
 
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
-
 signals:
     virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
@@ -189,6 +199,7 @@ private:
     QString m_groupId;
     QnSecondaryStreamQuality  m_secondaryQuality;
     bool m_cameraControlDisabled;
+    StatusFlags m_statusFlags;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

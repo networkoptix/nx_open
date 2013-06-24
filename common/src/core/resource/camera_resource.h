@@ -4,6 +4,7 @@
 #include <QtCore/QMetaType>
 
 #include "security_cam_resource.h"
+#include <deque>
 
 class QnAbstractDTSFactory;
 
@@ -51,6 +52,9 @@ public:
     void deserialize(const QnResourceParameters& parameters);
 
     QString toSearchString() const override;
+public slots:
+    void issueOccured();
+    void noCameraIssues();
 protected:
     void save();
 // -------------------------------------------------------------------------- //
@@ -88,6 +92,7 @@ private:
     QString m_firmware;
 
     QnAbstractDTSFactory* m_dtsFactory;
+    std::deque<qint64> m_issueTimes;
 };
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);

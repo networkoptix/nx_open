@@ -25,7 +25,7 @@ protected:
 
     static QnResourcePtr createArchiveResource(const QString& xfile);
 
-    QnResourceList findResources(const QString &directory);
+    void findResources(const QString &directory, QnResourceList *result);
 };
 
 #endif //QN_RESOURCE_DIRECTORY_BROWSER_H

@@ -85,7 +85,7 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     }
 
     m_capabilities |= Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability;
-    m_ptzMapper = qnCommon->ptzMapperPool()->mapper(m_resource->getModel());
+    m_ptzMapper = qnCommon->instance<QnPtzMapperPool>()->mapper(m_resource->getModel());
 
     // TODO: #Elric make configurable
     QString model = m_resource->getModel();
