@@ -216,6 +216,17 @@
    <header>ui/common/tree_combo_box.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>gridEvents</tabstop>
+  <tabstop>dateEditFrom</tabstop>
+  <tabstop>dateEditTo</tabstop>
+  <tabstop>eventComboBox</tabstop>
+  <tabstop>cameraButton</tabstop>
+  <tabstop>actionComboBox</tabstop>
+  <tabstop>clearFilterButton</tabstop>
+  <tabstop>eventRulesButton</tabstop>
+  <tabstop>refreshButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
