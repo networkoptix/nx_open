@@ -8,15 +8,16 @@ IOS Client
  - IOs client can work on IOs 5 
  
 NEW CAMERAS AND RECORDERS SUPPORTED:
+  - Few Arecont newest models
   - Avigilon cameras: 2.0-H3-D1-IR, 2.0-H3-DO1-IR, 2.0-H3M-DO1, 2.0W-H3-BO1-IR
-  - AXIS M3005, AXIS M3007
+  - AXIS M3005, AXIS M3007 and any  other Axis camera (in theory)
   - Vivotek: SD8362E, FD8372, IP8335H, FD8134, IP8362, MD8562, IP8151, IP8133, FD8135H, FE8172V
   - DAHUA IPC-HFW3200S
   - Any RTSP stream can be added as a camera. Just enter the desired RTSP URL instead of camera's IP in the manual addition form.
 
 NEW FEATURES:
  - Events and actions:
-    - Notifications are redesigned. They appear in the left panel.
+    - Notifications are redesigned. They appear in the right panel.
     - New actions are added: 
       - "Play sound" - ability to play sound if an event occur. Sound can be chosen from the library or uploaded by a user
       - "Text to speech" - ability to say something if an event occur. Extends "Play Sound" action
@@ -69,6 +70,7 @@ IMPROVEMENTS:
  - Free licenses are replaced with 4 trial licenses (45 days)
  - Notifications settings are stored in the database so they are same for all computers the user logs from. Used to be stored independently in the registry
  - Backup/Restore can be invoked from the "System" Context Menu in Tree...
+ - Now panoramic cameras are supported in Web and Mobile clients
   
 BUGS FIXED:  
 
