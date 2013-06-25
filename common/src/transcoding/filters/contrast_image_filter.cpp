@@ -9,11 +9,18 @@ QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params
 
 static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0x00000000, 0x00000000);
 
+bool QnContrastImageFilter::isFormatSupported(CLVideoDecoderOutput* frame) const
+{
+    return frame->data[1]; // if several video planes are present, format is supprted
+}
+
 void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
 {
     static const float GAMMA_EPS = 0.01f;
 
     if (!m_params.enabled)
+        return;
+    if (!isFormatSupported(frame))
         return;
 
     m_gamma.analizeImage(frame->data[0], frame->width, frame->height, frame->linesize[0], m_params, updateRect);
@@ -56,7 +63,8 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
                 typedef union
                 {
                     __m128i v;
-                    int32_t a[4];
+                    uint32_t a[4];
+                    uint8_t b[16];
                 } U32;
                 U32 tmp;
 
@@ -67,21 +75,21 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
                                  (m_gammaCorrection[(quint8)(tmp.a[0]>>16)] << 16)+
                                  (m_gammaCorrection[(quint8)(tmp.a[0]>>24)] << 24);
 
+                tmp.a[1] = (quint32) m_gammaCorrection[tmp.b[4]] + 
+                    (m_gammaCorrection[tmp.b[5]] << 8) +
+                    (m_gammaCorrection[tmp.b[6]] << 16) +
+                    (m_gammaCorrection[tmp.b[7]] << 24);
 
-                tmp.a[1] = m_gammaCorrection[(quint8)tmp.a[1]] + 
-                    (m_gammaCorrection[(quint8)(tmp.a[1]>>8)] << 8)+
-                    (m_gammaCorrection[(quint8)(tmp.a[1]>>16)] << 16)+
-                    (m_gammaCorrection[(quint8)(tmp.a[1]>>24)] << 24);
+                tmp.a[2] = (quint32) m_gammaCorrection[tmp.b[8]] + 
+                    (m_gammaCorrection[tmp.b[9]] << 8) +
+                    (m_gammaCorrection[tmp.b[10]] << 16) +
+                    (m_gammaCorrection[tmp.b[11]] << 24);
 
-                tmp.a[2] = m_gammaCorrection[(quint8)tmp.a[2]] + 
-                    (m_gammaCorrection[(quint8)(tmp.a[2]>>8)] << 8)+
-                    (m_gammaCorrection[(quint8)(tmp.a[2]>>16)] << 16)+
-                    (m_gammaCorrection[(quint8)(tmp.a[2]>>24)] << 24);
+                tmp.a[3] = (quint32) m_gammaCorrection[tmp.b[12]] + 
+                    (m_gammaCorrection[tmp.b[13]] << 8) +
+                    (m_gammaCorrection[tmp.b[14]] << 16) +
+                    (m_gammaCorrection[tmp.b[15]] << 24);
 
-                tmp.a[3] = m_gammaCorrection[(quint8)tmp.a[3]] + 
-                    (m_gammaCorrection[(quint8)(tmp.a[3]>>8)] << 8)+
-                    (m_gammaCorrection[(quint8)(tmp.a[3]>>16)] << 16)+
-                    (m_gammaCorrection[(quint8)(tmp.a[3]>24)] << 24);
 
                 *srcY++ = tmp.v;
             }

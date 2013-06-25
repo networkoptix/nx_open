@@ -51,7 +51,7 @@ public:
     void setMTDecoding(bool value);
 
     void setSpeed(float value);
-    virtual QImage getScreenshot() override;
+    virtual QImage getScreenshot(const ImageCorrectionParams& params) override;
     virtual QImage getGrayscaleScreenshot() override; 
     void setCurrentTime(qint64 time);
     void canUseBufferedFrameDisplayer(bool value);

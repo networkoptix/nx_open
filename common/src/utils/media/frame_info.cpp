@@ -93,23 +93,6 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
         dst->width = src->width;
         dst->height = src->height;
         dst->format = src->format;
-
-        /*
-        dst->linesize[0] = src->width;
-        dst->linesize[1] = src->width/2;
-        dst->linesize[2] = src->width/2;
-
-        dst->width = src->width;
-
-        dst->height = src->height;
-        dst->format = src->format;
-
-        int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
-
-        dst-data[0] = (unsigned char*) av_malloc(dst->getCapacity());
-        dst->data[1] = dst-data[0] + dst->linesize[0]*dst->height;
-        dst->data[2] = dst-data[1] + dst->linesize[1]*yu_h;
-        */
     }
 
     int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
