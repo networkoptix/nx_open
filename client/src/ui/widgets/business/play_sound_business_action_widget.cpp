@@ -121,6 +121,7 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
 
 void QnPlaySoundBusinessActionWidget::enableTestButton() {
     ui->testButton->setEnabled(true);
+    ui->testButton->setFocus();
 }
 
 void QnPlaySoundBusinessActionWidget::at_testButton_clicked() {

@@ -11,14 +11,15 @@
 #include "workbench_context_aware.h"
 
 struct QnPtzPreset {
-    QnPtzPreset(): hotkey(-1) {};
-    QnPtzPreset(int hotkey, const QString &name, const QVector3D &logicalPosition): hotkey(hotkey), name(name), logicalPosition(logicalPosition) {}
+    QnPtzPreset() {}
+    QnPtzPreset(QKeySequence hotkey, const QString &name, const QVector3D &logicalPosition):
+        hotkey(hotkey), name(name), logicalPosition(logicalPosition) {}
 
     bool isNull() const {
         return name.isEmpty();
     }
 
-    int hotkey;
+    QKeySequence hotkey;
     QString name;
     QVector3D logicalPosition;
 };
@@ -33,7 +34,7 @@ public:
     virtual ~QnWorkbenchPtzPresetManager();
 
     QnPtzPreset ptzPreset(const QnVirtualCameraResourcePtr &camera, const QString &name) const;
-    QnPtzPreset ptzPreset(const QnVirtualCameraResourcePtr &camera, int hotkey) const;
+    QnPtzPreset ptzPreset(const QnVirtualCameraResourcePtr &camera, const QKeySequence &hotkey) const;
     QList<QnPtzPreset> ptzPresets(const QnVirtualCameraResourcePtr &camera) const;
     void setPtzPresets(const QnVirtualCameraResourcePtr &camera, const QList<QnPtzPreset> &presets);
 
