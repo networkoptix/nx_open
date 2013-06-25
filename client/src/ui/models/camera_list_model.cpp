@@ -30,8 +30,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
     case Qt::DecorationRole:
         if (index.column() == RecordingColumn) {
             int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
-            if(camera->getStatus() == QnResource::Recording)
-                recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), camera);
+            recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), camera);
             result =  QnRecordingStatusHelper::icon(recordingMode);
         }
         else if (index.column() == NameColumn)
@@ -47,8 +46,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
         {
             case RecordingColumn: {
                 int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
-                if(camera->getStatus() == QnResource::Recording)
-                    recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), camera);
+                recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), camera);
                 result =  QnRecordingStatusHelper::shortTooltip(recordingMode);
                 break;
             }
