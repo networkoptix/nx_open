@@ -934,13 +934,19 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             break;
         }
     case BusinessActionType::PlaySound: {
-            QString filename = businessAction->getParams().getSoundUrl();
-            QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
+            const QString speechPrefix(QLatin1String("speech://")); //TODO: #GDM move to common module?
 
-            // if file is not exists then it is already deleted or just not downloaded yet
-            // I think it should not be played when downloaded
-            AudioPlayer::playFileAsync(filePath);
-            qDebug() << "play sound action received" << filename << filePath;
+            QString filename = businessAction->getParams().getSoundUrl();
+            if (filename.startsWith(speechPrefix)) {
+                AudioPlayer::sayTextAsync(filename.mid(speechPrefix.size()));
+                qDebug() << "speech action received" << filename.mid(speechPrefix.size());
+            } else {
+                QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
+                // if file is not exists then it is already deleted or just not downloaded yet
+                // I think it should not be played when downloaded
+                AudioPlayer::playFileAsync(filePath);
+                qDebug() << "play sound action received" << filename << filePath;
+            }
             break;
         }
     default:
@@ -1645,7 +1651,7 @@ void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
         businessEventsLogDialog()->setGeometry(oldGeometry);
 }
 
-void QnWorkbenchActionHandler::at_cameraListAction_triggered() 
+void QnWorkbenchActionHandler::at_cameraListAction_triggered()
 {
     QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
 
