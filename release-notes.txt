@@ -1,5 +1,12 @@
 ----------------------------------------------- 1.5.2 (1.6 beta) -----------------------------------------------
 
+ANDROID CLIENT:
+ - If a camera archive contained too many recorded fragments, live video was freezing. Fixed
+ - If log in with a different case letters (Admin - admin) cameras list could not be loaded. Fixed
+
+IOS Client
+ - IOs client can work on IOs 5 
+ 
 NEW CAMERAS AND RECORDERS SUPPORTED:
   - Avigilon cameras: 2.0-H3-D1-IR, 2.0-H3-DO1-IR, 2.0-H3M-DO1, 2.0W-H3-BO1-IR
   - AXIS M3005, AXIS M3007
@@ -20,24 +27,28 @@ NEW FEATURES:
  - History of events and actions is implemented. All events and actions are displayed in the table that provides 
    the ability to sort and filter data. Additionally "Check server issues..", "Check camera issues.." are added to 
    Media Servers' and Cameras' Context Menus.
- - Cameras List is introduced. It displays all Cameras in the table that provides the ability to sort and filter data
- - Video color correction. Just press the correction button on the item to activate it. Try this feature in dark scenes to 
-   estimate its power. Use context menu to adjust this feature's settings
+        - Cameras List is introduced. It displays all Cameras in the table that provides the ability to sort and filter data. 
+ - Video color/gamma correction. Just press the correction button on the item to activate it. Try this feature in dark scenes to 
+   estimate its power. Use context menu to adjust this feature's settings. Additionally it is possible to export video with such setting
  - It is possible to adjust second stream quality in cameras' settings. This is not recommended in general but may be needed for some reasons
  - Autoconnection can be activated on the login page. It will use the pre-entered user name and password to connect to the server automatically
  - If motion is occured on an item, it is indicated by the visual effect
  - Email notification about motion now contains a video link. If click on this link, video for this camera will be opened in a browser
- - IOs client can work on IOs 5
+ - If a user did not apply current motion mask by mistake (during camera setting) the warning will be shown
+
+ - Compatible with Windows Server 2012 Family
  
 IMPROVEMENTS:  
- - UI state (pinned or hidden tabs) are always saved between Client launches
+ - Ability to run client when the computer boots up
+        - Client only installer is available
+        - UI state (pinned or hidden tabs) are always saved between Client launches
  - Added ping button to Media Server settings dialog. It may be useful to check computer state: if the computer is pinging but 
    Media Server appears offline, then this is software problem. Otherwise it is likely to be hardware problem and hard reset may be needed
  - Health monitor improvements:
     - Added ping, show log and server issues button.
-    - Added checkbox graphs enabling/disabling.
+        - Added checkbox graphs enabling/disabling.
     - Added network usage in Health Monitoring.
- - Added timestamp option to screenshot, export selected area and multi-view
+        - Added timestamp option to screenshot, export selected area and multi-video
  - Current time is always displayed under playback buttons
  - Changed default motion sensitivity for motion dialog to 5 (used to be 8)
  - Main window is Repainted when aero is turned on/off
@@ -57,6 +68,7 @@ IMPROVEMENTS:
  - Enterprise license type is replaced with Professional
  - Free licenses are replaced with 4 trial licenses (45 days)
  - Notifications settings are stored in the database so they are same for all computers the user logs from. Used to be stored independently in the registry
+ - Backup/Restore can be invoked from the "System" Context Menu in Tree...
   
 BUGS FIXED:  
 
@@ -71,7 +83,7 @@ BUGS FIXED:
  - If run client after installation (check the flag), it was not possible to delete the directory the installer was downloaded to. Fixed
  - Tooltips' were popping up on incorrect positions sometimes. Fixed
  - If log out and open a local file in a new window, Client tried connected to EC. Fixed 
- - Events/Actions bugs:
+ - Events/Actions bugs fixed:
    - Auto-reset for camera output didn't work for some cameras
    - If press Add and Apply on the Events/Actions dialog, event rule could be duplicated incorrectly that might cause improper work. Fixed.
    - If an external storages was unplugged, HDD/SSD error was produced every minute. Fixed
@@ -88,7 +100,7 @@ BUGS FIXED:
  - Client could hang if add a media folder containing too many files (>100k). Now no more than 1000 files are added in this case
  - Fixed incorrect tab order in Events and Actions form
  - If zoom to an item and then close client (ALT + F4), all panels will be hidden after restarting
- - If resize an item all text on it was the same size. Now it is resized as well
+ - If resize a video on scene all text (Unauthorized, NO SIGNAL etc.) on it was the same size. Now it is resized as well
  - If disconnect Media Server from EC and reconnect it back its cameras are displaying NO SIGNAL. Fixed
  - If Media Server's IP was changed in all-in-one installation, then the server's ip was not updated in the tree unless it was reconnected to EC. Fixed
  
