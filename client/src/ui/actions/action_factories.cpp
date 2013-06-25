@@ -60,11 +60,11 @@ void QnOpenCurrentUserLayoutActionFactory::at_action_triggered() {
 
 
 QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
+    QList<QAction *> result;
+
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)
-        return QList<QAction *>();
-
-    QList<QAction *> result;
+        return result;
 
     QList<QnPtzPreset> presets = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera);
     qSort(presets.begin(), presets.end(), PtzPresetNameCmp());
@@ -72,6 +72,8 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
     foreach(const QnPtzPreset &preset, presets) {
         QAction *action = new QAction(parent);
         action->setText(preset.name);
+        if (!preset.hotkey.isEmpty())
+            action->setShortcut(preset.hotkey);
         action->setData(QVariant::fromValue<QnVirtualCameraResourcePtr>(camera));
         connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
 

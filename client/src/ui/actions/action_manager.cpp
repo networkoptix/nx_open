@@ -1028,6 +1028,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Add camera(s)...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
+    factory(Qn::cameraListByServerAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Camera(s) list by server...")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
+
     factory(Qn::PingAction).
         flags(Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Ping..."));

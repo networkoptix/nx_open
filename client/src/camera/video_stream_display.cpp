@@ -13,6 +13,7 @@
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "../client/client_settings.h"
+#include "transcoding/filters/contrast_image_filter.h"
 
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
@@ -738,7 +739,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
                 foreach(QnAbstractRenderer* render, m_renderList)
                     render->draw(outFrame); // send new one
             }
-            m_lastDisplayedFrame = outFrame;
             m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
             m_queueUsed = true;
         }
@@ -748,6 +748,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
             foreach(QnAbstractRenderer* render, m_renderList)
                 render->waitForFrameDisplayed(outFrame->channel);
         }
+        m_lastDisplayedFrame = outFrame;
         return true; //!m_bufferedFrameDisplayer;
     }
     else
@@ -886,6 +887,8 @@ void QnVideoStreamDisplay::setPausedSafe(bool value)
     QMutexLocker lock(&m_renderListMtx);
     foreach(QnAbstractRenderer* render, m_renderList)
         render->setPaused(value);
+    foreach(QnAbstractRenderer* render, m_newList)
+        render->setPaused(value);
     m_isPaused = value;
 }
 
@@ -968,7 +971,7 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 }
 
 
-QImage QnVideoStreamDisplay::getScreenshot()
+QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params)
 {
     if (m_decoder.isEmpty())
         return QImage();
@@ -981,19 +984,28 @@ QImage QnVideoStreamDisplay::getScreenshot()
     if (!lastFrame || !lastFrame->width || !lastFrame->data[0])
         return QImage();
 
+    // copy image
+    CLVideoDecoderOutput frameCopy;
+    frameCopy.setUseExternalData(false);
+    frameCopy.reallocate(lastFrame->width, lastFrame->height, lastFrame->format);
+    av_picture_copy((AVPicture*) &frameCopy, (AVPicture*) lastFrame, (PixelFormat) lastFrame->format, lastFrame->width, lastFrame->height);
+    QnContrastImageFilter filter(params);
+    filter.updateImage(&frameCopy, QRectF(0.0, 0.0, 1.0, 1.0));
+
+
     // convert colorSpace
-    SwsContext* convertor = sws_getContext(lastFrame->width, lastFrame->height, (PixelFormat) lastFrame->format,
-        lastFrame->width, lastFrame->height, PIX_FMT_BGRA,
+    SwsContext* convertor = sws_getContext(frameCopy.width, frameCopy.height, (PixelFormat) frameCopy.format,
+        frameCopy.width, frameCopy.height, PIX_FMT_BGRA,
         SWS_POINT, NULL, NULL, NULL);
     if( !convertor )
         return QImage();
 
-    int numBytes = avpicture_get_size(PIX_FMT_RGBA, lastFrame->width, lastFrame->height);
+    int numBytes = avpicture_get_size(PIX_FMT_RGBA, frameCopy.width, frameCopy.height);
     AVPicture outPicture; 
-    avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, lastFrame->width, lastFrame->height);
+    avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, frameCopy.width, frameCopy.height);
 
-    sws_scale(convertor, lastFrame->data, lastFrame->linesize, 
-              0, lastFrame->height, 
+    sws_scale(convertor, frameCopy.data, frameCopy.linesize, 
+              0, frameCopy.height, 
               outPicture.data, outPicture.linesize);
     sws_freeContext(convertor);
     // convert to QImage

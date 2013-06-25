@@ -23,6 +23,7 @@
 #include "client/client_settings.h"
 #include "ui/models/business_rules_actual_model.h"
 #include "utils/common/event_processors.h"
+#include "custom_file_dialog.h"
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -73,6 +74,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     m_filterAction      = new QAction(tr("Filter similar rows"), this);
     m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
     m_clipboardAction   = new QAction(tr("Copy selection to clipboard"), this);
+    m_exportAction      = new QAction(tr("Export selection to file"), this);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
     m_resetFilterAction = new QAction(tr("Clear filter"), this);
     m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R);
@@ -83,6 +85,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(mouseSignalizer,       SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_mouseButtonRelease(QObject *, QEvent *)));
 
     ui->gridEvents->addAction(m_clipboardAction);
+    ui->gridEvents->addAction(m_exportAction);
     ui->gridEvents->addAction(m_filterAction);
     ui->gridEvents->addAction(m_resetFilterAction);
 
@@ -94,6 +97,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(m_filterAction,         SIGNAL(triggered()),                this, SLOT(at_filterAction()));
     connect(m_resetFilterAction,    SIGNAL(triggered()),                this, SLOT(at_resetFilterAction()));
     connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));
+    connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
 
     connect(ui->dateEditFrom,       SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
     connect(ui->dateEditTo,         SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
@@ -250,10 +254,18 @@ void QnEventLogDialog::updateHeaderWidth()
         QModelIndex idx = m_model->index(i, (int) QnEventLogModel::ActionCameraColumn);
         QString targetText = m_model->data(idx).toString();
         int spaceIdx = targetText.indexOf(L' ');
-        if (spaceIdx >= 0)
-            w = qMax(w, fm.size(0, targetText.left(spaceIdx)).width());
-        else
+        int prevPos = 0;
+        if (spaceIdx == -1) {
             w = qMax(w, fm.size(0, targetText).width());
+        }
+        else {
+            while (spaceIdx >= 0) {
+                w = qMax(w, fm.size(0, targetText.mid(prevPos, spaceIdx - prevPos)).width());
+                prevPos = spaceIdx;
+                spaceIdx = targetText.indexOf(L' ', spaceIdx+1);
+            }
+            w = qMax(w, fm.size(0, targetText.mid(prevPos, targetText.length() - prevPos)).width());
+        }
     }
     ui->gridEvents->horizontalHeader()->resizeSection(4, qMax(w + 32, ui->cameraButton->width() + space));
 }
@@ -472,6 +484,7 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
 
     m_filterAction->setEnabled(idx.isValid());
     m_clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
+    m_exportAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
 
     menu->addAction(m_filterAction);
     menu->addAction(m_resetFilterAction);
@@ -479,12 +492,98 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     menu->addSeparator();
 
     menu->addAction(m_clipboardAction);
+    menu->addAction(m_exportAction);
 
     menu->exec(QCursor::pos());
     menu->deleteLater();
 }
 
+void QnEventLogDialog::at_exportAction()
+{
+    QString previousDir = qnSettings->lastExportDir();
+    if (previousDir.isEmpty())
+        previousDir = qnSettings->mediaFolder();
+    QString fileName;
+    while (true) 
+    {
+
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
+            mainWindow(),
+            tr("Export selected events to file"),
+            previousDir,
+            tr("HTML file (*.html);;CSV file (*.csv)")
+            ));
+        dialog->setFileMode(QFileDialog::AnyFile);
+        dialog->setAcceptMode(QFileDialog::AcceptSave);
+
+        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+            return;
+
+        fileName = dialog->selectedFiles().value(0);
+        QString selectedFilter = dialog->selectedNameFilter();
+        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+
+        if (fileName.isEmpty())
+            return;
+
+        if (!fileName.toLower().endsWith(selectedExtension)) {
+            fileName += selectedExtension;
+
+            if (QFile::exists(fileName)) {
+                QMessageBox::StandardButton button = QMessageBox::information(
+                    mainWindow(),
+                    tr("Save As"),
+                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
+                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+                    );
+
+                if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                    return;
+            }
+        }
+
+        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
+            QMessageBox::critical(
+                mainWindow(),
+                tr("Could not overwrite file"),
+                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
+                QMessageBox::Ok
+                );
+            continue;
+        }
+
+        break;
+    }
+    qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
+
+
+    QString textData;
+    QString htmlData;
+    processGrid(textData, htmlData, QLatin1Char(L';'));
+
+    QFile f(fileName);
+    if (f.open(QFile::WriteOnly))
+    {
+        if (fileName.endsWith(lit(".html")) || fileName.endsWith(lit(".htm")))
+            f.write(htmlData.toUtf8());
+        else
+            f.write(textData.toUtf8());
+    }
+}
+
 void QnEventLogDialog::at_copyToClipboard()
+{
+    QString textData;
+    QString htmlData;
+    processGrid(textData, htmlData, QLatin1Char(L'\t'));
+
+    QMimeData* mimeData = new QMimeData();
+    mimeData->setText(textData);
+    mimeData->setHtml(htmlData);
+    QApplication::clipboard()->setMimeData(mimeData);
+}
+
+void QnEventLogDialog::processGrid(QString& textData, QString& htmlData, const QLatin1Char& textDelimiter)
 {
     QAbstractItemModel *model = ui->gridEvents->model();
     QModelIndexList list = ui->gridEvents->selectionModel()->selectedIndexes();
@@ -492,10 +591,6 @@ void QnEventLogDialog::at_copyToClipboard()
         return;
 
     qSort(list);
-
-    QString textData;
-    QString htmlData;
-    QMimeData* mimeData = new QMimeData();
 
     htmlData.append(lit("<html>\n"));
     htmlData.append(lit("<body>\n"));
@@ -505,7 +600,7 @@ void QnEventLogDialog::at_copyToClipboard()
     for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
     {
         if (i > 0)
-            textData.append(lit('\t'));
+            textData.append(textDelimiter);
         QString header = model->headerData(list[i].column(), Qt::Horizontal).toString();
         htmlData.append(lit("<th>"));
         htmlData.append(header);
@@ -525,7 +620,7 @@ void QnEventLogDialog::at_copyToClipboard()
             htmlData.append(lit("<tr>"));
         }
         else {
-            textData.append(lit('\t'));
+            textData.append(textDelimiter);
         }
 
         htmlData.append(lit("<td>"));
@@ -539,12 +634,8 @@ void QnEventLogDialog::at_copyToClipboard()
     htmlData.append(lit("</body>\n"));
     htmlData.append(lit("</html>\n"));
     textData.append(lit('\n'));
-
-    mimeData->setText(textData);
-    mimeData->setHtml(htmlData);
-
-    QApplication::clipboard()->setMimeData(mimeData);
 }
+
 
 void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
 {

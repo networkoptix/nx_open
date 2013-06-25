@@ -19,8 +19,6 @@ QnResourceListDialog::QnResourceListDialog(QWidget *parent):
     ui->treeView->setModel(m_model);
     ui->topLabel->hide();
     ui->bottomLabel->hide();
-
-    setButtonBox(ui->buttonBox);
 }
 
 QnResourceListDialog::~QnResourceListDialog() {

@@ -480,6 +480,11 @@ namespace Qn {
         ServerAddCameraManuallyAction,
 
         /**
+         * Opens camera list by media server
+         */
+        cameraListByServerAction,
+
+        /**
          * Opens a YouTube upload dialog.
          */
         YouTubeUploadAction,

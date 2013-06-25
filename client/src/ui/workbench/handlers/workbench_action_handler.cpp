@@ -64,8 +64,7 @@
 #include <ui/dialogs/ptz_presets_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
-
-//#include <youtube/youtubeuploaddialog.h>
+#include <ui/dialogs/ptz_preset_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -247,6 +246,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
+    connect(action(Qn::cameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
@@ -934,13 +934,19 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             break;
         }
     case BusinessActionType::PlaySound: {
-            QString filename = businessAction->getParams().getSoundUrl();
-            QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
+            const QString speechPrefix(QLatin1String("speech://")); //TODO: #GDM move to common module?
 
-            // if file is not exists then it is already deleted or just not downloaded yet
-            // I think it should not be played when downloaded
-            AudioPlayer::playFileAsync(filePath);
-            qDebug() << "play sound action received" << filename << filePath;
+            QString filename = businessAction->getParams().getSoundUrl();
+            if (filename.startsWith(speechPrefix)) {
+                AudioPlayer::sayTextAsync(filename.mid(speechPrefix.size()));
+                qDebug() << "speech action received" << filename.mid(speechPrefix.size());
+            } else {
+                QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
+                // if file is not exists then it is already deleted or just not downloaded yet
+                // I think it should not be played when downloaded
+                AudioPlayer::playFileAsync(filePath);
+                qDebug() << "play sound action received" << filename << filePath;
+            }
             break;
         }
     default:
@@ -1645,13 +1651,17 @@ void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
         businessEventsLogDialog()->setGeometry(oldGeometry);
 }
 
-void QnWorkbenchActionHandler::at_cameraListAction_triggered() {
+void QnWorkbenchActionHandler::at_cameraListAction_triggered()
+{
+    QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
+
     bool newlyCreated = false;
     if(!cameraListDialog()) {
         m_cameraListDialog = new QnCameraListDialog(mainWindow(), context());
         newlyCreated = true;
     }
     QRect oldGeometry = cameraListDialog()->geometry();
+    cameraListDialog()->setMediaServerResource(server);
     cameraListDialog()->show();
     cameraListDialog()->raise();
     if(!newlyCreated)
@@ -1986,6 +1996,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
+        item.contrastParams = w->item()->imageEnhancement();
         item.dataByRole[Qn::ItemPausedRole] = true;
         item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
@@ -3434,12 +3445,18 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
         return;
     }
 
-    bool ok = false;
-    QString name = QInputDialog::getText(mainWindow(), tr("Save Position"), tr("Enter position name:"), QLineEdit::Normal, QString(), &ok);
-    if(!ok)
+    QList<QKeySequence> forbiddenHotkeys;
+    foreach(const QnPtzPreset &preset, context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera))
+        forbiddenHotkeys.push_back(preset.hotkey);
+
+    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
+    dialog->setForbiddenHotkeys(forbiddenHotkeys);
+    dialog->setPreset(QnPtzPreset(QKeySequence(), QString(), position));
+    dialog->setWindowTitle(tr("Save Position"));
+    if(dialog->exec() != QDialog::Accepted)
         return;
 
-    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, name, position);
+    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, dialog->preset());
 }
 
 void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {

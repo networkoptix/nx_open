@@ -64,10 +64,11 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
             raisedItem = workbench()->item(Qn::ZoomedRole);
     }
 
-    QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
+    QRect firstDecorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
 
     /* Draw 'raised' icon */
     if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
+        QRect decorationRect = firstDecorationRect;
         m_raisedIcon.paint(painter, decorationRect);
 
         QRect rect = optionV4.rect;
@@ -88,6 +89,7 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
     /* Draw 'problems' icon. */
     if(QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>()) {
         if(camera->statusFlags() & QnSecurityCamResource::HasIssuesFlag) {
+            QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
             m_buggyIcon.paint(painter, decorationRect);
 
             QRect rect = optionV4.rect;
@@ -127,7 +129,7 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
     }
 
     if(recording || scheduled) {
-        QRect iconRect = decorationRect;
+        QRect iconRect = firstDecorationRect;
         iconRect.moveLeft(iconRect.left() - iconRect.width() - 2);
 
         (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, iconRect);
