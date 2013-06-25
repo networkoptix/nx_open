@@ -240,7 +240,7 @@ void QnEventLogDialog::updateHeaderWidth()
         return;
 
     int space = ui->mainGridLayout->horizontalSpacing();
-    int offset = ui->gridEvents->verticalHeader()->sizeHint().width();
+    int offset = 0; // ui->gridEvents->verticalHeader()->sizeHint().width();
     space--; // grid line delimiter
     ui->gridEvents->horizontalHeader()->resizeSection(0, ui->dateEditFrom->width() + ui->dateEditTo->width() + ui->delimLabel->width() + space - offset);
     ui->gridEvents->horizontalHeader()->resizeSection(1, ui->eventComboBox->width() + space);
