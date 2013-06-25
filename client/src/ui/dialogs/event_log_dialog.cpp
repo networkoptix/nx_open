@@ -250,10 +250,18 @@ void QnEventLogDialog::updateHeaderWidth()
         QModelIndex idx = m_model->index(i, (int) QnEventLogModel::ActionCameraColumn);
         QString targetText = m_model->data(idx).toString();
         int spaceIdx = targetText.indexOf(L' ');
-        if (spaceIdx >= 0)
-            w = qMax(w, fm.size(0, targetText.left(spaceIdx)).width());
-        else
+        int prevPos = 0;
+        if (spaceIdx == -1) {
             w = qMax(w, fm.size(0, targetText).width());
+        }
+        else {
+            while (spaceIdx >= 0) {
+                w = qMax(w, fm.size(0, targetText.mid(prevPos, spaceIdx - prevPos)).width());
+                prevPos = spaceIdx;
+                spaceIdx = targetText.indexOf(L' ', spaceIdx+1);
+            }
+            w = qMax(w, fm.size(0, targetText.mid(prevPos, targetText.length() - prevPos)).width());
+        }
     }
     ui->gridEvents->horizontalHeader()->resizeSection(4, qMax(w + 32, ui->cameraButton->width() + space));
 }
