@@ -886,6 +886,8 @@ void QnVideoStreamDisplay::setPausedSafe(bool value)
     QMutexLocker lock(&m_renderListMtx);
     foreach(QnAbstractRenderer* render, m_renderList)
         render->setPaused(value);
+    foreach(QnAbstractRenderer* render, m_newList)
+        render->setPaused(value);
     m_isPaused = value;
 }
 
