@@ -86,12 +86,12 @@ void QnPtzPresetsDialog::submitToResource() {
         return;
 
     QList<QnPtzPreset> presets;
-    
+
     QStandardItem *root = m_model->invisibleRootItem();
     for(int row = 0, rowCount = root->rowCount(); row < rowCount; row++) {
         QStandardItem *item = root->child(row);
 
-        presets.push_back(QnPtzPreset(item->data(HotkeyRole).toInt(), item->text(), item->data(LogicalPositionRole).value<QVector3D>()));
+        presets.push_back(QnPtzPreset(item->data(HotkeyRole).value<QKeySequence>(), item->text(), item->data(LogicalPositionRole).value<QVector3D>()));
     }
 
     context()->instance<QnWorkbenchPtzPresetManager>()->setPtzPresets(m_camera, presets);
@@ -115,9 +115,9 @@ void QnPtzPresetsDialog::updateModel() {
         QStandardItem *nameItem = new QStandardItem(preset.name);
         nameItem->setData(QVariant::fromValue<QVector3D>(preset.logicalPosition), LogicalPositionRole);
         nameItem->setData(QVariant::fromValue(preset.hotkey), HotkeyRole);
-        
-        QStandardItem *hotkeyItem = new QStandardItem(preset.hotkey < 0 ? tr("None") : QString::number(preset.hotkey));
-        
+
+        QStandardItem *hotkeyItem = new QStandardItem(preset.hotkey.isEmpty() ? tr("None") : preset.hotkey.toString(QKeySequence::NativeText));
+
         int row = m_model->rowCount();
         m_model->setItem(row, NameColumn, nameItem);
         m_model->setItem(row, HotkeyColumn, hotkeyItem);
