@@ -110,7 +110,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 
     QnImageButtonWidget *filterButton = new QnImageButtonWidget(m_headerWidget);
-    filterButton->setIcon(qnSkin->icon("events/search.png"));
+    filterButton->setIcon(qnSkin->icon("item/search.png"));
     filterButton->setToolTip(tr("Filter..."));
     filterButton->setFixedSize(buttonSize);
     filterButton->setCached(true);
