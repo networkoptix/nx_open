@@ -255,7 +255,8 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
             mserverRes = newServer;
     }
     QUrl mserverUrl = mserverRes->getUrl();
-
+    if (apPServerUrl.host() == lit("localhost") || apPServerUrl.host() == lit("127.0.0.1"))
+        apPServerUrl.setHost(mserverUrl.host());
 
     QString result(lit("https://%1:%2/proxy/http/%3:%4/media/%5.webm?rand=%6&resolution=240p&pos=%7"));
     result = result.arg(apPServerUrl.host()).arg(apPServerUrl.port(80)).arg(mserverUrl.host()).arg(mserverUrl.port(80)).
@@ -311,7 +312,7 @@ QString QnBusinessStringsHelper::formatEmailList(const QStringList& value) {
     {
         if (i > 0)
             result.append(L' ');
-        result.append(QString(QLatin1String("<%1>")).arg(value[i]));
+        result.append(QString(QLatin1String("<%1>")).arg(value[i].trimmed()));
     }
     return result;
 }

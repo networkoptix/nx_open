@@ -88,8 +88,9 @@ message InitialMessage {
     repeated Resource resource = 2;
     repeated License license = 3;
     repeated CameraServerItem cameraServerItem = 4;
-    optional string hardwareId = 5;
+    optional string hardwareId1 = 5;
     optional string oldHardwareId = 6;
+    optional string hardwareId2 = 7;
 }
 
 message FileAddMessage {

@@ -295,14 +295,18 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnResourceList QnResourcePool::getAllEnabledCameras() const
+QnResourceList QnResourcePool::getAllEnabledCameras(QnResourcePtr mServer) const
 {
+    QnId parentId = mServer ? mServer->getId() : QnId();
     QnResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if (camResource != 0 && !camResource->isDisabled() && !camResource->hasFlags(QnResource::foreigner))
+        {
+            if (!parentId.isValid() || camResource->getParentId() == parentId)
             result << camResource;
+        }
     }
 
     return result;

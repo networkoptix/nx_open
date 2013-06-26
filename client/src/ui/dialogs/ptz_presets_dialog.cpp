@@ -10,13 +10,24 @@
 #include <ui/actions/action_manager.h>
 
 
+namespace {
+    enum DataRole {
+        LogicalPositionRole = Qt::UserRole,
+        HotkeyRole
+    };
+
+    enum Column {
+        NameColumn,
+        HotkeyColumn
+    };
+}
+
 QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     QnWorkbenchContextAware(parent),
     ui(new Ui::PtzPresetsDialog)
 {
     ui->setupUi(this);
-    setButtonBox(ui->buttonBox);
 
     m_removeButton = new QPushButton(tr("Remove"));
     m_activateButton = new QPushButton(tr("Activate"));
@@ -75,12 +86,12 @@ void QnPtzPresetsDialog::submitToResource() {
         return;
 
     QList<QnPtzPreset> presets;
-    
+
     QStandardItem *root = m_model->invisibleRootItem();
     for(int row = 0, rowCount = root->rowCount(); row < rowCount; row++) {
         QStandardItem *item = root->child(row);
 
-        presets.push_back(QnPtzPreset(item->text(), item->data(Qt::UserRole).value<QVector3D>()));
+        presets.push_back(QnPtzPreset(item->data(HotkeyRole).value<QKeySequence>(), item->text(), item->data(LogicalPositionRole).value<QVector3D>()));
     }
 
     context()->instance<QnWorkbenchPtzPresetManager>()->setPtzPresets(m_camera, presets);
@@ -95,12 +106,21 @@ void QnPtzPresetsDialog::updateModel() {
     if(!m_camera)
         return;
 
+    m_model->setColumnCount(2);
+    m_model->setHorizontalHeaderItem(NameColumn, new QStandardItem(tr("Name")));
+    m_model->setHorizontalHeaderItem(HotkeyColumn, new QStandardItem(tr("Hotkey")));
+
     QList<QnPtzPreset> presets = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(m_camera);
     foreach(const QnPtzPreset &preset, presets) {
-        QStandardItem *item = new QStandardItem(preset.name);
-        item->setData(QVariant::fromValue<QVector3D>(preset.logicalPosition), Qt::UserRole);
+        QStandardItem *nameItem = new QStandardItem(preset.name);
+        nameItem->setData(QVariant::fromValue<QVector3D>(preset.logicalPosition), LogicalPositionRole);
+        nameItem->setData(QVariant::fromValue(preset.hotkey), HotkeyRole);
 
-        m_model->appendRow(item);
+        QStandardItem *hotkeyItem = new QStandardItem(preset.hotkey.isEmpty() ? tr("None") : preset.hotkey.toString(QKeySequence::NativeText));
+
+        int row = m_model->rowCount();
+        m_model->setItem(row, NameColumn, nameItem);
+        m_model->setItem(row, HotkeyColumn, hotkeyItem);
     }
 }
 

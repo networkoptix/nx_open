@@ -238,8 +238,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->setColumnCount(ColumnCount - 1);
 #endif
 
-    setButtonBox(ui->buttonBox);
-
     m_removeAction = new QAction(tr("Remove Storage"), this);
 
     QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);

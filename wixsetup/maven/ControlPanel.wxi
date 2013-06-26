@@ -15,7 +15,6 @@
 -->  
   
   <Property Id="ARPNOREPAIR" Value="1" />    
-  <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
 
   <Icon Id="eve_logo.ico" SourceFile="Binary\eve\eve_logo.ico"/>
 
@@ -36,7 +35,7 @@
                 </Component>
             </Directory>
         </Directory>
-        
+
         <!-- Create alternative ARP entry that lets us launch uninstall with
             full UI.  Setting ARPSYSTEMCOMPONENT above hides WI generated key
                     that uses the product GUID.-->
@@ -56,6 +55,5 @@
             </RegistryKey>
         </Component>
     </DirectoryRef>
-    
-
+  
 </Include>

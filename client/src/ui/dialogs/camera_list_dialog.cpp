@@ -22,7 +22,6 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     setWindowFlags(Qt::Window);
 
     m_model = new QnCameraListModel(context);
-    m_model->setResources(qnResPool->getAllEnabledCameras());
     connect(qnResPool,  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
     connect(qnResPool,  SIGNAL(resourceAdded(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceAdded(const QnResourcePtr &)));
 
@@ -170,7 +169,10 @@ void QnCameraListDialog::at_copyToClipboard()
 
 void QnCameraListDialog::at_modelChanged()
 {
-    setWindowTitle(QString(lit("Cameras list - %1 camera(s) found")).arg(m_resourceSearch->rowCount()));
+    if (m_mediaServer == 0)
+        setWindowTitle(tr("Cameras list - %1 camera(s) found").arg(m_resourceSearch->rowCount()));
+    else
+        setWindowTitle(tr("Cameras list by media server '%1' - %2 camera(s) found").arg(QUrl(m_mediaServer->getUrl()).host()).arg(m_resourceSearch->rowCount()));
 }
 
 void QnCameraListDialog::at_resPool_resourceRemoved(const QnResourcePtr & resource)
@@ -181,6 +183,14 @@ void QnCameraListDialog::at_resPool_resourceRemoved(const QnResourcePtr & resour
 void QnCameraListDialog::at_resPool_resourceAdded(const QnResourcePtr & resource)
 {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (camera)
+    if (camera) {
+        if (m_mediaServer == 0 || camera->getParentId() == m_mediaServer->getId())
         m_model->addResource(camera);
+    }
+}
+
+void QnCameraListDialog::setMediaServerResource(QnResourcePtr server)
+{
+    m_mediaServer = server;
+    m_model->setResources(qnResPool->getAllEnabledCameras(m_mediaServer));
 }

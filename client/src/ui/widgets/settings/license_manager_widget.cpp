@@ -57,14 +57,14 @@ QnLicenseManagerWidget::~QnLicenseManagerWidget()
 void QnLicenseManagerWidget::updateLicenses() {
     m_licenses = qnLicensePool->getLicenses();
 
-    if (m_licenses.hardwareId().isEmpty()) {
+    if (m_licenses.hardwareId2().isEmpty()) {
         setEnabled(false);
     } else {
         setEnabled(true);
     }
 
     /* Update license widget. */
-    ui->licenseWidget->setHardwareId(m_licenses.hardwareId());
+    ui->licenseWidget->setHardwareId(m_licenses.hardwareId2());
     ui->licenseWidget->setFreeLicenseAvailable(!m_licenses.haveLicenseKey(qnProductFeatures().freeLicenseKey.toAscii()) && (qnProductFeatures().freeLicenseCount > 0));
 
     /* Update grid. */
@@ -95,7 +95,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
         }
     } else {
-        if (m_licenses.hardwareId().isEmpty()) {
+        if (m_licenses.hardwareId2().isEmpty()) {
             ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));
             useRedLabel = false;
         } else {
@@ -113,7 +113,7 @@ void QnLicenseManagerWidget::updateLicenses() {
     ui->infoLabel->setPalette(palette);
 }
 
-void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, const QString &hardwareId, const QString &oldHardwareId) {
+void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, const QString &hardwareId1, const QString &oldHardwareId, const QString &hardwareId2) {
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
@@ -130,8 +130,9 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
         n++;
     }
 
-    params.addQueryItem(QLatin1String("hwid"), hardwareId);
+    params.addQueryItem(QLatin1String("hwid"), hardwareId1);
     params.addQueryItem(QLatin1String("oldhwid"), oldHardwareId);
+    params.addQueryItem(QLatin1String("hwid2"), hardwareId2);
 
     QNetworkReply *reply = m_httpClient->post(request, params.encodedQuery());  
     m_replyKeyMap[reply] = licenseKey;
@@ -178,7 +179,7 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
         "Archive Streams Allowed: %4")
         .arg(license->typeName())
         .arg(QLatin1String(license->key()))
-        .arg(QLatin1String(m_licenses.hardwareId()))
+        .arg(QLatin1String(m_licenses.hardwareId2()))
         .arg(license->cameraCount());
     QMessageBox::information(this, tr("License Details"), details);
 }
@@ -240,7 +241,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             if (!license )
                 break;
 
-            if (license->isValid(qnLicensePool->getLicenses().hardwareId()))
+            if (license->isValid(qnLicensePool->getLicenses().hardwareId2()))
                 licenses.append(license);
         }
 
@@ -272,7 +273,8 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         return;
 
     if (ui->licenseWidget->isOnline()) {
-        updateFromServer(ui->licenseWidget->serialKey().toLatin1(), QLatin1String(m_licenses.hardwareId()), QLatin1String(m_licenses.oldHardwareId()));
+        updateFromServer(ui->licenseWidget->serialKey().toLatin1(), QLatin1String(m_licenses.hardwareId1()), QLatin1String(m_licenses.oldHardwareId()),
+                QLatin1String(m_licenses.hardwareId2()));
     } else {
         QList<QnLicensePtr> licenseList;
         QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));

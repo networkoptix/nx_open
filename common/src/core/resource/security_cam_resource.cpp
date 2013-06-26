@@ -69,6 +69,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
         m_groupName = other_casted->m_groupName;
         m_secondaryQuality = other_casted->m_secondaryQuality;
         m_cameraControlDisabled = other_casted->m_cameraControlDisabled;
+        m_statusFlags = other_casted->m_statusFlags;
     }
 }
 

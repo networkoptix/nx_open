@@ -194,6 +194,9 @@
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
      </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
      <attribute name="verticalHeaderShowSortIndicator" stdset="0">
       <bool>true</bool>
      </attribute>
@@ -216,6 +219,17 @@
    <header>ui/common/tree_combo_box.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>gridEvents</tabstop>
+  <tabstop>dateEditFrom</tabstop>
+  <tabstop>dateEditTo</tabstop>
+  <tabstop>eventComboBox</tabstop>
+  <tabstop>cameraButton</tabstop>
+  <tabstop>actionComboBox</tabstop>
+  <tabstop>clearFilterButton</tabstop>
+  <tabstop>eventRulesButton</tabstop>
+  <tabstop>refreshButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
