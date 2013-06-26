@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -492,12 +492,12 @@
      </widget>
      <widget class="QWidget" name="cameraPropertiesTab">
       <attribute name="title">
-       <string>Settings</string>
+       <string>Advanced</string>
       </attribute>
      </widget>
      <widget class="QWidget" name="tabAdvancedSettings">
       <attribute name="title">
-       <string>Advanced</string>
+       <string>Expert</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
