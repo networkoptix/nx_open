@@ -15,7 +15,7 @@ int CopyDirectory(const CAtlString &refcstrSourceDirectory,
                   const CAtlString &refcstrDestinationDirectory);
 
 
-UINT CopyProfile(MSIHANDLE hInstall, const char* actionName);
+UINT CopyProfile(MSIHANDLE hInstall, const char* actionName, BOOL verifyDestFolderExists = TRUE);
 void fixPath(CString& path);
 
 #endif // _CUSTOM_ACTIONS_UTILS_H_

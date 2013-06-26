@@ -350,7 +350,7 @@
         <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
         <CustomAction Id="CopyAppServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyAppServerProfile" Execute="deferred" Impersonate="no"/>
-    	<CustomAction Id="CopyAppServerNotificationFiles" BinaryKey="CustomActions.dll" DllEntry="CopyAppServerNotificationFiles" Execute="deferred" Impersonate="no"/>
+        <CustomAction Id="CopyAppServerNotificationFiles" BinaryKey="CustomActions.dll" DllEntry="CopyAppServerNotificationFiles" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
         <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
@@ -395,9 +395,10 @@
 
         <CustomAction Id="CopyAppServerProfile_Cmd" Property="CopyAppServerProfile" Execute="immediate" Impersonate="yes"
             Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller;[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller"/>
+
         <CustomAction Id="CopyAppServerNotificationFiles_Cmd" Property="CopyAppServerNotificationFiles" Execute="immediate" Impersonate="yes"
             Value="[${installer.customization}AppServerDir]hostedfiles\notifications;[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles\notifications"/>
-    	
+        
         <CustomAction Id="CopyMediaServerProfile_Cmd" Property="CopyMediaServerProfile" Execute="immediate" Impersonate="yes"
             Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server;[System64Folder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server"/>
 
@@ -504,8 +505,8 @@
                 <![CDATA[ (INSTALL_ECS OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyAppServerNotificationFiles" After="CopyAppServerNotificationFiles_Cmd">
                 <![CDATA[ (INSTALL_ECS OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-        	
-            <Custom Action="CopyMediaServerProfile_Cmd" After="InstallFiles">
+            
+            <Custom Action="CopyMediaServerProfile_Cmd" After="CopyAppServerNotificationFiles">
                 <![CDATA[ (INSTALL_SERVER OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyMediaServerProfile" After="CopyMediaServerProfile_Cmd">
                 <![CDATA[ (INSTALL_SERVER OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>

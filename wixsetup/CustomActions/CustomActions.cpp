@@ -14,7 +14,7 @@ UINT __stdcall CopyAppServerProfile(MSIHANDLE hInstall) {
 }
 
 UINT __stdcall CopyAppServerNotificationFiles(MSIHANDLE hInstall) {
-    return CopyProfile(hInstall, "CopyAppServerNotificationFiles");
+    return CopyProfile(hInstall, "CopyAppServerNotificationFiles", FALSE);
 }
 
 UINT __stdcall FindConfiguredStorages(MSIHANDLE hInstall)
