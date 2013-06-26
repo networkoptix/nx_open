@@ -1748,7 +1748,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
 }
 
 void QnWorkbenchUi::at_sliderItem_geometryChanged() {
-    setSliderOpened(isSliderOpened(), m_sliderYAnimator->isRunning()); /* Re-adjust to screen sides. */
+    setSliderOpened(isSliderOpened(), m_sliderYAnimator->isRunning(), false); /* Re-adjust to screen sides. */
 
     updateTreeGeometry();
     updateNotificationsGeometry();
