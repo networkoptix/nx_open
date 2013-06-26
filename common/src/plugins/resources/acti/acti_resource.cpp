@@ -147,6 +147,35 @@ QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) co
     return result;
 }
 
+bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const
+{
+    QByteArray rtspAudio[][2] = 
+    {
+        "T",  "4.13", // Platform and minimum allowed firmware version
+        "K",  "5.08",
+        "A1", "6.03"
+    };
+
+    QByteArray version;
+    QList<QByteArray> parts = firmware.split('-');
+    for (int i = 0; i < parts.size(); ++i)
+    {
+        if (parts[i].toLower().startsWith('v'))
+        {
+            version = parts[i].mid(1);
+            break;
+        }
+    }
+
+    for (int i = 0; i < sizeof(rtspAudio) / sizeof(rtspAudio[0]); ++i)
+    {
+        if (platform == rtspAudio[i][0] && version >= rtspAudio[i][1])
+            return true;
+    }
+
+    return false;
+}
+
 bool QnActiResource::initInternal()
 {
     CLHttpStatus status;
@@ -208,8 +237,7 @@ bool QnActiResource::initInternal()
     if (m_rtspPort == 0)
         m_rtspPort = DEFAULT_RTSP_PORT;
 
-    bool rtspAudioSupported = m_platform == "T" || m_platform == "K" || m_platform == "A1";
-    m_hasAudio = report.value("audio").toInt() > 0 && rtspAudioSupported;
+    m_hasAudio = report.value("audio").toInt() > 0 && isRtspAudioSupported(m_platform, getFirmware().toUtf8());
 
     QByteArray bitrateCap = report.value("video_bitrate_cap");
     if (!bitrateCap.isEmpty())

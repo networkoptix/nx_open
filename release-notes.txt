@@ -3,9 +3,13 @@
 ANDROID CLIENT:
  - If a camera archive contained too many recorded fragments, live video was freezing. Fixed
  - If log in with a different case letters (Admin - admin) cameras list could not be loaded. Fixed
-
+ - Panoramic cameras are supported
+ 
 IOS Client
  - IOs client can work on IOs 5 
+ - IOs Client displays sorted cameras list 
+ - IOs Client displays a camera name on the top left corner
+ - Panoramic cameras are supported
  
 NEW CAMERAS AND RECORDERS SUPPORTED:
   - Few Arecont newest models
@@ -64,13 +68,14 @@ IMPROVEMENTS:
  - If camera has issues, it is marked by the exclamation point in the tree
  - Events and Actions can be called from the tree Context menu (System)
  - Web Client can be opened from the tree Context menu (System)
- - IOs Client displays sorted cameras list 
- - IOs Client displays a camera name on the top left corner
  - Enterprise license type is replaced with Professional
  - Free licenses are replaced with 4 trial licenses (45 days)
  - Notifications settings are stored in the database so they are same for all computers the user logs from. Used to be stored independently in the registry
  - Backup/Restore can be invoked from the "System" Context Menu in Tree...
- - Now panoramic cameras are supported in Web and Mobile clients
+ - Now panoramic cameras are supported in Web client
+ - Basically the software forces cameras to change primary and secondary streams settings to desired values (FPS/quality). Now it is possible to 
+   leave the settings previously configured. I.e. it is possible to set up specific resolution, FPS and quality for first and second streams 
+   on a camera's web page and these particular settings will be used in the software. Warning: this is the expert mode feature!
   
 BUGS FIXED:  
 
