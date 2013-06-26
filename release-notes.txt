@@ -73,6 +73,9 @@ IMPROVEMENTS:
  - Notifications settings are stored in the database so they are same for all computers the user logs from. Used to be stored independently in the registry
  - Backup/Restore can be invoked from the "System" Context Menu in Tree...
  - Now panoramic cameras are supported in Web client
+ - Basically the software forces cameras to change primary and secondary streams settings to desired values (FPS/quality). Now it is possible to 
+   leave the settings previously configured. I.e. it is possible to set up specific resolution, FPS and quality for first and second streams 
+   on a camera's web page and these particular settings will be used in the software. Warning: this is the expert mode feature!
   
 BUGS FIXED:  
 
