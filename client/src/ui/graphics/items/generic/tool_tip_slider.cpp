@@ -105,7 +105,7 @@ void QnToolTipSlider::setToolTipItem(QnToolTipWidget *newToolTipItem) {
         toolTipItem()->setOpacity(opacity);
         toolTipItem()->setAcceptHoverEvents(true);
         toolTipItem()->installEventFilter(this);
-        toolTipItem()->setFlag(ItemIgnoresParentOpacity, true);
+        toolTipItem()->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
         connect(toolTipItem(), SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
 
         updateToolTipText();

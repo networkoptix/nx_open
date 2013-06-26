@@ -7,6 +7,9 @@
 #include <core/resource/layout_item_index.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
+
+#include <ui/graphics/items/generic/styled_tooltip_widget.h>
+
 #include <client/client_globals.h>
 
 class QComboBox;
@@ -22,6 +25,11 @@ class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnWorkbenchContext;
 
+class QnImageProvider;
+class QnProxyLabel;
+class QnClickableProxyLabel;
+class HoverFocusProcessor;
+
 class QnResourceCriterion;
 class QnResourcePoolModel;
 class QnResourceSearchProxyModel;
@@ -31,6 +39,42 @@ class QnResourceTreeWidget;
 namespace Ui {
     class ResourceBrowserWidget;
 }
+
+class QnResourceBrowserToolTipWidget: public QnStyledTooltipWidget {
+    Q_OBJECT
+
+    typedef QnStyledTooltipWidget base_type;
+public:
+    QnResourceBrowserToolTipWidget(QGraphicsItem *parent = 0);
+
+    void ensureThumbnail(QnImageProvider* provider);
+
+    /**
+     * Set tooltip text.
+     * \param text                      New text for this tool tip's label.
+     * \reimp
+     */
+    void setText(const QString &text);
+
+    /** Rectangle where the tooltip should fit - in coordinates of parent widget. */
+    void setEnclosingGeometry(const QRectF &enclosingGeometry);
+
+    //reimp
+    void pointTo(const QPointF &pos);
+    virtual void updateTailPos() override;
+signals:
+    void thumbnailClicked();
+
+private slots:
+    void at_provider_imageChanged(const QImage &image);
+
+private:
+    QnProxyLabel* m_textLabel;
+    QnClickableProxyLabel* m_thumbnailLabel;
+    QRectF m_enclosingRect;
+    QPointF m_pointTo;
+};
+
 
 class QnResourceBrowserWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT
@@ -60,6 +104,8 @@ public:
 
     virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
 
+    void setToolTipParent(QGraphicsWidget *widget);
+
 signals:
     void activated(const QnResourcePtr &resource);
     void currentTabChanged();
@@ -88,8 +134,13 @@ protected:
     void killSearchTimer();
     void showContextMenuAt(const QPoint &pos, bool ignoreSelection = false);
 
+    void hideToolTip();
+    void showToolTip();
 private slots:
     void updateFilter(bool force = false);
+    void updateToolTipVisibility();
+    void updateToolTipPosition();
+
     void forceUpdateFilter() { updateFilter(true); }
 
     void at_tabWidget_currentChanged(int index);
@@ -110,6 +161,8 @@ private:
     int m_filterTimerId;
 
     QnResourcePoolModel *m_resourceModel;
+    QnResourceBrowserToolTipWidget* m_tooltipWidget;
+    HoverFocusProcessor* m_hoverProcessor;
 
     QAction *m_renameAction;
 };

@@ -12,24 +12,26 @@
 #include <QtGui/QTreeView>
 #include <QtGui/QWheelEvent>
 
-#include <common/common_meta_types.h>
-
-#include <utils/common/scoped_value_rollback.h>
-#include <utils/common/scoped_painter_rollback.h>
 #include <client/client_settings.h>
+
+#include <common/common_meta_types.h>
 
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include <ui/common/palette.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
+#include <ui/animation/opacity_animator.h>
+#include <ui/common/palette.h>
+#include <ui/graphics/items/generic/clickable_widgets.h>
+#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource_pool_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
+#include <ui/processors/hover_processor.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
@@ -37,9 +39,12 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
-#include <ui/style/globals.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/common/scoped_painter_rollback.h>
+#include <utils/image_provider.h>
 
 namespace {
     const char *qn_searchModelPropertyName = "_qn_searchModel";
@@ -48,12 +53,109 @@ namespace {
 //    const char *qn_searchCriterionPropertyName = "_qn_searchCriterion";
 }
 
+/********** QnResourceBrowserToolTipWidget *********************/
+
+QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem *parent):
+    base_type(parent),
+    m_textLabel(new QnProxyLabel(this)),
+    m_thumbnailLabel(NULL)
+{
+    m_textLabel->setAlignment(Qt::AlignCenter);
+    m_textLabel->setWordWrap(true);
+    setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
+
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addItem(m_textLabel);
+    setLayout(layout);
+
+    updateTailPos();
+}
+
+void QnResourceBrowserToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
+    if (m_thumbnailLabel || !provider)
+        return;
+
+    QGraphicsLinearLayout *layout = dynamic_cast<QGraphicsLinearLayout*>(this->layout());
+    if (!layout)
+        return;
+
+    m_thumbnailLabel = new QnClickableProxyLabel(this);
+    m_thumbnailLabel->setAlignment(Qt::AlignCenter);
+    m_thumbnailLabel->setClickableButtons(Qt::LeftButton);
+    setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
+    layout->insertItem(0, m_thumbnailLabel);
+    connect(m_thumbnailLabel, SIGNAL(clicked()), this, SIGNAL(thumbnailClicked()));
+
+    if (!provider->image().isNull()) {
+        m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
+    } else {
+        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
+        connect(provider, SIGNAL(imageChanged(const QImage &)), this, SLOT(at_provider_imageChanged(const QImage &)));
+        provider->loadAsync();
+    }
+}
+
+void QnResourceBrowserToolTipWidget::setText(const QString &text) {
+    m_textLabel->setText(text);
+}
+
+void QnResourceBrowserToolTipWidget::updateTailPos()  {
+     QRectF rect = this->rect();
+
+ /*   if (m_enclosingRect.isNull())
+        return;
+
+    if (!parentItem())
+        return;
+
+    if (!parentItem()->parentItem())
+        return;
+
+    QGraphicsItem *list = parentItem();
+
+    // half of the tooltip height in coordinates of enclosing rect
+    qreal halfHeight = mapRectToItem(list, rect).height() / 2;
+
+    qreal parentPos = parentItem()->mapToItem(list, m_pointTo).y();
+
+    if (parentPos - halfHeight < m_enclosingRect.top())
+        setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.top())));
+    else
+    if (parentPos + halfHeight > m_enclosingRect.bottom())
+        setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.bottom())));
+    else */
+        setTailPos(QPointF(qRound(rect.left() + 10.0), qRound((rect.top() + rect.bottom()) / 2)));
+}
+
+void QnResourceBrowserToolTipWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
+    m_enclosingRect = enclosingGeometry;
+    updateTailPos();
+}
+
+void QnResourceBrowserToolTipWidget::pointTo(const QPointF &pos) {
+    m_pointTo = pos;
+    base_type::pointTo(pos);
+    updateTailPos();
+}
+
+void QnResourceBrowserToolTipWidget::at_provider_imageChanged(const QImage &image) {
+    if (!m_thumbnailLabel)
+        return;
+    m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
+}
+
+
+/********** QnResourceBrowserWidget *********************/
+
 QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::ResourceBrowserWidget()),
     m_ignoreFilterChanges(false),
-    m_filterTimerId(0)
+    m_filterTimerId(0),
+    m_tooltipWidget(NULL),
+    m_hoverProcessor(NULL)
 {
     ui->setupUi(this);
 
@@ -302,6 +404,36 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
     }
 }
 
+void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
+    if (m_tooltipWidget)
+        return;
+
+    m_tooltipWidget = new QnResourceBrowserToolTipWidget(widget);
+    m_hoverProcessor = new HoverFocusProcessor(widget);
+
+    m_tooltipWidget->setFocusProxy(widget);
+    m_tooltipWidget->setOpacity(0.0);
+    m_tooltipWidget->setAcceptHoverEvents(true);
+
+    m_tooltipWidget->setText(tr("Sample Tooltip"));
+
+//    m_tooltipWidget->installEventFilter(item);
+    m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
+//    connect(m_tooltipWidget, SIGNAL(thumbnailClicked()), this, SLOT(at_thumbnail_clicked()));
+    connect(m_tooltipWidget, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
+    connect(widget, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
+
+    m_hoverProcessor->addTargetItem(widget);
+    m_hoverProcessor->addTargetItem(m_tooltipWidget);
+    m_hoverProcessor->setHoverEnterDelay(250);
+    m_hoverProcessor->setHoverLeaveDelay(250);
+    connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
+    connect(m_hoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(updateToolTipVisibility()));
+
+    updateToolTipPosition();
+    updateToolTipVisibility();
+}
+
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const {
     QItemSelectionModel *selectionModel = currentSelectionModel();
     int nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).toInt();
@@ -348,6 +480,39 @@ void QnResourceBrowserWidget::updateFilter(bool force) {
 
     m_filterTimerId = startTimer(filter.isEmpty() ? 0 : 300);
 }
+
+
+void QnResourceBrowserWidget::hideToolTip() {
+    if (!m_tooltipWidget)
+        return;
+    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(0.0);
+}
+
+void QnResourceBrowserWidget::showToolTip() {
+    if (!m_tooltipWidget)
+        return;
+//    m_tooltipWidget->ensureThumbnail(m_imageProvider);
+    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
+}
+
+void QnResourceBrowserWidget::updateToolTipVisibility() {
+    if (!m_hoverProcessor)
+        return;
+
+    if(m_hoverProcessor->isHovered()) {
+        showToolTip();
+    } else {
+        hideToolTip();
+    }
+}
+
+void QnResourceBrowserWidget::updateToolTipPosition() {
+    if (!m_tooltipWidget)
+        return;
+    m_tooltipWidget->updateTailPos();
+    m_tooltipWidget->pointTo(QPointF(qRound(geometry().right()), qRound(geometry().height() / 2 )));
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
