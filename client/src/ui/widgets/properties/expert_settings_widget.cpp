@@ -1,5 +1,5 @@
-#include "advanced_settings_widget.h"
-#include "ui_advanced_settings_widget.h"
+#include "expert_settings_widget.h"
+#include "ui_expert_settings_widget.h"
 
 #include <ui/style/skin.h>
 #include "core/resource/resource_type.h"

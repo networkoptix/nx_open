@@ -426,7 +426,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     if (endAddr.isNull())
         online << startAddr;
     else
-        online = ip_cheker.onlineHosts(QHostAddress(QUrl(startAddr).host()), QHostAddress(QUrl(endAddr).host()));
+        online = ip_cheker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr), port ? port : 80);
 
 
     cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);

@@ -54,11 +54,6 @@ bool QnAbstractArchiveReader::open()
     return m_delegate && m_delegate->open(m_resource);
 }
 
-bool QnAbstractArchiveReader::isRealTimeSource() const
-{
-    return m_delegate && m_delegate->isRealTimeSource();
-}
-
 void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 usec)
 {
     if (usec != DATETIME_NOW)

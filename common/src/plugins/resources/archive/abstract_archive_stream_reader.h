@@ -86,7 +86,7 @@ public:
      */
     virtual qint64 endTime() const = 0;
 
-    bool isRealTimeSource() const;
+    virtual bool isRealTimeSource() const = 0;
 
     virtual bool setSendMotion(bool value) = 0;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
