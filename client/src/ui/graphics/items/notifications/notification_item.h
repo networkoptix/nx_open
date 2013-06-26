@@ -10,8 +10,10 @@
 #include <ui/actions/action_parameters.h>
 
 class QnProxyLabel;
+class QnClickableProxyLabel;
 class QGraphicsLinearLayout;
 class HoverFocusProcessor;
+class QnImageProvider;
 
 /**
  * An image button widget that displays thumbnail behind the button.
@@ -50,7 +52,7 @@ class QnNotificationToolTipWidget: public QnStyledTooltipWidget {
 public:
     QnNotificationToolTipWidget(QGraphicsItem *parent = 0);
 
-    Q_SLOT void setThumbnail(const QImage &image);
+    void ensureThumbnail(QnImageProvider* provider);
 
     /**
      * Set tooltip text.
@@ -65,10 +67,15 @@ public:
     //reimp
     void pointTo(const QPointF &pos);
     virtual void updateTailPos() override;
+signals:
+    void thumbnailClicked();
+
+private slots:
+    void at_provider_imageChanged(const QImage &image);
 
 private:
     QnProxyLabel* m_textLabel;
-    QnProxyLabel* m_thumbnailLabel;
+    QnClickableProxyLabel* m_thumbnailLabel;
     QRectF m_enclosingRect;
     QPointF m_pointTo;
 };
@@ -86,23 +93,32 @@ public:
 
     void addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
                          const QnActionParameters &parameters = QnActionParameters(),
-                         const qreal sizeMultiplier = 1.0, const bool isThumbnail = false);
+                         bool defaultAction = false);
+
+    enum ColorLevel {
+        None,
+        Common,
+        Important,
+        Critical,
+        System
+    };
+
+    ColorLevel colorLevel() const;
 
     QColor color() const;
 
-
 public slots:
     void setText(const QString &text);
-    void setColor(const QColor &color);
+    void setColorLevel(ColorLevel level);
+    void setColor(const QColor& color);
     void setTooltipText(const QString &text);
-    void setImage(const QImage &image);
+    void setImageProvider(QnImageProvider* provider);
 
     /** Rectangle where all tooltips should fit - in parent(!) coordinates. */
     void setTooltipEnclosingRect(const QRectF& rect);
 
 signals:
     void actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
-    void imageChanged(const QImage& image);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -116,7 +132,7 @@ private slots:
     void updateToolTipPosition();
 
     void at_button_clicked();
-
+    void at_thumbnail_clicked();
 private:
     struct ActionData {
         ActionData():
@@ -131,11 +147,13 @@ private:
     };
 
     QList<ActionData> m_actions;
+    int m_defaultActionIdx;
 
     QGraphicsLinearLayout* m_layout;
     QnProxyLabel* m_textLabel;
     QColor m_color;
-    QImage m_image;
+    ColorLevel m_colorLevel;
+    QnImageProvider* m_imageProvider;
 
     QnNotificationToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;

@@ -30,6 +30,7 @@ public:
 
 public slots:
     void setNotificationCount(int count);
+    void setColor(const QColor &color);
 protected:
     virtual void tick(int deltaMSecs) override;
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
@@ -37,6 +38,7 @@ private:
     bool m_blinking;
     bool m_blinkUp;
     qreal m_blinkProgress;
+    QColor m_color;
 };
 
 
@@ -71,6 +73,7 @@ private slots:
     void hideAll();
 
     void at_settingsButton_clicked();
+    void at_filterButton_clicked();
     void at_eventLogButton_clicked();
     void at_debugButton_clicked();
     void at_list_itemRemoved(QnNotificationItem* item);

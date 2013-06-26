@@ -33,8 +33,10 @@ public:
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
+
     void itemRemoved(QnNotificationItem *item);
     void itemCountChanged(int count);
+    void itemColorChanged(const QColor &color);
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
@@ -102,6 +104,7 @@ private:
     bool m_collapsedItemCountChanged;
     QSizeF m_visibleSize;
     QRectF m_tooltipsEnclosingRect;
+    int m_itemColorLevel;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H
