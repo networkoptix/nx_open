@@ -58,6 +58,7 @@ private slots:
     void at_filterAction();
     void at_resetFilterAction();
     void at_copyToClipboard();
+    void at_selectAllAction();
     void at_exportAction();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
 private:
@@ -89,6 +90,7 @@ private:
     QAction* m_resetFilterAction;
     QAction* m_clipboardAction;
     QAction* m_exportAction;
+    QAction* m_selectAllAction;
     QnBusinessRulesActualModel* m_rulesModel;
     Qt::MouseButton m_lastMouseButton;
 };

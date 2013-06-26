@@ -12,6 +12,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/actions/action_manager.h>
+#include "ui/common/grid_widget_helper.h"
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -45,9 +46,17 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     ui->gridCameras->setModel(m_resourceSearch);
 
     m_clipboardAction   = new QAction(tr("Copy selection to clipboard"), this);
+    m_exportAction      = new QAction(tr("Export selection to file"), this);
+    m_selectAllAction   = new QAction(tr("Select all"), this);
+    m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
+
     connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));
+    connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
+    connect(m_selectAllAction,      SIGNAL(triggered()),                this, SLOT(at_selectAllAction()));
+
     m_clipboardAction->setShortcut(QKeySequence::Copy);
     ui->gridCameras->addAction(m_clipboardAction);
+    ui->gridCameras->addAction(m_exportAction);
 
     ui->gridCameras->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 }
@@ -99,72 +108,28 @@ void QnCameraListDialog::at_customContextMenuRequested(const QPoint &)
         menu = new QMenu();
 
     m_clipboardAction->setEnabled(ui->gridCameras->selectionModel()->hasSelection());
+    m_exportAction->setEnabled(ui->gridCameras->selectionModel()->hasSelection());
+    menu->addAction(m_selectAllAction);
     menu->addAction(m_clipboardAction);
+    menu->addAction(m_exportAction);
 
     menu->exec(QCursor::pos());
     menu->deleteLater();
 }
 
+void QnCameraListDialog::at_exportAction()
+{
+    QnGridWidgetHelper(context()).exportGrid(ui->gridCameras);
+}
+
 void QnCameraListDialog::at_copyToClipboard()
 {
-    QAbstractItemModel *model = ui->gridCameras->model();
-    QModelIndexList list = ui->gridCameras->selectionModel()->selectedIndexes();
-    if(list.isEmpty())
-        return;
+    QnGridWidgetHelper(context()).gridToClipboard(ui->gridCameras);
+}
 
-    qSort(list);
-
-    QString textData;
-    QString htmlData;
-    QMimeData* mimeData = new QMimeData();
-
-    htmlData.append(lit("<html>\n"));
-    htmlData.append(lit("<body>\n"));
-    htmlData.append(lit("<table>\n"));
-
-    htmlData.append(lit("<tr>"));
-    for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
-    {
-        if (i > 0)
-            textData.append(lit('\t'));
-        QString header = model->headerData(list[i].column(), Qt::Horizontal).toString();
-        htmlData.append(lit("<th>"));
-        htmlData.append(header);
-        htmlData.append(lit("</th>"));
-        textData.append(header);
-    }
-    htmlData.append(lit("</tr>"));
-
-    int prevRow = -1;
-    for(int i = 0; i < list.size(); ++i)
-    {
-        if(list[i].row() != prevRow) {
-            prevRow = list[i].row();
-            textData.append(lit('\n'));
-            if (i > 0)
-                htmlData.append(lit("</tr>"));
-            htmlData.append(lit("<tr>"));
-        }
-        else {
-            textData.append(lit('\t'));
-        }
-
-        htmlData.append(lit("<td>"));
-        htmlData.append(model->data(list[i], Qt::DisplayRole).toString());
-        htmlData.append(lit("</td>"));
-
-        textData.append(model->data(list[i]).toString());
-    }
-    htmlData.append(lit("</tr>\n"));
-    htmlData.append(lit("</table>\n"));
-    htmlData.append(lit("</body>\n"));
-    htmlData.append(lit("</html>\n"));
-    textData.append(lit('\n'));
-
-    mimeData->setText(textData);
-    mimeData->setHtml(htmlData);
-
-    QApplication::clipboard()->setMimeData(mimeData);
+void QnCameraListDialog::at_selectAllAction()
+{
+    ui->gridCameras->selectAll();
 }
 
 void QnCameraListDialog::at_modelChanged()
