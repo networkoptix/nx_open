@@ -13,8 +13,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#define PORT_AUTO 0
-
 namespace {
     enum Column {
         CheckBoxColumn,
@@ -22,6 +20,8 @@ namespace {
         NameColumn,
         UrlColumn
     };
+
+    const int portAuto = 0;
 }
 
 QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(QWidget *parent):
@@ -218,8 +218,8 @@ void QnCameraAdditionDialog::removeAddedCameras() {
     int row = ui->camerasTable->rowCount() - 1;
     while (row >= 0){
         if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked)
-	        ui->camerasTable->removeRow(row);
-		row--;
+            ui->camerasTable->removeRow(row);
+        row--;
     }
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 }
@@ -379,7 +379,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
     int port = ui->portAutoCheckBox->isChecked()
-            ? PORT_AUTO
+            ? portAuto
             : ui->portSpinBox->value();
 
     QString startAddrStr;
@@ -406,7 +406,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         const QString& userInput = ui->cameraIpLineEdit->text();
         QUrl url = QUrl::fromUserInput(userInput);
         if (!url.isValid()) {
-            ui->validateLabelSearch->setText(tr("Camera address field must contain valid url or ip address"));
+            ui->validateLabelSearch->setText(tr("Camera address field must contain valid url, ip address or rtsp link"));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
@@ -472,9 +472,9 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
             if (0) { // TODO: #Elric
                 error = tr("Could not connect to server.\nMake sure the server is available and try again.");
             } else {
-                error = tr("Server returned an error."); 
+                error = tr("Server returned an error.");
             }
-            
+
             QMessageBox::critical(this, tr("Error"), error);
         }
     }

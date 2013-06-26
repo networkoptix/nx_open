@@ -5,7 +5,9 @@
 #include <QtGui/QKeyEvent>
 #include <QtGui/QStyleOptionFrameV2>
 
-#define DOT QLatin1Char('.')
+namespace {
+    const QLatin1Char dot('.');
+}
 
 class IpAddressValidator: public QValidator{
     virtual QValidator::State validate(QString &input, int &pos) const override{
@@ -38,7 +40,7 @@ class IpAddressValidator: public QValidator{
     }
 
     virtual void fixup(QString &input) const override{
-        QStringList sections = input.split(DOT);
+        QStringList sections = input.split(dot);
         while(sections.size() > 4)
             sections.removeLast();
         while (sections.size() < 4)
@@ -59,7 +61,7 @@ class IpAddressValidator: public QValidator{
         input.clear();
         for (int i = 0; i < 3; i++){
             input.append(sections[i]);
-            input.append(DOT);
+            input.append(dot);
         }
         input.append(sections[3]);
     }
@@ -99,19 +101,19 @@ void QnIpLineEdit::keyPressEvent(QKeyEvent *event){
         base_type::keyPressEvent(event);
 
         QString input = text();
-        QStringList sections = input.split(DOT);
+        QStringList sections = input.split(dot);
         QString last = sections.last();
 
         bool ok;
         int val = last.toInt(&ok);
         if (sections.count() < 4  && ok && val*10 > 255)
-            setText(input + DOT);
-    }else if (event->key() == 32 || event->key() == DOT){
+            setText(input + dot);
+    }else if (event->key() == 32 || event->key() == dot){
         QString input = text();
-        if (input.at(input.size() - 1) != DOT){
-            QStringList sections = input.split(DOT);
+        if (input.at(input.size() - 1) != dot){
+            QStringList sections = input.split(dot);
             if (sections.count() < 4)
-                setText(input + DOT);
+                setText(input + dot);
         }
         event->setAccepted(true);
     } else
