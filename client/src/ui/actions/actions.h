@@ -482,7 +482,7 @@ namespace Qn {
         /**
          * Opens camera list by media server
          */
-        cameraListByServerAction,
+        CameraListByServerAction,
 
         /**
          * Opens a YouTube upload dialog.
