@@ -43,6 +43,7 @@ public:
 
     void disableUpdateData();
     void enableUpdateData();
+    void setDateRange(const QDate& from, const QDate& to);
     void setCameraList(QnResourceList resList);
     void setActionType(BusinessActionType::Value value);
     void setEventType(BusinessEventType::Value value);

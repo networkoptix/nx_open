@@ -406,6 +406,15 @@ QString QnEventLogDialog::getTextForNCameras(int n) const
         return tr("< %1 cameras >").arg(n);
 }
 
+void QnEventLogDialog::setDateRange(const QDate& from, const QDate& to)
+{
+    ui->dateEditFrom->setDateRange(QDate(2000,1,1), to);
+    ui->dateEditTo->setDateRange(from, QDateTime::currentDateTime().date());
+
+    ui->dateEditTo->setDate(to);
+    ui->dateEditFrom->setDate(from);
+}
+
 void QnEventLogDialog::setCameraList(QnResourceList resList)
 {
     if (resList.size() == m_filterCameraList.size())
