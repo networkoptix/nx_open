@@ -46,17 +46,10 @@ signals:
     void serverChanged();
 
 private:
-    enum UrlModes {
-        SingleIpMode,
-        IpRangeMode,
-        UrlMode,
-        RtspMode
-    };
-
     void clearTable();
     void fillTable(const QnCamerasFoundInfoList &cameras);
     void removeAddedCameras();
-    void updateMode(UrlModes newMode);
+    void updateSubnetMode();
     bool ensureServerOnline();
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);
@@ -67,20 +60,18 @@ private slots:
     void at_header_checkStateChanged(Qt::CheckState state);
     void at_scanButton_clicked();
     void at_addButton_clicked();
-    void at_modeComboBox_currentIndexChanged(int index);
+    void at_subnetCheckbox_toggled(bool toggled);
     void at_resPool_resourceChanged(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
 
-
-
     QScopedPointer<Ui::CameraAdditionDialog> ui;
     QnMediaServerResourcePtr m_server;
     QnCheckBoxedHeaderView* m_header;
 
-    UrlModes m_mode;
     bool m_inIpRangeEdit;
+    bool m_subnetMode;
     bool m_inCheckStateChange;
 };
 
