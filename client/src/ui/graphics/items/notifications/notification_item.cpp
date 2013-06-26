@@ -11,7 +11,6 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/proxy_label.h>
-#include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
@@ -148,7 +147,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_tooltipWidget->setOpacity(0.0);
     m_tooltipWidget->setAcceptHoverEvents(true);
     m_tooltipWidget->installEventFilter(this);
-    m_tooltipWidget->setFlag(ItemIgnoresParentOpacity, true);
+    m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
     connect(m_tooltipWidget, SIGNAL(thumbnailClicked()), this, SLOT(at_thumbnail_clicked()));
     connect(m_tooltipWidget, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
     connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
