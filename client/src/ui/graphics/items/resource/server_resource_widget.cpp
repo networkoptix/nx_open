@@ -83,8 +83,6 @@ namespace {
         result << QObject::tr("b/s");
         result << QObject::tr("Kb/s");
         result << QObject::tr("Mb/s");
-        result << QObject::tr("Gb/s");
-        result << QObject::tr("Tb/s");
         return result;
     }
     const QList<QString> networkSuffixes = initNetworkSuffixes();
