@@ -1,3 +1,8 @@
+----------------------------------------------- 1.5.3 (1.6 beta-2) ---------------------------------------------
+
+ - Fixed issue when it was not possible to add cameras manually via IP range (introduced in beta)
+ - If press F11 current video went to fullscreen. If press F11 again the video got back but time line was hidden. Fixed (introduced in beta)
+ 
 ----------------------------------------------- 1.5.2 (1.6 beta) -----------------------------------------------
 
 ANDROID CLIENT:
@@ -23,7 +28,7 @@ NEW FEATURES:
  - Events and actions:
     - Notifications are redesigned. They appear in the right panel.
     - New actions are added: 
-      - "Play sound" - ability to play sound if an event occur. Sound can be chosen from the library or uploaded by a user
+      - "Play sound" - ability to play sound if an event occurs. Sound can be chosen from the library or uploaded by a user
       - "Text to speech" - ability to say something if an event occur. Extends "Play Sound" action
       - "Instant output". Earlier it was not possible to bound output action to instant events (like motion start)  
  - Zoom windows. Just press the zoom button on the item and draw the rectangle - its contents will be expanded in the new item. 
@@ -32,7 +37,7 @@ NEW FEATURES:
  - History of events and actions is implemented. All events and actions are displayed in the table that provides 
    the ability to sort and filter data. Additionally "Check server issues..", "Check camera issues.." are added to 
    Media Servers' and Cameras' Context Menus.
-        - Cameras List is introduced. It displays all Cameras in the table that provides the ability to sort and filter data. 
+ - Cameras List is introduced. It displays all Cameras in the table that provides the ability to sort and filter data. 
  - Video color/gamma correction. Just press the correction button on the item to activate it. Try this feature in dark scenes to 
    estimate its power. Use context menu to adjust this feature's settings. Additionally it is possible to export video with such setting
  - It is possible to adjust second stream quality in cameras' settings. This is not recommended in general but may be needed for some reasons
@@ -40,7 +45,7 @@ NEW FEATURES:
  - If motion is occured on an item, it is indicated by the visual effect
  - Email notification about motion now contains a video link. If click on this link, video for this camera will be opened in a browser
  - If a user did not apply current motion mask by mistake (during camera setting) the warning will be shown
-
+ - Locked Layouts are introduced. It is not possible to change items's positions and add or remove anything on these kind of layouts
  - Compatible with Windows Server 2012 Family
  
 IMPROVEMENTS:  
