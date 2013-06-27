@@ -11,6 +11,7 @@
 #include <QByteArray>
 #include <QMap>
 #include <QUrl>
+#include <functional>
 
 #include "qnbytearrayref.h"
 
@@ -28,6 +29,26 @@ namespace nx_http
 {
     const int DEFAULT_HTTP_PORT = 80;
 
+    /************************************************************************/
+    /* Comparator for case-insensitive comparison in STL assos. containers  */
+    /************************************************************************/
+    struct ci_less : std::binary_function<QByteArray, QByteArray, bool>
+    {
+        // case-independent (ci) compare_less binary function
+        struct nocase_compare : public std::binary_function<unsigned char,unsigned char,bool> 
+        {
+            bool operator() (const unsigned char& c1, const unsigned char& c2) const {
+                return tolower (c1) < tolower (c2); 
+            }
+        };
+        bool operator() (const QByteArray & s1, const QByteArray & s2) const {
+            return std::lexicographical_compare 
+                (s1.begin (), s1.end (),   // source range
+                s2.begin (), s2.end (),   // dest range
+                nocase_compare ());  // comparison
+        }
+    };
+
     /*!
         TODO consider using another container.
         Need some buffer with:\n
@@ -41,7 +62,7 @@ namespace nx_http
     typedef QnByteArrayConstRef ConstBufferRefType;
     typedef QByteArray StringType;
 
-    typedef std::map<StringType, StringType> HttpHeaders;
+    typedef std::map<StringType, StringType, ci_less> HttpHeaders;
     typedef HttpHeaders::value_type HttpHeader;
 
     static const size_t BufferNpos = size_t(-1);
