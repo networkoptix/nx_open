@@ -157,15 +157,11 @@ void QnEventLogDialog::updateData()
     }
     m_updateDisabled = true;
 
-    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
     BusinessEventType::Value eventType = BusinessEventType::NotDefined;
 
     QModelIndex idx = ui->eventComboBox->currentIndex();
     if (idx.isValid())
         eventType = (BusinessEventType::Value) ui->eventComboBox->model()->data(idx, Qn::FirstItemDataRole).toInt();
-
-    if (ui->actionComboBox->currentIndex() > 0)
-        actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
     bool serverIssue = BusinessEventType::parentEvent(eventType) == BusinessEventType::AnyServerIssue || eventType == BusinessEventType::AnyServerIssue;
     ui->cameraButton->setEnabled(!serverIssue);
@@ -174,6 +170,10 @@ void QnEventLogDialog::updateData()
 
     bool istantOnly = !BusinessEventType::hasToggleState(eventType) && eventType != BusinessEventType::NotDefined;
     updateActionList(istantOnly);
+
+    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
+    if (ui->actionComboBox->currentIndex() > 0)
+        actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
     query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(), ui->dateEditTo->dateTime().addDays(1).toMSecsSinceEpoch(),
           m_filterCameraList,
