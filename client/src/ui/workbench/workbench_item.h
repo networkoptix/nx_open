@@ -271,6 +271,11 @@ public:
         }
     }
 
+    template<class T>
+    bool setData(int role, const T &value) {
+        return setData(role, QVariant::fromValue<T>(value));
+    }
+
     /**
      * \param role                      Role to set data for.
      * \param value                     New value for the given data role.

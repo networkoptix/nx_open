@@ -172,6 +172,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
     AnimationTimer *animationTimer = m_instrumentManager->animationTimer();
+    setTimer(animationTimer);
+    startListening();
 
     /* Create and configure instruments. */
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
@@ -819,6 +821,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
     connect(item, SIGNAL(zoomRectChanged()),                            this, SLOT(at_item_zoomRectChanged()));
+    connect(item, SIGNAL(dataChanged(int)),                             this, SLOT(at_item_dataChanged(int)));
 
     m_widgets.push_back(widget);
     m_widgetByItem.insert(item, widget);
@@ -905,6 +908,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
         widgetsForResource.removeOne(widget);
     }
 
+    m_pendingNotificationWidgets.remove(widget);
     m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
@@ -1216,6 +1220,7 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate) {
     synchronizeGeometry(widget, animate);
     synchronizeZoomRect(widget);
     synchronizeLayer(widget);
+    synchronizePendingNotification(widget);
 }
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate) {
@@ -1301,6 +1306,24 @@ void QnWorkbenchDisplay::synchronizeZoomRect(QnWorkbenchItem *item) {
 void QnWorkbenchDisplay::synchronizeZoomRect(QnResourceWidget *widget) {
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         mediaWidget->setZoomRect(widget->item()->zoomRect());
+}
+
+void QnWorkbenchDisplay::synchronizePendingNotification(QnWorkbenchItem *item) {
+    QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL)
+        return; /* No widget was created for the given item. */
+
+    synchronizePendingNotification(widget);
+}
+
+void QnWorkbenchDisplay::synchronizePendingNotification(QnResourceWidget *widget) {
+    bool hasPendingNotification = widget->item()->data<bool>(Qn::ItemPendingNotificationRole, false);
+
+    if(hasPendingNotification) {
+        m_pendingNotificationWidgets.insert(widget, 0);
+    } else {
+        m_pendingNotificationWidgets.remove(widget);
+    }
 }
 
 void QnWorkbenchDisplay::synchronizeAllGeometries(bool animate) {
@@ -1456,6 +1479,15 @@ void QnWorkbenchDisplay::updateCurtainedCursor() {
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
 // -------------------------------------------------------------------------- //
+void QnWorkbenchDisplay::tick(int deltaMSecs) {
+    foreach(QnResourceWidget *widget, m_pendingNotificationWidgets.keys()) { // TODO: #Elric proper map iteration!
+        qint64 &time = m_pendingNotificationWidgets[widget];
+        time += deltaMSecs;
+
+        widget->setScale(1.0 + 0.05 * std::sin(2.0 * time / 1000.0 * 2.0 * M_PI));
+    }
+}
+
 void QnWorkbenchDisplay::at_viewportAnimator_finished() {
     synchronizeSceneBounds();
 }
@@ -1727,6 +1759,11 @@ void QnWorkbenchDisplay::at_item_flagChanged(Qn::ItemFlag flag, bool value) {
     }
 }
 
+void QnWorkbenchDisplay::at_item_dataChanged(int role) {
+    if(role == Qn::ItemPendingNotificationRole)
+        synchronizePendingNotification(static_cast<QnWorkbenchItem *>(sender()));
+}
+
 void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStopped() {
     m_curtainAnimator->curtain(m_widgetByRole[Qn::ZoomedRole]);
 }
@@ -1863,5 +1900,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
         splashItem->setColor(withAlpha(qnGlobals->errorTextColor(), 128));
         splashItem->setOpacity(0.0);
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
+
+        widget->item()->setData(Qn::ItemPendingNotificationRole, true);
     }
 }
