@@ -1579,7 +1579,8 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
-    notifyAboutUpdate(false);
+    if(qnSettings->isUpdatesEnabled())
+        notifyAboutUpdate(false);
 }
 
 void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {

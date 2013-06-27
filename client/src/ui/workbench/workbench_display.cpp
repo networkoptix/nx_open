@@ -1842,10 +1842,19 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if (!resource)
         return;
 
+    // TODO: #Elric copypasta
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
+    QnThumbnailsSearchState searchState = layout->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
+    bool thumbnailed = searchState.step > 0 && !layout->items().empty();
+    if(thumbnailed)
+        return;
+
     foreach(QnResourceWidget *widget, this->widgets(resource)) {
+        if(widget->zoomTargetWidget())
+            continue; /* Don't draw notification on zoom widgets. */
+
         QRectF rect = widget->rect();
         qreal expansion = qMin(rect.width(), rect.height()) / 2.0;
-        
 
         QnSplashItem *splashItem = new QnSplashItem(widget);
         splashItem->setSplashType(QnSplashItem::Rectangular);
