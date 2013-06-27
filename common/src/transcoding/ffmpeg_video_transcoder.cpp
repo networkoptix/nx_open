@@ -226,9 +226,12 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             for (int i = 0; i < descr->nb_components && decodedFrame->data[i]; ++i)
             {
                 int w = frameRect.left();
-                if (i > 0)
+                int h = frameRect.top();
+                if (i > 0) {
                     w >>= descr->log2_chroma_w;
-                m_decodedFrameRect.data[i] = decodedFrame->data[i] + w + frameRect.top() * decodedFrame->linesize[i];
+                    h >>= descr->log2_chroma_h;
+                }
+                m_decodedFrameRect.data[i] = decodedFrame->data[i] + w + h * decodedFrame->linesize[i];
                 m_decodedFrameRect.linesize[i] = decodedFrame->linesize[i];
             }
             m_decodedFrameRect.format = decodedFrame->format;
