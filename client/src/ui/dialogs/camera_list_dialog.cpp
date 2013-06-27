@@ -45,12 +45,12 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     ui->gridCameras->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->gridCameras->setModel(m_resourceSearch);
 
-    m_clipboardAction   = new QAction(tr("Copy selection to clipboard"), this);
+    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
     ui->gridCameras->addAction(m_clipboardAction);
 
-    m_exportAction      = new QAction(tr("Export selection to file"), this);
-    m_selectAllAction   = new QAction(tr("Select all"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File"), this);
+    m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
 
     connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));

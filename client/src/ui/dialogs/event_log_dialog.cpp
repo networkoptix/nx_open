@@ -66,14 +66,14 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         actionItems << BusinessActionType::toString(BusinessActionType::Value(i));
     ui->actionComboBox->addItems(actionItems);
 
-    m_filterAction      = new QAction(tr("Filter similar rows"), this);
+    m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
     m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
-    m_clipboardAction   = new QAction(tr("Copy selection to clipboard"), this);
-    m_exportAction      = new QAction(tr("Export selection to file"), this);
-    m_selectAllAction   = new QAction(tr("Select all"), this);
+    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File"), this);
+    m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
-    m_resetFilterAction = new QAction(tr("Clear filter"), this);
+    m_resetFilterAction = new QAction(tr("Clear Filter"), this);
     m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R);
 
     QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
