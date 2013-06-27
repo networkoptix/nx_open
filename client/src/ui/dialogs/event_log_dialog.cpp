@@ -53,12 +53,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
 
-    /*
-    for (int i = 0; i < (int) QnEventLogModel::ActionCameraColumn; ++i)
-        headers->setResizeMode(i, QHeaderView::Fixed);
-    for (int i = (int) QnEventLogModel::ActionCameraColumn; i < columns.size(); ++i)
-        headers->setResizeMode(i, QHeaderView::ResizeToContents);
-    */
     headers->setResizeMode(QHeaderView::Fixed);
 
     QStandardItem* rootItem = createEventTree(0, BusinessEventType::AnyBusinessEvent);
@@ -161,6 +155,7 @@ void QnEventLogDialog::updateData()
         m_dirty = true;
         return;
     }
+    m_updateDisabled = true;
 
     BusinessActionType::Value actionType = BusinessActionType::NotDefined;
     BusinessEventType::Value eventType = BusinessEventType::NotDefined;
@@ -171,6 +166,14 @@ void QnEventLogDialog::updateData()
 
     if (ui->actionComboBox->currentIndex() > 0)
         actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
+
+    bool serverIssue = BusinessEventType::parentEvent(eventType) == BusinessEventType::AnyServerIssue || eventType == BusinessEventType::AnyServerIssue;
+    ui->cameraButton->setEnabled(!serverIssue);
+    if (serverIssue)
+        setCameraList(QnResourceList());
+
+    bool istantOnly = !BusinessEventType::hasToggleState(eventType) && eventType != BusinessEventType::NotDefined;
+    updateActionList(istantOnly);
 
     query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(), ui->dateEditTo->dateTime().addDays(1).toMSecsSinceEpoch(),
           m_filterCameraList,
@@ -197,6 +200,9 @@ void QnEventLogDialog::updateData()
 
     ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
     ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date());
+
+    m_updateDisabled = false;
+    m_dirty = false;
 }
 
 QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
@@ -563,4 +569,19 @@ void QnEventLogDialog::setVisible(bool value)
     if (value && !isVisible())
         updateData();
     QDialog::setVisible(value);
+}
+
+void QnEventLogDialog::updateActionList(bool instantOnly)
+{
+    QStandardItemModel* model = dynamic_cast<QStandardItemModel*> (ui->actionComboBox->model());
+    for (int i = 0; i < (int) BusinessActionType::NotDefined; ++i) 
+    {
+        BusinessActionType::Value actionType = BusinessActionType::Value(i);
+        QModelIndex index = model->index(i+1, 0);
+        QStandardItem* item = model->itemFromIndex(index);
+        bool enabled = !instantOnly || !BusinessActionType::hasToggleState(actionType);
+        item->setEnabled(enabled);
+        if (ui->actionComboBox->currentIndex() == i+1 && !enabled)
+            ui->actionComboBox->setCurrentIndex(0);
+    }
 }

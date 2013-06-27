@@ -73,6 +73,7 @@ private:
     void requestFinished();
     bool isRuleExistByCond() const;
     bool isCameraMatched(QnBusinessRuleViewModel* ruleModel) const;
+    void updateActionList(bool instantOnly);
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
 
