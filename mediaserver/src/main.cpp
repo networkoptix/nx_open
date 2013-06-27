@@ -1175,6 +1175,7 @@ public:
         m_argc(argc),
         m_argv(argv)
     {
+        m_main.moveToThread(&m_main);
         setServiceDescription(SERVICE_NAME);
     }
 
