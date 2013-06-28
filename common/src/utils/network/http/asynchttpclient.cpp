@@ -185,6 +185,8 @@ namespace nx_http
                         arg(m_url.toString()).arg(m_httpStreamReader.message().response->statusLine.statusCode).
                         arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG1 );
                     //TODO/IMPL should only call removeFromWatch if startReadMessageBody has not been called from responseReceived connected slot
+                    if (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
+                        break; // wait more data
                     aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
 
                     const HttpResponse* response = m_httpStreamReader.message().response;

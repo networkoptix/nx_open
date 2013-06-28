@@ -66,14 +66,14 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         actionItems << BusinessActionType::toString(BusinessActionType::Value(i));
     ui->actionComboBox->addItems(actionItems);
 
-    m_filterAction      = new QAction(tr("Filter similar rows"), this);
+    m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
     m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
-    m_clipboardAction   = new QAction(tr("Copy selection to clipboard"), this);
-    m_exportAction      = new QAction(tr("Export selection to file"), this);
-    m_selectAllAction   = new QAction(tr("Select all"), this);
+    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File"), this);
+    m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
-    m_resetFilterAction = new QAction(tr("Clear filter"), this);
+    m_resetFilterAction = new QAction(tr("Clear Filter"), this);
     m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R);
 
     QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
@@ -157,15 +157,11 @@ void QnEventLogDialog::updateData()
     }
     m_updateDisabled = true;
 
-    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
     BusinessEventType::Value eventType = BusinessEventType::NotDefined;
 
     QModelIndex idx = ui->eventComboBox->currentIndex();
     if (idx.isValid())
         eventType = (BusinessEventType::Value) ui->eventComboBox->model()->data(idx, Qn::FirstItemDataRole).toInt();
-
-    if (ui->actionComboBox->currentIndex() > 0)
-        actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
     bool serverIssue = BusinessEventType::parentEvent(eventType) == BusinessEventType::AnyServerIssue || eventType == BusinessEventType::AnyServerIssue;
     ui->cameraButton->setEnabled(!serverIssue);
@@ -174,6 +170,10 @@ void QnEventLogDialog::updateData()
 
     bool istantOnly = !BusinessEventType::hasToggleState(eventType) && eventType != BusinessEventType::NotDefined;
     updateActionList(istantOnly);
+
+    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
+    if (ui->actionComboBox->currentIndex() > 0)
+        actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
     query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(), ui->dateEditTo->dateTime().addDays(1).toMSecsSinceEpoch(),
           m_filterCameraList,

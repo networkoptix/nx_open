@@ -102,6 +102,7 @@
 #include <utils/license_usage_helper.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/app_server_notification_cache.h>
+#include <utils/local_file_cache.h>
 #include <utils/media/audio_player.h>
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -1389,16 +1390,29 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
             !resources.empty() &&
             layouts.empty()) {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
+        return;
     }
 
     if (!resources.empty()) {
         parameters.setResources(resources);
         if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
-        else
-            QMessageBox::warning(mainWindow(),
-                                 tr("Cannot add item"),
-                                 tr("Cannot add a local file to Multi-Video"));
+        else {
+            QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+            if (layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout)) {
+                bool hasLocal = false;
+                foreach (const QnResourcePtr &resource, resources) {
+                    //TODO: #GDM refactor duplicated code
+                    hasLocal |= resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+                    if (hasLocal)
+                        break;
+                }
+                if (hasLocal)
+                    QMessageBox::warning(mainWindow(),
+                                         tr("Cannot add item"),
+                                         tr("Cannot add a local file to Multi-Video"));
+            }
+        }
     }
     if(!layouts.empty())
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
@@ -1579,7 +1593,8 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
-    notifyAboutUpdate(false);
+    if(qnSettings->isUpdatesEnabled())
+        notifyAboutUpdate(false);
 }
 
 void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
@@ -2920,6 +2935,9 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             device = m_exportStorage->open(layout->backgroundImageFilename(), QIODevice::WriteOnly);
             backround.save(device, "png");
             delete device;
+
+            QnLocalFileCache cache;
+            cache.storeImage(layout->backgroundImageFilename(), backround);
         }
     }
 

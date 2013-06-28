@@ -1,9 +1,29 @@
------------------------------------------------ 1.5.3 (1.6 beta-2) ---------------------------------------------
+----------------------------------------------- 1.5.2 (1.6 beta-2) ---------------------------------------------
 
- - Fixed issue when it was not possible to add cameras manually via IP range (introduced in beta)
- - If press F11 current video went to fullscreen. If press F11 again the video got back but time line was hidden. Fixed (introduced in beta)
+Since 1.5.1
+
+ - DO NOT INCLUDE IN RELEASE NOTES!!! - Removed hack for DW to display 10 times less network issues (since 1.4)
+ - Fixed issue when it was not possible to add cameras manually via IP range (since 1.4)
+ - Improved advanced camera settings management (since 1.4)
+ - ACTI cameras with old firmwares (T series < 4.13, K series < 5.08 and A1 series < 6.03) work now 
+ - Vivotek cameras CC8130, FD8136, FD8361, FD8362E
+
+Since previous build
  
------------------------------------------------ 1.5.2 (1.6 beta) -----------------------------------------------
+ - If press F11 current video went to fullscreen. If press F11 again the video got back but time line was hidden. Fixed
+ - Add "Select All" in context menu for "Event log" and "Camera list"
+ - Fixed Client crah while exporting from zoom item, if enable color correction adjustment and move zoom window
+ - Now it is not possible to set up filter conditions in Event Log (i.e. if set Media Server failures, then Caneras selector is disabled)
+ - If try to change camera name while "!" (network issue) is displayed, then it looked ugly
+ - VMAX auto-discovery was broken. Fixed
+ - If motion occured on an item it began to blink on the scene. This happened only once. Now this is happening until the user clicks on an item
+ - If motion occured on an item it began to blink on the scene but this affected linked items (zoom windows and preview search). Fixed
+ - Camera statuses worked incorrectly. Fixed
+ - Analog license activation warning is not resized. Fixed
+ - Preview search. The first item doesn't play. Fixed
+ - Fixed the banding of gamma correction while exporting
+ 
+----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 
 ANDROID CLIENT:
  - If a camera archive contained too many recorded fragments, live video was freezing. Fixed

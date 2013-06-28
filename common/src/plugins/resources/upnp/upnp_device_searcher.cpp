@@ -429,9 +429,12 @@ void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpCl
     {
         QMutexLocker lk( &m_mutex );
         std::map<nx_http::AsyncHttpClient*, DiscoveredDeviceInfo>::iterator it = m_httpClients.find( httpClient );
-        Q_ASSERT( it != m_httpClients.end() );
+        if (it == m_httpClients.end())
+            return;
+        //Q_ASSERT( it != m_httpClients.end() );
         ctx = &it->second;
     }
+
 
     if( httpClient->response() && httpClient->response()->statusLine.statusCode == nx_http::StatusCode::ok )
     {

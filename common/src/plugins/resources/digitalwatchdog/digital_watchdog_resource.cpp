@@ -218,8 +218,8 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 
     //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
-    QDateTime currTime = QDateTime::currentDateTime().addMSecs(-ADVANCED_SETTINGS_VALID_TIME);
-    if (currTime > m_advSettingsLastUpdated) {
+    QDateTime currTime = QDateTime::currentDateTime();
+    if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(currTime) > ADVANCED_SETTINGS_VALID_TIME) {
         foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
         {
             if (!setting->refreshValsFromCamera())
@@ -227,7 +227,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
                 return false;
             }
         }
-        m_advSettingsLastUpdated = QDateTime::currentDateTime();
+        m_advSettingsLastUpdated = currTime;
     }
 
     foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)

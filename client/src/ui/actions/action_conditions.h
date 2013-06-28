@@ -390,8 +390,13 @@ public:
 class QnLoggedInCondition: public QnActionCondition {
 public:
     QnLoggedInCondition(QObject* parent = NULL): QnActionCondition(parent) {}
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters);
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
 
+class QnCheckForUpdatesActionCondition: public QnActionCondition {
+public:
+    QnCheckForUpdatesActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 #endif // QN_ACTION_CONDITIONS_H
