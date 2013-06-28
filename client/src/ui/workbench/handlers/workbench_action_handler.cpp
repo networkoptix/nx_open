@@ -102,6 +102,7 @@
 #include <utils/license_usage_helper.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/app_server_notification_cache.h>
+#include <utils/local_file_cache.h>
 #include <utils/media/audio_player.h>
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -2934,6 +2935,9 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             device = m_exportStorage->open(layout->backgroundImageFilename(), QIODevice::WriteOnly);
             backround.save(device, "png");
             delete device;
+
+            QnLocalFileCache cache;
+            cache.storeImage(layout->backgroundImageFilename(), backround);
         }
     }
 
