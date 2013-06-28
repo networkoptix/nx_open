@@ -1480,12 +1480,12 @@ void QnWorkbenchDisplay::updateCurtainedCursor() {
 // QnWorkbenchDisplay :: handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchDisplay::tick(int deltaMSecs) {
-    foreach(QnResourceWidget *widget, m_pendingNotificationWidgets.keys()) { // TODO: #Elric proper map iteration!
+    /*foreach(QnResourceWidget *widget, m_pendingNotificationWidgets.keys()) { // TODO: #Elric proper map iteration!
         qint64 &time = m_pendingNotificationWidgets[widget];
         time += deltaMSecs;
 
         widget->setScale(1.0 + 0.05 * std::sin(2.0 * time / 1000.0 * 2.0 * M_PI));
-    }
+    }*/ // TODO: #Elric use different animation
 }
 
 void QnWorkbenchDisplay::at_viewportAnimator_finished() {

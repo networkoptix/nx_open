@@ -1389,16 +1389,29 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
             !resources.empty() &&
             layouts.empty()) {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
+        return;
     }
 
     if (!resources.empty()) {
         parameters.setResources(resources);
         if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
-        else
-            QMessageBox::warning(mainWindow(),
-                                 tr("Cannot add item"),
-                                 tr("Cannot add a local file to Multi-Video"));
+        else {
+            QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+            if (layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout)) {
+                bool hasLocal = false;
+                foreach (const QnResourcePtr &resource, resources) {
+                    //TODO: #GDM refactor duplicated code
+                    hasLocal |= resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+                    if (hasLocal)
+                        break;
+                }
+                if (hasLocal)
+                    QMessageBox::warning(mainWindow(),
+                                         tr("Cannot add item"),
+                                         tr("Cannot add a local file to Multi-Video"));
+            }
+        }
     }
     if(!layouts.empty())
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);

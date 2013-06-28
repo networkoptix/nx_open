@@ -2,10 +2,12 @@
 
 Since 1.5.1
 
- - Removed hack for DW to display 10 times less network issues (since 1.4)
+ - DO NOT INCLUDE IN RELEASE NOTES!!! - Removed hack for DW to display 10 times less network issues (since 1.4)
  - Fixed issue when it was not possible to add cameras manually via IP range (since 1.4)
  - Improved advanced camera settings management (since 1.4)
- 
+ - ACTI cameras with old firmwares (T series < 4.13, K series < 5.08 and A1 series < 6.03) work now 
+ - Vivotek cameras CC8130, FD8136, FD8361, FD8362E
+
 Since previous build
  
  - If press F11 current video went to fullscreen. If press F11 again the video got back but time line was hidden. Fixed
@@ -17,6 +19,9 @@ Since previous build
  - If motion occured on an item it began to blink on the scene. This happened only once. Now this is happening until the user clicks on an item
  - If motion occured on an item it began to blink on the scene but this affected linked items (zoom windows and preview search). Fixed
  - Camera statuses worked incorrectly. Fixed
+ - Analog license activation warning is not resized. Fixed
+ - Preview search. The first item doesn't play. Fixed
+ - Fixed the banding of gamma correction while exporting
  
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 
