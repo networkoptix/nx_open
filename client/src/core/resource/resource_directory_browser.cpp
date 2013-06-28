@@ -182,6 +182,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         QIODevice* backgroundFile = layoutStorage.open(layout->backgroundImageFilename(), QIODevice::ReadOnly);
         if (backgroundFile) {
             QByteArray data = backgroundFile->readAll();
+            delete backgroundFile;
 
             QnLocalFileCache cache;
             cache.storeImage(layout->backgroundImageFilename(), data);
