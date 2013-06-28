@@ -32,20 +32,11 @@ namespace nx_http
     /************************************************************************/
     /* Comparator for case-insensitive comparison in STL assos. containers  */
     /************************************************************************/
-    struct ci_less : std::binary_function<QByteArray, QByteArray, bool>
+    struct ci_less : std::less<QByteArray>
     {
         // case-independent (ci) compare_less binary function
-        struct nocase_compare : public std::binary_function<unsigned char,unsigned char,bool> 
-        {
-            bool operator() (const unsigned char& c1, const unsigned char& c2) const {
-                return tolower (c1) < tolower (c2); 
-            }
-        };
-        bool operator() (const QByteArray & s1, const QByteArray & s2) const {
-            return std::lexicographical_compare 
-                (s1.begin (), s1.end (),   // source range
-                s2.begin (), s2.end (),   // dest range
-                nocase_compare ());  // comparison
+        bool operator() (const QByteArray& c1, const QByteArray& c2) const {
+            return c1.toLower() < c2.toLower(); 
         }
     };
 
