@@ -31,9 +31,8 @@ bool QnWorkbenchAutoStarter::isAutoStartEnabled() {
 #ifdef Q_OS_WIN
     QSettings settings(lit("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"), QSettings::NativeFormat);
 
-    QString realPath = QDir::toNativeSeparators(qApp->applicationFilePath()).toLower();
-    QString registryPath = QDir::toNativeSeparators(settings.value(lit(QN_APPLICATION_NAME)).toString()).toLower();
-    registryPath.replace(lit('"'), QString());
+    QString realPath = autoStartPath();
+    QString registryPath = fromRegistryFormat(settings.value(lit(QN_APPLICATION_NAME)).toString());
     
     return realPath == registryPath;
 #else
@@ -46,7 +45,7 @@ void QnWorkbenchAutoStarter::setAutoStartEnabled(bool autoStartEnabled) {
     QSettings settings(lit("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"), QSettings::NativeFormat);
 
     if(autoStartEnabled) {
-        settings.setValue(lit(QN_APPLICATION_NAME), lit("\"") + QDir::toNativeSeparators(qApp->applicationFilePath()).toLower() + lit("\""));
+        settings.setValue(lit(QN_APPLICATION_NAME), toRegistryFormat(autoStartPath()));
     } else {
         settings.remove(lit(QN_APPLICATION_NAME));
     }
@@ -57,4 +56,22 @@ void QnWorkbenchAutoStarter::setAutoStartEnabled(bool autoStartEnabled) {
 
 void QnWorkbenchAutoStarter::at_autoStartSetting_valueChanged() {
     setAutoStartEnabled(qnSettings->autoStart());
+}
+
+QString QnWorkbenchAutoStarter::autoStartPath() const {
+    QFileInfo clientFile = QFileInfo(qApp->applicationFilePath());
+    QFileInfo launcherFile = QFileInfo(clientFile.dir(), lit(QN_APPLAUNCHER_EXECUTABLE_NAME));
+
+    QFileInfo resultFile = launcherFile.exists() ? launcherFile : clientFile;
+    return QDir::toNativeSeparators(resultFile.canonicalFilePath()).toLower();
+}
+
+QString QnWorkbenchAutoStarter::fromRegistryFormat(const QString &path) const {
+    QString result = QDir::toNativeSeparators(path).toLower();
+    result.replace(lit('"'), QString());
+    return result;
+}
+
+QString QnWorkbenchAutoStarter::toRegistryFormat(const QString &path) const {
+    return lit("\"") + QDir::toNativeSeparators(path).toLower() + lit("\"");
 }

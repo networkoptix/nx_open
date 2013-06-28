@@ -69,6 +69,7 @@ namespace Qn {
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
         ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
         ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
+        ItemPendingNotificationRole,                /**< Role for item's pending notification state. Value of type bool. */
 
         /* Context-based. */
         CurrentLayoutResourceRole,

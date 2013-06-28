@@ -6,10 +6,12 @@
 #include <core/resource_managment/resource_criterion.h>
 #include <core/resource_managment/resource_pool.h>
 #include <recording/time_period_list.h>
+#include <camera/resource_display.h>
+
+#include <client/client_settings.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <camera/resource_display.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -500,4 +502,8 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
 Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parameters) {
     Q_UNUSED(parameters)
     return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &parameters) {
+    return qnSettings->isUpdatesEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }

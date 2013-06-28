@@ -18,10 +18,11 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     qnProductFeatures();
 
     /* Init members. */
-    m_sessionManager = instance<QnSessionManager>();
+    m_sessionManager = new QnSessionManager(); //instance<QnSessionManager>();
 }
 
 QnCommonModule::~QnCommonModule() {
+    delete m_sessionManager;
     return;
 }
 

@@ -187,6 +187,10 @@ ios-client/build
 ios-client/dist
 ios-client/target
 
+ios-client/Settings.bundle/Root.plist
+ios-client/HDWitness/HDWitness-Info.plist
+ios-client/Podfile
+
 launcher/x86
 launcher/x64
 android-client/android-main/target/**

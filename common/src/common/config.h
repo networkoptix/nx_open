@@ -17,12 +17,10 @@
 // Application globals. Do not change.
 // -------------------------------------------------------------------------- //
 
-/* 
- * Media data alignment. We use 32 for compatibility with AVX instruction set */
+/** Media data alignment. We use 32 for compatibility with AVX instruction set */
 #define CL_MEDIA_ALIGNMENT 32
 
-/* 
- * Addition free space at a end of memory block. Some ffmpeg calls requires it */
+/** Additional free space at a end of memory block. Some ffmpeg calls requires it */
 #define CL_MEDIA_EXTRA 8
 
 
@@ -56,7 +54,7 @@
 #   define override override
 #elif defined(__GNUC__)
 #   if (GCC_VERSION >= 40700)
-//#   define override override
+#       define override override
 #   else
 #       define override
 #   endif

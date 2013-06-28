@@ -98,7 +98,7 @@ namespace nx_http
 
     HttpStreamReader::ReadState HttpStreamReader::state() const
     {
-        return waitingMessageStart;
+        return m_state;
     }
 
     size_t HttpStreamReader::messageBodyBufferSize() const
