@@ -247,13 +247,13 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 
                     reply.statistics.append(QnStatisticsDataItem(
                                                 interfaceName + QChar(0x21e9),
-                                                extractXmlBody(interfaceBlock, "in").toDouble() * 8, //converting from bytes to bits
+                                                extractXmlBody(interfaceBlock, "in").toULongLong() * 8, //converting from bytes to bits
                                                 NETWORK_IN,
                                                 interfaceType
                     ));
                     reply.statistics.append(QnStatisticsDataItem(
                                                 interfaceName + QChar(0x21e7),
-                                                extractXmlBody(interfaceBlock, "out").toDouble() * 8, //converting from bytes to bits
+                                                extractXmlBody(interfaceBlock, "out").toULongLong() * 8, //converting from bytes to bits
                                                 NETWORK_OUT,
                                                 interfaceType
                     ));
