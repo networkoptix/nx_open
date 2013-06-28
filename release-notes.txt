@@ -18,6 +18,9 @@ Since previous build
  - If motion occured on an item it began to blink on the scene. This happened only once. Now this is happening until the user clicks on an item
  - If motion occured on an item it began to blink on the scene but this affected linked items (zoom windows and preview search). Fixed
  - Camera statuses worked incorrectly. Fixed
+ - Analog license activation warning is not resized. Fixed
+ - Preview search. The first item doesn't play. Fixed
+ - Fixed the banding of gamma correction while exporting
  
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 
