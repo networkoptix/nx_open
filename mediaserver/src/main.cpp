@@ -431,7 +431,7 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-	//signal(SIGABRT, stopServer);
+    //signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -721,7 +721,7 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 
 void QnMain::at_timer()
 {
-	qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras()) 
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();

@@ -40,7 +40,7 @@
             full UI.  Setting ARPSYSTEMCOMPONENT above hides WI generated key
                     that uses the product GUID.-->
         <Component Id="ARPAltRegistryEntries" Guid="{397C3DDE-AFF3-45a6-9E6B-5054C7F6B60F}" Win64="no">
-            <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${product.name}" Action="createAndRemoveOnUninstall">
+            <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${product.name}">
                 <RegistryValue Type="string" Name="DisplayName" Value="[ProductName]"/>
                 <RegistryValue Type="string" Name="UninstallString" Value="[SystemFolder]msiexec.exe /i [ProductCode]"/>
                 <RegistryValue Type="string" Name="DisplayIcon" Value="[INSTALLDIR]Common\Resource\eve_logo.ico"/>
