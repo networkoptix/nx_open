@@ -6,7 +6,8 @@ Since 1.5.1
  - Fixed issue when it was not possible to add cameras manually via IP range (since 1.4)
  - Improved advanced camera settings management (since 1.4)
  - ACTI cameras with old firmwares (T series < 4.13, K series < 5.08 and A1 series < 6.03) work now 
- 
+ - Vivotek cameras CC8130, FD8136, FD8361, FD8362E
+
 Since previous build
  
  - If press F11 current video went to fullscreen. If press F11 again the video got back but time line was hidden. Fixed
