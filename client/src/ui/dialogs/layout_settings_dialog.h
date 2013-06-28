@@ -46,8 +46,13 @@ private slots:
     void updateControls();
 
     void viewFile();
+
     void selectFile();
+
+    void updatePreviewImageLabel();
 private:
+    qreal screenAspectRatio() const;
+
     bool hasChanges(const QnLayoutResourcePtr &layout);
 
     void loadPreview();
@@ -59,11 +64,11 @@ private:
     QString m_cachedFilename;
     QString m_newFilePath;
 
-    qreal m_cellAspectRatio;
-    bool m_estimatePending;
+    QImage m_previewImage;
+    QImage m_previewCropped;
 
-    /** Should image be cropped to current monitor AR */
-    bool m_cropImage;
+    qreal m_cellAspectRatio;
+    bool m_newImageLoaded;
 };
 
 #endif // LAYOUT_SETTINGS_DIALOG_H

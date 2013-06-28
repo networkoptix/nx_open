@@ -19,6 +19,7 @@
 #include <utils/threaded_image_loader.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/local_file_cache.h>
+#include <utils/image_transformations.h>
 
 namespace {
     const int labelFrameWidth = 4;  // in pixels
@@ -82,8 +83,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     ui(new Ui::QnLayoutSettingsDialog),
     m_cache(NULL),
     m_cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio()),
-    m_estimatePending(false),
-    m_cropImage(false)
+    m_newImageLoaded(false)
 {
     ui->setupUi(this);
 
@@ -99,6 +99,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     ui->userCanEditCheckBox->setVisible(false);
     ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
     ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
+    ui->cropToMonitorCheckBox->setVisible(false);
 
     setProgress(false);
 
@@ -108,6 +109,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
     connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
     connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(at_opacitySpinBox_valueChanged(int)));
+    connect(ui->cropToMonitorCheckBox, SIGNAL(toggled(bool)), this, SLOT(updatePreviewImageLabel()));
 
     updateControls();
 }
@@ -174,6 +176,11 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
     return true;
 }
 
+qreal QnLayoutSettingsDialog::screenAspectRatio() const {
+    QRect screen = qApp->desktop()->screenGeometry();
+    return (qreal)screen.width() / (qreal)screen.height();
+}
+
 bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
 
     if (
@@ -233,7 +240,10 @@ void QnLayoutSettingsDialog::at_accepted() {
         return;
     }
 
-    m_cache->storeImage(m_newFilePath, m_cropImage);
+    if (ui->cropToMonitorCheckBox->isChecked())
+        m_cache->storeImage(m_newFilePath, screenAspectRatio());
+    else
+        m_cache->storeImage(m_newFilePath);
     setProgress(true);
     ui->generalGroupBox->setEnabled(false);
     ui->buttonBox->setEnabled(false);
@@ -282,7 +292,7 @@ void QnLayoutSettingsDialog::loadPreview() {
     loader->setInput(m_newFilePath);
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(imageLabel->size());
-    loader->setCropToMonitorAspectRatio(m_cropImage);
+    loader->setFlags(Qn::TouchSizeFromOutside);
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
     loader->start();
     setProgress(true);
@@ -311,7 +321,8 @@ void QnLayoutSettingsDialog::selectFile() {
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
     dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
 
-    dialog->addCheckBox(tr("Crop to current monitor AR"), &m_cropImage);
+    bool cropImage = ui->cropToMonitorCheckBox->isChecked();
+    dialog->addCheckBox(tr("Crop to current monitor AR"), &cropImage);
     if(!dialog->exec())
         return;
 
@@ -321,7 +332,10 @@ void QnLayoutSettingsDialog::selectFile() {
 
     m_newFilePath = files[0];
     m_cachedFilename = QString();
+    m_previewImage = QImage();
+    m_previewCropped = QImage();
     m_estimatePending = true;
+    ui->cropToMonitorCheckBox->setChecked(cropImage);
 
     loadPreview();
     updateControls();
@@ -334,11 +348,32 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
         imageLabel->setText(tr("<Image cannot be loaded>"));
         return;
     }
+
+    m_previewImage = image.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::FastTransformation);
+    m_previewCropped = cropImageToAspectRatio(image, screenAspectRatio());
+    updatePreviewImageLabel();
+
+    ui->cropToMonitorCheckBox->setVisible(true); //new image is selected
+
+
+
+}
+
+void QnLayoutSettingsDialog::setProgress(bool value) {
+    ui->stackedWidget->setCurrentIndex(value ? 1 : 0);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!value);
+    if (!value)
+        updateControls();
+}
+
+void QnLayoutSettingsDialog::updatePreviewImageLabel() {
+    QImage image = ui->cropToMonitorCheckBox->isChecked()
+            ? m_previewCropped
+            : m_previewImage;
     imageLabel->setPixmap(QPixmap::fromImage(image));
 
-    if (!m_estimatePending)
+    if (!m_newImageLoaded)
         return;
-    m_estimatePending = false;
 
     qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
 
@@ -360,13 +395,4 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     }
     ui->widthSpinBox->setValue(w);
     ui->heightSpinBox->setValue(h);
-
 }
-
-void QnLayoutSettingsDialog::setProgress(bool value) {
-    ui->stackedWidget->setCurrentIndex(value ? 1 : 0);
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!value);
-    if (!value)
-        updateControls();
-}
-
