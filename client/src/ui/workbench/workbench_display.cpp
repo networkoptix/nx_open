@@ -47,8 +47,8 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/grid/curtain_item.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/splash_item.h>
+#include <ui/graphics/items/generic/particle_frame_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
 #include <ui/graphics/items/grid/grid_raised_cone_item.h>
@@ -172,8 +172,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
     AnimationTimer *animationTimer = m_instrumentManager->animationTimer();
-    setTimer(animationTimer);
-    startListening();
 
     /* Create and configure instruments. */
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
@@ -1319,10 +1317,23 @@ void QnWorkbenchDisplay::synchronizePendingNotification(QnWorkbenchItem *item) {
 void QnWorkbenchDisplay::synchronizePendingNotification(QnResourceWidget *widget) {
     bool hasPendingNotification = widget->item()->data<bool>(Qn::ItemPendingNotificationRole, false);
 
+    QnParticleFrameWidget *particleWidget = m_pendingNotificationWidgets.value(widget);
     if(hasPendingNotification) {
-        m_pendingNotificationWidgets.insert(widget, 0);
+        if(!particleWidget) {
+            particleWidget = new QnParticleFrameWidget();
+            particleWidget->setParticleColor(QColor(255, 0, 0, 128));
+            particleWidget->setParticleSize(QSizeF(20.0, 20.0));
+            particleWidget->setParticleSpeed(100.0, 25.0, 0.0, 0.0);
+            particleWidget->setParticleCount(1);
+            particleWidget->setOpacity(0.0);
+            widget->addOverlayWidget(particleWidget, QnResourceWidget::UserVisible, false, true, true);
+            m_pendingNotificationWidgets.insert(widget, particleWidget);
+        }
+
+        opacityAnimator(particleWidget, 2.0)->animateTo(1.0);
     } else {
-        m_pendingNotificationWidgets.remove(widget);
+        if(particleWidget)
+            opacityAnimator(particleWidget, 2.0)->animateTo(0.0);
     }
 }
 
@@ -1479,15 +1490,6 @@ void QnWorkbenchDisplay::updateCurtainedCursor() {
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchDisplay::tick(int deltaMSecs) {
-    /*foreach(QnResourceWidget *widget, m_pendingNotificationWidgets.keys()) { // TODO: #Elric proper map iteration!
-        qint64 &time = m_pendingNotificationWidgets[widget];
-        time += deltaMSecs;
-
-        widget->setScale(1.0 + 0.05 * std::sin(2.0 * time / 1000.0 * 2.0 * M_PI));
-    }*/ // TODO: #Elric use different animation
-}
-
 void QnWorkbenchDisplay::at_viewportAnimator_finished() {
     synchronizeSceneBounds();
 }

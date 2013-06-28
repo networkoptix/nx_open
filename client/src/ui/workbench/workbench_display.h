@@ -37,6 +37,7 @@ class QnWorkbench;
 class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnResourceWidget;
+class QnParticleFrameWidget;
 class QnResourceDisplay;
 class ViewportAnimator;
 class VariantAnimator;
@@ -59,7 +60,7 @@ class QnCamDisplay;
  * 
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchDisplay: public Connective<QObject>, public AnimationTimerListener, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations {
+class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations {
     Q_OBJECT
     Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity)
 
@@ -350,8 +351,6 @@ protected:
 
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
 
-    virtual void tick(int deltaMSecs) override;
-
 protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();
@@ -503,7 +502,7 @@ private:
     VariantAnimator *m_frameOpacityAnimator;
 
 
-    QHash<QnResourceWidget *, qint64> m_pendingNotificationWidgets;
+    QHash<QnResourceWidget *, QnParticleFrameWidget *> m_pendingNotificationWidgets;
 
 
     QnThumbnailsLoader *m_loader;

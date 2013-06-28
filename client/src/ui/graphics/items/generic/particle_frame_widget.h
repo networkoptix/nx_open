@@ -15,13 +15,26 @@ public:
     QnParticleFrameWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnParticleFrameWidget();
 
+    int particleCount() const;
+    void setParticleCount(int particleCount);
+    
+    QColor particleColor() const;
+    void setParticleColor(const QColor &particleColor);
+
+    QSizeF particleSize() const;
+    void setParticleSize(const QSizeF &particleSize);
+
+    void regenerateParticles();
+
+    void setParticleSpeed(qreal absoluteSpeed, qreal absoluteSpeedDeviation, qreal relativeSpeed, qreal relativeSpeedDeviation);
+    void getParticleSpeed(qreal *absoluteSpeed, qreal *absoluteSpeedDeviation, qreal *relativeSpeed, qreal *relativeSpeedDeviation) const;
+
 protected:
     virtual void tick(int deltaMSecs) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-private:
-    void advanceParticlePosition(const QRectF &rect, qreal dt, Particle *particle) const;
-    void updateItemPosition(const QRectF &rect, Particle *particle) const;
+    void updateListening();
 
 private:
     struct Particle {
@@ -33,7 +46,15 @@ private:
         qreal relativeSpeed;
     };
 
+    void regenerateParticle(Particle *particle) const;
+    void advanceParticlePosition(const QRectF &rect, qreal dt, Particle *particle) const;
+    void updateItemPosition(const QRectF &rect, Particle *particle) const;
+
+private:
     QList<Particle> m_particles;
+    qreal m_absoluteSpeed, m_absoluteSpeedDeviation, m_relativeSpeed, m_relativeSpeedDeviation;
+    QColor m_color;
+    QSizeF m_size;
 };
 
 
