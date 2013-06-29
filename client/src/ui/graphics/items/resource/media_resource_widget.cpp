@@ -723,7 +723,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
 
-    if(!(resource()->toResource()->flags() & QnResource::still_image))
+    //if(!(resource()->toResource()->flags() & QnResource::still_image))
         result |= InfoButton | EnhancementButton;
 
     if (!zoomRect().isNull())

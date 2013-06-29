@@ -554,6 +554,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
     m_mtx.unlock();
     if (decodeToFrame->width) {
+        if (decodeToFrame->width == 2592) {
+            decodeToFrame->width = 1920;
+            decodeToFrame->data[0] += (2592-1920)/2;
+            decodeToFrame->data[1] += (2592-1920)/4;
+            decodeToFrame->data[2] += (2592-1920)/4;
+        }
+
         QSize imageSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
         QMutexLocker lock(&m_imageSizeMtx);
         m_imageSize = imageSize;
@@ -821,6 +828,7 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::findScaleFactor(int width, 
 
 void QnVideoStreamDisplay::setMTDecoding(bool value)
 {
+    value = false;
     m_enableFrameQueue = value;
     m_needReinitDecoders = true;
 }

@@ -94,8 +94,16 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_timeChangeEnabled(true),
     m_paused(false),
     m_screenshotInterface(0),
-    m_histogramConsumer(0)
+    m_histogramConsumer(0),
+
+    //m_extraMin(-19),
+    //m_extraMax(19)
+    m_extraMin(-0.25),
+    m_extraMax(0.25)
 {
+    m_extraCurValue = m_extraMin;
+    m_extraStep = (m_extraMax - m_extraMin) / 150;
+
     Q_ASSERT( context );
 
     applyMixerSettings( m_brightness, m_contrast, m_hue, m_saturation );
@@ -279,6 +287,14 @@ void QnGLRenderer::drawYV12VideoTexture(
     unsigned int tex2ID,
     const float* v_array )
 {
+    /*
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-10000,10000,10000,-10000,-10000,10000);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    */
+
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
         (float)tex0Coords.right(), (float)tex0Coords.top(),
@@ -302,6 +318,18 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setUTexture( 1 );
     shader->setVTexture( 2 );
     shader->setOpacity(m_decodedPictureProvider.opacity());
+
+    if (m_extraCurValue >= m_extraMax) {
+        m_extraStep = - fabs(m_extraStep);
+    }
+    else if (m_extraCurValue <= m_extraMin) {
+        m_extraStep = fabs(m_extraStep);
+    }
+    m_extraCurValue += m_extraStep;
+    shader->setExtraParam(m_extraCurValue);
+    //qDebug() << "m_extraCurValue" << m_extraCurValue;
+
+
     if (m_imgCorrectParam.enabled) {
         if (!isPaused()) {
             m_yv12ToRgbWithGammaShaderProgram->setImageCorrection(picLock->imageCorrectionResult());

@@ -82,6 +82,11 @@ private:
     ImageCorrectionParams m_imgCorrectParam;
     QRectF m_displayedRect;
     QnHistogramConsumer* m_histogramConsumer;
+    
+    float m_extraMin;
+    float m_extraMax;
+    float m_extraStep;
+    float m_extraCurValue;
 
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen
