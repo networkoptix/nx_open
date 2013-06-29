@@ -250,12 +250,12 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case BusinessEventType::Camera_Disconnect: {
         item->setColorLevel(QnNotificationItem::Important);
-        item->addActionButton(
+/*        item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Open Camera"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
-        );
+        );*/
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Camera Settings"),
@@ -267,12 +267,12 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case BusinessEventType::Storage_Failure: {
         item->setColorLevel(QnNotificationItem::Important);
-        item->addActionButton(
+      /*  item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Open Monitor"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
-        );
+        );*/
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings"),
@@ -283,12 +283,12 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case BusinessEventType::Network_Issue:{
         item->setColorLevel(QnNotificationItem::Important);
-        item->addActionButton(
+       /* item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Open Camera"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
-        );
+        );*/
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Camera Settings"),

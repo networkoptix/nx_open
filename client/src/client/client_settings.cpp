@@ -70,6 +70,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
     addArgumentName(SOFTWARE_YUV,          "--soft-yuv");
     addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login");
     addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items");
+    addArgumentName(UPDATES_ENABLED,       "--updates-enabled");
 
     /* Load from internal resource. */
     QFile file(QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.json"));
@@ -200,6 +201,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case DEBUG_COUNTER:
     case UPDATE_FEED_URL:
     case DEV_MODE:
+    case UPDATES_ENABLED:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);

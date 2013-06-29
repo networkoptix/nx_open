@@ -18,6 +18,11 @@ protected:
     void setAutoStartEnabled(bool autoStartEnabled);
 
 private:
+    QString autoStartPath() const;
+    QString fromRegistryFormat(const QString &path) const;
+    QString toRegistryFormat(const QString &path) const;
+
+private:
     Q_SLOT void at_autoStartSetting_valueChanged();
 };
 

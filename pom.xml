@@ -270,7 +270,7 @@
             </modules>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <python.dir>/usr/bin/</python.dir>				
+                <python.dir>${env.environment}/python/bin/</python.dir>				
                 <qt.dir/>
                 <platform>macosx</platform>
                 <compiler>gcc</compiler>

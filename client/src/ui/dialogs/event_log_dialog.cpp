@@ -53,12 +53,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
 
-    /*
-    for (int i = 0; i < (int) QnEventLogModel::ActionCameraColumn; ++i)
-        headers->setResizeMode(i, QHeaderView::Fixed);
-    for (int i = (int) QnEventLogModel::ActionCameraColumn; i < columns.size(); ++i)
-        headers->setResizeMode(i, QHeaderView::ResizeToContents);
-    */
     headers->setResizeMode(QHeaderView::Fixed);
 
     QStandardItem* rootItem = createEventTree(0, BusinessEventType::AnyBusinessEvent);
@@ -72,16 +66,15 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         actionItems << BusinessActionType::toString(BusinessActionType::Value(i));
     ui->actionComboBox->addItems(actionItems);
 
-    m_filterAction      = new QAction(tr("Filter similar rows"), this);
+    m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
     m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
-    m_clipboardAction   = new QAction(tr("Copy selection to clipboard"), this);
-    m_exportAction      = new QAction(tr("Export selection to file"), this);
-    m_selectAllAction   = new QAction(tr("Select all"), this);
-
-    m_clipboardAction->setShortcut(QKeySequence::Copy);
-    m_resetFilterAction = new QAction(tr("Clear filter"), this);
-    m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R);
+    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File"), this);
+    m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
+    m_clipboardAction->setShortcut(QKeySequence::Copy);
+    m_resetFilterAction = new QAction(tr("Clear Filter"), this);
+    m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R);
 
     QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
     mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
@@ -162,14 +155,23 @@ void QnEventLogDialog::updateData()
         m_dirty = true;
         return;
     }
+    m_updateDisabled = true;
 
-    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
     BusinessEventType::Value eventType = BusinessEventType::NotDefined;
 
     QModelIndex idx = ui->eventComboBox->currentIndex();
     if (idx.isValid())
         eventType = (BusinessEventType::Value) ui->eventComboBox->model()->data(idx, Qn::FirstItemDataRole).toInt();
 
+    bool serverIssue = BusinessEventType::parentEvent(eventType) == BusinessEventType::AnyServerIssue || eventType == BusinessEventType::AnyServerIssue;
+    ui->cameraButton->setEnabled(!serverIssue);
+    if (serverIssue)
+        setCameraList(QnResourceList());
+
+    bool istantOnly = !BusinessEventType::hasToggleState(eventType) && eventType != BusinessEventType::NotDefined;
+    updateActionList(istantOnly);
+
+    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
     if (ui->actionComboBox->currentIndex() > 0)
         actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
@@ -198,6 +200,9 @@ void QnEventLogDialog::updateData()
 
     ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
     ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date());
+
+    m_updateDisabled = false;
+    m_dirty = false;
 }
 
 QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
@@ -506,21 +511,11 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     menu->addSeparator();
 
     menu->addAction(m_selectAllAction);
-    menu->addAction(m_clipboardAction);
     menu->addAction(m_exportAction);
+    menu->addAction(m_clipboardAction);
 
     menu->exec(QCursor::pos());
     menu->deleteLater();
-}
-
-void QnEventLogDialog::at_exportAction()
-{
-    QnGridWidgetHelper(context()).exportGrid(ui->gridEvents);
-}
-
-void QnEventLogDialog::at_copyToClipboard()
-{
-    QnGridWidgetHelper(context()).gridToClipboard(ui->gridEvents);
 }
 
 void QnEventLogDialog::at_selectAllAction()
@@ -528,6 +523,15 @@ void QnEventLogDialog::at_selectAllAction()
     ui->gridEvents->selectAll();
 }
 
+void QnEventLogDialog::at_exportAction()
+{
+    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents);
+}
+
+void QnEventLogDialog::at_copyToClipboard()
+{
+    QnGridWidgetHelper(context()).copyToClipboard(ui->gridEvents);
+}
 
 void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
 {
@@ -565,4 +569,19 @@ void QnEventLogDialog::setVisible(bool value)
     if (value && !isVisible())
         updateData();
     QDialog::setVisible(value);
+}
+
+void QnEventLogDialog::updateActionList(bool instantOnly)
+{
+    QStandardItemModel* model = dynamic_cast<QStandardItemModel*> (ui->actionComboBox->model());
+    for (int i = 0; i < (int) BusinessActionType::NotDefined; ++i) 
+    {
+        BusinessActionType::Value actionType = BusinessActionType::Value(i);
+        QModelIndex index = model->index(i+1, 0);
+        QStandardItem* item = model->itemFromIndex(index);
+        bool enabled = !instantOnly || !BusinessActionType::hasToggleState(actionType);
+        item->setEnabled(enabled);
+        if (ui->actionComboBox->currentIndex() == i+1 && !enabled)
+            ui->actionComboBox->setCurrentIndex(0);
+    }
 }

@@ -45,18 +45,17 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     ui->gridCameras->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->gridCameras->setModel(m_resourceSearch);
 
-    m_clipboardAction   = new QAction(tr("Copy selection to clipboard"), this);
-    m_exportAction      = new QAction(tr("Export selection to file"), this);
-    m_selectAllAction   = new QAction(tr("Select all"), this);
+    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
+    m_clipboardAction->setShortcut(QKeySequence::Copy);
+    ui->gridCameras->addAction(m_clipboardAction);
+
+    m_exportAction      = new QAction(tr("Export Selection to File"), this);
+    m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
 
     connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));
     connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
     connect(m_selectAllAction,      SIGNAL(triggered()),                this, SLOT(at_selectAllAction()));
-
-    m_clipboardAction->setShortcut(QKeySequence::Copy);
-    ui->gridCameras->addAction(m_clipboardAction);
-    ui->gridCameras->addAction(m_exportAction);
 
     ui->gridCameras->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 }
@@ -109,27 +108,28 @@ void QnCameraListDialog::at_customContextMenuRequested(const QPoint &)
 
     m_clipboardAction->setEnabled(ui->gridCameras->selectionModel()->hasSelection());
     m_exportAction->setEnabled(ui->gridCameras->selectionModel()->hasSelection());
+
     menu->addAction(m_selectAllAction);
-    menu->addAction(m_clipboardAction);
     menu->addAction(m_exportAction);
+    menu->addAction(m_clipboardAction);
 
     menu->exec(QCursor::pos());
     menu->deleteLater();
 }
 
+void QnCameraListDialog::at_selectAllAction()
+{
+    ui->gridCameras->selectAll();
+}
+
 void QnCameraListDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportGrid(ui->gridCameras);
+    QnGridWidgetHelper(context()).exportToFile(ui->gridCameras);
 }
 
 void QnCameraListDialog::at_copyToClipboard()
 {
-    QnGridWidgetHelper(context()).gridToClipboard(ui->gridCameras);
-}
-
-void QnCameraListDialog::at_selectAllAction()
-{
-    ui->gridCameras->selectAll();
+    QnGridWidgetHelper(context()).copyToClipboard(ui->gridCameras);
 }
 
 void QnCameraListDialog::at_modelChanged()

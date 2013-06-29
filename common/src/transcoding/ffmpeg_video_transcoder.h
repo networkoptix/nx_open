@@ -23,6 +23,7 @@ public:
 
     /* Allow multithread transcoding */
     void setMTMode(bool value);
+    virtual void addFilter(QnAbstractImageFilter* filter) override;
 private:
     int rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch);
 private:
