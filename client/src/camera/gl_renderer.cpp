@@ -80,6 +80,8 @@ bool QnGLRenderer::isPixelFormatSupported( PixelFormat pixfmt )
     }
 }
 
+static const double PI = 3.1415926;
+
 QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpenGLUploader& decodedPictureProvider )
 :
     QnGlFunctions( context ),
@@ -98,8 +100,8 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
 
     //m_extraMin(-19),
     //m_extraMax(19)
-    m_extraMin(-0.25),
-    m_extraMax(0.25)
+    m_extraMin(-PI/4.0),
+    m_extraMax(PI/4.0) // rotation range
 {
     m_extraCurValue = m_extraMin;
     m_extraStep = (m_extraMax - m_extraMin) / 150;
@@ -326,7 +328,7 @@ void QnGLRenderer::drawYV12VideoTexture(
         m_extraStep = fabs(m_extraStep);
     }
     m_extraCurValue += m_extraStep;
-    shader->setExtraParam(m_extraCurValue);
+    shader->setXShift(m_extraCurValue);
     //qDebug() << "m_extraCurValue" << m_extraCurValue;
 
 

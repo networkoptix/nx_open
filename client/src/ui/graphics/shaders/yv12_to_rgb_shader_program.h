@@ -25,8 +25,12 @@ public:
         setUniformValue(m_opacityLocation, opacity);
     }
 
-    void setExtraParam(GLfloat value) {
-        setUniformValue(m_extraParamLocation, value);
+    void setXShift(GLfloat angle) {
+        setUniformValue(m_xShiftLocation, angle);
+    }
+
+    void setYShift(GLfloat angle) {
+        setUniformValue(m_yShiftLocation, angle);
     }
 
 protected:
@@ -34,8 +38,8 @@ protected:
     int m_uTextureLocation;
     int m_vTextureLocation;
     int m_opacityLocation;
-    int m_extraParamLocation;
-
+    int m_xShiftLocation;
+    int m_yShiftLocation;
 };
 
 class QnYv12ToRgbShaderProgram: public QnAbstractYv12ToRgbShaderProgram 
