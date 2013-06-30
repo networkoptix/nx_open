@@ -331,8 +331,10 @@ void QnGLRenderer::drawYV12VideoTexture(
     }
     m_extraCurValue += m_extraStep;
     shader->setXShift(m_extraCurValue);
-    shader->setDstFov(PI/2.0);
+    shader->setYShift(18.0 * (PI/180.0));
     shader->setPerspShift(18.0 * (PI/180.0));
+    shader->setDstFov(PI/2.0);
+    shader->setAspectRatio(picLock->width()/(float)picLock->height());
     //shader->setDstFov(m_extraCurValue);
     //qDebug() << "m_extraCurValue" << m_extraCurValue;
 

@@ -41,6 +41,10 @@ public:
         setUniformValue(m_dstFovLocation, angle);
     }
 
+    void setAspectRatio(GLfloat value) {
+        setUniformValue(m_aspectRatioLocation, value);
+    }
+
 protected:
     int m_yTextureLocation;
     int m_uTextureLocation;
@@ -50,6 +54,7 @@ protected:
     int m_yShiftLocation;
     int m_perspShiftLocation;
     int m_dstFovLocation;
+    int m_aspectRatioLocation;
 };
 
 class QnYv12ToRgbShaderProgram: public QnAbstractYv12ToRgbShaderProgram 
