@@ -5,21 +5,7 @@ QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLCont
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
         void main() {
-            /*
-            float a = 18.5 * (3.1415926 / 180.0);
-            mat4 xRot = mat4(   1.0, 0.0,    0.0,     0.0,
-                                0,   cos(a), -sin(a), 0.0,
-                                0,   sin(a), cos(a),  0.0,
-                                0,   0.0,    0.0,     1.0);
-            
-            vec4 v = vec4(gl_Vertex) * xRot;
-            v.z = 500;
-            */
-
             gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-
-            gl_Position.z = gl_Position.z * 2;
-
             gl_TexCoord[0] = gl_MultiTexCoord0;
     }
     ));
@@ -129,7 +115,7 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
         vec2 pos = gl_TexCoord[0].st -0.5; // go to coordinates in range [-1..+1]
         pos = pos * 0.5; // zoom
 
-        float theta = (pos.x) * FOV + extraParam;
+        float theta = (pos.x + extraParam) * FOV;
         float phi = (pos.y) * FOV - PERSPECTIVE_ANGLE;
 
         // Vector in 3D space
