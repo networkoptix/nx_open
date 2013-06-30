@@ -12,7 +12,6 @@ QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLCont
 
 }
 
-
 // ============================= QnYv12ToRgbShaderProgram ==================
 
 QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent): 
@@ -20,33 +19,31 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
 {
     addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
-    uniform sampler2D uTexture;
-    uniform sampler2D vTexture;
-    uniform float opacity;
-    uniform float xShift;
+        uniform sampler2D uTexture;
+        uniform sampler2D vTexture;
+        uniform float opacity;
+        uniform float xShift;
+        uniform float yShift;
+        uniform float perspShift;
+        uniform float dstFov;
 
+    const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
                                 1.0, -0.344, -0.714,  0.529,
                                 1.0,  1.772,  0.0,   -0.886,
                                 0.0,  0.0,    0.0,    opacity);
 
-    const float PI = 3.1415926535;
-    const float SRC_FOV = 180.0 * (PI / 180.0);
-    const float DST_FOV = 90.0 * (PI / 180.0); // / SRC_FOV;
-    const float ASPECT_RATIO = 4.0 / 3.0;
-    const float PERSPECTIVE_ANGLE = 22.5 *  (PI / 180.0);
-
     void main() 
     {
-        mat3 perspectiveMatrix = mat3( 1.0, 0.0,                    0.0,
-                                       0.0, cos(PERSPECTIVE_ANGLE), -sin(PERSPECTIVE_ANGLE),
-                                       0.0, sin(PERSPECTIVE_ANGLE), cos(PERSPECTIVE_ANGLE));
-
-
         vec2 pos = gl_TexCoord[0].st -0.5; // go to coordinates in range [-0.5..+0.5]
 
-        float theta = xShift  + atan(pos.x * DST_FOV);
-        float phi = atan(pos.y * DST_FOV) - PERSPECTIVE_ANGLE;
+        float theta = atan(pos.x * dstFov) + xShift;
+        float phi   = atan(pos.y * dstFov) + yShift - perspShift;
+
+        // matrix for perspective correction
+        mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
+                                       0.0, cos(perspShift), -sin(perspShift),
+                                       0.0, sin(perspShift),  cos(perspShift));
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
@@ -55,16 +52,17 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
 
         // Calculate fisheye angle and radius
         theta = atan(psph.z, psph.x);
-        phi = atan(length(psph.xz),psph.y);
-        float r = phi / SRC_FOV;
+        phi   = atan(length(psph.xz), psph.y);
+        float r = phi / PI; // fisheye FOV
 
-        vec2 srcCoord = vec2(0.5 + r * cos(theta), 0.5 + r * sin(theta)); // return from polar coordinates
+        // return from polar coordinates
+        pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
         // do color transformation yuv->RGB
-        gl_FragColor = vec4(texture2D(yTexture, srcCoord).p,
-            texture2D(uTexture, srcCoord).p,
-            texture2D(vTexture, srcCoord).p,
-            1.0) * colorTransform;
+        gl_FragColor = vec4(texture2D(yTexture, pos).p,
+                            texture2D(uTexture, pos).p,
+                            texture2D(vTexture, pos).p,
+                            1.0) * colorTransform;
     }
     ));
 
@@ -75,6 +73,9 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
     m_vTextureLocation = uniformLocation("vTexture");
     m_opacityLocation = uniformLocation("opacity");
     m_xShiftLocation = uniformLocation("xShift");
+    m_yShiftLocation = uniformLocation("yShift");
+    m_perspShiftLocation = uniformLocation("perspShift");
+    m_dstFovLocation = uniformLocation("dstFov");
 }
 
     // ============================ QnYv12ToRgbWithGammaShaderProgram ==================================
@@ -85,33 +86,31 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 {
     addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
-    uniform sampler2D uTexture;
-    uniform sampler2D vTexture;
-    uniform float opacity;
-    uniform float xShift;
-
-    mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
-        1.0, -0.344, -0.714,  0.529,
-        1.0,  1.772,  0.0,   -0.886,
-        0.0,  0.0,    0.0,    opacity);
+        uniform sampler2D uTexture;
+        uniform sampler2D vTexture;
+        uniform float opacity;
+        uniform float xShift;
+        uniform float yShift;
+        uniform float perspShift;
+        uniform float dstFov;
 
     const float PI = 3.1415926535;
-    const float SRC_FOV = 180.0 * (PI / 180.0);
-    const float DST_FOV = 90.0 * (PI / 180.0);
-    const float ASPECT_RATIO = 4.0 / 3.0;
-    const float PERSPECTIVE_ANGLE = 22.5 *  (PI / 180.0);
+    mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
+                                1.0, -0.344, -0.714,  0.529,
+                                1.0,  1.772,  0.0,   -0.886,
+                                0.0,  0.0,    0.0,    opacity);
 
     void main() 
     {
-        mat3 perspectiveMatrix = mat3( 1.0, 0.0,                    0.0,
-                                       0.0, cos(PERSPECTIVE_ANGLE), -sin(PERSPECTIVE_ANGLE),
-                                       0.0, sin(PERSPECTIVE_ANGLE), cos(PERSPECTIVE_ANGLE));
-
-
         vec2 pos = gl_TexCoord[0].st -0.5; // go to coordinates in range [-0.5..+0.5]
 
-        float theta = pos.x * DST_FOV + xShift;
-        float phi   = pos.y * DST_FOV - PERSPECTIVE_ANGLE;
+        float theta = pos.x * dstFov + xShift;
+        float phi   = pos.y * dstFov + yShift - perspShift;
+
+        // Matrix for perspective correction
+        mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
+                                       0.0, cos(perspShift), -sin(perspShift),
+                                       0.0, sin(perspShift),  cos(perspShift));
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
@@ -120,20 +119,19 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 
         // Calculate fisheye angle and radius
         theta = atan(psph.z, psph.x);
-        phi = atan(length(psph.xz),psph.y);
-        float r = phi / SRC_FOV;
+        phi   = atan(length(psph.xz), psph.y);
+        float r = phi / PI; // fisheye FOV
 
-        vec2 srcCoord = vec2(0.5 + r * cos(theta), 0.5 + r * sin(theta)); // return from polar coordinates
+        // return from polar coordinates
+        pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
         // do color transformation yuv->RGB
-        gl_FragColor = vec4(texture2D(yTexture, srcCoord).p,
-            texture2D(uTexture, srcCoord).p,
-            texture2D(vTexture, srcCoord).p,
-            1.0) * colorTransform;
+        gl_FragColor = vec4(texture2D(yTexture, pos).p,
+                            texture2D(uTexture, pos).p,
+                            texture2D(vTexture, pos).p,
+                            1.0) * colorTransform;
     }
     ));
-
-
 
     link();
 
@@ -145,6 +143,9 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
     m_yLevels2Location = uniformLocation("yLevels2");
     m_yGammaLocation = uniformLocation("yGamma");
     m_xShiftLocation = uniformLocation("xShift");
+    m_yShiftLocation = uniformLocation("yShift");
+    m_perspShiftLocation = uniformLocation("perspShift");
+    m_dstFovLocation = uniformLocation("dstFov");
 }
 
 

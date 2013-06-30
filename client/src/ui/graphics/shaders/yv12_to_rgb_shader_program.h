@@ -33,6 +33,14 @@ public:
         setUniformValue(m_yShiftLocation, angle);
     }
 
+    void setPerspShift(GLfloat angle) {
+        setUniformValue(m_perspShiftLocation, angle);
+    }
+
+    void setDstFov(GLfloat angle) {
+        setUniformValue(m_dstFovLocation, angle);
+    }
+
 protected:
     int m_yTextureLocation;
     int m_uTextureLocation;
@@ -40,6 +48,8 @@ protected:
     int m_opacityLocation;
     int m_xShiftLocation;
     int m_yShiftLocation;
+    int m_perspShiftLocation;
+    int m_dstFovLocation;
 };
 
 class QnYv12ToRgbShaderProgram: public QnAbstractYv12ToRgbShaderProgram 

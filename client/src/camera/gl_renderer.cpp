@@ -102,6 +102,8 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     //m_extraMax(19)
     m_extraMin(-PI/4.0),
     m_extraMax(PI/4.0) // rotation range
+    //m_extraMin(PI/4.0),
+    //m_extraMax(PI/2.0) // rotation range
 {
     m_extraCurValue = m_extraMin;
     m_extraStep = (m_extraMax - m_extraMin) / 150;
@@ -329,6 +331,9 @@ void QnGLRenderer::drawYV12VideoTexture(
     }
     m_extraCurValue += m_extraStep;
     shader->setXShift(m_extraCurValue);
+    shader->setDstFov(PI/2.0);
+    shader->setPerspShift(18.0 * (PI/180.0));
+    //shader->setDstFov(m_extraCurValue);
     //qDebug() << "m_extraCurValue" << m_extraCurValue;
 
 
