@@ -901,6 +901,13 @@ void QnAppServerConnectionFactory::setCurrentVersion(const QString &version)
     }
 }
 
+void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_publicUrl.setHost(publicIp);
+    }
+}
+
 int QnAppServerConnectionFactory::defaultMediaProxyPort()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -955,6 +962,15 @@ QUrl QnAppServerConnectionFactory::defaultUrl()
     return QUrl();
 }
 
+QUrl QnAppServerConnectionFactory::publicUrl()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        return factory->m_publicUrl;
+    }
+
+    return QUrl();
+}
+
 void QnAppServerConnectionFactory::setAuthKey(const QString &authKey)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -976,6 +992,7 @@ void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
 
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_defaultUrl = url;
+        factory->m_publicUrl = url;
     }
 }
 

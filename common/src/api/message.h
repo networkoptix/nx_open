@@ -33,7 +33,8 @@ namespace Qn {
         Message_Type_BroadcastBusinessAction = 10,
         Message_Type_FileAdd = 11,
         Message_Type_FileRemove = 12,
-        Message_Type_FileUpdate = 13
+        Message_Type_FileUpdate = 13,
+        Message_Type_RuntimeInfoChange = 14
     };
 
     QString toString( Message_Type val );
@@ -41,9 +42,9 @@ namespace Qn {
 
 struct QnMessage
 {
-    QnMessage(): eventType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online) {}
+    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online) {}
 
-    Qn::Message_Type eventType;
+    Qn::Message_Type messageType;
     quint32 seqNumber;
 
     QnResourcePtr resource;
@@ -66,6 +67,7 @@ struct QnMessage
     QnCameraHistoryList cameraServerItems;
 
     QString filename;
+    QString publicIp;
 
     bool load(const pb::Message& message);
 
