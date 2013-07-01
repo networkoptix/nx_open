@@ -804,6 +804,8 @@ void QnResource::setDisabled(bool disabled)
 
 void QnResource::init()
 {
+    if (m_appStopping)
+        return;
     QMutexLocker lock(&m_initMutex);
     if (!m_initialized) 
     {

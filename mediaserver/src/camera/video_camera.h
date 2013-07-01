@@ -38,6 +38,7 @@ public:
     void notInUse(void* user);
 private:
     void createReader(QnResource::ConnectionRole role);
+    void stop();
 private:
     QMutex m_readersMutex;
     QMutex m_getReaderMutex;
