@@ -1,4 +1,3 @@
-
 #ifndef FROM_THIS_TO_SHARED_H
 #define FROM_THIS_TO_SHARED_H
 
@@ -10,12 +9,10 @@
     Implementation moved from QnResource class to enable it for non-QnResource classes
 */
 template <class T>
-    class QnFromThisToShared
+class QnFromThisToShared
 {
 public:
-    typedef QnSharedResourcePointer<T> T_ptr;
-
-    T_ptr toSharedPointer() const
+    QnSharedResourcePointer<T> toSharedPointer() const
     {
         return m_weakPointer.toStrongRef();
     }

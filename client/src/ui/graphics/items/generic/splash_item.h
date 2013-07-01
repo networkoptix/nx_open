@@ -7,6 +7,7 @@
 #include <ui/animation/animation_timer_listener.h>
 
 class QnSplashItem: public Animated<QGraphicsObject>, public AnimationTimerListener {
+    Q_OBJECT
     typedef Animated<QGraphicsObject> base_type;
 
 public:
@@ -48,6 +49,9 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     
     void animate(qint64 endTimeMSec, const QRectF &endRect, qreal endOpacity, bool destroy = false, qint64 midTimeMSec = -1, qreal midOpacity = 1.0);
+
+signals:
+    void animationFinished();
 
 protected:
     virtual void tick(int deltaMSecs) override;
