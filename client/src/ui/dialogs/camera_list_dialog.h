@@ -27,13 +27,14 @@ public:
 private slots:
     void at_searchStringChanged(const QString &text);
     void at_customContextMenuRequested(const QPoint &pos);
+    void at_selectAllAction();
     void at_exportAction();
     void at_copyToClipboard();
-    void at_selectAllAction();
     void at_gridDoubleClicked(const QModelIndex &index);
     void at_modelChanged();
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
+
 private:
     Q_DISABLE_COPY(QnCameraListDialog)
 

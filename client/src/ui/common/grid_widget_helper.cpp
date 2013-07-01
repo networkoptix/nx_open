@@ -1,7 +1,6 @@
 #include <QTableView>
 
 #include "grid_widget_helper.h"
-#include "client/client_globals.h"
 #include "client/client_settings.h"
 #include "ui/dialogs/custom_file_dialog.h"
 
@@ -11,60 +10,7 @@ QnGridWidgetHelper::QnGridWidgetHelper(QnWorkbenchContext *context):
 
 }
 
-void QnGridWidgetHelper::getGridData(QTableView* grid, QString& textData, QString& htmlData, const QLatin1Char& textDelimiter)
-{
-    QAbstractItemModel *model = grid->model();
-    QModelIndexList list = grid->selectionModel()->selectedIndexes();
-    if(list.isEmpty())
-        return;
-
-    qSort(list);
-
-    htmlData.append(lit("<html>\n"));
-    htmlData.append(lit("<body>\n"));
-    htmlData.append(lit("<table>\n"));
-
-    htmlData.append(lit("<tr>"));
-    for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
-    {
-        if (i > 0)
-            textData.append(textDelimiter);
-        QString header = model->headerData(list[i].column(), Qt::Horizontal).toString();
-        htmlData.append(lit("<th>"));
-        htmlData.append(header);
-        htmlData.append(lit("</th>"));
-        textData.append(header);
-    }
-    htmlData.append(lit("</tr>"));
-
-    int prevRow = -1;
-    for(int i = 0; i < list.size(); ++i)
-    {
-        if(list[i].row() != prevRow) {
-            prevRow = list[i].row();
-            textData.append(lit('\n'));
-            if (i > 0)
-                htmlData.append(lit("</tr>"));
-            htmlData.append(lit("<tr>"));
-        }
-        else {
-            textData.append(textDelimiter);
-        }
-
-        htmlData.append(lit("<td>"));
-        htmlData.append(model->data(list[i], Qn::DisplayHtmlRole).toString());
-        htmlData.append(lit("</td>"));
-
-        textData.append(model->data(list[i]).toString());
-    }
-    htmlData.append(lit("</tr>\n"));
-    htmlData.append(lit("</table>\n"));
-    htmlData.append(lit("</body>\n"));
-    htmlData.append(lit("</html>\n"));
-    textData.append(lit('\n'));
-}
-
-void QnGridWidgetHelper::exportGrid(QTableView* grid)
+void QnGridWidgetHelper::exportToFile(QTableView* grid)
 {
     QString previousDir = qnSettings->lastExportDir();
     if (previousDir.isEmpty())
@@ -137,7 +83,7 @@ void QnGridWidgetHelper::exportGrid(QTableView* grid)
     }
 }
 
-void QnGridWidgetHelper::gridToClipboard(QTableView* grid)
+void QnGridWidgetHelper::copyToClipboard(QTableView* grid)
 {
     QString textData;
     QString htmlData;
@@ -147,4 +93,57 @@ void QnGridWidgetHelper::gridToClipboard(QTableView* grid)
     mimeData->setText(textData);
     mimeData->setHtml(htmlData);
     QApplication::clipboard()->setMimeData(mimeData);
+}
+
+void QnGridWidgetHelper::getGridData(QTableView* grid, QString& textData, QString& htmlData, const QLatin1Char& textDelimiter)
+{
+    QAbstractItemModel *model = grid->model();
+    QModelIndexList list = grid->selectionModel()->selectedIndexes();
+    if(list.isEmpty())
+        return;
+
+    qSort(list);
+
+    htmlData.append(lit("<html>\n"));
+    htmlData.append(lit("<body>\n"));
+    htmlData.append(lit("<table>\n"));
+
+    htmlData.append(lit("<tr>"));
+    for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
+    {
+        if (i > 0)
+            textData.append(textDelimiter);
+        QString header = model->headerData(list[i].column(), Qt::Horizontal).toString();
+        htmlData.append(lit("<th>"));
+        htmlData.append(header);
+        htmlData.append(lit("</th>"));
+        textData.append(header);
+    }
+    htmlData.append(lit("</tr>"));
+
+    int prevRow = -1;
+    for(int i = 0; i < list.size(); ++i)
+    {
+        if(list[i].row() != prevRow) {
+            prevRow = list[i].row();
+            textData.append(lit('\n'));
+            if (i > 0)
+                htmlData.append(lit("</tr>"));
+            htmlData.append(lit("<tr>"));
+        }
+        else {
+            textData.append(textDelimiter);
+        }
+
+        htmlData.append(lit("<td>"));
+        htmlData.append(model->data(list[i], Qn::DisplayHtmlRole).toString());
+        htmlData.append(lit("</td>"));
+
+        textData.append(model->data(list[i]).toString());
+    }
+    htmlData.append(lit("</tr>\n"));
+    htmlData.append(lit("</table>\n"));
+    htmlData.append(lit("</body>\n"));
+    htmlData.append(lit("</html>\n"));
+    textData.append(lit('\n'));
 }
