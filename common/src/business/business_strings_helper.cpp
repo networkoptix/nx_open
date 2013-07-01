@@ -243,7 +243,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (!mserverRes)
         return QString();
 
-    QUrl apPServerUrl = QnAppServerConnectionFactory::defaultUrl();
+    QUrl apPServerUrl = QnAppServerConnectionFactory::publicUrl();
     quint64 ts = params.getEventTimestamp();
     QByteArray rnd = QByteArray::number(qrand()).toHex();
 

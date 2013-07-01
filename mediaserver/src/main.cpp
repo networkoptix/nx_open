@@ -431,7 +431,7 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-	//signal(SIGABRT, stopServer);
+    //signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -578,6 +578,8 @@ void QnMain::stopObjects()
 {
     qWarning() << "QnMain::stopObjects() called";
 
+    qnFileDeletor->pleaseStop();
+
     if (m_restServer)
         m_restServer->pleaseStop();
     if (m_progressiveDownloadingServer)
@@ -721,7 +723,7 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 
 void QnMain::at_timer()
 {
-	qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras()) 
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
@@ -1116,6 +1118,9 @@ void QnMain::run()
     delete QnMServerResourceSearcher::instance();
     QnMServerResourceSearcher::initStaticInstance( NULL );
 
+    delete QnVideoCameraPool::instance();
+    QnVideoCameraPool::initStaticInstance( NULL );
+
     QnResourceDiscoveryManager::instance()->stop();
     QnResource::stopAsyncTasks();
 
@@ -1150,9 +1155,6 @@ void QnMain::run()
 
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
-
-    delete QnVideoCameraPool::instance();
-    QnVideoCameraPool::initStaticInstance( NULL );
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );

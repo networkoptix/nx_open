@@ -31,7 +31,8 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResource* dev, bool isLive):
     m_lastSpeed(1),
     m_lastSeekPos(AV_NOPTS_VALUE),
     m_keepAllChannels(false),
-    m_lastConnectTimeUsec(0)
+    m_lastConnectTimeUsec(0),
+    m_needStop(false)
 {
     m_res = dynamic_cast<QnNetworkResource*>(dev);
     initPacketTime();
@@ -159,7 +160,7 @@ bool VMaxStreamFetcher::vmaxConnect()
         QTime t;
         t.restart();
         QMutexLocker lock(&m_connectMtx);
-        while (!m_vmaxConnection && t.elapsed() < PROCESS_TIMEOUT)
+        while (!m_vmaxConnection && t.elapsed() < PROCESS_TIMEOUT && !m_needStop)
             m_vmaxConnectionCond.wait(&m_connectMtx, PROCESS_TIMEOUT);
 
         if (m_vmaxConnection) {
@@ -501,6 +502,8 @@ void VMaxStreamFetcher::freeInstance(const QByteArray& clientGroupID, QnResource
 bool VMaxStreamFetcher::safeOpen()
 {
     QMutexLocker lock(&m_mutex);
+    if (m_needStop)
+        return false;
     if (!isOpened()) 
     {
         qint64 timeoutUsec = getUsecTimer() - m_lastConnectTimeUsec;
@@ -549,4 +552,18 @@ bool VMaxStreamFetcher::isPlaying() const
 {
     QMutexLocker lock(&m_mutex);
     return m_lastSeekPos != (qint64)AV_NOPTS_VALUE;
+}
+
+void VMaxStreamFetcher::pleaseStop()
+{
+    QMutexLocker lock(&m_connectMtx);
+    m_needStop = true;
+    m_vmaxConnectionCond.wakeAll();
+}
+
+void VMaxStreamFetcher::pleaseStopAll()
+{
+    QMutexLocker lock(&m_instMutex);
+    foreach(VMaxStreamFetcher* fetcher, m_instances.values())
+        fetcher->pleaseStop();
 }

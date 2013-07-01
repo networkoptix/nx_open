@@ -1068,7 +1068,6 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 
     QnWorkbenchItem *workbenchItem = widget->item();
     workbench()->setItem(Qn::RaisedRole, workbench()->item(Qn::RaisedRole) == workbenchItem ? NULL : workbenchItem);
-    workbenchItem->setData<bool>(Qn::ItemPendingNotificationRole, false);
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
