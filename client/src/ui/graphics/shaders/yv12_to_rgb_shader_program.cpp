@@ -33,18 +33,16 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
                                 1.0, -0.344, -0.714,  0.529,
                                 1.0,  1.772,  0.0,   -0.886,
                                 0.0,  0.0,    0.0,    opacity);
+    mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
+                                   0.0, cos(perspShift), -sin(perspShift),
+                                   0.0, sin(perspShift),  cos(perspShift));
 
     void main() 
     {
-        vec2 pos = gl_TexCoord[0].st -0.5; // go to coordinates in range [-0.5..+0.5]
+        vec2 pos = gl_TexCoord[0].st -0.5; // go to coordinates in range [-0...+0.5]
 
         float theta = atan(pos.x * dstFov) + xShift;
         float phi   = atan(pos.y * dstFov/aspectRatio) + yShift - perspShift;
-
-        // matrix for perspective correction
-        mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                       0.0, cos(perspShift), -sin(perspShift),
-                                       0.0, sin(perspShift),  cos(perspShift));
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
@@ -98,11 +96,13 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
         uniform float aspectRatio;
 
     const float PI = 3.1415926535;
-    const float ASPECT_RATIO = 4.0/3.0;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
                                 1.0, -0.344, -0.714,  0.529,
                                 1.0,  1.772,  0.0,   -0.886,
                                 0.0,  0.0,    0.0,    opacity);
+    mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
+                                   0.0, cos(perspShift), -sin(perspShift),
+                                   0.0, sin(perspShift),  cos(perspShift));
 
     void main() 
     {
@@ -110,11 +110,6 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 
         float theta = pos.x * dstFov + xShift;
         float phi   = pos.y * dstFov/aspectRatio  + yShift -  perspShift;
-
-        // Matrix for perspective correction
-        mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                       0.0, cos(perspShift), -sin(perspShift),
-                                       0.0, sin(perspShift),  cos(perspShift));
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
