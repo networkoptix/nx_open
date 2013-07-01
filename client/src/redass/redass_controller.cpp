@@ -232,8 +232,17 @@ void QnRedAssController::onTimer()
 {
     QMutexLocker lock(&m_mutex);
 
-    if (m_mode != Qn::AutoResolution)
+    if (m_mode != Qn::AutoResolution) 
+    {
+        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+        {
+            QnCamDisplay* display = itr.key();
+            QnArchiveStreamReader* reader = display->getArchiveReader();
+            if (!display->isFullScreen())
+                reader->setQuality(m_mode == Qn::LowResolution ? MEDIA_Quality_Low : MEDIA_Quality_High, true);
+        }
         return;
+    }
 
     if (++m_timerTicks >= TOHQ_ADDITIONAL_TRY)
     {

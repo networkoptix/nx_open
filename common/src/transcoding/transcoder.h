@@ -101,7 +101,7 @@ public:
 
     virtual bool open(QnCompressedVideoDataPtr video);
 
-    void addFilter(QnAbstractImageFilter* filter);
+    virtual void addFilter(QnAbstractImageFilter* filter);
 protected:
     static const int WIDTH_ALIGN = 32;
     static const int HEIGHT_ALIGN = 2;

@@ -105,11 +105,9 @@ namespace BusinessEventType
     }
 
     bool hasToggleState(Value val) {
-        if (val >= Count)
-            return false;
-
         switch( val )
         {
+        case AnyBusinessEvent:
         case Camera_Motion:
         case Camera_Input:
             return true;

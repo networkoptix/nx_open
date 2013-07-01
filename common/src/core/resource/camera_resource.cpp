@@ -3,7 +3,7 @@
 #include "api/app_server_connection.h"
 
 static const float MAX_EPS = 0.01f;
-static const int MAX_ISSUE_CNT = 1; // max camera issues during a 1 min.
+static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
 static const qint64 ISSUE_KEEP_TIMEOUT = 1000000ll * 60;
 
 QnVirtualCameraResource::QnVirtualCameraResource():
