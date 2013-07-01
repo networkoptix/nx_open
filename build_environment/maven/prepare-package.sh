@@ -2,6 +2,8 @@
 
 export buildlib=${buildLib}
 export QTDIR=`qmake -query QT_INSTALL_LIBS`
+export QTPLUG=`qmake -query QT_INSTALL_PLUGINS`
+
 
 if [[ -z $buildlib ]]; then
 
@@ -16,8 +18,8 @@ if [[ -z $buildlib ]]; then
 
   for i in ${qtplugin1} ${qtplugin2}
   do
-    cp -Rf `find $QTDIR/qt4/plugins -iname $i` ${libdir}/bin/debug/
-    cp -Rf `find $QTDIR/qt4/plugins -iname $i` ${libdir}/bin/release/
+    cp -Rf `find $QTPLUG -iname $i` ${libdir}/bin/debug/
+    cp -Rf `find $QTPLUG -iname $i` ${libdir}/bin/release/
   done
 
 fi
