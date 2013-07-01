@@ -33,6 +33,8 @@ message Message {
         FileAdd                 = 11;
         FileRemove              = 12;
         FileUpdate              = 13;
+        
+        RuntimeInfoChange       = 14;
     }
 
     required Type type = 1;
@@ -84,13 +86,14 @@ message InitialMessage {
         required InitialMessage message = 105;
     }
 
-    repeated ResourceType resourceType = 1;
-    repeated Resource resource = 2;
-    repeated License license = 3;
+    repeated ResourceType resourceType         = 1;
+    repeated Resource resource                 = 2;
+    repeated License license                   = 3;
     repeated CameraServerItem cameraServerItem = 4;
-    optional string hardwareId1 = 5;
-    optional string oldHardwareId = 6;
-    optional string hardwareId2 = 7;
+    optional string hardwareId1                = 5;
+    optional string oldHardwareId              = 6;
+    optional string hardwareId2                = 7;
+    optional string publicIp                   = 8;
 }
 
 message FileAddMessage {
@@ -115,4 +118,12 @@ message FileUpdateMessage {
     }
 
     required string path = 1;
+}
+
+message RuntimeInfoChangeMessage {
+    extend Message {
+        required RuntimeInfoChangeMessage message = 109;
+    }
+
+    optional string publicIp = 1;
 }
