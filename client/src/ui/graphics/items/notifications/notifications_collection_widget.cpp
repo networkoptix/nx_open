@@ -73,7 +73,7 @@ void QnBlinkingImageButtonWidget::setColor(const QColor &color) {
 
 void QnBlinkingImageButtonWidget::updateParticleGeometry() {
     QRectF rect = this->rect();
-    qreal radius = QnGeometry::length(rect.size()) / 2.0;
+    qreal radius = (rect.width() + rect.height()) / 4.0;
 
     m_particle->setRect(QRectF(rect.center() - QPointF(radius, radius), 2.0 * QSizeF(radius, radius)));
 }
@@ -89,7 +89,7 @@ void QnBlinkingImageButtonWidget::updateToolTip() {
 void QnBlinkingImageButtonWidget::tick(int deltaMSecs) {
     m_time += deltaMSecs;
     
-    m_particle->setOpacity(0.6 + 0.4 * std::sin(m_time / 400.0));
+    m_particle->setOpacity(0.6 + 0.4 * std::sin(m_time / 1000.0 * 2 * M_PI));
 }
 
 
