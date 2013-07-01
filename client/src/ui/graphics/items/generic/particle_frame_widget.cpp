@@ -100,7 +100,7 @@ void QnParticleFrameWidget::setParticleCount(int particleCount) {
     while(particleCount > m_particles.size()) {
         Particle particle;
         particle.item = new QnParticleItem(this);
-        particle.relativePos = random() * 4.0;
+        particle.relativePos = frandom() * 4.0;
 
         regenerateParticle(&particle);
 
@@ -150,8 +150,8 @@ void QnParticleFrameWidget::getParticleSpeed(qreal *absoluteSpeed, qreal *absolu
 }
 
 void QnParticleFrameWidget::regenerateParticle(Particle *particle) const {
-    particle->absoluteSpeed = m_absoluteSpeed + m_absoluteSpeedDeviation * (random() * 2.0 - 1.0);
-    particle->relativeSpeed = m_relativeSpeed + m_relativeSpeedDeviation * (random() * 2.0 - 1.0);
+    particle->absoluteSpeed = m_absoluteSpeed + m_absoluteSpeedDeviation * (frandom() * 2.0 - 1.0);
+    particle->relativeSpeed = m_relativeSpeed + m_relativeSpeedDeviation * (frandom() * 2.0 - 1.0);
     particle->item->setColor(m_color);
     particle->item->setRect(QRectF(-QnGeometry::toPoint(m_size) / 2.0, m_size));
 
