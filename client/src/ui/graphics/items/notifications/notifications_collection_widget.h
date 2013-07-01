@@ -60,6 +60,14 @@ public:
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
 
+    // TODO: #GDM bad practice.
+    // 1. There is not getter, only a setter.
+    // 2. QnBlinkingImageButtonWidget is notification-specific (Sets tooltip to 'You have %n notifications') =>
+    //      it should be named as such.
+    // 3. Locally stored blinker is not owned by this widget, pointer is not protected with QWeakPointer =>
+    //      its lifetime is expected to be correctly externally managed. Not something you can rely on in a big project.
+    // 4. And why add it as a member? This widget should know nothing about
+    //      some button. Just exposing the signals would be enough.
     void setBlinker(QnBlinkingImageButtonWidget* blinker);
 
 signals:
