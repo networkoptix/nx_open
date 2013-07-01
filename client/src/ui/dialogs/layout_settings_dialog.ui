@@ -42,7 +42,17 @@
          <number>0</number>
         </property>
         <widget class="QWidget" name="page">
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+          <item>
+           <widget class="QnFramedLabel" name="imageLabel">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
@@ -266,6 +276,13 @@
   <zorder>backgroundGroupBox</zorder>
   <zorder>generalGroupBox</zorder>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnFramedLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">ui/widgets/framed_label.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>buttonBox</tabstop>
  </tabstops>

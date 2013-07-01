@@ -16,6 +16,7 @@
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/style/globals.h>
+#include <ui/widgets/framed_label.h>
 
 #include <utils/threaded_image_loader.h>
 #include <utils/app_server_image_cache.h>
@@ -24,8 +25,6 @@
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
-    const int labelFrameWidth = 4;  // in pixels
-
     /** Possible states of the dialog contents. */
     enum DialogState {
         /** No image is selected. */
@@ -51,66 +50,7 @@ namespace {
     };
 }
 
-class QnFramedLabel: public QLabel {
-    typedef QLabel base_type;
-public:
-    explicit QnFramedLabel(QWidget* parent = 0):
-        base_type(parent),
-        m_opacityPercent(100)
-    {}
-    ~QnFramedLabel() {}
 
-    QSize size() const {
-        return base_type::size() - QSize(labelFrameWidth*2, labelFrameWidth*2);
-    }
-
-    int opacityPercent() const {
-        return m_opacityPercent;
-    }
-
-    void setOpacityPercent(int value) {
-        if (m_opacityPercent == value)
-            return;
-        m_opacityPercent = value;
-        repaint();
-    }
-
-    void debugSize() {
-        qDebug() << "label resize event received" << size();
-    }
-
-protected:
-    virtual void resizeEvent(QResizeEvent *event) override {
-        debugSize();
-    }
-
-    virtual void paintEvent(QPaintEvent *event) override {
-        bool pixmapExists = pixmap() && !pixmap()->isNull();
-        if (!pixmapExists)
-            base_type::paintEvent(event);
-
-        QPainter painter(this);
-        QRect fullRect = event->rect().adjusted(labelFrameWidth / 2, labelFrameWidth / 2, -labelFrameWidth / 2, -labelFrameWidth / 2);
-
-        if (pixmapExists) {
-            painter.setOpacity(0.01 * m_opacityPercent);
-            QRect pix = pixmap()->rect();
-            int x = fullRect.left() + (fullRect.width() - pix.width()) / 2;
-            int y = fullRect.top() + (fullRect.height() - pix.height()) / 2;
-            painter.drawPixmap(x, y, *pixmap());
-        }
-
-        painter.setOpacity(0.5);
-        QPen pen;
-        pen.setWidth(labelFrameWidth);
-        pen.setColor(QColor(Qt::lightGray));
-        painter.setPen(pen);
-        painter.drawRect(fullRect);
-    }
-
-private:
-    int m_opacityPercent;
-};
 
 class QnLayoutSettingsDialogPrivate
 {
@@ -180,11 +120,9 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    imageLabel = new QnFramedLabel(ui->page);
-    imageLabel->setObjectName(QLatin1String("imageLabel"));
-    imageLabel->setText(tr("<No image>"));
+    imageLabel = ui->imageLabel;
     imageLabel->setAlignment(Qt::AlignCenter);
-    imageLabel->setOpacityPercent(ui->opacitySpinBox->value());
+//    imageLabel->setOpacityPercent(ui->opacitySpinBox->value());
     //imageLabel->setMinimumSize(200, 200);
 
     ui->horizontalLayout->insertWidget(0, imageLabel, 1);
