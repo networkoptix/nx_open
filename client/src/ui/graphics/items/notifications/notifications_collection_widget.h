@@ -16,6 +16,7 @@
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
 class QnNotificationItem;
+class QnParticleItem;
 
 /**
  * An image button widget that displays thumbnail behind the button.
@@ -31,14 +32,19 @@ public:
 public slots:
     void setNotificationCount(int count);
     void setColor(const QColor &color);
+
 protected:
     virtual void tick(int deltaMSecs) override;
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
+
+private slots:
+    void updateParticleGeometry();
+    void updateParticleVisibility();
+    void updateToolTip();
+
 private:
-    bool m_blinking;
-    bool m_blinkUp;
-    qreal m_blinkProgress;
-    QColor m_color;
+    QnParticleItem *m_particle;
+    qint64 m_time;
+    int m_count;
 };
 
 
