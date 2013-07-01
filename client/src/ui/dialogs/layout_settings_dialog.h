@@ -12,6 +12,7 @@ namespace Ui {
 
 class QnFramedLabel;
 class QnAppServerImageCache;
+class QnLayoutSettingsDialogPrivate;
 
 class QnLayoutSettingsDialog : public QDialog
 {
@@ -28,7 +29,6 @@ public:
 protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
-
     virtual bool eventFilter(QObject *target, QEvent *event) override;
 private slots:
     void at_clearButton_clicked();
@@ -41,34 +41,27 @@ private slots:
     void setPreview(const QImage& image);
     void setProgress(bool value);
 
-    void updateCache(bool local);
-
     void updateControls();
 
     void viewFile();
 
     void selectFile();
-
-    void updatePreviewImageLabel();
 private:
     qreal screenAspectRatio() const;
 
     bool hasChanges(const QnLayoutResourcePtr &layout);
 
     void loadPreview();
+
+    Q_DECLARE_PRIVATE(QnLayoutSettingsDialog)
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
+    QnLayoutSettingsDialogPrivate *const d_ptr;
+
     QnAppServerImageCache *m_cache;
     QnFramedLabel* imageLabel;
 
-    QString m_cachedFilename;
-    QString m_newFilePath;
-
-    QImage m_previewImage;
-    QImage m_previewCropped;
-
-    qreal m_cellAspectRatio;
-    bool m_newImageLoaded;
+    bool m_isUpdating;
 };
 
 #endif // LAYOUT_SETTINGS_DIALOG_H
