@@ -14,4 +14,10 @@ if [[ -z $buildlib ]]; then
     cp -P `find $QTDIR -iname 'libQt'"$i"'.so*'` ${libdir}/build/bin/release  
   done
 
+  for i in ${qtplugin1} ${qtplugin2}
+  do
+    cp -Rf `find $QTDIR/qt4/plugins -iname $i` ${libdir}/bin/debug/
+    cp -Rf `find $QTDIR/qt4/plugins -iname $i` ${libdir}/bin/release/
+  done
+
 fi
