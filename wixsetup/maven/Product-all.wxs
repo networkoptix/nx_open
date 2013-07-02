@@ -30,8 +30,10 @@
 
         <?if ${build.configuration} = debug ?>
         <?define suffix = "d" ?>
+		<?define vmaxsuffix = "dd" ?>
         <?else?>
         <?define suffix = "" ?>
+		<?define vmaxsuffix = "r" ?>
         <?endif?>
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
@@ -1071,7 +1073,7 @@
 
         <ComponentGroup Id="VmaxProxySDK" Directory="${installer.customization}VmaxDir">
         	<Component>
-            	<File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_stream_source_mr.dll"/>
+            	<File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll"/>
         	</Component>
         	<Component>
             	<File Id="VmaxProxyPid.dat" Name="pid.dat" Source="${libdir}/bin/${build.configuration}/vmaxproxy/pid.dat"/>
