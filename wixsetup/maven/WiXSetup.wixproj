@@ -30,15 +30,10 @@
     <StartAction>Project</StartAction>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AdvancedTypeDlg.wxs" />
-    <Compile Include="AlreadyInstalledErrorDlg.wxs" />
     <Compile Include="AppServerDlg.wxs" />
-    <Compile Include="AppServerFiles.wxs" />
     <Compile Include="ClientDlg.wxs" />
     <Compile Include="ControlPanel.wxi" />
     <Compile Include="DowngradeWarningDlg.wxs" />
-    <Compile Include="FeaturesDlg.wxs" />
-    <Compile Include="FileAssociations.wxs" />
     <Compile Include="InstallTypeDlg.wxs" />
     <Compile Include="InvalidPasswordDlg.wxs" />
     <Compile Include="MyFeaturesDlg.wxs" />
@@ -48,7 +43,6 @@
     <Compile Include="PortIsBusyDlg.wxs" />
     <Compile Include="Product-all.wxs" />
     <Compile Include="Product-client.wxs" />
-    <Compile Include="Product.wxs" />
     <Compile Include="SelectionWarning.wxs" />
     <Compile Include="UninstallOptionsDlg.wxs" />
     <Compile Include="UpgradeDlg.wxs" />
@@ -66,9 +60,6 @@
       <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
       <Name>WixUIExtension</Name>
     </WixExtension>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="genassoc.py" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--

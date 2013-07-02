@@ -312,7 +312,7 @@ QString QnBusinessStringsHelper::formatEmailList(const QStringList& value) {
     {
         if (i > 0)
             result.append(L' ');
-        result.append(QString(QLatin1String("<%1>")).arg(value[i].trimmed()));
+        result.append(QString(QLatin1String("%1")).arg(value[i].trimmed()));
     }
     return result;
 }
