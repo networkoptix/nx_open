@@ -453,7 +453,7 @@
 								</configuration>
 							</execution>
 
-							<execution>
+<!--							<execution>
 								<id>prepare-deb</id>
 								<phase>prepare-package</phase>
 								<goals>
@@ -464,7 +464,7 @@
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<skip>${assembly-skip}</skip>
 								</configuration>
-							</execution>
+							</execution>-->
 						</executions>
 					</plugin>
 
