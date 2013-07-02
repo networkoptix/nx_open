@@ -234,7 +234,8 @@ void QnCameraAdditionDialog::updateSubnetMode() {
     ui->cameraIpLineEdit->setVisible(!m_subnetMode);
 
     if (m_subnetMode){
-        QHostAddress startAddr(ui->cameraIpLineEdit->text());
+        ui->startIPLineEdit->setText(ui->cameraIpLineEdit->text());
+        QHostAddress startAddr(ui->startIPLineEdit->text());
         if (startAddr.toIPv4Address()) {
             ui->startIPLineEdit->setText(startAddr.toString());
 
@@ -248,13 +249,16 @@ void QnCameraAdditionDialog::updateSubnetMode() {
         } else {
             ui->startIPLineEdit->setFocus();
         }
-    } else
+    } else {
+        ui->cameraIpLineEdit->setText(ui->startIPLineEdit->text());
         ui->cameraIpLineEdit->setFocus();
+    }
 }
 
 bool QnCameraAdditionDialog::ensureServerOnline() {
     if (m_server && m_server->getStatus() != QnResource::Offline)
         return true;
+
 
     QMessageBox::critical(this,
                           tr("Error"),
