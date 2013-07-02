@@ -582,7 +582,6 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painte
     return m_renderStatus;
 }
 
-// TODO: #GDM this method draws background only, why 'drawStatistics'?
 void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painter) {
     qreal width = rect.width();
     qreal height = rect.height();
