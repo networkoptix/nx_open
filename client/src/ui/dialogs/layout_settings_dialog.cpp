@@ -120,15 +120,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    imageLabel = ui->imageLabel;
-    imageLabel->setAlignment(Qt::AlignCenter);
-//    imageLabel->setOpacityPercent(ui->opacitySpinBox->value());
-    //imageLabel->setMinimumSize(200, 200);
-
-    ui->horizontalLayout->insertWidget(0, imageLabel, 1);
-    qDebug() << "onCreate label size" << imageLabel->size();
-
-    imageLabel->installEventFilter(this);
+    ui->imageLabel->installEventFilter(this);
 
     ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
     ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
@@ -148,23 +140,9 @@ QnLayoutSettingsDialog::~QnLayoutSettingsDialog()
 {
 }
 
-void QnLayoutSettingsDialog::showEvent(QShowEvent *event) {
-    base_type::showEvent(event);
-    qDebug() << "show event received" << this->isVisible();
-  //  loadPreview();
- //   updateControls();
-}
-
-void QnLayoutSettingsDialog::resizeEvent(QResizeEvent *event) {
-    Q_UNUSED(event)
-    Q_D(const QnLayoutSettingsDialog);
-
-    qDebug() << "resize event received, state" << d->state << this->isVisible();
-}
-
 bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
     Q_D(const QnLayoutSettingsDialog);
-    if (target == imageLabel &&
+    if (target == ui->imageLabel &&
             event->type() == QEvent::MouseButtonRelease) {
         if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == Error) )
             selectFile();
@@ -190,7 +168,6 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
         d->imageSourcePath = m_cache->getFullPath(d->imageFilename);
         d->state = ImageDownloading;
         m_cache->downloadFile(d->imageFilename);
-        qDebug() << "download started" << this->isVisible();
 
         ui->widthSpinBox->setValue(layout->backgroundSize().width());
         ui->heightSpinBox->setValue(layout->backgroundSize().height());
@@ -274,17 +251,15 @@ void QnLayoutSettingsDialog::updateControls() {
         QString text = d->state != Error
                 ? tr("<No image>")
                 : d->errorText;
-        qDebug() << "update controls, set text" << text;
-        imageLabel->setPixmap(QPixmap());
-        imageLabel->setText(d->state != Error
+        ui->imageLabel->setPixmap(QPixmap());
+        ui->imageLabel->setText(d->state != Error
                             ? tr("<No image>")
                             : d->errorText);
     } else {
         image = (d->canChangeAspectRatio() && ui->cropToMonitorCheckBox->isChecked())
                 ? d->croppedPreview
                 : d->preview;
-        qDebug() << "update controls, set image" << image.size() << this->isVisible();
-        imageLabel->setPixmap(QPixmap::fromImage(image));
+        ui->imageLabel->setPixmap(QPixmap::fromImage(image.scaled(ui->imageLabel->size(), Qt::KeepAspectRatio, Qt::FastTransformation)));
     }
 
     // TODO: #GDM do not change if values were changed manually?
@@ -358,13 +333,12 @@ void QnLayoutSettingsDialog::at_accepted() {
 }
 
 void QnLayoutSettingsDialog::at_opacitySpinBox_valueChanged(int value) {
-    imageLabel->setOpacityPercent(value);
+    ui->imageLabel->setOpacityPercent(value);
 }
 
 void QnLayoutSettingsDialog::at_imageLoaded(const QString &filename, bool ok) {
     Q_D(QnLayoutSettingsDialog);
 
-    qDebug() << "image loaded" << this->isVisible();
     if (m_cache->getFullPath(filename) != d->imageSourcePath)
         return;
     d->state = ImageDownloaded;
@@ -401,11 +375,10 @@ void QnLayoutSettingsDialog::loadPreview() {
     if (!d->imageFileIsAvailable() || d->imageIsLoading())
         return;
 
-    qDebug() << "started image loading" << imageLabel->size()  << this->isVisible();
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(d->imageSourcePath);
     loader->setTransformationMode(Qt::FastTransformation);
-    loader->setSize(imageLabel->size());
+    loader->setSize(ui->imageLabel->size());
     loader->setFlags(Qn::TouchSizeFromOutside);
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
     loader->start();
@@ -480,8 +453,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
         d->state = ImageLoaded;
     else if (d->state = NewImageLoading)
         d->state = NewImageLoaded;
-    qDebug() << "set preview" << imageLabel->size() << this->isVisible() << image.size();
-    d->preview = image.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::FastTransformation);
+    d->preview = image;
 
     /* Disable cropping for images that are quite well aspected. */
     qreal imageAspectRatio = (qreal)image.width() / (qreal)image.height();

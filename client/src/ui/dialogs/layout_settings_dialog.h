@@ -10,7 +10,6 @@ namespace Ui {
     class QnLayoutSettingsDialog;
 }
 
-class QnFramedLabel;
 class QnAppServerImageCache;
 class QnLayoutSettingsDialogPrivate;
 
@@ -27,8 +26,6 @@ public:
     bool submitToResource(const QnLayoutResourcePtr &layout);
 
 protected:
-    virtual void showEvent(QShowEvent *event) override;
-    virtual void resizeEvent(QResizeEvent *event) override;
     virtual bool eventFilter(QObject *target, QEvent *event) override;
 private slots:
     void at_clearButton_clicked();
@@ -59,7 +56,6 @@ private:
     QnLayoutSettingsDialogPrivate *const d_ptr;
 
     QnAppServerImageCache *m_cache;
-    QnFramedLabel* imageLabel;
 
     bool m_isUpdating;
 };
