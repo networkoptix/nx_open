@@ -45,6 +45,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     connect(ui->gridLicenses->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),   this,   SLOT(at_gridLicenses_currentChanged()));
     connect(ui->gridLicenses,                   SIGNAL(doubleClicked(const QModelIndex &)),                         this,   SLOT(at_gridLicenses_doubleClicked(const QModelIndex &)));
     connect(ui->licenseWidget,                  SIGNAL(stateChanged()),                                             this,   SLOT(at_licenseWidget_stateChanged()));
+    connect(this,                               SIGNAL(showMessageLater(QString,QString,bool)),                     this,   SLOT(showMessage(QString,QString,bool)), Qt::QueuedConnection);
 
     updateLicenses();
     at_gridLicenses_currentChanged();
@@ -113,11 +114,18 @@ void QnLicenseManagerWidget::updateLicenses() {
     ui->infoLabel->setPalette(palette);
 }
 
+void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message, bool warning) {
+    if (warning)
+        QMessageBox::warning(this, title, message);
+    else
+        QMessageBox::information(this, title, message);
+}
+
 void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, const QString &hardwareId1, const QString &oldHardwareId, const QString &hardwareId2) {
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
-    QUrl url(QLatin1String(QN_LICENSE_URL));
+    QUrl url(QLatin1String("http://networkoptix.com/nolicensed_vms/activate2.php"));
     QNetworkRequest request;
     request.setUrl(url);
 
@@ -164,8 +172,10 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     }
 
     if (!keyLicense) {
-        QMessageBox::warning(this, tr("License Activation"),
-            tr("Invalid License. Contact our support team to get a valid License."));
+        /* QNetworkReply slots should not start eventLoop */
+        emit showMessageLater(tr("License Activation"),
+                              tr("Invalid License. Contact our support team to get a valid License."),
+                              true);
     }
 }
 
@@ -214,17 +224,17 @@ void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licen
 
 void QnLicenseManagerWidget::at_downloadError() {
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
-        disconnect(reply, SIGNAL(finished()), this, SLOT(at_downloadFinished()));
-
-        QMessageBox::warning(this, tr("License Activation"),
-            tr("Network error has occurred during the Automatic License Activation.\nTry to activate your License manually."));
-
-        ui->licenseWidget->setOnline(false);
-
+        disconnect(reply, 0, this, 0); //avoid double "onError" handling
         m_replyKeyMap.remove(reply);
         reply->deleteLater();
-    }
 
+        /* QNetworkReply slots should not start eventLoop */
+        emit showMessageLater(tr("License Activation"),
+                              tr("Network error has occurred during the Automatic License Activation.\nTry to activate your License manually."),
+                              true);
+
+        ui->licenseWidget->setOnline(false);
+    }
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
