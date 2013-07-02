@@ -19,9 +19,10 @@ BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 
 CLIENT_BIN_PATH=${libdir}/bin/${build.configuration}
-CLIENT_HELP_PATH=${libdir}/bin/${build.configuration}/help
+CLIENT_HELP_PATH=${libdir}/bin/help
 CLIENT_STYLES_PATH=$CLIENT_BIN_PATH/styles
 CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
+CLIENT_SQLDRIVERS_PATH=$CLIENT_BIN_PATH/sqldrivers
 CLIENT_LIB_PATH=${libdir}/build/bin/${build.configuration}
 
 . $CLIENT_BIN_PATH/env.sh
@@ -39,6 +40,7 @@ cp -r $CLIENT_BIN_PATH/client-bin $BINSTAGE/${parsedVersion.majorVersion}.${pars
 cp -r $CLIENT_BIN_PATH/applauncher-bin $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.4
+cp -r $CLIENT_BIN_PATH/vox $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 cp -r ${project.build.directory}/1.4/bin/client-bin $BINSTAGE/1.4
 cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.4
 cp -r ${project.build.directory}/bin/applauncher* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
@@ -59,6 +61,7 @@ cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVe
 cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/1.4/styles
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/imageformats
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.4/imageformats
+cp -r $CLIENT_SQLDRIVERS_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/sqldrivers
 
 for f in `find $LIBSTAGE -type f` `find $BINSTAGE/**/styles -type f` $BINSTAGE/**/client-bin
 do

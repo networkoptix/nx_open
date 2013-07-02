@@ -126,6 +126,7 @@ private slots:
     void onFindAppServerButtonClicked();
     void onAppServerUrlHistoryComboBoxCurrentChanged( int index );
     void onRadioButtonPublicIpChanged();
+    void onRadioButtonEcsPublicIpChanged();
 
     void at_appServerPassword_textChanged(const QString &text);
 private:

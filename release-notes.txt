@@ -8,6 +8,7 @@ Since 1.5.1
  - Improved advanced camera settings management (since 1.4)
  - ACTI cameras with old firmwares (T series < 4.13, K series < 5.08 and A1 series < 6.03) work now 
  - Vivotek cameras CC8130, FD8136, FD8361, FD8362E
+ - If restore item for the fulloscreen, resolution hasn't been changed to low
 
 Since previous build
  
@@ -23,6 +24,13 @@ Since previous build
  - Analog license activation warning is not resized. Fixed
  - Preview search. The first item doesn't play. Fixed
  - Fixed the banding of gamma correction while exporting
+ - Cannot change layout with background. Fixed
+ - Bug #2131.Invalid error message when adding a camera to preview search layout. Fixed
+ - Change 45 days for 30!!!!
+ - Bug #2074. Centralize the slider position.
+ - Bug #2073Set "second stream quality" parameters when release "Do not control media stream"
+ - Bug #2072.Add warning message when copying paarameters, if one or more cameras aren't dual-stream cameras.
+ - All settings from admin interface has been hidden.
  
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 

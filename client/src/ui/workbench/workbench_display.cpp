@@ -50,7 +50,6 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/splash_item.h>
-#include <ui/graphics/items/generic/particle_frame_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
 #include <ui/graphics/items/grid/grid_raised_cone_item.h>

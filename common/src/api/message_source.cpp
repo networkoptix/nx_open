@@ -181,7 +181,7 @@ void QnMessageSource::httpReadyRead()
         if (!event.load(parsed))
             continue;
 
-        if (event.eventType == Qn::Message_Type_Initial)
+        if (event.messageType == Qn::Message_Type_Initial)
         {
             if (m_seqNumber == 0)
             {
@@ -198,7 +198,7 @@ void QnMessageSource::httpReadyRead()
             }
 
             emit connectionOpened(event);
-        } else if (event.eventType != Qn::Message_Type_Ping)
+        } else if (event.messageType != Qn::Message_Type_Ping)
         {
             emit messageReceived(event);
         }

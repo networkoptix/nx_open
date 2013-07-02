@@ -804,7 +804,12 @@ void QnResource::setDisabled(bool disabled)
 
 void QnResource::init()
 {
-    QMutexLocker lock(&m_initMutex);
+    if (m_appStopping)
+        return;
+
+    if (!m_initMutex.tryLock())
+        return; // if init already running, skip new request
+
     if (!m_initialized) 
     {
         m_initialized = initInternal();
@@ -813,6 +818,7 @@ void QnResource::init()
         if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
             setStatus(Offline);
     }
+    m_initMutex.unlock();
 }
 
 void QnResource::initAndEmit()

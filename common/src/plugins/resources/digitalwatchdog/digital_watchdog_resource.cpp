@@ -33,6 +33,9 @@ QnPlWatchDogResource::~QnPlWatchDogResource()
 
 bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
 {
+    if (m_appStopping)
+        return false;
+
     CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
     if (status == CL_HTTP_SUCCESS) 
@@ -69,6 +72,9 @@ bool QnPlWatchDogResource::initInternal()
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false) 
     {
+        if (m_appStopping)
+            return false;
+
         // The camera most likely is going to reset after enabling dual streaming
         enableOnvifSecondStream();
         return false;
@@ -250,6 +256,10 @@ bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant
     foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
     {
         //If param is not in list of child, it will return false. Then will try to find it in parent.
+
+        if (m_appStopping)
+            return false;
+
         if (setting->setParamPhysical(param, val))
         {
             return true;

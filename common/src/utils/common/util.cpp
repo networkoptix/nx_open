@@ -249,6 +249,8 @@ int random(int min, int max) {
     return min + static_cast<int>(static_cast<qint64>(max - min) * qrand() / (static_cast<qint64>(RAND_MAX) + 1));
 }
 
-qreal random() {
+qreal frandom() {
     return qrand() / (RAND_MAX + 1.0);
 }
+
+
