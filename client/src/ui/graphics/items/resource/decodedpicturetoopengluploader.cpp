@@ -722,7 +722,7 @@ public:
         }
 
         ImageCorrectionParams imCor = m_uploader->getImageCorrection();
-        m_pictureBuf->processImage(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
+        pictureBuf->processImage(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
 
 #ifdef GL_COPY_AGGREGATION
         if( !m_uploader->uploadDataToGlWithAggregation(
