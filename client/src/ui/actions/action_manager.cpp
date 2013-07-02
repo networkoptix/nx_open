@@ -630,7 +630,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(Qn::PreferencesServerTabAction).
-        flags(Qn::Main | Qn::Tree).
+        flags(Qn::Tree).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Backup Database...")).
         autoRepeat(false).
