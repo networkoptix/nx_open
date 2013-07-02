@@ -35,7 +35,7 @@
      <property name="title">
       <string>Background</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,0">
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
         <property name="currentIndex">
@@ -224,7 +224,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="opacityLabel">
           <property name="text">
            <string>&amp;Opacity:</string>
@@ -234,7 +234,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="3" column="1">
          <widget class="QSpinBox" name="opacitySpinBox">
           <property name="correctionMode">
            <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
@@ -253,6 +253,16 @@
           </property>
           <property name="value">
            <number>70</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QCheckBox" name="keepAspectRatioCheckBox">
+          <property name="text">
+           <string>Keep aspect ratio</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

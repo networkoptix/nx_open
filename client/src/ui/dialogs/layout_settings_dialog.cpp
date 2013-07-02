@@ -125,13 +125,16 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
     ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
 
-    connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(viewFile()));
-    connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(selectFile()));
-    connect(ui->clearButton,    SIGNAL(clicked()), this, SLOT(at_clearButton_clicked()));
-    connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
-    connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
-    connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(at_opacitySpinBox_valueChanged(int)));
-    connect(ui->cropToMonitorCheckBox, SIGNAL(toggled(bool)), this, SLOT(updateControls()));
+    connect(ui->viewButton,                 SIGNAL(clicked()),          this, SLOT(viewFile()));
+    connect(ui->selectButton,               SIGNAL(clicked()),          this, SLOT(selectFile()));
+    connect(ui->clearButton,                SIGNAL(clicked()),          this, SLOT(at_clearButton_clicked()));
+    connect(ui->lockedCheckBox,             SIGNAL(clicked()),          this, SLOT(updateControls()));
+    connect(ui->buttonBox,                  SIGNAL(accepted()),         this, SLOT(at_accepted()));
+    connect(ui->opacitySpinBox,             SIGNAL(valueChanged(int)),  this, SLOT(at_opacitySpinBox_valueChanged(int)));
+    connect(ui->widthSpinBox,               SIGNAL(valueChanged(int)),  this, SLOT(at_widthSpinBox_valueChanged(int)));
+    connect(ui->heightSpinBox,              SIGNAL(valueChanged(int)),  this, SLOT(at_heightSpinBox_valueChanged(int)));
+    connect(ui->cropToMonitorCheckBox,      SIGNAL(toggled(bool)),      this, SLOT(updateControls()));
+    connect(ui->keepAspectRatioCheckBox,    SIGNAL(toggled(bool)),      this, SLOT(updateControls()));
 
     updateControls();
 }
@@ -169,9 +172,12 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
         d->state = ImageDownloading;
         m_cache->downloadFile(d->imageFilename);
 
+        ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
+        ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
         ui->widthSpinBox->setValue(layout->backgroundSize().width());
         ui->heightSpinBox->setValue(layout->backgroundSize().height());
         ui->opacitySpinBox->setValue(layout->backgroundOpacity() * 100);
+        ui->keepAspectRatioCheckBox->setChecked(false);
     }
     ui->lockedCheckBox->setChecked(layout->locked());
 
@@ -201,6 +207,19 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
 qreal QnLayoutSettingsDialog::screenAspectRatio() const {
     QRect screen = qApp->desktop()->screenGeometry();
     return (qreal)screen.width() / (qreal)screen.height();
+}
+
+qreal QnLayoutSettingsDialog::bestAspectRatioForCells() const {
+    Q_D(const QnLayoutSettingsDialog);
+    if (d->state != ImageLoaded && d->state != NewImageLoaded)
+        return -1;
+    QImage image = (d->canChangeAspectRatio() && ui->cropToMonitorCheckBox->isChecked())
+            ? d->croppedPreview
+            : d->preview;
+    if (image.isNull())
+        return -2;
+    qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
+    return aspectRatio / d->cellAspectRatio;
 }
 
 bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
@@ -237,6 +256,7 @@ void QnLayoutSettingsDialog::updateControls() {
 
     ui->widthSpinBox->setEnabled(imagePresent && !locked);
     ui->heightSpinBox->setEnabled(imagePresent && !locked);
+    ui->keepAspectRatioCheckBox->setEnabled(imagePresent && !locked);
     ui->viewButton->setEnabled(imagePresent);
     ui->clearButton->setEnabled(imagePresent && !locked);
     ui->opacitySpinBox->setEnabled(imagePresent && !locked);
@@ -248,9 +268,6 @@ void QnLayoutSettingsDialog::updateControls() {
 
     QImage image;
     if (!imagePresent) {
-        QString text = d->state != Error
-                ? tr("<No image>")
-                : d->errorText;
         ui->imageLabel->setPixmap(QPixmap());
         ui->imageLabel->setText(d->state != Error
                             ? tr("<No image>")
@@ -262,12 +279,10 @@ void QnLayoutSettingsDialog::updateControls() {
         ui->imageLabel->setPixmap(QPixmap::fromImage(image.scaled(ui->imageLabel->size(), Qt::KeepAspectRatio, Qt::FastTransformation)));
     }
 
+    qreal targetAspectRatio = bestAspectRatioForCells();
     // TODO: #GDM do not change if values were changed manually?
-    if (!image.isNull() && d->state == NewImageLoaded) {
-        qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
-
+    if (ui->keepAspectRatioCheckBox->isChecked() && targetAspectRatio > 0) {
         int w, h;
-        qreal targetAspectRatio = aspectRatio / d->cellAspectRatio;
         if (targetAspectRatio >= 1.0) { // width is greater than height
             w = qnGlobals->layoutBackgroundMaxSize().width();
             h = qRound((qreal)w / targetAspectRatio);
@@ -275,6 +290,8 @@ void QnLayoutSettingsDialog::updateControls() {
             h = qnGlobals->layoutBackgroundMaxSize().height();
             w = qRound((qreal)h * targetAspectRatio);
         }
+        ui->widthSpinBox->setMaximum(w);
+        ui->heightSpinBox->setMaximum(h);
 
         // limit w*h <= recommended area; minor variations are allowed, e.g. 17*6 ~~= 100;
         qreal areaCoef = qSqrt((qreal)w * h / qnGlobals->layoutBackgroundRecommendedArea());
@@ -284,6 +301,9 @@ void QnLayoutSettingsDialog::updateControls() {
         }
         ui->widthSpinBox->setValue(w);
         ui->heightSpinBox->setValue(h);
+    } else {
+        ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
+        ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
     }
 
 }
@@ -335,6 +355,37 @@ void QnLayoutSettingsDialog::at_accepted() {
 void QnLayoutSettingsDialog::at_opacitySpinBox_valueChanged(int value) {
     ui->imageLabel->setOpacityPercent(value);
 }
+
+void QnLayoutSettingsDialog::at_widthSpinBox_valueChanged(int value) {
+    if (!ui->keepAspectRatioCheckBox->isChecked())
+        return;
+    if (m_isUpdating)
+        return;
+    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
+    Q_UNUSED(guard)
+
+    qreal targetAspectRatio = bestAspectRatioForCells();
+    if (targetAspectRatio < 0)
+        return;
+    int h = qRound((qreal)value / targetAspectRatio);
+    ui->heightSpinBox->setValue(h);
+}
+
+void QnLayoutSettingsDialog::at_heightSpinBox_valueChanged(int value) {
+    if (!ui->keepAspectRatioCheckBox->isChecked())
+        return;
+    if (m_isUpdating)
+        return;
+    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
+    Q_UNUSED(guard)
+
+    qreal targetAspectRatio = bestAspectRatioForCells();
+    if (targetAspectRatio < 0)
+        return;
+    int w = qRound((qreal)value * targetAspectRatio);
+    ui->widthSpinBox->setValue(w);
+}
+
 
 void QnLayoutSettingsDialog::at_imageLoaded(const QString &filename, bool ok) {
     Q_D(QnLayoutSettingsDialog);
@@ -459,6 +510,8 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     qreal imageAspectRatio = (qreal)image.width() / (qreal)image.height();
     if (qAbs(imageAspectRatio - screenAspectRatio()) > 0.05)
         d->croppedPreview = cropImageToAspectRatio(image, screenAspectRatio());
+
+    ui->keepAspectRatioCheckBox->setChecked(d->state == NewImageLoaded);
 
     updateControls();
 }

@@ -31,6 +31,8 @@ private slots:
     void at_clearButton_clicked();
     void at_accepted();
     void at_opacitySpinBox_valueChanged(int value);
+    void at_widthSpinBox_valueChanged(int value);
+    void at_heightSpinBox_valueChanged(int value);
 
     void at_imageLoaded(const QString& filename, bool ok);
     void at_imageStored(const QString& filename, bool ok);
@@ -44,7 +46,13 @@ private slots:
 
     void selectFile();
 private:
+    /** Aspect ratio of the current screen. */
     qreal screenAspectRatio() const;
+
+    /** Aspect ratio that is optimal for cells to best fit the current image.
+      * Returns negative value if image is not available.
+      */
+    qreal bestAspectRatioForCells() const;
 
     bool hasChanges(const QnLayoutResourcePtr &layout);
 
