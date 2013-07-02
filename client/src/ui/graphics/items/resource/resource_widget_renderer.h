@@ -11,7 +11,7 @@
 #include <camera/abstract_renderer.h>
 #include "utils/color_space/image_correction.h"
 #include "core/resource/resource_media_layout.h"
-
+#include "ui/fisheye/fisheye_ptz_processor.h"
 
 class QThread;
 class QGLContext;
@@ -79,6 +79,7 @@ public:
     bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
 
     void setImageCorrection(const ImageCorrectionParams& value);
+    void setFisheyeController(QnFisheyePtzController* controller);
 
     void setDisplayedRect(int channel, const QRectF& rect);
 

@@ -23,6 +23,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/common/geometry.h>
+#include "ui/fisheye/fisheye_ptz_processor.h"
 
 #include "video_camera.h"
 
@@ -97,17 +98,11 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_paused(false),
     m_screenshotInterface(0),
     m_histogramConsumer(0),
+    m_fisheyeController(0)
 
-    //m_extraMin(-19),
-    //m_extraMax(19)
-    m_extraMin(-PI/4.0),
-    m_extraMax(PI/4.0) // rotation range
-    //m_extraMin(PI/4.0),
-    //m_extraMax(PI/2.0) // rotation range
+    //m_extraMin(-PI/4.0),
+    //m_extraMax(PI/4.0) // rotation range
 {
-    m_extraCurValue = m_extraMin;
-    m_extraStep = (m_extraMax - m_extraMin) / 150;
-
     Q_ASSERT( context );
 
     applyMixerSettings( m_brightness, m_contrast, m_hue, m_saturation );
@@ -323,18 +318,10 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setVTexture( 2 );
     shader->setOpacity(m_decodedPictureProvider.opacity());
 
-    if (m_extraCurValue >= m_extraMax) {
-        m_extraStep = - fabs(m_extraStep);
+    if (m_fisheyeController) {
+        m_fisheyeController->setAspectRatio(picLock->width()/(float)picLock->height());
+        shader->setDevorpingParams(m_fisheyeController->getDevorpingParams());
     }
-    else if (m_extraCurValue <= m_extraMin) {
-        m_extraStep = fabs(m_extraStep);
-    }
-    m_extraCurValue += m_extraStep;
-    shader->setXShift(m_extraCurValue);
-    shader->setYShift(18.0 * (PI/180.0));
-    shader->setPerspShift(18.0 * (PI/180.0));
-    shader->setDstFov(PI/2.0);
-    shader->setAspectRatio(picLock->width()/(float)picLock->height());
     //shader->setDstFov(m_extraCurValue);
     //qDebug() << "m_extraCurValue" << m_extraCurValue;
 
@@ -547,4 +534,9 @@ void QnGLRenderer::setDisplayedRect(const QRectF& rect)
 void QnGLRenderer::setHistogramConsumer(QnHistogramConsumer* value) 
 { 
     m_histogramConsumer = value; 
+}
+
+void QnGLRenderer::setFisheyeController(QnFisheyePtzController* controller)
+{
+    m_fisheyeController = controller;
 }

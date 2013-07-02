@@ -264,6 +264,12 @@ const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
     return m_scheduleTasks;
 }
 
+bool QnSecurityCamResource::hasFisheye() const
+{
+    return true;
+}
+
+
 bool QnSecurityCamResource::hasDualStreaming() const
 {
     if (!hasParam(lit("hasDualStreaming")))

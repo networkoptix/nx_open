@@ -64,7 +64,7 @@ private slots:
     void at_display_resourceAdded(const QnResourcePtr &resource);
     void at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource);
     void at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &resource);
-    void at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &camera);
+    void at_ptzController_positionChanged(const QnMediaResourceWidget* widget);
 
     void at_splashItem_destroyed();
 

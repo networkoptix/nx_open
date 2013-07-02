@@ -15,10 +15,10 @@
 #include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 
-
 class CLVideoDecoderOutput;
 class ScreenshotInterface;
 class QnHistogramConsumer;
+class QnFisheyePtzController;
 
 class QnGLRenderer
 :
@@ -49,6 +49,8 @@ public:
     bool isNV12ToRgbShaderUsed() const;
 
     void setImageCorrectionParams(const ImageCorrectionParams& params) { m_imgCorrectParam = params; }
+    //void setDevorpingParams(const DevorpingParams& params) { m_devorpingParams = params; }
+    void setFisheyeController(QnFisheyePtzController* controller);
     ImageCorrectionParams getImageCorrectionParams() const { return m_imgCorrectParam; }
     
     void setPaused(bool value) { m_paused = value; }
@@ -80,14 +82,11 @@ private:
     ScreenshotInterface* m_screenshotInterface;
     ImageCorrectionResult m_imageCorrector;
     ImageCorrectionParams m_imgCorrectParam;
+    //DevorpingParams m_devorpingParams;
+    QnFisheyePtzController* m_fisheyeController;
     QRectF m_displayedRect;
     QnHistogramConsumer* m_histogramConsumer;
     
-    float m_extraMin;
-    float m_extraMax;
-    float m_extraStep;
-    float m_extraCurValue;
-
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen
     void drawVideoTextureDirectly(

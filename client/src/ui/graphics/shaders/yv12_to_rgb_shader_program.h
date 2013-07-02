@@ -5,6 +5,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtOpenGL/QtOpenGL>
 #include "shader_source.h"
+#include "ui/fisheye/fisheye_ptz_processor.h"
 
 class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram
 {
@@ -23,6 +24,17 @@ public:
 
     void setOpacity(GLfloat opacity) {
         setUniformValue(m_opacityLocation, opacity);
+    }
+
+    // devorping
+
+    void setDevorpingParams(const DevorpingParams& params)
+    {
+        setXShift(params.xAngle);
+        setYShift(params.yAngle);
+        setPerspShift(params.pAngle);
+        setDstFov(params.fov);
+        setAspectRatio(params.aspectRatio);
     }
 
     void setXShift(GLfloat angle) {

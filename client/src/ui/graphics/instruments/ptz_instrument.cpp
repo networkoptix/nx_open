@@ -451,7 +451,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
 {
-    connect(m_ptzController, SIGNAL(positionChanged(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &)));
+    connect(m_ptzController, SIGNAL(positionChanged(const QnMediaResourceWidget*)), this, SLOT(at_ptzController_positionChanged(const QnMediaResourceWidget*)));
     connect(m_mapperWatcher, SIGNAL(mapperChanged(const QnVirtualCameraResourcePtr &)), this, SLOT(at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &)));
     connect(display(), SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_display_resourceAdded(const QnResourcePtr &)));
     connect(display(), SIGNAL(resourceAboutToBeRemoved(const QnResourcePtr &)), this, SLOT(at_display_resourceAboutToBeRemoved(const QnResourcePtr &)));
@@ -581,9 +581,9 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
     if(!mapper)
         return;
 
-    QVector3D oldPhysicalPosition = m_ptzController->physicalPosition(camera);
+    QVector3D oldPhysicalPosition = m_ptzController->physicalPosition(widget);
     if(qIsNaN(oldPhysicalPosition)) {
-        m_ptzController->setMovement(camera, QVector3D());
+        m_ptzController->setMovement(widget, QVector3D());
 
         PtzData &data = m_dataByWidget[widget];
         data.pendingAbsoluteMove = rect;
@@ -609,7 +609,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
 
     TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
 
-    m_ptzController->setPhysicalPosition(camera, newPhysicalPosition);
+    m_ptzController->setPhysicalPosition(widget, newPhysicalPosition);
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
@@ -619,9 +619,7 @@ void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
 }
 
 void PtzInstrument::ptzUpdate(QnMediaResourceWidget *widget) {
-    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-
-    m_ptzController->updatePosition(camera);
+    m_ptzController->updatePosition(widget);
 }
 
 void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant) {
@@ -636,9 +634,7 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &spee
         (data.currentSpeed - data.requestedSpeed).lengthSquared() > instantSpeedUpdateThreshold * instantSpeedUpdateThreshold;
 
     if(instant) {
-        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-
-        m_ptzController->setMovement(camera, data.requestedSpeed);
+        m_ptzController->setMovement(widget, data.requestedSpeed);
         data.currentSpeed = data.requestedSpeed;
         data.pendingAbsoluteMove = QRectF();
 
@@ -725,7 +721,7 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
 
             PtzData &data = m_dataByWidget[widget];
-            data.currentSpeed = data.requestedSpeed = m_ptzController->movement(camera);
+            data.currentSpeed = data.requestedSpeed = m_ptzController->movement(widget);
 
             updateCapabilities(widget);
             updateOverlayWidget(widget);
@@ -968,8 +964,8 @@ void PtzInstrument::at_display_resourceAboutToBeRemoved(const QnResourcePtr &res
         disconnect(camera, NULL, this, NULL);
 }
 
-void PtzInstrument::at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &camera) {
-    if(!target() || target()->resource() != camera)
+void PtzInstrument::at_ptzController_positionChanged(const QnMediaResourceWidget* widget) {
+    if(!target() || target() != widget)
         return;
 
     PtzData &data = m_dataByWidget[target()];

@@ -322,6 +322,16 @@ void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& p
     }
 }
 
+void QnResourceWidgetRenderer::setFisheyeController(QnFisheyePtzController* controller)
+{
+    for (int i = 0; i < m_channelRenderers.size(); ++i){
+        RenderingTools& ctx = m_channelRenderers[i];
+        if( !ctx.uploader )
+            continue;
+        ctx.renderer->setFisheyeController(controller);
+    }
+}
+
 void QnResourceWidgetRenderer::setHystogramConsumer(QnHistogramConsumer* value)
 {
     for (int i = 0; i < m_channelRenderers.size(); ++i)

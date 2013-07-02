@@ -988,23 +988,21 @@ void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
-    QnResourceWidget *widget = menu()->currentParameters(sender()).widget();
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*> (menu()->currentParameters(sender()).widget());
     if(!widget)
         return;
     QWeakPointer<QnResourceWidget> guard(widget);
 
-    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
-        return;
+    
 
     QnWorkbenchPtzController *ptzController = context()->instance<QnWorkbenchPtzController>();
-    QVector3D position = ptzController->position(camera);
+    QVector3D position = ptzController->position(widget);
 
     for(int i = 0; i <= 20; i++) {
         qreal zoom = i / 20.0;
 
         position.setZ(zoom);
-        ptzController->setPosition(camera, position);
+        ptzController->setPosition(widget, position);
 
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));
@@ -3447,7 +3445,8 @@ void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
 
 void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
     QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(menu()->currentParameters(sender()).widget());
+    if(!camera || !widget)
         return;
 
     if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
@@ -3459,7 +3458,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
         return;
     }
 
-    QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(camera);
+    QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(widget);
     if(qIsNaN(position)) {
         QMessageBox::critical(
             mainWindow(),
@@ -3487,7 +3486,8 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(parameters.widget());
+    if(!camera || !widget)
         return;
 
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
@@ -3508,7 +3508,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
     }
 
     action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
-    context()->instance<QnWorkbenchPtzController>()->setPosition(camera, preset.logicalPosition);
+    context()->instance<QnWorkbenchPtzController>()->setPosition(widget, preset.logicalPosition);
 }
 
 void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {

@@ -44,6 +44,7 @@
 #include "camera/caching_time_period_loader.h"
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
+#include "ui/fisheye/fisheye_ptz_processor.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -65,12 +66,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_display(NULL),
     m_renderer(NULL),
     m_motionSensitivityValid(false),
-    m_binaryMotionMaskValid(false)
+    m_binaryMotionMaskValid(false),
+    m_ptzController(0)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
     m_camera = m_resource.dynamicCast<QnVirtualCameraResource>();
+
+    if (m_camera->hasDualStreaming()) {
+        m_ptzController = new QnFisheyePtzController();
+    }
 
 
     // TODO: #Elric
@@ -79,6 +85,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     QGraphicsView *view = QnWorkbenchContextAware::display()->view();
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
+    if (m_ptzController)
+        m_ptzController->addRenderer(m_renderer);
     connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
     connect(m_resource->toResource(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
     connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(updateDisplay()));
@@ -164,11 +172,14 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     if (m_display)
         m_display->removeRenderer(m_renderer);
 
+    delete m_ptzController;
+
     m_renderer->destroyAsync();
 
     foreach(__m128i *data, m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
+
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
@@ -434,8 +445,6 @@ void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &ima
     item()->setImageEnhancement(imageEnhancement);
     m_renderer->setImageCorrection(imageEnhancement);
 }
-
-
 
 // -------------------------------------------------------------------------- //
 // Painting
@@ -846,4 +855,9 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
 void QnMediaResourceWidget::at_renderWatcher_displayingChanged(QnResourceWidget *widget) {
     if(widget == this)
         updateRendererEnabled();
+}
+
+QnVirtualPtzController* QnMediaResourceWidget::virtualPtzController() const
+{
+    return m_ptzController;
 }
