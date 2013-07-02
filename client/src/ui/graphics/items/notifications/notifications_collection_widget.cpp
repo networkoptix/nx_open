@@ -51,6 +51,7 @@ QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
     m_particle = new QnParticleItem(this);
 
     connect(this, SIGNAL(geometryChanged()), this, SLOT(updateParticleGeometry()));
+    connect(this, SIGNAL(toggled(bool)), this, SLOT(updateParticleVisibility()));
 
     updateParticleGeometry();
     updateParticleVisibility();
@@ -79,7 +80,7 @@ void QnBlinkingImageButtonWidget::updateParticleGeometry() {
 }
 
 void QnBlinkingImageButtonWidget::updateParticleVisibility() {
-    m_particle->setVisible(m_count > 0);
+    m_particle->setVisible(m_count > 0 && !isChecked());
 }
 
 void QnBlinkingImageButtonWidget::updateToolTip() {
