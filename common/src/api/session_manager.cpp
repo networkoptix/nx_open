@@ -230,15 +230,12 @@ void QnSessionManager::at_aboutToBeStarted() {
     if (m_accessManager)
         return;
 
-    qDebug() << "access manager creating";
     m_accessManager = new QNetworkAccessManager(this);
-    qDebug() << "access manager created";
 }
 
 void QnSessionManager::at_aboutToBeStopped() {
     assert(QThread::currentThread() == this->thread());
 
-    qDebug() << "access manager deleting...";
     QMutexLocker locker(&m_accessManagerMutex);
     if (!m_accessManager)
         return;
@@ -256,8 +253,6 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
         qWarning() << "doSendAsyncGetRequest is called, while accessManager = 0";
         return;
     }
-
-    qDebug() << operation << "sending request" << url << objectName << params;
 
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
