@@ -20,6 +20,19 @@ class CLVideoDecoderOutput;
 class ScreenshotInterface;
 class QnHistogramConsumer;
 
+class QnGlRendererShaders: public QObject {
+    Q_OBJECT;
+public:
+    QnGlRendererShaders(const QGLContext *context, QObject *parent = NULL);
+    virtual ~QnGlRendererShaders();
+
+    QnYv12ToRgbShaderProgram *yv12ToRgb;
+    QnYv12ToRgbWithGammaShaderProgram *yv12ToRgbWithGamma;
+    QnYv12ToRgbaShaderProgram *yv12ToRgba;
+    QnNv12ToRgbShaderProgram *nv12ToRgb;
+};
+
+
 class QnGLRenderer
 :
     public QnGlFunctions
@@ -70,10 +83,7 @@ private:
     QnMetaDataV1Ptr m_lastDisplayedMetadata; // TODO: #Elric get rid of this
     unsigned m_lastDisplayedFlags;
     unsigned int m_prevFrameSequence;
-    QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
-    QScopedPointer<QnYv12ToRgbWithGammaShaderProgram> m_yv12ToRgbWithGammaShaderProgram;
-    QScopedPointer<QnYv12ToRgbaShaderProgram> m_yv12ToRgbaShaderProgram;
-    QScopedPointer<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
+    QSharedPointer<QnGlRendererShaders> m_shaders;
     bool m_timeChangeEnabled;
     mutable QMutex m_mutex;
     bool m_paused;
