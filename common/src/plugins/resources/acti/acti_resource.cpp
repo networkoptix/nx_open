@@ -348,9 +348,9 @@ QnAbstractPtzController* QnActiResource::getPtzController()
 void QnActiResource::initializePtz()
 {
     m_ptzController.reset(new QnActiPtzController(this));
-    Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
-    if(capabilities == Qn::NoCapabilities)
+    Qn::PtzCapabilities capabilities = m_ptzController->getCapabilities();
+    if(capabilities == Qn::NoPtzCapabilities)
         m_ptzController.reset();
 
-    setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
+    setPtzCapabilities((getPtzCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
 }

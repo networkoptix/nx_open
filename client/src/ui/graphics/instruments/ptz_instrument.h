@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "drag_processing_instrument.h"
+#include "core/resource/interface/abstract_ptz_controller.h"
 
 class FixedArSelectionItem;
 class QnSplashItem;
@@ -117,7 +118,7 @@ private:
     struct PtzData {
         PtzData(): capabilities(0), overlayWidget(NULL) {}
 
-        Qn::CameraCapabilities capabilities;
+        Qn::PtzCapabilities capabilities;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;
         QRectF pendingAbsoluteMove;

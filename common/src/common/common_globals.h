@@ -72,41 +72,9 @@ public:
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        AbsolutePtzCapability               = 0x020,
-        ContinuousPanTiltCapability         = 0x040,
-        ContinuousZoomCapability            = 0x080,
-        OctagonalPtzCapability              = 0x100, // TODO: #Elric deprecate this shit. Not really a capability.
-        
-        /* Shortcuts */
-        AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability | OctagonalPtzCapability,
-
-        /* Deprecated capabilities. */
-        DeprecatedContinuousPtzCapability   = 0x001,
-        DeprecatedZoomCapability            = 0x002,
-
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
-
-    /**
-     * \param capabilities              Camera capability flags containing some deprecated values.
-     * \returns                         Camera capability flags with deprecated values replaced with new ones.
-     */
-    inline Qn::CameraCapabilities undeprecate(Qn::CameraCapabilities capabilities) {
-        Qn::CameraCapabilities result = capabilities;
-
-        if(result & Qn::DeprecatedContinuousPtzCapability) {
-            result &= ~Qn::DeprecatedContinuousPtzCapability;
-            result |= Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability;
-        }
-
-        if(result & Qn::DeprecatedZoomCapability) {
-            result &= ~Qn::DeprecatedZoomCapability;
-            result |= Qn::ContinuousZoomCapability;
-        }
-
-        return result;
-    }
 
     enum StreamFpsSharingMethod {
         shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps

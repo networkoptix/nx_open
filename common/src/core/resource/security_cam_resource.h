@@ -79,7 +79,6 @@ public:
     const QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
-    virtual bool hasFisheye() const;
 
 
     /** Returns true if camera stores archive on a external system */

@@ -44,6 +44,7 @@ class QnMediaResource /*: virtual public QnResource*/
     //Q_OBJECT
 
 public:
+
     QnMediaResource();
     virtual ~QnMediaResource();
 
@@ -63,7 +64,13 @@ public:
     virtual const QnResourcePtr toResourcePtr() const = 0;
     virtual QnResourcePtr toResourcePtr() = 0;
 
-    virtual bool isFisheye() const { return false; }
+    virtual bool isFisheye() const { return true; }
+
+    Qn::PtzCapabilities getPtzCapabilities() const;
+    bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
+    void setPtzCapabilities(Qn::PtzCapabilities capabilities);
+    void setPtzCapability(Qn::PtzCapabilities capability, bool value);
+
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
 

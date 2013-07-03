@@ -100,6 +100,7 @@ private:
 
     QnWorkbenchPtzMapperWatcher *m_mapperWatcher;
     QHash<QnVirtualCameraResourcePtr, PtzData> m_dataByCamera;
+    QHash<const QnMediaResourceWidget*, PtzData> m_dataByWidget;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
     QHash<int, const QnMediaResourceWidget*> m_widgetByHandle;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByTimerId;

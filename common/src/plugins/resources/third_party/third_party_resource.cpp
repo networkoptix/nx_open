@@ -221,7 +221,7 @@ bool QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::RelayOutputCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
-        setCameraCapability( Qn::AbsolutePtzCapability, true );
+        setPtzCapability( Qn::AbsolutePtzCapability, true );
         //TODO/IMPL requesting nxcip::CameraPTZManager interface and setting capabilities
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )

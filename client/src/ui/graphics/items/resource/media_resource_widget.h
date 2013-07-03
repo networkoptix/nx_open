@@ -15,7 +15,7 @@
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
-class QnVirtualPtzController;
+class QnAbstractPtzController;
 class QnFisheyePtzController;
 
 class QnMediaResourceWidget: public QnResourceWidget {
@@ -97,7 +97,7 @@ public:
     ImageCorrectionParams imageEnhancement() const;
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
 
-    QnVirtualPtzController* virtualPtzController() const;
+    QnAbstractPtzController* virtualPtzController() const;
 signals:
     void motionSelectionChanged();
     void displayChanged();

@@ -88,3 +88,24 @@ void QnMediaResource::initMediaResource()
 {
     toResource()->addFlags(QnResource::media);
 }
+
+Qn::PtzCapabilities QnMediaResource::getPtzCapabilities() const
+{
+    QVariant mediaVariant;
+    QnResource* thisCasted = const_cast<QnResource*>(toResource());
+    thisCasted->getParam(QLatin1String("ptzCapabilities"), mediaVariant, QnDomainMemory);
+    return Qn::undeprecatePtzCapabilities(static_cast<Qn::PtzCapabilities>(mediaVariant.toInt()));
+}
+
+bool QnMediaResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
+{
+    return getPtzCapabilities() & capabilities;
+}
+
+void QnMediaResource::setPtzCapabilities(Qn::PtzCapabilities capabilities) {
+    toResource()->setParam(lit("ptzCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
+}
+
+void QnMediaResource::setPtzCapability(Qn::PtzCapabilities capability, bool value) {
+    setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
+}

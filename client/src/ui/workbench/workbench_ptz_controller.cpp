@@ -134,8 +134,9 @@ void QnWorkbenchPtzController::updatePosition(const QnMediaResourceWidget* widge
 
 QVector3D QnWorkbenchPtzController::movement(const QnMediaResourceWidget *widget) const 
 {
-    if (widget->virtualPtzController())
-        return widget->virtualPtzController()->movement();
+    if (widget->virtualPtzController()) {
+        return m_dataByWidget[widget].movement;
+    }
 
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
 
@@ -154,7 +155,8 @@ QVector3D QnWorkbenchPtzController::movement(const QnMediaResourceWidget *widget
 void QnWorkbenchPtzController::setMovement(const QnMediaResourceWidget *widget, const QVector3D &motion) 
 {
     if (widget->virtualPtzController()) {
-        widget->virtualPtzController()->setMovement(motion);
+        widget->virtualPtzController()->startMove(motion.x(), motion.y(), motion.y());
+        m_dataByWidget[widget].movement = motion;
         emit movementChanged(widget);
     }
     else {

@@ -230,11 +230,10 @@ int QnAxisPtzController::stopMove() {
     return startMove(0.0, 0.0, 0.0);
 }
 
-Qn::CameraCapabilities QnAxisPtzController::getCapabilities() {
+Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
     return m_capabilities;
 }
 
 const QnPtzSpaceMapper *QnAxisPtzController::getSpaceMapper() {
     return m_spaceMapper;
 }
-

@@ -45,6 +45,7 @@
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/fisheye/fisheye_ptz_processor.h"
+#include "core/resource/interface/abstract_ptz_controller.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -72,10 +73,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
-    m_camera = m_resource.dynamicCast<QnVirtualCameraResource>();
 
-    if (m_camera->hasDualStreaming()) {
-        m_ptzController = new QnFisheyePtzController();
+    if (m_resource->isFisheye()) {
+        m_ptzController = new QnFisheyePtzController(base_type::resource().data());
     }
 
 
@@ -746,6 +746,8 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
             && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
             )
         result |= PtzButton;
+    if (m_resource && m_resource->isFisheye())
+        result |= PtzButton;
 
     if(item()
             && item()->layout()
@@ -825,7 +827,8 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability));
+    bool ptzEnabled = m_resource->isFisheye() ||
+                      checked && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability));
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);
@@ -857,7 +860,7 @@ void QnMediaResourceWidget::at_renderWatcher_displayingChanged(QnResourceWidget 
         updateRendererEnabled();
 }
 
-QnVirtualPtzController* QnMediaResourceWidget::virtualPtzController() const
+QnAbstractPtzController* QnMediaResourceWidget::virtualPtzController() const
 {
     return m_ptzController;
 }

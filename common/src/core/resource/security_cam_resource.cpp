@@ -264,12 +264,6 @@ const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
     return m_scheduleTasks;
 }
 
-bool QnSecurityCamResource::hasFisheye() const
-{
-    return true;
-}
-
-
 bool QnSecurityCamResource::hasDualStreaming() const
 {
     if (!hasParam(lit("hasDualStreaming")))
@@ -503,7 +497,7 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 {
     QVariant mediaVariant;
     const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: #Elric const_cast? get rid of it!
-    return Qn::undeprecate(static_cast<Qn::CameraCapabilities>(mediaVariant.toInt()));
+    return static_cast<Qn::CameraCapabilities>(mediaVariant.toInt());
 }
 
 bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const

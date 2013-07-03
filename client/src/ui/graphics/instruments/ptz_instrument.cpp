@@ -561,9 +561,9 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
         return; /* Just to feel safe. We shouldn't get here. */
 
     PtzData &data = m_dataByWidget[widget];
-    Qn::CameraCapabilities oldCapabilities = data.capabilities;
+    Qn::PtzCapabilities oldCapabilities = data.capabilities;
 
-    data.capabilities = camera->getCameraCapabilities(); 
+    data.capabilities = camera->getPtzCapabilities(); 
     if((data.capabilities & Qn::AbsolutePtzCapability) && !m_mapperWatcher->mapper(camera))
         data.capabilities &= ~Qn::AbsolutePtzCapability; /* No mapper? Can't use absolute movement. */
 
@@ -576,8 +576,14 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
-    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    const QnPtzSpaceMapper *mapper = m_mapperWatcher->mapper(camera);
+    const QnPtzSpaceMapper *mapper = 0;
+    if (widget->virtualPtzController())
+        mapper = widget->virtualPtzController()->getSpaceMapper();
+    else {
+        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+        if (camera)
+            mapper = m_mapperWatcher->mapper(camera);
+    }
     if(!mapper)
         return;
 
@@ -717,7 +723,7 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
         return false;
 
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {
-        if(QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>()) {
+        if(widget->resource()) {
             connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
 
             PtzData &data = m_dataByWidget[widget];
