@@ -66,6 +66,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
             this, SLOT(at_tableView_currentRowChanged(QModelIndex,QModelIndex)));
 
     ui->tableView->clearSelection();
+    ui->tableView->resizeColumnsToContents();
 
     // TODO: #Elric replace with a single connect call
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
