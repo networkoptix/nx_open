@@ -604,26 +604,42 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
         return; 
     }
 
+    qreal zoom = widget->rect().width() / rect.width(); // For 2x zoom we'll get 2.0 here.
+    QPointF pos = rect.center();
 #if 0
+    QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
     qreal sideSize = 36.0 / oldPhysicalPosition.z();
 
     QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, oldPhysicalPosition.y() / 180 * M_PI);
     QVector3D x = sphericalToCartesian<QVector3D>(1.0, (oldPhysicalPosition.x() + 90) / 180 * M_PI, 0.0) * sideSize;
     QVector3D y = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, (oldPhysicalPosition.y() - 90) / 180 * M_PI) * sideSize;
 
-    QPointF pos = rect.center();
-    QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
     QVector3D r1 = r + x * delta.x() + y * delta.y();
     QnSphericalPoint<float> spherical = cartesianToSpherical<QVector3D>(r1);
-#else
+#elif 1
+    // equal angles projection
+    QVector2D delta = QVector2D(pos - widget->rect().center()); // / widget->size().width();
+    delta.setX(delta.x() / widget->size().width());
+    delta.setY(delta.y() / widget->size().height());
+    qreal aspectRatio = widget->size().width() / (qreal) widget->size().height();
 
-    qreal zoom = widget->rect().width() / rect.width(); // For 2x zoom we'll get 2.0 here.
     qreal fov = mm35vToFov(oldPhysicalPosition.z());
     QnSphericalPoint<float> spherical;
-    QPointF pos = rect.center();
-    QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
-    spherical.phi = oldPhysicalPosition.x() / 180 * M_PI + fov * delta.x();
-    spherical.psi = oldPhysicalPosition.y() / 180 * M_PI - fov * delta.y();
+    spherical.phi = gradToRad(oldPhysicalPosition.x()) + fov * delta.x();
+    spherical.psi = gradToRad(oldPhysicalPosition.y()) + fov/aspectRatio * delta.y();
+#else
+    // equal lines projection
+    QVector2D delta = QVector2D(pos - widget->rect().center()); // / widget->size().width();
+    delta.setX(delta.x() / widget->size().width());
+    delta.setY(delta.y() / widget->size().height());
+    qreal aspectRatio = widget->size().width() / (qreal) widget->size().height();
+
+    qreal fov = mm35vToFov(oldPhysicalPosition.z());
+    float rx = 2*tan(fov/2.0);
+    float ry = 2*tan(fov/aspectRatio/2.0);
+    QnSphericalPoint<float> spherical;
+    spherical.phi = gradToRad(oldPhysicalPosition.x()) + atan(rx * delta.x());
+    spherical.psi = gradToRad(oldPhysicalPosition.y()) + atan(ry * delta.y());
 #endif
     
     QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180, oldPhysicalPosition.z() * zoom);

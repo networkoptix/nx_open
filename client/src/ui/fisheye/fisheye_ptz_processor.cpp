@@ -102,7 +102,7 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
 
     qreal zoomSpeed = -m_motion.z() * MAX_ZOOM_SPEED;
     qreal xSpeed = m_motion.x() * MAX_MOVE_SPEED;
-    qreal ySpeed = m_motion.y() * MAX_MOVE_SPEED;
+    qreal ySpeed = -m_motion.y() * MAX_MOVE_SPEED;
 
     qreal timeSpend = (newTime - m_lastTime) / 1000000.0;
     
@@ -117,7 +117,7 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
 
     m_devorpingParams.xAngle = qBound(-xRange, m_devorpingParams.xAngle, xRange);
     m_devorpingParams.yAngle = qBound(-yRange, m_devorpingParams.yAngle, yRange);
-    //m_devorpingParams.pAngle = toRadian(18.0);
+    //m_devorpingParams.pAngle = gradToRad(18.0);
     
     m_lastTime = newTime;
 
