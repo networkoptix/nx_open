@@ -6,6 +6,7 @@
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
+#include <utils/math/math.h>
 
 namespace Qn {
     enum PtzCapability
@@ -47,6 +48,28 @@ namespace Qn {
         return result;
     }
 };
+
+namespace 
+{
+    qreal gradToRad(qreal x) { return x * M_PI / 180.0; }
+    qreal radToGrad(qreal x)   { return x * 180.0 / M_PI; }
+
+    /**
+     * \param fovDegreees               Width-based FOV in degrees.
+     * \returns                         Width-based 35mm-equivalent focal length.
+     */
+    qreal fovTo35mmEquiv(qreal fovRad) {
+        return (36.0 / 2.0) / std::tan((fovRad / 2.0));
+    }
+
+    qreal mm35vToFov(qreal mm) {
+        return std::atan((36.0 / 2.0) / mm) * 2.0;
+    }
+
+
+} // anonymous namespace
+
+
 
 class QnPtzSpaceMapper;
 

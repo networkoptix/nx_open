@@ -3,30 +3,12 @@
 #include <math.h>
 #include "utils/math/space_mapper.h"
 
-namespace {
-    /**
-     * \param fovDegreees               Width-based FOV in degrees.
-     * \returns                         Width-based 35mm-equivalent focal length.
-     */
-    qreal fovTo35mmEquiv(qreal fovRad) {
-        return (36.0 / 2.0) / std::tan((fovRad/ 2.0));
-    }
-
-    qreal mm35vToFov(qreal mm) {
-        return std::atan((36.0 / 2.0) / mm) * 2.0;
-    }
-
-} // anonymous namespace
-
-#define toRadian(x) (x * M_PI / 180.0)
-#define toGrad(x) (x * 180.0 / M_PI)
-
 qreal MAX_MOVE_SPEED = 1.0; // 1 rad per second
-qreal MAX_ZOOM_SPEED = toRadian(30.0); // zoom speed
-qreal MIN_FOV = toRadian(30.0);
-qreal MAX_FOV = toRadian(90.0);
+qreal MAX_ZOOM_SPEED = gradToRad(30.0); // zoom speed
+qreal MIN_FOV = gradToRad(30.0);
+qreal MAX_FOV = gradToRad(90.0);
 
-qreal FISHEYE_FOV = toRadian(180.0);
+qreal FISHEYE_FOV = gradToRad(180.0);
 
 QnFisheyePtzController::QnFisheyePtzController(QnResource* resource):
     QnAbstractPtzController(resource),
@@ -69,6 +51,7 @@ int QnFisheyePtzController::stopMove()
 
 int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 {
+    qreal ddd = mm35vToFov(zoomPos);
     m_motion = QVector3D();
     
     m_devorpingParams.fov = qBound(MIN_FOV, mm35vToFov(zoomPos), MAX_FOV);
@@ -76,16 +59,16 @@ int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
     qreal xRange = (FISHEYE_FOV - m_devorpingParams.fov) / 2.0;
     qreal yRange = xRange / m_devorpingParams.aspectRatio;
 
-    m_devorpingParams.xAngle = qBound(-xRange, toRadian(xPos), xRange);
-    m_devorpingParams.yAngle = qBound(-yRange, toRadian(yPos), yRange);
+    m_devorpingParams.xAngle = qBound(-xRange, gradToRad(xPos), xRange);
+    m_devorpingParams.yAngle = qBound(-yRange, gradToRad(yPos), yRange);
 
     return 0;
 }
 
 int QnFisheyePtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
 {
-    *xPos = toGrad(m_devorpingParams.xAngle);
-    *yPos = toGrad(m_devorpingParams.yAngle);
+    *xPos = radToGrad(m_devorpingParams.xAngle);
+    *yPos = radToGrad(m_devorpingParams.yAngle);
     *zoomPos = fovTo35mmEquiv(m_devorpingParams.fov);
 
     return 0;
@@ -134,6 +117,7 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
 
     m_devorpingParams.xAngle = qBound(-xRange, m_devorpingParams.xAngle, xRange);
     m_devorpingParams.yAngle = qBound(-yRange, m_devorpingParams.yAngle, yRange);
+    //m_devorpingParams.pAngle = toRadian(18.0);
     
     m_lastTime = newTime;
 

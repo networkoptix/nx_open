@@ -39,6 +39,7 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
 
     void main() 
     {
+        /*
         vec2 pos = (gl_TexCoord[0].st - 0.5) * dstFov; // go to coordinates in range [-dstFov/2...+dstFov/2]
 
         float theta = atan(pos.x) + xShift;
@@ -56,6 +57,8 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
 
         // return from polar coordinates
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
+        */
+        vec2 pos = gl_TexCoord[0].st;
 
         // do color transformation yuv->RGB
         gl_FragColor = vec4(texture2D(yTexture, pos).p,

@@ -604,7 +604,9 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
         return; 
     }
 
+#if 0
     qreal sideSize = 36.0 / oldPhysicalPosition.z();
+
     QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, oldPhysicalPosition.y() / 180 * M_PI);
     QVector3D x = sphericalToCartesian<QVector3D>(1.0, (oldPhysicalPosition.x() + 90) / 180 * M_PI, 0.0) * sideSize;
     QVector3D y = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, (oldPhysicalPosition.y() - 90) / 180 * M_PI) * sideSize;
@@ -613,8 +615,16 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
     QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
     QVector3D r1 = r + x * delta.x() + y * delta.y();
     QnSphericalPoint<float> spherical = cartesianToSpherical<QVector3D>(r1);
+#else
 
-    qreal zoom = widget->rect().width() / rect.width(); /* For 2x zoom we'll get 2.0 here. */
+    qreal zoom = widget->rect().width() / rect.width(); // For 2x zoom we'll get 2.0 here.
+    qreal fov = mm35vToFov(oldPhysicalPosition.z());
+    QnSphericalPoint<float> spherical;
+    QPointF pos = rect.center();
+    QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
+    spherical.phi = oldPhysicalPosition.x() / 180 * M_PI + fov * delta.x();
+    spherical.psi = oldPhysicalPosition.y() / 180 * M_PI - fov * delta.y();
+#endif
     
     QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180, oldPhysicalPosition.z() * zoom);
     QVector3D newLogicalPosition = mapper->toCamera().physicalToLogical(newPhysicalPosition);
