@@ -7,8 +7,10 @@ Since 1.5.1
  - Fixed issue when it was not possible to add cameras manually via IP range (since 1.4)
  - Improved advanced camera settings management (since 1.4)
  - ACTI cameras with old firmwares (T series < 4.13, K series < 5.08 and A1 series < 6.03) work now 
- - Vivotek cameras CC8130, FD8136, FD8361, FD8362E
+ - Vivotek cameras CC8130, FD8136, FD8361, FD8362E, FD8161
  - If restore item for the fulloscreen, resolution hasn't been changed to low
+ 
+ - Bug #2125. Preveiw search. Incorrect slider position in some case
 
 Since previous build
  
@@ -31,6 +33,15 @@ Since previous build
  - Bug #2073Set "second stream quality" parameters when release "Do not control media stream"
  - Bug #2072.Add warning message when copying paarameters, if one or more cameras aren't dual-stream cameras.
  - All settings from admin interface has been hidden.
+ 
+ - Feature #2044.Support Background image for NOV files.
+ - Bug #1868.If chunk hasn't been created yet, browser hangs on.
+ - Bug #2064Email doesn't stop sending if camera is on Scene.
+ - Bug #2085. Do not remove cameras from layout if server has been removed
+ - Bug #2139.Graphs look incorrect when health monitor hasn't been on scene.
+ - Bug #2144"Media server Failure" + "Camera output for 30 second" doesn't work.
+ - Bug #2148. If camera has been discovered automatically, then close multicast and restart mediaserver, than camera doesn't work.
+ - Feature #2132.PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
  
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 
