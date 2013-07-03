@@ -446,15 +446,6 @@ void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnR
         emit storageFailure(fileStorage);
 }
 
-void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status)
-{
-    QMutexLocker lock(&m_mutexStorages);
-    fileStorage->setStatus(status);
-    m_storagesStatisticsReady = false;
-    if (status == QnResource::Offline)
-        emit storageFailure(fileStorage);
-}
-
 void QnStorageManager::testOfflineStorages()
 {
     QMutexLocker lock(&m_mutexStorages);
