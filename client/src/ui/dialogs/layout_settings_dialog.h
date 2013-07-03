@@ -54,6 +54,11 @@ private:
       */
     qreal bestAspectRatioForCells() const;
 
+    /** Returns true if width and height in cells are already set to values
+      * corresponding to bestAspectRatioForCells()
+      */
+    bool cellsAreBestAspected() const;
+
     bool hasChanges(const QnLayoutResourcePtr &layout);
 
     void loadPreview();
