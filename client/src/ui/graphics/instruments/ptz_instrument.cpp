@@ -616,7 +616,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
 
     QVector3D r1 = r + x * delta.x() + y * delta.y();
     QnSphericalPoint<float> spherical = cartesianToSpherical<QVector3D>(r1);
-#elif 1
+#elif 0
     // equal angles projection
     QVector2D delta = QVector2D(pos - widget->rect().center()); // / widget->size().width();
     delta.setX(delta.x() / widget->size().width());

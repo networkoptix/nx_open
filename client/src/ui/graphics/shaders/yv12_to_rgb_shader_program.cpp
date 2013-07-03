@@ -114,7 +114,7 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
         vec2 pos = (gl_TexCoord[0].st -0.5) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
-        float phi   = pos.y/aspectRatio + yShift + perspShift;
+        float phi   = pos.y/aspectRatio + yShift - perspShift;
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
