@@ -889,6 +889,7 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
+    QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
