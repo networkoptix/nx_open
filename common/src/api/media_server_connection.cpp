@@ -63,6 +63,20 @@ namespace {
     template<class T>
     const char *check_reply_type() { return NULL; }
 
+    const quint64 saneNetworkSpeed = 100ull*1000ull*1000ull*1000ull; //let it be 100 gigabits
+    qreal checkNetworkSpeed(const quint64 bytesPerSec) {
+        if (bytesPerSec < saneNetworkSpeed) {
+            qreal value = static_cast<qreal>(bytesPerSec);
+            qDebug() << "sane value" << value;
+        } else {
+            qDebug() << "insane value" << bytesPerSec;
+        }
+
+        return (bytesPerSec < saneNetworkSpeed)
+                ? static_cast<qreal>(bytesPerSec)
+                : -1;
+    }
+
 } // anonymous namespace
 
 
@@ -237,6 +251,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
             }
 
             QByteArray networkBlock = extractXmlBody(data, "network"), interfaceBlock; {
+                qDebug() << "network statistics" << networkBlock;
                 int from = 0;
                 do {
                     interfaceBlock = extractXmlBody(networkBlock, "interface", &from);
@@ -247,13 +262,13 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 
                     reply.statistics.append(QnStatisticsDataItem(
                                                 interfaceName + QChar(0x21e9),
-                                                extractXmlBody(interfaceBlock, "in").toULongLong() * 8, //converting from bytes to bits
+                                                checkNetworkSpeed(extractXmlBody(interfaceBlock, "in").toULongLong() * 8), //converting from bytes per sec to bits per sec
                                                 NETWORK_IN,
                                                 interfaceType
                     ));
                     reply.statistics.append(QnStatisticsDataItem(
                                                 interfaceName + QChar(0x21e7),
-                                                extractXmlBody(interfaceBlock, "out").toULongLong() * 8, //converting from bytes to bits
+                                                checkNetworkSpeed(extractXmlBody(interfaceBlock, "out").toULongLong() * 8), //converting from bytes per sec to bits per sec
                                                 NETWORK_OUT,
                                                 interfaceType
                     ));
