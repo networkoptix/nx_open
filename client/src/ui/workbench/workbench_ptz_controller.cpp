@@ -90,6 +90,15 @@ QVector3D QnWorkbenchPtzController::position(const QnMediaResourceWidget *widget
 
 QVector3D QnWorkbenchPtzController::physicalPosition(const QnMediaResourceWidget *widget) const 
 {
+    if (widget->virtualPtzController())
+    {
+        qreal xPos;
+        qreal yPos;
+        qreal zPos;
+        widget->virtualPtzController()->getPosition(&xPos, &yPos, &zPos);
+        return QVector3D(xPos, yPos, zPos);
+    }
+
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera) {
         qnNullWarning(camera);
@@ -110,20 +119,23 @@ void QnWorkbenchPtzController::setPosition(const QnMediaResourceWidget *widget, 
 
 void QnWorkbenchPtzController::setPhysicalPosition(const QnMediaResourceWidget *widget, const QVector3D &physicalPosition) 
 {
-    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-
-    if(!camera) {
-        qnNullWarning(camera);
-        return;
+    const QnPtzSpaceMapper *mapper = 0;
+    if (widget->virtualPtzController())
+    {
+        mapper = widget->virtualPtzController()->getSpaceMapper();
     }
-
-    const QnPtzSpaceMapper *mapper = m_mapperWatcher->mapper(camera);
-    if(!mapper) {
-        qnWarning("Physical position is not supported for camera '%1'.", camera->getName());
-        return;
+    else {
+        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+        if(!camera) {
+            qnNullWarning(camera);
+            return;
+        }
+        mapper = m_mapperWatcher->mapper(camera);
+        if(!mapper)
+            qnWarning("Physical position is not supported for camera '%1'.", camera->getName());
     }
-
-    setPosition(widget, mapper->toCamera().physicalToLogical(physicalPosition));
+    if (mapper)
+        setPosition(widget, mapper->toCamera().physicalToLogical(physicalPosition));
 }
 
 
@@ -184,6 +196,12 @@ void QnWorkbenchPtzController::sendGetPosition(const QnMediaResourceWidget* widg
 
 void QnWorkbenchPtzController::sendSetPosition(const QnMediaResourceWidget* widget, const QVector3D &position) 
 {
+    if (widget->virtualPtzController())
+    {
+        widget->virtualPtzController()->moveTo(position.x(), position.y(), position.z());
+        return;
+    }
+
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
     if (!camera)
         return;

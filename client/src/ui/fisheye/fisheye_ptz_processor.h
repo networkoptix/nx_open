@@ -13,12 +13,12 @@ struct DevorpingParams
 
     bool enabled;
     // view angle and FOV at radians
-    float xAngle;
-    float yAngle;
-    float fov;
+    qreal xAngle;
+    qreal yAngle;
+    qreal fov;
     // perspective correction angle
-    float pAngle;
-    float aspectRatio;
+    qreal pAngle;
+    qreal aspectRatio;
 };
 
 class QnFisheyePtzController: public QnAbstractPtzController

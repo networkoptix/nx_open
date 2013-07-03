@@ -3,23 +3,39 @@
 #include <math.h>
 #include "utils/math/space_mapper.h"
 
+namespace {
+    /**
+     * \param fovDegreees               Width-based FOV in degrees.
+     * \returns                         Width-based 35mm-equivalent focal length.
+     */
+    qreal fovTo35mmEquiv(qreal fovRad) {
+        return (36.0 / 2.0) / std::tan((fovRad/ 2.0));
+    }
+
+    qreal mm35vToFov(qreal mm) {
+        return std::atan((36.0 / 2.0) / mm) * 2.0;
+    }
+
+} // anonymous namespace
+
 #define toRadian(x) (x * M_PI / 180.0)
+#define toGrad(x) (x * 180.0 / M_PI)
 
-float MAX_MOVE_SPEED = 1.0; // 1 rad per second
-float MAX_ZOOM_SPEED = toRadian(30.0); // zoom speed
-float MIN_FOV = toRadian(30.0);
-float MAX_FOV = toRadian(90.0);
+qreal MAX_MOVE_SPEED = 1.0; // 1 rad per second
+qreal MAX_ZOOM_SPEED = toRadian(30.0); // zoom speed
+qreal MIN_FOV = toRadian(30.0);
+qreal MAX_FOV = toRadian(90.0);
 
-float FISHEYE_FOV = toRadian(180.0);
+qreal FISHEYE_FOV = toRadian(180.0);
 
 QnFisheyePtzController::QnFisheyePtzController(QnResource* resource):
     QnAbstractPtzController(resource),
     m_renderer(0),
     m_lastTime(0)
 {
-    QnScalarSpaceMapper xMapper(-1.0, 1.0, -1.0, 1.0, Qn::ConstantExtrapolation);
-    QnScalarSpaceMapper yMapper(-1.0, 1.0, -1.0, 1.0, Qn::ConstantExtrapolation);
-    QnScalarSpaceMapper zMapper(-1.0, 1.0, -1.0, 1.0, Qn::ConstantExtrapolation);
+    QnScalarSpaceMapper xMapper(-90.0, 90.0, -90.0, 90.0, Qn::ConstantExtrapolation);
+    QnScalarSpaceMapper yMapper(-90.0, 90.0, -90.0, 90.0, Qn::ConstantExtrapolation);
+    QnScalarSpaceMapper zMapper(fovTo35mmEquiv(MIN_FOV), fovTo35mmEquiv(MAX_FOV), fovTo35mmEquiv(MIN_FOV), fovTo35mmEquiv(MAX_FOV), Qn::ConstantExtrapolation);
 
     m_spaceMapper = new QnPtzSpaceMapper(QnVectorSpaceMapper(xMapper, yMapper, zMapper), QStringList());
 }
@@ -53,14 +69,24 @@ int QnFisheyePtzController::stopMove()
 
 int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 {
+    m_motion = QVector3D();
+    
+    m_devorpingParams.fov = qBound(MIN_FOV, mm35vToFov(zoomPos), MAX_FOV);
+
+    qreal xRange = (FISHEYE_FOV - m_devorpingParams.fov) / 2.0;
+    qreal yRange = xRange / m_devorpingParams.aspectRatio;
+
+    m_devorpingParams.xAngle = qBound(-xRange, toRadian(xPos), xRange);
+    m_devorpingParams.yAngle = qBound(-yRange, toRadian(yPos), yRange);
+
     return 0;
 }
 
 int QnFisheyePtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
 {
-    *xPos = m_devorpingParams.xAngle;
-    *yPos = m_devorpingParams.yAngle;
-    *zoomPos = m_devorpingParams.fov;
+    *xPos = toGrad(m_devorpingParams.xAngle);
+    *yPos = toGrad(m_devorpingParams.yAngle);
+    *zoomPos = fovTo35mmEquiv(m_devorpingParams.fov);
 
     return 0;
 }
@@ -91,11 +117,11 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
 {
     qint64 newTime = getUsecTimer();
 
-    float zoomSpeed = -m_motion.z() * MAX_ZOOM_SPEED;
-    float xSpeed = m_motion.x() * MAX_MOVE_SPEED;
-    float ySpeed = -m_motion.y() * MAX_MOVE_SPEED;
+    qreal zoomSpeed = -m_motion.z() * MAX_ZOOM_SPEED;
+    qreal xSpeed = m_motion.x() * MAX_MOVE_SPEED;
+    qreal ySpeed = m_motion.y() * MAX_MOVE_SPEED;
 
-    float timeSpend = (newTime - m_lastTime) / 1000000.0;
+    qreal timeSpend = (newTime - m_lastTime) / 1000000.0;
     
     m_devorpingParams.fov += zoomSpeed * timeSpend;
     m_devorpingParams.fov = qBound(MIN_FOV, m_devorpingParams.fov, MAX_FOV);
@@ -103,8 +129,8 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
     m_devorpingParams.xAngle += xSpeed * timeSpend;
     m_devorpingParams.yAngle += ySpeed * timeSpend;
 
-    float xRange = (FISHEYE_FOV - m_devorpingParams.fov) / 2.0;
-    float yRange = xRange / m_devorpingParams.aspectRatio;
+    qreal xRange = (FISHEYE_FOV - m_devorpingParams.fov) / 2.0;
+    qreal yRange = xRange; // / m_devorpingParams.aspectRatio;
 
     m_devorpingParams.xAngle = qBound(-xRange, m_devorpingParams.xAngle, xRange);
     m_devorpingParams.yAngle = qBound(-yRange, m_devorpingParams.yAngle, yRange);
