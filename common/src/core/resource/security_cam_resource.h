@@ -149,8 +149,8 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
-    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
 
 protected slots:
     virtual void at_disabledChanged();
