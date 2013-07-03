@@ -155,7 +155,7 @@ QVector3D QnWorkbenchPtzController::movement(const QnMediaResourceWidget *widget
 void QnWorkbenchPtzController::setMovement(const QnMediaResourceWidget *widget, const QVector3D &motion) 
 {
     if (widget->virtualPtzController()) {
-        widget->virtualPtzController()->startMove(motion.x(), motion.y(), motion.y());
+        widget->virtualPtzController()->startMove(motion.x(), motion.y(), motion.z());
         m_dataByWidget[widget].movement = motion;
         emit movementChanged(widget);
     }

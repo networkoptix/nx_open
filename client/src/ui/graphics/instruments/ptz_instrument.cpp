@@ -556,15 +556,22 @@ void PtzInstrument::updateCapabilities(const QnSecurityCamResourcePtr &resource)
 }
 
 void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
-    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
-        return; /* Just to feel safe. We shouldn't get here. */
-
     PtzData &data = m_dataByWidget[widget];
     Qn::PtzCapabilities oldCapabilities = data.capabilities;
 
-    data.capabilities = camera->getPtzCapabilities(); 
-    if((data.capabilities & Qn::AbsolutePtzCapability) && !m_mapperWatcher->mapper(camera))
+    const QnPtzSpaceMapper* mapper = 0;
+    if (widget->virtualPtzController()) {
+        mapper = widget->virtualPtzController()->getSpaceMapper();
+        data.capabilities = widget->virtualPtzController()->getCapabilities();
+    }
+    else {
+        data.capabilities = widget->resource()->getPtzCapabilities();
+        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+        if (camera)
+            mapper = m_mapperWatcher->mapper(camera);
+    }
+
+    if((data.capabilities & Qn::AbsolutePtzCapability) && !mapper)
         data.capabilities &= ~Qn::AbsolutePtzCapability; /* No mapper? Can't use absolute movement. */
 
     if(oldCapabilities != data.capabilities)
