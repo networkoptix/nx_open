@@ -16,8 +16,8 @@ QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* re
 
 QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
 {
-    delete m_ownerDelegate;
     m_syncWrapper->erase(this);
+    delete m_ownerDelegate;
 }
 
 bool QnSyncPlayArchiveDelegate::open(QnResourcePtr resource)
