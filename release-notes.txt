@@ -9,11 +9,23 @@ Since 1.5.1
  - ACTI cameras with old firmwares (T series < 4.13, K series < 5.08 and A1 series < 6.03) work now 
  - Vivotek cameras CC8130, FD8136, FD8361, FD8362E, FD8161
  - If restore item for the fulloscreen, resolution hasn't been changed to low
+ - If cancel installation if different customizations (HD Witness, DW Spectrum) were installed, then the software 
+   still was in the installed programs list, but could not be removed. Fixed
+ - If change installed components and remove EC it was not suggested to delete DB. Fixed
+ - Upgrade failed sometimes if different customizations (HD Witness, DW Spectrum) were installed simultaneously
+ - Backup/Restore Configuration... is added to Tree Context Menu (System)
+ - Screen recording crashed on start if resolution was not multiple of 8. Fixed
+ - Fixed incorrect playback slider position occured in preview search in some cases
+ - If a camera was discovered automatically and after this it was not accessible by multicast, then this camera didn't 
+   work after Media Server restart. Fixed
+ - PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
+ - AXIS M7001
  
- - Bug #2125. Preveiw search. Incorrect slider position in some case
-
 Since previous build
- 
+
+ - Client Client crashe when move a zoom window quickly across items
+ - Fixed Client crash if change a camera's motion mask and reopen its settings
+ - If enable hardware acceleration Client crashed. Fixed
  - If press F11 current video went to fullscreen. If press F11 again the video got back but time line was hidden. Fixed
  - Add "Select All" in context menu for "Event log" and "Camera list"
  - Fixed Client crash while exporting from zoom item, if enable color correction adjustment and move zoom window
@@ -27,21 +39,19 @@ Since previous build
  - Preview search. The first item doesn't play. Fixed
  - Fixed the banding of gamma correction while exporting
  - Cannot change layout with background. Fixed
- - Bug #2131.Invalid error message when adding a camera to preview search layout. Fixed
- - Change 45 days for 30!!!!
- - Bug #2074. Centralize the slider position.
- - Bug #2073Set "second stream quality" parameters when release "Do not control media stream"
- - Bug #2072.Add warning message when copying paarameters, if one or more cameras aren't dual-stream cameras.
- - All settings from admin interface has been hidden.
- 
- - Feature #2044.Support Background image for NOV files.
- - Bug #1868.If chunk hasn't been created yet, browser hangs on.
- - Bug #2064Email doesn't stop sending if camera is on Scene.
- - Bug #2085. Do not remove cameras from layout if server has been removed
- - Bug #2139.Graphs look incorrect when health monitor hasn't been on scene.
- - Bug #2144"Media server Failure" + "Camera output for 30 second" doesn't work.
- - Bug #2148. If camera has been discovered automatically, then close multicast and restart mediaserver, than camera doesn't work.
- - Feature #2132.PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
+ - Fixed invalid error message when adding a camera to preview search layout ("Cannot add a local file to multi-video")
+ - 45 day trial license is changed to 30 day
+ - Manual Camera Addition dialog: data entering improved if switch from single IP to IP Range
+ - "Keep aspect ratio" flag added to layout settings
+ - The "Crop to current monitor aspect ratio" option is moved to layout settings (used to be on the open file form)
+ - In some case Email notification about motion can be generated before the archive can be navigated. 
+   In this if open archive by clicking on the link in E-Mail, browser could hang. Fixed
+ - Email about camera disconnection was being sent each minute after camera is disconnected if this camera is on Scene. Fixed
+ - (Multi-server environment) If a server that hosted cameras had been removed those cameras were moved to different 
+   servers but removed from Scene. Now those cameras are still on the Scene
+ - If close and reopen health monitoring graphs looked incorrect. Fixed
+ - Media server Failure" + "Camera output for 30 second" didn't work. Fixed
+ - Rotated item was resized incorrectly. Fixed
  
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 
