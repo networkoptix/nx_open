@@ -741,6 +741,16 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
             : Qn::MT_SoftwareGrid;
 
     d->calculateMaxFps(&maxFps, &maxDualStreamingFps, motionType);
+/*
+    int maxFps = m_camera->getMaxFps();
+    if (ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
+        maxFps -= MIN_SECOND_STREAM_FPS;
+
+    int maxDualStreamingFps;
+    if (m_camera->streamFpsSharingMethod() == Qn::shareFps)
+        maxDualStreamingFps = m_camera->getMaxFps() - MIN_SECOND_STREAM_FPS;
+    else
+        maxDualStreamingFps = maxFps;*/
 
     ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
