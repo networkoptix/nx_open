@@ -57,7 +57,6 @@ namespace {
     }
 
     const int ProlongedActionRole = Qt::UserRole + 2;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -121,7 +120,6 @@ QnBusinessRuleViewModel::~QnBusinessRuleViewModel() {
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     if (column == QnBusiness::DisabledColumn) {
-
         switch (role) {
             case Qt::CheckStateRole:
                 return (m_disabled ? Qt::Unchecked : Qt::Checked);
@@ -135,8 +133,6 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             default:
                 break;
         }
-
-//        return QVariant();
     }
 
     switch (role) {
@@ -165,7 +161,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                     return (int)m_actionParams.getUserGroup();
                 if (m_actionType == BusinessActionType::PlaySound)
                     return m_actionParams.getSoundUrl();
-            }
+            } else if (column == QnBusiness::AggregationColumn)
+                return m_aggregationPeriod;
             break;
 
         case Qt::TextColorRole:
@@ -241,6 +238,9 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
                 setActionParams(params);
             } else
                 setActionResources(value.value<QnResourceList>());
+            return true;
+        case QnBusiness::AggregationColumn:
+            setAggregationPeriod(value.toInt());
             return true;
         default:
             break;
@@ -586,6 +586,8 @@ QVariant QnBusinessRuleViewModel::getText(const int column, const bool detailed)
             return BusinessActionType::toString(m_actionType);
         case QnBusiness::TargetColumn:
             return getTargetText(detailed);
+        case QnBusiness::AggregationColumn:
+            return getAggregationText();
         default:
             break;
     }
@@ -817,6 +819,29 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
 
 }
 
+QString QnBusinessRuleViewModel::getAggregationText() const {
+    const int MINUTE = 60;
+    const int HOUR = MINUTE*60;
+    const int DAY = HOUR * 24;
+
+    if (BusinessActionType::hasToggleState(m_actionType))
+        return tr("not applied");
+
+    if (m_aggregationPeriod <= 0)
+        return tr("do instantly");
+
+    if (m_aggregationPeriod >= DAY && m_aggregationPeriod % DAY == 0)
+        return tr("no more than once per %n days", "", m_aggregationPeriod / DAY);
+
+    if (m_aggregationPeriod >= HOUR && m_aggregationPeriod % HOUR == 0)
+        return tr("no more than once per %n hours", "", m_aggregationPeriod / HOUR);
+
+    if (m_aggregationPeriod >= MINUTE && m_aggregationPeriod % MINUTE == 0)
+        return tr("no more than once per %n minutes", "", m_aggregationPeriod / MINUTE);
+
+    return tr("no more than once per %n seconds", "", m_aggregationPeriod);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////// ----------------- QnBusinessRulesViewModel ----------------------////////
@@ -905,6 +930,7 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
         case QnBusiness::SpacerColumn:      return tr("->");
         case QnBusiness::ActionColumn:      return tr("Action");
         case QnBusiness::TargetColumn:      return tr("Target");
+        case QnBusiness::AggregationColumn: return tr("Aggregation");
         default:
             break;
     }
@@ -937,6 +963,12 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
                     flags |= Qt::ItemIsEditable;
             }
             break;
+        case QnBusiness::AggregationColumn:
+            {
+                BusinessActionType::Value actionType = m_rules[index.row()]->actionType();
+                if (!BusinessActionType::hasToggleState(actionType))
+                    flags |= Qt::ItemIsEditable;
+            }
         default:
             break;
     }
