@@ -19,7 +19,6 @@ Since 1.5.1
  - If a camera was discovered automatically and after this it was not accessible by multicast, then this camera didn't 
    work after Media Server restart. Fixed
  - PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
- - AXIS M7001
  
 Since previous build
 
@@ -69,7 +68,7 @@ IOS Client
 NEW CAMERAS AND RECORDERS SUPPORTED:
   - Few Arecont newest models
   - Avigilon cameras: 2.0-H3-D1-IR, 2.0-H3-DO1-IR, 2.0-H3M-DO1, 2.0W-H3-BO1-IR
-  - AXIS M3005, AXIS M3007 and any  other Axis camera (in theory)
+  - AXIS M3005, AXIS M3007, AXIS M7001 and any  other Axis camera (in theory)
   - Vivotek: SD8362E, FD8372, IP8335H, FD8134, IP8362, MD8562, IP8151, IP8133, FD8135H, FE8172V
   - DAHUA IPC-HFW3200S
   - Any RTSP stream can be added as a camera. Just enter the desired RTSP URL instead of camera's IP in the manual addition form.
