@@ -119,6 +119,8 @@ bool QnMessage::load(const pb::Message &message)
             licenses.setHardwareId1(initialMessage.hardwareid1().c_str());
 			licenses.setOldHardwareId(initialMessage.oldhardwareid().c_str());
 			licenses.setHardwareId2(initialMessage.hardwareid2().c_str());
+            publicIp = QString::fromStdString(initialMessage.publicip());
+
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());
             qnResTypePool->replaceResourceTypeList(resourceTypes);
 
