@@ -132,6 +132,29 @@
                     "physicalMultiplier": 35.0
                 }
             }
+        },
+        {
+            "models": [
+                "SNC-RH124"
+            ],
+            "fromCamera": {
+                "x": {
+                    "extrapolationMode": "PeriodicExtrapolation",
+                    "logical":  [ -1,    1],
+                    "physical": [180, -180]
+                },
+                "y": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [ -1,  1],
+                    "physical": [-15, 90]
+                },
+                "z": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [0, 1],
+                    "physical": [1, 10.0],
+                    "physicalMultiplier": 38.5
+                }
+            }
         }
     ]
 }
