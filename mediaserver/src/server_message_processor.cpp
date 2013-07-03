@@ -23,6 +23,7 @@ void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, 
 	m_source->setAuthKey(authKey);
 
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
+    connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
     connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
 
@@ -49,16 +50,17 @@ void QnServerMessageProcessor::at_connectionReset()
     emit connectionReset();
 }
 
+void QnServerMessageProcessor::at_connectionOpened(QnMessage message)
+{
+    QnAppServerConnectionFactory::setPublicIp(message.publicIp);
+}
+
 void QnServerMessageProcessor::at_messageReceived(QnMessage message)
 {
     NX_LOG( QString::fromLatin1("Received message %1, resourceId %2, resource %3").
         arg(Qn::toString(message.messageType)).arg(message.resourceId.toString()).arg(message.resource ? message.resource->getName() : QString("NULL")), cl_logDEBUG1 );
 
-    if (message.messageType == Qn::Message_Type_Initial)
-    {
-        QnAppServerConnectionFactory::setPublicIp(message.publicIp);
-    }
-    else if (message.messageType == Qn::Message_Type_RuntimeInfoChange)
+    if (message.messageType == Qn::Message_Type_RuntimeInfoChange)
     {
         QnAppServerConnectionFactory::setPublicIp(message.publicIp);
     }
