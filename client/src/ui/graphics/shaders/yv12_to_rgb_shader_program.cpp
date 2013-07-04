@@ -37,6 +37,10 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
                                    0.0, cos(perspShift), -sin(perspShift),
                                    0.0, sin(perspShift),  cos(perspShift));
 
+    //mat3 perspectiveMatrix = mat3( cos(p)+(1-cos(p))*v.x*v.x,         (1 - cos(p))*v.x*v.y - sin(p)*v.z,  (1 - cos(p))*v.x*v.z + sin(p)*v.y,
+    //(1-cos(p))*v.y*v.x + sin(p)*v.z,   cos(p) + (1-cos(p))*v.y*v.y,        (1 - cos(p))*v.y*v.z - sin(p)*v.x,
+    //(1-cos(p))*v.z*v.x - sin(p)*v.y,   (1 - cos(p))*v.z*v.x + sin(p)*v.x,  cos(p) + (1-cos(p))*v.z*v.z);
+
     vec3 sphericalToCartesian(float theta, float phi) {
         return vec3(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
     }
@@ -122,8 +126,8 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 
     void main() 
     {
+        /*
         vec2 pos = (gl_TexCoord[0].st -0.5) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
-
         float theta = pos.x + xShift;
         float phi   = pos.y/aspectRatio - yShift - perspShift;
 
@@ -139,6 +143,8 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 
         // return from polar coordinates
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
+        */
+        vec2 pos = gl_TexCoord[0].st;
 
         // do color transformation yuv->RGB
         gl_FragColor = vec4(texture2D(yTexture, pos).p,
