@@ -114,6 +114,8 @@ private:
     void processPtzDrag(const QRectF &rect);
     void processPtzDoubleClick();
 
+    QVector3D physicalPositionForRect(QnMediaResourceWidget *widget, const QRectF &rect);
+    QVector3D physicalPositionForPos(QnMediaResourceWidget *widget, const QPointF &pos);
 private:
     struct PtzData {
         PtzData(): capabilities(0), overlayWidget(NULL) {}
@@ -143,6 +145,8 @@ private:
     bool m_isDoubleClick;
     bool m_ptzStartedEmitted;
     bool m_skipNextAction;
+    bool m_useDirectDrag;
+    QVector3D m_dragFromPosition;
 
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;

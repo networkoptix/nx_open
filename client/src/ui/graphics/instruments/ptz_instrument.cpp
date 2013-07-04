@@ -449,7 +449,8 @@ PtzInstrument::PtzInstrument(QObject *parent):
     m_ptzController(context()->instance<QnWorkbenchPtzController>()),
     m_mapperWatcher(context()->instance<QnWorkbenchPtzMapperWatcher>()),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
-    m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
+    m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0),
+    m_useDirectDrag(true)
 {
     connect(m_ptzController, SIGNAL(positionChanged(const QnMediaResourceWidget*)), this, SLOT(at_ptzController_positionChanged(const QnMediaResourceWidget*)));
     connect(m_mapperWatcher, SIGNAL(mapperChanged(const QnVirtualCameraResourcePtr &)), this, SLOT(at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &)));
@@ -583,6 +584,24 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
+    QVector3D newPhysicalPosition = physicalPositionForRect(widget, rect);
+    if(qIsNaN(newPhysicalPosition)) {
+        m_ptzController->setMovement(widget, QVector3D());
+        PtzData &data = m_dataByWidget[widget];
+        data.pendingAbsoluteMove = rect;
+        return; 
+    }
+
+    TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
+    m_ptzController->setPhysicalPosition(widget, newPhysicalPosition);
+}
+
+QVector3D PtzInstrument::physicalPositionForPos(QnMediaResourceWidget *widget, const QPointF &pos) {
+    return physicalPositionForRect(widget, QRectF(pos - toPoint(widget->size() / 2), widget->size()));
+}
+
+QVector3D PtzInstrument::physicalPositionForRect(QnMediaResourceWidget *widget, const QRectF &rect) 
+{
     const QnPtzSpaceMapper *mapper = 0;
     if (widget->virtualPtzController())
         mapper = widget->virtualPtzController()->getSpaceMapper();
@@ -591,18 +610,12 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
         if (camera)
             mapper = m_mapperWatcher->mapper(camera);
     }
-    if(!mapper)
-        return;
 
     QVector3D oldPhysicalPosition = m_ptzController->physicalPosition(widget);
-    if(qIsNaN(oldPhysicalPosition)) {
-        m_ptzController->setMovement(widget, QVector3D());
 
-        PtzData &data = m_dataByWidget[widget];
-        data.pendingAbsoluteMove = rect;
+    if(!mapper || qIsNaN(oldPhysicalPosition))
+        return oldPhysicalPosition;
 
-        return; 
-    }
 
     qreal zoom = widget->rect().width() / rect.width(); // For 2x zoom we'll get 2.0 here.
     QPointF pos = rect.center();
@@ -641,14 +654,12 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
     spherical.phi = gradToRad(oldPhysicalPosition.x()) + atan(rx * delta.x());
     spherical.psi = gradToRad(oldPhysicalPosition.y()) + atan(ry * delta.y());
 #endif
-    
+
     QVector3D newPhysicalPosition = QVector3D(radToGrad(spherical.phi), radToGrad(spherical.psi), oldPhysicalPosition.z() * zoom);
     QVector3D newLogicalPosition = mapper->toCamera().physicalToLogical(newPhysicalPosition);
     newPhysicalPosition = mapper->toCamera().logicalToPhysical(newLogicalPosition); /* There-and-back mapping ensures bounds. */
 
-    TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
-
-    m_ptzController->setPhysicalPosition(widget, newPhysicalPosition);
+    return newPhysicalPosition;
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
@@ -894,11 +905,17 @@ void PtzInstrument::startDrag(DragInfo *) {
     }
 
     if(!manipulator()) {
-        ensureSelectionItem();
-        selectionItem()->setParentItem(target());
-        selectionItem()->setViewport(m_viewport.data());
-        opacityAnimator(selectionItem())->stop();
-        selectionItem()->setOpacity(1.0);
+        if (m_useDirectDrag) {
+            m_dragFromPosition = m_ptzController->physicalPosition(target());
+            target()->setCursor(Qt::SizeAllCursor);
+        }
+        else {
+            ensureSelectionItem();
+            selectionItem()->setParentItem(target());
+            selectionItem()->setViewport(m_viewport.data());
+            opacityAnimator(selectionItem())->stop();
+            selectionItem()->setOpacity(1.0);
+        }
         /* Everything else will be initialized in the first call to drag(). */
     } else {
         manipulator()->setCursor(Qt::BlankCursor);
@@ -919,10 +936,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
         return;
     }
 
-    if(!manipulator()) {
-        ensureSelectionItem();
-        selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
-    } else {
+    if(manipulator()) {
         QPointF delta = info->mouseItemPos() - target()->rect().center();
         QSizeF size = target()->size();
         qreal scale = qMax(size.width(), size.height()) / 2.0;
@@ -951,20 +965,40 @@ void PtzInstrument::dragMove(DragInfo *info) {
 
         ptzMove(target(), QVector3D(speed));
     }
+    else if (m_useDirectDrag)
+    {
+        QPointF delta = info->mouseItemPos() - info->mousePressItemPos();
+        if (!delta.isNull())
+            target()->setCursor(Qt::BlankCursor);
+        QSizeF size = target()->size();
+        qreal scale = qMax(size.width(), size.height()) / 2.0;
+        QPointF shift(delta.x() / scale, -delta.y() / scale);
+        qreal fov = radToGrad(mm35vToFov(m_dragFromPosition.z()));
+        QVector3D positionDelta(shift.x() * fov/2.0, shift.y() * fov/2.0, 0.0);
+        m_ptzController->setPhysicalPosition(target(), m_dragFromPosition + positionDelta);
+    }
+    else {
+        ensureSelectionItem();
+        selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
+    }
 }
 
 void PtzInstrument::finishDrag(DragInfo *) {
     if(target()) {
         if(!manipulator()) {
-            ensureSelectionItem();
-            opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
+            if (m_useDirectDrag) {
+            }
+            else {
+                ensureSelectionItem();
+                opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
-            QRectF selectionRect = selectionItem()->boundingRect();
-            QSizeF targetSize = target()->size();
+                QRectF selectionRect = selectionItem()->boundingRect();
+                QSizeF targetSize = target()->size();
 
-            qreal relativeSize = qMax(selectionRect.width() / targetSize.width(), selectionRect.height() / targetSize.height());
-            if(relativeSize >= minPtzZoomRectSize)
-                processPtzDrag(selectionRect);
+                qreal relativeSize = qMax(selectionRect.width() / targetSize.width(), selectionRect.height() / targetSize.height());
+                if(relativeSize >= minPtzZoomRectSize)
+                    processPtzDrag(selectionRect);
+            }
         } else {
             manipulator()->setCursor(Qt::SizeAllCursor);
             target()->unsetCursor();
