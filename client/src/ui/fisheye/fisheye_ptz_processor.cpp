@@ -51,7 +51,6 @@ int QnFisheyePtzController::stopMove()
 
 int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 {
-    qreal ddd = mm35vToFov(zoomPos);
     m_motion = QVector3D();
     
     m_devorpingParams.fov = qBound(MIN_FOV, mm35vToFov(zoomPos), MAX_FOV);
@@ -102,7 +101,7 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
 
     qreal zoomSpeed = -m_motion.z() * MAX_ZOOM_SPEED;
     qreal xSpeed = m_motion.x() * MAX_MOVE_SPEED;
-    qreal ySpeed = -m_motion.y() * MAX_MOVE_SPEED;
+    qreal ySpeed = m_motion.y() * MAX_MOVE_SPEED;
 
     qreal timeSpend = (newTime - m_lastTime) / 1000000.0;
     
