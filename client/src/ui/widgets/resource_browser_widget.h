@@ -138,12 +138,12 @@ protected:
     void killSearchTimer();
     void showContextMenuAt(const QPoint &pos, bool ignoreSelection = false);
 
-    void hideToolTip();
-    void showToolTip();
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipVisibility();
     void updateToolTipPosition();
+    void hideToolTip();
+    void showToolTip();
 
     void forceUpdateFilter() { updateFilter(true); }
 

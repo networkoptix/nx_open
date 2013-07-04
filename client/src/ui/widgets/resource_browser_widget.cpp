@@ -125,7 +125,7 @@ void QnResourceBrowserToolTipWidget::updateTailPos()  {
     if (parentPos + halfHeight > m_enclosingRect.bottom())
         setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.bottom())));
     else */
-        setTailPos(QPointF(qRound(rect.left() + 10.0), qRound((rect.top() + rect.bottom()) / 2)));
+        setTailPos(QPointF(qRound(rect.left() - 10.0), qRound((rect.top() + rect.bottom()) / 2)));
 }
 
 void QnResourceBrowserToolTipWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
@@ -408,19 +408,28 @@ QString QnResourceBrowserWidget::toolTipAt(const QPointF &pos) const {
     QWidget* childWidget = ui->resourceTreeWidget->treeView();
     QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(childWidget);
 
-    QPoint childPos = childWidget->mapFrom(const_cast<QWidget*>(dynamic_cast<const QWidget*>(this)), pos.toPoint());
+    QPoint childPos = childWidget->mapFrom(const_cast<QnResourceBrowserWidget*>(this), pos.toPoint());
 
     if(view->model()) {
         QVariant toolTip = view->indexAt(childPos).data(Qt::ToolTipRole);
         if (toolTip.convert(QVariant::String))
             return toolTip.toString();
     }
-    return QString(tr("tooltip ot found"));
+    return QString();
 }
 
 bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
-    if (m_tooltipWidget)
+    if (!m_tooltipWidget)
+        return true; //default tooltip should not be displayed anyway
+
+    QString text = toolTipAt(pos);
+    if (text.isEmpty()) {
+        hideToolTip();
+    } else {
         m_tooltipWidget->setText(toolTipAt(pos));
+        m_tooltipWidget->pointTo(QPointF(qRound(geometry().right()), pos.y()));
+        showToolTip();
+    }
     return true;
 }
 
@@ -447,8 +456,8 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
     m_hoverProcessor->setHoverEnterDelay(250);
     m_hoverProcessor->setHoverLeaveDelay(250);
-    connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
-    connect(m_hoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(updateToolTipVisibility()));
+  //  connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
+    connect(m_hoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(hideToolTip()));
 
     updateToolTipPosition();
     updateToolTipVisibility();
@@ -530,7 +539,7 @@ void QnResourceBrowserWidget::updateToolTipPosition() {
     if (!m_tooltipWidget)
         return;
     m_tooltipWidget->updateTailPos();
-    m_tooltipWidget->pointTo(QPointF(qRound(geometry().right()), qRound(geometry().height() / 2 )));
+    //m_tooltipWidget->pointTo(QPointF(qRound(geometry().right()), qRound(geometry().height() / 2 )));
 }
 
 
