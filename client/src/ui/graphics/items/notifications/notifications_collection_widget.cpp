@@ -14,9 +14,11 @@
 #include <client/client_settings.h>
 
 #include <ui/common/geometry.h>
+#include <ui/animation/opacity_animator.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/generic/particle_item.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/style/skin.h>
@@ -50,12 +52,19 @@ QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
 
     m_particle = new QnParticleItem(this);
 
-    connect(this, SIGNAL(geometryChanged()), this, SLOT(updateParticleGeometry()));
-    connect(this, SIGNAL(toggled(bool)), this, SLOT(updateParticleVisibility()));
+    m_balloon = new QnToolTipWidget(this);
+    m_balloon->setText(tr("You have new notifications"));
+    m_balloon->setOpacity(0.0);
+
+    connect(m_balloon,  SIGNAL(geometryChanged()),  this, SLOT(updateBalloonTailPos()));
+    connect(this,       SIGNAL(geometryChanged()),  this, SLOT(updateParticleGeometry()));
+    connect(this,       SIGNAL(toggled(bool)),      this, SLOT(updateParticleVisibility()));
+    connect(m_particle, SIGNAL(visibleChanged()),   this, SLOT(at_particle_visibleChanged()));
 
     updateParticleGeometry();
     updateParticleVisibility();
     updateToolTip();
+    updateBalloonTailPos();
 }
 
 void QnBlinkingImageButtonWidget::setNotificationCount(int count) {
@@ -70,6 +79,17 @@ void QnBlinkingImageButtonWidget::setNotificationCount(int count) {
 
 void QnBlinkingImageButtonWidget::setColor(const QColor &color) {
     m_particle->setColor(color);
+}
+
+void QnBlinkingImageButtonWidget::showBalloon() {
+    /*updateBalloonGeometry();
+    opacityAnimator(m_balloon, 4.0)->animateTo(1.0);
+
+    QTimer::singleShot(3000, this, SLOT(hideBalloon()));*/
+}
+
+void QnBlinkingImageButtonWidget::hideBalloon() {
+    /*opacityAnimator(m_balloon, 4.0)->animateTo(0.0);*/
 }
 
 void QnBlinkingImageButtonWidget::updateParticleGeometry() {
@@ -87,10 +107,25 @@ void QnBlinkingImageButtonWidget::updateToolTip() {
     setToolTip(tr("You have %n notifications", "", m_count));
 }
 
+void QnBlinkingImageButtonWidget::updateBalloonTailPos() {
+    QRectF rect = m_balloon->rect();
+    m_balloon->setTailPos(QPointF(rect.right() + 8.0, rect.center().y()));
+}
+
+void QnBlinkingImageButtonWidget::updateBalloonGeometry() {
+    QRectF rect = this->rect();
+    m_balloon->pointTo(QPointF(rect.left(), rect.center().y()));
+}
+
 void QnBlinkingImageButtonWidget::tick(int deltaMSecs) {
     m_time += deltaMSecs;
     
     m_particle->setOpacity(0.6 + 0.4 * std::sin(m_time / 1000.0 * 2 * M_PI));
+}
+
+void QnBlinkingImageButtonWidget::at_particle_visibleChanged() {
+    if(m_particle->isVisible())
+        showBalloon();
 }
 
 
