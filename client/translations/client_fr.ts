@@ -2487,13 +2487,6 @@ Make sure the server is available and try again.</source>
         <source>Activate %1 more digital and %2 more analog licenses.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>Activate %1 more analog license(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>%1 more digital and %2 more analog licenses will be used.</source>
         <translation type="unfinished"></translation>
@@ -2536,6 +2529,13 @@ Make sure the server is available and try again.</source>
     <message>
         <source>Dual-Streaming is not supported by this camera.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Activate %n more analog license(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3086,7 +3086,7 @@ You will be asked to restart the client in compatibility mode.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n analog  license(s) will be used out of %1.</source>
+        <source>%n analog license(s) will be used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>

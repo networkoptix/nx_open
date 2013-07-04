@@ -3107,6 +3107,15 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="561"/>
+        <source>Activate %n more analog license(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="568"/>
         <source>%n more digital license(s) will be used.</source>
         <translation type="unfinished">
@@ -3128,15 +3137,6 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="554"/>
         <source>Activate %1 more digital and %2 more analog licenses.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="561"/>
-        <source>Activate %1 more analog license(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="563"/>
@@ -3521,7 +3521,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/export_camera_settings_dialog.cpp" line="115"/>
-        <source>%n analog  license(s) will be used out of %1.</source>
+        <source>%n analog license(s) will be used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>

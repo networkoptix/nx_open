@@ -3245,7 +3245,7 @@ Make sure the server is available and try again.</source>
     </message>
     <message numerus="yes">
         <source>Activate %1 more analog license(s).</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             <numerusform>激活%1 模拟许可</numerusform>
         </translation>
     </message>
@@ -3294,6 +3294,12 @@ Make sure the server is available and try again.</source>
     <message>
         <source>Dual-Streaming is not supported by this camera.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Activate %n more analog license(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3886,8 +3892,14 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message numerus="yes">
         <source>%n analog  license(s) will be used out of %1.</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             <numerusform>%1中的%n路模拟许可将被使用。</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) will be used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
