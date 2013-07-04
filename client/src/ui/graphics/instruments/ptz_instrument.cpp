@@ -311,6 +311,20 @@ public:
         updateLayout();
     }
 
+    void hideCursor()
+    {
+        manipulatorWidget()->setCursor(Qt::BlankCursor);
+        zoomInButton()->setCursor(Qt::BlankCursor);
+        zoomOutButton()->setCursor(Qt::BlankCursor);
+    }
+
+    void showCursor()
+    {
+        manipulatorWidget()->setCursor(Qt::SizeAllCursor);
+        zoomInButton()->setCursor(Qt::ArrowCursor);
+        zoomOutButton()->setCursor(Qt::ArrowCursor);
+    }
+
     PtzManipulatorWidget *manipulatorWidget() const {
         return m_manipulatorWidget;
     }
@@ -968,8 +982,11 @@ void PtzInstrument::dragMove(DragInfo *info) {
     else if (m_useDirectDrag)
     {
         QPointF delta = info->mouseItemPos() - info->mousePressItemPos();
-        if (!delta.isNull())
+        if (!delta.isNull()) {
             target()->setCursor(Qt::BlankCursor);
+            overlayWidget(target())->hideCursor();
+            
+        }
         QSizeF size = target()->size();
         qreal scale = qMax(size.width(), size.height()) / 2.0;
         QPointF shift(delta.x() / scale, -delta.y() / scale);
@@ -983,7 +1000,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
     }
 }
 
-void PtzInstrument::finishDrag(DragInfo *) {
+void PtzInstrument::finishDrag(DragInfo * info) {
     if(target()) {
         if(!manipulator()) {
             if (m_useDirectDrag) {
@@ -1010,6 +1027,11 @@ void PtzInstrument::finishDrag(DragInfo *) {
 
     if(m_ptzStartedEmitted)
         emit ptzFinished(target());
+
+    if (m_useDirectDrag) {
+        overlayWidget(target())->showCursor();
+        QCursor::setPos(info->mousePressScreenPos());
+    }
 }
 
 void PtzInstrument::finishDragProcess(DragInfo *info) {
