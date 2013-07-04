@@ -41,14 +41,6 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
         return vec3(r * cos(phi) * cos(psi), r * sin(phi) * cos(psi), r * sin(psi));
     }
 
-    vec3 cartesianToSpherical(vec3 vector) {
-        vec3 result;
-        result.z = length(vector);
-        result.x = atan(vector.y, vector.x);
-        result.y = asin(vector.z / result.z);
-        return result;
-    }
-
     void main() 
     {
         
@@ -60,10 +52,8 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
 
         vec3 r2 = r1 + x * pos.x + y * pos.y;
 
-        vec3 spherical = cartesianToSpherical(r2);
-
-        float theta = spherical.x;
-        float phi   = spherical.y;
+        float theta = atan(r2.y, r2.x);
+        float phi   = asin(r2.z / length(r2));
         
         /*
         float theta = atan(pos.x) + xShift;
