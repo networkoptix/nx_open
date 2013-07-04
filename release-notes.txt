@@ -19,6 +19,7 @@ Since 1.5.1
  - If a camera was discovered automatically and after this it was not accessible by multicast, then this camera didn't 
    work after Media Server restart. Fixed
  - PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
+ - Aggregation column is added to Event and Action (used to be in advanced E&A settings)
  
 Since previous build
 
