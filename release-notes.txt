@@ -21,6 +21,12 @@ Since 1.5.1
  - PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
  - Aggregation column is added to Event and Action (used to be in advanced E&A settings)
  
+ - iOS. Feature #1943. Sort cameras by name.
+ - iOS. Feature #1938. Add camera name on item.
+ - iOS5. Bug #1949. Incorrect date and time.
+ - iOS. Bug #1937. iPad. Server status aren't displayed.
+ 
+ 
 Since previous build
 
  - Client Client crashe when move a zoom window quickly across items
@@ -53,6 +59,8 @@ Since previous build
  - Media server Failure" + "Camera output for 30 second" didn't work. Fixed
  - Rotated item was resized incorrectly. Fixed
  
+ - Bug #2102.Cannot open exe file.
+ - Bug #2111. Email Notification contains local address in a motion hyperlink
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 
 ANDROID CLIENT:
