@@ -8,6 +8,7 @@ class QnWorkbenchContext;
 
 class QnCameraListModel: public QnResourceListModel, public QnWorkbenchContextAware
 {
+    Q_OBJECT
 public:
 
     enum Column {

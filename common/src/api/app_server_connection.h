@@ -79,6 +79,7 @@ public:
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem);
     int addBusinessRule(const QnBusinessEventRulePtr &businessRule);
     bool setPanicMode(QnMediaServerResource::PanicMode value);
+    void disconnectSync();
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId);
     int getServers(QnMediaServerResourceList& servers);
