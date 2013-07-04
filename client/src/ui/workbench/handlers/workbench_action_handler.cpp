@@ -102,6 +102,7 @@
 #include <utils/license_usage_helper.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/app_server_notification_cache.h>
+#include <utils/local_file_cache.h>
 #include <utils/media/audio_player.h>
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -233,14 +234,14 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugCalibratePtzAction),                SIGNAL(triggered()),    this,   SLOT(at_debugCalibratePtzAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
-    connect(action(Qn::PreferencesGeneralTabAction),                   SIGNAL(triggered()),    this,   SLOT(at_PreferencesGeneralTabAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
-    connect(action(Qn::PreferencesLicensesTabAction),                  SIGNAL(triggered()),    this,   SLOT(at_PreferencesLicensesTabAction_triggered()));
-    connect(action(Qn::PreferencesServerTabAction),               SIGNAL(triggered()),    this,   SLOT(at_PreferencesServerTabAction_triggered()));
-    connect(action(Qn::PreferencesNotificationTabAction),                SIGNAL(triggered()),    this,   SLOT(at_PreferencesNotificationTabAction_triggered()));
+    connect(action(Qn::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
+    connect(action(Qn::PreferencesLicensesTabAction),           SIGNAL(triggered()),    this,   SLOT(at_preferencesLicensesTabAction_triggered()));
+    connect(action(Qn::PreferencesServerTabAction),             SIGNAL(triggered()),    this,   SLOT(at_preferencesServerTabAction_triggered()));
+    connect(action(Qn::PreferencesNotificationTabAction),       SIGNAL(triggered()),    this,   SLOT(at_preferencesNotificationTabAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
@@ -1389,16 +1390,29 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
             !resources.empty() &&
             layouts.empty()) {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
+        return;
     }
 
     if (!resources.empty()) {
         parameters.setResources(resources);
         if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
-        else
-            QMessageBox::warning(mainWindow(),
-                                 tr("Cannot add item"),
-                                 tr("Cannot add a local file to Multi-Video"));
+        else {
+            QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+            if (layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout)) {
+                bool hasLocal = false;
+                foreach (const QnResourcePtr &resource, resources) {
+                    //TODO: #GDM refactor duplicated code
+                    hasLocal |= resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+                    if (hasLocal)
+                        break;
+                }
+                if (hasLocal)
+                    QMessageBox::warning(mainWindow(),
+                                         tr("Cannot add item"),
+                                         tr("Cannot add a local file to Multi-Video"));
+            }
+        }
     }
     if(!layouts.empty())
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
@@ -1579,7 +1593,8 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
-    notifyAboutUpdate(false);
+    if(qnSettings->isUpdatesEnabled())
+        notifyAboutUpdate(false);
 }
 
 void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
@@ -1592,29 +1607,29 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_PreferencesLicensesTabAction_triggered() {
+void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->openLicensesPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_PreferencesServerTabAction_triggered() {
+void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->openServerSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_PreferencesNotificationTabAction_triggered() {
+void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->openPopupSettingsPage();
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_PreferencesGeneralTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -2067,6 +2082,8 @@ void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
 
     businessEventsLogDialog()->disableUpdateData();
     businessEventsLogDialog()->setEventType(BusinessEventType::AnyCameraIssue);
+    QDate date = QDateTime::currentDateTime().date();
+    businessEventsLogDialog()->setDateRange(date, date);
     businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());
     businessEventsLogDialog()->enableUpdateData();
 
@@ -2180,6 +2197,8 @@ void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
 
     businessEventsLogDialog()->disableUpdateData();
     businessEventsLogDialog()->setEventType(BusinessEventType::AnyServerIssue);
+    QDate date = QDateTime::currentDateTime().date();
+    businessEventsLogDialog()->setDateRange(date, date);
     businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());
     businessEventsLogDialog()->enableUpdateData();
 
@@ -2916,6 +2935,9 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             device = m_exportStorage->open(layout->backgroundImageFilename(), QIODevice::WriteOnly);
             backround.save(device, "png");
             delete device;
+
+            QnLocalFileCache cache;
+            cache.storeImage(layout->backgroundImageFilename(), backround);
         }
     }
 

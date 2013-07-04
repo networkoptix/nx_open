@@ -22,7 +22,7 @@ QString QnLocalFileCache::getFullPath(const QString &filename) const {
                                     );
 }
 
-void QnLocalFileCache::storeImage(const QString &fileName, const QByteArray &image) {
+void QnLocalFileCache::storeImage(const QString &fileName, const QByteArray &imageData) {
     ensureCacheFolder();
     QString fullPath = getFullPath(fileName);
     if (QFileInfo(fullPath).exists())
@@ -30,8 +30,17 @@ void QnLocalFileCache::storeImage(const QString &fileName, const QByteArray &ima
 
     QFile file(fullPath);
     file.open(QIODevice::WriteOnly);
-    file.write(image);
+    file.write(imageData);
     file.close();
+}
+
+void QnLocalFileCache::storeImage(const QString &fileName, const QImage &image) {
+    ensureCacheFolder();
+    QString fullPath = getFullPath(fileName);
+    if (QFileInfo(fullPath).exists())
+        return;
+
+    image.save(fullPath, "png");
 }
 
 void QnLocalFileCache::downloadFile(const QString &filename) {

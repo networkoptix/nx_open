@@ -1,4 +1,3 @@
-
 #include "notifications_collection_widget.h"
 
 #include <QApplication>
@@ -14,8 +13,10 @@
 
 #include <client/client_settings.h>
 
+#include <ui/common/geometry.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
+#include <ui/graphics/items/generic/particle_item.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/style/skin.h>
@@ -41,54 +42,57 @@ namespace {
 
 QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
     base_type(parent),
-    m_blinking(false),
-    m_blinkUp(true),
-    m_blinkProgress(0.0),
-    m_color(Qt::transparent)
+    m_count(0),
+    m_time(0)
 {
     registerAnimation(this);
     startListening();
-    setNotificationCount(0);
+
+    m_particle = new QnParticleItem(this);
+
+    connect(this, SIGNAL(geometryChanged()), this, SLOT(updateParticleGeometry()));
+    connect(this, SIGNAL(toggled(bool)), this, SLOT(updateParticleVisibility()));
+
+    updateParticleGeometry();
+    updateParticleVisibility();
+    updateToolTip();
 }
 
 void QnBlinkingImageButtonWidget::setNotificationCount(int count) {
-    m_blinking = count > 0;
-    setToolTip(tr("You have %n notifications", "", count));
+    if(m_count == count)
+        return;
+
+    m_count = count;
+
+    updateParticleVisibility();
+    updateToolTip();
 }
 
 void QnBlinkingImageButtonWidget::setColor(const QColor &color) {
-    m_color = color;
+    m_particle->setColor(color);
+}
+
+void QnBlinkingImageButtonWidget::updateParticleGeometry() {
+    QRectF rect = this->rect();
+    qreal radius = (rect.width() + rect.height()) / 4.0;
+
+    m_particle->setRect(QRectF(rect.center() - QPointF(radius, radius), 2.0 * QSizeF(radius, radius)));
+}
+
+void QnBlinkingImageButtonWidget::updateParticleVisibility() {
+    m_particle->setVisible(m_count > 0 && !isChecked());
+}
+
+void QnBlinkingImageButtonWidget::updateToolTip() {
+    setToolTip(tr("You have %n notifications", "", m_count));
 }
 
 void QnBlinkingImageButtonWidget::tick(int deltaMSecs) {
-    qreal step = (qreal)deltaMSecs / 1000;
-    if (m_blinkUp) {
-        m_blinkProgress += step;
-        if (m_blinkProgress >= 1.0) {
-            m_blinkProgress = 1.0;
-            m_blinkUp = false;
-        }
-    } else {
-        m_blinkProgress -= step;
-        if (m_blinkProgress <= 0.2) {
-            m_blinkProgress = 0.2;
-            m_blinkUp = true;
-        }
-    }
+    m_time += deltaMSecs;
+    
+    m_particle->setOpacity(0.6 + 0.4 * std::sin(m_time / 1000.0 * 2 * M_PI));
 }
 
-void QnBlinkingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect)  {
-    base_type::paint(painter, startState, endState, progress, widget, rect);
-    if (!(startState & CHECKED) && m_blinking) {
-        QRadialGradient gradient(0.0, rect.height() / 2, rect.width()* 1.5);
-        gradient.setColorAt(0.0, toTransparent(m_color, m_blinkProgress));
-        gradient.setColorAt(1.0,  Qt::transparent);
-        qreal opacity = painter->opacity();
-        painter->setOpacity(1.0);
-        painter->fillRect(rect, gradient);
-        painter->setOpacity(opacity);
-    }
-}
 
 // ---------------------- QnNotificationsCollectionWidget -------------------
 
@@ -250,12 +254,12 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case BusinessEventType::Camera_Disconnect: {
         item->setColorLevel(QnNotificationItem::Important);
-        item->addActionButton(
+/*        item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Open Camera"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
-        );
+        );*/
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Camera Settings"),
@@ -267,12 +271,12 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case BusinessEventType::Storage_Failure: {
         item->setColorLevel(QnNotificationItem::Important);
-        item->addActionButton(
+      /*  item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Open Monitor"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
-        );
+        );*/
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings"),
@@ -283,12 +287,12 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case BusinessEventType::Network_Issue:{
         item->setColorLevel(QnNotificationItem::Important);
-        item->addActionButton(
+       /* item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Open Camera"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
-        );
+        );*/
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Camera Settings"),

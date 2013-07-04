@@ -64,6 +64,7 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
             raisedItem = workbench()->item(Qn::ZoomedRole);
     }
 
+#if 0
     QRect firstDecorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
 
     /* Draw 'raised' icon */
@@ -85,30 +86,12 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
         style->drawPrimitive(QStyle::PE_PanelItemViewItem, &optionV4, painter, optionV4.widget);
         optionV4.rect = rect;
     }
+#endif
 
-    /* Draw 'problems' icon. */
-    if(QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>()) {
-        if(camera->statusFlags() & QnSecurityCamResource::HasIssuesFlag) {
-            QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
-            m_buggyIcon.paint(painter, decorationRect);
-
-            QRect rect = optionV4.rect;
-            QRect skipRect(
-                rect.topLeft(),
-                QPoint(
-                    decorationRect.right() + decorationRect.left() - rect.left(),
-                    rect.bottom()
-                )
-            );
-            rect.setLeft(skipRect.right() + 1);
-
-            optionV4.rect = skipRect;
-            style->drawPrimitive(QStyle::PE_PanelItemViewItem, &optionV4, painter, optionV4.widget);
-            optionV4.rect = rect;
-        }
-    }
+    QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget).adjusted(-4, 0, -4, 0);
 
     /* Draw 'recording' icon. */
+    decorationRect.moveLeft(decorationRect.left() - decorationRect.width());
     bool recording = false, scheduled = false;
     if(resource) {
         if(!resource->isDisabled()) {
@@ -127,13 +110,14 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
             if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
                 scheduled = !camera->isScheduleDisabled();
     }
+    if(recording || scheduled)
+        (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, decorationRect);
 
-    if(recording || scheduled) {
-        QRect iconRect = firstDecorationRect;
-        iconRect.moveLeft(iconRect.left() - iconRect.width() - 2);
-
-        (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, iconRect);
-    }
+    /* Draw 'problems' icon. */
+    decorationRect.moveLeft(decorationRect.left() - decorationRect.width());
+    if(QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>())
+        if(camera->statusFlags() & QnSecurityCamResource::HasIssuesFlag)
+            m_buggyIcon.paint(painter, decorationRect);
 
     /* Draw item. */
     style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);

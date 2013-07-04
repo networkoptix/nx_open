@@ -431,7 +431,7 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-	//signal(SIGABRT, stopServer);
+    //signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -578,6 +578,8 @@ void QnMain::stopObjects()
 {
     qWarning() << "QnMain::stopObjects() called";
 
+    qnFileDeletor->pleaseStop();
+
     if (m_restServer)
         m_restServer->pleaseStop();
     if (m_progressiveDownloadingServer)
@@ -721,7 +723,7 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 
 void QnMain::at_timer()
 {
-	qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras()) 
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
@@ -887,6 +889,7 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
+    QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
@@ -1116,6 +1119,9 @@ void QnMain::run()
     delete QnMServerResourceSearcher::instance();
     QnMServerResourceSearcher::initStaticInstance( NULL );
 
+    delete QnVideoCameraPool::instance();
+    QnVideoCameraPool::initStaticInstance( NULL );
+
     QnResourceDiscoveryManager::instance()->stop();
     QnResource::stopAsyncTasks();
 
@@ -1151,9 +1157,6 @@ void QnMain::run()
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
 
-    delete QnVideoCameraPool::instance();
-    QnVideoCameraPool::initStaticInstance( NULL );
-
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
 
@@ -1163,6 +1166,11 @@ void QnMain::run()
 
     av_lockmgr_register(NULL);
 
+    // First disconnect eventManager from all slots, to not try to reconnect on connection close
+    disconnect(eventManager);
+
+    // This method will set flag on message channel to threat next connection close as normal
+    appServerConnection->disconnectSync();
     qSettings.setValue("lastRunningTime", 0);
 }
 

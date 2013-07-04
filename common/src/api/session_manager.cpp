@@ -76,6 +76,7 @@ QnSessionManager::QnSessionManager(QObject *parent):
     connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(at_aboutToBeStarted()));
 
     m_thread->setObjectName( QLatin1String("QnSessionManagerThread") ); /* Name will be shown in debugger. */
+    Q_ASSERT(parent == 0);
     this->moveToThread(m_thread.data());
     m_thread->start();
 }

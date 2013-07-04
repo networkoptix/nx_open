@@ -19,9 +19,12 @@
 #include "resource_property.h"
 
 #include "utils/common/synctime.h"
+#include "utils/common/util.h"
 
 bool QnResource::m_appStopping = false;
 QThreadPool QnResource::m_initAsyncPool;
+
+static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 
 QnResource::QnResource(): 
     QObject(),
@@ -31,7 +34,8 @@ QnResource::QnResource():
     m_disabled(false),
     m_status(Offline),
     m_initialized(false),
-    m_initMutex(QMutex::Recursive)
+    m_initMutex(QMutex::Recursive),
+    m_lastInitTime(0)
 {
 }
 
@@ -804,15 +808,22 @@ void QnResource::setDisabled(bool disabled)
 
 void QnResource::init()
 {
-    QMutexLocker lock(&m_initMutex);
+    if (m_appStopping)
+        return;
+
+    if (!m_initMutex.tryLock())
+        return; // if init already running, skip new request
+
     if (!m_initialized) 
     {
+        m_lastInitTime = getUsecTimer();
         m_initialized = initInternal();
         if( m_initialized )
             initializationDone();
         if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
             setStatus(Offline);
     }
+    m_initMutex.unlock();
 }
 
 void QnResource::initAndEmit()
@@ -842,6 +853,9 @@ void QnResource::stopAsyncTasks()
 
 void QnResource::initAsync()
 {
+    if (getUsecTimer() - m_lastInitTime < MIN_INIT_INTERVAL)
+        return; 
+
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     m_initAsyncPool.start(task);
 }

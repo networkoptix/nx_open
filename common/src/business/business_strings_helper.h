@@ -8,6 +8,7 @@
 
 class QnBusinessStringsHelper: QObject
 {
+    Q_OBJECT
 public:
     static QString eventReason(const QnBusinessEventParameters& params);
 

@@ -195,6 +195,7 @@ void ResizingInstrument::dragMove(DragInfo *info) {
         /* We don't handle heightForWidth. */
     }
 
+    /* Calculate new position. */
     QPointF newPos;
     if(m_section == Qt::TitleBarArea) {
         QPointF itemPos = widget->mapFromScene(info->mouseScenePos());
@@ -204,13 +205,23 @@ void ResizingInstrument::dragMove(DragInfo *info) {
     }
 
     if(m_constrained != NULL) {
-        QRectF newGeometry = m_constrained->constrainedGeometry(QRectF(newPos, newSize), Qn::calculatePinPoint(m_section));
-        newSize = newGeometry.size();
-        newPos = newGeometry.topLeft();
+        QRectF newRect = m_constrained->constrainedGeometry(QRectF(newPos, newSize), Qn::calculatePinPoint(m_section));
+        newPos = newRect.topLeft();
+        newSize = newRect.size();
     }
 
-    /* Change size & position. */
+    /* Change size. */
     widget->resize(newSize);
+    newSize = widget->size();
+
+    /* Recalculate new position. 
+     * Note that changes in size may change item's transformation => 
+     * we have to calculate position after setting the size. */
+    // TODO: totally evil copypasta
+    if(m_section != Qt::TitleBarArea)
+        newPos = widget->pos() + m_startPinPoint - widget->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), m_section));
+    
+    /* Change position. */
     widget->setPos(newPos);
 
     ResizingInfo resizingInfo(info, this);

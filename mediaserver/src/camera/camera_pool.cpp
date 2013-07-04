@@ -2,6 +2,11 @@
 
 #include "video_camera.h"
 #include "core/resource/security_cam_resource.h"
+#include "common/customization.h"
+
+#ifdef Q_OS_WIN
+#include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
+#endif
 
 QMutex QnVideoCameraPool::m_staticMtx;
 
@@ -9,6 +14,13 @@ void QnVideoCameraPool::stop()
 {
     foreach(QnVideoCamera* camera, m_cameras.values())
         camera->beforeStop();
+
+#ifdef Q_OS_WIN
+    if (qnCustomization() == Qn::DwSpectrumCustomization)
+    {
+        VMaxStreamFetcher::pleaseStopAll(); // increase stop time
+    }
+#endif
     foreach(QnVideoCamera* camera, m_cameras.values())
         delete camera;
 

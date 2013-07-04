@@ -4,6 +4,7 @@
 #include <QtGui/QComboBox>
 #include <QtGui/QTreeView>
 
+// TODO: #GDM belongs in ui/widgets, not in ui/common
 class QnTreeViewComboBox : public QComboBox 
 {
     Q_OBJECT

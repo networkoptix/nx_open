@@ -23,6 +23,10 @@ static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
 static const int DEFAUT_PROXY_PORT = 7009;
 
+static const QString ECS_PUBLIC_IP_MODE_AUTO = "auto";
+static const QString ECS_PUBLIC_IP_MODE_MANUAL = "manual";
+static const QString ECS_PUBLIC_IP_MODE_DISABLED = "disabled";
+
 bool MyIsUserAnAdmin()
 {
    bool isAdmin = false;
@@ -126,6 +130,9 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
 
     connect(ui->radioButtonPublicIPAuto, SIGNAL(toggled (bool)), this, SLOT(onRadioButtonPublicIpChanged()));
     connect(ui->radioButtonCustomPublicIP, SIGNAL(toggled (bool)), this, SLOT(onRadioButtonPublicIpChanged()));
+
+    connect(ui->ecsUseAutoPublicIp, SIGNAL(toggled (bool)), this, SLOT(onRadioButtonEcsPublicIpChanged()));
+    connect(ui->ecsUseManualPublicIp, SIGNAL(toggled (bool)), this, SLOT(onRadioButtonEcsPublicIpChanged()));
 
     m_findServices.start(10000);
     m_updateServiceStatus.start(500);
@@ -289,6 +296,11 @@ void QnSystrayWindow::showMessage(const QString& message)
 void QnSystrayWindow::onRadioButtonPublicIpChanged()
 {
     ui->staticPublicIPEdit->setEnabled(ui->radioButtonCustomPublicIP->isChecked());
+}
+
+void QnSystrayWindow::onRadioButtonEcsPublicIpChanged()
+{
+    ui->ecsManuaPublicIPEdit->setEnabled(ui->ecsUseManualPublicIp->isChecked());
 }
 
 void QnSystrayWindow::onDelayedMessage()
@@ -687,8 +699,16 @@ void QnSystrayWindow::onSettingsAction()
 #ifndef USE_SINGLE_STREAMING_PORT
     ui->apiPortLineEdit->setText(m_mServerSettings.value("apiPort").toString());
 #endif
-    ui->appServerPortLineEdit->setText(m_appServerSettings.value("port").toString());
-    ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toString());
+
+    QString ecsPublicIpMode = m_appServerSettings.value("publicIpMode").toString();
+    ui->ecsAllowPublicIpGroupBox->setChecked(ecsPublicIpMode != ECS_PUBLIC_IP_MODE_DISABLED);
+    ui->ecsUseAutoPublicIp->setChecked(ecsPublicIpMode == ECS_PUBLIC_IP_MODE_AUTO);
+    ui->ecsUseManualPublicIp->setChecked(ecsPublicIpMode == ECS_PUBLIC_IP_MODE_MANUAL);
+    ui->ecsManuaPublicIPEdit->setText(m_appServerSettings.value("manualPublicIp").toString());
+
+    onRadioButtonEcsPublicIpChanged();
+    ui->ecsPortSpinBox->setValue(m_appServerSettings.value("port").toInt());
+    ui->mediaProxyPortSpinBox->setValue(m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt());
 
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
@@ -698,8 +718,25 @@ void QnSystrayWindow::onSettingsAction()
 
 bool QnSystrayWindow::isAppServerParamChanged() const
 {
-    return ui->appServerPortLineEdit->text().toInt() != m_appServerSettings.value("port").toInt() ||
-           ui->proxyPortLineEdit->text().toInt() != m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt();
+    if (ui->ecsPortSpinBox->value() != m_appServerSettings.value("port").toInt() ||
+        ui->mediaProxyPortSpinBox->value() != m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt())
+        return true;
+
+    if (m_appServerSettings.value("manualPublicIp").toString().trimmed() != ui->ecsManuaPublicIPEdit->text().trimmed() && ui->ecsUseManualPublicIp->isChecked())
+        return true;
+
+    QString publicIpMode;
+    if (!ui->ecsAllowPublicIpGroupBox->isChecked())
+        publicIpMode = ECS_PUBLIC_IP_MODE_DISABLED;
+    else if (ui->ecsUseAutoPublicIp->isChecked())
+        publicIpMode = ECS_PUBLIC_IP_MODE_AUTO;
+    else
+        publicIpMode= ECS_PUBLIC_IP_MODE_MANUAL;
+
+    if (m_appServerSettings.value("publicIpMode").toString() != publicIpMode)
+        return true;
+
+    return false;
 }
 
 bool QnSystrayWindow::isMediaServerParamChanged() const
@@ -828,8 +865,8 @@ bool QnSystrayWindow::validateData()
 
     if (m_appServerHandle)
     {
-        checkedPorts << PortInfo(ui->appServerPortLineEdit->text().toInt(), m_appServerSettings.value("port").toInt(), APP_SERVER_NAME, 1);
-        checkedPorts << PortInfo(ui->proxyPortLineEdit->text().toInt(), m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt(), "media proxy", 1);
+        checkedPorts << PortInfo(ui->ecsPortSpinBox->value(), m_appServerSettings.value("port").toInt(), APP_SERVER_NAME, 1);
+        checkedPorts << PortInfo(ui->mediaProxyPortSpinBox->value(), m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt(), "media proxy", 1);
     }
 
     if (m_mediaServerHandle)
@@ -886,9 +923,17 @@ void QnSystrayWindow::saveData()
 
     m_mServerSettings.setValue("rtspTransport", ui->rtspTransportComboBox->currentText());
 
-    m_appServerSettings.setValue("port", ui->appServerPortLineEdit->text());
-    m_appServerSettings.setValue("proxyPort", ui->proxyPortLineEdit->text());
+    m_appServerSettings.setValue("port", QString::number(ui->ecsPortSpinBox->value()));
+    m_appServerSettings.setValue("proxyPort", QString::number(ui->mediaProxyPortSpinBox->value()));
 
+    if (!ui->ecsAllowPublicIpGroupBox->isChecked())
+        m_appServerSettings.setValue("publicIpMode", ECS_PUBLIC_IP_MODE_DISABLED);
+    else if (ui->ecsUseAutoPublicIp->isChecked())
+        m_appServerSettings.setValue("publicIpMode", ECS_PUBLIC_IP_MODE_AUTO);
+    else
+        m_appServerSettings.setValue("publicIpMode", ECS_PUBLIC_IP_MODE_MANUAL);
+
+    m_appServerSettings.setValue("manualPublicIp", ui->ecsManuaPublicIPEdit->text());
     QStringList urlList = m_settings.value("appserverUrlHistory").toString().split(';');
     urlList.insert(0, getAppServerURL().toString());
     urlList.removeDuplicates();

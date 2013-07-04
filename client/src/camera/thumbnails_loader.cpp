@@ -273,21 +273,22 @@ void QnThumbnailsLoader::updateProcessingLocked() {
     }
 
     /* Add margins. */
+    qint64 remainder = qMod(m_requestStart, m_timeStep);
     qint64 processingStart = m_requestStart;
-    qint64 processingEnd = m_requestEnd;
-    qint64 processingSize = processingEnd - processingStart;
-    processingStart = qFloor(qMax(0ll, processingStart - processingSize / 4), m_timeStep);
-    processingEnd = qCeil(processingEnd + processingSize / 4, m_timeStep);
+    qint64 processingSize = qCeil(m_requestEnd - m_requestStart, m_timeStep);
+    qint64 processingEnd = processingStart + processingSize; /* So that remainder stays the same. */
+    processingStart = qFloor(qMax(0ll, processingStart - remainder - processingSize / 4), m_timeStep) + remainder;
+    processingEnd = qCeil(processingEnd - remainder + processingSize / 4, m_timeStep) + remainder;
 
     /* Trim at live. */
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if(processingEnd > currentTime)
-        processingEnd = qCeil(currentTime + defaultUpdateInterval, m_timeStep);
+        processingEnd = qCeil(currentTime + defaultUpdateInterval, m_timeStep) + remainder;
 
     /* Adjust for the chunks near live that could not be loaded at the last request. */
     if(m_processingStart < m_maxLoadedTime && m_maxLoadedTime < m_processingEnd && processingEnd > m_maxLoadedTime) {
-        processingStart = qMin(processingStart, qFloor(m_maxLoadedTime, m_timeStep) + m_timeStep);
-        m_processingEnd = m_maxLoadedTime;
+        processingStart = qMin(processingStart, qFloor(m_maxLoadedTime - remainder, m_timeStep) + remainder + m_timeStep);
+        processingEnd = qCeil(m_maxLoadedTime, m_timeStep) + remainder;
     }
 
     if(processingPeriodValid) {
@@ -296,12 +297,12 @@ void QnThumbnailsLoader::updateProcessingLocked() {
 
         /* Try 1st option. */
         start = processingStart;
-        end = qMin(m_processingStart - m_timeStep, processingEnd);
+        end = qMin(qCeil(m_processingStart, m_timeStep) - m_timeStep + remainder, processingEnd);
         if(start <= end)
             enqueueForProcessingLocked(start, end);
 
         /* Try 2nd option. */
-        start = qMax(m_processingEnd + m_timeStep, processingStart);
+        start = qMax(qFloor(m_processingEnd, m_timeStep) + m_timeStep + remainder, processingStart);
         end = processingEnd;
         if(start <= end)
             enqueueForProcessingLocked(start, end);

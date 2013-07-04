@@ -15,6 +15,7 @@
 #include <utils/math/math.h>
 #include "device_plugins/server_camera/server_camera.h"
 #include "client/client_settings.h"
+#include <ui/common/resource_name.h>
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
@@ -384,36 +385,9 @@ QVariant QnEventLogModel::resourceData(const Column& column, const QnBusinessAct
     return QVariant();
 }
 
-QString QnEventLogModel::formatUrl(const QString& url)
-{
-    int prefix = url.indexOf(QLatin1String("://"));
-    if (prefix == -1)
-        return url;
-    else {
-        prefix += 3;
-        int hostEnd = url.indexOf(QLatin1Char(':'), prefix);
-        if (hostEnd == -1) {
-            hostEnd = url.indexOf(QLatin1Char('/'), prefix);
-            if (hostEnd == -1)
-                hostEnd = url.indexOf(QLatin1Char('?'), prefix);
-        }
-
-        if (hostEnd != -1)
-            return url.mid(prefix, hostEnd - prefix);
-    }
-    return url;
-}
-
 QString QnEventLogModel::getResourceNameString(QnId id)
 {
-    QString result;
-    QnResourcePtr res = getResourceById(id);
-    if (res) {
-        result = res->getName();
-        if (qnSettings->isIpShownInTree())
-            result += QString(lit(" (%2)")).arg(formatUrl(res->getUrl()));
-    }
-    return result;
+    return getResourceName(getResourceById(id));
 }
 
 QString QnEventLogModel::getUserGroupString(QnBusinessActionParameters::UserGroup value)
