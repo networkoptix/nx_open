@@ -43,6 +43,9 @@ private:
     QVector3D m_motion;
     QnResourceWidgetRenderer* m_renderer;
     DevorpingParams m_devorpingParams;
+    DevorpingParams m_srcPos;
+    DevorpingParams m_dstPos;
+    bool m_moveToAnimation;
     qint64 m_lastTime;
     QnPtzSpaceMapper* m_spaceMapper;
 };

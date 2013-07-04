@@ -10,10 +10,13 @@ qreal MAX_FOV = gradToRad(90.0);
 
 qreal FISHEYE_FOV = gradToRad(180.0);
 
+qreal MOVETO_ANIMATION_TIME = 0.5;
+
 QnFisheyePtzController::QnFisheyePtzController(QnResource* resource):
     QnAbstractPtzController(resource),
     m_renderer(0),
-    m_lastTime(0)
+    m_lastTime(0),
+    m_moveToAnimation(false)
 {
     QnScalarSpaceMapper xMapper(-90.0, 90.0, -90.0, 90.0, Qn::ConstantExtrapolation);
     QnScalarSpaceMapper yMapper(-90.0, 90.0, -90.0, 90.0, Qn::ConstantExtrapolation);
@@ -39,7 +42,7 @@ int QnFisheyePtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zo
 {
     m_motion = QVector3D(xVelocity, yVelocity, zoomVelocity);
     m_lastTime = getUsecTimer();
-
+    m_moveToAnimation = false;
     return 0;
 }
 
@@ -52,15 +55,16 @@ int QnFisheyePtzController::stopMove()
 int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 {
     m_motion = QVector3D();
-    
-    m_devorpingParams.fov = qBound(MIN_FOV, mm35vToFov(zoomPos), MAX_FOV);
 
-    qreal xRange = (FISHEYE_FOV - m_devorpingParams.fov) / 2.0;
-    qreal yRange = xRange / m_devorpingParams.aspectRatio;
+    m_dstPos.fov = qBound(MIN_FOV, mm35vToFov(zoomPos), MAX_FOV);
 
-    m_devorpingParams.xAngle = qBound(-xRange, gradToRad(xPos), xRange);
-    m_devorpingParams.yAngle = qBound(-yRange, gradToRad(yPos), yRange);
+    qreal xRange = (FISHEYE_FOV - m_dstPos.fov) / 2.0;
+    qreal yRange = xRange / m_dstPos.aspectRatio;
 
+    m_dstPos.xAngle = qBound(-xRange, gradToRad(xPos), xRange);
+    m_dstPos.yAngle = qBound(-yRange, gradToRad(yPos), yRange);
+    m_srcPos = m_devorpingParams;
+    m_moveToAnimation = true;
     return 0;
 }
 
@@ -98,27 +102,47 @@ void QnFisheyePtzController::setAspectRatio(float aspectRatio)
 DevorpingParams QnFisheyePtzController::getDevorpingParams()
 {
     qint64 newTime = getUsecTimer();
-
-    qreal zoomSpeed = -m_motion.z() * MAX_ZOOM_SPEED;
-    qreal xSpeed = m_motion.x() * MAX_MOVE_SPEED;
-    qreal ySpeed = m_motion.y() * MAX_MOVE_SPEED;
-
     qreal timeSpend = (newTime - m_lastTime) / 1000000.0;
-    
-    m_devorpingParams.fov += zoomSpeed * timeSpend;
-    m_devorpingParams.fov = qBound(MIN_FOV, m_devorpingParams.fov, MAX_FOV);
 
-    m_devorpingParams.xAngle += xSpeed * timeSpend;
-    m_devorpingParams.yAngle += ySpeed * timeSpend;
+    if (m_moveToAnimation)
+    {
+        if (timeSpend < MOVETO_ANIMATION_TIME) 
+        {
+            QEasingCurve easing(QEasingCurve::InOutQuad);
+            qreal value = easing.valueForProgress(timeSpend / MOVETO_ANIMATION_TIME);
 
-    qreal xRange = (FISHEYE_FOV - m_devorpingParams.fov) / 2.0;
-    qreal yRange = xRange; // / m_devorpingParams.aspectRatio;
+            qreal fovDelta = (m_dstPos.fov - m_srcPos.fov) * value;
+            qreal xDelta = (m_dstPos.xAngle - m_srcPos.xAngle) * value;
+            qreal yDelta = (m_dstPos.yAngle - m_srcPos.yAngle) * value;
 
-    m_devorpingParams.xAngle = qBound(-xRange, m_devorpingParams.xAngle, xRange);
-    m_devorpingParams.yAngle = qBound(-yRange, m_devorpingParams.yAngle, yRange);
-    //m_devorpingParams.pAngle = gradToRad(18.0);
-    
-    m_lastTime = newTime;
+            m_devorpingParams.fov = m_srcPos.fov + fovDelta;
+            m_devorpingParams.xAngle = m_srcPos.xAngle + xDelta;
+            m_devorpingParams.yAngle = m_srcPos.yAngle + yDelta;
+        }
+        else {
+            m_devorpingParams = m_dstPos;
+            m_moveToAnimation = false;
+        }
+    }
+    else {
+        qreal zoomSpeed = -m_motion.z() * MAX_ZOOM_SPEED;
+        qreal xSpeed = m_motion.x() * MAX_MOVE_SPEED;
+        qreal ySpeed = m_motion.y() * MAX_MOVE_SPEED;
+
+        m_devorpingParams.fov += zoomSpeed * timeSpend;
+        m_devorpingParams.fov = qBound(MIN_FOV, m_devorpingParams.fov, MAX_FOV);
+
+        m_devorpingParams.xAngle += xSpeed * timeSpend;
+        m_devorpingParams.yAngle += ySpeed * timeSpend;
+
+        qreal xRange = (FISHEYE_FOV - m_devorpingParams.fov) / 2.0;
+        qreal yRange = xRange; // / m_devorpingParams.aspectRatio;
+
+        m_devorpingParams.xAngle = qBound(-xRange, m_devorpingParams.xAngle, xRange);
+        m_devorpingParams.yAngle = qBound(-yRange, m_devorpingParams.yAngle, yRange);
+        //m_devorpingParams.pAngle = gradToRad(18.0);
+        m_lastTime = newTime;
+    }    
 
     return m_devorpingParams;
 }
