@@ -72,8 +72,8 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
     foreach(const QnPtzPreset &preset, presets) {
         QAction *action = new QAction(parent);
         action->setText(preset.name);
-        if (!preset.hotkey.isEmpty())
-            action->setShortcut(preset.hotkey);
+        if(preset.hotkey >= 0)
+            action->setShortcut(Qt::Key_0 + preset.hotkey);
         action->setData(QVariant::fromValue<QnVirtualCameraResourcePtr>(camera));
         connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
 

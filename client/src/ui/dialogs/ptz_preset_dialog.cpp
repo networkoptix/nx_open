@@ -1,22 +1,17 @@
 #include "ptz_preset_dialog.h"
 #include "ui_ptz_preset_dialog.h"
 
-#include <QtGui/QKeyEvent>
-
 #include <utils/common/variant.h>
-#include <ui/common/palette.h>
 
 QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
-    ui(new Ui::PtzPresetDialog()),
-    m_key(-1),
-    m_modifiers(0)
+    ui(new Ui::PtzPresetDialog())
 {
     ui->setupUi(this);
 
     connect(ui->nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateOkButtonEnabled()));
 
-    ui->hotkeyLineEdit->installEventFilter(this);
+    setForbiddenHotkeys(QList<int>(), false);
     updateOkButtonEnabled();
 }
 
@@ -27,91 +22,63 @@ QnPtzPresetDialog::~QnPtzPresetDialog() {
 QnPtzPreset QnPtzPresetDialog::preset() const {
     QnPtzPreset result = m_preset;
     result.name = ui->nameEdit->text();
-    if (m_key == 0)
-        result.hotkey = QKeySequence();
-    else
-    if (m_key > 0)
-        result.hotkey = QKeySequence(m_key + m_modifiers);
-
+    result.hotkey = currentHotkey();
     return result;
 }
 
 void QnPtzPresetDialog::setPreset(const QnPtzPreset &preset) {
     m_preset = preset;
     ui->nameEdit->setText(preset.name);
-    ui->hotkeyLineEdit->setText(preset.hotkey.toString(QKeySequence::NativeText));
+    setCurrentHotkey(preset.hotkey);
 }
 
-const QList<QKeySequence> &QnPtzPresetDialog::forbiddenHotkeys() const {
+const QList<int> &QnPtzPresetDialog::forbiddenHotkeys() const {
     return m_forbiddenHotkeys;
 }
 
-void QnPtzPresetDialog::setForbiddenHotkeys(const QList<QKeySequence> &forbiddenHotkeys) {
-    m_forbiddenHotkeys = forbiddenHotkeys;
-    updateHotkey();
+void QnPtzPresetDialog::setForbiddenHotkeys(const QList<int> &forbiddenHotkeys) {
+    setForbiddenHotkeys(forbiddenHotkeys, false);
 }
 
-bool QnPtzPresetDialog::eventFilter(QObject *obj, QEvent *event) {
-    if (obj != ui->hotkeyLineEdit)
-        return base_type::eventFilter(obj, event);
+void QnPtzPresetDialog::setForbiddenHotkeys(const QList<int> &forbiddenHotkeys, bool force) {
+    if(!force && m_forbiddenHotkeys == forbiddenHotkeys)
+        return;
 
-    if (event->type() == QEvent::KeyPress) {
-        QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(event);
-        if (pKeyEvent->key() == Qt::Key_Tab)
-            return false;
+    m_forbiddenHotkeys = forbiddenHotkeys;
 
-        if (pKeyEvent->key() == Qt::Key_Escape && isHotkeyValid() ) {
-            return false;
-        }
+    QList<int> hotkeys;
+    for(int i = 0; i < 10; i++)
+        hotkeys.push_back(i);
+    foreach(int forbiddenHotkey, m_forbiddenHotkeys)
+        hotkeys.removeOne(forbiddenHotkey);
 
-        if (pKeyEvent->key() == Qt::Key_Escape || pKeyEvent->key() == Qt::Key_Delete || pKeyEvent->key() == Qt::Key_Backspace) {
-            m_key = 0;
-            m_modifiers = 0;
-            updateHotkey();
-            return true;
-        }
+    bool haveHotkeys = !hotkeys.isEmpty();
+    ui->hotkeyComboBox->setVisible(haveHotkeys);
+    ui->hotkeyLabel->setVisible(haveHotkeys);
+    if(!haveHotkeys)
+        return;
 
-        switch (pKeyEvent->key()) {
-        case Qt::Key_Shift:
-        case Qt::Key_Control:
-        case Qt::Key_Alt:
-        case Qt::Key_AltGr:
-        case Qt::Key_Meta:
-            m_key = 0;
-            break;
-        default:
-            m_key = pKeyEvent->key();
-        }
+    int currentHotkey = this->currentHotkey();
 
-        m_modifiers = pKeyEvent->modifiers();
-    } else if (event->type() == QEvent::KeyRelease) {
-        QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(event);
-        qDebug() << pKeyEvent->key();
-        qDebug() << pKeyEvent->modifiers();
-    } else
-        return base_type::eventFilter(obj, event);
+    ui->hotkeyComboBox->clear();
+    ui->hotkeyComboBox->addItem(tr("None"), -1);
+    foreach(int hotkey, hotkeys)
+        ui->hotkeyComboBox->addItem(QString::number(hotkey), hotkey);
 
-    updateHotkey();
+    setCurrentHotkey(currentHotkey);
+}
 
-    return true;
+int QnPtzPresetDialog::currentHotkey() const {
+    return qvariant_cast<int>(ui->hotkeyComboBox->itemData(ui->hotkeyComboBox->currentIndex()), -1);
+}
 
+void QnPtzPresetDialog::setCurrentHotkey(int hotkey) {
+    int index = ui->hotkeyComboBox->findData(hotkey);
+    if(index < 0)
+        index = ui->hotkeyComboBox->findData(-1);
+    ui->hotkeyComboBox->setCurrentIndex(index);
 }
 
 void QnPtzPresetDialog::updateOkButtonEnabled() {
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isHotkeyValid() && !ui->nameEdit->text().isEmpty());
-}
-
-bool QnPtzPresetDialog::isHotkeyValid() const {
-    return ui->hotkeyLineEdit->text().isEmpty() || m_key != 0;
-}
-
-void QnPtzPresetDialog::updateHotkey() {
-    QKeySequence hotkey(m_key + m_modifiers);
-    ui->hotkeyLineEdit->setText(hotkey.toString(QKeySequence::NativeText));
-
-    if (m_forbiddenHotkeys.contains(hotkey) || m_key == 0)
-        setPaletteColor(ui->hotkeyLineEdit, QPalette::Text, Qt::red);
-    else
-        setPaletteColor(ui->hotkeyLineEdit, QPalette::Text, this->palette().color(QPalette::Text));
-    updateOkButtonEnabled();
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!ui->nameEdit->text().isEmpty());
 }

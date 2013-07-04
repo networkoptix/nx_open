@@ -18,8 +18,8 @@
 
 namespace {
     struct PtzPresetData {
-        PtzPresetData() {}
-        PtzPresetData(const QString &cameraPhysicalId, QKeySequence hotkey, const QString &name, const QVector3D &logicalPosition):
+        PtzPresetData(): hotkey(-1) {}
+        PtzPresetData(const QString &cameraPhysicalId, int hotkey, const QString &name, const QVector3D &logicalPosition): 
             cameraPhysicalId(cameraPhysicalId), hotkey(hotkey), name(name), logicalPosition(logicalPosition) {}
 
         QnPtzPreset preset() const {
@@ -27,7 +27,7 @@ namespace {
         }
 
         QString cameraPhysicalId;
-        QKeySequence hotkey;
+        int hotkey;
         QString name;
         QVector3D logicalPosition;
     };
@@ -58,7 +58,7 @@ namespace {
         bool operator()(const PtzPresetData &value) const {
             return value.cameraPhysicalId == cameraPhysicaId;
         }
-
+    
         QString cameraPhysicaId;
     };
 
@@ -97,7 +97,8 @@ inline void serialize(const PtzPresetData &value, QVariant *target) {
     QJson::serialize(value.cameraPhysicalId, "cameraPhysicalId", &result);
     QJson::serialize(value.name, "name", &result);
     QJson::serialize(value.logicalPosition, "logicalPosition", &result);
-    QJson::serialize(value.hotkey.toString(QKeySequence::PortableText), "hotkey", &result);
+    if(value.hotkey != -1)
+        QJson::serialize(value.hotkey, "hotkey", &result);
     *target = result;
 }
 
@@ -106,7 +107,7 @@ inline bool deserialize(const QVariant &value, PtzPresetData *target) {
         return false;
     QVariantMap map = value.toMap();
 
-    QString cameraPhysicalId, name, hotkey;
+    QString cameraPhysicalId, name;
     QVector3D logicalPosition;
     if(
         !QJson::deserialize(map, "cameraPhysicalId", &cameraPhysicalId) ||
@@ -115,11 +116,12 @@ inline bool deserialize(const QVariant &value, PtzPresetData *target) {
     ) {
             return false;
     }
-
+    
     /* Optional field. */
+    int hotkey = -1;
     QJson::deserialize(map, "hotkey", &hotkey);
 
-    *target = PtzPresetData(cameraPhysicalId, QKeySequence(hotkey, QKeySequence::PortableText), name, logicalPosition);
+    *target = PtzPresetData(cameraPhysicalId, hotkey, name, logicalPosition);
     return true;
 }
 
@@ -158,8 +160,8 @@ QnPtzPreset QnWorkbenchPtzPresetManager::ptzPreset(const QnVirtualCameraResource
     return pos->preset();
 }
 
-QnPtzPreset QnWorkbenchPtzPresetManager::ptzPreset(const QnVirtualCameraResourcePtr &camera, const QKeySequence &hotkey) const {
-    if(!camera || hotkey.isEmpty())
+QnPtzPreset QnWorkbenchPtzPresetManager::ptzPreset(const QnVirtualCameraResourcePtr &camera, int hotkey) const {
+    if(!camera || hotkey < 0)
         return QnPtzPreset();
 
     QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetHotkeyPredicate(PtzPresetData(camera->getPhysicalId(), hotkey, QString(), QVector3D())));
@@ -188,7 +190,7 @@ void QnWorkbenchPtzPresetManager::setPtzPresets(const QnVirtualCameraResourcePtr
     }
 
     boost::remove_erase_if(d->presets, PtzPresetCameraPredicate(camera->getPhysicalId()));
-
+    
     QString cameraPhysicalId = camera->getPhysicalId();
     foreach(const QnPtzPreset &preset, presets)
         d->presets.push_back(PtzPresetData(cameraPhysicalId, preset.hotkey, preset.name, preset.logicalPosition));
