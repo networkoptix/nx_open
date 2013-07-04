@@ -58,9 +58,8 @@ Since previous build
  - If close and reopen health monitoring graphs looked incorrect. Fixed
  - Media server Failure" + "Camera output for 30 second" didn't work. Fixed
  - Rotated item was resized incorrectly. Fixed
- 
- - Bug #2102.Cannot open exe file.
- - Bug #2111. Email Notification contains local address in a motion hyperlink
+ - If export to Multi-Video exe file this file was broken. Fixed
+
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 
 ANDROID CLIENT:
