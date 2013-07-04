@@ -10,6 +10,7 @@
 
 #include "workbench_context_aware.h"
 
+// TODO: move to client model types?
 struct QnPtzPreset {
     QnPtzPreset(): hotkey(-1) {};
     QnPtzPreset(int hotkey, const QString &name, const QVector3D &logicalPosition): hotkey(hotkey), name(name), logicalPosition(logicalPosition) {}
@@ -22,6 +23,7 @@ struct QnPtzPreset {
     QString name;
     QVector3D logicalPosition;
 };
+Q_DECLARE_METATYPE(QnPtzPreset);
 
 
 class QnWorkbenchPtzPresetManagerPrivate;

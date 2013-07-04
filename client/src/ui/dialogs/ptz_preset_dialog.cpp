@@ -11,7 +11,7 @@ QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlag
 
     connect(ui->nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateOkButtonEnabled()));
 
-    setForbiddenHotkeys(QList<int>(), false);
+    setForbiddenHotkeys(QList<int>(), true);
     updateOkButtonEnabled();
 }
 
