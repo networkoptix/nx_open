@@ -206,10 +206,20 @@ void QnToolTipSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     base_type::paint(painter, option, widget);
 }
 
-QString QnToolTipSlider::toolTipAt(const QPointF &) const {
+QString QnToolTipSlider::toolTipAt(const QPointF &pos) const {
+    Q_UNUSED(pos)
     /* Default tooltip is meaningless for this slider,
      * so we don't want it to be shown. */
     return QString();
+}
+
+bool QnToolTipSlider::showOwnTooltip(const QPointF &pos) {
+    Q_UNUSED(pos)
+    /* Default tooltip is meaningless for this slider,
+     * so we don't want it to be shown.
+     * Displaying is also controlled by the slider itself.
+     */
+    return true;
 }
 
 bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {

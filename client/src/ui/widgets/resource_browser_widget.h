@@ -6,9 +6,9 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <ui/actions/action_target_provider.h>
-#include <ui/workbench/workbench_context_aware.h>
-
+#include <ui/common/tool_tip_queryable.h>
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include <client/client_globals.h>
 
@@ -62,6 +62,7 @@ public:
     //reimp
     void pointTo(const QPointF &pos);
     virtual void updateTailPos() override;
+
 signals:
     void thumbnailClicked();
 
@@ -76,7 +77,7 @@ private:
 };
 
 
-class QnResourceBrowserWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider {
+class QnResourceBrowserWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider, public ToolTipQueryable {
     Q_OBJECT
 
 public:
@@ -121,6 +122,9 @@ protected:
     virtual void timerEvent(QTimerEvent *event) override;
 
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
+
+    virtual QString toolTipAt(const QPointF &pos) const override;
+    virtual bool showOwnTooltip(const QPointF &pos) override;
 
     QnResourceTreeWidget *currentItemView() const;
     QItemSelectionModel *currentSelectionModel() const;

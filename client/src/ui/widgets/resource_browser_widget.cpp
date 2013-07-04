@@ -404,6 +404,26 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
     }
 }
 
+QString QnResourceBrowserWidget::toolTipAt(const QPointF &pos) const {
+    QWidget* childWidget = ui->resourceTreeWidget->treeView();
+    QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(childWidget);
+
+    QPoint childPos = childWidget->mapFrom(const_cast<QWidget*>(dynamic_cast<const QWidget*>(this)), pos.toPoint());
+
+    if(view->model()) {
+        QVariant toolTip = view->indexAt(childPos).data(Qt::ToolTipRole);
+        if (toolTip.convert(QVariant::String))
+            return toolTip.toString();
+    }
+    return QString(tr("tooltip ot found"));
+}
+
+bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
+    if (m_tooltipWidget)
+        m_tooltipWidget->setText(toolTipAt(pos));
+    return true;
+}
+
 void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
     if (m_tooltipWidget)
         return;

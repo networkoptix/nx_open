@@ -66,15 +66,29 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     /* Note that tooltip is a rare event, so having a lot of dynamic_casts here is OK. */
 
     QGraphicsItem *targetItem = NULL;
+    ToolTipQueryable* targetAsToolTipQueryable = NULL;
     foreach(QGraphicsItem *item, scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform())) {
-        if(!item->toolTip().isEmpty() || dynamic_cast<ToolTipQueryable *>(item) || dynamic_cast<QGraphicsProxyWidget *>(item)) {
+        if(!item->toolTip().isEmpty() ||
+                dynamic_cast<ToolTipQueryable *>(item) ||
+                dynamic_cast<QGraphicsProxyWidget *>(item)
+                ) {
             targetItem = item;
+            targetAsToolTipQueryable = dynamic_cast<ToolTipQueryable *>(item);
+            QGraphicsProxyWidget* targetAsGraphicsProxy = dynamic_cast<QGraphicsProxyWidget *>(item);
+            if (!targetAsToolTipQueryable && targetAsGraphicsProxy)
+                targetAsToolTipQueryable = dynamic_cast<ToolTipQueryable *>(targetAsGraphicsProxy->widget());
             break;
         }
     }
     if(!targetItem) {
         helpEvent->ignore();
         return true; /* Eat it anyway. */
+    }
+
+    if (targetAsToolTipQueryable &&
+            targetAsToolTipQueryable->showOwnTooltip(targetItem->mapFromScene(scenePos))) {
+        helpEvent->accept();
+        return true;
     }
 
     GraphicsToolTip::showText(
