@@ -43,12 +43,13 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
 
     vec3 center = sphericalToCartesian(xShift, -yShift);
     vec3 x  = sphericalToCartesian(xShift + PI/2.0, 0.0) * 2.0*tan(dstFov/2.0);
-    vec3 y  = sphericalToCartesian(xShift, -yShift + PI/2.0) * 2.0*tan(dstFov/2.0/aspectRatio);
+    vec3 y  = sphericalToCartesian(xShift, -yShift + PI/2.0) * 2.0*tan(dstFov/2.0);
 
     void main() 
     {
         
         vec2 pos = gl_TexCoord[0].st - 0.5; // go to coordinates in range [-dstFov/2...+dstFov/2]
+        pos.y = pos.y / aspectRatio;
 
         vec3 pos3d = center + x * pos.x + y * pos.y;
 
