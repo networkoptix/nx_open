@@ -1,7 +1,7 @@
 ----------------------------------------------- 1.5.2 (1.6 beta-2) ---------------------------------------------
 
 Since 1.5.1
-
+ - DW Spectrum intro video had 2 black borders and sometimes finished by black screen. Fixed
  - Added proper cursors when resize rotated items
  - DO NOT INCLUDE IN RELEASE NOTES!!! - Removed hack for DW to display 10 times less network issues (since 1.4)
  - Fixed issue when it was not possible to add cameras manually via IP range (since 1.4)
@@ -19,9 +19,16 @@ Since 1.5.1
  - If a camera was discovered automatically and after this it was not accessible by multicast, then this camera didn't 
    work after Media Server restart. Fixed
  - PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
+ - Aggregation column is added to Event and Action (used to be in advanced E&A settings)
+ 
+ - iOS. Feature #1943. Sort cameras by name.
+ - iOS. Feature #1938. Add camera name on item.
+ - iOS5. Bug #1949. Incorrect date and time.
+ - iOS. Bug #1937. iPad. Server status aren't displayed.
+ 
  
 Since previous build
-
+ - 
  - Client Client crashe when move a zoom window quickly across items
  - Fixed Client crash if change a camera's motion mask and reopen its settings
  - If enable hardware acceleration Client crashed. Fixed
@@ -51,7 +58,8 @@ Since previous build
  - If close and reopen health monitoring graphs looked incorrect. Fixed
  - Media server Failure" + "Camera output for 30 second" didn't work. Fixed
  - Rotated item was resized incorrectly. Fixed
- 
+ - If export to Multi-Video exe file this file was broken. Fixed
+
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 
 ANDROID CLIENT:
