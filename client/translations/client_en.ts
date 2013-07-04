@@ -2,6 +2,16 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
+    <name>QnBlinkingImageButtonWidget</name>
+    <message numerus="yes">
+        <source>You have %n notifications</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
@@ -20,6 +30,34 @@
     <message numerus="yes">
         <source>%1 of %n cameras</source>
         <comment>...for</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>no more than once per %n days</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>no more than once per %n hours</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>no more than once per %n minutes</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>no more than once per %n seconds</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
