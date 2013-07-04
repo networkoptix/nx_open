@@ -184,6 +184,26 @@ QVariant QnPtzPresetListModel::headerData(int section, Qt::Orientation orientati
     return base_type::headerData(section, orientation, role);
 }
 
+bool QnPtzPresetListModel::removeRows(int row, int count, const QModelIndex &parent) {
+    if(parent.isValid() || row < 0 || count < 1 || row + count > m_presets.size())
+        return false;
+
+    beginRemoveRows(parent, row, row + count - 1);
+    m_presets.erase(m_presets.begin() + row, m_presets.begin() + row + count);
+    endRemoveRows();
+    return true;
+}
+
+bool QnPtzPresetListModel::insertRows(int row, int count, const QModelIndex &parent) {
+    if(parent.isValid() || row < 0 || row > m_presets.size() || count < 1)
+        return false;
+
+    beginInsertRows(parent, row, row + count - 1);
+    for(int i = 0; i < count; i++)
+        m_presets.insert(row, QnPtzPreset());
+    endInsertRows();
+    return true;
+}
 
 QString QnPtzPresetListModel::columnTitle(Column column) const {
     switch(column) {

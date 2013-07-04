@@ -99,12 +99,12 @@ void QnPtzPresetsDialog::updateActivateButtonEnabled() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnPtzPresetsDialog::at_removeButton_clicked() {
-    /*QList<QnPtzPreset> indices
+    QList<QPersistentModelIndex> indices;
     foreach(const QModelIndex &index, ui->treeView->selectionModel()->selectedRows())
-        selectedItems.insert(m_model->itemFromIndex(index));
+        indices.push_back(index);
 
-    foreach(QStandardItem *item, selectedItems)
-        m_model->invisibleRootItem()->removeRow(item->row());*/
+    foreach(const QPersistentModelIndex &index, indices)
+        m_model->removeRow(index.row(), index.parent());
 }
 
 void QnPtzPresetsDialog::at_activateButton_clicked() {
