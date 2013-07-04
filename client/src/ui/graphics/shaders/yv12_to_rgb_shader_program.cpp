@@ -37,19 +37,33 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
                                    0.0, cos(perspShift), -sin(perspShift),
                                    0.0, sin(perspShift),  cos(perspShift));
 
+    vec3 sphericalToCartesian(float r, float phi, float psi) {
+        return vec3(r * cos(phi) * cos(psi), r * sin(phi) * cos(psi), r * sin(psi));
+    }
+
+    vec3 cartesianToSpherical(vec3 vector) {
+        vec3 result;
+        result.z = length(vector);
+        result.x = atan(vector.y, vector.x);
+        result.y = asin(vector.z / result.z);
+        return result;
+    }
+
     void main() 
     {
         
         vec2 pos = gl_TexCoord[0].st - 0.5; // go to coordinates in range [-dstFov/2...+dstFov/2]
 
-        pos.x = pos.x * 2.0 * tan(dstFov/2.0);
-        pos.y = pos.y * 2.0 * tan(dstFov/aspectRatio/2.0);
+        vec3 r1 = sphericalToCartesian(1.0, xShift, -yShift);
+        vec3 x = sphericalToCartesian(1.0, xShift + PI/2.0, 0.0) * 2.0*tan(dstFov/2.0);
+        vec3 y = sphericalToCartesian(1.0, xShift, -yShift + PI/2.0) * 2.0*tan(dstFov/2.0);
 
-        pos.y = pos.y - tan(yShift);
-        
-        float r1 = length(vec3(pos.x, pos.y, 1.0));
-        float theta = atan(pos.x, 1.0) + xShift;
-        float phi   = asin(pos.y / r1) - perspShift;
+        vec3 r2 = r1 + x * pos.x + y * pos.y;
+
+        vec3 spherical = cartesianToSpherical(r2);
+
+        float theta = spherical.x;
+        float phi   = spherical.y;
         
         /*
         float theta = atan(pos.x) + xShift;
