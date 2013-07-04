@@ -41,11 +41,19 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
     {
         
         vec2 pos = gl_TexCoord[0].st - 0.5; // go to coordinates in range [-dstFov/2...+dstFov/2]
+
         pos.x = pos.x * 2.0 * tan(dstFov/2.0);
         pos.y = pos.y * 2.0 * tan(dstFov/aspectRatio/2.0);
 
+        
+        float r1 = length(vec3(pos.x, pos.y, 1.0));
+        float theta = atan(pos.x, 1.0) + xShift;
+        float phi   = asin(pos.y / r1) + yShift - perspShift;
+        
+        /*
         float theta = atan(pos.x) + xShift;
         float phi   = atan(pos.y) + yShift - perspShift;
+        */
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),

@@ -117,7 +117,7 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
 
     m_devorpingParams.xAngle = qBound(-xRange, m_devorpingParams.xAngle, xRange);
     m_devorpingParams.yAngle = qBound(-yRange, m_devorpingParams.yAngle, yRange);
-    m_devorpingParams.pAngle = gradToRad(18.0);
+    //m_devorpingParams.pAngle = gradToRad(18.0);
     
     m_lastTime = newTime;
 
