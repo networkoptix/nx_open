@@ -38,27 +38,25 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
                                    0.0, sin(perspShift),  cos(perspShift));
 
     vec3 sphericalToCartesian(float theta, float phi) {
-        return vec3(cos(theta) * cos(phi), cos(phi) * sin(theta), sin(phi));
+        return vec3(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
     }
+
+    vec3 center = sphericalToCartesian(xShift, -yShift);
+    vec3 x  = sphericalToCartesian(xShift + PI/2.0, 0.0) * 2.0*tan(dstFov/2.0);
+    vec3 y  = sphericalToCartesian(xShift, -yShift + PI/2.0) * 2.0*tan(dstFov/2.0/aspectRatio);
 
     void main() 
     {
         
         vec2 pos = gl_TexCoord[0].st - 0.5; // go to coordinates in range [-dstFov/2...+dstFov/2]
 
-        vec3 r1 = sphericalToCartesian(xShift, -yShift);
-        vec3 x = sphericalToCartesian(xShift + PI/2.0, 0.0) * 2.0*tan(dstFov/2.0);
-        vec3 y = sphericalToCartesian(xShift, -yShift + PI/2.0) * 2.0*tan(dstFov/2.0);
+        vec3 pos3d = center + x * pos.x + y * pos.y;
 
-        vec3 r2 = r1 + x * pos.x + y * pos.y;
-
-        float theta = atan(r2.y, r2.x);
-        float phi   = asin(r2.z / length(r2));
+        float theta = atan(pos3d.x, pos3d.y);
+        float phi   = asin(pos3d.z / length(pos3d));
         
         // Vector in 3D space
-        vec3 psph = vec3(cos(phi) * sin(theta),
-                         cos(phi) * cos(theta),
-                         sin(phi)             ) * perspectiveMatrix;
+        vec3 psph = sphericalToCartesian(theta, phi) * perspectiveMatrix;
 
         // Calculate fisheye angle and radius
         theta = atan(psph.z, psph.x);
