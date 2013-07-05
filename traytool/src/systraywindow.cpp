@@ -718,8 +718,25 @@ void QnSystrayWindow::onSettingsAction()
 
 bool QnSystrayWindow::isAppServerParamChanged() const
 {
-    return ui->ecsPortSpinBox->value() != m_appServerSettings.value("port").toInt() ||
-        ui->mediaProxyPortSpinBox->value() != m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt();
+    if (ui->ecsPortSpinBox->value() != m_appServerSettings.value("port").toInt() ||
+        ui->mediaProxyPortSpinBox->value() != m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt())
+        return true;
+
+    if (m_appServerSettings.value("manualPublicIp").toString().trimmed() != ui->ecsManuaPublicIPEdit->text().trimmed() && ui->ecsUseManualPublicIp->isChecked())
+        return true;
+
+    QString publicIpMode;
+    if (!ui->ecsAllowPublicIpGroupBox->isChecked())
+        publicIpMode = ECS_PUBLIC_IP_MODE_DISABLED;
+    else if (ui->ecsUseAutoPublicIp->isChecked())
+        publicIpMode = ECS_PUBLIC_IP_MODE_AUTO;
+    else
+        publicIpMode= ECS_PUBLIC_IP_MODE_MANUAL;
+
+    if (m_appServerSettings.value("publicIpMode").toString() != publicIpMode)
+        return true;
+
+    return false;
 }
 
 bool QnSystrayWindow::isMediaServerParamChanged() const

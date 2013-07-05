@@ -282,6 +282,10 @@ bool QnResourceTreeWidget::isEditingEnabled() const {
     return m_editingEnabled;
 }
 
+QAbstractItemView* QnResourceTreeWidget::treeView() const {
+    return ui->resourcesTreeView;
+}
+
 void QnResourceTreeWidget::updateCheckboxesVisibility() {
     ui->resourcesTreeView->setColumnHidden(1, !m_checkboxesVisible);
 }

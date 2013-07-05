@@ -16,6 +16,10 @@ class QnAbstractBusinessAction;
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 typedef QList<QnAbstractBusinessActionPtr> QnAbstractBusinessActionList;
 
+class QnPanicBusinessAction;
+typedef QSharedPointer<QnPanicBusinessAction> QnPanicBusinessActionPtr;
+typedef QList<QnPanicBusinessAction> QnPanicBusinessActionList;
+
 class QnBusinessActionData;
 typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
 typedef QSharedPointer<QnBusinessActionDataList> QnBusinessActionDataListPtr;

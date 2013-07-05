@@ -889,6 +889,7 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
+    QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
@@ -1165,6 +1166,11 @@ void QnMain::run()
 
     av_lockmgr_register(NULL);
 
+    // First disconnect eventManager from all slots, to not try to reconnect on connection close
+    disconnect(eventManager);
+
+    // This method will set flag on message channel to threat next connection close as normal
+    appServerConnection->disconnectSync();
     qSettings.setValue("lastRunningTime", 0);
 }
 

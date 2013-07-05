@@ -67,7 +67,16 @@ extern "C"
 
 //#define SYNC_UPLOADING_WITH_GLFENCE
 
+
+// TODO: #AK maybe it's time to remove them?
 //preceding bunch of macro will be removed after this functionality has been tested and works as expected
+
+//#define QN_DECODED_PICTURE_TO_OPENGL_UPLOADER_DEBUG
+#ifdef QN_DECODED_PICTURE_TO_OPENGL_UPLOADER_DEBUG
+#   define glCheckError glCheckError
+#else
+#   define glCheckError(...)
+#endif
 
 
 namespace
@@ -333,7 +342,7 @@ public:
                     GL_UNSIGNED_BYTE, 
                     filler );
                 bitrateCalculator.bytesProcessed( qMin(ROUND_COEFF, textureSize.width() - roundedWidth)*textureSize.height()*internalFormatPixelSize );
-                DEBUG_CODE(glCheckError("glTexSubImage2D"));
+                glCheckError("glTexSubImage2D");
             }
 
             if (height < textureSize.height()) {
@@ -349,7 +358,7 @@ public:
                     GL_UNSIGNED_BYTE, 
                     filler );
                 bitrateCalculator.bytesProcessed( textureSize.width()*qMin(ROUND_COEFF, textureSize.height() - height)*4 );
-                DEBUG_CODE(glCheckError("glTexSubImage2D"));
+                glCheckError("glTexSubImage2D");
             }
         }
     }
@@ -359,7 +368,7 @@ public:
             return;
 
         glGenTextures(1, &m_id);
-        DEBUG_CODE(glCheckError("glGenTextures"));
+        glCheckError("glGenTextures");
 
         m_allocated = true;
     }
@@ -1963,12 +1972,12 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                 "qPower2Ceil(r_w[i],ROUND_COEFF) = %5, h[i] = %6, planes[i] = %7").
                 arg(texture->id()).arg(i).arg(lineSizes[i]).arg(r_w[i]).arg(qPower2Ceil(r_w[i],ROUND_COEFF)).arg(h[i]).arg((size_t)planes[i]), cl_logDEBUG2 );
             glBindTexture( GL_TEXTURE_2D, texture->id() );
-            DEBUG_CODE(glCheckError("glBindTexture"));
+            glCheckError("glBindTexture");
 
             const quint64 lineSizes_i = lineSizes[i];
             const quint64 r_w_i = r_w[i];
             glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes_i);
-            DEBUG_CODE(glCheckError("glPixelStorei"));
+            glCheckError("glPixelStorei");
             Q_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
@@ -1985,11 +1994,11 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                             NULL
 #endif
                             );
-            DEBUG_CODE(glCheckError("glTexSubImage2D"));
+            glCheckError("glTexSubImage2D");
 
             bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[i],ROUND_COEFF)*h[i] );
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-            DEBUG_CODE(glCheckError("glPixelStorei"));
+            glCheckError("glPixelStorei");
 
 #ifdef USE_PBO
             d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
@@ -2024,11 +2033,11 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                             i == 0 ? height : height / 2,
                             i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
                             GL_UNSIGNED_BYTE, pixels );
-            DEBUG_CODE(glCheckError("glTexSubImage2D"));
+            glCheckError("glTexSubImage2D");
             glBindTexture( GL_TEXTURE_2D, 0 );
             bitrateCalculator.bytesProcessed( (i == 0 ? qPower2Ceil(width,ROUND_COEFF) : width / 2)*(i == 0 ? height : height / 2) );
             //glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-            //DEBUG_CODE(glCheckError("glPixelStorei"));
+            //glCheckError("glPixelStorei");
         }
 
         emptyPictureBuf->setColorFormat( PIX_FMT_NV12 );
@@ -2121,7 +2130,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         }
 
         glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
-        DEBUG_CODE(glCheckError("glPixelStorei"));
+        glCheckError("glPixelStorei");
 
         glTexSubImage2D(GL_TEXTURE_2D, 0,
             0, 0,
@@ -2129,10 +2138,10 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             h[0],
             glRGBFormat(format), GL_UNSIGNED_BYTE, pixels);
         bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[0],ROUND_COEFF)*h[0]*4 );
-        DEBUG_CODE(glCheckError("glTexSubImage2D"));
+        glCheckError("glTexSubImage2D");
 
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-        DEBUG_CODE(glCheckError("glPixelStorei"));
+        glCheckError("glPixelStorei");
 
         glBindTexture( GL_TEXTURE_2D, 0 );
 
@@ -2252,14 +2261,14 @@ void DecodedPictureToOpenGLUploader::ensurePBOInitialized(
     if( picBuf->m_pbo[pboIndex].id == std::numeric_limits<GLuint>::max() )
     {
         d->glGenBuffers( 1, &picBuf->m_pbo[pboIndex].id );
-        DEBUG_CODE(glCheckError("glGenBuffers"));
+        glCheckError("glGenBuffers");
         picBuf->m_pbo[pboIndex].sizeBytes = 0;
     }
 
     if( picBuf->m_pbo[pboIndex].sizeBytes < sizeInBytes )
     {
         d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, picBuf->m_pbo[pboIndex].id );
-        DEBUG_CODE(glCheckError("glBindBuffer"));
+        glCheckError("glBindBuffer");
 //GL_STREAM_DRAW_ARB 
 //GL_STREAM_READ_ARB 
 //GL_STREAM_COPY_ARB 
@@ -2270,9 +2279,9 @@ void DecodedPictureToOpenGLUploader::ensurePBOInitialized(
 //GL_DYNAMIC_READ_ARB
 //GL_DYNAMIC_COPY_ARB
         d->glBufferData( GL_PIXEL_UNPACK_BUFFER_ARB, sizeInBytes, NULL, GL_STREAM_DRAW_ARB/*GL_STATIC_DRAW_ARB*/ );
-        DEBUG_CODE(glCheckError("glBufferData"));
+        glCheckError("glBufferData");
         d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
-        DEBUG_CODE(glCheckError("glBindBuffer"));
+        glCheckError("glBindBuffer");
         picBuf->m_pbo[pboIndex].sizeBytes = sizeInBytes;
     }
 }

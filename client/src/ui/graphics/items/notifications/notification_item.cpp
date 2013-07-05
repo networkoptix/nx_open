@@ -96,6 +96,7 @@ void QnNotificationToolTipWidget::updateTailPos()  {
         setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.bottom())));
     else
         setTailPos(QPointF(qRound(rect.right() + 10.0), qRound((rect.top() + rect.bottom()) / 2)));
+    base_type::pointTo(m_pointTo);
 }
 
 void QnNotificationToolTipWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {

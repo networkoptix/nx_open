@@ -1,5 +1,5 @@
-
 #include "event_log_dialog.h"
+#include "ui_event_log_dialog.h"
 
 #include <QClipboard>
 #include <QMenu>
@@ -7,7 +7,6 @@
 #include <QtGui/QMouseEvent>
 #include <QMimeData>
 
-#include "ui_event_log_dialog.h"
 #include "ui/models/event_log_model.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource_managment/resource_pool.h"

@@ -94,7 +94,7 @@ namespace {
                 if(isSliderDown()) {
                     return formatStorageSize(sliderPosition() * bytesInMiB);
                 } else {
-                    return tr("%1%").arg(static_cast<int>(relativePosition() * 100));
+                    return tr("%1%").arg(static_cast<int>(relativePosition() * 100)); // TODO: #Elric no Q_OBJECT macro and a call to tr()
                 }
             }
         }

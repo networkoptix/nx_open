@@ -14,6 +14,7 @@
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/models/business_rules_view_model.h>
 #include <ui/models/notification_sound_model.h>
+#include <ui/widgets/business/aggregation_widget.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
@@ -182,6 +183,12 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                 return comboBox;
             }
+        case QnBusiness::AggregationColumn:
+            {
+                QnAggregationWidget* widget = new QnAggregationWidget(parent);
+                connect(widget, SIGNAL(valueChanged()), this, SLOT(at_editor_commit()));
+                return widget;
+            }
         default:
             break;
     }
@@ -239,6 +246,11 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
                 comboBox->setCurrentIndex(comboBox->findData(index.data(QnBusiness::ActionTypeRole)));
             }
             return;
+        case QnBusiness::AggregationColumn:
+            if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor)) {
+                widget->setValue(index.data(Qt::EditRole).toInt());
+            }
+            return;
         default:
             break;
     }
@@ -288,6 +300,11 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
         case QnBusiness::ActionColumn:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 model->setData(index, comboBox->itemData(comboBox->currentIndex()));
+            }
+            return;
+        case QnBusiness::AggregationColumn:
+            if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor)) {
+                model->setData(index, widget->value());
             }
             return;
         default:

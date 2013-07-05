@@ -21,6 +21,7 @@ namespace {
         ((LicenseObject,            "license"))
         ((BusinessRuleObject,       "businessRule"))
         ((ConnectObject,            "connect"))
+        ((DisconnectObject,         "disconnect"))
         ((TimeObject,               "time"))
         ((EmailObject,              "email"))
         ((StatusObject,             "status"))
@@ -843,6 +844,11 @@ bool QnAppServerConnection::setPanicMode(QnMediaServerResource::PanicMode value)
 
     QnHTTPRawResponse response;
     return QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(PanicObject), requestHeaders, requestParams, "", response);
+}
+
+void QnAppServerConnection::disconnectSync() {
+    QnHTTPRawResponse response;
+    QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(DisconnectObject), m_requestHeaders, m_requestParams, "", response);
 }
 
 int QnAppServerConnection::dumpDatabaseAsync(QObject *target, const char *slot) {
