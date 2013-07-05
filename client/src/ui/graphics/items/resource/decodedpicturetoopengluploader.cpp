@@ -67,12 +67,11 @@ extern "C"
 
 //#define SYNC_UPLOADING_WITH_GLFENCE
 
-#define QN_DECODED_PICTURE_TO_OPENGL_UPLOADER_DEBUG
-
 
 // TODO: #AK maybe it's time to remove them?
 //preceding bunch of macro will be removed after this functionality has been tested and works as expected
 
+//#define QN_DECODED_PICTURE_TO_OPENGL_UPLOADER_DEBUG
 #ifdef QN_DECODED_PICTURE_TO_OPENGL_UPLOADER_DEBUG
 #   define glCheckError glCheckError
 #else
