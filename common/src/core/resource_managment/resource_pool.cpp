@@ -223,10 +223,10 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         disconnect(resource.data(), NULL, this, NULL);
 
         if(m_updateLayouts)
-            foreach (const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
-            foreach(const QnLayoutItemData &data, layoutResource->getItems())
-            if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
-                layoutResource->removeItem(data);
+            foreach(const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+                foreach(const QnLayoutItemData &data, layoutResource->getItems())
+                    if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
+                        layoutResource->removeItem(data);
 
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
     }
