@@ -64,14 +64,7 @@ namespace {
     const char *check_reply_type() { return NULL; }
 
     const quint64 saneNetworkSpeed = 100ull*1000ull*1000ull*1000ull; //let it be 100 gigabits
-    qreal checkNetworkSpeed(const quint64 bytesPerSec) {
-        if (bytesPerSec < saneNetworkSpeed) {
-            qreal value = static_cast<qreal>(bytesPerSec);
-            qDebug() << "sane value" << value;
-        } else {
-            qDebug() << "insane value" << bytesPerSec;
-        }
-
+    qreal checkedNetworkSpeed(const quint64 bytesPerSec) {
         return (bytesPerSec < saneNetworkSpeed)
                 ? static_cast<qreal>(bytesPerSec)
                 : -1;
@@ -262,13 +255,13 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 
                     reply.statistics.append(QnStatisticsDataItem(
                                                 interfaceName + QChar(0x21e9),
-                                                checkNetworkSpeed(extractXmlBody(interfaceBlock, "in").toULongLong() * 8), //converting from bytes per sec to bits per sec
+                                                checkedNetworkSpeed(extractXmlBody(interfaceBlock, "in").toULongLong() * 8), //converting from bytes per sec to bits per sec
                                                 NETWORK_IN,
                                                 interfaceType
                     ));
                     reply.statistics.append(QnStatisticsDataItem(
                                                 interfaceName + QChar(0x21e7),
-                                                checkNetworkSpeed(extractXmlBody(interfaceBlock, "out").toULongLong() * 8), //converting from bytes per sec to bits per sec
+                                                checkedNetworkSpeed(extractXmlBody(interfaceBlock, "out").toULongLong() * 8), //converting from bytes per sec to bits per sec
                                                 NETWORK_OUT,
                                                 interfaceType
                     ));
