@@ -11,6 +11,7 @@
 #include <QtGui/QToolButton>
 #include <QtGui/QTreeView>
 #include <QtGui/QWheelEvent>
+#include <QtGui/QGraphicsLinearLayout>
 
 #include <client/client_settings.h>
 
@@ -57,22 +58,22 @@ namespace {
 QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem *parent):
     base_type(parent),
     m_textLabel(new QnProxyLabel(this)),
-    m_thumbnailLabel(NULL),
+    m_thumbnailLabel(new QnClickableProxyLabel(this)),
+    m_thumbnailVisible(false),
     m_resourceId(0)
 {
     m_textLabel->setAlignment(Qt::AlignCenter);
     m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
-    m_thumbnailLabel = new QnClickableProxyLabel(this);
     m_thumbnailLabel->setAlignment(Qt::AlignCenter);
     m_thumbnailLabel->setClickableButtons(Qt::LeftButton);
+    m_thumbnailLabel->setVisible(false);
     setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
     connect(m_thumbnailLabel, SIGNAL(clicked()), this, SIGNAL(thumbnailClicked()));
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addItem(m_thumbnailLabel);
     layout->addItem(m_textLabel);
     setLayout(layout);
 
@@ -84,8 +85,26 @@ void QnResourceBrowserToolTipWidget::setText(const QString &text) {
 }
 
 void QnResourceBrowserToolTipWidget::setPixmap(const QPixmap &pixmap) {
-    m_thumbnailLabel->setVisible(!pixmap.isNull());
+    setThumbnailVisible(!pixmap.isNull());
     m_thumbnailLabel->setPixmap(pixmap);
+    updateTailPos();
+}
+
+
+void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible) {
+    if (m_thumbnailVisible == visible)
+        return;
+
+    QGraphicsLinearLayout *layout = dynamic_cast<QGraphicsLinearLayout*>(this->layout());
+    if (!layout)
+        return; //safety check
+
+    m_thumbnailVisible = visible;
+    m_thumbnailLabel->setVisible(visible);
+    if (visible)
+        layout->insertItem(0, m_thumbnailLabel);
+    else
+        layout->removeItem(m_thumbnailLabel);
 }
 
 void QnResourceBrowserToolTipWidget::setResourceId(int id) {
@@ -97,31 +116,23 @@ int QnResourceBrowserToolTipWidget::resourceId() const {
 }
 
 void QnResourceBrowserToolTipWidget::updateTailPos()  {
-     QRectF rect = this->rect();
-
- /*   if (m_enclosingRect.isNull())
-        return;
-
-    if (!parentItem())
-        return;
-
-    if (!parentItem()->parentItem())
-        return;
-
-    QGraphicsItem *list = parentItem();
+    QRectF rect = this->rect();
+    QGraphicsWidget* w = parentWidget();
+    QRectF enclosingRect = w->geometry();
 
     // half of the tooltip height in coordinates of enclosing rect
-    qreal halfHeight = mapRectToItem(list, rect).height() / 2;
+    qreal halfHeight = mapRectToItem(w, rect).height() / 2;
 
-    qreal parentPos = parentItem()->mapToItem(list, m_pointTo).y();
+    qreal parentPos = parentItem()->mapToItem(w, m_pointTo).y();
 
-    if (parentPos - halfHeight < m_enclosingRect.top())
-        setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.top())));
+    if (parentPos - halfHeight < enclosingRect.top())
+        setTailPos(QPointF(qRound(rect.left() - 10.0), qRound(rect.top())));
     else
-    if (parentPos + halfHeight > m_enclosingRect.bottom())
-        setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.bottom())));
-    else */
+    if (parentPos + halfHeight > enclosingRect.bottom())
+        setTailPos(QPointF(qRound(rect.left() - 10.0), qRound(rect.bottom())));
+    else
         setTailPos(QPointF(qRound(rect.left() - 10.0), qRound((rect.top() + rect.bottom()) / 2)));
+    base_type::pointTo(m_pointTo);
 }
 
 void QnResourceBrowserToolTipWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
@@ -437,18 +448,28 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
         if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
             m_tooltipWidget->setResourceId(resource->getId());
             ThumbnailData& data = m_thumbnailByResource[resource];
-            switch (data.status) {
-            case None: {
-                    m_tooltipWidget->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
-                    data.loadingHandle = loadThumbnailForResource(resource);
+            if (data.status == None) {
+                data.loadingHandle = loadThumbnailForResource(resource);
+                if (data.loadingHandle != 0)
                     data.status = Loading;
-                }
+                else
+                    data.status = NoSignal;
+            }
+
+            switch (data.status) {
+            case None: //should never come here
                 break;
             case Loading:
+                m_tooltipWidget->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
                 break;
-            case Loaded: {
-                    m_tooltipWidget->setPixmap(QPixmap::fromImage(data.thumbnail));
-                }
+            case Loaded:
+                m_tooltipWidget->setPixmap(QPixmap::fromImage(data.thumbnail));
+                break;
+            case NoData:
+                m_tooltipWidget->setPixmap(qnSkin->pixmap("events/thumb_no_data.png"));
+                break;
+            case NoSignal:
+                m_tooltipWidget->setPixmap(qnSkin->pixmap("events/thumb_no_signal.png"));
                 break;
             }
         } else {
@@ -499,7 +520,7 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
 
 //    m_tooltipWidget->installEventFilter(item);
     m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
-//    connect(m_tooltipWidget, SIGNAL(thumbnailClicked()), this, SLOT(at_thumbnail_clicked()));
+    connect(m_tooltipWidget, SIGNAL(thumbnailClicked()), this, SLOT(at_thumbnailClicked()));
     connect(m_tooltipWidget, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
     connect(widget, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
 
@@ -507,11 +528,9 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
     m_hoverProcessor->setHoverEnterDelay(250);
     m_hoverProcessor->setHoverLeaveDelay(250);
-  //  connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
     connect(m_hoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(hideToolTip()));
 
     updateToolTipPosition();
-    updateToolTipVisibility();
 }
 
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const {
@@ -572,17 +591,6 @@ void QnResourceBrowserWidget::showToolTip() {
     if (!m_tooltipWidget)
         return;
      opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
-}
-
-void QnResourceBrowserWidget::updateToolTipVisibility() {
-    if (!m_hoverProcessor)
-        return;
-
-    if(m_hoverProcessor->isHovered()) {
-        showToolTip();
-    } else {
-        hideToolTip();
-    }
 }
 
 void QnResourceBrowserWidget::updateToolTipPosition() {
@@ -751,20 +759,33 @@ void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
 }
 
 void QnResourceBrowserWidget::at_thumbnailReceived(int status, const QImage &thumbnail, int handle) {
-    if (status != 0)
-        return;
-
     foreach (QnResourcePtr resource, m_thumbnailByResource.keys()) {
         ThumbnailData &data = m_thumbnailByResource[resource];
         if (data.loadingHandle != handle)
             continue;
-        data.thumbnail = thumbnail;
-        data.status = Loaded;
+
+        if (status == 0) {
+            data.thumbnail = thumbnail;
+            data.status = Loaded;
+        }
+        else {
+            data.status = NoData;
+        }
         data.loadingHandle = 0;
 
         if (m_tooltipWidget && m_tooltipWidget->resourceId() == resource->getId())
-            m_tooltipWidget->setPixmap(QPixmap::fromImage(thumbnail));
+            m_tooltipWidget->setPixmap(data.status == Loaded
+                                       ? QPixmap::fromImage(data.thumbnail)
+                                       : qnSkin->pixmap("events/thumb_no_data.png"));
         break;
     }
+}
 
+void QnResourceBrowserWidget::at_thumbnailClicked() {
+    if (!m_tooltipWidget)
+        return;
+    QnResourcePtr resource = qnResPool->getResourceById(m_tooltipWidget->resourceId());
+    if (!resource)
+        return;
+    menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resource));
 }

@@ -52,8 +52,9 @@ public:
      * \reimp
      */
     void setText(const QString &text);
-
     void setPixmap(const QPixmap &pixmap);
+
+    void setThumbnailVisible(bool visible);
 
     void setResourceId(int id);
     int resourceId() const;
@@ -76,6 +77,7 @@ private:
     QnClickableProxyLabel* m_thumbnailLabel;
     QRectF m_enclosingRect;
     QPointF m_pointTo;
+    bool m_thumbnailVisible;
     int m_resourceId;
 };
 
@@ -146,7 +148,6 @@ protected:
 
 private slots:
     void updateFilter(bool force = false);
-    void updateToolTipVisibility();
     void updateToolTipPosition();
     void hideToolTip();
     void showToolTip();
@@ -165,11 +166,14 @@ private slots:
     void at_showUrlsInTree_changed();
 
     void at_thumbnailReceived(int status, const QImage& thumbnail, int handle);
+    void at_thumbnailClicked();
 private:
     enum ThumbnailStatus {
         None,
         Loading,
-        Loaded
+        Loaded,
+        NoData,
+        NoSignal
     };
 
     struct ThumbnailData {
