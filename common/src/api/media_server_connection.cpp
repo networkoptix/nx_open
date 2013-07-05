@@ -346,7 +346,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
                 QString url = QLatin1String(extractXmlBody(resource, "url"));
                 QString name = QLatin1String(extractXmlBody(resource, "name"));
                 QString manufacture = QLatin1String(extractXmlBody(resource, "manufacturer"));
-                reply.append(QnCamerasFoundInfo(url, name, manufacture));
+                bool exists = QString(QLatin1String(extractXmlBody(resource, "exists"))).toInt();
+                reply.append(QnCamerasFoundInfo(url, name, manufacture, exists));
             } while (resource.length() > 0);
         } else {
             qnWarning("Camera search failed: %1.", extractXmlBody(response.data, "root"));
