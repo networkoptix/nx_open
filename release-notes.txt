@@ -20,11 +20,13 @@ Since 1.5.1
    work after Media Server restart. Fixed
  - PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
  - Aggregation column is added to Event and Action (used to be in advanced E&A settings)
+ - Login dialog opens much faster if it was opend once during this clietn run ( before it was opening slow every time )
  
  - iOS. Feature #1943. Sort cameras by name.
  - iOS. Feature #1938. Add camera name on item.
  - iOS5. Bug #1949. Incorrect date and time.
  - iOS. Bug #1937. iPad. Server status aren't displayed.
+ - Bug #1469. Web-client. Video doesn't play if camera has been moved from one server to another.
  
  
 Since previous build
@@ -59,6 +61,11 @@ Since previous build
  - Media server Failure" + "Camera output for 30 second" didn't work. Fixed
  - Rotated item was resized incorrectly. Fixed
  - If export to Multi-Video exe file this file was broken. Fixed
+ 
+ - Bug #2155.If "auto reset" is less then motion on camera, than "Camera output" doesn't stop.
+ - Bug #2154.When changes parameter "Allow access via public IP" in traytool, it's better to ask to restart EC.
+ - Bug #2151. Don't create an event if mediaserver has been stopped normally.
+ - Bug #2086."No signal" after deleting server from resource tree.
 
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 
