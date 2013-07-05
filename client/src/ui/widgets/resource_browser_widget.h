@@ -59,9 +59,6 @@ public:
     void setResourceId(int id);
     int resourceId() const;
 
-    /** Rectangle where the tooltip should fit - in coordinates of parent widget. */
-    void setEnclosingGeometry(const QRectF &enclosingGeometry);
-
     //reimp
     void pointTo(const QPointF &pos);
     virtual void updateTailPos() override;
@@ -75,7 +72,6 @@ private slots:
 private:
     QnProxyLabel* m_textLabel;
     QnClickableProxyLabel* m_thumbnailLabel;
-    QRectF m_enclosingRect;
     QPointF m_pointTo;
     bool m_thumbnailVisible;
     int m_resourceId;

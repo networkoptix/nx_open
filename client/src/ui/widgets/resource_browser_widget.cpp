@@ -117,27 +117,22 @@ int QnResourceBrowserToolTipWidget::resourceId() const {
 
 void QnResourceBrowserToolTipWidget::updateTailPos()  {
     QRectF rect = this->rect();
-    QGraphicsWidget* w = parentWidget();
-    QRectF enclosingRect = w->geometry();
+    QGraphicsWidget* parent = parentWidget();
+    QRectF enclosingRect = parent->geometry();
 
     // half of the tooltip height in coordinates of enclosing rect
-    qreal halfHeight = mapRectToItem(w, rect).height() / 2;
+    qreal halfHeight = mapRectToItem(parent, rect).height() / 2;
 
-    qreal parentPos = parentItem()->mapToItem(w, m_pointTo).y();
+    qreal parentPos = m_pointTo.y();
 
-    if (parentPos - halfHeight < enclosingRect.top())
+    if (parentPos - halfHeight < 0)
         setTailPos(QPointF(qRound(rect.left() - 10.0), qRound(rect.top())));
     else
-    if (parentPos + halfHeight > enclosingRect.bottom())
+    if (parentPos + halfHeight > enclosingRect.height())
         setTailPos(QPointF(qRound(rect.left() - 10.0), qRound(rect.bottom())));
     else
         setTailPos(QPointF(qRound(rect.left() - 10.0), qRound((rect.top() + rect.bottom()) / 2)));
     base_type::pointTo(m_pointTo);
-}
-
-void QnResourceBrowserToolTipWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
-    m_enclosingRect = enclosingGeometry;
-    updateTailPos();
 }
 
 void QnResourceBrowserToolTipWidget::pointTo(const QPointF &pos) {
