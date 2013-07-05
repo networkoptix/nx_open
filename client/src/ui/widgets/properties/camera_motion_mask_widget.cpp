@@ -65,6 +65,7 @@ void QnCameraMotionMaskWidget::init() {
     m_controller->resizingInstrument()->disable();
     m_controller->rubberBandInstrument()->disable();
     m_controller->itemLeftClickInstrument()->disable();
+    m_controller->setMenuEnabled(false);
 
     /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
     SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::Viewport, Instrument::makeSet(QEvent::Resize), this);
