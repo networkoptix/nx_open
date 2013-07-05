@@ -145,7 +145,6 @@ private:
     bool m_isDoubleClick;
     bool m_ptzStartedEmitted;
     bool m_skipNextAction;
-    bool m_useDirectDrag;
     QVector3D m_dragFromPosition;
 
     QBasicTimer m_clickTimer;

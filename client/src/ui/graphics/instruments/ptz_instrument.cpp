@@ -463,8 +463,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     m_ptzController(context()->instance<QnWorkbenchPtzController>()),
     m_mapperWatcher(context()->instance<QnWorkbenchPtzMapperWatcher>()),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
-    m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0),
-    m_useDirectDrag(true)
+    m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
 {
     connect(m_ptzController, SIGNAL(positionChanged(const QnMediaResourceWidget*)), this, SLOT(at_ptzController_positionChanged(const QnMediaResourceWidget*)));
     connect(m_mapperWatcher, SIGNAL(mapperChanged(const QnVirtualCameraResourcePtr &)), this, SLOT(at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &)));
@@ -919,19 +918,19 @@ void PtzInstrument::startDrag(DragInfo *) {
     }
 
     if(!manipulator()) {
-        if (m_useDirectDrag) {
-            m_dragFromPosition = m_ptzController->physicalPosition(target());
-            target()->setCursor(Qt::SizeAllCursor);
-        }
-        else {
-            ensureSelectionItem();
-            selectionItem()->setParentItem(target());
-            selectionItem()->setViewport(m_viewport.data());
-            opacityAnimator(selectionItem())->stop();
-            selectionItem()->setOpacity(1.0);
-        }
+        ensureSelectionItem();
+        selectionItem()->setParentItem(target());
+        selectionItem()->setViewport(m_viewport.data());
+        opacityAnimator(selectionItem())->stop();
+        selectionItem()->setOpacity(1.0);
         /* Everything else will be initialized in the first call to drag(). */
-    } else {
+    }
+    else if (target()->virtualPtzController()) {
+        m_dragFromPosition = m_ptzController->physicalPosition(target());
+        target()->setCursor(Qt::SizeAllCursor);
+    }
+    else{
+
         manipulator()->setCursor(Qt::BlankCursor);
         target()->setCursor(Qt::BlankCursor);
 
@@ -951,48 +950,50 @@ void PtzInstrument::dragMove(DragInfo *info) {
     }
 
     if(manipulator()) {
-        QPointF delta = info->mouseItemPos() - target()->rect().center();
-        QSizeF size = target()->size();
-        qreal scale = qMax(size.width(), size.height()) / 2.0;
-        QPointF speed(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0));
+        if (target()->virtualPtzController())
+        {
+            QPointF delta = info->mouseItemPos() - info->mousePressItemPos();
+            if (!delta.isNull()) {
+                target()->setCursor(Qt::BlankCursor);
+                overlayWidget(target())->hideCursor();
 
-        /* Adjust speed in case we're dealing with octagonal ptz. */
-        const PtzData &data = m_dataByWidget[target()];
-        if(data.capabilities & Qn::OctagonalPtzCapability) {
-            QnPolarPoint<double> polarSpeed = cartesianToPolar(speed);
-            polarSpeed.alpha = qRound(polarSpeed.alpha, M_PI / 4.0); /* Rounded to 45 degrees. */
-            speed = polarToCartesian<QPointF>(polarSpeed.r, polarSpeed.alpha);
-            if(qFuzzyIsNull(speed.x())) // TODO: #Elric use lower null threshold
-                speed.setX(0.0);
-            if(qFuzzyIsNull(speed.y()))
-                speed.setY(0.0);
-            // TODO: #Elric rebound to 1.0
+            }
+            QSizeF size = target()->size();
+            qreal scale = qMax(size.width(), size.height()) / 2.0;
+            QPointF shift(delta.x() / scale, -delta.y() / scale);
+            qreal fov = radToGrad(mm35vToFov(m_dragFromPosition.z()));
+            QVector3D positionDelta(shift.x() * fov/2.0, shift.y() * fov/2.0, 0.0);
+            m_ptzController->setPhysicalPosition(target(), m_dragFromPosition + positionDelta);
         }
+        else {
+            QPointF delta = info->mouseItemPos() - target()->rect().center();
+            QSizeF size = target()->size();
+            qreal scale = qMax(size.width(), size.height()) / 2.0;
+            QPointF speed(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0));
 
-        qreal speedMagnitude = length(speed);
-        qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
+            /* Adjust speed in case we're dealing with octagonal ptz. */
+            const PtzData &data = m_dataByWidget[target()];
+            if(data.capabilities & Qn::OctagonalPtzCapability) {
+                QnPolarPoint<double> polarSpeed = cartesianToPolar(speed);
+                polarSpeed.alpha = qRound(polarSpeed.alpha, M_PI / 4.0); /* Rounded to 45 degrees. */
+                speed = polarToCartesian<QPointF>(polarSpeed.r, polarSpeed.alpha);
+                if(qFuzzyIsNull(speed.x())) // TODO: #Elric use lower null threshold
+                    speed.setX(0.0);
+                if(qFuzzyIsNull(speed.y()))
+                    speed.setY(0.0);
+                // TODO: #Elric rebound to 1.0
+            }
 
-        ensureElementsWidget();
-        PtzArrowItem *arrowItem = elementsWidget()->arrowItem();
-        arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()), elementsWidget()->mapFromItem(target(), info->mouseItemPos()));
-        arrowItem->setSize(QSizeF(arrowSize, arrowSize));
+            qreal speedMagnitude = length(speed);
+            qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
 
-        ptzMove(target(), QVector3D(speed));
-    }
-    else if (m_useDirectDrag)
-    {
-        QPointF delta = info->mouseItemPos() - info->mousePressItemPos();
-        if (!delta.isNull()) {
-            target()->setCursor(Qt::BlankCursor);
-            overlayWidget(target())->hideCursor();
-            
+            ensureElementsWidget();
+            PtzArrowItem *arrowItem = elementsWidget()->arrowItem();
+            arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()), elementsWidget()->mapFromItem(target(), info->mouseItemPos()));
+            arrowItem->setSize(QSizeF(arrowSize, arrowSize));
+
+            ptzMove(target(), QVector3D(speed));
         }
-        QSizeF size = target()->size();
-        qreal scale = qMax(size.width(), size.height()) / 2.0;
-        QPointF shift(delta.x() / scale, -delta.y() / scale);
-        qreal fov = radToGrad(mm35vToFov(m_dragFromPosition.z()));
-        QVector3D positionDelta(shift.x() * fov/2.0, shift.y() * fov/2.0, 0.0);
-        m_ptzController->setPhysicalPosition(target(), m_dragFromPosition + positionDelta);
     }
     else {
         ensureSelectionItem();
@@ -1003,19 +1004,19 @@ void PtzInstrument::dragMove(DragInfo *info) {
 void PtzInstrument::finishDrag(DragInfo * info) {
     if(target()) {
         if(!manipulator()) {
-            if (m_useDirectDrag) {
-            }
-            else {
-                ensureSelectionItem();
-                opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
+            ensureSelectionItem();
+            opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
-                QRectF selectionRect = selectionItem()->boundingRect();
-                QSizeF targetSize = target()->size();
+            QRectF selectionRect = selectionItem()->boundingRect();
+            QSizeF targetSize = target()->size();
 
-                qreal relativeSize = qMax(selectionRect.width() / targetSize.width(), selectionRect.height() / targetSize.height());
-                if(relativeSize >= minPtzZoomRectSize)
-                    processPtzDrag(selectionRect);
-            }
+            qreal relativeSize = qMax(selectionRect.width() / targetSize.width(), selectionRect.height() / targetSize.height());
+            if(relativeSize >= minPtzZoomRectSize)
+                processPtzDrag(selectionRect);
+        }
+        else if (target()->virtualPtzController()) {
+            overlayWidget(target())->showCursor();
+            QCursor::setPos(info->mousePressScreenPos());
         } else {
             manipulator()->setCursor(Qt::SizeAllCursor);
             target()->unsetCursor();
@@ -1027,11 +1028,6 @@ void PtzInstrument::finishDrag(DragInfo * info) {
 
     if(m_ptzStartedEmitted)
         emit ptzFinished(target());
-
-    if (m_useDirectDrag) {
-        overlayWidget(target())->showCursor();
-        QCursor::setPos(info->mousePressScreenPos());
-    }
 }
 
 void PtzInstrument::finishDragProcess(DragInfo *info) {
