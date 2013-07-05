@@ -3,7 +3,6 @@
 
 #include <business/business_rule_processor.h>
 #include <business/actions/recording_business_action.h>
-#include <business/actions/panic_business_action.h>
 #include "events_db.h"
 
 /*
@@ -30,7 +29,7 @@ protected slots:
 private:
     bool executeRecordingAction(QnRecordingBusinessActionPtr action, QnResourcePtr res);
     bool executePanicAction(QnPanicBusinessActionPtr action);
-    bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource );
+    bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource);
 };
 
 #endif // __MSERVER_BUSINESS_RULE_PROCESSOR_H_

@@ -98,9 +98,11 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         consumer->beforeUpdate();
 
     {
-        // TODO: #Elric use ordered mutex locker here to avoid deadlocks.
-        QMutexLocker mutexLocker(&m_mutex); 
-        QMutexLocker mutexLocker2(&other->m_mutex); 
+        QMutex *m1 = &m_mutex, *m2 = &other->m_mutex;
+        if(m1 > m2)
+            std::swap(m1, m2);
+        QMutexLocker mutexLocker1(m1); 
+        QMutexLocker mutexLocker2(m2); 
         updateInner(other); 
     }
     silenceMode |= other->hasFlags(QnResource::foreigner);
