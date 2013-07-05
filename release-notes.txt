@@ -20,6 +20,7 @@ Since 1.5.1
    work after Media Server restart. Fixed
  - PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
  - Aggregation column is added to Event and Action (used to be in advanced E&A settings)
+ - Login dialog opens much faster if it was opend once during this clietn run ( before it was opening slow every time )
  
  - iOS. Feature #1943. Sort cameras by name.
  - iOS. Feature #1938. Add camera name on item.
