@@ -182,29 +182,43 @@ void QnCameraAdditionDialog::clearTable() {
     ui->camerasTable->setEnabled(false);
 }
 
-void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
+int QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
     clearTable();
 
+    int newCameras = 0;
     foreach(QnCamerasFoundInfo info, cameras){
-        if (info.existInPool)
-            continue;
+        bool enabledRow = !info.existInPool;
+        if (enabledRow)
+            newCameras++;
 
-        int row = ui->camerasTable->rowCount();
+        //insert new cameras to the beginning, old to the end
+        int row = enabledRow ? 0 : ui->camerasTable->rowCount();
         ui->camerasTable->insertRow(row);
 
         QTableWidgetItem *checkItem = new QTableWidgetItem();
         checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
-        checkItem->setCheckState(Qt::Unchecked);
+        if (enabledRow) {
+            checkItem->setCheckState(Qt::Unchecked);
+        } else {
+            checkItem->setFlags(checkItem->flags() | Qt::ItemIsTristate);
+            checkItem->setFlags(checkItem->flags() &~ Qt::ItemIsEnabled);
+            checkItem->setCheckState(Qt::PartiallyChecked);
+        }
 
         QTableWidgetItem *manufItem = new QTableWidgetItem(info.manufacturer);
         manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEditable);
+        if (!enabledRow)
+            manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEnabled);
 
         QTableWidgetItem *nameItem = new QTableWidgetItem(info.name);
         nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEditable);
+        if (!enabledRow)
+            nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEnabled);
 
         QFont font = ui->camerasTable->font();
         font.setUnderline(true);
 
+        qDebug() << "info.url" << info.url;
         QTableWidgetItem *urlItem = new QTableWidgetItem(info.url);
         urlItem->setFlags(urlItem->flags() &~ Qt::ItemIsEditable);
         urlItem->setData(Qt::FontRole, font);
@@ -215,6 +229,7 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         ui->camerasTable->setItem(row, UrlColumn, urlItem);
     }
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
+    return newCameras;
 }
 
 void QnCameraAdditionDialog::removeAddedCameras() {
@@ -332,10 +347,15 @@ void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column) {
     bool enabled = false;
 
     Qt::CheckState state = Qt::Unchecked;
+    bool firstRow =  true;
     for (int row = 0; row < rowCount; ++row) {
         QTableWidgetItem* item = ui->camerasTable->item(row, CheckBoxColumn);
-        if (row == 0)
+        if (!(item->flags() & Qt::ItemIsEnabled))
+            continue;
+
+        if (firstRow)
             state = item->checkState();
+        firstRow = false;
 
         if (item->checkState() != state)
             state = Qt::PartiallyChecked;
@@ -353,7 +373,11 @@ void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column) {
     if (column != UrlColumn)
         return;
 
-    QUrl url(ui->camerasTable->item(row, column)->text());
+    QString urlText = ui->camerasTable->item(row, column)->text();
+    if (!urlText.contains(QLatin1String("://")))
+        urlText = QLatin1String("http://") + urlText;
+
+    QUrl url(urlText);
     if (url.isEmpty())
         return;
 
@@ -369,13 +393,16 @@ void QnCameraAdditionDialog::at_header_checkStateChanged(Qt::CheckState state) {
         return;
 
     m_inCheckStateChange = true;
-    int rowCount = ui->camerasTable->rowCount();
-    for (int row = 0; row < rowCount; ++row) {
+    int enabledRowCount = 0;
+    for (int row = 0; row < ui->camerasTable->rowCount(); ++row) {
         QTableWidgetItem* item = ui->camerasTable->item(row, CheckBoxColumn);
+        if (!(item->flags() & Qt::ItemIsEnabled))
+            continue;
         item->setCheckState(state);
+        enabledRowCount++;
     }
 
-    ui->addButton->setEnabled(rowCount > 0 && state == Qt::Checked);
+    ui->addButton->setEnabled(enabledRowCount > 0 && state == Qt::Checked);
     m_inCheckStateChange = false;
 }
 
@@ -466,8 +493,8 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
             QnCamerasFoundInfoList cameras = result.reply().value<QnCamerasFoundInfoList>();
 
             if (cameras.size() > 0) {
-                fillTable(cameras);
-                if (ui->camerasTable->rowCount() == 0)
+                int newCameras = fillTable(cameras);
+                if (newCameras == 0)
                     QMessageBox::information(this, tr("Finished"), tr("All cameras are already in the resource tree."));
                 else
                     ui->addButton->setFocus();
