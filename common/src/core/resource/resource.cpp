@@ -190,19 +190,20 @@ void QnResource::setName(const QString& name)
 
 QnResource::Flags QnResource::flags() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    //QMutexLocker mutexLocker(&m_mutex);
     return m_flags;
 }
 
 void QnResource::setFlags(Flags flags)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    {
+        QMutexLocker mutexLocker(&m_mutex);
 
-    if(m_flags == flags)
-        return;
+        if(m_flags == flags)
+            return;
 
-    m_flags = flags;
-
+        m_flags = flags;
+    }
     emit flagsChanged(toSharedPointer(this));
 }
 
