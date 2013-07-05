@@ -576,6 +576,30 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>appServerUrlComboBox</tabstop>
+  <tabstop>appIPEdit</tabstop>
+  <tabstop>appPortSpinBox</tabstop>
+  <tabstop>appServerLogin</tabstop>
+  <tabstop>appServerPassword</tabstop>
+  <tabstop>findAppServerButton</tabstop>
+  <tabstop>testButton</tabstop>
+  <tabstop>rtspPortLineEdit</tabstop>
+  <tabstop>apiPortLineEdit</tabstop>
+  <tabstop>rtspTransportComboBox</tabstop>
+  <tabstop>groupBoxPublicIP</tabstop>
+  <tabstop>radioButtonPublicIPAuto</tabstop>
+  <tabstop>radioButtonCustomPublicIP</tabstop>
+  <tabstop>staticPublicIPEdit</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>ecsPortSpinBox</tabstop>
+  <tabstop>mediaProxyPortSpinBox</tabstop>
+  <tabstop>ecsAllowPublicIpGroupBox</tabstop>
+  <tabstop>ecsUseAutoPublicIp</tabstop>
+  <tabstop>ecsUseManualPublicIp</tabstop>
+  <tabstop>ecsManuaPublicIPEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -585,8 +609,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>227</x>
-     <y>311</y>
+     <x>236</x>
+     <y>569</y>
     </hint>
     <hint type="destinationlabel">
      <x>227</x>
@@ -601,8 +625,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>227</x>
-     <y>311</y>
+     <x>236</x>
+     <y>569</y>
     </hint>
     <hint type="destinationlabel">
      <x>227</x>
