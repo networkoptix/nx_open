@@ -186,6 +186,9 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
     clearTable();
 
     foreach(QnCamerasFoundInfo info, cameras){
+        if (info.existInPool)
+            continue;
+
         int row = ui->camerasTable->rowCount();
         ui->camerasTable->insertRow(row);
 
@@ -464,9 +467,12 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
 
             if (cameras.size() > 0) {
                 fillTable(cameras);
-                ui->addButton->setFocus();
+                if (ui->camerasTable->rowCount() == 0)
+                    QMessageBox::information(this, tr("Finished"), tr("All cameras are already in the resource tree."));
+                else
+                    ui->addButton->setFocus();
             } else {
-                QMessageBox::information(this, tr("Finished"), tr("No cameras found"));
+                QMessageBox::information(this, tr("Finished"), tr("No cameras found."));
             }
         } else {
             if (!ensureServerOnline())
