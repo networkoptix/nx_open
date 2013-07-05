@@ -56,6 +56,10 @@ QnLicenseManagerWidget::~QnLicenseManagerWidget()
 }
 
 void QnLicenseManagerWidget::updateLicenses() {
+    // do not re-read licences if we are activating one now
+    if (!m_handleKeyMap.isEmpty())
+        return;
+
     m_licenses = qnLicensePool->getLicenses();
 
     if (m_licenses.hardwareId2().isEmpty()) {
@@ -176,6 +180,10 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
         emit showMessageLater(tr("License Activation"),
                               tr("Invalid License. Contact our support team to get a valid License."),
                               true);
+    } else if (qnLicensePool->getLicenses().getLicenseByKey(licenseKey)) {
+        emit showMessageLater(tr("License Activation"),
+                              tr("The license is already activated."),
+                              true);
     }
 }
 
@@ -199,6 +207,9 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
 // -------------------------------------------------------------------------- //
 void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licenses, int handle)
 {
+    if (!m_handleKeyMap.contains(handle))
+        return;
+
     QByteArray licenseKey = m_handleKeyMap[handle];
     m_handleKeyMap.remove(handle);
 
@@ -207,15 +218,16 @@ void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licen
     QString message;
     if (!license || status)
         message = tr("There was a problem activating your license.");
-    else
-        message = m_licenses.haveLicenseKey(license->key()) ? tr("This license is already activated.") : tr("License was successfully activated.");
+    else if (license)
+        message = tr("License was successfully activated.");
 
     if (!licenses.isEmpty()) {
         m_licenses.append(licenses);
         qnLicensePool->addLicenses(licenses);
     }
 
-    QMessageBox::information(this, tr("License Activation"), message);
+    if (!message.isEmpty())
+        QMessageBox::information(this, tr("License Activation"), message);
 
     ui->licenseWidget->setSerialKey(QString());
 
