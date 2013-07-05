@@ -23,6 +23,6 @@ public:
     static int  invalidResourcesCount(const QnResourceList &resources);
 };
 
-typedef QSharedPointer<QnRecordingBusinessAction> QnRecordingBusinessActionPtr;
+typedef QSharedPointer<QnRecordingBusinessAction> QnRecordingBusinessActionPtr; // TODO: #Elric move to fwd header.
 
 #endif // __RECORDING_BUSINESS_ACTION_H__
