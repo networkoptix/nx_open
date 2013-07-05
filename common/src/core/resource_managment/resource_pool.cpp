@@ -180,7 +180,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
 
-    QMutexLocker locker(&m_resourcesMtx);
+    m_resourcesMtx.lock();
 
     foreach (const QnResourcePtr &resource, resources)
     {
@@ -224,12 +224,17 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
         if(m_updateLayouts)
             foreach (const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
-                foreach(const QnLayoutItemData &data, layoutResource->getItems())
-                    if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
-                        layoutResource->removeItem(data);
+            foreach(const QnLayoutItemData &data, layoutResource->getItems())
+            if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
+                layoutResource->removeItem(data);
 
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
+    }
 
+    m_resourcesMtx.unlock();
+
+    /* Remove resources. */
+    foreach (const QnResourcePtr &resource, removedResources) {
         emit resourceRemoved(resource);
     }
 }

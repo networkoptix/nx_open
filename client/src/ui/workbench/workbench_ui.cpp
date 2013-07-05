@@ -480,6 +480,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
     m_notificationsShowButton = blinker;
     m_notificationsShowButton->resize(15, 45);
+    m_notificationsShowButton->setCached(true);
     m_notificationsShowButton->setCheckable(true);
     m_notificationsShowButton->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
     m_notificationsShowButton->setProperty(Qn::NoHandScrollOver, true);
