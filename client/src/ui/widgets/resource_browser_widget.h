@@ -25,7 +25,6 @@ class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnWorkbenchContext;
 
-class QnImageProvider;
 class QnProxyLabel;
 class QnClickableProxyLabel;
 class HoverFocusProcessor;
@@ -47,14 +46,17 @@ class QnResourceBrowserToolTipWidget: public QnStyledTooltipWidget {
 public:
     QnResourceBrowserToolTipWidget(QGraphicsItem *parent = 0);
 
-    void ensureThumbnail(QnImageProvider* provider);
-
     /**
      * Set tooltip text.
      * \param text                      New text for this tool tip's label.
      * \reimp
      */
     void setText(const QString &text);
+
+    void setPixmap(const QPixmap &pixmap);
+
+    void setResourceId(int id);
+    int resourceId() const;
 
     /** Rectangle where the tooltip should fit - in coordinates of parent widget. */
     void setEnclosingGeometry(const QRectF &enclosingGeometry);
@@ -74,6 +76,7 @@ private:
     QnClickableProxyLabel* m_thumbnailLabel;
     QRectF m_enclosingRect;
     QPointF m_pointTo;
+    int m_resourceId;
 };
 
 
@@ -126,8 +129,11 @@ protected:
     virtual QString toolTipAt(const QPointF &pos) const override;
     virtual bool showOwnTooltip(const QPointF &pos) override;
 
+    int loadThumbnailForResource(const QnResourcePtr &resource);
+
     QnResourceTreeWidget *currentItemView() const;
     QItemSelectionModel *currentSelectionModel() const;
+    QModelIndex itemIndexAt(const QPoint &pos) const;
 
     bool isLayoutSearchable(QnWorkbenchLayout *layout) const;
     QnResourceSearchProxyModel *layoutModel(QnWorkbenchLayout *layout, bool create) const;
@@ -158,7 +164,23 @@ private slots:
 
     void at_showUrlsInTree_changed();
 
+    void at_thumbnailReceived(int status, const QImage& thumbnail, int handle);
 private:
+    enum ThumbnailStatus {
+        None,
+        Loading,
+        Loaded
+    };
+
+    struct ThumbnailData {
+        ThumbnailData(): status(None), loadingHandle(0) {}
+
+        QImage thumbnail;
+        ThumbnailStatus status;
+        int loadingHandle;
+    };
+
+
     QScopedPointer<Ui::ResourceBrowserWidget> ui;
 
     bool m_ignoreFilterChanges;
@@ -167,6 +189,7 @@ private:
     QnResourcePoolModel *m_resourceModel;
     QnResourceBrowserToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
+    QHash<QnResourcePtr, ThumbnailData> m_thumbnailByResource;
 
     QAction *m_renameAction;
 };

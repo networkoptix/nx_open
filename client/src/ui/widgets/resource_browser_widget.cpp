@@ -44,7 +44,6 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/image_provider.h>
 
 namespace {
     const char *qn_searchModelPropertyName = "_qn_searchModel";
@@ -58,46 +57,43 @@ namespace {
 QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem *parent):
     base_type(parent),
     m_textLabel(new QnProxyLabel(this)),
-    m_thumbnailLabel(NULL)
+    m_thumbnailLabel(NULL),
+    m_resourceId(0)
 {
     m_textLabel->setAlignment(Qt::AlignCenter);
     m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
+    m_thumbnailLabel = new QnClickableProxyLabel(this);
+    m_thumbnailLabel->setAlignment(Qt::AlignCenter);
+    m_thumbnailLabel->setClickableButtons(Qt::LeftButton);
+    setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
+    connect(m_thumbnailLabel, SIGNAL(clicked()), this, SIGNAL(thumbnailClicked()));
+
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);
+    layout->addItem(m_thumbnailLabel);
     layout->addItem(m_textLabel);
     setLayout(layout);
 
     updateTailPos();
 }
 
-void QnResourceBrowserToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
-    if (m_thumbnailLabel || !provider)
-        return;
-
-    QGraphicsLinearLayout *layout = dynamic_cast<QGraphicsLinearLayout*>(this->layout());
-    if (!layout)
-        return;
-
-    m_thumbnailLabel = new QnClickableProxyLabel(this);
-    m_thumbnailLabel->setAlignment(Qt::AlignCenter);
-    m_thumbnailLabel->setClickableButtons(Qt::LeftButton);
-    setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
-    layout->insertItem(0, m_thumbnailLabel);
-    connect(m_thumbnailLabel, SIGNAL(clicked()), this, SIGNAL(thumbnailClicked()));
-
-    if (!provider->image().isNull()) {
-        m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
-    } else {
-        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
-        connect(provider, SIGNAL(imageChanged(const QImage &)), this, SLOT(at_provider_imageChanged(const QImage &)));
-        provider->loadAsync();
-    }
-}
-
 void QnResourceBrowserToolTipWidget::setText(const QString &text) {
     m_textLabel->setText(text);
+}
+
+void QnResourceBrowserToolTipWidget::setPixmap(const QPixmap &pixmap) {
+    m_thumbnailLabel->setVisible(!pixmap.isNull());
+    m_thumbnailLabel->setPixmap(pixmap);
+}
+
+void QnResourceBrowserToolTipWidget::setResourceId(int id) {
+    m_resourceId = id;
+}
+
+int QnResourceBrowserToolTipWidget::resourceId() const {
+    return m_resourceId;
 }
 
 void QnResourceBrowserToolTipWidget::updateTailPos()  {
@@ -334,6 +330,14 @@ QItemSelectionModel *QnResourceBrowserWidget::currentSelectionModel() const {
     return currentItemView()->selectionModel();
 }
 
+QModelIndex QnResourceBrowserWidget::itemIndexAt(const QPoint &pos) const {
+    QAbstractItemView *treeView = ui->resourceTreeWidget->treeView();
+    if(!treeView->model())
+        return QModelIndex();
+    QPoint childPos = treeView->mapFrom(const_cast<QnResourceBrowserWidget*>(this), pos);
+    return treeView->indexAt(childPos);
+}
+
 QnResourceList QnResourceBrowserWidget::selectedResources() const {
     QnResourceList result;
 
@@ -405,32 +409,79 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
 }
 
 QString QnResourceBrowserWidget::toolTipAt(const QPointF &pos) const {
-    QWidget* childWidget = ui->resourceTreeWidget->treeView();
-    QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(childWidget);
-
-    QPoint childPos = childWidget->mapFrom(const_cast<QnResourceBrowserWidget*>(this), pos.toPoint());
-
-    if(view->model()) {
-        QVariant toolTip = view->indexAt(childPos).data(Qt::ToolTipRole);
-        if (toolTip.convert(QVariant::String))
-            return toolTip.toString();
-    }
+    Q_UNUSED(pos)
+    //default tooltip should not be displayed anyway
     return QString();
 }
 
 bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
     if (!m_tooltipWidget)
-        return true; //default tooltip should not be displayed anyway
+        //default tooltip should not be displayed anyway
+        return true;
 
-    QString text = toolTipAt(pos);
-    if (text.isEmpty()) {
+    QModelIndex index = itemIndexAt(pos.toPoint());
+    if (!index.isValid())
+        return true;
+
+    QVariant toolTip = index.data(Qt::ToolTipRole);
+    QString toolTipText = toolTip.convert(QVariant::String) ? toolTip.toString() : QString();
+
+    if (toolTipText.isEmpty()) {
         hideToolTip();
-    } else {
-        m_tooltipWidget->setText(toolTipAt(pos));
+    }
+    else {
+        m_tooltipWidget->setText(toolTipText);
         m_tooltipWidget->pointTo(QPointF(qRound(geometry().right()), pos.y()));
+
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
+            m_tooltipWidget->setResourceId(resource->getId());
+            ThumbnailData& data = m_thumbnailByResource[resource];
+            switch (data.status) {
+            case None: {
+                    m_tooltipWidget->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
+                    data.loadingHandle = loadThumbnailForResource(resource);
+                    data.status = Loading;
+                }
+                break;
+            case Loading:
+                break;
+            case Loaded: {
+                    m_tooltipWidget->setPixmap(QPixmap::fromImage(data.thumbnail));
+                }
+                break;
+            }
+        } else {
+            m_tooltipWidget->setResourceId(0);
+            m_tooltipWidget->setPixmap(QPixmap());
+        }
+
         showToolTip();
     }
     return true;
+}
+
+int QnResourceBrowserWidget::loadThumbnailForResource(const QnResourcePtr &resource) {
+    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (!networkResource)
+        return 0;
+
+    QnMediaServerResourcePtr serverResource = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(resource->getParentId()));
+    if (!serverResource)
+        return 0;
+
+    QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
+    if (!serverConnection)
+        return 0;
+
+    return serverConnection->getThumbnailAsync(
+                resource.dynamicCast<QnNetworkResource>(),
+                -1,
+                QSize(0, 200),
+                QLatin1String("png"),
+                QnMediaServerConnection::IFrameAfterTime,
+                this,
+                SLOT(at_thumbnailReceived(int, const QImage&, int)));
 }
 
 void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
@@ -520,8 +571,7 @@ void QnResourceBrowserWidget::hideToolTip() {
 void QnResourceBrowserWidget::showToolTip() {
     if (!m_tooltipWidget)
         return;
-//    m_tooltipWidget->ensureThumbnail(m_imageProvider);
-    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
+     opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
 }
 
 void QnResourceBrowserWidget::updateToolTipVisibility() {
@@ -698,4 +748,23 @@ void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
     bool urlsShown = qnSettings->isIpShownInTree();
 
     m_resourceModel->setUrlsShown(urlsShown);
+}
+
+void QnResourceBrowserWidget::at_thumbnailReceived(int status, const QImage &thumbnail, int handle) {
+    if (status != 0)
+        return;
+
+    foreach (QnResourcePtr resource, m_thumbnailByResource.keys()) {
+        ThumbnailData &data = m_thumbnailByResource[resource];
+        if (data.loadingHandle != handle)
+            continue;
+        data.thumbnail = thumbnail;
+        data.status = Loaded;
+        data.loadingHandle = 0;
+
+        if (m_tooltipWidget && m_tooltipWidget->resourceId() == resource->getId())
+            m_tooltipWidget->setPixmap(QPixmap::fromImage(thumbnail));
+        break;
+    }
+
 }
