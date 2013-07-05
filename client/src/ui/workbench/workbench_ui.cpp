@@ -302,6 +302,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_treeShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleTreeAction));
     m_treeShowButton->setFocusProxy(m_treeItem);
+    m_treeShowButton->stackBefore(m_treeItem);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);

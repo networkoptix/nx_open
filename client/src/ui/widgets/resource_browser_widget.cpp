@@ -212,6 +212,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
 
+    connect(qnResPool,          SIGNAL(resourceRemoved(QnResourcePtr)),             this,   SLOT(at_resPool_resourceRemoved(QnResourcePtr)));
+
     /* Run handlers. */
     updateFilter();
 
@@ -788,4 +790,8 @@ void QnResourceBrowserWidget::at_thumbnailClicked() {
     if (!resource)
         return;
     menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resource));
+}
+
+void QnResourceBrowserWidget::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
+    m_thumbnailByResource.remove(resource);
 }

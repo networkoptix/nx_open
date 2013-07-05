@@ -167,6 +167,8 @@ private slots:
 
     void at_thumbnailReceived(int status, const QImage& thumbnail, int handle);
     void at_thumbnailClicked();
+
+    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 private:
     enum ThumbnailStatus {
         None,
