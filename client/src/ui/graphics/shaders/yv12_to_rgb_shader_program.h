@@ -26,47 +26,12 @@ public:
         setUniformValue(m_opacityLocation, opacity);
     }
 
-    // devorping
-
-    void setDevorpingParams(const DevorpingParams& params)
-    {
-        setXShift(params.xAngle);
-        setYShift(params.yAngle);
-        setPerspShift(params.pAngle);
-        setDstFov(params.fov);
-        setAspectRatio(params.aspectRatio);
-    }
-
-    void setXShift(GLfloat angle) {
-        setUniformValue(m_xShiftLocation, angle);
-    }
-
-    void setYShift(GLfloat angle) {
-        setUniformValue(m_yShiftLocation, angle);
-    }
-
-    void setPerspShift(GLfloat angle) {
-        setUniformValue(m_perspShiftLocation, angle);
-    }
-
-    void setDstFov(GLfloat angle) {
-        setUniformValue(m_dstFovLocation, angle);
-    }
-
-    void setAspectRatio(GLfloat value) {
-        setUniformValue(m_aspectRatioLocation, value);
-    }
-
-protected:
+    virtual bool link() override; 
+private:
     int m_yTextureLocation;
     int m_uTextureLocation;
     int m_vTextureLocation;
     int m_opacityLocation;
-    int m_xShiftLocation;
-    int m_yShiftLocation;
-    int m_perspShiftLocation;
-    int m_dstFovLocation;
-    int m_aspectRatioLocation;
 };
 
 class QnYv12ToRgbShaderProgram: public QnAbstractYv12ToRgbShaderProgram 
@@ -86,10 +51,34 @@ public:
         setUniformValue(m_yLevels2Location, value.bCoeff);
         setUniformValue(m_yGammaLocation, value.gamma);
     }
+    virtual bool link() override;
 private:
     int m_yLevels1Location;
     int m_yLevels2Location;
     int m_yGammaLocation;
+};
+
+class QnYv12ToRgbWithFisheyeShaderProgram : public QnYv12ToRgbWithGammaShaderProgram
+{
+public:
+    QnYv12ToRgbWithFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    
+    void setDevorpingParams(const DevorpingParams& params)
+    {
+        setUniformValue(m_xShiftLocation, (float) params.xAngle);
+        setUniformValue(m_yShiftLocation, (float) params.yAngle);
+        setUniformValue(m_perspShiftLocation, (float) params.pAngle);
+        setUniformValue(m_dstFovLocation, (float) params.fov);
+        setUniformValue(m_aspectRatioLocation, (float) params.aspectRatio);
+    }
+
+    virtual bool link() override;
+protected:
+    int m_xShiftLocation;
+    int m_yShiftLocation;
+    int m_perspShiftLocation;
+    int m_dstFovLocation;
+    int m_aspectRatioLocation;
 };
 
 
@@ -97,6 +86,8 @@ class QnYv12ToRgbaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
     Q_OBJECT;
 public:
     QnYv12ToRgbaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+
+    virtual bool link() override;
 
     void setATexture(int target) {
         setUniformValue(m_aTextureLocation, target);

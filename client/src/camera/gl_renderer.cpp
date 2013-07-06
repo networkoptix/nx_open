@@ -109,6 +109,7 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     /* Prepare shaders. */
     m_yv12ToRgbShaderProgram.reset( new QnYv12ToRgbShaderProgram(context) );
     m_yv12ToRgbWithGammaShaderProgram.reset( new QnYv12ToRgbWithGammaShaderProgram(context) );
+    m_yv12ToRgbWithFisheyeShaderProgram.reset( new QnYv12ToRgbWithFisheyeShaderProgram(context) );
     m_yv12ToRgbaShaderProgram.reset( new QnYv12ToRgbaShaderProgram(context) );
     //m_nv12ToRgbShaderProgram.reset( new QnNv12ToRgbShaderProgram(context) );
 
@@ -308,10 +309,16 @@ void QnGLRenderer::drawYV12VideoTexture(
     DEBUG_CODE(glCheckError("glEnable"));
 
     QnAbstractYv12ToRgbShaderProgram* shader;
-    if (m_imgCorrectParam.enabled)
-        shader = m_yv12ToRgbWithGammaShaderProgram.data();
-    else
+    QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
+    if (m_fisheyeController) {
+        shader = gammaShader = m_yv12ToRgbWithFisheyeShaderProgram.data();
+    }
+    else if (m_imgCorrectParam.enabled) {
+        shader = gammaShader = m_yv12ToRgbWithGammaShaderProgram.data();
+    }
+    else {
         shader = m_yv12ToRgbShaderProgram.data();
+    }
     shader->bind();
     shader->setYTexture( 0 );
     shader->setUTexture( 1 );
@@ -319,21 +326,23 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setOpacity(m_decodedPictureProvider.opacity());
 
     if (m_fisheyeController) {
-        m_fisheyeController->setAspectRatio(picLock->width()/(float)picLock->height());
-        shader->setDevorpingParams(m_fisheyeController->getDevorpingParams());
+        DevorpingParams params = m_fisheyeController->getDevorpingParams();
+        params.aspectRatio = picLock->width()/(float)picLock->height();
+        m_yv12ToRgbWithFisheyeShaderProgram->setDevorpingParams(params);
     }
     //shader->setDstFov(m_extraCurValue);
     //qDebug() << "m_extraCurValue" << m_extraCurValue;
 
 
-    if (m_imgCorrectParam.enabled) {
+    if (gammaShader) 
+    {
         if (!isPaused()) {
-            m_yv12ToRgbWithGammaShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
+            gammaShader->setImageCorrection(picLock->imageCorrectionResult());
             if (m_histogramConsumer)
                 m_histogramConsumer->setHistogramData(picLock->imageCorrectionResult());
         }
         else {
-            m_yv12ToRgbWithGammaShaderProgram->setImageCorrection(calcImageCorrection());
+            gammaShader->setImageCorrection(calcImageCorrection());
             if (m_histogramConsumer) 
                 m_histogramConsumer->setHistogramData(m_imageCorrector);
         }
