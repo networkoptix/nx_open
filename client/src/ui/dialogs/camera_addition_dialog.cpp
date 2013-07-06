@@ -218,7 +218,6 @@ int QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         QFont font = ui->camerasTable->font();
         font.setUnderline(true);
 
-        qDebug() << "info.url" << info.url;
         QTableWidgetItem *urlItem = new QTableWidgetItem(info.url);
         urlItem->setFlags(urlItem->flags() &~ Qt::ItemIsEditable);
         urlItem->setData(Qt::FontRole, font);
