@@ -67,9 +67,11 @@ bool QnYv12ToRgbWithGammaShaderProgram::link()
     return rez;
 }
 
-QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLContext *context, QObject *parent): 
+QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLContext *context, QObject *parent, bool final): 
     QnAbstractYv12ToRgbShaderProgram(context, parent) 
 {
+    if (!final)
+        return;
     addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
         uniform sampler2D uTexture;
@@ -112,10 +114,10 @@ bool QnYv12ToRgbWithFisheyeShaderProgram::link()
     return rez;
 }
 
-QnYv12ToRgbWithFisheyeShaderProgram::QnYv12ToRgbWithFisheyeShaderProgram(const QGLContext *context, QObject *parent): 
-    QnYv12ToRgbWithGammaShaderProgram(context, parent) 
+QnYv12ToRgbWithFisheyeShaderProgram::QnYv12ToRgbWithFisheyeShaderProgram(const QGLContext *context, QObject *parent, const QString& gammaStr): 
+    QnYv12ToRgbWithGammaShaderProgram(context, parent, false) 
 {
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
+    QString shaderStr = lit(QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
         uniform sampler2D uTexture;
         uniform sampler2D vTexture;
@@ -161,17 +163,26 @@ QnYv12ToRgbWithFisheyeShaderProgram::QnYv12ToRgbWithFisheyeShaderProgram(const Q
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
         // do gamma correction and color transformation yuv->RGB
-        //float y = texture2D(yTexture, pos).p;
-        //gl_FragColor = vec4(clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0),
-        gl_FragColor = vec4(texture2D(yTexture, pos).p,
+        float y = texture2D(yTexture, pos).p;
+        gl_FragColor = vec4(%1,
                             texture2D(uTexture, pos).p,
                             texture2D(vTexture, pos).p,
                             1.0) * colorTransform;
     }
     ));
 
+    addShaderFromSourceCode(QGLShader::Fragment, shaderStr.arg(gammaStr));
+
     link();
 }
+
+// ------------------ QnYv12ToRgbWithFisheyeAndGammaShaderProgram -------------------
+
+QnYv12ToRgbWithFisheyeAndGammaShaderProgram::QnYv12ToRgbWithFisheyeAndGammaShaderProgram(const QGLContext *context, QObject *parent):
+    QnYv12ToRgbWithFisheyeShaderProgram(context, parent, lit("pow(max(y+yLevels2, 0.0) * yLevels1, yGamma)"))
+{
+
+};
 
 
 // ============================ QnYv12ToRgbaShaderProgram ==================================

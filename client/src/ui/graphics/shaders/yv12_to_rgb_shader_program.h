@@ -43,7 +43,7 @@ public:
 class QnYv12ToRgbWithGammaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
     Q_OBJECT;
 public:
-    QnYv12ToRgbWithGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnYv12ToRgbWithGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, bool final = true);
 
     void setImageCorrection(const ImageCorrectionResult& value)
     {
@@ -61,7 +61,7 @@ private:
 class QnYv12ToRgbWithFisheyeShaderProgram : public QnYv12ToRgbWithGammaShaderProgram
 {
 public:
-    QnYv12ToRgbWithFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnYv12ToRgbWithFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
     
     void setDevorpingParams(const DevorpingParams& params)
     {
@@ -81,6 +81,11 @@ protected:
     int m_aspectRatioLocation;
 };
 
+class QnYv12ToRgbWithFisheyeAndGammaShaderProgram : public QnYv12ToRgbWithFisheyeShaderProgram
+{
+public:
+    QnYv12ToRgbWithFisheyeAndGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+};
 
 class QnYv12ToRgbaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
     Q_OBJECT;

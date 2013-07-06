@@ -110,6 +110,7 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_yv12ToRgbShaderProgram.reset( new QnYv12ToRgbShaderProgram(context) );
     m_yv12ToRgbWithGammaShaderProgram.reset( new QnYv12ToRgbWithGammaShaderProgram(context) );
     m_yv12ToRgbWithFisheyeShaderProgram.reset( new QnYv12ToRgbWithFisheyeShaderProgram(context) );
+    m_yv12ToRgbWithFisheyeGammaShaderProgram.reset( new QnYv12ToRgbWithFisheyeAndGammaShaderProgram(context) );
     m_yv12ToRgbaShaderProgram.reset( new QnYv12ToRgbaShaderProgram(context) );
     //m_nv12ToRgbShaderProgram.reset( new QnNv12ToRgbShaderProgram(context) );
 
@@ -311,7 +312,10 @@ void QnGLRenderer::drawYV12VideoTexture(
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
     if (m_fisheyeController) {
-        shader = gammaShader = m_yv12ToRgbWithFisheyeShaderProgram.data();
+        if (m_imgCorrectParam.enabled)
+            shader = gammaShader = m_yv12ToRgbWithFisheyeGammaShaderProgram.data();
+        else
+            shader = m_yv12ToRgbWithFisheyeShaderProgram.data();
     }
     else if (m_imgCorrectParam.enabled) {
         shader = gammaShader = m_yv12ToRgbWithGammaShaderProgram.data();
