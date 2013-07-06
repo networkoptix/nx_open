@@ -11,6 +11,7 @@
 
 
 QnAbstractPtzController::QnAbstractPtzController(QnResource* resource) {
+    m_enabled = false;
     m_resource = dynamic_cast<QnSecurityCamResource*>(resource);
     if(!m_resource)
         qnWarning("Invalid non-camera resource '%1' provided to ptz controller.", resource ? resource->getName() : QLatin1String("NULL"));
@@ -80,4 +81,14 @@ qreal QnAbstractPtzController::getZoomVelocityCoeff() const
     QVariant val = 1.0;
     m_resource->getParam(QLatin1String("zoomVelocityCoeff"), val, QnDomainDatabase);
     return val.toFloat();
+}
+
+bool QnAbstractPtzController::isEnabled() const
+{
+    return m_enabled;
+}
+
+void QnAbstractPtzController::setEnabled(bool value)
+{
+    m_enabled = value;
 }

@@ -96,8 +96,12 @@ public:
     qreal getYVelocityCoeff() const;
     qreal getZoomVelocityCoeff() const;
 
+    bool isEnabled() const;
+    void setEnabled(bool value);
+
 private:
     QnSecurityCamResource* m_resource;
+    bool m_enabled;
 };
 
 #endif // QN_ABSTRACT_PTZ_CONTROLLER_H

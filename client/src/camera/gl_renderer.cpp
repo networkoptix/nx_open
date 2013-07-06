@@ -311,7 +311,7 @@ void QnGLRenderer::drawYV12VideoTexture(
 
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
-    if (m_fisheyeController) {
+    if (m_fisheyeController && m_fisheyeController->isEnabled()) {
         if (m_imgCorrectParam.enabled)
             shader = gammaShader = m_yv12ToRgbWithFisheyeGammaShaderProgram.data();
         else
@@ -329,7 +329,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setVTexture( 2 );
     shader->setOpacity(m_decodedPictureProvider.opacity());
 
-    if (m_fisheyeController) {
+    if (m_fisheyeController && m_fisheyeController->isEnabled()) {
         DevorpingParams params = m_fisheyeController->getDevorpingParams();
         params.aspectRatio = picLock->width()/(float)picLock->height();
         m_yv12ToRgbWithFisheyeShaderProgram->setDevorpingParams(params);

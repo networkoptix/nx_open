@@ -827,16 +827,19 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    bool ptzEnabled = m_resource->isFisheye() ||
-                      checked && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability));
+    bool ptzEnabled = checked && ( m_ptzController ||
+                                   m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability));
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);
 
     if(checked) {
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
-        action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
+        if (!m_resource->isFisheye())
+            action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
+    if (m_ptzController)
+        m_ptzController->setEnabled(checked);
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
