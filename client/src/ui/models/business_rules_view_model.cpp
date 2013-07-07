@@ -161,6 +161,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                     return (int)m_actionParams.getUserGroup();
                 if (m_actionType == BusinessActionType::PlaySound)
                     return m_actionParams.getSoundUrl();
+                if (m_actionType == BusinessActionType::SayText)
+                    return m_actionParams.getSoundUrl();
             } else if (column == QnBusiness::AggregationColumn)
                 return m_aggregationPeriod;
             break;
@@ -233,6 +235,10 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
                 setActionParams(params);
             }
             else if (m_actionType == BusinessActionType::PlaySound) {
+                QnBusinessActionParameters params;
+                params.setSoundUrl(value.toString());
+                setActionParams(params);
+            } else if (m_actionType == BusinessActionType::SayText) {
                 QnBusinessActionParameters params;
                 params.setSoundUrl(value.toString());
                 setActionParams(params);
@@ -684,6 +690,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
                 } else if (m_actionType == BusinessActionType::PlaySound) {
                     return !m_actionParams.getSoundUrl().isEmpty();
+                }  else if (m_actionType == BusinessActionType::SayText) {
+                    return !m_actionParams.getSoundUrl().isEmpty();
                 }
 
                 QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>();
@@ -803,6 +811,11 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
             return tr("Select a sound");
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         return soundModel->titleByFilename(filename);
+    } else if (m_actionType == BusinessActionType::SayText) {
+        QString text = m_actionParams.getSoundUrl();
+        if (text.isEmpty())
+            return tr("Enter the text");
+        return text;
     }
 
     QnResourceList resources = m_actionResources;
@@ -959,7 +972,8 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
                 if (BusinessActionType::requiresCameraResource(actionType)
                         || BusinessActionType::requiresUserResource(actionType)
                         || actionType == BusinessActionType::ShowPopup
-                        || actionType == BusinessActionType::PlaySound)
+                        || actionType == BusinessActionType::PlaySound
+                        || actionType == BusinessActionType::SayText)
                     flags |= Qt::ItemIsEditable;
             }
             break;

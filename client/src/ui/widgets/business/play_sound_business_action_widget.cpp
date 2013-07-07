@@ -15,11 +15,6 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/media/audio_player.h>
 
-namespace {
-    QString speechPrefix = QLatin1String("speech://");
-}
-
-
 QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -34,18 +29,7 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
 
     connect(soundModel, SIGNAL(listLoaded()), this, SLOT(updateCurrentIndex()));
 
-    connect(ui->soundRadioButton, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));
-    connect(ui->soundRadioButton, SIGNAL(toggled(bool)), ui->pathComboBox, SLOT(setEnabled(bool)));
-    connect(ui->soundRadioButton, SIGNAL(toggled(bool)), ui->manageButton, SLOT(setEnabled(bool)));
-    connect(ui->soundRadioButton, SIGNAL(toggled(bool)), ui->speechLineEdit, SLOT(setDisabled(bool)));
-
-    connect(ui->speechRadioButton, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));
-    connect(ui->speechRadioButton, SIGNAL(toggled(bool)), ui->pathComboBox, SLOT(setDisabled(bool)));
-    connect(ui->speechRadioButton, SIGNAL(toggled(bool)), ui->manageButton, SLOT(setDisabled(bool)));
-    connect(ui->speechRadioButton, SIGNAL(toggled(bool)), ui->speechLineEdit, SLOT(setEnabled(bool)));
-
     connect(ui->pathComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
-    connect(ui->speechLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
     connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
     connect(ui->manageButton, SIGNAL(clicked()), this, SLOT(at_manageButton_clicked()));
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(at_volumeSlider_valueChanged(int)));
@@ -57,12 +41,9 @@ QnPlaySoundBusinessActionWidget::~QnPlaySoundBusinessActionWidget()
 }
 
 void QnPlaySoundBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
-    setTabOrder(before,                 ui->soundRadioButton);
-    setTabOrder(ui->soundRadioButton,   ui->pathComboBox);
+    setTabOrder(before,                 ui->pathComboBox);
     setTabOrder(ui->pathComboBox,       ui->manageButton);
-    setTabOrder(ui->manageButton,       ui->speechRadioButton);
-    setTabOrder(ui->speechRadioButton,  ui->speechLineEdit);
-    setTabOrder(ui->speechLineEdit,     ui->volumeSlider);
+    setTabOrder(ui->manageButton,       ui->volumeSlider);
     setTabOrder(ui->volumeSlider,       ui->testButton);
     setTabOrder(ui->testButton, after);
 }
@@ -83,19 +64,9 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
     Q_UNUSED(guard)
 
     if (fields & QnBusiness::ActionParamsField) {
-        QString soundUrl = model->actionParams().getSoundUrl();
-
-        bool speech = soundUrl.startsWith(speechPrefix);
-        ui->speechRadioButton->setChecked(speech);
-        ui->soundRadioButton->setChecked(!speech);
-        if (speech) {
-            ui->speechLineEdit->setText(soundUrl.mid(speechPrefix.size()));
-        } else {
-            m_filename = soundUrl;
-
-            QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
-            ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
-        }
+        m_filename = model->actionParams().getSoundUrl();
+        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+        ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
     }
 }
 
@@ -103,19 +74,12 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QString soundUrl;
-    if (ui->soundRadioButton->isChecked()) {
-        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
-        if (!soundModel->loaded())
-            return;
-
-        soundUrl = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
-    } else {
-        soundUrl = speechPrefix + ui->speechLineEdit->text();
-    }
+    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    if (!soundModel->loaded())
+        return;
 
     QnBusinessActionParameters params;
-    params.setSoundUrl(soundUrl);
+    params.setSoundUrl(soundModel->filenameByRow(ui->pathComboBox->currentIndex()));
     model()->setActionParams(params);
 }
 
@@ -124,29 +88,22 @@ void QnPlaySoundBusinessActionWidget::enableTestButton() {
 }
 
 void QnPlaySoundBusinessActionWidget::at_testButton_clicked() {
-    if (ui->soundRadioButton->isChecked()) {
+    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    if (!soundModel->loaded())
+        return;
 
-        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
-        if (!soundModel->loaded())
-            return;
+    QString soundUrl = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
 
-        QString soundUrl = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
+    if (soundUrl.isEmpty())
+        return;
 
-        if (soundUrl.isEmpty())
-            return;
+    QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(soundUrl);
+    if (!QFileInfo(filePath).exists())
+        return;
 
-        QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(soundUrl);
-        if (!QFileInfo(filePath).exists())
-            return;
+    if (AudioPlayer::playFileAsync(filePath, this, SLOT(enableTestButton())))
+        ui->testButton->setEnabled(false);
 
-        if (AudioPlayer::playFileAsync(filePath, this, SLOT(enableTestButton())))
-            ui->testButton->setEnabled(false);
-    } else {
-        if (ui->speechLineEdit->text().isEmpty())
-            return;
-        if (AudioPlayer::sayTextAsync(ui->speechLineEdit->text(), this, SLOT(enableTestButton())))
-            ui->testButton->setEnabled(false);
-    }
 }
 
 void QnPlaySoundBusinessActionWidget::at_manageButton_clicked() {

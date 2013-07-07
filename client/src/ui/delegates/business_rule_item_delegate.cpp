@@ -135,14 +135,12 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                     connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     return comboBox;
                 } else if (actionType == BusinessActionType::PlaySound) {
-                    QString soundUrl = index.data(Qt::EditRole).toString();
-                    if (soundUrl.startsWith(QLatin1String("speech://")))
-                        return NULL;
-
                     QComboBox* comboBox = new QComboBox(parent);
                     comboBox->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
                     connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     return comboBox;
+                } else if (actionType == BusinessActionType::SayText) {
+                    return base_type::createEditor(parent, option, index);
                 }
 
                 QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
@@ -228,6 +226,10 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
                     return;
                 }
 
+                if (actionType == BusinessActionType::SayText) {
+                    base_type::setEditorData(editor, index);
+                }
+
 
                 if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
                     btn->setResources(index.data(QnBusiness::ActionResourcesRole).value<QnResourceList>());
@@ -278,7 +280,9 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
                         model->setData(index, comboBox->itemData(comboBox->currentIndex()));
                     }
                     return;
-                } else if (actionType == BusinessActionType::PlaySound) {
+                }
+
+                if (actionType == BusinessActionType::PlaySound) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
                         if (!soundModel->loaded())
@@ -286,6 +290,11 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
                         QString filename = soundModel->filenameByRow(comboBox->currentIndex());
                         model->setData(index, filename);
                     }
+                    return;
+                }
+
+                if (actionType == BusinessActionType::SayText) {
+                    base_type::setModelData(editor, model, index);
                     return;
                 }
 

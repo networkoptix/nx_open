@@ -19,6 +19,7 @@ namespace BusinessActionType {
         case Alert:                 return QObject::tr("Alert");
         case ShowPopup:             return QObject::tr("Show notification");
         case PlaySound:             return QObject::tr("Play Sound");
+        case SayText:               return QObject::tr("Say");
         }
         return QObject::tr("Unknown (%1)").arg((int)val);
     }
@@ -31,6 +32,7 @@ namespace BusinessActionType {
         case Alert:
         case ShowPopup:
         case PlaySound:
+        case SayText:
             return false;
 
         case CameraOutput:
@@ -53,6 +55,7 @@ namespace BusinessActionType {
         case Alert:
         case ShowPopup:
         case PlaySound:
+        case SayText:
             return false;
 
         case SendMail:
@@ -70,6 +73,7 @@ namespace BusinessActionType {
         case Alert:
         case ShowPopup:
         case PlaySound:
+        case SayText:
             return false;
 
         case CameraOutput:

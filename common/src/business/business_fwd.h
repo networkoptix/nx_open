@@ -112,13 +112,16 @@ namespace BusinessActionType {
 
         /*!
             parameters:\n
-                - soundSource (int, required)               - enumeration describing source of the sound (resources, EC, TTS)
-                - soundUrl (string, required)               - url of sound, can contain:
-                                                                * path to sound on the EC
-                                                                * path to the resource
+                - soundUrl (string, required)               - url of sound, contains path to sound on the EC
                                                                 * text that will be provided to TTS engine
         */
         PlaySound,
+
+        /*!
+            parameters:\n
+                - text (string, required)                   - text that will be provided to TTS engine
+        */
+        SayText,
 
         Alert,              // write a record to the server's log
         Bookmark,           // mark part of camera archive as undeleted
