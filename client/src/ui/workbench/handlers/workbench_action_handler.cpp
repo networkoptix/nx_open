@@ -3576,8 +3576,8 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
     wlayout->centralizeItems();
     QRect brect = wlayout->boundingRect();
 
-    int minWidth = brect.width();
-    int minHeight = brect.height();
+    int minWidth = qMax(brect.width(), qnGlobals->layoutBackgroundMinSize().width());
+    int minHeight = qMax(brect.height(), qnGlobals->layoutBackgroundMinSize().height());
 
     qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
     if (layout->cellAspectRatio() > 0) {

@@ -123,7 +123,11 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
 
     ui->imageLabel->installEventFilter(this);
 
+
+    ui->widthSpinBox->setMinimum(qnGlobals->layoutBackgroundMinSize().width());
     ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
+
+    ui->heightSpinBox->setMinimum(qnGlobals->layoutBackgroundMinSize().height());
     ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
 
     connect(ui->viewButton,                 SIGNAL(clicked()),          this, SLOT(viewFile()));
