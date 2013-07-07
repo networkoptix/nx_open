@@ -9,6 +9,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/common/ui_resource_name.h>
 #include <ui/style/warning_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -162,7 +163,7 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
     m_server = server;
 
     if (server) {
-        setWindowTitle(tr("Add cameras to %1").arg(server->getName()));
+        setWindowTitle(tr("Add cameras to %1").arg(getResourceName(server)));
         ui->validateLabelSearch->setVisible(false);
         ui->scanButton->setEnabled(true);
     } else {

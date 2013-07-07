@@ -16,7 +16,7 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/recording_business_action.h>
 
-#include <ui/common/resource_name.h>
+#include <ui/common/ui_resource_name.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>

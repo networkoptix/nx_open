@@ -5,8 +5,6 @@
 
 #include <core/resource/resource_fwd.h>
 
-// TODO: #Elric does not belong here?
-
-QString getResourceName(const QnResourcePtr& resource);
+QString getFullResourceName(const QnResourcePtr& resource, bool showIp);
 
 #endif // RESOURCE_NAME_H

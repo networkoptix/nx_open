@@ -15,7 +15,7 @@
 #include <utils/math/math.h>
 #include "device_plugins/server_camera/server_camera.h"
 #include "client/client_settings.h"
-#include <ui/common/resource_name.h>
+#include <ui/common/ui_resource_name.h>
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 

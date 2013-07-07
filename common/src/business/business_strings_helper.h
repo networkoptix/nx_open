@@ -6,7 +6,7 @@
 #include "business_aggregation_info.h"
 #include "business_fwd.h"
 
-class QnBusinessStringsHelper: QObject
+class QnBusinessStringsHelper: public QObject
 {
     Q_OBJECT
 public:
@@ -46,7 +46,6 @@ private:
 
 
     static QString resourceUrl(const QnBusinessEventParameters &params);
-    static QString resourceName(const QnBusinessEventParameters &params);
 
     static QString conflictString(const QnBusinessEventParameters &params);
 

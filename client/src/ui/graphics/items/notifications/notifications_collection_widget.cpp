@@ -13,10 +13,11 @@
 
 #include <client/client_settings.h>
 
-#include <ui/common/geometry.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/geometry.h>
+#include <ui/common/ui_resource_name.h>
 #include <ui/graphics/items/generic/particle_item.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
@@ -260,7 +261,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     item->setText(QnBusinessStringsHelper::shortEventDescription(params));
     item->setTooltipText(QnBusinessStringsHelper::longEventDescription(businessAction));
 
-    QString name = resource->getName();
+    QString name = getResourceName(resource);
 
     BusinessEventType::Value eventType = params.getEventType();
 
@@ -289,12 +290,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case BusinessEventType::Camera_Disconnect: {
         item->setColorLevel(QnNotificationItem::Important);
-/*        item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
-            tr("Open Camera"),
-            Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource)
-        );*/
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Camera Settings"),
@@ -306,12 +301,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case BusinessEventType::Storage_Failure: {
         item->setColorLevel(QnNotificationItem::Important);
-      /*  item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
-            tr("Open Monitor"),
-            Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource)
-        );*/
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings"),
@@ -322,12 +311,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case BusinessEventType::Network_Issue:{
         item->setColorLevel(QnNotificationItem::Important);
-       /* item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
-            tr("Open Camera"),
-            Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource)
-        );*/
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Camera Settings"),
@@ -399,10 +382,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
 
     item = new QnNotificationItem(m_list);
 
-    QString name = resource ? resource->getName() : QString();
-
-    item->setColorLevel(QnNotificationItem::System);
-
     switch (message) {
     case QnSystemHealth::EmailIsEmpty:
         item->addActionButton(
@@ -411,7 +390,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             Qn::UserSettingsAction,
             QnActionParameters(context()->user()).withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
         );
-        //default text
         break;
     case QnSystemHealth::NoLicenses:
         item->addActionButton(
@@ -419,7 +397,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             tr("Licenses"),
             Qn::PreferencesLicensesTabAction
         );
-        //default text
         break;
     case QnSystemHealth::SmtpIsNotSet:
         item->addActionButton(
@@ -427,7 +404,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             tr("SMTP Settings"),
             Qn::PreferencesServerTabAction
         );
-        //default text
         break;
     case QnSystemHealth::UsersEmailIsEmpty:
         item->addActionButton(
@@ -436,7 +412,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             Qn::UserSettingsAction,
             QnActionParameters(resource).withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
         );
-        item->setText(tr("E-Mail address is not set for user %1.").arg(name));
         break;
     case QnSystemHealth::ConnectionLost:
         item->addActionButton(
@@ -444,7 +419,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             tr("Connect to server"),
             Qn::ConnectToServerAction
         );
-        //default text
         break;
     case QnSystemHealth::EmailSendError:
         item->addActionButton(
@@ -452,7 +426,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             tr("SMTP Settings"),
             Qn::PreferencesServerTabAction
         );
-        //default text
         break;
     case QnSystemHealth::StoragesNotConfigured:
         item->addActionButton(
@@ -461,7 +434,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
         );
-        item->setText(tr("Storages are not configured on %1.").arg(name));
         break;
     case QnSystemHealth::StoragesAreFull:
         item->addActionButton(
@@ -470,24 +442,21 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
         );
-        item->setText(tr("Some storages are full on %1.").arg(name));
         break;
     default:
         break;
     }
-    if (item->text().isEmpty()) {
-        QString text = QnSystemHealth::messageName(message);
-        item->setText(text);
-    }
-    item->setTooltipText(QnSystemHealth::messageDescription(message));
+
+    QString resourceName = getResourceName(resource);
+    item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
+    item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
+    item->setColorLevel(QnNotificationItem::System);
+    item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
 
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
 
     m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
-
-    item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     m_itemsByMessageType.insert(message, item);
-
 }
 
 void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {

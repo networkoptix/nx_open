@@ -8,6 +8,7 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/ui_resource_name.h>
 #include <ui/models/ptz_preset_list_model.h>
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 
@@ -80,7 +81,7 @@ void QnPtzPresetsDialog::submitToResource() {
 }
 
 void QnPtzPresetsDialog::updateLabel() {
-    ui->topLabel->setText(m_camera ? tr("PTZ presets for camera %1:").arg(m_camera->getName()) : QString());
+    ui->topLabel->setText(m_camera ? tr("PTZ presets for camera %1:").arg(getResourceName(m_camera)) : QString());
 }
 
 void QnPtzPresetsDialog::updateModel() {
