@@ -56,8 +56,16 @@ class QnGraphicsView: public QGraphicsView {
 
 public:
     enum PaintFlag {
-        PaintInheritedBackround = 0x1,  /**< Invoke inherited implementation when drawing background. */
-        PaintInheritedForeground = 0x2  /**< Invoke inherited implementation when drawing foreground. */
+        /**< Invoke inherited implementation when drawing background. */
+        PaintInheritedBackround = 0x1,  
+
+        /**< Invoke inherited implementation when drawing foreground. */
+        PaintInheritedForeground = 0x2, 
+
+        /**< Invoke base paint implementation even if painting on some
+         * external surface (i.e. not current viewport).
+         * This can happen as a result of <tt>grabWidget()</tt> call. */
+        PaintOnExternalSurfaces = 0x4, 
     };
     Q_DECLARE_FLAGS(PaintFlags, PaintFlag);
 

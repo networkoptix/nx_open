@@ -43,6 +43,7 @@ public:
 
     void disableUpdateData();
     void enableUpdateData();
+    void setDateRange(const QDate& from, const QDate& to);
     void setCameraList(QnResourceList resList);
     void setActionType(BusinessActionType::Value value);
     void setEventType(BusinessEventType::Value value);
@@ -56,7 +57,9 @@ private slots:
     void at_cameraButtonClicked();
     void at_filterAction();
     void at_resetFilterAction();
+    void at_selectAllAction();
     void at_copyToClipboard();
+    void at_exportAction();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
@@ -70,6 +73,7 @@ private:
     void requestFinished();
     bool isRuleExistByCond() const;
     bool isCameraMatched(QnBusinessRuleViewModel* ruleModel) const;
+    void updateActionList(bool instantOnly);
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
 
@@ -84,6 +88,8 @@ private:
 
     QAction* m_filterAction;
     QAction* m_resetFilterAction;
+    QAction* m_selectAllAction;
+    QAction* m_exportAction;
     QAction* m_clipboardAction;
     QnBusinessRulesActualModel* m_rulesModel;
     Qt::MouseButton m_lastMouseButton;

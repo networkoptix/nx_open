@@ -3,6 +3,8 @@
 #include "api/app_server_connection.h"
 
 static const float MAX_EPS = 0.01f;
+static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
+static const qint64 ISSUE_KEEP_TIMEOUT = 1000000ll * 60;
 
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_scheduleDisabled(true),
@@ -248,4 +250,30 @@ QString QnVirtualCameraResource::toSearchString() const
     QString result;
     QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << manufacturer; //TODO: #Elric evil!
     return result;
+}
+
+
+void QnVirtualCameraResource::issueOccured()
+{
+    QMutexLocker lock(&m_mutex);
+    m_issueTimes.push_back(getUsecTimer());
+    if (m_issueTimes.size() >= MAX_ISSUE_CNT) {
+        if (!hasStatusFlags(HasIssuesFlag)) {
+            addStatusFlags(HasIssuesFlag);
+            save();
+        }
+    }
+}
+
+void QnVirtualCameraResource::noCameraIssues()
+{
+    QMutexLocker lock(&m_mutex);
+    qint64 threshold = getUsecTimer() - ISSUE_KEEP_TIMEOUT;
+    while(!m_issueTimes.empty() && m_issueTimes.front() < threshold)
+        m_issueTimes.pop_front();
+
+    if (m_issueTimes.empty() && hasStatusFlags(HasIssuesFlag)) {
+        removeStatusFlags(HasIssuesFlag);
+        save();
+    }
 }

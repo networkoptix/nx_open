@@ -7,6 +7,7 @@
 
 
 class QnHistogramWidget: public QWidget, public QnHistogramConsumer {
+    Q_OBJECT
 public:
     QnHistogramWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
 

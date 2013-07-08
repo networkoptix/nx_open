@@ -112,7 +112,7 @@ void QnExportCameraSettingsDialog::updateLicensesStatus(){
     QString usageText =
             tr("%n digital license(s) will be used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital()) +
             QLatin1Char('\n') +
-            tr("%n analog  license(s) will be used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
+            tr("%n analog license(s) will be used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
     ui->licenseLabel->setText(usageText);
 
     updateOkStatus();

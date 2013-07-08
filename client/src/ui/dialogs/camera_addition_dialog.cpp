@@ -9,11 +9,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/common/ui_resource_name.h>
 #include <ui/style/warning_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
-#include <utils/common/scoped_value_rollback.h>
 
 namespace {
     enum Column {
@@ -24,7 +23,6 @@ namespace {
     };
 
     const int portAuto = 0;
-    const QLatin1String rtspPrefix("rtsp://");
 }
 
 QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(QWidget *parent):
@@ -107,7 +105,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     ui(new Ui::CameraAdditionDialog),
     m_server(NULL),
     m_inIpRangeEdit(false),
-    m_mode(SingleIpMode),
+    m_subnetMode(false),
     m_inCheckStateChange(false)
 {
     ui->setupUi(this);
@@ -128,7 +126,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     connect(ui->endIPLineEdit,      SIGNAL(textChanged(QString)),                   this,   SLOT(at_endIPLineEdit_textChanged(QString)));
     connect(ui->camerasTable,       SIGNAL(cellChanged(int,int)),                   this,   SLOT(at_camerasTable_cellChanged(int, int)));
     connect(ui->camerasTable,       SIGNAL(cellClicked(int,int)),                   this,   SLOT(at_camerasTable_cellClicked(int, int)));
-    connect(ui->modeComboBox,       SIGNAL(currentIndexChanged(int)),               this,   SLOT(at_modeComboBox_currentIndexChanged(int)));
+    connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),                          this,   SLOT(at_subnetCheckbox_toggled(bool)));
     connect(ui->closeButton,        SIGNAL(clicked()),                              this,   SLOT(accept()));
     connect(m_header,               SIGNAL(checkStateChanged(Qt::CheckState)),      this,   SLOT(at_header_checkStateChanged(Qt::CheckState)));
     connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),                          ui->portSpinBox, SLOT(setDisabled(bool)));
@@ -151,6 +149,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     setWarningStyle(ui->validateLabelSearch);
     setWarningStyle(ui->serverOfflineLabel);
 
+    updateSubnetMode();
     clearTable();
 }
 
@@ -164,7 +163,7 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
     m_server = server;
 
     if (server) {
-        setWindowTitle(tr("Add cameras to %1").arg(server->getName()));
+        setWindowTitle(tr("Add cameras to %1").arg(getResourceName(server)));
         ui->validateLabelSearch->setVisible(false);
         ui->scanButton->setEnabled(true);
     } else {
@@ -184,22 +183,38 @@ void QnCameraAdditionDialog::clearTable() {
     ui->camerasTable->setEnabled(false);
 }
 
-void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
+int QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
     clearTable();
 
+    int newCameras = 0;
     foreach(QnCamerasFoundInfo info, cameras){
-        int row = ui->camerasTable->rowCount();
+        bool enabledRow = !info.existInPool;
+        if (enabledRow)
+            newCameras++;
+
+        //insert new cameras to the beginning, old to the end
+        int row = enabledRow ? 0 : ui->camerasTable->rowCount();
         ui->camerasTable->insertRow(row);
 
         QTableWidgetItem *checkItem = new QTableWidgetItem();
         checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
-        checkItem->setCheckState(Qt::Unchecked);
+        if (enabledRow) {
+            checkItem->setCheckState(Qt::Unchecked);
+        } else {
+            checkItem->setFlags(checkItem->flags() | Qt::ItemIsTristate);
+            checkItem->setFlags(checkItem->flags() &~ Qt::ItemIsEnabled);
+            checkItem->setCheckState(Qt::PartiallyChecked);
+        }
 
         QTableWidgetItem *manufItem = new QTableWidgetItem(info.manufacturer);
         manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEditable);
+        if (!enabledRow)
+            manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEnabled);
 
         QTableWidgetItem *nameItem = new QTableWidgetItem(info.name);
         nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEditable);
+        if (!enabledRow)
+            nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEnabled);
 
         QFont font = ui->camerasTable->font();
         font.setUnderline(true);
@@ -214,50 +229,35 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         ui->camerasTable->setItem(row, UrlColumn, urlItem);
     }
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
+    return newCameras;
 }
 
 void QnCameraAdditionDialog::removeAddedCameras() {
     int row = ui->camerasTable->rowCount() - 1;
     while (row >= 0){
         if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked)
-	        ui->camerasTable->removeRow(row);
-		row--;
+            ui->camerasTable->removeRow(row);
+        row--;
     }
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 }
 
-void QnCameraAdditionDialog::updateMode(UrlModes newMode) {
-    if (m_mode == newMode)
-        return;
+void QnCameraAdditionDialog::updateSubnetMode() {
+    ui->startIPLabel->setVisible(m_subnetMode);
+    ui->startIPLineEdit->setVisible(m_subnetMode);
+    ui->endIPLabel->setVisible(m_subnetMode);
+    ui->endIPLineEdit->setVisible(m_subnetMode);
 
-    QString prevUserInput;
-    switch (m_mode) {
-    case SingleIpMode:
-        prevUserInput = ui->cameraIpLineEdit->text();
-        break;
-    case IpRangeMode:
-        prevUserInput = ui->startIPLineEdit->text();
-        break;
-    case UrlMode:
-        prevUserInput = ui->urlLineEdit->text();
-        break;
-    case RtspMode:
-        prevUserInput = ui->rtspLineEdit->text();
-        break;
-    }
-    int prevUserInputAsIp = QHostAddress(prevUserInput).toIPv4Address();
+    ui->cameraIpLabel->setVisible(!m_subnetMode);
+    ui->cameraIpLineEdit->setVisible(!m_subnetMode);
 
+    if (m_subnetMode){
+        ui->startIPLineEdit->setText(ui->cameraIpLineEdit->text());
+        QHostAddress startAddr(ui->startIPLineEdit->text());
+        if (startAddr.toIPv4Address()) {
+            ui->startIPLineEdit->setText(startAddr.toString());
 
-    switch (newMode) {
-    case SingleIpMode:
-        if (prevUserInputAsIp > 0)
-            ui->cameraIpLineEdit->setText(prevUserInput);
-        ui->cameraIpLineEdit->setFocus();
-        break;
-    case IpRangeMode:
-        if (prevUserInputAsIp > 0) {
-            ui->startIPLineEdit->setText(prevUserInput);
-            quint32 addr = prevUserInputAsIp;
+            quint32 addr = startAddr.toIPv4Address();
             addr = addr >> 8;
             addr = (addr << 8) + 255;
             QString endAddrStr = QHostAddress(addr).toString();
@@ -267,25 +267,16 @@ void QnCameraAdditionDialog::updateMode(UrlModes newMode) {
         } else {
             ui->startIPLineEdit->setFocus();
         }
-        at_startIPLineEdit_editingFinished();
-        break;
-    case UrlMode:
-        ui->urlLineEdit->setText(prevUserInput);
-        ui->urlLineEdit->setFocus();
-        break;
-    case RtspMode:
-        ui->rtspLineEdit->setText(prevUserInput);
-        ui->rtspLineEdit->setFocus();
-        break;
+    } else {
+        ui->cameraIpLineEdit->setText(ui->startIPLineEdit->text());
+        ui->cameraIpLineEdit->setFocus();
     }
-    m_mode = newMode;
-
-    ui->credsWidget->setVisible(m_mode != RtspMode);
 }
 
 bool QnCameraAdditionDialog::ensureServerOnline() {
     if (m_server && m_server->getStatus() != QnResource::Offline)
         return true;
+
 
     QMessageBox::critical(this,
                           tr("Error"),
@@ -314,7 +305,7 @@ void QnCameraAdditionDialog::at_startIPLineEdit_textChanged(QString value) {
 
 void QnCameraAdditionDialog::at_startIPLineEdit_editingFinished() {
     QHostAddress startAddr(ui->endIPLineEdit->text());
-    if (startAddr.toIPv4Address() % 256 == 0){
+    if (ui->subnetCheckbox->isChecked() && (startAddr.toIPv4Address() % 256 == 0)){
         QHostAddress endAddr(startAddr.toIPv4Address() + 255);
         ui->endIPLineEdit->setText(endAddr.toString());
     }
@@ -349,17 +340,22 @@ void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column) {
 
     if (m_inCheckStateChange)
         return;
-    QnScopedValueRollback<bool> guard(&m_inCheckStateChange, true);
-    Q_UNUSED(guard)
+
+    m_inCheckStateChange = true;
 
     int rowCount = ui->camerasTable->rowCount();
     bool enabled = false;
 
     Qt::CheckState state = Qt::Unchecked;
+    bool firstRow =  true;
     for (int row = 0; row < rowCount; ++row) {
         QTableWidgetItem* item = ui->camerasTable->item(row, CheckBoxColumn);
-        if (row == 0)
+        if (!(item->flags() & Qt::ItemIsEnabled))
+            continue;
+
+        if (firstRow)
             state = item->checkState();
+        firstRow = false;
 
         if (item->checkState() != state)
             state = Qt::PartiallyChecked;
@@ -369,13 +365,19 @@ void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column) {
     }
     ui->addButton->setEnabled(enabled);
     m_header->setCheckState(state);
+
+    m_inCheckStateChange = false;
 }
 
 void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column) {
     if (column != UrlColumn)
         return;
 
-    QUrl url(ui->camerasTable->item(row, column)->text());
+    QString urlText = ui->camerasTable->item(row, column)->text();
+    if (!urlText.contains(QLatin1String("://")))
+        urlText = QLatin1String("http://") + urlText;
+
+    QUrl url(urlText);
     if (url.isEmpty())
         return;
 
@@ -389,16 +391,19 @@ void QnCameraAdditionDialog::at_header_checkStateChanged(Qt::CheckState state) {
 
     if (m_inCheckStateChange)
         return;
-    QnScopedValueRollback<bool> guard(&m_inCheckStateChange, true);
-    Q_UNUSED(guard)
 
-    int rowCount = ui->camerasTable->rowCount();
-    for (int row = 0; row < rowCount; ++row) {
+    m_inCheckStateChange = true;
+    int enabledRowCount = 0;
+    for (int row = 0; row < ui->camerasTable->rowCount(); ++row) {
         QTableWidgetItem* item = ui->camerasTable->item(row, CheckBoxColumn);
+        if (!(item->flags() & Qt::ItemIsEnabled))
+            continue;
         item->setCheckState(state);
+        enabledRowCount++;
     }
 
-    ui->addButton->setEnabled(rowCount > 0 && state == Qt::Checked);
+    ui->addButton->setEnabled(enabledRowCount > 0 && state == Qt::Checked);
+    m_inCheckStateChange = false;
 }
 
 void QnCameraAdditionDialog::at_scanButton_clicked() {
@@ -413,59 +418,45 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
 
     QString startAddrStr;
     QString endAddrStr;
+    if (m_subnetMode) {
+        startAddrStr = ui->startIPLineEdit->text();
+        endAddrStr = ui->endIPLineEdit->text();
 
-    switch (m_mode) {
-    case SingleIpMode:
-        startAddrStr = ui->cameraIpLineEdit->text();
-        break;
-    case IpRangeMode:
-        {
-            startAddrStr = ui->startIPLineEdit->text();
-            endAddrStr = ui->endIPLineEdit->text();
-            QHostAddress startAddr(startAddrStr);
-            QHostAddress endAddr(endAddrStr);
-            if (startAddr.toIPv4Address() > endAddr.toIPv4Address()){
-                ui->validateLabelSearch->setText(tr("First address in range is greater than last one"));
-                ui->validateLabelSearch->setVisible(true);
-                return;
-            }
+        QHostAddress startAddr(startAddrStr);
+        QHostAddress endAddr(endAddrStr);
 
-            if (!endAddr.isInSubnet(startAddr, 8)){
-                ui->validateLabelSearch->setText(tr("Ip address range is too big, maximum of 255 addresses is allowed"));
-                ui->validateLabelSearch->setVisible(true);
-                return;
-            }
-        }
-        break;
-    case UrlMode:
-        startAddrStr = ui->urlLineEdit->text();
-        if (!QUrl::fromUserInput(startAddrStr).isValid()) {
-            ui->validateLabelSearch->setText(tr("Camera address field must contain valid url or ip address"));
+        if (startAddr.toIPv4Address() > endAddr.toIPv4Address()){
+            ui->validateLabelSearch->setText(tr("First address in range is greater than last one"));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
-        break;
-    case RtspMode:
-        startAddrStr = ui->rtspLineEdit->text();
-        if (!startAddrStr.startsWith(rtspPrefix))
-            startAddrStr = rtspPrefix + startAddrStr;
-        if (!QUrl::fromUserInput(startAddrStr).isValid()) {
-            ui->validateLabelSearch->setText(tr("Camera address field must contain valid url or ip address"));
+
+        if (!endAddr.isInSubnet(startAddr, 8)){
+            ui->validateLabelSearch->setText(tr("Ip address range is too big, maximum of 255 addresses is allowed"));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
-        break;
+    } else {
+        const QString& userInput = ui->cameraIpLineEdit->text();
+        QUrl url = QUrl::fromUserInput(userInput);
+        if (!url.isValid()) {
+            ui->validateLabelSearch->setText(tr("Camera address field must contain valid url, ip address or rtsp link"));
+            ui->validateLabelSearch->setVisible(true);
+            return;
+        }
+        //startAddrStr = url.host();
+        startAddrStr = userInput;
+        endAddrStr = QString();
     }
 
     clearTable();
     ui->scanButton->setEnabled(false);
-    ui->modeStackedWidget->setEnabled(false);
-/*    ui->startIPLineEdit->setEnabled(false);
+    ui->startIPLineEdit->setEnabled(false);
     ui->cameraIpLineEdit->setEnabled(false);
-    ui->endIPLineEdit->setEnabled(false);*/
+    ui->endIPLineEdit->setEnabled(false);
     ui->portAutoCheckBox->setEnabled(false);
     ui->portSpinBox->setEnabled(false);
-    ui->modeComboBox->setEnabled(false);
+    ui->subnetCheckbox->setEnabled(false);
     ui->loginLineEdit->setEnabled(false);
     ui->passwordLineEdit->setEnabled(false);
 
@@ -485,13 +476,12 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     loop.exec();
 
     ui->scanButton->setEnabled(m_server);
-    ui->modeStackedWidget->setEnabled(true);
-    /*ui->startIPLineEdit->setEnabled(true);
+    ui->startIPLineEdit->setEnabled(true);
     ui->cameraIpLineEdit->setEnabled(true);
-    ui->endIPLineEdit->setEnabled(true);*/
+    ui->endIPLineEdit->setEnabled(true);
     ui->portAutoCheckBox->setEnabled(true);
     ui->portSpinBox->setEnabled(!ui->portAutoCheckBox->isChecked());
-    ui->modeComboBox->setEnabled(true);
+    ui->subnetCheckbox->setEnabled(true);
     ui->loginLineEdit->setEnabled(true);
     ui->passwordLineEdit->setEnabled(true);
 
@@ -503,10 +493,13 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
             QnCamerasFoundInfoList cameras = result.reply().value<QnCamerasFoundInfoList>();
 
             if (cameras.size() > 0) {
-                fillTable(cameras);
-                ui->addButton->setFocus();
+                int newCameras = fillTable(cameras);
+                if (newCameras == 0)
+                    QMessageBox::information(this, tr("Finished"), tr("All cameras are already in the resource tree."));
+                else
+                    ui->addButton->setFocus();
             } else {
-                QMessageBox::information(this, tr("Finished"), tr("No cameras found"));
+                QMessageBox::information(this, tr("Finished"), tr("No cameras found."));
             }
         } else {
             if (!ensureServerOnline())
@@ -516,28 +509,18 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
             if (0) { // TODO: #Elric
                 error = tr("Could not connect to server.\nMake sure the server is available and try again.");
             } else {
-                error = tr("Server returned an error."); 
+                error = tr("Server returned an error.");
             }
-            
+
             QMessageBox::critical(this, tr("Error"), error);
         }
     }
 
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
-    switch (m_mode) {
-    case SingleIpMode:
-        ui->cameraIpLineEdit->setFocus();
-        break;
-    case IpRangeMode:
+    if (m_subnetMode)
         ui->startIPLineEdit->setFocus();
-        break;
-    case UrlMode:
-        ui->urlLineEdit->setFocus();
-        break;
-    case RtspMode:
-        ui->rtspLineEdit->setFocus();
-        break;
-    }
+    else
+        ui->cameraIpLineEdit->setFocus();
 }
 
 void QnCameraAdditionDialog::at_addButton_clicked() {
@@ -595,9 +578,12 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     }
 }
 
-void QnCameraAdditionDialog::at_modeComboBox_currentIndexChanged(int index) {
-    ui->modeStackedWidget->setCurrentIndex(index);
-    updateMode(static_cast<UrlModes>(index));
+void QnCameraAdditionDialog::at_subnetCheckbox_toggled(bool toggled) {
+    if (m_subnetMode == toggled)
+        return;
+
+    m_subnetMode = toggled;
+    updateSubnetMode();
 }
 
 void QnCameraAdditionDialog::at_resPool_resourceChanged(const QnResourcePtr &resource) {

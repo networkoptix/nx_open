@@ -65,7 +65,6 @@ Instrument *SelectionFixupInstrument::preForwardingInstrument() const {
     return m_preForwardingInstrument;
 }
 
-
 bool SelectionFixupInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     if(!(item->flags() & QGraphicsItem::ItemIsSelectable))
         return false;

@@ -58,7 +58,7 @@ struct ImageCorrectionResult
     int hystogram[256];
     bool filled;
 
-    void analizeImage( const quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data, const QRectF& srcRect);
+    void analizeImage( const quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data, const QRectF& srcRect = QRectF(0.0, 0.0, 1.0, 1.0));
 private:
     float calcGamma(int leftPos, int rightPos, int pixels) const;
 private:

@@ -20,10 +20,8 @@ namespace nx_http
 
 class QnAxisOnvifResource : public QnPlOnvifResource
 {
-    static int MAX_RESOLUTION_DECREASES_NUM;
-
     Q_OBJECT
-
+    static int MAX_RESOLUTION_DECREASES_NUM;
 public:
     QnAxisOnvifResource();
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;

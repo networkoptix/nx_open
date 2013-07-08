@@ -11,6 +11,7 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 #include "core/datapacket/media_data_packet.h"
+#include "utils/color_space/image_correction.h"
 
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
 #define AV_REVERSE_REORDERED   QnAbstractMediaData::MediaFlags_ReverseReordered
@@ -245,7 +246,7 @@ struct CLVideoData
 class ScreenshotInterface
 {
 public:
-    virtual QImage getScreenshot() = 0; // 8 bit Y channel only
+    virtual QImage getScreenshot(const ImageCorrectionParams& params) = 0; // 8 bit Y channel only
     virtual QImage getGrayscaleScreenshot() = 0;
 };
 

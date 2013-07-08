@@ -311,15 +311,15 @@ public:
     static QSize eroded(const QSize &size, const QMargins &amount);
 
     /**
-     * \param size                      Size to check for containment.
-     * \param otherSize                 Reference size.
+     * \param size                      Reference size.
+     * \param otherSize                 Size to check for containment.
      * \returns                         Whether the reference size contains the given size.
      */
     static bool contains(const QSizeF &size, const QSizeF &otherSize);
 
     /**
-     * \param size                      Size to check for containment.
-     * \param otherSize                 Reference size.
+     * \param size                      Reference size.
+     * \param otherSize                 Size to check for containment.
      * \returns                         Whether the reference size contains the given size.
      */
     static bool contains(const QSize &size, const QSize &otherSize);

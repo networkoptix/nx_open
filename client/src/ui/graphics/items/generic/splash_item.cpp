@@ -129,6 +129,8 @@ void QnSplashItem::tick(int deltaMSecs) {
     if(a->time >= a->endTime) {
         stopListening();
 
+        emit animationFinished();
+
         if(a->destroy)
             qnDeleteLater(this);
     }

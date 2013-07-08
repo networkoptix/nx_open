@@ -50,6 +50,7 @@ public:
         EXTRA_PTZ_MAPPINGS_PATH,
 
         UPDATE_FEED_URL,
+        UPDATES_ENABLED,
         IGNORED_UPDATE_VERSION,
 
         TOUR_CYCLE_TIME,
@@ -75,9 +76,14 @@ public:
         CLOCK_SECONDS,
 
         POPUP_SYSTEM_HEALTH,
+        
+        AUTO_START,
 
-        /** Filter value for network connections in the statistics widget */
+        /** Filter value for network connections in the statistics widget. */
         STATISTICS_NETWORK_FILTER,
+
+        /** Last used value for the 'Keep aspect ratio' flag in the layout settings. */
+        LAYOUT_KEEP_ASPECT_RATIO,
 
         VARIABLE_COUNT
     };
@@ -126,6 +132,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
         QN_DECLARE_RW_PROPERTY(QUrl,                        updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QUrl())
+        QN_DECLARE_RW_PROPERTY(bool,                        isUpdatesEnabled,       setUpdatesEnabled,          UPDATES_ENABLED,            true)
         QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,           ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(bool,                        isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
@@ -144,7 +151,9 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockSecondsOn,       setClockSecondsOn,          CLOCK_SECONDS,              true)
         QN_DECLARE_RW_PROPERTY(quint64,                     popupSystemHealth,      setPopupSystemHealth,       POPUP_SYSTEM_HEALTH,        0xFFFFFFFFFFFFFFFFull)
+        QN_DECLARE_RW_PROPERTY(bool,                        autoStart,              setAutoStart,               AUTO_START,                 false)
         QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)
+        QN_DECLARE_RW_PROPERTY(bool,                        layoutKeepAspectRatio,  setLayoutKeepAspectRatio,   LAYOUT_KEEP_ASPECT_RATIO,   true)
     QN_END_PROPERTY_STORAGE()
 
 private:

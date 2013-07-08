@@ -138,11 +138,16 @@ void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &
 
 void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 {
-    switch(message.eventType) {
+    switch(message.messageType) {
     case Qn::Message_Type_Initial:
+        {
+            QnAppServerConnectionFactory::setPublicIp(message.publicIp);
+            break;
+        }
     case Qn::Message_Type_Ping:
-        break;
-
+        {
+            break;
+        }
     case Qn::Message_Type_License:
         {
             qnLicensePool->addLicense(message.license);

@@ -11,6 +11,8 @@ public:
     QnContrastImageFilter(const ImageCorrectionParams& params);
     virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) override;
 private:
+    bool isFormatSupported(CLVideoDecoderOutput* frame) const;
+private:
     ImageCorrectionParams m_params;
     ImageCorrectionResult m_gamma;
     float m_lastGamma;

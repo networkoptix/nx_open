@@ -33,6 +33,9 @@ QnPlWatchDogResource::~QnPlWatchDogResource()
 
 bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
 {
+    if (m_appStopping)
+        return false;
+
     CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
     if (status == CL_HTTP_SUCCESS) 
@@ -69,6 +72,9 @@ bool QnPlWatchDogResource::initInternal()
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false) 
     {
+        if (m_appStopping)
+            return false;
+
         // The camera most likely is going to reset after enabling dual streaming
         enableOnvifSecondStream();
         return false;
@@ -218,8 +224,8 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 
     //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
-    QDateTime currTime = QDateTime::currentDateTime().addMSecs(-ADVANCED_SETTINGS_VALID_TIME);
-    if (currTime > m_advSettingsLastUpdated) {
+    QDateTime currTime = QDateTime::currentDateTime();
+    if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(currTime) > ADVANCED_SETTINGS_VALID_TIME) {
         foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
         {
             if (!setting->refreshValsFromCamera())
@@ -227,7 +233,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
                 return false;
             }
         }
-        m_advSettingsLastUpdated = QDateTime::currentDateTime();
+        m_advSettingsLastUpdated = currTime;
     }
 
     foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
@@ -250,6 +256,10 @@ bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant
     foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
     {
         //If param is not in list of child, it will return false. Then will try to find it in parent.
+
+        if (m_appStopping)
+            return false;
+
         if (setting->setParamPhysical(param, val))
         {
             return true;

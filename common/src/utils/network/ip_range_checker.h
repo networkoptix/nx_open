@@ -11,7 +11,7 @@ class QnIprangeChecker : public QObject
 public:
     QnIprangeChecker();
     ~QnIprangeChecker();
-    QList<QString> onlineHosts(QHostAddress startAddr, QHostAddress endAddr);
+    QList<QString> onlineHosts(QHostAddress startAddr, QHostAddress endAddr, int port);
 private:
 
 };

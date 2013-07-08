@@ -110,6 +110,8 @@ public:
      */
     bool isEditingEnabled() const;
 
+    QAbstractItemView* treeView() const;
+
 protected:
     virtual bool eventFilter(QObject *obj, QEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;

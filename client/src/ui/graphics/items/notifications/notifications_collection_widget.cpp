@@ -1,4 +1,3 @@
-
 #include "notifications_collection_widget.h"
 
 #include <QtWidgets/QApplication>
@@ -14,8 +13,13 @@
 
 #include <client/client_settings.h>
 
+#include <ui/animation/opacity_animator.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/geometry.h>
+#include <ui/common/ui_resource_name.h>
+#include <ui/graphics/items/generic/particle_item.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/style/skin.h>
@@ -24,6 +28,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 
+#include <utils/math/color_transformations.h>
 
 //TODO: #GDM remove debug
 #include <business/actions/common_business_action.h>
@@ -40,50 +45,90 @@ namespace {
 
 QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
     base_type(parent),
-    m_blinking(false),
-    m_blinkUp(true),
-    m_blinkProgress(0.0)
+    m_count(0),
+    m_time(0)
 {
     registerAnimation(this);
     startListening();
-    setNotificationCount(0);
+
+    m_particle = new QnParticleItem(this);
+
+    m_balloon = new QnToolTipWidget(this);
+    m_balloon->setText(tr("You have new notifications"));
+    m_balloon->setOpacity(0.0);
+
+    connect(m_balloon,  SIGNAL(geometryChanged()),  this, SLOT(updateBalloonTailPos()));
+    connect(this,       SIGNAL(geometryChanged()),  this, SLOT(updateParticleGeometry()));
+    connect(this,       SIGNAL(toggled(bool)),      this, SLOT(updateParticleVisibility()));
+    connect(m_particle, SIGNAL(visibleChanged()),   this, SLOT(at_particle_visibleChanged()));
+
+    updateParticleGeometry();
+    updateParticleVisibility();
+    updateToolTip();
+    updateBalloonTailPos();
 }
 
 void QnBlinkingImageButtonWidget::setNotificationCount(int count) {
-    m_blinking = count > 0;
-    setToolTip(tr("You have %n notifications", "", count));
+    if(m_count == count)
+        return;
+
+    m_count = count;
+
+    updateParticleVisibility();
+    updateToolTip();
+}
+
+void QnBlinkingImageButtonWidget::setColor(const QColor &color) {
+    m_particle->setColor(color);
+}
+
+void QnBlinkingImageButtonWidget::showBalloon() {
+    /*updateBalloonGeometry();
+    opacityAnimator(m_balloon, 4.0)->animateTo(1.0);
+
+    QTimer::singleShot(3000, this, SLOT(hideBalloon()));*/
+}
+
+void QnBlinkingImageButtonWidget::hideBalloon() {
+    /*opacityAnimator(m_balloon, 4.0)->animateTo(0.0);*/
+}
+
+void QnBlinkingImageButtonWidget::updateParticleGeometry() {
+    QRectF rect = this->rect();
+    qreal radius = (rect.width() + rect.height()) / 4.0;
+
+    m_particle->setRect(QRectF(rect.center() - QPointF(radius, radius), 2.0 * QSizeF(radius, radius)));
+}
+
+void QnBlinkingImageButtonWidget::updateParticleVisibility() {
+    m_particle->setVisible(m_count > 0 && !isChecked());
+}
+
+void QnBlinkingImageButtonWidget::updateToolTip() {
+    setToolTip(tr("You have %n notifications", "", m_count));
+}
+
+void QnBlinkingImageButtonWidget::updateBalloonTailPos() {
+    QRectF rect = m_balloon->rect();
+    m_balloon->setTailPos(QPointF(rect.right() + 8.0, rect.center().y()));
+}
+
+void QnBlinkingImageButtonWidget::updateBalloonGeometry() {
+    QRectF rect = this->rect();
+    m_balloon->pointTo(QPointF(rect.left(), rect.center().y()));
 }
 
 void QnBlinkingImageButtonWidget::tick(int deltaMSecs) {
-    qreal step = (qreal)deltaMSecs / 1000;
-    if (m_blinkUp) {
-        m_blinkProgress += step;
-        if (m_blinkProgress >= 1.0) {
-            m_blinkProgress = 1.0;
-            m_blinkUp = false;
-        }
-    } else {
-        m_blinkProgress -= step;
-        if (m_blinkProgress <= 0.2) {
-            m_blinkProgress = 0.2;
-            m_blinkUp = true;
-        }
-    }
+    m_time += deltaMSecs;
+    
+    m_particle->setOpacity(0.6 + 0.4 * std::sin(m_time / 1000.0 * 2 * M_PI));
 }
 
-void QnBlinkingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect)  {
-    base_type::paint(painter, startState, endState, progress, widget, rect);
-    if (!(startState & CHECKED) && m_blinking) {
-        int blinkColor = 255 * m_blinkProgress;
-        QRadialGradient gradient(0.0, rect.height() / 2, rect.width()* 1.5);
-        gradient.setColorAt(0.0, QColor(blinkColor, blinkColor, 0, 196));
-        gradient.setColorAt(1.0,  QColor(0, 0, 0, 0));
-        qreal opacity = painter->opacity();
-        painter->setOpacity(1.0);
-        painter->fillRect(rect, gradient);
-        painter->setOpacity(opacity);
-    }
+void QnBlinkingImageButtonWidget::at_particle_visibleChanged() {
+    if(m_particle->isVisible())
+        showBalloon();
 }
+
 
 // ---------------------- QnNotificationsCollectionWidget -------------------
 
@@ -99,10 +144,17 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 
     QnImageButtonWidget *settingsButton = new QnImageButtonWidget(m_headerWidget);
     settingsButton->setIcon(qnSkin->icon("events/settings.png"));
-    settingsButton->setToolTip(tr("Settings"));
+    settingsButton->setToolTip(tr("Settings..."));
     settingsButton->setFixedSize(buttonSize);
     settingsButton->setCached(true);
     connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
+
+    QnImageButtonWidget *filterButton = new QnImageButtonWidget(m_headerWidget);
+    filterButton->setIcon(qnSkin->icon("item/search.png"));
+    filterButton->setToolTip(tr("Filter..."));
+    filterButton->setFixedSize(buttonSize);
+    filterButton->setCached(true);
+    connect(filterButton, SIGNAL(clicked()), this, SLOT(at_filterButton_clicked()));
 
     QnImageButtonWidget *eventLogButton = new QnImageButtonWidget(m_headerWidget);
     eventLogButton->setIcon(qnSkin->icon("events/log.png"));
@@ -121,13 +173,6 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
         connect(debugButton, SIGNAL(clicked()), this, SLOT(at_debugButton_clicked()));
     }
 
-    QnImageButtonWidget *hideAllButton = new QnImageButtonWidget(m_headerWidget);
-    hideAllButton->setIcon(qnSkin->icon("events/hide_all.png"));
-    hideAllButton->setToolTip(tr("Hide all"));
-    hideAllButton->setFixedSize(buttonSize);
-    hideAllButton->setCached(true);
-    connect(hideAllButton, SIGNAL(clicked()), this, SLOT(hideAll()));
-
     qreal margin = (widgetHeight - buttonSize) / 2.0;
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setSpacing(2.0);
@@ -137,7 +182,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
         controlsLayout->addItem(debugButton);
     controlsLayout->addItem(eventLogButton);
     controlsLayout->addItem(settingsButton);
-    controlsLayout->addItem(hideAllButton);
+    controlsLayout->addItem(filterButton);
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -151,6 +196,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     connect(m_list, SIGNAL(itemRemoved(QnNotificationItem*)), this, SLOT(at_list_itemRemoved(QnNotificationItem*)));
     connect(m_list, SIGNAL(visibleSizeChanged()), this, SIGNAL(visibleSizeChanged()));
     connect(m_list, SIGNAL(sizeHintChanged()), this, SIGNAL(sizeHintChanged()));
+
 
     setLayout(layout);
 
@@ -190,16 +236,16 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
     m_blinker = blinker;
     if (m_blinker) {
         connect(m_list, SIGNAL(itemCountChanged(int)), m_blinker, SLOT(setNotificationCount(int)));
+        connect(m_list, SIGNAL(itemColorChanged(QColor)), m_blinker, SLOT(setColor(QColor)));
         m_blinker->setNotificationCount(m_list->itemCount());
     }
 }
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
 {
-    QnSingleThumbnailLoader* loader = QnSingleThumbnailLoader::newInstance(resource, this);
-    connect(loader, SIGNAL(success(QImage)), item, SLOT(setImage(QImage)));
-    connect(loader, SIGNAL(finished()), loader, SLOT(deleteLater()));
-    loader->load(usecsSinceEpoch, QSize(0, thumbnailHeight)); //width is auto-calculated
+    QnSingleThumbnailLoader* loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, QSize(0, thumbnailHeight), item);
+    item->setImageProvider(loader);
+    //connect(loader, SIGNAL(finished()), loader, SLOT(deleteLater()));
 }
 
 
@@ -215,47 +261,35 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     item->setText(QnBusinessStringsHelper::shortEventDescription(params));
     item->setTooltipText(QnBusinessStringsHelper::longEventDescription(businessAction));
 
-    QString name = resource->getName();
+    QString name = getResourceName(resource);
 
     BusinessEventType::Value eventType = params.getEventType();
 
     switch (eventType) {
     case BusinessEventType::Camera_Motion: {
-        item->setColor(qnGlobals->notificationColorCommon());
+        item->setColorLevel(QnNotificationItem::Common);
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Browse Archive"),
             Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000),
-            2.0,
-            true
+            QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)
         );
         loadThumbnailForItem(item, resource, params.getEventTimestamp());
         break;
     }
     case BusinessEventType::Camera_Input: {
-        item->setColor(qnGlobals->notificationColorCommon());
+        item->setColorLevel(QnNotificationItem::Common);
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Open Camera"),
             Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource),
-            2.0,
-            true
+            QnActionParameters(resource)
         );
         loadThumbnailForItem(item, resource);
         break;
     }
     case BusinessEventType::Camera_Disconnect: {
-        item->setColor(qnGlobals->notificationColorImportant());
-        item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
-            tr("Open Camera"),
-            Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource),
-            2.0,
-            true
-        );
+        item->setColorLevel(QnNotificationItem::Important);
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Camera Settings"),
@@ -266,15 +300,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Storage_Failure: {
-        item->setColor(qnGlobals->notificationColorImportant());
+        item->setColorLevel(QnNotificationItem::Important);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
-            tr("Open Monitor"),
-            Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource)
-        );
-        item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/storage.png"),
             tr("Server settings"),
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
@@ -282,15 +310,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Network_Issue:{
-        item->setColor(qnGlobals->notificationColorImportant());
-        item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
-            tr("Open Camera"),
-            Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource),
-            2.0,
-            true
-        );
+        item->setColorLevel(QnNotificationItem::Important);
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Camera Settings"),
@@ -301,7 +321,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Ip_Conflict: {
-        item->setColor(qnGlobals->notificationColorCritical());
+        item->setColorLevel(QnNotificationItem::Critical);
         QString webPageAddress = params.getSource();
 
         item->addActionButton(
@@ -314,7 +334,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::MediaServer_Failure: {
-        item->setColor(qnGlobals->notificationColorCritical());
+        item->setColorLevel(QnNotificationItem::Critical);
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Settings"),
@@ -326,7 +346,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::MediaServer_Conflict: {
-        item->setColor(qnGlobals->notificationColorCritical());
+        item->setColorLevel(QnNotificationItem::Critical);
         item->addActionButton(
             qnResIconCache->icon(resource->flags(), resource->getStatus()),
             tr("Description"),
@@ -362,10 +382,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
 
     item = new QnNotificationItem(m_list);
 
-    QString name = resource ? resource->getName() : QString();
-
-    item->setColor(qnGlobals->notificationColorSystem());
-
     switch (message) {
     case QnSystemHealth::EmailIsEmpty:
         item->addActionButton(
@@ -374,7 +390,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             Qn::UserSettingsAction,
             QnActionParameters(context()->user()).withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
         );
-        //default text
         break;
     case QnSystemHealth::NoLicenses:
         item->addActionButton(
@@ -382,7 +397,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             tr("Licenses"),
             Qn::PreferencesLicensesTabAction
         );
-        //default text
         break;
     case QnSystemHealth::SmtpIsNotSet:
         item->addActionButton(
@@ -390,7 +404,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             tr("SMTP Settings"),
             Qn::PreferencesServerTabAction
         );
-        //default text
         break;
     case QnSystemHealth::UsersEmailIsEmpty:
         item->addActionButton(
@@ -399,7 +412,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             Qn::UserSettingsAction,
             QnActionParameters(resource).withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
         );
-        item->setText(tr("E-Mail address is not set for user %1.").arg(name));
         break;
     case QnSystemHealth::ConnectionLost:
         item->addActionButton(
@@ -407,7 +419,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             tr("Connect to server"),
             Qn::ConnectToServerAction
         );
-        //default text
         break;
     case QnSystemHealth::EmailSendError:
         item->addActionButton(
@@ -415,7 +426,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             tr("SMTP Settings"),
             Qn::PreferencesServerTabAction
         );
-        //default text
         break;
     case QnSystemHealth::StoragesNotConfigured:
         item->addActionButton(
@@ -424,7 +434,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
         );
-        item->setText(tr("Storages are not configured on %1.").arg(name));
         break;
     case QnSystemHealth::StoragesAreFull:
         item->addActionButton(
@@ -433,24 +442,21 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
         );
-        item->setText(tr("Some storages are full on %1.").arg(name));
         break;
     default:
         break;
     }
-    if (item->text().isEmpty()) {
-        QString text = QnSystemHealth::messageName(message);
-        item->setText(text);
-    }
-    item->setTooltipText(QnSystemHealth::messageDescription(message));
+
+    QString resourceName = getResourceName(resource);
+    item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
+    item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
+    item->setColorLevel(QnNotificationItem::System);
+    item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
 
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
 
     m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
-
-    item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     m_itemsByMessageType.insert(message, item);
-
 }
 
 void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
@@ -474,6 +480,10 @@ void QnNotificationsCollectionWidget::hideAll() {
 }
 
 void QnNotificationsCollectionWidget::at_settingsButton_clicked() {
+    menu()->trigger(Qn::BusinessEventsAction);
+}
+
+void QnNotificationsCollectionWidget::at_filterButton_clicked() {
     menu()->trigger(Qn::PreferencesNotificationTabAction);
 }
 

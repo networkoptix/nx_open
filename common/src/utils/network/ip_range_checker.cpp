@@ -12,8 +12,10 @@
 
 struct QnIprangeCheckerHelper 
 {
+    QnIprangeCheckerHelper(quint32 _ip, int _port): ip(_ip), port(_port), online(false) {}
 
     quint32 ip;
+    int port;
     bool online;
     QHostAddress discoveryAddress;
 
@@ -23,7 +25,7 @@ struct QnIprangeCheckerHelper
         
         QString ips = QHostAddress(ip).toString();
 
-        CLSimpleHTTPClient http (QHostAddress(ip), 80, 1500, QAuthenticator());
+        CLSimpleHTTPClient http (QHostAddress(ip), port, 1500, QAuthenticator());
         CLHttpStatus status = http.doGET(QByteArray(""));
         if (status != CL_TRANSPORT_ERROR) 
         {
@@ -46,7 +48,7 @@ QnIprangeChecker::~QnIprangeChecker()
 
 }
 
-QList<QString> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostAddress endAddr)
+QList<QString> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostAddress endAddr, int port)
 {
     // sorry; did not have time to mess with asiynch qt sockets + thread isuses;
     // so bad(slow) implementaiton here 
@@ -60,9 +62,7 @@ QList<QString> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostAddres
 
     for (quint32 i = startIpv4; i <= endIpv4; ++i)
     {
-        QnIprangeCheckerHelper helper;
-        helper.online = false;
-        helper.ip = i;
+        QnIprangeCheckerHelper helper(i, port);
         candidates.push_back(helper);
     }
 

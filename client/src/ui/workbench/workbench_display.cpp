@@ -17,6 +17,8 @@
 #include <utils/math/color_transformations.h>
 #include <utils/common/toggle.h>
 #include <utils/common/util.h>
+#include <utils/common/variant_timer.h>
+
 #include <client/client_meta_types.h>
 #include <common/common_meta_types.h>
 
@@ -47,7 +49,6 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/grid/curtain_item.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
@@ -1842,10 +1843,29 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if (!resource)
         return;
 
+    // TODO: #Elric copypasta
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
+    QnThumbnailsSearchState searchState = layout->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
+    bool thumbnailed = searchState.step > 0 && !layout->items().empty();
+    if(thumbnailed)
+        return;
+
+    at_notificationTimer_timeout(resource);
+    QnVariantTimer::singleShot(500, this, SLOT(at_notificationTimer_timeout(const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource));
+    QnVariantTimer::singleShot(1000, this, SLOT(at_notificationTimer_timeout(const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource));
+}
+
+void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource) {
+    at_notificationTimer_timeout(resource.value<QnResourcePtr>());
+}
+
+void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource) {
     foreach(QnResourceWidget *widget, this->widgets(resource)) {
+        if(widget->zoomTargetWidget())
+            continue; /* Don't draw notification on zoom widgets. */
+
         QRectF rect = widget->rect();
         qreal expansion = qMin(rect.width(), rect.height()) / 2.0;
-        
 
         QnSplashItem *splashItem = new QnSplashItem(widget);
         splashItem->setSplashType(QnSplashItem::Rectangular);

@@ -226,6 +226,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                           qnSyncTime->currentUSecsSinceEpoch(),
                           reason,
                           QString::number((qlonglong) elapsed/1000));
+        QnVirtualCameraResourcePtr cam = getResource().dynamicCast<QnVirtualCameraResource>();
+        if (cam)
+            cam->issueOccured();
+
     }
     return result;
 }
@@ -378,6 +382,10 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 
 void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 {
+    QnVirtualCameraResourcePtr cam = getResource().dynamicCast<QnVirtualCameraResource>();
+    if (cam)
+        cam->issueOccured();
+
     emit networkIssue(getResource(),
                       qnSyncTime->currentUSecsSinceEpoch(),
                       QnBusiness::NetworkIssueRtpPacketLoss,

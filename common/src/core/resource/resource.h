@@ -352,6 +352,7 @@ private:
     QMutex m_initMutex;
 
     static QThreadPool m_initAsyncPool;
+    qint64 m_lastInitTime;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);

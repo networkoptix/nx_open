@@ -180,7 +180,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
 
-    QMutexLocker locker(&m_resourcesMtx);
+    m_resourcesMtx.lock();
 
     foreach (const QnResourcePtr &resource, resources)
     {
@@ -223,13 +223,18 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         disconnect(resource.data(), NULL, this, NULL);
 
         if(m_updateLayouts)
-            foreach (const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+            foreach(const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
                 foreach(const QnLayoutItemData &data, layoutResource->getItems())
                     if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
                         layoutResource->removeItem(data);
 
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
+    }
 
+    m_resourcesMtx.unlock();
+
+    /* Remove resources. */
+    foreach (const QnResourcePtr &resource, removedResources) {
         emit resourceRemoved(resource);
     }
 }
@@ -295,14 +300,18 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnResourceList QnResourcePool::getAllEnabledCameras() const
+QnResourceList QnResourcePool::getAllEnabledCameras(QnResourcePtr mServer) const
 {
+    QnId parentId = mServer ? mServer->getId() : QnId();
     QnResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if (camResource != 0 && !camResource->isDisabled() && !camResource->hasFlags(QnResource::foreigner))
+        {
+            if (!parentId.isValid() || camResource->getParentId() == parentId)
             result << camResource;
+        }
     }
 
     return result;

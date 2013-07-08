@@ -25,6 +25,12 @@ public:
      * \returns                         Tooltip at the given position.
      */
     virtual QString toolTipAt(const QPointF &pos) const = 0;
+
+    /**
+     * \param pos                       Position inside an item.
+     * \returns                         True if default GraphicsTooltip should not be drawn.
+     */
+    virtual bool showOwnTooltip(const QPointF &pos) = 0;
 };
 
 

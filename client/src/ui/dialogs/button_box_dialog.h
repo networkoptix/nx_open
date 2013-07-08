@@ -2,7 +2,6 @@
 #define QN_BUTTON_BOX_DIALOG_H
 
 #include <QtCore/QWeakPointer>
-
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 
@@ -13,41 +12,25 @@
  */
 class QnButtonBoxDialog: public Connective<QDialog> {
     Q_OBJECT;
-
     typedef Connective<QDialog> base_type;
 
 public:
-    QnButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0): 
-        base_type(parent, windowFlags), 
-        m_clickedButton(QDialogButtonBox::NoButton)
-    {}
+    QnButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    virtual ~QnButtonBoxDialog();
 
     QDialogButtonBox::StandardButton clickedButton() const {
         return m_clickedButton;
     }
     
 protected:
-    void setButtonBox(QDialogButtonBox *buttonBox) {
-        if(m_buttonBox) {
-            disconnect(m_buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonBox_clicked(QAbstractButton *)));
-            disconnect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-            disconnect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-        }
+    void setButtonBox(QDialogButtonBox *buttonBox);
 
-        m_buttonBox = buttonBox;
+    virtual bool event(QEvent *event) override;
 
-        if(m_buttonBox) {
-            connect(m_buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonBox_clicked(QAbstractButton *)));
-            connect(m_buttonBox, SIGNAL(accepted()),                 this, SLOT(accept()));
-            connect(m_buttonBox, SIGNAL(rejected()),                 this, SLOT(reject()));
-        }
-    }
+private:
+    void initializeButtonBox();
 
-private slots:
-    void at_buttonBox_clicked(QAbstractButton *button) {
-        if(m_buttonBox)
-            m_clickedButton = m_buttonBox.data()->standardButton(button);
-    }
+    Q_SLOT void at_buttonBox_clicked(QAbstractButton *button);
 
 private:
     QDialogButtonBox::StandardButton m_clickedButton;

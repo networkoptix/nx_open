@@ -44,7 +44,7 @@ QString QnPlOnvifResource::DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStr
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
 const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
-const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 200; //200 ms
+const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 60; //60s
 static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 15;
 //!if renew subscription exactly at termination time, camera can already terminate subscription, so have to do that a little bit earlier..
 static const unsigned int RENEW_NOTIFICATION_FORWARDING_SECS = 5;
@@ -200,7 +200,7 @@ QnPlOnvifResource::QnPlOnvifResource()
 :
     m_onvifAdditionalSettings(0),
     m_physicalParamsMutex(QMutex::Recursive),
-    m_advSettingsLastUpdated(QDateTime::currentDateTime()),
+    m_advSettingsLastUpdated(),
     m_iframeDistance(-1),
     m_minQuality(0),
     m_maxQuality(0),
@@ -2024,12 +2024,12 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 
     //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
-    QDateTime currTime = QDateTime::currentDateTime().addMSecs(-ADVANCED_SETTINGS_VALID_TIME);
-    if (currTime > m_advSettingsLastUpdated) {
+    QDateTime currTime = QDateTime::currentDateTime();
+    if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(currTime) > ADVANCED_SETTINGS_VALID_TIME) {
         if (!m_onvifAdditionalSettings->makeGetRequest()) {
             return false;
         }
-        m_advSettingsLastUpdated = QDateTime::currentDateTime();
+        m_advSettingsLastUpdated = currTime;
     }
 
     if (it.value().getFromCamera(*m_onvifAdditionalSettings)) {
@@ -2840,7 +2840,8 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
     {
         //adding task to reset port state
         const quint64 timerID = TimerManager::instance()->addTimer( this, autoResetTimeoutMS );
-        m_triggerOutputTasks.insert( std::make_pair( timerID, TriggerOutputTask( outputID, !active, 0 ) ) );
+        if (active)
+            m_triggerOutputTasks.insert( std::make_pair( timerID, TriggerOutputTask( outputID, !active, 0 ) ) );
     }
 #endif
 

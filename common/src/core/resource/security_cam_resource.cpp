@@ -7,7 +7,8 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_motionType(Qn::MT_Default),
     m_recActionCnt(0),
     m_secondaryQuality(SSQualityMedium),
-    m_cameraControlDisabled(false)
+    m_cameraControlDisabled(false),
+    m_statusFlags(0)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionMaskList << QnMotionRegion();
@@ -68,6 +69,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
         m_groupName = other_casted->m_groupName;
         m_secondaryQuality = other_casted->m_secondaryQuality;
         m_cameraControlDisabled = other_casted->m_cameraControlDisabled;
+        m_statusFlags = other_casted->m_statusFlags;
     }
 }
 
@@ -600,4 +602,29 @@ QnStreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const
         return QnQualityLowest;
     else
         return QnQualityNormal;
+}
+
+QnSecurityCamResource::StatusFlags QnSecurityCamResource::statusFlags() const
+{
+    return m_statusFlags;
+}
+
+bool QnSecurityCamResource::hasStatusFlags(StatusFlags value) const
+{
+    return m_statusFlags & value;
+}
+
+void QnSecurityCamResource::setStatusFlags(StatusFlags value)
+{
+    m_statusFlags = value;
+}
+
+void QnSecurityCamResource::addStatusFlags(StatusFlags value)
+{
+    m_statusFlags |= value;
+}
+
+void QnSecurityCamResource::removeStatusFlags(StatusFlags value)
+{
+    m_statusFlags &= ~value;
 }

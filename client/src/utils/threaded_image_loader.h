@@ -7,6 +7,24 @@
 
 #include <QtGui/QImage>
 
+namespace Qn {
+    /**
+    * Loader flags.
+    */
+    enum ImageLoaderFlag {
+        /** If set, image will not be upscaled. */
+        DownscaleOnly = 0x1,
+
+        /** If set, image will be scaled to size to touch it from outside (default is touch inside). */
+        TouchSizeFromOutside = 0x2,
+
+        /** If set, image will be cropped to target aspectRatio. */
+        CropToTargetAspectRatio = 0x4
+    };
+    Q_DECLARE_FLAGS(ImageLoaderFlags, ImageLoaderFlag)
+
+}
+
 /**
  * @brief The QnThreadedImageLoaderPrivate class is private class. DO NOT USE it in your modules.
  */
@@ -18,10 +36,9 @@ public:
     ~QnThreadedImageLoaderPrivate();
 public slots:
     void setSize(const QSize &size);
-    void setAspectRatioMode(const Qt::AspectRatioMode mode);
+    void setAspectRatio(const qreal aspectRatio);
     void setTransformationMode(const Qt::TransformationMode mode);
-    void setDownScaleOnly(const bool value);
-    void setCropToMonitorAspectRatio(const bool value);
+    void setFlags(const Qn::ImageLoaderFlags flags);
 
     void setInput(const QImage &input);
     void setInput(const QString &filename);
@@ -33,14 +50,13 @@ signals:
     void finished(const QString &output);
 
 private:
-    QSize m_size;
-    Qt::AspectRatioMode m_aspectMode;
-    Qt::TransformationMode m_transformationMode;
-    bool m_downScaleOnly;
     QImage m_input;
+    QSize m_size;
+    qreal m_aspectRatio;
+    Qt::TransformationMode m_transformationMode;
     QString m_inputFilename;
     QString m_outputFilename;
-    bool m_cropToMonitorAspectRatio;
+    Qn::ImageLoaderFlags m_flags;
 };
 
 
@@ -64,10 +80,12 @@ public slots:
     void setSize(const QSize &size);
 
     /**
-     * @brief setAspectRatioMode    Set aspect ratio used in resize. Default value is Qt::KeepAspectRatio.
-     * @param mode                  Qt::AspectRatioMode
+     * @brief setAspectRatio        Set target aspect ratio of an image. If CropToTargetAspectRatio flag is set, image
+     *                              will be cropped to this aspect ratio, else target aspect ratio will be ignored.
+     *                              If set to 0.0, original aspect ratio will be kept. Default is 0.0.
+     * @param aspectRatio           Aspect ratio as width to height.
      */
-    void setAspectRatioMode(const Qt::AspectRatioMode mode);
+    void setAspectRatio(const qreal aspectRatio);
 
     /**
      * @brief setTransformationMode Set transformation mode used in resize. Default value is Qt::SmoothTransformation.
@@ -75,17 +93,12 @@ public slots:
      */
     void setTransformationMode(const Qt::TransformationMode mode);
 
-    /**
-     * @brief setDownScaleOnly      Set downscale-only flag. If set image will not be upscaled. Default value is True.
-     * @param value                 Bool value
-     */
-    void setDownScaleOnly(const bool value);
 
     /**
-     * @brief setCropToMonitorAspectRatio   Set crop flag. If set image will be cropped to current monitor aspect ratio.
-     * @param value                 Bool value
+     * @brief setFlags              Set various loader flags. @see Qn::ImageLoaderFlags for details.
+     * @param flags                 Set of Qn::ImageLoaderFlag values. Default is DownscaleOnly | CropToTargetAspectRatio;
      */
-    void setCropToMonitorAspectRatio(const bool value);
+    void setFlags(const Qn::ImageLoaderFlags flags);
 
     /**
      * @brief setInput              Input image file. Have lower priority than setInput(QString)

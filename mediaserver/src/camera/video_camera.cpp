@@ -242,16 +242,21 @@ void QnVideoCamera::beforeStop()
         m_secondaryReader->removeDataProcessor(m_primaryGopKeeper);
         m_secondaryReader->pleaseStop();
     }
+}
 
+void QnVideoCamera::stop()
+{
     if (m_primaryReader)
         m_primaryReader->stop();
     if (m_secondaryReader)
         m_secondaryReader->stop();
 }
 
+
 QnVideoCamera::~QnVideoCamera()
 {
     beforeStop();
+    stop();
     delete m_primaryGopKeeper;
     delete m_secondaryGopKeeper;
 }

@@ -293,6 +293,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
     m_treeWidget->installEventFilter(m_treeItem);
+    m_treeWidget->setToolTipParent(m_treeItem);
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
     m_treeItem->setProperty(Qn::NoHandScrollOver, true);
 
@@ -301,6 +302,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_treeShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleTreeAction));
     m_treeShowButton->setFocusProxy(m_treeItem);
+    m_treeShowButton->stackBefore(m_treeItem);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
@@ -478,6 +480,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
     m_notificationsShowButton = blinker;
     m_notificationsShowButton->resize(15, 45);
+    m_notificationsShowButton->setCached(true);
     m_notificationsShowButton->setCheckable(true);
     m_notificationsShowButton->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
     m_notificationsShowButton->setProperty(Qn::NoHandScrollOver, true);
@@ -1748,7 +1751,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
 }
 
 void QnWorkbenchUi::at_sliderItem_geometryChanged() {
-    setSliderOpened(isSliderOpened(), m_sliderYAnimator->isRunning()); /* Re-adjust to screen sides. */
+    setSliderOpened(isSliderOpened(), m_sliderYAnimator->isRunning(), false); /* Re-adjust to screen sides. */
 
     updateTreeGeometry();
     updateNotificationsGeometry();

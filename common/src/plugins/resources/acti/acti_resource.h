@@ -74,6 +74,7 @@ private:
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
     QList<int> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
     void initializePtz();
+    bool isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const;
 private:
     QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
     QList<int> m_availFps[MAX_STREAMS];

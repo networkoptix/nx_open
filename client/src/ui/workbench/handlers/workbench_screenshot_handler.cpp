@@ -17,6 +17,7 @@
 #include <camera/cam_display.h>
 
 #include "file_processor.h"
+#include "ui/workbench/workbench_item.h"
 
 QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent): 
     QObject(parent), 
@@ -118,7 +119,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     {
         QList<QImage> images;
         for (int i = 0; i < layout->channelCount(); ++i)
-            images.push_back(display->camDisplay()->getScreenshot(i));
+            images.push_back(display->camDisplay()->getScreenshot(i, widget->item()->imageEnhancement()));
         QSize channelSize = images[0].size();
         QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
         QRectF zoomRect = widget->zoomRect().isNull() ? QRectF(0, 0, 1, 1) : widget->zoomRect();

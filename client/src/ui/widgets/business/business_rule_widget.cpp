@@ -20,6 +20,7 @@
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/widgets/business/aggregation_widget.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
 #include <ui/widgets/properties/weektime_schedule_widget.h>
@@ -50,17 +51,6 @@ namespace {
         return QString();
     }
 
-    // TODO: #GDM fill aggregationComboBox in cpp file so that
-    // names & numbers are in one place. Store steps in userData.
-
-    // make sure size is equal to ui->aggregationComboBox->count()
-    const int aggregationSteps[] = {
-        1,                    /* 1 second. */
-        60,                   /* 1 minute. */
-        60 * 60,              /* 1 hour. */
-        60 * 60 * 24          /* 1 day. */
-    };
-
 } // namespace
 
 QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *context) :
@@ -87,12 +77,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
 
     connect(ui->actionTypeComboBox,         SIGNAL(currentIndexChanged(int)),   this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
 
-    connect(ui->aggregationCheckBox,        SIGNAL(toggled(bool)),              this, SLOT(updateModelAggregationPeriod()));
-    connect(ui->aggregationValueSpinBox,    SIGNAL(editingFinished()),          this, SLOT(at_ui_aggregationPeriodChanged()));
-    connect(ui->aggregationPeriodComboBox,  SIGNAL(currentIndexChanged(int)),   this, SLOT(at_ui_aggregationPeriodChanged()));
+    connect(ui->aggregationWidget,          SIGNAL(valueChanged()),             this, SLOT(updateModelAggregationPeriod()));
 
-    connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationValueSpinBox, SLOT(setEnabled(bool)));
-    connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationPeriodComboBox, SLOT(setEnabled(bool)));
 
     connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
 }
@@ -172,7 +158,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->actionAtLabel->setText(m_model->actionType() == BusinessActionType::SendMail ? tr("to") : tr("at"));
 
         bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
-        ui->actionAggregationFrame->setVisible(actionIsInstant);
+        ui->aggregationWidget->setVisible(actionIsInstant);
 
         initActionParameters();
     }
@@ -188,18 +174,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
     }
 
     if (fields & QnBusiness::AggregationField) {
-        int msecs = model->aggregationPeriod();
-        ui->aggregationCheckBox->setChecked(msecs > 0);
-        if (msecs > 0) {
-            int idx = 0;
-            while (idx < ui->aggregationPeriodComboBox->count() - 1
-                   && msecs >= aggregationSteps[idx+1]
-                   && msecs % aggregationSteps[idx+1] == 0)
-                idx++;
+        ui->aggregationWidget->setValue(model->aggregationPeriod());
 
-            ui->aggregationPeriodComboBox->setCurrentIndex(idx);
-            ui->aggregationValueSpinBox->setValue(msecs / aggregationSteps[idx]);
-        }
     }
 
     if (fields & QnBusiness::CommentsField) {
@@ -254,11 +230,11 @@ void QnBusinessRuleWidget::initActionParameters() {
 
     if (m_actionParameters) {
         ui->actionParamsLayout->addWidget(m_actionParameters);
-        m_actionParameters->updateTabOrder(ui->aggregationPeriodComboBox,  ui->commentsLineEdit);
+        m_actionParameters->updateTabOrder(ui->aggregationWidget,  ui->commentsLineEdit);
         m_actionParameters->setVisible(true);
         m_actionParameters->setModel(m_model);
     } else {
-        setTabOrder(ui->aggregationPeriodComboBox, ui->commentsLineEdit);
+        setTabOrder(ui->aggregationWidget, ui->commentsLineEdit);
     }
 }
 
@@ -307,10 +283,7 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event) {
 void QnBusinessRuleWidget::updateModelAggregationPeriod() {
     if (!m_model || m_updating)
         return;
-
-    int val = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
-    int idx = ui->aggregationPeriodComboBox->currentIndex();
-    m_model->setAggregationPeriod(val * aggregationSteps[idx]);
+    m_model->setAggregationPeriod(ui->aggregationWidget->value());
 }
 
 
@@ -346,13 +319,6 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
     int typeIdx = m_model->actionTypesModel()->item(index)->data().toInt();
     BusinessActionType::Value val = (BusinessActionType::Value)typeIdx;
     m_model->setActionType(val);
-}
-
-void QnBusinessRuleWidget::at_ui_aggregationPeriodChanged() {
-    if (!m_model || m_updating)
-        return;
-
-    updateModelAggregationPeriod();
 }
 
 void QnBusinessRuleWidget::at_commentsLineEdit_textChanged(const QString &value) {

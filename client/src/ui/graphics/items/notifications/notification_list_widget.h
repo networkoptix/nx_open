@@ -30,11 +30,14 @@ public:
     void setToolTipsEnclosingRect(const QRectF &rect);
 
     int itemCount() const;
+
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
+
     void itemRemoved(QnNotificationItem *item);
     void itemCountChanged(int count);
+    void itemColorChanged(const QColor &color); // TODO: #GDM accessor?
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
@@ -43,6 +46,7 @@ protected:
     virtual void updateGeometry() override;
 
     void updateVisibleSize();
+
 private slots:
     void at_item_clicked(Qt::MouseButton button);
     void at_item_geometryChanged();
@@ -102,6 +106,7 @@ private:
     bool m_collapsedItemCountChanged;
     QSizeF m_visibleSize;
     QRectF m_tooltipsEnclosingRect;
+    int m_itemColorLevel;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H

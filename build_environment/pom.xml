@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.5.2-SNAPSHOT</version>
+		<version>1.5.3-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.5.2-SNAPSHOT</version>
+	<version>1.5.3-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>build_environment</artifactId>
 	<packaging>pom</packaging>
@@ -438,6 +438,18 @@
 									<skip>${rsync.skip}</skip>
 								</configuration>
 							</execution>
+							<execution>
+								<id>prepare-deb</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.build.directory}/prepare-package.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+		    							<skip>${assembly-skip}</skip>
+								</configuration>
+							</execution>							
 						</executions>
 					</plugin>				
 					<plugin>
@@ -534,6 +546,38 @@
 
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>rsync-buildenv</id>
+								<phase>initialize</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${environment.dir}/get_buildenv.sh</executable>
+									<workingDirectory>${environment.dir}</workingDirectory>		
+									<skip>${rsync.skip}</skip>
+								</configuration>
+							</execution>
+							<execution>
+								<id>prepare-deb</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.build.directory}/prepare-package.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+		    							<skip>${assembly-skip}</skip>
+								</configuration>
+							</execution>							
+						</executions>
+					</plugin>				
+
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>

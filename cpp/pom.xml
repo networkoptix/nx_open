@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.5.2-SNAPSHOT</version>
+		<version>1.5.3-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.5.2-SNAPSHOT</version>
+	<version>1.5.3-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cpp</artifactId>
 	<packaging>pom</packaging>
@@ -453,7 +453,7 @@
 								</configuration>
 							</execution>
 
-							<execution>
+<!--							<execution>
 								<id>prepare-deb</id>
 								<phase>prepare-package</phase>
 								<goals>
@@ -464,7 +464,7 @@
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<skip>${assembly-skip}</skip>
 								</configuration>
-							</execution>
+							</execution>-->
 						</executions>
 					</plugin>
 

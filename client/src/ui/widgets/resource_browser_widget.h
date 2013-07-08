@@ -6,7 +6,10 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <ui/actions/action_target_provider.h>
+#include <ui/common/tool_tip_queryable.h>
+#include <ui/graphics/items/generic/styled_tooltip_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
+
 #include <client/client_globals.h>
 
 class QComboBox;
@@ -22,6 +25,10 @@ class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnWorkbenchContext;
 
+class QnProxyLabel;
+class QnClickableProxyLabel;
+class HoverFocusProcessor;
+
 class QnResourceCriterion;
 class QnResourcePoolModel;
 class QnResourceSearchProxyModel;
@@ -32,7 +39,46 @@ namespace Ui {
     class ResourceBrowserWidget;
 }
 
-class QnResourceBrowserWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider {
+class QnResourceBrowserToolTipWidget: public QnStyledTooltipWidget {
+    Q_OBJECT
+
+    typedef QnStyledTooltipWidget base_type;
+public:
+    QnResourceBrowserToolTipWidget(QGraphicsItem *parent = 0);
+
+    /**
+     * Set tooltip text.
+     * \param text                      New text for this tool tip's label.
+     * \reimp
+     */
+    void setText(const QString &text);
+    void setPixmap(const QPixmap &pixmap);
+
+    void setThumbnailVisible(bool visible);
+
+    void setResourceId(int id);
+    int resourceId() const;
+
+    //reimp
+    void pointTo(const QPointF &pos);
+    virtual void updateTailPos() override;
+
+signals:
+    void thumbnailClicked();
+
+private slots:
+    void at_provider_imageChanged(const QImage &image);
+
+private:
+    QnProxyLabel* m_textLabel;
+    QnClickableProxyLabel* m_thumbnailLabel;
+    QPointF m_pointTo;
+    bool m_thumbnailVisible;
+    int m_resourceId;
+};
+
+
+class QnResourceBrowserWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider, public ToolTipQueryable {
     Q_OBJECT
 
 public:
@@ -60,6 +106,8 @@ public:
 
     virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
 
+    void setToolTipParent(QGraphicsWidget *widget);
+
 signals:
     void activated(const QnResourcePtr &resource);
     void currentTabChanged();
@@ -76,8 +124,14 @@ protected:
 
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
+    virtual QString toolTipAt(const QPointF &pos) const override;
+    virtual bool showOwnTooltip(const QPointF &pos) override;
+
+    int loadThumbnailForResource(const QnResourcePtr &resource);
+
     QnResourceTreeWidget *currentItemView() const;
     QItemSelectionModel *currentSelectionModel() const;
+    QModelIndex itemIndexAt(const QPoint &pos) const;
 
     bool isLayoutSearchable(QnWorkbenchLayout *layout) const;
     QnResourceSearchProxyModel *layoutModel(QnWorkbenchLayout *layout, bool create) const;
@@ -90,6 +144,10 @@ protected:
 
 private slots:
     void updateFilter(bool force = false);
+    void updateToolTipPosition();
+    void hideToolTip();
+    void showToolTip();
+
     void forceUpdateFilter() { updateFilter(true); }
 
     void at_tabWidget_currentChanged(int index);
@@ -103,13 +161,37 @@ private slots:
 
     void at_showUrlsInTree_changed();
 
+    void at_thumbnailReceived(int status, const QImage& thumbnail, int handle);
+    void at_thumbnailClicked();
+
+    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 private:
+    enum ThumbnailStatus {
+        None,
+        Loading,
+        Loaded,
+        NoData,
+        NoSignal
+    };
+
+    struct ThumbnailData {
+        ThumbnailData(): status(None), loadingHandle(0) {}
+
+        QImage thumbnail;
+        ThumbnailStatus status;
+        int loadingHandle;
+    };
+
+
     QScopedPointer<Ui::ResourceBrowserWidget> ui;
 
     bool m_ignoreFilterChanges;
     int m_filterTimerId;
 
     QnResourcePoolModel *m_resourceModel;
+    QnResourceBrowserToolTipWidget* m_tooltipWidget;
+    HoverFocusProcessor* m_hoverProcessor;
+    QHash<QnResourcePtr, ThumbnailData> m_thumbnailByResource;
 
     QAction *m_renameAction;
 };

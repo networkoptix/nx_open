@@ -25,6 +25,7 @@ namespace QnBusiness {
         SpacerColumn,
         ActionColumn,
         TargetColumn,
+        AggregationColumn,
         ColumnCount
     };
 
@@ -143,6 +144,7 @@ private:
     QString getSourceText(const bool detailed) const;
     QString getTargetText(const bool detailed) const;
 
+    QString getAggregationText() const;
 private:
     int m_id;
     bool m_modified;

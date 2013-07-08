@@ -11,7 +11,7 @@
 #include "button_box_dialog.h"
 
 class QPushButton;
-class QStandardItemModel;
+class QnPtzPresetListModel;
 
 namespace Ui {
     class PtzPresetsDialog;
@@ -48,7 +48,7 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     QPushButton *m_removeButton;
     QPushButton *m_activateButton;
-    QStandardItemModel *m_model;
+    QnPtzPresetListModel *m_model;
 };
 
 #endif // QN_PTZ_PRESETS_DIALOG_H

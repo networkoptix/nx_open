@@ -13,6 +13,7 @@
 
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
+#include <ui/animation/animation_timer_listener.h>
 
 #include <client/client_globals.h>
 
@@ -397,6 +398,8 @@ protected slots:
     void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
 
     void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
+    void at_notificationTimer_timeout(const QVariant &resource);
+    void at_notificationTimer_timeout(const QnResourcePtr &resource);
 
 private:
     /* Directly visible state */
@@ -495,8 +498,6 @@ private:
 
     /** Frame opacity animator. */
     VariantAnimator *m_frameOpacityAnimator;
-
-
 
     QnThumbnailsLoader *m_loader;
 };
