@@ -20,18 +20,17 @@ Since 1.5.1
    work after Media Server restart. Fixed
  - PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
  - Aggregation column is added to Event and Action (used to be in advanced E&A settings)
- - Login dialog opens much faster if it was opend once during this clietn run ( before it was opening slow every time )
- 
+ - Advanced PTZ for Sony SNCRH124 implemented
+ - Login dialog opens much faster
  - iOS. Feature #1943. Sort cameras by name.
  - iOS. Feature #1938. Add camera name on item.
  - iOS5. Bug #1949. Incorrect date and time.
  - iOS. Bug #1937. iPad. Server status aren't displayed.
  - Bug #1469. Web-client. Video doesn't play if camera has been moved from one server to another.
- 
+ - Thumbnails are shown in Resource Tree if hover with a mouse cursor on a camera
  
 Since previous build
- - 
- - Client Client crashe when move a zoom window quickly across items
+ - Client crashed when move a zoom window quickly across items. Fixed
  - Fixed Client crash if change a camera's motion mask and reopen its settings
  - If enable hardware acceleration Client crashed. Fixed
  - If press F11 current video went to fullscreen. If press F11 again the video got back but time line was hidden. Fixed
