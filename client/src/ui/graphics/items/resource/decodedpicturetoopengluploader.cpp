@@ -1153,8 +1153,6 @@ private:
 //TODO/IMPL minimize blocking in \a DecodedPictureToOpenGLUploader::uploadDataToGl method: 
     //before calling this method we can check that it would not block and take another task if it would
 
-//TODO/IMPL use nv12->rgba shader
-
 //we need second frame in case of using async upload to ensure renderer always gets something to draw
 static const size_t MIN_GL_PIC_BUF_COUNT = 2;
 
