@@ -1,6 +1,7 @@
 ----------------------------------------------- 1.5.2 (1.6 beta-2) ---------------------------------------------
 
 Since 1.5.1
+ - Hotkeys can be assigned for PTZ presets (0-9)
  - DW Spectrum intro video had 2 black borders and sometimes finished by black screen. Fixed
  - Added proper cursors when resize rotated items
  - DO NOT INCLUDE IN RELEASE NOTES!!! - Removed hack for DW to display 10 times less network issues (since 1.4)
@@ -28,8 +29,16 @@ Since 1.5.1
  - iOS. Bug #1937. iPad. Server status aren't displayed.
  - Bug #1469. Web-client. Video doesn't play if camera has been moved from one server to another.
  - Thumbnails are shown in Resource Tree if hover with a mouse cursor on a camera
+ - Fixed incorrect tab order in tray tool
  
 Since previous build
+ - "Text to Speech" is displayed as a separate action in "Event and Actions" (used to be selector in "Play Sound")
+ - Localized datetime format is used in event log form
+ - Fixed incorrect messages if activating licenses
+ - Some pictures could not be used for E-Mapping. Fixed
+ - Context menu in motion mask settings is removed
+ - Network Statistics displayed incorrect values (up to 400 GiB) during high load. Fixed
+ - Sample Sounds were unsorted in the "MANAGE" list. Fixed
  - Client crashed when move a zoom window quickly across items. Fixed
  - Fixed Client crash if change a camera's motion mask and reopen its settings
  - If enable hardware acceleration Client crashed. Fixed
