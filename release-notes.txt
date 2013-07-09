@@ -1,8 +1,10 @@
 ----------------------------------------------- 1.5.2 (1.6 beta-2) ---------------------------------------------
 
 Since 1.5.1
+ - If trying to add an existing camera manually the software used to reply "No cameras found". Now it displays such cameras 
+   but they cannot be added once more
  - Hotkeys can be assigned for PTZ presets (0-9)
- - DW Spectrum intro video had 2 black borders and sometimes finished by black screen. Fixed
+ - DW Spectrum intro video had 2 black borders and sometimes ended by black screen. Fixed
  - Added proper cursors when resize rotated items
  - DO NOT INCLUDE IN RELEASE NOTES!!! - Removed hack for DW to display 10 times less network issues (since 1.4)
  - Fixed issue when it was not possible to add cameras manually via IP range (since 1.4)
@@ -30,6 +32,7 @@ Since 1.5.1
  - Bug #1469. Web-client. Video doesn't play if camera has been moved from one server to another.
  - Thumbnails are shown in Resource Tree if hover with a mouse cursor on a camera
  - Fixed incorrect tab order in tray tool
+ - If restore database from another server, then licences were removed, but recording continues until Media Server restart. Fixed
  
 Since previous build
  - "Text to Speech" is displayed as a separate action in "Event and Actions" (used to be selector in "Play Sound")
