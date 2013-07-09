@@ -14,6 +14,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
+#include <utils/settings.h>
+
 #include "action_parameter_types.h"
 #include "action_manager.h"
 
