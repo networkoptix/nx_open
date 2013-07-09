@@ -156,6 +156,7 @@ public slots:
     void setTitleOpened(bool opened = true, bool animate = true, bool save = true);
     void setNotificationsOpened(bool opened = true, bool animate = true, bool save = true);
     void setCalendarOpened(bool opened = true, bool animate = true);
+    void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
 
     void toggleTreeOpened() {
         setTreeOpened(!isTreeOpened());
@@ -187,16 +188,14 @@ protected:
     Q_SLOT void updateNotificationsGeometry();
     void updateFpsGeometry();
     void updateCalendarGeometry();
+    void updateDayTimeWidgetGeometry();
     Q_SLOT void updateSliderResizerGeometry();
     void updateSliderZoomButtonsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry,
-                                        const QRectF &titleGeometry,
-                                        const QRectF &sliderGeometry,
-                                        const QRectF &calendarGeometry,
-                                        qreal *maxHeight);
+    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry, qreal *maxHeight);
     QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
+    QRectF updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     void updateActivityInstrumentState();
 
     void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
@@ -267,6 +266,7 @@ private slots:
 
     void at_calendarShowButton_toggled(bool checked);
     void at_calendarItem_paintGeometryChanged();
+    void at_dayTimeItem_paintGeometryChanged();
     void at_calendarHidingProcessor_hoverFocusLeft();
 
     void at_fpsItem_geometryChanged();
@@ -318,6 +318,8 @@ private:
     bool m_calendarOpened;
 
     bool m_calendarVisible;
+
+    bool m_dayTimeOpened;
 
     bool m_windowButtonsUsed;
 
@@ -460,6 +462,17 @@ private:
     HoverFocusProcessor *m_calendarHidingProcessor;
 
     bool m_inCalendarGeometryUpdate;
+
+    bool m_inDayTimeGeometryUpdate;
+
+    QnMaskedProxyWidget *m_dayTimeItem;
+
+    VariantAnimator *m_dayTimeSizeAnimator;
+
+
+
+
+
 
     qreal m_pinOffset;
 };

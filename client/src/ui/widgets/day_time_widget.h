@@ -17,7 +17,7 @@ public:
     virtual ~QnDayTimeWidget();
 
 signals:
-    void clicked(const QTime &time);
+    void timeClicked(const QTime &time);
 
 private slots:
     void at_tableWidget_itemClicked(QTableWidgetItem *item);

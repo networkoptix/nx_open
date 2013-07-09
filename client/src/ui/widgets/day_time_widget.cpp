@@ -66,8 +66,10 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     }
 
     QVBoxLayout *layout = new QVBoxLayout();
-    layout->addWidget(m_headerLabel);
-    layout->addWidget(m_tableWidget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(1);
+    layout->addWidget(m_headerLabel, 0);
+    layout->addWidget(m_tableWidget, 1);
     setLayout(layout);
     
     setFocusPolicy(Qt::StrongFocus);
@@ -86,7 +88,7 @@ void QnDayTimeWidget::at_tableWidget_itemClicked(QTableWidgetItem *item) {
     if(hour < 0)
         return;
 
-    emit clicked(QTime(hour, 0, 0, 0));
+    emit timeClicked(QTime(hour, 0, 0, 0));
 }
 
 
