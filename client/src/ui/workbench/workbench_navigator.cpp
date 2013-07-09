@@ -951,7 +951,7 @@ void QnWorkbenchNavigator::updateLines() {
 }
 
 void QnWorkbenchNavigator::updateCalendar() {
-    if (!m_calendar)
+    if(!m_calendar)
         return;
     if(m_currentWidgetFlags & WidgetSupportsPeriods)
         m_calendar->setCurrentWidgetIsCentral(true);
