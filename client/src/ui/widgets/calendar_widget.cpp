@@ -17,21 +17,6 @@
 #include <ui/common/palette.h>
 
 namespace {
-    const QColor selectionColor = withAlpha(qnGlobals->selectionColor(), 192);
-
-    const QColor backgroundColor(24, 24, 24, 0);
-    //const QColor backgroundColor(0, 0, 0, 0);
-
-    const QColor secondaryRecordingColor(32, 255, 32, 255);
-    const QColor primaryRecordingColor(32, 128, 32, 255);
-    //const QColor primaryRecordingColor(16, 64, 16, 255);
-
-    const QColor secondaryMotionColor(255, 0, 0, 255);
-    const QColor primaryMotionColor(128, 0, 0, 255);
-    //const QColor primaryMotionColor(64, 0, 0, 255);
-
-    const QColor separatorColor(0, 0, 0, 255);
-
     enum {
         DAY = 1000 * 60 * 60 * 24
     };
@@ -39,7 +24,8 @@ namespace {
 } // anonymous namespace
 
 
-QnCalendarWidget::QnCalendarWidget():
+QnCalendarWidget::QnCalendarWidget(QWidget *parent):
+    base_type(parent),
     m_delegate(new QnCalendarItemDelegate(this)),
     m_empty(true),
     m_currentWidgetIsCentral(false),
@@ -79,14 +65,14 @@ QnCalendarWidget::QnCalendarWidget():
     updateEmpty();
 }
 
-void QnCalendarWidget::setCurrentTimePeriods(Qn::TimePeriodContent type, QnTimePeriodList periods)
+void QnCalendarWidget::setCurrentTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &periods)
 {
     m_currentPeriodStorage.setPeriods(type, periods);
     updateEmpty();
     update();
 }
 
-void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodContent type, QnTimePeriodList periods) {
+void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &periods) {
     m_syncedPeriodStorage.setPeriods(type, periods);
     updateEmpty();
     update();

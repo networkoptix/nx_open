@@ -16,14 +16,13 @@ class QnCalendarItemDelegate;
  */
 class QnCalendarWidget: public QCalendarWidget {
     Q_OBJECT
-
     typedef QCalendarWidget base_type;
 
 public: 
-    QnCalendarWidget();
+    QnCalendarWidget(QWidget *parent = NULL);
     
-    void setCurrentTimePeriods(Qn::TimePeriodContent type, QnTimePeriodList periods);
-    void setSyncedTimePeriods(Qn::TimePeriodContent type, QnTimePeriodList periods);
+    void setCurrentTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &periods);
+    void setSyncedTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &periods);
     void setSelectedWindow(quint64 windowStart, quint64 windowEnd);
 
     // TODO: #GDM please do something about this setter. The naming is terribly wrong

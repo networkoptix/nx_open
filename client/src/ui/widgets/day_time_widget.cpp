@@ -6,6 +6,35 @@
 
 #include <utils/common/variant.h>
 
+#include <ui/common/palette.h>
+#include <ui/delegates/calendar_item_delegate.h>
+
+namespace {
+    enum {
+        HOUR = 60 * 60 * 1000
+    };
+}
+
+
+// -------------------------------------------------------------------------- //
+// QnDayTimeItemDelegate
+// -------------------------------------------------------------------------- //
+class QnDayTimeItemDelegate: public QnCalendarItemDelegate {
+public:
+    QnDayTimeItemDelegate(QnDayTimeWidget *dayTimeWidget): QnCalendarItemDelegate(dayTimeWidget), m_dayTimeWidget(dayTimeWidget) {}
+
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        m_dayTimeWidget->paintCell(painter, option.rect, index.data(Qt::UserRole).toTime());
+    }
+
+private:
+    QnDayTimeWidget *m_dayTimeWidget;
+};
+
+
+// -------------------------------------------------------------------------- //
+// QnDayTimeTableWidget
+// -------------------------------------------------------------------------- //
 class QnDayTimeTableWidget: public QTableWidget {
     typedef QTableWidget base_type;
 public:
@@ -13,7 +42,7 @@ public:
         base_type(parent) 
     {
         setTabKeyNavigation(false);
-        setShowGrid(true);
+        setShowGrid(false);
         verticalHeader()->setVisible(false);
         verticalHeader()->setResizeMode(QHeaderView::Stretch);
         verticalHeader()->setMinimumSectionSize(0);
@@ -49,21 +78,28 @@ protected:
 };
 
 
+// -------------------------------------------------------------------------- //
+// QnDayTimeWidget
+// -------------------------------------------------------------------------- //
 QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     base_type(parent)
 {
     m_headerLabel = new QLabel(this);
     
     m_tableWidget = new QnDayTimeTableWidget(this);
+    setPaletteColor(m_tableWidget, QPalette::Highlight, QColor(0, 0, 0, 255));
     m_tableWidget->setRowCount(4);
     m_tableWidget->setColumnCount(6);
     for(int i = 0; i < 24; i++) {
         QTableWidgetItem *item = new QTableWidgetItem();
         item->setText(lit("%1").arg(i, 2, 10, lit('0')));
-        item->setData(Qt::UserRole, i);
+        item->setData(Qt::UserRole, QTime(i, 0, 0, 0));
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         m_tableWidget->setItem(i / 6, i % 6, item);
     }
+
+    m_delegate = new QnDayTimeItemDelegate(this);
+    m_tableWidget->setItemDelegate(m_delegate);
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
@@ -77,18 +113,84 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     connect(m_tableWidget, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(at_tableWidget_itemClicked(QTableWidgetItem *)));
+
+    setDate(QDate::currentDate());
 }
 
 QnDayTimeWidget::~QnDayTimeWidget() {
     return;
 }
 
-void QnDayTimeWidget::at_tableWidget_itemClicked(QTableWidgetItem *item) {
-    int hour = qvariant_cast<int>(item->data(Qt::UserRole), -1);
-    if(hour < 0)
+QDate QnDayTimeWidget::date() {
+    return m_date;
+}
+
+void QnDayTimeWidget::setDate(const QDate &date) {
+    if(m_date == date)
         return;
 
-    emit timeClicked(QTime(hour, 0, 0, 0));
+    m_date = date;
+
+    updateHeaderText();
+}
+
+void QnDayTimeWidget::setPrimaryTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &periods) {
+    m_primaryPeriodStorage.setPeriods(type, periods);
+    update();
+}
+
+void QnDayTimeWidget::setSecondaryTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &periods) {
+    m_secondaryPeriodStorage.setPeriods(type, periods);
+    update();
+}
+
+void QnDayTimeWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) {
+    m_selectedPeriod = QnTimePeriod(windowStart, windowEnd - windowStart);
+
+    if(m_selectedPeriod.startTimeMs >= m_selectedHoursPeriod.startTimeMs && m_selectedPeriod.startTimeMs < m_selectedHoursPeriod.startTimeMs + HOUR &&
+        m_selectedPeriod.endTimeMs() <= m_selectedHoursPeriod.endTimeMs() && m_selectedPeriod.endTimeMs() > m_selectedHoursPeriod.endTimeMs() - HOUR)
+        return; /* Ok, no update needed. */
+
+    QDateTime hourWindowStart = QDateTime::fromMSecsSinceEpoch(windowStart);
+    hourWindowStart.setTime(QTime(hourWindowStart.time().hour(), 0, 0, 0));
+    QDateTime hourWindowEnd = QDateTime::fromMSecsSinceEpoch(windowEnd + HOUR - 1);
+    hourWindowEnd.setTime(QTime(hourWindowEnd.time().hour(), 0, 0, 0));
+    
+    qint64 start = hourWindowStart.toMSecsSinceEpoch();
+    qint64 end = hourWindowEnd.toMSecsSinceEpoch();
+
+    QnTimePeriod hoursWindow = QnTimePeriod(start, end - start);
+    if(m_selectedHoursPeriod == hoursWindow)
+        return;
+
+    m_selectedHoursPeriod = hoursWindow;
+    update();
+}
+
+void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTime &time) {
+    QnTimePeriod period(QDateTime(m_date, time).toMSecsSinceEpoch(), HOUR); 
+
+    m_delegate->paintCell(
+        painter, 
+        palette(), 
+        rect, 
+        period, 
+        QnTimePeriod(0, -1),
+        m_selectedPeriod, 
+        m_primaryPeriodStorage, 
+        m_secondaryPeriodStorage, 
+        QString::number(time.hour())
+    );
+}
+
+void QnDayTimeWidget::updateHeaderText() {
+    m_headerLabel->setText(m_date.toString());
+}
+
+void QnDayTimeWidget::at_tableWidget_itemClicked(QTableWidgetItem *item) {
+    QTime time = item->data(Qt::UserRole).toTime();
+    if(time.isValid())
+        emit timeClicked(item->data(Qt::UserRole).toTime());
 }
 
 

@@ -12,8 +12,6 @@
 namespace {
     const QColor selectionColor = withAlpha(qnGlobals->selectionColor(), 192);
     
-    const QColor backgroundColor(24, 24, 24, 0);
-
     const QColor primaryRecordingColor(32, 128, 32, 255);
     const QColor secondaryRecordingColor(32, 255, 32, 255);
 
@@ -26,7 +24,7 @@ namespace {
         switch(fillType) {
         case QnCalendarItemDelegate::MotionFill:    return primaryMotionColor;
         case QnCalendarItemDelegate::RecordingFill: return primaryRecordingColor;
-        default:                                    return backgroundColor;
+        default:                                    return QColor();
         }
     }
 
@@ -34,7 +32,7 @@ namespace {
         switch(fillType) {
         case QnCalendarItemDelegate::MotionFill:    return secondaryMotionColor;
         case QnCalendarItemDelegate::RecordingFill: return secondaryRecordingColor;
-        default:                                    return backgroundColor;
+        default:                                    return QColor();
         }
     }
 
@@ -77,8 +75,9 @@ void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palett
     QnScopedPainterFontRollback fontRollback(painter);
 
     /* Draw background. */
-    painter->fillRect(rect, QBrush(primaryColor(primaryFill), Qt::SolidPattern));
-    if(primaryFill != secondaryFill && secondaryFill != EmptyFill)
+    if(primaryFill != EmptyFill)
+        painter->fillRect(rect, QBrush(primaryColor(primaryFill), Qt::SolidPattern));
+    if(secondaryFill != EmptyFill && secondaryFill != primaryFill)
         painter->fillRect(rect, QBrush(secondaryColor(secondaryFill), Qt::Dense6Pattern));
 
     /* Selection frame. */

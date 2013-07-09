@@ -537,8 +537,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QnCalendarWidget *calendarWidget = new QnCalendarWidget();
     navigator()->setCalendar(calendarWidget);
 
-    QnDayTimeWidget *dayTimeWidget = new QnDayTimeWidget();
-    navigator()->setDayTimeWidget(dayTimeWidget);
+    m_dayTimeWidget = new QnDayTimeWidget();
+    navigator()->setDayTimeWidget(m_dayTimeWidget);
 
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_calendarItem->setWidget(calendarWidget);
@@ -547,8 +547,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_calendarItem->setProperty(Qn::NoHandScrollOver, true);
 
     m_dayTimeItem = new QnMaskedProxyWidget(m_controlsWidget);
-    m_dayTimeItem->setWidget(dayTimeWidget);
-    dayTimeWidget->installEventFilter(m_calendarItem);
+    m_dayTimeItem->setWidget(m_dayTimeWidget);
+    m_dayTimeWidget->installEventFilter(m_calendarItem);
     m_dayTimeItem->resize(250, 120);
     m_dayTimeItem->setProperty(Qn::NoHandScrollOver, true);
     m_dayTimeItem->stackBefore(m_calendarItem);
@@ -595,7 +595,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarShowButton)); /* Speed of 1.0 is OK here. */
 
     connect(calendarWidget,             SIGNAL(emptyChanged()),                                                                     this,                           SLOT(updateCalendarVisibility()));
-    connect(calendarWidget,             SIGNAL(dateClicked(const QDate &)),                                                         this,                           SLOT(at_calendarWidget_dateClicked()));
+    connect(calendarWidget,             SIGNAL(dateClicked(const QDate &)),                                                         this,                           SLOT(at_calendarWidget_dateClicked(const QDate &)));
     connect(m_dayTimeItem,              SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_dayTimeItem_paintGeometryChanged()));
     connect(m_calendarShowButton,       SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_calendarShowButton_toggled(bool)));
     connect(m_calendarOpacityProcessor, SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateCalendarOpacity()));
@@ -2115,7 +2115,10 @@ void QnWorkbenchUi::at_sliderZoomOutButton_released() {
     m_sliderZoomingOut = false;
 }
 
-void QnWorkbenchUi::at_calendarWidget_dateClicked() {
+void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date) {
+    m_dayTimeWidget->setDate(date);
+
     if(isCalendarOpened())
         setDayTimeWidgetOpened(true, true);
 }
+

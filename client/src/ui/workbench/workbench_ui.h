@@ -46,6 +46,7 @@ class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
 class QnGraphicsMessageBoxItem;
 class QnNotificationsCollectionWidget;
+class QnDayTimeWidget;
 
 class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT
@@ -276,7 +277,7 @@ private slots:
     void at_sliderZoomOutButton_pressed();
     void at_sliderZoomOutButton_released();
 
-    void at_calendarWidget_dateClicked();
+    void at_calendarWidget_dateClicked(const QDate &date);
 
 
 private:
@@ -468,6 +469,8 @@ private:
     bool m_inDayTimeGeometryUpdate;
 
     QnMaskedProxyWidget *m_dayTimeItem;
+
+    QnDayTimeWidget *m_dayTimeWidget;
 
     VariantAnimator *m_dayTimeSizeAnimator;
 

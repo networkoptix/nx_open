@@ -902,6 +902,8 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
     m_timeSlider->setTimePeriods(CurrentLine, type, periods);
     if(m_calendar)
         m_calendar->setCurrentTimePeriods(type, periods);
+    if(m_dayTimeWidget)
+        m_dayTimeWidget->setPrimaryTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods() {
@@ -933,6 +935,8 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent type) {
     m_timeSlider->setTimePeriods(SyncedLine, type, periods);
     if(m_calendar)
         m_calendar->setSyncedTimePeriods(type, periods);
+    if(m_dayTimeWidget)
+        m_dayTimeWidget->setSecondaryTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateLines() {
@@ -988,6 +992,7 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider() {
 
 void QnWorkbenchNavigator::updateCalendarFromSlider(){
     m_calendar->setSelectedWindow(m_timeSlider->windowStart(), m_timeSlider->windowEnd());
+    m_dayTimeWidget->setSelectedWindow(m_timeSlider->windowStart(), m_timeSlider->windowEnd());
 }
 
 void QnWorkbenchNavigator::updateLive() {
