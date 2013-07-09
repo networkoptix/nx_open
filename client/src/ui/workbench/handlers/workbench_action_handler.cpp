@@ -2849,6 +2849,9 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
+    if(!qnSettings->isUpdatesEnabled())
+        return;
+
     QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
     if(update.isNull())
         return;

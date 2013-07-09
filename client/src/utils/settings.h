@@ -122,6 +122,7 @@ public:
         TRANSLATION_PATH,
 
         UPDATE_FEED_URL,
+        UPDATES_ENABLED,
 
         TOUR_CYCLE_TIME,
         IP_SHOWN_IN_TREE,
@@ -169,6 +170,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                 extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                 translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
         QN_DECLARE_RW_PROPERTY(QUrl,                    updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QUrl())
+        QN_DECLARE_RW_PROPERTY(bool,                    isUpdatesEnabled,       setUpdatesEnabled,          UPDATES_ENABLED,            true)
         QN_DECLARE_RW_PROPERTY(int,                     tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(bool,                    isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,            timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
