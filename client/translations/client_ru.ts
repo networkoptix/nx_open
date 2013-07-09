@@ -2974,7 +2974,7 @@ It might take a few moments to populate them in the tree.</source>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="95"/>
-        <source>Manufacturer</source>
+        <source>Driver</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

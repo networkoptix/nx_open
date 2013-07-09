@@ -3103,7 +3103,7 @@ Make sure the server is available and try again.</source>
         <translation type="unfinished">名称</translation>
     </message>
     <message>
-        <source>Manufacturer</source>
+        <source>Driver</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
