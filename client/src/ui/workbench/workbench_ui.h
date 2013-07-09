@@ -276,6 +276,8 @@ private slots:
     void at_sliderZoomOutButton_pressed();
     void at_sliderZoomOutButton_released();
 
+    void at_calendarWidget_dateClicked();
+
 
 private:
     /* Global state. */

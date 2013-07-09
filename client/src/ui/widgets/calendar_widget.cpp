@@ -59,7 +59,7 @@ QnCalendarWidget::QnCalendarWidget():
 
     m_tableView = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
     m_tableView->horizontalHeader()->setMinimumSectionSize(18);
-    QObject::connect(m_tableView, SIGNAL(changeDate(const QDate&, bool)), this, SIGNAL(dateClicked(const QDate&)));
+    connect(m_tableView, SIGNAL(changeDate(const QDate &, bool)), this, SIGNAL(dateClicked(const QDate &)));
 
     m_tableView->viewport()->installEventFilter(this);
 
