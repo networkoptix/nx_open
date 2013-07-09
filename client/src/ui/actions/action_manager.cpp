@@ -610,7 +610,8 @@ QnActionManager::QnActionManager(QObject *parent):
     
     factory(Qn::CheckForUpdatesAction).
         flags(Qn::Main).
-        text(tr("Check for Updates..."));
+        text(tr("Check for Updates...")).
+        condition(new QnCheckForUpdatesActionCondition(this));
 
     factory(Qn::AboutAction).
         flags(Qn::Main).

@@ -67,6 +67,7 @@ QnSettings::QnSettings():
     addArgumentName(SOFTWARE_YUV,          "--soft-yuv");
     addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login");
     addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items");
+    addArgumentName(UPDATES_ENABLED,       "--updates-enabled");
 
     /* Load from internal resource. */
     QString path = QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.ini");
@@ -191,6 +192,7 @@ void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVarian
     case DEBUG_COUNTER:
     case UPDATE_FEED_URL:
     case DEV_MODE:
+    case UPDATES_ENABLED:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);

@@ -364,3 +364,8 @@ Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &
 
     return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
 }
+
+Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+    return qnSettings->isUpdatesEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
+}
