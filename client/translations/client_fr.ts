@@ -874,7 +874,7 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HTML file (*.html);;CSV file (*.csv)</source>
+        <source>HTML file (*.html);;Spread Sheet (CSV) file (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

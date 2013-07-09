@@ -1081,7 +1081,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="26"/>
-        <source>HTML file (*.html);;CSV file (*.csv)</source>
+        <source>HTML file (*.html);;Spread Sheet (CSV) file (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
