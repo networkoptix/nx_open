@@ -56,6 +56,7 @@ inline quint8 GetPixelSSE3(quint8* buffer, int stride, float x, float y)
 
 QnFisheyeImageFilter::QnFisheyeImageFilter(const DevorpingParams& params):
     QnAbstractImageFilter(),
+    m_params(params),
     m_lastImageFormat(-1)
 {
     memset (m_transform, 0, sizeof(m_transform));
@@ -118,6 +119,7 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
 {
     delete m_transform[plane];
     m_transform[plane] = new QPointF[imageSize.width() * imageSize.height()];
+    m_params.aspectRatio = imageSize.width() / (qreal) imageSize.height();
 
     qreal aspectRatio = imageSize.width() / (qreal) imageSize.height();
     qreal kx = 2.0*tan(m_params.fov/2.0);
