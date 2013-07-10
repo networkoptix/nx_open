@@ -1350,7 +1350,7 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HTML file (*.html);;CSV file (*.csv)</source>
+        <source>HTML file (*.html);;Spread Sheet (CSV) file (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3103,7 +3103,7 @@ Make sure the server is available and try again.</source>
         <translation type="unfinished">名称</translation>
     </message>
     <message>
-        <source>Manufacturer</source>
+        <source>Driver</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

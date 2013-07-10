@@ -1081,7 +1081,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="26"/>
-        <source>HTML file (*.html);;CSV file (*.csv)</source>
+        <source>HTML file (*.html);;Spread Sheet (CSV) file (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2974,7 +2974,7 @@ It might take a few moments to populate them in the tree.</source>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="95"/>
-        <source>Manufacturer</source>
+        <source>Driver</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

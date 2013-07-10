@@ -17,11 +17,11 @@ namespace QnResourceProperty {
         const char *tags = "tags";
         const char *cameraCapabilities = "cameraCapabilities"; // TODO: #Elric gcc warn: defined but not used
 
-        const char *properties[] = {id, typeId, uniqueId, name, searchString, status, flags, url, tags, NULL};
+        const char *properties[] = {id, typeId, uniqueId, name, searchString, status, flags, url, tags, cameraCapabilities, NULL};
 
     } // anonymous namespace
 
-    // TODO: #Elric TEST
+    // TODO: #Elric autotest!
 
     /**
      * Tests that the QnResource actually exposes the properties defined in this file.

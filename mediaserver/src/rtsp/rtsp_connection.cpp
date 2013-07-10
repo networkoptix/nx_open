@@ -1286,7 +1286,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
             return CODE_OK;
         }
-        else if (normParam.startsWith("x-send-motion"))
+        else if (normParam.startsWith("x-send-motion") && d->archiveDP)
         {
             QByteArray value = vals[1].trimmed();
             d->archiveDP->setSendMotion(value == "1" || value == "true");

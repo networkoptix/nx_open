@@ -1,7 +1,10 @@
 ----------------------------------------------- 1.5.2 (1.6 beta-2) ---------------------------------------------
 
 Since 1.5.1
- - DW Spectrum intro video had 2 black borders and sometimes finished by black screen. Fixed
+ - If trying to add an existing camera manually the software used to reply "No cameras found". Now it displays such cameras 
+   but they cannot be added once more
+ - Hotkeys can be assigned for PTZ presets (0-9)
+ - DW Spectrum intro video had 2 black borders and sometimes ended by black screen. Fixed
  - Added proper cursors when resize rotated items
  - DO NOT INCLUDE IN RELEASE NOTES!!! - Removed hack for DW to display 10 times less network issues (since 1.4)
  - Fixed issue when it was not possible to add cameras manually via IP range (since 1.4)
@@ -20,18 +23,29 @@ Since 1.5.1
    work after Media Server restart. Fixed
  - PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
  - Aggregation column is added to Event and Action (used to be in advanced E&A settings)
- - Login dialog opens much faster if it was opend once during this clietn run ( before it was opening slow every time )
- 
+ - Advanced PTZ for Sony SNCRH124 implemented
+ - Login dialog opens much faster
  - iOS. Feature #1943. Sort cameras by name.
  - iOS. Feature #1938. Add camera name on item.
  - iOS5. Bug #1949. Incorrect date and time.
  - iOS. Bug #1937. iPad. Server status aren't displayed.
  - Bug #1469. Web-client. Video doesn't play if camera has been moved from one server to another.
- 
+ - Thumbnails are shown in Resource Tree if hover with a mouse cursor on a camera
+ - Fixed incorrect tab order in tray tool
+ - If restore database from another server, then licences were removed, but recording continues until Media Server restart. Fixed
+ - Sometimes the same camera with the same IP could be added twice: via automatic discovery and via manual addition. Fixed
+ - Time picker is added to calendar
+ - If old version is launched in compatibility mode, then upgrade notification was invoked. Now not
  
 Since previous build
- - 
- - Client Client crashe when move a zoom window quickly across items
+ - "Text to Speech" is displayed as a separate action in "Event and Actions" (used to be selector in "Play Sound")
+ - Localized datetime format is used in event log form
+ - Fixed incorrect messages if activating licenses
+ - Some pictures could not be used for E-Mapping. Fixed
+ - Context menu in motion mask settings is removed
+ - Network Statistics displayed incorrect values (up to 400 GiB) during high load. Fixed
+ - Sample Sounds were unsorted in the "MANAGE" list. Fixed
+ - Client crashed when move a zoom window quickly across items. Fixed
  - Fixed Client crash if change a camera's motion mask and reopen its settings
  - If enable hardware acceleration Client crashed. Fixed
  - If press F11 current video went to fullscreen. If press F11 again the video got back but time line was hidden. Fixed
@@ -157,7 +171,7 @@ BUGS FIXED:
  - Audio was not exported properly in AC3 format if trying to export Multi-Video
  - Fixed visual chunks flickering in some cases (especally while zooming)
  - If run client after installation (check the flag), it was not possible to delete the directory the installer was downloaded to. Fixed
- - Tooltips' were popping up on incorrect positions sometimes. Fixed
+ - Tooltips were popping up on incorrect positions sometimes. Fixed
  - If log out and open a local file in a new window, Client tried connected to EC. Fixed 
  - Events/Actions bugs fixed:
    - Auto-reset for camera output didn't work for some cameras

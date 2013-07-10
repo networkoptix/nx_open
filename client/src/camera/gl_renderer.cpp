@@ -252,21 +252,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    glEnable(GL_BLEND);
-
-    //applying opacity
-    if( m_decodedPictureProvider.opacity() < 1.0 )
-    {
-        this->glBlendColor( 0, 0, 0, m_decodedPictureProvider.opacity() );
-        glBlendFunc( GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA );
-    }
-
     drawBindedTexture( v_array, tx_array );
-
-    if( m_decodedPictureProvider.opacity() < 1.0 )
-    {
-        glBlendFunc( GL_SRC_COLOR, GL_DST_COLOR );
-    }
 }
 
 void QnGLRenderer::setScreenshotInterface(ScreenshotInterface* value) { 

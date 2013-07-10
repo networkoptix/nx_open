@@ -16,6 +16,7 @@ extern "C"
 #endif
 #include "utils/math/math.h"
 
+
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
 {
     m_ctx = avcodec_alloc_context3(NULL);
@@ -40,7 +41,6 @@ QnMediaContext::QnMediaContext(const QByteArray& payload)
 }
 
 QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
-
 {
     m_ctx = QnFfmpegHelper::deserializeCodecContext((const char*) payload, dataSize);
 }
@@ -50,7 +50,12 @@ QnMediaContext::~QnMediaContext()
     if (m_ctx) {
         if (m_ctx->codec)
             avcodec_close(m_ctx);
-        av_free(m_ctx);
+        av_freep(&m_ctx->rc_override);
+        av_freep(&m_ctx->intra_matrix);
+        av_freep(&m_ctx->inter_matrix);
+        av_freep(&m_ctx->extradata);
+        av_freep(&m_ctx->rc_eq);
+        av_freep(&m_ctx);
     }
 }
 
@@ -68,6 +73,10 @@ QString QnMediaContext::codecName() const
 bool QnMediaContext::equalTo(QnMediaContext *other) const
 {
     // I've add new condition bits_per_coded_sample for G726 audio codec
+    if( m_ctx == NULL && other->m_ctx == NULL )
+        return true;
+    if( m_ctx == NULL || other->m_ctx == NULL )
+        return false;
     return m_ctx->codec_id == other->m_ctx->codec_id && m_ctx->bits_per_coded_sample == other->m_ctx->bits_per_coded_sample;
 }
 

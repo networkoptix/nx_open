@@ -104,7 +104,7 @@ QString QnCameraListModel::columnTitle(Column column) const
     switch(column) {
     case RecordingColumn: return tr("Recording");
     case NameColumn:      return tr("Name");
-    case VendorColumn:    return tr("Manufacturer");
+    case VendorColumn:    return tr("Driver");
     case ModelColumn:     return tr("Model");
     case FirmwareColumn:  return tr("Firmware");
     case IPColumn:        return tr("IP/Name");

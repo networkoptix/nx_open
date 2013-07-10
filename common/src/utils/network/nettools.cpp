@@ -97,7 +97,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
-                    result.append(QnInterfaceAndAddr(iface.name(), address.ip()));
+                    result.append(QnInterfaceAndAddr(iface.name(), address.ip(), iface));
                     break;
                 }
             }
@@ -118,8 +118,10 @@ QList<QHostAddress> allLocalAddresses()
     // if nothing else works use first enabled hostaddr
     foreach(const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
     {
-        if (!QUdpSocket().bind(iface.address, 0))
+        if (!(iface.netIf.flags() & QNetworkInterface::IsUp))
             continue;
+        //if (!QUdpSocket().bind(iface.address, 0))
+        //    continue;
 
         rez << iface.address;
     }

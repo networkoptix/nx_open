@@ -106,9 +106,12 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList &params
                 }
                 else {
                     // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
-                    QnResourcePtr existRes = qnResPool->getResourceByUrl(resource->getUrl());
-                    if (existRes && (existRes->getStatus() == QnResource::Online || existRes->getStatus() == QnResource::Recording))
-                        existResource = true;
+                    QnNetworkResourcePtr netRes = resource.dynamicCast<QnNetworkResource>();
+                    if (netRes) {
+                        QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
+                        if (!existResList.isEmpty())
+                            existResource = true;
+                    }
                 }
                 resultByteArray.append(QString("<exists>%1</exists>\n").arg(existResource ? 1 : 0));
 

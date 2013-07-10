@@ -43,7 +43,8 @@ void QnRecordingManager::start()
 
 void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
 {
-    recorders.recorderHiRes->pleaseStop();
+    if( recorders.recorderHiRes )
+        recorders.recorderHiRes->pleaseStop();
     if (recorders.recorderLowRes)
         recorders.recorderLowRes->pleaseStop();
 }
@@ -231,7 +232,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             providerHi->start();
         }
 
-        if (providerLow) {
+        if (providerLow && recorderHiRes) {
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
