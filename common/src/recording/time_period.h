@@ -39,6 +39,7 @@ public:
     void addPeriod(const QnTimePeriod &timePeriod);
 
     QnTimePeriod intersected(const QnTimePeriod &other) const;
+    bool intersects(const QnTimePeriod &other) const;
     void clear();
 
     /**
