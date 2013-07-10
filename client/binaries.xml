@@ -1,5 +1,5 @@
 <assembly>
-	<id>${platform}-${arch}-${customization}</id>
+	<id>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}-${platform}-${arch}-${customization}</id>
 	<formats>
 		<format>zip</format>
 	</formats>
