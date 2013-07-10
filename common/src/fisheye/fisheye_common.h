@@ -24,6 +24,16 @@ struct DevorpingParams
         return true;
     }
 
+    DevorpingParams(const DevorpingParams& other)
+    {
+        enabled = other.enabled;
+        xAngle = other.xAngle;
+        yAngle = other.yAngle;
+        fov = other.fov;
+        pAngle = other.pAngle;
+        aspectRatio = other.aspectRatio;
+    }
+
     bool enabled;
     // view angle and FOV at radians
     qreal xAngle;

@@ -37,7 +37,7 @@ public:
 
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
         if (l.uuid != r.uuid || l.flags != r.flags || l.zoomTargetUuid != r.zoomTargetUuid || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || 
-            !qFuzzyCompare(l.zoomRect, r.zoomRect) || !qFuzzyCompare(l.rotation, r.rotation) || !(l.contrastParams == r.contrastParams))
+            !qFuzzyCompare(l.zoomRect, r.zoomRect) || !qFuzzyCompare(l.rotation, r.rotation) || !(l.contrastParams == r.contrastParams) || !(l.devorpingParams == r.devorpingParams))
             return false;
 
         if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || !l.resource.id.isValid() || !r.resource.id.isValid()))

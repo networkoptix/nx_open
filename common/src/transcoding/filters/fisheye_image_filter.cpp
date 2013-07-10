@@ -71,6 +71,8 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
 
+    _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
+
     if (imageSize != m_lastImageSize || frame->format != m_lastImageFormat) 
     {
         for (int plane = 0; plane < descr->nb_components && frame->data[plane]; ++plane)
@@ -124,7 +126,7 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
     QMatrix4x4 rotX(kx,      0.0,                                0.0,                   0.0,
                     0.0,     cos(m_params.yAngle)*ky,            -sin(m_params.yAngle), 0.0,
                     0.0,     sin(m_params.yAngle)*ky,            cos(m_params.yAngle),  0.0,
-                    0.0,     0.0,                                0.0,                   0.0);
+                    0.0,     0.0,                                0.0,                   1.0);
 
     QPointF* dstPos = m_transform[plane];
     for (int y = 0; y < imageSize.height(); ++y)
@@ -145,9 +147,10 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
             theta      = atan2(psph.z(), psph.x());
             qreal r  = atan2(QVector2D(psph.x(), psph.z()).length(), psph.y()) / M_PI;
 
+
             // return from polar coordinates
-            qreal dstX = qBound(0.0, cos(theta) * r + 0.5, (qreal) imageSize.width());
-            qreal dstY = qBound(0.0, sin(theta) * r + 0.5, (qreal) imageSize.height());
+            qreal dstX = qBound(0.0, (cos(theta) * r + 0.5) * imageSize.width(),  (qreal) imageSize.width());
+            qreal dstY = qBound(0.0, (sin(theta) * r + 0.5) * imageSize.height(), (qreal) imageSize.height());
 
             *dstPos++ = QPointF(dstX, dstY);
         }

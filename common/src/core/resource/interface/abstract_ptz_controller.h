@@ -97,7 +97,7 @@ public:
     qreal getZoomVelocityCoeff() const;
 
     virtual bool isEnabled() const { return true; }
-    virtual void setEnabled(bool value) {}
+    virtual void setEnabled(bool ) {}
 
 private:
     QnSecurityCamResource* m_resource;

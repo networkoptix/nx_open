@@ -144,6 +144,8 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
         //newParams.pAngle = gradToRad(18.0);
         m_lastTime = newTime;
     }
+    newParams.enabled = m_devorpingParams.enabled;
+
     if (!(newParams == m_devorpingParams)) {
         m_devorpingParams = newParams;
         emit dewarpingParamsChanged(newParams);
