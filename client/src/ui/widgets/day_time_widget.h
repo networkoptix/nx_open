@@ -38,6 +38,7 @@ private:
 private slots:
     void at_tableWidget_itemClicked(QTableWidgetItem *item);
 
+    void updateEnabled();
     void updateHeaderText();
     void updateCurrentTime();
 

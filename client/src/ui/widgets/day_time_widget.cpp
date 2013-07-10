@@ -144,6 +144,7 @@ void QnDayTimeWidget::setDate(const QDate &date) {
 
     m_date = date;
 
+    updateEnabled();
     updateHeaderText();
 }
 
@@ -177,6 +178,7 @@ void QnDayTimeWidget::setEnabledWindow(quint64 windowStart, quint64 windowEnd) {
         return;
 
     m_enabledHoursPeriod = hoursWindow;
+    updateEnabled();
     update();
 }
 
@@ -230,15 +232,23 @@ void QnDayTimeWidget::updateCurrentTime() {
     m_currentTime = qnSyncTime->currentMSecsSinceEpoch();
 }
 
+void QnDayTimeWidget::updateEnabled() {
+    for(int row = 0; row < m_tableWidget->rowCount(); row++) {
+        for(int col = 0; col < m_tableWidget->columnCount(); col++) {
+            QTableWidgetItem *item = m_tableWidget->item(row, col);
+            QTime time = item->data(Qt::UserRole).toTime();
+            QnTimePeriod period(QDateTime(m_date, time).toMSecsSinceEpoch(), HOUR);
+
+            item->setFlags(m_enabledPeriod.intersects(period) ? (Qt::ItemIsSelectable | Qt::ItemIsEnabled) : Qt::NoItemFlags);
+        }
+    }
+}
+
 void QnDayTimeWidget::at_tableWidget_itemClicked(QTableWidgetItem *item) {
     QTime time = item->data(Qt::UserRole).toTime();
     if(!time.isValid())
         return;
 
-    QnTimePeriod period(QDateTime(m_date, time).toMSecsSinceEpoch(), HOUR);
-    if(!m_enabledPeriod.intersects(period))
-        return;
-        
     emit timeClicked(item->data(Qt::UserRole).toTime());
 }
 
