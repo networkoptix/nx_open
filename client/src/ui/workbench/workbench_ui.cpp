@@ -2091,7 +2091,6 @@ void QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged() {
     QnScopedValueRollback<bool> guard(&m_inDayTimeGeometryUpdate, true);
 
     updateDayTimeWidgetGeometry();
-
     updateNotificationsGeometry();
 }
 

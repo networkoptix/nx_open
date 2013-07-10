@@ -215,11 +215,11 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
         palette(), 
         rect, 
         period, 
-        m_enabledPeriod,
+        m_enabledPeriod, 
         m_selectedPeriod, 
         m_primaryPeriodStorage, 
         m_secondaryPeriodStorage, 
-        QString::number(time.hour())
+        time.toString(lit("h ap"))
     );
 }
 
@@ -245,6 +245,9 @@ void QnDayTimeWidget::updateEnabled() {
 }
 
 void QnDayTimeWidget::at_tableWidget_itemClicked(QTableWidgetItem *item) {
+    if(!(item->flags() & Qt::ItemIsEnabled))
+        return;
+
     QTime time = item->data(Qt::UserRole).toTime();
     if(!time.isValid())
         return;
