@@ -43,7 +43,8 @@ void QnRecordingManager::start()
 
 void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
 {
-    recorders.recorderHiRes->pleaseStop();
+    if( recorders.recorderHiRes )
+        recorders.recorderHiRes->pleaseStop();
     if (recorders.recorderLowRes)
         recorders.recorderLowRes->pleaseStop();
 }
