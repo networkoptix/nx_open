@@ -78,9 +78,12 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
     closeDecoder();
 
-    if (m_passedContext && m_passedContext->codec)
+    if( m_passedContext )
     {
-        avcodec_close(m_passedContext);
+        if( m_passedContext->codec )
+            avcodec_close(m_passedContext);
+        av_free( m_passedContext );
+        m_passedContext = NULL;
     }
 
     if( m_swDecoderCount )
