@@ -82,8 +82,12 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
     {
         if( m_passedContext->codec )
             avcodec_close(m_passedContext);
-        av_free( m_passedContext );
-        m_passedContext = NULL;
+        av_freep(&m_passedContext->rc_override);
+        av_freep(&m_passedContext->intra_matrix);
+        av_freep(&m_passedContext->inter_matrix);
+        av_freep(&m_passedContext->extradata);
+        av_freep(&m_passedContext->rc_eq);
+        av_freep(&m_passedContext);
     }
 
     if( m_swDecoderCount )
@@ -124,7 +128,13 @@ void CLFFmpegVideoDecoder::closeDecoder()
     if (m_deinterlaceBuffer)
         av_free(m_deinterlaceBuffer);
     av_free(m_deinterlacedFrame);
-    av_free(m_context);
+    av_freep(&m_context->rc_override);
+    av_freep(&m_context->intra_matrix);
+    av_freep(&m_context->inter_matrix);
+    av_freep(&m_context->extradata);
+    av_freep(&m_context->rc_eq);
+    av_freep(&m_context);
+
     delete m_frameTypeExtractor;
     m_motionMap.clear();
 }
@@ -235,7 +245,12 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
     if (m_context->codec)
         avcodec_close(m_context);
 
-    av_free(m_context);
+    av_freep(&m_context->rc_override);
+    av_freep(&m_context->intra_matrix);
+    av_freep(&m_context->inter_matrix);
+    av_freep(&m_context->extradata);
+    av_freep(&m_context->rc_eq);
+    av_freep(&m_context);
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
     if (m_passedContext) {
