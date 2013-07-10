@@ -1,0 +1,20 @@
+<assembly>
+	<id>${platform}-${arch}-${customization}</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>${libdir}/bin/${build.configuration}</directory>
+			<outputDirectory>../${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/bin</outputDirectory>
+			<includes>
+				<include>client-bin</include>
+				<include>client.exe</include>
+			</includes>
+			<excludes>
+				<exclude>**/.hidden</exclude>
+			</excludes>			
+		</fileSet>			
+	</fileSets>
+</assembly>
