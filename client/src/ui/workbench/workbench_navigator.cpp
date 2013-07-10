@@ -802,6 +802,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
     if(m_calendar)
         m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
+    if(m_dayTimeWidget)
+        m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
 
     if(!m_pausedOverride) {
         qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();

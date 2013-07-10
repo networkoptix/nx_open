@@ -87,6 +87,7 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     base_type(parent)
 {
     m_headerLabel = new QLabel(this);
+    m_headerLabel->setAlignment(Qt::AlignCenter);
     
     m_tableWidget = new QnDayTimeTableWidget(this);
     setPaletteColor(m_tableWidget, QPalette::Highlight, QColor(0, 0, 0, 255));
@@ -152,6 +153,29 @@ void QnDayTimeWidget::setSecondaryTimePeriods(Qn::TimePeriodContent type, const 
     update();
 }
 
+void QnDayTimeWidget::setEnabledWindow(quint64 windowStart, quint64 windowEnd) {
+    m_enabledPeriod = QnTimePeriod(windowStart, windowEnd - windowStart);
+
+    if(m_enabledPeriod.startTimeMs >= m_enabledHoursPeriod.startTimeMs && m_enabledPeriod.startTimeMs < m_enabledHoursPeriod.startTimeMs + HOUR &&
+        m_enabledPeriod.endTimeMs() <= m_enabledHoursPeriod.endTimeMs() && m_enabledPeriod.endTimeMs() > m_enabledHoursPeriod.endTimeMs() - HOUR)
+        return; /* Ok, no update needed. */
+
+    QDateTime hourWindowStart = QDateTime::fromMSecsSinceEpoch(windowStart);
+    hourWindowStart.setTime(QTime(hourWindowStart.time().hour(), 0, 0, 0));
+    QDateTime hourWindowEnd = QDateTime::fromMSecsSinceEpoch(windowEnd + HOUR - 1);
+    hourWindowEnd.setTime(QTime(hourWindowEnd.time().hour(), 0, 0, 0));
+    
+    qint64 start = hourWindowStart.toMSecsSinceEpoch();
+    qint64 end = hourWindowEnd.toMSecsSinceEpoch();
+
+    QnTimePeriod hoursWindow = QnTimePeriod(start, end - start);
+    if(m_enabledHoursPeriod == hoursWindow)
+        return;
+
+    m_enabledHoursPeriod = hoursWindow;
+    update();
+}
+
 void QnDayTimeWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) {
     m_selectedPeriod = QnTimePeriod(windowStart, windowEnd - windowStart);
 
@@ -185,7 +209,7 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
         palette(), 
         rect, 
         period, 
-        QnTimePeriod(0, -1),
+        m_enabledPeriod,
         m_selectedPeriod, 
         m_primaryPeriodStorage, 
         m_secondaryPeriodStorage, 
@@ -194,7 +218,8 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
 }
 
 void QnDayTimeWidget::updateHeaderText() {
-    m_headerLabel->setText(m_date.toString());
+    /* Note that the format is the same as in time slider date bar. */
+    m_headerLabel->setText(lit("<b>%1</b>").arg(m_date.toString(lit("dd MMMM yyyy"))));
 }
 
 void QnDayTimeWidget::updateCurrentTime() {
@@ -203,8 +228,14 @@ void QnDayTimeWidget::updateCurrentTime() {
 
 void QnDayTimeWidget::at_tableWidget_itemClicked(QTableWidgetItem *item) {
     QTime time = item->data(Qt::UserRole).toTime();
-    if(time.isValid())
-        emit timeClicked(item->data(Qt::UserRole).toTime());
+    if(!time.isValid())
+        return;
+
+    QnTimePeriod period(QDateTime(m_date, time).toMSecsSinceEpoch(), HOUR);
+    if(!m_enabledPeriod.intersects(period))
+        return;
+        
+    emit timeClicked(item->data(Qt::UserRole).toTime());
 }
 
 

@@ -26,6 +26,7 @@ public:
     void setSecondaryTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &periods);
 
     void setSelectedWindow(quint64 windowStart, quint64 windowEnd);
+    void setEnabledWindow(quint64 windowStart, quint64 windowEnd);
 
 signals:
     void timeClicked(const QTime &time);
@@ -42,7 +43,7 @@ private slots:
 
 private:
     QnTimePeriodStorage m_primaryPeriodStorage, m_secondaryPeriodStorage;
-    QnTimePeriod m_selectedPeriod, m_selectedHoursPeriod;
+    QnTimePeriod m_selectedPeriod, m_selectedHoursPeriod, m_enabledPeriod, m_enabledHoursPeriod;
     QLabel *m_headerLabel;
     QDate m_date;
     qint64 m_currentTime;
