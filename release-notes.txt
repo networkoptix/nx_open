@@ -33,6 +33,9 @@ Since 1.5.1
  - Thumbnails are shown in Resource Tree if hover with a mouse cursor on a camera
  - Fixed incorrect tab order in tray tool
  - If restore database from another server, then licences were removed, but recording continues until Media Server restart. Fixed
+ - Sometimes the same camera with the same IP could be added twice: via automatic discovery and via manual addition. Fixed
+ - Time picker is added to calendar
+ - If old version is launched in compatibility mode, then upgrade notification was invoked. Now not
  
 Since previous build
  - "Text to Speech" is displayed as a separate action in "Event and Actions" (used to be selector in "Play Sound")
@@ -168,7 +171,7 @@ BUGS FIXED:
  - Audio was not exported properly in AC3 format if trying to export Multi-Video
  - Fixed visual chunks flickering in some cases (especally while zooming)
  - If run client after installation (check the flag), it was not possible to delete the directory the installer was downloaded to. Fixed
- - Tooltips' were popping up on incorrect positions sometimes. Fixed
+ - Tooltips were popping up on incorrect positions sometimes. Fixed
  - If log out and open a local file in a new window, Client tried connected to EC. Fixed 
  - Events/Actions bugs fixed:
    - Auto-reset for camera output didn't work for some cameras
