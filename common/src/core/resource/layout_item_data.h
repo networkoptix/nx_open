@@ -10,6 +10,7 @@
 #include <utils/math/fuzzy.h>
 #include <utils/common/id.h>
 #include "utils/color_space/image_correction.h"
+#include "fisheye/fisheye_common.h"
 
 class QnLayoutItemData {
 public:
@@ -30,6 +31,7 @@ public:
     QRectF zoomRect;
     qreal rotation;
     ImageCorrectionParams contrastParams;
+    DevorpingParams devorpingParams;
 
     QHash<int, QVariant> dataByRole;
 

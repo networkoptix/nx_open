@@ -10,6 +10,7 @@
 
 #include <client/client_globals.h>
 #include "utils/color_space/image_correction.h"
+#include "fisheye/fisheye_common.h"
 
 class QnWorkbenchLayout;
 class QnLayoutItemData;
@@ -215,9 +216,19 @@ public:
      * \param                           New image enhancement params for this item.
      */
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
+
+    /**
+     * \param                           New dewarping enhancement params for this item.
+     */
+    void setDevorpingParams(const DevorpingParams& params);
+
     
     const ImageCorrectionParams &imageEnhancement() const {
         return m_imageEnhancement;
+    }
+
+    const DevorpingParams &devorpingParams() const {
+        return m_devorpingParams;
     }
 
     QnWorkbenchItem *zoomTargetItem() const;
@@ -289,6 +300,7 @@ signals:
     void flagChanged(Qn::ItemFlag flag, bool value);
     void zoomRectChanged();
     void imageEnhancementChanged();
+    void devorpingParamsChanged();
     void zoomTargetItemChanged();
     void rotationChanged();
     void dataChanged(int role);
@@ -321,6 +333,9 @@ private:
 
     /** Item image enhancement params. */
     ImageCorrectionParams m_imageEnhancement;
+
+    /** Fisheye devorping params */
+    DevorpingParams m_devorpingParams;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;

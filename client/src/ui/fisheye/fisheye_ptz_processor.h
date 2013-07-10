@@ -10,6 +10,7 @@ class QnResourceWidgetRenderer;
 
 class QnFisheyePtzController: public QnAbstractPtzController
 {
+    Q_OBJECT
 public:
     QnFisheyePtzController(QnResource* resource);
     virtual ~QnFisheyePtzController();
@@ -24,6 +25,10 @@ public:
     void addRenderer(QnResourceWidgetRenderer* renderer);
     void setAspectRatio(float aspectRatio);
     DevorpingParams getDevorpingParams();
+    virtual void setEnabled(bool value) override;
+    virtual bool isEnabled() const override;
+signals:
+    void dewarpingParamsChanged(DevorpingParams params);
 private slots:
     void at_timer();
 private:

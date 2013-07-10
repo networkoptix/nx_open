@@ -1,5 +1,16 @@
 #include "fisheye_image_filter.h"
 
+extern "C" {
+#ifdef WIN32
+#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#endif
+#include <libavutil/pixdesc.h>
+#ifdef WIN32
+#undef AVPixFmtDescriptor
+#endif
+};
+
+
 // constant values that will be needed
 static const __m128 CONST_1111 = _mm_set1_ps(1);
 static const __m128 CONST_256 = _mm_set1_ps(256);
@@ -45,9 +56,9 @@ inline quint8 GetPixelSSE3(quint8* buffer, int stride, float x, float y)
 
 QnFisheyeImageFilter::QnFisheyeImageFilter(const DevorpingParams& params):
     QnAbstractImageFilter(),
-    m_transform(0)
+    m_lastImageFormat(-1)
 {
-
+    memset (m_transform, 0, sizeof(m_transform));
 }
 
 void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
@@ -57,30 +68,54 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
     int top = updateRect.top() * frame->height;
     int bottom = updateRect.bottom() * frame->height;
     QSize imageSize(right - left, bottom - top);
-    if (imageSize != m_lastImageSize) {
-        updateFisheyeTransform(imageSize);
+
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
+
+    if (imageSize != m_lastImageSize || frame->format != m_lastImageFormat) 
+    {
+        for (int plane = 0; plane < descr->nb_components && frame->data[plane]; ++plane)
+        {
+            int w = imageSize.width();
+            int h = imageSize.height();
+            if (plane > 0) {
+                w >>= descr->log2_chroma_w;
+                h >>= descr->log2_chroma_h;
+            }
+            updateFisheyeTransform(QSize(w, h), plane);
+        }
         m_lastImageSize = imageSize;
+        m_lastImageFormat = frame->format;
     }
 
-    int index = 0;
-    for (int y = 0; y < imageSize.height(); ++y)
+    for (int plane = 0; plane < descr->nb_components && frame->data[plane]; ++plane)
     {
-        quint8* srcLine = frame->data[0] + y*frame->linesize[0];
-        for (int x = 0; x < imageSize.width(); ++x)
+        int index = 0;
+        int w = imageSize.width();
+        int h = imageSize.height();
+        if (plane > 0) {
+            w >>= descr->log2_chroma_w;
+            h >>= descr->log2_chroma_h;
+        }
+
+        for (int y = 0; y < h; ++y)
         {
-            const QPointF* dstPixel = m_transform + index;
-            quint8 pixel = GetPixelSSE3(frame->data[0], frame->linesize[0], dstPixel->x(), dstPixel->y());
-            srcLine[x] = pixel;
-            
-            index++;
+            quint8* srcLine = frame->data[plane] + y*frame->linesize[plane];
+            for (int x = 0; x < w; ++x)
+            {
+                const QPointF* dstPixel = m_transform[plane] + index;
+                quint8 pixel = GetPixelSSE3(frame->data[plane], frame->linesize[plane], dstPixel->x(), dstPixel->y());
+                srcLine[x] = pixel;
+                
+                index++;
+            }
         }
     }
 }
 
-void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize)
+void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int plane)
 {
-    delete m_transform;
-    m_transform = new QPointF[imageSize.width() * imageSize.height()];
+    delete m_transform[plane];
+    m_transform[plane] = new QPointF[imageSize.width() * imageSize.height()];
 
     qreal aspectRatio = imageSize.width() / (qreal) imageSize.height();
     qreal kx = 2.0*tan(m_params.fov/2.0);
@@ -91,7 +126,7 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize)
                     0.0,     sin(m_params.yAngle)*ky,            cos(m_params.yAngle),  0.0,
                     0.0,     0.0,                                0.0,                   0.0);
 
-    QPointF* dstPos = m_transform;
+    QPointF* dstPos = m_transform[plane];
     for (int y = 0; y < imageSize.height(); ++y)
     {
         for (int x = 0; x < imageSize.width(); ++x)

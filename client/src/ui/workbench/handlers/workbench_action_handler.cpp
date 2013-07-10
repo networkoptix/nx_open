@@ -435,6 +435,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.zoomTargetUuid = params.zoomUuid;
     data.rotation = params.rotation;
     data.contrastParams = params.contrastParams;
+    data.devorpingParams = params.devorpingParams;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
     if(params.frameColor.isValid())
         data.dataByRole[Qn::ItemFrameColorRole] = params.frameColor;
@@ -2012,6 +2013,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
         item.contrastParams = w->item()->imageEnhancement();
+        item.devorpingParams = w->item()->devorpingParams();
         item.dataByRole[Qn::ItemPausedRole] = true;
         item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
@@ -3074,7 +3076,8 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
                                                        role,
                                                        0, 0,
                                                        itemData.zoomRect,
-                                                       itemData.contrastParams);
+                                                       itemData.contrastParams,
+                                                       itemData.devorpingParams);
 
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->toResource()->getUrl()).arg(m_layoutFileName));
@@ -3189,6 +3192,7 @@ Do you want to continue?"),
     QString selectedFilter;
     bool withTimestamps = false;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
+    DevorpingParams devorpingParams = itemData.devorpingParams;
 
     while (true) {
         QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
@@ -3208,7 +3212,8 @@ Do you want to continue?"),
 #endif
         dialog->addCheckBox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
         dialog->addCheckBox(tr("Video adjustment (Requires Transcoding)"), &contrastParams.enabled, delegate);
-
+        if (devorpingParams.enabled)
+            dialog->addCheckBox(tr("Apply dewarping filter (Requires Transcoding)"), &devorpingParams.enabled, delegate);
 
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
@@ -3321,7 +3326,8 @@ Do you want to continue?"),
                                                   QnStorageResourcePtr(), role,
                                                   timeOffset, serverTimeZone,
                                                   itemData.zoomRect,
-                                                  contrastParams);
+                                                  contrastParams,
+                                                  devorpingParams);
         exportProgressDialog->exec();
     }
 }

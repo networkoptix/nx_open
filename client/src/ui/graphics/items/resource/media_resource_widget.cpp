@@ -76,6 +76,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     if (m_resource->isFisheye()) {
         m_ptzController = new QnFisheyePtzController(base_type::resource().data());
+        connect(m_ptzController, SIGNAL(dewarpingParamsChanged(DevorpingParams)), this, SLOT(at_dewarpingParamsChanged(DevorpingParams)));
     }
 
 
@@ -180,6 +181,11 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
         qFreeAligned(data);
     m_binaryMotionMask.clear();
 
+}
+
+void QnMediaResourceWidget::at_dewarpingParamsChanged(DevorpingParams params)
+{
+    item()->setDevorpingParams(params);
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
@@ -832,7 +838,6 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);
-
     if(checked) {
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
         if (!m_resource->isFisheye())

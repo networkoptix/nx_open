@@ -12,6 +12,7 @@
 #include "transcoding/ffmpeg_video_transcoder.h"
 #include "transcoding/filters/contrast_image_filter.h"
 #include "transcoding/filters/time_image_filter.h"
+#include "transcoding/filters/fisheye_image_filter.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -456,7 +457,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     bool isTranscode = m_role == Role_FileExportWithTime || 
         (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
         !m_srcRect.isEmpty() ||
-        m_contrastParams.enabled;
+        m_contrastParams.enabled ||
+        m_devorpingParams.enabled;
 
     const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
@@ -510,6 +512,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
 
+                if (m_devorpingParams.enabled)
+                    m_videoTranscoder->addFilter(new QnFisheyeImageFilter(m_devorpingParams));
                 if (m_contrastParams.enabled)
                     m_videoTranscoder->addFilter(new QnContrastImageFilter(m_contrastParams));
                 if (m_role == Role_FileExportWithTime) 
@@ -806,4 +810,9 @@ void QnStreamRecorder::setSrcRect(const QRectF& srcRect)
 void QnStreamRecorder::setContrastParams(const ImageCorrectionParams& params)
 {
     m_contrastParams = params;
+}
+
+void QnStreamRecorder::setDevorpingParams(const DevorpingParams& params)
+{
+    m_devorpingParams = params;
 }

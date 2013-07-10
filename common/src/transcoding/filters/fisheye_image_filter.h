@@ -11,11 +11,14 @@ public:
 
     virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) override;
 private:
-    void updateFisheyeTransform(const QSize& imageSize);
+    void updateFisheyeTransform(const QSize& imageSize, int plane);
 private:
+    static const int MAX_COLOR_PLANES = 4;
+
     DevorpingParams m_params;
     QSize m_lastImageSize;
-    QPointF* m_transform;
+    QPointF* m_transform[MAX_COLOR_PLANES];
+    int m_lastImageFormat;
 };
 
 #endif // __FISHEYE_IMAGE_FILTER_H__

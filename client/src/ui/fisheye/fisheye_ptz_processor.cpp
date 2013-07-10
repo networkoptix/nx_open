@@ -103,6 +103,7 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
 {
     qint64 newTime = getUsecTimer();
     qreal timeSpend = (newTime - m_lastTime) / 1000000.0;
+    DevorpingParams newParams = m_devorpingParams;
 
     if (m_moveToAnimation)
     {
@@ -115,12 +116,12 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
             qreal xDelta = (m_dstPos.xAngle - m_srcPos.xAngle) * value;
             qreal yDelta = (m_dstPos.yAngle - m_srcPos.yAngle) * value;
 
-            m_devorpingParams.fov = m_srcPos.fov + fovDelta;
-            m_devorpingParams.xAngle = m_srcPos.xAngle + xDelta;
-            m_devorpingParams.yAngle = m_srcPos.yAngle + yDelta;
+            newParams.fov = m_srcPos.fov + fovDelta;
+            newParams.xAngle = m_srcPos.xAngle + xDelta;
+            newParams.yAngle = m_srcPos.yAngle + yDelta;
         }
         else {
-            m_devorpingParams = m_dstPos;
+            newParams = m_dstPos;
             m_moveToAnimation = false;
         }
     }
@@ -129,20 +130,37 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
         qreal xSpeed = m_motion.x() * MAX_MOVE_SPEED;
         qreal ySpeed = m_motion.y() * MAX_MOVE_SPEED;
 
-        m_devorpingParams.fov += zoomSpeed * timeSpend;
-        m_devorpingParams.fov = qBound(MIN_FOV, m_devorpingParams.fov, MAX_FOV);
+        newParams.fov += zoomSpeed * timeSpend;
+        newParams.fov = qBound(MIN_FOV, newParams.fov, MAX_FOV);
 
-        m_devorpingParams.xAngle += xSpeed * timeSpend;
-        m_devorpingParams.yAngle += ySpeed * timeSpend;
+        newParams.xAngle += xSpeed * timeSpend;
+        newParams.yAngle += ySpeed * timeSpend;
 
-        qreal xRange = (FISHEYE_FOV - m_devorpingParams.fov) / 2.0;
-        qreal yRange = xRange; // / m_devorpingParams.aspectRatio;
+        qreal xRange = (FISHEYE_FOV - newParams.fov) / 2.0;
+        qreal yRange = xRange; // / newParams.aspectRatio;
 
-        m_devorpingParams.xAngle = qBound(-xRange, m_devorpingParams.xAngle, xRange);
-        m_devorpingParams.yAngle = qBound(-yRange, m_devorpingParams.yAngle, yRange);
-        //m_devorpingParams.pAngle = gradToRad(18.0);
+        newParams.xAngle = qBound(-xRange, newParams.xAngle, xRange);
+        newParams.yAngle = qBound(-yRange, newParams.yAngle, yRange);
+        //newParams.pAngle = gradToRad(18.0);
         m_lastTime = newTime;
-    }    
+    }
+    if (!(newParams == m_devorpingParams)) {
+        m_devorpingParams = newParams;
+        emit dewarpingParamsChanged(newParams);
+    }
 
-    return m_devorpingParams;
+    return newParams;
+}
+
+void QnFisheyePtzController::setEnabled(bool value)
+{
+    if (m_devorpingParams.enabled != value) {
+        m_devorpingParams.enabled = value;
+        emit dewarpingParamsChanged(m_devorpingParams);
+    }
+}
+
+bool QnFisheyePtzController::isEnabled() const
+{
+    return m_devorpingParams.enabled;
 }

@@ -12,6 +12,7 @@
 #include <client/client_globals.h>
 #include "camera/resource_display.h" // TODO: #Elric FWD!
 #include "utils/color_space/image_correction.h"
+#include "fisheye/fisheye_common.h"
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -142,6 +143,7 @@ private slots:
     void at_histogramButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
+    void at_dewarpingParamsChanged(DevorpingParams params);
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
 
