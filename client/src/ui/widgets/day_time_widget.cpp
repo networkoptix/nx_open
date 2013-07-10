@@ -109,10 +109,14 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     m_tableWidget->viewport()->installEventFilter(signalizer);
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updateCurrentTime()));
 
+    QHBoxLayout *headerLayout = new QHBoxLayout();
+    headerLayout->setContentsMargins(2, 2, 2, 2);
+    headerLayout->addWidget(m_headerLabel, 0);
+
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(1);
-    layout->addWidget(m_headerLabel, 0);
+    layout->addLayout(headerLayout, 0);
     layout->addWidget(m_tableWidget, 1);
     setLayout(layout);
     
