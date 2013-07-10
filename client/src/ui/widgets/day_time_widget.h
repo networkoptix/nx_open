@@ -38,12 +38,14 @@ private slots:
     void at_tableWidget_itemClicked(QTableWidgetItem *item);
 
     void updateHeaderText();
+    void updateCurrentTime();
 
 private:
     QnTimePeriodStorage m_primaryPeriodStorage, m_secondaryPeriodStorage;
     QnTimePeriod m_selectedPeriod, m_selectedHoursPeriod;
     QLabel *m_headerLabel;
     QDate m_date;
+    qint64 m_currentTime;
     QnDayTimeItemDelegate *m_delegate;
     QnDayTimeTableWidget *m_tableWidget;
 };

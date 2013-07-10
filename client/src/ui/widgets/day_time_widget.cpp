@@ -5,6 +5,8 @@
 #include <QLabel>
 
 #include <utils/common/variant.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/synctime.h>
 
 #include <ui/common/palette.h>
 #include <ui/delegates/calendar_item_delegate.h>
@@ -101,6 +103,11 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     m_delegate = new QnDayTimeItemDelegate(this);
     m_tableWidget->setItemDelegate(m_delegate);
 
+    QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
+    signalizer->setEventType(QEvent::Paint);
+    m_tableWidget->viewport()->installEventFilter(signalizer);
+    connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updateCurrentTime()));
+
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(1);
@@ -115,6 +122,7 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     connect(m_tableWidget, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(at_tableWidget_itemClicked(QTableWidgetItem *)));
 
     setDate(QDate::currentDate());
+    updateCurrentTime();
 }
 
 QnDayTimeWidget::~QnDayTimeWidget() {
@@ -169,6 +177,8 @@ void QnDayTimeWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) 
 
 void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTime &time) {
     QnTimePeriod period(QDateTime(m_date, time).toMSecsSinceEpoch(), HOUR); 
+    if (period.startTimeMs > m_currentTime)
+        period = QnTimePeriod();
 
     m_delegate->paintCell(
         painter, 
@@ -185,6 +195,10 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
 
 void QnDayTimeWidget::updateHeaderText() {
     m_headerLabel->setText(m_date.toString());
+}
+
+void QnDayTimeWidget::updateCurrentTime() {
+    m_currentTime = qnSyncTime->currentMSecsSinceEpoch();
 }
 
 void QnDayTimeWidget::at_tableWidget_itemClicked(QTableWidgetItem *item) {
