@@ -35,7 +35,7 @@
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <license.environment>production</license.environment>
 
-        <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>		                                  	
+        <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/${build.configuration}/vox</ClientVoxSourceDir>		                                  	
         <unpack.skip>false</unpack.skip>
         <ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>

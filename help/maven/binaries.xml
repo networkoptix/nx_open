@@ -12,7 +12,7 @@
 	<fileSets>
 		<fileSet>
 			<directory>${ClientHelpSourceDir}</directory>
-			<outputDirectory>../help</outputDirectory>
+			<outputDirectory>../bin/help</outputDirectory>
 		</fileSet>
 	</fileSets>
 </assembly>
