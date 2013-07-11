@@ -858,7 +858,7 @@
                                 </Component>
                             </Directory> 
 
-                            <Directory Id="${installer.customization}_1_5_1_Dir" Name="1.5">
+                            <Directory Id="${installer.customization}_1_5_Dir" Name="1.5">
 
                                 <Directory Id="styles_1_5" Name="styles">
                                     <Component Id="bespin_1_5">
@@ -874,6 +874,10 @@
                                         <fire:FirewallException Id="FirewallExceptionClient_1_5" Name="${product.name} 1.5" Scope="any" IgnoreFailure="yes"/>
                                     </File>
                                 </Component>
+
+                                <Component Id="ClientQjson_1_5">
+                                    <File Id="ClientQjson.dll_1_5" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
+                                </Component>                            
 
                                 <Component Id="ClientSigar_1_5">
                                     <File Id="ClientSigar.dll_1_5" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
@@ -1184,76 +1188,76 @@
 
         <ComponentGroup Id="ClientFFmpegLibraries_1_5" Directory="${installer.customization}_1_5_Dir">
             <Component>
-                <File Id="ClientAvcodecDll_1_5" Name="avcodec-54-1.5.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
+                <File Id="ClientAvcodecDll_1_5" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
             </Component>
             <Component>
-                <File Id="ClientAvdeviceDll_1_5" Name="avdevice-53-1.5.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
+                <File Id="ClientAvdeviceDll_1_5" Name="avdevice-53.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
             </Component>
             <Component>
-                <File Id="ClientAvfilterDll_1_5" Name="avfilter-2-1.5.dll" Source="${libdir}/bin/${build.configuration}/avfilter-2.dll"/>
+                <File Id="ClientAvfilterDll_1_5" Name="avfilter-2.dll" Source="${libdir}/bin/${build.configuration}/avfilter-2.dll"/>
             </Component>
             <Component>
-                <File Id="ClientAvformatDll_1_5" Name="avformat-54-1.5.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
+                <File Id="ClientAvformatDll_1_5" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
             </Component>
             <Component>
-                <File Id="ClientAvutilDll_1_5" Name="avutil-51.dll-1.5" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
+                <File Id="ClientAvutilDll_1_5" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
             </Component>
             <Component>
-                <File Id="ClientSwscaleDll_1_5" Name="swscale-2.dll-1.5" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
+                <File Id="ClientSwscaleDll_1_5" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
             </Component>
             <Component>
-                <File Id="ClientOggDll_1_5" Name="libogg-0-1.5.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
+                <File Id="ClientOggDll_1_5" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
             </Component>
             <Component>
-                <File Id="ClientVorbisDll_1_5" Name="libvorbis-0-1.5.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
+                <File Id="ClientVorbisDll_1_5" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
             </Component>
             <Component>
-                <File Id="ClientMp3lameDll_1_5" Name="libmp3lame-0-1.5.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+                <File Id="ClientMp3lameDll_1_5" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
             </Component>
             <Component>
-                <File Id="ClientVorbisEncDll_1_5" Name="libvorbisenc-2-1.5.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
+                <File Id="ClientVorbisEncDll_1_5" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
             </Component>
             <Component>
-                <File Id="ClientX264_1_5" Name="x264-1.5.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
+                <File Id="ClientX264_1_5" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
             </Component>
         </ComponentGroup>                            
 
         <ComponentGroup Id="ClientQTLibraries_1_5" Directory="${installer.customization}_1_5_Dir">
             <Component>
-                <File Id="ClientQtCore$(var.suffix)4.dll_1_5" Name="QtCore$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
+                <File Id="ClientQtCore$(var.suffix)4.dll_1_5" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
             </Component>
             <Component>
-                <File Id="ClientQtGui$(var.suffix)4.dll_1_5" Name="QtGui$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
+                <File Id="ClientQtGui$(var.suffix)4.dll_1_5" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
             </Component>
             <Component>
-                <File Id="ClientQtMultimedia$(var.suffix)4.dll_1_5" Name="QtMultimedia$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
+                <File Id="ClientQtMultimedia$(var.suffix)4.dll_1_5" Name="QtMultimedia$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
             </Component>
             <Component>
-                <File Id="ClientQtNetwork$(var.suffix)4.dll_1_5" Name="QtNetwork$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
+                <File Id="ClientQtNetwork$(var.suffix)4.dll_1_5" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
             </Component>
             <Component>
-                <File Id="ClientQtOpenGL$(var.suffix)4.dll_1_5" Name="QtOpenGL$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtOpenGL$(var.suffix)4.dll" />
+                <File Id="ClientQtOpenGL$(var.suffix)4.dll_1_5" Name="QtOpenGL$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtOpenGL$(var.suffix)4.dll" />
             </Component>
             <Component>
-                <File Id="ClientQtXml$(var.suffix)4.dll_1_5" Name="QtXml$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
+                <File Id="ClientQtXml$(var.suffix)4.dll_1_5" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
             </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenAL_1_5" Directory="${installer.customization}_1_5_Dir">
             <Component>
-                <File Id="OpenAL32.dll_1_5" Name="OpenAL32-1.5.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
+                <File Id="OpenAL32.dll_1_5" Name="OpenAL32.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
             </Component>
             <Component>
-                <File Id="wrap_oal.dll_1_5" Name="wrap_oal-1.5.dll" Source="${libdir}/bin/${build.configuration}\wrap_oal.dll"/>
+                <File Id="wrap_oal.dll_1_5" Name="wrap_oal.dll" Source="${libdir}/bin/${build.configuration}\wrap_oal.dll"/>
             </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenSSL_1_5" Directory="${installer.customization}_1_5_Dir">
             <Component>
-                <File Id="Clientlibeay32.dll_1_5" Name="libeay32-1.5.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
+                <File Id="Clientlibeay32.dll_1_5" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
             </Component>
             <Component>
-                <File Id="Clientssleay32.dll_1_5" Name="ssleay32-1.5.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
+                <File Id="Clientssleay32.dll_1_5" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
             </Component>
         </ComponentGroup>            
         
@@ -1415,6 +1419,7 @@
             <ComponentGroupRef Id="ImageFormats_1_5" />
             <ComponentGroupRef Id="ClientOpenAL_1_5" />
             <ComponentGroupRef Id="ClientOpenSSL_1_5" />
+            <ComponentRef Id="ClientQjson_1_5"/>
             <ComponentRef Id="ClientSigar_1_5"/>            
             <ComponentRef Id="ClientQtColorPicker_1_5"/>
             <ComponentRef Id="bespin_1_5" />             
