@@ -261,6 +261,7 @@
                                         <argument>ClientHelp.wxs</argument>
                                         <argument>ClientVox.wxs</argument>
                                         <argument>AppServerDlg.wxs</argument> 
+                                        <argument>Client.wxs</argument> 
                                     </arguments>
                                 </configuration>                    
                             </execution>
