@@ -1,4 +1,9 @@
------------------------------------------------ 1.5.2 (1.6 beta-2) ---------------------------------------------
+----------------------------------------------- 1.6-RC ---------------------------------------------
+
+Since 1.5.1
+If uninstall EC ports are busy for a white so if reinstall it the ports will change
+
+----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
 Since 1.5.1
  - If trying to add an existing camera manually the software used to reply "No cameras found". Now it displays such cameras 
