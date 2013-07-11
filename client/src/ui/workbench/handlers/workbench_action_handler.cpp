@@ -671,7 +671,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
         QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
         int button = QMessageBox::warning(mainWindow(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
-        if (button == QMessageBox::Retry){
+        if (button == QMessageBox::Retry) {
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
         } else {
@@ -2040,10 +2040,11 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(mainWindow());
         newlyCreated = true;
 
-        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
-        connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
-        connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
-        connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
+        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),        this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+        connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)),  this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
+        connect(cameraSettingsDialog(), SIGNAL(rejected()),                                             this, SLOT(at_cameraSettingsDialog_rejected()));
+        connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                               this, SLOT(at_cameraSettingsDialog_advancedSettingChanged()));
+        connect(cameraSettingsDialog(), SIGNAL(cameraOpenRequested()),                                  this, SLOT(at_cameraSettingsDialog_cameraOpenRequested()));
     }
 
     if(cameraSettingsDialog()->widget()->resources() != resources) {
@@ -2112,6 +2113,14 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
     }
 }
 
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraOpenRequested() {
+    QnResourceList resources = cameraSettingsDialog()->widget()->resources();
+    menu()->trigger(Qn::OpenInNewLayoutAction, resources);
+
+    cameraSettingsDialog()->widget()->setResources(resources);
+    m_selectionUpdatePending = false;
+}
+
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras){
     connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
 }
@@ -2120,7 +2129,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_rejected() {
     cameraSettingsDialog()->widget()->updateFromResources();
 }
 
-void QnWorkbenchActionHandler::at_cameraSettingsAdvanced_changed() {
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_advancedSettingChanged() {
     if(!cameraSettingsDialog())
         return;
 

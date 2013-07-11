@@ -68,12 +68,14 @@ public:
     bool isValidMotionRegion();
 
     void setExportScheduleButtonEnabled(bool enabled);
+
 signals:
     void hasChangesChanged();
     void modeChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
+    void resourcesChanged();
 
 protected slots:
     void at_moreLicensesRequested();
