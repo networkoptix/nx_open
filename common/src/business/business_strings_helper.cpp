@@ -17,48 +17,47 @@ QString QnBusinessStringsHelper::eventName(BusinessEventType::Value value) {
 }
 
 QString QnBusinessStringsHelper::shortEventDescription(const QnBusinessEventParameters &params) {
-
     BusinessEventType::Value eventType = params.getEventType();
     QString resourceName = resourceUrl(params);
     switch (eventType) {
     case BusinessEventType::NotDefined:
-        return QObject::tr("Undefined event has occured");
+        return tr("Undefined event has occured");
 
     case BusinessEventType::Camera_Disconnect:
-        return QObject::tr("Camera %1 was disconnected").arg(resourceName);
+        return tr("Camera %1 was disconnected").arg(resourceName);
 
     case BusinessEventType::Camera_Input:
-        return QObject::tr("Input on %1").arg(resourceName);
+        return tr("Input on %1").arg(resourceName);
 
     case BusinessEventType::Camera_Motion:
-        return QObject::tr("Motion on %1").arg(resourceName);
+        return tr("Motion on %1").arg(resourceName);
 
     case BusinessEventType::Storage_Failure:
-        return QObject::tr("Storage Failure at \"%1\"").arg(resourceName);
+        return tr("Storage Failure at %1").arg(resourceName);
 
     case BusinessEventType::Network_Issue:
-        return QObject::tr("Network Issue at %1").arg(resourceName);
+        return tr("Network Issue at %1").arg(resourceName);
 
     case BusinessEventType::MediaServer_Failure:
-        return QObject::tr("Media Server \"%1\" Failure").arg(resourceName);
+        return tr("Media Server \"%1\" Failure").arg(resourceName);
 
     case BusinessEventType::Camera_Ip_Conflict:
-        return QObject::tr("Camera IP Conflict at \"%1\"").arg(resourceName);
+        return tr("Camera IP Conflict at %1").arg(resourceName);
 
     case BusinessEventType::MediaServer_Conflict:
-        return QObject::tr("Media Server \"%1\" Conflict").arg(resourceName);
+        return tr("Media Server \"%1\" Conflict").arg(resourceName);
 
     default:
         break;
     }
-    return QObject::tr("Unknown Event has occured");
+    return tr("Unknown Event has occured");
 }
 
 QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr &action,
                                                   const QnBusinessAggregationInfo& aggregationInfo) {
     BusinessEventType::Value eventType = action->getRuntimeParams().getEventType();
     QString resourceName = resourceUrl(action->getRuntimeParams());
-    QString serverName = QObject::tr("%1 Server").arg(QLatin1String(VER_COMPANYNAME_STR));
+    QString serverName = tr("%1 Server").arg(QLatin1String(VER_COMPANYNAME_STR));
     int issueCount = qMax(aggregationInfo.totalCount(), 1);
 
     switch (eventType) {
@@ -73,15 +72,14 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
             .arg(serverName)
             .arg(resourceName);
     case BusinessEventType::Camera_Motion:
-        return QObject::tr("%1 has detected motion on camera %2")
+        return tr("%1 has detected motion on camera %2")
             .arg(serverName)
             .arg(resourceName);
     case BusinessEventType::Storage_Failure:
-        return tr("%1 \"%2\" has detected %n storage issues", "", issueCount)
-            .arg(serverName)
+        return tr("%1 has detected %n storage issue(s)", "", issueCount)
             .arg(resourceName);
     case BusinessEventType::Network_Issue:
-        return tr("%1 has experienced %n network issues with camera %2", "", issueCount)
+        return tr("%1 has experienced %n network issue(s) with camera %2", "", issueCount)
             .arg(serverName)
             .arg(resourceName);
     case BusinessEventType::MediaServer_Failure:
@@ -93,8 +91,7 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
             .arg(serverName)
             .arg(resourceName);
     case BusinessEventType::MediaServer_Conflict:
-        return tr("%1 \"%2\" is conflicting with other server")
-            .arg(serverName)
+        return tr("%1 is conflicting with other server")
             .arg(resourceName);
     default:
         if (eventType >= BusinessEventType::UserDefined)
@@ -115,14 +112,13 @@ QString QnBusinessStringsHelper::timestampString(const QnBusinessEventParameters
     QString result;
     int count = qMax(aggregationCount, 1);
     if (count == 1)
-        result = QObject::tr("at %1 on %2", "%1 means time, %2 means date")
-        .arg(time.time().toString())
-        .arg(time.date().toString());
+        return tr("at %1 on %2", "%1 means time, %2 means date")
+            .arg(time.time().toString())
+            .arg(time.date().toString());
     else
-        result = QObject::tr("%n times, first time at %1 on %2", "%1 means time, %2 means date", count)
-        .arg(time.time().toString())
-        .arg(time.date().toString());
-    return result;
+        return tr("%n times, first time at %1 on %2", "%1 means time, %2 means date", count)
+            .arg(time.time().toString())
+            .arg(time.date().toString());
 }
 
 QString QnBusinessStringsHelper::resourceUrl(const QnBusinessEventParameters &params) {
@@ -145,14 +141,14 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
             break;
         case QnBusiness::NetworkIssueConnectionClosed:
             if (eventType == BusinessEventType::Network_Issue)
-                result = QString(tr("Connection to camera was unexpectedly closed"));
+                result = QString(tr("Connection to camera was unexpectedly closed."));
             break;
         case QnBusiness::NetworkIssueRtpPacketLoss:
             if (eventType == BusinessEventType::Network_Issue) {
                 QStringList seqs = reasonText.split(QLatin1Char(';'));
                 if (seqs.size() != 2)
                     break;
-                result = QString(tr("RTP packet loss detected. Prev seq.=%1 next seq.=%2")).arg(seqs[0]).arg(seqs[1]);
+                result = QString(tr("RTP packet loss detected. Prev seq.=%1 next seq.=%2.")).arg(seqs[0]).arg(seqs[1]);
             }
             break;
         case QnBusiness::MServerIssueTerminated:
@@ -165,7 +161,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
             break;
         case QnBusiness::StorageIssueIoError:
             if (eventType == BusinessEventType::Storage_Failure)
-                result = QString(tr("I/O Error occured at %1").arg(reasonText));
+                result = QString(tr("I/O Error occured at %1.").arg(reasonText));
             break;
         case QnBusiness::StorageIssueNotEnoughSpeed:
             if (eventType == BusinessEventType::Storage_Failure)
@@ -273,7 +269,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
 QString QnBusinessStringsHelper::conflictString(const QnBusinessEventParameters &params) {
     QStringList conflicts = params.getConflicts();
 
-    QString result = QObject::tr("%1 conflicted with: ").arg(params.getSource());
+    QString result = tr("%1 conflicted with: ").arg(params.getSource());
     for (int i = 0; i < conflicts.size(); ++i) {
         if (i > 0)
             result += lit(", ");
@@ -294,7 +290,7 @@ QString QnBusinessStringsHelper::eventParamsString(BusinessEventType::Value even
     case BusinessEventType::Camera_Motion:
         break;
     case BusinessEventType::Camera_Input:
-        result = QObject::tr("Input port: %1").arg(params.getInputPortId());
+        result = tr("Input port: %1").arg(params.getInputPortId());
         break;
     case BusinessEventType::Storage_Failure:
     case BusinessEventType::Network_Issue:
