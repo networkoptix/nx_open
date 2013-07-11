@@ -158,6 +158,8 @@ public:
     void reallocate(int newWidth, int newHeight, int format);
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
     void memZerro();
+
+    void copyDataFrom(const AVFrame* frame);
 public:
     int flags;
 

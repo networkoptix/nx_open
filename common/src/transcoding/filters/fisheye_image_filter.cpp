@@ -88,7 +88,10 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
         }
         m_lastImageSize = imageSize;
         m_lastImageFormat = frame->format;
+        m_tmpBuffer.reallocate(frame->width, frame->height, frame->format);
     }
+
+    m_tmpBuffer.copyDataFrom(frame);
 
     for (int plane = 0; plane < descr->nb_components && frame->data[plane]; ++plane)
     {
@@ -102,12 +105,12 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
 
         for (int y = 0; y < h; ++y)
         {
-            quint8* srcLine = frame->data[plane] + y*frame->linesize[plane];
+            quint8* dstLine = frame->data[plane] + y*frame->linesize[plane];
             for (int x = 0; x < w; ++x)
             {
                 const QPointF* dstPixel = m_transform[plane] + index;
-                quint8 pixel = GetPixelSSE3(frame->data[plane], frame->linesize[plane], dstPixel->x(), dstPixel->y());
-                srcLine[x] = pixel;
+                quint8 pixel = GetPixelSSE3(m_tmpBuffer.data[plane], m_tmpBuffer.linesize[plane], dstPixel->x(), dstPixel->y());
+                dstLine[x] = pixel;
                 
                 index++;
             }

@@ -18,6 +18,7 @@ private:
     DevorpingParams m_params;
     QSize m_lastImageSize;
     QPointF* m_transform[MAX_COLOR_PLANES];
+    CLVideoDecoderOutput m_tmpBuffer;
     int m_lastImageFormat;
 };
 

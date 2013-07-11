@@ -307,3 +307,19 @@ bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
 {
     return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
 }
+
+void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
+{
+    Q_ASSERT(width == frame->width);
+    Q_ASSERT(height == frame->height);
+    Q_ASSERT(format == frame->format);
+
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+    {
+        int h = height;
+        if (i > 0)
+            h >>= descr->log2_chroma_h;
+        copyPlane(data[i], frame->data[i], width, linesize[i], frame->linesize[i], h);
+    }
+}
