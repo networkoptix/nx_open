@@ -1,5 +1,5 @@
-
 #include "event_log_dialog.h"
+#include "ui_event_log_dialog.h"
 
 #include <QClipboard>
 #include <QMenu>
@@ -7,7 +7,6 @@
 #include <QtGui/QMouseEvent>
 #include <QMimeData>
 
-#include "ui_event_log_dialog.h"
 #include "ui/models/event_log_model.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource_managment/resource_pool.h"
@@ -24,6 +23,7 @@
 #include "ui/models/business_rules_actual_model.h"
 #include "utils/common/event_processors.h"
 #include "custom_file_dialog.h"
+#include "ui/common/grid_widget_helper.h"
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -52,12 +52,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
 
-    /*
-    for (int i = 0; i < (int) QnEventLogModel::ActionCameraColumn; ++i)
-        headers->setResizeMode(i, QHeaderView::Fixed);
-    for (int i = (int) QnEventLogModel::ActionCameraColumn; i < columns.size(); ++i)
-        headers->setResizeMode(i, QHeaderView::ResizeToContents);
-    */
     headers->setResizeMode(QHeaderView::Fixed);
 
     QStandardItem* rootItem = createEventTree(0, BusinessEventType::AnyBusinessEvent);
@@ -71,12 +65,14 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         actionItems << BusinessActionType::toString(BusinessActionType::Value(i));
     ui->actionComboBox->addItems(actionItems);
 
-    m_filterAction      = new QAction(tr("Filter similar rows"), this);
+    m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
     m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
-    m_clipboardAction   = new QAction(tr("Copy selection to clipboard"), this);
-    m_exportAction      = new QAction(tr("Export selection to file"), this);
+    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File"), this);
+    m_selectAllAction   = new QAction(tr("Select All"), this);
+    m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
-    m_resetFilterAction = new QAction(tr("Clear filter"), this);
+    m_resetFilterAction = new QAction(tr("Clear Filter"), this);
     m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R);
 
     QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
@@ -98,6 +94,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(m_resetFilterAction,    SIGNAL(triggered()),                this, SLOT(at_resetFilterAction()));
     connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));
     connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
+    connect(m_selectAllAction,      SIGNAL(triggered()),                this, SLOT(at_selectAllAction()));
 
     connect(ui->dateEditFrom,       SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
     connect(ui->dateEditTo,         SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
@@ -157,14 +154,23 @@ void QnEventLogDialog::updateData()
         m_dirty = true;
         return;
     }
+    m_updateDisabled = true;
 
-    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
     BusinessEventType::Value eventType = BusinessEventType::NotDefined;
 
     QModelIndex idx = ui->eventComboBox->currentIndex();
     if (idx.isValid())
         eventType = (BusinessEventType::Value) ui->eventComboBox->model()->data(idx, Qn::FirstItemDataRole).toInt();
 
+    bool serverIssue = BusinessEventType::parentEvent(eventType) == BusinessEventType::AnyServerIssue || eventType == BusinessEventType::AnyServerIssue;
+    ui->cameraButton->setEnabled(!serverIssue);
+    if (serverIssue)
+        setCameraList(QnResourceList());
+
+    bool istantOnly = !BusinessEventType::hasToggleState(eventType) && eventType != BusinessEventType::NotDefined;
+    updateActionList(istantOnly);
+
+    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
     if (ui->actionComboBox->currentIndex() > 0)
         actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
@@ -193,6 +199,9 @@ void QnEventLogDialog::updateData()
 
     ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
     ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date());
+
+    m_updateDisabled = false;
+    m_dirty = false;
 }
 
 QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
@@ -406,6 +415,15 @@ QString QnEventLogDialog::getTextForNCameras(int n) const
         return tr("< %1 cameras >").arg(n);
 }
 
+void QnEventLogDialog::setDateRange(const QDate& from, const QDate& to)
+{
+    ui->dateEditFrom->setDateRange(QDate(2000,1,1), to);
+    ui->dateEditTo->setDateRange(from, QDateTime::currentDateTime().date());
+
+    ui->dateEditTo->setDate(to);
+    ui->dateEditFrom->setDate(from);
+}
+
 void QnEventLogDialog::setCameraList(QnResourceList resList)
 {
     if (resList.size() == m_filterCameraList.size())
@@ -491,151 +509,28 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
 
     menu->addSeparator();
 
-    menu->addAction(m_clipboardAction);
+    menu->addAction(m_selectAllAction);
     menu->addAction(m_exportAction);
+    menu->addAction(m_clipboardAction);
 
     menu->exec(QCursor::pos());
     menu->deleteLater();
 }
 
+void QnEventLogDialog::at_selectAllAction()
+{
+    ui->gridEvents->selectAll();
+}
+
 void QnEventLogDialog::at_exportAction()
 {
-    QString previousDir = qnSettings->lastExportDir();
-    if (previousDir.isEmpty())
-        previousDir = qnSettings->mediaFolder();
-    QString fileName;
-    while (true) 
-    {
-
-        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-            mainWindow(),
-            tr("Export selected events to file"),
-            previousDir,
-            tr("HTML file (*.html);;CSV file (*.csv)")
-            ));
-        dialog->setFileMode(QFileDialog::AnyFile);
-        dialog->setAcceptMode(QFileDialog::AcceptSave);
-
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
-            return;
-
-        fileName = dialog->selectedFiles().value(0);
-        QString selectedFilter = dialog->selectedNameFilter();
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-
-        if (fileName.isEmpty())
-            return;
-
-        if (!fileName.toLower().endsWith(selectedExtension)) {
-            fileName += selectedExtension;
-
-            if (QFile::exists(fileName)) {
-                QMessageBox::StandardButton button = QMessageBox::information(
-                    mainWindow(),
-                    tr("Save As"),
-                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                    );
-
-                if(button == QMessageBox::Cancel || button == QMessageBox::No)
-                    return;
-            }
-        }
-
-        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-            QMessageBox::critical(
-                mainWindow(),
-                tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
-                QMessageBox::Ok
-                );
-            continue;
-        }
-
-        break;
-    }
-    qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
-
-
-    QString textData;
-    QString htmlData;
-    processGrid(textData, htmlData, QLatin1Char(L';'));
-
-    QFile f(fileName);
-    if (f.open(QFile::WriteOnly))
-    {
-        if (fileName.endsWith(lit(".html")) || fileName.endsWith(lit(".htm")))
-            f.write(htmlData.toUtf8());
-        else
-            f.write(textData.toUtf8());
-    }
+    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents);
 }
 
 void QnEventLogDialog::at_copyToClipboard()
 {
-    QString textData;
-    QString htmlData;
-    processGrid(textData, htmlData, QLatin1Char(L'\t'));
-
-    QMimeData* mimeData = new QMimeData();
-    mimeData->setText(textData);
-    mimeData->setHtml(htmlData);
-    QApplication::clipboard()->setMimeData(mimeData);
+    QnGridWidgetHelper(context()).copyToClipboard(ui->gridEvents);
 }
-
-void QnEventLogDialog::processGrid(QString& textData, QString& htmlData, const QLatin1Char& textDelimiter)
-{
-    QAbstractItemModel *model = ui->gridEvents->model();
-    QModelIndexList list = ui->gridEvents->selectionModel()->selectedIndexes();
-    if(list.isEmpty())
-        return;
-
-    qSort(list);
-
-    htmlData.append(lit("<html>\n"));
-    htmlData.append(lit("<body>\n"));
-    htmlData.append(lit("<table>\n"));
-
-    htmlData.append(lit("<tr>"));
-    for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
-    {
-        if (i > 0)
-            textData.append(textDelimiter);
-        QString header = model->headerData(list[i].column(), Qt::Horizontal).toString();
-        htmlData.append(lit("<th>"));
-        htmlData.append(header);
-        htmlData.append(lit("</th>"));
-        textData.append(header);
-    }
-    htmlData.append(lit("</tr>"));
-
-    int prevRow = -1;
-    for(int i = 0; i < list.size(); ++i)
-    {
-        if(list[i].row() != prevRow) {
-            prevRow = list[i].row();
-            textData.append(lit('\n'));
-            if (i > 0)
-                htmlData.append(lit("</tr>"));
-            htmlData.append(lit("<tr>"));
-        }
-        else {
-            textData.append(textDelimiter);
-        }
-
-        htmlData.append(lit("<td>"));
-        htmlData.append(model->data(list[i], Qn::DisplayHtmlRole).toString());
-        htmlData.append(lit("</td>"));
-
-        textData.append(model->data(list[i]).toString());
-    }
-    htmlData.append(lit("</tr>\n"));
-    htmlData.append(lit("</table>\n"));
-    htmlData.append(lit("</body>\n"));
-    htmlData.append(lit("</html>\n"));
-    textData.append(lit('\n'));
-}
-
 
 void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
 {
@@ -673,4 +568,19 @@ void QnEventLogDialog::setVisible(bool value)
     if (value && !isVisible())
         updateData();
     QDialog::setVisible(value);
+}
+
+void QnEventLogDialog::updateActionList(bool instantOnly)
+{
+    QStandardItemModel* model = dynamic_cast<QStandardItemModel*> (ui->actionComboBox->model());
+    for (int i = 0; i < (int) BusinessActionType::NotDefined; ++i) 
+    {
+        BusinessActionType::Value actionType = BusinessActionType::Value(i);
+        QModelIndex index = model->index(i+1, 0);
+        QStandardItem* item = model->itemFromIndex(index);
+        bool enabled = !instantOnly || !BusinessActionType::hasToggleState(actionType);
+        item->setEnabled(enabled);
+        if (ui->actionComboBox->currentIndex() == i+1 && !enabled)
+            ui->actionComboBox->setCurrentIndex(0);
+    }
 }

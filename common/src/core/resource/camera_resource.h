@@ -52,32 +52,13 @@ public:
     void deserialize(const QnResourceParameters& parameters);
 
     QString toSearchString() const override;
+
 public slots:
     void issueOccured();
     void noCameraIssues();
+
 protected:
     void save();
-// -------------------------------------------------------------------------- //
-// Begin QnSecurityCamResource metaobject support
-// -------------------------------------------------------------------------- //
-    /* These are copied from QnSecurityCamResource. For metaobject system to work
-     * correctly, no signals/slots must be declared before these ones. */
-public slots:
-    virtual void inputPortListenerAttached() override { QnSecurityCamResource::inputPortListenerAttached(); }
-    virtual void inputPortListenerDetached() override { QnSecurityCamResource::inputPortListenerDetached(); }
-
-    virtual void recordingEventAttached() override { QnSecurityCamResource::recordingEventAttached(); }
-    virtual void recordingEventDetached() override { QnSecurityCamResource::recordingEventDetached(); }
-
-signals:
-    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
-    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
-
-protected slots:
-    virtual void at_disabledChanged() override { QnSecurityCamResource::at_disabledChanged(); }
-// -------------------------------------------------------------------------- //
-// End QnSecurityCamResource metaobject support
-// -------------------------------------------------------------------------- //
 
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);

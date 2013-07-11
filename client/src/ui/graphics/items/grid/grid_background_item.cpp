@@ -247,19 +247,32 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
     } //TODO: #GDM limit image mem cache size
 
 #ifdef NATIVE_PAINT_BACKGROUND
+    const QImage* imgToLoad = NULL;
+    std::auto_ptr<QImage> tempImgAp;
+    if( image.format() != QImage::Format_ARGB32 )
+    {
+        tempImgAp.reset( new QImage() );
+        *tempImgAp = image.convertToFormat( QImage::Format_ARGB32 );
+        imgToLoad = tempImgAp.get();
+    }
+    else
+    {
+        imgToLoad = &image;
+    }
+
     //converting image to YUV format
     m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
 
     //adding stride to source data
     //TODO: #ak it is possible to remove this copying and optimize loading by using ffmpeg to load picture files
-    const unsigned int requiredImgXStride = qPower2Ceil( (unsigned int)image.width()*4, X_STRIDE_FOR_SSE_CONVERT_UTILS );
-    quint8* alignedImgBuffer = (quint8*)qMallocAligned( requiredImgXStride*image.height(), X_STRIDE_FOR_SSE_CONVERT_UTILS );
+    const unsigned int requiredImgXStride = qPower2Ceil( (unsigned int)imgToLoad->width()*4, X_STRIDE_FOR_SSE_CONVERT_UTILS );
+    quint8* alignedImgBuffer = (quint8*)qMallocAligned( requiredImgXStride*imgToLoad->height(), X_STRIDE_FOR_SSE_CONVERT_UTILS );
     //copying image data to aligned buffer
-    for( int y = 0; y < image.height(); ++y )
-        memcpy( alignedImgBuffer + requiredImgXStride*y, image.constScanLine(y), image.width()*image.depth()/8 );
+    for( int y = 0; y < imgToLoad->height(); ++y )
+        memcpy( alignedImgBuffer + requiredImgXStride*y, imgToLoad->constScanLine(y), imgToLoad->width()*imgToLoad->depth()/8 );
 
 #ifdef USE_YUVA420
-    m_imgAsFrame->reallocate( image.width(), image.height(), PIX_FMT_YUVA420P );
+    m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), PIX_FMT_YUVA420P );
     bgra_to_yva12_sse2_intr(
         alignedImgBuffer,
         requiredImgXStride,
@@ -270,11 +283,11 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
         m_imgAsFrame->linesize[0],
         m_imgAsFrame->linesize[1],
         m_imgAsFrame->linesize[3],
-        image.width(),
-        image.height(),
+        imgToLoad->width(),
+        imgToLoad->height(),
         false );
 #else
-    m_imgAsFrame->reallocate( image.width(), image.height(), PIX_FMT_YUV420P );
+    m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), PIX_FMT_YUV420P );
     bgra_to_yv12_sse2_intr(
         alignedImgBuffer,
         requiredImgXStride,
@@ -283,8 +296,8 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
         m_imgAsFrame->data[2],
         m_imgAsFrame->linesize[0],
         m_imgAsFrame->linesize[1],
-        image.width(),
-        image.height(),
+        imgToLoad->width(),
+        imgToLoad->height(),
         false );
 #endif
 

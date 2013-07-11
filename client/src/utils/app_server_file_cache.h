@@ -38,8 +38,14 @@ protected:
     QString folderName() const;
 signals:
     void fileDownloaded(const QString& filename, bool ok);
+    void delayedFileDownloaded(const QString& filename, bool ok);
+
     void fileUploaded(const QString& filename, bool ok);
+    void delayedFileUploaded(const QString& filename, bool ok);
+
     void fileDeleted(const QString& filename, bool ok);
+    void delayedFileDeleted(const QString& filename, bool ok);
+
     void fileListReceived(const QStringList& filenames, bool ok);
 private slots:
     void at_fileLoaded(int status, const QByteArray& data, int handle);

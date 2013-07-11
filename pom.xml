@@ -36,9 +36,9 @@
         <license.environment>production</license.environment>
 
         <root.dir>${basedir}</root.dir>
+        <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>		                                  	
         <libdir>${root.dir}/build_environment/target</libdir>
         <customization.dir>${basedir}/customization</customization.dir>
-        <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
         <ClientVoxSourceDir>${libdir}/bin/${build.configuration}/vox</ClientVoxSourceDir>		                                  	
         <unpack.skip>false</unpack.skip>
         <ffmpeg.version>N-39672-g40b7a27-faac-1.5.2-SNAPSHOT</ffmpeg.version>
@@ -263,7 +263,7 @@
             </modules>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <python.dir>/usr/bin/</python.dir>				
+                <python.dir>${env.environment}/python/bin/</python.dir>				
                 <qt.dir/>
                 <platform>macosx</platform>
                 <compiler>gcc</compiler>

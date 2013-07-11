@@ -2,9 +2,8 @@
 * 29 nov 2012
 * a.kolesnikov
 ***********************************************************/
-
-#ifndef PANICBUSINESSACTION_H
-#define PANICMAILBUSINESSACTION_H
+#ifndef QN_PANIC_BUSINESS_ACTION_H
+#define QN_PANIC_BUSINESS_ACTION_H
 
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
@@ -16,10 +15,6 @@ class QnPanicBusinessAction: public QnAbstractBusinessAction
     typedef QnAbstractBusinessAction base_type;
 public:
     explicit QnPanicBusinessAction(const QnBusinessEventParameters &runtimeParams);
-
-private:
 };
 
-typedef QSharedPointer<QnPanicBusinessAction> QnPanicBusinessActionPtr; // TODO: #Elric move to _fwd header
-
-#endif  //PANICBUSINESSACTION_H
+#endif  //QN_PANIC_BUSINESS_ACTION_H

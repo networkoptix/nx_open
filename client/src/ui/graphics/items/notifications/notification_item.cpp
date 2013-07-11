@@ -6,18 +6,21 @@
 #include <QtGui/QGraphicsLinearLayout>
 
 #include <utils/math/color_transformations.h>
+#include <utils/image_provider.h>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/processors/hover_processor.h>
+#include <ui/style/skin.h>
+#include <ui/style/globals.h>
 
 namespace {
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
     const qreal margin = 4.0;
-    const qreal colorSignSize = 16.0; // TODO: #Elric real color size is 12px (calculated froim screenshot)
+    const qreal colorSignSize = 8.0;
     const qreal buttonSize = 16.0;
 } // anonymous namespace
 
@@ -40,18 +43,28 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     updateTailPos();
 }
 
-void QnNotificationToolTipWidget::setThumbnail(const QImage &image) {
-    if (!m_thumbnailLabel) {
-        m_thumbnailLabel = new QnProxyLabel(this);
-        m_thumbnailLabel->setAlignment(Qt::AlignCenter);
-        setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
-        QGraphicsLinearLayout *layout = dynamic_cast<QGraphicsLinearLayout*>(this->layout());
-        if (!layout)
-            return;
-        layout->insertItem(0, m_thumbnailLabel);
-    }
+void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
+    if (m_thumbnailLabel || !provider)
+        return;
 
-    m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
+    QGraphicsLinearLayout *layout = dynamic_cast<QGraphicsLinearLayout*>(this->layout());
+    if (!layout)
+        return;
+
+    m_thumbnailLabel = new QnClickableProxyLabel(this);
+    m_thumbnailLabel->setAlignment(Qt::AlignCenter);
+    m_thumbnailLabel->setClickableButtons(Qt::LeftButton);
+    setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
+    layout->insertItem(0, m_thumbnailLabel);
+    connect(m_thumbnailLabel, SIGNAL(clicked()), this, SIGNAL(thumbnailClicked()));
+
+    if (!provider->image().isNull()) {
+        m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
+    } else {
+        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
+        connect(provider, SIGNAL(imageChanged(const QImage &)), this, SLOT(at_provider_imageChanged(const QImage &)));
+        provider->loadAsync();
+    }
 }
 
 void QnNotificationToolTipWidget::setText(const QString &text) {
@@ -83,6 +96,7 @@ void QnNotificationToolTipWidget::updateTailPos()  {
         setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.bottom())));
     else
         setTailPos(QPointF(qRound(rect.right() + 10.0), qRound((rect.top() + rect.bottom()) / 2)));
+    base_type::pointTo(m_pointTo);
 }
 
 void QnNotificationToolTipWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
@@ -96,14 +110,23 @@ void QnNotificationToolTipWidget::pointTo(const QPointF &pos) {
     updateTailPos();
 }
 
+void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) {
+    if (!m_thumbnailLabel)
+        return;
+    m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
+}
+
 
 /********** QnNotificationItem *********************/
 
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
+    m_defaultActionIdx(-1),
     m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
     m_textLabel(new QnProxyLabel(this)),
     m_color(Qt::transparent),
+    m_colorLevel(None),
+    m_imageProvider(NULL),
     m_tooltipWidget(new QnNotificationToolTipWidget(this)),
     m_hoverProcessor(new HoverFocusProcessor(this))
 {
@@ -115,7 +138,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_textLabel->setAlignment(Qt::AlignCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
-    m_layout->setContentsMargins(colorSignSize, margin, margin, margin);
+    m_layout->setContentsMargins(colorSignSize + margin, margin, margin, margin);
     m_layout->addItem(m_textLabel);
     m_layout->setStretchFactor(m_textLabel, 1.0);
 
@@ -125,10 +148,10 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_tooltipWidget->setOpacity(0.0);
     m_tooltipWidget->setAcceptHoverEvents(true);
     m_tooltipWidget->installEventFilter(this);
-    m_tooltipWidget->setFlag(ItemIgnoresParentOpacity, true);
+    m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
+    connect(m_tooltipWidget, SIGNAL(thumbnailClicked()), this, SLOT(at_thumbnail_clicked()));
     connect(m_tooltipWidget, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
     connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
-    connect(this, SIGNAL(imageChanged(QImage)), m_tooltipWidget, SLOT(setThumbnail(QImage)));
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
@@ -156,17 +179,41 @@ void QnNotificationItem::setTooltipText(const QString &text) {
     m_tooltipWidget->setText(text);
 }
 
+QnNotificationItem::ColorLevel QnNotificationItem::colorLevel() const {
+    return m_colorLevel;
+}
+
 QColor QnNotificationItem::color() const {
     return m_color;
 }
 
+void QnNotificationItem::setColorLevel(ColorLevel level) {
+    m_colorLevel = level;
+    switch (level) {
+    case None:
+        break;
+    case Common:
+        m_color = qnGlobals->notificationColorCommon();
+        break;
+    case Important:
+        m_color = qnGlobals->notificationColorImportant();
+        break;
+    case Critical:
+        m_color = qnGlobals->notificationColorCritical();
+        break;
+    case System:
+        m_color = qnGlobals->notificationColorSystem();
+        break;
+    }
+}
+
 void QnNotificationItem::setColor(const QColor &color) {
+    m_colorLevel = None;
     m_color = color;
 }
 
-void QnNotificationItem::setImage(const QImage &image) {
-    m_image = image;
-    emit imageChanged(image);
+void QnNotificationItem::setImageProvider(QnImageProvider* provider) {
+    m_imageProvider = provider;
 }
 
 void QnNotificationItem::setTooltipEnclosingRect(const QRectF &rect) {
@@ -174,23 +221,19 @@ void QnNotificationItem::setTooltipEnclosingRect(const QRectF &rect) {
 }
 
 void QnNotificationItem::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
-                                         const QnActionParameters &parameters,
-                                         const qreal sizeMultiplier, const bool isThumbnail) 
+                                         const QnActionParameters &parameters, bool defaultAction)
 {
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
-    
-    QnImageButtonWidget *button = NULL;
-    if (isThumbnail) {
-        button = new QnThumbnailImageButtonWidget(this);
-        connect(this, SIGNAL(imageChanged(QImage)), button, SLOT(setThumbnail(QImage)));
-    } else {
-        button = new QnImageButtonWidget(this);
-    }
+
+    QnImageButtonWidget *button = new QnImageButtonWidget(this);
+
     button->setIcon(icon);
     button->setToolTip(tooltip);
     button->setCached(true);
-    button->setFixedSize(buttonSize * sizeMultiplier);
+    button->setFixedSize(buttonSize);
     button->setProperty(actionIndexPropertyName, m_actions.size());
+    if (m_defaultActionIdx < 0 || defaultAction)
+        m_defaultActionIdx = m_actions.size();
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -211,10 +254,10 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
 
     QRectF rect = this->rect();
-    qreal side = qMin(qMin(rect.width(), rect.height()), colorSignSize) / 2.0;
+    qreal side = qMin(qMin(rect.width(), rect.height()) * 0.5, colorSignSize);
 
     qreal left = rect.left();
-    qreal xcenter = left + side * 0.5;
+    qreal xcenter = left + side;
 
     qreal ycenter = (rect.top() + rect.bottom()) / 2;
     qreal top = ycenter - side;
@@ -224,7 +267,8 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     QPainterPath path;
     path.moveTo(left, top);
     path.lineTo(xcenter, top);
-    path.arcTo(xcenter - side, ycenter - side, side * 2, side * 2, 90, -180);
+    path.lineTo(xcenter, bottom);
+    //path.arcTo(xcenter - side, ycenter - side, side * 2, side * 2, 90, -180);
     path.lineTo(left, bottom);
     path.closeSubpath();
 
@@ -236,6 +280,7 @@ void QnNotificationItem::hideToolTip() {
 }
 
 void QnNotificationItem::showToolTip() {
+    m_tooltipWidget->ensureThumbnail(m_imageProvider);
     opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
 }
 
@@ -257,6 +302,16 @@ void QnNotificationItem::at_button_clicked() {
     if (m_actions.size() <= idx)
         return;
     ActionData data = m_actions[idx];
+
+    emit actionTriggered(data.action, data.params);
+}
+
+void QnNotificationItem::at_thumbnail_clicked() {
+    if (m_defaultActionIdx < 0)
+        return;
+    if (m_actions.size() <= m_defaultActionIdx)
+        return;
+    ActionData data = m_actions[m_defaultActionIdx];
 
     emit actionTriggered(data.action, data.params);
 }

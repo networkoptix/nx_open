@@ -21,6 +21,7 @@ namespace {
         ((LicenseObject,            "license"))
         ((BusinessRuleObject,       "businessRule"))
         ((ConnectObject,            "connect"))
+        ((DisconnectObject,         "disconnect"))
         ((TimeObject,               "time"))
         ((EmailObject,              "email"))
         ((StatusObject,             "status"))
@@ -845,6 +846,11 @@ bool QnAppServerConnection::setPanicMode(QnMediaServerResource::PanicMode value)
     return QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(PanicObject), requestHeaders, requestParams, "", response);
 }
 
+void QnAppServerConnection::disconnectSync() {
+    QnHTTPRawResponse response;
+    QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(DisconnectObject), m_requestHeaders, m_requestParams, "", response);
+}
+
 int QnAppServerConnection::dumpDatabaseAsync(QObject *target, const char *slot) {
     return QnSessionManager::instance()->sendAsyncGetRequest(url(), nameMapper()->name(DumpDbObject), m_requestHeaders, m_requestParams, target, slot);
 }
@@ -898,6 +904,13 @@ void QnAppServerConnectionFactory::setCurrentVersion(const QString &version)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_currentVersion = version;
+    }
+}
+
+void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_publicUrl.setHost(publicIp);
     }
 }
 
@@ -955,6 +968,15 @@ QUrl QnAppServerConnectionFactory::defaultUrl()
     return QUrl();
 }
 
+QUrl QnAppServerConnectionFactory::publicUrl()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        return factory->m_publicUrl;
+    }
+
+    return QUrl();
+}
+
 void QnAppServerConnectionFactory::setAuthKey(const QString &authKey)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -976,6 +998,7 @@ void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
 
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_defaultUrl = url;
+        factory->m_publicUrl = url;
     }
 }
 

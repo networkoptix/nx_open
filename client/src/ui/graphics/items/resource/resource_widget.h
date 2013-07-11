@@ -290,6 +290,7 @@ signals:
 
 protected:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
+    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual bool windowFrameEvent(QEvent *event) override;
@@ -323,6 +324,9 @@ protected:
 
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
+
+    virtual QCursor calculateCursor() const;
+    Q_SLOT void updateCursor();
 
     int overlayWidgetIndex(QGraphicsWidget *widget) const;
     void updateOverlayWidgetsGeometry();

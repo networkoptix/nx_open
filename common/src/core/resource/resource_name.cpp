@@ -3,7 +3,6 @@
 #include <QHostAddress>
 
 #include <core/resource/resource.h>
-#include <client/client_settings.h>
 
 QString extractHost(const QString &url) {
     /* Try it as a host address first. */
@@ -15,17 +14,15 @@ QString extractHost(const QString &url) {
     return QUrl(url).host();
 }
 
-QString getResourceName(const QnResourcePtr& resource) {
+QString getFullResourceName(const QnResourcePtr &resource, bool showIp) {
     if (!resource)
         return QString();
 
     QnResource::Flags flags = resource->flags();
-    if (qnSettings->isIpShownInTree()) {
-        if((flags & QnResource::network) || (flags & QnResource::server && flags & QnResource::remote)) {
-            QString host = extractHost(resource->getUrl());
-            if(!host.isEmpty())
-                return QString(QLatin1String("%1 (%2)")).arg(resource->getName()).arg(host);
-        }
+    if (showIp && ((flags & QnResource::network) || (flags & QnResource::server && flags & QnResource::remote))) {
+        QString host = extractHost(resource->getUrl());
+        if(!host.isEmpty())
+            return QString(QLatin1String("%1 (%2)")).arg(resource->getName()).arg(host);
     }
     return resource->getName();
 }

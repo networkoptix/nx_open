@@ -1,5 +1,5 @@
-#include "advanced_settings_widget.h"
-#include "ui_advanced_settings_widget.h"
+#include "expert_settings_widget.h"
+#include "ui_expert_settings_widget.h"
 
 #include <ui/style/skin.h>
 #include "core/resource/resource_type.h"
@@ -99,20 +99,19 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
     bool sameControlState = true;
     QnSecondaryStreamQuality quality = cameras[0]->secondaryStreamQuality();
     bool controlState = cameras[0]->isCameraControlDisabled();
-    m_hasDualStreaming = true;
-    bool existDualStreaming = false;
+    m_hasDualStreaming = cameras[0]->hasDualStreaming();
     bool arecontCameraExists = false;
+    bool mixedDualStreaming = false;
     for (int i = 1; i < cameras.size(); ++i)
     {
         if (cameras[i]->secondaryStreamQuality() != quality)
             sameQuality = false;
         if (cameras[i]->isCameraControlDisabled() != controlState)
             sameControlState = false;
-
+        if (cameras[i]->hasDualStreaming() != m_hasDualStreaming)
+            mixedDualStreaming = true;
         if (!cameras[i]->hasDualStreaming())
             m_hasDualStreaming = false;
-        else
-            existDualStreaming = true;
         QnResourceTypePtr cameraType = qnResTypePool->getResourceType(cameras[i]->getTypeId());
         if (cameraType && cameraType->getManufacture() == lit("ArecontVision"))
             arecontCameraExists = true;
@@ -131,7 +130,6 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
 
     updateControlsState();
     m_disableUpdate = false;
-    bool mixedDualStreaming = !m_hasDualStreaming && existDualStreaming;
     ui->labelWarn->setVisible(mixedDualStreaming);
     ui->checkBoxDisableControl->setEnabled(!arecontCameraExists);
 }

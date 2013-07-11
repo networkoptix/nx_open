@@ -63,6 +63,13 @@ namespace {
     template<class T>
     const char *check_reply_type() { return NULL; }
 
+    const quint64 saneNetworkSpeed = 100ull*1000ull*1000ull*1000ull; //let it be 100 gigabits
+    qreal checkedNetworkSpeed(const quint64 bytesPerSec) {
+        return (bytesPerSec < saneNetworkSpeed)
+                ? static_cast<qreal>(bytesPerSec)
+                : -1;
+    }
+
 } // anonymous namespace
 
 
@@ -237,6 +244,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
             }
 
             QByteArray networkBlock = extractXmlBody(data, "network"), interfaceBlock; {
+                qDebug() << "network statistics" << networkBlock;
                 int from = 0;
                 do {
                     interfaceBlock = extractXmlBody(networkBlock, "interface", &from);
@@ -247,13 +255,13 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 
                     reply.statistics.append(QnStatisticsDataItem(
                                                 interfaceName + QChar(0x21e9),
-                                                extractXmlBody(interfaceBlock, "in").toDouble() * 8, //converting from bytes to bits
+                                                checkedNetworkSpeed(extractXmlBody(interfaceBlock, "in").toULongLong() * 8), //converting from bytes per sec to bits per sec
                                                 NETWORK_IN,
                                                 interfaceType
                     ));
                     reply.statistics.append(QnStatisticsDataItem(
                                                 interfaceName + QChar(0x21e7),
-                                                extractXmlBody(interfaceBlock, "out").toDouble() * 8, //converting from bytes to bits
+                                                checkedNetworkSpeed(extractXmlBody(interfaceBlock, "out").toULongLong() * 8), //converting from bytes per sec to bits per sec
                                                 NETWORK_OUT,
                                                 interfaceType
                     ));
@@ -346,7 +354,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
                 QString url = QLatin1String(extractXmlBody(resource, "url"));
                 QString name = QLatin1String(extractXmlBody(resource, "name"));
                 QString manufacture = QLatin1String(extractXmlBody(resource, "manufacturer"));
-                reply.append(QnCamerasFoundInfo(url, name, manufacture));
+                bool exists = QString(QLatin1String(extractXmlBody(resource, "exists"))).toInt();
+                reply.append(QnCamerasFoundInfo(url, name, manufacture, exists));
             } while (resource.length() > 0);
         } else {
             qnWarning("Camera search failed: %1.", extractXmlBody(response.data, "root"));

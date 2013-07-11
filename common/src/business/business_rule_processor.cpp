@@ -50,7 +50,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
-    QnResourceList resList = action->getResources().filtered<QnVirtualCameraResource>();
+    QnResourceList resList = action->getResources().filtered<QnNetworkResource>();
     if (resList.isEmpty()) {
         executeActionInternal(action, QnResourcePtr());
     }
@@ -115,6 +115,7 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     case BusinessActionType::ShowPopup:
     case BusinessActionType::PlaySound:
+    case BusinessActionType::SayText:
         return broadcastBusinessAction(action);
 
     default:

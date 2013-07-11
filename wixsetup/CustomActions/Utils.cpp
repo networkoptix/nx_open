@@ -86,9 +86,11 @@ int CopyDirectory(const CAtlString &refcstrSourceDirectory,
 
   strPattern = refcstrSourceDirectory + "\\*";
 
-  // Create destination directory
-  if(::CreateDirectory(refcstrDestinationDirectory, 0) == FALSE)
-    return ::GetLastError();
+  // Create destination directory if not exists
+  if (GetFileAttributes(refcstrDestinationDirectory) == INVALID_FILE_ATTRIBUTES) {
+      if(::SHCreateDirectoryEx(0, refcstrDestinationDirectory, 0) != ERROR_SUCCESS)
+        return ::GetLastError();
+  }
 
   hFile = ::FindFirstFile(strPattern, &FileInformation);
   if(hFile != INVALID_HANDLE_VALUE)
@@ -126,7 +128,7 @@ int CopyDirectory(const CAtlString &refcstrSourceDirectory,
   return 0;
 }
 
-UINT CopyProfile(MSIHANDLE hInstall, const char* actionName) {
+UINT CopyProfile(MSIHANDLE hInstall, const char* actionName, BOOL verifyDestFolderExists) {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
@@ -151,9 +153,11 @@ UINT CopyProfile(MSIHANDLE hInstall, const char* actionName) {
     if (GetFileAttributes(fromFolder) == INVALID_FILE_ATTRIBUTES)
         goto LExit;
 
-    // Exit if "to" folder is already exists
-    if (GetFileAttributes(toFolder) != INVALID_FILE_ATTRIBUTES)
-        goto LExit;
+    if (verifyDestFolderExists) {
+        // Exit if "to" folder is already exists
+        if (GetFileAttributes(toFolder) != INVALID_FILE_ATTRIBUTES)
+            goto LExit;
+    }
 
     CopyDirectory(fromFolder, toFolder);
 

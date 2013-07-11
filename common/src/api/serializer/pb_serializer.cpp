@@ -484,6 +484,7 @@ int serializeBusinessActionType(BusinessActionType::Value value) {
     case BusinessActionType::Alert:                 return pb::Alert;
     case BusinessActionType::ShowPopup:             return pb::ShowPopup;
     case BusinessActionType::PlaySound:             return pb::PlaySound;
+    case BusinessActionType::SayText:               return pb::SayText;
     }
     return pb::NotDefinedAction;
 }
@@ -641,6 +642,7 @@ BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     case pb::Alert:                 return BusinessActionType::Alert;
     case pb::ShowPopup:             return BusinessActionType::ShowPopup;
     case pb::PlaySound:             return BusinessActionType::PlaySound;
+    case pb::SayText:               return BusinessActionType::SayText;
     }
     return BusinessActionType::NotDefined;
 }
@@ -773,6 +775,7 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
     }
     connectInfo->proxyPort = pb_connectInfo.proxyport();
     connectInfo->ecsGuid = QString::fromUtf8(pb_connectInfo.ecsguid().c_str());
+    connectInfo->publicIp = QString::fromUtf8(pb_connectInfo.publicip().c_str());
 }
 
 void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRuleList &businessRules, const QByteArray &data)

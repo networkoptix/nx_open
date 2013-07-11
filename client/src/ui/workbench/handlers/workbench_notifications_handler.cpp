@@ -81,7 +81,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
         return;
     }
 
-    if (!(m_showBusinessEventsHelper->value() & (1 << eventType))) {
+    if (!(m_showBusinessEventsHelper->value() & (1ull << eventType))) {
         qDebug() << "popup received, ignoring" << BusinessEventType::toString(eventType);
         return;
     }
@@ -99,7 +99,7 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
 }
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource) {
-    if (!(qnSettings->popupSystemHealth() & (1 << message)))
+    if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
     emit systemHealthEventAdded(message, resource);
 }
@@ -159,7 +159,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
     }
 
     /* Checking that we want to see this message */
-    bool canShow = qnSettings->popupSystemHealth() & (1 << message);
+    bool canShow = qnSettings->popupSystemHealth() & (1ull << message);
 
     if (visible && canShow)
         emit systemHealthEventAdded(message, resource);
@@ -206,7 +206,7 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
         return;
     quint64 visible = qnSettings->popupSystemHealth();
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
-        if (visible & (1 << i))
+        if (visible & (1ull << i))
             continue;
         QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
         emit systemHealthEventRemoved(message, QnResourcePtr());

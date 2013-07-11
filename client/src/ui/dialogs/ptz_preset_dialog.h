@@ -10,7 +10,7 @@ namespace Ui {
 }
 
 class QnPtzPresetDialog: public QnButtonBoxDialog {
-    Q_OBJECT
+    Q_OBJECT;
     typedef QnButtonBoxDialog base_type;
 
 public:
@@ -20,23 +20,20 @@ public:
     QnPtzPreset preset() const;
     void setPreset(const QnPtzPreset &preset);
 
-    const QList<QKeySequence> &forbiddenHotkeys() const;
-    void setForbiddenHotkeys(const QList<QKeySequence> &forbiddenHotkeys);
+    const QList<int> &forbiddenHotkeys() const;
+    void setForbiddenHotkeys(const QList<int> &forbiddenHotkeys);
 
 protected:
-    virtual bool eventFilter(QObject *obj, QEvent *event) override;
+    int currentHotkey() const;
+    void setCurrentHotkey(int hotkey);
+    void setForbiddenHotkeys(const QList<int> &forbiddenHotkeys, bool force);
 
     Q_SLOT void updateOkButtonEnabled();
-    void updateHotkey();
 
-    bool isHotkeyValid() const;
 private:
     QScopedPointer<Ui::PtzPresetDialog> ui;
     QnPtzPreset m_preset;
-    QList<QKeySequence> m_forbiddenHotkeys;
-
-    int m_key;
-    Qt::KeyboardModifiers m_modifiers;
+    QList<int> m_forbiddenHotkeys;
 };
 
 #endif // QN_PTZ_PRESET_DIALOG_H

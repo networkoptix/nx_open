@@ -27,7 +27,8 @@ namespace {
 QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::WindowFlags flags):
     base_type(parent, flags),
     m_hoverProcessor(new HoverFocusProcessor(this)),
-    m_collapsedItemCountChanged(false)
+    m_collapsedItemCountChanged(false),
+    m_itemColorLevel(-1)
 {
     registerAnimation(this);
     startListening();
@@ -38,7 +39,7 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
 
     m_collapser.item = new QnNotificationItem(this);
-    m_collapser.item->setColor(QColor(Qt::white));
+    m_collapser.item->setColor(Qt::white);
     m_collapser.item->setTooltipText(tr("Some notifications have not place to be displayed."));
     m_collapser.item->setMinimumSize(QSizeF(widgetWidth, collapserHeight));
     m_collapser.item->setMaximumSize(QSizeF(widgetWidth, collapserHeight));
@@ -207,11 +208,16 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
     }
 
     bool itemCountChange = !itemsToDelete.isEmpty();
+    bool itemColorChange = false;
 
     // remove unused items
     foreach(QnNotificationItem* item, itemsToDelete) {
         ItemData* data = m_itemDataByItem[item];
         delete data;
+
+        int level = static_cast<int>(item->colorLevel());
+        if (level == m_itemColorLevel)
+            itemColorChange = true;
 
         disconnect(item, 0, this, 0);
         m_itemDataByItem.remove(item);
@@ -223,6 +229,20 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         updateGeometry();
         emit itemCountChanged(m_items.size());
     }
+
+    if (itemColorChange && !m_items.isEmpty()) {
+        QnNotificationItem* maxLevelItem = m_items.first();
+        foreach (QnNotificationItem* item, m_items) {
+            if (item->colorLevel() > maxLevelItem->colorLevel())
+                maxLevelItem = item;
+        }
+        int level = static_cast<int>(maxLevelItem->colorLevel());
+        if (level != m_itemColorLevel) {
+            m_itemColorLevel = level;
+            emit itemColorChanged(maxLevelItem->color());
+        }
+    }
+
     updateVisibleSize();
 }
 
@@ -272,6 +292,13 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
 
     m_collapsedItemCountChanged = true;
     emit itemCountChanged(m_items.size());
+
+    int level = static_cast<int>(item->colorLevel());
+    if (level > m_itemColorLevel) {
+        m_itemColorLevel = level;
+        emit itemColorChanged(item->color());
+    }
+
     updateGeometry();
 }
 

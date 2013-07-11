@@ -51,7 +51,7 @@ QString QnRecordingStatusHelper::shortTooltip(int recordingMode)
     case Qn::RecordingType_Never:
         return QObject::tr("Not recording");
     case Qn::RecordingType_Run:
-        return QObject::tr("Everything");
+        return QObject::tr("Continuous");
     case Qn::RecordingType_MotionOnly:
         return QObject::tr("Motion only");
     case Qn::RecordingType_MotionPlusLQ:

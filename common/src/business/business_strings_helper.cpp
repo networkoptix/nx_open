@@ -1,12 +1,16 @@
 #include "business_strings_helper.h"
-#include "events/reasoned_business_event.h"
-#include "events/camera_input_business_event.h"
-#include "business_aggregation_info.h"
 #include "version.h"
-#include "core/resource/resource.h"
-#include "core/resource_managment/resource_pool.h"
-#include "api/app_server_connection.h"
-#include "events/conflict_business_event.h"
+
+#include <api/app_server_connection.h>
+
+#include <business/business_aggregation_info.h>
+#include <business/events/reasoned_business_event.h>
+#include <business/events/camera_input_business_event.h>
+#include <business/events/conflict_business_event.h>
+
+#include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
+#include <core/resource_managment/resource_pool.h>
 
 QString QnBusinessStringsHelper::eventName(BusinessEventType::Value value) {
     return BusinessEventType::toString(value); //TODO: #GDM refactor, toString should not be used in public
@@ -24,10 +28,10 @@ QString QnBusinessStringsHelper::shortEventDescription(const QnBusinessEventPara
         return QObject::tr("Camera %1 was disconnected").arg(resourceName);
 
     case BusinessEventType::Camera_Input:
-        return QObject::tr("Input signal was caught on camera %1").arg(resourceName);
+        return QObject::tr("Input on %1").arg(resourceName);
 
     case BusinessEventType::Camera_Motion:
-        return QObject::tr("Motion was detected on camera %1").arg(resourceName);
+        return QObject::tr("Motion on %1").arg(resourceName);
 
     case BusinessEventType::Storage_Failure:
         return QObject::tr("Storage Failure at \"%1\"").arg(resourceName);
@@ -115,7 +119,7 @@ QString QnBusinessStringsHelper::timestampString(const QnBusinessEventParameters
         .arg(time.time().toString())
         .arg(time.date().toString());
     else
-        result = QObject::tr("%n times since %1 %2", "%1 means time, %2 means date", count)
+        result = QObject::tr("%n times, first time at %1 on %2", "%1 means time, %2 means date", count)
         .arg(time.time().toString())
         .arg(time.date().toString());
     return result;
@@ -124,13 +128,7 @@ QString QnBusinessStringsHelper::timestampString(const QnBusinessEventParameters
 QString QnBusinessStringsHelper::resourceUrl(const QnBusinessEventParameters &params) {
     int id = params.getEventResourceId();
     QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::AllResources) : QnResourcePtr();
-    return res ? QString(QLatin1String("%1 (%2)")).arg(res->getName()).arg(res->getUrl()) : QString();
-}
-
-QString QnBusinessStringsHelper::resourceName(const QnBusinessEventParameters &params) {
-    int id = params.getEventResourceId();
-    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::AllResources) : QnResourcePtr();
-    return res ? res->getName() : QString();
+    return getFullResourceName(res, true);
 }
 
 QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& params) {
@@ -243,7 +241,8 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (!mserverRes)
         return QString();
 
-    QUrl apPServerUrl = QnAppServerConnectionFactory::defaultUrl();
+    QUrl apPServerUrl = QnAppServerConnectionFactory::publicUrl();
+    QUrl appServerDefaultUrl = QnAppServerConnectionFactory::defaultUrl();
     quint64 ts = params.getEventTimestamp();
     QByteArray rnd = QByteArray::number(qrand()).toHex();
 
@@ -254,9 +253,15 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
         if (newServer)
             mserverRes = newServer;
     }
+
     QUrl mserverUrl = mserverRes->getUrl();
-    if (apPServerUrl.host() == lit("localhost") || apPServerUrl.host() == lit("127.0.0.1"))
-        apPServerUrl.setHost(mserverUrl.host());
+    if (resolveAddress(apPServerUrl.host()) == QHostAddress::LocalHost) {
+        if (resolveAddress(appServerDefaultUrl.host()) != QHostAddress::LocalHost) {
+            apPServerUrl = appServerDefaultUrl;
+        } else {
+            apPServerUrl.setHost(mserverUrl.host());
+        }
+    }
 
     QString result(lit("https://%1:%2/proxy/http/%3:%4/media/%5.webm?rand=%6&resolution=240p&pos=%7"));
     result = result.arg(apPServerUrl.host()).arg(apPServerUrl.port(80)).arg(mserverUrl.host()).arg(mserverUrl.port(80)).
@@ -312,7 +317,7 @@ QString QnBusinessStringsHelper::formatEmailList(const QStringList& value) {
     {
         if (i > 0)
             result.append(L' ');
-        result.append(QString(QLatin1String("<%1>")).arg(value[i].trimmed()));
+        result.append(QString(QLatin1String("%1")).arg(value[i].trimmed()));
     }
     return result;
 }

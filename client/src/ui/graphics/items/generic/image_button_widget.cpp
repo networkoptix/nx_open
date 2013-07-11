@@ -23,6 +23,8 @@
 #include <ui/common/geometry.h>
 #include <ui/common/accessor.h>
 
+#define QN_IMAGE_BUTTON_WIDGET_DEBUG
+
 namespace {
     bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags) {
         bool result = true;
@@ -35,6 +37,16 @@ namespace {
 
         return result;
     }
+
+    GLuint checkedBindTexture(QGLWidget *widget, const QPixmap &pixmap, GLenum target, GLint format, QGLContext::BindOptions options) {
+        GLint result = widget->bindTexture(pixmap, target, format, options);
+#ifdef QN_IMAGE_BUTTON_WIDGET_DEBUG
+        if(!glIsTexture(result))
+            qnWarning("OpenGL texture %1 was unexpectedly released, rendering glitches may ensue.", result);
+#endif
+        return result;
+    }
+
 
     QPixmap bestPixmap(const QIcon &icon, QIcon::Mode mode, QIcon::State state) {
         return qnSkin->pixmap(icon, QSize(1024, 1024), mode, state);
@@ -264,17 +276,17 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     bool isOne = qFuzzyCompare(progress, 1.0);
     if (isOne || isZero) {
         if (isZero) {
-            widget->bindTexture(pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+            checkedBindTexture(widget, pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         } else {
-            widget->bindTexture(pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+            checkedBindTexture(widget, pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         }
 
         glDrawTexturedRect(rect);
     } else {
         m_gl->glActiveTexture(GL_TEXTURE1);
-        widget->bindTexture(pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+        checkedBindTexture(widget, pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_gl->glActiveTexture(GL_TEXTURE0);
-        widget->bindTexture(pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+        checkedBindTexture(widget, pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_shader->bind();
         m_shader->setProgress(progress);
         m_shader->setTexture0(0);

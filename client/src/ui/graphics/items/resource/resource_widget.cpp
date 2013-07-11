@@ -267,6 +267,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Run handlers. */
     updateTitleText();
     updateButtonsVisibility();
+    updateCursor();
 }
 
 QnResourceWidget::~QnResourceWidget() {
@@ -425,6 +426,17 @@ void QnResourceWidget::updateInfoText() {
     setInfoTextInternal(m_infoTextFormatHasPlaceholder ? m_infoTextFormat.arg(calculateInfoText()) : m_infoTextFormat);
 }
 
+QCursor QnResourceWidget::calculateCursor() const {
+    return Qt::ArrowCursor;
+}
+
+void QnResourceWidget::updateCursor() {
+    QCursor newCursor = calculateCursor();
+    QCursor oldCursor = this->cursor();
+    if(newCursor.shape() != oldCursor.shape() || newCursor.shape() == Qt::BitmapCursor)
+        setCursor(newCursor);
+}
+
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
         return constraint;
@@ -536,6 +548,13 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
         result &= ~Qn::SideSections;
 
     return result;
+}
+
+QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const {
+    if(section == Qn::NoSection)
+        return calculateCursor();
+
+    return base_type::windowCursorAt(section);
 }
 
 int QnResourceWidget::helpTopicAt(const QPointF &) const {
@@ -875,7 +894,7 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
          * its frame, cursor must be unset manually. */
         Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
         if(section == Qt::NoSection)
-            unsetCursor();
+            updateCursor();
     }
 
     return result;

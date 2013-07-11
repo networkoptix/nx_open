@@ -2,6 +2,16 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
+    <name>QnBlinkingImageButtonWidget</name>
+    <message numerus="yes">
+        <source>You have %n notifications</source>
+        <translation>
+            <numerusform>You have %n notification</numerusform>
+            <numerusform>You have %n notifications</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
@@ -20,9 +30,37 @@
     <message numerus="yes">
         <source>%1 of %n cameras</source>
         <comment>...for</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 of %n camera</numerusform>
+            <numerusform>%1 of %n cameras</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>no more than once per %n days</source>
+        <translation>
+            <numerusform>no more than once per day</numerusform>
+            <numerusform>no more than once per %n days</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>no more than once per %n hours</source>
+        <translation>
+            <numerusform>no more than once per hour</numerusform>
+            <numerusform>no more than once per %n hours</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>no more than once per %n minutes</source>
+        <translation>
+            <numerusform>no more than once per minute</numerusform>
+            <numerusform>no more than once per %n minutes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>no more than once per %n seconds</source>
+        <translation>
+            <numerusform>no more than once per second</numerusform>
+            <numerusform>no more than once per %n seconds</numerusform>
         </translation>
     </message>
 </context>
@@ -31,16 +69,18 @@
     <message numerus="yes">
         <source>%n camera(s) added successfully.
 It might take a few moments to populate them in the tree.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n camera added successfully.
+It might take a few moments to populate the tree.</numerusform>
+            <numerusform>%n cameras added successfully.
+It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Error while adding camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Error while adding a camera</numerusform>
+            <numerusform>Error while adding cameras</numerusform>
         </translation>
     </message>
 </context>
@@ -48,44 +88,51 @@ It might take a few moments to populate them in the tree.</source>
     <name>QnCameraScheduleWidget</name>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n digital license is used out of %1.</numerusform>
+            <numerusform>%n digital licenses are used out of %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n analog license is used out of %1.</numerusform>
+            <numerusform>%n analog licenses are used out of %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Activate %n more digital license(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Activate %n more digital license.</numerusform>
+            <numerusform>Activate %n more digital licenses.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Activate %1 more analog license(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation type="obsolete">
+            <numerusform>Activate %1 more analog license.</numerusform>
+            <numerusform>Activate %1 more analog licenses.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more digital license(s) will be used.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n more digital license will be used.</numerusform>
+            <numerusform>%n more digital licenses will be used.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more analog license(s) will be used.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n more analog license will be used.</numerusform>
+            <numerusform>%n more analog licenses will be used.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Activate %n more analog license(s).</source>
+        <translation>
+            <numerusform>Activate %n more analog license.</numerusform>
+            <numerusform>Activate %n more analog licenses.</numerusform>
         </translation>
     </message>
 </context>
@@ -93,16 +140,23 @@ It might take a few moments to populate them in the tree.</source>
     <name>QnExportCameraSettingsDialog</name>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n digital license will be used out of %1.</numerusform>
+            <numerusform>%n digital licenses will be used out of %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog  license(s) will be used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation type="obsolete">
+            <numerusform>%n analog license will be used out of %1.</numerusform>
+            <numerusform>%n analog  licenses will be used out of %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) will be used out of %1.</source>
+        <translation>
+            <numerusform>%n analog license will be used out of %1.</numerusform>
+            <numerusform>%n analog licenses will be used out of %1.</numerusform>
         </translation>
     </message>
 </context>
@@ -110,9 +164,9 @@ It might take a few moments to populate them in the tree.</source>
     <name>QnLicenseListModel</name>
     <message numerus="yes">
         <source>In %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>In %n day</numerusform>
+            <numerusform>In %n days</numerusform>
         </translation>
     </message>
 </context>
@@ -120,16 +174,16 @@ It might take a few moments to populate them in the tree.</source>
     <name>QnMultipleCameraSettingsWidget</name>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n digital license is used out of %1.</numerusform>
+            <numerusform>%n digital licenses are used out of %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n analog license is used out of %1.</numerusform>
+            <numerusform>%n analog licenses are used out of %1.</numerusform>
         </translation>
     </message>
 </context>
@@ -137,16 +191,16 @@ It might take a few moments to populate them in the tree.</source>
     <name>QnSingleCameraSettingsWidget</name>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n digital license is used out of %1.</numerusform>
+            <numerusform>%n digital licenses are used out of %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n analog license is used out of %1.</numerusform>
+            <numerusform>%n analog licenses are used out of %1.</numerusform>
         </translation>
     </message>
 </context>
@@ -234,28 +288,28 @@ It might take a few moments to populate them in the tree.</source>
     <name>QnWorkbenchEcsHandler</name>
     <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Could not save the following layout to Enterprise Controller.</numerusform>
             <numerusform>Could not save the following %n layouts to Enterprise Controller.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Do you want to restore this layout?</numerusform>
             <numerusform>Do you want to restore these %n layouts?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Could not save the following item to Enterprise Controller.</numerusform>
             <numerusform>Could not save the following %n items to Enterprise Controller.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Could not save changes made to the following resource.</numerusform>
             <numerusform>Could not save changes made to the following %n resources.</numerusform>
         </translation>

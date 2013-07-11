@@ -558,7 +558,7 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
     } else if (helper.requiredDigital() > 0) {
         ui->requiredLicensesLabel->setText(tr("Activate %n more digital license(s).", "", helper.requiredDigital()));
     } else if (helper.requiredAnalog() > 0) {
-        ui->requiredLicensesLabel->setText(tr("Activate %1 more analog license(s).", "", helper.requiredAnalog()));
+        ui->requiredLicensesLabel->setText(tr("Activate %n more analog license(s).", "", helper.requiredAnalog()));
     } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
         ui->requiredLicensesLabel->setText(tr("%1 more digital and %2 more analog licenses will be used.")
                                            .arg(usedDigitalChange)

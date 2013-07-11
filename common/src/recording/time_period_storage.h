@@ -10,11 +10,13 @@
 class QnTimePeriodStorage {
 public: 
     QnTimePeriodStorage(): m_aggregationMSecs(0) {}
+    
     QnTimePeriodList periods(Qn::TimePeriodContent type) const;
     QnTimePeriodList aggregated(Qn::TimePeriodContent type) const;
-    void setPeriods( Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods );
-    void setAggregationMSecs(int value);
+    void setPeriods(Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods);
+    
     int aggregationMSecs() const;
+    void setAggregationMSecs(int value);
 
 protected:
     void updateAggregated(Qn::TimePeriodContent type);

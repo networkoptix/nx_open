@@ -426,7 +426,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     if (endAddr.isNull())
         online << startAddr;
     else
-        online = ip_cheker.onlineHosts(QHostAddress(QUrl(startAddr).host()), QHostAddress(QUrl(endAddr).host()));
+        online = ip_cheker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr), port ? port : 80);
 
 
     cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
@@ -478,6 +478,8 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
 
     foreach(const ManualSearcherHelper& h, testList)
     {
+        result.append(h.resList);
+        /*
         for (int i = 0; i < h.resList.size(); ++i)
         {
             if (qnResPool->hasSuchResource(h.resList[i]->getUniqueId())) // already in resource pool 
@@ -490,6 +492,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
 
             result.push_back(h.resList[i]);
         }
+        */
     }
 
     cl_log.log("Found ",  result.size(), " new resources", cl_logINFO);

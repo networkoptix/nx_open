@@ -155,7 +155,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_screenRecorder(NULL),
     m_countdownCanceled(false),
     m_recordingCountdownLabel(NULL),
-    m_tourModeHintLabel(NULL)
+    m_tourModeHintLabel(NULL),
+    m_menuEnabled(true)
 {
     ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -313,6 +314,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        m_rubberBandInstrument,         SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),         ptzInstrument,                  SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        ptzInstrument,                  SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),         m_motionSelectionInstrument,    SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
 
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                         m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        m_handScrollInstrument,         SLOT(recursiveEnable()));
@@ -337,8 +340,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_moveInstrument,               SLOT(recursiveEnable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_dragInstrument,               SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_dragInstrument,               SLOT(recursiveEnable()));
-    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_resizingInstrument,           SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_resizingInstrument,           SLOT(recursiveEnable()));
+    //connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_resizingInstrument,           SLOT(recursiveDisable()));
+    //connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_resizingInstrument,           SLOT(recursiveEnable()));
 
     connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_handScrollInstrument,         SLOT(recursiveEnable()));
@@ -519,6 +522,9 @@ void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis)
 }
 
 void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
+    if(!m_menuEnabled)
+        return;
+
     QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
     if(menu->isEmpty())
         return;
@@ -1146,15 +1152,12 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
     workbench()->setItem(Qn::RaisedRole, NULL);
 }
 
-void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
+void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info) {
     TRACE("SCENE RCLICKED");
 
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope));
-    if(menu->isEmpty())
-        return;
+    view->scene()->clearSelection(); /* Just to feel safe. */
 
-    /* We don't want the curtain to kick in while menu is open. */
-    menu->exec(info.screenPos());
+    showContextMenuAt(info.screenPos());
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {
