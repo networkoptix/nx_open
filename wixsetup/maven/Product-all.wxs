@@ -681,7 +681,7 @@
 
                             <Directory Id="ServerSqlDrivers" Name="sqldrivers">
                                 <Component Id="ServerSqlDrivers">
-                                    <File Id="qsqlite$(var.suffix)4.dll" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\sqldrivers\qsqlite$(var.suffix)4.dll" />
+                                    <File Id="qsqlite$(var.suffix)4.dll" Name="qsqlite4.dll" Source="${libdir}/bin/${build.configuration}\sqldrivers\qsqlite$(var.suffix)4.dll" />
                                 </Component>
                             </Directory>
 
