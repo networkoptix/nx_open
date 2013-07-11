@@ -30,10 +30,10 @@
 
         <?if ${build.configuration} = debug ?>
         <?define suffix = "d" ?>
-		<?define vmaxsuffix = "dd" ?>
+        <?define vmaxsuffix = "dd" ?>
         <?else?>
         <?define suffix = "" ?>
-		<?define vmaxsuffix = "r" ?>
+        <?define vmaxsuffix = "r" ?>
         <?endif?>
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
@@ -400,7 +400,7 @@
 
         <CustomAction Id="CopyAppServerNotificationFiles_Cmd" Property="CopyAppServerNotificationFiles" Execute="immediate" Impersonate="yes"
             Value="[${installer.customization}AppServerDir]hostedfiles\notifications;[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles\notifications"/>
-        
+
         <CustomAction Id="CopyMediaServerProfile_Cmd" Property="CopyMediaServerProfile" Execute="immediate" Impersonate="yes"
             Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server;[System64Folder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server"/>
 
@@ -435,7 +435,7 @@
             DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
             MigrateFeatures="yes" />
 
-<!--        <Upgrade Id="${customization.clientUpgradeCode}">
+        <!--        <Upgrade Id="${customization.clientUpgradeCode}">
             <UpgradeVersion OnlyDetect='yes' Property='NEWERCLIENTINSTALLED' Minimum='${release.version}.${buildNumber}' IncludeMinimum='no' />
         </Upgrade> -->
 
@@ -507,7 +507,7 @@
                 <![CDATA[ (INSTALL_ECS OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyAppServerNotificationFiles" After="CopyAppServerNotificationFiles_Cmd">
                 <![CDATA[ (INSTALL_ECS OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-            
+
             <Custom Action="CopyMediaServerProfile_Cmd" After="CopyAppServerNotificationFiles">
                 <![CDATA[ (INSTALL_SERVER OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyMediaServerProfile" After="CopyMediaServerProfile_Cmd">
@@ -856,7 +856,34 @@
                                 <Component Id="ClientQtColorPicker_1_4">
                                     <File Id="ColorPicker26$(var.suffix).dll_1_4" Name="QtSolutions_ColorPicker-2.6$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
                                 </Component>
-                            </Directory>                            
+                            </Directory> 
+
+                            <Directory Id="${installer.customization}_1_5_1_Dir" Name="1.5">
+
+                                <Directory Id="styles_1_5" Name="styles">
+                                    <Component Id="bespin_1_5">
+                                        <File Id="bespin$(var.suffix).dll_1_5" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
+                                    </Component>
+                                </Directory>
+
+                                <Directory Id="ImageFormats_1_5" Name="imageformats">
+                                </Directory>                            
+
+                                <Component Id="ClientExecutable_1_5">
+                                    <File Id="client.exe_1_5" Name="${product.name}.exe" Source="${project.build.directory}/1.5/bin/client.exe" KeyPath="yes">
+                                        <fire:FirewallException Id="FirewallExceptionClient_1_5" Name="${product.name} 1.5" Scope="any" IgnoreFailure="yes"/>
+                                    </File>
+                                </Component>
+
+                                <Component Id="ClientSigar_1_5">
+                                    <File Id="ClientSigar.dll_1_5" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
+                                </Component>
+
+                                <Component Id="ClientQtColorPicker_1_5">
+                                    <File Id="ColorPicker26$(var.suffix).dll_1_5" Name="QtSolutions_ColorPicker-2.6$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
+                                </Component>
+                            </Directory>
+
                         </Directory>
                     </Directory>
                 </Directory>
@@ -896,7 +923,7 @@
                 <File Id="TrayToolssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
             </Component>
         </ComponentGroup>
-        
+
         <ComponentGroup Id="ProxyQTLibraries" Directory="${installer.customization}ProxyServerDir">
             <Component>
                 <File Id="ProxyQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
@@ -1073,7 +1100,7 @@
 
         <ComponentGroup Id="VmaxProxySDK" Directory="${installer.customization}VmaxDir">
             <Component>
-            	<File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll"/>
+                <File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll"/>
             </Component>
             <Component>
                 <File Id="VmaxProxyPid.dat" Name="pid.dat" Source="${libdir}/bin/${build.configuration}/vmaxproxy/pid.dat"/>
@@ -1154,6 +1181,81 @@
                 <File Id="Clientssleay32.dll_1_4" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
             </Component>
         </ComponentGroup>                        
+
+        <ComponentGroup Id="ClientFFmpegLibraries_1_5" Directory="${installer.customization}_1_5_Dir">
+            <Component>
+                <File Id="ClientAvcodecDll_1_5" Name="avcodec-54-1.5.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
+            </Component>
+            <Component>
+                <File Id="ClientAvdeviceDll_1_5" Name="avdevice-53-1.5.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
+            </Component>
+            <Component>
+                <File Id="ClientAvfilterDll_1_5" Name="avfilter-2-1.5.dll" Source="${libdir}/bin/${build.configuration}/avfilter-2.dll"/>
+            </Component>
+            <Component>
+                <File Id="ClientAvformatDll_1_5" Name="avformat-54-1.5.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
+            </Component>
+            <Component>
+                <File Id="ClientAvutilDll_1_5" Name="avutil-51.dll-1.5" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
+            </Component>
+            <Component>
+                <File Id="ClientSwscaleDll_1_5" Name="swscale-2.dll-1.5" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
+            </Component>
+            <Component>
+                <File Id="ClientOggDll_1_5" Name="libogg-0-1.5.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
+            </Component>
+            <Component>
+                <File Id="ClientVorbisDll_1_5" Name="libvorbis-0-1.5.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
+            </Component>
+            <Component>
+                <File Id="ClientMp3lameDll_1_5" Name="libmp3lame-0-1.5.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+            </Component>
+            <Component>
+                <File Id="ClientVorbisEncDll_1_5" Name="libvorbisenc-2-1.5.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
+            </Component>
+            <Component>
+                <File Id="ClientX264_1_5" Name="x264-1.5.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
+            </Component>
+        </ComponentGroup>                            
+
+        <ComponentGroup Id="ClientQTLibraries_1_5" Directory="${installer.customization}_1_5_Dir">
+            <Component>
+                <File Id="ClientQtCore$(var.suffix)4.dll_1_5" Name="QtCore$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="ClientQtGui$(var.suffix)4.dll_1_5" Name="QtGui$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="ClientQtMultimedia$(var.suffix)4.dll_1_5" Name="QtMultimedia$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="ClientQtNetwork$(var.suffix)4.dll_1_5" Name="QtNetwork$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="ClientQtOpenGL$(var.suffix)4.dll_1_5" Name="QtOpenGL$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtOpenGL$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="ClientQtXml$(var.suffix)4.dll_1_5" Name="QtXml$(var.suffix)4-1.5.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="ClientOpenAL_1_5" Directory="${installer.customization}_1_5_Dir">
+            <Component>
+                <File Id="OpenAL32.dll_1_5" Name="OpenAL32-1.5.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
+            </Component>
+            <Component>
+                <File Id="wrap_oal.dll_1_5" Name="wrap_oal-1.5.dll" Source="${libdir}/bin/${build.configuration}\wrap_oal.dll"/>
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="ClientOpenSSL_1_5" Directory="${installer.customization}_1_5_Dir">
+            <Component>
+                <File Id="Clientlibeay32.dll_1_5" Name="libeay32-1.5.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
+            </Component>
+            <Component>
+                <File Id="Clientssleay32.dll_1_5" Name="ssleay32-1.5.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
+            </Component>
+        </ComponentGroup>            
         
         <ComponentGroup Id="ImageFormats" Directory="ImageFormats">
             <Component>
@@ -1166,7 +1268,7 @@
                 <File Id="qtiff$(var.suffix)4.dll" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
             </Component>
         </ComponentGroup>
-        
+
         <ComponentGroup Id="ImageFormats_1_4" Directory="ImageFormats_1_4">
             <Component>
                 <File Id="qgif4.dll_1_4" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
@@ -1178,6 +1280,18 @@
                 <File Id="qtiff4.dll_1_4" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
             </Component>
         </ComponentGroup>
+
+        <ComponentGroup Id="ImageFormats_1_5" Directory="ImageFormats_1_5">
+            <Component>
+                <File Id="qgif4.dll_1_5" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="qjpeg4.dll_1_5" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="qtiff4.dll_1_5" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
+            </Component>
+        </ComponentGroup>        
 
         <?if $(var.arch) = x86 ?>
         <?define archSuffix = "x86" ?>
@@ -1293,7 +1407,17 @@
             <ComponentGroupRef Id="ClientOpenSSL_1_4" />
             <ComponentRef Id="ClientSigar_1_4"/>            
             <ComponentRef Id="ClientQtColorPicker_1_4"/>
-            <ComponentRef Id="bespin_1_4" />            
+            <ComponentRef Id="bespin_1_4" />       
+
+            <ComponentRef Id="ClientExecutable_1_5" />          
+            <ComponentGroupRef Id="ClientFFmpegLibraries_1_5"/>
+            <ComponentGroupRef Id="ClientQTLibraries_1_5" />
+            <ComponentGroupRef Id="ImageFormats_1_5" />
+            <ComponentGroupRef Id="ClientOpenAL_1_5" />
+            <ComponentGroupRef Id="ClientOpenSSL_1_5" />
+            <ComponentRef Id="ClientSigar_1_5"/>            
+            <ComponentRef Id="ClientQtColorPicker_1_5"/>
+            <ComponentRef Id="bespin_1_5" />             
 
             <ComponentRef Id='ClientDirectoryComponent'/>
         </Feature>
@@ -1769,8 +1893,12 @@
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
 
             <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ $(var.Remove_E1) ]]></Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ NOT $(var.Remove_E1) ]]></Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">
+                <![CDATA[ $(var.Remove_E1) ]]>
+            </Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">
+                <![CDATA[ NOT $(var.Remove_E1) ]]>
+            </Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE_DATABASE" Value="0">1</Publish>
         </UI>
