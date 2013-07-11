@@ -31,6 +31,9 @@ public:
 signals:
     void timeClicked(const QTime &time);
 
+protected:
+    virtual void changeEvent(QEvent *event) override;
+
 private:
     friend class QnDayTimeItemDelegate;
     void paintCell(QPainter *painter, const QRect &rect, const QTime &time);
@@ -41,6 +44,7 @@ private slots:
     void updateEnabled();
     void updateHeaderText();
     void updateCurrentTime();
+    void updateTimeFormat();
 
 private:
     QnTimePeriodStorage m_primaryPeriodStorage, m_secondaryPeriodStorage;
@@ -50,6 +54,7 @@ private:
     qint64 m_currentTime;
     QnDayTimeItemDelegate *m_delegate;
     QnDayTimeTableWidget *m_tableWidget;
+    QString m_timeFormat;
 };
 
 #endif // QN_DAY_TIME_WIDGET_H
