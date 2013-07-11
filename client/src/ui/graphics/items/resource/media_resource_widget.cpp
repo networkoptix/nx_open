@@ -154,6 +154,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateButtonsVisibility();
     updateIconButton();
     updateAspectRatio();
+    updateCursor();
     setImageEnhancement(item->imageEnhancement());
 }
 
@@ -665,7 +666,10 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
         } else {
             setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
         }
+
+        updateCursor();
     }
+
     base_type::optionsChangedNotify(changedFlags);
 }
 
@@ -745,6 +749,14 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result |= ZoomWindowButton;
 
     return result;
+}
+
+QCursor QnMediaResourceWidget::calculateCursor() const {
+    if(options() & (DisplayMotion | DisplayMotionSensitivity)) {
+        return Qt::CrossCursor;
+    } else {
+        return base_type::calculateCursor();
+    }
 }
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
