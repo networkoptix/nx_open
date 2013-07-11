@@ -666,9 +666,10 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
         } else {
             setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
         }
-
-        updateCursor();
     }
+
+    if(changedFlags & (DisplayMotion | DisplayMotionSensitivity | ControlZoomWindow))
+        updateCursor();
 
     base_type::optionsChangedNotify(changedFlags);
 }
@@ -752,7 +753,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 }
 
 QCursor QnMediaResourceWidget::calculateCursor() const {
-    if((options() & (DisplayMotion | DisplayMotionSensitivity)) || (QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
+    if((options() & (DisplayMotion | DisplayMotionSensitivity | ControlZoomWindow)) || (QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
         return Qt::CrossCursor;
     } else {
         return base_type::calculateCursor();
