@@ -79,7 +79,12 @@ function ask_for_value {
     local full_name="$COMPANY_NAME-entcontroller/$varname"
     local error_message="${full_name}_invalid"
 
-    [ -n "$default" ] && db_set $full_name $default 
+    # Support unattened install
+    db_get $full_name
+    if [ "$RET" = "false" ]; then
+        [ -n "$default" ] && db_set $full_name $default 
+    fi
+
     db_input high $full_name || true
     db_go
 
