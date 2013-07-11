@@ -10,7 +10,7 @@ Since 1.5.1
  - Fixed issue when it was not possible to add cameras manually via IP range (since 1.4)
  - Improved advanced camera settings management (since 1.4)
  - ACTI cameras with old firmwares (T series < 4.13, K series < 5.08 and A1 series < 6.03) work now 
- - Vivotek cameras CC8130, FD8136, FD8361, FD8362E, FD8161
+ - Vivotek cameras CC8130, FD8136, FD8361, FD8362E, FD8161 are supported
  - If restore item for the fulloscreen, resolution hasn't been changed to low
  - If cancel installation if different customizations (HD Witness, DW Spectrum) were installed, then the software 
    still was in the installed programs list, but could not be removed. Fixed
@@ -36,10 +36,13 @@ Since 1.5.1
  - Sometimes the same camera with the same IP could be added twice: via automatic discovery and via manual addition. Fixed
  - Time picker is added to calendar
  - If old version is launched in compatibility mode, then upgrade notification was invoked. Now not
+ - "Open Item" button is added to Camera Setings form. It opens the current camera in a new tab
+ - Smart Search and Motion Mask configuration are more intuitive (different cursors are used)
+ - Localized datetime format is used in Time Line (depends on regional settings)
  
 Since previous build
  - "Text to Speech" is displayed as a separate action in "Event and Actions" (used to be selector in "Play Sound")
- - Localized datetime format is used in event log form
+ - Localized datetime format is used in event log form (depends on regional settings)
  - Fixed incorrect messages if activating licenses
  - Some pictures could not be used for E-Mapping. Fixed
  - Context menu in motion mask settings is removed
@@ -75,6 +78,7 @@ Since previous build
  - Media server Failure" + "Camera output for 30 second" didn't work. Fixed
  - Rotated item was resized incorrectly. Fixed
  - If export to Multi-Video exe file this file was broken. Fixed
+ - Rendering glitches are fixed (appeared sometimes on specific PC configurations)
  
  - Bug #2155.If "auto reset" is less then motion on camera, than "Camera output" doesn't stop.
  - Bug #2154.When changes parameter "Allow access via public IP" in traytool, it's better to ask to restart EC.
