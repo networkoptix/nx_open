@@ -752,7 +752,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 }
 
 QCursor QnMediaResourceWidget::calculateCursor() const {
-    if(options() & (DisplayMotion | DisplayMotionSensitivity)) {
+    if((options() & (DisplayMotion | DisplayMotionSensitivity)) || (QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
         return Qt::CrossCursor;
     } else {
         return base_type::calculateCursor();
