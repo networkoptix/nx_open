@@ -14,6 +14,7 @@
 #include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
 
+#include <ui/common/geometry.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/style/globals.h>
@@ -60,8 +61,8 @@ public:
         state(NoImage),
         cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio())
     {}
+    
     virtual ~QnLayoutSettingsDialogPrivate(){}
-
 
     void clear() {
         state = NoImage;
@@ -79,12 +80,11 @@ public:
 
     bool imageIsLoading() const {
         return
-                state == ImageDownloading ||
-                state == ImageLoading ||
-                state == NewImageLoading ||
-                state == NewImageUploading;
+            state == ImageDownloading ||
+            state == ImageLoading ||
+            state == NewImageLoading ||
+            state == NewImageUploading;
     }
-
 
     bool canChangeAspectRatio() const {
         return !croppedPreview.isNull();
@@ -149,14 +149,15 @@ QnLayoutSettingsDialog::~QnLayoutSettingsDialog()
 }
 
 bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
-    Q_D(const QnLayoutSettingsDialog);
-    if (target == ui->imageLabel &&
-            event->type() == QEvent::MouseButtonRelease) {
+    Q_D(QnLayoutSettingsDialog);
+
+    if (target == ui->imageLabel && event->type() == QEvent::MouseButtonRelease) {
         if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == Error) )
             selectFile();
         else
             viewFile();
     }
+
     return base_type::eventFilter(target, event);
 }
 
@@ -253,6 +254,7 @@ bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
 void QnLayoutSettingsDialog::updateControls() {
     if (m_isUpdating)
         return;
+
     QnScopedValueRollback<bool> guard(&m_isUpdating, true);
     Q_UNUSED(guard)
 
@@ -283,7 +285,7 @@ void QnLayoutSettingsDialog::updateControls() {
     QImage image;
     if (!imagePresent) {
         ui->imageLabel->setPixmap(QPixmap());
-        ui->imageLabel->setText(d->state != Error
+        ui->imageLabel->setText(d->state != Error 
                             ? tr("<No image>")
                             : d->errorText);
     } else {
@@ -296,25 +298,17 @@ void QnLayoutSettingsDialog::updateControls() {
     qreal targetAspectRatio = bestAspectRatioForCells();
     // TODO: #GDM do not change if values were changed manually?
     if (ui->keepAspectRatioCheckBox->isChecked() && targetAspectRatio > 0 && !cellsAreBestAspected()) {
-        int w, h;
-        if (targetAspectRatio >= 1.0) { // width is greater than height
-            w = qnGlobals->layoutBackgroundMaxSize().width();
-            h = qRound((qreal)w / targetAspectRatio);
-        } else {
-            h = qnGlobals->layoutBackgroundMaxSize().height();
-            w = qRound((qreal)h * targetAspectRatio);
-        }
-        ui->widthSpinBox->setMaximum(w);
-        ui->heightSpinBox->setMaximum(h);
+        QSize minSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMinSize(), Qt::KeepAspectRatioByExpanding).toSize();
+        QSize maxSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMaxSize(), Qt::KeepAspectRatio).toSize();
+
+        ui->widthSpinBox->setRange(minSize.width(), maxSize.width());
+        ui->heightSpinBox->setRange(minSize.height(), maxSize.height());
 
         // limit w*h <= recommended area; minor variations are allowed, e.g. 17*6 ~~= 100;
-        qreal areaCoef = qSqrt((qreal)w * h / qnGlobals->layoutBackgroundRecommendedArea());
-        if (areaCoef > 1.0) {
-            w = qRound((qreal)w / areaCoef);
-            h = qRound((qreal)h / areaCoef);
-        }
-        ui->widthSpinBox->setValue(w);
-        ui->heightSpinBox->setValue(h);
+        qreal height = qSqrt(qnGlobals->layoutBackgroundRecommendedArea() / targetAspectRatio);
+        qreal width = height * targetAspectRatio;
+        ui->widthSpinBox->setValue(width);
+        ui->heightSpinBox->setValue(height);
     } else {
         ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
         ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
