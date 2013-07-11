@@ -86,7 +86,6 @@ function ask_for_value {
         [ -n "$default" ] && db_set $full_name $default 
     fi
 
-    [ -n "$default" ] && db_set $full_name $default 
     db_input high $full_name || true
     db_go
 
