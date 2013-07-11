@@ -26,7 +26,14 @@
 			<artifactId>client</artifactId>
 			<version>1.4.0-SNAPSHOT</version>
 			<type>zip</type>
-			<classifier>${platform}-${arch}-${customization}</classifier>
+			<classifier>1.4-${platform}-${arch}-${customization}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>client</artifactId>
+			<version>1.5.1-SNAPSHOT</version>
+			<type>zip</type>
+			<classifier>1.5-${platform}-${arch}-${customization}</classifier>
 		</dependency>
 	</dependencies>	
 	

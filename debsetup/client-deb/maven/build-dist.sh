@@ -65,8 +65,10 @@ cp -r $CLIENT_HELP_PATH $BINSTAGE
 cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE
 cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/styles
 cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/1.4/styles
+cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/1.5/styles
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/imageformats
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.4/imageformats
+cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.5/imageformats
 cp -r $CLIENT_SQLDRIVERS_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/sqldrivers
 
 for f in `find $LIBSTAGE -type f` `find $BINSTAGE/**/styles -type f` $BINSTAGE/**/client-bin
