@@ -5,6 +5,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 
+#include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
 #include <utils/image_provider.h>
 
@@ -128,7 +129,8 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_colorLevel(None),
     m_imageProvider(NULL),
     m_tooltipWidget(new QnNotificationToolTipWidget(this)),
-    m_hoverProcessor(new HoverFocusProcessor(this))
+    m_hoverProcessor(new HoverFocusProcessor(this)),
+    m_inToolTipPositionUpdate(false)
 {
     setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
     setFrameWidth(0.5);
@@ -293,6 +295,11 @@ void QnNotificationItem::updateToolTipVisibility() {
 }
 
 void QnNotificationItem::updateToolTipPosition() {
+    if(m_inToolTipPositionUpdate)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_inToolTipPositionUpdate, true); /* Prevent stack overflow. */
+
     m_tooltipWidget->updateTailPos();
     m_tooltipWidget->pointTo(QPointF(0, qRound(geometry().height() / 2 )));
 }

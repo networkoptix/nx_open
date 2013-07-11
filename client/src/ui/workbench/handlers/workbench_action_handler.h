@@ -258,7 +258,8 @@ protected slots:
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
     void at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras);
     void at_cameraSettingsDialog_rejected();
-    void at_cameraSettingsAdvanced_changed();
+    void at_cameraSettingsDialog_advancedSettingChanged();
+    void at_cameraSettingsDialog_cameraOpenRequested();
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();

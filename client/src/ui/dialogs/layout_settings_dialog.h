@@ -27,6 +27,7 @@ public:
 
 protected:
     virtual bool eventFilter(QObject *target, QEvent *event) override;
+
 private slots:
     void at_clearButton_clicked();
     void at_accepted();
@@ -45,18 +46,21 @@ private slots:
     void viewFile();
 
     void selectFile();
+
 private:
     /** Aspect ratio of the current screen. */
     qreal screenAspectRatio() const;
 
-    /** Aspect ratio that is optimal for cells to best fit the current image.
-      * Returns negative value if image is not available.
-      */
+    /** 
+     * Aspect ratio that is optimal for cells to best fit the current image.
+     * Returns negative value if image is not available.
+     */
     qreal bestAspectRatioForCells() const;
 
-    /** Returns true if width and height in cells are already set to values
-      * corresponding to bestAspectRatioForCells()
-      */
+    /** 
+     * Returns true if width and height in cells are already set to values
+     * corresponding to bestAspectRatioForCells()
+     */
     bool cellsAreBestAspected() const;
 
     bool hasChanges(const QnLayoutResourcePtr &layout);
@@ -64,6 +68,7 @@ private:
     void loadPreview();
 
     Q_DECLARE_PRIVATE(QnLayoutSettingsDialog)
+
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
     QnLayoutSettingsDialogPrivate *const d_ptr;

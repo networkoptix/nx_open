@@ -88,6 +88,8 @@ void QnCameraSettingsWidget::setResources(const QnResourceList &resources) {
             break;
         }
     }
+
+    emit resourcesChanged();
 }
 
 Qn::CameraSettingsTab QnCameraSettingsWidget::currentTab() const {

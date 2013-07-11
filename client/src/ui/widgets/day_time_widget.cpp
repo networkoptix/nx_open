@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QTableWidget>
 #include <QLabel>
+#include <QLocale>
 
 #include <utils/common/variant.h>
 #include <utils/common/event_processors.h>
@@ -95,9 +96,7 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     m_tableWidget->setColumnCount(6);
     for(int i = 0; i < 24; i++) {
         QTableWidgetItem *item = new QTableWidgetItem();
-        item->setText(lit("%1").arg(i, 2, 10, lit('0')));
         item->setData(Qt::UserRole, QTime(i, 0, 0, 0));
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         m_tableWidget->setItem(i / 6, i % 6, item);
     }
 
@@ -127,7 +126,9 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     connect(m_tableWidget, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(at_tableWidget_itemClicked(QTableWidgetItem *)));
 
     setDate(QDate::currentDate());
+    updateTimeFormat();
     updateCurrentTime();
+    updateEnabled();
 }
 
 QnDayTimeWidget::~QnDayTimeWidget() {
@@ -179,7 +180,6 @@ void QnDayTimeWidget::setEnabledWindow(quint64 windowStart, quint64 windowEnd) {
 
     m_enabledHoursPeriod = hoursWindow;
     updateEnabled();
-    update();
 }
 
 void QnDayTimeWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) {
@@ -219,7 +219,7 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
         m_selectedPeriod, 
         m_primaryPeriodStorage, 
         m_secondaryPeriodStorage, 
-        time.toString(lit("h ap"))
+        time.toString(m_timeFormat)
     );
 }
 
@@ -232,6 +232,21 @@ void QnDayTimeWidget::updateCurrentTime() {
     m_currentTime = qnSyncTime->currentMSecsSinceEpoch();
 }
 
+void QnDayTimeWidget::updateTimeFormat() {
+    QString timeFormat;
+    if(QLocale().timeFormat().contains(lit("ap"), Qt::CaseInsensitive)) {
+        timeFormat = lit("h ap");
+    } else {
+        timeFormat = lit("hh:mm");
+    }
+
+    if(m_timeFormat == timeFormat)
+        return;
+
+    m_timeFormat = timeFormat;
+    m_tableWidget->update();
+}
+
 void QnDayTimeWidget::updateEnabled() {
     for(int row = 0; row < m_tableWidget->rowCount(); row++) {
         for(int col = 0; col < m_tableWidget->columnCount(); col++) {
@@ -242,6 +257,13 @@ void QnDayTimeWidget::updateEnabled() {
             item->setFlags(m_enabledPeriod.intersects(period) ? (Qt::ItemIsSelectable | Qt::ItemIsEnabled) : Qt::NoItemFlags);
         }
     }
+}
+
+void QnDayTimeWidget::changeEvent(QEvent *event) {
+    if(event->type() == QEvent::LocaleChange)
+        updateTimeFormat();
+
+    base_type::changeEvent(event);
 }
 
 void QnDayTimeWidget::at_tableWidget_itemClicked(QTableWidgetItem *item) {

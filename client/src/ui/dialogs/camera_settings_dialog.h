@@ -23,14 +23,15 @@ public:
         return m_settingsWidget;
     }
 
-    void ignoreAcceptOnce(){
-        mIgnoreAccept = true;
+    void ignoreAcceptOnce() {
+        m_ignoreAccept = true;
     }
 
 signals:
     void buttonClicked(QDialogButtonBox::StandardButton button);
     void advancedSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &cameras);
+    void cameraOpenRequested();
 
 private slots:
     void at_buttonBox_clicked(QAbstractButton *button);
@@ -44,8 +45,8 @@ private:
     QWeakPointer<QnWorkbenchContext> m_context;
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
-    QPushButton *m_applyButton, *m_okButton;
-    bool mIgnoreAccept;
+    QPushButton *m_applyButton, *m_okButton, *m_openButton;
+    bool m_ignoreAccept;
 };
 
 

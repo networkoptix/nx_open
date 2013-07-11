@@ -10,7 +10,7 @@
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     QDialog(parent, windowFlags),
-    mIgnoreAccept(false)
+    m_ignoreAccept(false)
 {
     setWindowTitle(tr("Camera settings"));
 
@@ -20,6 +20,9 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags 
     m_buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
     m_applyButton = m_buttonBox->button(QDialogButtonBox::Apply);
     m_okButton = m_buttonBox->button(QDialogButtonBox::Ok);
+    
+    m_openButton = new QPushButton(tr("Open in Layout"));
+    m_buttonBox->addButton(m_openButton, QDialogButtonBox::HelpRole);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(m_settingsWidget);
@@ -32,6 +35,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags 
     connect(m_settingsWidget,   SIGNAL(modeChanged()),              this,   SLOT(at_settingsWidget_modeChanged()));
     connect(m_settingsWidget,   SIGNAL(advancedSettingChanged()),   this,   SLOT(at_advancedSettingChanged()));
     connect(m_settingsWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
+    connect(m_openButton,       SIGNAL(clicked()),                  this,   SIGNAL(cameraOpenRequested()));
 
     at_settingsWidget_hasChangesChanged();
 }
@@ -51,7 +55,9 @@ void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
 }
 
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
-    m_okButton->setEnabled(m_settingsWidget->mode() == QnCameraSettingsWidget::SingleMode || m_settingsWidget->mode() == QnCameraSettingsWidget::MultiMode);
+    QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
+    m_okButton->setEnabled(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
+    m_openButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);
 }
 
 void QnCameraSettingsDialog::at_advancedSettingChanged() {
@@ -62,9 +68,9 @@ void QnCameraSettingsDialog::at_buttonBox_clicked(QAbstractButton *button) {
     emit buttonClicked(m_buttonBox->standardButton(button));
 }
 
-void QnCameraSettingsDialog::acceptIfSafe(){
-    if (mIgnoreAccept)
-        mIgnoreAccept = false;
+void QnCameraSettingsDialog::acceptIfSafe() {
+    if (m_ignoreAccept)
+        m_ignoreAccept = false;
     else
         accept();
 }
