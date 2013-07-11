@@ -80,6 +80,12 @@ function ask_for_value {
     local full_name="$COMPANY_NAME-mediaserver/$varname"
     local error_message="${full_name}_invalid"
 
+    # Support unattened install
+    db_get $full_name
+    if [ "$RET" = "false" ]; then
+        [ -n "$default" ] && db_set $full_name $default 
+    fi
+
     [ -n "$default" ] && db_set $full_name $default 
     db_input high $full_name || true
     db_go
