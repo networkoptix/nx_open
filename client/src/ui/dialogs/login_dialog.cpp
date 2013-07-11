@@ -38,8 +38,6 @@
 #include "connectinfo.h"
 #include "version.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
-#include "ui/common/palette.h"
-#include "ui/style/globals.h"
 
 
 namespace {
