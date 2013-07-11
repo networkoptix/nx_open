@@ -3,6 +3,9 @@
 
 #include <QComboBox>
 
+/**
+ * A combo box with additional slots that are not available in <tt>QComboBox</tt>.
+ */
 class QnComboBox: public QComboBox {
     Q_OBJECT
     typedef QComboBox base_type;

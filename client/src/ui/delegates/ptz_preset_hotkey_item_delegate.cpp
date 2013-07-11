@@ -1,6 +1,6 @@
 #include "ptz_preset_hotkey_item_delegate.h"
 
-#include <ui/widgets/combo_box.h>
+#include <ui/widgets/char_combo_box.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -39,7 +39,7 @@ QnPtzPresetHotkeyItemDelegate::~QnPtzPresetHotkeyItemDelegate() {
 }
 
 QWidget *QnPtzPresetHotkeyItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
-    QnComboBox *result = new QnComboBox(parent);
+    QnCharComboBox *result = new QnCharComboBox(parent);
 
     result->addItem(tr("None"), -1);
     for(int i = 0; i <= 9; i++)
@@ -63,7 +63,7 @@ QWidget *QnPtzPresetHotkeyItemDelegate::createEditor(QWidget *parent, const QSty
 }
 
 void QnPtzPresetHotkeyItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-    QnComboBox *comboBox = dynamic_cast<QnComboBox *>(editor);
+    QnCharComboBox *comboBox = dynamic_cast<QnCharComboBox *>(editor);
     if(!comboBox)
         return;
 
@@ -79,7 +79,7 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(QWidget *editor, QAbstractItemM
     if(!model)
         return;
 
-    QnComboBox *comboBox = dynamic_cast<QnComboBox *>(editor);
+    QnCharComboBox *comboBox = dynamic_cast<QnCharComboBox *>(editor);
     if(!comboBox)
         return;
 
