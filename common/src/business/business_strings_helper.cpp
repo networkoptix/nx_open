@@ -13,7 +13,37 @@
 #include <core/resource_managment/resource_pool.h>
 
 QString QnBusinessStringsHelper::eventName(BusinessEventType::Value value) {
-    return BusinessEventType::toString(value); //TODO: #GDM refactor, toString should not be used in public
+
+    if (value >= BusinessEventType::UserDefined)
+        return tr("User Defined (%1)").arg((int)value - (int)BusinessEventType::UserDefined);
+
+    switch( value )
+    {
+    case BusinessEventType::Camera_Motion:
+        return tr("Motion on Camera");
+    case BusinessEventType::Camera_Input:
+        return tr("Input Signal on Camera");
+    case BusinessEventType::Camera_Disconnect:
+        return tr("Camera Disconnected");
+    case BusinessEventType::Storage_Failure:
+        return tr("Storage Failure");
+    case BusinessEventType::Network_Issue:
+        return tr("Network Issue");
+    case BusinessEventType::Camera_Ip_Conflict:
+        return tr("Camera IP Conflict");
+    case BusinessEventType::MediaServer_Failure:
+        return tr("Media Server Failure");
+    case BusinessEventType::MediaServer_Conflict:
+        return tr("Media Server Conflict");
+    case BusinessEventType::AnyCameraIssue:
+        return tr("Any camera issue");
+    case BusinessEventType::AnyServerIssue:
+        return tr("Any server issue");
+    case BusinessEventType::AnyBusinessEvent:
+        return tr("Any event");
+    default:
+        return QString();
+    }
 }
 
 QString QnBusinessStringsHelper::shortEventDescription(const QnBusinessEventParameters &params) {

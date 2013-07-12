@@ -66,40 +66,6 @@ namespace BusinessEventType
         return result;
     }
 
-    QString toString( Value val )  {
-        if (val >= UserDefined)
-            return QObject::tr("User Defined (%1)").arg((int)val - (int)UserDefined);
-
-        switch( val )
-        {
-        case Camera_Motion:
-            return QObject::tr("Motion on Camera");
-        case Camera_Input:
-            return QObject::tr("Input Signal on Camera");
-        case Camera_Disconnect:
-            return QObject::tr("Camera Disconnected");
-        case Storage_Failure:
-            return QObject::tr("Storage Failure");
-        case Network_Issue:
-            return QObject::tr("Network Issue");
-        case Camera_Ip_Conflict:
-            return QObject::tr("Camera IP Conflict");
-        case MediaServer_Failure:
-            return QObject::tr("Media Server Failure");
-        case MediaServer_Conflict:
-            return QObject::tr("Media Server Conflict");
-        case AnyCameraIssue:
-            return QObject::tr("Any camera issue");
-        case AnyServerIssue:
-            return QObject::tr("Any server issue");
-        case AnyBusinessEvent:
-            return QObject::tr("Any event");
-        default:
-            return QString();
-        }
-        //return QObject::tr("Unknown Event");
-    }
-
     bool isResourceRequired(Value val) {
         return requiresCameraResource(val) || requiresServerResource(val);
     }
