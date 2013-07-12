@@ -16,26 +16,9 @@
                               WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
                         </Shortcut>
                     </File>
-
-                    <!--<ServiceInstall Id="${installer.customization}AppLauncherService"
-                                Name="${installer.customization}AppLauncher"
-                                DisplayName="${applauncher.name}"
-                                Type="ownProcess"
-                                Start="auto"
-                                ErrorControl="normal"
-                                Description="${applauncher.name}">
-                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
-                </ServiceInstall>                               
-                
-                <ServiceControl Id="Start${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Start="install" Wait="no" />
-                <ServiceControl Id="Stop${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Stop="both" Wait="yes" Remove="uninstall" />   -->
                 </Component>
 
                 <Component Id="AppLauncherConfiguration" Permanent="yes">
-                    <!--<Condition>
-                        NOT PREVIOUSVERSIONSINSTALLED
-                    </Condition> -->
-
                     <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\${applauncher.name}">
                         <RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
