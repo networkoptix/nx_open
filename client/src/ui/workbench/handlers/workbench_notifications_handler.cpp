@@ -3,6 +3,8 @@
 #include <client/client_settings.h>
 #include <client_message_processor.h>
 
+#include <business/business_strings_helper.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -82,7 +84,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     }
 
     if (!(m_showBusinessEventsHelper->value() & (1ull << eventType))) {
-        qDebug() << "popup received, ignoring" << BusinessEventType::toString(eventType);
+        qDebug() << "popup received, ignoring" << QnBusinessStringsHelper::eventName(eventType);
         return;
     }
 
@@ -90,7 +92,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::AllResources);
     QString resource = res ? res->getName() : QString();
 
-    qDebug() << "popup received" << eventType << BusinessEventType::toString(eventType) << "from" << resource << "(" << id << ")";
+    qDebug() << "popup received" << eventType << QnBusinessStringsHelper::eventName(eventType) << "from" << resource << "(" << id << ")";
     emit businessActionAdded(businessAction);
 }
 

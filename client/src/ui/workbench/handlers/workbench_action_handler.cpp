@@ -3687,13 +3687,23 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QnReso
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
     action(Qn::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
-    if (!action(Qn::TogglePanicModeAction)->isChecked())
-        action(Qn::TogglePanicModeAction)->setEnabled(context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled());
+    //if (!action(Qn::TogglePanicModeAction)->isChecked()) {
+
+    bool enabled = 
+        context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
+        (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
+    action(Qn::TogglePanicModeAction)->setEnabled(enabled);
+
+    //}
 }
 
 void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
-    action(Qn::TogglePanicModeAction)->setEnabled(context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled()
-                                                  || action(Qn::TogglePanicModeAction)->isChecked());
+    // TODO: #Elric totally evil copypasta and hacky workaround.
+    bool enabled = 
+        context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
+        (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
+
+    action(Qn::TogglePanicModeAction)->setEnabled(enabled);
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {

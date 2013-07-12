@@ -10,6 +10,7 @@
 #include <core/resource/user_resource.h>
 
 #include <business/business_action_parameters.h>
+#include <business/business_strings_helper.h>
 #include <business/events/abstract_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
@@ -18,6 +19,7 @@
 
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/notification_sound_model.h>
+#include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -49,7 +51,7 @@ namespace {
     }
 
     QString eventTypeString(BusinessEventType::Value eventType, Qn::ToggleState eventState, BusinessActionType::Value actionType) {
-        QString typeStr = BusinessEventType::toString(eventType);
+        QString typeStr = QnBusinessStringsHelper::eventName(eventType);
         if (BusinessActionType::hasToggleState(actionType))
             return QObject::tr("While %1").arg(typeStr);
         else
@@ -81,7 +83,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     for (int i = 0; i < BusinessEventType::Count; i++) {
         BusinessEventType::Value val = (BusinessEventType::Value)i;
 
-        QStandardItem *item = new QStandardItem(BusinessEventType::toString(val));
+        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(val));
         item->setData(val);
 
         QList<QStandardItem *> row;
@@ -621,14 +623,20 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                 if (m_actionType == BusinessActionType::SendMail) {
                     if (!isValid(QnBusiness::TargetColumn))
                         return qnResIconCache->icon(QnResourceIconCache::Offline, true);
-                    return qnResIconCache->icon(QnResourceIconCache::Users);
+                    else
+                        return qnResIconCache->icon(QnResourceIconCache::Users);
 
                 } else if (m_actionType == BusinessActionType::ShowPopup) {
                     if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
                         return qnResIconCache->icon(QnResourceIconCache::User);
                     else
                         return qnResIconCache->icon(QnResourceIconCache::Users);
+
+                } else if (m_actionType == BusinessActionType::PlaySound || m_actionType == BusinessActionType::SayText) {
+                    return qnSkin->icon("tree/sound.png");
                 }
+
+
 
                 QnResourceList resources = m_actionResources; //TODO: #GDM filtered by type
                 if (!BusinessActionType::requiresCameraResource(m_actionType)) {

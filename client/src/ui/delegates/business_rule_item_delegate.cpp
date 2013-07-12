@@ -5,6 +5,7 @@
 #include <QtGui/QComboBox>
 
 #include <business/business_action_parameters.h>
+#include <business/business_strings_helper.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -163,7 +164,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 QComboBox* comboBox = new QComboBox(parent);
                 for (int i = 0; i < BusinessEventType::Count; i++) {
                     BusinessEventType::Value val = (BusinessEventType::Value)i;
-                    comboBox->addItem(BusinessEventType::toString(val), val);
+                    comboBox->addItem(QnBusinessStringsHelper::eventName(val), val);
                 }
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                 return comboBox;
