@@ -32,7 +32,6 @@ public:
     static QString eventParamsString(BusinessEventType::Value eventType, const QnBusinessEventParameters &params);
 
     static QString motionUrl(const QnBusinessEventParameters &params);
-    static QString formatEmailList(const QStringList& value);
 private:
 
     /** Common part of full event description*/

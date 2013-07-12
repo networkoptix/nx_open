@@ -191,6 +191,17 @@ bool QnBusinessRuleProcessor::checkRuleCondition(QnAbstractBusinessEventPtr bEve
     return true;
 }
 
+QString QnBusinessRuleProcessor::formatEmailList(const QStringList &value) {
+    QString result;
+    for (int i = 0; i < value.size(); ++i)
+    {
+        if (i > 0)
+            result.append(L' ');
+        result.append(QString(QLatin1String("%1")).arg(value[i].trimmed()));
+    }
+    return result;
+}
+
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
     bool condOK = checkRuleCondition(bEvent, rule);
@@ -400,7 +411,13 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
                 EMAIL_SEND_TIMEOUT,
                 this,
                 SLOT(at_sendEmailFinished(int,bool,int)));
-    action->getParams().setEmailAddress(QnBusinessStringsHelper::formatEmailList(recipients)); // update final email list in action (for storing into DB)
+
+    /*
+     * This action instance is not used anymore but storing into the Events Log db.
+     * Therefore we are storing all used emails in order to not recalculate them in
+     * the event log processing methods. --rvasilenko
+     */
+    action->getParams().setEmailAddress(formatEmailList(recipients));
     return true;
 }
 
