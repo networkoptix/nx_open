@@ -419,6 +419,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     QSet<QnStorageResourcePtr> result;
     QSet<QnStorageResourcePtr> smallStorages;
 
+    QMutexLocker lock(&m_mutexStorages);
     for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
