@@ -30,7 +30,7 @@
 
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
-    QWidget(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     d_ptr(new QnCameraSettingsWidgetPrivate()),
     ui(new Ui::SingleCameraSettingsWidget),
@@ -233,12 +233,21 @@ const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
 }
 
 void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &camera) {
+    Q_D(QnCameraSettingsWidget);
+
     if(m_camera == camera)
         return;
 
+    if(m_camera)
+        disconnect(m_camera, NULL, this, NULL);
+
     m_camera = camera;
-    Q_D(QnCameraSettingsWidget);
     d->setCameras(QnVirtualCameraResourceList() << camera);
+
+    if(m_camera) {
+        connect(m_camera, SIGNAL(urlChanged()), this, SLOT(updateIpAddressText()));
+        connect(m_camera, SIGNAL(urlChanged()), this, SLOT(updateWebPageText())); // TODO: #Elric also listen to hostAddress changes?
+    }
 
     updateFromResource();
 }
@@ -359,8 +368,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->firmwareEdit->setText(QString());
         ui->enableAudioCheckBox->setChecked(false);
         ui->macAddressEdit->setText(QString());
-        ui->ipAddressEdit->setText(QString());
-        ui->webPageLabel->setText(QString());
         ui->loginEdit->setText(QString());
         ui->passwordEdit->setText(QString());
 
@@ -371,7 +378,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         ui->softwareMotionButton->setEnabled(false);
         ui->cameraMotionButton->setText(QString());
-        ui->motionWebPageLabel->setText(QString());
         ui->cameraMotionButton->setChecked(false);
         ui->softwareMotionButton->setChecked(false);
 
@@ -380,19 +386,12 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->motionAvailableLabel->setVisible(true);
         ui->analogGroupBox->setVisible(false);
     } else {
-        QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
-        QUrl url = QUrl::fromUserInput(m_camera->getUrl());
-        if (url.isValid() && url.port() != 80 && url.port() > 0)
-            webPageAddress += QLatin1Char(':') + QString::number(url.port());
-
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
         ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
-        ui->ipAddressEdit->setText(m_camera->getUrl());
-        ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());
 
@@ -433,7 +432,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
 
             // TODO #Elric: wrong, need to get camera-specific web page
-            ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
             ui->cameraMotionButton->setChecked(m_camera->getMotionType() != Qn::MT_SoftwareGrid);
             ui->softwareMotionButton->setChecked(m_camera->getMotionType() == Qn::MT_SoftwareGrid);
 
@@ -450,6 +448,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     updateMotionWidgetFromResource();
     updateMotionAvailability();
     updateLicenseText();
+    updateIpAddressText();
+    updateWebPageText();
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
@@ -754,6 +754,35 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
 
     ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
+}
+
+void QnSingleCameraSettingsWidget::updateIpAddressText() {
+    if(m_camera) {
+        ui->ipAddressEdit->setText(m_camera->getUrl());
+    } else {
+        ui->ipAddressEdit->clear();
+    }
+}
+
+void QnSingleCameraSettingsWidget::updateWebPageText() {
+    if(m_camera) {
+        QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
+        QUrl url = QUrl::fromUserInput(m_camera->getUrl());
+        if (url.isValid() && url.port() != 80 && url.port() > 0)
+            webPageAddress += QLatin1Char(':') + QString::number(url.port());
+
+        ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+
+        if (!m_camera->isDtsBased()) {
+            // TODO #Elric: wrong, need to get camera-specific web page
+            ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+        } else {
+            ui->motionWebPageLabel->clear();
+        }
+    } else {
+        ui->webPageLabel->clear();
+        ui->motionWebPageLabel->clear();
+    }
 }
 
 void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {

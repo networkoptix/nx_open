@@ -19,6 +19,7 @@
 
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/notification_sound_model.h>
+#include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -622,7 +623,8 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                 if (m_actionType == BusinessActionType::SendMail) {
                     if (!isValid(QnBusiness::TargetColumn))
                         return qnResIconCache->icon(QnResourceIconCache::Offline, true);
-                    return qnResIconCache->icon(QnResourceIconCache::Users);
+                    else
+                        return qnResIconCache->icon(QnResourceIconCache::Users);
 
                 } else if (m_actionType == BusinessActionType::ShowPopup) {
                     if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
@@ -630,9 +632,8 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                     else
                         return qnResIconCache->icon(QnResourceIconCache::Users);
 
-                } else if (m_actionType ==BusinessActionType::PlaySound) {
-                    //TODO: #Elric replace sound icon
-                    return qnResIconCache->icon(QnResourceIconCache::Servers);
+                } else if (m_actionType == BusinessActionType::PlaySound || m_actionType == BusinessActionType::SayText) {
+                    return qnSkin->icon("tree/sound.png");
                 }
 
 
