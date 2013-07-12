@@ -91,7 +91,7 @@ qreal QnFisheyePtzController::boundXAngle(qreal value, qreal fov) const
 qreal QnFisheyePtzController::boundYAngle(qreal value, qreal fov) const
 {
     qreal yRange = (FISHEYE_FOV - fov) / 2.0 / m_dstPos.aspectRatio;
-    if (!m_devorpingParams.horizontalView)
+    if (m_devorpingParams.horizontalView)
         return qBound(-yRange, value, yRange);
     else
         return qBound(0.0, value, yRange / 2.0);
