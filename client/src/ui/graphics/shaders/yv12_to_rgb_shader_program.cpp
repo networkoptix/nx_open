@@ -219,15 +219,18 @@ QString QnFisheyeVerticalShaderProgram::getShaderText()
                                 0.0,  0.0,    0.0,    opacity); // avoid +0x80 for uv directly in matrix
 
     float kx = 2.0*tan(dstFov/2.0);
-    float ky = kx/aspectRatio;
+    float ky = kx/aspectRatio*2.0;
     // rotate around X axis and scale
     mat3 rotX = mat3( kx,      0.0,                       0.0,
                       0.0,     cos(yShift-PI/2.0)*ky,            -sin(yShift-PI/2.0),
                       0.0,     sin(yShift-PI/2.0)*ky,            cos(yShift-PI/2.0));
     void main() 
     {
-        vec2 pos = gl_TexCoord[0].st - 0.5; // go to coordinates in range [-0.5..0.5]
+        vec2 pos = vec2(gl_TexCoord[0].x - 0.5,
+                        gl_TexCoord[0].y - 1.0);
+
         vec3 pos3d = vec3(pos.x, pos.y, 1.0) * rotX; // 3d vector on surface, rotate and scale
+
 
         float theta = atan(pos3d.x, pos3d.z);
         float z = pos3d.y / length(pos3d);
