@@ -49,8 +49,6 @@ private:
 
     static QString eventReason(const QnBusinessEventParameters& params);
 
-    static QString eventExtendedSource(const QnBusinessEventParameters& params);
-
     static QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount);
 };
 

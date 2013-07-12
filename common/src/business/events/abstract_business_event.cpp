@@ -82,40 +82,6 @@ namespace BusinessEventType
         }
     }
 
-    bool hasReason(Value val) {
-        switch (val)
-        {
-        case Storage_Failure:
-        case Network_Issue:
-        case MediaServer_Failure:
-            return true;
-        default:
-            return false;
-        }
-    }
-
-    bool hasConflicts(Value val) {
-        switch (val)
-        {
-        case Camera_Ip_Conflict:
-        case MediaServer_Conflict:
-            return true;
-        default:
-            return false;
-        }
-    }
-
-    bool hasExtendedSource(Value val) {
-        switch (val)
-        {
-        case Camera_Input:
-            return true;
-        default:
-            return false;
-        }
-    }
-
-
     bool requiresCameraResource(Value val) {
         switch( val )
         {

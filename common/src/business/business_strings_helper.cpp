@@ -107,9 +107,12 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     result += delimiter;
     result += tr("Source: %1").arg(eventSource(params, useIp));
 
-    if (useHtml && eventType == BusinessEventType::Camera_Motion)
+    if (useHtml && eventType == BusinessEventType::Camera_Motion) {
+        result += delimiter;
         result += tr("Url: %1").arg(motionUrl(params));
+    }
 
+    result += delimiter;
     result += aggregatedEventDetails(action, aggregationInfo, delimiter);
 
     return result;
@@ -118,25 +121,45 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
 QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString &delimiter) {
     QString result;
 
+    result += eventTimestamp(params, aggregationCount);
+
     BusinessEventType::Value eventType = params.getEventType();
-    if (BusinessEventType::hasExtendedSource(eventType)) {
-        result += delimiter;
-        result += eventExtendedSource(params);
+    switch (eventType) {
+    case BusinessEventType::Camera_Input: {
+            result += delimiter;
+            result = tr("Input port: %1").arg(params.getInputPortId());
+            break;
+        }
+    case BusinessEventType::Storage_Failure:
+    case BusinessEventType::Network_Issue:
+    case BusinessEventType::MediaServer_Failure: {
+            result += delimiter;
+            result += tr("Reason: %1").arg(eventReason(params));
+            break;
+        }
+    case BusinessEventType::Camera_Ip_Conflict: {
+            result += delimiter;
+            result += tr("Conflict address: %1").arg(params.getSource());
+
+            int n = 0;
+            foreach (QString mac, params.getConflicts()) {
+                result += delimiter;
+                result += tr("Camera #%1 MAC: %2").arg(++n).arg(mac);
+            }
+
+            break;
+        }
+    case BusinessEventType::MediaServer_Conflict: {
+            int n = 0;
+            foreach (QString ip, params.getConflicts()) {
+                result += delimiter;
+                result += tr("Conflicting EC #%1: %2").arg(++n).arg(ip);
+            }
+            break;
+        }
+    default:
+        break;
     }
-
-    result += delimiter;
-    result += tr("Time: %1").arg(eventTimestamp(params, aggregationCount));
-
-    if (BusinessEventType::hasReason(eventType)) {
-        result += delimiter;
-        result += tr("Reason: %1").arg(eventReason(params));
-    }
-
-    if (BusinessEventType::hasConflicts(eventType)) {
-        result += delimiter;
-        result += tr("Conflicts: %1 vs\n%2").arg(params.getSource()).arg(params.getConflicts().join(delimiter));
-    }
-
     return result;
 }
 
@@ -146,11 +169,11 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
 
     int count = qMax(aggregationCount, 1);
     if (count == 1)
-        return tr("at %1 on %2", "%1 means time, %2 means date")
+        return tr("Time: %1 on %2", "%1 means time, %2 means date")
             .arg(time.time().toString())
             .arg(time.date().toString());
     else
-        return tr("%n times, first time at %1 on %2", "%1 means time, %2 means date", count)
+        return tr("First occurence: %1 on %2 (%n times total)", "%1 means time, %2 means date", count)
             .arg(time.time().toString())
             .arg(time.date().toString());
 }
@@ -208,19 +231,6 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     return result;
 }
 
-QString QnBusinessStringsHelper::eventExtendedSource(const QnBusinessEventParameters &params) {
-    QString result;
-
-    switch (params.getEventType()) {
-    case BusinessEventType::Camera_Input:
-        result = tr("Input port: %1").arg(params.getInputPortId());
-        break;
-    default:
-        break;
-    }
-    return result;
-}
-
 QString QnBusinessStringsHelper::aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
                                               const QnBusinessAggregationInfo& aggregationInfo,
                                               const QString& delimiter) {
@@ -230,7 +240,7 @@ QString QnBusinessStringsHelper::aggregatedEventDetails(const QnAbstractBusiness
     }
 
     foreach (QnInfoDetail detail, aggregationInfo.toList()) {
-        if (!result.isEmpty() > 0)
+        if (!result.isEmpty())
             result += delimiter;
         result += eventDetails(detail.runtimeParams, detail.count, delimiter);
     }
