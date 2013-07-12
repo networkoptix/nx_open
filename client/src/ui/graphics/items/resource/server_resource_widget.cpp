@@ -585,6 +585,11 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painte
 }
 
 void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painter) {
+    if(!m_gl)
+        m_gl.reset(new QnGlFunctions(QGLContext::currentContext()));
+    if(!(m_gl->features() & QnGlFunctions::ArbPrograms))
+        return; /* Don't draw anything on old OpenGL versions. */
+
     qreal width = rect.width();
     qreal height = rect.height();
     qreal min = qMin(width, height);
@@ -598,6 +603,7 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
         return;
 
     QRectF inner(offset, offset, ow, oh);
+
 
     /* Draw background */
     if(!m_backgroundGradientPainter)
