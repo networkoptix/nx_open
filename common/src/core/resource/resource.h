@@ -225,6 +225,7 @@ public:
     virtual QnAbstractPtzController* getPtzController(); // TODO: #vasilenko: OMG what is THIS doing here???
 
     static void stopAsyncTasks();
+
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
