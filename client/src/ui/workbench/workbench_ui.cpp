@@ -1185,6 +1185,9 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
     } else {
         setCalendarVisible(calendarVisible, animate);
     }
+
+    if(!calendarVisible)
+        setCalendarOpened(false);
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
