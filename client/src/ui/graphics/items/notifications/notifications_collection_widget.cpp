@@ -23,7 +23,6 @@
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/style/skin.h>
-#include <ui/style/resource_icon_cache.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
@@ -150,7 +149,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 
     QnImageButtonWidget *filterButton = new QnImageButtonWidget(m_headerWidget);
-    filterButton->setIcon(qnSkin->icon("item/search.png"));
+    filterButton->setIcon(qnSkin->icon("events/filter.png"));
     filterButton->setToolTip(tr("Filter..."));
     filterButton->setFixedSize(buttonSize);
     filterButton->setCached(true);
@@ -269,7 +268,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case BusinessEventType::Camera_Motion: {
         item->setColorLevel(QnNotificationItem::Common);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/camera.png"),
             tr("Browse Archive"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)
@@ -280,7 +279,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case BusinessEventType::Camera_Input: {
         item->setColorLevel(QnNotificationItem::Common);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/camera.png"),
             tr("Open Camera"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
@@ -291,7 +290,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case BusinessEventType::Camera_Disconnect: {
         item->setColorLevel(QnNotificationItem::Important);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/camera.png"),
             tr("Camera Settings"),
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
@@ -312,7 +311,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case BusinessEventType::Network_Issue:{
         item->setColorLevel(QnNotificationItem::Important);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/server.png"),
             tr("Camera Settings"),
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
@@ -325,7 +324,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         QString webPageAddress = params.getSource();
 
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/camera.png"),
             tr("Open camera web page..."),
             Qn::BrowseUrlAction,
             QnActionParameters().withArgument(Qn::UrlRole, webPageAddress)
@@ -336,7 +335,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case BusinessEventType::MediaServer_Failure: {
         item->setColorLevel(QnNotificationItem::Critical);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/server.png"),
             tr("Settings"),
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
@@ -348,7 +347,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case BusinessEventType::MediaServer_Conflict: {
         item->setColorLevel(QnNotificationItem::Critical);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/server.png"),
             tr("Description"),
             Qn::MessageBoxAction,
             QnActionParameters().
