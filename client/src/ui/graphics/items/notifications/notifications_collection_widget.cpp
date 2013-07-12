@@ -44,8 +44,8 @@ namespace {
 
 QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
     base_type(parent),
-    m_count(0),
-    m_time(0)
+    m_time(0),
+    m_count(0)
 {
     registerAnimation(this);
     startListening();
@@ -257,8 +257,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     QnNotificationItem *item = new QnNotificationItem(m_list);
 
-    item->setText(QnBusinessStringsHelper::shortEventDescription(params));
-    item->setTooltipText(QnBusinessStringsHelper::longEventDescription(businessAction));
+    item->setText(QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree()));
+    item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
 
     QString name = getResourceName(resource);
 
@@ -329,7 +329,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::BrowseUrlAction,
             QnActionParameters().withArgument(Qn::UrlRole, webPageAddress)
         );
-
         break;
     }
     case BusinessEventType::MediaServer_Failure: {
@@ -340,8 +339,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
         );
-
-        item->setText(tr("Failure on %1.").arg(name));
         break;
     }
     case BusinessEventType::MediaServer_Conflict: {
@@ -524,26 +521,76 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
 
         QnBusinessEventParameters params;
         params.setEventType(eventType);
+        params.setEventTimestamp((quint64)QDateTime::currentMSecsSinceEpoch() * 1000ull);
         switch(eventType) {
-        case BusinessEventType::Camera_Motion:
-        case BusinessEventType::Camera_Input:
-        case BusinessEventType::Camera_Disconnect:
-        case BusinessEventType::Network_Issue:
-            params.setEventResourceId(sampleCamera->getId());
-            break;
+        case BusinessEventType::Camera_Motion: {
+                params.setEventResourceId(sampleCamera->getId());
 
-        case BusinessEventType::Storage_Failure:
-        case BusinessEventType::Camera_Ip_Conflict:
-        case BusinessEventType::MediaServer_Failure:
-        case BusinessEventType::MediaServer_Conflict:
-            params.setEventResourceId(sampleServer->getId());
-            break;
+                break;
+            }
+
+        case BusinessEventType::Camera_Input: {
+                params.setEventResourceId(sampleCamera->getId());
+                params.setInputPortId(lit("01"));
+                break;
+            }
+
+        case BusinessEventType::Camera_Disconnect: {
+                params.setEventResourceId(sampleCamera->getId());
+                break;
+            }
+
+        case BusinessEventType::Network_Issue:{
+                params.setEventResourceId(sampleCamera->getId());
+                params.setReasonCode(QnBusiness::NetworkIssueNoFrame);
+                params.setReasonText(lit("15"));
+                break;
+            }
+
+        case BusinessEventType::Storage_Failure:{
+                params.setEventResourceId(sampleServer->getId());
+                params.setReasonCode(QnBusiness::StorageIssueNotEnoughSpeed);
+                params.setReasonText(lit("C: E:"));
+                break;
+            }
+
+        case BusinessEventType::Camera_Ip_Conflict:{
+                params.setEventResourceId(sampleServer->getId());
+                params.setSource(lit("192.168.0.5"));
+
+                QStringList conflicts;
+                conflicts << lit("50:e5:49:43:b2:59");
+                conflicts << lit("50:e5:49:43:b2:60");
+                conflicts << lit("50:e5:49:43:b2:61");
+                conflicts << lit("50:e5:49:43:b2:62");
+                conflicts << lit("50:e5:49:43:b2:63");
+                conflicts << lit("50:e5:49:43:b2:64");
+                params.setConflicts(conflicts);
+                break;
+            }
+        case BusinessEventType::MediaServer_Failure:{
+                params.setEventResourceId(sampleServer->getId());
+                params.setReasonCode(QnBusiness::MServerIssueTerminated);
+                break;
+            }
+
+        case BusinessEventType::MediaServer_Conflict: {
+                params.setEventResourceId(sampleServer->getId());
+                params.setSource(lit("10.0.2.187"));
+
+                QStringList conflicts;
+                conflicts << lit("10.0.2.108");
+                conflicts << lit("192.168.0.15");
+                params.setConflicts(conflicts);
+                break;
+            }
         default:
             break;
 
         }
 
         QnAbstractBusinessActionPtr baction(new QnCommonBusinessAction(BusinessActionType::ShowPopup, params));
+        baction->setAggregationCount(random(1, 5));
         showBusinessAction(baction);
     }
 }

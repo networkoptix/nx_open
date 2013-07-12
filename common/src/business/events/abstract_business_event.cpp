@@ -77,63 +77,62 @@ namespace BusinessEventType
         case Camera_Motion:
         case Camera_Input:
             return true;
-
-        case Camera_Disconnect:
-        case Storage_Failure:
-        case Network_Issue:
-        case Camera_Ip_Conflict:
-        case MediaServer_Failure:
-        case MediaServer_Conflict:
-            return false;
-
         default:
             return false;
         }
-        //warning should be raised on unknown events;
-        return false;
     }
 
-    bool requiresCameraResource(Value val) {
-        if (val >= Count)
+    bool hasReason(Value val) {
+        switch (val)
+        {
+        case Storage_Failure:
+        case Network_Issue:
+        case MediaServer_Failure:
+            return true;
+        default:
             return false;
+        }
+    }
+
+    bool hasConflicts(Value val) {
+        switch (val)
+        {
+        case Camera_Ip_Conflict:
+        case MediaServer_Conflict:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool hasExtendedSource(Value val) {
+        switch (val)
+        {
+        case Camera_Input:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+
+    bool requiresCameraResource(Value val) {
         switch( val )
         {
         case Camera_Motion:
         case Camera_Input:
         case Camera_Disconnect:
             return true;
-
-        case Storage_Failure:
-        case Network_Issue:
-        case Camera_Ip_Conflict:
-        case MediaServer_Failure:
-        case MediaServer_Conflict:
-            return false;
-
         default:
             return false;
         }
-        return false;
     }
 
     bool requiresServerResource(Value val) {
-        if (val >= Count)
-            return false;
-
         switch( val )
         {
         case Storage_Failure:
             return false; //TODO: #GDM restore when will work fine
-
-        case Camera_Motion:
-        case Camera_Input:
-        case Camera_Disconnect:
-        case Network_Issue:
-        case Camera_Ip_Conflict:
-        case MediaServer_Failure:
-        case MediaServer_Conflict:
-            return false;
-
         default:
             return false;
         }

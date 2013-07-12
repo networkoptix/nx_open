@@ -22,6 +22,15 @@ namespace BusinessEventType
 
     bool hasToggleState(Value val);
 
+    /** Event should have a reason field */
+    bool hasReason(Value val);
+
+    /** Event should have a conflicts field */
+    bool hasConflicts(Value val);
+
+    /** Event should have an additional source field */
+    bool hasExtendedSource(Value val);
+
     bool requiresCameraResource(Value val);
 
     bool requiresServerResource(Value val);

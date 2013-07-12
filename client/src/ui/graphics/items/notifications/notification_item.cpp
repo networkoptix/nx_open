@@ -32,7 +32,7 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     m_textLabel(new QnProxyLabel(this)),
     m_thumbnailLabel(NULL)
 {
-    m_textLabel->setAlignment(Qt::AlignCenter);
+    m_textLabel->setAlignment(Qt::AlignLeft);
     m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 

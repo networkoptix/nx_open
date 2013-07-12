@@ -10,45 +10,48 @@ class QnBusinessStringsHelper: public QObject
 {
     Q_OBJECT
 public:
-    static QString eventReason(const QnBusinessEventParameters& params);
-
-    /** Name of the event in common, e.g. 'Motion on Camera' */
+    /**
+     * Name of the event in common, e.g. 'Motion on Camera'
+     * Used primarily in lists where all event types are enumerated.
+     */
     static QString eventName(BusinessEventType::Value value);
 
-    /** Short description of the event */
-    static QString shortEventDescription(const QnBusinessEventParameters &params);
-
-    /** Full event description */
-    static QString longEventDescription(const QnAbstractBusinessActionPtr& action,
-                                            const QnBusinessAggregationInfo& aggregationInfo = QnBusinessAggregationInfo());
-
-    /** Full description in HTML format */
-    static QString longEventDescriptionHtml(const QnAbstractBusinessActionPtr& action,
-                                            const QnBusinessAggregationInfo& aggregationInfo = QnBusinessAggregationInfo());
+    /** Event <event> occured on the <resource> */
+    static QString eventAtResource(const QnBusinessEventParameters &params, bool useIp);
 
     /**
-    * Short description. Contain event params only. Doesn't include event type to message
-    */
-    static QString eventParamsString(BusinessEventType::Value eventType, const QnBusinessEventParameters &params);
+     * @brief eventDescription      Form full event description, splitted to lines.
+     * @param action                Action that describes the event.
+     * @param aggregationInfo       Aggregation details if events were aggregated.
+     * @param useIp                 Use resources addresses in the 'Source' field.
+     * @param useHtml               Create html-formatted output.
+     * @return                      Event description like this:
+     *                                  Event: Motion on camera
+     *                                  Source: Entrance Camera (192.168.0.5)
+     *                                  Time: 5 times, first time at 15.00 on 19.06.2013
+     *                                  ...
+     */
+    static QString eventDescription(const QnAbstractBusinessActionPtr& action,
+                                    const QnBusinessAggregationInfo& aggregationInfo,
+                                    bool useIp,
+                                    bool useHtml);
+
+    static QString eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString &delimiter);
 
     static QString motionUrl(const QnBusinessEventParameters &params);
 private:
-
-    /** Common part of full event description*/
-    static QString eventDescription(const QnAbstractBusinessActionPtr& action,
-                                    const QnBusinessAggregationInfo& aggregationInfo = QnBusinessAggregationInfo());
-
     /** Details of event: aggregation info, date and time, other info */
-    static QString eventDetails(const QnAbstractBusinessActionPtr& action,
-                                const QnBusinessAggregationInfo& aggregationInfo = QnBusinessAggregationInfo(),
-                                const QString& delimiter = QString());
+    static QString aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
+                                const QnBusinessAggregationInfo& aggregationInfo,
+                                const QString& delimiter);
 
+    static QString eventSource(const QnBusinessEventParameters &params, bool useIp);
 
-    static QString resourceUrl(const QnBusinessEventParameters &params);
+    static QString eventReason(const QnBusinessEventParameters& params);
 
-    static QString conflictString(const QnBusinessEventParameters &params);
+    static QString eventExtendedSource(const QnBusinessEventParameters& params);
 
-    static QString timestampString(const QnBusinessEventParameters &params, int aggregationCount);
+    static QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount);
 };
 
 #endif // __BUSINESS_STRINGS_HELPER_H__
