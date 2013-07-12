@@ -629,7 +629,13 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                         return qnResIconCache->icon(QnResourceIconCache::User);
                     else
                         return qnResIconCache->icon(QnResourceIconCache::Users);
+
+                } else if (m_actionType ==BusinessActionType::PlaySound) {
+                    //TODO: #Elric replace sound icon
+                    return qnResIconCache->icon(QnResourceIconCache::Servers);
                 }
+
+
 
                 QnResourceList resources = m_actionResources; //TODO: #GDM filtered by type
                 if (!BusinessActionType::requiresCameraResource(m_actionType)) {
