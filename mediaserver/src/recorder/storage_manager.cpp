@@ -419,8 +419,8 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     QSet<QnStorageResourcePtr> result;
     QSet<QnStorageResourcePtr> smallStorages;
 
-    QMutexLocker lock(&m_mutexStorages);
-    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    QnStorageManager::StorageMap storageRoots = getAllStorages();
+    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
         if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
