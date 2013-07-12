@@ -5,10 +5,12 @@
 
 struct DevorpingParams
 {
-    DevorpingParams(): enabled(false), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), pAngle(0.0), aspectRatio(1.0) {}
+    DevorpingParams(): enabled(false), horizontalView(false), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), pAngle(0.0), aspectRatio(1.0) {}
     bool operator==(const DevorpingParams& other) const
     {
         if (enabled != other.enabled)
+            return false;
+        if (horizontalView != other.horizontalView)
             return false;
         if (fabs(xAngle - other.xAngle) > 0.0001)
             return false;
@@ -27,6 +29,7 @@ struct DevorpingParams
     DevorpingParams(const DevorpingParams& other)
     {
         enabled = other.enabled;
+        horizontalView = other.horizontalView;
         xAngle = other.xAngle;
         yAngle = other.yAngle;
         fov = other.fov;
@@ -35,6 +38,7 @@ struct DevorpingParams
     }
 
     bool enabled;
+    bool horizontalView;
     // view angle and FOV at radians
     qreal xAngle;
     qreal yAngle;

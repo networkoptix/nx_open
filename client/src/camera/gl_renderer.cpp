@@ -109,8 +109,13 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     /* Prepare shaders. */
     m_yv12ToRgbShaderProgram.reset( new QnYv12ToRgbShaderProgram(context) );
     m_yv12ToRgbWithGammaShaderProgram.reset( new QnYv12ToRgbWithGammaShaderProgram(context) );
-    m_yv12ToRgbWithFisheyeShaderProgram.reset( new QnYv12ToRgbWithFisheyeShaderProgram(context) );
-    m_yv12ToRgbWithFisheyeGammaShaderProgram.reset( new QnYv12ToRgbWithFisheyeAndGammaShaderProgram(context) );
+    
+    m_horizontalFisheyeProgram.reset(new QnFisheyeHorizontalShaderProgram(context));
+    m_verticalFisheyeProgram.reset(new QnFisheyeVerticalShaderProgram(context));
+    m_horizontalFisheyeGammaProgram.reset(new QnFisheyeWithGammaShaderProgram<QnFisheyeHorizontalShaderProgram>(context));
+    m_verticalFisheyeGammaProgram.reset(new QnFisheyeWithGammaShaderProgram<QnFisheyeVerticalShaderProgram>(context));
+
+
     m_yv12ToRgbaShaderProgram.reset( new QnYv12ToRgbaShaderProgram(context) );
     //m_nv12ToRgbShaderProgram.reset( new QnNv12ToRgbShaderProgram(context) );
 
@@ -311,11 +316,24 @@ void QnGLRenderer::drawYV12VideoTexture(
 
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
-    if (m_fisheyeController && m_fisheyeController->isEnabled()) {
-        if (m_imgCorrectParam.enabled)
-            shader = gammaShader = m_yv12ToRgbWithFisheyeGammaShaderProgram.data();
-        else
-            shader = m_yv12ToRgbWithFisheyeShaderProgram.data();
+    QnFisheyeShaderProgram* fisheyeShader = 0;
+    DevorpingParams params;
+    if (m_fisheyeController && m_fisheyeController->isEnabled()) 
+    {
+        params = m_fisheyeController->getDevorpingParams();
+        if (params.horizontalView) 
+        {
+            if (m_imgCorrectParam.enabled)
+                shader = gammaShader = fisheyeShader = m_horizontalFisheyeGammaProgram.data();
+            else
+                shader = fisheyeShader = m_horizontalFisheyeProgram.data();
+        }
+        else {
+            if (m_imgCorrectParam.enabled)
+                shader = gammaShader = fisheyeShader = m_verticalFisheyeGammaProgram.data();
+            else
+                shader = fisheyeShader = m_verticalFisheyeProgram.data();
+        }
     }
     else if (m_imgCorrectParam.enabled) {
         shader = gammaShader = m_yv12ToRgbWithGammaShaderProgram.data();
@@ -329,10 +347,9 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setVTexture( 2 );
     shader->setOpacity(m_decodedPictureProvider.opacity());
 
-    if (m_fisheyeController && m_fisheyeController->isEnabled()) {
-        DevorpingParams params = m_fisheyeController->getDevorpingParams();
+    if (fisheyeShader) {
         params.aspectRatio = picLock->width()/(float)picLock->height();
-        m_yv12ToRgbWithFisheyeShaderProgram->setDevorpingParams(params);
+        fisheyeShader->setDevorpingParams(params);
     }
     //shader->setDstFov(m_extraCurValue);
     //qDebug() << "m_extraCurValue" << m_extraCurValue;

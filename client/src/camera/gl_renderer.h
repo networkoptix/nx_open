@@ -74,8 +74,12 @@ private:
     unsigned int m_prevFrameSequence;
     QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
     QScopedPointer<QnYv12ToRgbWithGammaShaderProgram> m_yv12ToRgbWithGammaShaderProgram;
-    QScopedPointer<QnYv12ToRgbWithFisheyeShaderProgram> m_yv12ToRgbWithFisheyeShaderProgram;
-    QScopedPointer<QnYv12ToRgbWithFisheyeAndGammaShaderProgram> m_yv12ToRgbWithFisheyeGammaShaderProgram;
+
+    QScopedPointer<QnFisheyeHorizontalShaderProgram> m_horizontalFisheyeProgram;
+    QScopedPointer<QnFisheyeVerticalShaderProgram> m_verticalFisheyeProgram;
+    QScopedPointer<QnFisheyeWithGammaShaderProgram<QnFisheyeHorizontalShaderProgram> > m_horizontalFisheyeGammaProgram;
+    QScopedPointer<QnFisheyeWithGammaShaderProgram<QnFisheyeVerticalShaderProgram> > m_verticalFisheyeGammaProgram;
+
     QScopedPointer<QnYv12ToRgbaShaderProgram> m_yv12ToRgbaShaderProgram;
     QScopedPointer<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
     bool m_timeChangeEnabled;

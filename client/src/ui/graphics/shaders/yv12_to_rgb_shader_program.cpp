@@ -101,7 +101,7 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 
 // ============================= QnYv12ToRgbWithFisheyeShaderProgram ==================
 
-bool QnYv12ToRgbWithFisheyeShaderProgram::link()
+bool QnFisheyeShaderProgram::link()
 {
     bool rez = QnYv12ToRgbWithGammaShaderProgram::link();
     if (rez) {
@@ -114,10 +114,25 @@ bool QnYv12ToRgbWithFisheyeShaderProgram::link()
     return rez;
 }
 
-QnYv12ToRgbWithFisheyeShaderProgram::QnYv12ToRgbWithFisheyeShaderProgram(const QGLContext *context, QObject *parent, const QString& gammaStr): 
+QnFisheyeShaderProgram::QnFisheyeShaderProgram(const QGLContext *context, QObject *parent, const QString& shaderStr):
     QnYv12ToRgbWithGammaShaderProgram(context, parent, false) 
 {
-    QString shaderStr = lit(QN_SHADER_SOURCE(
+    addShaderFromSourceCode(QGLShader::Fragment, shaderStr);
+
+    link();
+}
+
+// ---------------------------- QnFisheyeHorizontalShaderProgram ------------------------------------
+
+QnFisheyeHorizontalShaderProgram::QnFisheyeHorizontalShaderProgram(const QGLContext *context, QObject *parent, const QString& gammaStr):
+    QnFisheyeShaderProgram(context, parent, getShaderText().arg(gammaStr))
+{
+
+}
+
+QString QnFisheyeHorizontalShaderProgram::getShaderText()
+{
+    return lit(QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
         uniform sampler2D uTexture;
         uniform sampler2D vTexture;
@@ -165,24 +180,78 @@ QnYv12ToRgbWithFisheyeShaderProgram::QnYv12ToRgbWithFisheyeShaderProgram(const Q
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
         gl_FragColor = vec4(%1,
+            texture2D(uTexture, pos).p,
+            texture2D(vTexture, pos).p,
+            1.0) * colorTransform;
+    }
+    ));
+}
+
+// ------------------ QnFisheyeVerticalShaderProgram -------------------
+
+QnFisheyeVerticalShaderProgram::QnFisheyeVerticalShaderProgram(const QGLContext *context, QObject *parent, const QString& gammaStr):
+    QnFisheyeShaderProgram(context, parent, getShaderText().arg(gammaStr))
+{
+
+}
+
+
+QString QnFisheyeVerticalShaderProgram::getShaderText() 
+{
+    return lit(QN_SHADER_SOURCE(
+        uniform sampler2D yTexture;
+        uniform sampler2D uTexture;
+        uniform sampler2D vTexture;
+        uniform float opacity;
+        uniform float yLevels1;
+        uniform float yLevels2;
+        uniform float yGamma;
+        uniform float xShift;
+        uniform float yShift;
+        uniform float perspShift; // unused
+        uniform float dstFov;
+        uniform float aspectRatio;
+
+    const float PI = 3.1415926535;
+    mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
+                                1.0, -0.344, -0.714,  0.529,
+                                1.0,  1.772,  0.0,   -0.886,
+                                0.0,  0.0,    0.0,    opacity); // avoid +0x80 for uv directly in matrix
+
+    float kx = 2.0*tan(dstFov/2.0);
+    float ky = kx/aspectRatio;
+    // rotate around X axis and scale
+    mat3 rotX = mat3( kx,      0.0,                       0.0,
+                      0.0,     cos(yShift-PI/2.0)*ky,            -sin(yShift-PI/2.0),
+                      0.0,     sin(yShift-PI/2.0)*ky,            cos(yShift-PI/2.0));
+    void main() 
+    {
+        vec2 pos = gl_TexCoord[0].st - 0.5; // go to coordinates in range [-0.5..0.5]
+        vec3 pos3d = vec3(pos.x, pos.y, 1.0) * rotX; // 3d vector on surface, rotate and scale
+
+        float theta = atan(pos3d.x, pos3d.z);
+        float z = pos3d.y / length(pos3d);
+
+        // Vector on 3D sphere
+        float k   = cos(asin(z)); // same as sqrt(1-z*z)
+        vec3 psph = vec3(k * sin(theta), k * cos(theta), z);
+
+        // Calculate fisheye angle and radius
+        theta      = atan(psph.z, psph.x) - xShift;
+        float r  = atan(length(psph.xz), psph.y) / PI;
+
+        // return from polar coordinates
+        pos = vec2(cos(theta), sin(theta)) * r + 0.5;
+
+        // do gamma correction and color transformation yuv->RGB
+        float y = texture2D(yTexture, pos).p;
+        gl_FragColor = vec4(%1,
                             texture2D(uTexture, pos).p,
                             texture2D(vTexture, pos).p,
                             1.0) * colorTransform;
     }
     ));
-
-    addShaderFromSourceCode(QGLShader::Fragment, shaderStr.arg(gammaStr));
-
-    link();
 }
-
-// ------------------ QnYv12ToRgbWithFisheyeAndGammaShaderProgram -------------------
-
-QnYv12ToRgbWithFisheyeAndGammaShaderProgram::QnYv12ToRgbWithFisheyeAndGammaShaderProgram(const QGLContext *context, QObject *parent):
-    QnYv12ToRgbWithFisheyeShaderProgram(context, parent, lit("pow(max(y+yLevels2, 0.0) * yLevels1, yGamma)"))
-{
-
-};
 
 
 // ============================ QnYv12ToRgbaShaderProgram ==================================

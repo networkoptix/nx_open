@@ -29,8 +29,13 @@ public:
     virtual bool isEnabled() const override;
 signals:
     void dewarpingParamsChanged(DevorpingParams params);
+    void spaceMapperChanged();
 private slots:
     void at_timer();
+private:
+    qreal boundXAngle(qreal value, qreal fov) const;
+    qreal boundYAngle(qreal value, qreal fov) const;
+    void updateSpaceMapper(bool horizontalView);
 private:
     QVector3D m_motion;
     QnResourceWidgetRenderer* m_renderer;

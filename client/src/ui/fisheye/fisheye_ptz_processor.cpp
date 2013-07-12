@@ -16,13 +16,10 @@ QnFisheyePtzController::QnFisheyePtzController(QnResource* resource):
     QnAbstractPtzController(resource),
     m_renderer(0),
     m_lastTime(0),
-    m_moveToAnimation(false)
+    m_moveToAnimation(false),
+    m_spaceMapper(0)
 {
-    QnScalarSpaceMapper xMapper(-90.0, 90.0, -90.0, 90.0, Qn::ConstantExtrapolation);
-    QnScalarSpaceMapper yMapper(-90.0, 90.0, -90.0, 90.0, Qn::ConstantExtrapolation);
-    QnScalarSpaceMapper zMapper(fovTo35mmEquiv(MIN_FOV), fovTo35mmEquiv(MAX_FOV), fovTo35mmEquiv(MIN_FOV), fovTo35mmEquiv(MAX_FOV), Qn::ConstantExtrapolation);
-
-    m_spaceMapper = new QnPtzSpaceMapper(QnVectorSpaceMapper(xMapper, yMapper, zMapper), QStringList());
+    updateSpaceMapper(false);
 }
 
 QnFisheyePtzController::~QnFisheyePtzController()
@@ -30,6 +27,35 @@ QnFisheyePtzController::~QnFisheyePtzController()
     if (m_renderer)
         m_renderer->setFisheyeController(0);
     delete m_spaceMapper;
+}
+
+void QnFisheyePtzController::updateSpaceMapper(bool horizontalView)
+{
+    if (m_spaceMapper)
+        delete m_spaceMapper;
+
+    QnScalarSpaceMapper zMapper(fovTo35mmEquiv(MIN_FOV), fovTo35mmEquiv(MAX_FOV), fovTo35mmEquiv(MIN_FOV), fovTo35mmEquiv(MAX_FOV), Qn::ConstantExtrapolation);
+    qreal minX, maxX, minY, maxY;
+    Qn::ExtrapolationMode xExtrapolationMode;
+
+    if (horizontalView) {
+        minX = minY = -180.0;
+        maxX = maxY = 180.0;
+        xExtrapolationMode = Qn::ConstantExtrapolation;
+    }
+    else {
+        minX = -180.0;
+        maxX = 180.0;
+        minY = 0.0;
+        maxY = 180.0;
+        xExtrapolationMode = Qn::PeriodicExtrapolation;
+    }
+
+    QnScalarSpaceMapper xMapper(minX, maxX, minX, maxX, xExtrapolationMode);
+    QnScalarSpaceMapper yMapper(minY, maxY, minY, maxY, Qn::ConstantExtrapolation);
+    m_spaceMapper = new QnPtzSpaceMapper(QnVectorSpaceMapper(xMapper, yMapper, zMapper), QStringList());
+
+    emit spaceMapperChanged();
 }
 
 void QnFisheyePtzController::addRenderer(QnResourceWidgetRenderer* renderer)
@@ -52,17 +78,33 @@ int QnFisheyePtzController::stopMove()
     return 0;
 }
 
+qreal QnFisheyePtzController::boundXAngle(qreal value, qreal fov) const
+{
+    //qreal yRange = xRange / m_dstPos.aspectRatio;
+    qreal xRange = (FISHEYE_FOV - fov) / 2.0;
+    if (m_devorpingParams.horizontalView)
+        return qBound(-xRange, value, xRange);
+    else
+        return value;
+}
+
+qreal QnFisheyePtzController::boundYAngle(qreal value, qreal fov) const
+{
+    qreal yRange = (FISHEYE_FOV - fov) / 2.0 / m_dstPos.aspectRatio;
+    if (!m_devorpingParams.horizontalView)
+        return qBound(-yRange, value, yRange);
+    else
+        return qBound(0.0, value, yRange / 2.0);
+}
+
 int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 {
     m_motion = QVector3D();
 
     m_dstPos.fov = qBound(MIN_FOV, mm35vToFov(zoomPos), MAX_FOV);
 
-    qreal xRange = (FISHEYE_FOV - m_dstPos.fov) / 2.0;
-    qreal yRange = xRange / m_dstPos.aspectRatio;
-
-    m_dstPos.xAngle = qBound(-xRange, gradToRad(xPos), xRange);
-    m_dstPos.yAngle = qBound(-yRange, gradToRad(yPos), yRange);
+    m_dstPos.xAngle = boundXAngle(gradToRad(xPos), m_dstPos.fov);
+    m_dstPos.yAngle = boundYAngle(gradToRad(yPos), m_dstPos.fov);
     m_srcPos = m_devorpingParams;
     m_moveToAnimation = true;
     return 0;
@@ -139,16 +181,19 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
         qreal xRange = (FISHEYE_FOV - newParams.fov) / 2.0;
         qreal yRange = xRange; // / newParams.aspectRatio;
 
-        newParams.xAngle = qBound(-xRange, newParams.xAngle, xRange);
-        newParams.yAngle = qBound(-yRange, newParams.yAngle, yRange);
+        newParams.xAngle = boundXAngle(newParams.xAngle, newParams.fov);
+        newParams.yAngle = boundYAngle(newParams.yAngle, newParams.fov);
         //newParams.pAngle = gradToRad(18.0);
         m_lastTime = newTime;
     }
     newParams.enabled = m_devorpingParams.enabled;
 
-    if (!(newParams == m_devorpingParams)) {
-        m_devorpingParams = newParams;
+    if (!(newParams == m_devorpingParams)) 
+    {
+        if (newParams.horizontalView != m_devorpingParams.horizontalView)
+            updateSpaceMapper(newParams.horizontalView);
         emit dewarpingParamsChanged(newParams);
+        m_devorpingParams = newParams;
     }
 
     return newParams;

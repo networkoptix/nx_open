@@ -58,15 +58,16 @@ private:
     int m_yGammaLocation;
 };
 
-class QnYv12ToRgbWithFisheyeShaderProgram : public QnYv12ToRgbWithGammaShaderProgram
+class QnFisheyeShaderProgram : public QnYv12ToRgbWithGammaShaderProgram
 {
 public:
-    QnYv12ToRgbWithFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
+    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& shaderText = QString());
     
     void setDevorpingParams(const DevorpingParams& params)
     {
         setUniformValue(m_xShiftLocation, (float) params.xAngle);
-        setUniformValue(m_yShiftLocation, (float) params.yAngle);
+        //setUniformValue(m_yShiftLocation, (float) params.yAngle);
+        //setUniformValue(m_yShiftLocation, (float) (M_PI/2.0));
         setUniformValue(m_perspShiftLocation, (float) params.pAngle);
         setUniformValue(m_dstFovLocation, (float) params.fov);
         setUniformValue(m_aspectRatioLocation, (float) params.aspectRatio);
@@ -81,10 +82,28 @@ protected:
     int m_aspectRatioLocation;
 };
 
-class QnYv12ToRgbWithFisheyeAndGammaShaderProgram : public QnYv12ToRgbWithFisheyeShaderProgram
+class QnFisheyeHorizontalShaderProgram : public QnFisheyeShaderProgram
 {
 public:
-    QnYv12ToRgbWithFisheyeAndGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnFisheyeHorizontalShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
+protected:
+    QString getShaderText();
+};
+
+class QnFisheyeVerticalShaderProgram : public QnFisheyeShaderProgram
+{
+public:
+    QnFisheyeVerticalShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
+protected:
+    QString getShaderText();
+};
+
+template <typename T>
+class QnFisheyeWithGammaShaderProgram : public T
+{
+public:
+    QnFisheyeWithGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL):
+      T(context, parent, getShaderText().arg(lit("pow(max(y+yLevels2, 0.0) * yLevels1, yGamma)"))) {}
 };
 
 class QnYv12ToRgbaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
