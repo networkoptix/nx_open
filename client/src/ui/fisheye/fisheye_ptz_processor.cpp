@@ -19,7 +19,7 @@ QnFisheyePtzController::QnFisheyePtzController(QnResource* resource):
     m_moveToAnimation(false),
     m_spaceMapper(0)
 {
-    updateSpaceMapper(false);
+    updateSpaceMapper(DevorpingParams().horizontalView);
 }
 
 QnFisheyePtzController::~QnFisheyePtzController()
@@ -199,7 +199,6 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
 
         newParams.xAngle = boundXAngle(newParams.xAngle, newParams.fov);
         newParams.yAngle = boundYAngle(newParams.yAngle, newParams.fov);
-        //newParams.pAngle = gradToRad(18.0);
         m_lastTime = newTime;
     }
     newParams.enabled = m_devorpingParams.enabled;
@@ -212,7 +211,8 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
         m_devorpingParams = newParams;
     }
 
-    newParams.pAngle = -0.25;
+    //newParams.pAngle = -0.25;
+    newParams.pAngle = gradToRad(-18.0);
     return newParams;
 }
 
