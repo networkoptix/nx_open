@@ -5,7 +5,7 @@
 
 struct DevorpingParams
 {
-    DevorpingParams(): enabled(false), horizontalView(false), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), pAngle(0.0), aspectRatio(1.0) {}
+    DevorpingParams(): enabled(false), horizontalView(true), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0), aspectRatio(1.0) {}
     bool operator==(const DevorpingParams& other) const
     {
         if (enabled != other.enabled)
@@ -16,7 +16,7 @@ struct DevorpingParams
             return false;
         if (fabs(yAngle - other.yAngle) > 0.0001)
             return false;
-        if (fabs(pAngle - other.pAngle) > 0.0001)
+        if (fabs(fovRot - other.fovRot) > 0.0001)
             return false;
         if (fabs(fov - other.fov) > 0.0001)
             return false;
@@ -33,7 +33,7 @@ struct DevorpingParams
         xAngle = other.xAngle;
         yAngle = other.yAngle;
         fov = other.fov;
-        pAngle = other.pAngle;
+        fovRot = other.fovRot;
         aspectRatio = other.aspectRatio;
     }
 
@@ -44,7 +44,7 @@ struct DevorpingParams
     qreal yAngle;
     qreal fov;
     // perspective correction angle
-    qreal pAngle;
+    qreal fovRot;
     qreal aspectRatio;
 };
 
