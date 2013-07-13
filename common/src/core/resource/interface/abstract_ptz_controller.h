@@ -103,4 +103,13 @@ private:
     QnSecurityCamResource* m_resource;
 };
 
+class QnVirtualPtzController: public QnAbstractPtzController
+{
+public:
+    QnVirtualPtzController(QnResource* resource): QnAbstractPtzController(resource), m_animate(false) {}
+    void setAnimationEnabled(bool value) { m_animate = value; }
+protected:
+    bool m_animate;
+};
+
 #endif // QN_ABSTRACT_PTZ_CONTROLLER_H

@@ -868,7 +868,7 @@ void QnMediaResourceWidget::at_renderWatcher_displayingChanged(QnResourceWidget 
         updateRendererEnabled();
 }
 
-QnAbstractPtzController* QnMediaResourceWidget::virtualPtzController() const
+QnVirtualPtzController* QnMediaResourceWidget::virtualPtzController() const
 {
     return m_ptzController;
 }

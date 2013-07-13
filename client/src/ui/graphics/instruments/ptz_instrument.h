@@ -149,6 +149,7 @@ private:
 
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;
+    QPointF m_dragAddDelta;
 
     struct SplashItemAnimation {
         SplashItemAnimation(): item(NULL), fadingIn(true), expansionMultiplier(0.0), opacityMultiplier(0.0) {}

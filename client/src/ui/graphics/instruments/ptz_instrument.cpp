@@ -720,6 +720,9 @@ void PtzInstrument::processPtzClick(const QPointF &pos) {
         splashItem->setPos(pos);
         m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
     }
+    else {
+        target()->virtualPtzController()->setAnimationEnabled(true);
+    }
     ptzMoveTo(target(), pos);
 }
 
@@ -912,6 +915,7 @@ void PtzInstrument::startDragProcess(DragInfo *) {
 void PtzInstrument::startDrag(DragInfo *) {
     m_isClick = false;
     m_ptzStartedEmitted = false;
+    m_dragAddDelta = QPointF(0.0, 0.0);
 
     if(!target()) {
         /* Whoops, already destroyed. */
@@ -954,6 +958,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
     if(manipulator()) {
         if (target()->virtualPtzController())
         {
+            target()->virtualPtzController()->setAnimationEnabled(false);
             QPointF delta = info->mouseItemPos() - info->mousePressItemPos();
             if (!delta.isNull()) {
                 target()->setCursor(Qt::BlankCursor);
@@ -963,6 +968,15 @@ void PtzInstrument::dragMove(DragInfo *info) {
             QSizeF size = target()->size();
             qreal scale = qMax(size.width(), size.height()) / 2.0;
             QPointF shift(delta.x() / scale, -delta.y() / scale);
+
+            if (qAbs(shift.x()) > 0.5 || qAbs(shift.y()) > 0.5)
+            {
+                m_dragAddDelta += shift;
+                shift = QPointF(0.0, 0.0);
+                QCursor::setPos(info->mousePressScreenPos());
+            }
+            shift += m_dragAddDelta;
+
             qreal fov = radToGrad(mm35vToFov(m_dragFromPosition.z()));
             QVector3D positionDelta(shift.x() * fov/2.0, shift.y() * fov/2.0, 0.0);
             m_ptzController->setPhysicalPosition(target(), m_dragFromPosition + positionDelta);

@@ -98,7 +98,7 @@ public:
     ImageCorrectionParams imageEnhancement() const;
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
 
-    QnAbstractPtzController* virtualPtzController() const;
+    QnVirtualPtzController* virtualPtzController() const;
 signals:
     void motionSelectionChanged();
     void displayChanged();

@@ -14,7 +14,6 @@
 #include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include "ui/graphics/items/resource/media_resource_widget.h"
-#include "ui/fisheye/virtual_ptz_controller.h"
 
 //#define QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
 #ifdef QN_WORKBENCH_PTZ_CONTROLLER_DEBUG

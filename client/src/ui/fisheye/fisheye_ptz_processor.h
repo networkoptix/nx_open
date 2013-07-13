@@ -8,7 +8,7 @@
 
 class QnResourceWidgetRenderer;
 
-class QnFisheyePtzController: public QnAbstractPtzController
+class QnFisheyePtzController: public QnVirtualPtzController
 {
     Q_OBJECT
 public:

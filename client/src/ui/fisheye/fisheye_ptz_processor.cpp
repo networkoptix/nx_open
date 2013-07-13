@@ -13,7 +13,7 @@ qreal FISHEYE_FOV = gradToRad(180.0);
 qreal MOVETO_ANIMATION_TIME = 0.5;
 
 QnFisheyePtzController::QnFisheyePtzController(QnResource* resource):
-    QnAbstractPtzController(resource),
+    QnVirtualPtzController(resource),
     m_renderer(0),
     m_lastTime(0),
     m_moveToAnimation(false),
@@ -106,6 +106,12 @@ int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
     m_dstPos.xAngle = boundXAngle(gradToRad(xPos), m_dstPos.fov);
     m_dstPos.yAngle = boundYAngle(gradToRad(yPos), m_dstPos.fov);
     m_srcPos = m_devorpingParams;
+
+    if (m_dstPos.xAngle - m_srcPos.xAngle > M_PI)
+        m_srcPos.xAngle += M_PI * 2.0;
+    else if (m_dstPos.xAngle - m_srcPos.xAngle < -M_PI)
+        m_srcPos.xAngle -= M_PI * 2.0;
+
     m_moveToAnimation = true;
     return 0;
 }
@@ -141,6 +147,16 @@ void QnFisheyePtzController::setAspectRatio(float aspectRatio)
     m_devorpingParams.aspectRatio = aspectRatio;
 }
 
+qreal normalizeAngle(qreal value)
+{
+    if (value > M_PI * 2)
+        return value - M_PI * 2;
+    else if(value < -M_PI * 2)
+        return value + M_PI * 2;
+    else
+        return value;
+}
+
 DevorpingParams QnFisheyePtzController::getDevorpingParams()
 {
     qint64 newTime = getUsecTimer();
@@ -149,7 +165,7 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
 
     if (m_moveToAnimation)
     {
-        if (timeSpend < MOVETO_ANIMATION_TIME) 
+        if (timeSpend < MOVETO_ANIMATION_TIME && m_animate) 
         {
             QEasingCurve easing(QEasingCurve::InOutQuad);
             qreal value = easing.valueForProgress(timeSpend / MOVETO_ANIMATION_TIME);
@@ -175,7 +191,7 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
         newParams.fov += zoomSpeed * timeSpend;
         newParams.fov = qBound(MIN_FOV, newParams.fov, MAX_FOV);
 
-        newParams.xAngle += xSpeed * timeSpend;
+        newParams.xAngle = normalizeAngle(newParams.xAngle + xSpeed * timeSpend);
         newParams.yAngle += ySpeed * timeSpend;
 
         qreal xRange = (FISHEYE_FOV - newParams.fov) / 2.0;
