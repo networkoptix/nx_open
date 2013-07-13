@@ -160,7 +160,7 @@ QString QnFisheyeShaderProgram::getShaderText()
     void main() 
     {
         vec3 pos3d = vec3(gl_TexCoord[0].x - 0.5, gl_TexCoord[0].y - yCenter, 1.0) * to3d;
-        vec3 psph = pos3d / length(pos3d); // Vector in 3D space
+        vec3 psph = normalize(pos3d); // Vector in 3D space
 
         // Calculate fisheye angle and radius
         float theta = atan(psph.z, psph.x) + fovRot;
