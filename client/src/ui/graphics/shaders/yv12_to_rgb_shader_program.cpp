@@ -162,10 +162,12 @@ QString QnFisheyeShaderProgram::getShaderText()
         vec3 pos3d = vec3(gl_TexCoord[0].x - 0.5, gl_TexCoord[0].y - yCenter, 1.0) * to3d; // xCenter constant for a while
 
         float theta = atan(pos3d.x, pos3d.y);
-        float phi   = asin(pos3d.z / length(pos3d));
+        float z = pos3d.z / length(pos3d);
+        float phi   = asin(z);
 
         // Vector in 3D space
-        vec3 psph = sphericalToCartesian(theta, phi);
+        float k = cos(phi);
+        vec3 psph = vec3(k * sin(theta), k * cos(theta), z);
 
         // Calculate fisheye angle and radius
         theta = atan(psph.z, psph.x) + fovRot;
