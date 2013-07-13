@@ -203,12 +203,9 @@ QString QnFisheyeVerticalShaderProgram::getShaderText()
         uniform sampler2D uTexture;
         uniform sampler2D vTexture;
         uniform float opacity;
-        uniform float yLevels1;
-        uniform float yLevels2;
-        uniform float yGamma;
         uniform float xShift;
         uniform float yShift;
-        uniform float perspShift; // unused
+        uniform float perspShift;
         uniform float dstFov;
         uniform float aspectRatio;
 
@@ -216,40 +213,49 @@ QString QnFisheyeVerticalShaderProgram::getShaderText()
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
                                 1.0, -0.344, -0.714,  0.529,
                                 1.0,  1.772,  0.0,   -0.886,
-                                0.0,  0.0,    0.0,    opacity); // avoid +0x80 for uv directly in matrix
+                                0.0,  0.0,    0.0,    opacity);
 
-    float kx = 2.0*tan(dstFov/2.0);
-    float ky = kx/aspectRatio*2.0;
-    // rotate around X axis and scale
-    mat3 rotX = mat3( kx,      0.0,                       0.0,
-                      0.0,     cos(yShift-PI/2.0)*ky,            -sin(yShift-PI/2.0),
-                      0.0,     sin(yShift-PI/2.0)*ky,            cos(yShift-PI/2.0));
+    vec3 sphericalToCartesian(float theta, float phi) {
+        return vec3(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
+    }
+
+    float xShift2 = sin(xShift)*sin(perspShift);
+    vec3 center = sphericalToCartesian(xShift2, -yShift);
+    vec3 x  = sphericalToCartesian(xShift2 + PI/2.0, 0.0) * 2.0*tan(dstFov/2.0);
+    vec3 y  = sphericalToCartesian(xShift2, -yShift + PI/2.0) * 2.0*tan(dstFov/2.0);
+
+    mat3 to3d = mat3(x.x, y.x, center.x,
+                     x.y, y.y, center.y,
+                     x.z, y.z, center.z);
+
     void main() 
     {
-        vec2 pos = vec2(gl_TexCoord[0].x - 0.5,
-                        gl_TexCoord[0].y - 1.0);
-        vec3 pos3d = vec3(pos.x, pos.y, 1.0) * rotX; // 3d vector on surface, rotate and scale
 
-        float theta = atan(pos3d.x, pos3d.z);
-        float z = pos3d.y / length(pos3d);
+        vec2 pos = gl_TexCoord[0].st - 0.5; // go to coordinates in range [-0.5..0.5]
+        pos.y = pos.y - 0.5;
+        pos.y = pos.y / aspectRatio;
 
-        // Vector on 3D sphere
-        float k   = cos(asin(z)); // same as sqrt(1-z*z)
-        vec3 psph = vec3(k * sin(theta), k * cos(theta), z);
+        vec3 pos3d = vec3(pos.x, pos.y, 1.0) * to3d;
+
+        float theta = atan(pos3d.x, pos3d.y);
+        float phi   = asin(pos3d.z / length(pos3d));
+
+        // Vector in 3D space
+        vec3 psph = sphericalToCartesian(theta, phi); // * perspectiveMatrix;
 
         // Calculate fisheye angle and radius
-        theta      = atan(psph.z, psph.x) - xShift;
-        float r  = atan(length(psph.xz), psph.y) / PI;
+        theta = atan(psph.z, psph.x) - xShift;
+        phi   = atan(length(psph.xz), psph.y);
+        float r = phi / PI; // fisheye FOV
 
         // return from polar coordinates
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
-        // do gamma correction and color transformation yuv->RGB
-        float y = texture2D(yTexture, pos).p;
-        gl_FragColor = vec4(%1,
-                            texture2D(uTexture, pos).p,
-                            texture2D(vTexture, pos).p,
-                            1.0) * colorTransform;
+        // do color transformation yuv->RGB
+        gl_FragColor = vec4(texture2D(yTexture, pos).p,
+            texture2D(uTexture, pos).p,
+            texture2D(vTexture, pos).p,
+            1.0) * colorTransform;
     }
     ));
 }

@@ -212,6 +212,7 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
         m_devorpingParams = newParams;
     }
 
+    newParams.pAngle = -0.25;
     return newParams;
 }
 

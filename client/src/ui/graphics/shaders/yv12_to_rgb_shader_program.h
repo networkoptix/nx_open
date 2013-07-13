@@ -66,7 +66,7 @@ public:
     void setDevorpingParams(const DevorpingParams& params)
     {
         setUniformValue(m_xShiftLocation, (float) params.xAngle);
-        setUniformValue(m_yShiftLocation, (float) params.yAngle);
+        setUniformValue(m_yShiftLocation, (float) (params.yAngle - M_PI/2.0));
         setUniformValue(m_perspShiftLocation, (float) params.pAngle);
         setUniformValue(m_dstFovLocation, (float) params.fov);
         setUniformValue(m_aspectRatioLocation, (float) params.aspectRatio);
