@@ -61,51 +61,44 @@ private:
 class QnFisheyeShaderProgram : public QnYv12ToRgbWithGammaShaderProgram
 {
 public:
-    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& shaderText = QString());
+    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
     
     void setDevorpingParams(const DevorpingParams& params)
     {
-        setUniformValue(m_xShiftLocation, (float) params.xAngle);
-        if (params.horizontalView)
+        float fovRot = sin(params.xAngle)*sin(params.pAngle);
+        if (params.horizontalView) {
             setUniformValue(m_yShiftLocation, (float) (params.yAngle));
-        else
+            setUniformValue(m_yCenterLocation, (float) 0.5);
+            setUniformValue(m_xShiftLocation, (float) params.xAngle);
+            setUniformValue(m_fovRotLocation, (float) fovRot);
+        }
+        else {
             setUniformValue(m_yShiftLocation, (float) (params.yAngle - M_PI/2.0));
-        setUniformValue(m_perspShiftLocation, (float) params.pAngle);
-        setUniformValue(m_dstFovLocation, (float) params.fov);
+            setUniformValue(m_yCenterLocation, (float) 1.0);
+            setUniformValue(m_xShiftLocation, (float) fovRot);
+            setUniformValue(m_fovRotLocation, (float) -params.xAngle);
+        }
         setUniformValue(m_aspectRatioLocation, (float) params.aspectRatio);
+        setUniformValue(m_dstFovLocation, (float) params.fov);
     }
 
     virtual bool link() override;
+private:
+    QString getShaderText();
 protected:
     int m_xShiftLocation;
     int m_yShiftLocation;
-    int m_perspShiftLocation;
+    int m_fovRotLocation;
     int m_dstFovLocation;
     int m_aspectRatioLocation;
+    int m_yCenterLocation;
 };
 
-class QnFisheyeHorizontalShaderProgram : public QnFisheyeShaderProgram
-{
-public:
-    QnFisheyeHorizontalShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
-protected:
-    QString getShaderText();
-};
-
-class QnFisheyeVerticalShaderProgram : public QnFisheyeShaderProgram
-{
-public:
-    QnFisheyeVerticalShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
-protected:
-    QString getShaderText();
-};
-
-template <typename T>
-class QnFisheyeWithGammaShaderProgram : public T
+class QnFisheyeWithGammaShaderProgram : public QnFisheyeShaderProgram
 {
 public:
     QnFisheyeWithGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL):
-      T(context, parent, getShaderText().arg(lit("pow(max(y+yLevels2, 0.0) * yLevels1, yGamma)"))) {}
+      QnFisheyeShaderProgram(context, parent, lit("pow(max(y+yLevels2, 0.0) * yLevels1, yGamma)")) {}
 };
 
 class QnYv12ToRgbaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {

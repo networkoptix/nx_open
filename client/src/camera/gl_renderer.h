@@ -75,10 +75,8 @@ private:
     QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
     QScopedPointer<QnYv12ToRgbWithGammaShaderProgram> m_yv12ToRgbWithGammaShaderProgram;
 
-    QScopedPointer<QnFisheyeHorizontalShaderProgram> m_horizontalFisheyeProgram;
-    QScopedPointer<QnFisheyeVerticalShaderProgram> m_verticalFisheyeProgram;
-    QScopedPointer<QnFisheyeWithGammaShaderProgram<QnFisheyeHorizontalShaderProgram> > m_horizontalFisheyeGammaProgram;
-    QScopedPointer<QnFisheyeWithGammaShaderProgram<QnFisheyeVerticalShaderProgram> > m_verticalFisheyeGammaProgram;
+    QScopedPointer<QnFisheyeShaderProgram> m_fisheyeProgram;
+    QScopedPointer<QnFisheyeWithGammaShaderProgram> m_fisheyeGammaProgram;
 
     QScopedPointer<QnYv12ToRgbaShaderProgram> m_yv12ToRgbaShaderProgram;
     QScopedPointer<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
