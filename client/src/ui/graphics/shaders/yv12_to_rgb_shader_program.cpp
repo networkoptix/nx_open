@@ -164,10 +164,10 @@ QString QnFisheyeShaderProgram::getShaderText()
 
         // Calculate fisheye angle and radius
         float theta = atan(psph.z, psph.x) + fovRot;
-        float phi   = atan(length(psph.xz), psph.y);
+        float r     = acos(psph.y) / PI;
 
         // return from polar coordinates
-        vec2 pos = vec2(cos(theta), sin(theta)) * (phi / PI) + 0.5;
+        vec2 pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
