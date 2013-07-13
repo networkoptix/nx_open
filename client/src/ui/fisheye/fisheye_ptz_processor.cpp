@@ -211,8 +211,8 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
         m_devorpingParams = newParams;
     }
 
-    //newParams.pAngle = -0.25;
-    newParams.pAngle = gradToRad(-18.0);
+    //newParams.pAngle = gradToRad(-14.0); // city 360 picture
+    //newParams.pAngle = gradToRad(-18.0);
     return newParams;
 }
 
