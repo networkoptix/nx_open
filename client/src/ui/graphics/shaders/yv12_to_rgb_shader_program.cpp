@@ -152,13 +152,11 @@ QString QnFisheyeShaderProgram::getShaderText()
         return vec3(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
     }
 
-    vec3 center = sphericalToCartesian(xShift, -yShift);
-    vec3 x  = sphericalToCartesian(xShift + PI/2.0, 0.0) * 2.0*tan(dstFov/2.0);
-    vec3 y  = sphericalToCartesian(xShift, -yShift + PI/2.0) * 2.0*tan(dstFov/2.0);
-
-    mat3 to3d = mat3(x.x, y.x/aspectRatio, center.x,
-                     x.y, y.y/aspectRatio, center.y,
-                     x.z, y.z/aspectRatio, center.z);
+    float kx =  2.0*tan(dstFov/2.0);
+    mat3 to3d = transpose(mat3(
+        sphericalToCartesian(xShift + PI/2.0, 0.0) * kx,
+        sphericalToCartesian(xShift, -yShift + PI/2.0) * kx /aspectRatio,
+        sphericalToCartesian(xShift, -yShift)));
 
     void main() 
     {
