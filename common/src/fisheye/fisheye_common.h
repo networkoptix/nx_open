@@ -5,7 +5,7 @@
 
 struct DevorpingParams
 {
-    DevorpingParams(): enabled(false), horizontalView(true), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0), aspectRatio(1.0) {}
+    DevorpingParams(): enabled(false), horizontalView(false), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0), aspectRatio(1.0) {}
     bool operator==(const DevorpingParams& other) const
     {
         if (enabled != other.enabled)
