@@ -160,8 +160,8 @@ QString QnFisheyeShaderProgram::getShaderText()
 
     void main() 
     {
-        vec3 pos3d = vec3(gl_TexCoord[0].xy - vec2(0.5, yCenter), 1.0) * to3d;
-        vec3 psph = normalize(pos3d); // Point on 3D space
+        vec3 pos3d = vec3(gl_TexCoord[0].xy - vec2(0.5, yCenter), 1.0) * to3d; // point on the surface
+        vec3 psph = normalize(pos3d); // Point on the sphere
 
         // Calculate fisheye angle and radius
         float theta = atan(psph.z, psph.x) + fovRot;
@@ -172,7 +172,7 @@ QString QnFisheyeShaderProgram::getShaderText()
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
-        gl_FragColor = vec4(%1,
+        gl_FragColor = vec4(%1, // put gamma correction str here or just 'y'
                             texture2D(uTexture, pos).p,
                             texture2D(vTexture, pos).p,
                             1.0) * colorTransform;
