@@ -138,6 +138,9 @@ QString QnFisheyeShaderProgram::getShaderText()
         uniform float dstFov;
         uniform float aspectRatio;
         uniform float yCenter;
+        uniform float yLevels1;
+        uniform float yLevels2;
+        uniform float yGamma;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
@@ -145,7 +148,7 @@ QString QnFisheyeShaderProgram::getShaderText()
                                 1.0,  1.772,  0.0,   -0.886,
                                 0.0,  0.0,    0.0,    opacity);
 
-    vec3 sphericalToCartesian(float theta, float phi) {
+    vec3 sphericalToCartesian(in float theta, in float phi) {
         return vec3(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
     }
 
@@ -159,8 +162,8 @@ QString QnFisheyeShaderProgram::getShaderText()
 
     void main() 
     {
-        vec3 pos3d = vec3(gl_TexCoord[0].x - 0.5, gl_TexCoord[0].y - yCenter, 1.0) * to3d;
-        vec3 psph = normalize(pos3d); // Vector in 3D space
+        vec3 pos3d = vec3(gl_TexCoord[0].xy - vec2(0.5, yCenter), 1.0) * to3d;
+        vec3 psph = normalize(pos3d); // Point on 3D space
 
         // Calculate fisheye angle and radius
         float theta = atan(psph.z, psph.x) + fovRot;
