@@ -352,6 +352,8 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         if (cs != Qt::PartiallyChecked)
             m_camera->setCameraControlDisabled(cs == Qt::Checked);
 
+        m_camera->setDevorpingParams(ui->fisheyeSettingsWidget->devorpingParams());
+
 
         setHasDbChanges(false);
     }

@@ -19,11 +19,17 @@ public:
 
     void updateFromResource(QnSecurityCamResourcePtr camera);
 
+    DevorpingParams devorpingParams() const;
 signals:
     void dataChanged();
+private:
+    qreal getAngle();
 private slots:
+    void at_dataChanged();
 private:
     QScopedPointer<Ui::FisheyeSettingsWidget> ui;
+    bool m_silenseMode;
+    DevorpingParams m_devorpingParams;
 };
 
 #endif // QN_FISHEYE_SETTINGS_WIDGET_H

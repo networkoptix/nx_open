@@ -8,6 +8,7 @@
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
 #include "network_resource.h"
+#include "fisheye/fisheye_common.h"
 
 class QnAbstractArchiveDelegate;
 
@@ -142,6 +143,9 @@ public:
     void addStatusFlags(StatusFlags value);
     void removeStatusFlags(StatusFlags value);
 
+    DevorpingParams getDevorpingParams() const;
+    void setDevorpingParams(const DevorpingParams& params);
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -194,6 +198,7 @@ private:
     QnSecondaryStreamQuality  m_secondaryQuality;
     bool m_cameraControlDisabled;
     StatusFlags m_statusFlags;
+    DevorpingParams m_devorpingParams;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

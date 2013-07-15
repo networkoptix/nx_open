@@ -65,7 +65,7 @@ public:
     
     void setDevorpingParams(const DevorpingParams& params)
     {
-        float fovRot = sin(params.xAngle)*sin(params.fovRot);
+        float fovRot = sin(params.xAngle)*params.fovRot;
         if (params.horizontalView) {
             setUniformValue(m_yShiftLocation, (float) (params.yAngle));
             setUniformValue(m_yCenterLocation, (float) 0.5);

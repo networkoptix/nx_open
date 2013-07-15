@@ -19,6 +19,9 @@
      <property name="text">
       <string>Horizontal view (camera on the wall)</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
@@ -40,16 +43,26 @@
      <item>
       <widget class="QSlider" name="horizontalSlider">
        <property name="minimum">
-        <number>-150</number>
+        <number>-250</number>
        </property>
        <property name="maximum">
-        <number>150</number>
+        <number>250</number>
        </property>
        <property name="value">
         <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="angleText">
+       <property name="text">
+        <string>0.0</string>
        </property>
       </widget>
      </item>
