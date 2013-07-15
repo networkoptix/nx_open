@@ -84,12 +84,12 @@ void QnResource::updateInner(QnResourcePtr other)
     m_id = other->m_id; //TODO: #Elric this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
-    m_tags = other->m_tags;
-    m_url = other->m_url;
-
-    setFlags(other->m_flags);
-    setName(other->m_name);
-    setParentId(other->m_parentId);
+    
+    setTags(other->getTags())
+    setUrl(other->getUrl())
+    setFlags(other->flags());
+    setName(other->getName());
+    setParentId(other->getParentId());
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)
@@ -683,7 +683,7 @@ bool QnResource::hasTag(const QString& tag) const
     return m_tags.contains(tag);
 }
 
-QStringList QnResource::tagList() const
+QStringList QnResource::getTags() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_tags;
