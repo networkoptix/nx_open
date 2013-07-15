@@ -77,11 +77,11 @@ void TagsEditDialog::accept()
     if (!m_objectIds.isEmpty()) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(m_objectIds.at(0));
         if (resource) {
-            oldIntersectedObjectTagsSet = resource->tagList().toSet();
+            oldIntersectedObjectTagsSet = resource->getTags().toSet();
             for (int i = 1; i < m_objectIds.size(); ++i) {
                 resource = qnResPool->getResourceByUniqId(m_objectIds.at(i));
                 if (resource)
-                    oldIntersectedObjectTagsSet = oldIntersectedObjectTagsSet.intersect(resource->tagList().toSet());
+                    oldIntersectedObjectTagsSet = oldIntersectedObjectTagsSet.intersect(resource->getTags().toSet());
             }
         }
     }
@@ -96,7 +96,7 @@ void TagsEditDialog::accept()
     foreach (const QString &objectId, m_objectIds) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(objectId);
         if (resource) {
-            QSet<QString> oldObjectTags = resource->tagList().toSet();
+            QSet<QString> oldObjectTags = resource->getTags().toSet();
             QSet<QString> objectTags = oldObjectTags;
             if (!oldIntersectedObjectTagsSet.isEmpty())
                 objectTags = objectTags.subtract(oldIntersectedObjectTagsSet.subtract(intersectedObjectTagsSet));
@@ -122,11 +122,11 @@ void TagsEditDialog::reset()
     if (!m_objectIds.isEmpty()) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(m_objectIds.at(0));
         if (resource) {
-            allObjectTagsSet = intersectedObjectTagsSet = resource->tagList().toSet();
+            allObjectTagsSet = intersectedObjectTagsSet = resource->getTags().toSet();
             for (int i = 1; i < m_objectIds.size(); ++i) {
                 resource = qnResPool->getResourceByUniqId(m_objectIds.at(i));
                 if (resource) {
-                    QSet<QString> objectTags = resource->tagList().toSet();
+                    QSet<QString> objectTags = resource->getTags().toSet();
                     intersectedObjectTagsSet = intersectedObjectTagsSet.intersect(objectTags);
                     allObjectTagsSet = allObjectTagsSet.unite(objectTags);
                 }

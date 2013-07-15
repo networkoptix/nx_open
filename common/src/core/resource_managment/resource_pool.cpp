@@ -460,7 +460,7 @@ QStringList QnResourcePool::allTags() const
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources.values())
-        result << resource->tagList();
+        result << resource->getTags();
 
     return result;
 }
