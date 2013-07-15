@@ -629,13 +629,3 @@ void QnSecurityCamResource::removeStatusFlags(StatusFlags value)
     m_statusFlags &= ~value;
 }
 
-DevorpingParams QnSecurityCamResource::getDevorpingParams() const
-{
-    return m_devorpingParams;
-}
-
-
-void QnSecurityCamResource::setDevorpingParams(const DevorpingParams& params)
-{
-    m_devorpingParams = params;
-}

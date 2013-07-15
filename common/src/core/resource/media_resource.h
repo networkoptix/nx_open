@@ -6,7 +6,7 @@
 #include "resource.h"
 #include "resource_media_layout.h"
 #include "utils/common/from_this_to_shared.h"
-
+#include "fisheye/fisheye_common.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
@@ -65,6 +65,9 @@ public:
     virtual QnResourcePtr toResourcePtr() = 0;
 
     virtual bool isFisheye() const { return true; }
+    DevorpingParams getDevorpingParams() const;
+    void setDevorpingParams(const DevorpingParams& params);
+
 
     Qn::PtzCapabilities getPtzCapabilities() const;
     bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
@@ -73,6 +76,7 @@ public:
 
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
+    DevorpingParams m_devorpingParams;
 
     void initMediaResource();
 };

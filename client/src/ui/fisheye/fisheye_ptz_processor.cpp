@@ -2,6 +2,8 @@
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include <math.h>
 #include "utils/math/space_mapper.h"
+#include "core/resource/interface/abstract_ptz_controller.h"
+#include "core/resource/media_resource.h"
 
 qreal MAX_MOVE_SPEED = 1.0; // 1 rad per second
 qreal MAX_ZOOM_SPEED = gradToRad(30.0); // zoom speed
@@ -211,7 +213,11 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
         m_devorpingParams = newParams;
     }
 
-    newParams.fovRot = gradToRad(-12.0); // city 360 picture
+    DevorpingParams camParams = m_resource->getDevorpingParams();
+    newParams.fovRot = camParams.fovRot;
+    newParams.horizontalView = camParams.horizontalView;
+
+    //newParams.fovRot = gradToRad(-12.0); // city 360 picture
     //newParams.fovRot = gradToRad(-18.0);
     return newParams;
 }
