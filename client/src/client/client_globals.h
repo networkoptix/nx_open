@@ -326,6 +326,17 @@ namespace Qn {
         ResolutionModeCount
     };
 
+    /**
+     * Importance level of a notification. 
+     */
+    enum NotificationLevel {
+        NoNotification,
+        OtherNotification,
+        CommonNotification,
+        ImportantNotification,
+        CriticalNotification,
+        SystemNotification,
+    };
 
 } // namespace Qn
 

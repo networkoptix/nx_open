@@ -1,5 +1,5 @@
-#ifndef NOTIFICATION_ITEM_H
-#define NOTIFICATION_ITEM_H
+#ifndef QN_NOTIFICATION_ITEM_H
+#define QN_NOTIFICATION_ITEM_H
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
@@ -45,6 +45,7 @@ private:
     QImage m_thumbnail;
 };
 
+
 class QnNotificationToolTipWidget: public QnStyledTooltipWidget {
     Q_OBJECT
 
@@ -80,6 +81,7 @@ private:
     QPointF m_pointTo;
 };
 
+
 //TODO: #GDM rename to QnNotificationWidget
 class QnNotificationItem: public QnClickableFrameWidget {
     Q_OBJECT
@@ -95,29 +97,23 @@ public:
                          const QnActionParameters &parameters = QnActionParameters(),
                          bool defaultAction = false);
 
-    enum ColorLevel {
-        None,
-        Common,
-        Important,
-        Critical,
-        System
-    };
+    static QColor notificationColor(Qn::NotificationLevel level);
 
-    ColorLevel colorLevel() const;
+    Qn::NotificationLevel notificationLevel() const;
+    void setNotificationLevel(Qn::NotificationLevel notificationLevel);
 
-    QColor color() const;
+    /** 
+     * \param rect                      Rectangle where all tooltips should fit, in parent(!) coordinates. 
+     */
+    void setTooltipEnclosingRect(const QRectF &rect);
 
-public slots:
+    void setImageProvider(QnImageProvider *provider);
+
     void setText(const QString &text);
-    void setColorLevel(ColorLevel level);
-    void setColor(const QColor& color);
     void setTooltipText(const QString &text);
-    void setImageProvider(QnImageProvider* provider);
-
-    /** Rectangle where all tooltips should fit - in parent(!) coordinates. */
-    void setTooltipEnclosingRect(const QRectF& rect);
 
 signals:
+    void notificationLevelChanged();
     void actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
 
 protected:
@@ -133,6 +129,7 @@ private slots:
 
     void at_button_clicked();
     void at_thumbnail_clicked();
+
 private:
     struct ActionData {
         ActionData():
@@ -152,7 +149,7 @@ private:
     QGraphicsLinearLayout* m_layout;
     QnProxyLabel* m_textLabel;
     QColor m_color;
-    ColorLevel m_colorLevel;
+    Qn::NotificationLevel m_notificationLevel;
     QnImageProvider* m_imageProvider;
 
     QnNotificationToolTipWidget* m_tooltipWidget;
@@ -162,4 +159,4 @@ private:
     bool m_inToolTipPositionUpdate;
 };
 
-#endif // NOTIFICATION_ITEM_H
+#endif // QN_NOTIFICATION_ITEM_H

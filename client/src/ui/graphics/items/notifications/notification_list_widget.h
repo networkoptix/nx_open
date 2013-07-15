@@ -3,6 +3,8 @@
 
 #include <QtCore/QLinkedList>
 
+#include <client/client_globals.h>
+
 #include <ui/animation/animated.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
@@ -21,7 +23,6 @@ public:
 
     void addItem(QnNotificationItem *item, bool locked = false);
     void removeItem(QnNotificationItem *item);
-
     void clear();
 
     QSizeF visibleSize() const;
@@ -30,14 +31,15 @@ public:
     void setToolTipsEnclosingRect(const QRectF &rect);
 
     int itemCount() const;
+    Qn::NotificationLevel itemNotificationLevel() const;
 
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
 
-    void itemRemoved(QnNotificationItem *item);
-    void itemCountChanged(int count);
-    void itemColorChanged(const QColor &color); // TODO: #GDM accessor?
+    void itemRemoved(QnNotificationItem *item); // TODO: #GDM symmetry break, where is itemAdded signal?
+    void itemCountChanged();
+    void itemNotificationLevelChanged();
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
@@ -106,7 +108,7 @@ private:
     bool m_collapsedItemCountChanged;
     QSizeF m_visibleSize;
     QRectF m_tooltipsEnclosingRect;
-    int m_itemColorLevel;
+    Qn::NotificationLevel m_itemNotificationLevel;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H
