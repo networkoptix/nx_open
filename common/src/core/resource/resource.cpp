@@ -86,10 +86,6 @@ void QnResource::updateInner(QnResourcePtr other)
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     
     setTags(other->getTags());
-    setUrl(other->getUrl());
-    setFlags(other->flags());
-    setName(other->getName());
-    setParentId(other->getParentId());
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)
@@ -105,9 +101,14 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         QMutexLocker mutexLocker2(m2); 
         updateInner(other); 
     }
+
     silenceMode |= other->hasFlags(QnResource::foreigner);
     setStatus(other->m_status, silenceMode);
     setDisabled(other->m_disabled);
+    setUrl(other->getUrl());
+    setFlags(other->flags());
+    setName(other->getName());
+    setParentId(other->getParentId());
     emit resourceChanged(toSharedPointer(this));
 
     QnParamList paramList = other->getResourceParamList();
