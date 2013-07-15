@@ -310,10 +310,10 @@ void QnGLRenderer::drawYV12VideoTexture(
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
     QnFisheyeShaderProgram* fisheyeShader = 0;
-    DevorpingParams params;
+    DewarpingParams params;
     if (m_fisheyeController && m_fisheyeController->isEnabled()) 
     {
-        params = m_fisheyeController->getDevorpingParams();
+        params = m_fisheyeController->getDewarpingParams();
         if (m_imgCorrectParam.enabled)
             shader = gammaShader = fisheyeShader = m_shaders->fisheyeGammaProgram;
         else
@@ -332,8 +332,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setOpacity(m_decodedPictureProvider.opacity());
 
     if (fisheyeShader) {
-        params.aspectRatio = picLock->width()/(float)picLock->height();
-        fisheyeShader->setDevorpingParams(params);
+        fisheyeShader->setDewarpingParams(params, picLock->width()/(float)picLock->height());
     }
     //shader->setDstFov(m_extraCurValue);
     //qDebug() << "m_extraCurValue" << m_extraCurValue;

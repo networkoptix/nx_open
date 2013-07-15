@@ -3,10 +3,10 @@
 
 #include <QObject>
 
-struct DevorpingParams
+struct DewarpingParams
 {
-    DevorpingParams(): enabled(false), horizontalView(false), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0), aspectRatio(1.0) {}
-    bool operator==(const DevorpingParams& other) const
+    DewarpingParams(): enabled(false), horizontalView(false), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0) {}
+    bool operator==(const DewarpingParams& other) const
     {
         if (enabled != other.enabled)
             return false;
@@ -20,13 +20,11 @@ struct DevorpingParams
             return false;
         if (fabs(fov - other.fov) > 0.0001)
             return false;
-        if (fabs(aspectRatio - other.aspectRatio) > 0.0001)
-            return false;
 
         return true;
     }
 
-    DevorpingParams(const DevorpingParams& other)
+    DewarpingParams(const DewarpingParams& other)
     {
         enabled = other.enabled;
         horizontalView = other.horizontalView;
@@ -34,7 +32,6 @@ struct DevorpingParams
         yAngle = other.yAngle;
         fov = other.fov;
         fovRot = other.fovRot;
-        aspectRatio = other.aspectRatio;
     }
 
     static const char DELIM = ';';
@@ -51,10 +48,10 @@ struct DevorpingParams
         return rez;
     }
 
-    static DevorpingParams deserialize(const QByteArray& data)
+    static DewarpingParams deserialize(const QByteArray& data)
     {
         QList<QByteArray> params = data.split(DELIM);
-        DevorpingParams result;
+        DewarpingParams result;
         if (params.size() >= 6) {
             result.enabled = params[0].toInt() > 0;
             result.horizontalView = params[1].toInt() > 0;
@@ -74,9 +71,8 @@ struct DevorpingParams
     qreal fov;
     // perspective correction angle
     qreal fovRot;
-    qreal aspectRatio;
 };
 
-Q_DECLARE_METATYPE(DevorpingParams);
+Q_DECLARE_METATYPE(DewarpingParams);
 
 #endif // __FISHEYE_COMMON_H__

@@ -122,7 +122,7 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
                                             qint64 timeOffsetMs, qint64 serverTimeZoneMs,
                                             QRectF srcRect,
                                             const ImageCorrectionParams& contrastParams,
-                                            const DevorpingParams& devorpingParams)
+                                            const DewarpingParams& devorpingParams)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);

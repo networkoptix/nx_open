@@ -110,13 +110,13 @@ void QnMediaResource::setPtzCapability(Qn::PtzCapabilities capability, bool valu
     setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
 }
 
-DevorpingParams QnMediaResource::getDevorpingParams() const
+DewarpingParams QnMediaResource::getDewarpingParams() const
 {
     return m_devorpingParams;
 }
 
 
-void QnMediaResource::setDewarpingParams(const DevorpingParams& params)
+void QnMediaResource::setDewarpingParams(const DewarpingParams& params)
 {
     m_devorpingParams = params;
 }

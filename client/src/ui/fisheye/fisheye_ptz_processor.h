@@ -23,25 +23,25 @@ public:
     virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
     void addRenderer(QnResourceWidgetRenderer* renderer);
-    void setAspectRatio(float aspectRatio);
-    DevorpingParams getDevorpingParams();
+    //void setAspectRatio(float aspectRatio);
+    DewarpingParams getDewarpingParams();
     virtual void setEnabled(bool value) override;
     virtual bool isEnabled() const override;
 signals:
-    void dewarpingParamsChanged(DevorpingParams params);
+    void dewarpingParamsChanged(DewarpingParams params);
     void spaceMapperChanged();
 private slots:
     void at_timer();
 private:
     qreal boundXAngle(qreal value, qreal fov) const;
-    qreal boundYAngle(qreal value, qreal fov) const;
+    qreal boundYAngle(qreal value, qreal fov, qreal aspectRatio) const;
     void updateSpaceMapper(bool horizontalView);
 private:
     QVector3D m_motion;
     QnResourceWidgetRenderer* m_renderer;
-    DevorpingParams m_devorpingParams;
-    DevorpingParams m_srcPos;
-    DevorpingParams m_dstPos;
+    DewarpingParams m_dewarpingParams;
+    DewarpingParams m_srcPos;
+    DewarpingParams m_dstPos;
     bool m_moveToAnimation;
     qint64 m_lastTime;
     QnPtzSpaceMapper* m_spaceMapper;

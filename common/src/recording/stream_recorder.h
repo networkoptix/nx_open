@@ -90,7 +90,7 @@ public:
 
     void setContrastParams(const ImageCorrectionParams& params);
 
-    void setDewarpingParams(const DevorpingParams& params);
+    void setDewarpingParams(const DewarpingParams& params);
 
     /*
     * Server time zone. Used for export to avi/mkv files
@@ -183,7 +183,7 @@ private:
     qint64 m_truncateIntervalEps;
     QRectF m_srcRect;
     ImageCorrectionParams m_contrastParams;
-    DevorpingParams m_devorpingParams;
+    DewarpingParams m_devorpingParams;
 };
 
 #endif // _STREAM_RECORDER_H__

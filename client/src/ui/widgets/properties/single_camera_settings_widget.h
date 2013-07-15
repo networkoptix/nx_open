@@ -96,7 +96,7 @@ signals:
     void hasChangesChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
-    void fisheyeSettingChanged(DevorpingParams params);
+    void fisheyeSettingChanged(DewarpingParams params);
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
@@ -180,7 +180,7 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
-    DevorpingParams m_dewarpingParamsBackup;
+    DewarpingParams m_dewarpingParamsBackup;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

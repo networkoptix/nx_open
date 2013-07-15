@@ -31,7 +31,7 @@ public:
     QRectF zoomRect;
     qreal rotation;
     ImageCorrectionParams contrastParams;
-    DevorpingParams devorpingParams;
+    DewarpingParams devorpingParams;
 
     QHash<int, QVariant> dataByRole;
 

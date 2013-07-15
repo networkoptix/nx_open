@@ -812,7 +812,7 @@ void QnStreamRecorder::setContrastParams(const ImageCorrectionParams& params)
     m_contrastParams = params;
 }
 
-void QnStreamRecorder::setDewarpingParams(const DevorpingParams& params)
+void QnStreamRecorder::setDewarpingParams(const DewarpingParams& params)
 {
     m_devorpingParams = params;
 }

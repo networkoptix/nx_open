@@ -50,7 +50,7 @@ public:
                                  qint64 timeOffsetMs = 0, qint64 serverTimeZoneMs = Qn::InvalidUtcOffset,
                                  QRectF srcRect = QRectF(),
                                  const ImageCorrectionParams& contrastParams = ImageCorrectionParams(),
-                                 const DevorpingParams& devorpingParams = DevorpingParams());
+                                 const DewarpingParams& devorpingParams = DewarpingParams());
 
     void setResource(QnMediaResourcePtr resource);
     void setExportProgressOffset(int value);

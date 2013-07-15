@@ -76,7 +76,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     if (m_resource->isFisheye()) {
         m_ptzController = new QnFisheyePtzController(base_type::resource().data());
-        connect(m_ptzController, SIGNAL(dewarpingParamsChanged(DevorpingParams)), this, SLOT(at_dewarpingParamsChanged(DevorpingParams)));
+        connect(m_ptzController, SIGNAL(dewarpingParamsChanged(DewarpingParams)), this, SLOT(at_dewarpingParamsChanged(DewarpingParams)));
     }
 
 
@@ -184,7 +184,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
 
 }
 
-void QnMediaResourceWidget::at_dewarpingParamsChanged(DevorpingParams params)
+void QnMediaResourceWidget::at_dewarpingParamsChanged(DewarpingParams params)
 {
     item()->setDevorpingParams(params);
 }

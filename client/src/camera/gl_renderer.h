@@ -64,7 +64,6 @@ public:
     bool isNV12ToRgbShaderUsed() const;
 
     void setImageCorrectionParams(const ImageCorrectionParams& params) { m_imgCorrectParam = params; }
-    //void setDevorpingParams(const DevorpingParams& params) { m_devorpingParams = params; }
     void setFisheyeController(QnFisheyePtzController* controller);
     bool isFisheyeEnabled() const;
     ImageCorrectionParams getImageCorrectionParams() const { return m_imgCorrectParam; }

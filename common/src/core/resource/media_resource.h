@@ -65,8 +65,8 @@ public:
     virtual QnResourcePtr toResourcePtr() = 0;
 
     virtual bool isFisheye() const { return true; }
-    DevorpingParams getDevorpingParams() const;
-    void setDewarpingParams(const DevorpingParams& params);
+    DewarpingParams getDewarpingParams() const;
+    void setDewarpingParams(const DewarpingParams& params);
 
 
     Qn::PtzCapabilities getPtzCapabilities() const;
@@ -76,7 +76,7 @@ public:
 
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
-    DevorpingParams m_devorpingParams;
+    DewarpingParams m_devorpingParams;
 
     void initMediaResource();
 };

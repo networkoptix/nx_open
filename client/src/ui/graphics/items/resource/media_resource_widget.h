@@ -144,7 +144,7 @@ private slots:
     void at_histogramButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
-    void at_dewarpingParamsChanged(DevorpingParams params);
+    void at_dewarpingParamsChanged(DewarpingParams params);
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
 

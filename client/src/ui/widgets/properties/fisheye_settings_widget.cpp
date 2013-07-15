@@ -27,7 +27,7 @@ void QnFisheyeSettingsWidget::updateFromResource(QnSecurityCamResourcePtr camera
         return;
     m_silenseMode = true;
 
-    m_devorpingParams = camera->getDevorpingParams();
+    m_devorpingParams = camera->getDewarpingParams();
     ui->horizontalRadioButton->setChecked(m_devorpingParams.horizontalView);
     ui->verticalRadioButton->setChecked(!m_devorpingParams.horizontalView);
     ui->horizontalSlider->setValue(m_devorpingParams.fovRot * 10);
@@ -52,7 +52,7 @@ void QnFisheyeSettingsWidget::at_dataChanged()
         emit dataChanged();
 }
 
-DevorpingParams QnFisheyeSettingsWidget::devorpingParams() const
+DewarpingParams QnFisheyeSettingsWidget::devorpingParams() const
 {
     return m_devorpingParams;
 }

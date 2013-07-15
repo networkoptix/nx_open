@@ -3199,7 +3199,7 @@ Do you want to continue?"),
     QString selectedFilter;
     bool withTimestamps = false;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
-    DevorpingParams devorpingParams = itemData.devorpingParams;
+    DewarpingParams devorpingParams = itemData.devorpingParams;
 
     while (true) {
         QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();

@@ -7,7 +7,7 @@
 class QnFisheyeImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnFisheyeImageFilter(const DevorpingParams& params);
+    QnFisheyeImageFilter(const DewarpingParams& params);
 
     virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) override;
 private:
@@ -15,7 +15,7 @@ private:
 private:
     static const int MAX_COLOR_PLANES = 4;
 
-    DevorpingParams m_params;
+    DewarpingParams m_params;
     QSize m_lastImageSize;
     QPointF* m_transform[MAX_COLOR_PLANES];
     CLVideoDecoderOutput m_tmpBuffer;

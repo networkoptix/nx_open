@@ -461,7 +461,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
             ui->advancedSettingsWidget->updateFromResource(m_camera);
             ui->fisheyeSettingsWidget->updateFromResource(m_camera);
-            m_dewarpingParamsBackup = m_camera->getDevorpingParams();
+            m_dewarpingParamsBackup = m_camera->getDewarpingParams();
         }
     }
 

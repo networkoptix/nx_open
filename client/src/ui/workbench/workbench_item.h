@@ -220,14 +220,14 @@ public:
     /**
      * \param                           New dewarping enhancement params for this item.
      */
-    void setDevorpingParams(const DevorpingParams& params);
+    void setDevorpingParams(const DewarpingParams& params);
 
     
     const ImageCorrectionParams &imageEnhancement() const {
         return m_imageEnhancement;
     }
 
-    const DevorpingParams &devorpingParams() const {
+    const DewarpingParams &devorpingParams() const {
         return m_devorpingParams;
     }
 
@@ -335,7 +335,7 @@ private:
     ImageCorrectionParams m_imageEnhancement;
 
     /** Fisheye devorping params */
-    DevorpingParams m_devorpingParams;
+    DewarpingParams m_devorpingParams;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;
