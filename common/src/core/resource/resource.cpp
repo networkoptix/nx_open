@@ -85,11 +85,11 @@ void QnResource::updateInner(QnResourcePtr other)
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     
-    setTags(other->getTags());
-    setUrl(other->getUrl());
-    setFlags(other->flags());
-    setName(other->getName());
-    setParentId(other->getParentId());
+    m_tags = other->m_tags;
+    m_url = other->m_url;
+    m_flags = other->m_flags;
+    m_name = other->m_name;
+    m_parentId = other->m_parentId;
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)
