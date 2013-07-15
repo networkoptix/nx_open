@@ -178,6 +178,11 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
     setHasDbChanges(false);
 }
 
+void QnMultipleCameraSettingsWidget::reject()
+{
+    updateFromResources();
+}
+
 void QnMultipleCameraSettingsWidget::updateFromResources() {
     if(m_cameras.empty()) {
         ui->loginEdit->setText(QString());

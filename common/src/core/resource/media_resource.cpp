@@ -116,7 +116,7 @@ DevorpingParams QnMediaResource::getDevorpingParams() const
 }
 
 
-void QnMediaResource::setDevorpingParams(const DevorpingParams& params)
+void QnMediaResource::setDewarpingParams(const DevorpingParams& params)
 {
     m_devorpingParams = params;
 }

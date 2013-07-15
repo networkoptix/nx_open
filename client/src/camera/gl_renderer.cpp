@@ -552,5 +552,12 @@ void QnGLRenderer::setHistogramConsumer(QnHistogramConsumer* value)
 
 void QnGLRenderer::setFisheyeController(QnFisheyePtzController* controller)
 {
+    QMutexLocker lock(&m_mutex);
     m_fisheyeController = controller;
+}
+
+bool QnGLRenderer::isFisheyeEnabled() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_fisheyeController && m_fisheyeController->isEnabled();
 }

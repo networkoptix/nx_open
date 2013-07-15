@@ -37,6 +37,35 @@ struct DevorpingParams
         aspectRatio = other.aspectRatio;
     }
 
+    static const char DELIM = ';';
+
+    QByteArray serialize() const
+    {
+        QByteArray rez;
+        rez.append(enabled ? '1' : '0').append(DELIM);
+        rez.append(horizontalView ? '1' : '0').append(DELIM);
+        rez.append(QByteArray::number(xAngle)).append(DELIM);
+        rez.append(QByteArray::number(xAngle)).append(DELIM);
+        rez.append(QByteArray::number(fov)).append(DELIM);
+        rez.append(QByteArray::number(fovRot)).append(DELIM);
+        return rez;
+    }
+
+    static DevorpingParams deserialize(const QByteArray& data)
+    {
+        QList<QByteArray> params = data.split(DELIM);
+        DevorpingParams result;
+        if (params.size() >= 6) {
+            result.enabled = params[0].toInt() > 0;
+            result.horizontalView = params[1].toInt() > 0;
+            result.xAngle = params[2].toDouble();
+            result.yAngle = params[3].toDouble();
+            result.fov = params[4].toDouble();
+            result.fovRot = params[5].toDouble();
+        }
+        return result;
+    }
+
     bool enabled;
     bool horizontalView;
     // view angle and FOV at radians

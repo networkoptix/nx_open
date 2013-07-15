@@ -61,6 +61,7 @@ public:
 
     void updateFromResources();
     void submitToResources();
+    void reject();
 
     Mode mode() const;
 
@@ -76,7 +77,7 @@ signals:
     void advancedSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
     void resourcesChanged();
-
+    void fisheyeSettingChanged();
 protected slots:
     void at_moreLicensesRequested();
     void at_advancedSettingChanged();

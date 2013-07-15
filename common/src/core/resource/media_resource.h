@@ -66,7 +66,7 @@ public:
 
     virtual bool isFisheye() const { return true; }
     DevorpingParams getDevorpingParams() const;
-    void setDevorpingParams(const DevorpingParams& params);
+    void setDewarpingParams(const DevorpingParams& params);
 
 
     Qn::PtzCapabilities getPtzCapabilities() const;

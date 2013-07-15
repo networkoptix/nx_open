@@ -2106,7 +2106,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
         saveCameraSettingsFromDialog(true);
         break;
     case QDialogButtonBox::Cancel:
-        cameraSettingsDialog()->widget()->updateFromResources();
+        cameraSettingsDialog()->widget()->reject();
         break;
     default:
         break;

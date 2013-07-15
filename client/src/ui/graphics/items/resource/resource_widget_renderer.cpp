@@ -289,7 +289,7 @@ void QnResourceWidgetRenderer::setChannelScreenSize(const QSize &screenSize) {
 }
 
 bool QnResourceWidgetRenderer::constantDownscaleFactor() const {
-    return false;
+    return !m_channelRenderers.empty() && m_channelRenderers[0].renderer && m_channelRenderers[0].renderer->isFisheyeEnabled();
 }
 
 QSize QnResourceWidgetRenderer::sourceSize() const {

@@ -205,6 +205,10 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
     }
     newParams.enabled = m_devorpingParams.enabled;
 
+    DevorpingParams camParams = m_resource->getDevorpingParams();
+    newParams.fovRot = gradToRad(camParams.fovRot);
+    newParams.horizontalView = camParams.horizontalView;
+
     if (!(newParams == m_devorpingParams)) 
     {
         if (newParams.horizontalView != m_devorpingParams.horizontalView)
@@ -212,10 +216,6 @@ DevorpingParams QnFisheyePtzController::getDevorpingParams()
         emit dewarpingParamsChanged(newParams);
         m_devorpingParams = newParams;
     }
-
-    DevorpingParams camParams = m_resource->getDevorpingParams();
-    newParams.fovRot = camParams.fovRot;
-    newParams.horizontalView = camParams.horizontalView;
 
     //newParams.fovRot = gradToRad(-12.0); // city 360 picture
     //newParams.fovRot = gradToRad(-18.0);

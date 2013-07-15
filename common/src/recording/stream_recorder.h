@@ -90,7 +90,7 @@ public:
 
     void setContrastParams(const ImageCorrectionParams& params);
 
-    void setDevorpingParams(const DevorpingParams& params);
+    void setDewarpingParams(const DevorpingParams& params);
 
     /*
     * Server time zone. Used for export to avi/mkv files

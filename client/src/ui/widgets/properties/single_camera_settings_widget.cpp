@@ -99,7 +99,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
     connect(ui->advancedSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
-    connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+    connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
 
     updateFromResource();
 }
@@ -240,8 +240,9 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     if(m_camera == camera)
         return;
 
-    if(m_camera)
+    if(m_camera) {
         disconnect(m_camera, NULL, this, NULL);
+    }
 
     m_camera = camera;
     d->setCameras(QnVirtualCameraResourceList() << camera);
@@ -352,7 +353,8 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         if (cs != Qt::PartiallyChecked)
             m_camera->setCameraControlDisabled(cs == Qt::Checked);
 
-        m_camera->setDevorpingParams(ui->fisheyeSettingsWidget->devorpingParams());
+        m_camera->setDewarpingParams(ui->fisheyeSettingsWidget->devorpingParams());
+        m_dewarpingParamsBackup = ui->fisheyeSettingsWidget->devorpingParams();
 
 
         setHasDbChanges(false);
@@ -366,6 +368,13 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     } else {
         setAnyCameraChanges(false);
     }
+}
+
+void QnSingleCameraSettingsWidget::reject()
+{
+    if (m_camera)
+        m_camera->setDewarpingParams(m_dewarpingParamsBackup);
+    updateFromResource();
 }
 
 void QnSingleCameraSettingsWidget::updateFromResource() {
@@ -452,6 +461,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
             ui->advancedSettingsWidget->updateFromResource(m_camera);
             ui->fisheyeSettingsWidget->updateFromResource(m_camera);
+            m_dewarpingParamsBackup = m_camera->getDevorpingParams();
         }
     }
 
@@ -894,4 +904,10 @@ void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
     {
         loadAdvancedSettings();
     }
+}
+
+void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
+{
+    at_dbDataChanged();
+    m_camera->setDewarpingParams(ui->fisheyeSettingsWidget->devorpingParams());
 }

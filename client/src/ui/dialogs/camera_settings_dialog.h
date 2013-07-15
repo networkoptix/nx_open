@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/widgets/properties/camera_settings_widget.h>
+#include "fisheye/fisheye_common.h"
 
 class QAbstractButton;
 
@@ -30,6 +31,7 @@ public:
 signals:
     void buttonClicked(QDialogButtonBox::StandardButton button);
     void advancedSettingChanged();
+    void fisheyeSettingChanged(DevorpingParams params);
     void scheduleExported(const QnVirtualCameraResourceList &cameras);
     void cameraOpenRequested();
 
