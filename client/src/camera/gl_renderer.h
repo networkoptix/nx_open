@@ -28,8 +28,8 @@ public:
 
     QnYv12ToRgbShaderProgram *yv12ToRgb;
     QnYv12ToRgbWithGammaShaderProgram *yv12ToRgbWithGamma;
-    QScopedPointer<QnFisheyeShaderProgram> fisheyeProgram;
-    QScopedPointer<QnFisheyeWithGammaShaderProgram> fisheyeGammaProgram;
+    QnFisheyeShaderProgram* fisheyeProgram;
+    QnFisheyeWithGammaShaderProgram* fisheyeGammaProgram;
     QnYv12ToRgbaShaderProgram *yv12ToRgba;
     QnNv12ToRgbShaderProgram *nv12ToRgb;
 };

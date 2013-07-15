@@ -69,6 +69,8 @@ QnGlRendererShaders::QnGlRendererShaders(const QGLContext *context, QObject *par
     yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(context, this);
     yv12ToRgba = new QnYv12ToRgbaShaderProgram(context, this);
     nv12ToRgb = new QnNv12ToRgbShaderProgram(context, this);
+    fisheyeProgram = new QnFisheyeShaderProgram(context, this);
+    fisheyeGammaProgram = new QnFisheyeWithGammaShaderProgram(context, this);
 }
 
 QnGlRendererShaders::~QnGlRendererShaders() {
@@ -313,12 +315,12 @@ void QnGLRenderer::drawYV12VideoTexture(
     {
         params = m_fisheyeController->getDevorpingParams();
         if (m_imgCorrectParam.enabled)
-        shader = m_yv12ToRgbWithGammaShaderProgram.data();
+            shader = m_shaders->fisheyeGammaProgram;
         else
-            shader = fisheyeShader = m_fisheyeProgram.data();
+            shader = fisheyeShader = m_shaders->fisheyeProgram;
     }
     else if (m_imgCorrectParam.enabled) {
-        shader = gammaShader = m_yv12ToRgbWithGammaShaderProgram.data();
+        shader = gammaShader = m_shaders->yv12ToRgbWithGamma;
     }
     else {
         shader = m_shaders->yv12ToRgb;
@@ -340,12 +342,12 @@ void QnGLRenderer::drawYV12VideoTexture(
     if (gammaShader) 
     {
         if (!isPaused()) {
-            m_yv12ToRgbWithGammaShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
+            gammaShader->setImageCorrection(picLock->imageCorrectionResult());
             if (m_histogramConsumer)
                 m_histogramConsumer->setHistogramData(picLock->imageCorrectionResult());
         }
         else {
-            m_yv12ToRgbWithGammaShaderProgram->setImageCorrection(calcImageCorrection());
+            gammaShader->setImageCorrection(calcImageCorrection());
             if (m_histogramConsumer) 
                 m_histogramConsumer->setHistogramData(m_imageCorrector);
         }
