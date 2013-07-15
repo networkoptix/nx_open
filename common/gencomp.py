@@ -19,7 +19,7 @@ QList<QnCompatibilityItem> localCompatibilityItems()
     sorted_matrix.sort(key=lambda x: x.v1[1] * 100 + hash(x.comp1) + x.v2[1])
 
     for ci in sorted_matrix:
-        print >> xfile, '    items.append(QnCompatibilityItem(lit("%s"), lit("%s"), lit("%s")));' % (version_to_string(ci.v1), ci.comp1, version_to_string(ci.v2))
+        print >> xfile, '    items.append(QnCompatibilityItem(QLatin1String("%s"), QLatin1String("%s"), QLatin1String("%s")));' % (version_to_string(ci.v1), ci.comp1, version_to_string(ci.v2))
     print >> xfile, footer
 
 def gencomp_objc(xfile):
