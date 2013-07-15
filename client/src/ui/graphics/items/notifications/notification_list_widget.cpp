@@ -239,7 +239,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         Qn::NotificationLevel level = maxLevelItem->notificationLevel();
         if (level != m_itemNotificationLevel) {
             m_itemNotificationLevel = level;
-            emit itemNotificationLevelChanged();
+            emit notificationLevelChanged();
         }
     }
 
@@ -296,7 +296,7 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     Qn::NotificationLevel level = item->notificationLevel();
     if (level > m_itemNotificationLevel) {
         m_itemNotificationLevel = level;
-        emit itemNotificationLevelChanged();
+        emit notificationLevelChanged();
     }
 
     updateGeometry();
@@ -331,7 +331,7 @@ int QnNotificationListWidget::itemCount() const {
     return m_items.size();
 }
 
-Qn::NotificationLevel QnNotificationListWidget::itemNotificationLevel() const {
+Qn::NotificationLevel QnNotificationListWidget::notificationLevel() const {
     return m_itemNotificationLevel;
 }
 

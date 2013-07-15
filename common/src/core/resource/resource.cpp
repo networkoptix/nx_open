@@ -105,6 +105,7 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         QMutexLocker mutexLocker2(m2); 
         updateInner(other); 
     }
+
     silenceMode |= other->hasFlags(QnResource::foreigner);
     setStatus(other->m_status, silenceMode);
     setDisabled(other->m_disabled);

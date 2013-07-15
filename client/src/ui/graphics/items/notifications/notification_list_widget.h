@@ -31,7 +31,7 @@ public:
     void setToolTipsEnclosingRect(const QRectF &rect);
 
     int itemCount() const;
-    Qn::NotificationLevel itemNotificationLevel() const;
+    Qn::NotificationLevel notificationLevel() const;
 
 signals:
     void visibleSizeChanged();
@@ -39,7 +39,7 @@ signals:
 
     void itemRemoved(QnNotificationItem *item); // TODO: #GDM symmetry break, where is itemAdded signal?
     void itemCountChanged();
-    void itemNotificationLevelChanged();
+    void notificationLevelChanged();
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;

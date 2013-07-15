@@ -81,12 +81,14 @@ public:
     QnBlinkingImageButtonWidget *blinker() const {
         return m_blinker.data();
     }
-
     void setBlinker(QnBlinkingImageButtonWidget *blinker);
+
+    Qn::NotificationLevel notificationLevel() const;
 
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
+    void notificationLevelChanged();
 
 private slots:
     void showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
@@ -99,7 +101,7 @@ private slots:
     void at_filterButton_clicked();
     void at_eventLogButton_clicked();
     void at_debugButton_clicked();
-    void at_list_itemRemoved(QnNotificationItem* item);
+    void at_list_itemRemoved(QnNotificationItem *item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
 
 private:

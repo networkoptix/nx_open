@@ -235,19 +235,18 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
     m_blinker = blinker;
     
     if (m_blinker) {
-        connect(m_list, SIGNAL(itemCountChanged()),             this, SLOT(updateBlinker()));
-        connect(m_list, SIGNAL(itemNotificationLevelChanged()), this, SLOT(updateBlinker()));
+        connect(m_list, SIGNAL(itemCountChanged()),         this, SLOT(updateBlinker()));
+        connect(m_list, SIGNAL(notificationLevelChanged()), this, SLOT(updateBlinker()));
         updateBlinker();
     }
 }
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
 {
-    QnSingleThumbnailLoader* loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, QSize(0, thumbnailHeight), item);
+    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, QSize(0, thumbnailHeight), item);
     item->setImageProvider(loader);
     //connect(loader, SIGNAL(finished()), loader, SLOT(deleteLater()));
 }
-
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
@@ -481,7 +480,7 @@ void QnNotificationsCollectionWidget::updateBlinker() {
         return;
 
     blinker()->setNotificationCount(m_list->itemCount());
-    blinker()->setColor(QnNotificationItem::notificationColor(m_list->itemNotificationLevel()));
+    blinker()->setColor(QnNotificationItem::notificationColor(m_list->notificationLevel()));
 }
 
 void QnNotificationsCollectionWidget::at_settingsButton_clicked() {
