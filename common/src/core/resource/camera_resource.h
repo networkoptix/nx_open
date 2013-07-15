@@ -98,7 +98,7 @@ protected:
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList); // find resolution helper function
 private:
-    int m_channelNumer; // video/audio source number
+    int m_channelNumber; // video/audio source number
 };
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
