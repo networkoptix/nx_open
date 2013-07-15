@@ -315,7 +315,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     {
         params = m_fisheyeController->getDevorpingParams();
         if (m_imgCorrectParam.enabled)
-            shader = m_shaders->fisheyeGammaProgram;
+            shader = gammaShader = fisheyeShader = m_shaders->fisheyeGammaProgram;
         else
             shader = fisheyeShader = m_shaders->fisheyeProgram;
     }
