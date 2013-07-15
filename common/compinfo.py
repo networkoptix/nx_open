@@ -3,14 +3,19 @@ import string
 from compatibility import *
 
 CL = Component('Client', 'HD Witness Client')
+IOSCL = Component('iOSClient', 'iOS HD Witness Client')
 
 V10 = Version(1, 0)
 V11 = Version(1, 1)
 V12 = Version(1, 2)
 V13 = Version(1, 3)
 V14 = Version(1, 4)
+V15 = Version(1, 5)
+V16 = Version(1, 6)
            
 COMPATIBILITY_INFO = (
+    (V16, (IOSCL,), V15), # iOS V1.6 can connect to 1.5
+    (V15, (IOSCL,), V16), # iOS V1.5 can connect to 1.6
 #    (V13, (CL,), Range(V12, V12)),
 #    (V14, (CL,), Range(V12, V13)),
 )
