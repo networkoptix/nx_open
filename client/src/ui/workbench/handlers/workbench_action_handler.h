@@ -239,14 +239,14 @@ protected slots:
     void at_openFolderAction_triggered();
     void at_checkForUpdatesAction_triggered();
     void at_aboutAction_triggered();
-    void at_PreferencesGeneralTabAction_triggered();
     void at_businessEventsAction_triggered();
     void at_businessEventsLogAction_triggered();
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
-    void at_PreferencesLicensesTabAction_triggered();
-    void at_PreferencesServerTabAction_triggered();
-    void at_PreferencesNotificationTabAction_triggered();
+    void at_preferencesGeneralTabAction_triggered();
+    void at_preferencesLicensesTabAction_triggered();
+    void at_preferencesServerTabAction_triggered();
+    void at_preferencesNotificationTabAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
@@ -259,7 +259,8 @@ protected slots:
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
     void at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras);
     void at_cameraSettingsDialog_rejected();
-    void at_cameraSettingsAdvanced_changed();
+    void at_cameraSettingsDialog_advancedSettingChanged();
+    void at_cameraSettingsDialog_cameraOpenRequested();
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();

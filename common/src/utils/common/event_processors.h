@@ -82,6 +82,17 @@ private:
     QVector<bool> m_typeMask;
 };
 
+template<class Base>
+class QnEveryEventProcessor: public QnEventProcessor<Base> {
+public:
+    QnEveryEventProcessor(QObject *parent = NULL): QnEventProcessor<Base>(parent) {}
+
+protected:
+    virtual bool isActivating(QObject *, QEvent *) const override {
+        return true;
+    }
+};
+
 
 class QnEventSignalizerBase: public QObject {
     Q_OBJECT;
@@ -109,6 +120,8 @@ protected:
 
 typedef QnEventSignalizer<QnSingleEventProcessor<QnEventSignalizerBase> > QnSingleEventSignalizer;
 typedef QnEventSignalizer<QnMultiEventProcessor<QnEventSignalizerBase> >  QnMultiEventSignalizer;
+typedef QnEventSignalizer<QnEveryEventProcessor<QnEventSignalizerBase> >  QnEveryEventSignalizer;
+
 
 namespace Qn {
     enum EventProcessingPolicy {
@@ -147,6 +160,7 @@ private:
 
 typedef QnEventEater<QnSingleEventProcessor<QObject> > QnSingleEventEater;
 typedef QnEventEater<QnMultiEventProcessor<QObject> > QnMultiEventEater;
+typedef QnEventEater<QnEveryEventProcessor<QObject> > QnEveryEventEater;
 
 #define QN_EVENT_SIGNAL_EMITTER_SIGNAL_COUNT 60
 

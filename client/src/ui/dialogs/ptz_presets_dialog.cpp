@@ -8,19 +8,10 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/ui_resource_name.h>
+#include <ui/models/ptz_preset_list_model.h>
+#include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 
-
-namespace {
-    enum DataRole {
-        LogicalPositionRole = Qt::UserRole,
-        HotkeyRole
-    };
-
-    enum Column {
-        NameColumn,
-        HotkeyColumn
-    };
-}
 
 QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -31,9 +22,10 @@ QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFl
 
     m_removeButton = new QPushButton(tr("Remove"));
     m_activateButton = new QPushButton(tr("Activate"));
-    m_model = new QStandardItemModel(this);
+    m_model = new QnPtzPresetListModel(this);
 
     ui->treeView->setModel(m_model);
+    ui->treeView->setItemDelegateForColumn(m_model->column(QnPtzPresetListModel::HotkeyColumn), new QnPtzPresetHotkeyItemDelegate(this));
     ui->buttonBox->addButton(m_removeButton, QDialogButtonBox::HelpRole);
     ui->buttonBox->addButton(m_activateButton, QDialogButtonBox::HelpRole);
 
@@ -85,43 +77,15 @@ void QnPtzPresetsDialog::submitToResource() {
     if(!m_camera)
         return;
 
-    QList<QnPtzPreset> presets;
-
-    QStandardItem *root = m_model->invisibleRootItem();
-    for(int row = 0, rowCount = root->rowCount(); row < rowCount; row++) {
-        QStandardItem *item = root->child(row);
-
-        presets.push_back(QnPtzPreset(item->data(HotkeyRole).value<QKeySequence>(), item->text(), item->data(LogicalPositionRole).value<QVector3D>()));
-    }
-
-    context()->instance<QnWorkbenchPtzPresetManager>()->setPtzPresets(m_camera, presets);
+    context()->instance<QnWorkbenchPtzPresetManager>()->setPtzPresets(m_camera, m_model->presets());
 }
 
 void QnPtzPresetsDialog::updateLabel() {
-    ui->topLabel->setText(m_camera ? tr("PTZ presets for camera %1:").arg(m_camera->getName()) : QString());
+    ui->topLabel->setText(m_camera ? tr("PTZ presets for camera %1:").arg(getResourceName(m_camera)) : QString());
 }
 
 void QnPtzPresetsDialog::updateModel() {
-    m_model->clear();
-    if(!m_camera)
-        return;
-
-    m_model->setColumnCount(2);
-    m_model->setHorizontalHeaderItem(NameColumn, new QStandardItem(tr("Name")));
-    m_model->setHorizontalHeaderItem(HotkeyColumn, new QStandardItem(tr("Hotkey")));
-
-    QList<QnPtzPreset> presets = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(m_camera);
-    foreach(const QnPtzPreset &preset, presets) {
-        QStandardItem *nameItem = new QStandardItem(preset.name);
-        nameItem->setData(QVariant::fromValue<QVector3D>(preset.logicalPosition), LogicalPositionRole);
-        nameItem->setData(QVariant::fromValue(preset.hotkey), HotkeyRole);
-
-        QStandardItem *hotkeyItem = new QStandardItem(preset.hotkey.isEmpty() ? tr("None") : preset.hotkey.toString(QKeySequence::NativeText));
-
-        int row = m_model->rowCount();
-        m_model->setItem(row, NameColumn, nameItem);
-        m_model->setItem(row, HotkeyColumn, hotkeyItem);
-    }
+    m_model->setPresets(context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(m_camera));
 }
 
 void QnPtzPresetsDialog::updateRemoveButtonEnabled() {
@@ -136,20 +100,18 @@ void QnPtzPresetsDialog::updateActivateButtonEnabled() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnPtzPresetsDialog::at_removeButton_clicked() {
-    QSet<QStandardItem *> selectedItems;
+    QList<QPersistentModelIndex> indices;
     foreach(const QModelIndex &index, ui->treeView->selectionModel()->selectedRows())
-        selectedItems.insert(m_model->itemFromIndex(index));
+        indices.push_back(index);
 
-    foreach(QStandardItem *item, selectedItems)
-        m_model->invisibleRootItem()->removeRow(item->row());
+    foreach(const QPersistentModelIndex &index, indices)
+        m_model->removeRow(index.row(), index.parent());
 }
 
 void QnPtzPresetsDialog::at_activateButton_clicked() {
-    QStandardItem *item = m_model->itemFromIndex(ui->treeView->currentIndex());
-    if(!item)
-        return;
+    QnPtzPreset preset = ui->treeView->currentIndex().data(Qn::PtzPresetRole).value<QnPtzPreset>();
 
-    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(m_camera).withArgument(Qn::ResourceNameRole, item->text()));
+    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(m_camera).withArgument(Qn::ResourceNameRole, preset.name));
 }
 
 

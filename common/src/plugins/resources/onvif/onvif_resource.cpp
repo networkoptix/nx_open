@@ -2843,7 +2843,8 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
     {
         //adding task to reset port state
         const quint64 timerID = TimerManager::instance()->addTimer( this, autoResetTimeoutMS );
-        m_triggerOutputTasks.insert( std::make_pair( timerID, TriggerOutputTask( outputID, !active, 0 ) ) );
+        if (active)
+            m_triggerOutputTasks.insert( std::make_pair( timerID, TriggerOutputTask( outputID, !active, 0 ) ) );
     }
 #endif
 

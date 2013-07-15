@@ -5,13 +5,13 @@
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
 
+#include <utils/image_transformations.h>
 
 QnThreadedImageLoaderPrivate::QnThreadedImageLoaderPrivate() :
     QObject(),
-    m_aspectMode(Qt::KeepAspectRatio),
+    m_aspectRatio(0.0),
     m_transformationMode(Qt::SmoothTransformation),
-    m_downScaleOnly(true),
-    m_cropToMonitorAspectRatio(false)
+    m_flags(Qn::DownscaleOnly | Qn::CropToTargetAspectRatio)
 {
 }
 
@@ -23,20 +23,16 @@ void QnThreadedImageLoaderPrivate::setSize(const QSize &size) {
     m_size = size;
 }
 
-void QnThreadedImageLoaderPrivate::setAspectRatioMode(const Qt::AspectRatioMode mode) {
-    m_aspectMode = mode;
+void QnThreadedImageLoaderPrivate::setAspectRatio(const qreal aspectRatio) {
+    m_aspectRatio = aspectRatio;
 }
 
 void QnThreadedImageLoaderPrivate::setTransformationMode(const Qt::TransformationMode mode) {
     m_transformationMode = mode;
 }
 
-void QnThreadedImageLoaderPrivate::setDownScaleOnly(const bool value) {
-    m_downScaleOnly = value;
-}
-
-void QnThreadedImageLoaderPrivate::setCropToMonitorAspectRatio(const bool value) {
-    m_cropToMonitorAspectRatio = value;
+void QnThreadedImageLoaderPrivate::setFlags(const Qn::ImageLoaderFlags flags) {
+    m_flags = flags;
 }
 
 void QnThreadedImageLoaderPrivate::setInput(const QImage &input) {
@@ -57,30 +53,27 @@ void QnThreadedImageLoaderPrivate::start() {
     }
 
     QImage output = m_input;
-    if (!output.isNull() && m_cropToMonitorAspectRatio) {
-        qreal aspectRatio = (qreal)output.width() / (qreal)output.height();
-
-        QRect screen = qApp->desktop()->screenGeometry();
-        qreal targetAspectRatio = (qreal)screen.width() / (qreal)screen.height();
-        if (!qFuzzyCompare(aspectRatio, targetAspectRatio)) {
-            if (targetAspectRatio > aspectRatio) {
-                int targetHeight = qRound((qreal)output.width() / targetAspectRatio);
-                int offset = (output.height() - targetHeight) / 2;
-                output = output.copy(0, offset, output.width(), targetHeight);
-            } else {
-                int targetWidth = qRound((qreal)output.height() * targetAspectRatio);
-                int offset = (output.width() - targetWidth / 2);
-                output = output.copy(offset, 0, targetWidth, output.height());
-            }
-        }
+    if (!output.isNull() && !qFuzzyIsNull(m_aspectRatio) && (m_flags & Qn::CropToTargetAspectRatio)) {
+        output = cropImageToAspectRatio(output, m_aspectRatio);
     }
 
     if (!output.isNull() && m_size.isValid() && !m_size.isNull()) {
-        if (m_downScaleOnly)
-            m_size = m_size.boundedTo(output.size());
+        QSize targetSize = m_size;
+        if (m_flags & Qn::TouchSizeFromOutside) {
+            qreal aspectRatio = (qreal)output.width() / (qreal)output.height();
+            if (output.width() > output.height()) {
+                targetSize.setWidth(qRound((qreal)targetSize.height() * aspectRatio));
+            } else {
+                targetSize.setHeight(qRound((qreal)targetSize.width() / aspectRatio));
+            }
 
-        if (m_size != output.size())
-            output = output.scaled(m_size, m_aspectMode, m_transformationMode);
+        }
+
+        if (m_flags & Qn::DownscaleOnly)
+            targetSize = targetSize.boundedTo(output.size());
+
+        if (targetSize != output.size())
+            output = output.scaled(targetSize, Qt::KeepAspectRatio, m_transformationMode);
     }
 
     if (!m_outputFilename.isEmpty()) {
@@ -94,6 +87,7 @@ void QnThreadedImageLoaderPrivate::start() {
     delete this;
 }
 
+//---------------  QnThreadedImageLoader ---------------------//
 
 QnThreadedImageLoader::QnThreadedImageLoader(QObject *parent) :
     QObject(parent),
@@ -111,20 +105,16 @@ void QnThreadedImageLoader::setSize(const QSize &size) {
     m_loader->setSize(size);
 }
 
-void QnThreadedImageLoader::setAspectRatioMode(const Qt::AspectRatioMode mode) {
-    m_loader->setAspectRatioMode(mode);
+void QnThreadedImageLoader::setAspectRatio(const qreal aspectRatio) {
+    m_loader->setAspectRatio(aspectRatio);
 }
 
 void QnThreadedImageLoader::setTransformationMode(const Qt::TransformationMode mode) {
     m_loader->setTransformationMode(mode);
 }
 
-void QnThreadedImageLoader::setDownScaleOnly(const bool value) {
-    m_loader->setDownScaleOnly(value);
-}
-
-void QnThreadedImageLoader::setCropToMonitorAspectRatio(const bool value) {
-    m_loader->setCropToMonitorAspectRatio(value);
+void QnThreadedImageLoader::setFlags(const Qn::ImageLoaderFlags flags) {
+    m_loader->setFlags(flags);
 }
 
 void QnThreadedImageLoader::setInput(const QImage &input) {

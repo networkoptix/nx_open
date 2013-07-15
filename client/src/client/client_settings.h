@@ -79,8 +79,11 @@ public:
         
         AUTO_START,
 
-        /** Filter value for network connections in the statistics widget */
+        /** Filter value for network connections in the statistics widget. */
         STATISTICS_NETWORK_FILTER,
+
+        /** Last used value for the 'Keep aspect ratio' flag in the layout settings. */
+        LAYOUT_KEEP_ASPECT_RATIO,
 
         VARIABLE_COUNT
     };
@@ -150,6 +153,7 @@ private:
         QN_DECLARE_RW_PROPERTY(quint64,                     popupSystemHealth,      setPopupSystemHealth,       POPUP_SYSTEM_HEALTH,        0xFFFFFFFFFFFFFFFFull)
         QN_DECLARE_RW_PROPERTY(bool,                        autoStart,              setAutoStart,               AUTO_START,                 false)
         QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)
+        QN_DECLARE_RW_PROPERTY(bool,                        layoutKeepAspectRatio,  setLayoutKeepAspectRatio,   LAYOUT_KEEP_ASPECT_RATIO,   true)
     QN_END_PROPERTY_STORAGE()
 
 private:

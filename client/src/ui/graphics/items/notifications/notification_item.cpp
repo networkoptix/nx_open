@@ -5,6 +5,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsLinearLayout>
 
+#include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
 #include <utils/image_provider.h>
 
@@ -31,7 +32,7 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     m_textLabel(new QnProxyLabel(this)),
     m_thumbnailLabel(NULL)
 {
-    m_textLabel->setAlignment(Qt::AlignCenter);
+    m_textLabel->setAlignment(Qt::AlignLeft);
     m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
@@ -96,6 +97,7 @@ void QnNotificationToolTipWidget::updateTailPos()  {
         setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.bottom())));
     else
         setTailPos(QPointF(qRound(rect.right() + 10.0), qRound((rect.top() + rect.bottom()) / 2)));
+    base_type::pointTo(m_pointTo);
 }
 
 void QnNotificationToolTipWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
@@ -127,7 +129,8 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_colorLevel(None),
     m_imageProvider(NULL),
     m_tooltipWidget(new QnNotificationToolTipWidget(this)),
-    m_hoverProcessor(new HoverFocusProcessor(this))
+    m_hoverProcessor(new HoverFocusProcessor(this)),
+    m_inToolTipPositionUpdate(false)
 {
     setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
     setFrameWidth(0.5);
@@ -292,6 +295,11 @@ void QnNotificationItem::updateToolTipVisibility() {
 }
 
 void QnNotificationItem::updateToolTipPosition() {
+    if(m_inToolTipPositionUpdate)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_inToolTipPositionUpdate, true); /* Prevent stack overflow. */
+
     m_tooltipWidget->updateTailPos();
     m_tooltipWidget->pointTo(QPointF(0, qRound(geometry().height() / 2 )));
 }

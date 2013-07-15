@@ -30,6 +30,7 @@
 #include <ui/animation/animation_event.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_ptz_controller.h>
@@ -59,6 +60,8 @@ namespace {
     const int speedUpdateIntervalMSec = 500;
 
     const double minPtzZoomRectSize = 0.08;
+
+    const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in workbench_controller */ // TODO: #Elric
 }
 
 
@@ -724,6 +727,14 @@ void PtzInstrument::processPtzClick(const QPointF &pos) {
         target()->virtualPtzController()->setAnimationEnabled(true);
     }
     ptzMoveTo(target(), pos);
+
+    /* Also do item unzoom if we're zoomed in. */
+    QRectF viewportGeometry = display()->viewportGeometry();
+    QRectF zoomedItemGeometry = display()->itemGeometry(target()->item());
+    if(viewportGeometry.width() < zoomedItemGeometry.width() * itemUnzoomThreshold || viewportGeometry.height() < zoomedItemGeometry.height() * itemUnzoomThreshold) {
+        workbench()->setItem(Qn::ZoomedRole, NULL);
+        workbench()->setItem(Qn::ZoomedRole, target()->item());
+    }
 }
 
 void PtzInstrument::processPtzDrag(const QRectF &rect) {

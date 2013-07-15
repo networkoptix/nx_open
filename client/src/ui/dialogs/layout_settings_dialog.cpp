@@ -3,6 +3,7 @@
 
 #include <QtCore/qmath.h>
 #include <QUrl>
+#include <QResizeEvent>
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
@@ -10,104 +11,135 @@
 #include <QtGui/QPaintEvent>
 #include <QImageReader>
 
+#include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
 
+#include <ui/common/geometry.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/style/globals.h>
+#include <ui/widgets/framed_label.h>
 
 #include <utils/threaded_image_loader.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/local_file_cache.h>
+#include <utils/image_transformations.h>
+#include <utils/common/scoped_value_rollback.h>
 
 namespace {
-    const int labelFrameWidth = 4;  // in pixels
+    /** Possible states of the dialog contents. */
+    enum DialogState {
+        /** No image is selected. */
+        NoImage,
+        /** Error is occured. */
+        Error,
+        /** Current layout image is being downloaded from the EC. */
+        ImageDownloading,
+        /** Current layout image is downloaded from the EC. */
+        ImageDownloaded,
+        /** Current layout image is downloaded and being loading. */
+        ImageLoading,
+        /** Current layout image is loaded. */
+        ImageLoaded,
+        /** New image is selected. */
+        NewImageSelected,
+        /** New image is selected and being loading. */
+        NewImageLoading,
+        /** New image is selected and loaded. */
+        NewImageLoaded,
+        /** New image is selected being uploading to the EC. */
+        NewImageUploading
+    };
 }
 
-class QnFramedLabel: public QLabel {
-    typedef QLabel base_type;
+
+
+class QnLayoutSettingsDialogPrivate
+{
 public:
-    explicit QnFramedLabel(QWidget* parent = 0):
-        base_type(parent),
-        m_opacityPercent(100)
+    QnLayoutSettingsDialogPrivate():
+        state(NoImage),
+        cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio())
     {}
-    ~QnFramedLabel() {}
+    
+    virtual ~QnLayoutSettingsDialogPrivate(){}
 
-    QSize size() const {
-        return base_type::size() - QSize(labelFrameWidth*2, labelFrameWidth*2);
+    void clear() {
+        state = NoImage;
+        imageFilename = QString();
+        imageSourcePath = QString();
+        preview = QImage();
+        croppedPreview = QImage();
+        errorText = QString();
     }
 
-    int opacityPercent() const {
-        return m_opacityPercent;
+    /** Image is present and image file is available locally. */
+    bool imageFileIsAvailable() const {
+        return state != NoImage && state != Error && state != ImageDownloading;
     }
 
-    void setOpacityPercent(int value) {
-        if (m_opacityPercent == value)
-            return;
-        m_opacityPercent = value;
-        repaint();
+    bool imageIsLoading() const {
+        return
+            state == ImageDownloading ||
+            state == ImageLoading ||
+            state == NewImageLoading ||
+            state == NewImageUploading;
     }
 
-protected:
-    virtual void paintEvent(QPaintEvent *event) override {
-        bool pixmapExists = pixmap() && !pixmap()->isNull();
-        if (!pixmapExists)
-            base_type::paintEvent(event);
-
-        QPainter painter(this);
-        QRect fullRect = event->rect().adjusted(labelFrameWidth / 2, labelFrameWidth / 2, -labelFrameWidth / 2, -labelFrameWidth / 2);
-
-        if (pixmapExists) {
-            painter.setOpacity(0.01 * m_opacityPercent);
-            QRect pix = pixmap()->rect();
-            int x = fullRect.left() + (fullRect.width() - pix.width()) / 2;
-            int y = fullRect.top() + (fullRect.height() - pix.height()) / 2;
-            painter.drawPixmap(x, y, *pixmap());
-        }
-
-        painter.setOpacity(0.5);
-        QPen pen;
-        pen.setWidth(labelFrameWidth);
-        pen.setColor(QColor(Qt::lightGray));
-        painter.setPen(pen);
-        painter.drawRect(fullRect);
+    bool canChangeAspectRatio() const {
+        return !croppedPreview.isNull();
     }
 
-private:
-    int m_opacityPercent;
+    DialogState state;
+
+    /** Path to the selected image (may be path in cache). */
+    QString imageSourcePath;
+
+    /** Filename of the image (GUID-generated). */
+    QString imageFilename;
+
+    /** Cell aspect ratio for the current layout. */
+    qreal cellAspectRatio;
+
+    /** Preview image */
+    QImage preview;
+
+    /** Cropped preview image. */
+    QImage croppedPreview;
+
+    /** Text of the last error if any occured. */
+    QString errorText;
 };
+
 
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
+    d_ptr(new QnLayoutSettingsDialogPrivate()),
     m_cache(NULL),
-    m_cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio()),
-    m_estimatePending(false),
-    m_cropImage(false)
+    m_isUpdating(false)
 {
     ui->setupUi(this);
 
-    imageLabel = new QnFramedLabel(ui->page);
-    imageLabel->setObjectName(QLatin1String("imageLabel"));
-    imageLabel->setText(tr("<No image>"));
-    imageLabel->setAlignment(Qt::AlignCenter);
-    imageLabel->setOpacityPercent(ui->opacitySpinBox->value());
-    ui->horizontalLayout->insertWidget(0, imageLabel, 1);
+    ui->imageLabel->installEventFilter(this);
 
-    imageLabel->installEventFilter(this);
 
-    ui->userCanEditCheckBox->setVisible(false);
+    ui->widthSpinBox->setMinimum(qnGlobals->layoutBackgroundMinSize().width());
     ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
+
+    ui->heightSpinBox->setMinimum(qnGlobals->layoutBackgroundMinSize().height());
     ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
 
-    setProgress(false);
-
-    connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(viewFile()));
-    connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(selectFile()));
-    connect(ui->clearButton,    SIGNAL(clicked()), this, SLOT(at_clearButton_clicked()));
-    connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
-    connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
-    connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(at_opacitySpinBox_valueChanged(int)));
+    connect(ui->viewButton,                 SIGNAL(clicked()),          this, SLOT(viewFile()));
+    connect(ui->selectButton,               SIGNAL(clicked()),          this, SLOT(selectFile()));
+    connect(ui->clearButton,                SIGNAL(clicked()),          this, SLOT(at_clearButton_clicked()));
+    connect(ui->lockedCheckBox,             SIGNAL(clicked()),          this, SLOT(updateControls()));
+    connect(ui->buttonBox,                  SIGNAL(accepted()),         this, SLOT(at_accepted()));
+    connect(ui->opacitySpinBox,             SIGNAL(valueChanged(int)),  this, SLOT(at_opacitySpinBox_valueChanged(int)));
+    connect(ui->widthSpinBox,               SIGNAL(valueChanged(int)),  this, SLOT(at_widthSpinBox_valueChanged(int)));
+    connect(ui->heightSpinBox,              SIGNAL(valueChanged(int)),  this, SLOT(at_heightSpinBox_valueChanged(int)));
+    connect(ui->cropToMonitorCheckBox,      SIGNAL(toggled(bool)),      this, SLOT(updateControls()));
+    connect(ui->keepAspectRatioCheckBox,    SIGNAL(toggled(bool)),      this, SLOT(updateControls()));
 
     updateControls();
 }
@@ -116,189 +148,325 @@ QnLayoutSettingsDialog::~QnLayoutSettingsDialog()
 {
 }
 
-void QnLayoutSettingsDialog::showEvent(QShowEvent *event) {
-    base_type::showEvent(event);
-    loadPreview();
-}
-
-void QnLayoutSettingsDialog::resizeEvent(QResizeEvent *event) {
-    base_type::resizeEvent(event);
-//    loadPreview();
-}
-
 bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
-    if (target == imageLabel &&
-            event->type() == QEvent::MouseButtonRelease) {
-        if (!m_newFilePath.isEmpty())
-            viewFile();
-        else if (!ui->lockedCheckBox->isChecked())
+    Q_D(QnLayoutSettingsDialog);
+
+    if (target == ui->imageLabel && event->type() == QEvent::MouseButtonRelease) {
+        if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == Error) )
             selectFile();
+        else
+            viewFile();
     }
+
     return base_type::eventFilter(target, event);
 }
 
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
-    m_cachedFilename = layout->backgroundImageFilename();
+    Q_D(QnLayoutSettingsDialog);
 
-    updateCache(layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout));
+    m_cache = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout) //TODO: #GDM refactor duplicated code
+            ? new QnLocalFileCache(this)
+            : new QnAppServerImageCache(this);
+    connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    connect(m_cache, SIGNAL(fileUploaded(QString, bool)), this, SLOT(at_imageStored(QString, bool)));
 
-    if (!m_cachedFilename.isEmpty()) {
-        m_newFilePath = m_cache->getFullPath(m_cachedFilename);
-        m_cache->downloadFile(m_cachedFilename);
+    d->clear();
+    d->imageFilename = layout->backgroundImageFilename();
+
+    if (!d->imageFilename.isEmpty()) {
+        d->imageSourcePath = m_cache->getFullPath(d->imageFilename);
+        d->state = ImageDownloading;
+        m_cache->downloadFile(d->imageFilename);
+
+        ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
+        ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
         ui->widthSpinBox->setValue(layout->backgroundSize().width());
         ui->heightSpinBox->setValue(layout->backgroundSize().height());
         ui->opacitySpinBox->setValue(layout->backgroundOpacity() * 100);
+        ui->keepAspectRatioCheckBox->setChecked(false);
     }
     ui->lockedCheckBox->setChecked(layout->locked());
-    ui->userCanEditCheckBox->setChecked(layout->userCanEdit());
 
     if (layout->cellAspectRatio() > 0) {
         qreal cellWidth = 1.0 + layout->cellSpacing().width();
         qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
-        m_cellAspectRatio = cellWidth / cellHeight;
+        d->cellAspectRatio = cellWidth / cellHeight;
     }
 
     updateControls();
 }
 
 bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout) {
+    Q_D(const QnLayoutSettingsDialog);
+
     if (!hasChanges(layout))
         return false;
 
-    layout->setUserCanEdit(ui->userCanEditCheckBox->isChecked());
     layout->setLocked(ui->lockedCheckBox->isChecked());
-    layout->setBackgroundImageFilename(m_cachedFilename);
+    layout->setBackgroundImageFilename(d->imageFilename);
     layout->setBackgroundSize(QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value()));
     layout->setBackgroundOpacity((qreal)ui->opacitySpinBox->value() * 0.01);
     // TODO: #GDM remove unused image if any
     return true;
 }
 
-bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
+qreal QnLayoutSettingsDialog::screenAspectRatio() const {
+    QRect screen = qApp->desktop()->screenGeometry();
+    return (qreal)screen.width() / (qreal)screen.height();
+}
 
+qreal QnLayoutSettingsDialog::bestAspectRatioForCells() const {
+    Q_D(const QnLayoutSettingsDialog);
+    if (d->state != ImageLoaded && d->state != NewImageLoaded)
+        return -1;
+    QImage image = (d->canChangeAspectRatio() && ui->cropToMonitorCheckBox->isChecked())
+            ? d->croppedPreview
+            : d->preview;
+    if (image.isNull())
+        return -2;
+    qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
+    return aspectRatio / d->cellAspectRatio;
+}
+
+bool QnLayoutSettingsDialog::cellsAreBestAspected() const {
+    qreal targetAspectRatio = bestAspectRatioForCells();
+    if (targetAspectRatio < 0)
+        return false;
+    int w = qRound((qreal)ui->heightSpinBox->value() * targetAspectRatio);
+    int h = qRound((qreal)ui->widthSpinBox->value() / targetAspectRatio);
+    return (w == ui->widthSpinBox->value() || h == ui->heightSpinBox->value());
+}
+
+bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
+    Q_D(const QnLayoutSettingsDialog);
     if (
-            (ui->userCanEditCheckBox->isChecked() != layout->userCanEdit()) ||
             (ui->lockedCheckBox->isChecked() != layout->locked()) ||
             (ui->opacitySpinBox->value() != int(layout->backgroundOpacity() * 100)) ||
-            (m_cachedFilename != layout->backgroundImageFilename())
+            (d->imageFilename != layout->backgroundImageFilename())
             )
         return true;
 
     // do not save size change if no image was set
     QSize newSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
-    return (!m_cachedFilename.isEmpty() && newSize != layout->backgroundSize());
+    return (d->state != NoImage && newSize != layout->backgroundSize());
 }
-
-void QnLayoutSettingsDialog::updateCache(bool local) {
-    if (m_cache && ((dynamic_cast<QnLocalFileCache *>(m_cache) != NULL) == local))
-        return;
-
-    if (m_cache)
-        disconnect(m_cache, 0, this, 0);
-
-    m_cache = local
-            ? new QnLocalFileCache(this)
-            : new QnAppServerImageCache(this);
-
-    connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
-    connect(m_cache, SIGNAL(fileUploaded(QString, bool)), this, SLOT(at_imageStored(QString, bool)));
-}
-
 
 void QnLayoutSettingsDialog::updateControls() {
-    bool imagePresent = !m_newFilePath.isEmpty();
+    if (m_isUpdating)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
+    Q_UNUSED(guard)
+
+    Q_D(const QnLayoutSettingsDialog);
+
+    setProgress(d->imageIsLoading());
+    ui->generalGroupBox->setEnabled(d->state != NewImageUploading);
+    ui->buttonBox->setEnabled(d->state != NewImageUploading);
+
+    if (d->imageIsLoading())
+        return;
+
+    bool imagePresent = d->imageFileIsAvailable();
     bool locked = ui->lockedCheckBox->isChecked();
 
     ui->widthSpinBox->setEnabled(imagePresent && !locked);
     ui->heightSpinBox->setEnabled(imagePresent && !locked);
+    ui->keepAspectRatioCheckBox->setEnabled(imagePresent && !locked);
     ui->viewButton->setEnabled(imagePresent);
     ui->clearButton->setEnabled(imagePresent && !locked);
     ui->opacitySpinBox->setEnabled(imagePresent && !locked);
     ui->selectButton->setEnabled(!locked);
+    ui->cropToMonitorCheckBox->setEnabled(imagePresent && d->canChangeAspectRatio());
+    // image is already cropped to monitor aspect ratio
+    if (imagePresent && !d->canChangeAspectRatio())
+        ui->cropToMonitorCheckBox->setChecked(true);
+
+    QImage image;
+    if (!imagePresent) {
+        ui->imageLabel->setPixmap(QPixmap());
+        ui->imageLabel->setText(d->state != Error 
+                            ? tr("<No image>")
+                            : d->errorText);
+    } else {
+        image = (d->canChangeAspectRatio() && ui->cropToMonitorCheckBox->isChecked())
+                ? d->croppedPreview
+                : d->preview;
+        ui->imageLabel->setPixmap(QPixmap::fromImage(image.scaled(ui->imageLabel->size(), Qt::KeepAspectRatio, Qt::FastTransformation)));
+    }
+
+    qreal targetAspectRatio = bestAspectRatioForCells();
+    // TODO: #GDM do not change if values were changed manually?
+    if (ui->keepAspectRatioCheckBox->isChecked() && targetAspectRatio > 0 && !cellsAreBestAspected()) {
+        QSize minSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMinSize(), Qt::KeepAspectRatioByExpanding).toSize();
+        QSize maxSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMaxSize(), Qt::KeepAspectRatio).toSize();
+
+        ui->widthSpinBox->setRange(minSize.width(), maxSize.width());
+        ui->heightSpinBox->setRange(minSize.height(), maxSize.height());
+
+        // limit w*h <= recommended area; minor variations are allowed, e.g. 17*6 ~~= 100;
+        qreal height = qSqrt(qnGlobals->layoutBackgroundRecommendedArea() / targetAspectRatio);
+        qreal width = height * targetAspectRatio;
+        ui->widthSpinBox->setValue(width);
+        ui->heightSpinBox->setValue(height);
+    } else {
+        ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
+        ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
+    }
+
 }
 
 void QnLayoutSettingsDialog::at_clearButton_clicked() {
-    m_newFilePath = QString();
-    m_cachedFilename = QString();
-
-    imageLabel->setPixmap(QPixmap());
-    imageLabel->setText(tr("<No image>"));
-
+    Q_D(QnLayoutSettingsDialog);
+    d->clear();
     updateControls();
 }
 
 void QnLayoutSettingsDialog::at_accepted() {
-    if (m_newFilePath.isEmpty() || !m_cachedFilename.isEmpty()) {
+    Q_D(QnLayoutSettingsDialog);
+
+    switch (d->state) {
+
+    /* if image not present or still not loaded then do nothing */
+    case NoImage:
+    case Error:
+    case NewImageSelected:
+    case ImageDownloaded:
         accept();
         return;
+
+    /* current progress should be cancelled before accepting */
+    case ImageDownloading:
+    case ImageLoading:
+    case NewImageLoading:
+    case NewImageUploading:
+        return;
+
+    case ImageLoaded:
+        /* Current image should be cropped and re-uploaded. */
+        if (d->canChangeAspectRatio() && ui->cropToMonitorCheckBox->isChecked())
+            break;
+        qnSettings->setLayoutKeepAspectRatio(ui->keepAspectRatioCheckBox->isChecked());
+        accept();
+        return;
+    case NewImageLoaded:
+        break;
     }
 
-    m_cache->storeImage(m_newFilePath, m_cropImage);
-    setProgress(true);
-    ui->generalGroupBox->setEnabled(false);
-    ui->buttonBox->setEnabled(false);
+    if (ui->cropToMonitorCheckBox->isChecked())
+        m_cache->storeImage(d->imageSourcePath, screenAspectRatio());
+    else
+        m_cache->storeImage(d->imageSourcePath);
+    d->state = NewImageUploading;
+    updateControls();
 }
 
 void QnLayoutSettingsDialog::at_opacitySpinBox_valueChanged(int value) {
-    imageLabel->setOpacityPercent(value);
+    ui->imageLabel->setOpacityPercent(value);
 }
 
+void QnLayoutSettingsDialog::at_widthSpinBox_valueChanged(int value) {
+    if (!ui->keepAspectRatioCheckBox->isChecked())
+        return;
+    if (m_isUpdating)
+        return;
+    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
+    Q_UNUSED(guard)
+
+    qreal targetAspectRatio = bestAspectRatioForCells();
+    if (targetAspectRatio < 0)
+        return;
+    int h = qRound((qreal)value / targetAspectRatio);
+    ui->heightSpinBox->setValue(h);
+}
+
+void QnLayoutSettingsDialog::at_heightSpinBox_valueChanged(int value) {
+    if (!ui->keepAspectRatioCheckBox->isChecked())
+        return;
+    if (m_isUpdating)
+        return;
+    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
+    Q_UNUSED(guard)
+
+    qreal targetAspectRatio = bestAspectRatioForCells();
+    if (targetAspectRatio < 0)
+        return;
+    int w = qRound((qreal)value * targetAspectRatio);
+    ui->widthSpinBox->setValue(w);
+}
+
+
 void QnLayoutSettingsDialog::at_imageLoaded(const QString &filename, bool ok) {
-    if (m_cache->getFullPath(filename) != m_newFilePath)
+    Q_D(QnLayoutSettingsDialog);
+
+    if (m_cache->getFullPath(filename) != d->imageSourcePath)
         return;
+    d->state = ImageDownloaded;
+
     if (!ok) {
-        imageLabel->setText(tr("<Image cannot be loaded>"));
-        return;
+        d->state = Error;
+        d->errorText = tr("<Image cannot be loaded>");
+    } else {
+        d->state = ImageDownloaded;
     }
     loadPreview();
+    updateControls();
 }
 
 void QnLayoutSettingsDialog::at_imageStored(const QString &filename, bool ok) {
-    setProgress(false);
+    Q_D(QnLayoutSettingsDialog);
+
     if (!ok) {
-        imageLabel->setPixmap(QPixmap());
-        imageLabel->setText(tr("<Image cannot be uploaded>"));
-        m_cachedFilename = QString();
-        m_newFilePath = QString();
-        ui->generalGroupBox->setEnabled(true);
-        ui->buttonBox->setEnabled(true);
+        d->state = Error;
+        d->errorText = tr("<Image cannot be uploaded>");
+        updateControls();
         return;
     }
-
-    m_cachedFilename = filename;
+    d->imageFilename = filename;
+    d->state = NewImageLoaded;
+    qnSettings->setLayoutKeepAspectRatio(ui->keepAspectRatioCheckBox->isChecked());
+    //updateControls() is not needed, we are closing the dialog here
     accept();
 }
 
 void QnLayoutSettingsDialog::loadPreview() {
     if (!this->isVisible())
         return;
-
-    imageLabel->setPixmap(QPixmap());
-    imageLabel->setText(tr("<No image>"));
-    if (m_newFilePath.isEmpty())
+    Q_D(QnLayoutSettingsDialog);
+    if (!d->imageFileIsAvailable() || d->imageIsLoading())
         return;
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
-    loader->setInput(m_newFilePath);
+    loader->setInput(d->imageSourcePath);
     loader->setTransformationMode(Qt::FastTransformation);
-    loader->setSize(imageLabel->size());
-    loader->setCropToMonitorAspectRatio(m_cropImage);
+    loader->setSize(ui->imageLabel->size());
+    loader->setFlags(Qn::TouchSizeFromOutside);
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
     loader->start();
-    setProgress(true);
+
+    if (d->state == ImageDownloaded)
+        d->state = ImageLoading;
+    else if (d->state == NewImageSelected)
+        d->state = NewImageLoading;
 }
 
 void QnLayoutSettingsDialog::viewFile() {
-    QString path = QLatin1String("file:///") + m_newFilePath;
+    Q_D(const QnLayoutSettingsDialog);
+    if (!d->imageFileIsAvailable())
+        return;
+
+    QString path = QLatin1String("file:///") + d->imageSourcePath;
     if (QDesktopServices::openUrl(QUrl(path)))
         return;
 
     QnImagePreviewDialog dialog;
-    dialog.openImage(m_newFilePath);
+    dialog.openImage(d->imageSourcePath);
     dialog.exec();
 }
 
 void QnLayoutSettingsDialog::selectFile() {
+    Q_D(QnLayoutSettingsDialog);
+
     QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Open file")));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
@@ -311,7 +479,8 @@ void QnLayoutSettingsDialog::selectFile() {
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
     dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
 
-    dialog->addCheckBox(tr("Crop to current monitor AR"), &m_cropImage);
+    bool cropImage = ui->cropToMonitorCheckBox->isChecked();
+    dialog->addCheckBox(tr("Crop to current monitor AR"), &cropImage);
     if(!dialog->exec())
         return;
 
@@ -319,54 +488,55 @@ void QnLayoutSettingsDialog::selectFile() {
     if (files.size() < 0)
         return;
 
-    m_newFilePath = files[0];
-    m_cachedFilename = QString();
-    m_estimatePending = true;
+    d->clear();
+    d->imageSourcePath = files[0];
+    d->imageFilename = QString();
+    d->state = NewImageSelected;
+    ui->cropToMonitorCheckBox->setChecked(cropImage);
 
     loadPreview();
     updateControls();
 }
 
 void QnLayoutSettingsDialog::setPreview(const QImage &image) {
-    setProgress(false);
+    Q_D(QnLayoutSettingsDialog);
+    if (d->state != ImageLoading && d->state != NewImageLoading)
+        return;
+
     if (image.isNull()) {
-        imageLabel->setPixmap(QPixmap());
-        imageLabel->setText(tr("<Image cannot be loaded>"));
+        d->state = Error;
+        d->errorText = tr("<Image cannot be loaded>");
+        updateControls();
         return;
     }
-    imageLabel->setPixmap(QPixmap::fromImage(image));
 
-    if (!m_estimatePending)
-        return;
-    m_estimatePending = false;
+    if (d->state == ImageLoading)
+        d->state = ImageLoaded;
+    else if (d->state = NewImageLoading)
+        d->state = NewImageLoaded;
+    d->preview = image;
 
-    qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
+    /* Disable cropping for images that are quite well aspected. */
+    qreal imageAspectRatio = (qreal)image.width() / (qreal)image.height();
+    if (qAbs(imageAspectRatio - screenAspectRatio()) > 0.05)
+        d->croppedPreview = cropImageToAspectRatio(image, screenAspectRatio());
 
-    int w, h;
-    qreal targetAspectRatio = aspectRatio / m_cellAspectRatio;
-    if (targetAspectRatio >= 1.0) { // width is greater than height
-        w = qnGlobals->layoutBackgroundMaxSize().width();
-        h = qRound((qreal)w / targetAspectRatio);
+    if (d->state == NewImageLoaded) {
+        // always set flag to true for new images
+        ui->keepAspectRatioCheckBox->setChecked(true);
+    } else if (!qnSettings->layoutKeepAspectRatio()) {
+        // for old - set to false if previous accepted value was false
+        ui->keepAspectRatioCheckBox->setChecked(false);
     } else {
-        h = qnGlobals->layoutBackgroundMaxSize().height();
-        w = qRound((qreal)h * targetAspectRatio);
-    }
+        // set to true if possible (current sizes will not be changed)
+        ui->keepAspectRatioCheckBox->setChecked(cellsAreBestAspected());
+   }
 
-    // limit w*h <= recommended area; minor variations are allowed, e.g. 17*6 ~~= 100;
-    qreal areaCoef = qSqrt((qreal)w * h / qnGlobals->layoutBackgroundRecommendedArea());
-    if (areaCoef > 1.0) {
-        w = qRound((qreal)w / areaCoef);
-        h = qRound((qreal)h / areaCoef);
-    }
-    ui->widthSpinBox->setValue(w);
-    ui->heightSpinBox->setValue(h);
-
+    updateControls();
 }
 
 void QnLayoutSettingsDialog::setProgress(bool value) {
     ui->stackedWidget->setCurrentIndex(value ? 1 : 0);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!value);
-    if (!value)
-        updateControls();
 }
 

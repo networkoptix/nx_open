@@ -66,7 +66,7 @@ namespace Qn
 
 bool QnMessage::load(const pb::Message &message)
 {
-    eventType = (Qn::Message_Type)message.type();
+    messageType = (Qn::Message_Type)message.type();
     pb::Message_Type msgType = message.type();
     seqNumber = message.seqnumber();
 
@@ -119,6 +119,8 @@ bool QnMessage::load(const pb::Message &message)
             licenses.setHardwareId1(initialMessage.hardwareid1().c_str());
 			licenses.setOldHardwareId(initialMessage.oldhardwareid().c_str());
 			licenses.setHardwareId2(initialMessage.hardwareid2().c_str());
+            publicIp = QString::fromStdString(initialMessage.publicip());
+
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());
             qnResTypePool->replaceResourceTypeList(resourceTypes);
 
@@ -163,6 +165,12 @@ bool QnMessage::load(const pb::Message &message)
         {
             const pb::FileUpdateMessage& fileUpdateMessage = message.GetExtension(pb::FileUpdateMessage::message);
             filename = QString::fromStdString(fileUpdateMessage.path());
+            break;
+        }
+        case pb::Message_Type_RuntimeInfoChange:
+        {
+            const pb::RuntimeInfoChangeMessage& runtimeInfoChangeMessage = message.GetExtension(pb::RuntimeInfoChangeMessage::message);
+            publicIp = QString::fromStdString(runtimeInfoChangeMessage.publicip());
             break;
         }
     default:

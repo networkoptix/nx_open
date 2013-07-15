@@ -159,6 +159,7 @@ private:
     HoverFocusProcessor* m_hoverProcessor;
     bool m_pendingPositionUpdate;
     bool m_instantPositionUpdate;
+    bool m_inToolTipPositionUpdate;
 };
 
 #endif // NOTIFICATION_ITEM_H

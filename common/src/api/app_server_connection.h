@@ -79,6 +79,7 @@ public:
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem);
     int addBusinessRule(const QnBusinessEventRulePtr &businessRule);
     bool setPanicMode(QnMediaServerResource::PanicMode value);
+    void disconnectSync();
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId);
     int getServers(QnMediaServerResourceList& servers);
@@ -218,6 +219,7 @@ public:
     static QString authKey();
     static QString clientGuid();
     static QUrl defaultUrl();
+    static QUrl publicUrl();
     static int defaultMediaProxyPort();
     static QString currentVersion();
 	static QnResourceFactory* defaultFactory();
@@ -228,6 +230,7 @@ public:
     static void setDefaultFactory(QnResourceFactory *);
     static void setDefaultMediaProxyPort(int port);
     static void setCurrentVersion(const QString &version);
+    static void setPublicIp(const QString &publicIp);
 
     static QnAppServerConnectionPtr createConnection();
     static QnAppServerConnectionPtr createConnection(const QUrl &url);
@@ -237,6 +240,7 @@ private:
     QString m_clientGuid;
     QString m_authKey;
     QUrl m_defaultUrl;
+    QUrl m_publicUrl;
     int m_defaultMediaProxyPort;
     QString m_currentVersion;
     QnResourceFactory *m_resourceFactory;

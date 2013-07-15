@@ -142,26 +142,19 @@ public:
     void addStatusFlags(StatusFlags value);
     void removeStatusFlags(StatusFlags value);
 
-// -------------------------------------------------------------------------- //
-// Begin QnSecurityCamResource signals/slots
-// -------------------------------------------------------------------------- //
-    /* For metaobject system to work correctly, this block must be in sync with
-     * the one in QnVirtualCameraResource. */
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
 
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
+
 signals:
-    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
-    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
 
 protected slots:
     virtual void at_disabledChanged();
-// -------------------------------------------------------------------------- //
-// End QnSecurityCamResource signals/slots
-// -------------------------------------------------------------------------- //
 
 protected:
     void updateInner(QnResourcePtr other) override;

@@ -379,10 +379,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Get More Licenses..."));
 
-    factory(Qn::PreferencesServerTabAction).
-        flags(Qn::NoTarget).
-        text(tr("Settings..."));
-
     factory(Qn::PreferencesNotificationTabAction).
         flags(Qn::NoTarget).
         text(tr("Settings..."));
@@ -630,6 +626,13 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Cameras List...")).
         shortcut(tr("Ctrl+M")).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+
+    factory(Qn::PreferencesServerTabAction).
+        flags(Qn::Tree | Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Backup/Restore Configuration...")).
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 

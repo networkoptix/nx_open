@@ -861,9 +861,14 @@ void QnRtspConnectionProcessor::at_camera_disabledChanged()
 void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
+
     QnVideoCamera* camera = 0;
-    if (d->mediaRes)
+    if (d->mediaRes) {
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
+        QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
+        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->isDisabled())
+            cameraRes->initAsync();
+    }
     if (camera && d->liveMode == Mode_Live)
     {
         if (!d->liveDpHi && !d->mediaRes->toResource()->isDisabled()) {
@@ -1186,7 +1191,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
             return CODE_OK;
         }
-        else if (normParam.startsWith("x-send-motion"))
+        else if (normParam.startsWith("x-send-motion") && d->archiveDP)
         {
             QByteArray value = vals[1].trimmed();
             d->archiveDP->setSendMotion(value == "1" || value == "true");

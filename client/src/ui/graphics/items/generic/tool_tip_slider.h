@@ -46,6 +46,7 @@ protected:
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
 
     virtual QString toolTipAt(const QPointF &pos) const override;
+    virtual bool showOwnTooltip(const QPointF &pos) override;
 
 private:
     void init();

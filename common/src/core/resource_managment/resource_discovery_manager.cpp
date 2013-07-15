@@ -478,6 +478,8 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
 
     foreach(const ManualSearcherHelper& h, testList)
     {
+        result.append(h.resList);
+        /*
         for (int i = 0; i < h.resList.size(); ++i)
         {
             if (qnResPool->hasSuchResource(h.resList[i]->getUniqueId())) // already in resource pool 
@@ -490,6 +492,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
 
             result.push_back(h.resList[i]);
         }
+        */
     }
 
     cl_log.log("Found ",  result.size(), " new resources", cl_logINFO);

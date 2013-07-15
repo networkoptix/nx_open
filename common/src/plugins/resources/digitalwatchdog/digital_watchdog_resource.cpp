@@ -33,6 +33,9 @@ QnPlWatchDogResource::~QnPlWatchDogResource()
 
 bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
 {
+    if (m_appStopping)
+        return false;
+
     CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
     if (status == CL_HTTP_SUCCESS) 
@@ -69,6 +72,9 @@ bool QnPlWatchDogResource::initInternal()
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false) 
     {
+        if (m_appStopping)
+            return false;
+
         // The camera most likely is going to reset after enabling dual streaming
         enableOnvifSecondStream();
         return false;
@@ -130,7 +136,7 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
 
-    int hiEnd = 1024*11;
+    int hiEnd = 1024*9;
     int lowEnd = 1024*1.8;
 
     float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
@@ -250,6 +256,10 @@ bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant
     foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
     {
         //If param is not in list of child, it will return false. Then will try to find it in parent.
+
+        if (m_appStopping)
+            return false;
+
         if (setting->setParamPhysical(param, val))
         {
             return true;

@@ -16,13 +16,14 @@
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
 class QnNotificationItem;
+class QnParticleItem;
+class QnToolTipWidget;
 
 /**
  * An image button widget that displays thumbnail behind the button.
  */
 class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationTimerListener {
     Q_OBJECT
-
     typedef QnImageButtonWidget base_type;
 
 public:
@@ -31,14 +32,27 @@ public:
 public slots:
     void setNotificationCount(int count);
     void setColor(const QColor &color);
+
 protected:
     virtual void tick(int deltaMSecs) override;
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
+
+private slots:
+    void showBalloon();
+    void hideBalloon();
+
+    void updateParticleGeometry();
+    void updateParticleVisibility();
+    void updateToolTip();
+    void updateBalloonTailPos();
+    void updateBalloonGeometry();
+
+    void at_particle_visibleChanged();
+
 private:
-    bool m_blinking;
-    bool m_blinkUp;
-    qreal m_blinkProgress;
-    QColor m_color;
+    QnToolTipWidget *m_balloon;
+    QnParticleItem *m_particle;
+    qint64 m_time;
+    int m_count;
 };
 
 
@@ -60,6 +74,14 @@ public:
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
 
+    // TODO: #GDM bad practice.
+    // 1. There is not getter, only a setter.
+    // 2. QnBlinkingImageButtonWidget is notification-specific (Sets tooltip to 'You have %n notifications') =>
+    //      it should be named as such.
+    // 3. Locally stored blinker is not owned by this widget, pointer is not protected with QWeakPointer =>
+    //      its lifetime is expected to be correctly externally managed. Not something you can rely on in a big project.
+    // 4. And why add it as a member? This widget should know nothing about
+    //      some button. Just exposing the signals would be enough.
     void setBlinker(QnBlinkingImageButtonWidget* blinker);
 
 signals:

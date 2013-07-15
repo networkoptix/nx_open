@@ -57,7 +57,25 @@ namespace {
 
         return result;
     }
+
 } // anonymous namespace
+
+
+// -------------------------------------------------------------------------- //
+// QnGlRendererShaders
+// -------------------------------------------------------------------------- //
+QnGlRendererShaders::QnGlRendererShaders(const QGLContext *context, QObject *parent): QObject(parent) {
+    yv12ToRgb = new QnYv12ToRgbShaderProgram(context, this);
+    yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(context, this);
+    yv12ToRgba = new QnYv12ToRgbaShaderProgram(context, this);
+    nv12ToRgb = new QnNv12ToRgbShaderProgram(context, this);
+}
+
+QnGlRendererShaders::~QnGlRendererShaders() {
+    return;
+}
+
+Q_GLOBAL_STATIC(QnGlContextData<QnGlRendererShaders>, qn_glRendererShaders_instanceStorage);
 
 
 // -------------------------------------------------------------------------- //
@@ -81,10 +99,7 @@ bool QnGLRenderer::isPixelFormatSupported( PixelFormat pixfmt )
     }
 }
 
-static const double PI = 3.1415926;
-
-QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpenGLUploader& decodedPictureProvider )
-:
+QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpenGLUploader& decodedPictureProvider ):
     QnGlFunctions( context ),
     m_decodedPictureProvider( decodedPictureProvider ),
     m_brightness( 0 ),
@@ -106,16 +121,10 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     Q_ASSERT( context );
 
     applyMixerSettings( m_brightness, m_contrast, m_hue, m_saturation );
-    /* Prepare shaders. */
-    m_yv12ToRgbShaderProgram.reset( new QnYv12ToRgbShaderProgram(context) );
-    m_yv12ToRgbWithGammaShaderProgram.reset( new QnYv12ToRgbWithGammaShaderProgram(context) );
     
-    m_fisheyeProgram.reset(new QnFisheyeShaderProgram(context));
-    m_fisheyeGammaProgram.reset(new QnFisheyeWithGammaShaderProgram(context));
+    m_shaders = qn_glRendererShaders_instanceStorage()->get(context);
+    
 
-
-    m_yv12ToRgbaShaderProgram.reset( new QnYv12ToRgbaShaderProgram(context) );
-    //m_nv12ToRgbShaderProgram.reset( new QnNv12ToRgbShaderProgram(context) );
 
     cl_log.log( QString(QLatin1String("OpenGL max texture size: %1.")).arg(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE)), cl_logINFO );
 }
@@ -126,9 +135,7 @@ QnGLRenderer::~QnGLRenderer()
 
 void QnGLRenderer::beforeDestroy()
 {
-    m_yv12ToRgbShaderProgram.reset();
-    m_yv12ToRgbaShaderProgram.reset();
-    m_nv12ToRgbShaderProgram.reset();
+    m_shaders.clear();
 }
 
 void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
@@ -252,21 +259,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    glEnable(GL_BLEND);
-
-    //applying opacity
-    if( m_decodedPictureProvider.opacity() < 1.0 )
-    {
-        this->glBlendColor( 0, 0, 0, m_decodedPictureProvider.opacity() );
-        glBlendFunc( GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA );
-    }
-
     drawBindedTexture( v_array, tx_array );
-
-    if( m_decodedPictureProvider.opacity() < 1.0 )
-    {
-        glBlendFunc( GL_SRC_COLOR, GL_DST_COLOR );
-    }
 }
 
 void QnGLRenderer::setScreenshotInterface(ScreenshotInterface* value) { 
@@ -320,7 +313,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     {
         params = m_fisheyeController->getDevorpingParams();
         if (m_imgCorrectParam.enabled)
-            shader = gammaShader = fisheyeShader = m_fisheyeGammaProgram.data();
+        shader = m_yv12ToRgbWithGammaShaderProgram.data();
         else
             shader = fisheyeShader = m_fisheyeProgram.data();
     }
@@ -328,7 +321,7 @@ void QnGLRenderer::drawYV12VideoTexture(
         shader = gammaShader = m_yv12ToRgbWithGammaShaderProgram.data();
     }
     else {
-        shader = m_yv12ToRgbShaderProgram.data();
+        shader = m_shaders->yv12ToRgb;
     }
     shader->bind();
     shader->setYTexture( 0 );
@@ -347,12 +340,12 @@ void QnGLRenderer::drawYV12VideoTexture(
     if (gammaShader) 
     {
         if (!isPaused()) {
-            gammaShader->setImageCorrection(picLock->imageCorrectionResult());
+            m_yv12ToRgbWithGammaShaderProgram->setImageCorrection(picLock->imageCorrectionResult());
             if (m_histogramConsumer)
                 m_histogramConsumer->setHistogramData(picLock->imageCorrectionResult());
         }
         else {
-            gammaShader->setImageCorrection(calcImageCorrection());
+            m_yv12ToRgbWithGammaShaderProgram->setImageCorrection(calcImageCorrection());
             if (m_histogramConsumer) 
                 m_histogramConsumer->setHistogramData(m_imageCorrector);
         }
@@ -404,12 +397,12 @@ void QnGLRenderer::drawYVA12VideoTexture(
     glEnable(GL_TEXTURE_2D);
     DEBUG_CODE(glCheckError("glEnable"));
 
-    m_yv12ToRgbaShaderProgram->bind();
-    m_yv12ToRgbaShaderProgram->setYTexture( 0 );
-    m_yv12ToRgbaShaderProgram->setUTexture( 1 );
-    m_yv12ToRgbaShaderProgram->setVTexture( 2 );
-    m_yv12ToRgbaShaderProgram->setATexture( 3 );
-    m_yv12ToRgbaShaderProgram->setOpacity(m_decodedPictureProvider.opacity() );
+    m_shaders->yv12ToRgba->bind();
+    m_shaders->yv12ToRgba->setYTexture( 0 );
+    m_shaders->yv12ToRgba->setUTexture( 1 );
+    m_shaders->yv12ToRgba->setVTexture( 2 );
+    m_shaders->yv12ToRgba->setATexture( 3 );
+    m_shaders->yv12ToRgba->setOpacity(m_decodedPictureProvider.opacity() );
 
     glActiveTexture(GL_TEXTURE3);
     DEBUG_CODE(glCheckError("glActiveTexture"));
@@ -433,7 +426,7 @@ void QnGLRenderer::drawYVA12VideoTexture(
 
     drawBindedTexture( v_array, tx_array );
 
-    m_yv12ToRgbaShaderProgram->release();
+    m_shaders->yv12ToRgba->release();
 }
 
 void QnGLRenderer::drawNV12VideoTexture(
@@ -452,12 +445,12 @@ void QnGLRenderer::drawNV12VideoTexture(
     glEnable(GL_TEXTURE_2D);
     DEBUG_CODE(glCheckError("glEnable"));
 
-    m_nv12ToRgbShaderProgram->bind();
-    //m_nv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
-    m_nv12ToRgbShaderProgram->setYTexture( yPlaneTexID );
-    m_nv12ToRgbShaderProgram->setUVTexture( uvPlaneTexID );
-    m_nv12ToRgbShaderProgram->setOpacity( m_decodedPictureProvider.opacity() );
-    m_nv12ToRgbShaderProgram->setColorTransform( QnNv12ToRgbShaderProgram::colorTransform(QnNv12ToRgbShaderProgram::YuvEbu) );
+    m_shaders->nv12ToRgb->bind();
+    //m_shaders->nv12ToRgb->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
+    m_shaders->nv12ToRgb->setYTexture( yPlaneTexID );
+    m_shaders->nv12ToRgb->setUVTexture( uvPlaneTexID );
+    m_shaders->nv12ToRgb->setOpacity( m_decodedPictureProvider.opacity() );
+    m_shaders->nv12ToRgb->setColorTransform( QnNv12ToRgbShaderProgram::colorTransform(QnNv12ToRgbShaderProgram::YuvEbu) );
 
     glActiveTexture(GL_TEXTURE1);
     DEBUG_CODE(glCheckError("glActiveTexture"));
@@ -471,7 +464,7 @@ void QnGLRenderer::drawNV12VideoTexture(
 
     drawBindedTexture( v_array, tx_array );
 
-    m_nv12ToRgbShaderProgram->release();
+    m_shaders->nv12ToRgb->release();
 }
 
 void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_array )
@@ -521,8 +514,8 @@ bool QnGLRenderer::isYV12ToRgbShaderUsed() const
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
-        && m_yv12ToRgbShaderProgram
-        && m_yv12ToRgbShaderProgram->isLinked();
+        && m_shaders->yv12ToRgb
+        && m_shaders->yv12ToRgb->isLinked();
 }
 
 bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
@@ -531,8 +524,8 @@ bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
-        && m_yv12ToRgbaShaderProgram
-        && m_yv12ToRgbaShaderProgram->isLinked();
+        && m_shaders->yv12ToRgba
+        && m_shaders->yv12ToRgba->isLinked();
 }
 
 bool QnGLRenderer::isNV12ToRgbShaderUsed() const
@@ -541,8 +534,8 @@ bool QnGLRenderer::isNV12ToRgbShaderUsed() const
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
-        && m_nv12ToRgbShaderProgram
-        /*&& m_nv12ToRgbShaderProgram->isValid()*/;
+        && m_shaders->nv12ToRgb
+        /*&& m_shaders->nv12ToRgb->isLinked()*/;
 }
 
 void QnGLRenderer::setDisplayedRect(const QRectF& rect)

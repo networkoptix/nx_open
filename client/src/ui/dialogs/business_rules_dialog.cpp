@@ -30,7 +30,7 @@
 #include <client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
-    base_type(parent),
+    base_type(parent, Qt::Window),
     QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
@@ -38,6 +38,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     m_advancedMode(false)
 {
     ui->setupUi(this);
+    setWindowState(Qt::WindowMaximized | windowState());
 
     setHelpTopic(this, Qn::EventsActions_Help);
 
@@ -49,6 +50,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
+
+    ui->tableView->resizeColumnsToContents();
+
     ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::EventColumn, QHeaderView::Interactive);
     ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
@@ -66,6 +70,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
             this, SLOT(at_tableView_currentRowChanged(QModelIndex,QModelIndex)));
 
     ui->tableView->clearSelection();
+
 
     // TODO: #Elric replace with a single connect call
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);

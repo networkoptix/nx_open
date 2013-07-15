@@ -7,6 +7,7 @@
 #include "core/resource_managment/resource_discovery_manager.h"
 #include "core/resource/resource.h"
 #include "core/resource_managment/resource_searcher.h"
+#include "core/resource_managment/resource_pool.h"
 
 QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
 {
@@ -98,6 +99,22 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList &params
                 resultByteArray.append(QString("<name>%1</name>\n").arg(resource->getName()));
                 resultByteArray.append(QString("<url>%1</url>\n").arg(resource->getUrl()));
                 resultByteArray.append(QString("<manufacturer>%1</manufacturer>\n").arg(resourceType->getName()));
+
+                bool existResource = false;
+                if (qnResPool->hasSuchResource(resource->getUniqueId())) { 
+                    existResource = true; // already in resource pool 
+                }
+                else {
+                    // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
+                    QnNetworkResourcePtr netRes = resource.dynamicCast<QnNetworkResource>();
+                    if (netRes) {
+                        QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
+                        if (!existResList.isEmpty())
+                            existResource = true;
+                    }
+                }
+                resultByteArray.append(QString("<exists>%1</exists>\n").arg(existResource ? 1 : 0));
+
                 resultByteArray.append("</resource>\n");
             }
         }

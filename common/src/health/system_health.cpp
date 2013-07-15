@@ -1,65 +1,58 @@
 #include "system_health.h"
 
-#include <QObject>
-
-
-namespace QnSystemHealth {
-
-    QString messageName(MessageType messageType) {
-        switch (messageType) {
-        case EmailIsEmpty:
-            return QObject::tr("Your E-Mail address is not set.");
-        case NoLicenses:
-            return QObject::tr("You have no licenses.");
-        case SmtpIsNotSet:
-            return QObject::tr("E-Mail server is not set.");
-        case UsersEmailIsEmpty:
-            return QObject::tr("Some users have not set their E-Mail addresses.");
-        case ConnectionLost:
-            return QObject::tr("Connection to Enterprise Controller is lost.");
-        case EmailSendError:
-            return QObject::tr("Error while sending E-Mail.");
-        case StoragesAreFull:
-            return QObject::tr("Some storages are full.");
-        case StoragesNotConfigured:
-            return QObject::tr("Storages are not configured.");
-        default:
-            break;
-        }
-        return QString();
+QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType) {
+    switch (messageType) {
+    case QnSystemHealth::EmailIsEmpty:
+        return tr("Your E-Mail address is not set");
+    case QnSystemHealth::NoLicenses:
+        return tr("You have no licenses");
+    case QnSystemHealth::SmtpIsNotSet:
+        return tr("E-Mail server is not set");
+    case QnSystemHealth::UsersEmailIsEmpty:
+        return tr("Some users have not set their E-Mail addresses");
+    case QnSystemHealth::ConnectionLost:
+        return tr("Connection to Enterprise Controller is lost");
+    case QnSystemHealth::EmailSendError:
+        return tr("Error while sending E-Mail");
+    case QnSystemHealth::StoragesAreFull:
+        return tr("Storages are full");
+    case QnSystemHealth::StoragesNotConfigured:
+        return tr("Storages are not configured");
+    default:
+        break;
     }
-
-    QString messageDescription(MessageType messageType) {
-        switch (messageType) {
-        case EmailIsEmpty: {
-                QString result = QObject::tr("Your E-Mail address is not set.");
-                result += QLatin1Char('\n');
-                result += QObject::tr("You cannot receive system notifications via E-Mail.");
-                return result;
-            }
-        case NoLicenses:
-            return QObject::tr("You have no licenses.");
-        case SmtpIsNotSet:
-            return QObject::tr("E-Mail server is not set.");
-        case UsersEmailIsEmpty: {
-                QString result = QObject::tr("Some users have not set their E-Mail addresses.");
-                result += QLatin1Char('\n');
-                result += QObject::tr("They cannot receive system notifications via E-Mail.");
-                return result;
-            }
-        case ConnectionLost:
-            return QObject::tr("Connection to Enterprise Controller is lost.");
-        case EmailSendError:
-            return QObject::tr("Error while sending E-Mail.");
-        case StoragesAreFull:
-            return QObject::tr("Some storages are full.");
-        case StoragesNotConfigured:
-            return QObject::tr("Storages are not configured.");
-
-        default:
-            break;
-        }
-        return QString();
-    }
-
+    return QString();
 }
+
+
+QString QnSystemHealthStringsHelper::messageName(QnSystemHealth::MessageType messageType, QString resourceName) {
+    switch (messageType) {
+    case QnSystemHealth::UsersEmailIsEmpty:
+        return tr("E-Mail address is not set for user %1").arg(resourceName);
+    default:
+        break;
+    }
+    return messageTitle(messageType);
+}
+
+QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, QString resourceName) {
+    switch (messageType) {
+    case QnSystemHealth::EmailIsEmpty:
+        return tr("Your E-Mail address is not set.\nYou cannot receive system notifications via E-Mail.");
+    case QnSystemHealth::SmtpIsNotSet:
+        return tr("E-Mail server is not set.\nYou cannot receive system notifications via E-Mail.");
+    case QnSystemHealth::UsersEmailIsEmpty:
+        return tr("Some users have not set their E-Mail addresses.\nThey cannot receive system notifications via E-Mail.");
+    case QnSystemHealth::StoragesAreFull:
+        return tr("Storages are full on the following Media Server:\n%1.").arg(resourceName);
+    case QnSystemHealth::StoragesNotConfigured:
+        return tr("Storages are not configured on the following Media Server:\n%1.").arg(resourceName);
+    case QnSystemHealth::NoLicenses:
+        return tr("You have no licenses.\nYou cannot record video from cameras.");
+    default:
+        break;
+    }
+    return messageName(messageType, resourceName);
+}
+
+

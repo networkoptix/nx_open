@@ -47,7 +47,12 @@ signals:
 
 private:
     void clearTable();
-    void fillTable(const QnCamerasFoundInfoList &cameras);
+
+    /**
+     * Fill table with the received cameras info.
+     * \returns number of new cameras.
+     */
+    int fillTable(const QnCamerasFoundInfoList &cameras);
     void removeAddedCameras();
     void updateSubnetMode();
     bool ensureServerOnline();

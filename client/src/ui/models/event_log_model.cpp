@@ -15,7 +15,7 @@
 #include <utils/math/math.h>
 #include "device_plugins/server_camera/server_camera.h"
 #include "client/client_settings.h"
-#include <ui/common/resource_name.h>
+#include <ui/common/ui_resource_name.h>
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
@@ -36,7 +36,7 @@ public:
         // event types to lex order
         QMap<QString, int> events;
         for (int i = 0; i < 256; ++i) {
-            events.insert(BusinessEventType::toString(BusinessEventType::Value(i)), i);
+            events.insert(QnBusinessStringsHelper::eventName(BusinessEventType::Value(i)), i);
             m_eventTypeToLexOrder[i] = 255; // put undefined events to the end of the list
         }
         int cnt = 0;
@@ -414,7 +414,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
             break;
         }
         case EventColumn:
-            return BusinessEventType::toString(action.getRuntimeParams().getEventType());
+            return QnBusinessStringsHelper::eventName(action.getRuntimeParams().getEventType());
             break;
         case EventCameraColumn:
             return getResourceNameString(action.getRuntimeParams().getEventResourceId());
@@ -441,7 +441,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
                     result = lit("Motion video");
             }
             else {
-                result = QnBusinessStringsHelper::eventParamsString(eventType, action.getRuntimeParams());
+                result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, lit("\n"));
             }
 
             if (!BusinessEventType::hasToggleState(eventType)) {

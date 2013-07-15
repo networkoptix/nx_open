@@ -37,7 +37,6 @@ class QnWorkbench;
 class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnResourceWidget;
-class QnParticleFrameWidget;
 class QnResourceDisplay;
 class ViewportAnimator;
 class VariantAnimator;
@@ -315,8 +314,6 @@ protected:
     void synchronizeGeometry(QnResourceWidget *widget, bool animate);
     void synchronizeZoomRect(QnWorkbenchItem *item);
     void synchronizeZoomRect(QnResourceWidget *widget);
-    void synchronizePendingNotification(QnWorkbenchItem *item);
-    void synchronizePendingNotification(QnResourceWidget *widget);
     void synchronizeAllGeometries(bool animate);
     void synchronizeLayer(QnWorkbenchItem *item);
     void synchronizeLayer(QnResourceWidget *widget);
@@ -382,7 +379,6 @@ protected slots:
     void at_item_zoomRectChanged();
     void at_item_rotationChanged();
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
-    void at_item_dataChanged(int);
 
     void at_curtainActivityInstrument_activityStopped();
     void at_curtainActivityInstrument_activityStarted();
@@ -402,6 +398,8 @@ protected slots:
     void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
 
     void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
+    void at_notificationTimer_timeout(const QVariant &resource);
+    void at_notificationTimer_timeout(const QnResourcePtr &resource);
 
 private:
     /* Directly visible state */
@@ -500,10 +498,6 @@ private:
 
     /** Frame opacity animator. */
     VariantAnimator *m_frameOpacityAnimator;
-
-
-    QHash<QnResourceWidget *, QnParticleFrameWidget *> m_pendingNotificationWidgets;
-
 
     QnThumbnailsLoader *m_loader;
 };

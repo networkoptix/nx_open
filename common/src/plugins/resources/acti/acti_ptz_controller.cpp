@@ -69,7 +69,11 @@ QnActiPtzController::QnActiPtzController(QnActiResource* resource):
 }
 
 QnActiPtzController::~QnActiPtzController() {
-    return;
+    if( m_spaceMapper )
+    {
+        delete m_spaceMapper;
+        m_spaceMapper = NULL;
+    }
 }
 
 qreal toLogicalScale(qreal src, qreal rangeMin, qreal rangeMax)

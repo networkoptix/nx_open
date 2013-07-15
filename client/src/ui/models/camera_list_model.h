@@ -6,10 +6,11 @@
 
 class QnWorkbenchContext;
 
-class QnCameraListModel: public QnResourceListModel, public QnWorkbenchContextAware
-{
-public:
+class QnCameraListModel: public QnResourceListModel, public QnWorkbenchContextAware {
+    Q_OBJECT
+    typedef QnResourceListModel base_type;
 
+public:
     enum Column {
         RecordingColumn,
         NameColumn,
@@ -23,13 +24,18 @@ public:
     };
 
     QnCameraListModel(QObject *parent = NULL, QnWorkbenchContext* context = NULL);
-    virtual QVariant data(const QModelIndex &index, int role) const override;
+    virtual ~QnCameraListModel();
 
-    void setColumns(const QList<Column>& columns);
+    const QList<Column> &columns() const;
+    void setColumns(const QList<Column> &columns);
+
+    virtual QVariant data(const QModelIndex &index, int role) const override;
+    virtual int columnCount(const QModelIndex &parent) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
 private:
     QString columnTitle(Column column) const;
-    int columnCount(const QModelIndex &parent) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+
 private:
     QList<Column> m_columns;
 };

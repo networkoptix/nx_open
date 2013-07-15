@@ -104,6 +104,15 @@ public:
         return m_itemLeftClickInstrument;
     }
 
+    // TODO: #Elric split into menu_controller or smth like that
+    bool isMenuEnabled() const {
+        return m_menuEnabled;
+    }
+
+    void setMenuEnabled(bool menuEnabled) {
+        m_menuEnabled = menuEnabled;
+    }
+
 public slots:
     void startRecording();
     void stopRecording();
@@ -293,6 +302,8 @@ private:
     QnGraphicsMessageBox *m_recordingCountdownLabel;
 
     QnGraphicsMessageBox *m_tourModeHintLabel;
+
+    bool m_menuEnabled;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

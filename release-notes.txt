@@ -1,28 +1,95 @@
------------------------------------------------ 1.5.2 (1.6 beta-2) ---------------------------------------------
+----------------------------------------------- 1.6-RC ---------------------------------------------
 
 Since 1.5.1
+If uninstall EC ports are busy for a white so if reinstall it the ports will change
 
+----------------------------------------------- 1.6 beta-2 ---------------------------------------------
+
+Since 1.5.1
+ - If trying to add an existing camera manually the software used to reply "No cameras found". Now it displays such cameras 
+   but they cannot be added once more
+ - Hotkeys can be assigned for PTZ presets (0-9)
+ - DW Spectrum intro video had 2 black borders and sometimes ended by black screen. Fixed
+ - Added proper cursors when resize rotated items
  - DO NOT INCLUDE IN RELEASE NOTES!!! - Removed hack for DW to display 10 times less network issues (since 1.4)
  - Fixed issue when it was not possible to add cameras manually via IP range (since 1.4)
  - Improved advanced camera settings management (since 1.4)
  - ACTI cameras with old firmwares (T series < 4.13, K series < 5.08 and A1 series < 6.03) work now 
- - Vivotek cameras CC8130, FD8136, FD8361, FD8362E
-
-Since previous build
+ - Vivotek cameras CC8130, FD8136, FD8361, FD8362E, FD8161 are supported
+ - If restore item for the fulloscreen, resolution hasn't been changed to low
+ - If cancel installation if different customizations (HD Witness, DW Spectrum) were installed, then the software 
+   still was in the installed programs list, but could not be removed. Fixed
+ - If change installed components and remove EC it was not suggested to delete DB. Fixed
+ - Upgrade failed sometimes if different customizations (HD Witness, DW Spectrum) were installed simultaneously
+ - Backup/Restore Configuration... is added to Tree Context Menu (System)
+ - Screen recording crashed on start if resolution was not multiple of 8. Fixed
+ - Fixed incorrect playback slider position occured in preview search in some cases
+ - If a camera was discovered automatically and after this it was not accessible by multicast, then this camera didn't 
+   work after Media Server restart. Fixed
+ - PTZ calibration for Vivotek FD8136, FD8361, FD8362E, FD8161.
+ - Aggregation column is added to Event and Action (used to be in advanced E&A settings)
+ - Advanced PTZ for Sony SNCRH124 implemented
+ - Login dialog opens much faster
+ - iOS. Feature #1943. Sort cameras by name.
+ - iOS. Feature #1938. Add camera name on item.
+ - iOS5. Bug #1949. Incorrect date and time.
+ - iOS. Bug #1937. iPad. Server status aren't displayed.
+ - Bug #1469. Web-client. Video doesn't play if camera has been moved from one server to another.
+ - Thumbnails are shown in Resource Tree if hover with a mouse cursor on a camera
+ - Fixed incorrect tab order in tray tool
+ - If restore database from another server, then licences were removed, but recording continues until Media Server restart. Fixed
+ - Sometimes the same camera with the same IP could be added twice: via automatic discovery and via manual addition. Fixed
+ - Time picker is added to calendar
+ - If old version is launched in compatibility mode, then upgrade notification was invoked. Now not
+ - "Open Item" button is added to Camera Setings form. It opens the current camera in a new tab
+ - Smart Search and Motion Mask configuration are more intuitive (different cursors are used)
+ - Localized datetime format is used in Time Line (depends on regional settings)
  
+Since previous build
+ - "Text to Speech" is displayed as a separate action in "Event and Actions" (used to be selector in "Play Sound")
+ - Localized datetime format is used in event log form (depends on regional settings)
+ - Fixed incorrect messages if activating licenses
+ - Some pictures could not be used for E-Mapping. Fixed
+ - Context menu in motion mask settings is removed
+ - Network Statistics displayed incorrect values (up to 400 GiB) during high load. Fixed
+ - Sample Sounds were unsorted in the "MANAGE" list. Fixed
+ - Client crashed when move a zoom window quickly across items. Fixed
+ - Fixed Client crash if change a camera's motion mask and reopen its settings
+ - If enable hardware acceleration Client crashed. Fixed
  - If press F11 current video went to fullscreen. If press F11 again the video got back but time line was hidden. Fixed
  - Add "Select All" in context menu for "Event log" and "Camera list"
- - Fixed Client crah while exporting from zoom item, if enable color correction adjustment and move zoom window
+ - Fixed Client crash while exporting from zoom item, if enable color correction adjustment and move zoom window
  - Now it is not possible to set up filter conditions in Event Log (i.e. if set Media Server failures, then Caneras selector is disabled)
  - If try to change camera name while "!" (network issue) is displayed, then it looked ugly
  - VMAX auto-discovery was broken. Fixed
- - If motion occured on an item it began to blink on the scene. This happened only once. Now this is happening until the user clicks on an item
+ - Media Server service stop time improved
  - If motion occured on an item it began to blink on the scene but this affected linked items (zoom windows and preview search). Fixed
  - Camera statuses worked incorrectly. Fixed
  - Analog license activation warning is not resized. Fixed
  - Preview search. The first item doesn't play. Fixed
  - Fixed the banding of gamma correction while exporting
+ - Cannot change layout with background. Fixed
+ - Fixed invalid error message when adding a camera to preview search layout ("Cannot add a local file to multi-video")
+ - 45 day trial license is changed to 30 day
+ - Manual Camera Addition dialog: data entering improved if switch from single IP to IP Range
+ - "Keep aspect ratio" flag added to layout settings
+ - The "Crop to current monitor aspect ratio" option is moved to layout settings (used to be on the open file form)
+ - In some case Email notification about motion can be generated before the archive can be navigated. 
+   In this if open archive by clicking on the link in E-Mail, browser could hang. Fixed
+ - Email about camera disconnection was being sent each minute after camera is disconnected if this camera is on Scene. Fixed
+ - (Multi-server environment) If a server that hosted cameras had been removed those cameras were moved to different 
+   servers but removed from Scene. Now those cameras are still on the Scene
+ - If close and reopen health monitoring graphs looked incorrect. Fixed
+ - Media server Failure" + "Camera output for 30 second" didn't work. Fixed
+ - Rotated item was resized incorrectly. Fixed
+ - If export to Multi-Video exe file this file was broken. Fixed
+ - Rendering glitches are fixed (appeared sometimes on specific PC configurations)
  
+ - Bug #2155.If "auto reset" is less then motion on camera, than "Camera output" doesn't stop.
+ - Bug #2154.When changes parameter "Allow access via public IP" in traytool, it's better to ask to restart EC.
+ - Bug #2151. Don't create an event if mediaserver has been stopped normally.
+ - Bug #2086."No signal" after deleting server from resource tree.
+
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
 
 ANDROID CLIENT:
@@ -39,7 +106,7 @@ IOS Client
 NEW CAMERAS AND RECORDERS SUPPORTED:
   - Few Arecont newest models
   - Avigilon cameras: 2.0-H3-D1-IR, 2.0-H3-DO1-IR, 2.0-H3M-DO1, 2.0W-H3-BO1-IR
-  - AXIS M3005, AXIS M3007 and any  other Axis camera (in theory)
+  - AXIS M3005, AXIS M3007, AXIS M7001 and any  other Axis camera (in theory)
   - Vivotek: SD8362E, FD8372, IP8335H, FD8134, IP8362, MD8562, IP8151, IP8133, FD8135H, FE8172V
   - DAHUA IPC-HFW3200S
   - Any RTSP stream can be added as a camera. Just enter the desired RTSP URL instead of camera's IP in the manual addition form.
@@ -113,7 +180,7 @@ BUGS FIXED:
  - Audio was not exported properly in AC3 format if trying to export Multi-Video
  - Fixed visual chunks flickering in some cases (especally while zooming)
  - If run client after installation (check the flag), it was not possible to delete the directory the installer was downloaded to. Fixed
- - Tooltips' were popping up on incorrect positions sometimes. Fixed
+ - Tooltips were popping up on incorrect positions sometimes. Fixed
  - If log out and open a local file in a new window, Client tried connected to EC. Fixed 
  - Events/Actions bugs fixed:
    - Auto-reset for camera output didn't work for some cameras

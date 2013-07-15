@@ -1,30 +1,35 @@
-
 #include "event_log_dialog.h"
+#include "ui_event_log_dialog.h"
 
-#include <QClipboard>
-#include <QMenu>
+#include <QtCore/QMimeData>
+#include <QtGui/QClipboard>
+#include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
 #include <QtGui/QMouseEvent>
-#include <QMimeData>
 
-#include "ui_event_log_dialog.h"
-#include "ui/models/event_log_model.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource_managment/resource_pool.h"
-#include "ui/workbench/workbench_context.h"
-#include "business/events/abstract_business_event.h"
-#include "ui/actions/action_manager.h"
-#include "ui/actions/actions.h"
-#include "ui/style/resource_icon_cache.h"
-#include "device_plugins/server_camera/server_camera.h"
-#include "resource_selection_dialog.h"
-#include "client/client_globals.h"
-#include "ui/style/skin.h"
-#include "client/client_settings.h"
-#include "ui/models/business_rules_actual_model.h"
-#include "utils/common/event_processors.h"
-#include "custom_file_dialog.h"
-#include "ui/common/grid_widget_helper.h"
+#include <client/client_globals.h>
+#include <client/client_settings.h>
+
+#include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
+
+#include <business/events/abstract_business_event.h>
+#include <business/business_strings_helper.h>
+
+#include <device_plugins/server_camera/server_camera.h>
+
+#include <ui/actions/action_manager.h>
+#include <ui/actions/actions.h>
+#include <ui/common/grid_widget_helper.h>
+#include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/models/business_rules_actual_model.h>
+#include <ui/models/event_log_model.h>
+#include <ui/style/resource_icon_cache.h>
+#include <ui/style/skin.h>
+#include <ui/workbench/workbench_context.h>
+
+#include <utils/common/event_processors.h>
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent),
@@ -121,7 +126,7 @@ QnEventLogDialog::~QnEventLogDialog()
 
 QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, BusinessEventType::Value value)
 {
-    QStandardItem* item = new QStandardItem(BusinessEventType::toString(value));
+    QStandardItem* item = new QStandardItem(QnBusinessStringsHelper::eventName(value));
     item->setData((int) value, Qn::FirstItemDataRole);
 
     if (rootItem)

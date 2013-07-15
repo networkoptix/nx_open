@@ -50,7 +50,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
-    QnResourceList resList = action->getResources().filtered<QnVirtualCameraResource>();
+    QnResourceList resList = action->getResources().filtered<QnNetworkResource>();
     if (resList.isEmpty()) {
         executeActionInternal(action, QnResourcePtr());
     }
@@ -115,6 +115,7 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     case BusinessActionType::ShowPopup:
     case BusinessActionType::PlaySound:
+    case BusinessActionType::SayText:
         return broadcastBusinessAction(action);
 
     default:
@@ -188,6 +189,17 @@ bool QnBusinessRuleProcessor::checkRuleCondition(QnAbstractBusinessEventPtr bEve
     if (!rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
         return false;
     return true;
+}
+
+QString QnBusinessRuleProcessor::formatEmailList(const QStringList &value) {
+    QString result;
+    for (int i = 0; i < value.size(); ++i)
+    {
+        if (i > 0)
+            result.append(L' ');
+        result.append(QString(QLatin1String("%1")).arg(value[i].trimmed()));
+    }
+    return result;
 }
 
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
@@ -394,12 +406,18 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
     appServerConnection->sendEmailAsync(
                 recipients,
-                QnBusinessStringsHelper::shortEventDescription(action->getRuntimeParams()),
-                QnBusinessStringsHelper::longEventDescriptionHtml(action, action->aggregationInfo()),
+                QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
+                QnBusinessStringsHelper::eventDescription(action, action->aggregationInfo(), true, true),
                 EMAIL_SEND_TIMEOUT,
                 this,
                 SLOT(at_sendEmailFinished(int,bool,int)));
-    action->getParams().setEmailAddress(QnBusinessStringsHelper::formatEmailList(recipients)); // update final email list in action (for storing into DB)
+
+    /*
+     * This action instance is not used anymore but storing into the Events Log db.
+     * Therefore we are storing all used emails in order to not recalculate them in
+     * the event log processing methods. --rvasilenko
+     */
+    action->getParams().setEmailAddress(formatEmailList(recipients));
     return true;
 }
 

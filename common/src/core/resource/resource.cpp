@@ -19,9 +19,12 @@
 #include "resource_property.h"
 
 #include "utils/common/synctime.h"
+#include "utils/common/util.h"
 
 bool QnResource::m_appStopping = false;
 QThreadPool QnResource::m_initAsyncPool;
+
+static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 
 QnResource::QnResource(): 
     QObject(),
@@ -31,7 +34,8 @@ QnResource::QnResource():
     m_disabled(false),
     m_status(Offline),
     m_initialized(false),
-    m_initMutex(QMutex::Recursive)
+    m_initMutex(QMutex::Recursive),
+    m_lastInitTime(0)
 {
 }
 
@@ -80,12 +84,12 @@ void QnResource::updateInner(QnResourcePtr other)
     m_id = other->m_id; //TODO: #Elric this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
-    m_tags = other->m_tags;
-    m_url = other->m_url;
-
-    setFlags(other->m_flags);
-    setName(other->m_name);
-    setParentId(other->m_parentId);
+    
+    setTags(other->getTags())
+    setUrl(other->getUrl())
+    setFlags(other->flags());
+    setName(other->getName());
+    setParentId(other->getParentId());
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)
@@ -94,9 +98,11 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         consumer->beforeUpdate();
 
     {
-        // TODO: #Elric use ordered mutex locker here to avoid deadlocks.
-        QMutexLocker mutexLocker(&m_mutex); 
-        QMutexLocker mutexLocker2(&other->m_mutex); 
+        QMutex *m1 = &m_mutex, *m2 = &other->m_mutex;
+        if(m1 > m2)
+            std::swap(m1, m2);
+        QMutexLocker mutexLocker1(m1); 
+        QMutexLocker mutexLocker2(m2); 
         updateInner(other); 
     }
     silenceMode |= other->hasFlags(QnResource::foreigner);
@@ -186,19 +192,20 @@ void QnResource::setName(const QString& name)
 
 QnResource::Flags QnResource::flags() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    //QMutexLocker mutexLocker(&m_mutex);
     return m_flags;
 }
 
 void QnResource::setFlags(Flags flags)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    {
+        QMutexLocker mutexLocker(&m_mutex);
 
-    if(m_flags == flags)
-        return;
+        if(m_flags == flags)
+            return;
 
-    m_flags = flags;
-
+        m_flags = flags;
+    }
     emit flagsChanged(toSharedPointer(this));
 }
 
@@ -676,7 +683,7 @@ bool QnResource::hasTag(const QString& tag) const
     return m_tags.contains(tag);
 }
 
-QStringList QnResource::tagList() const
+QStringList QnResource::getTags() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_tags;
@@ -804,15 +811,22 @@ void QnResource::setDisabled(bool disabled)
 
 void QnResource::init()
 {
-    QMutexLocker lock(&m_initMutex);
+    if (m_appStopping)
+        return;
+
+    if (!m_initMutex.tryLock())
+        return; // if init already running, skip new request
+
     if (!m_initialized) 
     {
+        m_lastInitTime = getUsecTimer();
         m_initialized = initInternal();
         if( m_initialized )
             initializationDone();
         if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
             setStatus(Offline);
     }
+    m_initMutex.unlock();
 }
 
 void QnResource::initAndEmit()
@@ -842,6 +856,9 @@ void QnResource::stopAsyncTasks()
 
 void QnResource::initAsync()
 {
+    if (getUsecTimer() - m_lastInitTime < MIN_INIT_INTERVAL)
+        return; 
+
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     m_initAsyncPool.start(task);
 }

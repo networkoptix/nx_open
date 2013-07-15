@@ -112,6 +112,7 @@ protected:
 
     virtual QString calculateInfoText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
+    virtual QCursor calculateCursor() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

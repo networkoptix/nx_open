@@ -70,7 +70,6 @@ namespace Qn {
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
         ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
         ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
-        ItemPendingNotificationRole,                /**< Role for item's pending notification state. Value of type bool. */
 
         /* Context-based. */
         CurrentLayoutResourceRole,
@@ -94,6 +93,7 @@ namespace Qn {
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
+        PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
         DisplayHtmlRole                             /**< Same as Display role, but use HTML format. */
@@ -230,6 +230,7 @@ namespace Qn {
         GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
         GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
         GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
+        GlobalPanicPermission                   = 0x00001000,   /**< Can trigger panic recording. */
         
         /* Deprecated permissions. */
         DeprecatedEditCamerasPermission         = 0x00000010,   /**< Can edit camera settings and change camera's PTZ state. */
@@ -239,7 +240,7 @@ namespace Qn {
         GlobalLiveViewerPermissions             = GlobalViewLivePermission,
         GlobalViewerPermissions                 = GlobalLiveViewerPermissions       | GlobalViewArchivePermission | GlobalExportPermission,
         GlobalAdvancedViewerPermissions         = GlobalViewerPermissions           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
+        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions | GlobalPanicPermission,
         GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
             
         AllPermissions                          = 0xFFFFFFFF
@@ -264,6 +265,9 @@ namespace Qn {
             result &= ~Qn::DeprecatedViewExportArchivePermission;
             result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
         }
+
+        if(result & Qn::GlobalProtectedPermission)
+            result |= Qn::GlobalPanicPermission;
 
         return result;
     }

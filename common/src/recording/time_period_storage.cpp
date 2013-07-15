@@ -10,7 +10,7 @@ QnTimePeriodList QnTimePeriodStorage::aggregated(Qn::TimePeriodContent type) con
     return m_aggregatedPeriods[type];
 }
 
-void QnTimePeriodStorage::setPeriods( Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods )
+void QnTimePeriodStorage::setPeriods(Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods) 
 {
     m_normalPeriods[type] = timePeriods;
     updateAggregated(type);

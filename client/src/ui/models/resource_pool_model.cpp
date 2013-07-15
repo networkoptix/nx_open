@@ -15,7 +15,7 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/common/resource_name.h>
+#include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_item.h>

@@ -83,6 +83,7 @@ namespace {
         result << QObject::tr("b/s");
         result << QObject::tr("Kb/s");
         result << QObject::tr("Mb/s");
+   //     result << QObject::tr("Gb/s");
         return result;
     }
     const QList<QString> networkSuffixes = initNetworkSuffixes();
@@ -90,11 +91,12 @@ namespace {
     QString networkLoadText(const qreal value, qreal upperBound) {
         int idx = 0;
         qreal upper = upperBound / 1000;
-        while (upper >= 1.0) {
+        while (upper >= 1.0 && idx < networkSuffixes.size() - 1) {
             upperBound = upper;
             upper = upperBound / 1000;
             idx++;
         }
+
         idx = qMin(idx, networkSuffixes.size() - 1);
         return QString(QLatin1String("%1 %2")).arg(QString::number(value*upperBound, 'f', 2)).arg(networkSuffixes.at(idx));
     }
@@ -582,8 +584,12 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painte
     return m_renderStatus;
 }
 
-// TODO: #GDM this method draws background only, why 'drawStatistics'?
 void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painter) {
+    if(!m_gl)
+        m_gl.reset(new QnGlFunctions(QGLContext::currentContext()));
+    if(!(m_gl->features() & QnGlFunctions::ArbPrograms))
+        return; /* Don't draw anything on old OpenGL versions. */
+
     qreal width = rect.width();
     qreal height = rect.height();
     qreal min = qMin(width, height);
@@ -597,6 +603,7 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
         return;
 
     QRectF inner(offset, offset, ow, oh);
+
 
     /* Draw background */
     if(!m_backgroundGradientPainter)

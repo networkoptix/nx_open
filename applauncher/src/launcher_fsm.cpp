@@ -156,6 +156,10 @@ void LauncherFSM::onBindingToLocalAddressEntered()
         emit bindFailed();
 }
 
+static const QLatin1String NON_RECENT_VERSION_ARGS_PARAM_NAME( "nonRecentVersionArgs" );
+static const QLatin1String NON_RECENT_VERSION_ARGS_DEFAULT_VALUE( "--updates-enabled=false" );
+static const QLatin1String PREVIOUS_LAUNCHED_VERSION_PARAM_NAME( "previousLaunchedVersion" );
+
 void LauncherFSM::onAddingTaskToNamedPipeEntered()
 {
     NX_LOG( QString::fromLatin1("Entered AddingTaskToNamedPipe"), cl_logDEBUG1 );
@@ -171,6 +175,7 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
             emit failedToAddTaskToThePipe();
             return;
         }
+
         serializedTask = applauncher::api::StartApplicationTask(versionToLaunch, appArgs).serialize();
     }
     else
@@ -208,16 +213,16 @@ bool LauncherFSM::addTaskToTheQueue()
     QString versionToLaunch;
     QString appArgs;
     if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
-        return false;   //TODO/IMPL
+        return false;   //TODO/IMPL no single version installed
     m_taskQueue.push( QSharedPointer<applauncher::api::BaseTask>( new applauncher::api::StartApplicationTask(versionToLaunch, appArgs) ) );
     return true;
 }
 
 bool LauncherFSM::getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs )
 {
-    if( m_settings.contains( "previousLaunchedVersion" ) )
+    if( m_settings.contains( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ) )
     {
-        *versionToLaunch = m_settings.value( "previousLaunchedVersion" ).toString();
+        *versionToLaunch = m_settings.value( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ).toString();
         *appArgs = m_settings.value( "previousUsedCmdParams" ).toString();
     }
     else if( m_installationManager.count() > 0 )
@@ -230,6 +235,9 @@ bool LauncherFSM::getVersionToLaunch( QString* const versionToLaunch, QString* c
         NX_LOG( QString::fromLatin1("Failed to generate launch task. No client installed"), cl_logDEBUG1 );
         return false;
     }
+
+    if( versionToLaunch != m_installationManager.getMostRecentVersion() )
+        *appArgs += QString::fromLatin1(" ") + m_settings.value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
 
     return true;
 }

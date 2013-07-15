@@ -23,7 +23,7 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid)
             mainWindow(),
             QObject::tr("Export selected events to file"),
             previousDir,
-            QObject::tr("HTML file (*.html);;CSV file (*.csv)")
+            QObject::tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)")
             ));
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);

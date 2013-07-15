@@ -78,7 +78,7 @@ void QnMediaServerStatisticsStorage::update() {
 
     emit statisticsChanged();
 
-    if (m_alreadyUpdating)
+    if (!m_listeners || m_alreadyUpdating)
         return;
 
     m_apiConnection->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));

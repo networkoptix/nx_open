@@ -225,6 +225,7 @@ public:
     virtual QnAbstractPtzController* getPtzController(); // TODO: #vasilenko: OMG what is THIS doing here???
 
     static void stopAsyncTasks();
+
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
@@ -352,6 +353,7 @@ private:
     QMutex m_initMutex;
 
     static QThreadPool m_initAsyncPool;
+    qint64 m_lastInitTime;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);

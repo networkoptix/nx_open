@@ -10,14 +10,16 @@
 #include <core/resource/user_resource.h>
 
 #include <business/business_action_parameters.h>
+#include <business/business_strings_helper.h>
 #include <business/events/abstract_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/recording_business_action.h>
 
-#include <ui/common/resource_name.h>
+#include <ui/common/ui_resource_name.h>
 #include <ui/models/notification_sound_model.h>
+#include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -49,7 +51,7 @@ namespace {
     }
 
     QString eventTypeString(BusinessEventType::Value eventType, Qn::ToggleState eventState, BusinessActionType::Value actionType) {
-        QString typeStr = BusinessEventType::toString(eventType);
+        QString typeStr = QnBusinessStringsHelper::eventName(eventType);
         if (BusinessActionType::hasToggleState(actionType))
             return QObject::tr("While %1").arg(typeStr);
         else
@@ -57,7 +59,6 @@ namespace {
     }
 
     const int ProlongedActionRole = Qt::UserRole + 2;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +83,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     for (int i = 0; i < BusinessEventType::Count; i++) {
         BusinessEventType::Value val = (BusinessEventType::Value)i;
 
-        QStandardItem *item = new QStandardItem(BusinessEventType::toString(val));
+        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(val));
         item->setData(val);
 
         QList<QStandardItem *> row;
@@ -121,7 +122,6 @@ QnBusinessRuleViewModel::~QnBusinessRuleViewModel() {
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     if (column == QnBusiness::DisabledColumn) {
-
         switch (role) {
             case Qt::CheckStateRole:
                 return (m_disabled ? Qt::Unchecked : Qt::Checked);
@@ -135,8 +135,6 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             default:
                 break;
         }
-
-//        return QVariant();
     }
 
     switch (role) {
@@ -165,7 +163,10 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                     return (int)m_actionParams.getUserGroup();
                 if (m_actionType == BusinessActionType::PlaySound)
                     return m_actionParams.getSoundUrl();
-            }
+                if (m_actionType == BusinessActionType::SayText)
+                    return m_actionParams.getSoundUrl();
+            } else if (column == QnBusiness::AggregationColumn)
+                return m_aggregationPeriod;
             break;
 
         case Qt::TextColorRole:
@@ -239,8 +240,15 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
                 QnBusinessActionParameters params;
                 params.setSoundUrl(value.toString());
                 setActionParams(params);
+            } else if (m_actionType == BusinessActionType::SayText) {
+                QnBusinessActionParameters params;
+                params.setSoundUrl(value.toString());
+                setActionParams(params);
             } else
                 setActionResources(value.value<QnResourceList>());
+            return true;
+        case QnBusiness::AggregationColumn:
+            setAggregationPeriod(value.toInt());
             return true;
         default:
             break;
@@ -586,6 +594,8 @@ QVariant QnBusinessRuleViewModel::getText(const int column, const bool detailed)
             return BusinessActionType::toString(m_actionType);
         case QnBusiness::TargetColumn:
             return getTargetText(detailed);
+        case QnBusiness::AggregationColumn:
+            return getAggregationText();
         default:
             break;
     }
@@ -613,14 +623,20 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                 if (m_actionType == BusinessActionType::SendMail) {
                     if (!isValid(QnBusiness::TargetColumn))
                         return qnResIconCache->icon(QnResourceIconCache::Offline, true);
-                    return qnResIconCache->icon(QnResourceIconCache::Users);
+                    else
+                        return qnResIconCache->icon(QnResourceIconCache::Users);
 
                 } else if (m_actionType == BusinessActionType::ShowPopup) {
                     if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
                         return qnResIconCache->icon(QnResourceIconCache::User);
                     else
                         return qnResIconCache->icon(QnResourceIconCache::Users);
+
+                } else if (m_actionType == BusinessActionType::PlaySound || m_actionType == BusinessActionType::SayText) {
+                    return qnSkin->icon("tree/sound.png");
                 }
+
+
 
                 QnResourceList resources = m_actionResources; //TODO: #GDM filtered by type
                 if (!BusinessActionType::requiresCameraResource(m_actionType)) {
@@ -681,6 +697,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                 } else if (m_actionType == BusinessActionType::CameraRecording) {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
                 } else if (m_actionType == BusinessActionType::PlaySound) {
+                    return !m_actionParams.getSoundUrl().isEmpty();
+                }  else if (m_actionType == BusinessActionType::SayText) {
                     return !m_actionParams.getSoundUrl().isEmpty();
                 }
 
@@ -801,6 +819,11 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
             return tr("Select a sound");
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         return soundModel->titleByFilename(filename);
+    } else if (m_actionType == BusinessActionType::SayText) {
+        QString text = m_actionParams.getSoundUrl();
+        if (text.isEmpty())
+            return tr("Enter the text");
+        return text;
     }
 
     QnResourceList resources = m_actionResources;
@@ -815,6 +838,29 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         return tr("%n Camera(s)", "", resources.size());
     }
 
+}
+
+QString QnBusinessRuleViewModel::getAggregationText() const {
+    const int MINUTE = 60;
+    const int HOUR = MINUTE*60;
+    const int DAY = HOUR * 24;
+
+    if (BusinessActionType::hasToggleState(m_actionType))
+        return tr("not applied");
+
+    if (m_aggregationPeriod <= 0)
+        return tr("do instantly");
+
+    if (m_aggregationPeriod >= DAY && m_aggregationPeriod % DAY == 0)
+        return tr("no more than once per %n days", "", m_aggregationPeriod / DAY);
+
+    if (m_aggregationPeriod >= HOUR && m_aggregationPeriod % HOUR == 0)
+        return tr("no more than once per %n hours", "", m_aggregationPeriod / HOUR);
+
+    if (m_aggregationPeriod >= MINUTE && m_aggregationPeriod % MINUTE == 0)
+        return tr("no more than once per %n minutes", "", m_aggregationPeriod / MINUTE);
+
+    return tr("no more than once per %n seconds", "", m_aggregationPeriod);
 }
 
 
@@ -905,6 +951,7 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
         case QnBusiness::SpacerColumn:      return tr("->");
         case QnBusiness::ActionColumn:      return tr("Action");
         case QnBusiness::TargetColumn:      return tr("Target");
+        case QnBusiness::AggregationColumn: return tr("Aggregation");
         default:
             break;
     }
@@ -933,10 +980,17 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
                 if (BusinessActionType::requiresCameraResource(actionType)
                         || BusinessActionType::requiresUserResource(actionType)
                         || actionType == BusinessActionType::ShowPopup
-                        || actionType == BusinessActionType::PlaySound)
+                        || actionType == BusinessActionType::PlaySound
+                        || actionType == BusinessActionType::SayText)
                     flags |= Qt::ItemIsEditable;
             }
             break;
+        case QnBusiness::AggregationColumn:
+            {
+                BusinessActionType::Value actionType = m_rules[index.row()]->actionType();
+                if (!BusinessActionType::hasToggleState(actionType))
+                    flags |= Qt::ItemIsEditable;
+            }
         default:
             break;
     }

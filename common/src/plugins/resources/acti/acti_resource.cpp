@@ -151,9 +151,9 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
 {
     QByteArray rtspAudio[][2] = 
     {
-        "T",  "4.13", // Platform and minimum allowed firmware version
-        "K",  "5.08",
-        "A1", "6.03"
+        {"T",  "4.13"}, // Platform and minimum allowed firmware version
+        {"K",  "5.08"},
+        {"A1", "6.03"}
     };
 
     QByteArray version;
@@ -167,7 +167,7 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
         }
     }
 
-    for (int i = 0; i < sizeof(rtspAudio) / sizeof(rtspAudio[0]); ++i)
+    for (uint i = 0; i < sizeof(rtspAudio) / sizeof(rtspAudio[0]); ++i)
     {
         if (platform == rtspAudio[i][0] && version >= rtspAudio[i][1])
             return true;

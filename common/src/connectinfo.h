@@ -12,6 +12,7 @@ struct QnConnectInfo
     QList<QnCompatibilityItem> compatibilityItems;
     int proxyPort;
     QString ecsGuid;
+    QString publicIp;
 };
 
 // TODO: #Elric remove shared pointer.
