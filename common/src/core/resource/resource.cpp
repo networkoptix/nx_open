@@ -85,8 +85,8 @@ void QnResource::updateInner(QnResourcePtr other)
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     
-    setTags(other->getTags())
-    setUrl(other->getUrl())
+    setTags(other->getTags());
+    setUrl(other->getUrl());
     setFlags(other->flags());
     setName(other->getName());
     setParentId(other->getParentId());
