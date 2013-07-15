@@ -62,7 +62,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->recordingTab,                                            Qn::CameraSettings_Recording_Help);
     setHelpTopic(ui->motionTab,                                               Qn::CameraSettings_Motion_Help);
     setHelpTopic(ui->cameraPropertiesTab,                                     Qn::CameraSettings_Properties_Help);
-    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Advanced_Help);
+    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Expert_Help);
+    setHelpTopic(ui->tabFisheyeSettings,                                      Qn::CameraSettings_Dewarping_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
@@ -98,6 +99,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
     connect(ui->advancedSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+    connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
 
     updateFromResource();
 }
@@ -258,6 +260,8 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
         return Qn::CameraPropertiesTab;
     } else if(tab == ui->tabAdvancedSettings) {
         return Qn::AdvancedCameraSettingsTab;
+    } else if(tab == ui->tabFisheyeSettings) {
+        return Qn::FisheyeCameraSettingsTab;
     } else {
         qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
         return Qn::GeneralSettingsTab;
@@ -282,6 +286,9 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
         break;
     case Qn::AdvancedCameraSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabAdvancedSettings);
+        break;
+    case Qn::FisheyeCameraSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->tabFisheyeSettings);
         break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
@@ -444,6 +451,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
             ui->advancedSettingsWidget->updateFromResource(m_camera);
+            ui->fisheyeSettingsWidget->updateFromResource(m_camera);
         }
     }
 

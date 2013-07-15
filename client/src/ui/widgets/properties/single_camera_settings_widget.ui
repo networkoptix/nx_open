@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -505,6 +505,16 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabFisheyeSettings">
+      <attribute name="title">
+       <string>Dewarping</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <widget class="QnFisheyeSettingsWidget" name="fisheyeSettingsWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -525,6 +535,12 @@
    <class>QnAdvancedSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/expert_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnFisheyeSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/properties/fisheye_settings_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
