@@ -12,6 +12,7 @@
 class QnRadialGradientPainter;
 class QnMediaServerStatisticsManager;
 class StatisticsOverlayWidget;
+class QnGlFunctions;
 
 enum LegendButtonBar {
     CommonButtonBar,
@@ -121,6 +122,9 @@ private:
 
     /** Helper for the background painting. */
     QSharedPointer<QnRadialGradientPainter> m_backgroundGradientPainter;
+
+    /** Helper for the OpenGL functions */
+    QScopedPointer<QnGlFunctions> m_gl;
 
     /** Button bars with corresponding buttons */
     QnImageButtonBar* m_legendButtonBar[ButtonBarCount];

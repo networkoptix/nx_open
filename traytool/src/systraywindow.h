@@ -6,7 +6,6 @@
 #include <QStringListModel>
 #include <QSystemTrayIcon>
 
-
 class FoundEnterpriseControllersModel;
 
 class QAction;
@@ -84,16 +83,18 @@ private:
 class QnSystrayWindow : public QDialog
 {
     Q_OBJECT
+    typedef QDialog base_type;
 
 public:
     QnSystrayWindow( FoundEnterpriseControllersModel* const foundEnterpriseControllersModel );
 
     virtual ~QnSystrayWindow();
-    QSystemTrayIcon* getTrayIcon() const { return trayIcon; }
+    QSystemTrayIcon *trayIcon() const { return m_trayIcon; }
     void executeAction(QString cmd);
     void setVisible(bool visible);
 
 protected:
+    virtual void accept() override;
     virtual void closeEvent(QCloseEvent *event) override;
 
 private slots:
@@ -129,6 +130,7 @@ private slots:
     void onRadioButtonEcsPublicIpChanged();
 
     void at_appServerPassword_textChanged(const QString &text);
+
 private:
     QAction* actionByName(const QString& name);
     QString nameByAction(QAction* action);
@@ -137,6 +139,8 @@ private:
 
     void createActions();
     void createTrayIcon();
+
+    void initTranslations();
 
     void updateServiceInfoInternal(SC_HANDLE service, DWORD status, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction);
     bool validateData();
@@ -148,21 +152,22 @@ private:
     bool isAppServerParamChanged() const;
     bool isMediaServerParamChanged() const;
 
+private:
     QScopedPointer<Ui::SettingsDialog> ui;
     QScopedPointer<QDialog> m_findAppServerDialog;
     QScopedPointer<Ui::FindAppServerDialog> m_findAppServerDialogUI;
 
     QSettings m_settings;
-    QSettings m_mServerSettings;
+    QSettings m_mediaServerSettings;
     QSettings m_appServerSettings;
 
     QAction *m_showMediaServerLogAction;
     QAction *m_showAppLogAction;
-    QAction *settingsAction;
-    QAction *quitAction;
+    QAction *m_settingsAction;
+    QAction *m_quitAction;
 
-    QSystemTrayIcon *trayIcon;
-    QMenu *trayIconMenu;
+    QSystemTrayIcon *m_trayIcon;
+    QMenu *m_trayIconMenu;
 
     QString m_detailedErrorText;
     QIcon m_iconOK;
@@ -184,7 +189,7 @@ private:
     bool m_needStartAppServer;
     int m_skipTicks;
 
-    typedef QPair<QString, QAction*> NameAndAction;
+    typedef QPair<QString, QAction *> NameAndAction;
     typedef QList<NameAndAction> NameActionList;
 
     int m_prevMediaServerStatus;
@@ -195,7 +200,7 @@ private:
     QQueue<QString> m_delayedMessages;
     QString m_mediaServerServiceName;
     QString m_appServerServiceName;
-    FoundEnterpriseControllersModel* const m_foundEnterpriseControllersModel;
+    FoundEnterpriseControllersModel *const m_foundEnterpriseControllersModel;
 };
 
 #endif

@@ -16,7 +16,7 @@ QnVirtualCameraResource::QnVirtualCameraResource():
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): 
     QnVirtualCameraResource(),
-    m_channelNumer(0)
+    m_channelNumber(0)
 {
     setFlags(local_live_cam);
 }
@@ -44,18 +44,17 @@ int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolu
 int QnPhysicalCameraResource::getChannel() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_channelNumer;
+    return m_channelNumber;
 }
 
 void QnPhysicalCameraResource::setUrl(const QString &url)
 {
-    QUrl u(url);
+    QnVirtualCameraResource::setUrl(url); /* This call emits, so we should not invoke it under lock. */
 
     QMutexLocker lock(&m_mutex);
-    QnVirtualCameraResource::setUrl(url);
-    m_channelNumer = u.queryItemValue(QLatin1String("channel")).toInt();
-    if (m_channelNumer > 0)
-        m_channelNumer--; // convert human readable channel in range [1..x] to range [0..x]
+    m_channelNumber = QUrl(url).queryItemValue(QLatin1String("channel")).toInt();
+    if (m_channelNumber > 0)
+        m_channelNumber--; // convert human readable channel in range [1..x] to range [0..x-1]
 }
 
 float QnPhysicalCameraResource::getResolutionAspectRatio(const QSize& resolution)

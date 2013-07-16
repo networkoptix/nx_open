@@ -41,7 +41,7 @@ private:
     void updateFromSettings();
     void submitToSettings();
 
-    void initLanguages();
+    void initTranslations();
 
 private slots:
     void at_browseMainMediaFolderButton_clicked();

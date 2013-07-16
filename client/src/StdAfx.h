@@ -2,7 +2,7 @@
 
 #include <client/config.h>
 #ifdef __cplusplus
-    #include <common/common_globals.h>
+#   include <common/common_globals.h>
 #endif
 
 /* Windows headers. */

@@ -22,6 +22,15 @@ class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
 
+class QnInitResPool: public QThreadPool
+{
+public:
+    QnInitResPool() : QThreadPool() 
+    {
+        setMaxThreadCount(64);
+    }
+};
+
 class QnResourceParameters: public QMap<QString, QString> {
     typedef QMap<QString, QString> base_type;
 
@@ -49,7 +58,7 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(Flags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
-    Q_PROPERTY(QStringList tags READ tagList WRITE setTags)
+    Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
 
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
@@ -140,7 +149,7 @@ public:
 
     // this function is called if resourse changes state from offline to online or so 
     void init();
-    void initAsync();
+    void initAsync(bool optional);
     
     // flags like network media and so on
     Flags flags() const;
@@ -216,7 +225,7 @@ public:
     void setTags(const QStringList& tags);
     void removeTag(const QString& tag);
     bool hasTag(const QString& tag) const;
-    QStringList tagList() const;
+    QStringList getTags() const;
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
     bool hasUnprocessedCommands() const;
@@ -225,6 +234,7 @@ public:
     virtual QnAbstractPtzController* getPtzController(); // TODO: #vasilenko: OMG what is THIS doing here???
 
     static void stopAsyncTasks();
+
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
@@ -350,8 +360,9 @@ private:
 
     bool m_initialized;    
     QMutex m_initMutex;
+    QMutex m_initAsyncMutex;
 
-    static QThreadPool m_initAsyncPool;
+    static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
 };
 

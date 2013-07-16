@@ -23,7 +23,6 @@
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/style/skin.h>
-#include <ui/style/resource_icon_cache.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
@@ -45,8 +44,8 @@ namespace {
 
 QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
     base_type(parent),
-    m_count(0),
-    m_time(0)
+    m_time(0),
+    m_count(0)
 {
     registerAnimation(this);
     startListening();
@@ -135,8 +134,7 @@ void QnBlinkingImageButtonWidget::at_particle_visibleChanged() {
 
 QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
-    QnWorkbenchContextAware(context),
-    m_blinker(NULL)
+    QnWorkbenchContextAware(context)
 {
     m_headerWidget = new GraphicsWidget(this);
 
@@ -150,7 +148,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 
     QnImageButtonWidget *filterButton = new QnImageButtonWidget(m_headerWidget);
-    filterButton->setIcon(qnSkin->icon("item/search.png"));
+    filterButton->setIcon(qnSkin->icon("events/filter.png"));
     filterButton->setToolTip(tr("Filter..."));
     filterButton->setFixedSize(buttonSize);
     filterButton->setCached(true);
@@ -233,21 +231,22 @@ void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF &rec
 void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *blinker) {
     if (m_blinker)
         disconnect(m_list, 0, m_blinker, 0);
+    
     m_blinker = blinker;
+    
     if (m_blinker) {
-        connect(m_list, SIGNAL(itemCountChanged(int)), m_blinker, SLOT(setNotificationCount(int)));
-        connect(m_list, SIGNAL(itemColorChanged(QColor)), m_blinker, SLOT(setColor(QColor)));
-        m_blinker->setNotificationCount(m_list->itemCount());
+        connect(m_list, SIGNAL(itemCountChanged()),         this, SLOT(updateBlinker()));
+        connect(m_list, SIGNAL(notificationLevelChanged()), this, SLOT(updateBlinker()));
+        updateBlinker();
     }
 }
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
 {
-    QnSingleThumbnailLoader* loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, QSize(0, thumbnailHeight), item);
+    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, QSize(0, thumbnailHeight), item);
     item->setImageProvider(loader);
     //connect(loader, SIGNAL(finished()), loader, SLOT(deleteLater()));
 }
-
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
@@ -258,8 +257,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     QnNotificationItem *item = new QnNotificationItem(m_list);
 
-    item->setText(QnBusinessStringsHelper::shortEventDescription(params));
-    item->setTooltipText(QnBusinessStringsHelper::longEventDescription(businessAction));
+    item->setText(QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree()));
+    item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
 
     QString name = getResourceName(resource);
 
@@ -267,9 +266,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     switch (eventType) {
     case BusinessEventType::Camera_Motion: {
-        item->setColorLevel(QnNotificationItem::Common);
+        item->setNotificationLevel(Qn::CommonNotification);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/camera.png"),
             tr("Browse Archive"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)
@@ -278,9 +277,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Input: {
-        item->setColorLevel(QnNotificationItem::Common);
+        item->setNotificationLevel(Qn::CommonNotification);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/camera.png"),
             tr("Open Camera"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
@@ -289,9 +288,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Disconnect: {
-        item->setColorLevel(QnNotificationItem::Important);
+        item->setNotificationLevel(Qn::ImportantNotification);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/camera.png"),
             tr("Camera Settings"),
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
@@ -300,7 +299,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Storage_Failure: {
-        item->setColorLevel(QnNotificationItem::Important);
+        item->setNotificationLevel(Qn::ImportantNotification);
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings"),
@@ -310,9 +309,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Network_Issue:{
-        item->setColorLevel(QnNotificationItem::Important);
+        item->setNotificationLevel(Qn::ImportantNotification);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/server.png"),
             tr("Camera Settings"),
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
@@ -321,34 +320,31 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Ip_Conflict: {
-        item->setColorLevel(QnNotificationItem::Critical);
+        item->setNotificationLevel(Qn::CriticalNotification);
         QString webPageAddress = params.getSource();
 
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/camera.png"),
             tr("Open camera web page..."),
             Qn::BrowseUrlAction,
             QnActionParameters().withArgument(Qn::UrlRole, webPageAddress)
         );
-
         break;
     }
     case BusinessEventType::MediaServer_Failure: {
-        item->setColorLevel(QnNotificationItem::Critical);
+        item->setNotificationLevel(Qn::CriticalNotification);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/server.png"),
             tr("Settings"),
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
         );
-
-        item->setText(tr("Failure on %1.").arg(name));
         break;
     }
     case BusinessEventType::MediaServer_Conflict: {
-        item->setColorLevel(QnNotificationItem::Critical);
+        item->setNotificationLevel(Qn::CriticalNotification);
         item->addActionButton(
-            qnResIconCache->icon(resource->flags(), resource->getStatus()),
+            qnSkin->icon("events/server.png"),
             tr("Description"),
             Qn::MessageBoxAction,
             QnActionParameters().
@@ -450,7 +446,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     QString resourceName = getResourceName(resource);
     item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
     item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
-    item->setColorLevel(QnNotificationItem::System);
+    item->setNotificationLevel(Qn::SystemNotification);
     item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
 
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
@@ -477,6 +473,14 @@ void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::Me
 void QnNotificationsCollectionWidget::hideAll() {
     m_list->clear();
     m_itemsByMessageType.clear();
+}
+
+void QnNotificationsCollectionWidget::updateBlinker() {
+    if(!blinker())
+        return;
+
+    blinker()->setNotificationCount(m_list->itemCount());
+    blinker()->setColor(QnNotificationItem::notificationColor(m_list->notificationLevel()));
 }
 
 void QnNotificationsCollectionWidget::at_settingsButton_clicked() {
@@ -525,26 +529,76 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
 
         QnBusinessEventParameters params;
         params.setEventType(eventType);
+        params.setEventTimestamp((quint64)QDateTime::currentMSecsSinceEpoch() * 1000ull);
         switch(eventType) {
-        case BusinessEventType::Camera_Motion:
-        case BusinessEventType::Camera_Input:
-        case BusinessEventType::Camera_Disconnect:
-        case BusinessEventType::Network_Issue:
-            params.setEventResourceId(sampleCamera->getId());
-            break;
+        case BusinessEventType::Camera_Motion: {
+                params.setEventResourceId(sampleCamera->getId());
 
-        case BusinessEventType::Storage_Failure:
-        case BusinessEventType::Camera_Ip_Conflict:
-        case BusinessEventType::MediaServer_Failure:
-        case BusinessEventType::MediaServer_Conflict:
-            params.setEventResourceId(sampleServer->getId());
-            break;
+                break;
+            }
+
+        case BusinessEventType::Camera_Input: {
+                params.setEventResourceId(sampleCamera->getId());
+                params.setInputPortId(lit("01"));
+                break;
+            }
+
+        case BusinessEventType::Camera_Disconnect: {
+                params.setEventResourceId(sampleCamera->getId());
+                break;
+            }
+
+        case BusinessEventType::Network_Issue:{
+                params.setEventResourceId(sampleCamera->getId());
+                params.setReasonCode(QnBusiness::NetworkIssueNoFrame);
+                params.setReasonText(lit("15"));
+                break;
+            }
+
+        case BusinessEventType::Storage_Failure:{
+                params.setEventResourceId(sampleServer->getId());
+                params.setReasonCode(QnBusiness::StorageIssueNotEnoughSpeed);
+                params.setReasonText(lit("C: E:"));
+                break;
+            }
+
+        case BusinessEventType::Camera_Ip_Conflict:{
+                params.setEventResourceId(sampleServer->getId());
+                params.setSource(lit("192.168.0.5"));
+
+                QStringList conflicts;
+                conflicts << lit("50:e5:49:43:b2:59");
+                conflicts << lit("50:e5:49:43:b2:60");
+                conflicts << lit("50:e5:49:43:b2:61");
+                conflicts << lit("50:e5:49:43:b2:62");
+                conflicts << lit("50:e5:49:43:b2:63");
+                conflicts << lit("50:e5:49:43:b2:64");
+                params.setConflicts(conflicts);
+                break;
+            }
+        case BusinessEventType::MediaServer_Failure:{
+                params.setEventResourceId(sampleServer->getId());
+                params.setReasonCode(QnBusiness::MServerIssueTerminated);
+                break;
+            }
+
+        case BusinessEventType::MediaServer_Conflict: {
+                params.setEventResourceId(sampleServer->getId());
+                params.setSource(lit("10.0.2.187"));
+
+                QStringList conflicts;
+                conflicts << lit("10.0.2.108");
+                conflicts << lit("192.168.0.15");
+                params.setConflicts(conflicts);
+                break;
+            }
         default:
             break;
 
         }
 
         QnAbstractBusinessActionPtr baction(new QnCommonBusinessAction(BusinessActionType::ShowPopup, params));
+        baction->setAggregationCount(random(1, 5));
         showBusinessAction(baction);
     }
 }

@@ -25,14 +25,15 @@ namespace {
     const qreal buttonSize = 16.0;
 } // anonymous namespace
 
-/********** QnNotificationToolTipWidget *********************/
-
+// -------------------------------------------------------------------------- //
+// QnNotificationToolTipWidget
+// -------------------------------------------------------------------------- //
 QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     base_type(parent),
     m_textLabel(new QnProxyLabel(this)),
     m_thumbnailLabel(NULL)
 {
-    m_textLabel->setAlignment(Qt::AlignCenter);
+    m_textLabel->setAlignment(Qt::AlignLeft);
     m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
@@ -118,20 +119,22 @@ void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) 
 }
 
 
-/********** QnNotificationItem *********************/
-
+// -------------------------------------------------------------------------- //
+// QnNotificationItem
+// -------------------------------------------------------------------------- //
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
     m_defaultActionIdx(-1),
     m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
     m_textLabel(new QnProxyLabel(this)),
-    m_color(Qt::transparent),
-    m_colorLevel(None),
+    m_notificationLevel(Qn::OtherNotification),
     m_imageProvider(NULL),
     m_tooltipWidget(new QnNotificationToolTipWidget(this)),
     m_hoverProcessor(new HoverFocusProcessor(this)),
     m_inToolTipPositionUpdate(false)
 {
+    m_color = notificationColor(m_notificationLevel);
+
     setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
     setFrameWidth(0.5);
     setWindowBrush(Qt::transparent);
@@ -167,6 +170,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 }
 
 QnNotificationItem::~QnNotificationItem() {
+    return;
 }
 
 QString QnNotificationItem::text() const {
@@ -181,37 +185,32 @@ void QnNotificationItem::setTooltipText(const QString &text) {
     m_tooltipWidget->setText(text);
 }
 
-QnNotificationItem::ColorLevel QnNotificationItem::colorLevel() const {
-    return m_colorLevel;
+Qn::NotificationLevel QnNotificationItem::notificationLevel() const {
+    return m_notificationLevel;
 }
 
-QColor QnNotificationItem::color() const {
-    return m_color;
-}
-
-void QnNotificationItem::setColorLevel(ColorLevel level) {
-    m_colorLevel = level;
+QColor QnNotificationItem::notificationColor(Qn::NotificationLevel level) {
     switch (level) {
-    case None:
-        break;
-    case Common:
-        m_color = qnGlobals->notificationColorCommon();
-        break;
-    case Important:
-        m_color = qnGlobals->notificationColorImportant();
-        break;
-    case Critical:
-        m_color = qnGlobals->notificationColorCritical();
-        break;
-    case System:
-        m_color = qnGlobals->notificationColorSystem();
-        break;
+    case Qn::NoNotification:        return Qt::transparent;
+    case Qn::OtherNotification:     return Qt::white;
+    case Qn::CommonNotification:    return qnGlobals->notificationColorCommon();
+    case Qn::ImportantNotification: return qnGlobals->notificationColorImportant();
+    case Qn::CriticalNotification:  return qnGlobals->notificationColorCritical();
+    case Qn::SystemNotification:    return qnGlobals->notificationColorSystem();
+    default:
+        qnWarning("Invalid notification level '%1'.", static_cast<int>(level));
+        return QColor();
     }
 }
 
-void QnNotificationItem::setColor(const QColor &color) {
-    m_colorLevel = None;
-    m_color = color;
+void QnNotificationItem::setNotificationLevel(Qn::NotificationLevel notificationLevel) {
+    if(m_notificationLevel == notificationLevel)
+        return;
+
+    m_notificationLevel = notificationLevel;
+    m_color = notificationColor(m_notificationLevel);
+
+    emit notificationLevelChanged();
 }
 
 void QnNotificationItem::setImageProvider(QnImageProvider* provider) {

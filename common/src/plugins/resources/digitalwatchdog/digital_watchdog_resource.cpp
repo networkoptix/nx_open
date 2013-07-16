@@ -136,7 +136,7 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
 
-    int hiEnd = 1024*11;
+    int hiEnd = 1024*9;
     int lowEnd = 1024*1.8;
 
     float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;

@@ -19,7 +19,7 @@
 
 #define CUSTOM_RIGHTS (quint64)0x0FFFFFFF
 
-namespace Qn{
+namespace Qn {
     const quint64 ExcludingOwnerPermission = GlobalOwnerPermissions & ~GlobalAdminPermissions;
     const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
 }

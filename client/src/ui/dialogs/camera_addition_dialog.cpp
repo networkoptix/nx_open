@@ -25,6 +25,10 @@ namespace {
     const int portAuto = 0;
 }
 
+
+// -------------------------------------------------------------------------- //
+// QnCheckBoxedHeaderView
+// -------------------------------------------------------------------------- //
 QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(QWidget *parent):
     base_type(Qt::Horizontal, parent),
     m_checkState(Qt::Unchecked)
@@ -100,6 +104,9 @@ void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
 }
 
 
+// -------------------------------------------------------------------------- //
+// QnCameraAdditionDialog
+// -------------------------------------------------------------------------- //
 QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     QDialog(parent),
     ui(new Ui::CameraAdditionDialog),
@@ -151,6 +158,10 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 
     updateSubnetMode();
     clearTable();
+
+    /* Set focus on scan button so that placeholder text is visible in ip/url line edit.  */
+    ui->scanButton->setFocus();
+    ui->cameraIpLineEdit->setText(QString());
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
@@ -251,7 +262,7 @@ void QnCameraAdditionDialog::updateSubnetMode() {
     ui->cameraIpLabel->setVisible(!m_subnetMode);
     ui->cameraIpLineEdit->setVisible(!m_subnetMode);
 
-    if (m_subnetMode){
+    if (m_subnetMode) {
         ui->startIPLineEdit->setText(ui->cameraIpLineEdit->text());
         QHostAddress startAddr(ui->startIPLineEdit->text());
         if (startAddr.toIPv4Address()) {

@@ -7,6 +7,7 @@
 #include "camera_settings_tab.h"
 #include "utils/camera_advanced_settings_xml_parser.h"
 #include "ui/workbench/workbench_context_aware.h"
+#include "utils/common/connective.h"
 
 
 namespace Ui {
@@ -17,11 +18,11 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
 
-class QnSingleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
+class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
-    typedef QWidget base_type;
+    typedef Connective<QWidget> base_type;
 
 public:
     explicit QnSingleCameraSettingsWidget(QWidget *parent = NULL);
@@ -121,6 +122,8 @@ private slots:
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
     void updateLicenseText();
+    void updateIpAddressText();
+    void updateWebPageText();
 
 private:
     void setHasCameraChanges(bool hasChanges);
