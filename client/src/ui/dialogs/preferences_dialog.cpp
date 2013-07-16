@@ -172,9 +172,11 @@ void QnPreferencesDialog::submitToSettings() {
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: #Elric re-check if it is needed here.
 
     QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
-    if(!translation.filePaths().isEmpty())
-        m_settings->setTranslationPath(translation.filePaths()[0]);
-    m_settings->setTranslationSuffix(translation.suffix());
+    if(!translation.isEmpty()) {
+        if(!translation.filePaths().isEmpty())
+            m_settings->setTranslationPath(translation.filePaths()[0]);
+        m_settings->setTranslationSuffix(translation.suffix());
+    }
 
     if (m_recordingSettingsWidget)
         m_recordingSettingsWidget->submitToSettings();

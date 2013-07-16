@@ -24,6 +24,8 @@
 
 static const QString MEDIA_SERVER_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" Media Server"));
 static const QString APP_SERVER_NAME(lit("Enterprise Controller"));
+static const QString CLIENT_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" ") + lit(QN_PRODUCT_NAME) + lit(" Client"));
+
 static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
 static const int DEFAUT_PROXY_PORT = 7009;
@@ -174,6 +176,22 @@ void QnSystrayWindow::initTranslations() {
     QnTranslationListModel *model = new QnTranslationListModel(this);
     model->setTranslations(translationManager->loadTranslations());
     ui->languageComboBox->setModel(model);
+
+    // TODO: #Elric code duplication
+    QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), CLIENT_NAME);
+    QString translationPath = clientSettings.value(lit("translationPath")).toString();
+    int index = translationPath.lastIndexOf(lit("client"));
+    if(index != -1)
+        translationPath.replace(index, 6, lit("traytool"));
+    QString translationSuffix = clientSettings.value(lit("translationSuffix")).toString();
+
+    for(int i = 0; i < ui->languageComboBox->count(); i++) {
+        QnTranslation translation = ui->languageComboBox->itemData(i, Qn::TranslationRole).value<QnTranslation>();
+        if(translation.suffix() == translationSuffix || translation.filePaths().contains(translationPath)) {
+            ui->languageComboBox->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
@@ -253,6 +271,26 @@ void QnSystrayWindow::setVisible(bool visible)
     //maximizeAction->setEnabled(!isMaximized());
     m_settingsAction->setEnabled(isMaximized() || !visible);
     QDialog::setVisible(visible);
+}
+
+void QnSystrayWindow::accept() {
+    base_type::accept();
+
+    QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
+    if(!translation.isEmpty()) {
+        // TODO: #Elric code duplication.
+        QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), CLIENT_NAME);
+        clientSettings.setValue(lit("translationSuffix"), translation.suffix()); 
+        
+        QString translationPath;
+        if(!translation.filePaths().isEmpty())
+            translationPath = translation.filePaths()[0];
+        int index = translationPath.lastIndexOf(lit("traytool"));
+        if(index != -1)
+            translationPath.replace(index, 8, lit("client"));
+
+        clientSettings.setValue(lit("translationPath"), translationPath);
+    }
 }
 
 void QnSystrayWindow::closeEvent(QCloseEvent *event)

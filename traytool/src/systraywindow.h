@@ -83,6 +83,7 @@ private:
 class QnSystrayWindow : public QDialog
 {
     Q_OBJECT
+    typedef QDialog base_type;
 
 public:
     QnSystrayWindow( FoundEnterpriseControllersModel* const foundEnterpriseControllersModel );
@@ -93,6 +94,7 @@ public:
     void setVisible(bool visible);
 
 protected:
+    virtual void accept() override;
     virtual void closeEvent(QCloseEvent *event) override;
 
 private slots:
@@ -128,6 +130,7 @@ private slots:
     void onRadioButtonEcsPublicIpChanged();
 
     void at_appServerPassword_textChanged(const QString &text);
+
 private:
     QAction* actionByName(const QString& name);
     QString nameByAction(QAction* action);
