@@ -6,6 +6,8 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 
+#include <translation/translation_list_model.h>
+
 #include <core/resource/resource_directory_browser.h>
 #include <decoders/abstractvideodecoderplugin.h>
 #include <plugins/plugin_manager.h>
@@ -126,10 +128,9 @@ QnPreferencesDialog::~QnPreferencesDialog() {
 void QnPreferencesDialog::initTranslations() {
     QnWorkbenchTranslationManager *translationManager = context()->instance<QnWorkbenchTranslationManager>();
 
-    foreach(const QnTranslation &translation, translationManager->loadTranslations()) {
-        QIcon icon(QString(lit(":/flags/%1.png")).arg(translation.localeCode()));
-        ui->languageComboBox->addItem(icon, translation.languageName(), QVariant::fromValue<QnTranslation>(translation));
-    }
+    QnTranslationListModel *model = new QnTranslationListModel(this);
+    model->setTranslations(context()->instance<QnWorkbenchTranslationManager>()->loadTranslations());
+    ui->languageComboBox->setModel(model);
 }
 
 void QnPreferencesDialog::accept() {
@@ -170,7 +171,7 @@ void QnPreferencesDialog::submitToSettings() {
     checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: #Elric re-check if it is needed here.
 
-    QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex()).value<QnTranslation>();
+    QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
     if(!translation.filePaths().isEmpty())
         m_settings->setTranslationPath(translation.filePaths()[0]);
     m_settings->setTranslationSuffix(translation.suffix());
@@ -208,7 +209,7 @@ void QnPreferencesDialog::updateFromSettings() {
     QString translationPath = m_settings->translationPath();
     QString translationSuffix = m_settings->translationSuffix();
     for(int i = 0; i < ui->languageComboBox->count(); i++) {
-        QnTranslation translation = ui->languageComboBox->itemData(i).value<QnTranslation>();
+        QnTranslation translation = ui->languageComboBox->itemData(i, Qn::TranslationRole).value<QnTranslation>();
         if(translation.suffix() == translationSuffix || translation.filePaths().contains(translationPath)) {
             ui->languageComboBox->setCurrentIndex(i);
             break;
