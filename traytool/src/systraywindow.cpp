@@ -167,19 +167,6 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
 }
 
 void QnSystrayWindow::initTranslations() {
-    QList<QString> prefixes;
-    prefixes.push_back(lit("traytool"));
-    prefixes.push_back(lit("common"));
-    prefixes.push_back(lit("qt"));
-
-    QList<QString> searchPaths;
-    searchPaths.push_back(QLatin1String(":/translations"));
-    searchPaths.push_back(QApplication::applicationDirPath() + QLatin1String("/translations"));
-
-    QnTranslationManager *translationManager = new QnTranslationManager(this);
-    translationManager->setPrefixes(prefixes);
-    translationManager->setSearchPaths(searchPaths);
-
     QnTranslationListModel *model = new QnTranslationListModel(this);
     model->setTranslations(translationManager->loadTranslations());
     ui->languageComboBox->setModel(model);

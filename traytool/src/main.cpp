@@ -10,6 +10,9 @@
 
 #include "systraywindow.h"
 #include "common/common_module.h"
+#include "traytool_translation_manager.h"
+
+static const QString CLIENT_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(QN_PRODUCT_NAME) + lit(" Client"));
 
 
 int main(int argc, char *argv[])
@@ -50,6 +53,25 @@ int main(int argc, char *argv[])
     QnCommonModule common(argc, argv);
 
     QDir::setCurrent(QApplication::applicationDirPath());
+
+
+    QnTraytoolTranslationManager *translationManager = qnCommon->instance<QnTraytoolTranslationManager>();
+    QSettings clientSettings(QSettings::SystemScope, qApp->organizationName(), CLIENT_NAME);
+    QString translationPath = clientSettings.value(lit("translationPath")).toString();
+    int index = translationPath.lastIndexOf(lit("client"));
+    if(index != -1)
+        translationPath.replace(index, 6, lit("traytool"));
+    QString translationSuffix = clientSettings.value(lit("translationSuffix")).toString();
+    QnTranslation translation = translationManager->loadTranslation(translationPath);
+    if(translation.isEmpty()) {
+        foreach(const QnTranslation &otherTranslation, translationManager->loadTranslations()) {
+            if(otherTranslation.suffix() == translationSuffix) {
+                translation = otherTranslation;
+                break;
+            }
+        }
+    }
+    translationManager->loadTranslation(translation);
 
     QString argument = argc > 1 ? lit(argv[1]) : QString();
     if (argument == lit("quit"))
