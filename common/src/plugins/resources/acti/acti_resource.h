@@ -72,7 +72,7 @@ public:
     virtual void onTimer( const quint64& timerID );
 
     static QByteArray unquoteStr(const QByteArray& value);
-    QMap<QByteArray, QByteArray> parseReport(const QByteArray& report) const;
+    QMap<QByteArray, QByteArray> parseSystemInfo(const QByteArray& report) const;
 
     //!Called by http server on receiving message from camera
     void cameraMessageReceived( const QString& path, const QnRequestParamList& message );
@@ -109,7 +109,7 @@ private:
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
     QList<int> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
     void initializePtz();
-    bool initializeIO();
+    void initializeIO( const QMap<QByteArray, QByteArray>& systemInfo );
     bool isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const;
 
 private:

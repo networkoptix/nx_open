@@ -140,7 +140,7 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
     return result;
 }
 
-QMap<QByteArray, QByteArray> QnActiResource::parseReport(const QByteArray& report) const
+QMap<QByteArray, QByteArray> QnActiResource::parseSystemInfo(const QByteArray& report) const
 {
     QMap<QByteArray, QByteArray> result;
     QList<QByteArray> lines = report.split('\n');
@@ -243,10 +243,10 @@ bool QnActiResource::initInternal()
     if (status != CL_HTTP_SUCCESS)
         return false;
 
-    QByteArray serverReport = makeActiRequest(QLatin1String("system"), QLatin1String("SERVER_REPORT"), status, true);
+    QByteArray serverReport = makeActiRequest(QLatin1String("system"), QLatin1String("SYSTEM_INFO"), status, true);
     if (status != CL_HTTP_SUCCESS)
         return false;
-    QMap<QByteArray, QByteArray> report = parseReport(serverReport);
+    QMap<QByteArray, QByteArray> report = parseSystemInfo(serverReport);
     setFirmware(QString::fromUtf8(report.value("firmware version")));
     setMAC(QString::fromUtf8(report.value("mac address")));
     m_platform = report.value("platform").trimmed().toUpper();
@@ -301,7 +301,7 @@ bool QnActiResource::initInternal()
 
     initializePtz();
 
-    initializeIO();
+    initializeIO( report );
 
     setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setParam(MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
@@ -607,25 +607,13 @@ void QnActiResource::initializePtz()
     setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
 }
 
-bool QnActiResource::initializeIO()
+void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInfo )
 {
-    CLHttpStatus status = CL_HTTP_SUCCESS;
-    QByteArray dioResponse = makeActiRequest( QLatin1String("system"), QString::fromLatin1("SYSTEM_INFO"), status );
-    if( status != CL_HTTP_SUCCESS )
-        return false;
+    QMap<QByteArray, QByteArray>::const_iterator it = systemInfo.find( "di" );
+    if( it != systemInfo.end() )
+        m_inputCount = it.value().toInt();
 
-    const QList<QByteArray>& lines = dioResponse.split('\n');
-    foreach( QByteArray line, lines )
-    {
-        const QList<QByteArray>& tokens = line.split('=');
-        if( tokens.size() != 2 )
-            continue;
-        const QByteArray& paramName = tokens[0].trimmed();
-        if( paramName == "DI" )
-            m_inputCount = tokens[1].trimmed().toInt();
-        else if( paramName == "DO" )
-            m_outputCount = tokens[1].trimmed().toInt();
-    }
-
-    return true;
+    it = systemInfo.find( "do" );
+    if( it != systemInfo.end() )
+        m_outputCount = it.value().toInt();
 }

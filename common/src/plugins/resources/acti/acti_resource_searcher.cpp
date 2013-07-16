@@ -147,10 +147,10 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     if (devInfo.info.presentationUrl.isEmpty() || devInfo.timer.elapsed() > CACHE_UPDATE_TIME)
     {
         CLHttpStatus status;
-        QByteArray serverReport = actiRes->makeActiRequest(QLatin1String("system"), QLatin1String("SERVER_REPORT"), status, true);
+        QByteArray serverReport = actiRes->makeActiRequest(QLatin1String("system"), QLatin1String("SYSTEM_INFO"), status, true);
         if (status != CL_HTTP_SUCCESS)
             return result;
-        QMap<QByteArray, QByteArray> report = actiRes->parseReport(serverReport);
+        QMap<QByteArray, QByteArray> report = actiRes->parseSystemInfo(serverReport);
         if (report.isEmpty())
             return result;
 
