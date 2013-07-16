@@ -140,7 +140,9 @@ namespace nx_http
             multipleChoices = 300,
             badRequest = 400,
             unauthorized = 401,
-            internalServerError = 500
+            notFound = 404,
+            internalServerError = 500,
+            notImplemented = 501
         };
 
         StringType toString( Value );

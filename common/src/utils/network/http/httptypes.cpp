@@ -152,8 +152,14 @@ namespace nx_http
                     return StringType("Multiple Choices");
                 case badRequest:
                     return StringType("Bad Request");
+                case unauthorized:
+                    return StringType("Unauthorized");
+                case notFound:
+                    return StringType("Not Found");
                 case internalServerError:
                     return StringType("Internal Server Error");
+                case notImplemented:
+                    return StringType("Not Implemented");
                 default:
                     return QString::fromLatin1( "Unknown_%1" ).arg(val).toLatin1();
             }
