@@ -22,6 +22,15 @@ class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
 
+class QnInitResPool: public QThreadPool
+{
+public:
+    QnInitResPool() : QThreadPool() 
+    {
+        setMaxThreadCount(64);
+    }
+};
+
 class QnResourceParameters: public QMap<QString, QString> {
     typedef QMap<QString, QString> base_type;
 
@@ -140,7 +149,7 @@ public:
 
     // this function is called if resourse changes state from offline to online or so 
     void init();
-    void initAsync();
+    void initAsync(bool optional);
     
     // flags like network media and so on
     Flags flags() const;
@@ -351,8 +360,9 @@ private:
 
     bool m_initialized;    
     QMutex m_initMutex;
+    QMutex m_initAsyncMutex;
 
-    static QThreadPool m_initAsyncPool;
+    static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
 };
 
