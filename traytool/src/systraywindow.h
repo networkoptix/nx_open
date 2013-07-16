@@ -6,7 +6,6 @@
 #include <QStringListModel>
 #include <QSystemTrayIcon>
 
-
 class FoundEnterpriseControllersModel;
 
 class QAction;
@@ -89,7 +88,7 @@ public:
     QnSystrayWindow( FoundEnterpriseControllersModel* const foundEnterpriseControllersModel );
 
     virtual ~QnSystrayWindow();
-    QSystemTrayIcon* getTrayIcon() const { return trayIcon; }
+    QSystemTrayIcon *trayIcon() const { return m_trayIcon; }
     void executeAction(QString cmd);
     void setVisible(bool visible);
 
@@ -153,16 +152,16 @@ private:
     QScopedPointer<Ui::FindAppServerDialog> m_findAppServerDialogUI;
 
     QSettings m_settings;
-    QSettings m_mServerSettings;
+    QSettings m_mediaServerSettings;
     QSettings m_appServerSettings;
 
     QAction *m_showMediaServerLogAction;
     QAction *m_showAppLogAction;
-    QAction *settingsAction;
-    QAction *quitAction;
+    QAction *m_settingsAction;
+    QAction *m_quitAction;
 
-    QSystemTrayIcon *trayIcon;
-    QMenu *trayIconMenu;
+    QSystemTrayIcon *m_trayIcon;
+    QMenu *m_trayIconMenu;
 
     QString m_detailedErrorText;
     QIcon m_iconOK;
@@ -184,7 +183,7 @@ private:
     bool m_needStartAppServer;
     int m_skipTicks;
 
-    typedef QPair<QString, QAction*> NameAndAction;
+    typedef QPair<QString, QAction *> NameAndAction;
     typedef QList<NameAndAction> NameActionList;
 
     int m_prevMediaServerStatus;
@@ -195,7 +194,7 @@ private:
     QQueue<QString> m_delayedMessages;
     QString m_mediaServerServiceName;
     QString m_appServerServiceName;
-    FoundEnterpriseControllersModel* const m_foundEnterpriseControllersModel;
+    FoundEnterpriseControllersModel *const m_foundEnterpriseControllersModel;
 };
 
 #endif
