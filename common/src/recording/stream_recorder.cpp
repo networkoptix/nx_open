@@ -468,6 +468,11 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         qint64 startTime = m_startOffset+mediaData->timestamp/1000;
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_startTime, fileExt), QString::number(startTime).toAscii().data(), 0);
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Software, fileExt), "Network Optix", 0);
+        DewarpingParams resDeworping = mediaDev->getDewarpingParams();
+        if (resDeworping.enabled && !m_devorpingParams.enabled) {
+            // deworping exists in resource and not activated now. Allow deworping for saved file
+            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Dewarping, fileExt), resDeworping.serialize(), 0);
+        }
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature) {
             QByteArray signPattern = QnSignHelper::getSignPattern();
