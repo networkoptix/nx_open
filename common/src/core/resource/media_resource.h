@@ -35,14 +35,10 @@ QString QnStreamQualityToString(QnStreamQuality value);
 QnStreamQuality QnStreamQualityFromString( const QString& str );
 
 /*!
-    \note Derived class MUST call \a init() just after object instanciation
+    \note Derived class MUST call \a initMediaResource() just after object instanciation
 */
-class QnMediaResource /*: virtual public QnResource*/
-//:
-//    public QnFromThisToShared<QnMediaResource>
+class QnMediaResource
 {
-    //Q_OBJECT
-
 public:
     QnMediaResource();
     virtual ~QnMediaResource();
