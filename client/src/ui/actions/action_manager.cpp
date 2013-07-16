@@ -585,7 +585,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::BrowseUrlAction).
         flags(Qn::NoTarget).
-        text(tr("Open in browser..."));
+        text(tr("Open in Browser..."));
 
 
     factory(Qn::PreferencesGeneralTabAction).
@@ -699,13 +699,13 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        text(tr("Open in a New Tab")).
+        text(tr("Open in New Tab")).
         conditionalText(tr("Monitor in a New Tab"), hasFlags(QnResource::server), Qn::All).
         condition(new QnOpenInNewEntityActionCondition(this));
 
     factory(Qn::OpenInNewWindowAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        text(tr("Open in a New Window")).
+        text(tr("Open in New Window")).
         conditionalText(tr("Monitor in a New Window"), hasFlags(QnResource::server), Qn::All).
         condition(new QnOpenInNewEntityActionCondition(this));
 

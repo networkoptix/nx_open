@@ -21,7 +21,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags 
     m_applyButton = m_buttonBox->button(QDialogButtonBox::Apply);
     m_okButton = m_buttonBox->button(QDialogButtonBox::Ok);
     
-    m_openButton = new QPushButton(tr("Open in Layout"));
+    m_openButton = new QPushButton(tr("Open in New Tab"));
     m_buttonBox->addButton(m_openButton, QDialogButtonBox::HelpRole);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
