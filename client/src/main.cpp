@@ -365,7 +365,6 @@ int main(int argc, char **argv)
         qnSettings->save();
         cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
-        QnWorkbenchTranslationManager::installTranslation(translationPath);
         QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
 
@@ -458,6 +457,7 @@ int main(int argc, char **argv)
         /* Create workbench context. */
         QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
         context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
+        context->instance<QnWorkbenchTranslationManager>()->installTranslation(translationPath);
 
         /* Create main window. */
         QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
