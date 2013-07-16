@@ -64,7 +64,7 @@ public:
     virtual const QnResourcePtr toResourcePtr() const = 0;
     virtual QnResourcePtr toResourcePtr() = 0;
 
-    virtual bool isFisheye() const { return true; }
+    virtual bool isFisheye() const;
     DewarpingParams getDewarpingParams() const;
     void setDewarpingParams(const DewarpingParams& params);
 

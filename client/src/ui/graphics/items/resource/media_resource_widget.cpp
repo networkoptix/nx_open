@@ -73,11 +73,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
-
-    if (m_resource->isFisheye()) {
-        m_ptzController = new QnFisheyePtzController(base_type::resource().data());
-        connect(m_ptzController, SIGNAL(dewarpingParamsChanged(DewarpingParams)), this, SLOT(at_dewarpingParamsChanged(DewarpingParams)));
-    }
+    m_camera = base_type::resource().dynamicCast<QnVirtualCameraResource>();
 
 
     // TODO: #Elric
@@ -86,8 +82,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     QGraphicsView *view = QnWorkbenchContextAware::display()->view();
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
-    if (m_ptzController)
-        m_ptzController->addRenderer(m_renderer);
+    updateFisheyeController();
     connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
     connect(m_resource->toResource(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
     connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(updateDisplay()));
@@ -121,6 +116,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(updateButtonsVisibility()));
+    connect(resource()->toResource(), SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(updateButtonsVisibility()));
 
     QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget();
     zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
@@ -150,7 +146,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         connect(m_camera.data(),    SIGNAL(statusChanged(const QnResourcePtr &)),                       this,   SLOT(updateIconButton()));
         connect(m_camera.data(),    SIGNAL(scheduleTasksChanged(const QnSecurityCamResourcePtr &)),     this,   SLOT(updateIconButton()));
         connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)),this,   SLOT(updateButtonsVisibility()));
-
+        connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)),this,   SLOT(updateFisheyeController()));
         timer->start(1000 * 60); /* Update icon button every minute. */
     }
 
@@ -165,6 +161,22 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateAspectRatio();
     updateCursor();
     setImageEnhancement(item->imageEnhancement());
+}
+
+void QnMediaResourceWidget::updateFisheyeController()
+{
+    if (m_resource->isFisheye()) 
+    {
+        if (!m_ptzController) {
+            m_ptzController = new QnFisheyePtzController(base_type::resource().data());
+            connect(m_ptzController, SIGNAL(dewarpingParamsChanged(DewarpingParams)), this, SLOT(at_dewarpingParamsChanged(DewarpingParams)));
+            m_ptzController->addRenderer(m_renderer);
+        }
+    }
+    else {
+        delete m_ptzController;
+        m_ptzController = 0;
+    }
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -847,7 +859,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     bool ptzEnabled = checked && ( m_ptzController ||
-                                   m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability));
+                                   m_camera && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)));
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);

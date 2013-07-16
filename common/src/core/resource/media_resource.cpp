@@ -118,5 +118,17 @@ DewarpingParams QnMediaResource::getDewarpingParams() const
 
 void QnMediaResource::setDewarpingParams(const DewarpingParams& params)
 {
+    bool capsChanged = params.enabled != m_devorpingParams.enabled;
     m_devorpingParams = params;
+    if (capsChanged) {
+        if (params.enabled)
+            setPtzCapabilities(Qn::AllPtzCapabilities);
+        else
+            setPtzCapabilities(Qn::NoPtzCapabilities);
+    }
+}
+
+bool QnMediaResource::isFisheye() const
+{
+    return m_devorpingParams.enabled;
 }

@@ -145,6 +145,7 @@ private slots:
     void at_camDisplay_liveChanged();
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
     void at_dewarpingParamsChanged(DewarpingParams params);
+    void updateFisheyeController();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
 

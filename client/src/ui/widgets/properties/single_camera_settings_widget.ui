@@ -275,6 +275,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBoxDewarping">
+         <property name="text">
+          <string>Turn on dewarping controls</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
