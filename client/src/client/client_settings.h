@@ -45,7 +45,8 @@ public:
         DEBUG_COUNTER,
 
         EXTRA_TRANSLATIONS_PATH,
-        TRANSLATION_PATH,
+        TRANSLATION_PATH, 
+        TRANSLATION_SUFFIX,
 
         EXTRA_PTZ_MAPPINGS_PATH,
 
@@ -130,7 +131,8 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0)
         QN_DECLARE_RW_PROPERTY(QString,                     extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
-        QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
+        QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setTranslationPath,         TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
+        QN_DECLARE_RW_PROPERTY(QString,                     translationSuffix,      setTranslationSuffix,       TRANSLATION_SUFFIX,         QString())
         QN_DECLARE_RW_PROPERTY(QUrl,                        updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QUrl())
         QN_DECLARE_RW_PROPERTY(bool,                        isUpdatesEnabled,       setUpdatesEnabled,          UPDATES_ENABLED,            true)
         QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,           ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())

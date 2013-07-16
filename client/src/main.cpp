@@ -298,7 +298,7 @@ int main(int argc, char **argv)
         bool noSingleApplication = false;
         int screen = -1;
         QString authenticationString, delayedDrop, instantDrop, logLevel;
-        QString translationPath = qnSettings->translationPath();
+        QString translationPath;
         bool devBackgroundEditable = false;
         bool skipMediaFolderScan = false;
         bool noFullScreen = false;
@@ -365,7 +365,6 @@ int main(int argc, char **argv)
         qnSettings->save();
         cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
-        QnWorkbenchTranslationManager::installTranslation(translationPath);
         QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
 
@@ -458,6 +457,27 @@ int main(int argc, char **argv)
         /* Create workbench context. */
         QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
         context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
+
+        /* Load translation. */
+        QnWorkbenchTranslationManager *translationManager = context->instance<QnWorkbenchTranslationManager>();
+        QnTranslation translation;
+        if(!translationPath.isEmpty()) /* From command line. */
+            translation = translationManager->loadTranslation(translationPath);
+
+        if(translation.isEmpty()) { /* By suffix. */
+            QString suffix = qnSettings->translationSuffix();
+            foreach(const QnTranslation &otherTranslation, translationManager->loadTranslations()) {
+                if(otherTranslation.suffix() == suffix) {
+                    translation = otherTranslation;
+                    break;
+                }
+            }
+        }
+
+        if(translation.isEmpty()) /* By path. */
+            translation = translationManager->loadTranslation(qnSettings->translationPath());
+
+        translationManager->installTranslation(translation);
 
         /* Create main window. */
         QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));

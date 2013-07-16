@@ -62,6 +62,7 @@ void QnResourceListModel::removeResource(const QnResourcePtr &resource) {
         return;
 
     beginResetModel();
+
     for (int i = 0; i < m_resources.size(); ++i) {
         if (m_resources[i]->getId() == resource->getId()) { // TODO: #Elric check by pointer, not id. Makes no sense.
             disconnect(m_resources[i].data(), NULL, this, NULL);
