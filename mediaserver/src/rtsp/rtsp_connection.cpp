@@ -867,7 +867,7 @@ void QnRtspConnectionProcessor::createDataProvider()
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
         if (cameraRes && !cameraRes->isInitialized() && !cameraRes->isDisabled())
-            cameraRes->initAsync();
+            cameraRes->initAsync(true);
     }
     if (camera && d->liveMode == Mode_Live)
     {

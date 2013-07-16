@@ -357,7 +357,7 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
         if (!camera->isInitialized() && !camera->isDisabled()) {
-            camera->initAsync();
+            camera->initAsync(false);
         }
 
 		QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
@@ -406,7 +406,7 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
             m_onlineCameras.insert(camera); // TODO: merge into at_camera_statusChanged
 
         if (!camera->isInitialized() && !camera->isDisabled() && !camera->isScheduleDisabled())
-            camera->initAsync();
+            camera->initAsync(true);
 
         connect(camera.data(), SIGNAL(statusChanged(const QnResourcePtr &)),            this, SLOT(at_camera_statusChanged(const QnResourcePtr &)));
         connect(camera.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),          this, SLOT(at_camera_resourceChanged(const QnResourcePtr &)));
