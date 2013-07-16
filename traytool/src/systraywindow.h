@@ -137,6 +137,8 @@ private:
     void createActions();
     void createTrayIcon();
 
+    void initTranslations();
+
     void updateServiceInfoInternal(SC_HANDLE service, DWORD status, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction);
     bool validateData();
     void saveData();
@@ -147,6 +149,7 @@ private:
     bool isAppServerParamChanged() const;
     bool isMediaServerParamChanged() const;
 
+private:
     QScopedPointer<Ui::SettingsDialog> ui;
     QScopedPointer<QDialog> m_findAppServerDialog;
     QScopedPointer<Ui::FindAppServerDialog> m_findAppServerDialogUI;

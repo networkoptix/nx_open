@@ -3,6 +3,9 @@
 
 #include <utils/network/foundenterprisecontrollersmodel.h>
 
+#include <translation/translation_manager.h>
+#include <translation/translation_list_model.h>
+
 #include "systraywindow.h"
 #include "ui_settings.h"
 #include "ui_findappserverdialog.h"
@@ -153,12 +156,33 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
 
     connect(ui->appServerPassword, SIGNAL(textChanged(const QString &)), this, SLOT(at_appServerPassword_textChanged(const QString &)));
 
+    initTranslations();
+
     m_mediaServerStartAction->setVisible(false);
     m_mediaServerStopAction->setVisible(false);
     m_showMediaServerLogAction->setVisible(false);
     m_appServerStartAction->setVisible(false);
     m_appServerStopAction->setVisible(false);
     m_showAppLogAction->setVisible(false);
+}
+
+void QnSystrayWindow::initTranslations() {
+    QList<QString> prefixes;
+    prefixes.push_back(lit("traytool"));
+    prefixes.push_back(lit("common"));
+    prefixes.push_back(lit("qt"));
+
+    QList<QString> searchPaths;
+    searchPaths.push_back(QLatin1String(":/translations"));
+    searchPaths.push_back(QApplication::applicationDirPath() + QLatin1String("/translations"));
+
+    QnTranslationManager *translationManager = new QnTranslationManager(this);
+    translationManager->setPrefixes(prefixes);
+    translationManager->setSearchPaths(searchPaths);
+
+    QnTranslationListModel *model = new QnTranslationListModel(this);
+    model->setTranslations(translationManager->loadTranslations());
+    ui->languageComboBox->setModel(model);
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
