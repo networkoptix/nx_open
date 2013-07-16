@@ -495,14 +495,14 @@ void QnMServerResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res, 
             {
                 if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
                 {
-                    rpNetRes->initAsync();
+                    rpNetRes->initAsync(false);
                     //rpNetRes->setStatus(QnResource::Online);
                 }
 
             }
             else if (!rpNetRes->isInitialized())
             {
-                rpNetRes->initAsync(); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
+                rpNetRes->initAsync(false); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
                 //if (rpNetRes->isInitialized() && rpNetRes->getStatus() == QnResource::Unauthorized)
                 //    rpNetRes->setStatus(QnResource::Online);
             }

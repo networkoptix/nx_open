@@ -22,7 +22,8 @@
 #include "utils/common/util.h"
 
 bool QnResource::m_appStopping = false;
-QThreadPool QnResource::m_initAsyncPool;
+QnInitResPool QnResource::m_initAsyncPool;
+
 
 static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 
@@ -820,7 +821,6 @@ void QnResource::init()
 
     if (!m_initialized) 
     {
-        m_lastInitTime = getUsecTimer();
         m_initialized = initInternal();
         if( m_initialized )
             initializationDone();
@@ -855,13 +855,27 @@ void QnResource::stopAsyncTasks()
 }
 
 
-void QnResource::initAsync()
+void QnResource::initAsync(bool optional)
 {
-    if (getUsecTimer() - m_lastInitTime < MIN_INIT_INTERVAL)
+    qint64 t = getUsecTimer();
+
+    QMutexLocker lock(&m_initAsyncMutex);
+
+    if (t - m_lastInitTime < MIN_INIT_INTERVAL)
         return; 
 
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
-    m_initAsyncPool.start(task);
+    if (optional) {
+        if (m_initAsyncPool.tryStart(task))
+            m_lastInitTime = t;
+        else
+            delete task;
+    }
+    else {
+        m_lastInitTime = t;
+        m_initAsyncMutex.unlock();
+        m_initAsyncPool.start(task);
+    }
 }
 
 bool QnResource::isInitialized() const
