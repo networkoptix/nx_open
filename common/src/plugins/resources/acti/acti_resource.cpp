@@ -12,6 +12,8 @@
 #include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
 #include "acti_ptz_controller.h"
+#include "rest/server/rest_connection_processor.h"
+#include "common/global_settings.h"
 
 
 const char* QnActiResource::MANUFACTURE = "ACTI";
@@ -23,9 +25,13 @@ QString DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
 QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 static int DEFAULT_AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
 
-QnActiResource::QnActiResource():
+QnActiResource::QnActiResource()
+:
     m_rtspPort(DEFAULT_RTSP_PORT),
-    m_hasAudio(false)
+    m_hasAudio(false),
+    m_outputCount(0),
+    m_inputCount(0),
+    m_inputMonitored(false)
 {
     setAuth(QLatin1String("admin"), QLatin1String("123456"));
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
@@ -34,6 +40,18 @@ QnActiResource::QnActiResource():
 
 QnActiResource::~QnActiResource()
 {
+    QMutexLocker lk( &m_dioMutex );
+    for( std::map<quint64, TriggerOutputTask>::iterator
+        it = m_triggerOutputTasks.begin();
+        it != m_triggerOutputTasks.end();
+         )
+    {
+        const quint64 taskID = it->first;
+        m_triggerOutputTasks.erase( it++ );
+        lk.unlock();
+        TimerManager::instance()->joinAndDeleteTimer( taskID );
+        lk.relock();
+    }
 }
 
 QString QnActiResource::getDriverName() const
@@ -81,7 +99,7 @@ QByteArray QnActiResource::unquoteStr(const QByteArray& v)
     return value.mid(pos1, value.length()-pos1-pos2);
 }
 
-QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData) const
+QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData, QString* const localAddress) const
 {
     QByteArray result;
 
@@ -91,6 +109,8 @@ QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& 
     QString pattern(QLatin1String("cgi-bin/%1?USER=%2&PWD=%3&%4"));
     status = client.doGET(pattern.arg(group).arg(auth.user()).arg(auth.password()).arg(command));
     if (status == CL_HTTP_SUCCESS) {
+        if( localAddress )
+            *localAddress = client.localAddress();
         client.readAll(result);
         if (result.startsWith("ERROR: bad account")) {
             status = CL_HTTP_AUTH_REQUIRED; 
@@ -130,6 +150,42 @@ QMap<QByteArray, QByteArray> QnActiResource::parseReport(const QByteArray& repor
     }
 
     return result;
+}
+
+static const QLatin1String CAMERA_EVENT_ACTIVATED_PARAM_NAME( "activated" );
+static const QLatin1String CAMERA_EVENT_DEACTIVATED_PARAM_NAME( "deactivated" );
+static const QLatin1String CAMERA_INPUT_NUMBER_PARAM_NAME( "di" );
+
+void QnActiResource::cameraMessageReceived( const QString& path, const QnRequestParamList& /*params*/ )
+{
+    const QStringList& pathItems = path.split(QLatin1Char('/'));
+    if( pathItems.isEmpty() )
+        return;
+
+    QString inputNumber;
+    bool isActivated = false;
+    for( QStringList::const_iterator
+        it = pathItems.begin();
+        it != pathItems.end();
+        ++it )
+    {
+        const QStringList& tokens = it->split(QLatin1Char('='));
+        if( tokens.isEmpty() )
+            continue;
+
+        if( tokens[0] == CAMERA_EVENT_ACTIVATED_PARAM_NAME )
+            isActivated = true;
+        else if( tokens[0] == CAMERA_EVENT_DEACTIVATED_PARAM_NAME )
+            isActivated = false;
+        else if( tokens.size() > 1 && tokens[0] == CAMERA_INPUT_NUMBER_PARAM_NAME )
+            inputNumber = tokens[1];
+    }
+
+    emit cameraInput(
+        toSharedPointer(),
+        inputNumber,
+        isActivated,
+        QDateTime::currentMSecsSinceEpoch() );
 }
 
 QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
@@ -243,8 +299,9 @@ bool QnActiResource::initInternal()
     if (!bitrateCap.isEmpty())
         m_availBitrate = parseVideoBitrateCap(bitrateCap);
 
-
     initializePtz();
+
+    initializeIO();
 
     setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setParam(MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
@@ -257,6 +314,132 @@ bool QnActiResource::initInternal()
 bool QnActiResource::isResourceAccessible()
 {
     return updateMACAddress();
+}
+
+bool QnActiResource::startInputPortMonitoring()
+{
+    if( Qn::GlobalSettings::instance()->httpPort() == 0 )
+        return false;   //no http listener is present
+
+    //considering, that we have excusive access to the camera, so rewriting existing event setup
+
+    //monitoring all input ports
+    CLHttpStatus responseStatusCode = CL_HTTP_SUCCESS;
+
+        //setting Digital Input Active Level
+            //GET /cgi-bin/cmd/encoder?EVENT_DI1&EVENT_DI2&EVENT_RSPDO1&EVENT_RSPDO2 HTTP/1.1\r\n
+            //response:
+            //EVENT_DI1='0,10'\n
+            //EVENT_DI2='0,0'\n
+            //EVENT_RSPDO1='1,0'\n
+            //ERROR: EVENT_RSPDO2 not found\n
+
+    QString eventStr;
+    for( int i = 0; i < m_inputCount; ++i )
+    {
+        if( !eventStr.isEmpty() )
+            eventStr += QString::fromLatin1("&");
+        eventStr += QString::fromLatin1("EVENT_DI%1='0,0'").arg(i+1);
+    }
+    QString localInterfaceAddress;  //determining address of local interface, used to connect to camera
+    QByteArray responseMsgBody = makeActiRequest(QLatin1String("encoder"), eventStr, responseStatusCode, false, &localInterfaceAddress);
+    if( responseStatusCode != CL_HTTP_SUCCESS )
+        return false;
+
+    static const int EVENT_HTTP_SERVER_NUMBER = 1;
+    static const int MAX_CONNECTION_TIME_SEC = 7;
+
+        //registering itself as event server
+            //GET /cgi-bin/cmd/encoder?FTP_SERVER&HTTP_SERVER&SMTP_SEC&SMTP_PRI HTTP/1.1\r\n
+            //response:
+            //FTP_SERVER=',,,21,0,10000'\n
+            //HTTP_SERVER='1,1,192.168.0.101,3451,hz,hz,10'\n
+            //HTTP_SERVER='2,0,,80,,,10'\n
+            //SMTP_SEC='0,2,,,,,25,110,10'\n
+
+            //GET /cgi-bin/cmd/encoder?HTTP_SERVER=1,1,192.168.0.101,3451,hz,hzhz,10 HTTP/1.1\r\n
+            //response:
+            //OK: HTTP_SERVER='1,1,192.168.0.101,3451,hz,hzhz,10'\n
+    responseMsgBody = makeActiRequest(
+        QLatin1String("encoder"),
+        QString::fromLatin1("HTTP_SERVER=%1,1,%2,%3,guest,guest,%4").arg(EVENT_HTTP_SERVER_NUMBER).arg(localInterfaceAddress).arg(Qn::GlobalSettings::instance()->httpPort()).arg(MAX_CONNECTION_TIME_SEC),
+        responseStatusCode );
+    if( responseStatusCode != CL_HTTP_SUCCESS )
+        return false;
+
+    //registering URL commands (one command per input port)
+        //GET /cgi-bin/cmd/encoder?EVENT_RSPCMD1=1,[api/camera_event/98/di/activated],[api/camera_event/98/di/deactivated]&EVENT_RSPCMD2=1,[],[]&EVENT_RSPCMD3=1,[],[]
+
+    const QString cgiPath = QString::fromLatin1("api/camera_event/%1/di").arg(this->getId());
+    QString setupURLCommandRequestStr;
+    for( int i = 1; i <= m_inputCount; ++i )
+    {
+        if( !setupURLCommandRequestStr.isEmpty() )
+            setupURLCommandRequestStr += QLatin1String("&");
+        setupURLCommandRequestStr += QString::fromLatin1("EVENT_RSPCMD%1=%2,[%3/%4/di=%1],[%3/%5/di=%1]").arg(i).arg(EVENT_HTTP_SERVER_NUMBER).arg(cgiPath).arg(CAMERA_EVENT_ACTIVATED_PARAM_NAME).arg(CAMERA_EVENT_DEACTIVATED_PARAM_NAME);
+    }
+    responseMsgBody = makeActiRequest(
+        QLatin1String("encoder"),
+        setupURLCommandRequestStr,
+        responseStatusCode );
+    if( responseStatusCode != CL_HTTP_SUCCESS )
+        return false;
+
+
+        //registering events (one event per input port)
+            //GET /cgi-bin/cmd/encoder?EVENT_CONFIG HTTP/1.1\r\n
+            //response:
+            //EVENT_CONFIG='1,1,1234567,00:00,24:00,DI1,MSG1'\n
+            //EVENT_CONFIG='2,0,1234567,00:00,24:00,NONE,NONE'\n
+            //EVENT_CONFIG='3,0,1234567,00:00,24:00,NONE,NONE'\n
+
+            //GET /cgi-bin/cmd/encoder?EVENT_CONFIG=1,1,1234567,00:00,24:00,DI1,MSG1 HTTP/1.1\r\n
+            //response:
+            //OK: EVENT_CONFIG='1,1,1234567,00:00,24:00,DI1,MSG1'\n
+    QString registerEventRequestStr;
+    for( int i = 1; i <= m_inputCount; ++i )
+    {
+        if( !registerEventRequestStr.isEmpty() )
+            registerEventRequestStr += QLatin1String("&");
+        registerEventRequestStr += QString::fromLatin1("EVENT_CONFIG=%1,1,1234567,00:00,24:00,DI%1,CMD%1").arg(i);
+    }
+    responseMsgBody = makeActiRequest(
+        QLatin1String("encoder"),
+        registerEventRequestStr,
+        responseStatusCode );
+    if( responseStatusCode != CL_HTTP_SUCCESS )
+        return false;
+
+    m_inputMonitored = true;
+
+    return true;
+}
+
+void QnActiResource::stopInputPortMonitoring()
+{
+    if( Qn::GlobalSettings::instance()->httpPort() == 0 )
+        return;   //no http listener is present
+
+        //unregistering events
+    QString registerEventRequestStr;
+    for( int i = 1; i <= m_inputCount; ++i )
+    {
+        if( !registerEventRequestStr.isEmpty() )
+            registerEventRequestStr += QLatin1String("&");
+        registerEventRequestStr += QString::fromLatin1("EVENT_CONFIG=%1,0,1234567,00:00,24:00,DI%1,CMD%1").arg(i);
+    }
+    CLHttpStatus responseStatusCode = CL_HTTP_SUCCESS;
+    makeActiRequest(
+        QLatin1String("encoder"),
+        registerEventRequestStr,
+        responseStatusCode );
+
+    m_inputMonitored = false;
+}
+
+bool QnActiResource::isInputPortMonitored() const
+{
+    return m_inputMonitored;
 }
 
 const QnResourceAudioLayout* QnActiResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
@@ -345,6 +528,75 @@ QnAbstractPtzController* QnActiResource::getPtzController()
     return m_ptzController.data();
 }
 
+QStringList QnActiResource::getRelayOutputList() const
+{
+    QStringList outputIDStrList;
+    for( int i = 1; i <= m_outputCount; ++i )
+        outputIDStrList << QString::number(i);
+    return outputIDStrList;
+}
+
+QStringList QnActiResource::getInputPortList() const
+{
+    QStringList inputIDStrList;
+    for( int i = 1; i <= m_inputCount; ++i )
+        inputIDStrList << QString::number(i);
+    return inputIDStrList;
+}
+
+static const int MIN_DIO_PORT_NUMBER = 1;
+static const int MAX_DIO_PORT_NUMBER = 2;
+
+bool QnActiResource::setRelayOutputState(
+    const QString& ouputID,
+    bool activate,
+    unsigned int autoResetTimeoutMS )
+{
+    QMutexLocker lk( &m_dioMutex );
+
+    bool outputNumberOK = true;
+    const int outputNumber = ouputID.toInt(&outputNumberOK);
+    if( !outputNumberOK )
+        return false;
+    if( outputNumber < MIN_DIO_PORT_NUMBER || outputNumber > m_outputCount )
+        return false;
+
+    const quint64 timerID = TimerManager::instance()->addTimer( this, 0 );
+    m_triggerOutputTasks.insert( std::make_pair( timerID, TriggerOutputTask( outputNumber, activate, autoResetTimeoutMS ) ) );
+    return true;
+}
+
+void QnActiResource::onTimer( const quint64& timerID )
+{
+    TriggerOutputTask triggerOutputTask;
+    {
+        QMutexLocker lk( &m_dioMutex );
+        std::map<quint64, TriggerOutputTask>::iterator it = m_triggerOutputTasks.find( timerID );
+        if( it == m_triggerOutputTasks.end() )
+            return;
+
+        triggerOutputTask = it->second;
+        m_triggerOutputTasks.erase( it );
+    }
+
+    const int dioOutputMask =
+        1 << (4 + triggerOutputTask.outputID - 1) | //signalling output port id we refer to
+        (triggerOutputTask.active ? (1 << (triggerOutputTask.outputID-1)) : 0);        //signalling new port state
+
+    CLHttpStatus status = CL_HTTP_SUCCESS;
+    QByteArray dioResponse = makeActiRequest(
+        QLatin1String("encoder"),
+        QString::fromLatin1("DIO_OUTPUT=0x%1").arg(dioOutputMask, 2, 16, QLatin1Char('0')),
+        status );
+    if( status != CL_HTTP_SUCCESS )
+        return;
+
+    if( triggerOutputTask.autoResetTimeoutMS > 0 )
+        m_triggerOutputTasks.insert( std::make_pair(
+            TimerManager::instance()->addTimer( this, triggerOutputTask.autoResetTimeoutMS ),
+            TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, triggerOutputTask.autoResetTimeoutMS ) ) );
+}
+
 void QnActiResource::initializePtz()
 {
     m_ptzController.reset(new QnActiPtzController(this));
@@ -353,4 +605,27 @@ void QnActiResource::initializePtz()
         m_ptzController.reset();
 
     setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
+}
+
+bool QnActiResource::initializeIO()
+{
+    CLHttpStatus status = CL_HTTP_SUCCESS;
+    QByteArray dioResponse = makeActiRequest( QLatin1String("system"), QString::fromLatin1("SYSTEM_INFO"), status );
+    if( status != CL_HTTP_SUCCESS )
+        return false;
+
+    const QList<QByteArray>& lines = dioResponse.split('\n');
+    foreach( QByteArray line, lines )
+    {
+        const QList<QByteArray>& tokens = line.split('=');
+        if( tokens.size() != 2 )
+            continue;
+        const QByteArray& paramName = tokens[0].trimmed();
+        if( paramName == "DI" )
+            m_inputCount = tokens[1].trimmed().toInt();
+        else if( paramName == "DO" )
+            m_outputCount = tokens[1].trimmed().toInt();
+    }
+
+    return true;
 }
