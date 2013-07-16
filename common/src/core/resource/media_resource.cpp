@@ -89,27 +89,6 @@ void QnMediaResource::initMediaResource()
     toResource()->addFlags(QnResource::media);
 }
 
-Qn::PtzCapabilities QnMediaResource::getPtzCapabilities() const
-{
-    QVariant mediaVariant;
-    QnResource* thisCasted = const_cast<QnResource*>(toResource());
-    thisCasted->getParam(QLatin1String("ptzCapabilities"), mediaVariant, QnDomainMemory);
-    return Qn::undeprecatePtzCapabilities(static_cast<Qn::PtzCapabilities>(mediaVariant.toInt()));
-}
-
-bool QnMediaResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
-{
-    return getPtzCapabilities() & capabilities;
-}
-
-void QnMediaResource::setPtzCapabilities(Qn::PtzCapabilities capabilities) {
-    toResource()->setParam(lit("ptzCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
-}
-
-void QnMediaResource::setPtzCapability(Qn::PtzCapabilities capability, bool value) {
-    setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
-}
-
 DewarpingParams QnMediaResource::getDewarpingParams() const
 {
     return m_devorpingParams;
@@ -122,9 +101,9 @@ void QnMediaResource::setDewarpingParams(const DewarpingParams& params)
     m_devorpingParams = params;
     if (capsChanged) {
         if (params.enabled)
-            setPtzCapabilities(Qn::AllPtzCapabilities);
+            toResource()->setPtzCapabilities(Qn::AllPtzCapabilities);
         else
-            setPtzCapabilities(Qn::NoPtzCapabilities);
+            toResource()->setPtzCapabilities(Qn::NoPtzCapabilities);
     }
 }
 

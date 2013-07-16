@@ -566,7 +566,7 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
     }
 }
 
-void PtzInstrument::updateCapabilities(const QnSecurityCamResourcePtr &resource) {
+void PtzInstrument::updateCapabilities(const QnResourcePtr &resource) {
     foreach(QnResourceWidget *widget, display()->widgets(resource))
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
             updateCapabilities(mediaWidget);
@@ -582,7 +582,7 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
         data.capabilities = widget->virtualPtzController()->getCapabilities();
     }
     else {
-        data.capabilities = widget->resource()->getPtzCapabilities();
+        data.capabilities = widget->resource()->toResource()->getPtzCapabilities();
         QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
         if (camera)
             mapper = m_mapperWatcher->mapper(camera);
@@ -1073,8 +1073,7 @@ void PtzInstrument::finishDragProcess(DragInfo *info) {
 }
 
 void PtzInstrument::at_display_resourceAdded(const QnResourcePtr &resource) {
-    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-        connect(camera, SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)), this, SLOT(updateCapabilities(const QnSecurityCamResourcePtr &)));
+    connect(resource, SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SLOT(updateCapabilities(const QnResourcePtr  &)));
 }
 
 void PtzInstrument::at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource) {

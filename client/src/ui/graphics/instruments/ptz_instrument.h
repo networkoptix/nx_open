@@ -77,7 +77,7 @@ private slots:
 
     void updateOverlayWidget();
     void updateOverlayWidget(QnMediaResourceWidget *widget);
-    void updateCapabilities(const QnSecurityCamResourcePtr &resource);
+    void updateCapabilities(const QnResourcePtr &resource);
     void updateCapabilities(QnMediaResourceWidget *widget);
 
 private:

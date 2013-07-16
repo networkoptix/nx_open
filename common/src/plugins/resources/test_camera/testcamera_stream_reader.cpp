@@ -139,10 +139,10 @@ bool QnTestCameraStreamReader::isStreamOpened() const
 
 void QnTestCameraStreamReader::updateStreamParamsBasedOnQuality()
 {
-
+    pleaseReOpen();
 }
 
 void QnTestCameraStreamReader::updateStreamParamsBasedOnFps()
 {
-
+    pleaseReOpen();
 }

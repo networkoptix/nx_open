@@ -86,6 +86,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
     connect(m_resource->toResource(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
     connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(updateDisplay()));
+    connect(resource()->toResource(),      SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)),       this,   SLOT(updateButtonsVisibility()));
+    connect(resource()->toResource(),      SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)),       this,   SLOT(updateFisheyeController()));
     updateDisplay();
 
     /* Set up static text. */
@@ -146,7 +148,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         connect(m_camera.data(),    SIGNAL(statusChanged(const QnResourcePtr &)),                       this,   SLOT(updateIconButton()));
         connect(m_camera.data(),    SIGNAL(scheduleTasksChanged(const QnSecurityCamResourcePtr &)),     this,   SLOT(updateIconButton()));
         connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)),this,   SLOT(updateButtonsVisibility()));
-        connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)),this,   SLOT(updateFisheyeController()));
         timer->start(1000 * 60); /* Update icon button every minute. */
     }
 

@@ -64,17 +64,11 @@ public:
     DewarpingParams getDewarpingParams() const;
     void setDewarpingParams(const DewarpingParams& params);
 
-
-    Qn::PtzCapabilities getPtzCapabilities() const;
-    bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
-    void setPtzCapabilities(Qn::PtzCapabilities capabilities);
-    void setPtzCapability(Qn::PtzCapabilities capability, bool value);
-
+protected:
+    void initMediaResource();
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
     DewarpingParams m_devorpingParams;
-
-    void initMediaResource();
 };
 
 #endif // QN_MEDIA_RESOURCE_H

@@ -45,8 +45,8 @@ void QnWorkbenchPtzCameraWatcher::at_resourcePool_resourceAdded(const QnResource
     if(!camera)
         return;
 
-    connect(camera.data(), SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)), this, SLOT(at_resource_cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)));
-    at_resource_cameraCapabilitiesChanged(camera);
+    connect(camera.data(), SIGNAL(ptzCapabilitiesChanged(const QnSecurityCamResourcePtr &)), this, SLOT(at_resource_ptzCapabilitiesChanged(const QnSecurityCamResourcePtr &)));
+    at_resource_ptzCapabilitiesChanged(camera);
 }
 
 void QnWorkbenchPtzCameraWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -54,13 +54,14 @@ void QnWorkbenchPtzCameraWatcher::at_resourcePool_resourceRemoved(const QnResour
     if(!camera)
         return;
 
-    disconnect(camera.data(), NULL, this, NULL);
+    disconnect(resource.data(), NULL, this, NULL);
     removePtzCamera(camera);
 }
 
-void QnWorkbenchPtzCameraWatcher::at_resource_cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource) {
+void QnWorkbenchPtzCameraWatcher::at_resource_ptzCapabilitiesChanged(const QnResourcePtr &resource) 
+{
     if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
-        if(camera->getCameraCapabilities() & Qn::AllPtzCapabilities) {
+        if(resource->getPtzCapabilities() & Qn::AllPtzCapabilities) {
             addPtzCamera(camera);
         } else {
             removePtzCamera(camera);
