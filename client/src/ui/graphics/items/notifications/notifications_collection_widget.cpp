@@ -134,8 +134,7 @@ void QnBlinkingImageButtonWidget::at_particle_visibleChanged() {
 
 QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
-    QnWorkbenchContextAware(context),
-    m_blinker(NULL)
+    QnWorkbenchContextAware(context)
 {
     m_headerWidget = new GraphicsWidget(this);
 
@@ -232,21 +231,22 @@ void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF &rec
 void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *blinker) {
     if (m_blinker)
         disconnect(m_list, 0, m_blinker, 0);
+    
     m_blinker = blinker;
+    
     if (m_blinker) {
-        connect(m_list, SIGNAL(itemCountChanged(int)), m_blinker, SLOT(setNotificationCount(int)));
-        connect(m_list, SIGNAL(itemColorChanged(QColor)), m_blinker, SLOT(setColor(QColor)));
-        m_blinker->setNotificationCount(m_list->itemCount());
+        connect(m_list, SIGNAL(itemCountChanged()),         this, SLOT(updateBlinker()));
+        connect(m_list, SIGNAL(notificationLevelChanged()), this, SLOT(updateBlinker()));
+        updateBlinker();
     }
 }
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
 {
-    QnSingleThumbnailLoader* loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, QSize(0, thumbnailHeight), item);
+    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, QSize(0, thumbnailHeight), item);
     item->setImageProvider(loader);
     //connect(loader, SIGNAL(finished()), loader, SLOT(deleteLater()));
 }
-
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
@@ -266,7 +266,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     switch (eventType) {
     case BusinessEventType::Camera_Motion: {
-        item->setColorLevel(QnNotificationItem::Common);
+        item->setNotificationLevel(Qn::CommonNotification);
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
             tr("Browse Archive"),
@@ -277,7 +277,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Input: {
-        item->setColorLevel(QnNotificationItem::Common);
+        item->setNotificationLevel(Qn::CommonNotification);
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
             tr("Open Camera"),
@@ -288,7 +288,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Disconnect: {
-        item->setColorLevel(QnNotificationItem::Important);
+        item->setNotificationLevel(Qn::ImportantNotification);
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
             tr("Camera Settings"),
@@ -299,7 +299,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Storage_Failure: {
-        item->setColorLevel(QnNotificationItem::Important);
+        item->setNotificationLevel(Qn::ImportantNotification);
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings"),
@@ -309,7 +309,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Network_Issue:{
-        item->setColorLevel(QnNotificationItem::Important);
+        item->setNotificationLevel(Qn::ImportantNotification);
         item->addActionButton(
             qnSkin->icon("events/server.png"),
             tr("Camera Settings"),
@@ -320,7 +320,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Ip_Conflict: {
-        item->setColorLevel(QnNotificationItem::Critical);
+        item->setNotificationLevel(Qn::CriticalNotification);
         QString webPageAddress = params.getSource();
 
         item->addActionButton(
@@ -332,7 +332,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::MediaServer_Failure: {
-        item->setColorLevel(QnNotificationItem::Critical);
+        item->setNotificationLevel(Qn::CriticalNotification);
         item->addActionButton(
             qnSkin->icon("events/server.png"),
             tr("Settings"),
@@ -342,7 +342,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::MediaServer_Conflict: {
-        item->setColorLevel(QnNotificationItem::Critical);
+        item->setNotificationLevel(Qn::CriticalNotification);
         item->addActionButton(
             qnSkin->icon("events/server.png"),
             tr("Description"),
@@ -446,7 +446,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     QString resourceName = getResourceName(resource);
     item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
     item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
-    item->setColorLevel(QnNotificationItem::System);
+    item->setNotificationLevel(Qn::SystemNotification);
     item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
 
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
@@ -473,6 +473,14 @@ void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::Me
 void QnNotificationsCollectionWidget::hideAll() {
     m_list->clear();
     m_itemsByMessageType.clear();
+}
+
+void QnNotificationsCollectionWidget::updateBlinker() {
+    if(!blinker())
+        return;
+
+    blinker()->setNotificationCount(m_list->itemCount());
+    blinker()->setColor(QnNotificationItem::notificationColor(m_list->notificationLevel()));
 }
 
 void QnNotificationsCollectionWidget::at_settingsButton_clicked() {

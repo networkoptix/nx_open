@@ -22,7 +22,8 @@
 #include "utils/common/util.h"
 
 bool QnResource::m_appStopping = false;
-QThreadPool QnResource::m_initAsyncPool;
+QnInitResPool QnResource::m_initAsyncPool;
+
 
 static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 
@@ -85,11 +86,11 @@ void QnResource::updateInner(QnResourcePtr other)
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     
-    setTags(other->getTags());
-    setUrl(other->getUrl());
-    setFlags(other->flags());
-    setName(other->getName());
-    setParentId(other->getParentId());
+    m_tags = other->m_tags;
+    m_url = other->m_url;
+    m_flags = other->m_flags;
+    m_name = other->m_name;
+    m_parentId = other->m_parentId;
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)
@@ -105,6 +106,7 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         QMutexLocker mutexLocker2(m2); 
         updateInner(other); 
     }
+
     silenceMode |= other->hasFlags(QnResource::foreigner);
     setStatus(other->m_status, silenceMode);
     setDisabled(other->m_disabled);
@@ -819,7 +821,6 @@ void QnResource::init()
 
     if (!m_initialized) 
     {
-        m_lastInitTime = getUsecTimer();
         m_initialized = initInternal();
         if( m_initialized )
             initializationDone();
@@ -854,13 +855,27 @@ void QnResource::stopAsyncTasks()
 }
 
 
-void QnResource::initAsync()
+void QnResource::initAsync(bool optional)
 {
-    if (getUsecTimer() - m_lastInitTime < MIN_INIT_INTERVAL)
+    qint64 t = getUsecTimer();
+
+    QMutexLocker lock(&m_initAsyncMutex);
+
+    if (t - m_lastInitTime < MIN_INIT_INTERVAL)
         return; 
 
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
-    m_initAsyncPool.start(task);
+    if (optional) {
+        if (m_initAsyncPool.tryStart(task))
+            m_lastInitTime = t;
+        else
+            delete task;
+    }
+    else {
+        m_lastInitTime = t;
+        lock.unlock();
+        m_initAsyncPool.start(task);
+    }
 }
 
 bool QnResource::isInitialized() const

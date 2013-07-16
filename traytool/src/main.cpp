@@ -10,6 +10,9 @@
 
 #include "systraywindow.h"
 #include "common/common_module.h"
+#include "traytool_translation_manager.h"
+
+static const QString CLIENT_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" ") + lit(QN_PRODUCT_NAME) + lit(" Client"));
 
 
 int main(int argc, char *argv[])
@@ -49,11 +52,31 @@ int main(int argc, char *argv[])
 
     QnCommonModule common(argc, argv);
 
-    QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
+    QDir::setCurrent(QApplication::applicationDirPath());
 
-    if (argc > 1 && QString(argv[1]) == "quit")
+
+    QnTraytoolTranslationManager *translationManager = qnCommon->instance<QnTraytoolTranslationManager>();
+    QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), CLIENT_NAME);
+    QString translationPath = clientSettings.value(lit("translationPath")).toString();
+    int index = translationPath.lastIndexOf(lit("client"));
+    if(index != -1)
+        translationPath.replace(index, 6, lit("traytool"));
+    QString translationSuffix = clientSettings.value(lit("translationSuffix")).toString();
+    QnTranslation translation = translationManager->loadTranslation(translationPath);
+    if(translation.isEmpty()) {
+        foreach(const QnTranslation &otherTranslation, translationManager->loadTranslations()) {
+            if(otherTranslation.suffix() == translationSuffix) {
+                translation = otherTranslation;
+                break;
+            }
+        }
+    }
+    QnTranslationManager::installTranslation(translation);
+
+    QString argument = argc > 1 ? lit(argv[1]) : QString();
+    if (argument == lit("quit"))
     {
-        app.sendMessage("quit");
+        app.sendMessage(lit("quit"));
         return 0;
     }
 
@@ -61,7 +84,7 @@ int main(int argc, char *argv[])
     {
         if (MyIsUserAnAdmin())
         {
-            app.sendMessage("quit");
+            app.sendMessage(lit("quit"));
 
             // Need to wait while app quit
             // Otherwise QtSingleApplication behaves incorrectly
@@ -69,7 +92,7 @@ int main(int argc, char *argv[])
                 Sleep(100);
         }
         else {
-            app.sendMessage("activate");
+            app.sendMessage(lit("activate"));
             return 0;
         }
     }
@@ -78,13 +101,12 @@ int main(int argc, char *argv[])
     FoundEnterpriseControllersModel foundEnterpriseControllersModel( &nxModuleFinder );
     nxModuleFinder.start();
 
-    QnSystrayWindow window( &foundEnterpriseControllersModel );
+    QnSystrayWindow window(&foundEnterpriseControllersModel);
 
-    QObject::connect(&app, SIGNAL(messageReceived(const QString&)),
-        &window, SLOT(handleMessage(const QString&)));
+    QObject::connect(&app, SIGNAL(messageReceived(const QString&)), &window, SLOT(handleMessage(const QString&)));
 
-    if (argc > 1)
-        window.executeAction(argv[1]);
+    if (!argument.isEmpty())
+        window.executeAction(argument);
     //window.show();
     return app.exec();
 }

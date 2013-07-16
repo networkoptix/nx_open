@@ -1,7 +1,9 @@
 ----------------------------------------------- 1.6-RC ---------------------------------------------
 
 Since 1.5.1
-If uninstall EC ports are busy for a white so if reinstall it the ports will change
+ - If uninstall EC ports are busy for a white so if reinstall it the ports will change
+ - CLND could be used for local file if open it in a new layout after using calendar search on a camera. Fixed
+ - If change camera IP address it was not reflected on camera settings form (only in tree) until the form was re-opened. Fixed
 
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
@@ -11,9 +13,9 @@ Since 1.5.1
  - Hotkeys can be assigned for PTZ presets (0-9)
  - DW Spectrum intro video had 2 black borders and sometimes ended by black screen. Fixed
  - Added proper cursors when resize rotated items
- - DO NOT INCLUDE IN RELEASE NOTES!!! - Removed hack for DW to display 10 times less network issues (since 1.4)
- - Fixed issue when it was not possible to add cameras manually via IP range (since 1.4)
- - Improved advanced camera settings management (since 1.4)
+ - DO NOT INCLUDE IN RELEASE NOTES!!! - Removed hack for DW to display 10 times less network issues
+ - Fixed issue when it was not possible to add cameras manually via IP range
+ - Improved advanced camera settings management
  - ACTI cameras with old firmwares (T series < 4.13, K series < 5.08 and A1 series < 6.03) work now 
  - Vivotek cameras CC8130, FD8136, FD8361, FD8362E, FD8161 are supported
  - If restore item for the fulloscreen, resolution hasn't been changed to low
@@ -30,11 +32,7 @@ Since 1.5.1
  - Aggregation column is added to Event and Action (used to be in advanced E&A settings)
  - Advanced PTZ for Sony SNCRH124 implemented
  - Login dialog opens much faster
- - iOS. Feature #1943. Sort cameras by name.
- - iOS. Feature #1938. Add camera name on item.
- - iOS5. Bug #1949. Incorrect date and time.
- - iOS. Bug #1937. iPad. Server status aren't displayed.
- - Bug #1469. Web-client. Video doesn't play if camera has been moved from one server to another.
+ - Web-client. Video didn't play if camera had been moved from one server to another.
  - Thumbnails are shown in Resource Tree if hover with a mouse cursor on a camera
  - Fixed incorrect tab order in tray tool
  - If restore database from another server, then licences were removed, but recording continues until Media Server restart. Fixed
@@ -84,15 +82,14 @@ Since previous build
  - Rotated item was resized incorrectly. Fixed
  - If export to Multi-Video exe file this file was broken. Fixed
  - Rendering glitches are fixed (appeared sometimes on specific PC configurations)
- 
- - Bug #2155.If "auto reset" is less then motion on camera, than "Camera output" doesn't stop.
- - Bug #2154.When changes parameter "Allow access via public IP" in traytool, it's better to ask to restart EC.
- - Bug #2151. Don't create an event if mediaserver has been stopped normally.
- - Bug #2086."No signal" after deleting server from resource tree.
+ - (Multi-Server) If delete one server from tree its cameras were moved to another server but "No signal" was displayed until restart. Fixed
+ - If "auto reset" time for camera output action was less then motion time then "Camera output" didn't stop. Fixed
+ - When changes parameter "Allow access via public IP" in traytool, Tray Tool suggests to restart EC.
+ - If mediaserver had been stopped normally the event was fired. Now not
+
 
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
-
-ANDROID CLIENT:
+ ANDROID CLIENT:
  - If a camera archive contained too many recorded fragments, live video was freezing. Fixed
  - If log in with a different case letters (Admin - admin) cameras list could not be loaded. Fixed
  - Panoramic cameras are supported
@@ -102,6 +99,8 @@ IOS Client
  - IOs Client displays sorted cameras list 
  - IOs Client displays a camera name on the top left corner
  - Panoramic cameras are supported
+ - iPad. Server status wasn't displayed properly. Fixed
+ - Incorrect date and time was displayed on iOS5. Fixed
  
 NEW CAMERAS AND RECORDERS SUPPORTED:
   - Few Arecont newest models
