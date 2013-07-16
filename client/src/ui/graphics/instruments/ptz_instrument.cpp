@@ -663,14 +663,6 @@ void PtzInstrument::processPtzClick(const QPointF &pos) {
     m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
 
     ptzMoveTo(target(), pos);
-
-    /* Also do item unzoom if we're zoomed in. */
-    QRectF viewportGeometry = display()->viewportGeometry();
-    QRectF zoomedItemGeometry = display()->itemGeometry(target()->item());
-    if(viewportGeometry.width() < zoomedItemGeometry.width() * itemUnzoomThreshold || viewportGeometry.height() < zoomedItemGeometry.height() * itemUnzoomThreshold) {
-        workbench()->setItem(Qn::ZoomedRole, NULL);
-        workbench()->setItem(Qn::ZoomedRole, target()->item());
-    }
 }
 
 void PtzInstrument::processPtzDrag(const QRectF &rect) {
@@ -698,6 +690,14 @@ void PtzInstrument::processPtzDoubleClick() {
     m_activeAnimations.push_back(SplashItemAnimation(splashItem, -1.0, 1.0));
 
     ptzUnzoom(target());
+
+    /* Also do item unzoom if we're zoomed in. */
+    QRectF viewportGeometry = display()->viewportGeometry();
+    QRectF zoomedItemGeometry = display()->itemGeometry(target()->item());
+    if(viewportGeometry.width() < zoomedItemGeometry.width() * itemUnzoomThreshold || viewportGeometry.height() < zoomedItemGeometry.height() * itemUnzoomThreshold) {
+        workbench()->setItem(Qn::ZoomedRole, NULL);
+        workbench()->setItem(Qn::ZoomedRole, target()->item());
+    }
 }
 
 
