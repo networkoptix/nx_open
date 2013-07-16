@@ -2,6 +2,20 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
+    <name>Language</name>
+    <message>
+        <location filename="../src/ui/workbench/workbench_translation_manager.cpp" line="32"/>
+        <location filename="../src/ui/workbench/workbench_translation_manager.cpp" line="78"/>
+        <source>Locale Code</source>
+        <translation>ru</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/workbench_translation_manager.cpp" line="77"/>
+        <source>Language Name</source>
+        <translation>Русский</translation>
+    </message>
+</context>
+<context>
     <name>ConnectionTestingDialog</name>
     <message>
         <location filename="../src/connection_testing_dialog.ui" line="20"/>
@@ -72,7 +86,7 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="83"/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Порт</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="124"/>
@@ -300,12 +314,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="66"/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Логин</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="83"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="101"/>
@@ -316,22 +330,22 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/settings.ui" line="117"/>
         <location filename="../src/settings.ui" line="405"/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Порт</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="165"/>
         <source>Find</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="211"/>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Тест</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="220"/>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Хост</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="232"/>
@@ -341,12 +355,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="246"/>
         <source>RTSP Port</source>
-        <translation type="unfinished"></translation>
+        <translation>RTSP Порт</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="269"/>
         <source>API Port</source>
-        <translation type="unfinished"></translation>
+        <translation>API Порт</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="286"/>
@@ -413,12 +427,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="563"/>
         <source>Language:</source>
-        <translation type="unfinished"></translation>
+        <translation>Язык:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="575"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация</translation>
     </message>
 </context>
 </TS>

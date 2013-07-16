@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr" sourcelanguage="en">
 <context>
+    <name>Language</name>
+    <message>
+        <source>Language Name</source>
+        <translation>Français</translation>
+    </message>
+    <message>
+        <source>Locale Code</source>
+        <translation>fr</translation>
+    </message>
+</context>
+<context>
     <name>ConnectionTestingDialog</name>
     <message>
         <location filename="../src/connection_testing_dialog.ui" line="20"/>
