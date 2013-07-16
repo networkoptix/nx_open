@@ -846,7 +846,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
 void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     bool isLive = m_display->camDisplay()->isRealTimeSource();
 
-    if(!isLive)
+    if(!isLive && !m_ptzController)
         buttonBar()->setButtonsChecked(PtzButton, false);
 }
 
