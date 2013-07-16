@@ -118,6 +118,10 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
     }
 }
 
+QVector3D sphericalToCartesian(qreal theta, qreal phi) {
+    return QVector3D(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
+}
+
 void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int plane)
 {
     delete m_transform[plane];
@@ -127,30 +131,40 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
     qreal kx = 2.0*tan(m_params.fov/2.0);
     qreal ky = kx/aspectRatio;
 
-    QMatrix4x4 rotX(kx,      0.0,                                0.0,                   0.0,
-                    0.0,     cos(m_params.yAngle)*ky,            -sin(m_params.yAngle), 0.0,
-                    0.0,     sin(m_params.yAngle)*ky,            cos(m_params.yAngle),  0.0,
-                    0.0,     0.0,                                0.0,                   1.0);
+    float fovRot = sin(m_params.xAngle)*m_params.fovRot;
+    qreal xShift, yShift, yCenter;
+    if (m_params.horizontalView) {
+        yShift = m_params.yAngle;
+        yCenter = 0.5;
+        xShift = m_params.xAngle;
+        fovRot = fovRot;
+    }
+    else {
+        yShift = m_params.yAngle - M_PI/2.0;
+        yCenter =  1.0;
+        xShift = fovRot;
+        fovRot =  -m_params.xAngle;
+    }
+
+
+    QVector3D dx = sphericalToCartesian(xShift + M_PI/2.0, 0.0) * kx;
+    QVector3D dy = sphericalToCartesian(xShift, -yShift + M_PI/2.0) * kx /aspectRatio;
+    QVector3D  center = sphericalToCartesian(xShift, -yShift);
+
+    QMatrix4x4 to3d(dx.x(),     dy.x(),     center.x(),     0.0,
+                    dx.y(),     dy.y(),     center.y(),     0.0,
+                    dx.z(),     dy.z(),     center.z(),     0.0,
+                    0.0,        0.0,        0.0,            1.0);
 
     QPointF* dstPos = m_transform[plane];
     for (int y = 0; y < imageSize.height(); ++y)
     {
         for (int x = 0; x < imageSize.width(); ++x)
         {
-            QVector3D pos3d(x / (qreal) (imageSize.width()-1) - 0.5, y / (qreal) (imageSize.height()-1) - 0.5, 1.0);
-            pos3d = rotX * pos3d;  // 3d vector on surface, rotate and scale
-
-            qreal theta = atan2(pos3d.x(), pos3d.z()) + m_params.xAngle;
-            qreal z = pos3d.y() / pos3d.length();
-
-            // Vector on 3D sphere
-            qreal k   = cos(asin(z)); // same as sqrt(1-z*z)
-            QVector3D psph(k * sin(theta), k * cos(theta), z);
-
-            // Calculate fisheye angle and radius
-            theta      = atan2(psph.z(), psph.x());
-            qreal r  = atan2(QVector2D(psph.x(), psph.z()).length(), psph.y()) / M_PI;
-
+            QVector3D pos3d(x / (qreal) (imageSize.width()-1) - 0.5, y / (qreal) (imageSize.height()-1) - yCenter, 1.0);
+            pos3d = to3d * pos3d;  // 3d vector on surface, rotate and scale
+            qreal theta = atan2(pos3d.z(), pos3d.x()) + fovRot;     // fisheye angle
+            qreal r     = acos(pos3d.y() / pos3d.length()) / M_PI;  // fisheye radius
 
             // return from polar coordinates
             qreal dstX = qBound(0.0, (cos(theta) * r + 0.5) * imageSize.width(),  (qreal) imageSize.width());
