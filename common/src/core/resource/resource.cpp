@@ -873,7 +873,7 @@ void QnResource::initAsync(bool optional)
     }
     else {
         m_lastInitTime = t;
-        m_initAsyncMutex.unlock();
+        lock.unlock();
         m_initAsyncPool.start(task);
     }
 }
