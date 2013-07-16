@@ -99,26 +99,23 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this,   SLOT(reject()));
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
     connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
-    connect(ui->clearCacheButton,                       SIGNAL(clicked()),                    action(Qn::ClearCacheAction), SLOT(trigger()));
+    connect(ui->clearCacheButton,                       SIGNAL(clicked()),                                          action(Qn::ClearCacheAction), SLOT(trigger()));
 
-    initLanguages();
+    initTranslations();
     updateFromSettings();
     at_context_userChanged();
 
     if (m_settings->isWritable()) {
         ui->readOnlyWarningLabel->hide();
-    }
-    else {
+    } else {
         setWarningStyle(ui->readOnlyWarningLabel);
         ui->readOnlyWarningLabel->setText(
-                     #ifdef Q_OS_LINUX
-                             tr("Settings file is read-only. Please contact your system administrator.\n" \
-                                "All changes will be lost after program exit.")
-                     #else
-                             tr("Settings cannot be saved. Please contact your system administrator.\n" \
-                                "All changes will be lost after program exit.")
-                     #endif
-                             );
+#ifdef Q_OS_LINUX
+            tr("Settings file is read-only. Please contact your system administrator.\nAll changes will be lost after program exit.")
+#else
+            tr("Settings cannot be saved. Please contact your system administrator.\nAll changes will be lost after program exit.")
+#endif
+        );
     }
 }
 
@@ -126,26 +123,32 @@ QnPreferencesDialog::~QnPreferencesDialog() {
     return;
 }
 
-void QnPreferencesDialog::initLanguages() {
+void QnPreferencesDialog::initTranslations() {
     QnWorkbenchTranslationManager *translationManager = context()->instance<QnWorkbenchTranslationManager>();
 
-    foreach(const QnTranslation &translation, translationManager->loadTranslations()){
-        QIcon icon(QString(QLatin1String(":/flags/%1.png")).arg(translation.localeCode));
-        ui->languageComboBox->addItem(icon, translation.languageName, translation.translationPath);
+    foreach(const QnTranslation &translation, translationManager->loadTranslations()) {
+        QIcon icon(QString(lit(":/flags/%1.png")).arg(translation.localeCode()));
+        ui->languageComboBox->addItem(icon, translation.languageName(), QVariant::fromValue<QnTranslation>(translation));
     }
 }
 
 void QnPreferencesDialog::accept() {
-    QString oldLanguage = m_settings->translationPath();
+    QString oldTranslationSuffix = m_settings->translationSuffix();
+    
     submitToSettings();
-    if (oldLanguage != m_settings->translationPath()) {
-        QMessageBox::StandardButton button =
-            QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart. Press OK to close application now."),
-                                     QMessageBox::Ok, QMessageBox::Cancel);
+    
+    if (oldTranslationSuffix != m_settings->translationSuffix()) {
+        QMessageBox::StandardButton button = QMessageBox::information(
+            this, 
+            tr("Information"), 
+            tr("The language change will take effect after application restart. Press OK to close application now."),
+            QMessageBox::Ok, 
+            QMessageBox::Cancel
+        );
         if (button == QMessageBox::Ok)
             qApp->exit();
     }
-    //m_youTubeSettingsWidget->accept();
+    
     base_type::accept();
 }
 
@@ -167,7 +170,10 @@ void QnPreferencesDialog::submitToSettings() {
     checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: #Elric re-check if it is needed here.
 
-    m_settings->setLanguage(ui->languageComboBox->itemData(ui->languageComboBox->currentIndex()).toString());
+    QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex()).value<QnTranslation>();
+    if(!translation.filePaths().isEmpty())
+        m_settings->setTranslationPath(translation.filePaths()[0]);
+    m_settings->setTranslationSuffix(translation.suffix());
 
     if (m_recordingSettingsWidget)
         m_recordingSettingsWidget->submitToSettings();
@@ -199,9 +205,15 @@ void QnPreferencesDialog::updateFromSettings() {
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
 
-    int id = ui->languageComboBox->findData(m_settings->translationPath());
-    if (id >= 0)
-        ui->languageComboBox->setCurrentIndex(id);
+    QString translationPath = m_settings->translationPath();
+    QString translationSuffix = m_settings->translationSuffix();
+    for(int i = 0; i < ui->languageComboBox->count(); i++) {
+        QnTranslation translation = ui->languageComboBox->itemData(i).value<QnTranslation>();
+        if(translation.suffix() == translationSuffix || translation.filePaths().contains(translationPath)) {
+            ui->languageComboBox->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 void QnPreferencesDialog::openLicensesPage() {

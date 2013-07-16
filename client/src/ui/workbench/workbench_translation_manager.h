@@ -1,7 +1,7 @@
 #ifndef QN_WORKBENCH_TRANSLATION_MANAGER_H
 #define QN_WORKBENCH_TRANSLATION_MANAGER_H
 
-#include <utils/common/translation_manager.h>
+#include <translation/translation_manager.h>
 
 #include "workbench_context_aware.h"
 

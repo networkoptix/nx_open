@@ -33,7 +33,7 @@
      </property>
      <widget class="QWidget" name="tabMediaServer">
       <attribute name="title">
-       <string>Media Server settings</string>
+       <string>Media Server Settings</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
@@ -373,7 +373,7 @@
      </widget>
      <widget class="QWidget" name="tabAppServer">
       <attribute name="title">
-       <string>Enterprise Controller (EC) settings</string>
+       <string>Enterprise Controller (EC) Settings</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>

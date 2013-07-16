@@ -93,6 +93,7 @@ namespace Qn {
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
+        TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
         DisplayHtmlRole                             /**< Same as Display role, but use HTML format. */

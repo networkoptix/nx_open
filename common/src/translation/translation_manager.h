@@ -3,23 +3,7 @@
 
 #include <QtCore/QObject>
 
-struct QnTranslation {
-    QnTranslation() {}
-    
-    QnTranslation(const QString &languageName, const QString &localeCode, const QString &translationPath): 
-        languageName(languageName), localeCode(localeCode), translationPath(translationPath) 
-    {}
-
-    /** Language name. */
-    QString languageName;
-
-    /** Locale code, e.g. "zh_CN". */
-    QString localeCode;
-
-    /** Path to main .qm file. */
-    QString translationPath;
-};
-
+#include "translation.h"
 
 class QnTranslationManager: public QObject {
     Q_OBJECT
@@ -34,12 +18,13 @@ public:
     void setSearchPaths(const QList<QString> &searchPaths);
 
     QList<QnTranslation> loadTranslations();
+    QnTranslation loadTranslation(const QString &translationPath);
 
-    void installTranslation(const QnTranslation &translation);
-    void installTranslation(const QString &translationPath);
+    static void installTranslation(const QnTranslation &translation);
 
 protected:
     QList<QnTranslation> loadTranslationsInternal() const;
+    QnTranslation loadTranslationInternal(const QString &translationDir, const QString &translationName) const;
 
 private:
     QList<QString> m_searchPaths;
