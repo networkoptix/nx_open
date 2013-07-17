@@ -476,6 +476,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         m_resourceParamList[name].setDomain(domain);
         if (!m_resourceParamList[name].setValue(val))
         {
+            locker.unlock();
             cl_log.log("cannot set such param!", cl_logWARNING);
             emit asyncParamSetDone(toSharedPointer(this), name, val, false);
             return false;
@@ -801,7 +802,7 @@ int QnResource::commandProcQueueSize()
 
 bool QnResource::isDisabled() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    //QMutexLocker mutexLocker(&m_mutex);
 
     return m_disabled;
 }
