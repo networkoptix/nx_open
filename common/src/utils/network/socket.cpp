@@ -615,7 +615,7 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
 #else
     int sended = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen, 0),
-        m_writeTimeoutMS );
+        getWriteTimeOut() );
     if( sended == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
         mConnected = false;
     else if (sended == 0)
@@ -640,7 +640,7 @@ int CommunicatingSocket::recv(void *buffer, int bufferLen, int flags)
 #else
     int bytesRead = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::recv, sockDesc, (void*)buffer, (size_t)bufferLen, flags),
-        m_readTimeoutMS );
+        getReadTimeOut() );
     if( bytesRead == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
         mConnected = false;
     else if (bytesRead == 0)
@@ -918,7 +918,7 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 #else
     return doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
-        m_writeTimeoutMS ) == bufferLen;
+        getWriteTimeOut() ) == bufferLen;
 #endif
 }
 
@@ -933,7 +933,7 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
 #else
     int rtn = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::recvfrom, sockDesc, (void*)buffer, (size_t)bufferLen, 0, (sockaddr*)&clntAddr, (socklen_t*)&addrLen),
-        m_readTimeoutMS );
+        getReadTimeOut() );
 #endif
 
     if (rtn >= 0) {
