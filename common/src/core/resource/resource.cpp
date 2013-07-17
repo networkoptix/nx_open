@@ -613,7 +613,7 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 
     emit statusChanged(toSharedPointer(this));
 
-    qint64 dt = qnSyncTime->currentDateTime();
+    QDateTime dt = qnSyncTime->currentDateTime();
     QMutexLocker mutexLocker(&m_mutex);
     m_lastStatusUpdateTime = dt;
 }
