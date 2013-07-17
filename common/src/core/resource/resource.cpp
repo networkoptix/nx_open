@@ -213,16 +213,28 @@ void QnResource::setFlags(Flags flags)
 
 void QnResource::addFlags(Flags flags)
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    
-    setFlags(m_flags | flags);
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        flags |= m_flags;
+        if(m_flags == flags)
+            return;
+
+        m_flags = flags;
+    }
+    emit flagsChanged(toSharedPointer(this));
 }
 
 void QnResource::removeFlags(Flags flags)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        flags = m_flags & ~flags;
+        if(m_flags == flags)
+            return;
 
-    setFlags(m_flags & ~flags);
+        m_flags = flags;
+    }
+    emit flagsChanged(toSharedPointer(this));
 }
 
 QString QnResource::toString() const
@@ -601,8 +613,9 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 
     emit statusChanged(toSharedPointer(this));
 
+    qint64 dt = qnSyncTime->currentDateTime();
     QMutexLocker mutexLocker(&m_mutex);
-    m_lastStatusUpdateTime = qnSyncTime->currentDateTime();
+    m_lastStatusUpdateTime = dt;
 }
 
 QDateTime QnResource::getLastStatusUpdateTime() const
