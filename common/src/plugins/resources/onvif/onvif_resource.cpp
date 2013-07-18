@@ -2494,7 +2494,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     //strcpy( buf, "<wsnt:TopicExpression Dialect=\"xsd:anyURI\">tns1:Device/Trigger/Relay</wsnt:TopicExpression>" );
     //topicFilter.__any.push_back( buf );
     //request.Filter = &topicFilter;
-
+                                                             
     _oasisWsnB2__SubscribeResponse response;
     m_prevSoapCallResult = soapWrapper.Subscribe( &request, &response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )    //TODO/IMPL find out which is error and which is not
@@ -2677,6 +2677,7 @@ bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const r
         return false;
     }
 
+    m_relayOutputInfo.clear();
     for( size_t i = 0; i < response.RelayOutputs.size(); ++i )
     {
         m_relayOutputInfo.push_back( RelayOutputInfo( 
