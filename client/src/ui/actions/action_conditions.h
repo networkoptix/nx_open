@@ -399,4 +399,10 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+class QnShowcaseActionCondition: public QnActionCondition {
+public:
+    QnShowcaseActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 #endif // QN_ACTION_CONDITIONS_H

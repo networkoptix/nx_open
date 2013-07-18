@@ -273,6 +273,10 @@ bool QnActiResource::initInternal()
         }
     }
 
+    makeActiRequest(QLatin1String("system"), QLatin1String("RTP_B2=1"), status); // disable extra data aka B2 frames for RTSP (disable value:1, enable: 2)
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+
     QByteArray fpsString = makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_FPS_CAP"), status);
     if (status != CL_HTTP_SUCCESS)
         return false;

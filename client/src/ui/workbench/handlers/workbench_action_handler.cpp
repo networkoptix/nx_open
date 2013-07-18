@@ -234,6 +234,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
     connect(action(Qn::DebugCalibratePtzAction),                SIGNAL(triggered()),    this,   SLOT(at_debugCalibratePtzAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
+    connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
@@ -1598,6 +1599,10 @@ void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
 
 void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
     notifyAboutUpdate(true);
+}
+
+void QnWorkbenchActionHandler::at_showcaseAction_triggered() {
+    QDesktopServices::openUrl(QUrl(QLatin1String(QN_SHOWCASE_URL), QUrl::TolerantMode));
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
