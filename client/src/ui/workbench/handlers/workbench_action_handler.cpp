@@ -2191,7 +2191,15 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if(!server)
         return;
 
-    QUrl url(server->apiConnection()->url().toString() + QLatin1String("/api/showLog?lines=1000"));
+    // TODO: #Elric total encapsulation failure, there should be no proxy-related logic here.
+    QString url;
+    if(server->getPrimaryIF() == lit("proxy")) {
+        QUrl apiUrl(server->getApiUrl());
+        url = QString(lit("http://%1:%2/proxy/%3:%4/api/showLog?lines=1000")).arg(server->getProxyHost()).arg(server->getProxyPort()).arg(apiUrl.host()).arg(apiUrl.port());
+    } else {
+        url = server->getApiUrl() + lit("/api/showLog?lines=1000");
+    }
+    
     QDesktopServices::openUrl(url);
 }
 
