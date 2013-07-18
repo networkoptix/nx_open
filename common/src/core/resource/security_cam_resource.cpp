@@ -341,7 +341,7 @@ bool QnSecurityCamResource::setRelayOutputState(
 
 void QnSecurityCamResource::inputPortListenerAttached()
 {
-    QMutexLocker lk( &m_mutex );
+    QMutexLocker lk( &m_initMutex );
 
     //if camera is not initialized yet, delayed input monitoring will start on initialization completion
     if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
@@ -350,7 +350,7 @@ void QnSecurityCamResource::inputPortListenerAttached()
 
 void QnSecurityCamResource::inputPortListenerDetached()
 {
-    QMutexLocker lk( &m_mutex );
+    QMutexLocker lk( &m_initMutex );
  
     if( m_inputPortListenerCount <= 0 )
         return;
