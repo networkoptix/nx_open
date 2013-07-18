@@ -216,7 +216,6 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_needUpdateOnvifUrl(false),
     m_timeDrift(0),
     m_prevSoapCallResult(0),
-    m_eventCapabilities( NULL ),
     m_eventMonitorType( emtNone ),
     m_timerID( 0 ),
     m_renewSubscriptionTaskID(0),
@@ -255,12 +254,6 @@ QnPlOnvifResource::~QnPlOnvifResource()
     stopInputPortMonitoring();
 
     delete m_onvifAdditionalSettings;
-
-    if( m_eventCapabilities )
-    {
-        delete m_eventCapabilities;
-        m_eventCapabilities = NULL;
-    }
 }
 
 const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
@@ -775,7 +768,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
         {
             //TODO: #vasilenko UTF unuse std::string
             if (response.Capabilities->Events)
-                m_eventCapabilities = new onvifXsd__EventCapabilities( *response.Capabilities->Events );
+                m_eventCapabilities.reset( new onvifXsd__EventCapabilities( *response.Capabilities->Events ) );
 
             if (response.Capabilities->Media) 
             {
@@ -2160,7 +2153,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer()
 {
     QMutexLocker lk( &m_subscriptionMutex );
 
-    if( !m_eventCapabilities || m_onvifNotificationSubscriptionID.isEmpty() )
+    if( !m_eventCapabilities.get() || m_onvifNotificationSubscriptionID.isEmpty() )
         return;
 
     const QAuthenticator& auth = getAuth();
@@ -2280,7 +2273,7 @@ bool QnPlOnvifResource::startInputPortMonitoring()
         return false;
     }
 
-    if( !m_eventCapabilities )
+    if( !m_eventCapabilities.get() )
         return false;
 
     if( m_eventCapabilities->WSPullPointSupport )
