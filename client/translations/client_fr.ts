@@ -1838,7 +1838,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server Logs</source>
+        <source>Server Logs...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1888,7 +1888,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>no more than once per</source>
+        <source>Interval of action : Every</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
