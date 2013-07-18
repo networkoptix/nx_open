@@ -13,9 +13,13 @@ public:
 
     const QList<QString> &prefixes() const;
     void setPrefixes(const QList<QString> &prefixes);
+    void addPrefix(const QString &prefix);
+    void removePrefix(const QString &prefix);
 
     const QList<QString> &searchPaths() const;
     void setSearchPaths(const QList<QString> &searchPaths);
+    void addSearchPath(const QString &searchPath);
+    void removeSearchPath(const QString &searchPath);
 
     QList<QnTranslation> loadTranslations();
     QnTranslation loadTranslation(const QString &translationPath);

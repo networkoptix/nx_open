@@ -476,17 +476,6 @@
     </message>
 </context>
 <context>
-    <name>Language</name>
-    <message>
-        <source>Language Name</source>
-        <translation type="obsolete">Français</translation>
-    </message>
-    <message>
-        <source>Locale Code</source>
-        <translation type="obsolete">fr</translation>
-    </message>
-</context>
-<context>
     <name>LicenseManagerWidget</name>
     <message>
         <source>Form</source>

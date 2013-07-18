@@ -2,12 +2,24 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QTranslator>
-#include <QtGui/QApplication>
+#include <QtCore/QCoreApplication>
+
+#include <utils/common/warnings.h>
 
 QnTranslationManager::QnTranslationManager(QObject *parent):
     QObject(parent),
     m_translationsValid(false)
-{}
+{
+    addPrefix(lit("common"));
+    addPrefix(lit("qt"));
+    
+    addSearchPath(lit(":/translations"));
+    if(qApp) {
+        addSearchPath(qApp->applicationDirPath() + lit("/translations"));
+    } else {
+        qnWarning("QApplication instance does not exist, executable-relative translations will not be loaded.");
+    }
+}
 
 QnTranslationManager::~QnTranslationManager() {
     return;
@@ -25,6 +37,22 @@ void QnTranslationManager::setPrefixes(const QList<QString> &prefixes) {
     m_translationsValid = false;
 }
 
+void QnTranslationManager::addPrefix(const QString &prefix) {
+    if(m_prefixes.contains(prefix))
+        return;
+
+    m_prefixes.push_back(prefix);
+    m_translationsValid = false;
+}
+
+void QnTranslationManager::removePrefix(const QString &prefix) {
+    if(!m_prefixes.contains(prefix))
+        return;
+
+    m_prefixes.removeOne(prefix);
+    m_translationsValid = false;
+}
+
 const QList<QString> &QnTranslationManager::searchPaths() const {
     return m_searchPaths;
 }
@@ -34,6 +62,22 @@ void QnTranslationManager::setSearchPaths(const QList<QString> &searchPaths) {
         return;
 
     m_searchPaths = searchPaths;
+    m_translationsValid = false;
+}
+
+void QnTranslationManager::addSearchPath(const QString &searchPath) {
+    if(m_searchPaths.contains(searchPath))
+        return;
+
+    m_searchPaths.push_back(searchPath);
+    m_translationsValid = false;
+}
+
+void QnTranslationManager::removeSearchPath(const QString &searchPath) {
+    if(!m_searchPaths.contains(searchPath))
+        return;
+
+    m_searchPaths.removeOne(searchPath);
     m_translationsValid = false;
 }
 

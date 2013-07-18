@@ -30,14 +30,12 @@
 <context>
     <name>Language</name>
     <message>
-        <location filename="../src/translation/translation_manager.cpp" line="93"/>
         <source>Language Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Français</translation>
     </message>
     <message>
-        <location filename="../src/translation/translation_manager.cpp" line="94"/>
         <source>Locale Code</source>
-        <translation type="unfinished"></translation>
+        <translation>fr</translation>
     </message>
 </context>
 <context>

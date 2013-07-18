@@ -10,7 +10,6 @@
 #include "ui_settings.h"
 #include "ui_findappserverdialog.h"
 #include "connection_testing_dialog.h"
-#include "traytool_translation_manager.h"
 #include "common/common_module.h"
 
 #include <shlobj.h>
@@ -171,7 +170,7 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
 }
 
 void QnSystrayWindow::initTranslations() {
-    QnTraytoolTranslationManager *translationManager = qnCommon->instance<QnTraytoolTranslationManager>();
+    QnTranslationManager *translationManager = qnCommon->instance<QnTranslationManager>();
 
     QnTranslationListModel *model = new QnTranslationListModel(this);
     model->setTranslations(translationManager->loadTranslations());

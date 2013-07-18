@@ -28,17 +28,6 @@
     </message>
 </context>
 <context>
-    <name>Language</name>
-    <message>
-        <source>Locale Code</source>
-        <translation type="obsolete">ru</translation>
-    </message>
-    <message>
-        <source>Language Name</source>
-        <translation type="obsolete">Русский</translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <location filename="../src/main.cpp" line="39"/>
