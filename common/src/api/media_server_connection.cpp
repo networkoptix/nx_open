@@ -38,7 +38,7 @@ namespace {
         ((TimeObject,               "gettime"))
         ((CameraSearchObject,       "manualCamera/search"))
         ((CameraAddObject,          "manualCamera/add"))
-        ((eventLogObject,           "events"))
+        ((EventLogObject,           "events"))
         ((ImageObject,              "image"))
     );
 
@@ -364,7 +364,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, reply, handle);
         break;
     }
-    case eventLogObject: {
+    case EventLogObject: {
         QnApiPbSerializer serializer;
         QnBusinessActionDataListPtr events(new QnBusinessActionDataList);
         if (response.status == 0)
@@ -607,6 +607,6 @@ int QnMediaServerConnection::getEventLogAsync(
     if (actionType != BusinessActionType::NotDefined)
         params << QnRequestParam( "action", (int) actionType);
 
-    return sendAsyncGetRequest(eventLogObject, params, QN_REPLY_TYPE(QnBusinessActionDataListPtr), target, slot);
+    return sendAsyncGetRequest(EventLogObject, params, QN_REPLY_TYPE(QnBusinessActionDataListPtr), target, slot);
 }
 

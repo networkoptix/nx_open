@@ -2,20 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
-    <name>Language</name>
-    <message>
-        <location filename="../src/ui/workbench/workbench_translation_manager.cpp" line="32"/>
-        <location filename="../src/ui/workbench/workbench_translation_manager.cpp" line="78"/>
-        <source>Locale Code</source>
-        <translation>ru</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/workbench_translation_manager.cpp" line="77"/>
-        <source>Language Name</source>
-        <translation>Русский</translation>
-    </message>
-</context>
-<context>
     <name>ConnectionTestingDialog</name>
     <message>
         <location filename="../src/connection_testing_dialog.ui" line="20"/>
@@ -42,14 +28,25 @@
     </message>
 </context>
 <context>
+    <name>Language</name>
+    <message>
+        <source>Locale Code</source>
+        <translation type="obsolete">ru</translation>
+    </message>
+    <message>
+        <source>Language Name</source>
+        <translation type="obsolete">Русский</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
-        <location filename="../src/main.cpp" line="36"/>
+        <location filename="../src/main.cpp" line="39"/>
         <source>System Tray</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="37"/>
+        <location filename="../src/main.cpp" line="40"/>
         <source>There is no system tray on this system.
 Application will now quit.</source>
         <translation type="unfinished"></translation>
@@ -71,12 +68,12 @@ Application will now quit.</source>
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="536"/>
+        <location filename="../src/systraywindow.cpp" line="565"/>
         <source>Insufficient privileges to manage services</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="536"/>
+        <location filename="../src/systraywindow.cpp" line="565"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
         <translation type="unfinished"></translation>
     </message>
@@ -84,17 +81,17 @@ Application will now quit.</source>
 <context>
     <name>QnSystrayWindow</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="83"/>
+        <location filename="../src/systraywindow.cpp" line="87"/>
         <source>Port</source>
         <translation>Порт</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="124"/>
+        <location filename="../src/systraywindow.cpp" line="128"/>
         <source>VMS settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="143"/>
+        <location filename="../src/systraywindow.cpp" line="147"/>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
 Engine version %4.&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
@@ -102,194 +99,194 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="228"/>
+        <location filename="../src/systraywindow.cpp" line="237"/>
         <source>The requested access was denied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="231"/>
+        <location filename="../src/systraywindow.cpp" line="240"/>
         <source>The specified database does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="234"/>
+        <location filename="../src/systraywindow.cpp" line="243"/>
         <source>A specified parameter is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="238"/>
+        <location filename="../src/systraywindow.cpp" line="247"/>
         <source>Insufficient permissions to start/stop services</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="256"/>
+        <location filename="../src/systraywindow.cpp" line="265"/>
         <source>No %1 services installed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="372"/>
-        <location filename="../src/systraywindow.cpp" line="398"/>
+        <location filename="../src/systraywindow.cpp" line="401"/>
+        <location filename="../src/systraywindow.cpp" line="427"/>
         <source>%1 has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="379"/>
-        <location filename="../src/systraywindow.cpp" line="405"/>
+        <location filename="../src/systraywindow.cpp" line="408"/>
+        <location filename="../src/systraywindow.cpp" line="434"/>
         <source>%1 has been started</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="427"/>
-        <location filename="../src/systraywindow.cpp" line="433"/>
-        <location filename="../src/systraywindow.cpp" line="459"/>
-        <location filename="../src/systraywindow.cpp" line="465"/>
+        <location filename="../src/systraywindow.cpp" line="456"/>
+        <location filename="../src/systraywindow.cpp" line="462"/>
+        <location filename="../src/systraywindow.cpp" line="488"/>
+        <location filename="../src/systraywindow.cpp" line="494"/>
         <source>Start </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="427"/>
+        <location filename="../src/systraywindow.cpp" line="456"/>
         <source> (stopped)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="433"/>
+        <location filename="../src/systraywindow.cpp" line="462"/>
         <source> (starting)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="439"/>
-        <location filename="../src/systraywindow.cpp" line="445"/>
-        <location filename="../src/systraywindow.cpp" line="452"/>
+        <location filename="../src/systraywindow.cpp" line="468"/>
+        <location filename="../src/systraywindow.cpp" line="474"/>
+        <location filename="../src/systraywindow.cpp" line="481"/>
         <source>Stop </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="439"/>
+        <location filename="../src/systraywindow.cpp" line="468"/>
         <source> (stopping)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="445"/>
+        <location filename="../src/systraywindow.cpp" line="474"/>
         <source> (started)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="452"/>
+        <location filename="../src/systraywindow.cpp" line="481"/>
         <source> (resuming)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="459"/>
+        <location filename="../src/systraywindow.cpp" line="488"/>
         <source> (paused)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="465"/>
+        <location filename="../src/systraywindow.cpp" line="494"/>
         <source> (pausing)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="483"/>
-        <location filename="../src/systraywindow.cpp" line="505"/>
-        <location filename="../src/systraywindow.cpp" line="819"/>
-        <location filename="../src/systraywindow.cpp" line="852"/>
-        <location filename="../src/systraywindow.cpp" line="908"/>
-        <location filename="../src/systraywindow.cpp" line="918"/>
-        <location filename="../src/systraywindow.cpp" line="925"/>
+        <location filename="../src/systraywindow.cpp" line="512"/>
+        <location filename="../src/systraywindow.cpp" line="534"/>
+        <location filename="../src/systraywindow.cpp" line="848"/>
+        <location filename="../src/systraywindow.cpp" line="881"/>
+        <location filename="../src/systraywindow.cpp" line="937"/>
+        <location filename="../src/systraywindow.cpp" line="947"/>
+        <location filename="../src/systraywindow.cpp" line="954"/>
         <source>Systray</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="483"/>
-        <location filename="../src/systraywindow.cpp" line="505"/>
+        <location filename="../src/systraywindow.cpp" line="512"/>
+        <location filename="../src/systraywindow.cpp" line="534"/>
         <source>%1 is going to be stopped. Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="576"/>
+        <location filename="../src/systraywindow.cpp" line="605"/>
         <source>&amp;Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="581"/>
-        <location filename="../src/systraywindow.cpp" line="585"/>
+        <location filename="../src/systraywindow.cpp" line="610"/>
+        <location filename="../src/systraywindow.cpp" line="614"/>
         <source>&amp;Show %1 log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="589"/>
+        <location filename="../src/systraywindow.cpp" line="618"/>
         <source>&amp;Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="592"/>
-        <location filename="../src/systraywindow.cpp" line="600"/>
+        <location filename="../src/systraywindow.cpp" line="621"/>
+        <location filename="../src/systraywindow.cpp" line="629"/>
         <source>Start %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="596"/>
-        <location filename="../src/systraywindow.cpp" line="604"/>
+        <location filename="../src/systraywindow.cpp" line="625"/>
+        <location filename="../src/systraywindow.cpp" line="633"/>
         <source>Stop %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="694"/>
+        <location filename="../src/systraywindow.cpp" line="723"/>
         <source>* Last used connection *</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="814"/>
+        <location filename="../src/systraywindow.cpp" line="843"/>
         <source>The changes you made require %1 and %2 to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="816"/>
+        <location filename="../src/systraywindow.cpp" line="845"/>
         <source>The changes you made require %1 to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="852"/>
+        <location filename="../src/systraywindow.cpp" line="881"/>
         <source>Invalid %1 port specified.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="886"/>
+        <location filename="../src/systraywindow.cpp" line="915"/>
         <source>media proxy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="891"/>
+        <location filename="../src/systraywindow.cpp" line="920"/>
         <source>media server RTSP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="893"/>
+        <location filename="../src/systraywindow.cpp" line="922"/>
         <source>media server API</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="908"/>
+        <location filename="../src/systraywindow.cpp" line="937"/>
         <source>%1 port is same as %2 port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="918"/>
+        <location filename="../src/systraywindow.cpp" line="947"/>
         <source>%1 port already used by another process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="925"/>
+        <location filename="../src/systraywindow.cpp" line="954"/>
         <source>Invalid IP address specified for public IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="990"/>
+        <location filename="../src/systraywindow.cpp" line="1019"/>
         <source>Invalid parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="990"/>
+        <location filename="../src/systraywindow.cpp" line="1019"/>
         <source>You have entered invalid URL.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -431,6 +428,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/settings.ui" line="575"/>
+        <source>(requires restart)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="586"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>

@@ -400,10 +400,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>dd.MM.yy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
@@ -483,11 +479,11 @@
     <name>Language</name>
     <message>
         <source>Language Name</source>
-        <translation>Français</translation>
+        <translation type="obsolete">Français</translation>
     </message>
     <message>
         <source>Locale Code</source>
-        <translation>fr</translation>
+        <translation type="obsolete">fr</translation>
     </message>
 </context>
 <context>
@@ -687,26 +683,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>OpenGlDriversErrorMessageDisplay</name>
     <message>
-        <source>We have detected that your video card drivers may be not installed or are out of date.
-Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.
-For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php</source>
+        <source>Important Performance Tip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Important Performance Tip</source>
+        <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>OpenGlHardwareErrorMessageDisplay</name>
     <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.
-Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.
-For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php</source>
+        <source>Critical Performance Tip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Critical Performance Tip</source>
+        <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -807,10 +799,6 @@ For easy instructions on how to install or update your video driver, follow inst
         <source>Hotkey:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>None</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>PtzPresetsDialog</name>
@@ -874,10 +862,6 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HTML file (*.html);;Spread Sheet (CSV) file (*.csv)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Save As</source>
         <translation type="unfinished"></translation>
     </message>
@@ -910,10 +894,6 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Everything</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Motion only</source>
         <translation type="unfinished"></translation>
     </message>
@@ -931,6 +911,14 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Mb/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continuous</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1250,14 +1238,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Open</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in a New Tab</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in a New Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1813,10 +1793,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open in browser...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open Web Client</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1892,6 +1868,18 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Unpin Notifications</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Open in Browser...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1964,6 +1952,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>You have new notifications</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2104,6 +2096,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Enter the text</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2258,10 +2254,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No cameras found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No cameras selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2320,6 +2312,14 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Server returned an error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All cameras are already in the resource tree.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras found.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2542,6 +2542,10 @@ Make sure the server is available and try again.</source>
     <name>QnCameraSettingsDialog</name>
     <message>
         <source>Camera settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in New Tab</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3278,10 +3282,6 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This license is already activated.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>License was successfully activated.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3312,6 +3312,10 @@ Locked to Hardware ID: %3&lt;br /&gt;
 &lt;br /&gt;
 &lt;b&gt;Features:&lt;/b&gt;&lt;br /&gt;
 Archive Streams Allowed: %4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The license is already activated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3674,11 +3678,11 @@ Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Downloading sound...</source>
+        <source>&lt;Downloading sound...&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Uploading sound...</source>
+        <source>&lt;Uploading sound...&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3725,10 +3729,6 @@ Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failure on %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3753,19 +3753,7 @@ Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>E-Mail address is not set for user %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Connect to server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storages are not configured on %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some storages are full on %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3783,15 +3771,7 @@ Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Play Sound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Manage...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Say Text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3918,6 +3898,35 @@ All changes will be lost after program exit.</source>
     </message>
 </context>
 <context>
+    <name>QnPtzPresetDialog</name>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPtzPresetHotkeyItemDelegate</name>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPtzPresetListModel</name>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hotkey</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnPtzPresetsDialog</name>
     <message>
         <source>Remove</source>
@@ -3929,18 +3938,6 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>PTZ presets for camera %1:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hotkey</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>None</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4011,6 +4008,10 @@ All changes will be lost after program exit.</source>
         <source>Live Cameras</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Sample Tooltip</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
@@ -4054,6 +4055,25 @@ All changes will be lost after program exit.</source>
     </message>
 </context>
 <context>
+    <name>QnSayTextBusinessActionWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Say the following:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSendmailBusinessActionWidget</name>
     <message>
         <source>&amp;Additional Recipients:</source>
@@ -4068,10 +4088,6 @@ All changes will be lost after program exit.</source>
     <name>QnServerResourceWidget</name>
     <message>
         <source>%1 (%2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

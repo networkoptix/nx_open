@@ -566,10 +566,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>dd.MM.yy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
@@ -675,11 +671,11 @@
     </message>
     <message>
         <source>Language Name</source>
-        <translation type="unfinished">中文</translation>
+        <translation type="obsolete">中文</translation>
     </message>
     <message>
         <source>Locale Code</source>
-        <translation>zh-CN</translation>
+        <translation type="obsolete">zh-CN</translation>
     </message>
 </context>
 <context>
@@ -1106,11 +1102,15 @@ Would you like to restart client in compatibility mode?</source>
         <source>We have detected that your video card drivers may be not installed or are out of date.
 Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.
 For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php</source>
-        <translation type="unfinished">我们发现您的显卡驱动可能没有安装或者已经过期。安装或者升级显卡驱动可以在浏览视频时提高系统性能。关于如何安装和升级显卡驱动，可以参照http://tribaltrouble.com/driversupport.php</translation>
+        <translation type="obsolete">我们发现您的显卡驱动可能没有安装或者已经过期。安装或者升级显卡驱动可以在浏览视频时提高系统性能。关于如何安装和升级显卡驱动，可以参照http://tribaltrouble.com/driversupport.php</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
         <translation type="unfinished">关键性能提示</translation>
+    </message>
+    <message>
+        <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1119,11 +1119,15 @@ For easy instructions on how to install or update your video driver, follow inst
         <source>We have detected that your video card is not supported. You can proceed at your own risk.
 Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.
 For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php</source>
-        <translation type="unfinished">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照http://tribaltrouble.com/driversupport.php</translation>
+        <translation type="obsolete">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照http://tribaltrouble.com/driversupport.php</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
         <translation type="unfinished">重要性能提示</translation>
+    </message>
+    <message>
+        <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1265,7 +1269,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation type="obsolete">无</translation>
     </message>
 </context>
 <context>
@@ -1350,10 +1354,6 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HTML file (*.html);;Spread Sheet (CSV) file (*.csv)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Save As</source>
         <translation type="unfinished">另存为</translation>
     </message>
@@ -1386,10 +1386,6 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Everything</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Motion only</source>
         <translation type="unfinished">仅运动</translation>
     </message>
@@ -1407,6 +1403,14 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Mb/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continuous</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1773,11 +1777,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Open in a New Tab</source>
-        <translation type="unfinished">在新标签中打开</translation>
+        <translation type="obsolete">在新标签中打开</translation>
     </message>
     <message>
         <source>Open in a New Window</source>
-        <translation type="unfinished">在新窗口中打开</translation>
+        <translation type="obsolete">在新窗口中打开</translation>
     </message>
     <message>
         <source>Open Containing Folder</source>
@@ -2384,10 +2388,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open in browser...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open Web Client</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2463,6 +2463,18 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Unpin Notifications</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Open in Browser...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -2534,6 +2546,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>You have new notifications</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2740,6 +2756,10 @@ for recording at
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Enter the text</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2955,7 +2975,7 @@ for recording at
     </message>
     <message>
         <source>No cameras found</source>
-        <translation type="unfinished">没有发现摄像机</translation>
+        <translation type="obsolete">没有发现摄像机</translation>
     </message>
     <message>
         <source>No cameras selected</source>
@@ -3040,6 +3060,14 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Server returned an error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All cameras are already in the resource tree.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras found.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3307,6 +3335,10 @@ Make sure the server is available and try again.</source>
     <message>
         <source>Camera settings</source>
         <translation type="unfinished">摄像机设定</translation>
+    </message>
+    <message>
+        <source>Open in New Tab</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4128,7 +4160,7 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>This license is already activated.</source>
-        <translation type="unfinished">许可已经激活</translation>
+        <translation type="obsolete">许可已经激活</translation>
     </message>
     <message>
         <source>License was successfully activated.</source>
@@ -4172,6 +4204,10 @@ Archive Streams Allowed: %4</source>
 &lt;br /&gt;
 &lt;b&gt;特性:&lt;/b&gt;&lt;br /&gt;
 允许录像视频: %4</translation>
+    </message>
+    <message>
+        <source>The license is already activated.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4665,11 +4701,11 @@ Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Downloading sound...</source>
+        <source>&lt;Downloading sound...&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Uploading sound...</source>
+        <source>&lt;Uploading sound...&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4716,10 +4752,6 @@ Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failure on %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4744,19 +4776,7 @@ Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>E-Mail address is not set for user %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Connect to server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storages are not configured on %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some storages are full on %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4774,15 +4794,7 @@ Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished">表格</translation>
     </message>
     <message>
-        <source>Play Sound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Manage...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Say Text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4996,6 +5008,35 @@ All changes will be lost after program exit.</source>
     </message>
 </context>
 <context>
+    <name>QnPtzPresetDialog</name>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">无</translation>
+    </message>
+</context>
+<context>
+    <name>QnPtzPresetHotkeyItemDelegate</name>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">无</translation>
+    </message>
+</context>
+<context>
+    <name>QnPtzPresetListModel</name>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">名称</translation>
+    </message>
+    <message>
+        <source>Hotkey</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnPtzPresetsDialog</name>
     <message>
         <source>Remove</source>
@@ -5011,15 +5052,11 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">名称</translation>
-    </message>
-    <message>
-        <source>Hotkey</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">名称</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation type="obsolete">无</translation>
     </message>
 </context>
 <context>
@@ -5096,6 +5133,10 @@ All changes will be lost after program exit.</source>
     <message>
         <source>Live Cameras</source>
         <translation type="unfinished">实时摄像机</translation>
+    </message>
+    <message>
+        <source>Sample Tooltip</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5180,6 +5221,25 @@ All changes will be lost after program exit.</source>
     </message>
 </context>
 <context>
+    <name>QnSayTextBusinessActionWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">表格</translation>
+    </message>
+    <message>
+        <source>Say the following:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSendmailBusinessActionWidget</name>
     <message>
         <source>&amp;Additional Recipients:</source>
@@ -5210,7 +5270,7 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>Ping</source>
-        <translation type="unfinished">Ping</translation>
+        <translation type="obsolete">Ping</translation>
     </message>
     <message>
         <source>Show Log</source>
