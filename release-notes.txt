@@ -5,6 +5,11 @@ Since 1.5.1
  - CLND could be used for local file if open it in a new layout after using calendar search on a camera. Fixed
  - If change camera IP address it was not reflected on camera settings form (only in tree) until the form was re-opened. Fixed
  - If an item has been zoomed using mouse wheel, then double click unzooms it and does full PTZ unzoom as well
+ - Camera selection form (in Events/Actions and Copy Schedule dialogs) is redesigned: click marks camera as selected
+ 
+Since previous build
+ - Selected item was not market in Tree (> sign). Fixed
+ - Network Statistics sometimes displayed 0 Mbps usage for short time. Fixed
  
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
