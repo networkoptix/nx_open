@@ -144,10 +144,10 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
 
     ui->informationLabel->setText(
         tr(
-            "<b>%1</b> version %2 (%3).<br/>\n"
+            "%1 Tray Assistant version %2 (%3).<br/>\n"
             "Built for %5-%6 with %7.<br/>\n"
         ).
-        arg(QLatin1String(QN_APPLICATION_NAME)).
+        arg(QLatin1String(QN_PRODUCT_NAME)).
         arg(QLatin1String(QN_APPLICATION_VERSION)).
         arg(QLatin1String(QN_APPLICATION_REVISION)).
         arg(QLatin1String(QN_APPLICATION_PLATFORM)).
