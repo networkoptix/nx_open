@@ -241,6 +241,11 @@ namespace Qn {
         CheckForUpdatesAction,
 
         /**
+         * Open Showcase page in default browser
+        */
+        ShowcaseAction,
+
+        /**
          * Closes the client.
          */
         ExitAction,

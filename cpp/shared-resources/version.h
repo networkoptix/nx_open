@@ -39,6 +39,7 @@
 #define QN_FREE_LICENSE_IS_TRIAL        ${freeLicenseIsTrial}
 #define QN_LICENSE_URL                  "${license.url}"
 #define QN_RSA_PUBLIC_KEY               ${rsa.public.key}
+#define QN_SHOWCASE_URL                 "${showcase.url}"
 
 #define QN_BUILDENV_PATH                "${environment.dir}"
 
