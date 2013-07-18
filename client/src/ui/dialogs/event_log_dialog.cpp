@@ -551,7 +551,7 @@ void QnEventLogDialog::at_cameraButtonClicked()
     dialog.setSelectedResources(m_filterCameraList);
 
     if (dialog.exec() == QDialog::Accepted)
-        setCameraList(dialog.getSelectedResources());
+        setCameraList(dialog.selectedResources());
 }
 
 void QnEventLogDialog::disableUpdateData()

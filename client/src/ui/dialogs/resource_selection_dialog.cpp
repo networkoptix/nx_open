@@ -17,12 +17,24 @@
 // -------------------------------------------------------------------------- //
 // QnResourceSelectionDialog
 // -------------------------------------------------------------------------- //
-QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent, Qn::NodeType rootNodeType) :
+QnResourceSelectionDialog::QnResourceSelectionDialog(Qn::NodeType rootNodeType, QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    ui(new Ui::QnResourceSelectionDialog),
-    m_delegate(NULL)
+    QnWorkbenchContextAware(parent)
 {
+    init(rootNodeType);
+}
+
+QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
+    base_type(parent),
+    QnWorkbenchContextAware(parent)
+{
+    init(Qn::ServersNode);
+}
+
+void QnResourceSelectionDialog::init(Qn::NodeType rootNodeType) {
+    m_delegate = NULL;
+
+    ui.reset(new Ui::QnResourceSelectionDialog);
     ui->setupUi(this);
 
     m_flat = rootNodeType == Qn::UsersNode; //TODO: #GDM servers?
@@ -32,7 +44,11 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent, Qn::NodeTy
     case Qn::UsersNode:
         setWindowTitle(tr("Select users..."));
         break;
-    default: //default value is "Select cameras...", consistent to default value of rootNodeType
+    case Qn::ServersNode:
+        setWindowTitle(tr("Select cameras..."));
+        break;
+    default:
+        setWindowTitle(tr("Select resources..."));
         break;
     }
 
@@ -46,15 +62,17 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent, Qn::NodeTy
 
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
+    ui->resourcesWidget->setEditingEnabled(false);
+    ui->resourcesWidget->setSimpleSelectionEnabled(true);
 
     ui->delegateFrame->setVisible(false);
 }
 
-QnResourceSelectionDialog::~QnResourceSelectionDialog()
-{
+QnResourceSelectionDialog::~QnResourceSelectionDialog() {
+    return;
 }
 
-QnResourceList QnResourceSelectionDialog::getSelectedResources() const {
+QnResourceList QnResourceSelectionDialog::selectedResources() const {
     QnResourceList result;
     for (int i = 0; i < m_resourceModel->rowCount(); ++i){
         //root nodes
@@ -67,18 +85,18 @@ QnResourceList QnResourceSelectionDialog::getSelectedResources() const {
             QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
             if(resource)
                  result.append(resource);
-        }
-        else
-        for (int j = 0; j < m_resourceModel->rowCount(idx); ++j){
-            //cameras
-            QModelIndex camIdx = m_resourceModel->index(j, Qn::NameColumn, idx);
-            QModelIndex checkedIdx = camIdx.sibling(j, Qn::CheckColumn);
-            bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
-            if (!checked)
-                continue;
-            QnResourcePtr resource = camIdx.data(Qn::ResourceRole).value<QnResourcePtr>();
-            if(resource)
-                 result.append(resource);
+        } else {
+            for (int j = 0; j < m_resourceModel->rowCount(idx); ++j) {
+                //cameras
+                QModelIndex camIdx = m_resourceModel->index(j, Qn::NameColumn, idx);
+                QModelIndex checkedIdx = camIdx.sibling(j, Qn::CheckColumn);
+                bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
+                if (!checked)
+                    continue;
+                QnResourcePtr resource = camIdx.data(Qn::ResourceRole).value<QnResourcePtr>();
+                if(resource)
+                     result.append(resource);
+            }
         }
     }
     return result;
@@ -94,17 +112,17 @@ void QnResourceSelectionDialog::setSelectedResources(const QnResourceList &selec
             bool checked = selected.contains(resource);
             m_resourceModel->setData(checkedIdx,
                                      checked ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
-        }
-        else
-        for (int j = 0; j < m_resourceModel->rowCount(idx); ++j){
-            //cameras
-            QModelIndex camIdx = m_resourceModel->index(j, Qn::NameColumn, idx);
-            QModelIndex checkedIdx = camIdx.sibling(j, Qn::CheckColumn);
+        } else {
+            for (int j = 0; j < m_resourceModel->rowCount(idx); ++j){
+                //cameras
+                QModelIndex camIdx = m_resourceModel->index(j, Qn::NameColumn, idx);
+                QModelIndex checkedIdx = camIdx.sibling(j, Qn::CheckColumn);
 
-            QnResourcePtr resource = camIdx.data(Qn::ResourceRole).value<QnResourcePtr>();
-            bool checked = selected.contains(resource);
-            m_resourceModel->setData(checkedIdx,
-                                     checked ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+                QnResourcePtr resource = camIdx.data(Qn::ResourceRole).value<QnResourcePtr>();
+                bool checked = selected.contains(resource);
+                m_resourceModel->setData(checkedIdx,
+                                         checked ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+            }
         }
     }
 }
@@ -127,11 +145,11 @@ void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *d
     at_resourceModel_dataChanged();
 }
 
-QnResourceSelectionDialogDelegate* QnResourceSelectionDialog::delegate() {
+QnResourceSelectionDialogDelegate* QnResourceSelectionDialog::delegate() const {
     return m_delegate;
 }
 
 void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(getSelectedResources()));
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(selectedResources()));
 }
 
