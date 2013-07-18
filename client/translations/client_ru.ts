@@ -2005,7 +2005,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1046"/>
-        <source>Server Logs</source>
+        <source>Server Logs...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2352,7 +2352,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="20"/>
-        <source>no more than once per</source>
+        <source>Interval of action : Every</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
