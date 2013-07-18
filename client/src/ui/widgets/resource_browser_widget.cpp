@@ -148,8 +148,9 @@ void QnResourceBrowserToolTipWidget::at_provider_imageChanged(const QImage &imag
 }
 
 
-/********** QnResourceBrowserWidget *********************/
-
+// -------------------------------------------------------------------------- //
+// QnResourceBrowserWidget
+// -------------------------------------------------------------------------- //
 QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
     QnWorkbenchContextAware(parent, context),

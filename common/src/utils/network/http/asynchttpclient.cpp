@@ -89,9 +89,10 @@ namespace nx_http
                             lk.relock();
                             continue;
 
+                        case PollSet::etTimedOut:
                         case PollSet::etError:
                             cl_log.log( QString::fromLatin1("Failed to connect to %1:%2. %3").arg(m_url.host()).arg(m_url.port()).
-                                arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
+                                arg(SystemError::toString(eventType != PollSet::etTimedOut ? m_socket->prevErrorCode() : SystemError::timedOut)), cl_logWARNING );
                             if( reconnectIfAppropriate() )
                                 break;
                             m_state = sFailed;

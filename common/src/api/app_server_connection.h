@@ -213,8 +213,7 @@ private:
 };
 
 
-class QN_EXPORT QnAppServerConnectionFactory
-{
+class QN_EXPORT QnAppServerConnectionFactory {
 public:
     static QString authKey();
     static QString clientGuid();

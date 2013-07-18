@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>527</width>
-    <height>579</height>
+    <width>524</width>
+    <height>585</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -39,7 +39,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
-          <string>Enterprise Controller connection</string>
+          <string>Enterprise controller connection</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
@@ -243,7 +243,7 @@
                </sizepolicy>
               </property>
               <property name="text">
-               <string>RTSP Port</string>
+               <string>RTSP port</string>
               </property>
              </widget>
             </item>
@@ -266,7 +266,7 @@
                </sizepolicy>
               </property>
               <property name="text">
-               <string>API Port</string>
+               <string>API port</string>
               </property>
              </widget>
             </item>
@@ -373,7 +373,7 @@
      </widget>
      <widget class="QWidget" name="tabAppServer">
       <attribute name="title">
-       <string>Enterprise Controller (EC) Settings</string>
+       <string>Enterprise Controller Settings</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -385,7 +385,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Network settings</string>
+          <string>Enterprise controller network settings</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>

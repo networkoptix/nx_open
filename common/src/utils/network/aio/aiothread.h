@@ -36,7 +36,7 @@ namespace aio
         //!Implementation of QnLongRunnable::pleaseStop
         virtual void pleaseStop() override;
 
-        //!Monitor socket \a sock for event \a eventToWatch occurence and trigger \a eventHandler on event
+        //!Monitor socket \a sock for event \a eventToWatch occurrence and trigger \a eventHandler on event
         /*!
             \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
             \note MUST be called with \a mutex locked
@@ -44,7 +44,8 @@ namespace aio
         bool watchSocket(
             const QSharedPointer<Socket>& sock,
             PollSet::EventType eventToWatch,
-            AIOEventHandler* const eventHandler );
+            AIOEventHandler* const eventHandler,
+            int timeoutMS = 0 );
         //!Do not monitor \a sock for event \a eventType
         /*!
             Garantees that no \a eventTriggered will be called after return of this method.

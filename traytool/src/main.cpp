@@ -10,7 +10,7 @@
 
 #include "systraywindow.h"
 #include "common/common_module.h"
-#include "traytool_translation_manager.h"
+#include "translation/translation_manager.h"
 
 static const QString CLIENT_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" ") + lit(QN_PRODUCT_NAME) + lit(" Client"));
 
@@ -55,7 +55,9 @@ int main(int argc, char *argv[])
     QDir::setCurrent(QApplication::applicationDirPath());
 
 
-    QnTraytoolTranslationManager *translationManager = qnCommon->instance<QnTraytoolTranslationManager>();
+    QnTranslationManager *translationManager = qnCommon->instance<QnTranslationManager>();
+    translationManager->addPrefix(lit("traytool"));
+
     QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), CLIENT_NAME);
     QString translationPath = clientSettings.value(lit("translationPath")).toString();
     int index = translationPath.lastIndexOf(lit("client"));

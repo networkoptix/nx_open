@@ -197,8 +197,8 @@ protected slots:
     void at_workbench_cellSpacingChanged();
     void at_workbench_currentLayoutChanged();
 
-    void at_eventManager_connectionClosed();
-    void at_eventManager_connectionOpened();
+    void at_messageProcessor_connectionClosed();
+    void at_messageProcessor_connectionOpened();
     void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& businessAction);
 
     void at_mainMenuAction_triggered();
@@ -346,6 +346,9 @@ protected slots:
     void at_messageBoxAction_triggered();
 
     void at_browseUrlAction_triggered();
+
+    void at_versionMismatchWatcher_mismatchDataChanged();
+
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
@@ -383,6 +386,7 @@ private:
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 
     QnAdjustVideoDialog* adjustVideoDialog();
+
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
