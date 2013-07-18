@@ -343,7 +343,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
 
     if (dialog.exec() != QDialog::Accepted)
         return;
-    m_model->setEventResources(dialog.getSelectedResources());
+    m_model->setEventResources(dialog.selectedResources());
 }
 
 void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
@@ -358,7 +358,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     if (node == Qn::BastardNode)
         return;
 
-    QnResourceSelectionDialog dialog(this, node);
+    QnResourceSelectionDialog dialog(node, this);
 
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)
@@ -371,7 +371,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
 
     if (dialog.exec() != QDialog::Accepted)
         return;
-    m_model->setActionResources(dialog.getSelectedResources());
+    m_model->setActionResources(dialog.selectedResources());
 }
 
 void QnBusinessRuleWidget::at_scheduleButton_clicked() {

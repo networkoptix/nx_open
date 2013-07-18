@@ -640,6 +640,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
+    factory(Qn::ShowcaseAction).
+        flags(Qn::Main).
+        text(tr("Showcase...")).
+        condition(new QnShowcaseActionCondition(this));
+
     factory(Qn::CheckForUpdatesAction).
         flags(Qn::Main).
         text(tr("Check for Updates...")).

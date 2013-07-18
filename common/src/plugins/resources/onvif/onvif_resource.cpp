@@ -216,7 +216,6 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_needUpdateOnvifUrl(false),
     m_timeDrift(0),
     m_prevSoapCallResult(0),
-    m_eventCapabilities( NULL ),
     m_eventMonitorType( emtNone ),
     m_timerID( 0 ),
     m_renewSubscriptionTaskID(0),
@@ -255,12 +254,6 @@ QnPlOnvifResource::~QnPlOnvifResource()
     stopInputPortMonitoring();
 
     delete m_onvifAdditionalSettings;
-
-    if( m_eventCapabilities )
-    {
-        delete m_eventCapabilities;
-        m_eventCapabilities = NULL;
-    }
 }
 
 const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
@@ -775,7 +768,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
         {
             //TODO: #vasilenko UTF unuse std::string
             if (response.Capabilities->Events)
-                m_eventCapabilities = new onvifXsd__EventCapabilities( *response.Capabilities->Events );
+                m_eventCapabilities.reset( new onvifXsd__EventCapabilities( *response.Capabilities->Events ) );
 
             if (response.Capabilities->Media) 
             {
@@ -2160,7 +2153,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer()
 {
     QMutexLocker lk( &m_subscriptionMutex );
 
-    if( !m_eventCapabilities || m_onvifNotificationSubscriptionID.isEmpty() )
+    if( !m_eventCapabilities.get() || m_onvifNotificationSubscriptionID.isEmpty() )
         return;
 
     const QAuthenticator& auth = getAuth();
@@ -2280,7 +2273,7 @@ bool QnPlOnvifResource::startInputPortMonitoring()
         return false;
     }
 
-    if( !m_eventCapabilities )
+    if( !m_eventCapabilities.get() )
         return false;
 
     if( m_eventCapabilities->WSPullPointSupport )
@@ -2494,7 +2487,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     //strcpy( buf, "<wsnt:TopicExpression Dialect=\"xsd:anyURI\">tns1:Device/Trigger/Relay</wsnt:TopicExpression>" );
     //topicFilter.__any.push_back( buf );
     //request.Filter = &topicFilter;
-
+                                                             
     _oasisWsnB2__SubscribeResponse response;
     m_prevSoapCallResult = soapWrapper.Subscribe( &request, &response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )    //TODO/IMPL find out which is error and which is not
@@ -2677,6 +2670,7 @@ bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const r
         return false;
     }
 
+    m_relayOutputInfo.clear();
     for( size_t i = 0; i < response.RelayOutputs.size(); ++i )
     {
         m_relayOutputInfo.push_back( RelayOutputInfo( 

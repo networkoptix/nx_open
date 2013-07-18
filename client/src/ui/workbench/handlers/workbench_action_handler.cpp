@@ -98,6 +98,7 @@
 #include <ui/workbench/watchers/workbench_update_watcher.h>
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
 #include <utils/license_usage_helper.h>
 #include <utils/app_server_image_cache.h>
@@ -210,8 +211,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_messageProcessor_connectionClosed()));
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_messageProcessor_connectionOpened()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)), this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
 
     // TODO: #GDM why these connect calls are here? Why not in QnAppServerNotificationCache?
@@ -233,6 +234,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
     connect(action(Qn::DebugCalibratePtzAction),                SIGNAL(triggered()),    this,   SLOT(at_debugCalibratePtzAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
+    connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
@@ -330,12 +332,13 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
+    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
 
     context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
 
 
     /* Run handlers that update state. */
-    at_eventManager_connectionClosed();
+    at_messageProcessor_connectionClosed();
     at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
     at_updateWatcher_availableUpdateChanged();
@@ -911,7 +914,7 @@ void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     qnRedAssController->setMode(Qn::AutoResolution);
 }
 
-void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
+void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Server..."));
 
@@ -923,7 +926,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     context()->instance<QnAppServerNotificationCache>()->clear();
 }
 
-void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
+void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM use conditional texts?
 
@@ -1599,6 +1602,10 @@ void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
     notifyAboutUpdate(true);
 }
 
+void QnWorkbenchActionHandler::at_showcaseAction_triggered() {
+    QDesktopServices::openUrl(QUrl(QLatin1String(QN_SHOWCASE_URL), QUrl::TolerantMode));
+}
+
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
     QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
@@ -1821,7 +1828,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     context()->setUserName(connectionData.url.userName());
 
-    at_eventManager_connectionOpened();
+    at_messageProcessor_connectionOpened();
 }
 
 void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
@@ -2191,7 +2198,15 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if(!server)
         return;
 
-    QUrl url(server->apiConnection()->url().toString() + QLatin1String("/api/showLog?lines=1000"));
+    // TODO: #Elric total encapsulation failure, there should be no proxy-related logic here.
+    QString url;
+    if(!server->getProxyHost().isEmpty()) {
+        QUrl apiUrl(server->getApiUrl());
+        url = QString(lit("http://%1:%2/proxy/%3:%4/api/showLog?lines=1000")).arg(server->getProxyHost()).arg(server->getProxyPort()).arg(apiUrl.host()).arg(apiUrl.port());
+    } else {
+        url = server->getApiUrl() + lit("/api/showLog?lines=1000");
+    }
+    
     QDesktopServices::openUrl(url);
 }
 
@@ -3805,4 +3820,50 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
         return;
 
     QDesktopServices::openUrl(QUrl::fromUserInput(url));
+}
+
+void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
+    QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
+    if(!watcher->hasMismatches())
+        return;
+
+    QnSoftwareVersion latestVersion = watcher->latestVersion();
+
+    QString components;
+    foreach(const QnVersionMismatchData &data, watcher->mismatchData()) {
+        QString component;
+        switch(data.component) {
+        case Qn::ClientComponent:
+            component = tr("Client v%1<br/>").arg(data.version.toString());
+            break;
+        case Qn::EnterpriseControllerComponent:
+            component = tr("Enterprise Controller v%1<br/>").arg(data.version.toString());
+            break;
+        case Qn::MediaServerComponent: {
+            QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
+            if(resource) {
+                component = tr("Media Server v%1 at %2<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
+            } else {
+                component = tr("Media Server v%1<br/>").arg(data.version.toString());
+            }
+        }
+        default:
+            break;
+        }
+
+        if(data.version != latestVersion)
+            component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
+        
+        components += component;
+    }
+
+    QString message = tr(
+        "Some components of the system are not upgraded:<br/>"
+        "<br/>"
+        "%1"
+        "<br/>"
+        "Please upgrade all components to the latest version %2."
+    ).arg(components).arg(watcher->latestVersion().toString());
+
+    QMessageBox::warning(mainWindow(), tr("Version Mismatch"), message);
 }

@@ -37,13 +37,14 @@ class QnResourceSelectionDialog : public QDialog, public QnWorkbenchContextAware
     typedef QDialog base_type;
 
 public:
-    explicit QnResourceSelectionDialog(QWidget *parent, Qn::NodeType rootNodeType = Qn::ServersNode);
+    explicit QnResourceSelectionDialog(Qn::NodeType rootNodeType, QWidget *parent = NULL);
+    explicit QnResourceSelectionDialog(QWidget *parent = NULL);
     ~QnResourceSelectionDialog();
 
-    QnResourceList getSelectedResources() const;
+    QnResourceList selectedResources() const;
     void setSelectedResources(const QnResourceList &selected);
 
-    QnResourceSelectionDialogDelegate* delegate();
+    QnResourceSelectionDialogDelegate *delegate() const;
     void setDelegate(QnResourceSelectionDialogDelegate* delegate);
 
 protected:
@@ -51,6 +52,9 @@ protected:
 
 private slots:
     void at_resourceModel_dataChanged();
+
+private:
+    void init(Qn::NodeType rootNodeType);
 
 private:
     QScopedPointer<Ui::QnResourceSelectionDialog> ui;

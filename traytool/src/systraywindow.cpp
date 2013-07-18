@@ -62,10 +62,10 @@ bool MyIsUserAnAdmin()
    return isAdmin;
 }
 
-QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEnterpriseControllersModel ):
+QnSystrayWindow::QnSystrayWindow(FoundEnterpriseControllersModel *const foundEnterpriseControllersModel):
     ui(new Ui::SettingsDialog),
     m_findAppServerDialog(new QDialog()),
-    m_findAppServerDialogUI( new Ui::FindAppServerDialog() ),
+    m_findAppServerDialogUI(new Ui::FindAppServerDialog()),
     m_mediaServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME),
     m_appServerSettings(QSettings::SystemScope, qApp->organizationName(), APP_SERVER_NAME),
     m_foundEnterpriseControllersModel( foundEnterpriseControllersModel )

@@ -147,6 +147,14 @@ public:
     };
 
 
+    enum SystemComponent {
+        EnterpriseControllerComponent,
+        MediaServerComponent,
+        ClientComponent,
+        MediaProxyComponent,
+    };
+
+
     /**
      * Generic enumeration holding different data roles used in Qn classes.
      */
