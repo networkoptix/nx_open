@@ -31,7 +31,7 @@
     <name>Language</name>
     <message>
         <source>Language Name</source>
-        <translation>Français</translation>
+        <translation>FranÃ§ais</translation>
     </message>
     <message>
         <source>Locale Code</source>
