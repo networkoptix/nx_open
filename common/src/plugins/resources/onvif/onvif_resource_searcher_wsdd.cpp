@@ -66,7 +66,7 @@ OnvifResourceSearcherWsdd::~OnvifResourceSearcherWsdd()
         it != m_ifaceToSock.end();
         ++it )
     {
-        delete it->second->sock;
+        it->second->sock.reset();
         delete it->second;
     }
     m_ifaceToSock.clear();
@@ -300,6 +300,8 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
     }
 }*/
 
+#define LEAK_SEARCH
+
 void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
 {
 #if 0
@@ -311,14 +313,23 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         findEndpointsImpl( result, iface );
     }
 #else
+
     const QList<QnInterfaceAndAddr>& intfList = getAllIPv4Interfaces();
+
+#ifdef LEAK_SEARCH
+    if( !m_isFirstSearch )
+    {
+        foreach(QnInterfaceAndAddr iface, intfList)
+            readProbeMatches( iface, result );
+    }
+#endif
+
     foreach(QnInterfaceAndAddr iface, intfList)
     {
         if (m_shouldStop)
             return;
 
-        if( !sendProbe( iface ) )
-            continue;
+        sendProbe( iface );
     }
 
     if( m_isFirstSearch )
@@ -329,12 +340,26 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
 #else
         ::sleep( 1 );
 #endif
+
+#ifdef LEAK_SEARCH
+        foreach(QnInterfaceAndAddr iface, intfList)
+            readProbeMatches( iface, result );
+
+        foreach(QnInterfaceAndAddr iface, intfList)
+        {
+            if (m_shouldStop)
+                return;
+
+            sendProbe( iface );
+        }
+#endif
     }
 
-    foreach(QnInterfaceAndAddr iface, intfList)
-    {
-        readProbeMatches( iface, result );
-    }
+#ifndef LEAK_SEARCH
+        foreach(QnInterfaceAndAddr iface, intfList)
+            readProbeMatches( iface, result );
+#endif
+
 #endif
 }
 
@@ -346,7 +371,11 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result)
     //findHelloEndpoints(endpoints);
 
 
-    findEndpoints(endpoints);
+    //for( int i = 0; i < 100; ++i )
+    //{
+        findEndpoints(endpoints);
+    //    endpoints.clear();
+    //}
 
 #if 0
     //ToDo: delete
@@ -744,10 +773,10 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
     if( p.second )
     {
         ctx = new ProbeContext();
-        ctx->sock = new UDPSocket();
+        ctx->sock.reset( new UDPSocket() );
         if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
         {
-            delete ctx->sock;
+            ctx->sock.reset();
             delete ctx;
             m_ifaceToSock.erase( p.first );
             return false;
@@ -755,9 +784,7 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
 
         ctx->soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
         ctx->soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
-        //ctx->soapWsddProxy.soap->connect_timeout = SOAP_DISCOVERY_TIMEOUT;
-        //ctx->soapWsddProxy.soap->accept_timeout = SOAP_DISCOVERY_TIMEOUT;
-        ctx->soapWsddProxy.soap->user = ctx->sock;
+        ctx->soapWsddProxy.soap->user = ctx->sock.get();
         ctx->soapWsddProxy.soap->fconnect = nullGsoapFconnect;
         ctx->soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
         ctx->soapWsddProxy.soap->fsend = gsoapFsendSmall;
@@ -766,6 +793,29 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
         ctx->soapWsddProxy.soap->master = ctx->sock->handle();
     }
+
+#ifdef LEAK_SEARCH
+    if( !ctx->soapWsddProxy.soap )
+    {
+        //ctx->sock.reset( new UDPSocket() );
+        //ctx->sock->bindToInterface(iface);
+        //ctx->sock->setNonBlockingMode( true );
+
+        ctx->soapWsddProxy.soap = soap_new();
+        soap_init(ctx->soapWsddProxy.soap);
+        ctx->soapWsddProxy.wsddProxy_init( SOAP_IO_DEFAULT, SOAP_IO_DEFAULT );
+        ctx->soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
+        ctx->soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
+        ctx->soapWsddProxy.soap->user = ctx->sock.get();
+        ctx->soapWsddProxy.soap->fconnect = nullGsoapFconnect;
+        ctx->soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
+        ctx->soapWsddProxy.soap->fsend = gsoapFsendSmall;
+        ctx->soapWsddProxy.soap->frecv = gsoapFrecv;
+        ctx->soapWsddProxy.soap->fopen = NULL;
+        ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
+        ctx->soapWsddProxy.soap->master = ctx->sock->handle();
+    }
+#endif
 
     //UDPSocket socket;
     //if (!socket.bindToInterface(iface))
@@ -800,7 +850,7 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         return true;
 
     //removing socket for it to be recreated on next sendProbe call
-    delete ctx->sock;
+    ctx->sock.reset();
     delete ctx;
     m_ifaceToSock.erase( p.first );
     return false;
@@ -813,15 +863,15 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         return false;
     ProbeContext& ctx = *it->second;
 
+#ifdef LEAK_SEARCH
+    Q_ASSERT( ctx.soapWsddProxy.soap );
+#endif
+
     //Receiving all ProbeMatches. Timeout = 500 ms, as written in ONVIF spec
     for( ;; )
     {
         if (m_shouldStop)
-        {
-            soap_destroy(ctx.soapWsddProxy.soap);
-            soap_end(ctx.soapWsddProxy.soap);
             return false;
-        }
 
         __wsdd__ProbeMatches wsddProbeMatches;
         wsddProbeMatches.wsdd__ProbeMatches = NULL;
@@ -841,10 +891,26 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
             }
             soap_destroy(ctx.soapWsddProxy.soap);
             soap_end(ctx.soapWsddProxy.soap);
+#ifdef LEAK_SEARCH
+            //soap_free(ctx.soapWsddProxy.soap);
+            //ctx.soapWsddProxy.soap = NULL;
+
+            //ctx.soapWsddProxy.reset();
+            //ctx.soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
+            //ctx.soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
+            //ctx.soapWsddProxy.soap->user = ctx.sock.get();
+            //ctx.soapWsddProxy.soap->fconnect = nullGsoapFconnect;
+            //ctx.soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
+            //ctx.soapWsddProxy.soap->fsend = gsoapFsendSmall;
+            //ctx.soapWsddProxy.soap->frecv = gsoapFrecv;
+            //ctx.soapWsddProxy.soap->fopen = NULL;
+            //ctx.soapWsddProxy.soap->socket = ctx.sock->handle();
+            //ctx.soapWsddProxy.soap->master = ctx.sock->handle();
+#endif
             if( soapRes != SOAP_EOF )
             {
                 //removing socket for it to be recreated on next sendProbe call
-                delete ctx.sock;
+                ctx.sock.reset();
                 delete it->second;
                 m_ifaceToSock.erase( it );
             }
