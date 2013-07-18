@@ -6,6 +6,10 @@ Since 1.5.1
  - If change camera IP address it was not reflected on camera settings form (only in tree) until the form was re-opened. Fixed
  - If an item has been zoomed using mouse wheel, then double click unzooms it and does full PTZ unzoom as well
  - Camera selection form (in Events/Actions and Copy Schedule dialogs) is redesigned: click marks camera as selected
+ - If Client connects to the systen that contain different versions of server components (i.e EC 1.5.1, MS1 1.5.0 and MS2 1.5.1), 
+   the warning will be given
+ - TrayTool can be translated. Languages settings are applied both for Client and Tray Tool
+ - ACTI cameras sometimes started displaying grey picture. Fixed
  
 Since previous build
  - Selected item was not market in Tree (> sign). Fixed
