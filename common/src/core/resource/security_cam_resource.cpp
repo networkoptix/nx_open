@@ -157,8 +157,6 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
 void QnSecurityCamResource::initializationDone()
 {
-    QMutexLocker lk( &m_mutex );
-
     if( m_inputPortListenerCount > 0 )
         startInputPortMonitoring();
 }
