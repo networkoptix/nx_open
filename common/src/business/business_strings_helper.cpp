@@ -262,7 +262,6 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     QUrl apPServerUrl = QnAppServerConnectionFactory::publicUrl();
     QUrl appServerDefaultUrl = QnAppServerConnectionFactory::defaultUrl();
     quint64 ts = params.getEventTimestamp();
-    QByteArray rnd = QByteArray::number(qrand()).toHex();
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
     if (history) {
@@ -281,9 +280,8 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
         }
     }
 
-    QString result(lit("https://%1:%2/proxy/http/%3:%4/media/%5.webm?rand=%6&resolution=240p&pos=%7"));
-    result = result.arg(apPServerUrl.host()).arg(apPServerUrl.port(80)).arg(mserverUrl.host()).arg(mserverUrl.port(80)).
-        arg(res->getPhysicalId()).arg(QLatin1String(rnd)).arg(ts/1000);
+    QString result(lit("https://%1:%2/web/camera?physical_id=%3&pos=%4"));
+    result = result.arg(apPServerUrl.host()).arg(apPServerUrl.port(80)).arg(res->getPhysicalId()).arg(ts/1000);
 
     return result;
 }
