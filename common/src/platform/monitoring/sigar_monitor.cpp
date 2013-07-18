@@ -151,17 +151,27 @@ public:
         }
 
         NetworkStat &last = lastNetworkStatByInterfaceName[interfaceName];
-        quint64 elapsed = last.timer.isValid()
-                ? last.timer.elapsed()
-                : 0;
-        result.bytesPerSecIn = elapsed > 0
-                ? qMax(current.rx_bytes - last.stat.rx_bytes, sigar_uint64_t(0)) * 1000 / elapsed
-                : 0;
-        result.bytesPerSecOut = elapsed > 0
-                ? qMax(current.tx_bytes - last.stat.tx_bytes, sigar_uint64_t(0)) * 1000 / elapsed
-                : 0;
+        qint64 elapsed = last.timer.isValid() ? last.timer.elapsed() : 0;
+        if(elapsed <= 0) {
+            result.bytesPerSecIn = result.bytesPerSecOut = 0;
+        } else {
+            qint64 bytesIn = static_cast<qint64>(current.rx_bytes) - static_cast<qint64>(last.stat.rx_bytes);
+            qint64 bytesOut = static_cast<qint64>(current.tx_bytes) - static_cast<qint64>(last.stat.tx_bytes);
+
+#ifdef Q_OS_WIN
+            // TODO: #Elric totally evil workaround for windows, flaw in GetIfTable.
+            if(bytesIn < 0) /* Integer overflow. */
+                bytesIn = bytesIn + std::numeric_limits<unsigned int>::max();
+            if(bytesOut < 0) /* Integer overflow. */
+                bytesOut = bytesOut + std::numeric_limits<unsigned int>::max();
+#endif
+
+            result.bytesPerSecIn = bytesIn * 1000 / elapsed;
+            result.bytesPerSecOut = bytesOut * 1000 / elapsed;
+        }
         last.stat = current;
         last.timer.restart();
+
         return result;
     }
 
