@@ -66,6 +66,10 @@ struct QnMessage
     QnLicenseList licenses;
     QnCameraHistoryList cameraServerItems;
 
+    QByteArray oldHardwareId;
+    QByteArray hardwareId1;
+    QByteArray hardwareId2;
+
     QString filename;
     QString publicIp;
 

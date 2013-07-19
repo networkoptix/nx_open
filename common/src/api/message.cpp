@@ -104,7 +104,7 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_License:
         {
             const pb::LicenseMessage& licenseMessage = message.GetExtension(pb::LicenseMessage::message);
-			parseLicense(license, licenseMessage.license(), qnLicensePool->getLicenses().oldHardwareId());
+			parseLicense(license, licenseMessage.license(), qnLicensePool->oldHardwareId());
             break;
         }
         case pb::Message_Type_CameraServerItem:
@@ -116,9 +116,9 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_Initial:
         {
             const pb::InitialMessage& initialMessage = message.GetExtension(pb::InitialMessage::message);
-            licenses.setHardwareId1(initialMessage.hardwareid1().c_str());
-			licenses.setOldHardwareId(initialMessage.oldhardwareid().c_str());
-			licenses.setHardwareId2(initialMessage.hardwareid2().c_str());
+            oldHardwareId = initialMessage.oldhardwareid().c_str();
+            hardwareId1 = initialMessage.hardwareid1().c_str();
+            hardwareId2 = initialMessage.hardwareid2().c_str();
             publicIp = QString::fromStdString(initialMessage.publicip());
 
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());

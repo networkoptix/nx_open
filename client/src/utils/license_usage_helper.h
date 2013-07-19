@@ -25,7 +25,7 @@ public:
 private:
     void update();
 
-    QnLicenseList m_licenses;
+    QnLicenseListHelper m_licenses;
 
     int m_usedDigital;
     int m_usedAnalog;
