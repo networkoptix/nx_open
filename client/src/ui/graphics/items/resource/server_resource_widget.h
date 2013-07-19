@@ -7,6 +7,9 @@
 
 #include <api/model/statistics_reply.h>
 
+#include <ui/animation/animated.h>
+#include <ui/animation/animation_timer_listener.h>
+
 #include "resource_widget.h"
 
 class QnRadialGradientPainter;
@@ -15,10 +18,10 @@ class StatisticsOverlayWidget;
 class QnGlFunctions;
 
 
-class QnServerResourceWidget: public QnResourceWidget {
+class QnServerResourceWidget: public Animated<QnResourceWidget>, AnimationTimerListener {
     Q_OBJECT
 
-    typedef QnResourceWidget base_type;
+    typedef Animated<QnResourceWidget> base_type;
 
 public:
     static const Button PingButton = static_cast<Button>(0x08);
@@ -53,12 +56,15 @@ protected:
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
 
+    virtual void tick(int deltaMSecs) override;
+
 private slots:
     void at_statistics_received();
     void at_pingButton_clicked();
     void at_showLogButton_clicked();
     void at_checkIssuesButton_clicked();
-
+    
+    void updateHoverKey();
     void updateGraphVisibility();
     void updateInfoOpacity();
 
@@ -122,12 +128,13 @@ private:
     QSharedPointer<QnRadialGradientPainter> m_backgroundGradientPainter;
 
     /** Button bars with corresponding buttons */
-    QnImageButtonBar* m_legendButtonBar[ButtonBarCount];
+    QnImageButtonBar *m_legendButtonBar[ButtonBarCount];
 
     struct GraphData {
-        GraphData(): bar(CommonButtonBar), mask(0), visible(false), opacity(1.0) {}
+        GraphData(): bar(NULL), button(NULL), mask(0), visible(false), opacity(1.0) {}
 
-        LegendButtonBar bar;
+        QnImageButtonBar *bar;
+        QnImageButtonWidget *button;
         int mask;
         bool visible;
         qreal opacity;
@@ -136,7 +143,7 @@ private:
     /** Which buttons are checked on each button bar */
     QHash<QString, GraphData> m_graphDataByKey;
 
-    QString hoveredKey;
+    QString m_hoveredKey;
 
     qreal m_infoOpacity;
 };

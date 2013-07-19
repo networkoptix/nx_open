@@ -27,6 +27,24 @@
     CLASS(const T0 &arg0, T1 &arg1): BASE(arg0, arg1) __VA_ARGS__               \
     template<class T0, class T1>                                                \
     CLASS(T0 &arg0, T1 &arg1): BASE(arg0, arg1) __VA_ARGS__                     \
+                                                                                \
+    template<class T0, class T1, class T2>                                      \
+    CLASS(const T0 &arg0, const T1 &arg1, const T2 &arg2): BASE(arg0, arg1, arg2) __VA_ARGS__ \
+    template<class T0, class T1, class T2>                                      \
+    CLASS(T0 &arg0, const T1 &arg1, const T2 &arg2): BASE(arg0, arg1, arg2) __VA_ARGS__ \
+    template<class T0, class T1, class T2>                                      \
+    CLASS(const T0 &arg0, T1 &arg1, const T2 &arg2): BASE(arg0, arg1, arg2) __VA_ARGS__ \
+    template<class T0, class T1, class T2>                                      \
+    CLASS(const T0 &arg0, const T1 &arg1, T2 &arg2): BASE(arg0, arg1, arg2) __VA_ARGS__ \
+    template<class T0, class T1, class T2>                                      \
+    CLASS(T0 &arg0, T1 &arg1, const T2 &arg2): BASE(arg0, arg1, arg2) __VA_ARGS__ \
+    template<class T0, class T1, class T2>                                      \
+    CLASS(const T0 &arg0, T1 &arg1, T2 &arg2): BASE(arg0, arg1, arg2) __VA_ARGS__ \
+    template<class T0, class T1, class T2>                                      \
+    CLASS(T0 &arg0, const T1 &arg1, T2 &arg2): BASE(arg0, arg1, arg2) __VA_ARGS__ \
+    template<class T0, class T1, class T2>                                      \
+    CLASS(T0 &arg0, T1 &arg1, T2 &arg2): BASE(arg0, arg1, arg2) __VA_ARGS__     \
+
 
 
 #endif // QN_FORWARD_H

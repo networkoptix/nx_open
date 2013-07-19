@@ -219,6 +219,8 @@ namespace {
     const int legendFontSize = 20;
     const int itemSpacing = 2;
 
+    const char *legendKeyPropertyName = "_qn_legendKey";
+
 } // anonymous namespace
 
 
@@ -391,7 +393,8 @@ protected:
             foreach(QString key, m_widget->m_sortedKeys) {
                 QnStatisticsData &stats = m_widget->m_history[key];
 
-                if (!m_widget->m_graphDataByKey[key].visible)
+                const QnServerResourceWidget::GraphData &data = m_widget->m_graphDataByKey[key];
+                if (!data.visible)
                     continue;
 
                 QLinkedList<qreal> values = stats.values;
@@ -399,7 +402,7 @@ protected:
                 qreal currentValue = 0;
                 QPainterPath path = createChartPath(values, x_step, -1.0 * (oh - 2*space_offset), elapsed_step, &currentValue);
                 displayValues[key] = currentValue;
-                graphPen.setColor(getDeviceColor(stats.deviceType, key));
+                graphPen.setColor(toTransparent(getDeviceColor(stats.deviceType, key), data.opacity));
                 painter->strokePath(path, graphPen);
             }
         }
@@ -426,7 +429,8 @@ protected:
                 foreach(QString key, m_widget->m_sortedKeys) {
                     QnStatisticsData &stats = m_widget->m_history[key];
 
-                    if (!m_widget->m_graphDataByKey[key].visible)
+                    const QnServerResourceWidget::GraphData &data = m_widget->m_graphDataByKey[key];
+                    if (!data.visible)
                         continue;
 
                     qreal interValue = displayValues[key];
@@ -434,8 +438,7 @@ protected:
                         continue;
                     qreal y = offsetTop + qMax(offsetTop, oh * (1.0 - interValue));
 
-
-                    main_pen.setColor(getDeviceColor(stats.deviceType, key));
+                    main_pen.setColor(toTransparent(getDeviceColor(stats.deviceType, key), data.opacity));
                     painter->setPen(main_pen);
                     painter->drawText(xRight, y, tr("%1%").arg(qRound(interValue * 100.0)));
                 }
@@ -454,13 +457,16 @@ private:
 // QnServerResourceWidget
 // -------------------------------------------------------------------------- //
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
-    QnResourceWidget(context, item, parent),
+    base_type(context, item, parent),
     m_manager(context->instance<QnMediaServerStatisticsManager>()),
     m_lastHistoryId(-1),
     m_counter(0),
     m_renderStatus(Qn::NothingRendered),
     m_infoOpacity(0.0)
 {
+    registerAnimation(this);
+    startListening();
+
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     if(!m_resource)
         qnCritical("Server resource widget was created with a non-server resource.");
@@ -618,13 +624,16 @@ void QnServerResourceWidget::updateLegend() {
 
         if (!m_graphDataByKey.contains(key)) {
             GraphData &data = m_graphDataByKey[key];
-            data.bar = buttonBarByDeviceType(stats.deviceType);
-            data.mask = m_legendButtonBar[data.bar]->unusedMask();
+            data.bar = m_legendButtonBar[buttonBarByDeviceType(stats.deviceType)];
+            data.mask = data.bar->unusedMask();
             data.visible = true;
 
-            LegendButtonWidget *button = new LegendButtonWidget(stats.deviceType, key);
-            button->setChecked(true);
-            m_legendButtonBar[data.bar]->addButton(data.mask, button);
+            data.button = new LegendButtonWidget(stats.deviceType, key);
+            data.button->setProperty(legendKeyPropertyName, key);
+            data.button->setChecked(true);
+            data.bar->addButton(data.mask, data.button);
+
+            connect(data.button, SIGNAL(stateChanged()), this, SLOT(updateHoverKey()));
         }
     }
 }
@@ -633,7 +642,7 @@ void QnServerResourceWidget::updateGraphVisibility() {
     for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
         GraphData &data = *pos;
 
-        data.visible = m_legendButtonBar[data.bar]->checkedButtons() & data.mask;
+        data.visible = data.bar->checkedButtons() & data.mask;
     }
 }
 
@@ -643,10 +652,40 @@ void QnServerResourceWidget::updateInfoOpacity() {
         m_legendButtonBar[i]->setOpacity(m_infoOpacity);
 }
 
+void QnServerResourceWidget::updateHoverKey() {
+    for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
+        GraphData &data = *pos;
+
+        if(data.button && data.button->isHovered() && data.button->isChecked()) {
+            m_hoveredKey = pos.key();
+            return;
+        }
+    }
+
+    m_hoveredKey = QString();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnServerResourceWidget::tick(int deltaMSecs) {
+    qreal delta = 4.0 * deltaMSecs / 1000.0;
+
+    for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
+        GraphData &data = *pos;
+        if(m_hoveredKey.isEmpty()) {
+            data.opacity = qMin(data.opacity + delta, 1.0);
+        } else {
+            if(pos.key() == m_hoveredKey) {
+                data.opacity = qMin(data.opacity + delta, 1.0);
+            } else {
+                data.opacity = qMax(data.opacity - delta, 0.2);
+            }
+        }
+    }
+}
+
 QString QnServerResourceWidget::calculateTitleText() const {
     return tr("%1 (%2)").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
 }
@@ -710,3 +749,4 @@ void QnServerResourceWidget::at_showLogButton_clicked() {
 void QnServerResourceWidget::at_checkIssuesButton_clicked() {
     menu()->trigger(Qn::ServerIssuesAction, QnActionParameters(m_resource));
 }
+
