@@ -388,17 +388,41 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
             m_restartPending = false;
         }
 
-        m_restartPending = m_restartPending && (QMessageBox::warning(
-                                  this,
-                                  tr("Could not connect to Enterprise Controller"),
-                                  tr("You are about to connect to Enterprise Controller which has a different version:\n"\
-                                     " - Client version: %1.\n"\
-                                     " - EC version: %2.\n"\
-                                     "Would you like to restart client in compatibility mode?")
-                                  .arg(QLatin1String(QN_ENGINE_VERSION))
-                                  .arg(connectInfo->version),
-                                  QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
-                          && restartInCompatibilityMode(connectInfo);
+        if(m_restartPending) {
+            bool canRestart = QFile::exists(qApp->applicationDirPath() + QLatin1String("/../") + stripVersion(connectInfo->version));
+            if(canRestart) {
+                int button = QMessageBox::warning(
+                    this,
+                    tr("Could not connect to Enterprise Controller"),
+                    tr("You are about to connect to Enterprise Controller which has a different version:\n"\
+                        " - Client version: %1.\n"\
+                        " - EC version: %2.\n"\
+                        "Would you like to restart client in compatibility mode?"
+                    ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version),
+                    QMessageBox::Ok, 
+                    QMessageBox::Cancel
+                );
+                if(button == QMessageBox::Ok) {
+                    restartInCompatibilityMode(connectInfo);
+                } else {
+                    m_restartPending = false;
+                }
+            } else {
+                m_restartPending = false;
+                QMessageBox::warning(
+                    this,
+                    tr("Could not connect to Enterprise Controller"),
+                    tr("You are about to connect to Enterprise Controller which has a different version:\n"
+                        " - Client version: %1.\n"
+                        " - EC version: %2.\n"
+                        "Product version %2 must be installed in order to connect to this Enterprise Controller. " 
+                        "Please download version %2 of the product and upgrade the system."
+                    ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version),
+                    QMessageBox::Ok
+                );
+            }
+        }
+
         if (!m_restartPending) {
             updateFocus();
             return;
