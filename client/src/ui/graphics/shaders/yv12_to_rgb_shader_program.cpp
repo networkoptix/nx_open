@@ -111,6 +111,9 @@ bool QnFisheyeShaderProgram::link()
         m_dstFovLocation = uniformLocation("dstFov");
         m_aspectRatioLocation = uniformLocation("aspectRatio");
         m_yCenterLocation = uniformLocation("yCenter");
+
+        m_maxXLocation = uniformLocation("maxX");
+        m_maxYLocation = uniformLocation("maxY");
     }
     return rez;
 }
@@ -141,6 +144,8 @@ QString QnFisheyeShaderProgram::getShaderText()
         uniform float yLevels1;
         uniform float yLevels2;
         uniform float yGamma;
+        uniform float maxX;
+        uniform float maxY;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
@@ -164,6 +169,9 @@ QString QnFisheyeShaderProgram::getShaderText()
         float theta = atan(pos3d.z, pos3d.x) + fovRot;                         // fisheye angle
         float r     = acos(pos3d.y / length(pos3d)) / PI;                      // fisheye radius
         vec2 pos = vec2(cos(theta), sin(theta)) * r + 0.5;                     // return from polar
+
+        pos.x = min(pos.x, maxX);
+        pos.y = min(pos.y, maxY);
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;

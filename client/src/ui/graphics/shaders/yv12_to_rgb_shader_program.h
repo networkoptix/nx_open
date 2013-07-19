@@ -63,7 +63,7 @@ class QnFisheyeShaderProgram : public QnYv12ToRgbWithGammaShaderProgram
 public:
     QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
     
-    void setDewarpingParams(const DewarpingParams& params, float aspectRatio)
+    void setDewarpingParams(const DewarpingParams& params, float aspectRatio, float maxX, float maxY)
     {
         float fovRot = sin(params.xAngle)*params.fovRot;
         if (params.horizontalView) {
@@ -80,6 +80,9 @@ public:
         }
         setUniformValue(m_aspectRatioLocation, aspectRatio);
         setUniformValue(m_dstFovLocation, (float) params.fov);
+
+        setUniformValue(m_maxXLocation, maxX);
+        setUniformValue(m_maxYLocation, maxY);
     }
 
     virtual bool link() override;
@@ -92,6 +95,8 @@ protected:
     int m_dstFovLocation;
     int m_aspectRatioLocation;
     int m_yCenterLocation;
+    int m_maxXLocation;
+    int m_maxYLocation;
 };
 
 class QnFisheyeWithGammaShaderProgram : public QnFisheyeShaderProgram
