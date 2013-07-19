@@ -14,19 +14,12 @@ public:
 
     QnSoftwareVersion(int major, int minor, int bugfix): m_major(major), m_minor(minor), m_bugfix(bugfix) {}
 
-    QnSoftwareVersion(const QString &versionString) {
-        m_major = m_minor = m_bugfix = 0;
+    explicit QnSoftwareVersion(const char *versionString) {
+        init(QLatin1String(versionString));
+    }
 
-        QStringList versionList = versionString.split(QLatin1Char('.'));
-
-        if (versionList.size() > 0)
-            m_major = versionList[0].toInt();
-
-        if (versionList.size() > 1)
-            m_minor = versionList[1].toInt();
-
-        if (versionList.size() > 2)
-            m_bugfix = versionList[2].toInt();
+    explicit QnSoftwareVersion(const QString &versionString) {
+        init(versionString);
     }
 
     bool isNull() const {
@@ -76,6 +69,22 @@ public:
 
     friend QDataStream &operator>>(QDataStream &stream, QnSoftwareVersion &version) {
         return stream >> version.m_major >> version.m_minor >> version.m_bugfix;
+    }
+
+private:
+    void init(const QString &versionString) {
+        m_major = m_minor = m_bugfix = 0;
+
+        QStringList versionList = versionString.split(QLatin1Char('.'));
+
+        if (versionList.size() > 0)
+            m_major = versionList[0].toInt();
+
+        if (versionList.size() > 1)
+            m_minor = versionList[1].toInt();
+
+        if (versionList.size() > 2)
+            m_bugfix = versionList[2].toInt();
     }
 
 private:

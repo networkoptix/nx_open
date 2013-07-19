@@ -57,7 +57,7 @@ void QnWorkbenchVersionMismatchWatcher::at_messageProcessor_connectionClosed() {
 
     QnVersionMismatchData clientData;
     clientData.component = Qn::ClientComponent;
-    clientData.version = lit(QN_ENGINE_VERSION);
+    clientData.version = QnSoftwareVersion(QN_ENGINE_VERSION);
     m_mismatchData.push_back(clientData);
 
     updateHasMismatches();
@@ -69,7 +69,7 @@ void QnWorkbenchVersionMismatchWatcher::at_messageProcessor_connectionOpened() {
     
     QnVersionMismatchData clientData;
     clientData.component = Qn::ClientComponent;
-    clientData.version = lit(QN_ENGINE_VERSION);
+    clientData.version = QnSoftwareVersion(QN_ENGINE_VERSION);
     m_mismatchData.push_back(clientData);
 
     QnVersionMismatchData ecData;

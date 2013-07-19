@@ -1857,7 +1857,7 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     qnLicensePool->reset();
 
-    QnAppServerConnectionFactory::setCurrentVersion(QLatin1String(""));
+    QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
     // TODO: #Elric save workbench state on logout.
 
     notificationsHandler()->clear();

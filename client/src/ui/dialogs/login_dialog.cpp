@@ -291,7 +291,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
 
 }
 
-bool QnLoginDialog::sendCommandToLauncher(const QString &version, const QStringList &arguments) {
+bool QnLoginDialog::sendCommandToLauncher(const QnSoftwareVersion &version, const QStringList &arguments) {
     QLocalSocket sock;
     sock.connectToServer(launcherPipeName);
     if(!sock.waitForConnected(-1)) {
@@ -299,7 +299,7 @@ bool QnLoginDialog::sendCommandToLauncher(const QString &version, const QStringL
         return false;
     }
 
-    const QByteArray &serializedTask = applauncher::api::StartApplicationTask(version, arguments).serialize();
+    const QByteArray &serializedTask = applauncher::api::StartApplicationTask(stripVersion(version.toString()), arguments).serialize();
     if(sock.write(serializedTask.data(), serializedTask.size()) != serializedTask.size()) {
         qnDebug("Failed to send launch task to local server %1: %2.", launcherPipeName, sock.errorString());
         return false;
@@ -321,7 +321,7 @@ bool QnLoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
     arguments << QLatin1String("--screen");
     arguments << QString::number(qApp->desktop()->screenNumber(this));
 
-    bool result = sendCommandToLauncher(stripVersion(connectInfo->version), arguments);
+    bool result = sendCommandToLauncher(connectInfo->version, arguments);
     if (!result) {
         QMessageBox::critical(
             this,
@@ -393,11 +393,11 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
         compatibilityChecker = &localChecker;
     }
 
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
-        QString minSupportedVersion = QLatin1String("1.4"); 
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
+        QnSoftwareVersion minSupportedVersion("1.4"); 
 
         m_restartPending = true;
-        if (stripVersion(connectInfo->version).compare(minSupportedVersion) < 0) { // TODO: #GDM we have QnSoftwareVersion for this.
+        if (connectInfo->version < minSupportedVersion) {
             QMessageBox::warning(
                 this,
                 tr("Could not connect to Enterprise Controller"),
@@ -406,8 +406,8 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                    " - EC version: %2.\n"
                    "Compatibility mode for versions lower than %3 is not supported.")
                     .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectInfo->version)
-                    .arg(minSupportedVersion)
+                    .arg(connectInfo->version.toString())
+                    .arg(minSupportedVersion.toString())
             );
             m_restartPending = false;
         }
@@ -420,7 +420,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                     " - Client version: %1.\n"
                     " - EC version: %2.\n"
                     "Would you like to restart client in compatibility mode?"
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version),
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
                 QMessageBox::Ok, 
                 QMessageBox::Cancel
             );

@@ -193,7 +193,7 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
         server->setStreamingUrl(QString::fromUtf8(pb_server.streamingurl().c_str()));
 
     if (pb_server.has_version())
-        server->setVersion(QString::fromUtf8(pb_server.version().c_str()));
+        server->setVersion(QnSoftwareVersion(QString::fromUtf8(pb_server.version().c_str())));
 
     if (pb_serverResource.has_status())
         server->setStatus(static_cast<QnResource::Status>(pb_serverResource.status()));
@@ -763,7 +763,7 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
     if (!pb_connectInfo.ParseFromArray(data.data(), data.size()))
         throw QnSerializationException(tr("Cannot parse serialized connection information."));
 
-    connectInfo->version = QString::fromUtf8(pb_connectInfo.version().c_str());
+    connectInfo->version = QnSoftwareVersion(QString::fromUtf8(pb_connectInfo.version().c_str()));
 
     typedef google::protobuf::RepeatedPtrField<pb::CompatibilityItem> PbCompatibilityItemList;
     PbCompatibilityItemList items = pb_connectInfo.compatibilityitems().item();
