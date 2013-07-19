@@ -119,11 +119,11 @@ QueueFileWriter* QnWriterPool::getWriter(const QString& fileName)
     return itr.value();
 }
 
-Q_GLOBAL_STATIC(QnWriterPool, inst)
+Q_GLOBAL_STATIC(QnWriterPool, QnWriterPool_instance)
 
 QnWriterPool* QnWriterPool::instance()
 {
-    return inst();
+    return QnWriterPool_instance();
 }
 
 // -------------- QBufferedFile -------------
