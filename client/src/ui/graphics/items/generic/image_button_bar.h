@@ -38,6 +38,8 @@ public:
     const QSizeF &uniformButtonSize() const;
     void setUniformButtonSize(const QSizeF &uniformButtonSize);
 
+    int unusedMask() const;
+
 signals:
     void visibleButtonsChanged();
     void checkedButtonsChanged();

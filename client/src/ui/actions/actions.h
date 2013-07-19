@@ -242,7 +242,7 @@ namespace Qn {
 
         /**
          * Open Showcase page in default browser
-        */
+         */
         ShowcaseAction,
 
         /**

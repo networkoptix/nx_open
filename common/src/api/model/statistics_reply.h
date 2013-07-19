@@ -6,12 +6,12 @@
 #include <QtCore/QHash>
 #include <QtCore/QLinkedList>
 
+// TODO: #Elric global enum without suffixes. BAD!!!
 enum QnStatisticsDeviceType {
-    CPU,                /**< CPU load in percents */
-    RAM,                /**< RAM load in percents */
-    HDD,                /**< HDD load in percents */
-    NETWORK_IN,         /**< Network load in bits per sec - inbound traffic */
-    NETWORK_OUT         /**< Network load in bits per sec - outbound traffic */
+    CPU,                /**< CPU load in percents. */
+    RAM,                /**< RAM load in percents. */
+    HDD,                /**< HDD load in percents. */
+    NETWORK,            /**< Network load in percent. */
 };
 
 struct QnStatisticsDataItem {

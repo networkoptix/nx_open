@@ -327,6 +327,7 @@ protected:
 
     /** Mutex that is to be used when accessing resource fields. */
     mutable QMutex m_mutex;
+    QMutex m_initMutex;
 
     mutable QnParamList m_resourceParamList;
 
@@ -368,7 +369,6 @@ private:
     QStringList m_tags;
 
     bool m_initialized;    
-    QMutex m_initMutex;
     QMutex m_initAsyncMutex;
 
     static QnInitResPool m_initAsyncPool;

@@ -4,6 +4,7 @@
 #include "onvif_resource_information_fetcher.h"
 
 #include <map>
+#include <memory>
 
 #include <QString>
 
@@ -92,7 +93,7 @@ private:
     class ProbeContext
     {
     public:
-        UDPSocket* sock;
+        std::auto_ptr<UDPSocket> sock;
         wsddProxy soapWsddProxy;
         wsdd__ProbeType wsddProbe;
         wsa__EndpointReferenceType replyTo;

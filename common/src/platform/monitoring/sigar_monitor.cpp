@@ -142,6 +142,8 @@ public:
         if (INVOKE(sigar_net_interface_stat_get(sigar, interfaceName.toLatin1().constData(), &current) != SIGAR_OK))
             return result;
 
+        result.bytesPerSecMax = current.speed / 8;
+
         if(!lastNetworkStatByInterfaceName.contains(interfaceName)) { /* Is this the first call? */
             NetworkStat stat;
             stat.stat = current;
