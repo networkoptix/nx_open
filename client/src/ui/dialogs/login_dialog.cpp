@@ -426,8 +426,11 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                     QMessageBox::Ok, 
                     QMessageBox::Cancel
                 );
-                if(button == QMessageBox::Ok)
+                if(button == QMessageBox::Ok) {
                     restartInCompatibilityMode(connectInfo);
+                } else {
+                    m_restartPending = false;
+                }
             } else {
                 m_restartPending = false;
                 QMessageBox::warning(
