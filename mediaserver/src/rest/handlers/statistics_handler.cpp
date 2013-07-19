@@ -51,6 +51,7 @@ int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamLis
         result.append(QString("<type>%1</type>\n").arg(static_cast<int>(networkLoad.type)));
         result.append(QString("<in>%1</in>\n").arg(networkLoad.bytesPerSecIn));
         result.append(QString("<out>%1</out>\n").arg(networkLoad.bytesPerSecOut));
+        result.append(QString("<max>%1</max>\n").arg(networkLoad.bytesPerSecMax));
         result.append("</interface>\n");
     }
     result.append("</network>\n");

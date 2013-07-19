@@ -46,10 +46,8 @@ namespace {
             return colors.ram;
         case HDD:
             return colors.hddByKey(key);
-        case NETWORK_IN:
-            return colors.networkInByKey(key);
-        case NETWORK_OUT:
-            return colors.networkOutByKey(key);
+        case NETWORK:
+            return colors.networkByKey(key);
         default:
             return QColor(Qt::white);
         }
@@ -199,10 +197,7 @@ namespace {
 
     /** Backward sorting because buttonBar inserts buttons in reversed order */
     bool statisticsDataLess(const QnStatisticsData &first, const QnStatisticsData &second) {
-        if (
-                (first.deviceType == NETWORK_IN || first.deviceType == NETWORK_OUT) &&
-                (second.deviceType == NETWORK_IN || second.deviceType == NETWORK_OUT)
-            )
+        if (first.deviceType == NETWORK && second.deviceType == NETWORK)
             return first.description.toLower() > second.description.toLower();
 
         if (first.deviceType != second.deviceType)
@@ -243,18 +238,7 @@ public:
     {
         setCheckable(true);
         setProperty(Qn::NoBlockMotionSelection, true);
-
-        switch (deviceType) {
-        case NETWORK_IN:
-            setToolTip(QString(QLatin1String("%1 (incoming)")).arg(key));
-            break;
-        case NETWORK_OUT:
-            setToolTip(QString(QLatin1String("%1 (outgoing)")).arg(key));
-            break;
-        default:
-            setToolTip(key);
-            break;
-        }
+        setToolTip(key);
         setIcon(qnSkin->icon("item/check.png"));
     }
 
@@ -395,11 +379,11 @@ protected:
         foreach(QString key, m_widget->m_sortedKeys) {
             QnStatisticsData &stats = m_widget->m_history[key];
 
-            LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
+            QnServerResourceWidget::LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
             if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
                 continue;
 
-            if (stats.deviceType == NETWORK_IN || stats.deviceType == NETWORK_OUT)
+            if (stats.deviceType == NETWORK)
                 maxNetworkValue = qMax(maxNetworkValue, maxValue(stats.values));
         }
         qreal networkUpperBound = qFuzzyIsNull(maxNetworkValue) ? 0.0 : 1.0;
@@ -423,13 +407,13 @@ protected:
 
             foreach(QString key, m_widget->m_sortedKeys) {
                 QnStatisticsData &stats = m_widget->m_history[key];
-                LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
+                QnServerResourceWidget::LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
 
                 if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
                     continue;
 
                 QLinkedList<qreal> values = stats.values;
-                if (stats.deviceType == NETWORK_IN || stats.deviceType == NETWORK_OUT)
+                if (stats.deviceType == NETWORK)
                     values = scaledNetworkValues(values, networkUpperBound);
 
                 qreal currentValue = 0;
@@ -462,7 +446,7 @@ protected:
                 qreal xLeft  = itemSpacing;
                 foreach(QString key, m_widget->m_sortedKeys) {
                     QnStatisticsData &stats = m_widget->m_history[key];
-                    LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
+                    QnServerResourceWidget::LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
 
                     if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
                         continue;
@@ -476,7 +460,7 @@ protected:
                     main_pen.setColor(getDeviceColor(stats.deviceType, key));
                     painter->setPen(main_pen);
 
-                    if (stats.deviceType == NETWORK_OUT || stats.deviceType == NETWORK_IN) {
+                    if (stats.deviceType == NETWORK) {
                         painter->drawText(xLeft, y, networkLoadText(interValue, networkUpperBound));
                     } else {
                         painter->drawText(xRight, y, tr("%1%").arg(qRound(interValue * 100.0)));
@@ -517,8 +501,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     if(!m_resource)
         qnCritical("Server resource widget was created with a non-server resource.");
 
-    m_manager->setFlagsFilter(NETWORK_OUT, qnSettings->statisticsNetworkFilter());
-    m_manager->setFlagsFilter(NETWORK_IN, qnSettings->statisticsNetworkFilter());
+    m_manager->setFlagsFilter(NETWORK, qnSettings->statisticsNetworkFilter());
     m_pointsLimit = m_manager->pointsLimit();
     m_manager->registerConsumer(m_resource, this, SLOT(at_statistics_received()));
     m_updatePeriod = m_manager->updatePeriod(m_resource);
@@ -661,16 +644,12 @@ void QnServerResourceWidget::addOverlays() {
     addOverlayWidget(mainOverlayWidget, UserVisible, true);
 }
 
-LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const QnStatisticsDeviceType deviceType) const {
-    switch(deviceType) {
-    case NETWORK_IN:
-        return NetworkInButtonBar;
-    case NETWORK_OUT:
-        return NetworkOutButtonBar;
-    default:
-        break;
+QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const QnStatisticsDeviceType deviceType) const {
+    if(deviceType == NETWORK) {
+        return NetworkButtonBar;
+    } else {
+        return CommonButtonBar;
     }
-    return CommonButtonBar;
 }
 
 void QnServerResourceWidget::updateLegend() {

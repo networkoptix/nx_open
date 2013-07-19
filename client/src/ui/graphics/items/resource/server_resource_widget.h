@@ -14,13 +14,6 @@ class QnMediaServerStatisticsManager;
 class StatisticsOverlayWidget;
 class QnGlFunctions;
 
-enum LegendButtonBar {
-    CommonButtonBar,
-    NetworkOutButtonBar,
-    NetworkInButtonBar,
-
-    ButtonBarCount
-};
 
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -71,6 +64,12 @@ private slots:
 
 
 private:
+    enum LegendButtonBar {
+        CommonButtonBar,
+        NetworkButtonBar,
+        ButtonBarCount
+    };
+
     /** Background painting function. */
     void drawBackground(const QRectF &rect, QPainter *painter);
 
