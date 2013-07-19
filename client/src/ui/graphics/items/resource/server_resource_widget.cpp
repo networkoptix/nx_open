@@ -219,8 +219,6 @@ namespace {
     const int legendFontSize = 20;
     const int itemSpacing = 2;
 
-    const char *buttonBarPropertyName = "_qn_buttonBarPropertyName";
-
 } // anonymous namespace
 
 
@@ -374,13 +372,6 @@ protected:
         }
 
         QMap<QString, qreal> displayValues;
-        foreach(QString key, m_widget->m_sortedKeys) {
-            QnStatisticsData &stats = m_widget->m_history[key];
-
-            QnServerResourceWidget::LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
-            if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
-                continue;
-        }
 
         /* Draw graph lines */
         {
@@ -399,9 +390,8 @@ protected:
 
             foreach(QString key, m_widget->m_sortedKeys) {
                 QnStatisticsData &stats = m_widget->m_history[key];
-                QnServerResourceWidget::LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
 
-                if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
+                if (!m_widget->m_graphDataByKey[key].visible)
                     continue;
 
                 QLinkedList<qreal> values = stats.values;
@@ -435,9 +425,8 @@ protected:
                 qreal xRight = offsetX + ow + itemSpacing*2;
                 foreach(QString key, m_widget->m_sortedKeys) {
                     QnStatisticsData &stats = m_widget->m_history[key];
-                    QnServerResourceWidget::LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
 
-                    if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
+                    if (!m_widget->m_graphDataByKey[key].visible)
                         continue;
 
                     qreal interValue = displayValues[key];
@@ -472,9 +461,6 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_renderStatus(Qn::NothingRendered),
     m_infoOpacity(0.0)
 {
-    for (int i = 0; i < ButtonBarCount; i++)
-        m_maxMaskUsed[i] = 1;
-
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     if(!m_resource)
         qnCritical("Server resource widget was created with a non-server resource.");
@@ -515,6 +501,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     connect(checkIssuesButton, SIGNAL(clicked()), this, SLOT(at_checkIssuesButton_clicked()));
     buttonBar()->addButton(CheckIssuesButton, checkIssuesButton);
 
+    connect(headerOverlayWidget(), SIGNAL(opacityChanged()), this, SLOT(updateInfoOpacity()));
 
     /* Run handlers. */
     updateButtonsVisibility();
@@ -546,11 +533,6 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painte
 }
 
 void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painter) {
-    if(!m_gl)
-        m_gl.reset(new QnGlFunctions(QGLContext::currentContext()));
-    if(!(m_gl->features() & QnGlFunctions::ArbPrograms))
-        return; /* Don't draw anything on old OpenGL versions. */
-
     qreal width = rect.width();
     qreal height = rect.height();
     qreal min = qMin(width, height);
@@ -603,9 +585,9 @@ void QnServerResourceWidget::addOverlays() {
 
     for (int i = 0; i < ButtonBarCount; i++) {
         m_legendButtonBar[i] = new QnImageButtonBar(this, 0, Qt::Horizontal);
-        connect(m_legendButtonBar[i], SIGNAL(checkedButtonsChanged()), this, SLOT(at_legend_checkedButtonsChanged()));
         m_legendButtonBar[i]->setOpacity(m_infoOpacity);
-        m_legendButtonBar[i]->setProperty(buttonBarPropertyName, i);
+
+        connect(m_legendButtonBar[i], SIGNAL(checkedButtonsChanged()), this, SLOT(updateGraphVisibility()));
 
         QGraphicsLinearLayout *legendOverlayHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
         legendOverlayHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -631,41 +613,34 @@ QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDevic
 }
 
 void QnServerResourceWidget::updateLegend() {
-    int visibleMask[ButtonBarCount];
-    int checkedMask[ButtonBarCount];
-    for (int i = 0; i < ButtonBarCount; i++) {
-        visibleMask[i] = 0;
-        checkedMask[i] = 0;
-    }
-
     foreach (QString key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];
 
-        LegendButtonBar bar = buttonBarByDeviceType(stats.deviceType);
-        int mask;
-        if (!m_buttonMaskByKey[bar].contains(key)) {
-            mask = m_maxMaskUsed[bar];
-            m_maxMaskUsed[bar] *= 2;
-            m_buttonMaskByKey[bar][key] = mask;
-        } else {
-            mask = m_buttonMaskByKey[bar][key];
+        if (!m_graphDataByKey.contains(key)) {
+            GraphData &data = m_graphDataByKey[key];
+            data.bar = buttonBarByDeviceType(stats.deviceType);
+            data.mask = m_legendButtonBar[data.bar]->unusedMask();
+            data.visible = true;
+
+            LegendButtonWidget *button = new LegendButtonWidget(stats.deviceType, key);
+            button->setChecked(true);
+            m_legendButtonBar[data.bar]->addButton(data.mask, button);
         }
-        visibleMask[bar] |= mask;
-
-        if (!m_legendButtonBar[bar]->button(mask)) {
-            m_legendButtonBar[bar]->addButton(mask, new LegendButtonWidget(stats.deviceType, key));
-        }
-
-        bool checked =  m_checkedFlagByKey[bar].value(key, true);
-        if (checked)
-            checkedMask[bar] |= mask;
     }
+}
 
-    for (int i = 0; i < ButtonBarCount; i++) {
-        m_legendButtonBar[i]->setCheckedButtons(checkedMask[i]);
-        m_legendButtonBar[i]->setVisibleButtons(visibleMask[i]);
+void QnServerResourceWidget::updateGraphVisibility() {
+    for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
+        GraphData &data = *pos;
+
+        data.visible = m_legendButtonBar[data.bar]->checkedButtons() & data.mask;
     }
+}
 
+void QnServerResourceWidget::updateInfoOpacity() {
+    m_infoOpacity = headerOverlayWidget()->opacity();
+    for (int i = 0; i < ButtonBarCount; i++)
+        m_legendButtonBar[i]->setOpacity(m_infoOpacity);
 }
 
 
@@ -681,14 +656,6 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
     result &= (CloseButton | RotateButton | InfoButton);
     result |= PingButton | ShowLogButton | CheckIssuesButton;
     return result;
-}
-
-QVariant QnServerResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
-    if(change == QGraphicsItem::ItemSceneHasChanged) {
-        connect(opacityAnimator(headerOverlayWidget()), SIGNAL(valueChanged(const QVariant &)), this, SLOT(at_headerOverlayWidget_opacityChanged(const QVariant &)));
-    }
-
-    return base_type::itemChange(change, value);
 }
 
 void QnServerResourceWidget::at_statistics_received() {
@@ -730,24 +697,6 @@ void QnServerResourceWidget::at_statistics_received() {
 
     m_elapsedTimer.restart();
     m_counter++;
-}
-
-void QnServerResourceWidget::at_legend_checkedButtonsChanged() {
-    LegendButtonBar bar = (LegendButtonBar)sender()->property(buttonBarPropertyName).toInt();
-
-    int checkedMask = m_legendButtonBar[bar]->checkedButtons();
-    foreach (QString key, m_sortedKeys) {
-        if (!m_buttonMaskByKey[bar].contains(key))
-            continue;
-        int mask = m_buttonMaskByKey[bar][key];
-        m_checkedFlagByKey[bar][key] = ((checkedMask & mask) > 0);
-    }
-}
-
-void QnServerResourceWidget::at_headerOverlayWidget_opacityChanged(const QVariant &value) {
-    m_infoOpacity = value.toDouble();
-    for (int i = 0; i < ButtonBarCount; i++)
-        m_legendButtonBar[i]->setOpacity(m_infoOpacity);
 }
 
 void QnServerResourceWidget::at_pingButton_clicked() {
