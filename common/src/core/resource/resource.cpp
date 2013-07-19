@@ -778,26 +778,26 @@ void QnResource::initializationDone()
 
 // -----------------------------------------------------------------------------
 // Temporary until real ResourceFactory is implemented
-Q_GLOBAL_STATIC(QnResourceCommandProcessor, commandProcessor)
+Q_GLOBAL_STATIC(QnResourceCommandProcessor, QnResourceCommandProcessor_instance)
 
 void QnResource::startCommandProc()
 {
-    commandProcessor()->start();
+    QnResourceCommandProcessor_instance()->start();
 }
 
 void QnResource::stopCommandProc()
 {
-    commandProcessor()->stop();
+    QnResourceCommandProcessor_instance()->stop();
 }
 
 void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
 {
-    commandProcessor()->putData(data);
+    QnResourceCommandProcessor_instance()->putData(data);
 }
 
 int QnResource::commandProcQueueSize()
 {
-    return commandProcessor()->queueSize();
+    return QnResourceCommandProcessor_instance()->queueSize();
 }
 
 bool QnResource::isDisabled() const

@@ -37,17 +37,17 @@ QnResourcePool::~QnResourcePool()
 
 //Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
-static QnResourcePool* resourcePool = NULL;
+static QnResourcePool* resourcePool_instance = NULL;
 
 void QnResourcePool::initStaticInstance( QnResourcePool* inst )
 {
-    resourcePool = inst;
+    resourcePool_instance = inst;
 }
 
 QnResourcePool* QnResourcePool::instance()
 {
     //return globalResourcePool();
-    return resourcePool;
+    return resourcePool_instance;
 }
 
 bool QnResourcePool::isLayoutsUpdated() const {

@@ -36,7 +36,7 @@ void QnStorageResource::addWritedSpace(qint64 value)
 
 // ---------------------------- QnStoragePluginFactory ------------------------------
 
-Q_GLOBAL_STATIC(QnStoragePluginFactory, inst)
+Q_GLOBAL_STATIC(QnStoragePluginFactory, QnStoragePluginFactory_instance)
 
 QnStoragePluginFactory::QnStoragePluginFactory(): m_defaultFactory(0)
 {
@@ -49,7 +49,7 @@ QnStoragePluginFactory::~QnStoragePluginFactory()
 
 QnStoragePluginFactory *QnStoragePluginFactory::instance()
 {
-    return inst();
+    return QnStoragePluginFactory_instance();
 }
 
 void QnStoragePluginFactory::registerStoragePlugin(const QString &protocol, const StorageResourceFactory &factory, bool isDefaultProtocol)
