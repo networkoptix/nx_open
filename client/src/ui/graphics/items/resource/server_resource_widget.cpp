@@ -344,7 +344,6 @@ protected:
         qreal ow = width - offsetX*2;
         qreal oh = height - offsetTop - offsetBottom;
 
-
         if (ow <= 0 || oh <= 0)
             return;
 
@@ -375,20 +374,13 @@ protected:
         }
 
         QMap<QString, qreal> displayValues;
-        qreal maxNetworkValue = 0.0;
         foreach(QString key, m_widget->m_sortedKeys) {
             QnStatisticsData &stats = m_widget->m_history[key];
 
             QnServerResourceWidget::LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
             if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
                 continue;
-
-            if (stats.deviceType == NETWORK)
-                maxNetworkValue = qMax(maxNetworkValue, maxValue(stats.values));
         }
-        qreal networkUpperBound = qFuzzyIsNull(maxNetworkValue) ? 0.0 : 1.0;
-        while (maxNetworkValue > networkUpperBound && !qFuzzyIsNull(networkUpperBound))
-            networkUpperBound *= 10;
 
         /* Draw graph lines */
         {
@@ -413,8 +405,6 @@ protected:
                     continue;
 
                 QLinkedList<qreal> values = stats.values;
-                if (stats.deviceType == NETWORK)
-                    values = scaledNetworkValues(values, networkUpperBound);
 
                 qreal currentValue = 0;
                 QPainterPath path = createChartPath(values, x_step, -1.0 * (oh - 2*space_offset), elapsed_step, &currentValue);
@@ -443,7 +433,6 @@ protected:
                 painter->setOpacity(opacity * m_widget->m_infoOpacity);
 
                 qreal xRight = offsetX + ow + itemSpacing*2;
-                qreal xLeft  = itemSpacing;
                 foreach(QString key, m_widget->m_sortedKeys) {
                     QnStatisticsData &stats = m_widget->m_history[key];
                     QnServerResourceWidget::LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
@@ -459,18 +448,7 @@ protected:
 
                     main_pen.setColor(getDeviceColor(stats.deviceType, key));
                     painter->setPen(main_pen);
-
-                    if (stats.deviceType == NETWORK) {
-                        painter->drawText(xLeft, y, networkLoadText(interValue, networkUpperBound));
-                    } else {
-                        painter->drawText(xRight, y, tr("%1%").arg(qRound(interValue * 100.0)));
-                    }
-                }
-
-                if (networkUpperBound > 0) {
-                    main_pen.setColor(qnGlobals->statisticsColors().networkLimit);
-                    painter->setPen(main_pen);
-                    painter->drawText(xLeft, offsetTop*1.5, networkLoadText(1.0, networkUpperBound));
+                    painter->drawText(xRight, y, tr("%1%").arg(qRound(interValue * 100.0)));
                 }
 
                 painter->setOpacity(opacity);
