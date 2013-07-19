@@ -293,17 +293,15 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
 
 bool QnLoginDialog::sendCommandToLauncher(const QString &version, const QStringList &arguments) {
     QLocalSocket sock;
-    sock.connectToServer( launcherPipeName );
-    if( !sock.waitForConnected( -1 ) )
-    {
-        qDebug()<<QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());
+    sock.connectToServer(launcherPipeName);
+    if(!sock.waitForConnected(-1)) {
+        qnDebug("Failed to connect to local server %1: %2.", launcherPipeName, sock.errorString());
         return false;
     }
 
-    const QByteArray& serializedTask = applauncher::api::StartApplicationTask(version, arguments).serialize();
-    if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
-    {
-        qDebug()<<QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());
+    const QByteArray &serializedTask = applauncher::api::StartApplicationTask(version, arguments).serialize();
+    if(sock.write(serializedTask.data(), serializedTask.size()) != serializedTask.size()) {
+        qnDebug("Failed to send launch task to local server %1: %2.", launcherPipeName, sock.errorString());
         return false;
     }
 
@@ -312,7 +310,6 @@ bool QnLoginDialog::sendCommandToLauncher(const QString &version, const QStringL
             sock.readAll();
 //    if (result != "ok")
 //        return false;
-
     return true;
 }
 
@@ -415,17 +412,21 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
             m_restartPending = false;
         }
 
-        m_restartPending = m_restartPending && (QMessageBox::warning(
-                                  this,
-                                  tr("Could not connect to Enterprise Controller"),
-                                  tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                                     " - Client version: %1.\n"
-                                     " - EC version: %2.\n"
-                                     "Would you like to restart client in compatibility mode?")
-                                  .arg(QLatin1String(QN_ENGINE_VERSION))
-                                  .arg(connectInfo->version),
-                                  QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
-                          && restartInCompatibilityMode(connectInfo);
+        if(m_restartPending) {
+            int button = QMessageBox::warning(
+                this,
+                tr("Could not connect to Enterprise Controller"),
+                tr("You are about to connect to Enterprise Controller which has a different version:\n"
+                    " - Client version: %1.\n"
+                    " - EC version: %2.\n"
+                    "Would you like to restart client in compatibility mode?"
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version),
+                QMessageBox::Ok, 
+                QMessageBox::Cancel
+            );
+            if(button == QMessageBox::Ok)
+                restartInCompatibilityMode(connectInfo);
+        }
         
         if (!m_restartPending) {
             updateFocus();
