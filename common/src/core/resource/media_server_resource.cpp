@@ -325,12 +325,16 @@ int QnMediaServerResource::getProxyPort()
     return connection ? connection->getProxyPort() : 0;
 }
 
-QString QnMediaServerResource::getVersion() const
+QnSoftwareVersion QnMediaServerResource::getVersion() const
 {
+    QMutexLocker lock(&m_mutex);
+
     return m_version;
 }
 
-void QnMediaServerResource::setVersion(const QString &version)
+void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
 {
+    QMutexLocker lock(&m_mutex);
+
     m_version = version;
 }

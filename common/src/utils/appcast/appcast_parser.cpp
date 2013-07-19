@@ -53,8 +53,8 @@ void QnAppCastParser::parse(const QByteArray& data) {
 
                 if (m_platform.isEmpty() || m_platform == attributes.value(TAG_PLATFORM).toString()) {
                     currentItem.url = QUrl(attributes.value(TAG_URL).toString());
-                    currentItem.productVersion = attributes.value(TAG_VERSION).toString();
-                    currentItem.engineVersion = attributes.value(TAG_ENGINEVERSION).toString();
+                    currentItem.productVersion = QnSoftwareVersion(attributes.value(TAG_VERSION).toString());
+                    currentItem.engineVersion = QnSoftwareVersion(attributes.value(TAG_ENGINEVERSION).toString());
                 }
             }
 
