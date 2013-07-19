@@ -482,9 +482,11 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
          scaleFactor != QnFrameScaler::factor_1);
 
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
-    //if (render->isDisplaying(outFrame))
-    foreach(QnAbstractRenderer* render, m_renderList)
-        render->waitForFrameDisplayed(data->channelNumber);
+    
+    foreach(QnAbstractRenderer* render, m_renderList) {
+        if (render->isDisplaying(outFrame))
+            render->waitForFrameDisplayed(data->channelNumber);
+    }
 
     outFrame->channel = data->channelNumber;
     outFrame->flags = 0;
@@ -830,7 +832,6 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::findScaleFactor(int width, 
 
 void QnVideoStreamDisplay::setMTDecoding(bool value)
 {
-    value = false;
     m_enableFrameQueue = value;
     m_needReinitDecoders = true;
 }
