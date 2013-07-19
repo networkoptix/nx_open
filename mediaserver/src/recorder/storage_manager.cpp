@@ -12,7 +12,7 @@
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 
-Q_GLOBAL_STATIC(QnStorageManager, inst)
+Q_GLOBAL_STATIC(QnStorageManager, QnStorageManager_inst)
 
 class TestStorageThread: public QnLongRunnable
 {
@@ -248,7 +248,7 @@ QnStorageManager::~QnStorageManager()
 
 QnStorageManager* QnStorageManager::instance()
 {
-    return inst();
+    return QnStorageManager_inst();
 }
 
 QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone)

@@ -241,6 +241,12 @@ void QnVirtualCameraResource::save()
     }
 }
 
+int QnVirtualCameraResource::saveAsync(QObject *target, const char *slot)
+{
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+    return conn->saveAsync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), target, slot);
+}
+
 QString QnVirtualCameraResource::toSearchString() const
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
@@ -259,9 +265,15 @@ void QnVirtualCameraResource::issueOccured()
     if (m_issueTimes.size() >= MAX_ISSUE_CNT) {
         if (!hasStatusFlags(HasIssuesFlag)) {
             addStatusFlags(HasIssuesFlag);
-            save();
+            lock.unlock();
+            saveAsync(this, SLOT(at_saveAsyncFinished(int, const QnResourceList &, int)));
         }
     }
+}
+
+void QnVirtualCameraResource::at_saveAsyncFinished(int, const QnResourceList &, int)
+{
+    // not used
 }
 
 void QnVirtualCameraResource::noCameraIssues()
@@ -273,6 +285,7 @@ void QnVirtualCameraResource::noCameraIssues()
 
     if (m_issueTimes.empty() && hasStatusFlags(HasIssuesFlag)) {
         removeStatusFlags(HasIssuesFlag);
-        save();
+        lock.unlock();
+        saveAsync(this, SLOT(at_saveAsyncFinished(int, const QnResourceList &, int)));
     }
 }
