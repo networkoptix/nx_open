@@ -38,8 +38,6 @@ protected:
 
 private:
     void setMaxFps(int f);
-    void save();
-
 protected:
     QSize m_resolution1;
     QSize m_resolution2;
