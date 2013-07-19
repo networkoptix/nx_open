@@ -13,7 +13,12 @@ Since 1.5.1
  
 Since previous build
  - Selected item was not market in Tree (> sign). Fixed
- - Network Statistics sometimes displayed 0 Mbps usage for short time. Fixed
+ - Network Statistics sometimes displayed 0 Mbps usage for a short time. Fixed
+ - If PTZ is enabled zoom windows' positions are still displayed
+ - It is suggested to use custom Public IP for EC (this IP will be inserted in e-mail links)
+ - E-mail about motion now contains the link. If this link is clicked then web-client is opened and it starts playing back the 
+   certain camera on the motion position
+ - Local files playback fixed  
  
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
