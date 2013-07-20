@@ -111,3 +111,10 @@ bool QnMediaResource::isFisheye() const
 {
     return m_devorpingParams.enabled;
 }
+
+void QnMediaResource::updateInner(QnResourcePtr other)
+{
+    QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
+    if (other_casted)
+        m_devorpingParams = other_casted->m_devorpingParams;
+}

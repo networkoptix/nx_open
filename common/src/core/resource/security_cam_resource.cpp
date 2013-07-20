@@ -52,6 +52,7 @@ QnSecurityCamResource::~QnSecurityCamResource()
 void QnSecurityCamResource::updateInner(QnResourcePtr other)
 {
     QnNetworkResource::updateInner(other);
+    QnMediaResource::updateInner(other);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)

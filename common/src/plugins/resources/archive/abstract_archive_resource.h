@@ -28,6 +28,8 @@ public:
     virtual const QnResourcePtr toResourcePtr() const override;
     //!Implementation of QnMediaResource::toResource
     virtual QnResourcePtr toResourcePtr() override;
+
+    void updateInner(QnResourcePtr other) override;
 };
 
 #endif //abstract_archive_device_h1838

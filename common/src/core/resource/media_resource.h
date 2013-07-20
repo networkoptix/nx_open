@@ -66,6 +66,7 @@ public:
 
 protected:
     void initMediaResource();
+    void updateInner(QnResourcePtr other);
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
     DewarpingParams m_devorpingParams;
