@@ -185,6 +185,11 @@ void QnMediaResourceWidget::updateFisheyeController()
             m_fisheyePtz = new QnFisheyePtzController(base_type::resource().data());
             connect(m_fisheyePtz, SIGNAL(dewarpingParamsChanged(DewarpingParams)), this, SLOT(at_dewarpingParamsChanged(DewarpingParams)));
             m_fisheyePtz->addRenderer(m_renderer);
+
+            if (!zoomRect().isEmpty()) {
+                m_fisheyePtz->setEnabled(true);
+                m_fisheyePtz->moveToRect(zoomRect());
+            }
         }
     }
     else {
