@@ -1,3 +1,5 @@
+#include "version.h"
+
 #include "camera.pb.h"
 #include "server.pb.h"
 #include "user.pb.h"
@@ -720,9 +722,6 @@ void QnApiPbSerializer::deserializeLicenses(QnLicenseList &licenses, const QByte
     if (!pb_licenses.ParseFromArray(data.data(), data.size()))
         throw QnSerializationException(tr("Cannot parse serialized licenses."));
 
-    licenses.setHardwareId1(pb_licenses.hwid1().c_str());
-    licenses.setOldHardwareId(pb_licenses.oldhardwareid().c_str());
-    licenses.setHardwareId2(pb_licenses.hwid2().c_str());
     parseLicenses(licenses, pb_licenses.license());
 }
 
@@ -1138,7 +1137,7 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QB
 	//}
 
 	block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
-	if (QnLicense(block).isValid(oldHardwareId)) {
+    if (QnLicense(block).isValid(oldHardwareId, QLatin1String(QN_PRODUCT_NAME_SHORT))) {
 		license = QnLicensePtr(new QnLicense(block));
 		return;
 	}
@@ -1274,7 +1273,7 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
         QnLicensePtr license;
         // Parse license and validate its signature
 		if (!pb_license.rawlicense().empty() || !pb_license.signature().empty())
-			parseLicense(license, pb_license, licenses.oldHardwareId());
+			parseLicense(license, pb_license, qnLicensePool->oldHardwareId());
 
         // Verify that license is valid and for our hardwareid
         if (license)
