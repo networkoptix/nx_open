@@ -146,6 +146,7 @@ private slots:
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
     void at_dewarpingParamsChanged(DewarpingParams params);
     void updateFisheyeController();
+    void at_zoomRectChanged();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
 
@@ -192,7 +193,7 @@ private:
 
     QStaticText m_sensStaticText[10];
 
-    QnFisheyePtzController* m_ptzController;
+    QnFisheyePtzController* m_fisheyePtz;
 };
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H

@@ -7,7 +7,7 @@
 
 qreal MAX_MOVE_SPEED = 1.0; // 1 rad per second
 qreal MAX_ZOOM_SPEED = gradToRad(30.0); // zoom speed
-qreal MIN_FOV = gradToRad(30.0);
+qreal MIN_FOV = gradToRad(20.0);
 qreal MAX_FOV = gradToRad(90.0);
 
 qreal FISHEYE_FOV = gradToRad(180.0);
@@ -228,4 +228,34 @@ void QnFisheyePtzController::setEnabled(bool value)
 bool QnFisheyePtzController::isEnabled() const
 {
     return m_dewarpingParams.enabled;
+}
+
+void QnFisheyePtzController::moveToRect(const QRectF& r)
+{
+    QPointF c = QPointF(r.center().x() - 0.5, r.center().y() - 0.5);
+    qreal fov = r.width() * M_PI;
+    if (m_resource->getDewarpingParams().horizontalView) {
+        qreal x = c.x() * M_PI;
+        qreal y = -c.y() * M_PI;
+        moveTo(radToGrad(x), radToGrad(y), fovTo35mmEquiv(fov));
+    }
+    else {
+        qreal x = -(::atan2(c.y(), c.x()) - M_PI/2.0);
+        qreal y = 0;
+        if (qAbs(c.x()) > qAbs(c.y())) 
+        {
+            if (c.x() > 0)
+                y = (1.0 - r.right()) *  M_PI;
+            else
+                y = r.left() * M_PI;
+        }
+        else {
+            if (c.y() > 0)
+                y = (1.0 - r.bottom()) * M_PI;
+            else
+                y = r.top() * M_PI;
+        }
+
+        moveTo(radToGrad(x), radToGrad(y), fovTo35mmEquiv(fov));
+    }
 }

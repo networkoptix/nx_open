@@ -27,6 +27,8 @@ public:
     DewarpingParams getDewarpingParams();
     virtual void setEnabled(bool value) override;
     virtual bool isEnabled() const override;
+
+    void moveToRect(const QRectF& r);
 signals:
     void dewarpingParamsChanged(DewarpingParams params);
     void spaceMapperChanged();

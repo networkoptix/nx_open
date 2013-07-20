@@ -68,7 +68,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_renderer(NULL),
     m_motionSensitivityValid(false),
     m_binaryMotionMaskValid(false),
-    m_ptzController(0)
+    m_fisheyePtz(0)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource)
@@ -151,9 +151,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         timer->start(1000 * 60); /* Update icon button every minute. */
     }
 
-    connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateButtonsVisibility()));
-    connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateAspectRatio()));
-    connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateIconButton()));
+    //connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateButtonsVisibility()));
+    //connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateAspectRatio()));
+    //connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateIconButton()));
+    connect(this, SIGNAL(zoomRectChanged()), this, SLOT(at_zoomRectChanged()));
     connect(context->instance<QnWorkbenchRenderWatcher>(), SIGNAL(displayingChanged(QnResourceWidget *)), this, SLOT(at_renderWatcher_displayingChanged(QnResourceWidget *)));
 
     at_camDisplay_liveChanged();
@@ -164,19 +165,31 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     setImageEnhancement(item->imageEnhancement());
 }
 
+void QnMediaResourceWidget::at_zoomRectChanged()
+{
+    updateButtonsVisibility();
+    updateAspectRatio();
+    updateIconButton();
+    if (m_fisheyePtz) {
+        m_fisheyePtz->setEnabled(true);
+        m_fisheyePtz->moveToRect(zoomRect());
+    }
+}
+
 void QnMediaResourceWidget::updateFisheyeController()
 {
+    setOption(VirtualZoomWindow, m_resource->isFisheye());
     if (m_resource->isFisheye()) 
     {
-        if (!m_ptzController) {
-            m_ptzController = new QnFisheyePtzController(base_type::resource().data());
-            connect(m_ptzController, SIGNAL(dewarpingParamsChanged(DewarpingParams)), this, SLOT(at_dewarpingParamsChanged(DewarpingParams)));
-            m_ptzController->addRenderer(m_renderer);
+        if (!m_fisheyePtz) {
+            m_fisheyePtz = new QnFisheyePtzController(base_type::resource().data());
+            connect(m_fisheyePtz, SIGNAL(dewarpingParamsChanged(DewarpingParams)), this, SLOT(at_dewarpingParamsChanged(DewarpingParams)));
+            m_fisheyePtz->addRenderer(m_renderer);
         }
     }
     else {
-        delete m_ptzController;
-        m_ptzController = 0;
+        delete m_fisheyePtz;
+        m_fisheyePtz = 0;
     }
 }
 
@@ -187,7 +200,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     if (m_display)
         m_display->removeRenderer(m_renderer);
 
-    delete m_ptzController;
+    delete m_fisheyePtz;
 
     m_renderer->destroyAsync();
 
@@ -847,7 +860,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
 void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     bool isLive = m_display->camDisplay()->isRealTimeSource();
 
-    if(!isLive && !m_ptzController)
+    if(!isLive && !m_fisheyePtz)
         buttonBar()->setButtonsChecked(PtzButton, false);
 }
 
@@ -859,7 +872,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    bool ptzEnabled = checked && ( m_ptzController ||
+    bool ptzEnabled = checked && ( m_fisheyePtz ||
                                    m_camera && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)));
 
     setOption(ControlPtz, ptzEnabled);
@@ -869,15 +882,16 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
         if (!m_resource->isFisheye())
             action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
-    if (m_ptzController)
-        m_ptzController->setEnabled(checked);
+    if (m_fisheyePtz)
+        m_fisheyePtz->setEnabled(checked);
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     setOption(ControlZoomWindow, checked);
 
-    if(checked)
+    if(checked) {
         buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
+    }
 }
 void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
 {
@@ -896,5 +910,5 @@ void QnMediaResourceWidget::at_renderWatcher_displayingChanged(QnResourceWidget 
 
 QnVirtualPtzController* QnMediaResourceWidget::virtualPtzController() const
 {
-    return m_ptzController;
+    return m_fisheyePtz;
 }
