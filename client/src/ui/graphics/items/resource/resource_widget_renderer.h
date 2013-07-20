@@ -11,7 +11,7 @@
 #include <camera/abstract_renderer.h>
 #include "utils/color_space/image_correction.h"
 #include "core/resource/resource_media_layout.h"
-#include "ui/fisheye/fisheye_ptz_processor.h"
+#include "ui/fisheye/fisheye_ptz_controller.h"
 
 class QThread;
 class QGLContext;

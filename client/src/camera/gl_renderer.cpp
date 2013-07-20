@@ -23,7 +23,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/common/geometry.h>
-#include "ui/fisheye/fisheye_ptz_processor.h"
+#include "ui/fisheye/fisheye_ptz_controller.h"
 
 #include "video_camera.h"
 

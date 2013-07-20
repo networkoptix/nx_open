@@ -5,7 +5,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtOpenGL/QtOpenGL>
 #include "shader_source.h"
-#include "ui/fisheye/fisheye_ptz_processor.h"
+#include "ui/fisheye/fisheye_ptz_controller.h"
 
 class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram
 {

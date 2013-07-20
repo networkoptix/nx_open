@@ -1,4 +1,4 @@
-#include "fisheye_ptz_processor.h"
+#include "fisheye_ptz_controller.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include <math.h>
 #include "utils/math/space_mapper.h"

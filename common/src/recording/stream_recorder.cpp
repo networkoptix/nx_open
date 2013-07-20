@@ -527,7 +527,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 }
 
                 m_videoTranscoder->setQuality(QnQualityHighest);
-                if (!m_srcRect.isEmpty())
+                if (!m_srcRect.isEmpty() && !m_devorpingParams.enabled)
                     m_videoTranscoder->setSrcRect(m_srcRect);
                 m_videoTranscoder->setVideoLayout(layout);
                 m_videoTranscoder->open(mediaData);

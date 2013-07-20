@@ -3233,9 +3233,19 @@ Do you want to continue?"),
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
         dialog->addCheckBox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
-        dialog->addCheckBox(tr("Video adjustment (Requires Transcoding)"), &contrastParams.enabled, delegate);
-        if (devorpingParams.enabled)
-            dialog->addCheckBox(tr("Apply dewarping filter (Requires Transcoding)"), &devorpingParams.enabled, delegate);
+
+        bool doTranscode = contrastParams.enabled || devorpingParams.enabled;
+        if (doTranscode)
+        {
+            if (contrastParams.enabled && devorpingParams.enabled)
+                dialog->addCheckBox(tr("Do dewarping and image adjustment (Requires Transcoding)"), &doTranscode, delegate);
+            else if (contrastParams.enabled)
+                dialog->addCheckBox(tr("Do image adjustment (Requires Transcoding)"), &doTranscode, delegate);
+            else
+                dialog->addCheckBox(tr("Do dewarping (Requires Transcoding)"), &doTranscode, delegate);
+        }
+        contrastParams.enabled &= doTranscode;
+        devorpingParams.enabled &= doTranscode;
 
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
