@@ -157,12 +157,18 @@ QString QnFisheyeShaderProgram::getShaderText()
         return vec3(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
     }
 
-    float kx =  2.0*tan(dstFov/2.0);
-    mat3 to3d = transpose(mat3(
-        sphericalToCartesian(xShift + PI/2.0, 0.0) * kx,
-        sphericalToCartesian(xShift, -yShift + PI/2.0) * kx /aspectRatio,
-        sphericalToCartesian(xShift, -yShift)));
 
+
+
+    float kx =  2.0*tan(dstFov/2.0);
+    vec3 xVect  = vec3(sphericalToCartesian(xShift + PI/2.0, 0.0)) * kx;
+    vec3 yVect  = vec3(sphericalToCartesian(xShift, -yShift + PI/2.0)) * kx /aspectRatio;
+    vec3 center = vec3(sphericalToCartesian(xShift, -yShift));
+
+    mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
+                     xVect.y,   yVect.y,    center.y,
+                     xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
+    
     void main() 
     {
         vec3 pos3d = vec3(gl_TexCoord[0].xy - vec2(0.5, yCenter), 1.0) * to3d; // point on the surface
