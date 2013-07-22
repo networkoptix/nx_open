@@ -36,14 +36,21 @@ public:
                                     bool useIp,
                                     bool useHtml);
 
-    static QString eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString &delimiter);
+    static QString eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
+    static QVariantHash eventDetailsMap(const QnBusinessEventParameters &params, int aggregationCount);
+
+    static QString renderEventDetailsText(QVariantHash contextMap);
 
     static QString motionUrl(const QnBusinessEventParameters &params);
 private:
+    static QString eventDetailsCombined(QVariantHash& detailsMap, const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
+
     /** Details of event: aggregation info, date and time, other info */
     static QString aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
-                                const QnBusinessAggregationInfo& aggregationInfo,
-                                const QString& delimiter);
+                                              const QnBusinessAggregationInfo& aggregationInfo,
+                                              const QString& delimiter);
+    static QVariantList aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
+                                const QnBusinessAggregationInfo& aggregationInfo);
 
     static QString eventSource(const QnBusinessEventParameters &params, bool useIp);
 

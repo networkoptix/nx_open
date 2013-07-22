@@ -1,6 +1,7 @@
 #include "business_strings_helper.h"
 #include "version.h"
 
+#include "mustache/mustache.h"
 #include <api/app_server_connection.h>
 
 #include <business/business_aggregation_info.h>
@@ -15,6 +16,16 @@
 namespace {
     static const QString plainTextDelimiter(lit("\n"));
     static const QString htmlDelimiter(lit("<br>"));
+
+    static const QString tpName(lit("name"));
+    static const QString tpEvent(lit("event"));
+    static const QString tpSource(lit("source"));
+    static const QString tpUrlInt(lit("urlint"));
+    static const QString tpUrlExt(lit("urlext"));
+    static const QString tpTimestamp(lit("timestamp"));
+    static const QString tpReason(lit("reason"));
+    static const QString tpAggregated(lit("aggregated"));
+    static const QString tpInputPort(lit("inputPort"));
 }
 
 QString QnBusinessStringsHelper::eventName(BusinessEventType::Value value) {
@@ -88,6 +99,26 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     return tr("Unknown Event has occured");
 }
 
+QString readFile(const QString& filename) {
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return QString();
+    }
+
+    QTextStream stream(&file);
+    return stream.readAll();
+}
+
+QString renderTemplateFromString(const QString& _template, const QVariantHash& contextMap) {
+    Mustache::Renderer renderer;
+    Mustache::QtVariantContext context(contextMap);
+    return renderer.render(_template, &context);
+}
+
+QString renderTemplateFromFile(const QString& filename, const QVariantHash& contextMap) {
+    QString _template = readFile(filename);
+    return renderTemplateFromString(_template, contextMap);
+}
 
 QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action,
                                                   const QnBusinessAggregationInfo &aggregationInfo,
@@ -101,31 +132,66 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     QnBusinessEventParameters params = action->getRuntimeParams();
     BusinessEventType::Value eventType = params.getEventType();
 
-    QString result;
-    result += tr("Event: %1").arg(eventName(eventType));
+    if (useHtml) {
+        QVariantHash contextMap;
 
-    result += delimiter;
-    result += tr("Source: %1").arg(eventSource(params, useIp));
+        contextMap[tpName] = lit("John Smith");
+        contextMap[tpEvent] = eventName(eventType);
+        contextMap[tpSource] = eventSource(params, useIp);
+        if (eventType == BusinessEventType::Camera_Motion) {
+            contextMap[tpUrlInt] = motionUrl(params);
+            contextMap[tpUrlExt] = motionUrl(params);
+        }
+        contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo);
 
-    if (useHtml && eventType == BusinessEventType::Camera_Motion) {
+        return renderTemplateFromFile(lit("Z:\\Downloads\\qt-mustache\\mail.mustache"), contextMap);
+    } else {
+        QString result;
+        result += tr("Event: %1").arg(eventName(eventType));
         result += delimiter;
-        result += tr("Url: %1").arg(motionUrl(params));
+        result += tr("Source: %1").arg(eventSource(params, useIp));
+        result += delimiter;
+        result += aggregatedEventDetails(action, aggregationInfo, delimiter);
+
+        return result;
     }
+}
 
-    result += delimiter;
-    result += aggregatedEventDetails(action, aggregationInfo, delimiter);
+QString QnBusinessStringsHelper::renderEventDetailsText(QVariantHash contextMap) {
+    QString _template = lit("{{timestamp}}")
+        + lit("{{#inputPort}}\n") + tr("Input port: %1").arg(lit("{{inputPort}}")) + lit("{{/inputPort}}")
+        + lit("{{#reason}}\n") + tr("Reason: %1").arg(lit("{{reason}}")) + lit("{{/reason}}")
+        + lit("{{#cameraConflictAddress}}\n") + tr("Conflict address: %1").arg(lit("{{cameraConflictAddress}}"))
+            + lit("{{#cameraConflicts}}\n") + tr("Camera #%1 MAC: %2").arg(lit("{{number}}")).arg(lit("{{mac}}")) + lit("{{/cameraConflicts}}")
+        + lit("{{/cameraConflictAddress}}")
+    + lit("{{#msConflicts}}\n") + tr("Conflicting EC #%1: %2").arg(lit("{{ecsNumber}}")).arg(lit("{{ecsIp}}")) + lit("{{/msConflicts}}");
 
+    return renderTemplateFromString(_template, contextMap);
+}
+
+QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) {
+    QVariantHash dummy;
+    return eventDetailsCombined(dummy, params, aggregationCount, delimiter);
+}
+
+QVariantHash QnBusinessStringsHelper::eventDetailsMap(const QnBusinessEventParameters &params, int aggregationCount) {
+    QVariantHash result;
+    eventDetailsCombined(result, params, aggregationCount, QString());
     return result;
 }
 
-QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString &delimiter) {
+QString QnBusinessStringsHelper::eventDetailsCombined(QVariantHash& detailsMap, const QnBusinessEventParameters &params, int aggregationCount, const QString &delimiter) {
     QString result;
 
-    result += eventTimestamp(params, aggregationCount);
+    QString timestamp = eventTimestamp(params, aggregationCount);
+    detailsMap[tpTimestamp] = timestamp;
+    result += timestamp;
 
     BusinessEventType::Value eventType = params.getEventType();
     switch (eventType) {
     case BusinessEventType::Camera_Input: {
+            detailsMap[tpInputPort] = params.getInputPortId();
+
             result += delimiter;
             result = tr("Input port: %1").arg(params.getInputPortId());
             break;
@@ -133,28 +199,46 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     case BusinessEventType::Storage_Failure:
     case BusinessEventType::Network_Issue:
     case BusinessEventType::MediaServer_Failure: {
+            detailsMap[tpReason] = eventReason(params);
+
             result += delimiter;
             result += tr("Reason: %1").arg(eventReason(params));
             break;
         }
     case BusinessEventType::Camera_Ip_Conflict: {
+            detailsMap[lit("cameraConflictAddress")] = params.getSource();
+
             result += delimiter;
             result += tr("Conflict address: %1").arg(params.getSource());
 
+            QVariantList conflicts;
             int n = 0;
             foreach (QString mac, params.getConflicts()) {
+                QVariantHash conflict;
+                conflict[lit("number")] = ++n;
+                conflict[lit("mac")] = mac;
+                conflicts << conflict;
+
                 result += delimiter;
-                result += tr("Camera #%1 MAC: %2").arg(++n).arg(mac);
+                result += tr("Camera #%1 MAC: %2").arg(n).arg(mac);
             }
+            detailsMap[lit("cameraConflicts")] = conflicts;
 
             break;
         }
     case BusinessEventType::MediaServer_Conflict: {
+            QVariantList conflicts;
             int n = 0;
             foreach (QString ip, params.getConflicts()) {
+                QVariantHash conflict;
+                conflict[lit("ecsNumber")] = ++n;
+                conflict[lit("ecsIp")] = ip;
+                conflicts << conflict;
+
                 result += delimiter;
-                result += tr("Conflicting EC #%1: %2").arg(++n).arg(ip);
+                result += tr("Conflicting EC #%1: %2").arg(n).arg(ip);
             }
+            detailsMap[lit("msConflicts")] = conflicts;
             break;
         }
     default:
@@ -243,6 +327,19 @@ QString QnBusinessStringsHelper::aggregatedEventDetails(const QnAbstractBusiness
         if (!result.isEmpty())
             result += delimiter;
         result += eventDetails(detail.runtimeParams, detail.count, delimiter);
+    }
+    return result;
+}
+
+QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
+                                              const QnBusinessAggregationInfo& aggregationInfo) {
+    QVariantList result;
+    if (aggregationInfo.isEmpty()) {
+        result << eventDetailsMap(action->getRuntimeParams(), action->getAggregationCount());
+    }
+
+    foreach (QnInfoDetail detail, aggregationInfo.toList()) {
+        result << eventDetailsMap(detail.runtimeParams, detail.count);
     }
     return result;
 }
