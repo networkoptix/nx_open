@@ -75,12 +75,12 @@ public:
         }
         else {
             //setUniformValue(m_yShiftLocation, (float) params.yAngle);
-            setUniformValue(m_yShiftLocation, (float) 0);
+            setUniformValue(m_yShiftLocation, (float) params.yAngle);
             setUniformValue(m_yCenterLocation, (float) 1.0);
             //setUniformValue(m_xShiftLocation, (float) fovRot);
             //setUniformValue(m_fovRotLocation, (float) -params.xAngle);
             setUniformValue(m_xShiftLocation, (float) params.xAngle);
-            setUniformValue(m_fovRotLocation, (float) params.yAngle);
+            setUniformValue(m_fovRotLocation, (float) fovRot);
         }
         setUniformValue(m_aspectRatioLocation, aspectRatio);
         setUniformValue(m_dstFovLocation, (float) params.fov);

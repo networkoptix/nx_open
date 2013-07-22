@@ -315,11 +315,11 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
         vec2 pos = vec2(gl_TexCoord[0].x - 0.5, 1.0 - gl_TexCoord[0].y) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
-        float phi   = pos.y/aspectRatio*(acos(fovRot)/PI*2.0) + yShift + fovRot * cos(theta);
+        float phi   = pos.y/aspectRatio*(acos(-fovRot)/PI*2.0) + yShift - fovRot * cos(theta);
 
         mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                       0.0, cos(fovRot), -sin(fovRot),
-                                       0.0, sin(fovRot),  cos(fovRot));
+                                       0.0, cos(-fovRot), -sin(-fovRot),
+                                       0.0, sin(-fovRot),  cos(-fovRot));
 
 
         // Vector in 3D space
