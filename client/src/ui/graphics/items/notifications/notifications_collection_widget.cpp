@@ -38,6 +38,11 @@ namespace {
     const qreal widgetHeight = 24;
     const int thumbnailHeight = 100;
 
+    /** We limit the maximal number of notification items to prevent crashes due
+     * to reaching GDI resource limit. */
+    const int maxNotificationItems = 128;
+
+
     const char *itemResourcePropertyName = "_qn_itemResource";
 
 } //anonymous namespace
@@ -254,6 +259,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
     if (!resource)
         return;
+
+    if(m_list->itemCount() >= maxNotificationItems)
+        return; /* Just drop the notification if we already have too many of them in queue. */
 
     QnNotificationItem *item = new QnNotificationItem(m_list);
 

@@ -184,10 +184,10 @@ public:
 
     ~QnTimestampsCheckboxControlDelegate() {}
 
-
     void at_filterSelected(const QString &value) override {
         checkbox()->setEnabled(value != m_target);
     }
+
 private:
     QString m_target;
 };

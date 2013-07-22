@@ -23,8 +23,10 @@ public:
     void setCheckbox(QCheckBox *value) {
         m_checkBox = value;
     }
+
 public slots:
     virtual void at_filterSelected(const QString &value) = 0;
+
 private:
     QCheckBox* m_checkBox;
 };
@@ -72,19 +74,19 @@ public:
 
     void addLineEdit(const QString& text, QString *value);
 
-
     /**
      * @brief addWidget                 Adds custom widget to this file dialog.
      * @param widget                    Pointer to the widget.
      */
-    void addWidget(QWidget* widget);
+    void addWidget(QWidget *widget);
+
 private slots:
     void at_accepted();
-private:
-    QMap<QCheckBox*, bool *> m_checkboxes;
-    QMap<QSpinBox*, int *> m_spinboxes;
-    QMap<QLineEdit*, QString *> m_lineedits;
 
+private:
+    QMap<QCheckBox*, bool *> m_checkBoxes;
+    QMap<QSpinBox*, int *> m_spinBoxes;
+    QMap<QLineEdit*, QString *> m_lineEdits;
 };
 
 #endif // CUSTOM_FILE_DIALOG_H
