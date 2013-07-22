@@ -15,7 +15,7 @@ namespace {
 
     int popoutTimeoutMs = 300;
     int moveUpTimeoutMs = 500;
-    int displayTimeoutMs = 5000;
+    int displayTimeoutMs = 12500;
     int hideTimeoutMs = 300;
     int collapseTimeoutMs = 250;
     int hoverLeaveTimeoutMSec = 250;

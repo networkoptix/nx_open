@@ -616,8 +616,12 @@ void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInf
     QMap<QByteArray, QByteArray>::const_iterator it = systemInfo.find( "di" );
     if( it != systemInfo.end() )
         m_inputCount = it.value().toInt();
+    if( m_inputCount > 0 )
+        setCameraCapability(Qn::RelayInputCapability, true);
 
     it = systemInfo.find( "do" );
     if( it != systemInfo.end() )
         m_outputCount = it.value().toInt();
+    if( m_outputCount > 0 )
+        setCameraCapability(Qn::RelayOutputCapability, true);
 }
