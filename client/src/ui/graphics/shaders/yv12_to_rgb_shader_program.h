@@ -61,7 +61,7 @@ private:
 class QnFisheyeShaderProgram : public QnYv12ToRgbWithGammaShaderProgram
 {
 public:
-    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
+    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = QString());
     
     void setDewarpingParams(const DewarpingParams& params, float aspectRatio, float maxX, float maxY)
     {
@@ -102,8 +102,9 @@ protected:
 class QnFisheyeWithGammaShaderProgram : public QnFisheyeShaderProgram
 {
 public:
-    QnFisheyeWithGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL):
-      QnFisheyeShaderProgram(context, parent, lit("pow(max(y+yLevels2, 0.0) * yLevels1, yGamma)")) {}
+    QnFisheyeWithGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+private:
+    QString getShaderText();
 };
 
 class QnYv12ToRgbaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {

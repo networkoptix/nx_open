@@ -332,7 +332,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setOpacity(m_decodedPictureProvider.opacity());
 
     if (fisheyeShader) {
-        fisheyeShader->setDewarpingParams(params, picLock->width()/(float)picLock->height(), (float)tex0Coords.right(), (float)tex0Coords.bottom());
+        fisheyeShader->setDewarpingParams(params, picLock->width()/(float)picLock->height() * 2.0, (float)tex0Coords.right(), (float)tex0Coords.bottom());
     }
     //shader->setDstFov(m_extraCurValue);
     //qDebug() << "m_extraCurValue" << m_extraCurValue;

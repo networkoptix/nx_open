@@ -243,7 +243,7 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
         ++ctx.framesSinceJump;
     }
 
-    QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
+    QSize sourceSize = QSize(image->width * image->sample_aspect_ratio * 2.0, image->height);
     if(m_sourceSize == sourceSize)
         return;
 

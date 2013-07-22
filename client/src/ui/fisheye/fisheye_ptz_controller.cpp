@@ -8,7 +8,7 @@
 qreal MAX_MOVE_SPEED = 1.0; // 1 rad per second
 qreal MAX_ZOOM_SPEED = gradToRad(30.0); // zoom speed
 qreal MIN_FOV = gradToRad(20.0);
-qreal MAX_FOV = gradToRad(90.0);
+qreal MAX_FOV = gradToRad(180.0);
 
 qreal FISHEYE_FOV = gradToRad(180.0);
 

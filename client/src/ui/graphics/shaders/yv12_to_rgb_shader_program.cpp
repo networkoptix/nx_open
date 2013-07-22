@@ -121,7 +121,10 @@ bool QnFisheyeShaderProgram::link()
 QnFisheyeShaderProgram::QnFisheyeShaderProgram(const QGLContext *context, QObject *parent, const QString& gammaStr):
     QnYv12ToRgbWithGammaShaderProgram(context, parent, false) 
 {
-    addShaderFromSourceCode(QGLShader::Fragment, getShaderText().arg(gammaStr));
+    if (!gammaStr.isEmpty())
+        addShaderFromSourceCode(QGLShader::Fragment, gammaStr.toLocal8Bit());
+    else
+        addShaderFromSourceCode(QGLShader::Fragment, getShaderText());
 
     link();
 }
@@ -183,7 +186,7 @@ QString QnFisheyeShaderProgram::getShaderText()
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
-        gl_FragColor = vec4(%1, // put gamma correction str here or just 'y'
+        gl_FragColor = vec4(y,
                             texture2D(uTexture, pos).p,
                             texture2D(vTexture, pos).p,
                             1.0) * colorTransform;
@@ -225,4 +228,123 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, 
     ));
 
     link();
+}
+
+QnFisheyeWithGammaShaderProgram::QnFisheyeWithGammaShaderProgram(const QGLContext *context, QObject *parent):
+    QnFisheyeShaderProgram(context, parent, getShaderText()) 
+{
+    
+}
+
+// horizontal view (working)
+/*
+QString QnFisheyeWithGammaShaderProgram::getShaderText()
+{
+    return lit(QN_SHADER_SOURCE(
+        uniform sampler2D yTexture;
+    uniform sampler2D uTexture;
+    uniform sampler2D vTexture;
+    uniform float opacity;
+    uniform float xShift;
+    uniform float yShift;
+    uniform float perspShift;
+    uniform float dstFov;
+    uniform float aspectRatio;
+
+    const float PI = 3.1415926535;
+    mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
+        1.0, -0.344, -0.714,  0.529,
+        1.0,  1.772,  0.0,   -0.886,
+        0.0,  0.0,    0.0,    opacity);
+    
+    mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
+                                   0.0, cos(perspShift), -sin(perspShift),
+                                   0.0, sin(perspShift),  cos(perspShift));
+
+    void main() 
+    {
+        vec2 pos = (gl_TexCoord[0].st -0.5) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
+
+        float theta = pos.x + xShift;
+        float phi   = pos.y/aspectRatio - yShift - perspShift;
+
+        // Vector in 3D space
+        vec3 psph = vec3(cos(phi) * sin(theta),
+                        cos(phi) * cos(theta),
+                        sin(phi)             )  * perspectiveMatrix;
+
+        // Calculate fisheye angle and radius
+        theta = atan(psph.z, psph.x);
+        //phi   = atan(length(psph.xz), psph.y);
+        phi   = acos(psph.y);
+        float r = phi / PI; // fisheye FOV
+
+        // return from polar coordinates
+        pos = vec2(cos(theta), sin(theta)) * r + 0.5;
+
+        // do color transformation yuv->RGB
+        gl_FragColor = vec4(texture2D(yTexture, pos).p,
+            texture2D(uTexture, pos).p,
+            texture2D(vTexture, pos).p,
+            1.0) * colorTransform;
+    }
+    ));
+}
+*/
+
+QString QnFisheyeWithGammaShaderProgram::getShaderText()
+{
+    return lit(QN_SHADER_SOURCE(
+        uniform sampler2D yTexture;
+        uniform sampler2D uTexture;
+        uniform sampler2D vTexture;
+        uniform float opacity;
+        uniform float xShift;
+        uniform float yShift;
+        uniform float fovRot;
+        uniform float dstFov;
+        uniform float aspectRatio;
+
+    const float PI = 3.1415926535;
+    mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
+                                1.0, -0.344, -0.714,  0.529,
+                                1.0,  1.772,  0.0,   -0.886,
+                                0.0,  0.0,    0.0,    opacity);
+
+    mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
+                                   0.0, cos(fovRot), -sin(fovRot),
+                                   0.0, sin(fovRot),  cos(fovRot));
+
+    void main() 
+    {
+        //vec2 pos = (gl_TexCoord[0].st - vec2(0.5, 0.0)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
+        vec2 pos = vec2(gl_TexCoord[0].x - 0.5, 1.0 - gl_TexCoord[0].y) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
+
+        float theta = pos.x - fovRot;
+        float phi   = pos.y/aspectRatio + (yShift + PI/2);
+
+        // Vector in 3D space
+        vec3 psph = vec3(cos(phi) * sin(theta),
+                         cos(phi) * cos(theta),
+                         sin(phi)             ); //  * perspectiveMatrix;
+
+        // Calculate fisheye angle and radius
+        //theta = atan(psph.z, psph.x);
+        //phi   = acos(psph.y);
+        theta = atan(psph.y, psph.x);
+        phi   = acos(psph.z);
+
+
+        float r = phi / PI; // fisheye FOV
+
+        // return from polar coordinates
+        pos = vec2(cos(theta), sin(theta)) * r + 0.5;
+
+        // do color transformation yuv->RGB
+        gl_FragColor = vec4(texture2D(yTexture, pos).p,
+            texture2D(uTexture, pos).p,
+            texture2D(vTexture, pos).p,
+            1.0) * colorTransform;
+    }
+    ));
 }
