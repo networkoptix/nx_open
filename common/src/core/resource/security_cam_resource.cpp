@@ -157,8 +157,6 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
 void QnSecurityCamResource::initializationDone()
 {
-    QMutexLocker lk( &m_mutex );
-
     if( m_inputPortListenerCount.load() > 0 )
         startInputPortMonitoring();
 }
@@ -343,7 +341,7 @@ bool QnSecurityCamResource::setRelayOutputState(
 
 void QnSecurityCamResource::inputPortListenerAttached()
 {
-    QMutexLocker lk( &m_mutex );
+    QMutexLocker lk( &m_initMutex );
 
     //if camera is not initialized yet, delayed input monitoring will start on initialization completion
     if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
@@ -352,7 +350,7 @@ void QnSecurityCamResource::inputPortListenerAttached()
 
 void QnSecurityCamResource::inputPortListenerDetached()
 {
-    QMutexLocker lk( &m_mutex );
+    QMutexLocker lk( &m_initMutex );
  
     if( m_inputPortListenerCount.load() <= 0 )
         return;

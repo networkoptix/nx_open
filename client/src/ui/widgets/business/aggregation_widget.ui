@@ -17,7 +17,7 @@
    <item>
     <widget class="QCheckBox" name="enabledCheckBox">
      <property name="text">
-      <string>no more than once per</string>
+      <string>Interval of action : Every</string>
      </property>
     </widget>
    </item>

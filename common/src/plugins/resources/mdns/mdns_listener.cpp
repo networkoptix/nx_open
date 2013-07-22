@@ -170,9 +170,9 @@ QStringList QnMdnsListener::getLocalAddressList() const
 
 
 
-Q_GLOBAL_STATIC(QnMdnsListener, inst);
+Q_GLOBAL_STATIC(QnMdnsListener, QnMdnsListener_instance);
 
 QnMdnsListener* QnMdnsListener::instance()
 {
-    return inst();
+    return QnMdnsListener_instance();
 }

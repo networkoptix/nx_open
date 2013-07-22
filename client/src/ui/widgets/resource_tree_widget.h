@@ -81,10 +81,10 @@ public:
     void setGraphicsTweaks(Qn::GraphicsTweaksFlags flags);
 
     /**
-     * @brief getGraphicsTweaks         Which graphics tweaks are enabled for this widget.
+     * @brief graphicsTweaks         Which graphics tweaks are enabled for this widget.
      * @return                          Set of flags describing used tweaks.
      */
-    Qn::GraphicsTweaksFlags getGraphicsTweaks();
+    Qn::GraphicsTweaksFlags graphicsTweaks();
 
     /**
      * @brief setFilterVisible          Show/hide resource tree filter widget.
@@ -110,6 +110,10 @@ public:
      */
     bool isEditingEnabled() const;
 
+    void setSimpleSelectionEnabled(bool enabled = true);
+
+    bool isSimpleSelectionEnabled() const;
+
     QAbstractItemView* treeView() const;
 
 protected:
@@ -127,6 +131,7 @@ private slots:
     void at_treeView_enterPressed(const QModelIndex &index);
     void at_treeView_spacePressed(const QModelIndex &index);
     void at_treeView_doubleClicked(const QModelIndex &index);
+    void at_treeView_clicked(const QModelIndex &index);
 
     void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
     void at_resourceProxyModel_rowsInserted(const QModelIndex &index);
@@ -143,20 +148,16 @@ private:
 
     QnResourceTreeSortProxyModel *m_resourceProxyModel;
 
-    /**
-     * @brief m_checkboxesVisible       This property holds whether checkboxes against each row are visible.
-     */
+    /** This property holds whether checkboxes against each row are visible. */
     bool m_checkboxesVisible;
 
-    /**
-     * @brief m_graphicsTweaksFlags     This property holds which graphics tweaks are used for widget displaying.
-     */
+    /** This property holds which graphics tweaks are used for widget displaying. */
     Qn::GraphicsTweaksFlags m_graphicsTweaksFlags;
 
-    /**
-     * @brief m_editingEnabled          This property holds whether renaming by F2 and moving by drag'n'drop are enabled.
-     */
+    /** This property holds whether renaming by F2 and moving by drag'n'drop are enabled. */
     bool m_editingEnabled;
+
+    bool m_simpleSelectionEnabled;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::GraphicsTweaksFlags)

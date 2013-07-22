@@ -293,7 +293,9 @@ Socket::Socket(int type, int protocol)
     m_impl( NULL ),
     m_nonBlockingMode( false ),
     m_status( 0 ),
-    m_prevErrorCode( SystemError::noError )
+    m_prevErrorCode( SystemError::noError ),
+    m_readTimeoutMS( 0 ),
+    m_writeTimeoutMS( 0 )
 {
     if( !createSocket(type, protocol) )
     {
@@ -310,7 +312,9 @@ Socket::Socket(int _sockDesc)
     m_impl( NULL ),
     m_nonBlockingMode( false ),
     m_status( 0 ),
-    m_prevErrorCode( SystemError::noError )
+    m_prevErrorCode( SystemError::noError ),
+    m_readTimeoutMS( 0 ),
+    m_writeTimeoutMS( 0 )
 {
     this->sockDesc = _sockDesc;
     m_impl = new SocketImpl();
@@ -440,16 +444,12 @@ namespace
 
 CommunicatingSocket::CommunicatingSocket(int type, int protocol)
     : Socket(type, protocol),
-      m_readTimeoutMS( 0 ),
-      m_writeTimeoutMS( 0 ),
       mConnected(false)
 {
 }
 
 CommunicatingSocket::CommunicatingSocket(int newConnSD) 
-    : Socket(newConnSD),
-      m_readTimeoutMS( 0 ),
-      m_writeTimeoutMS( 0 )
+    : Socket(newConnSD)
 {
 }
 
@@ -580,44 +580,6 @@ void CommunicatingSocket::shutdown()
 #endif
 }
 
-bool CommunicatingSocket::setReadTimeOut( unsigned int ms )
-{
-    timeval tv;
-
-    tv.tv_sec = ms/1000;
-    tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout
-#ifdef Q_OS_WIN32
-    if ( setsockopt (sockDesc, SOL_SOCKET, SO_RCVTIMEO, ( char* )&ms,  sizeof ( ms ) ) != 0)
-#else
-    if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const void *)&tv,sizeof(struct timeval)) < 0)
-#endif
-    {
-        qWarning()<<"handle("<<sockDesc<<"). setReadTimeOut("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
-        return false;
-    }
-    m_readTimeoutMS = ms;
-    return true;
-}
-
-bool CommunicatingSocket::setWriteTimeOut( unsigned int ms )
-{
-    timeval tv;
-
-    tv.tv_sec = ms/1000;
-    tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout
-#ifdef Q_OS_WIN32
-    if ( setsockopt (sockDesc, SOL_SOCKET, SO_SNDTIMEO, ( char* )&ms,  sizeof ( ms ) ) != 0)
-#else
-    if (::setsockopt(sockDesc, SOL_SOCKET, SO_SNDTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
-#endif
-    {
-        qWarning()<<"handle("<<sockDesc<<"). setWriteTimeOut("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
-        return false;
-    }
-    m_writeTimeoutMS = ms;
-    return true;
-}
-
 bool CommunicatingSocket::setSendBufferSize(int buff_size)
 {
     return ::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
@@ -653,7 +615,7 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
 #else
     int sended = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen, 0),
-        m_writeTimeoutMS );
+        getWriteTimeOut() );
     if( sended == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
         mConnected = false;
     else if (sended == 0)
@@ -678,7 +640,7 @@ int CommunicatingSocket::recv(void *buffer, int bufferLen, int flags)
 #else
     int bytesRead = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::recv, sockDesc, (void*)buffer, (size_t)bufferLen, flags),
-        m_readTimeoutMS );
+        getReadTimeOut() );
     if( bytesRead == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
         mConnected = false;
     else if (bytesRead == 0)
@@ -956,7 +918,7 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 #else
     return doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
-        m_writeTimeoutMS ) == bufferLen;
+        getWriteTimeOut() ) == bufferLen;
 #endif
 }
 
@@ -971,7 +933,7 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
 #else
     int rtn = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::recvfrom, sockDesc, (void*)buffer, (size_t)bufferLen, 0, (sockaddr*)&clntAddr, (socklen_t*)&addrLen),
-        m_readTimeoutMS );
+        getReadTimeOut() );
 #endif
 
     if (rtn >= 0) {
@@ -999,6 +961,54 @@ bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
     //if (!res)
     //    qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
     return res;
+}
+
+bool Socket::setReadTimeOut( unsigned int ms )
+{
+    timeval tv;
+
+    tv.tv_sec = ms/1000;
+    tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout
+#ifdef Q_OS_WIN32
+    if ( setsockopt (sockDesc, SOL_SOCKET, SO_RCVTIMEO, ( char* )&ms,  sizeof ( ms ) ) != 0)
+#else
+    if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const void *)&tv,sizeof(struct timeval)) < 0)
+#endif
+    {
+        qWarning()<<"handle("<<sockDesc<<"). setReadTimeOut("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
+        return false;
+    }
+    m_readTimeoutMS = ms;
+    return true;
+}
+
+unsigned int Socket::getReadTimeOut() const
+{
+    return m_readTimeoutMS;
+}
+
+bool Socket::setWriteTimeOut( unsigned int ms )
+{
+    timeval tv;
+
+    tv.tv_sec = ms/1000;
+    tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout
+#ifdef Q_OS_WIN32
+    if ( setsockopt (sockDesc, SOL_SOCKET, SO_SNDTIMEO, ( char* )&ms,  sizeof ( ms ) ) != 0)
+#else
+    if (::setsockopt(sockDesc, SOL_SOCKET, SO_SNDTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
+#endif
+    {
+        qWarning()<<"handle("<<sockDesc<<"). setWriteTimeOut("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
+        return false;
+    }
+    m_writeTimeoutMS = ms;
+    return true;
+}
+
+unsigned int Socket::getWriteTimeOut() const
+{
+    return m_writeTimeoutMS;
 }
 
 bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {

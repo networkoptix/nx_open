@@ -32,7 +32,9 @@ public:
         etWrite = 2,
         //!Error occured on socket. Output only event
         etError = 4,
-        etCount = 5
+        //!Used for periodic operations and for socket timers
+        etTimedOut = 8,
+        etCount = 9
     };
 
     /*!
@@ -88,11 +90,12 @@ public:
         \return true, if socket added to set
         \note This method does not check, whether \a sock is already in pollset
         \note Ivalidates all iterators
+        \note \a userData is associated with pair (\a sock, \a eventType)
     */
     bool add( Socket* const sock, EventType eventType, void* userData = NULL );
     //!Do not monitor event \a eventType on socket \a sock anymore
     /*!
-        \return User data, associated with \a sock. NULL, if \a sock was not found
+        \return User data, associated with \a sock and \a eventType. NULL, if \a sock was not found
         \note Ivalidates all iterators
     */
     void* remove( Socket* const sock, EventType eventType );

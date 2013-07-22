@@ -27,9 +27,11 @@ namespace SystemError
 #ifdef _WIN32
     static const ErrorCode wouldBlock = WSAEWOULDBLOCK;
     static const ErrorCode inProgress = WSAEWOULDBLOCK;
+    static const ErrorCode timedOut = WSAETIMEDOUT;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
+    static const ErrorCode timedOut = ETIMEDOUT;
 #endif
 
     //!Returns error code of previous system call

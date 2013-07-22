@@ -60,11 +60,11 @@ QnSignHelper::QnSignHelper():
     m_signBackground = Qt::white;
 
     m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
-    m_hwIdStr = QLatin1String(qnLicensePool->getLicenses().hardwareId2());
+    m_hwIdStr = QLatin1String(qnLicensePool->hardwareId2());
     if (m_hwIdStr.isEmpty())
         m_hwIdStr = tr("Unknown");
 
-    QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
+    QList<QnLicensePtr> list = qnLicensePool->getLicenses();
     m_licensedToStr = QString(tr("FREE license"));
     foreach (QnLicensePtr license, list)
     {
@@ -705,12 +705,12 @@ QByteArray QnSignHelper::getSignPattern()
 
     result.append(qApp->applicationName().toUtf8()).append(" v").append(qApp->applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QString hid = QLatin1String(qnLicensePool->getLicenses().hardwareId2());
+    QString hid = QLatin1String(qnLicensePool->hardwareId2());
     if (hid.isEmpty())
         hid = tr("Unknown");
     result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
+    QList<QnLicensePtr> list = qnLicensePool->getLicenses();
     QString licenseName(tr("FREE license"));
     foreach (QnLicensePtr license, list)
     {

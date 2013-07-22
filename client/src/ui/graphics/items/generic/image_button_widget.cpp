@@ -580,6 +580,8 @@ void QnImageButtonWidget::updateState(StateFlags state) {
     } else {
         m_animator->animateTo(hoverProgress);
     }
+
+    emit stateChanged();
 }
 
 QAction *QnImageButtonWidget::defaultAction() const {

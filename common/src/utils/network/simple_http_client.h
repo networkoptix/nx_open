@@ -68,6 +68,8 @@ public:
     static QString digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url);
     QByteArray getHeaderValue(const QByteArray& key);
 
+    const QString& localAddress() const;
+    unsigned short localPort() const;
 
     QString mRealm;
     QString mNonce;
@@ -105,6 +107,8 @@ private:
     char* m_dataRestPtr;
     int m_dataRestLen;
     QMap<QByteArray,QByteArray> m_additionHeaders;
+    QString m_localAddress;
+    unsigned short m_localPort;
 };
 
 /*!

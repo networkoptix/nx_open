@@ -507,3 +507,7 @@ Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parame
 Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &parameters) {
     return qnSettings->isUpdatesEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }
+
+Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &parameters) {
+    return Qn::EnabledAction;
+}

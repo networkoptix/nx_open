@@ -11,4 +11,7 @@ message ConnectInfo {
     optional int32 proxyPort                       = 3;
     optional string ecsGuid                        = 4;
     optional string publicIp                       = 5;
+    optional string oldHardwareId                  = 6;
+    optional string hardwareId1                    = 7;
+    optional string hardwareId2                    = 8;
 }

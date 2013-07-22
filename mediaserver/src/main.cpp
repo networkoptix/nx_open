@@ -61,6 +61,7 @@
 #include "rest/handlers/statistics_handler.h"
 #include "rest/handlers/camera_settings_handler.h"
 #include "rest/handlers/manual_camera_addition_handler.h"
+#include "rest/handlers/camera_event_handler.h"
 #include "rest/server/rest_connection_processor.h"
 #include "rtsp/rtsp_connection.h"
 #include "network/default_tcp_connection_processor.h"
@@ -88,6 +89,7 @@
 #include "rest/handlers/favico_handler.h"
 #include "rest/handlers/storage_space_handler.h"
 #include "common/customization.h"
+#include "common/global_settings.h"
 #include "plugins/resources/stardot/stardot_resource_searcher.h"
 #include "plugins/plugin_manager.h"
 #include "core/resource_managment/camera_driver_restriction_list.h"
@@ -756,6 +758,7 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
 void QnMain::initTcpListener()
 {
     int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
+    Qn::GlobalSettings::instance()->setHttpPort(rtspPort);    //required for QnActiResource (which is in libcommon). #todo: make qSettings global???
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
     QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnFileSystemHandler());
@@ -772,6 +775,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
     QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
+    QnRestConnectionProcessor::registerHandler("api/camera_event", new QnCameraEventHandler());  //used to receive event from acti camera. TODO: remove this from api
     QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
@@ -911,7 +915,7 @@ void QnMain::run()
     else
         compatibilityChecker = &localChecker;
 
-    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QN_ENGINE_VERSION, "ECS", connectInfo->version))
+    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QnSoftwareVersion(QN_ENGINE_VERSION), "ECS", connectInfo->version))
     {
         cl_log.log(cl_logERROR, "Incompatible Enterprise Controller version detected! Giving up.");
         return;

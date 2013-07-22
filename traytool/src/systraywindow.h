@@ -142,7 +142,7 @@ private:
 
     void initTranslations();
 
-    void updateServiceInfoInternal(SC_HANDLE service, DWORD status, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction);
+    void updateServiceInfoInternal(SC_HANDLE handle, DWORD status, QAction* startAction, QAction* stopAction, QAction* logAction);
     bool validateData();
     void saveData();
     bool checkPortNum(int port, const QString& message);
@@ -189,13 +189,10 @@ private:
     bool m_needStartAppServer;
     int m_skipTicks;
 
-    typedef QPair<QString, QAction *> NameAndAction;
-    typedef QList<NameAndAction> NameActionList;
-
     int m_prevMediaServerStatus;
     int m_prevAppServerStatus;
 
-    NameActionList m_actionList;
+    QList<QAction *> m_actions;
     QTime m_lastMessageTimer;
     QQueue<QString> m_delayedMessages;
     QString m_mediaServerServiceName;

@@ -28,6 +28,17 @@
     </message>
 </context>
 <context>
+    <name>Language</name>
+    <message>
+        <source>Locale Code</source>
+        <translation>ru</translation>
+    </message>
+    <message>
+        <source>Language Name</source>
+        <translation>Русский</translation>
+    </message>
+</context>
+<context>
     <name>QDnsLookup</name>
     <message>
         <location filename="../src/qt5/network/qdnslookup.cpp" line="449"/>
@@ -142,154 +153,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/abstract_business_action.cpp" line="23"/>
+        <location filename="../src/business/actions/abstract_business_action.cpp" line="22"/>
+        <source>Say</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/abstract_business_action.cpp" line="24"/>
         <source>Unknown (%1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="71"/>
-        <source>User Defined (%1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="76"/>
-        <source>Motion on Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="78"/>
-        <source>Input Signal on Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="80"/>
-        <source>Camera Disconnected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="82"/>
-        <source>Storage Failure</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="84"/>
-        <source>Network Issue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="86"/>
-        <source>Camera IP Conflict</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="88"/>
-        <source>Media Server Failure</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="90"/>
-        <source>Media Server Conflict</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="92"/>
-        <source>Any camera issue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="94"/>
-        <source>Any server issue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="96"/>
-        <source>Any event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="24"/>
-        <source>Camera %1 was disconnected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="27"/>
-        <source>Input signal was caught on camera %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="30"/>
-        <source>Motion was detected on camera %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="36"/>
-        <source>Network Issue at %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="50"/>
-        <source>Unknown Event has occured</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="57"/>
-        <source>%1 Server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="21"/>
-        <source>Undefined event has occured</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="72"/>
-        <source>%1 has detected motion on camera %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="299"/>
-        <source>Input port: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="114"/>
-        <source>at %1 on %2</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="33"/>
-        <source>Storage Failure at &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="39"/>
-        <source>Media Server &quot;%1&quot; Failure</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="42"/>
-        <source>Camera IP Conflict at &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="45"/>
-        <source>Media Server &quot;%1&quot; Conflict</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="118"/>
-        <source>%n times since %1 %2</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="278"/>
-        <source>%1 conflicted with: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -327,64 +197,6 @@
         <source>Undefined</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="13"/>
-        <location filename="../src/health/system_health.cpp" line="41"/>
-        <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="15"/>
-        <location filename="../src/health/system_health.cpp" line="43"/>
-        <source>E-Mail server is not set.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="11"/>
-        <location filename="../src/health/system_health.cpp" line="35"/>
-        <source>Your E-Mail address is not set.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="17"/>
-        <location filename="../src/health/system_health.cpp" line="45"/>
-        <source>Some users have not set their E-Mail addresses.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="19"/>
-        <location filename="../src/health/system_health.cpp" line="51"/>
-        <source>Connection to Enterprise Controller is lost.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="21"/>
-        <location filename="../src/health/system_health.cpp" line="53"/>
-        <source>Error while sending E-Mail.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="23"/>
-        <location filename="../src/health/system_health.cpp" line="55"/>
-        <source>Some storages are full.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="25"/>
-        <location filename="../src/health/system_health.cpp" line="57"/>
-        <source>Storages are not configured.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="37"/>
-        <source>You cannot receive system notifications via E-Mail.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="47"/>
-        <source>They cannot receive system notifications via E-Mail.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnAbstractStorageResource</name>
@@ -412,72 +224,72 @@
 <context>
     <name>QnApiPbSerializer</name>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="654"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="656"/>
         <source>Cannot parse serialized cameras.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="663"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="665"/>
         <source>Cannot parse serialized servers.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="672"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="674"/>
         <source>Cannot parse serialized layouts.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="692"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="694"/>
         <source>Cannot parse serialized users.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="701"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="703"/>
         <source>Cannot parse serialized resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="710"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="712"/>
         <source>Cannot parse serialized resource types.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="719"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="721"/>
         <source>Cannot parse serialized licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="732"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="734"/>
         <source>Cannot parse serialized camera history.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="742"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="744"/>
         <source>Cannot parse serialized key-value pairs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="752"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="754"/>
         <source>Cannot parse serialized settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="762"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="764"/>
         <source>Cannot parse serialized connection information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="783"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="785"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="792"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="794"/>
         <source>Cannot parse serialized action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="804"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="806"/>
         <source>Cannot parse serialized actions.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -485,97 +297,204 @@
 <context>
     <name>QnBusinessStringsHelper</name>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="62"/>
-        <source>Undefined event has occured</source>
+        <location filename="../src/business/business_strings_helper.cpp" line="23"/>
+        <source>User Defined (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="64"/>
-        <source>%1 has detected that camera %2 was disconnected</source>
+        <location filename="../src/business/business_strings_helper.cpp" line="28"/>
+        <source>Motion on Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="30"/>
+        <source>Input Signal on Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="32"/>
+        <source>Camera Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="34"/>
+        <source>Storage Failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="36"/>
+        <source>Network Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="38"/>
+        <source>Camera IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="40"/>
+        <source>Media Server Failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="42"/>
+        <source>Media Server Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="44"/>
+        <source>Any camera issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="46"/>
+        <source>Any server issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="48"/>
+        <source>Any event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="59"/>
+        <source>Undefined event has occured on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="62"/>
+        <source>Camera %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="65"/>
+        <source>Input on %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="68"/>
-        <source>%1 has caught an input signal on camera %2</source>
+        <source>Motion on %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="76"/>
-        <source>%1 &quot;%2&quot; has detected %n storage issues</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="80"/>
-        <source>%1 has experienced %n network issues with camera %2</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="71"/>
+        <source>Storage Failure at %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="84"/>
-        <source>%1 &quot;%2&quot; failure was detected</source>
+        <location filename="../src/business/business_strings_helper.cpp" line="74"/>
+        <source>Network Issue at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="77"/>
+        <source>Media Server &quot;%1&quot; Failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="80"/>
+        <source>Camera IP Conflict at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="83"/>
+        <source>Media Server &quot;%1&quot; Conflict</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="88"/>
-        <source>%1 &quot;%2&quot; has detected camera IP conflict</source>
+        <source>Unknown Event has occured</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="92"/>
-        <source>%1 &quot;%2&quot; is conflicting with other server</source>
+        <location filename="../src/business/business_strings_helper.cpp" line="105"/>
+        <source>Event: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="97"/>
-        <source>User Defined Event (%1) has occured on %2</source>
+        <location filename="../src/business/business_strings_helper.cpp" line="108"/>
+        <source>Source: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="101"/>
-        <source>Unknown Event has occured on %1</source>
+        <location filename="../src/business/business_strings_helper.cpp" line="112"/>
+        <source>Url: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="146"/>
-        <source>No video frame received during last %1 seconds.</source>
+        <location filename="../src/business/business_strings_helper.cpp" line="130"/>
+        <source>Input port: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="150"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="137"/>
+        <source>Reason: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="142"/>
+        <source>Conflict address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="147"/>
+        <source>Camera #%1 MAC: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="156"/>
+        <source>Conflicting EC #%1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="172"/>
+        <source>Time: %1 on %2</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/business/business_strings_helper.cpp" line="176"/>
+        <source>First occurence: %1 on %2 (%n times total)</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="197"/>
+        <source>No video frame received during last %1 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="201"/>
         <source>Connection to camera was unexpectedly closed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="157"/>
-        <source>RTP packet loss detected. Prev seq.=%1 next seq.=%2</source>
+        <location filename="../src/business/business_strings_helper.cpp" line="208"/>
+        <source>RTP packet loss detected, prev seq.=%1 next seq.=%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="162"/>
-        <source>Server terminated.</source>
+        <location filename="../src/business/business_strings_helper.cpp" line="213"/>
+        <source>Server terminated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="166"/>
-        <source>Server started after crash.</source>
+        <location filename="../src/business/business_strings_helper.cpp" line="217"/>
+        <source>Server started after crash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="170"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="225"/>
+        <source>Not enough HDD/SSD speed for recording to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="221"/>
         <source>I/O Error occured at %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="174"/>
-        <source>Not enough HDD/SSD speed
-for recording to %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -773,6 +692,90 @@ for recording to %1.</source>
     </message>
 </context>
 <context>
+    <name>QnSystemHealthStringsHelper</name>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="6"/>
+        <source>Your E-Mail address is not set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="8"/>
+        <source>You have no licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="10"/>
+        <source>E-Mail server is not set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="12"/>
+        <source>Some users have not set their E-Mail addresses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="14"/>
+        <source>Connection to Enterprise Controller is lost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="16"/>
+        <source>Error while sending E-Mail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="18"/>
+        <source>Storages are full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="20"/>
+        <source>Storages are not configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="31"/>
+        <source>E-Mail address is not set for user %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="41"/>
+        <source>Your E-Mail address is not set.
+You cannot receive system notifications via E-Mail.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="43"/>
+        <source>E-Mail server is not set.
+You cannot receive system notifications via E-Mail.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="45"/>
+        <source>Some users have not set their E-Mail addresses.
+They cannot receive system notifications via E-Mail.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="47"/>
+        <source>Storages are full on the following Media Server:
+%1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="49"/>
+        <source>Storages are not configured on the following Media Server:
+%1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="51"/>
+        <source>You have no licenses.
+You cannot record video from cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <location filename="../src/utils/network/tcp_connection_processor.cpp" line="280"/>
@@ -831,7 +834,7 @@ for recording to %1.</source>
 <context>
     <name>Socket</name>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="346"/>
+        <location filename="../src/utils/network/socket.cpp" line="350"/>
         <source>Couldn&apos;t resolve %1: %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -844,7 +847,7 @@ for recording to %1.</source>
 <context>
     <name>UDPSocket</name>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="927"/>
+        <location filename="../src/utils/network/socket.cpp" line="889"/>
         <source>Disconnect failed (connect()).</source>
         <translation type="unfinished"></translation>
     </message>

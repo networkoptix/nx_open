@@ -38,6 +38,7 @@ public:
     ~QnCheckResourceAndWarnDelegate();
     virtual void init(QWidget* parent) override;
     virtual bool validate(const QnResourceList &selected) override;
+
 protected:
     virtual bool isResourceValid(const QnSharedResourcePointer<ResourceType> &resource) const = 0;
     virtual QString getText(int invalid, int total) const = 0;

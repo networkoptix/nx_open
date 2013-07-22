@@ -14,6 +14,7 @@ QnImageButtonBar::QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags window
     base_type(parent, windowFlags),
     m_visibleButtons(0),
     m_checkedButtons(0),
+    m_enabledButtons(0),
     m_updating(false),
     m_submitting(false)
 {
@@ -35,7 +36,7 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
         return;
     }
 
-    button->setParent(this); /* We're expected to take ownership, even if the button wasn't actually added. */
+    button->setParentItem(this); /* We're expected to take ownership, even if the button wasn't actually added. */
 
     if(!qIsPower2(mask))
         qnWarning("Given mask '%1' is not a power of 2.", mask);
@@ -57,7 +58,10 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
     connect(button, SIGNAL(toggled(bool)),      this, SLOT(at_button_toggled()));
     connect(button, SIGNAL(enabledChanged()),   this, SLOT(at_button_enabledChanged()));
 
-    submitVisibleButtons();
+    setButtonsVisible(mask, button->isVisible());
+    setButtonsEnabled(mask, button->isEnabled());
+    setButtonsChecked(mask, button->isChecked());
+
     submitButtonSize(button);
 }
 
@@ -161,6 +165,21 @@ void QnImageButtonBar::setUniformButtonSize(const QSizeF &uniformButtonSize) {
 
     foreach(QnImageButtonWidget *button, m_buttonByMask) 
         submitButtonSize(button);
+}
+
+int QnImageButtonBar::unusedMask() const {
+    int usedMask = 0;
+    foreach(int mask, m_maskByButton)
+        usedMask |= mask;
+
+    int mask = 1;
+    for(int i = 0; i < 31; i++) {
+        if(!(usedMask & mask))
+            return mask;
+        mask <<= 1;
+    }
+    
+    return 0;
 }
 
 void QnImageButtonBar::submitVisibleButtons() {

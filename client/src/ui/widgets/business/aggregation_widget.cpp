@@ -15,7 +15,7 @@ QnAggregationWidget::QnAggregationWidget(QWidget *parent) :
     connect(ui->enabledCheckBox, SIGNAL(toggled(bool)), ui->periodComboBox, SLOT(setEnabled(bool)));
 
     connect(ui->enabledCheckBox,    SIGNAL(toggled(bool)),              this, SIGNAL(valueChanged()));
-    connect(ui->valueSpinBox,       SIGNAL(editingFinished()),          this, SIGNAL(valueChanged()));
+    connect(ui->valueSpinBox,       SIGNAL(valueChanged(int)),          this, SIGNAL(valueChanged()));
     connect(ui->periodComboBox,     SIGNAL(currentIndexChanged(int)),   this, SIGNAL(valueChanged()));
 }
 

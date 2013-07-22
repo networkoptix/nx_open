@@ -90,7 +90,7 @@ private:
     void registerLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget);
     void unregisterLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget, bool deleteWindowWidget = true);
 
-    void updateOverlayVisibility(QnMediaResourceWidget *widget);
+    void updateOverlayMode(QnMediaResourceWidget *widget);
     void updateWindowFromWidget(QnMediaResourceWidget *widget);
     void updateWidgetFromWindow(ZoomWindowWidget *windowWidget);
 

@@ -15,6 +15,7 @@
 #else
 #   define QN_PRODUCT_NAME              "${namespace.additional}"
 #endif
+#define QN_PRODUCT_NAME_SHORT           "${product.name.short}"
 #define QN_ENGINE_VERSION               "${release.version}.${buildNumber}"
 #define QN_APPLICATION_REVISION         "${changeSet}"
 #define QN_APPLICATION_PLATFORM         "${platform}"
@@ -39,6 +40,7 @@
 #define QN_FREE_LICENSE_IS_TRIAL        ${freeLicenseIsTrial}
 #define QN_LICENSE_URL                  "${license.url}"
 #define QN_RSA_PUBLIC_KEY               ${rsa.public.key}
+#define QN_SHOWCASE_URL                 "${showcase.url}"
 
 #define QN_BUILDENV_PATH                "${environment.dir}"
 

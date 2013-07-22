@@ -10,11 +10,11 @@
 #include "serverutil.h"
 #include <business/business_rule_processor.h>
 
-Q_GLOBAL_STATIC(QnServerMessageProcessor, static_instance)
+Q_GLOBAL_STATIC(QnServerMessageProcessor, QnServerMessageProcessor_instance)
 
 QnServerMessageProcessor* QnServerMessageProcessor::instance()
 {
-    return static_instance();
+    return QnServerMessageProcessor_instance();
 }
 
 void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, int timeout)

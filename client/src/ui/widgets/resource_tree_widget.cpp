@@ -114,7 +114,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     m_resourceProxyModel(0),
     m_checkboxesVisible(true),
     m_graphicsTweaksFlags(0),
-    m_editingEnabled(false)
+    m_editingEnabled(false),
+    m_simpleSelectionEnabled(false)
 {
     ui->setupUi(this);
     ui->filterFrame->setVisible(false);
@@ -126,6 +127,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
     connect(ui->resourcesTreeView,      SIGNAL(spacePressed(QModelIndex)),  this,               SLOT(at_treeView_spacePressed(QModelIndex)));
     connect(ui->resourcesTreeView,      SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
+    connect(ui->resourcesTreeView,      SIGNAL(clicked(QModelIndex)),       this,               SLOT(at_treeView_clicked(QModelIndex)));
 
     connect(this,                       SIGNAL(viewportSizeChanged()),      this,               SLOT(updateColumnsSize()), Qt::QueuedConnection);
 
@@ -271,15 +273,37 @@ void QnResourceTreeWidget::setEditingEnabled(bool enabled) {
         return;
 
     m_editingEnabled = enabled;
-    ui->resourcesTreeView->setAcceptDrops(m_editingEnabled);
-    if (enabled)
-        ui->resourcesTreeView->setEditTriggers(QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked);
-    else
+
+    if (m_editingEnabled) {
+        ui->resourcesTreeView->setAcceptDrops(true);
+        ui->resourcesTreeView->setDragDropMode(QAbstractItemView::DragDrop);
+        ui->resourcesTreeView->setEditTriggers(QAbstractItemView::EditKeyPressed | QAbstractItemView::SelectedClicked);
+    } else {
+        ui->resourcesTreeView->setAcceptDrops(false);
+        ui->resourcesTreeView->setDragDropMode(QAbstractItemView::NoDragDrop);
         ui->resourcesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    }
 }
 
 bool QnResourceTreeWidget::isEditingEnabled() const {
     return m_editingEnabled;
+}
+
+void QnResourceTreeWidget::setSimpleSelectionEnabled(bool enabled) {
+    if(m_simpleSelectionEnabled == enabled)
+        return;
+
+    m_simpleSelectionEnabled = enabled;
+
+    if(m_simpleSelectionEnabled) {
+        ui->resourcesTreeView->setSelectionMode(QAbstractItemView::NoSelection);
+    } else {
+        ui->resourcesTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    }
+}
+
+bool QnResourceTreeWidget::isSimpleSelectionEnabled() const {
+    return m_simpleSelectionEnabled;
 }
 
 QAbstractItemView* QnResourceTreeWidget::treeView() const {
@@ -369,6 +393,25 @@ void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
         !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
         !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
         emit activated(resource);
+}
+
+void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex &index) {
+    if(!m_simpleSelectionEnabled)
+        return;
+
+    if(index.column() == Qn::CheckColumn)
+        return; /* Will be processed by delegate. */
+
+    QModelIndex checkIndex = index.sibling(index.row(), Qn::CheckColumn);
+    if(QAbstractItemModel *model = ui->resourcesTreeView->model()) {
+        int checkState = model->data(checkIndex, Qt::CheckStateRole).toInt();
+        if(checkState == Qt::Checked) {
+            checkState = Qt::Unchecked;
+        } else {
+            checkState = Qt::Checked;
+        }
+        model->setData(checkIndex, checkState, Qt::CheckStateRole);
+    }
 }
 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end) {

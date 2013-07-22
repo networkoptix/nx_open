@@ -315,15 +315,4 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
 </context>
-<context>
-    <name>Language</name>
-    <message>
-        <source>Locale Code</source>
-        <translation>en</translation>
-    </message>
-    <message>
-        <source>Language Name</source>
-        <translation>English</translation>
-    </message>
-</context>
 </TS>

@@ -5,6 +5,8 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
+#include <utils/common/software_version.h>
+
 // Presense of an entry in global table means
 // that component of ver1 is compatible (or has compatibility mode)
 // with EVERY component of ver2
@@ -40,6 +42,7 @@ public:
 
     //TODO: #Ivan write comments PLEASE! what comp1 and comp2 mean and should they be translated?
     bool isCompatible(const QString& comp1, const QString& ver1, const QString& comp2, const QString& ver2) const;
+    bool isCompatible(const QString& comp1, const QnSoftwareVersion& ver1, const QString& comp2, const QnSoftwareVersion& ver2) const;
     int size() const;
 
 private:

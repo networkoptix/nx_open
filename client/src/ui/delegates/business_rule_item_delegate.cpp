@@ -57,13 +57,13 @@ void QnSelectResourcesDialogButton::setNodeType(Qn::NodeType nodeType) {
 }
 
 void QnSelectResourcesDialogButton::at_clicked() {
-    QnResourceSelectionDialog dialog(this, m_nodeType); //TODO: #GDM servers dialog?
+    QnResourceSelectionDialog dialog(m_nodeType, this); //TODO: #GDM servers dialog?
     dialog.setSelectedResources(m_resources);
     dialog.setDelegate(m_dialogDelegate);
     int result = dialog.exec();
     if (result != QDialog::Accepted)
         return;
-    m_resources = dialog.getSelectedResources();
+    m_resources = dialog.selectedResources();
     emit commit();
 }
 

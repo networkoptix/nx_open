@@ -13,8 +13,8 @@ message License {
 }
 
 message Licenses {
-    repeated License license       = 1;
-    optional string  hwid1         = 2;
-    optional string  oldHardwareId = 3;
-    optional string  hwid2         = 4;
+    repeated License license              = 1;
+    optional string  unused_hwid1         = 2;
+    optional string  unused_oldHardwareId = 3;
+    optional string  unused_hwid2         = 4;
 }

@@ -83,15 +83,15 @@ void QnAboutDialog::retranslateUi()
         arg(QLatin1String(QN_APPLICATION_ARCH)).
         arg(QLatin1String(QN_APPLICATION_COMPILER));
 
-    QString ecsVersion = QnAppServerConnectionFactory::currentVersion();
+    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
     QUrl ecsUrl = QnAppServerConnectionFactory::defaultUrl();
     QString servers;
 
-    if (ecsVersion.isEmpty()) {
+    if (ecsVersion.isNull()) {
         servers = tr("<b>Enterprise controller</b> not connected.<br>\n");
     } else {
         servers = tr("<b>Enterprise controller</b> version %1 at %2:%3.<br>\n").
-            arg(ecsVersion).
+            arg(ecsVersion.toString()).
             arg(ecsUrl.host()).
             arg(ecsUrl.port());
     }
@@ -101,10 +101,10 @@ void QnAboutDialog::retranslateUi()
         if (server->getStatus() != QnResource::Online)
             continue;
 
-        serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion()).arg(QUrl(server->getUrl()).host()));
+        serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
     }
     
-    if (!ecsVersion.isEmpty() && !serverVersions.isEmpty())
+    if (!ecsVersion.isNull() && !serverVersions.isEmpty())
         servers += serverVersions.join(QLatin1String("<br>\n"));
 
     QString credits = 

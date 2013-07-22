@@ -35,6 +35,8 @@ QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent) :
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
+    ui->resourcesWidget->setEditingEnabled(false);
+    ui->resourcesWidget->setSimpleSelectionEnabled(true);
 
     setWarningStyle(ui->motionLabel);
     ui->motionLabel->setVisible(false);

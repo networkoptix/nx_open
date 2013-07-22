@@ -95,17 +95,17 @@ void QnConnectionTestingDialog::testResults(int status, QnConnectInfoPtr connect
                     "Connection details that you have entered are incorrect, please try again.\n\n"\
                     "If this error persists, please contact your VMS administrator.");
     } else
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
-        QString minSupportedVersion = QLatin1String("1.4");
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
+        QnSoftwareVersion minSupportedVersion("1.4");
 
-        if (stripVersion(connectInfo->version).compare(minSupportedVersion) < 0) {
+        if (connectInfo->version < minSupportedVersion) {
             detail = tr("Enterprise Controller has a different version:\n"\
                         " - Client version: %1.\n"\
                         " - EC version: %2.\n"\
                         "Compatibility mode for versions lower than %3 is not supported.")
                     .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectInfo->version)
-                    .arg(minSupportedVersion);
+                    .arg(connectInfo->version.toString())
+                    .arg(minSupportedVersion.toString());
             success = false;
         } else {
             detail = tr("Enterprise Controller has a different version:\n"\
@@ -113,7 +113,7 @@ void QnConnectionTestingDialog::testResults(int status, QnConnectInfoPtr connect
                         " - EC version: %2.\n"\
                         "You will be asked to restart the client in compatibility mode.")
                     .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectInfo->version);
+                    .arg(connectInfo->version.toString());
         }
     }
 

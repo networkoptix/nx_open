@@ -2,6 +2,7 @@
 #define onvif_resource_h
 
 #include <list>
+#include <memory>
 #include <stack>
 
 #include <QtCore/QDateTime>
@@ -417,7 +418,7 @@ private:
     QString m_ptzUrl;
     int m_timeDrift;
     int m_prevSoapCallResult;
-    onvifXsd__EventCapabilities* m_eventCapabilities;
+    std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;

@@ -36,16 +36,16 @@ private:
 template<class Base, bool baseIsInstrumented = boost::is_base_of<InstrumentedBase, Base>::value>
 class Instrumented: public Base, public InstrumentedBase {
 public:
-    QN_FORWARD_CONSTRUCTOR(Instrumented, Base, { updateScene(this->scene(), this); });
+    QN_FORWARD_CONSTRUCTOR(Instrumented, Base, { InstrumentedBase::updateScene(this->scene(), this); });
 
     virtual ~Instrumented() {
-        updateScene(NULL, this);
+        InstrumentedBase::updateScene(NULL, this);
     }
 
 protected:
     virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override {
         if(change == QGraphicsItem::ItemSceneHasChanged)
-            updateScene(this->scene(), this);
+            InstrumentedBase::updateScene(this->scene(), this);
 
         return Base::itemChange(change, value);
     }

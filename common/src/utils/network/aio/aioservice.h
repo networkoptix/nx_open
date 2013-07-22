@@ -40,8 +40,9 @@ namespace aio
 
         //!Returns true, if object has been successfully initialized
         bool isInitialized() const;
-        //!Monitor socket \a sock for event \a eventToWatch occurence and trigger \a eventHandler on event
+        //!Monitor socket \a sock for event \a eventToWatch occurrence and trigger \a eventHandler on event
         /*!
+            \note if no event in corresponding socket timeout (if not 0), then PollSet::etTimedOut event will be reported
             \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
         */
         bool watchSocket(

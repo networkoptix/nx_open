@@ -213,15 +213,14 @@ private:
 };
 
 
-class QN_EXPORT QnAppServerConnectionFactory
-{
+class QN_EXPORT QnAppServerConnectionFactory {
 public:
     static QString authKey();
     static QString clientGuid();
     static QUrl defaultUrl();
     static QUrl publicUrl();
     static int defaultMediaProxyPort();
-    static QString currentVersion();
+    static QnSoftwareVersion currentVersion();
 	static QnResourceFactory* defaultFactory();
 
     static void setAuthKey(const QString &key);
@@ -229,7 +228,7 @@ public:
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
     static void setDefaultMediaProxyPort(int port);
-    static void setCurrentVersion(const QString &version);
+    static void setCurrentVersion(const QnSoftwareVersion &version);
     static void setPublicIp(const QString &publicIp);
 
     static QnAppServerConnectionPtr createConnection();
@@ -242,7 +241,7 @@ private:
     QUrl m_defaultUrl;
     QUrl m_publicUrl;
     int m_defaultMediaProxyPort;
-    QString m_currentVersion;
+    QnSoftwareVersion m_currentVersion;
     QnResourceFactory *m_resourceFactory;
     QnApiPbSerializer m_serializer;
 };

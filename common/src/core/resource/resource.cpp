@@ -213,16 +213,28 @@ void QnResource::setFlags(Flags flags)
 
 void QnResource::addFlags(Flags flags)
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    
-    setFlags(m_flags | flags);
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        flags |= m_flags;
+        if(m_flags == flags)
+            return;
+
+        m_flags = flags;
+    }
+    emit flagsChanged(toSharedPointer(this));
 }
 
 void QnResource::removeFlags(Flags flags)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        flags = m_flags & ~flags;
+        if(m_flags == flags)
+            return;
 
-    setFlags(m_flags & ~flags);
+        m_flags = flags;
+    }
+    emit flagsChanged(toSharedPointer(this));
 }
 
 QString QnResource::toString() const
@@ -464,6 +476,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         m_resourceParamList[name].setDomain(domain);
         if (!m_resourceParamList[name].setValue(val))
         {
+            locker.unlock();
             cl_log.log("cannot set such param!", cl_logWARNING);
             emit asyncParamSetDone(toSharedPointer(this), name, val, false);
             return false;
@@ -601,8 +614,9 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 
     emit statusChanged(toSharedPointer(this));
 
+    QDateTime dt = qnSyncTime->currentDateTime();
     QMutexLocker mutexLocker(&m_mutex);
-    m_lastStatusUpdateTime = qnSyncTime->currentDateTime();
+    m_lastStatusUpdateTime = dt;
 }
 
 QDateTime QnResource::getLastStatusUpdateTime() const
@@ -764,31 +778,31 @@ void QnResource::initializationDone()
 
 // -----------------------------------------------------------------------------
 // Temporary until real ResourceFactory is implemented
-Q_GLOBAL_STATIC(QnResourceCommandProcessor, commandProcessor)
+Q_GLOBAL_STATIC(QnResourceCommandProcessor, QnResourceCommandProcessor_instance)
 
 void QnResource::startCommandProc()
 {
-    commandProcessor()->start();
+    QnResourceCommandProcessor_instance()->start();
 }
 
 void QnResource::stopCommandProc()
 {
-    commandProcessor()->stop();
+    QnResourceCommandProcessor_instance()->stop();
 }
 
 void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
 {
-    commandProcessor()->putData(data);
+    QnResourceCommandProcessor_instance()->putData(data);
 }
 
 int QnResource::commandProcQueueSize()
 {
-    return commandProcessor()->queueSize();
+    return QnResourceCommandProcessor_instance()->queueSize();
 }
 
 bool QnResource::isDisabled() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    //QMutexLocker mutexLocker(&m_mutex);
 
     return m_disabled;
 }

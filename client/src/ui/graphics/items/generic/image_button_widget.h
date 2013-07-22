@@ -93,6 +93,7 @@ signals:
     void toggled(bool checked);
     void pressed();
     void released();
+    void stateChanged();
 
 protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;

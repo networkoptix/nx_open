@@ -188,9 +188,13 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-bool QnLicense::isValid(const QByteArray& hardwareId) const
+bool QnLicense::isValid(const QByteArray& hardwareId, const QString& brand) const
 {
-    return (m_isValid1 || m_isValid2) && (hardwareId == m_hardwareId);
+    return (m_isValid1 || m_isValid2) && (hardwareId == m_hardwareId) &&
+        (m_brand == brand ||
+            // temporary fix for current trial DW licenses
+            // TODO: Ivan, remove it for v2.0, all trial licenses should be expired by that moment
+            (m_brand == lit("digitalwatchdog") && brand == lit("dwspectrum")));
 }
 
 bool QnLicense::isAnalog() const {
@@ -236,55 +240,44 @@ QString QnLicense::typeName() const {
     }
 }
 
+// -------------------------------------------------------------------------- //
+// QnLicenseListHelper
+// -------------------------------------------------------------------------- //
 
-// -------------------------------------------------------------------------- //
-// QnLicenseList
-// -------------------------------------------------------------------------- //
-QList<QnLicensePtr> QnLicenseList::licenses() const
-{
-    return m_licenses.values();
+QnLicenseListHelper::QnLicenseListHelper(const QnLicenseList& licenseList) {
+    foreach (QnLicensePtr license, licenseList) {
+        m_licenseDict[license->key()] = license;
+    }
 }
 
-QList<QByteArray> QnLicenseList::allLicenseKeys() const
-{
-    QList<QByteArray> result;
+bool QnLicenseListHelper::haveLicenseKey(const QByteArray &key) const {
+    return m_licenseDict.contains(key);
+}
 
-    foreach (const QnLicensePtr& license, m_licenses.values()) {
-        result.append(license->key());
-    }
+QnLicensePtr QnLicenseListHelper::getLicenseByKey(const QByteArray& key) const {
+    if (m_licenseDict.contains(key))
+        return m_licenseDict[key];
+    else
+        return QnLicensePtr();
+}
+
+QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
+    return m_licenseDict.keys();
+}
+
+int QnLicenseListHelper::totalCamerasByClass(bool analog) const
+{
+    int result = 0;
+
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    foreach (QnLicensePtr license, m_licenseDict.values())
+        if (license->isAnalog() == analog && (license->expirationTime() < 0 || currentTime < license->expirationTime())) // TODO: #Elric make NEVER an INT64_MAX
+            result += license->cameraCount();
 
     return result;
 }
 
-void QnLicenseList::setHardwareId1(const QByteArray &hardwareId1)
-{
-    m_hardwareId1 = hardwareId1;
-}
-
-QByteArray QnLicenseList::hardwareId1() const
-{
-    return m_hardwareId1;
-}
-
-void QnLicenseList::setOldHardwareId(const QByteArray &oldHardwareId)
-{
-    m_oldHardwareId = oldHardwareId;
-}
-
-QByteArray QnLicenseList::oldHardwareId() const
-{
-    return m_oldHardwareId;
-}
-
-void QnLicenseList::setHardwareId2(const QByteArray &hardwareId2)
-{
-    m_hardwareId2 = hardwareId2;
-}
-
-QByteArray QnLicenseList::hardwareId2() const
-{
-    return m_hardwareId2;
-}
+#if 0
 
 void QnLicenseList::append(QnLicensePtr license)
 {
@@ -312,41 +305,7 @@ void QnLicenseList::append(QnLicenseList licenses)
         append(license);
 }
 
-bool QnLicenseList::isEmpty() const
-{
-    return m_licenses.isEmpty();
-}
-
-void QnLicenseList::clear()
-{
-    m_licenses.clear();
-}
-
-int QnLicenseList::totalCamerasByClass(bool analog) const
-{
-    int result = 0;
-
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    foreach (QnLicensePtr license, m_licenses.values())
-        if (license->isAnalog() == analog && (license->expirationTime() < 0 || currentTime < license->expirationTime())) // TODO: #Elric make NEVER an INT64_MAX
-            result += license->cameraCount();
-
-    return result;
-}
-
-bool QnLicenseList::haveLicenseKey(const QByteArray &key) const
-{
-    return m_licenses.contains(key);
-}
-
-QnLicensePtr QnLicenseList::getLicenseByKey(const QByteArray& key) const
-{
-    if (m_licenses.contains(key))
-        return m_licenses[key];
-    else
-        return QnLicensePtr();
-}
-
+#endif // 0
 
 // -------------------------------------------------------------------------- //
 // QnLicensePool
@@ -363,43 +322,72 @@ QnLicensePool *QnLicensePool::instance()
     return qn_licensePool_instance();
 }
 
-const QnLicenseList &QnLicensePool::getLicenses() const
+QnLicenseList QnLicensePool::getLicenses() const
 {
     QMutexLocker locker(&m_mutex);
 
-    return m_licenses;
+    return m_licenseDict.values();
+}
+
+bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license) {
+    const QString brand(QLatin1String(QN_PRODUCT_NAME_SHORT));
+
+    // >= v1.5, shoud have hwid1 or hwid2, and have brand
+    if (license->isValid(m_hardwareId1, brand) || license->isValid(m_hardwareId2, brand))
+        return true;
+
+    // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
+    if (license->isValid(m_oldHardwareId, brand) || license->isValid(m_oldHardwareId, QLatin1String("")))
+        return true;
+
+    return false;
+}
+
+bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
+{
+    // We check if m_brand is empty to allow v1.4 licenses to still work
+    if (license && isLicenseMatchesCurrentSystem(license)) {
+        m_licenseDict[license->key()] = license;
+        return true;
+    }
+
+    return false;
 }
 
 void QnLicensePool::addLicense(const QnLicensePtr &license)
 {
     QMutexLocker locker(&m_mutex);
 
-    if (license) {
-        m_licenses.append(license);
-
+    if (addLicense_i(license))
         emit licensesChanged();
+}
+
+bool QnLicensePool::addLicenses_i(const QnLicenseList &licenses)
+{
+    bool atLeastOneAdded = false;
+
+    foreach(QnLicensePtr license, licenses) {
+        if (addLicense_i(license))
+            atLeastOneAdded = true;
     }
+
+    return atLeastOneAdded;
 }
 
 void QnLicensePool::addLicenses(const QnLicenseList &licenses)
 {
     QMutexLocker locker(&m_mutex);
 
-    m_licenses.append(licenses);
-
-    emit licensesChanged();
+    if (addLicenses_i(licenses))
+        emit licensesChanged();
 }
 
 void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
 {
     QMutexLocker locker(&m_mutex);
 
-    m_licenses.setHardwareId1(licenses.hardwareId1());
-    m_licenses.setOldHardwareId(licenses.oldHardwareId());
-    m_licenses.setHardwareId2(licenses.hardwareId2());
-    m_licenses.clear();
-    foreach (QnLicensePtr license, licenses.licenses())
-        m_licenses.append(license);
+    m_licenseDict.clear();
+    addLicenses_i(licenses);
 
     emit licensesChanged();
 }
@@ -408,7 +396,7 @@ void QnLicensePool::reset()
 {
     QMutexLocker locker(&m_mutex);
 
-    m_licenses = QnLicenseList();
+    m_licenseDict = QnLicenseDict();
 
     emit licensesChanged();
 }
@@ -417,7 +405,37 @@ bool QnLicensePool::isEmpty() const
 {
     QMutexLocker locker(&m_mutex);
 
-    return m_licenses.isEmpty();
+    return m_licenseDict.isEmpty();
+}
+
+void QnLicensePool::setHardwareId1(const QByteArray &hardwareId1)
+{
+    m_hardwareId1 = hardwareId1;
+}
+
+QByteArray QnLicensePool::hardwareId1() const
+{
+    return m_hardwareId1;
+}
+
+void QnLicensePool::setOldHardwareId(const QByteArray &oldHardwareId)
+{
+    m_oldHardwareId = oldHardwareId;
+}
+
+QByteArray QnLicensePool::oldHardwareId() const
+{
+    return m_oldHardwareId;
+}
+
+void QnLicensePool::setHardwareId2(const QByteArray &hardwareId2)
+{
+    m_hardwareId2 = hardwareId2;
+}
+
+QByteArray QnLicensePool::hardwareId2() const
+{
+    return m_hardwareId2;
 }
 
 
