@@ -355,11 +355,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         item->setNotificationLevel(Qn::CriticalNotification);
         item->addActionButton(
             qnSkin->icon("events/server.png"),
-            tr("Description"),
-            Qn::MessageBoxAction,
-            QnActionParameters().
-                withArgument(Qn::TitleRole, tr("Information")).
-                withArgument(Qn::TextRole, tr("There is another mediaserver in your network that is accessing your cameras."))
+            QString(),
+            Qn::NoAction
         );
         break;
     }

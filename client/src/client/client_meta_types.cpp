@@ -12,6 +12,7 @@
 #include "ui/actions/action_parameters.h"
 
 namespace {
+
     volatile bool qn_clientMetaTypes_initialized = false;
 
     QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode);
