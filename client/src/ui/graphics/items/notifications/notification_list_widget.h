@@ -69,12 +69,12 @@ private:
             return state == Displaying || state == Displayed || state == Hiding || state == Collapsing;
         }
 
-        void unlockAndHide() {
+        void unlockAndHide(qreal speedUp) {
             locked = false;
-            hide();
+            hide(speedUp);
         }
 
-        void hide();
+        void hide(qreal speedUp);
 
         void setAnimation(qreal from, qreal to, qreal time);
         void animationTick(qreal deltaMSecs);
@@ -106,6 +106,7 @@ private:
 
     ItemData m_collapser;
     bool m_collapsedItemCountChanged;
+    qreal m_speedUp;
     QSizeF m_visibleSize;
     QRectF m_tooltipsEnclosingRect;
     Qn::NotificationLevel m_itemNotificationLevel;
