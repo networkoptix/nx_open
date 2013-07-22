@@ -258,15 +258,17 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
         0.0,  0.0,    0.0,    opacity);
     
     mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                   0.0, cos(fovRot), -sin(fovRot),
-                                   0.0, sin(fovRot),  cos(fovRot));
+                                   0.0, cos(-fovRot), -sin(-fovRot),
+                                   0.0, sin(-fovRot),  cos(-fovRot));
 
     void main() 
     {
         vec2 pos = (gl_TexCoord[0].st -0.5) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
-        float phi   = pos.y/aspectRatio + yShift + fovRot * cos(theta);
+        pos.y = pos.y/aspectRatio;
+        float roty = fovRot* cos(theta);
+        float phi   = pos.y/(1.0 - roty) - roty + yShift;
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
@@ -310,17 +312,18 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
                                 1.0,  1.772,  0.0,   -0.886,
                                 0.0,  0.0,    0.0,    opacity);
 
+    mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
+                                   0.0, cos(-fovRot), -sin(-fovRot),
+                                   0.0, sin(-fovRot),  cos(-fovRot));
+
     void main() 
     {
         vec2 pos = vec2(gl_TexCoord[0].x - 0.5, 1.0 - gl_TexCoord[0].y) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
-        float phi   = pos.y/aspectRatio*(acos(-fovRot)/PI*2.0) + yShift - fovRot * cos(theta);
-
-        mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                       0.0, cos(-fovRot), -sin(-fovRot),
-                                       0.0, sin(-fovRot),  cos(-fovRot));
-
+        pos.y = pos.y/aspectRatio;
+        float roty = fovRot* cos(theta);
+        float phi   = pos.y/(1.0 - roty) - roty + yShift;
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
