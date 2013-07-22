@@ -50,7 +50,7 @@ protected:
     void updateVisibleSize();
 
 private slots:
-    void at_item_clicked(Qt::MouseButton button);
+    void at_item_closeTriggered();
     void at_item_geometryChanged();
     void at_geometry_changed();
 
