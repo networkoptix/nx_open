@@ -3,6 +3,8 @@
 #include <QApplication>
 #include <QtGui/QGraphicsLinearLayout>
 
+#include <utils/common/delete_later.h>
+
 #include <business/business_strings_helper.h>
 
 #include <camera/single_thumbnail_loader.h>
@@ -353,11 +355,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         item->setNotificationLevel(Qn::CriticalNotification);
         item->addActionButton(
             qnSkin->icon("events/server.png"),
-            tr("Description"),
-            Qn::MessageBoxAction,
-            QnActionParameters().
-                withArgument(Qn::TitleRole, tr("Information")).
-                withArgument(Qn::TextRole, tr("There is another mediaserver in your network that watches your cameras."))
+            QString(),
+            Qn::NoAction
         );
         break;
     }
@@ -365,7 +364,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
 
-    connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
+    /* We use Qt::QueuedConnection as our handler may start the event loop. */
+    connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters &)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters &)), Qt::QueuedConnection);
     m_list->addItem(item);
 }
 
@@ -617,7 +617,7 @@ void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationItem *it
         if (m_itemsByMessageType.remove(message, item) > 0)
             break;
     }
-    delete item;
+    qnDeleteLater(item);
 }
 
 void QnNotificationsCollectionWidget::at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters) {

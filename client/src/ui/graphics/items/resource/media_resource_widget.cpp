@@ -470,6 +470,9 @@ void QnMediaResourceWidget::updateIconButton() {
 }
 
 void QnMediaResourceWidget::updateRendererEnabled() {
+    if(m_resource->toResourcePtr()->flags() & QnResource::still_image)
+        return;
+
     for(int channel = 0; channel < channelCount(); channel++)
         m_renderer->setEnabled(channel, !exposedRect(channel, true, true, false).isEmpty());
 }
