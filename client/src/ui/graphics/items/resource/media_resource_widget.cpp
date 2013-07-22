@@ -110,14 +110,14 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
     connect(searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
 
-    QnImageButtonWidget *ptzButton = new QnImageButtonWidget();
-    ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
-    ptzButton->setCheckable(true);
-    ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
-    ptzButton->setToolTip(tr("PTZ"));
-    setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
-    connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
-    connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(updateButtonsVisibility()));
+    m_ptzButton = new QnImageButtonWidget();
+    m_ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
+    m_ptzButton->setCheckable(true);
+    m_ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
+    m_ptzButton->setToolTip(tr("PTZ"));
+    setHelpTopic(m_ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
+    connect(m_ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
+    connect(m_ptzButton, SIGNAL(toggled(bool)), this, SLOT(updateButtonsVisibility()));
     connect(resource()->toResource(), SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(updateButtonsVisibility()));
 
     QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget();
@@ -136,7 +136,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(enhancementButton, SIGNAL(toggled(bool)), this, SLOT(at_histogramButton_toggled(bool)));
 
     buttonBar()->addButton(MotionSearchButton,  searchButton);
-    buttonBar()->addButton(PtzButton,           ptzButton);
+    buttonBar()->addButton(PtzButton,           m_ptzButton);
     buttonBar()->addButton(ZoomWindowButton,    zoomWindowButton);
     buttonBar()->addButton(EnhancementButton,   enhancementButton);
 
@@ -784,7 +784,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result |= MotionSearchButton;
 
     if(m_camera
-            && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability))
+            && (m_camera->getPtzCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability))
             && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
             )
         result |= PtzButton;
@@ -796,6 +796,9 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
             && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
             )
         result |= ZoomWindowButton;
+
+    if (!(result & PtzButton))
+        m_ptzButton->setChecked(false);
 
     return result;
 }

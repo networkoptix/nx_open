@@ -194,6 +194,8 @@ private:
     QStaticText m_sensStaticText[10];
 
     QnFisheyePtzController* m_fisheyePtz;
+
+    QnImageButtonWidget *m_ptzButton;
 };
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H
