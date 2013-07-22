@@ -247,7 +247,7 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
     uniform float opacity;
     uniform float xShift;
     uniform float yShift;
-    uniform float perspShift;
+    uniform float fovRot;
     uniform float dstFov;
     uniform float aspectRatio;
 
@@ -258,15 +258,15 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
         0.0,  0.0,    0.0,    opacity);
     
     mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                   0.0, cos(perspShift), -sin(perspShift),
-                                   0.0, sin(perspShift),  cos(perspShift));
+                                   0.0, cos(fovRot), -sin(fovRot),
+                                   0.0, sin(fovRot),  cos(fovRot));
 
     void main() 
     {
         vec2 pos = (gl_TexCoord[0].st -0.5) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
-        float phi   = pos.y/aspectRatio - yShift - perspShift;
+        float phi   = pos.y/aspectRatio + yShift + fovRot * cos(theta);
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
@@ -275,7 +275,6 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
 
         // Calculate fisheye angle and radius
         theta = atan(psph.z, psph.x);
-        //phi   = atan(length(psph.xz), psph.y);
         phi   = acos(psph.y);
         float r = phi / PI; // fisheye FOV
 
@@ -311,28 +310,32 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
                                 1.0,  1.772,  0.0,   -0.886,
                                 0.0,  0.0,    0.0,    opacity);
 
-    mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                   0.0, cos(fovRot), -sin(fovRot),
-                                   0.0, sin(fovRot),  cos(fovRot));
-
     void main() 
     {
         //vec2 pos = (gl_TexCoord[0].st - vec2(0.5, 0.0)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
         vec2 pos = vec2(gl_TexCoord[0].x - 0.5, 1.0 - gl_TexCoord[0].y) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
-        float theta = pos.x - fovRot;
-        float phi   = pos.y/aspectRatio + (yShift + PI/2);
+        float theta = pos.x + xShift;
+        float phi   = pos.y/aspectRatio + yShift + fovRot * cos(theta);
+
+        mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
+                                       0.0, cos(fovRot), -sin(fovRot),
+                                       0.0, sin(fovRot),  cos(fovRot));
+
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
-                         cos(phi) * cos(theta),
-                         sin(phi)             ); //  * perspectiveMatrix;
+                         sin(phi),
+                         cos(phi) * cos(theta))  * perspectiveMatrix;
 
         // Calculate fisheye angle and radius
-        //theta = atan(psph.z, psph.x);
-        //phi   = acos(psph.y);
-        theta = atan(psph.y, psph.x);
-        phi   = acos(psph.z);
+        theta = atan(psph.z, psph.x);
+        phi   = acos(psph.y);
+        
+        //theta = atan(psph.y, psph.x);
+        //phi   = acos(psph.z);
+        //theta = atan(cos(theta), sin(theta));
+        //phi   = acos(sin(phi));
 
 
         float r = phi / PI; // fisheye FOV

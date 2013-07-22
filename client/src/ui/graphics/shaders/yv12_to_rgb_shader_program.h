@@ -65,7 +65,8 @@ public:
     
     void setDewarpingParams(const DewarpingParams& params, float aspectRatio, float maxX, float maxY)
     {
-        float fovRot = sin(params.xAngle)*params.fovRot;
+        //float fovRot = sin(params.xAngle)*params.fovRot;
+        float fovRot = gradToRad(-12);
         if (params.horizontalView) {
             setUniformValue(m_yShiftLocation, (float) (params.yAngle));
             setUniformValue(m_yCenterLocation, (float) 0.5);
@@ -73,10 +74,13 @@ public:
             setUniformValue(m_fovRotLocation, (float) fovRot);
         }
         else {
-            setUniformValue(m_yShiftLocation, (float) (params.yAngle - M_PI/2.0));
+            //setUniformValue(m_yShiftLocation, (float) params.yAngle);
+            setUniformValue(m_yShiftLocation, (float) 0);
             setUniformValue(m_yCenterLocation, (float) 1.0);
-            setUniformValue(m_xShiftLocation, (float) fovRot);
-            setUniformValue(m_fovRotLocation, (float) -params.xAngle);
+            //setUniformValue(m_xShiftLocation, (float) fovRot);
+            //setUniformValue(m_fovRotLocation, (float) -params.xAngle);
+            setUniformValue(m_xShiftLocation, (float) params.xAngle);
+            setUniformValue(m_fovRotLocation, (float) params.yAngle);
         }
         setUniformValue(m_aspectRatioLocation, aspectRatio);
         setUniformValue(m_dstFovLocation, (float) params.fov);
