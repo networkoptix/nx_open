@@ -36,6 +36,10 @@ QnActiResource::QnActiResource()
     setAuth(QLatin1String("admin"), QLatin1String("123456"));
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
         m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
+
+    connect(
+        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
+        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
 }
 
 QnActiResource::~QnActiResource()
@@ -559,7 +563,7 @@ bool QnActiResource::setRelayOutputState(
     QMutexLocker lk( &m_dioMutex );
 
     bool outputNumberOK = true;
-    const int outputNumber = ouputID.toInt(&outputNumberOK);
+    const int outputNumber = !ouputID.isEmpty() ? ouputID.toInt(&outputNumberOK) : 1;
     if( !outputNumberOK )
         return false;
     if( outputNumber < MIN_DIO_PORT_NUMBER || outputNumber > m_outputCount )
