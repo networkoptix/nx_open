@@ -20,6 +20,9 @@ public:
     qreal frameWidth() const;
     void setFrameWidth(qreal frameWidth);
 
+    Qt::PenStyle frameStyle() const;
+    void setFrameStyle(Qt::PenStyle frameStyle);
+
     QBrush frameBrush() const;
     void setFrameBrush(const QBrush &frameBrush);
 
@@ -37,6 +40,7 @@ protected:
 
 private:
     qreal m_frameWidth;
+    Qt::PenStyle m_frameStyle;
 };
 
 #endif // QN_SIMPLE_FRAME_WIDGET_H

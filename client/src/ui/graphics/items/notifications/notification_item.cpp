@@ -23,7 +23,9 @@ namespace {
     const qreal margin = 4.0;
     const qreal colorSignSize = 8.0;
     const qreal buttonSize = 16.0;
+
 } // anonymous namespace
+
 
 // -------------------------------------------------------------------------- //
 // QnNotificationToolTipWidget
@@ -67,6 +69,10 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
         connect(provider, SIGNAL(imageChanged(const QImage &)), this, SLOT(at_provider_imageChanged(const QImage &)));
         provider->loadAsync();
     }
+}
+
+QString QnNotificationToolTipWidget::text() const {
+    return m_textLabel->text();
 }
 
 void QnNotificationToolTipWidget::setText(const QString &text) {
@@ -125,30 +131,39 @@ void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) 
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
     m_defaultActionIdx(-1),
-    m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
-    m_textLabel(new QnProxyLabel(this)),
     m_notificationLevel(Qn::OtherNotification),
     m_imageProvider(NULL),
-    m_tooltipWidget(new QnNotificationToolTipWidget(this)),
-    m_hoverProcessor(new HoverFocusProcessor(this)),
     m_inToolTipPositionUpdate(false)
 {
     m_color = notificationColor(m_notificationLevel);
 
+    setClickableButtons(Qt::RightButton | Qt::LeftButton);
     setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
     setFrameWidth(0.5);
     setWindowBrush(Qt::transparent);
 
+    m_overlayWidget = new QnSimpleFrameWidget(this);
+    m_overlayWidget->setFrameStyle(Qt::NoPen);
+
+    m_textLabel = new QnProxyLabel(this);
     m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
+    m_closeButton = new QnImageButtonWidget(this);
+    m_closeButton->setCached(true);
+    m_closeButton->setIcon(qnSkin->icon("titlebar/exit.png")); // TODO: #Elric
+    m_closeButton->setFixedSize(12.0, 12.0);
+    connect(m_closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
+
+    m_layout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_layout->setContentsMargins(colorSignSize + margin, margin, margin, margin);
     m_layout->addItem(m_textLabel);
     m_layout->setStretchFactor(m_textLabel, 1.0);
 
     setLayout(m_layout);
 
+    m_tooltipWidget = new QnNotificationToolTipWidget(this);
     m_tooltipWidget->setFocusProxy(this);
     m_tooltipWidget->setOpacity(0.0);
     m_tooltipWidget->setAcceptHoverEvents(true);
@@ -158,15 +173,26 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     connect(m_tooltipWidget, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
     connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
 
+    m_toolTipHoverProcessor = new HoverFocusProcessor(this);
+    m_toolTipHoverProcessor->addTargetItem(this);
+    m_toolTipHoverProcessor->addTargetItem(m_tooltipWidget);
+    m_toolTipHoverProcessor->setHoverEnterDelay(250);
+    m_toolTipHoverProcessor->setHoverLeaveDelay(250);
+    connect(m_toolTipHoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
+    connect(m_toolTipHoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(updateToolTipVisibility()));
+
+    m_hoverProcessor = new HoverFocusProcessor(this);
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
-    m_hoverProcessor->setHoverEnterDelay(250);
-    m_hoverProcessor->setHoverLeaveDelay(250);
-    connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
-    connect(m_hoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(updateToolTipVisibility()));
+    connect(m_hoverProcessor,           SIGNAL(hoverEntered()),  this,  SLOT(updateOverlayVisibility()));
+    connect(m_hoverProcessor,           SIGNAL(hoverLeft()),     this,  SLOT(updateOverlayVisibility()));
 
     updateToolTipPosition();
     updateToolTipVisibility();
+    updateOverlayGeometry();
+    updateOverlayVisibility(false);
+    updateOverlayColor();
+    updateCloseButtonGeometry();
 }
 
 QnNotificationItem::~QnNotificationItem() {
@@ -210,6 +236,8 @@ void QnNotificationItem::setNotificationLevel(Qn::NotificationLevel notification
     m_notificationLevel = notificationLevel;
     m_color = notificationColor(m_notificationLevel);
 
+    updateOverlayColor();
+
     emit notificationLevelChanged();
 }
 
@@ -219,6 +247,17 @@ void QnNotificationItem::setImageProvider(QnImageProvider* provider) {
 
 void QnNotificationItem::setTooltipEnclosingRect(const QRectF &rect) {
     m_tooltipWidget->setEnclosingGeometry(rect);
+}
+
+void QnNotificationItem::setGeometry(const QRectF &geometry) {
+    QSizeF oldSize = size();
+
+    base_type::setGeometry(geometry);
+
+    if(!qFuzzyCompare(size(), oldSize)) {
+        updateOverlayGeometry();
+        updateCloseButtonGeometry();
+    }
 }
 
 void QnNotificationItem::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
@@ -242,7 +281,7 @@ void QnNotificationItem::addActionButton(const QIcon &icon, const QString &toolt
     layout->addStretch(1);
     layout->addItem(button);
     layout->addStretch(1);
-    m_layout->addItem(layout);
+    m_layout->insertItem(0, layout);
 
     connect(button, SIGNAL(clicked()), this, SLOT(at_button_clicked()));
     m_actions << ActionData(actionId, parameters);
@@ -286,7 +325,7 @@ void QnNotificationItem::showToolTip() {
 }
 
 void QnNotificationItem::updateToolTipVisibility() {
-    if(m_hoverProcessor->isHovered()) {
+    if(m_toolTipHoverProcessor->isHovered() && !m_tooltipWidget->text().isEmpty()) {
         showToolTip();
     } else {
         hideToolTip();
@@ -301,6 +340,51 @@ void QnNotificationItem::updateToolTipPosition() {
 
     m_tooltipWidget->updateTailPos();
     m_tooltipWidget->pointTo(QPointF(0, qRound(geometry().height() / 2 )));
+}
+
+void QnNotificationItem::updateOverlayGeometry() {
+    m_overlayWidget->setGeometry(QRectF(QPointF(0, 0), size()));
+}
+
+void QnNotificationItem::updateCloseButtonGeometry() {
+    m_closeButton->setGeometry(QRectF(rect().topRight() - QPointF(m_closeButton->size().width(), 0.0), m_closeButton->size()));
+}
+
+void QnNotificationItem::updateOverlayVisibility(bool animate) {
+    if(m_actions.isEmpty()) {
+        m_overlayWidget->setOpacity(0);
+        m_closeButton->setOpacity(0);
+        return; // TODO: #Elric?
+    }
+
+    qreal opacity = m_hoverProcessor->isHovered() ? 1.0 : 0.0;
+
+    if(animate) {
+        opacityAnimator(m_overlayWidget, 4.0)->animateTo(opacity);
+        opacityAnimator(m_closeButton, 4.0)->animateTo(opacity);
+    } else {
+        m_overlayWidget->setOpacity(opacity);
+        m_closeButton->setOpacity(opacity);
+    }
+}
+
+void QnNotificationItem::updateOverlayColor() {
+    m_overlayWidget->setWindowBrush(toTransparent(m_color, 0.3));
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnNotificationItem::clicked(Qt::MouseButton button) {
+    if(button == Qt::RightButton) {
+        emit closeTriggered();
+    } else if(button == Qt::LeftButton) {
+        if(!m_actions.isEmpty()) {
+            ActionData data = m_actions[0]; // TODO: #Elric
+            emit actionTriggered(data.action, data.params);
+        }
+    }
 }
 
 void QnNotificationItem::at_button_clicked() {
