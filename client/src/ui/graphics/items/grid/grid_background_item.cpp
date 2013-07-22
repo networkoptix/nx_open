@@ -333,7 +333,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     if( !d->imgUploaded )
     {
         //uploading image to opengl texture
-        m_imgUploader->uploadDecodedPicture( m_imgAsFrame, QRectF(0.0, 0.0, 1.0, 1.0), false );
+        m_imgUploader->uploadDecodedPicture( m_imgAsFrame );
         d->imgUploaded = true;
     }
 
