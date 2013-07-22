@@ -101,12 +101,12 @@ void QnCustomFileDialog::addWidget(QWidget *widget) {
 }
 
 void QnCustomFileDialog::at_accepted() {
-    foreach(QCheckBox* key, m_checkboxes.keys())
-        *m_checkboxes[key] = key->isChecked();
+    foreach(QCheckBox* key, m_checkBoxes.keys())
+        *m_checkBoxes[key] = key->isChecked();
 
-    foreach(QSpinBox* key, m_spinboxes.keys())
-        *m_spinboxes[key] = key->value();
+    foreach(QSpinBox* key, m_spinBoxes.keys())
+        *m_spinBoxes[key] = key->value();
 
-    foreach(QLineEdit* key, m_lineedits.keys())
-        *m_lineedits[key] = key->text();
+    foreach(QLineEdit* key, m_lineEdits.keys())
+        *m_lineEdits[key] = key->text();
 }
