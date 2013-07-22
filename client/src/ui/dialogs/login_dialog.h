@@ -68,7 +68,7 @@ protected:
      */
     bool restartInCompatibilityMode(QnConnectInfoPtr connectInfo);
 
-    bool sendCommandToLauncher(const QString &version, const QStringList &arguments);
+    bool sendCommandToLauncher(const QnSoftwareVersion &version, const QStringList &arguments);
 
 private slots:
     void updateAcceptibility();

@@ -63,13 +63,6 @@ namespace {
     template<class T>
     const char *check_reply_type() { return NULL; }
 
-    const quint64 saneNetworkSpeed = 100ull*1000ull*1000ull*1000ull; //let it be 100 gigabits
-    qreal checkedNetworkSpeed(const quint64 bytesPerSec) {
-        return (bytesPerSec < saneNetworkSpeed)
-                ? static_cast<qreal>(bytesPerSec)
-                : -1;
-    }
-
 } // anonymous namespace
 
 
@@ -250,21 +243,15 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
                     interfaceBlock = extractXmlBody(networkBlock, "interface", &from);
                     if (interfaceBlock.length() == 0)
                         break;
+
                     QString interfaceName = QLatin1String(extractXmlBody(interfaceBlock, "name"));
                     int interfaceType = extractXmlBody(interfaceBlock, "type").toInt();
+                    qint64 bytesIn = extractXmlBody(interfaceBlock, "in").toLongLong();
+                    qint64 bytesOut = extractXmlBody(interfaceBlock, "out").toLongLong();
+                    qint64 bytesMax = extractXmlBody(interfaceBlock, "max").toLongLong();
 
-                    reply.statistics.append(QnStatisticsDataItem(
-                                                interfaceName + QChar(0x21e9),
-                                                checkedNetworkSpeed(extractXmlBody(interfaceBlock, "in").toULongLong() * 8), //converting from bytes per sec to bits per sec
-                                                NETWORK_IN,
-                                                interfaceType
-                    ));
-                    reply.statistics.append(QnStatisticsDataItem(
-                                                interfaceName + QChar(0x21e7),
-                                                checkedNetworkSpeed(extractXmlBody(interfaceBlock, "out").toULongLong() * 8), //converting from bytes per sec to bits per sec
-                                                NETWORK_OUT,
-                                                interfaceType
-                    ));
+                    if(bytesMax != 0)
+                        reply.statistics.push_back(QnStatisticsDataItem(interfaceName, static_cast<qreal>(qMax(bytesIn, bytesOut)) / bytesMax, NETWORK, interfaceType));
                 } while (networkBlock.length() > 0);
             }
 

@@ -15,6 +15,7 @@
 #else
 #   define QN_PRODUCT_NAME              "${namespace.additional}"
 #endif
+#define QN_PRODUCT_NAME_SHORT           "${product.name.short}"
 #define QN_ENGINE_VERSION               "${release.version}.${buildNumber}"
 #define QN_APPLICATION_REVISION         "${changeSet}"
 #define QN_APPLICATION_PLATFORM         "${platform}"

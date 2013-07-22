@@ -56,9 +56,11 @@ public:
 public slots:
     void issueOccured();
     void noCameraIssues();
-
+private slots:
+    void at_saveAsyncFinished(int, const QnResourceList &, int);
 protected:
     void save();
+    int saveAsync(QObject *target, const char *slot);
 
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);

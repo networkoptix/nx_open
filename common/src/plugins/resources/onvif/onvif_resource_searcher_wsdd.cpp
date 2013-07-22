@@ -24,7 +24,7 @@
 #include "utils/common/string.h"
 
 //static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
-static const int SOAP_DISCOVERY_TIMEOUT = 0; // "+" in seconds, "-" in mseconds
+static const int SOAP_DISCOVERY_TIMEOUT = -500; // "+" in seconds, "-" in mseconds
 static const int SOAP_HELLO_CHECK_TIMEOUT = -1; // "+" in seconds, "-" in mseconds
 static const int CHECK_HELLO_RETRY_COUNT = 50;
 
@@ -300,35 +300,24 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
     }
 }*/
 
-#define LEAK_SEARCH
-
 void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
 {
-#if 0
-    foreach(QnInterfaceAndAddr iface, getAllIPv4Interfaces())
-    {
-        if (m_shouldStop)
-            return;
-
-        findEndpointsImpl( result, iface );
-    }
-#else
-
     const QList<QnInterfaceAndAddr>& intfList = getAllIPv4Interfaces();
 
-#ifdef LEAK_SEARCH
     if( !m_isFirstSearch )
     {
         foreach(QnInterfaceAndAddr iface, intfList)
+        {
+            if (m_shouldStop)
+                return;
             readProbeMatches( iface, result );
+        }
     }
-#endif
 
     foreach(QnInterfaceAndAddr iface, intfList)
     {
         if (m_shouldStop)
             return;
-
         sendProbe( iface );
     }
 
@@ -341,7 +330,6 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         ::sleep( 1 );
 #endif
 
-#ifdef LEAK_SEARCH
         foreach(QnInterfaceAndAddr iface, intfList)
             readProbeMatches( iface, result );
 
@@ -349,27 +337,14 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         {
             if (m_shouldStop)
                 return;
-
             sendProbe( iface );
         }
-#endif
     }
-
-#ifndef LEAK_SEARCH
-        foreach(QnInterfaceAndAddr iface, intfList)
-            readProbeMatches( iface, result );
-#endif
-
-#endif
 }
 
 void OnvifResourceSearcherWsdd::findResources(QnResourceList& result)
 {
     EndpointInfoHash endpoints;
-
-    //updateInterfacesListenSockets();
-    //findHelloEndpoints(endpoints);
-
 
     //for( int i = 0; i < 100; ++i )
     //{
@@ -377,19 +352,6 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result)
     //    endpoints.clear();
     //}
 
-#if 0
-    //ToDo: delete
-    EndpointInfoHash::ConstIterator endpIter = endpoints.begin();
-    qDebug() << "OnvifResourceSearcherWsdd::findResources: Endpoints in the list:"
-             << (endpoints.size()? "": " EMPTY");
-
-    while (endpIter != endpoints.end()) 
-    {
-        qDebug() << "    " << endpIter.key() << " (" << endpIter.value().uniqId << "): " << endpIter.value().manufacturer
-                 << " - " << endpIter.value().name << ", discovered in " << endpIter.value().discoveryIp;
-        ++endpIter;
-    }
-#endif
     m_onvifFetcher.findResources(endpoints, result);
 }
 
@@ -794,34 +756,6 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         ctx->soapWsddProxy.soap->master = ctx->sock->handle();
     }
 
-#ifdef LEAK_SEARCH
-    if( !ctx->soapWsddProxy.soap )
-    {
-        //ctx->sock.reset( new UDPSocket() );
-        //ctx->sock->bindToInterface(iface);
-        //ctx->sock->setNonBlockingMode( true );
-
-        ctx->soapWsddProxy.soap = soap_new();
-        soap_init(ctx->soapWsddProxy.soap);
-        ctx->soapWsddProxy.wsddProxy_init( SOAP_IO_DEFAULT, SOAP_IO_DEFAULT );
-        ctx->soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
-        ctx->soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
-        ctx->soapWsddProxy.soap->user = ctx->sock.get();
-        ctx->soapWsddProxy.soap->fconnect = nullGsoapFconnect;
-        ctx->soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
-        ctx->soapWsddProxy.soap->fsend = gsoapFsendSmall;
-        ctx->soapWsddProxy.soap->frecv = gsoapFrecv;
-        ctx->soapWsddProxy.soap->fopen = NULL;
-        ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
-        ctx->soapWsddProxy.soap->master = ctx->sock->handle();
-    }
-#endif
-
-    //UDPSocket socket;
-    //if (!socket.bindToInterface(iface))
-    //    return;
-    //socket.setReadTimeOut(SOAP_DISCOVERY_TIMEOUT * 1000);
-
     fillWsddStructs( ctx->wsddProbe, ctx->replyTo );
 
     char* messageID = const_cast<char*>(soap_wsa_rand_uuid(ctx->soapWsddProxy.soap));
@@ -863,9 +797,7 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         return false;
     ProbeContext& ctx = *it->second;
 
-#ifdef LEAK_SEARCH
     Q_ASSERT( ctx.soapWsddProxy.soap );
-#endif
 
     //Receiving all ProbeMatches. Timeout = 500 ms, as written in ONVIF spec
     for( ;; )
@@ -891,29 +823,9 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
             }
             soap_destroy(ctx.soapWsddProxy.soap);
             soap_end(ctx.soapWsddProxy.soap);
-#ifdef LEAK_SEARCH
-            //soap_free(ctx.soapWsddProxy.soap);
-            //ctx.soapWsddProxy.soap = NULL;
-
-            //ctx.soapWsddProxy.reset();
-            //ctx.soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
-            //ctx.soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
-            //ctx.soapWsddProxy.soap->user = ctx.sock.get();
-            //ctx.soapWsddProxy.soap->fconnect = nullGsoapFconnect;
-            //ctx.soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
-            //ctx.soapWsddProxy.soap->fsend = gsoapFsendSmall;
-            //ctx.soapWsddProxy.soap->frecv = gsoapFrecv;
-            //ctx.soapWsddProxy.soap->fopen = NULL;
-            //ctx.soapWsddProxy.soap->socket = ctx.sock->handle();
-            //ctx.soapWsddProxy.soap->master = ctx.sock->handle();
-#endif
-            if( soapRes != SOAP_EOF )
-            {
-                //removing socket for it to be recreated on next sendProbe call
-                ctx.sock.reset();
-                delete it->second;
-                m_ifaceToSock.erase( it );
-            }
+            ctx.sock.reset();
+            delete it->second;
+            m_ifaceToSock.erase( it );
             return true;
         }
 
@@ -933,6 +845,6 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         }
 
         soap_destroy(ctx.soapWsddProxy.soap);
-        soap_end(ctx.soapWsddProxy.soap);
+        //soap_end(ctx.soapWsddProxy.soap);
     }
 }
