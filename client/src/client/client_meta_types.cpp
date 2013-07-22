@@ -8,6 +8,8 @@
 #include "client_model_types.h"
 #include "utils/color_space/image_correction.h"
 #include "ui/workbench/workbench_ptz_preset_manager.h"
+#include "ui/actions/actions.h"
+#include "ui/actions/action_parameters.h"
 
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
@@ -44,6 +46,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<QnPtzPreset>();
+    qRegisterMetaType<Qn::ActionId>();
+    qRegisterMetaType<QnActionParameters>();
 
     qn_clientMetaTypes_initialized = true;
 }

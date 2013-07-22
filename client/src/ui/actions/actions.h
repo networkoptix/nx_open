@@ -1,6 +1,8 @@
 #ifndef QN_ACTIONS_H
 #define QN_ACTIONS_H
 
+#include <QMetaType>
+
 #include "action_fwd.h"
 
 #include <client/client_globals.h>
@@ -899,6 +901,8 @@ namespace Qn {
     };
 
 } // namespace Qn
+
+Q_DECLARE_METATYPE(Qn::ActionId);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionScopes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionParameterTypes);

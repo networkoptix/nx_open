@@ -19,7 +19,7 @@ class QnNotificationListWidget : public Animated<GraphicsWidget>, public Animati
 
 public:
     explicit QnNotificationListWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags flags = 0);
-    ~QnNotificationListWidget();
+    virtual ~QnNotificationListWidget();
 
     void addItem(QnNotificationItem *item, bool locked = false);
     void removeItem(QnNotificationItem *item);

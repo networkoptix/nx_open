@@ -21,7 +21,8 @@ namespace {
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
     const qreal margin = 4.0;
-    const qreal colorSignSize = 8.0;
+    const qreal colorSignSize = 16.0;
+    const qreal closeButtonSize = 12.0;
     const qreal buttonSize = 16.0;
 
 } // anonymous namespace
@@ -152,12 +153,21 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
 
     m_closeButton = new QnImageButtonWidget(this);
     m_closeButton->setCached(true);
+    m_closeButton->setToolTip(tr("Close (<b>Right Click</b>)"));
     m_closeButton->setIcon(qnSkin->icon("titlebar/exit.png")); // TODO: #Elric
-    m_closeButton->setFixedSize(12.0, 12.0);
+    m_closeButton->setFixedSize(closeButtonSize, closeButtonSize);
     connect(m_closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
 
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->setContentsMargins((colorSignSize - closeButtonSize) / 2.0, 0.0, (colorSignSize - closeButtonSize) / 2.0, 0.0);
+    layout->setSpacing(0.0);
+    layout->addStretch(1);
+    layout->addItem(m_closeButton);
+    layout->addStretch(1);
+
     m_layout = new QGraphicsLinearLayout(Qt::Horizontal);
-    m_layout->setContentsMargins(colorSignSize + margin, margin, margin, margin);
+    m_layout->setContentsMargins(0.0, margin, margin, margin);
+    m_layout->addItem(layout);
     m_layout->addItem(m_textLabel);
     m_layout->setStretchFactor(m_textLabel, 1.0);
 
@@ -281,10 +291,12 @@ void QnNotificationItem::addActionButton(const QIcon &icon, const QString &toolt
     layout->addStretch(1);
     layout->addItem(button);
     layout->addStretch(1);
-    m_layout->insertItem(0, layout);
+    m_layout->addItem(layout);
 
     connect(button, SIGNAL(clicked()), this, SLOT(at_button_clicked()));
     m_actions << ActionData(actionId, parameters);
+
+    m_textLabel->setToolTip(tooltip); // TODO: #Elric
 }
 
 void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -294,25 +306,10 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
 
     QRectF rect = this->rect();
-    qreal side = qMin(qMin(rect.width(), rect.height()) * 0.5, colorSignSize);
+    QPointF d = QPointF(colorSignSize, colorSignSize) / 2.0;
+    QPointF center = QPointF(rect.left() + colorSignSize / 2.0, (rect.top() + rect.bottom()) / 2.0);
 
-    qreal left = rect.left();
-    qreal xcenter = left + side;
-
-    qreal ycenter = (rect.top() + rect.bottom()) / 2;
-    qreal top = ycenter - side;
-    qreal bottom = ycenter + side;
-
-    // TODO: cache the path?
-    QPainterPath path;
-    path.moveTo(left, top);
-    path.lineTo(xcenter, top);
-    path.lineTo(xcenter, bottom);
-    //path.arcTo(xcenter - side, ycenter - side, side * 2, side * 2, 90, -180);
-    path.lineTo(left, bottom);
-    path.closeSubpath();
-
-    painter->drawPath(path);
+    painter->drawRect(QRectF(center - d, center + d));
 }
 
 void QnNotificationItem::hideToolTip() {
@@ -347,7 +344,7 @@ void QnNotificationItem::updateOverlayGeometry() {
 }
 
 void QnNotificationItem::updateCloseButtonGeometry() {
-    m_closeButton->setGeometry(QRectF(rect().topRight() - QPointF(m_closeButton->size().width(), 0.0), m_closeButton->size()));
+    //m_closeButton->setGeometry(QRectF(rect().topRight() - QPointF(m_closeButton->size().width(), 0.0), m_closeButton->size()));
 }
 
 void QnNotificationItem::updateOverlayVisibility(bool animate) {

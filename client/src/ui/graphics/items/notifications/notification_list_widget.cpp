@@ -53,6 +53,7 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
 QnNotificationListWidget::~QnNotificationListWidget() {
     foreach(ItemData* data, m_itemDataByItem)
         delete data;
+    m_itemDataByItem.clear();
 }
 
 QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
