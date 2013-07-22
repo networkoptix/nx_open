@@ -312,11 +312,10 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
 
     void main() 
     {
-        //vec2 pos = (gl_TexCoord[0].st - vec2(0.5, 0.0)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
         vec2 pos = vec2(gl_TexCoord[0].x - 0.5, 1.0 - gl_TexCoord[0].y) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
-        float phi   = pos.y/aspectRatio + yShift + fovRot * cos(theta);
+        float phi   = pos.y/aspectRatio*(acos(fovRot)/PI*2.0) + yShift + fovRot * cos(theta);
 
         mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
                                        0.0, cos(fovRot), -sin(fovRot),
@@ -331,13 +330,6 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
         // Calculate fisheye angle and radius
         theta = atan(psph.z, psph.x);
         phi   = acos(psph.y);
-        
-        //theta = atan(psph.y, psph.x);
-        //phi   = acos(psph.z);
-        //theta = atan(cos(theta), sin(theta));
-        //phi   = acos(sin(phi));
-
-
         float r = phi / PI; // fisheye FOV
 
         // return from polar coordinates
