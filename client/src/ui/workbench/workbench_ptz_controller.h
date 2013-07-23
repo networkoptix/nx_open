@@ -56,6 +56,8 @@ public:
      */
     void setMovement(const QnMediaResourceWidget *widget, const QVector3D &movement);
 
+    void changePanoMode(const QnMediaResourceWidget *widget);
+    QString getPanoModeText(const QnMediaResourceWidget *widget) const;
 signals:
     void movementChanged(const QnMediaResourceWidget* widget);
     void positionChanged(const QnMediaResourceWidget* widget);

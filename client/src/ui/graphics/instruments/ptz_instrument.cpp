@@ -353,8 +353,8 @@ public:
 
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
-        m_modeButton->setText(lit("180"));
-        m_modeButton->setToolTip(lit("Press at Your Own Risk!")); // TODO: #VASILENKO
+        m_modeButton->setText(lit("90"));
+        m_modeButton->setToolTip(lit("Dewarping panoram mode"));
 
         updateLayout();
     }
@@ -404,6 +404,11 @@ public:
 
         if(!qFuzzyCompare(oldSize, size()))
             updateLayout();
+    }
+
+    void setModeButtonText(const QString& text)
+    {
+        m_modeButton->setText(text);
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -1169,7 +1174,9 @@ void PtzInstrument::at_modeButton_clicked() {
     PtzTextButtonWidget *button = checked_cast<PtzTextButtonWidget *>(sender());
 
     if(QnMediaResourceWidget *widget = button->target()) {
-        // TODO: #VASILENKO
+        m_ptzController->changePanoMode(widget);
+        ensureOverlayWidget(widget);
+        overlayWidget(widget)->setModeButtonText(m_ptzController->getPanoModeText(widget));
     }
 }
 

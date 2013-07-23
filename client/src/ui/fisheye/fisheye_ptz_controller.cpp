@@ -260,3 +260,18 @@ void QnFisheyePtzController::moveToRect(const QRectF& r)
         moveTo(radToGrad(x), radToGrad(y), fovTo35mmEquiv(fov));
     }
 }
+
+void QnFisheyePtzController::changePanoMode()
+{
+    m_dewarpingParams.panoFactor = m_dewarpingParams.panoFactor * 2;
+    if (m_dewarpingParams.horizontalView  && m_dewarpingParams.panoFactor > 2 ||
+        !m_dewarpingParams.horizontalView && m_dewarpingParams.panoFactor > 4)
+    {
+        m_dewarpingParams.panoFactor = 1;
+    }
+}
+
+QString QnFisheyePtzController::getPanoModeText() const
+{
+    return QString::number(m_dewarpingParams.panoFactor * 90);
+}

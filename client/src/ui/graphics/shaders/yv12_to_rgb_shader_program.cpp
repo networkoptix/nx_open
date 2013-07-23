@@ -277,7 +277,9 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
 
         float theta = pos.x + xShift;
         float roty = -fovRot* cos(theta);
-        float phi   = pos.y*(1.0 - roty)/-aspectRatio + roty + yShift;
+        pos.y = pos.y/(-aspectRatio);
+        float ymaxInv = aspectRatio / dstFov;
+        float phi   = pos.y * ((ymaxInv - roty) / ymaxInv) + roty + yShift;
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
@@ -349,7 +351,11 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
 
         float theta = pos.x + xShift;
         float roty = -fovRot* cos(theta);
-        float phi   = pos.y*(1.0 - roty)/-aspectRatio + roty + yShift;
+        float roty2 = -fovRot*2.0*cos(theta);
+        
+        pos.y = pos.y/(-aspectRatio);
+        float ymaxInv = aspectRatio / dstFov;
+        float phi   = pos.y * ((ymaxInv - roty) / ymaxInv) + roty + yShift;
         
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),

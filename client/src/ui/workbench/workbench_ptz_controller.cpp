@@ -393,3 +393,16 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
     }
 }
 
+void QnWorkbenchPtzController::changePanoMode(const QnMediaResourceWidget *widget)
+{
+    if (widget->virtualPtzController()) 
+        widget->virtualPtzController()->changePanoMode();
+}
+
+QString QnWorkbenchPtzController::getPanoModeText(const QnMediaResourceWidget *widget) const
+{
+    if (widget->virtualPtzController()) 
+        return widget->virtualPtzController()->getPanoModeText();
+    else
+        return QString();
+}

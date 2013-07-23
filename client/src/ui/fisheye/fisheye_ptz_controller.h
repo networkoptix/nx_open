@@ -29,6 +29,8 @@ public:
 
     void moveToRect(const QRectF& r);
 
+    virtual void changePanoMode() override;
+    virtual QString getPanoModeText() const override;
 signals:
     void dewarpingParamsChanged(DewarpingParams params);
     void spaceMapperChanged();
