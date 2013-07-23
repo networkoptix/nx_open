@@ -36,6 +36,8 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     base_type(parent),
     m_thumbnailLabel(NULL)
 {
+    setClickableButtons(Qt::RightButton);
+
     m_textLabel = new QnProxyLabel(this);
     m_textLabel->setAlignment(Qt::AlignLeft);
     m_textLabel->setWordWrap(true);
@@ -43,10 +45,10 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget(this);
     closeButton->setCached(true);
-    closeButton->setToolTip(tr("Close"));
+    closeButton->setToolTip(tr("Close (<b>Right Click</b>)"));
     closeButton->setIcon(qnSkin->icon("titlebar/exit.png")); // TODO: #Elric
     closeButton->setFixedSize(closeButtonSize, closeButtonSize);
-    connect(closeButton, SIGNAL(clicked()), this, SIGNAL(closeButtonClicked()));
+    connect(closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
 
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(0, 0, 0, 0);
@@ -67,10 +69,10 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
 
     m_thumbnailLabel = new QnClickableProxyLabel(this);
     m_thumbnailLabel->setAlignment(Qt::AlignCenter);
-    m_thumbnailLabel->setClickableButtons(Qt::LeftButton);
+    m_thumbnailLabel->setClickableButtons(Qt::LeftButton | Qt::RightButton);
     setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
     m_layout->insertItem(0, m_thumbnailLabel);
-    connect(m_thumbnailLabel, SIGNAL(clicked()), this, SIGNAL(thumbnailClicked()));
+    connect(m_thumbnailLabel, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_thumbnailLabel_clicked(Qt::MouseButton)));
 
     if (!provider->image().isNull()) {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
@@ -128,6 +130,19 @@ void QnNotificationToolTipWidget::pointTo(const QPointF &pos) {
     updateTailPos();
 }
 
+void QnNotificationToolTipWidget::clicked(Qt::MouseButton button) {
+    if(button == Qt::RightButton)
+        emit closeTriggered();
+}
+
+void QnNotificationToolTipWidget::at_thumbnailLabel_clicked(Qt::MouseButton button) {
+    if(button == Qt::RightButton) {
+        emit closeTriggered();
+    } else {
+        emit thumbnailClicked();
+    }
+}
+
 void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) {
     if (!m_thumbnailLabel)
         return;
@@ -174,7 +189,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_tooltipWidget->installEventFilter(this);
     m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
     connect(m_tooltipWidget,            SIGNAL(thumbnailClicked()), this,   SLOT(at_thumbnail_clicked()));
-    connect(m_tooltipWidget,            SIGNAL(closeButtonClicked()), this, SIGNAL(closeTriggered()));
+    connect(m_tooltipWidget,            SIGNAL(closeTriggered()),   this,   SIGNAL(closeTriggered()));
     connect(m_tooltipWidget,            SIGNAL(tailPosChanged()),   this,   SLOT(updateToolTipPosition()));
     connect(this,                       SIGNAL(geometryChanged()),  this,   SLOT(updateToolTipPosition()));
 
