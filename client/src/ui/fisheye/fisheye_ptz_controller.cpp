@@ -238,6 +238,7 @@ void QnFisheyePtzController::setEnabled(bool value)
     if (m_dewarpingParams.enabled != value) {
         m_dewarpingParams.enabled = value;
         emit dewarpingParamsChanged(m_dewarpingParams);
+        emit spaceMapperChanged();
     }
 }
 
