@@ -635,6 +635,9 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
     if(PtzOverlayWidget *staticOverlay = overlayWidget(widget)) {
         widget->setOverlayWidgetVisibility(staticOverlay, visibility);
         staticOverlay->manipulatorWidget()->setVisible(m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapability);
+        
+        if (widget->virtualPtzController())
+            staticOverlay->setModeButtonText(widget->virtualPtzController()->getPanoModeText());
     }
 }
 
