@@ -143,6 +143,6 @@ QnTranslation QnTranslationManager::loadTranslationInternal(const QString &trans
     for(int i = 0; i < m_prefixes.size(); i++)
         filePaths.push_back(translationDir + lit('/') + m_prefixes[i] + suffix);
 
-    return QnTranslation(languageName, localeCode, suffix, filePaths);
+    return QnTranslation(languageName, localeCode, filePaths);
 }
 

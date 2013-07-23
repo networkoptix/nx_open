@@ -63,16 +63,7 @@ int main(int argc, char *argv[])
     int index = translationPath.lastIndexOf(lit("client"));
     if(index != -1)
         translationPath.replace(index, 6, lit("traytool"));
-    QString translationSuffix = clientSettings.value(lit("translationSuffix")).toString();
     QnTranslation translation = translationManager->loadTranslation(translationPath);
-    if(translation.isEmpty()) {
-        foreach(const QnTranslation &otherTranslation, translationManager->loadTranslations()) {
-            if(otherTranslation.suffix() == translationSuffix) {
-                translation = otherTranslation;
-                break;
-            }
-        }
-    }
     QnTranslationManager::installTranslation(translation);
 
     QString argument = argc > 1 ? lit(argv[1]) : QString();

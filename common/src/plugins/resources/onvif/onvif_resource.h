@@ -201,20 +201,6 @@ public:
     void beforeConfigureStream();
     void afterConfigureStream();
 
-signals:
-    //!Emitted on camera input port state has been changed
-    /*!
-        \param resource Smart pointer to \a this
-        \param inputPortID
-        \param value true if input is connected, false otherwise
-        \param timestamp MSecs since epoch, UTC
-    */
-    void cameraInput(
-        const QnResourcePtr &resource,
-        const QString& inputPortID,
-        bool value,
-        qint64 timestamp);
-
 protected:
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);

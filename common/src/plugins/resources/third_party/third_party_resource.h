@@ -64,20 +64,6 @@ public:
 
     const QList<nxcip::Resolution>& getEncoderResolutionList( int encoderNumber ) const;
 
-signals:
-    //!Emitted on camera input port state has been changed
-    /*!
-        \param resource Smart pointer to \a this
-        \param inputPortID
-        \param value true if input is connected, false otherwise
-        \param timestamp MSecs since epoch, UTC
-    */
-    void cameraInput(
-        QnResourcePtr resource,
-        const QString& inputPortID,
-        bool value,
-        qint64 timestamp );
-
 protected:
     //!Implementation of QnResource::initInternal
     virtual bool initInternal() override;

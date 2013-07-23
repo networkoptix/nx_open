@@ -7,7 +7,6 @@
 #include "api/app_server_connection.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "acti_stream_reader.h"
-#include <business/business_event_connector.h>
 #include <business/business_event_rule.h>
 #include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
@@ -36,10 +35,6 @@ QnActiResource::QnActiResource()
     setAuth(QLatin1String("admin"), QLatin1String("123456"));
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
         m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
-
-    connect(
-        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
 }
 
 QnActiResource::~QnActiResource()
@@ -602,7 +597,7 @@ void QnActiResource::onTimer( const quint64& timerID )
     if( triggerOutputTask.autoResetTimeoutMS > 0 )
         m_triggerOutputTasks.insert( std::make_pair(
             TimerManager::instance()->addTimer( this, triggerOutputTask.autoResetTimeoutMS ),
-            TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, triggerOutputTask.autoResetTimeoutMS ) ) );
+            TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, 0 ) ) );
 }
 
 void QnActiResource::initializePtz()

@@ -101,6 +101,7 @@ public:
 
     /*!
         Change output with id \a ouputID state to \a activate
+        \param ouputID If empty, implementation MUST select any output port
         \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
         \return true in case of success. false, if nothing has been done
     */
@@ -151,6 +152,18 @@ public slots:
 signals:
     void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    //!Emitted on camera input port state has been changed
+    /*!
+        \param resource Smart pointer to \a this
+        \param inputPortID
+        \param value true if input is connected, false otherwise
+        \param timestamp MSecs since epoch, UTC
+    */
+    void cameraInput(
+        QnResourcePtr resource,
+        const QString& inputPortID,
+        bool value,
+        qint64 timestamp );
 
 protected slots:
     virtual void at_disabledChanged();
