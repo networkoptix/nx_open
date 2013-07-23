@@ -3232,30 +3232,41 @@ Do you want to continue?"),
 #ifdef Q_OS_WIN
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
-        dialog->addCheckBox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
+        dialog->addCheckBox(tr("Include timestamps (requires transcoding)"), &withTimestamps, delegate);
 
         bool doTranscode = contrastParams.enabled || dewarpingParams.enabled;
-        if (doTranscode)
-        {
-            if (contrastParams.enabled && dewarpingParams.enabled)
-                dialog->addCheckBox(tr("Do dewarping and image adjustment (Requires Transcoding)"), &doTranscode, delegate);
-            else if (contrastParams.enabled)
-                dialog->addCheckBox(tr("Do image adjustment (Requires Transcoding)"), &doTranscode, delegate);
-            else
-                dialog->addCheckBox(tr("Do dewarping (Requires Transcoding)"), &doTranscode, delegate);
+        if (doTranscode) {
+            if (contrastParams.enabled && dewarpingParams.enabled) {
+                dialog->addCheckBox(tr("Apply dewarping and image correction (requires transcoding)"), &doTranscode, delegate);
+            } else if (contrastParams.enabled) {
+                dialog->addCheckBox(tr("Apply image correction (requires transcoding)"), &doTranscode, delegate);
+            } else {
+                dialog->addCheckBox(tr("Apply dewarping (requires transcoding)"), &doTranscode, delegate);
+            }
         }
-        contrastParams.enabled &= doTranscode;
-        dewarpingParams.enabled &= doTranscode;
-
+        
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
+        contrastParams.enabled &= doTranscode;
+        dewarpingParams.enabled &= doTranscode;
         fileName = dialog->selectedFiles().value(0);
         selectedFilter = dialog->selectedNameFilter();
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
 
         if (fileName.isEmpty())
             return;
+
+        if(doTranscode || withTimestamps) {
+            QMessageBox::StandardButton button = QMessageBox::question(
+                mainWindow(),
+                tr("Save As"),
+                tr("You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?"),
+                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+            );
+            if(button != QMessageBox::Yes)
+                return;
+        }
 
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
@@ -3267,8 +3278,7 @@ Do you want to continue?"),
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                 );
-
-                if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                if(button != QMessageBox::Yes)
                     return;
             }
         }
