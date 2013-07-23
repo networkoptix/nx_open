@@ -580,8 +580,7 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
     if (widget->virtualPtzController()) {
         mapper = widget->virtualPtzController()->getSpaceMapper();
         data.capabilities = widget->virtualPtzController()->getCapabilities();
-    }
-    else {
+    } else {
         data.capabilities = widget->resource()->toResource()->getPtzCapabilities();
         QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
         if (camera)
@@ -652,7 +651,7 @@ QVector3D PtzInstrument::physicalPositionForRect(QnMediaResourceWidget *widget, 
     delta.setY(delta.y() / widget->size().height());
     qreal aspectRatio = widget->size().width() / (qreal) widget->size().height();
 
-    qreal fov = mm35vToFov(oldPhysicalPosition.z());
+    qreal fov = mm35EquivToFov(oldPhysicalPosition.z());
     QnSphericalPoint<float> spherical;
     spherical.phi = gradToRad(oldPhysicalPosition.x()) + fov * delta.x();
     spherical.psi = gradToRad(oldPhysicalPosition.y()) + fov/aspectRatio * delta.y();
@@ -663,7 +662,7 @@ QVector3D PtzInstrument::physicalPositionForRect(QnMediaResourceWidget *widget, 
     delta.setY(delta.y() / widget->size().height());
     qreal aspectRatio = widget->size().width() / (qreal) widget->size().height();
 
-    qreal fov = mm35vToFov(oldPhysicalPosition.z());
+    qreal fov = mm35EquivToFov(oldPhysicalPosition.z());
     float rx = 2*tan(fov/2.0);
     float ry = 2*tan(fov/aspectRatio/2.0);
     QnSphericalPoint<float> spherical;
@@ -714,18 +713,18 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &spee
 void PtzInstrument::processPtzClick(const QPointF &pos) {
     if(!target() || m_skipNextAction)
         return;
-    if (!target()->virtualPtzController())
-    {
+
+    if (!target()->virtualPtzController()) {
         // built in virtual PTZ execute command too fast. animation looks bad
         QnSplashItem *splashItem = newSplashItem(target());
         splashItem->setSplashType(QnSplashItem::Circular);
         splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
         splashItem->setPos(pos);
         m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
-    }
-    else {
+    } else {
         target()->virtualPtzController()->setAnimationEnabled(true);
     }
+
     ptzMoveTo(target(), pos);
 }
 
@@ -746,8 +745,7 @@ void PtzInstrument::processPtzDoubleClick() {
     if(!target() || m_skipNextAction)
         return;
 
-    if (!target()->virtualPtzController())
-    {
+    if (!target()->virtualPtzController()) {
         QnSplashItem *splashItem = newSplashItem(target());
         splashItem->setSplashType(QnSplashItem::Rectangular);
         splashItem->setPos(target()->rect().center());
@@ -943,12 +941,10 @@ void PtzInstrument::startDrag(DragInfo *) {
         ensureElementsWidget();
         opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
         /* Everything else will be initialized in the first call to drag(). */
-    }
-    else if (target()->virtualPtzController()) {
+    } else if (target()->virtualPtzController()) {
         m_dragFromPosition = m_ptzController->physicalPosition(target());
         target()->setCursor(Qt::SizeAllCursor);
-    }
-    else{
+    } else {
         ensureSelectionItem();
         selectionItem()->setParentItem(target());
         selectionItem()->setViewport(m_viewport.data());
@@ -995,9 +991,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
         arrowItem->setSize(QSizeF(arrowSize, arrowSize));
 
         ptzMove(target(), QVector3D(speed));
-    }
-    else if (target()->virtualPtzController())
-    {
+    } else if (target()->virtualPtzController()) {
         target()->virtualPtzController()->setAnimationEnabled(false);
         QPointF delta = info->mouseItemPos() - info->mousePressItemPos();
         if (!delta.isNull()) {
@@ -1017,7 +1011,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
         }
         shift += m_dragAddDelta;
 
-        qreal fov = radToGrad(mm35vToFov(m_dragFromPosition.z()));
+        qreal fov = radToGrad(mm35EquivToFov(m_dragFromPosition.z()));
         QVector3D positionDelta(shift.x() * fov/2.0, shift.y() * fov/2.0, 0.0);
         m_ptzController->setPhysicalPosition(target(), m_dragFromPosition + positionDelta);
     }

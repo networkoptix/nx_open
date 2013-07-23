@@ -9,9 +9,8 @@
 #include <utils/math/math.h>
 
 namespace Qn {
-    enum PtzCapability
-    {
-        NoPtzCapabilities                   = 0x00,
+    enum PtzCapability {
+        NoPtzCapabilities                   = 0x000,
         AbsolutePtzCapability               = 0x020,
         ContinuousPanTiltCapability         = 0x040,
         ContinuousZoomCapability            = 0x080,
@@ -31,8 +30,7 @@ namespace Qn {
      * \param capabilities              Camera capability flags containing some deprecated values.
      * \returns                         Camera capability flags with deprecated values replaced with new ones.
      */
-    inline Qn::PtzCapabilities undeprecatePtzCapabilities(Qn::PtzCapabilities capabilities) 
-    {
+    inline Qn::PtzCapabilities undeprecatePtzCapabilities(Qn::PtzCapabilities capabilities) {
         Qn::PtzCapabilities result = capabilities;
 
         if(result & Qn::DeprecatedContinuousPtzCapability) {
@@ -47,12 +45,11 @@ namespace Qn {
 
         return result;
     }
-};
+}
 
-namespace 
-{
+namespace {
     qreal gradToRad(qreal x) { return x * M_PI / 180.0; }
-    qreal radToGrad(qreal x)   { return x * 180.0 / M_PI; }
+    qreal radToGrad(qreal x) { return x * 180.0 / M_PI; }
 
     /**
      * \param fovDegreees               Width-based FOV in degrees.
@@ -62,13 +59,15 @@ namespace
         return (36.0 / 2.0) / std::tan((fovRad / 2.0));
     }
 
-    qreal mm35vToFov(qreal mm) {
-        return std::atan((36.0 / 2.0) / mm) * 2.0;
+    /**
+     * \param mm35Equiv                 Width-based 35mm-equivalent focal length.
+     * \returns                         Width-based FOV in degrees.
+     */
+    qreal mm35EquivToFov(qreal mm35Equiv) {
+        return std::atan((36.0 / 2.0) / mm35Equiv) * 2.0;
     }
 
-
 } // anonymous namespace
-
 
 
 class QnPtzSpaceMapper;
@@ -97,19 +96,22 @@ public:
     qreal getZoomVelocityCoeff() const;
 
     virtual bool isEnabled() const { return true; }
-    virtual void setEnabled(bool ) {}
+    virtual void setEnabled(bool enabled) { Q_UNUSED(enabled); }
 
 protected:
     QnMediaResource* m_resource;
 };
 
-class QnVirtualPtzController: public QnAbstractPtzController
-{
+class QnVirtualPtzController: public QnAbstractPtzController {
+    Q_OBJECT
 public:
-    QnVirtualPtzController(QnResource* resource): QnAbstractPtzController(resource), m_animate(false) {}
-    void setAnimationEnabled(bool value) { m_animate = value; }
-protected:
-    bool m_animate;
+    QnVirtualPtzController(QnResource* resource): QnAbstractPtzController(resource), m_animationEnabled(false) {}
+    
+    bool isAnimationEnabled() const { return m_animationEnabled; }
+    void setAnimationEnabled(bool animationEnabled) { m_animationEnabled = animationEnabled; }
+
+private:
+    bool m_animationEnabled;
 };
 
 #endif // QN_ABSTRACT_PTZ_CONTROLLER_H
