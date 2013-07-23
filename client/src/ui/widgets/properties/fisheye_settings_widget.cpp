@@ -27,10 +27,10 @@ void QnFisheyeSettingsWidget::updateFromResource(QnSecurityCamResourcePtr camera
         return;
     m_silenseMode = true;
 
-    m_devorpingParams = camera->getDewarpingParams();
-    ui->horizontalRadioButton->setChecked(m_devorpingParams.horizontalView);
-    ui->verticalRadioButton->setChecked(!m_devorpingParams.horizontalView);
-    ui->horizontalSlider->setValue(m_devorpingParams.fovRot * 10);
+    m_dewarpingParams = camera->getDewarpingParams();
+    ui->horizontalRadioButton->setChecked(m_dewarpingParams.horizontalView);
+    ui->verticalRadioButton->setChecked(!m_dewarpingParams.horizontalView);
+    ui->horizontalSlider->setValue(m_dewarpingParams.fovRot * 10);
      
     if (!m_silenseMode)
         emit dataChanged();
@@ -46,13 +46,13 @@ qreal QnFisheyeSettingsWidget::getAngle()
 void QnFisheyeSettingsWidget::at_dataChanged()
 {
     ui->angleText->setText(QString::number(getAngle(), 'f', 1));
-    m_devorpingParams.fovRot = getAngle();
-    m_devorpingParams.horizontalView = ui->horizontalRadioButton->isChecked();
+    m_dewarpingParams.fovRot = getAngle();
+    m_dewarpingParams.horizontalView = ui->horizontalRadioButton->isChecked();
     if (!m_silenseMode)
         emit dataChanged();
 }
 
-DewarpingParams QnFisheyeSettingsWidget::devorpingParams() const
+DewarpingParams QnFisheyeSettingsWidget::dewarpingParams() const
 {
-    return m_devorpingParams;
+    return m_dewarpingParams;
 }

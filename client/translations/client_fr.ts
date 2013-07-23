@@ -1838,10 +1838,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server Logs...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1867,6 +1863,14 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Open in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showcase...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Logs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3377,12 +3381,6 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot restart the client in compatibility mode.
-Please close the application and start it again
-using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not connect to Enterprise Controller</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3450,6 +3448,18 @@ Would you like to restart client in compatibility mode?</source>
     <message>
         <source>Are you sure you want to delete the connection
 %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot restart the client in compatibility mode.
+Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to connect to Enterprise Controller which has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3580,10 +3590,6 @@ Would you like to restart client in compatibility mode?</source>
 <context>
     <name>QnNotificationListWidget</name>
     <message>
-        <source>Some notifications have not place to be displayed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 items more</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3676,6 +3682,13 @@ Would you like to restart client in compatibility mode?</source>
     </message>
 </context>
 <context>
+    <name>QnNotificationToolTipWidget</name>
+    <message>
+        <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnNotificationsCollectionWidget</name>
     <message>
         <source>Settings...</source>
@@ -3715,18 +3728,6 @@ Would you like to restart client in compatibility mode?</source>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is another mediaserver in your network that watches your cameras.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4010,6 +4011,10 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>Select users...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select resources...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4964,6 +4969,30 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Image cannot be uploaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client v%1&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enterprise Controller v%1&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media Server v%1 at %2&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media Server v%1&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version Mismatch</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

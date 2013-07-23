@@ -8,8 +8,7 @@
 
 class QnResourceWidgetRenderer;
 
-class QnFisheyePtzController: public QnVirtualPtzController
-{
+class QnFisheyePtzController: public QnVirtualPtzController {
     Q_OBJECT
 public:
     QnFisheyePtzController(QnResource* resource);
@@ -29,15 +28,19 @@ public:
     virtual bool isEnabled() const override;
 
     void moveToRect(const QRectF& r);
+
 signals:
     void dewarpingParamsChanged(DewarpingParams params);
     void spaceMapperChanged();
+
 private slots:
     void at_timer();
+
 private:
     qreal boundXAngle(qreal value, qreal fov) const;
     qreal boundYAngle(qreal value, qreal fov, qreal aspectRatio) const;
     void updateSpaceMapper(bool horizontalView, int pf);
+
 private:
     QVector3D m_motion;
     QnResourceWidgetRenderer* m_renderer;

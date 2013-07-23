@@ -116,7 +116,7 @@ protected:
         QColor frameColor;
         qreal rotation;
         ImageCorrectionParams contrastParams;
-        DewarpingParams devorpingParams;
+        DewarpingParams dewarpingParams;
 
         AddToLayoutParams():
             usePosition(false),

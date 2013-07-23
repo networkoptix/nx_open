@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
-    <name>Language</name>
-    <message>
-        <source>Locale Code</source>
-        <translation>en</translation>
-    </message>
-    <message>
-        <source>Language Name</source>
-        <translation>English</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message numerus="yes">
         <source>%1 &quot;%2&quot; has detected %n storage issues</source>
@@ -35,6 +24,17 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>Language</name>
+    <message>
+        <source>Locale Code</source>
+        <translation>en</translation>
+    </message>
+    <message>
+        <source>Language Name</source>
+        <translation>English</translation>
     </message>
 </context>
 </TS>

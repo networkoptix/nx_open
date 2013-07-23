@@ -356,10 +356,10 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         if (cs != Qt::PartiallyChecked)
             m_camera->setCameraControlDisabled(cs == Qt::Checked);
 
-        DewarpingParams dewarping = ui->fisheyeSettingsWidget->devorpingParams();
+        DewarpingParams dewarping = ui->fisheyeSettingsWidget->dewarpingParams();
         dewarping.enabled = ui->checkBoxDewarping->isChecked();
         m_camera->setDewarpingParams(dewarping);
-        m_dewarpingParamsBackup = ui->fisheyeSettingsWidget->devorpingParams();
+        m_dewarpingParamsBackup = ui->fisheyeSettingsWidget->dewarpingParams();
 
         setHasDbChanges(false);
     }
@@ -921,5 +921,5 @@ void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
 void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
 {
     at_dbDataChanged();
-    m_camera->setDewarpingParams(ui->fisheyeSettingsWidget->devorpingParams());
+    m_camera->setDewarpingParams(ui->fisheyeSettingsWidget->dewarpingParams());
 }

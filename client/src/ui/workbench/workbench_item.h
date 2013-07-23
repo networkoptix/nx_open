@@ -220,15 +220,15 @@ public:
     /**
      * \param                           New dewarping enhancement params for this item.
      */
-    void setDevorpingParams(const DewarpingParams& params);
+    void setDewarpingParams(const DewarpingParams& params);
 
     
     const ImageCorrectionParams &imageEnhancement() const {
         return m_imageEnhancement;
     }
 
-    const DewarpingParams &devorpingParams() const {
-        return m_devorpingParams;
+    const DewarpingParams &dewarpingParams() const {
+        return m_dewarpingParams;
     }
 
     QnWorkbenchItem *zoomTargetItem() const;
@@ -300,7 +300,7 @@ signals:
     void flagChanged(Qn::ItemFlag flag, bool value);
     void zoomRectChanged();
     void imageEnhancementChanged();
-    void devorpingParamsChanged();
+    void dewarpingParamsChanged();
     void zoomTargetItemChanged();
     void rotationChanged();
     void dataChanged(int role);
@@ -334,8 +334,8 @@ private:
     /** Item image enhancement params. */
     ImageCorrectionParams m_imageEnhancement;
 
-    /** Fisheye devorping params */
-    DewarpingParams m_devorpingParams;
+    /** Fisheye dewarping params. */
+    DewarpingParams m_dewarpingParams;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;

@@ -260,14 +260,6 @@ public:
         return m_texCoords;
     }
 
-    const QSize &textureSize() const {
-        return m_textureSize;
-    }
-
-    const QSize &contentSize() const {
-        return m_contentSize;
-    }
-
     GLuint id() const {
         return m_id;
     }
@@ -303,10 +295,12 @@ public:
             textureSize = m_textureSize;
         }
 
+        static const int TEX_COORD_PRECISION = 1000;    //3 fractional digits
+
         int roundedWidth = qPower2Ceil((unsigned) width, ROUND_COEFF);
         m_texCoords = QVector2D(
-            static_cast<float>(roundedWidth) / textureSize.width(),
-            static_cast<float>(height) / textureSize.height()
+            width * TEX_COORD_PRECISION / textureSize.width() / (float)TEX_COORD_PRECISION,
+            height * TEX_COORD_PRECISION / textureSize.height() / (float)TEX_COORD_PRECISION
         );
 
         if(fillValue != -1) {
@@ -1281,7 +1275,9 @@ void DecodedPictureToOpenGLUploader::pleaseStop()
     m_cond.wakeAll();
 }
 
-void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture, const QRectF displayedRect )
+void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
+    const QSharedPointer<CLVideoDecoderOutput>& decodedPicture,
+    const QRectF displayedRect )
 {
     NX_LOG( QString::fromAscii( "Uploading decoded picture to gl textures. dts %1" ).arg(decodedPicture->pkt_dts), cl_logDEBUG2 );
 
@@ -2010,7 +2006,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
         glBindTexture( GL_TEXTURE_2D, 0 );
 
-        emptyPictureBuf->setColorFormat( PIX_FMT_YUV420P );
+        emptyPictureBuf->setColorFormat( format == PIX_FMT_YUVA420P ? PIX_FMT_YUVA420P : PIX_FMT_YUV420P );
     }
     else if( format == PIX_FMT_NV12 && usingShaderNV12ToRgb() )
     {
@@ -2299,11 +2295,12 @@ void DecodedPictureToOpenGLUploader::releasePictureBuffersNonSafe()
     releaseDecodedPicturePool( &m_picturesBeingRendered );
 }
 
-static void yv12ToRgba(
+static void yv12aToRgba(
     int width, int height,
     quint8* yp, size_t y_stride,
     quint8* up, size_t u_stride,
     quint8* vp, size_t v_stride,
+    quint8* ap, size_t a_stride,
     quint8* const rgbaBuf )
 {
     static const int PIXEL_SIZE = 4;
@@ -2327,7 +2324,7 @@ static void yv12ToRgba(
             (rgbaBuf + (y*width + x)*PIXEL_SIZE)[0] = r;
             (rgbaBuf + (y*width + x)*PIXEL_SIZE)[1] = g;
             (rgbaBuf + (y*width + x)*PIXEL_SIZE)[2] = b;
-            (rgbaBuf + (y*width + x)*PIXEL_SIZE)[3] = 255; //a
+            (rgbaBuf + (y*width + x)*PIXEL_SIZE)[3] = ap ? *(ap+y*a_stride+x) : 0xff;
         }
     }
 }
@@ -2337,21 +2334,21 @@ void DecodedPictureToOpenGLUploader::savePicToFile( AVFrame* const pic, int pts 
     if( !m_rgbaBuf )
         m_rgbaBuf = new uint8_t[pic->width*pic->height*4];
 
-    yv12ToRgba(
+    yv12aToRgba(
         pic->width, pic->height,
         pic->data[0], pic->linesize[0],
         pic->data[1], pic->linesize[1],
         pic->data[2], pic->linesize[2],
+        pic->data[3], pic->linesize[3],
         m_rgbaBuf );
 
 	QImage img(
 		m_rgbaBuf,
 		pic->width,
 		pic->height,
-        QImage::Format_ARGB32_Premultiplied );	//QImage::Format_ARGB4444_Premultiplied );
-    const QString& fileName = QString::fromAscii("C:\\temp\\%1_%2.bmp").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
-    img.save(fileName, "bmp");
+        QImage::Format_ARGB32 );	//QImage::Format_ARGB4444_Premultiplied );
+    const QString& fileName = QString::fromAscii("C:\\temp\\%1_%2.png").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
+    img.save(fileName, "png");
     /*if( !img.save( fileName, "bmp" ) )
         int x = 0;*/
 }
-

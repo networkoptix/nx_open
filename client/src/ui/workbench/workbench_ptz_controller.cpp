@@ -89,8 +89,7 @@ QVector3D QnWorkbenchPtzController::position(const QnMediaResourceWidget *widget
 
 QVector3D QnWorkbenchPtzController::physicalPosition(const QnMediaResourceWidget *widget) const 
 {
-    if (widget->virtualPtzController())
-    {
+    if (widget->virtualPtzController()) {
         qreal xPos;
         qreal yPos;
         qreal zPos;

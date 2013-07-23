@@ -280,7 +280,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treeWidget->resize(250, 0);
 
     m_treeBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
-    m_treeBackgroundItem->setAutoFillBackground(true);
     {
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
@@ -352,7 +351,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Title bar. */
     m_titleBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
-    m_titleBackgroundItem->setAutoFillBackground(true);
     {
         QLinearGradient gradient(0, 0, 0, 1);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
@@ -461,7 +459,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Notifications panel. */
     m_notificationsBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
-    m_notificationsBackgroundItem->setAutoFillBackground(true);
     {
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);

@@ -162,7 +162,7 @@ DewarpingParams QnFisheyePtzController::getDewarpingParams()
 
     if (m_moveToAnimation)
     {
-        if (timeSpend < MOVETO_ANIMATION_TIME && m_animate) 
+        if (timeSpend < MOVETO_ANIMATION_TIME && isAnimationEnabled()) 
         {
             QEasingCurve easing(QEasingCurve::InOutQuad);
             qreal value = easing.valueForProgress(timeSpend / MOVETO_ANIMATION_TIME);

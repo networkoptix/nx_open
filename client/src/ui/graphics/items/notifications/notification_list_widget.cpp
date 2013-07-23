@@ -41,7 +41,6 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
 
     m_collapser.item = new QnNotificationItem(this);
     m_collapser.item->setNotificationLevel(Qn::OtherNotification);
-    m_collapser.item->setTooltipText(tr("Some notifications have not place to be displayed."));
     m_collapser.item->setMinimumSize(QSizeF(widgetWidth, collapserHeight));
     m_collapser.item->setMaximumSize(QSizeF(widgetWidth, collapserHeight));
     m_collapser.item->setOpacity(0.0);
@@ -54,6 +53,7 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
 QnNotificationListWidget::~QnNotificationListWidget() {
     foreach(ItemData* data, m_itemDataByItem)
         delete data;
+    m_itemDataByItem.clear();
 }
 
 QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
@@ -280,8 +280,7 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     item->setMinimumWidth(widgetWidth);
     item->setMaximumWidth(widgetWidth);
     item->setTooltipEnclosingRect(m_tooltipsEnclosingRect);
-    item->setClickableButtons(item->clickableButtons() | Qt::RightButton);
-    connect(item, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_item_clicked(Qt::MouseButton)));
+    connect(item, SIGNAL(closeTriggered()), this, SLOT(at_item_closeTriggered()));
     connect(item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
 
     ItemData* data = new ItemData();
@@ -347,12 +346,11 @@ void QnNotificationListWidget::setToolTipsEnclosingRect(const QRectF &rect) {
     m_collapser.item->setTooltipEnclosingRect(rect);
 }
 
-void QnNotificationListWidget::at_item_clicked(Qt::MouseButton button) {
-    if (button != Qt::RightButton)
-        return;
+void QnNotificationListWidget::at_item_closeTriggered() {
     QnNotificationItem *item = dynamic_cast<QnNotificationItem *>(sender());
     if (!item)
         return;
+
     m_itemDataByItem[item]->unlockAndHide(m_speedUp);
 }
 

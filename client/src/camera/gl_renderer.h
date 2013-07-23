@@ -105,7 +105,6 @@ private:
     ScreenshotInterface* m_screenshotInterface;
     ImageCorrectionResult m_imageCorrector;
     ImageCorrectionParams m_imgCorrectParam;
-    //DevorpingParams m_devorpingParams;
     QnFisheyePtzController* m_fisheyeController;
     QRectF m_displayedRect;
     QnHistogramConsumer* m_histogramConsumer;

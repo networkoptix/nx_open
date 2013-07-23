@@ -19,6 +19,14 @@ void QnTranslationListModel::setTranslations(const QList<QnTranslation> &transla
     beginResetModel();
 
     m_translations = translations;
+    
+    m_hasExternal = false;
+    foreach(const QnTranslation &translation, m_translations) {
+        if(!isInternal(translation)) {
+            m_hasExternal = true;
+            break;
+        }
+    }
 
     endResetModel();
 }
@@ -43,12 +51,20 @@ QVariant QnTranslationListModel::data(const QModelIndex &index, int role) const 
     switch(role) {
     case Qt::EditRole:
     case Qt::DisplayRole:
-    case Qt::ToolTipRole:
     case Qt::StatusTipRole:
     case Qt::WhatsThisRole:
     case Qt::AccessibleTextRole:
     case Qt::AccessibleDescriptionRole:
-        return translation.languageName();
+    case Qt::ToolTipRole:
+        if(!m_hasExternal) {
+            return translation.languageName();
+        } else {
+            if(isInternal(translation)) {
+                return tr("%1 (built-in)").arg(translation.languageName());
+            } else {
+                return tr("%1 (external)").arg(translation.languageName());
+            }
+        }
     case Qt::DecorationRole:
         return QIcon(QString(lit(":/flags/%1.png")).arg(translation.localeCode()));
     case Qn::TranslationRole:
@@ -64,3 +80,9 @@ bool QnTranslationListModel::setData(const QModelIndex &, const QVariant &, int)
     return false;
 }
 
+bool QnTranslationListModel::isInternal(const QnTranslation &translation) {
+    foreach(const QString &filePath, translation.filePaths())
+        if(!filePath.startsWith(lit(":/")))
+            return false;
+    return true;
+}
