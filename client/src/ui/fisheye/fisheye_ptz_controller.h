@@ -44,7 +44,7 @@ private slots:
 
 private:
     qreal boundXAngle(qreal value, qreal fov) const;
-    qreal boundYAngle(qreal value, qreal fov, qreal aspectRatio) const;
+    qreal boundYAngle(qreal value, qreal fov, qreal aspectRatio, bool horizontal) const;
     void updateSpaceMapper(bool horizontalView, int pf);
 
 private:
