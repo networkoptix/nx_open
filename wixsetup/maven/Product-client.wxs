@@ -9,11 +9,12 @@
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
 
+        <Property Id="REINSTALLMODE" Value="amus"/>
+
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
-        <?define VmsRepairing=" (REINSTALLMODE) " ?>
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
         <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
