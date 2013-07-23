@@ -138,7 +138,7 @@ void QnFisheyeShaderProgram::setDewarpingParams(const DewarpingParams& params, f
             setUniformValue(m_yCenterLocation, (float) 1.0);
     }
 
-    setUniformValue(m_aspectRatioLocation, aspectRatio);
+    setUniformValue(m_aspectRatioLocation, (float) (aspectRatio * params.panoFactor));
     setUniformValue(m_dstFovLocation, (float) params.fov);
 
     setUniformValue(m_maxXLocation, maxX);

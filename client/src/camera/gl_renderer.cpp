@@ -359,7 +359,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setOpacity(m_decodedPictureProvider.opacity());
 
     if (fisheyeShader) {
-        fisheyeShader->setDewarpingParams(params, picLock->width()/(float)picLock->height() * params.panoFactor, (float)tex0Coords.right(), (float)tex0Coords.bottom());
+        fisheyeShader->setDewarpingParams(params, picLock->width()/(float)picLock->height(), (float)tex0Coords.right(), (float)tex0Coords.bottom());
     }
 
     if (gammaShader) 
