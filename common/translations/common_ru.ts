@@ -30,10 +30,12 @@
 <context>
     <name>Language</name>
     <message>
+        <location filename="../src/translation/translation_manager.cpp" line="138"/>
         <source>Locale Code</source>
         <translation>ru</translation>
     </message>
     <message>
+        <location filename="../src/translation/translation_manager.cpp" line="137"/>
         <source>Language Name</source>
         <translation>Русский</translation>
     </message>
@@ -224,72 +226,72 @@
 <context>
     <name>QnApiPbSerializer</name>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="656"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="658"/>
         <source>Cannot parse serialized cameras.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="665"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="667"/>
         <source>Cannot parse serialized servers.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="674"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="676"/>
         <source>Cannot parse serialized layouts.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="694"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="696"/>
         <source>Cannot parse serialized users.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="703"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="705"/>
         <source>Cannot parse serialized resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="712"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="714"/>
         <source>Cannot parse serialized resource types.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="721"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="723"/>
         <source>Cannot parse serialized licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="734"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="733"/>
         <source>Cannot parse serialized camera history.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="744"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="743"/>
         <source>Cannot parse serialized key-value pairs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="754"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="753"/>
         <source>Cannot parse serialized settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="764"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="763"/>
         <source>Cannot parse serialized connection information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="785"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="784"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="794"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
         <source>Cannot parse serialized action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="806"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="805"/>
         <source>Cannot parse serialized actions.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -582,22 +584,22 @@
 <context>
     <name>QnLicense</name>
     <message>
-        <location filename="../src/licensing/license.cpp" line="229"/>
+        <location filename="../src/licensing/license.cpp" line="233"/>
         <source>Free</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="230"/>
+        <location filename="../src/licensing/license.cpp" line="234"/>
         <source>Trial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="231"/>
+        <location filename="../src/licensing/license.cpp" line="235"/>
         <source>Analog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="232"/>
+        <location filename="../src/licensing/license.cpp" line="236"/>
         <source>Professional</source>
         <translation type="unfinished"></translation>
     </message>
@@ -828,6 +830,19 @@ You cannot record video from cameras.</source>
         <location filename="../src/transcoding/transcoder.cpp" line="300"/>
         <location filename="../src/transcoding/transcoder.cpp" line="334"/>
         <source>Unknown Transcode Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnTranslationListModel</name>
+    <message>
+        <location filename="../src/translation/translation_list_model.cpp" line="63"/>
+        <source>%1 (built-in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/translation/translation_list_model.cpp" line="65"/>
+        <source>%1 (external)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

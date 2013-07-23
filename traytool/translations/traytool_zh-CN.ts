@@ -58,12 +58,12 @@ Application will now quit.</source>
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="589"/>
+        <location filename="../src/systraywindow.cpp" line="587"/>
         <source>Insufficient privileges to manage services</source>
         <translation>没有足够的权限来管理服务</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="589"/>
+        <location filename="../src/systraywindow.cpp" line="587"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
         <translation>必须启用UAC来请求非管理员用户的权限</translation>
     </message>
@@ -90,27 +90,27 @@ Built for %5-%6 with %7.&lt;br/&gt;
 以%7为 %5-%6 创建。&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="234"/>
+        <location filename="../src/systraywindow.cpp" line="233"/>
         <source>The requested access was denied</source>
         <translation>请求访问被拒</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="237"/>
+        <location filename="../src/systraywindow.cpp" line="236"/>
         <source>The specified database does not exist.</source>
         <translation>指定的数据库不存在。</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="240"/>
+        <location filename="../src/systraywindow.cpp" line="239"/>
         <source>A specified parameter is invalid.</source>
         <translation>指定的参数无效。</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="244"/>
+        <location filename="../src/systraywindow.cpp" line="243"/>
         <source>Insufficient permissions to start/stop services</source>
         <translation>没有足够的权限启动/停止服务</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="262"/>
+        <location filename="../src/systraywindow.cpp" line="261"/>
         <source>No %1 services installed</source>
         <translation>没有安装 %1 服务</translation>
     </message>
@@ -127,12 +127,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">开始</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="457"/>
+        <location filename="../src/systraywindow.cpp" line="455"/>
         <source> (stopped)</source>
         <translation>(已停止)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="465"/>
+        <location filename="../src/systraywindow.cpp" line="463"/>
         <source> (starting)</source>
         <translation>(开启中)</translation>
     </message>
@@ -141,38 +141,38 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">(停止)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="473"/>
+        <location filename="../src/systraywindow.cpp" line="471"/>
         <source> (stopping)</source>
         <translation>(停止中)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="481"/>
+        <location filename="../src/systraywindow.cpp" line="479"/>
         <source> (started)</source>
         <translation>(已开启)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="489"/>
+        <location filename="../src/systraywindow.cpp" line="487"/>
         <source> (resuming)</source>
         <translation>(重新开启中)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="497"/>
+        <location filename="../src/systraywindow.cpp" line="495"/>
         <source> (paused)</source>
         <translation>(已暂停)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="505"/>
+        <location filename="../src/systraywindow.cpp" line="503"/>
         <source> (pausing)</source>
         <translation>(暂停中)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="536"/>
-        <location filename="../src/systraywindow.cpp" line="558"/>
-        <location filename="../src/systraywindow.cpp" line="872"/>
-        <location filename="../src/systraywindow.cpp" line="905"/>
-        <location filename="../src/systraywindow.cpp" line="961"/>
-        <location filename="../src/systraywindow.cpp" line="971"/>
-        <location filename="../src/systraywindow.cpp" line="978"/>
+        <location filename="../src/systraywindow.cpp" line="534"/>
+        <location filename="../src/systraywindow.cpp" line="556"/>
+        <location filename="../src/systraywindow.cpp" line="870"/>
+        <location filename="../src/systraywindow.cpp" line="903"/>
+        <location filename="../src/systraywindow.cpp" line="959"/>
+        <location filename="../src/systraywindow.cpp" line="969"/>
+        <location filename="../src/systraywindow.cpp" line="976"/>
         <source>Systray</source>
         <translation>系统拖盘</translation>
     </message>
@@ -181,7 +181,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">%1 将被停止。确定？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="629"/>
+        <location filename="../src/systraywindow.cpp" line="627"/>
         <source>&amp;Settings</source>
         <translation>&amp;设置</translation>
     </message>
@@ -190,7 +190,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">&amp;显示 %1 日志</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="645"/>
+        <location filename="../src/systraywindow.cpp" line="643"/>
         <source>&amp;Quit</source>
         <translation>&amp;退出</translation>
     </message>
@@ -203,7 +203,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">停止p %1</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="745"/>
+        <location filename="../src/systraywindow.cpp" line="743"/>
         <source>* Last used connection *</source>
         <translation>*最后使用的连接*</translation>
     </message>
@@ -223,127 +223,127 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="398"/>
+        <location filename="../src/systraywindow.cpp" line="396"/>
         <source>Enterprise controller has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="405"/>
+        <location filename="../src/systraywindow.cpp" line="403"/>
         <source>Enterprise controller has been started</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="424"/>
+        <location filename="../src/systraywindow.cpp" line="422"/>
         <source>Media server has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="431"/>
+        <location filename="../src/systraywindow.cpp" line="429"/>
         <source>Media server has been started</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="536"/>
+        <location filename="../src/systraywindow.cpp" line="534"/>
         <source>Media server is going to be stopped. Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="558"/>
+        <location filename="../src/systraywindow.cpp" line="556"/>
         <source>Enterprise controller is going to be stopped. Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="635"/>
+        <location filename="../src/systraywindow.cpp" line="633"/>
         <source>&amp;Show Media Server Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="640"/>
+        <location filename="../src/systraywindow.cpp" line="638"/>
         <source>&amp;Show Enterprise Controller Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="648"/>
+        <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Start Media Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="653"/>
+        <location filename="../src/systraywindow.cpp" line="651"/>
         <source>Stop Media Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="658"/>
+        <location filename="../src/systraywindow.cpp" line="656"/>
         <source>Start Enterprise Controller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="663"/>
+        <location filename="../src/systraywindow.cpp" line="661"/>
         <source>Stop Enterprise Controller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="865"/>
+        <location filename="../src/systraywindow.cpp" line="863"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="867"/>
+        <location filename="../src/systraywindow.cpp" line="865"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="869"/>
+        <location filename="../src/systraywindow.cpp" line="867"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="905"/>
+        <location filename="../src/systraywindow.cpp" line="903"/>
         <source>Invalid %1 port specified.</source>
         <translation>指定了无效的 %1端口。</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="938"/>
+        <location filename="../src/systraywindow.cpp" line="936"/>
         <source>enterprise controller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="939"/>
+        <location filename="../src/systraywindow.cpp" line="937"/>
         <source>media proxy</source>
         <translation>媒体代理</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="944"/>
+        <location filename="../src/systraywindow.cpp" line="942"/>
         <source>media server RTSP</source>
         <translation>媒体服务器RTSP</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="946"/>
+        <location filename="../src/systraywindow.cpp" line="944"/>
         <source>media server API</source>
         <translation>媒体服务器 API</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="961"/>
+        <location filename="../src/systraywindow.cpp" line="959"/>
         <source>%1 port is same as %2 port</source>
         <translation>%1 与%2端口相同</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="971"/>
+        <location filename="../src/systraywindow.cpp" line="969"/>
         <source>%1 port already used by another process</source>
         <translation>%1端口已经被另一个程序使用</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="978"/>
+        <location filename="../src/systraywindow.cpp" line="976"/>
         <source>Invalid IP address specified for public IP address</source>
         <translation>无效的IP地址指定为公共IP地址</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1043"/>
+        <location filename="../src/systraywindow.cpp" line="1041"/>
         <source>Invalid parameters</source>
         <translation>无效的参数</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1043"/>
+        <location filename="../src/systraywindow.cpp" line="1041"/>
         <source>You have entered invalid URL.</source>
         <translation>您所输入的网址无效。</translation>
     </message>
