@@ -65,8 +65,7 @@ public:
     
     void setDewarpingParams(const DewarpingParams& params, float aspectRatio, float maxX, float maxY)
     {
-        //float fovRot = sin(params.xAngle)*params.fovRot;
-        float fovRot = gradToRad(-12);
+        float fovRot = sin(params.xAngle)*params.fovRot;
         if (params.horizontalView) {
             setUniformValue(m_yShiftLocation, (float) (params.yAngle));
             setUniformValue(m_yCenterLocation, (float) 0.5);

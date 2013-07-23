@@ -253,9 +253,9 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
-        1.0, -0.344, -0.714,  0.529,
-        1.0,  1.772,  0.0,   -0.886,
-        0.0,  0.0,    0.0,    opacity);
+                                1.0, -0.344, -0.714,  0.529,
+                                1.0,  1.772,  0.0,   -0.886,
+                                0.0,  0.0,    0.0,    opacity);
     
     mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
                                    0.0, cos(-fovRot), -sin(-fovRot),
@@ -266,9 +266,8 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
         vec2 pos = (gl_TexCoord[0].st -0.5) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
-        pos.y = pos.y/aspectRatio;
-        float roty = fovRot* cos(theta);
-        float phi   = pos.y/(1.0 - roty) - roty + yShift;
+        float roty = -fovRot* cos(theta);
+        float phi   = pos.y*(1.0 - roty)/aspectRatio + roty + yShift;
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
@@ -321,10 +320,9 @@ QString QnFisheyeWithGammaShaderProgram::getShaderText()
         vec2 pos = vec2(gl_TexCoord[0].x - 0.5, 1.0 - gl_TexCoord[0].y) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
-        pos.y = pos.y/aspectRatio;
-        float roty = fovRot* cos(theta);
-        float phi   = pos.y/(1.0 - roty) - roty + yShift;
-
+        float roty = -fovRot* cos(theta);
+        float phi   = pos.y*(1.0 - roty)/aspectRatio + roty + yShift;
+        
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
                          sin(phi),
