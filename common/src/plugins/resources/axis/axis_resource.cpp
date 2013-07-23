@@ -8,7 +8,6 @@
 #include "api/app_server_connection.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
-#include <business/business_event_connector.h>
 #include <business/business_event_rule.h>
 #include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
@@ -25,9 +24,6 @@ QnPlAxisResource::QnPlAxisResource()
 {
     setAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
-    connect(
-        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
 }
 
 QnPlAxisResource::~QnPlAxisResource()
