@@ -101,7 +101,7 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 
 // ============================= QnYv12ToRgbWithFisheyeShaderProgram ==================
 
-const QString QnFisheyeShaderProgram::GAMMA_STRING(lit("clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0"));
+const QString QnFisheyeShaderProgram::GAMMA_STRING(lit("clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)"));
 
 QnFisheyeShaderProgram::QnFisheyeShaderProgram(const QGLContext *context, QObject *parent, const QString& gammaStr):
     QnYv12ToRgbWithGammaShaderProgram(context, parent, false),
