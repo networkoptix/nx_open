@@ -243,7 +243,10 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
         ++ctx.framesSinceJump;
     }
 
-    QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
+    int panoFactor = 1;
+    if (!m_channelRenderers.empty() && m_channelRenderers[0].renderer)
+        panoFactor = m_channelRenderers[0].renderer->panoFactor();
+    QSize sourceSize = QSize(image->width * image->sample_aspect_ratio * panoFactor, image->height);
     if(m_sourceSize == sourceSize)
         return;
 

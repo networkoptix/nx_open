@@ -21,7 +21,7 @@ QnFisheyePtzController::QnFisheyePtzController(QnResource* resource):
     m_moveToAnimation(false),
     m_spaceMapper(0)
 {
-    updateSpaceMapper(DewarpingParams().horizontalView);
+    updateSpaceMapper(DewarpingParams().horizontalView, 1);
 }
 
 QnFisheyePtzController::~QnFisheyePtzController()
@@ -31,12 +31,12 @@ QnFisheyePtzController::~QnFisheyePtzController()
     delete m_spaceMapper;
 }
 
-void QnFisheyePtzController::updateSpaceMapper(bool horizontalView)
+void QnFisheyePtzController::updateSpaceMapper(bool horizontalView, int pf)
 {
     if (m_spaceMapper)
         delete m_spaceMapper;
 
-    QnScalarSpaceMapper zMapper(fovTo35mmEquiv(MIN_FOV), fovTo35mmEquiv(MAX_FOV), fovTo35mmEquiv(MIN_FOV), fovTo35mmEquiv(MAX_FOV), Qn::ConstantExtrapolation);
+    QnScalarSpaceMapper zMapper(fovTo35mmEquiv(MIN_FOV), fovTo35mmEquiv(MAX_FOV*pf), fovTo35mmEquiv(MIN_FOV), fovTo35mmEquiv(MAX_FOV*pf), Qn::ConstantExtrapolation);
     qreal minX, maxX, minY, maxY;
     Qn::ExtrapolationMode xExtrapolationMode;
 
@@ -103,7 +103,7 @@ int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 {
     m_motion = QVector3D();
 
-    m_dstPos.fov = qBound(MIN_FOV, mm35EquivToFov(zoomPos), MAX_FOV);
+    m_dstPos.fov = qBound(MIN_FOV, mm35EquivToFov(zoomPos), MAX_FOV * m_dewarpingParams.panoFactor);
 
     m_dstPos.xAngle = boundXAngle(gradToRad(xPos), m_dstPos.fov);
     m_dstPos.yAngle = boundYAngle(gradToRad(yPos), m_dstPos.fov, 1.0);
@@ -186,7 +186,7 @@ DewarpingParams QnFisheyePtzController::getDewarpingParams()
         qreal ySpeed = m_motion.y() * MAX_MOVE_SPEED;
 
         newParams.fov += zoomSpeed * timeSpend;
-        newParams.fov = qBound(MIN_FOV, newParams.fov, MAX_FOV);
+        newParams.fov = qBound(MIN_FOV, newParams.fov, MAX_FOV*m_dewarpingParams.panoFactor);
 
         newParams.xAngle = normalizeAngle(newParams.xAngle + xSpeed * timeSpend);
         newParams.yAngle += ySpeed * timeSpend;
@@ -203,11 +203,12 @@ DewarpingParams QnFisheyePtzController::getDewarpingParams()
     DewarpingParams camParams = m_resource->getDewarpingParams();
     newParams.fovRot = gradToRad(camParams.fovRot);
     newParams.horizontalView = camParams.horizontalView;
+    newParams.panoFactor = m_dewarpingParams.panoFactor;
 
     if (!(newParams == m_dewarpingParams)) 
     {
         if (newParams.horizontalView != m_dewarpingParams.horizontalView)
-            updateSpaceMapper(newParams.horizontalView);
+            updateSpaceMapper(newParams.horizontalView, newParams.panoFactor);
         emit dewarpingParamsChanged(newParams);
         m_dewarpingParams = newParams;
     }

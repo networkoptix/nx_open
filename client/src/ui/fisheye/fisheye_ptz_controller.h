@@ -39,7 +39,7 @@ private slots:
 private:
     qreal boundXAngle(qreal value, qreal fov) const;
     qreal boundYAngle(qreal value, qreal fov, qreal aspectRatio) const;
-    void updateSpaceMapper(bool horizontalView);
+    void updateSpaceMapper(bool horizontalView, int pf);
 
 private:
     QVector3D m_motion;
