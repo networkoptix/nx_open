@@ -1995,9 +1995,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     /* Calculate size of the resulting matrix. */
     qreal desiredAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
-    QnResourceWidget* w = parameters.widget();
-    if (w && w->hasAspectRatio())
-        desiredAspectRatio = w->aspectRatio();
+    QnResourceWidget *widget = parameters.widget();
+    if (widget && widget->hasAspectRatio())
+        desiredAspectRatio = widget->aspectRatio();
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * itemCount)));
 
@@ -2017,8 +2017,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
-        item.contrastParams = w->item()->imageEnhancement();
-        item.dewarpingParams = w->item()->dewarpingParams();
+        item.contrastParams = widget->item()->imageEnhancement();
+        item.dewarpingParams = widget->item()->dewarpingParams();
         item.dataByRole[Qn::ItemPausedRole] = true;
         item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
@@ -3187,8 +3187,6 @@ Do you want to continue?"),
             return;
     }
 
-    QnNetworkResourcePtr networkResource = widget->resource().dynamicCast<QnNetworkResource>();
-
     QString previousDir = qnSettings->lastExportDir();
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
@@ -3207,7 +3205,7 @@ Do you want to continue?"),
 #endif
             ;
 
-    QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
+    QnLayoutItemData itemData = widget->item()->data();
 
     QString fileName;
     QString selectedExtension;
@@ -3217,7 +3215,9 @@ Do you want to continue?"),
     DewarpingParams dewarpingParams = itemData.dewarpingParams;
 
     while (true) {
-        QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
+        QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), lit('_'));
+        QString timePart = (widget->resource()->toResource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss")) : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
+        QString suggestion = namePart + lit("_") + timePart;
 
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
