@@ -226,72 +226,72 @@
 <context>
     <name>QnApiPbSerializer</name>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="658"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="662"/>
         <source>Cannot parse serialized cameras.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="667"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="671"/>
         <source>Cannot parse serialized servers.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="676"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="680"/>
         <source>Cannot parse serialized layouts.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="696"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="700"/>
         <source>Cannot parse serialized users.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="705"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="709"/>
         <source>Cannot parse serialized resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="714"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="718"/>
         <source>Cannot parse serialized resource types.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="723"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="727"/>
         <source>Cannot parse serialized licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="733"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="737"/>
         <source>Cannot parse serialized camera history.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="743"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="747"/>
         <source>Cannot parse serialized key-value pairs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="753"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="757"/>
         <source>Cannot parse serialized settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="763"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="767"/>
         <source>Cannot parse serialized connection information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="784"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="788"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="797"/>
         <source>Cannot parse serialized action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="805"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="809"/>
         <source>Cannot parse serialized actions.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -653,42 +653,42 @@
 <context>
     <name>QnStreamRecorder</name>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="428"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="429"/>
         <source>No %1 container in FFMPEG library.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="447"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="448"/>
         <source>Can&apos;t create output file &apos;%1&apos; for video recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="492"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="499"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="574"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="583"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="582"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="611"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="620"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="623"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="632"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="734"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="743"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
