@@ -24,6 +24,8 @@ Since previous build
  - Local files playback fixed  
  - Timeout of notifications is changed: the more notifications are in queue, the less the timeout is
  - Notifications are redesigned
+ - Notification sounds are renamed
+ 
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
 Since 1.5.1

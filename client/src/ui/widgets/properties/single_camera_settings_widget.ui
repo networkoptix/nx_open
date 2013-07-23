@@ -277,7 +277,7 @@
        <item>
         <widget class="QCheckBox" name="checkBoxDewarping">
          <property name="text">
-          <string>Turn on dewarping controls</string>
+          <string>This is the fish-eye lens camera</string>
          </property>
         </widget>
        </item>

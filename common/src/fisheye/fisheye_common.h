@@ -5,7 +5,7 @@
 
 struct DewarpingParams
 {
-    DewarpingParams(): enabled(false), horizontalView(false), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0) {}
+    DewarpingParams(): enabled(false), horizontalView(true), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0), panoFactor(1.0) {}
     bool operator==(const DewarpingParams& other) const
     {
         if (enabled != other.enabled)
@@ -20,6 +20,8 @@ struct DewarpingParams
             return false;
         if (fabs(fov - other.fov) > 0.0001)
             return false;
+        if (fabs(panoFactor - other.panoFactor) > 0.0001)
+            return false;
 
         return true;
     }
@@ -32,6 +34,7 @@ struct DewarpingParams
         yAngle = other.yAngle;
         fov = other.fov;
         fovRot = other.fovRot;
+        panoFactor = other.panoFactor;
     }
 
     static const char DELIM = ';';
@@ -45,6 +48,7 @@ struct DewarpingParams
         rez.append(QByteArray::number(xAngle)).append(DELIM);
         rez.append(QByteArray::number(fov)).append(DELIM);
         rez.append(QByteArray::number(fovRot)).append(DELIM);
+        rez.append(QByteArray::number(panoFactor)).append(DELIM);
         return rez;
     }
 
@@ -59,6 +63,8 @@ struct DewarpingParams
             result.yAngle = params[3].toDouble();
             result.fov = params[4].toDouble();
             result.fovRot = params[5].toDouble();
+            if (params.size() >= 7)
+                result.panoFactor = params[6].toDouble();
         }
         return result;
     }
@@ -71,6 +77,7 @@ struct DewarpingParams
     qreal fov;
     // perspective correction angle
     qreal fovRot;
+    qreal panoFactor;
 };
 
 Q_DECLARE_METATYPE(DewarpingParams);

@@ -260,14 +260,6 @@ public:
         return m_texCoords;
     }
 
-    const QSize &textureSize() const {
-        return m_textureSize;
-    }
-
-    const QSize &contentSize() const {
-        return m_contentSize;
-    }
-
     GLuint id() const {
         return m_id;
     }
@@ -303,10 +295,12 @@ public:
             textureSize = m_textureSize;
         }
 
+        static const int TEX_COORD_PRECISION = 1000;    //3 fractional digits
+
         int roundedWidth = qPower2Ceil((unsigned) width, ROUND_COEFF);
         m_texCoords = QVector2D(
-            static_cast<float>(roundedWidth) / textureSize.width(),
-            static_cast<float>(height) / textureSize.height()
+            width * TEX_COORD_PRECISION / textureSize.width() / (float)TEX_COORD_PRECISION,
+            height * TEX_COORD_PRECISION / textureSize.height() / (float)TEX_COORD_PRECISION
         );
 
         if(fillValue != -1) {
