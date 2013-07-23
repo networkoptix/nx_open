@@ -459,7 +459,7 @@ int main(int argc, char **argv)
         context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
         /* Load translation. */
-        QnWorkbenchTranslationManager *translationManager = context->instance<QnWorkbenchTranslationManager>();
+        QnClientTranslationManager *translationManager = context->instance<QnClientTranslationManager>();
         QnTranslation translation;
         if(!translationPath.isEmpty()) /* From command line. */
             translation = translationManager->loadTranslation(translationPath);

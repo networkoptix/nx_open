@@ -4,7 +4,7 @@
 
 #include <client/client_settings.h>
 
-QnWorkbenchTranslationManager::QnWorkbenchTranslationManager(QObject *parent):
+QnClientTranslationManager::QnClientTranslationManager(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
@@ -15,7 +15,7 @@ QnWorkbenchTranslationManager::QnWorkbenchTranslationManager(QObject *parent):
         addSearchPath(extraPath);
 }
 
-QnWorkbenchTranslationManager::~QnWorkbenchTranslationManager() {
+QnClientTranslationManager::~QnClientTranslationManager() {
     return;
 }
 

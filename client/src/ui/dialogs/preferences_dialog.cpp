@@ -127,7 +127,7 @@ QnPreferencesDialog::~QnPreferencesDialog() {
 
 void QnPreferencesDialog::initTranslations() {
     QnTranslationListModel *model = new QnTranslationListModel(this);
-    model->setTranslations(context()->instance<QnWorkbenchTranslationManager>()->loadTranslations());
+    model->setTranslations(context()->instance<QnClientTranslationManager>()->loadTranslations());
     ui->languageComboBox->setModel(model);
 }
 
