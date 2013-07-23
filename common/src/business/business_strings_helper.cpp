@@ -144,7 +144,7 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
         }
         contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo);
 
-        return renderTemplateFromFile(lit("Z:\\Downloads\\qt-mustache\\mail.mustache"), contextMap);
+        return renderTemplateFromFile(lit(":/skin/email_templates/camera_motion.mustache"), contextMap);
     } else {
         QString result;
         result += tr("Event: %1").arg(eventName(eventType));
