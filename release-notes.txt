@@ -15,7 +15,7 @@ Since 1.5.1
    was suggested with no luck. Now warning is given instead of restart
  
 Since previous build
- - Selected item was not market in Tree (> sign). Fixed
+ - Selected item was not marked in Tree (> sign). Fixed
  - Network Statistics sometimes displayed 0 Mbps usage for a short time. Fixed
  - If PTZ is enabled zoom windows' positions are still displayed
  - It is suggested to use custom Public IP for EC (this IP will be inserted in e-mail links)
@@ -105,7 +105,6 @@ Since previous build
  - If "auto reset" time for camera output action was less then motion time then "Camera output" didn't stop. Fixed
  - When changes parameter "Allow access via public IP" in traytool, Tray Tool suggests to restart EC.
  - If mediaserver had been stopped normally the event was fired. Now not
-
 
 ----------------------------------------------- 1.5.2 - 3549(1.6 beta) -----------------------------------------------
  ANDROID CLIENT:
