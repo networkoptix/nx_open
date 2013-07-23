@@ -217,7 +217,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
 
 void QnMediaResourceWidget::at_dewarpingParamsChanged(DewarpingParams params)
 {
-    item()->setDevorpingParams(params);
+    item()->setDewarpingParams(params);
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {

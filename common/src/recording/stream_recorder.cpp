@@ -458,7 +458,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
         !m_srcRect.isEmpty() ||
         m_contrastParams.enabled ||
-        m_devorpingParams.enabled;
+        m_dewarpingParams.enabled;
 
     const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
@@ -469,7 +469,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_startTime, fileExt), QString::number(startTime).toAscii().data(), 0);
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Software, fileExt), "Network Optix", 0);
         DewarpingParams resDeworping = mediaDev->getDewarpingParams();
-        if (resDeworping.enabled && !m_devorpingParams.enabled) {
+        if (resDeworping.enabled && !m_dewarpingParams.enabled) {
             // deworping exists in resource and not activated now. Allow deworping for saved file
             av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Dewarping, fileExt), resDeworping.serialize(), 0);
         }
@@ -517,8 +517,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
 
-                if (m_devorpingParams.enabled)
-                    m_videoTranscoder->addFilter(new QnFisheyeImageFilter(m_devorpingParams));
+                if (m_dewarpingParams.enabled)
+                    m_videoTranscoder->addFilter(new QnFisheyeImageFilter(m_dewarpingParams));
                 if (m_contrastParams.enabled)
                     m_videoTranscoder->addFilter(new QnContrastImageFilter(m_contrastParams));
                 if (m_role == Role_FileExportWithTime) 
@@ -527,7 +527,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 }
 
                 m_videoTranscoder->setQuality(QnQualityHighest);
-                if (!m_srcRect.isEmpty() && !m_devorpingParams.enabled)
+                if (!m_srcRect.isEmpty() && !m_dewarpingParams.enabled)
                     m_videoTranscoder->setSrcRect(m_srcRect);
                 m_videoTranscoder->setVideoLayout(layout);
                 m_videoTranscoder->open(mediaData);
@@ -819,5 +819,5 @@ void QnStreamRecorder::setContrastParams(const ImageCorrectionParams& params)
 
 void QnStreamRecorder::setDewarpingParams(const DewarpingParams& params)
 {
-    m_devorpingParams = params;
+    m_dewarpingParams = params;
 }

@@ -183,7 +183,7 @@ private:
     qint64 m_truncateIntervalEps;
     QRectF m_srcRect;
     ImageCorrectionParams m_contrastParams;
-    DewarpingParams m_devorpingParams;
+    DewarpingParams m_dewarpingParams;
 };
 
 #endif // _STREAM_RECORDER_H__

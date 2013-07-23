@@ -69,7 +69,7 @@ protected:
     void updateInner(QnResourcePtr other);
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
-    DewarpingParams m_devorpingParams;
+    DewarpingParams m_dewarpingParams;
 };
 
 #endif // QN_MEDIA_RESOURCE_H

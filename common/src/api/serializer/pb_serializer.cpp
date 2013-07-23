@@ -306,7 +306,7 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
             itemData.combinedGeometry.setBottom(pb_item.bottom());
             itemData.rotation = pb_item.rotation();
             itemData.contrastParams = ImageCorrectionParams::deserialize(QByteArray(pb_item.contrastparams().c_str()));
-            itemData.devorpingParams = DewarpingParams::deserialize(pb_item.dewarpingparams().c_str());
+            itemData.dewarpingParams = DewarpingParams::deserialize(pb_item.dewarpingparams().c_str());
 
             if(pb_item.has_zoomtargetuuid())
                 itemData.zoomTargetUuid = QUuid(QString::fromUtf8(pb_item.zoomtargetuuid().c_str()));
@@ -588,7 +588,7 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
             pb_item.set_bottom(itemIn.combinedGeometry.bottom());
             pb_item.set_rotation(itemIn.rotation);
             pb_item.set_contrastparams(itemIn.contrastParams.serialize().constData());
-            pb_item.set_dewarpingparams(itemIn.devorpingParams.serialize().constData());
+            pb_item.set_dewarpingparams(itemIn.dewarpingParams.serialize().constData());
 
             pb_item.set_zoomtargetuuid(itemIn.zoomTargetUuid.toString().toUtf8().constData());
             pb_item.set_zoomleft(itemIn.zoomRect.left());

@@ -19,7 +19,7 @@ public:
 
     void updateFromResource(QnSecurityCamResourcePtr camera);
 
-    DewarpingParams devorpingParams() const;
+    DewarpingParams dewarpingParams() const;
 signals:
     void dataChanged();
 private:
@@ -29,7 +29,7 @@ private slots:
 private:
     QScopedPointer<Ui::FisheyeSettingsWidget> ui;
     bool m_silenseMode;
-    DewarpingParams m_devorpingParams;
+    DewarpingParams m_dewarpingParams;
 };
 
 #endif // QN_FISHEYE_SETTINGS_WIDGET_H
