@@ -103,7 +103,7 @@ int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 {
     m_motion = QVector3D();
 
-    m_dstPos.fov = qBound(MIN_FOV, mm35vToFov(zoomPos), MAX_FOV * m_dewarpingParams.panoFactor);
+    m_dstPos.fov = qBound(MIN_FOV, mm35EquivToFov(zoomPos), MAX_FOV * m_dewarpingParams.panoFactor);
 
     m_dstPos.xAngle = boundXAngle(gradToRad(xPos), m_dstPos.fov);
     m_dstPos.yAngle = boundYAngle(gradToRad(yPos), m_dstPos.fov, 1.0);
