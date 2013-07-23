@@ -177,6 +177,7 @@ void QnMediaResourceWidget::updateFisheyeController() {
         if (!m_fisheyePtz) {
             m_fisheyePtz = new QnFisheyePtzController(base_type::resource().data());
             connect(m_fisheyePtz, SIGNAL(dewarpingParamsChanged(DewarpingParams)), this, SLOT(at_dewarpingParamsChanged(DewarpingParams)));
+            connect(m_fisheyePtz, SIGNAL(spaceMapperChanged()), this, SLOT(updateAspectRatio()));
             m_fisheyePtz->addRenderer(m_renderer);
 
             if (!zoomRect().isEmpty()) {
@@ -855,11 +856,14 @@ void QnMediaResourceWidget::updateAspectRatio() {
         return; /* Not yet initialized. */
 
     QSize sourceSize = m_renderer->sourceSize();
+
+    sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
+
     if(sourceSize.isEmpty()) {
         setAspectRatio(-1);
     } else {
         setAspectRatio(
-            QnGeometry::aspectRatio(m_renderer->sourceSize()) *
+            QnGeometry::aspectRatio(sourceSize) *
             QnGeometry::aspectRatio(channelLayout()->size()) *
             (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
         );

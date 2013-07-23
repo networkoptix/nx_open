@@ -321,7 +321,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     DewarpingParams params;
     if (m_fisheyeController && m_fisheyeController->isEnabled()) 
     {
-        params = m_fisheyeController->getDewarpingParams();
+        params = m_fisheyeController->updateDewarpingParams();
         if (params.panoFactor > 1.0)
         {
             if (params.horizontalView)
@@ -588,7 +588,7 @@ bool QnGLRenderer::isFisheyeEnabled() const
 int QnGLRenderer::panoFactor() const
 {
     if (m_fisheyeController && m_fisheyeController->isEnabled()) 
-        return (int) m_fisheyeController->getDewarpingParams().panoFactor;
+        return (int) m_fisheyeController->updateDewarpingParams().panoFactor;
     else
         return 1;
 }

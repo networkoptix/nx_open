@@ -243,10 +243,7 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
         ++ctx.framesSinceJump;
     }
 
-    int panoFactor = 1;
-    if (!m_channelRenderers.empty() && m_channelRenderers[0].renderer)
-        panoFactor = m_channelRenderers[0].renderer->panoFactor();
-    QSize sourceSize = QSize(image->width * image->sample_aspect_ratio * panoFactor, image->height);
+    QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
     if(m_sourceSize == sourceSize)
         return;
 
@@ -299,6 +296,14 @@ QSize QnResourceWidgetRenderer::sourceSize() const {
     QMutexLocker locker(&m_mutex);
 
     return m_sourceSize;
+
+    /*
+    int panoFactor = 1;
+    if (!m_channelRenderers.empty() && m_channelRenderers[0].renderer)
+        panoFactor = m_channelRenderers[0].renderer->panoFactor();
+
+    return QSize(m_sourceSize.width() * panoFactor, m_sourceSize.height());
+    */
 }
 
 const QGLContext* QnResourceWidgetRenderer::glContext() const

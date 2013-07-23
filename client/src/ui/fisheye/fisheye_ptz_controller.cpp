@@ -154,7 +154,12 @@ qreal normalizeAngle(qreal value)
         return value;
 }
 
-DewarpingParams QnFisheyePtzController::getDewarpingParams()
+DewarpingParams QnFisheyePtzController::getDewarpingParams() const
+{
+    return m_dewarpingParams;
+}
+
+DewarpingParams QnFisheyePtzController::updateDewarpingParams()
 {
     qint64 newTime = getUsecTimer();
     qreal timeSpend = (newTime - m_lastTime) / 1000000.0;
@@ -269,6 +274,9 @@ void QnFisheyePtzController::changePanoMode()
     {
         m_dewarpingParams.panoFactor = 1;
     }
+    m_dewarpingParams.fov = MAX_FOV * m_dewarpingParams.panoFactor;
+    emit dewarpingParamsChanged(m_dewarpingParams);
+    updateSpaceMapper(m_dewarpingParams.horizontalView, m_dewarpingParams.panoFactor);
 }
 
 QString QnFisheyePtzController::getPanoModeText() const
