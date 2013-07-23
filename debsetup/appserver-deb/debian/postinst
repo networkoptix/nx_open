@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 . /usr/share/debconf/confmodule
 
@@ -14,6 +14,9 @@ SSL_DIR="/opt/$COMPANY_NAME/entcontroller/var/ssl"
 SSL_CERT="$SSL_DIR/cert.pem"
 BINDIR="/opt/$COMPANY_NAME/entcontroller/bin"
 
+ECS_PORT_DEFAULT=7001
+ECS_PROXY_PORT_DEFAULT=7004
+
 # This is necessary because changed configuration options should take effect 
 # immediately.
 if status $COMPANY_NAME-entcontroller | grep "start/running" > /dev/null; then
@@ -21,6 +24,9 @@ if status $COMPANY_NAME-entcontroller | grep "start/running" > /dev/null; then
 fi
     
 function read_config {
+    ECS_PORT=$ECS_PORT_DEFAULT
+    ECS_PROXY_PORT=$ECS_PROXY_PORT_DEFAULT
+
     [ -f $CONFIG_FILE ] || { true; return; }
 
     ECS_GUID=$(cat $CONFIG_FILE | grep ecsGuid | head -1 | sed 's/ecsGuid\s*=\s*\(.*\)/\1/g')
@@ -61,8 +67,8 @@ function create_dir {
     mkdir -p "$dir"
 }
 
-function validate_password {
-    [ -n "$1" ]
+function validate_ecsPassword {
+    [ "$IS_ADMIN_PW_SET" = "true" -o -n "$1" ]
 }
 
 function validate_ecsPort {
@@ -81,7 +87,7 @@ function ask_for_value {
 
     # Support unattened install
     db_get $full_name
-    if [ "$RET" = "false" ]; then
+    if [ "$RET" = "" ]; then
         [ -n "$default" ] && db_set $full_name $default 
     fi
 
@@ -112,6 +118,9 @@ case "$1" in
   configure)
       read_config
 
+      IS_ADMIN_PW_SET="false"
+      [ -f /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db ] && $BINDIR/dbconfig isadminpw && IS_ADMIN_PW_SET="true"
+
       ECS_PORT=$(ask_for_value ecsPort "$ECS_PORT")
       ECS_PROXY_PORT=$(ask_for_value ecsProxyPort "$ECS_PROXY_PORT")
       ECS_PASSWORD=$(ask_for_value ecsPassword "")
@@ -122,7 +131,7 @@ case "$1" in
 
       if [ -n "$ECS_PASSWORD" ]
       then
-        "$BINDIR/dbconfig" admin "$ECS_PASSWORD"
+        "$BINDIR/dbconfig" setpw admin "$ECS_PASSWORD"
       fi
 
       "$BINDIR/certgen" -i
