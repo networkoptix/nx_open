@@ -180,11 +180,10 @@ void QnSystrayWindow::initTranslations() {
     int index = translationPath.lastIndexOf(lit("client"));
     if(index != -1)
         translationPath.replace(index, 6, lit("traytool"));
-    QString translationSuffix = clientSettings.value(lit("translationSuffix")).toString();
 
     for(int i = 0; i < ui->languageComboBox->count(); i++) {
         QnTranslation translation = ui->languageComboBox->itemData(i, Qn::TranslationRole).value<QnTranslation>();
-        if(translation.suffix() == translationSuffix || translation.filePaths().contains(translationPath)) {
+        if(translation.filePaths().contains(translationPath)) {
             ui->languageComboBox->setCurrentIndex(i);
             break;
         }
@@ -277,7 +276,6 @@ void QnSystrayWindow::accept() {
     if(!translation.isEmpty()) {
         // TODO: #Elric code duplication.
         QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), CLIENT_NAME);
-        clientSettings.setValue(lit("translationSuffix"), translation.suffix()); 
         
         QString translationPath;
         if(!translation.filePaths().isEmpty())
