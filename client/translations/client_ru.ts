@@ -4261,8 +4261,8 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
 <context>
     <name>QnNotificationToolTipWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notification_item.cpp" line="46"/>
-        <source>Close</source>
+        <location filename="../src/ui/graphics/items/notifications/notification_item.cpp" line="48"/>
+        <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

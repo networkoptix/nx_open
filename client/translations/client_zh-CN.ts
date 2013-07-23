@@ -4753,7 +4753,11 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <name>QnNotificationToolTipWidget</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished">关闭</translation>
+        <translation type="obsolete">关闭</translation>
+    </message>
+    <message>
+        <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
