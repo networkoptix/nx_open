@@ -708,7 +708,11 @@ QVector3D PtzInstrument::physicalPositionForRect(QnMediaResourceWidget *widget, 
     QPointF pos = rect.center();
 #if 1
     QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
-    qreal sideSize = 36.0 / oldPhysicalPosition.z();
+    qreal sideSize;
+    if (mapper->flags() & Qn::FovBasedMapper)
+        sideSize = oldPhysicalPosition.z(); // 35mm equivalent is not compatible with large view angle > PI
+    else
+        sideSize = 36.0 / oldPhysicalPosition.z();
 
     QVector3D r = sphericalToCartesian<QVector3D>(1.0, gradToRad(oldPhysicalPosition.x()), gradToRad(oldPhysicalPosition.y()));
     QVector3D x = sphericalToCartesian<QVector3D>(1.0, gradToRad(oldPhysicalPosition.x() + 90), 0.0) * sideSize;

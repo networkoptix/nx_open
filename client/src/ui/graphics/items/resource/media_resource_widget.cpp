@@ -185,6 +185,7 @@ void QnMediaResourceWidget::updateFisheyeController() {
                 m_fisheyePtz->moveToRect(zoomRect());
             }
         }
+        m_fisheyePtz->setDewarpingParams(item()->dewarpingParams());
     } else {
         delete m_fisheyePtz;
         m_fisheyePtz = 0;
@@ -857,7 +858,8 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     QSize sourceSize = m_renderer->sourceSize();
 
-    sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
+    if (item()->dewarpingParams().enabled)
+        sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
 
     if(sourceSize.isEmpty()) {
         setAspectRatio(-1);
@@ -905,6 +907,9 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     if(checked)
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
     
+    //DewarpingParams params = item()->dewarpingParams();
+    //params.enabled = checked;
+    //item()->setDevorpingParams(params);
     if(m_fisheyePtz)
         m_fisheyePtz->setEnabled(checked);
 }

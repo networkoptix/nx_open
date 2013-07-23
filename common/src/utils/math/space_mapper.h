@@ -9,6 +9,17 @@
 
 #include "interpolator.h"
 
+namespace Qn
+{
+    enum SpaceMapperFlag {
+        NoMapperFlags   = 0x00,
+
+        /** Mapper return Z pos as fov instead of 35mm equiv. It is necessary for large view ange */
+        FovBasedMapper = 0x01
+    };
+    Q_DECLARE_FLAGS(SpaceMapperFlags, SpaceMapperFlag);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(SpaceMapperFlags);
+};
 
 // -------------------------------------------------------------------------- //
 // QnScalarSpaceMapper
@@ -114,8 +125,10 @@ bool deserialize(const QVariant &value, QnVectorSpaceMapper *target);
 // -------------------------------------------------------------------------- //
 // QnPtzSpaceMapper
 // -------------------------------------------------------------------------- //
-class QnPtzSpaceMapper {
+class QnPtzSpaceMapper 
+{
 public:
+
     QnPtzSpaceMapper() {}
     QnPtzSpaceMapper(const QnVectorSpaceMapper &mapper, const QStringList &models): m_fromCamera(mapper), m_toCamera(mapper), m_models(models) {}
     QnPtzSpaceMapper(const QnVectorSpaceMapper &fromCamera, const QnVectorSpaceMapper &toCamera, const QStringList &models): m_fromCamera(fromCamera), m_toCamera(toCamera), m_models(models) {}
@@ -136,9 +149,19 @@ public:
         return m_models;
     }
 
+    Qn::SpaceMapperFlags flags() const {
+        return m_flags;
+    }
+
+    void setFlags(Qn::SpaceMapperFlags value)
+    {
+        m_flags = value;
+    }
+
 private:
     QnVectorSpaceMapper m_fromCamera, m_toCamera;
     QStringList m_models; // TODO: #Elric remove
+    Qn::SpaceMapperFlags m_flags;
 };
 
 void serialize(const QnPtzSpaceMapper &value, QVariant *target);

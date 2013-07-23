@@ -24,7 +24,10 @@ public:
     void addRenderer(QnResourceWidgetRenderer* renderer);
     //void setAspectRatio(float aspectRatio);
     DewarpingParams updateDewarpingParams();
+
     DewarpingParams getDewarpingParams() const;
+    void setDewarpingParams(const DewarpingParams params);
+
     virtual void setEnabled(bool value) override;
     virtual bool isEnabled() const override;
 
