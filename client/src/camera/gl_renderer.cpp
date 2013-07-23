@@ -69,8 +69,16 @@ QnGlRendererShaders::QnGlRendererShaders(const QGLContext *context, QObject *par
     yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(context, this);
     yv12ToRgba = new QnYv12ToRgbaShaderProgram(context, this);
     nv12ToRgb = new QnNv12ToRgbShaderProgram(context, this);
-    fisheyeProgram = new QnFisheyeShaderProgram(context, this);
-    fisheyeGammaProgram = new QnFisheyeWithGammaShaderProgram(context, this);
+    
+    
+    fisheyePtzProgram = new QnFisheyeRectilinearProgram(context, this);
+    fisheyePtzGammaProgram =  new QnFisheyeRectilinearProgram(context, this, QnFisheyeShaderProgram::GAMMA_STRING);
+
+    fisheyePanoHProgram = new QnFisheyeEquirectangularHProgram(context, this);
+    fisheyePanoHGammaProgram = new QnFisheyeEquirectangularHProgram(context, this, QnFisheyeShaderProgram::GAMMA_STRING);
+
+    fisheyePanoVProgram = new QnFisheyeEquirectangularVProgram(context, this);
+    fisheyePanoVGammaProgram = new QnFisheyeEquirectangularVProgram(context, this, QnFisheyeShaderProgram::GAMMA_STRING);
 }
 
 QnGlRendererShaders::~QnGlRendererShaders() {
@@ -314,10 +322,29 @@ void QnGLRenderer::drawYV12VideoTexture(
     if (m_fisheyeController && m_fisheyeController->isEnabled()) 
     {
         params = m_fisheyeController->getDewarpingParams();
-        if (m_imgCorrectParam.enabled)
-            shader = gammaShader = fisheyeShader = m_shaders->fisheyeGammaProgram;
-        else
-            shader = fisheyeShader = m_shaders->fisheyeProgram;
+        if (params.panoFactor > 1.0)
+        {
+            if (params.horizontalView)
+            {
+                if (m_imgCorrectParam.enabled)
+                    gammaShader = fisheyeShader = m_shaders->fisheyePanoHGammaProgram;
+                else
+                    fisheyeShader = m_shaders->fisheyePanoHProgram;
+            }
+            else {
+                if (m_imgCorrectParam.enabled)
+                    gammaShader = fisheyeShader = m_shaders->fisheyePanoVGammaProgram;
+                else
+                    fisheyeShader = m_shaders->fisheyePanoVProgram;
+            }
+        }
+        else {
+            if (m_imgCorrectParam.enabled)
+                gammaShader = fisheyeShader = m_shaders->fisheyePtzGammaProgram;
+            else
+                fisheyeShader = m_shaders->fisheyePtzProgram;
+        }
+        shader = fisheyeShader;
     }
     else if (m_imgCorrectParam.enabled) {
         shader = gammaShader = m_shaders->yv12ToRgbWithGamma;
@@ -332,11 +359,8 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setOpacity(m_decodedPictureProvider.opacity());
 
     if (fisheyeShader) {
-        fisheyeShader->setDewarpingParams(params, picLock->width()/(float)picLock->height() * 2.0, (float)tex0Coords.right(), (float)tex0Coords.bottom());
+        fisheyeShader->setDewarpingParams(params, picLock->width()/(float)picLock->height() * params.panoFactor, (float)tex0Coords.right(), (float)tex0Coords.bottom());
     }
-    //shader->setDstFov(m_extraCurValue);
-    //qDebug() << "m_extraCurValue" << m_extraCurValue;
-
 
     if (gammaShader) 
     {
@@ -559,4 +583,12 @@ bool QnGLRenderer::isFisheyeEnabled() const
 {
     QMutexLocker lock(&m_mutex);
     return m_fisheyeController && m_fisheyeController->isEnabled();
+}
+
+int QnGLRenderer::panoFactor() const
+{
+    if (m_fisheyeController && m_fisheyeController->isEnabled()) 
+        return (int) m_fisheyeController->getDewarpingParams().panoFactor;
+    else
+        return 1;
 }

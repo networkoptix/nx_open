@@ -28,8 +28,16 @@ public:
 
     QnYv12ToRgbShaderProgram *yv12ToRgb;
     QnYv12ToRgbWithGammaShaderProgram *yv12ToRgbWithGamma;
-    QnFisheyeShaderProgram* fisheyeProgram;
-    QnFisheyeWithGammaShaderProgram* fisheyeGammaProgram;
+    
+    QnFisheyeRectilinearProgram* fisheyePtzProgram;
+    QnFisheyeRectilinearProgram* fisheyePtzGammaProgram;
+
+    QnFisheyeEquirectangularHProgram* fisheyePanoHProgram;
+    QnFisheyeEquirectangularHProgram* fisheyePanoHGammaProgram;
+
+    QnFisheyeEquirectangularVProgram* fisheyePanoVProgram;
+    QnFisheyeEquirectangularVProgram* fisheyePanoVGammaProgram;
+
     QnYv12ToRgbaShaderProgram *yv12ToRgba;
     QnNv12ToRgbShaderProgram *nv12ToRgb;
 };
@@ -74,6 +82,7 @@ public:
     void setDisplayedRect(const QRectF& rect);
 
     void setHistogramConsumer(QnHistogramConsumer* value);
+    int panoFactor() const;
 private:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
     ImageCorrectionResult calcImageCorrection();
