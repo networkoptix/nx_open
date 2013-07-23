@@ -22,7 +22,6 @@
 #include "utils/math/math.h"
 #include "utils/common/timermanager.h"
 #include "api/app_server_connection.h"
-#include <business/business_event_connector.h>
 #include "soap/soapserver.h"
 #include "soapStub.h"
 
@@ -222,9 +221,6 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_maxChannels(1),
     m_streamConfCounter(0)
 {
-    connect(
-        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-        QnBusinessEventConnector::instance(), SLOT(at_cameraInput( QnResourcePtr, const QString&, bool, qint64 )) );
 }
 
 QnPlOnvifResource::~QnPlOnvifResource()

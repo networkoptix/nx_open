@@ -362,7 +362,7 @@
         <CustomAction Id="SetClientFolderToRegistry" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
 
         <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
-                      Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate" Impersonate="yes"/>
+                      Value="&quot;[#dbconfig.exe]&quot; &quot;setpw&quot; &quot;[APPSERVER_LOGIN]&quot; &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="InitDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
 

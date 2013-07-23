@@ -10,8 +10,6 @@
 
 #include <QStringList>
 
-#include <business/business_event_connector.h>
-
 #include "api/app_server_connection.h"
 #include "third_party_stream_reader.h"
 
@@ -29,9 +27,6 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_refCounter( 2 )
 {
     setAuth( QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword) );
-    connect(
-        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
 }
 
 QnThirdPartyResource::~QnThirdPartyResource()
