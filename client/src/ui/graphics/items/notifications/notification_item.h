@@ -47,10 +47,10 @@ private:
 };
 
 
-class QnNotificationToolTipWidget: public QnStyledTooltipWidget {
+class QnNotificationToolTipWidget: public Clickable<QnStyledTooltipWidget> {
     Q_OBJECT
+    typedef Clickable<QnStyledTooltipWidget> base_type;
 
-    typedef QnStyledTooltipWidget base_type;
 public:
     QnNotificationToolTipWidget(QGraphicsItem *parent = 0);
 
@@ -72,10 +72,14 @@ public:
 
 signals:
     void thumbnailClicked();
-    void closeButtonClicked();
+    void closeTriggered();
+
+protected:
+    virtual void clicked(Qt::MouseButton button) override;
 
 private slots:
     void at_provider_imageChanged(const QImage &image);
+    void at_thumbnailLabel_clicked(Qt::MouseButton button);
 
 private:
     QGraphicsLinearLayout *m_layout;
