@@ -72,11 +72,13 @@ public:
 
 signals:
     void thumbnailClicked();
+    void closeButtonClicked();
 
 private slots:
     void at_provider_imageChanged(const QImage &image);
 
 private:
+    QGraphicsLinearLayout *m_layout;
     QnProxyLabel* m_textLabel;
     QnClickableProxyLabel* m_thumbnailLabel;
     QRectF m_enclosingRect;
@@ -136,7 +138,6 @@ private slots:
     void updateOverlayVisibility(bool animate = true);
     void updateOverlayGeometry();
     void updateOverlayColor();
-    void updateCloseButtonGeometry();
 
     void at_button_clicked();
     void at_thumbnail_clicked();

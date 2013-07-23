@@ -22,6 +22,7 @@
 #endif
 #endif
 
+
 namespace {
     enum ImageStatus {
         None,
@@ -247,6 +248,7 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
     } //TODO: #GDM limit image mem cache size
 
 #ifdef NATIVE_PAINT_BACKGROUND
+    //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..
     const QImage* imgToLoad = NULL;
     std::auto_ptr<QImage> tempImgAp;
     if( image.format() != QImage::Format_ARGB32 )
@@ -337,7 +339,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     painter->beginNativePainting();
 
-    if( painter->opacity() < 1.0 )
+    if( m_imgAsFrame->format == PIX_FMT_YUVA420P )
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -345,6 +347,10 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     m_imgUploader->setOpacity( painter->opacity() );
     m_renderer->paint(QRectF(0, 0, 1, 1), d->rect);
+
+    if( m_imgAsFrame->format == PIX_FMT_YUVA420P )
+        glDisable(GL_BLEND);
+
     painter->endNativePainting();
 #else
     if (!d->image.isNull())

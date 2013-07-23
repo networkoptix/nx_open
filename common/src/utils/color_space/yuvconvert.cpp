@@ -366,7 +366,8 @@ void bgra_to_yva12_sse2_intr(
     bgra_to_yv12_sse2_intr( rgba, xStride, y, u, v, yStride, uvStride, width, height, flip );
 
     //copying alpha plane to \a a
-    for( int yLine = 0; yLine < height/2; ++yLine )
+    //TODO: optimize with sse
+    for( int yLine = 0; yLine < height; ++yLine )
     {
         for( int x = 0; x < width; ++x )
             *(a+x) = *((rgba + x*4)+3);
