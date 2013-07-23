@@ -456,8 +456,12 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget *widget) {
     } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity)) {
         /* Leave invisible. */
     } else if(widget->options() & QnResourceWidget::DisplayCrosshair) {
-        opacity = 0.4;
-        interactive = false;
+        if(widget->virtualPtzController()) {
+            /* Leave invisible. */
+        } else {
+            opacity = 0.4;
+            interactive = false;
+        }
     } else {
         opacity = 1.0;
         interactive = true;
