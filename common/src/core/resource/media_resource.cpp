@@ -91,14 +91,14 @@ void QnMediaResource::initMediaResource()
 
 DewarpingParams QnMediaResource::getDewarpingParams() const
 {
-    return m_devorpingParams;
+    return m_dewarpingParams;
 }
 
 
 void QnMediaResource::setDewarpingParams(const DewarpingParams& params)
 {
-    bool capsChanged = params.enabled != m_devorpingParams.enabled;
-    m_devorpingParams = params;
+    bool capsChanged = params.enabled != m_dewarpingParams.enabled;
+    m_dewarpingParams = params;
     if (capsChanged) {
         if (params.enabled)
             toResource()->setPtzCapabilities(Qn::AllPtzCapabilities);
@@ -109,12 +109,12 @@ void QnMediaResource::setDewarpingParams(const DewarpingParams& params)
 
 bool QnMediaResource::isFisheye() const
 {
-    return m_devorpingParams.enabled;
+    return m_dewarpingParams.enabled;
 }
 
 void QnMediaResource::updateInner(QnResourcePtr other)
 {
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
     if (other_casted)
-        m_devorpingParams = other_casted->m_devorpingParams;
+        m_dewarpingParams = other_casted->m_dewarpingParams;
 }

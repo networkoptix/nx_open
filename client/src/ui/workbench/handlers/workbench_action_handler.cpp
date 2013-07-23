@@ -438,7 +438,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.zoomTargetUuid = params.zoomUuid;
     data.rotation = params.rotation;
     data.contrastParams = params.contrastParams;
-    data.devorpingParams = params.devorpingParams;
+    data.dewarpingParams = params.dewarpingParams;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
     if(params.frameColor.isValid())
         data.dataByRole[Qn::ItemFrameColorRole] = params.frameColor;
@@ -2018,7 +2018,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
         item.contrastParams = w->item()->imageEnhancement();
-        item.devorpingParams = w->item()->devorpingParams();
+        item.dewarpingParams = w->item()->dewarpingParams();
         item.dataByRole[Qn::ItemPausedRole] = true;
         item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
@@ -3099,7 +3099,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
                                                        0, 0,
                                                        itemData.zoomRect,
                                                        itemData.contrastParams,
-                                                       itemData.devorpingParams);
+                                                       itemData.dewarpingParams);
 
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->toResource()->getUrl()).arg(m_layoutFileName));
@@ -3214,7 +3214,7 @@ Do you want to continue?"),
     QString selectedFilter;
     bool withTimestamps = false;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
-    DewarpingParams devorpingParams = itemData.devorpingParams;
+    DewarpingParams dewarpingParams = itemData.dewarpingParams;
 
     while (true) {
         QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
@@ -3232,30 +3232,41 @@ Do you want to continue?"),
 #ifdef Q_OS_WIN
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
-        dialog->addCheckBox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
+        dialog->addCheckBox(tr("Include timestamps (requires transcoding)"), &withTimestamps, delegate);
 
-        bool doTranscode = contrastParams.enabled || devorpingParams.enabled;
-        if (doTranscode)
-        {
-            if (contrastParams.enabled && devorpingParams.enabled)
-                dialog->addCheckBox(tr("Do dewarping and image adjustment (Requires Transcoding)"), &doTranscode, delegate);
-            else if (contrastParams.enabled)
-                dialog->addCheckBox(tr("Do image adjustment (Requires Transcoding)"), &doTranscode, delegate);
-            else
-                dialog->addCheckBox(tr("Do dewarping (Requires Transcoding)"), &doTranscode, delegate);
+        bool doTranscode = contrastParams.enabled || dewarpingParams.enabled;
+        if (doTranscode) {
+            if (contrastParams.enabled && dewarpingParams.enabled) {
+                dialog->addCheckBox(tr("Apply dewarping and image correction (requires transcoding)"), &doTranscode, delegate);
+            } else if (contrastParams.enabled) {
+                dialog->addCheckBox(tr("Apply image correction (requires transcoding)"), &doTranscode, delegate);
+            } else {
+                dialog->addCheckBox(tr("Apply dewarping (requires transcoding)"), &doTranscode, delegate);
+            }
         }
-        contrastParams.enabled &= doTranscode;
-        devorpingParams.enabled &= doTranscode;
-
+        
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
+        contrastParams.enabled &= doTranscode;
+        dewarpingParams.enabled &= doTranscode;
         fileName = dialog->selectedFiles().value(0);
         selectedFilter = dialog->selectedNameFilter();
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
 
         if (fileName.isEmpty())
             return;
+
+        if(doTranscode || withTimestamps) {
+            QMessageBox::StandardButton button = QMessageBox::question(
+                mainWindow(),
+                tr("Save As"),
+                tr("You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?"),
+                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+            );
+            if(button != QMessageBox::Yes)
+                return;
+        }
 
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
@@ -3267,8 +3278,7 @@ Do you want to continue?"),
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                 );
-
-                if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                if(button != QMessageBox::Yes)
                     return;
             }
         }
@@ -3359,7 +3369,7 @@ Do you want to continue?"),
                                                   timeOffset, serverTimeZone,
                                                   itemData.zoomRect,
                                                   contrastParams,
-                                                  devorpingParams);
+                                                  dewarpingParams);
         exportProgressDialog->exec();
     }
 }

@@ -41,6 +41,7 @@ QN_HELP_TOPIC(MainWindow_ThumbnailSearch_Help,                  "thumbnail_searc
 QN_HELP_TOPIC(MainWindow_MediaItem_Help,                        "viewing_camera_stream_information.htm")
 QN_HELP_TOPIC(MainWindow_MediaItem_Local_Help,                  "playing_back_local_files_in_hd_witness.htm")
 QN_HELP_TOPIC(MainWindow_MediaItem_Ptz_Help,                    "setting_up_ptz.htm")
+QN_HELP_TOPIC(MainWindow_MediaItem_FishEye_Help,                "setting_up_ptz.htm") // TODO
 QN_HELP_TOPIC(MainWindow_MediaItem_SmartSearch_Help,            "performing_smart_search.htm")
 QN_HELP_TOPIC(MainWindow_MediaItem_AnalogLicense_Help,          "obtaining_and_activating_hd_witness_licenses.htm")
 QN_HELP_TOPIC(MainWindow_MonitoringItem_Help,                   "monitoring_media_servers.htm")

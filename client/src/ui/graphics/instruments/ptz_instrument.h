@@ -40,6 +40,8 @@ signals:
     void ptzFinished(QnMediaResourceWidget *widget);
     void ptzProcessFinished(QnMediaResourceWidget *widget);
 
+    void doubleClicked(QnMediaResourceWidget *widget);
+
 protected:
     virtual void installedNotify() override;
     virtual void aboutToBeDisabledNotify() override;
