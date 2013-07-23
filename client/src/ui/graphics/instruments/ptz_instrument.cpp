@@ -219,13 +219,13 @@ private:
 
 
 // -------------------------------------------------------------------------- //
-// PtzZoomButtonWidget
+// PtzImageButtonWidget
 // -------------------------------------------------------------------------- //
-class PtzZoomButtonWidget: public QnImageButtonWidget {
+class PtzImageButtonWidget: public QnImageButtonWidget {
     typedef QnImageButtonWidget base_type;
 
 public:
-    PtzZoomButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
+    PtzImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags)
     {}
 
@@ -238,7 +238,7 @@ public:
     }
 
 protected:
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override {
         qreal opacity = painter->opacity();
         painter->setOpacity(opacity * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
 
@@ -249,9 +249,13 @@ protected:
             painter->drawEllipse(rect);
         }
 
-        base_type::paint(painter, startState, endState, progress, widget, rect);
+        paintContents(painter, startState, endState, progress, widget, rect);
 
         painter->setOpacity(opacity);
+    }
+
+    virtual void paintContents(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+        base_type::paint(painter, startState, endState, progress, widget, rect);
     }
 
     qreal stateOpacity(StateFlags stateFlags) {
@@ -260,6 +264,43 @@ protected:
 
 private:
     QWeakPointer<QnMediaResourceWidget> m_target;
+};
+
+
+// -------------------------------------------------------------------------- //
+// PtzTextButtonWidget
+// -------------------------------------------------------------------------- //
+class PtzTextButtonWidget: public PtzImageButtonWidget {
+    typedef PtzImageButtonWidget base_type;
+
+public:
+    PtzTextButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
+        base_type(parent, windowFlags)
+    {}
+
+    const QString text() const {
+        return m_text;
+    }
+
+    void setText(const QString &text) {
+        if(m_text == text)
+            return;
+
+        m_text = text;
+        update();
+    }
+
+protected:
+    virtual void paintContents(QPainter *painter, StateFlags, StateFlags, qreal, QGLWidget *, const QRectF &rect) override {
+        QFont font = this->font();
+        font.setPixelSize(rect.height() / 2);
+        QnScopedPainterFontRollback fontRollback(painter, font);
+
+        painter->drawText(rect, Qt::AlignCenter, m_text);
+    }
+
+private:
+    QString m_text;
 };
 
 
@@ -306,11 +347,14 @@ public:
 
         /* Note that construction order is important as it defines which items are on top. */
         m_manipulatorWidget = new PtzManipulatorWidget(this);
-        m_zoomInButton = new PtzZoomButtonWidget(this);
-        m_zoomOutButton = new PtzZoomButtonWidget(this);
+        m_zoomInButton = new PtzImageButtonWidget(this);
+        m_zoomOutButton = new PtzImageButtonWidget(this);
+        m_modeButton = new PtzTextButtonWidget(this);
 
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
+        m_modeButton->setText(lit("180"));
+        m_modeButton->setToolTip(lit("Press at Your Own Risk!")); // TODO: #VASILENKO
 
         updateLayout();
     }
@@ -333,12 +377,16 @@ public:
         return m_manipulatorWidget;
     }
 
-    PtzZoomButtonWidget *zoomInButton() const {
+    PtzImageButtonWidget *zoomInButton() const {
         return m_zoomInButton;
     }
 
-    PtzZoomButtonWidget *zoomOutButton() const {
+    PtzImageButtonWidget *zoomOutButton() const {
         return m_zoomOutButton;
+    }
+
+    PtzTextButtonWidget *modeButton() const {
+        return m_modeButton;
     }
 
     bool isMarkersVisible() const {
@@ -419,13 +467,15 @@ private:
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
         m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
         m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
+        m_modeButton->setGeometry(QRectF(rect.topRight() - xStep * 4.0 + yStep * 2.0, 3.0 * QnGeometry::toSize(xStep + yStep)));
     }
 
 private:
     bool m_markersVisible;
     PtzManipulatorWidget *m_manipulatorWidget;
-    PtzZoomButtonWidget *m_zoomInButton;
-    PtzZoomButtonWidget *m_zoomOutButton;
+    PtzImageButtonWidget *m_zoomInButton;
+    PtzImageButtonWidget *m_zoomOutButton;
+    PtzTextButtonWidget *m_modeButton;
 };
 
 
@@ -523,6 +573,8 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
     overlay->zoomInButton()->setTarget(widget);
     overlay->zoomOutButton()->setTarget(widget);
+    overlay->modeButton()->setTarget(widget);
+    overlay->modeButton()->setVisible(widget->virtualPtzController() != NULL);
     overlay->setMarkersVisible(widget->virtualPtzController() == NULL);
     data.overlayWidget = overlay;
 
@@ -530,6 +582,7 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     connect(overlay->zoomInButton(),    SIGNAL(released()), this, SLOT(at_zoomInButton_released()));
     connect(overlay->zoomOutButton(),   SIGNAL(pressed()),  this, SLOT(at_zoomOutButton_pressed()));
     connect(overlay->zoomOutButton(),   SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
+    connect(overlay->modeButton(),      SIGNAL(clicked()),  this, SLOT(at_modeButton_clicked()));
 
     widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false, false);
 
@@ -1112,6 +1165,14 @@ void PtzInstrument::at_splashItem_destroyed() {
     m_activeAnimations.removeAll(item);
 }
 
+void PtzInstrument::at_modeButton_clicked() {
+    PtzTextButtonWidget *button = checked_cast<PtzTextButtonWidget *>(sender());
+
+    if(QnMediaResourceWidget *widget = button->target()) {
+        // TODO: #VASILENKO
+    }
+}
+
 void PtzInstrument::at_zoomInButton_pressed() {
     at_zoomButton_activated(1.0);
 }
@@ -1129,7 +1190,7 @@ void PtzInstrument::at_zoomOutButton_released() {
 }
 
 void PtzInstrument::at_zoomButton_activated(qreal speed) {
-    PtzZoomButtonWidget *button = checked_cast<PtzZoomButtonWidget *>(sender());
+    PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
     
     if(QnMediaResourceWidget *widget = button->target())
         ptzMove(widget, QVector3D(0.0, 0.0, speed), true);

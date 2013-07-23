@@ -71,6 +71,7 @@ private slots:
 
     void at_splashItem_destroyed();
 
+    void at_modeButton_clicked();
     void at_zoomInButton_pressed();
     void at_zoomInButton_released();
     void at_zoomOutButton_pressed();
@@ -118,6 +119,7 @@ private:
 
     QVector3D physicalPositionForRect(QnMediaResourceWidget *widget, const QRectF &rect);
     QVector3D physicalPositionForPos(QnMediaResourceWidget *widget, const QPointF &pos);
+
 private:
     struct PtzData {
         PtzData(): capabilities(0), overlayWidget(NULL) {}
