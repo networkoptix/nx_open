@@ -5,7 +5,7 @@
 
 struct DewarpingParams
 {
-    DewarpingParams(): enabled(true), horizontalView(true), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0) {}
+    DewarpingParams(): enabled(true), horizontalView(false), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0) {}
     bool operator==(const DewarpingParams& other) const
     {
         if (enabled != other.enabled)
