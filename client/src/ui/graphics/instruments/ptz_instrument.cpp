@@ -299,7 +299,8 @@ class PtzOverlayWidget: public GraphicsWidget {
 
 public:
     PtzOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
-        base_type(parent, windowFlags)
+        base_type(parent, windowFlags),
+        m_markersVisible(true)
     {
         setAcceptedMouseButtons(0);
 
@@ -340,6 +341,14 @@ public:
         return m_zoomOutButton;
     }
 
+    bool isMarkersVisible() const {
+        return m_markersVisible;
+    }
+
+    void setMarkersVisible(bool markersVisible) {
+        m_markersVisible = markersVisible;
+    }
+
     virtual void setGeometry(const QRectF &rect) override {
         QSizeF oldSize = size();
 
@@ -349,9 +358,12 @@ public:
             updateLayout();
     }
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */) {
-        Q_UNUSED(option)
-        Q_UNUSED(widget)
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+        if(!m_markersVisible) {
+            base_type::paint(painter, option, widget);
+            return;
+        }
+
         QRectF rect = this->rect();
 
         QVector<QPointF> crosshairLines; // TODO: #Elric cache these?
@@ -410,6 +422,7 @@ private:
     }
 
 private:
+    bool m_markersVisible;
     PtzManipulatorWidget *m_manipulatorWidget;
     PtzZoomButtonWidget *m_zoomInButton;
     PtzZoomButtonWidget *m_zoomOutButton;
@@ -510,6 +523,7 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
     overlay->zoomInButton()->setTarget(widget);
     overlay->zoomOutButton()->setTarget(widget);
+    overlay->setMarkersVisible(widget->virtualPtzController() == NULL);
     data.overlayWidget = overlay;
 
     connect(overlay->zoomInButton(),    SIGNAL(pressed()),  this, SLOT(at_zoomInButton_pressed()));
@@ -753,14 +767,14 @@ void PtzInstrument::processPtzDoubleClick() {
         splashItem->setRect(QRectF(-toPoint(size) / 2, size));
         m_activeAnimations.push_back(SplashItemAnimation(splashItem, -1.0, 1.0));
         ptzUnzoom(target());
-    }
 
-    /* Also do item unzoom if we're zoomed in. */
-    QRectF viewportGeometry = display()->viewportGeometry();
-    QRectF zoomedItemGeometry = display()->itemGeometry(target()->item());
-    if(viewportGeometry.width() < zoomedItemGeometry.width() * itemUnzoomThreshold || viewportGeometry.height() < zoomedItemGeometry.height() * itemUnzoomThreshold) {
-        workbench()->setItem(Qn::ZoomedRole, NULL);
-        workbench()->setItem(Qn::ZoomedRole, target()->item());
+        /* Also do item unzoom if we're zoomed in. */
+        QRectF viewportGeometry = display()->viewportGeometry();
+        QRectF zoomedItemGeometry = display()->itemGeometry(target()->item());
+        if(viewportGeometry.width() < zoomedItemGeometry.width() * itemUnzoomThreshold || viewportGeometry.height() < zoomedItemGeometry.height() * itemUnzoomThreshold)
+            emit doubleClicked(target());
+    } else {
+        emit doubleClicked(target());
     }
 }
 
