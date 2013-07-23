@@ -602,7 +602,7 @@ void QnActiResource::onTimer( const quint64& timerID )
     if( triggerOutputTask.autoResetTimeoutMS > 0 )
         m_triggerOutputTasks.insert( std::make_pair(
             TimerManager::instance()->addTimer( this, triggerOutputTask.autoResetTimeoutMS ),
-            TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, triggerOutputTask.autoResetTimeoutMS ) ) );
+            TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, 0 ) ) );
 }
 
 void QnActiResource::initializePtz()

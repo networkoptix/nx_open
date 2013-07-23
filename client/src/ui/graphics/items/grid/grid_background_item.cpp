@@ -339,7 +339,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     painter->beginNativePainting();
 
-    if( m_imgAsFrame->format == PIX_FMT_YUVA420P )
+    if( m_imgAsFrame->format == PIX_FMT_YUVA420P || m_imgAsFrame->format == PIX_FMT_RGBA )
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -348,7 +348,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     m_imgUploader->setOpacity( painter->opacity() );
     m_renderer->paint(QRectF(0, 0, 1, 1), d->rect);
 
-    if( m_imgAsFrame->format == PIX_FMT_YUVA420P )
+    if( m_imgAsFrame->format == PIX_FMT_YUVA420P || m_imgAsFrame->format == PIX_FMT_RGBA )
         glDisable(GL_BLEND);
 
     painter->endNativePainting();
