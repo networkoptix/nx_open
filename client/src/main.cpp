@@ -77,7 +77,7 @@ extern "C"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
 #include "client_message_processor.h"
-#include "ui/workbench/workbench_translation_manager.h"
+#include "client/client_translation_manager.h"
 
 #ifdef Q_OS_LINUX
     #include "ui/workaround/x11_launcher_workaround.h"
@@ -99,6 +99,7 @@ extern "C"
 #include "utils/common/long_runnable.h"
 
 #include "text_to_wav.h"
+#include "common/common_module.h"
 
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -451,33 +452,23 @@ int main(int argc, char **argv)
 #endif // Q_OS_WIN
         QnResourceDiscoveryManager::instance()->start();
 
-        // here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+        // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
         qApp->setStyle(qnSkin->style());
 
-        /* Create workbench context. */
-        QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
-        context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
-
         /* Load translation. */
-        QnClientTranslationManager *translationManager = context->instance<QnClientTranslationManager>();
+        QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
         QnTranslation translation;
         if(!translationPath.isEmpty()) /* From command line. */
             translation = translationManager->loadTranslation(translationPath);
-
-        if(translation.isEmpty()) { /* By suffix. */
-            QString suffix = qnSettings->translationSuffix();
-            foreach(const QnTranslation &otherTranslation, translationManager->loadTranslations()) {
-                if(otherTranslation.suffix() == suffix) {
-                    translation = otherTranslation;
-                    break;
-                }
-            }
-        }
 
         if(translation.isEmpty()) /* By path. */
             translation = translationManager->loadTranslation(qnSettings->translationPath());
 
         translationManager->installTranslation(translation);
+
+        /* Create workbench context. */
+        QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
+        context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
         /* Create main window. */
         QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));

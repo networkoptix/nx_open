@@ -1,12 +1,9 @@
-#include "workbench_translation_manager.h"
-
-#include <QtGui/QApplication>
+#include "client_translation_manager.h"
 
 #include <client/client_settings.h>
 
 QnClientTranslationManager::QnClientTranslationManager(QObject *parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent)
+    base_type(parent)
 {
     addPrefix(lit("client"));
 

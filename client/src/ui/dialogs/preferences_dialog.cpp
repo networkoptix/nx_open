@@ -15,10 +15,11 @@
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
 #include <client/client_settings.h>
+#include <client/client_translation_manager.h>
+#include <common/common_module.h>
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
-#include "ui/workbench/workbench_translation_manager.h"
 #include "ui/workbench/workbench_access_controller.h"
 #include "ui/screen_recording/screen_recorder.h"
 
@@ -127,16 +128,16 @@ QnPreferencesDialog::~QnPreferencesDialog() {
 
 void QnPreferencesDialog::initTranslations() {
     QnTranslationListModel *model = new QnTranslationListModel(this);
-    model->setTranslations(context()->instance<QnClientTranslationManager>()->loadTranslations());
+    model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
     ui->languageComboBox->setModel(model);
 }
 
 void QnPreferencesDialog::accept() {
-    QString oldTranslationSuffix = m_settings->translationSuffix();
+    QString oldTranslationPath = m_settings->translationPath();
     
     submitToSettings();
     
-    if (oldTranslationSuffix != m_settings->translationSuffix()) {
+    if (oldTranslationPath != m_settings->translationPath()) {
         QMessageBox::StandardButton button = QMessageBox::information(
             this, 
             tr("Information"), 
@@ -173,7 +174,6 @@ void QnPreferencesDialog::submitToSettings() {
     if(!translation.isEmpty()) {
         if(!translation.filePaths().isEmpty())
             m_settings->setTranslationPath(translation.filePaths()[0]);
-        m_settings->setTranslationSuffix(translation.suffix());
     }
 
     if (m_recordingSettingsWidget)
@@ -207,10 +207,9 @@ void QnPreferencesDialog::updateFromSettings() {
         m_recordingSettingsWidget->updateFromSettings();
 
     QString translationPath = m_settings->translationPath();
-    QString translationSuffix = m_settings->translationSuffix();
     for(int i = 0; i < ui->languageComboBox->count(); i++) {
         QnTranslation translation = ui->languageComboBox->itemData(i, Qn::TranslationRole).value<QnTranslation>();
-        if(translation.suffix() == translationSuffix || translation.filePaths().contains(translationPath)) {
+        if(translation.filePaths().contains(translationPath)) {
             ui->languageComboBox->setCurrentIndex(i);
             break;
         }
