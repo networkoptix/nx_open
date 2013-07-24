@@ -71,16 +71,6 @@ namespace {
         cl_log.log(QString(QLatin1String("OpenGL renderer: %1.")).arg(QLatin1String(renderer.constData())), cl_logINFO);
         cl_log.log(QString(QLatin1String("OpenGL vendor: %1.")).arg(QLatin1String(vendor.constData())), cl_logINFO);
 
-#ifdef Q_OS_LINUX
-        // Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
-        // Therefore VSync is off by default in linux and is enabled only here.
-        if (!vendor.toLower().contains("nvidia")) {
-            QGLFormat format = widget->format();
-            format.setSwapInterval(1); /* Turn vsync on. */
-            widget->setFormat(format);
-        }
-#endif
-
         bool softwareTrouble = false;
         bool hardwareTrouble = false;
 

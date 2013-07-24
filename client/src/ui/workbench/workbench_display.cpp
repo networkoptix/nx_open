@@ -353,17 +353,42 @@ void QnWorkbenchDisplay::initSceneView() {
         } else {
             QGLFormat glFormat;
             glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
+
+            // TODO: #GDM this is totally EVIL. This is a checker!!!
+            // As the name says, it MUST NOT change anything, only check.
+            // This code does not belong here.
 #ifdef Q_OS_LINUX
             // Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
-            // VSync will be re-enabled later in GLHardware checker if drivers are not NVidia's --gdm
+            // Therefore VSync is off by default in linux and is enabled only here.
+            if (!vendor.toLower().contains("nvidia")) {
+                QGLFormat format = widget->format();
+                format.setSwapInterval(1); /* Turn vsync on. */
+                widget->setFormat(format);
+            }
+#endif
+
+#ifdef Q_OS_LINUX
+            /* Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
+             * VSync will be re-enabled later if drivers are not NVidia's. */
             glFormat.setSwapInterval(0); /* Turn vsync off. */
 #else
             glFormat.setSwapInterval(1); /* Turn vsync on. */
 #endif
 
             QGLWidget *glWidget = new QGLWidget(glFormat);
-            new QnGlHardwareChecker(glWidget);
             m_view->setViewport(glWidget);
+
+#ifdef Q_OS_LINUX
+            glWidget->context()->makeCurrent();
+            QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+            if (!vendor.toLower().contains("nvidia")) {
+                QGLFormat format = glWidget->format();
+                format.setSwapInterval(1); /* Turn vsync on. */
+                glWidget->setFormat(format);
+            }
+#endif
+
+            new QnGlHardwareChecker(glWidget);
 
             /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
             DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(glWidget);
