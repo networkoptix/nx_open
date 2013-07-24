@@ -25,7 +25,9 @@ Since previous build
  - Timeout of notifications is changed: the more notifications are in queue, the less the timeout is
  - Notifications are redesigned
  - Notification sounds are renamed
- 
+ - Added support timeline mode for calendar.
+ - Installation. Admin password has not been filled. Fixed. 
+
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
 Since 1.5.1
