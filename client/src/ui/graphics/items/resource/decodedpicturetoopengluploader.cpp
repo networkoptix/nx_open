@@ -295,13 +295,9 @@ public:
             textureSize = m_textureSize;
         }
 
-        static const int TEX_COORD_PRECISION = 1000;    //3 fractional digits
-
         int roundedWidth = qPower2Ceil((unsigned) width, ROUND_COEFF);
-        m_texCoords = QVector2D(
-            width * TEX_COORD_PRECISION / textureSize.width() / (float)TEX_COORD_PRECISION,
-            height * TEX_COORD_PRECISION / textureSize.height() / (float)TEX_COORD_PRECISION
-        );
+
+        m_texCoords = QVector2D(width  / (float) textureSize.width(), height / (float) textureSize.height());
 
         if(fillValue != -1) {
             m_fillValue = fillValue;
