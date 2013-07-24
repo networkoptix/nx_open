@@ -353,17 +353,29 @@ void QnWorkbenchDisplay::initSceneView() {
         } else {
             QGLFormat glFormat;
             glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
+
 #ifdef Q_OS_LINUX
-            // Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
-            // VSync will be re-enabled later in GLHardware checker if drivers are not NVidia's --gdm
+            /* Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
+             * VSync will be re-enabled later if drivers are not NVidia's. */
             glFormat.setSwapInterval(0); /* Turn vsync off. */
 #else
             glFormat.setSwapInterval(1); /* Turn vsync on. */
 #endif
 
             QGLWidget *glWidget = new QGLWidget(glFormat);
-            new QnGlHardwareChecker(glWidget);
             m_view->setViewport(glWidget);
+
+#ifdef Q_OS_LINUX
+            glWidget->context()->makeCurrent();
+            QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+            if (!vendor.toLower().contains("nvidia")) {
+                QGLFormat format = glWidget->format();
+                format.setSwapInterval(1); /* Turn vsync on. */
+                glWidget->setFormat(format);
+            }
+#endif
+
+            new QnGlHardwareChecker(glWidget);
 
             /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
             DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(glWidget);
@@ -377,13 +389,11 @@ void QnWorkbenchDisplay::initSceneView() {
 
         /* All our items save and restore painter state. */
         m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
+
 #ifndef __APPLE__
-        //on macos, this flag results in QnMaskedProxyWidget::paint never called
+        /* On macos, this flag results in QnMaskedProxyWidget::paint never called. */
         m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
 #endif
-
-        /* Don't even try to uncomment this one, it slows everything down. */
-        //m_view->setCacheMode(QGraphicsView::CacheBackground);
 
         /* We don't need scrollbars. */
         m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

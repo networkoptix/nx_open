@@ -7,8 +7,8 @@
 #include "shader_source.h"
 #include "ui/fisheye/fisheye_ptz_controller.h"
 
-class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram
-{
+class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram {
+    Q_OBJECT
 public:
     QnAbstractYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 
@@ -34,19 +34,20 @@ private:
     int m_opacityLocation;
 };
 
-class QnYv12ToRgbShaderProgram: public QnAbstractYv12ToRgbShaderProgram 
-{
+
+class QnYv12ToRgbShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
+    Q_OBJECT
 public:
     QnYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 };
 
+
 class QnYv12ToRgbWithGammaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnYv12ToRgbWithGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, bool final = true);
 
-    void setImageCorrection(const ImageCorrectionResult& value)
-    {
+    void setImageCorrection(const ImageCorrectionResult& value) {
         setUniformValue(m_yLevels1Location, value.aCoeff);
         setUniformValue(m_yLevels2Location, value.bCoeff);
         setUniformValue(m_yGammaLocation, value.gamma);
@@ -60,6 +61,7 @@ private:
 
 class QnFisheyeShaderProgram : public QnYv12ToRgbWithGammaShaderProgram
 {
+	Q_OBJECT
 public:
     static const QString GAMMA_STRING;
 
@@ -85,6 +87,7 @@ private:
 
 class QnFisheyeRectilinearProgram : public QnFisheyeShaderProgram
 {
+	Q_OBJECT
 public:
     QnFisheyeRectilinearProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
 protected:
@@ -93,6 +96,7 @@ protected:
 
 class QnFisheyeEquirectangularHProgram : public QnFisheyeShaderProgram
 {
+	Q_OBJECT
 public:
     QnFisheyeEquirectangularHProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
 protected:
@@ -101,6 +105,7 @@ protected:
 
 class QnFisheyeEquirectangularVProgram : public QnFisheyeShaderProgram
 {
+	Q_OBJECT
 public:
     QnFisheyeEquirectangularVProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
 protected:
@@ -108,7 +113,7 @@ protected:
 };
 
 class QnYv12ToRgbaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnYv12ToRgbaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 
@@ -117,6 +122,7 @@ public:
     void setATexture(int target) {
         setUniformValue(m_aTextureLocation, target);
     }
+
 private:
     int m_aTextureLocation;
 };
