@@ -186,10 +186,10 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
 void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& imageSize, int plane)
 {
     QMatrix4x4 perspectiveMatrix( 
-        1.0,    0.0,                    0.0,                    0.0,
-        0.0,    cos(-m_params.fov),     -sin(-m_params.fov),    0.0,
-        0.0,    sin(-m_params.fov),     cos(-m_params.fov),     0.0,
-        0.0,    0.0,                    0.0,                    1.0
+        1.0,    0.0,                       0.0,                         0.0,
+        0.0,    cos(-m_params.fovRot),     -sin(-m_params.fovRot),      0.0,
+        0.0,    sin(-m_params.fovRot),     cos(-m_params.fovRot),       0.0,
+        0.0,    0.0,                       0.0,                         1.0
     );
 
     qreal aspectRatio = imageSize.width() / (qreal) imageSize.height();
