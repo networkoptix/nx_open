@@ -210,6 +210,8 @@ DewarpingParams QnFisheyePtzController::updateDewarpingParams()
     newParams.fovRot = gradToRad(camParams.fovRot);
     newParams.horizontalView = camParams.horizontalView;
     newParams.panoFactor = m_dewarpingParams.panoFactor;
+    if (newParams.horizontalView)
+        newParams.panoFactor = qMin(newParams.panoFactor, 2.0);
 
     if (!(newParams == m_dewarpingParams)) 
     {
