@@ -29,7 +29,8 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent):
     m_delegate(new QnCalendarItemDelegate(this)),
     m_empty(true),
     m_currentWidgetIsCentral(false),
-    m_currentTime(0)
+    m_currentTime(0),
+    m_localOffset(0)
 {
     setHorizontalHeaderFormat(QCalendarWidget::ShortDayNames);
     setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
@@ -117,6 +118,7 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
         palette(), 
         rect, 
         period, 
+        m_localOffset,
         m_enabledPeriod, 
         m_selectedPeriod, 
         m_currentWidgetIsCentral ? m_currentPeriodStorage : m_emptyPeriodStorage, 
@@ -163,4 +165,17 @@ void QnCalendarWidget::mousePressEvent(QMouseEvent *event) {
 
 void QnCalendarWidget::mouseReleaseEvent(QMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
+}
+
+qint64 QnCalendarWidget::localOffset() const {
+    return m_localOffset;
+}
+
+void QnCalendarWidget::setLocalOffset(qint64 localOffset) {
+    if(m_localOffset == localOffset)
+        return;
+
+    m_localOffset = localOffset;
+
+    update();
 }

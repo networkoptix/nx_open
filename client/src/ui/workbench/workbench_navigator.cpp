@@ -720,6 +720,8 @@ void QnWorkbenchNavigator::updateLocalOffset() {
     if(qnSettings->timeMode() == Qn::ServerTimeMode && m_currentMediaWidget && (m_currentWidgetFlags & WidgetUsesUTC))
         localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_currentMediaWidget->resource(), 0);
     m_timeSlider->setLocalOffset(localOffset);
+    m_calendar->setLocalOffset(localOffset);
+    m_dayTimeWidget->setLocalOffset(localOffset);
 }
 
 void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
@@ -1356,8 +1358,8 @@ void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased() {
 
 void QnWorkbenchNavigator::at_calendar_dateClicked(const QDate &date){
     QDateTime dateTime(date);
-    qint64 startMSec = dateTime.toMSecsSinceEpoch();
-    qint64 endMSec = dateTime.addDays(1).toMSecsSinceEpoch();
+    qint64 startMSec = dateTime.toMSecsSinceEpoch() - m_calendar->localOffset();
+    qint64 endMSec = dateTime.addDays(1).toMSecsSinceEpoch() - m_calendar->localOffset();
 
     m_timeSlider->finishAnimations();
     if (QApplication::keyboardModifiers() == Qt::ControlModifier) {
@@ -1382,8 +1384,8 @@ void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time) {
 
     QDateTime dateTime = QDateTime(date, time);
 
-    qint64 startMSec = dateTime.toMSecsSinceEpoch();
-    qint64 endMSec = dateTime.addSecs(60 * 60).toMSecsSinceEpoch();
+    qint64 startMSec = dateTime.toMSecsSinceEpoch() - m_dayTimeWidget->localOffset();
+    qint64 endMSec = dateTime.addSecs(60 * 60).toMSecsSinceEpoch() - m_dayTimeWidget->localOffset();
 
     m_timeSlider->finishAnimations();
     m_timeSlider->setWindow(startMSec, endMSec, true);
