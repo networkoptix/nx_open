@@ -32,8 +32,7 @@ enum QnSecondaryStreamQuality
     SSQualityNotDefined
 };
 
-// TODO: #Elric string / display string mismatch
-QString QnStreamQualityToString(QnStreamQuality value);
+QString QnStreamQualityToDisplayString(QnStreamQuality value);
 QnStreamQuality QnStreamQualityFromString( const QString& str );
 
 /*!

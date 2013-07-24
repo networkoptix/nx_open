@@ -6,7 +6,7 @@
 #include "resource_media_layout.h"
 
 
-QString QnStreamQualityToString(QnStreamQuality value) {
+QString QnStreamQualityToDisplayString(QnStreamQuality value) {
     switch(value) {
     case QnQualityLowest:
         return QObject::tr("Lowest");
