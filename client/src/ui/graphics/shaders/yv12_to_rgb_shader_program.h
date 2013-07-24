@@ -6,8 +6,8 @@
 #include <QtOpenGL/QtOpenGL>
 #include "shader_source.h"
 
-class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram
-{
+class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram {
+    Q_OBJECT
 public:
     QnAbstractYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 
@@ -32,23 +32,25 @@ protected:
     int m_opacityLocation;
 };
 
-class QnYv12ToRgbShaderProgram: public QnAbstractYv12ToRgbShaderProgram 
-{
+
+class QnYv12ToRgbShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
+    Q_OBJECT
 public:
     QnYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 };
 
+
 class QnYv12ToRgbWithGammaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnYv12ToRgbWithGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 
-    void setImageCorrection(const ImageCorrectionResult& value)
-    {
+    void setImageCorrection(const ImageCorrectionResult& value) {
         setUniformValue(m_yLevels1Location, value.aCoeff);
         setUniformValue(m_yLevels2Location, value.bCoeff);
         setUniformValue(m_yGammaLocation, value.gamma);
     }
+
 private:
     int m_yLevels1Location;
     int m_yLevels2Location;
@@ -57,13 +59,14 @@ private:
 
 
 class QnYv12ToRgbaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnYv12ToRgbaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 
     void setATexture(int target) {
         setUniformValue(m_aTextureLocation, target);
     }
+
 private:
     int m_aTextureLocation;
 };

@@ -187,7 +187,7 @@ public:
         if(status)
             m_features |= QnGlFunctions::OpenGL3_2 | QnGlFunctions::ArbSync;
 
-        RESOLVE(PFNGLBLENDCOLORPROC,                     glBlendColor);
+        RESOLVE(PFNGLBLENDCOLORPROC,                    glBlendColor);
 
 #undef RESOLVE
 

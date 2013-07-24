@@ -74,18 +74,8 @@ namespace {
         bool softwareTrouble = false;
         bool hardwareTrouble = false;
 
-        if (!(functions.features() & QnGlFunctions::OpenGL1_3)) {
-            qnWarning("Multitexturing is not supported.");
-            softwareTrouble = true;
-        }
-
-        if (version <= QByteArray("1.1.0")) {
+        if (!(functions.features() & QnGlFunctions::OpenGL2_0)) {
             qnWarning("OpenGL version %1 is not supported.", version);
-            softwareTrouble = true;
-        }
-
-        if (!(functions.features() & QnGlFunctions::ArbPrograms)) {
-            qnWarning("OpenGL ARB shaders not supported, using software YUV to RGB conversion.");
             softwareTrouble = true;
         }
 

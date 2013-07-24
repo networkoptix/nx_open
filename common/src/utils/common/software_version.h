@@ -10,16 +10,25 @@
 
 class QnSoftwareVersion: public boost::equality_comparable1<QnSoftwareVersion, boost::less_than_comparable1<QnSoftwareVersion> > {
 public:
+    enum Format {
+        StandardFormat,     /**< Standard version format, e.g. <tt>"MAJOR[.MINOR[.BUGFIX]]"</tt>. */
+        OpenGlFormat        /**< OpenGL version format, with arbitrary text following the version string. */
+    };
+
     QnSoftwareVersion(): m_major(0), m_minor(0), m_bugfix(0) {}
 
     QnSoftwareVersion(int major, int minor, int bugfix): m_major(major), m_minor(minor), m_bugfix(bugfix) {}
 
-    explicit QnSoftwareVersion(const char *versionString) {
-        init(QLatin1String(versionString));
+    explicit QnSoftwareVersion(const char *versionString, Format format = StandardFormat) {
+        init(QLatin1String(versionString), format);
     }
 
-    explicit QnSoftwareVersion(const QString &versionString) {
-        init(versionString);
+    explicit QnSoftwareVersion(const QByteArray &versionString, Format format = StandardFormat) {
+        init(QLatin1String(versionString.constData()), format);
+    }
+
+    explicit QnSoftwareVersion(const QString &versionString, Format format = StandardFormat) {
+        init(versionString, format);
     }
 
     bool isNull() const {
@@ -72,8 +81,14 @@ public:
     }
 
 private:
-    void init(const QString &versionString) {
+    void init(QString versionString, Format format) {
         m_major = m_minor = m_bugfix = 0;
+
+        if(format == OpenGlFormat) {
+            int spaceIndex = versionString.indexOf(QLatin1Char(' '));
+            if(spaceIndex != -1)
+                versionString = versionString.left(spaceIndex);
+        }
 
         QStringList versionList = versionString.split(QLatin1Char('.'));
 
