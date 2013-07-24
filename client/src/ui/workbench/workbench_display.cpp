@@ -354,19 +354,6 @@ void QnWorkbenchDisplay::initSceneView() {
             QGLFormat glFormat;
             glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
 
-            // TODO: #GDM this is totally EVIL. This is a checker!!!
-            // As the name says, it MUST NOT change anything, only check.
-            // This code does not belong here.
-#ifdef Q_OS_LINUX
-            // Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
-            // Therefore VSync is off by default in linux and is enabled only here.
-            if (!vendor.toLower().contains("nvidia")) {
-                QGLFormat format = widget->format();
-                format.setSwapInterval(1); /* Turn vsync on. */
-                widget->setFormat(format);
-            }
-#endif
-
 #ifdef Q_OS_LINUX
             /* Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
              * VSync will be re-enabled later if drivers are not NVidia's. */
@@ -402,13 +389,11 @@ void QnWorkbenchDisplay::initSceneView() {
 
         /* All our items save and restore painter state. */
         m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
+
 #ifndef __APPLE__
-        //on macos, this flag results in QnMaskedProxyWidget::paint never called
+        /* On macos, this flag results in QnMaskedProxyWidget::paint never called. */
         m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
 #endif
-
-        /* Don't even try to uncomment this one, it slows everything down. */
-        //m_view->setCacheMode(QGraphicsView::CacheBackground);
 
         /* We don't need scrollbars. */
         m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
