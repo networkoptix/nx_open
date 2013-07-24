@@ -12,6 +12,8 @@ public:
     virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) override;
 private:
     void updateFisheyeTransform(const QSize& imageSize, int plane);
+    void updateFisheyeTransformRectilinear(const QSize& imageSize, int plane);
+    void updateFisheyeTransformEquirectangular(const QSize& imageSize, int plane);
 private:
     static const int MAX_COLOR_PLANES = 4;
 

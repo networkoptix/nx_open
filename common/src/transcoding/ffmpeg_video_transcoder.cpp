@@ -35,6 +35,11 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 {
     qFreeAligned(m_videoEncodingBuffer);
+    close();
+}
+
+void QnFfmpegVideoTranscoder::close()
+{
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (scaleContext[i])
             sws_freeContext(scaleContext[i]);
@@ -43,10 +48,12 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
     if (m_encoderCtx) {
         avcodec_close(m_encoderCtx);
         av_free(m_encoderCtx);
+        m_encoderCtx = 0;
     }
 
     for (int i = 0; i < m_videoDecoders.size(); ++i)
         delete m_videoDecoders[i];
+    m_videoDecoders.clear();
 }
 
 int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch)
@@ -106,6 +113,8 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
 
 bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
 {
+    close();
+
     QnVideoTranscoder::open(video);
 
     int channels = m_layout ? m_layout->channelCount() : 1;

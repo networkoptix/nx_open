@@ -517,8 +517,21 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
 
-                if (m_dewarpingParams.enabled)
+                if (m_dewarpingParams.enabled) {
                     m_videoTranscoder->addFilter(new QnFisheyeImageFilter(m_dewarpingParams));
+                    if (m_dewarpingParams.panoFactor > 1) 
+                    {
+                        // update image aspect, keep megapixels amount unchanged
+                        m_videoTranscoder->open(mediaData);
+                        QSize srcResolution = m_videoTranscoder->getResolution();
+                        int square = srcResolution.width() * srcResolution.height();
+                        float aspect = srcResolution.width() / (float) srcResolution.height() * m_dewarpingParams.panoFactor;
+                        int x = int(sqrt(square * aspect) + 0.5);
+                        int y = int(x /aspect + 0.5);
+                        QSize res = QSize(qPower2Floor(x, 16), qPower2Floor(y, 2));
+                        m_videoTranscoder->setResolution(res);
+                    }
+                }
                 if (m_contrastParams.enabled)
                     m_videoTranscoder->addFilter(new QnContrastImageFilter(m_contrastParams));
                 if (m_role == Role_FileExportWithTime) 
