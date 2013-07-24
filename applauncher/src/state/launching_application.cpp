@@ -38,6 +38,9 @@ static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin
 static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
 #endif
 
+static const QLatin1String NON_RECENT_VERSION_ARGS_PARAM_NAME( "nonRecentVersionArgs" );
+static const QLatin1String NON_RECENT_VERSION_ARGS_DEFAULT_VALUE( "--updates-enabled=false" );
+
 void LaunchingApplication::onEntry( QEvent* _event )
 {
     QState::onEntry( _event );
@@ -54,6 +57,9 @@ void LaunchingApplication::onEntry( QEvent* _event )
         emit failed();
         return;
     }
+
+    if( startTask->version != m_installationManager.getMostRecentVersion() )
+        startTask->appArgs += QString::fromLatin1(" ") + m_settings->value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
 
     const QString binPath = appData.installationDirectory + "/" + APPLICATION_BIN_NAME;
     NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(startTask->version).arg(binPath), cl_logDEBUG2 );
