@@ -1900,7 +1900,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     const int planeCount = format == PIX_FMT_YUVA420P ? 4 : 3;
 
     unsigned int r_w[MAX_PLANE_COUNT];
-    r_w[0] = width;
+    r_w[0] = (width/2)*2;
     r_w[1] = width / 2;
     r_w[2] = width / 2;
     r_w[3] = width; //alpha plane
