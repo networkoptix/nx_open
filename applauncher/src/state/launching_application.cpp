@@ -51,8 +51,20 @@ void LaunchingApplication::onEntry( QEvent* _event )
     applauncher::api::StartApplicationTask* startTask = m_launcherCommonData.currentTask.staticCast<applauncher::api::StartApplicationTask>().data();
 
     InstallationManager::AppData appData;
-    if( !m_installationManager.getInstalledVersionData( startTask->version, &appData ) )
+    for( ;; )
     {
+        if( m_installationManager.getInstalledVersionData( startTask->version, &appData ) )
+            break;
+
+        if( m_installationManager.count() > 0 )
+        {
+            const QString& theMostRecentVersion = m_installationManager.getMostRecentVersion();
+            if( startTask->version != theMostRecentVersion )
+            {
+                startTask->version = theMostRecentVersion;
+                continue;
+            }
+        }
         NX_LOG( QString::fromLatin1("Failed to find installed version %1 path").arg(startTask->version), cl_logDEBUG1 );
         emit failed();
         return;
