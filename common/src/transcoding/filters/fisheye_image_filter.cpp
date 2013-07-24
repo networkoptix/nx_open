@@ -127,6 +127,14 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
     delete m_transform[plane];
     m_transform[plane] = new QPointF[imageSize.width() * imageSize.height()];
 
+    if (m_params.panoFactor == 1)
+        updateFisheyeTransformRectilinear(imageSize, plane);
+    else
+        updateFisheyeTransformEquirectangular(imageSize, plane);
+}
+
+void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageSize, int plane)
+{
     qreal aspectRatio = imageSize.width() / (qreal) imageSize.height();
     qreal kx = 2.0*tan(m_params.fov/2.0);
     qreal ky = kx/aspectRatio;
@@ -167,8 +175,66 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
             qreal r     = acos(pos3d.y() / pos3d.length()) / M_PI;  // fisheye radius
 
             // return from polar coordinates
-            qreal dstX = qBound(0.0, (cos(theta) * r + 0.5) * imageSize.width(),  (qreal) imageSize.width());
-            qreal dstY = qBound(0.0, (sin(theta) * r + 0.5) * imageSize.height(), (qreal) imageSize.height());
+            qreal dstX = qBound(0.0, (cos(theta) * r + 0.5) * (imageSize.width()-1),  (qreal) (imageSize.width() - 1));
+            qreal dstY = qBound(0.0, (sin(theta) * r + 0.5) * (imageSize.height()-1), (qreal) (imageSize.height() - 1));
+
+            *dstPos++ = QPointF(dstX, dstY);
+        }
+    }
+}
+
+void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& imageSize, int plane)
+{
+    QMatrix4x4 perspectiveMatrix( 
+        1.0,    0.0,                    0.0,                    0.0,
+        0.0,    cos(-m_params.fov),     -sin(-m_params.fov),    0.0,
+        0.0,    sin(-m_params.fov),     cos(-m_params.fov),     0.0,
+        0.0,    0.0,                    0.0,                    1.0
+    );
+
+    qreal aspectRatio = imageSize.width() / (qreal) imageSize.height();
+    qreal yCenter;
+    qreal yShift;
+    if (m_params.horizontalView) {
+        yCenter = 0.5;
+        yShift = m_params.yAngle;
+    }
+    else {
+        yCenter =  1.0;
+        aspectRatio = -aspectRatio; // just add neg to calculation
+        yShift = -m_params.yAngle;
+    }
+
+    QPointF* dstPos = m_transform[plane];
+    for (int y = 0; y < imageSize.height(); ++y)
+    {
+        for (int x = 0; x < imageSize.width(); ++x)
+        {
+            QVector2D pos(x / (qreal) (imageSize.width()-1) - 0.5, y / (qreal) (imageSize.height()-1) - yCenter);
+            pos *= m_params.fov;
+
+            float theta = pos.x() + m_params.xAngle;
+            float roty = -m_params.fovRot * cos(theta);
+            pos.setY(pos.y() / aspectRatio);
+            float ymaxInv = aspectRatio / m_params.fov;
+            float phi   = pos.y() * ((ymaxInv - roty) / ymaxInv) + roty + yShift;
+
+            // Vector in 3D space
+            QVector3D pos3d;
+            if (m_params.horizontalView)
+                pos3d = QVector3D(cos(phi) * sin(theta),    cos(phi) * cos(theta), sin(phi));
+            else
+                pos3d = QVector3D(cos(phi) * sin(theta),    sin(phi),              cos(phi) * cos(theta));
+            QVector3D psph = perspectiveMatrix * pos3d;
+
+            // Calculate fisheye angle and radius
+            theta = atan2(psph.z(), psph.x());
+            phi   = acos(psph.y());
+            float r = phi / M_PI; // fisheye FOV
+
+            // return from polar coordinates
+            qreal dstX = qBound(0.0, (cos(theta) * r + 0.5) * (imageSize.width()-1),  (qreal) (imageSize.width() - 1));
+            qreal dstY = qBound(0.0, (sin(theta) * r + 0.5) * (imageSize.height()-1), (qreal) (imageSize.height() - 1));
 
             *dstPos++ = QPointF(dstX, dstY);
         }
