@@ -30,7 +30,8 @@ NEW FEATURES:
       - "Play sound" - ability to play sound if an event occurs. Sound can be chosen from the library or uploaded by a user
       - "Text to speech" - ability to say something if an event occur. Extends "Play Sound" action
       - "Instant output". Earlier it was not possible to bound output action to instant events (like motion start)  
-
+    - E-Mail message about motion on a camera now contains a link that opens this camera on this particular moment and starts playback
+      
  - Zoom windows. Just press the zoom button on the item and draw the rectangle - its contents will be expanded in the new item. 
    It is possible to create several zoom windows from a single item
 
@@ -48,8 +49,6 @@ NEW FEATURES:
  - It is possible to adjust second stream quality in cameras' settings. This is not recommended in general but may be needed for some reasons
  
  - If motion is occured on an item, it is indicated by the visual effect
- 
- - Email notification about motion now contains a video link. If click on this link, video for this camera will be opened in a browser
  
  - Locked Layouts are introduced. It is not possible to change items's positions and add or remove anything on these kind of layouts
  
@@ -108,10 +107,9 @@ IMPROVEMENTS:
    - If a user did not apply current motion mask by mistake (during camera setting) the warning will be shown
    
  - Health monitoring:
-   - Added buttons for showing log and checking server issues .
-   - Added checkbox graphs enabling/disabling.
-   - Added network usage in Health Monitoring.
-   - Added timestamp option to screenshot, export selected area and multi-video
+   - Added buttons for showing log and checking server issues
+   - Added checkbox graphs enabling/disabling
+   - Added network usage in Health Monitoring
 
  - Layout/Multi Videos:   
    - Improved behavior if local files are saved on a layout
@@ -124,8 +122,9 @@ IMPROVEMENTS:
  - Licenses:
    - Enterprise license type is replaced with Professional
    - Free licenses are replaced with 4 trial licenses (30 days)
-
- - PTZ
+   - HD Witness licenses cannot be activated on DW Spectrum and vice versa
+   
+ - PTZ:
    - If an item has been zoomed using mouse wheel, then double click unzooms it and does full PTZ unzoom as well
    - PTZ Controls are rotated automatically if rotate the item and remain in proper positions     
    - Hotkeys can be assigned for PTZ presets (0-9)
@@ -133,15 +132,21 @@ IMPROVEMENTS:
  - Events and Actions:
    - Notifications settings are stored in the database so now they are same for all computers the user logs from. Used to be stored independently in the registry
    - Aggregation column is added to Event and Action (used to be in advanced E&A settings)
- 
- - Manual Camera Addition:
-   - If try to add an existing camera manually the software used to reply "No cameras found". Now it displays such cameras 
-     but they cannot be added once more
-
- - Time Line
+   - E-Mail templates are improved
+   
+ - Time Line:
    - Time picker is added to Calendar
    - Localized datetime format is used in Time Line (depends on regional settings)
 
+ - Export:
+   - If export single camera, then the default filename is "Camera name+start day+start time" (used to be MAC address)
+   - Added timestamp option to screenshot
+
+ - Manual Camera Addition:
+   - If try to add an existing camera manually the software used to reply "No cameras found". Now it displays cameras that are already registered
+     but they cannot be added once more
+
+   
 BUGS FIXED:  
 
  - Client UI Main Controls:
@@ -181,7 +186,7 @@ BUGS FIXED:
    - Audio was not exported properly in AC3 format if trying to export Multi-Video 
 
  - Installer:
-   - If uninstall EC ports are busy for a white so if reinstall it the ports will change 
+   - If uninstall EC then ports were busy for a while so if reinstall it the ports were changed. Fixed 
    - If cancel installation if different customizations (HD Witness, DW Spectrum) were installed, then the software 
    still was in the installed programs list, but could not be removed. Fixed
    - If change installed components and remove EC it was not suggested to delete DB. Fixed

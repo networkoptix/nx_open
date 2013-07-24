@@ -2412,7 +2412,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">在浏览器中打开...</translation>
     </message>
     <message>
-        <source>Open Web Client</source>
+        <source>Open Web Client...</source>
         <translation>打开Web客户端</translation>
     </message>
     <message>
@@ -2468,7 +2468,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Ping...</translation>
     </message>
     <message>
-        <source>Server Logs</source>
+        <source>Server Logs...</source>
         <translation>服务器日志</translation>
     </message>
     <message>

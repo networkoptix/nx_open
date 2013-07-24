@@ -1633,7 +1633,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1051"/>
-        <source>Server Logs</source>
+        <source>Server Logs...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1703,7 +1703,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="600"/>
-        <source>Open Web Client</source>
+        <source>Open Web Client...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
