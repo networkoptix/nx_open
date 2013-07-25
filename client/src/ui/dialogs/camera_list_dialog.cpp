@@ -49,7 +49,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     m_clipboardAction->setShortcut(QKeySequence::Copy);
     ui->gridCameras->addAction(m_clipboardAction);
 
-    m_exportAction      = new QAction(tr("Export Selection to File"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File..."), this);
     m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
 
@@ -124,7 +124,7 @@ void QnCameraListDialog::at_selectAllAction()
 
 void QnCameraListDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridCameras);
+    QnGridWidgetHelper(context()).exportToFile(ui->gridCameras, QObject::tr("Export selected cameras to file"));
 }
 
 void QnCameraListDialog::at_copyToClipboard()

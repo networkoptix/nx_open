@@ -149,11 +149,9 @@ private:
     bool m_isDoubleClick;
     bool m_ptzStartedEmitted;
     bool m_skipNextAction;
-    QVector3D m_dragFromPosition;
 
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;
-    QPointF m_dragAddDelta;
 
     struct SplashItemAnimation {
         SplashItemAnimation(): item(NULL), fadingIn(true), expansionMultiplier(0.0), opacityMultiplier(0.0) {}

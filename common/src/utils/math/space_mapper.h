@@ -14,8 +14,8 @@ namespace Qn
     enum SpaceMapperFlag {
         NoMapperFlags   = 0x00,
 
-        /** Mapper return Z pos as fov instead of 35mm equiv. It is necessary for large view ange */
-        FovBasedMapper = 0x01
+        /** Mapper return Z pos as fov instead of 35mm equiv. It is necessary for large view angle. */
+        FovBasedMapper  = 0x01
     };
     Q_DECLARE_FLAGS(SpaceMapperFlags, SpaceMapperFlag);
     Q_DECLARE_OPERATORS_FOR_FLAGS(SpaceMapperFlags);
