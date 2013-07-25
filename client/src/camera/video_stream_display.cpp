@@ -564,7 +564,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             decodeToFrame->data[2] += (2592-1920)/4;
         }
         */
-
         QSize imageSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
         QMutexLocker lock(&m_imageSizeMtx);
         m_imageSize = imageSize;

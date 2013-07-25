@@ -138,7 +138,8 @@ void QnFisheyeShaderProgram::setDewarpingParams(const DewarpingParams& params, f
             setUniformValue(m_yCenterLocation, (float) 1.0);
     }
 
-    setUniformValue(m_aspectRatioLocation, (float) (aspectRatio * params.panoFactor));
+    setUniformValue(m_aspectRatioLocation, (float) (aspectRatio));
+    setUniformValue(m_panoFactorLocation, (float) (params.panoFactor));
     setUniformValue(m_dstFovLocation, (float) params.fov);
 
     setUniformValue(m_maxXLocation, maxX);
@@ -155,6 +156,7 @@ bool QnFisheyeShaderProgram::link()
         m_fovRotLocation = uniformLocation("fovRot");
         m_dstFovLocation = uniformLocation("dstFov");
         m_aspectRatioLocation = uniformLocation("aspectRatio");
+        m_panoFactorLocation = uniformLocation("panoFactor");
         m_yCenterLocation = uniformLocation("yCenter");
 
         m_maxXLocation = uniformLocation("maxX");
@@ -214,15 +216,19 @@ QString QnFisheyeRectilinearProgram::getShaderText()
                      xVect.y,   yVect.y,    center.y,
                      xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
     
+    float backAR = (1.0 - 1.0 / aspectRatio)/2.0;
+    float ar2 = maxY*aspectRatio;
+
     void main() 
     {
-        vec3 pos3d = vec3(gl_TexCoord[0].xy / vec2(maxX, maxY) - vec2(0.5, yCenter), 1.0) * to3d; // point on the surface
+        vec3 pos3d = vec3(gl_TexCoord[0].xy / vec2(maxX, ar2) - vec2(0.5, yCenter), 1.0) * to3d; // point on the surface
+
         float theta = atan(pos3d.z, pos3d.x) + fovRot;                         // fisheye angle
         float r     = acos(pos3d.y / length(pos3d)) / PI;                      // fisheye radius
         vec2 pos = vec2(cos(theta), sin(theta)) * r + 0.5;                     // return from polar
 
         pos.x = min(pos.x*maxX, maxX);
-        pos.y = min(pos.y*maxY, maxY);
+        pos.y = min((pos.y - backAR)*ar2, maxY);
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
@@ -246,45 +252,51 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
 {
     return lit(QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
-        uniform sampler2D uTexture;
-        uniform sampler2D vTexture;
-        uniform float opacity;
-        uniform float xShift;
-        uniform float yShift;
-        uniform float fovRot;
-        uniform float dstFov;
-        uniform float aspectRatio;
-        uniform float yCenter;
-        uniform float yLevels1;
-        uniform float yLevels2;
-        uniform float yGamma;
-        uniform float maxX;
-        uniform float maxY;
+    uniform sampler2D uTexture;
+    uniform sampler2D vTexture;
+    uniform float opacity;
+    uniform float xShift;
+    uniform float yShift;
+    uniform float fovRot;
+    uniform float dstFov;
+    uniform float aspectRatio;
+    uniform float panoFactor;
+    uniform float yCenter;
+    uniform float yLevels1;
+    uniform float yLevels2;
+    uniform float yGamma;
+    uniform float maxX;
+    uniform float maxY;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
-                                1.0, -0.344, -0.714,  0.529,
-                                1.0,  1.772,  0.0,   -0.886,
-                                0.0,  0.0,    0.0,    opacity);
-    
+        1.0, -0.344, -0.714,  0.529,
+        1.0,  1.772,  0.0,   -0.886,
+        0.0,  0.0,    0.0,    opacity);
+
     mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                   0.0, cos(-fovRot), -sin(-fovRot),
-                                   0.0, sin(-fovRot),  cos(-fovRot));
+        0.0, cos(-fovRot), -sin(-fovRot),
+        0.0, sin(-fovRot),  cos(-fovRot));
+
+    float backAR = (1.0 - 1.0 / aspectRatio)/2.0;
+    float ar2 = maxY*aspectRatio;
 
     void main() 
     {
-        vec2 pos = (gl_TexCoord[0].xy / vec2(maxX, maxY) - vec2(0.5, yCenter)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
+        vec2 pos = (gl_TexCoord[0].xy / vec2(maxX, ar2) - vec2(0.5, yCenter)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
         float roty = -fovRot* cos(theta);
-        pos.y = pos.y/aspectRatio;
+        float roty2 = -fovRot*2.0*cos(theta);
+
+        pos.y = pos.y/panoFactor;
         float ymaxInv = aspectRatio / dstFov;
-        float phi   = pos.y * ((ymaxInv - roty) / ymaxInv) + roty - yShift;
+        float phi   = pos.y * ((ymaxInv - roty) / ymaxInv) - roty - yShift;
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
-                        cos(phi) * cos(theta),
-                        sin(phi)             )  * perspectiveMatrix;
+            cos(phi) * cos(theta),  // only one difference between H and V shaders: this 2 lines in back order
+            sin(phi))  * perspectiveMatrix;
 
         // Calculate fisheye angle and radius
         theta = atan(psph.z, psph.x);
@@ -295,14 +307,14 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
         pos.x = min(pos.x*maxX, maxX);
-        pos.y = min(pos.y*maxY, maxY);
+        pos.y = min((pos.y - backAR)*ar2, maxY);
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
         gl_FragColor = vec4(%1,
-                            texture2D(uTexture, pos).p,
-                            texture2D(vTexture, pos).p,
-                            1.0) * colorTransform;
+            texture2D(uTexture, pos).p,
+            texture2D(vTexture, pos).p,
+            1.0) * colorTransform;
     }
     ));
 }
@@ -328,6 +340,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         uniform float fovRot;
         uniform float dstFov;
         uniform float aspectRatio;
+        uniform float panoFactor;
         uniform float yCenter;
         uniform float yLevels1;
         uniform float yLevels2;
@@ -345,15 +358,18 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
                                    0.0, cos(-fovRot), -sin(-fovRot),
                                    0.0, sin(-fovRot),  cos(-fovRot));
 
+    float backAR = (1.0 - 1.0 / aspectRatio)/2.0;
+    float ar2 = maxY*aspectRatio;
+
     void main() 
     {
-        vec2 pos = (gl_TexCoord[0].xy / vec2(maxX, maxY) - vec2(0.5, yCenter)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
+        vec2 pos = (gl_TexCoord[0].xy / vec2(maxX, ar2) - vec2(0.5, yCenter)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
         float roty = -fovRot* cos(theta);
         float roty2 = -fovRot*2.0*cos(theta);
         
-        pos.y = pos.y/(-aspectRatio);
+        pos.y = pos.y/(-panoFactor);
         float ymaxInv = aspectRatio / dstFov;
         float phi   = pos.y * ((ymaxInv - roty) / ymaxInv) + roty + yShift;
         
@@ -371,7 +387,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
         pos.x = min(pos.x*maxX, maxX);
-        pos.y = min(pos.y*maxY, maxY);
+        pos.y = min((pos.y - backAR)*ar2, maxY);
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
