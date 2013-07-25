@@ -1805,7 +1805,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open Web Client</source>
+        <source>Open Web Client...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1893,7 +1893,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server Logs</source>
+        <source>Server Logs...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

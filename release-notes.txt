@@ -1,7 +1,7 @@
 ----------------------------------------------- 1.6-RC ---------------------------------------------
 
 Since 1.5.1
- - If uninstall EC ports are busy for a white so if reinstall it the ports will change
+ - If uninstall EC, then ports were busy for a white so if reinstall it the ports were changed. Fixed
  - CLND could be used for local file if open it in a new layout after using calendar search on a camera. Fixed
  - If change camera IP address it was not reflected on camera settings form (only in tree) until the form was re-opened. Fixed
  - If an item has been zoomed using mouse wheel, then double click unzooms it and does full PTZ unzoom as well
@@ -13,6 +13,8 @@ Since 1.5.1
  - If change aggregation period in advanced settings it was not suggested to apply changes. Fixed
  - If try to connect to a newer version of EC (i.e. 1.4 client to 1.5 EC) and the newer version is not installed the restart 
    was suggested with no luck. Now warning is given instead of restart
+ - Input/Output is supported by ACTI cameras
+ - HD Witness licenses cannot be activated on DW Spectrum and vice versa
  
 Since previous build
  - Selected item was not marked in Tree (> sign). Fixed
@@ -25,9 +27,11 @@ Since previous build
  - Timeout of notifications is changed: the more notifications are in queue, the less the timeout is
  - Notifications are redesigned
  - Notification sounds are renamed
+ - All image settings that require transcoding (Gamma Correction and Fisheye De-Warp) are combined to one in the Export form. 
+   Such setting is enabled only if a filter has been applied before the export
  - Added support timeline mode for calendar.
  - Installation. Admin password has not been filled. Fixed. 
-
+ 
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
 Since 1.5.1

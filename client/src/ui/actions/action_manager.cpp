@@ -597,7 +597,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::WebClientAction).
         flags(Qn::Main | Qn::Tree).
-        text(tr("Open Web Client")).
+        text(tr("Open Web Client...")).
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
@@ -1048,7 +1048,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ServerLogsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Server Logs")).
+        text(tr("Server Logs...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory(Qn::ServerIssuesAction).
