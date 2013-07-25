@@ -23,7 +23,7 @@ public:
 
     void addRenderer(QnResourceWidgetRenderer* renderer);
     //void setAspectRatio(float aspectRatio);
-    DewarpingParams updateDewarpingParams();
+    DewarpingParams updateDewarpingParams(float ar);
 
     DewarpingParams getDewarpingParams() const;
     void setDewarpingParams(const DewarpingParams params);
@@ -56,6 +56,15 @@ private:
     bool m_moveToAnimation;
     qint64 m_lastTime;
     QnPtzSpaceMapper* m_spaceMapper;
+
+    struct SpaceRange {
+        SpaceRange(): min(0.0), max(0.0) {}
+        SpaceRange(qreal _min, qreal _max): min(_min), max(_max) {}
+        qreal min;
+        qreal max;
+    };
+    SpaceRange m_xRange;
+    SpaceRange m_yRange;
 };
 
 #endif // __FISHEYE_PTZ_CONTROLLER_H__

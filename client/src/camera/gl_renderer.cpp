@@ -319,9 +319,11 @@ void QnGLRenderer::drawYV12VideoTexture(
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
     QnFisheyeShaderProgram* fisheyeShader = 0;
     DewarpingParams params;
+    float ar = 1.0;
     if (m_fisheyeController && m_fisheyeController->isEnabled()) 
     {
-        params = m_fisheyeController->updateDewarpingParams();
+        ar = picLock->width()/(float)picLock->height();
+        params = m_fisheyeController->updateDewarpingParams(ar);
         if (params.panoFactor > 1.0)
         {
             if (params.horizontalView)
@@ -359,7 +361,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setOpacity(m_decodedPictureProvider.opacity());
 
     if (fisheyeShader) {
-        fisheyeShader->setDewarpingParams(params, picLock->width()/(float)picLock->height(), (float)tex0Coords.right(), (float)tex0Coords.bottom());
+        fisheyeShader->setDewarpingParams(params, ar, (float)tex0Coords.right(), (float)tex0Coords.bottom());
     }
 
     if (gammaShader) 
@@ -588,7 +590,7 @@ bool QnGLRenderer::isFisheyeEnabled() const
 int QnGLRenderer::panoFactor() const
 {
     if (m_fisheyeController && m_fisheyeController->isEnabled()) 
-        return (int) m_fisheyeController->updateDewarpingParams().panoFactor;
+        return (int) m_fisheyeController->getDewarpingParams().panoFactor;
     else
         return 1;
 }

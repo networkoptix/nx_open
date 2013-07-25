@@ -41,20 +41,21 @@ void QnFisheyePtzController::updateSpaceMapper(bool horizontalView, int pf)
     Qn::ExtrapolationMode xExtrapolationMode;
 
     if (horizontalView) {
-        minX = minY = -180.0;
-        maxX = maxY = 180.0;
+        m_xRange = SpaceRange(gradToRad(-90.0), gradToRad(90.0));
+        m_yRange = SpaceRange(gradToRad(-90.0), gradToRad(90.0));
         xExtrapolationMode = Qn::ConstantExtrapolation;
     }
     else {
-        minX = -180.0;
-        maxX = 180.0;
-        minY = 0.0;
-        maxY = 180.0;
+        m_xRange = SpaceRange(gradToRad(-180.0), gradToRad(180.0));
+        if (pf > 1)
+            m_yRange = SpaceRange(0, gradToRad(90.0));
+        else
+            m_yRange = SpaceRange(0.0, gradToRad(180.0 + 30.0)); // why extra ~25-30 degree is required?
         xExtrapolationMode = Qn::PeriodicExtrapolation;
     }
 
-    QnScalarSpaceMapper xMapper(minX, maxX, minX, maxX, xExtrapolationMode);
-    QnScalarSpaceMapper yMapper(minY, maxY, minY, maxY, Qn::ConstantExtrapolation);
+    QnScalarSpaceMapper xMapper(radToGrad(m_xRange.min), radToGrad(m_xRange.max), radToGrad(m_xRange.min), radToGrad(m_xRange.max), xExtrapolationMode);
+    QnScalarSpaceMapper yMapper(radToGrad(m_yRange.min), radToGrad(m_yRange.max), radToGrad(m_yRange.min), radToGrad(m_yRange.max), Qn::ConstantExtrapolation);
     m_spaceMapper = new QnPtzSpaceMapper(QnVectorSpaceMapper(xMapper, yMapper, zMapper), QStringList());
     m_spaceMapper->setFlags(Qn::FovBasedMapper);
 
@@ -93,11 +94,21 @@ qreal QnFisheyePtzController::boundXAngle(qreal value, qreal fov) const
 
 qreal QnFisheyePtzController::boundYAngle(qreal value, qreal fov, qreal aspectRatio, bool horizontal) const
 {
-    qreal yRange = ((horizontal ? FISHEYE_FOV : FISHEYE_FOV/2.0)- fov/ aspectRatio);
+    qreal yFov = fov / aspectRatio;
+
+    if (horizontal)
+        return qBound(m_yRange.min + yFov/2.0, value, m_yRange.max - yFov/2.0);
+    else
+        //return qBound(m_yRange.min, value, m_yRange.max - yFov * 3.0/4.0);
+        return qBound(m_yRange.min, value, m_yRange.max - yFov);
+
+    /*
+    qreal yRange = FISHEYE_FOV - fov/ aspectRatio;
     if (m_dewarpingParams.horizontalView)
         return qBound(-yRange/2.0, value, yRange/2.0);
     else
         return qBound(0.0, value, yRange);
+    */
 }
 
 int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
@@ -160,7 +171,7 @@ DewarpingParams QnFisheyePtzController::getDewarpingParams() const
     return m_dewarpingParams;
 }
 
-DewarpingParams QnFisheyePtzController::updateDewarpingParams()
+DewarpingParams QnFisheyePtzController::updateDewarpingParams(float ar)
 {
     qint64 newTime = getUsecTimer();
     qreal timeSpend = (newTime - m_lastTime) / 1000000.0;
@@ -201,7 +212,7 @@ DewarpingParams QnFisheyePtzController::updateDewarpingParams()
         qreal yRange = xRange; // / newParams.aspectRatio;
 
         newParams.xAngle = boundXAngle(newParams.xAngle, newParams.fov);
-        newParams.yAngle = boundYAngle(newParams.yAngle, newParams.fov, m_dewarpingParams.panoFactor, m_dewarpingParams.horizontalView);
+        newParams.yAngle = boundYAngle(newParams.yAngle, newParams.fov, m_dewarpingParams.panoFactor*ar, m_dewarpingParams.horizontalView);
         m_lastTime = newTime;
     }
     newParams.enabled = m_dewarpingParams.enabled;
