@@ -13,6 +13,7 @@
 #include "acti_ptz_controller.h"
 #include "rest/server/rest_connection_processor.h"
 #include "common/global_settings.h"
+#include "business/business_event_connector.h"
 
 
 const char* QnActiResource::MANUFACTURE = "ACTI";
