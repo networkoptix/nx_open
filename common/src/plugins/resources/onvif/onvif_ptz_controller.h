@@ -19,7 +19,7 @@ public:
     virtual int stopMove() override;
     virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
     virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;
-    virtual Qn::CameraCapabilities getCapabilities() override;
+    virtual Qn::PtzCapabilities getCapabilities() override;
     virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
     // TODO: #Elric need to implement this one properly.
@@ -34,7 +34,7 @@ private:
 
 private:
     QnPlOnvifResource* m_resource;
-    Qn::CameraCapabilities m_capabilities;
+    Qn::PtzCapabilities m_ptzCapabilities;
     const QnPtzSpaceMapper *m_ptzMapper;
     QString m_mediaProfile;
     QString m_ptzConfigurationToken;

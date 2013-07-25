@@ -12,7 +12,7 @@
 QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource): 
     QnAbstractPtzController(resource),
     m_resource(resource),
-    m_capabilities(0),
+    m_ptzCapabilities(0),
     m_ptzMapper(NULL),
     m_verticalFlipped(false),
     m_horizontalFlipped(false)
@@ -84,23 +84,23 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
         //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
     }
 
-    m_capabilities |= Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability;
+    m_ptzCapabilities = Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability;
     m_ptzMapper = qnCommon->instance<QnPtzMapperPool>()->mapper(m_resource->getModel());
 
     // TODO: #Elric make configurable
     QString model = m_resource->getModel();
     if(model == lit("FW3471-PS-E")) {
-        m_capabilities |= Qn::OctagonalPtzCapability;
-        m_capabilities &= ~Qn::AbsolutePtzCapability;
+        m_ptzCapabilities |= Qn::OctagonalPtzCapability;
+        m_ptzCapabilities &= ~Qn::AbsolutePtzCapability;
     }
     if(model == lit("IPC-HDB3200C")) {
-        m_capabilities = Qn::NoCapabilities;
+        m_ptzCapabilities = Qn::NoPtzCapabilities;
     }
     if(model == lit("DWC-MPTZ20X")) {
-        m_capabilities |= Qn::OctagonalPtzCapability;
+        m_ptzCapabilities |= Qn::OctagonalPtzCapability;
     }
     if(model == lit("FD8161") || model == lit("FD8362E") || model == lit("FD8361") || model == lit("FD8136") || model == lit("FD8162") || model == lit("FD8372") || model == lit("FD8135H") || model == lit("IP8151") || model == lit("IP8335H") || model == lit("IP8362") || model == lit("MD8562")) {
-        m_capabilities = Qn::NoCapabilities;
+        m_ptzCapabilities = Qn::NoPtzCapabilities;
     }
 
 
@@ -266,9 +266,9 @@ int QnOnvifPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
     return rez;
 }
 
-Qn::CameraCapabilities QnOnvifPtzController::getCapabilities() 
+Qn::PtzCapabilities QnOnvifPtzController::getCapabilities() 
 {
-    return m_capabilities;
+    return m_ptzCapabilities;
 }
 
 const QnPtzSpaceMapper *QnOnvifPtzController::getSpaceMapper() 

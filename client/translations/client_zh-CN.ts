@@ -602,6 +602,29 @@
     </message>
 </context>
 <context>
+    <name>FisheyeSettingsWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">表格</translation>
+    </message>
+    <message>
+        <source>Horizontal mount (camera on the wall)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical mount (camera on the ceiling)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera view angle correction:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.0</source>
+        <translation type="unfinished">0.0</translation>
+    </message>
+</context>
+<context>
     <name>GraphicsScrollBar</name>
     <message>
         <source>Scroll here</source>
@@ -2389,7 +2412,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">在浏览器中打开...</translation>
     </message>
     <message>
-        <source>Open Web Client</source>
+        <source>Open Web Client...</source>
         <translation>打开Web客户端</translation>
     </message>
     <message>
@@ -2445,7 +2468,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Ping...</translation>
     </message>
     <message>
-        <source>Server Logs</source>
+        <source>Server Logs...</source>
         <translation>服务器日志</translation>
     </message>
     <message>
@@ -3116,7 +3139,7 @@ Make sure the server is available and try again.</source>
         <translation>复制选择到剪贴板</translation>
     </message>
     <message>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation>复制选择到档案</translation>
     </message>
     <message>
@@ -3828,7 +3851,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation>复制选择到剪贴板</translation>
     </message>
     <message>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation>输出选择到档案</translation>
     </message>
     <message>
@@ -4486,6 +4509,10 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <message>
         <source>Zoom window</source>
         <translation>缩放窗口</translation>
+    </message>
+    <message>
+        <source>Dewarping</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6563,11 +6590,11 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Include Timestamps (Requires Transcoding)</source>
-        <translation>包括时间戳(需转码)</translation>
+        <translation type="obsolete">包括时间戳(需转码)</translation>
     </message>
     <message>
         <source>Video adjustment (Requires Transcoding)</source>
-        <translation>视频调整(需转码)</translation>
+        <translation type="obsolete">视频调整(需转码)</translation>
     </message>
     <message>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists.Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
@@ -6607,6 +6634,26 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Version Mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include timestamps (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply dewarping and image correction (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply image correction (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply dewarping (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7218,6 +7265,14 @@ hh:mm:ss</source>
     <message>
         <source>Expert</source>
         <translation>专家</translation>
+    </message>
+    <message>
+        <source>This is the fish-eye lens camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dewarping</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -482,9 +482,11 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
          scaleFactor != QnFrameScaler::factor_1);
 
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
-    //if (render->isDisplaying(outFrame))
-    foreach(QnAbstractRenderer* render, m_renderList)
-        render->waitForFrameDisplayed(data->channelNumber);
+    
+    foreach(QnAbstractRenderer* render, m_renderList) {
+        if (render->isDisplaying(outFrame))
+            render->waitForFrameDisplayed(data->channelNumber);
+    }
 
     outFrame->channel = data->channelNumber;
     outFrame->flags = 0;
@@ -554,6 +556,14 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
     m_mtx.unlock();
     if (decodeToFrame->width) {
+        /*
+        if (decodeToFrame->width == 2592) {
+            decodeToFrame->width = 1920;
+            decodeToFrame->data[0] += (2592-1920)/2;
+            decodeToFrame->data[1] += (2592-1920)/4;
+            decodeToFrame->data[2] += (2592-1920)/4;
+        }
+        */
         QSize imageSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
         QMutexLocker lock(&m_imageSizeMtx);
         m_imageSize = imageSize;

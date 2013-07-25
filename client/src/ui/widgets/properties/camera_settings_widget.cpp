@@ -34,6 +34,7 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchConte
     connect(m_multiWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(advancedSettingChanged()), this, SLOT(at_advancedSettingChanged()));
+    connect(m_singleWidget, SIGNAL(fisheyeSettingChanged()), this, SIGNAL(fisheyeSettingChanged()));
     connect(m_singleWidget, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(m_multiWidget,  SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
 
@@ -240,6 +241,20 @@ void QnCameraSettingsWidget::updateFromResources() {
         break;
     case MultiMode:
         m_multiWidget->updateFromResources();
+        break;
+    default:
+        break;
+    }
+}
+
+void QnCameraSettingsWidget::reject()
+{
+    switch(mode()) {
+    case SingleMode:
+        m_singleWidget->reject();
+        break;
+    case MultiMode:
+        m_multiWidget->reject();
         break;
     default:
         break;

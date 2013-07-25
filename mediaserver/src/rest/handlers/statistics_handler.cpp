@@ -1,7 +1,5 @@
 #include "statistics_handler.h"
 
-#include <QtCore/QFileInfo>
-
 #include "utils/common/util.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "platform/platform_abstraction.h"

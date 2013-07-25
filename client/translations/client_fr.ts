@@ -421,6 +421,29 @@
     </message>
 </context>
 <context>
+    <name>FisheyeSettingsWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal mount (camera on the wall)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical mount (camera on the ceiling)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera view angle correction:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.0</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>GraphicsScrollBar</name>
     <message>
         <source>Scroll here</source>
@@ -1782,7 +1805,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open Web Client</source>
+        <source>Open Web Client...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1870,7 +1893,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server Logs</source>
+        <source>Server Logs...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2349,7 +2372,7 @@ Make sure the server is available and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2978,7 +3001,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3515,6 +3538,10 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Zoom window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4948,14 +4975,6 @@ and you do not have the rights to overwrite it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Include Timestamps (Requires Transcoding)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Video adjustment (Requires Transcoding)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists.Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4993,6 +5012,26 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Version Mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include timestamps (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply dewarping and image correction (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply image correction (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply dewarping (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5479,6 +5518,14 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Expert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the fish-eye lens camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

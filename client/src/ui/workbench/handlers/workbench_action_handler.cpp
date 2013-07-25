@@ -438,6 +438,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.zoomTargetUuid = params.zoomUuid;
     data.rotation = params.rotation;
     data.contrastParams = params.contrastParams;
+    data.dewarpingParams = params.dewarpingParams;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
     if(params.frameColor.isValid())
         data.dataByRole[Qn::ItemFrameColorRole] = params.frameColor;
@@ -989,23 +990,21 @@ void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
-    QnResourceWidget *widget = menu()->currentParameters(sender()).widget();
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*> (menu()->currentParameters(sender()).widget());
     if(!widget)
         return;
     QWeakPointer<QnResourceWidget> guard(widget);
 
-    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
-        return;
+    
 
     QnWorkbenchPtzController *ptzController = context()->instance<QnWorkbenchPtzController>();
-    QVector3D position = ptzController->position(camera);
+    QVector3D position = ptzController->position(widget);
 
     for(int i = 0; i <= 20; i++) {
         qreal zoom = i / 20.0;
 
         position.setZ(zoom);
-        ptzController->setPosition(camera, position);
+        ptzController->setPosition(widget, position);
 
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));
@@ -1996,9 +1995,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     /* Calculate size of the resulting matrix. */
     qreal desiredAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
-    QnResourceWidget* w = parameters.widget();
-    if (w && w->hasAspectRatio())
-        desiredAspectRatio = w->aspectRatio();
+    QnResourceWidget *widget = parameters.widget();
+    if (widget && widget->hasAspectRatio())
+        desiredAspectRatio = widget->aspectRatio();
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * itemCount)));
 
@@ -2018,7 +2017,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
-        item.contrastParams = w->item()->imageEnhancement();
+        item.contrastParams = widget->item()->imageEnhancement();
+        item.dewarpingParams = widget->item()->dewarpingParams();
         item.dataByRole[Qn::ItemPausedRole] = true;
         item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
@@ -2113,7 +2113,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
         saveCameraSettingsFromDialog(true);
         break;
     case QDialogButtonBox::Cancel:
-        cameraSettingsDialog()->widget()->updateFromResources();
+        cameraSettingsDialog()->widget()->reject();
         break;
     default:
         break;
@@ -3098,7 +3098,8 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
                                                        role,
                                                        0, 0,
                                                        itemData.zoomRect,
-                                                       itemData.contrastParams);
+                                                       itemData.contrastParams,
+                                                       itemData.dewarpingParams);
 
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->toResource()->getUrl()).arg(m_layoutFileName));
@@ -3186,8 +3187,6 @@ Do you want to continue?"),
             return;
     }
 
-    QnNetworkResourcePtr networkResource = widget->resource().dynamicCast<QnNetworkResource>();
-
     QString previousDir = qnSettings->lastExportDir();
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
@@ -3206,16 +3205,19 @@ Do you want to continue?"),
 #endif
             ;
 
-    QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
+    QnLayoutItemData itemData = widget->item()->data();
 
     QString fileName;
     QString selectedExtension;
     QString selectedFilter;
     bool withTimestamps = false;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
+    DewarpingParams dewarpingParams = itemData.dewarpingParams;
 
     while (true) {
-        QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
+        QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), lit('_'));
+        QString timePart = (widget->resource()->toResource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss")) : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
+        QString suggestion = namePart + lit("_") + timePart;
 
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
@@ -3230,19 +3232,41 @@ Do you want to continue?"),
 #ifdef Q_OS_WIN
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
-        dialog->addCheckBox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
-        dialog->addCheckBox(tr("Video adjustment (Requires Transcoding)"), &contrastParams.enabled, delegate);
+        dialog->addCheckBox(tr("Include timestamps (requires transcoding)"), &withTimestamps, delegate);
 
-
+        bool doTranscode = contrastParams.enabled || dewarpingParams.enabled;
+        if (doTranscode) {
+            if (contrastParams.enabled && dewarpingParams.enabled) {
+                dialog->addCheckBox(tr("Apply dewarping and image correction (requires transcoding)"), &doTranscode, delegate);
+            } else if (contrastParams.enabled) {
+                dialog->addCheckBox(tr("Apply image correction (requires transcoding)"), &doTranscode, delegate);
+            } else {
+                dialog->addCheckBox(tr("Apply dewarping (requires transcoding)"), &doTranscode, delegate);
+            }
+        }
+        
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
+        contrastParams.enabled &= doTranscode;
+        dewarpingParams.enabled &= doTranscode;
         fileName = dialog->selectedFiles().value(0);
         selectedFilter = dialog->selectedNameFilter();
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
 
         if (fileName.isEmpty())
             return;
+
+        if(doTranscode || withTimestamps) {
+            QMessageBox::StandardButton button = QMessageBox::question(
+                mainWindow(),
+                tr("Save As"),
+                tr("You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?"),
+                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+            );
+            if(button != QMessageBox::Yes)
+                return;
+        }
 
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
@@ -3254,8 +3278,7 @@ Do you want to continue?"),
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                 );
-
-                if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                if(button != QMessageBox::Yes)
                     return;
             }
         }
@@ -3345,7 +3368,8 @@ Do you want to continue?"),
                                                   QnStorageResourcePtr(), role,
                                                   timeOffset, serverTimeZone,
                                                   itemData.zoomRect,
-                                                  contrastParams);
+                                                  contrastParams,
+                                                  dewarpingParams);
         exportProgressDialog->exec();
     }
 }
@@ -3469,7 +3493,8 @@ void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
 
 void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
     QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(menu()->currentParameters(sender()).widget());
+    if(!camera || !widget)
         return;
 
     if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
@@ -3481,7 +3506,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
         return;
     }
 
-    QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(camera);
+    QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(widget);
     if(qIsNaN(position)) {
         QMessageBox::critical(
             mainWindow(),
@@ -3509,7 +3534,8 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(parameters.widget());
+    if(!camera || !widget)
         return;
 
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
@@ -3530,7 +3556,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
     }
 
     action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
-    context()->instance<QnWorkbenchPtzController>()->setPosition(camera, preset.logicalPosition);
+    context()->instance<QnWorkbenchPtzController>()->setPosition(widget, preset.logicalPosition);
 }
 
 void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {

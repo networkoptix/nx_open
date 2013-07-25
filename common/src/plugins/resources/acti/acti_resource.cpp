@@ -35,6 +35,10 @@ QnActiResource::QnActiResource()
     setAuth(QLatin1String("admin"), QLatin1String("123456"));
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
         m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
+
+    connect(
+        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
+        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
 }
 
 QnActiResource::~QnActiResource()
@@ -603,11 +607,11 @@ void QnActiResource::onTimer( const quint64& timerID )
 void QnActiResource::initializePtz()
 {
     m_ptzController.reset(new QnActiPtzController(this));
-    Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
-    if(capabilities == Qn::NoCapabilities)
+    Qn::PtzCapabilities capabilities = m_ptzController->getCapabilities();
+    if(capabilities == Qn::NoPtzCapabilities)
         m_ptzController.reset();
 
-    setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
+    setPtzCapabilities((getPtzCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
 }
 
 void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInfo )

@@ -8,17 +8,6 @@
 
 static const quint16 DEFAULT_AXIS_API_PORT = 80; // TODO: #Elric copypasta from axis_resource.cpp
 
-namespace {
-    /**
-     * \param fovDegreees               Width-based FOV in degrees.
-     * \returns                         Width-based 35mm-equivalent focal length.
-     */
-    qreal fovTo35mmEquiv(qreal fovDegreees) {
-        return (36.0 / 2) / std::tan((fovDegreees / 2) * (M_PI / 180));
-    }
-
-} // anonymous namespace
-
 
 class QnAxisParameterMap {
 public:
@@ -134,7 +123,7 @@ void QnAxisPtzController::init(const QnAxisParameterMap &params) {
 
         QnScalarSpaceMapper xMapper(minPan, maxPan, minPan, maxPan, qFuzzyCompare(maxPan - minPan, 360.0) ? Qn::PeriodicExtrapolation : Qn::ConstantExtrapolation);
         QnScalarSpaceMapper yMapper(minTilt, maxTilt, minTilt, maxTilt, Qn::ConstantExtrapolation);
-        QnScalarSpaceMapper zMapper(1, 9999, fovTo35mmEquiv(maxAngle), fovTo35mmEquiv(minAngle), Qn::ConstantExtrapolation);
+        QnScalarSpaceMapper zMapper(1, 9999, fovTo35mmEquiv(gradToRad(maxAngle)), fovTo35mmEquiv(gradToRad(minAngle)), Qn::ConstantExtrapolation);
         /* Note that we do not care about actual zoom limits on the camera. 
          * It's up to the camera to enforce them. */
         
@@ -230,11 +219,10 @@ int QnAxisPtzController::stopMove() {
     return startMove(0.0, 0.0, 0.0);
 }
 
-Qn::CameraCapabilities QnAxisPtzController::getCapabilities() {
+Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
     return m_capabilities;
 }
 
 const QnPtzSpaceMapper *QnAxisPtzController::getSpaceMapper() {
     return m_spaceMapper;
 }
-

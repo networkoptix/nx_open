@@ -4,6 +4,7 @@
 #include "core/resource/camera_resource.h"
 #include "acti_resource.h"
 #include "../mdns/mdns_listener.h"
+#include "utils/network/http/asynchttpclient.h"
 
 extern QString getValueFromString(const QString& line);
 
@@ -20,7 +21,6 @@ QnActiResourceSearcher::QnActiResourceSearcher():
 
 QnActiResourceSearcher::~QnActiResourceSearcher()
 {
-    delete m_manager;
 }
 
 QnResourceList QnActiResourceSearcher::findResources(void)
@@ -66,11 +66,11 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
     {
         if (!m_httpInProgress.contains(url.host())) 
         {
-            if (!m_manager) {
-                m_manager = new QNetworkAccessManager();
-                connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(at_replyReceived(QNetworkReply*)));
-            }
-            m_manager->get(QNetworkRequest(url));
+            QString urlStr = url.toString();
+
+            nx_http::AsyncHttpClient* request = new nx_http::AsyncHttpClient();
+            connect(request, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(at_replyReceived(nx_http::AsyncHttpClient*)), Qt::DirectConnection);
+            request->doGet(url);
             m_httpInProgress << url.host();
         }
     }
@@ -78,12 +78,12 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
     return m_cachedXml.value(host).xml;
 }
 
-void QnActiResourceSearcher::at_replyReceived(QNetworkReply* reply)
+void QnActiResourceSearcher::at_replyReceived(nx_http::AsyncHttpClient* reply)
 {
     QMutexLocker lock(&m_mutex);
 
     QString host = reply->url().host();
-    m_cachedXml[host].xml = reply->readAll();
+    m_cachedXml[host].xml = reply->fetchMessageBodyBuffer();
     m_cachedXml[host].timer.restart();
     m_httpInProgress.remove(host);
 

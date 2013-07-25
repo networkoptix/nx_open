@@ -62,13 +62,15 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->recordingTab,                                            Qn::CameraSettings_Recording_Help);
     setHelpTopic(ui->motionTab,                                               Qn::CameraSettings_Motion_Help);
     setHelpTopic(ui->cameraPropertiesTab,                                     Qn::CameraSettings_Properties_Help);
-    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Advanced_Help);
+    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Expert_Help);
+    setHelpTopic(ui->tabFisheyeSettings,                                      Qn::CameraSettings_Dewarping_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
 
     connect(ui->nameEdit,               SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->enableAudioCheckBox,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
+    connect(ui->checkBoxDewarping,      SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
 
@@ -98,6 +100,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
     connect(ui->advancedSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+    connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
 
     updateFromResource();
 }
@@ -238,8 +241,9 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     if(m_camera == camera)
         return;
 
-    if(m_camera)
+    if(m_camera) {
         disconnect(m_camera, NULL, this, NULL);
+    }
 
     m_camera = camera;
     d->setCameras(QnVirtualCameraResourceList() << camera);
@@ -269,6 +273,8 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
         return Qn::CameraPropertiesTab;
     } else if(tab == ui->tabAdvancedSettings) {
         return Qn::AdvancedCameraSettingsTab;
+    } else if(tab == ui->tabFisheyeSettings) {
+        return Qn::FisheyeCameraSettingsTab;
     } else {
         qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
         return Qn::GeneralSettingsTab;
@@ -293,6 +299,9 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
         break;
     case Qn::AdvancedCameraSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabAdvancedSettings);
+        break;
+    case Qn::FisheyeCameraSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->tabFisheyeSettings);
         break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
@@ -347,6 +356,10 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         if (cs != Qt::PartiallyChecked)
             m_camera->setCameraControlDisabled(cs == Qt::Checked);
 
+        DewarpingParams dewarping = ui->fisheyeSettingsWidget->dewarpingParams();
+        dewarping.enabled = ui->checkBoxDewarping->isChecked();
+        m_camera->setDewarpingParams(dewarping);
+        m_dewarpingParamsBackup = ui->fisheyeSettingsWidget->dewarpingParams();
 
         setHasDbChanges(false);
     }
@@ -361,6 +374,13 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     }
 }
 
+void QnSingleCameraSettingsWidget::reject()
+{
+    if (m_camera)
+        m_camera->setDewarpingParams(m_dewarpingParamsBackup);
+    updateFromResource();
+}
+
 void QnSingleCameraSettingsWidget::updateFromResource() {
     loadAdvancedSettings();
 
@@ -369,6 +389,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->modelEdit->setText(QString());
         ui->firmwareEdit->setText(QString());
         ui->enableAudioCheckBox->setChecked(false);
+        ui->checkBoxDewarping->setChecked(false);
         ui->macAddressEdit->setText(QString());
         ui->loginEdit->setText(QString());
         ui->passwordEdit->setText(QString());
@@ -392,7 +413,10 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
+        ui->checkBoxDewarping->setChecked(m_camera->getDewarpingParams().enabled);
         ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
+        //ui->checkBoxDewarping->setEnabled(m_camera->getPtzCapabilities() == 0);
+        ui->checkBoxDewarping->setEnabled(m_camera->hasParam(lit("ptzCapabilities")));
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());
@@ -444,8 +468,12 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
             ui->advancedSettingsWidget->updateFromResource(m_camera);
+            ui->fisheyeSettingsWidget->updateFromResource(m_camera);
+            m_dewarpingParamsBackup = m_camera->getDewarpingParams();
         }
     }
+
+    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->checkBoxDewarping->isChecked());
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
@@ -500,6 +528,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     using ::setReadOnly;
     setReadOnly(ui->nameEdit, readOnly);
     setReadOnly(ui->enableAudioCheckBox, readOnly);
+    setReadOnly(ui->checkBoxDewarping, readOnly);
     setReadOnly(ui->loginEdit, readOnly);
     setReadOnly(ui->passwordEdit, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);
@@ -826,6 +855,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
 }
 
 void QnSingleCameraSettingsWidget::at_dbDataChanged() {
+    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->checkBoxDewarping->isChecked());
     setHasDbChanges(true);
 }
 
@@ -886,4 +916,10 @@ void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
     {
         loadAdvancedSettings();
     }
+}
+
+void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
+{
+    at_dbDataChanged();
+    m_camera->setDewarpingParams(ui->fisheyeSettingsWidget->dewarpingParams());
 }

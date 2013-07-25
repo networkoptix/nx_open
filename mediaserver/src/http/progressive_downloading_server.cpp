@@ -1,9 +1,9 @@
 
 #include <memory>
 
-#include <QFileInfo>
 #include <QSettings>
 #include "progressive_downloading_server.h"
+#include <utils/fs/file.h>
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
 #include "transcoding/transcoder.h"
@@ -384,7 +384,7 @@ void QnProgressiveDownloadingConsumer::run()
         d->responseBody.clear();
 
         //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
-        const QString& requestedResourcePath = QFileInfo(getDecodedUrl().path()).fileName();
+        const QString& requestedResourcePath = QnFile::fileName(getDecodedUrl().path());
         const int nameFormatSepPos = requestedResourcePath.lastIndexOf( QLatin1Char('.') );
         const QString& resUniqueID = requestedResourcePath.mid(0, nameFormatSepPos);
         d->streamingFormat = nameFormatSepPos == -1 ? QByteArray() : requestedResourcePath.mid( nameFormatSepPos+1 ).toLocal8Bit();

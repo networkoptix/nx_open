@@ -1,14 +1,15 @@
-#include "recorded_chunks_handler.h"
 
-#include <QtCore/QFileInfo>
+#include "recorded_chunks_handler.h"
 
 #include "recorder/storage_manager.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "rest/server/rest_server.h"
 #include "core/resource_managment/resource_pool.h"
 #include "utils/common/util.h"
+#include <utils/fs/file.h>
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
+
 
 QRect QnRecordedChunksHandler::deserializeMotionRect(const QString& rectStr)
 {
@@ -155,7 +156,7 @@ int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList
     Q_UNUSED(params)
     Q_UNUSED(contentType)
     //QString method = path.mid(path.lastIndexOf('/')+1);
-    QString method = QFileInfo(path).baseName();
+    QString method = QnFile::baseName(path);
 
     QFile f(QString(":/xsd/api/") + method);
     f.open(QFile::ReadOnly);

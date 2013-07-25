@@ -18,7 +18,7 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
-    enum Tag {Tag_startTime, Tag_endTime, Tag_LayoutInfo, Tag_Software, Tag_Signature};
+    enum Tag {Tag_startTime, Tag_endTime, Tag_LayoutInfo, Tag_Software, Tag_Signature, Tag_Dewarping};
 
     /*
     * Some containers supports only predefined tag names. So, I've introduce this function

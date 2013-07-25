@@ -391,6 +391,13 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
                     }
                 }
             }
+
+            AVDictionaryEntry* dewarpInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_Dewarping, format), 0, 0);
+            if (dewarpInfo) {
+                QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>();
+                if (mediaRes)
+                    mediaRes->setDewarpingParams(DewarpingParams::deserialize(dewarpInfo->value));
+            }
         }
     }
     return m_videoLayout;
@@ -623,6 +630,8 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
             return "encoded_by"; // "ITCH";
         case Tag_Signature:
             return "copyright"; // "ICOP";
+        case Tag_Dewarping:
+            return "title";
         }
     }
     else {
@@ -638,6 +647,8 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
             return "software";
         case Tag_Signature:
             return "signature"; // "ICOP";
+        case Tag_Dewarping:
+            return "dewarp";
         }
     }
     return "";

@@ -85,7 +85,8 @@ protected:
 // QnDayTimeWidget
 // -------------------------------------------------------------------------- //
 QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
-    base_type(parent)
+    base_type(parent),
+    m_localOffset(0)
 {
     m_headerLabel = new QLabel(this);
     m_headerLabel->setAlignment(Qt::AlignCenter);
@@ -215,6 +216,7 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
         palette(), 
         rect, 
         period, 
+        m_localOffset,
         m_enabledPeriod, 
         m_selectedPeriod, 
         m_primaryPeriodStorage, 
@@ -274,7 +276,19 @@ void QnDayTimeWidget::at_tableWidget_itemClicked(QTableWidgetItem *item) {
     if(!time.isValid())
         return;
 
-    emit timeClicked(item->data(Qt::UserRole).toTime());
+    emit timeClicked(time);
 }
 
+qint64 QnDayTimeWidget::localOffset() const {
+    return m_localOffset;
+}
+
+void QnDayTimeWidget::setLocalOffset(qint64 localOffset) {
+    if(m_localOffset == localOffset)
+        return;
+
+    m_localOffset = localOffset;
+
+    m_tableWidget->update();
+}
 
