@@ -171,7 +171,7 @@ DewarpingParams QnFisheyePtzController::getDewarpingParams() const
     return m_dewarpingParams;
 }
 
-DewarpingParams QnFisheyePtzController::updateDewarpingParams()
+DewarpingParams QnFisheyePtzController::updateDewarpingParams(float ar)
 {
     qint64 newTime = getUsecTimer();
     qreal timeSpend = (newTime - m_lastTime) / 1000000.0;
@@ -212,7 +212,7 @@ DewarpingParams QnFisheyePtzController::updateDewarpingParams()
         qreal yRange = xRange; // / newParams.aspectRatio;
 
         newParams.xAngle = boundXAngle(newParams.xAngle, newParams.fov);
-        newParams.yAngle = boundYAngle(newParams.yAngle, newParams.fov, m_dewarpingParams.panoFactor, m_dewarpingParams.horizontalView);
+        newParams.yAngle = boundYAngle(newParams.yAngle, newParams.fov, m_dewarpingParams.panoFactor*ar, m_dewarpingParams.horizontalView);
         m_lastTime = newTime;
     }
     newParams.enabled = m_dewarpingParams.enabled;
