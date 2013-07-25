@@ -36,6 +36,10 @@ public:
                                     bool useIp,
                                     bool useHtml);
 
+    static QVariantHash eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
+                                    const QnBusinessAggregationInfo &aggregationInfo,
+                                    bool useIp);
+
     static QString eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
     static QVariantHash eventDetailsMap(const QnBusinessEventParameters &params, int aggregationCount);
 

@@ -1,0 +1,23 @@
+<!-- content -->
+{{#aggregated}}
+<div class="content"><table bgcolor="">
+    <div class="callout">
+        <p>Conflict detected at: {{timestamp}}</p>
+        <table>
+            <tr>
+                <th>Number</th>
+                <th>ECS IP</th>
+                <th>Number</th>
+            </tr>
+                {{#msConflicts}}
+                    <tr>
+                        <td>{{number}}</td>
+                        <td>{{mac}}</td>
+                        <td><i>{{timestamp}}</i></td>
+                    </tr>
+                {{/msConflicts}}
+                <tr><td><i>{{timestamp}}</i></td></tr>
+        </table>
+    </div>
+</table></div><!-- /content -->
+{{/aggregated}}

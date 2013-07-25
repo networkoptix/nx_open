@@ -105,6 +105,7 @@ public:
 
     int sendEmailAsync(const QString& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
     int sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
+    int sendEmailAsync(const QStringList &to, const QString& subject, const QString& message, const QnEmailAttachmentList& attachments, int timeout, QObject *target, const char *slot);
 
     /**
      * @brief requestStoredFileAsync        Get stored file from EC

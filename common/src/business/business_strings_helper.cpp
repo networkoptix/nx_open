@@ -1,7 +1,6 @@
 #include "business_strings_helper.h"
 #include "version.h"
 
-#include "mustache/mustache.h"
 #include <api/app_server_connection.h>
 
 #include <business/business_aggregation_info.h>
@@ -17,7 +16,7 @@ namespace {
     static const QString plainTextDelimiter(lit("\n"));
     static const QString htmlDelimiter(lit("<br>"));
 
-    static const QString tpName(lit("name"));
+    static const QString tpProductName(lit("productName"));
     static const QString tpEvent(lit("event"));
     static const QString tpSource(lit("source"));
     static const QString tpUrlInt(lit("urlint"));
@@ -99,27 +98,6 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     return tr("Unknown Event has occured");
 }
 
-QString readFile(const QString& filename) {
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return QString();
-    }
-
-    QTextStream stream(&file);
-    return stream.readAll();
-}
-
-QString renderTemplateFromString(const QString& _template, const QVariantHash& contextMap) {
-    Mustache::Renderer renderer;
-    Mustache::QtVariantContext context(contextMap);
-    return renderer.render(_template, &context);
-}
-
-QString renderTemplateFromFile(const QString& filename, const QVariantHash& contextMap) {
-    QString _template = readFile(filename);
-    return renderTemplateFromString(_template, contextMap);
-}
-
 QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action,
                                                   const QnBusinessAggregationInfo &aggregationInfo,
                                                   bool useIp,
@@ -132,41 +110,42 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     QnBusinessEventParameters params = action->getRuntimeParams();
     BusinessEventType::Value eventType = params.getEventType();
 
-    if (useHtml) {
-        QVariantHash contextMap;
+    QString result;
+    result += tr("Event: %1").arg(eventName(eventType));
 
-        contextMap[tpName] = lit("John Smith");
-        contextMap[tpEvent] = eventName(eventType);
-        contextMap[tpSource] = eventSource(params, useIp);
-        if (eventType == BusinessEventType::Camera_Motion) {
-            contextMap[tpUrlInt] = motionUrl(params);
-            contextMap[tpUrlExt] = motionUrl(params);
-        }
-        contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo);
+    result += delimiter;
+    result += tr("Source: %1").arg(eventSource(params, useIp));
 
-        return renderTemplateFromFile(lit(":/skin/email_templates/camera_motion.mustache"), contextMap);
-    } else {
-        QString result;
-        result += tr("Event: %1").arg(eventName(eventType));
+    if (useHtml && eventType == BusinessEventType::Camera_Motion) {
         result += delimiter;
-        result += tr("Source: %1").arg(eventSource(params, useIp));
-        result += delimiter;
-        result += aggregatedEventDetails(action, aggregationInfo, delimiter);
-
-        return result;
+        result += tr("Url: %1").arg(motionUrl(params));
     }
+
+    result += delimiter;
+    result += aggregatedEventDetails(action, aggregationInfo, delimiter);
+
+    return result;
 }
 
-QString QnBusinessStringsHelper::renderEventDetailsText(QVariantHash contextMap) {
-    QString _template = lit("{{timestamp}}")
-        + lit("{{#inputPort}}\n") + tr("Input port: %1").arg(lit("{{inputPort}}")) + lit("{{/inputPort}}")
-        + lit("{{#reason}}\n") + tr("Reason: %1").arg(lit("{{reason}}")) + lit("{{/reason}}")
-        + lit("{{#cameraConflictAddress}}\n") + tr("Conflict address: %1").arg(lit("{{cameraConflictAddress}}"))
-            + lit("{{#cameraConflicts}}\n") + tr("Camera #%1 MAC: %2").arg(lit("{{number}}")).arg(lit("{{mac}}")) + lit("{{/cameraConflicts}}")
-        + lit("{{/cameraConflictAddress}}")
-    + lit("{{#msConflicts}}\n") + tr("Conflicting EC #%1: %2").arg(lit("{{ecsNumber}}")).arg(lit("{{ecsIp}}")) + lit("{{/msConflicts}}");
+QVariantHash QnBusinessStringsHelper::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
+                                                  const QnBusinessAggregationInfo &aggregationInfo,
+                                                  bool useIp) {
 
-    return renderTemplateFromString(_template, contextMap);
+    QnBusinessEventParameters params = action->getRuntimeParams();
+    BusinessEventType::Value eventType = params.getEventType();
+
+    QVariantHash contextMap;
+
+    contextMap[tpProductName] = lit(QN_PRODUCT_NAME);
+    contextMap[tpEvent] = eventName(eventType);
+    contextMap[tpSource] = eventSource(params, useIp);
+    if (eventType == BusinessEventType::Camera_Motion) {
+        contextMap[tpUrlInt] = motionUrl(params);
+        contextMap[tpUrlExt] = motionUrl(params);
+    }
+    contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo);
+
+    return contextMap;
 }
 
 QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) {

@@ -1,0 +1,18 @@
+<!-- content -->
+<div class="content"><table bgcolor="">
+    <div class="callout">
+        <p>MediaServer failure information:</p>
+        <table>
+            <tr>
+                <th>Reason</th>
+                <th>Timestamp</th>
+            </tr>
+            {{#aggregated}}
+                <tr>
+                    <td>{{reason}}</td>
+                    <td><i>{{timestamp}}</i></td>
+                </tr>
+            {{/aggregated}}
+        </table>
+    </div>
+</table></div><!-- /content -->

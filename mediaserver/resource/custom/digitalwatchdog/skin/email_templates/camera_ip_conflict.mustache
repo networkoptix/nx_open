@@ -1,0 +1,20 @@
+<!-- content -->
+{{#aggregated}}
+<div class="content"><table bgcolor="">
+    <div class="callout">
+        <p>Conflict detected at {{timestamp}} for IP address {{cameraConflictAddress}}:</p>
+        <table>
+            <tr>
+                <th>Number</th>
+                <th>MAC Address</th>
+            </tr>
+            {{#cameraConflicts}}
+                <tr>
+                    <td>{{number}}</td>
+                    <td>{{mac}}</td>
+                </tr>
+            {{/cameraConflicts}}
+        </table>
+    </div>
+</table></div><!-- /content -->
+{{/aggregated}}

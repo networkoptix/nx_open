@@ -13,6 +13,9 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include "mustache/mustache_helper.h"
+#include "mustache/partial_info.h"
+
 #include "utils/common/synctime.h"
 #include <utils/common/email.h>
 #include "business_strings_helper.h"
@@ -403,11 +406,27 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
 
+    QVariantHash contextMap = QnBusinessStringsHelper::eventDescriptionMap(action, action->aggregationInfo(), true);
+    QnPartialInfo partialInfo(action->getRuntimeParams().getEventType());
+
+    assert(!partialInfo.attrName.isEmpty());
+    contextMap[partialInfo.attrName] = lit("true");
+
+    QnEmailAttachmentList attachments;
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(lit("productLogo.png"), lit(":/skin/email_attachments/productLogo.png"), lit("image/png"))));
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(partialInfo.eventLogoFilename, lit(":/skin/email_attachments/") + partialInfo.eventLogoFilename, lit("image/png"))));
+    contextMap[lit("productLogoFilename")] = lit("cid:productLogo.png");
+    contextMap[lit("eventLogoFilename")] = lit("cid:") + partialInfo.eventLogoFilename;
+    attachments.append(partialInfo.attachments);
+
+    QString messageBody = renderTemplateFromFile(lit(":/skin/email_templates"), lit("container.mustache"), contextMap);
+
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
     appServerConnection->sendEmailAsync(
                 recipients,
                 QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
-                QnBusinessStringsHelper::eventDescription(action, action->aggregationInfo(), true, true),
+                messageBody,
+                attachments,
                 EMAIL_SEND_TIMEOUT,
                 this,
                 SLOT(at_sendEmailFinished(int,bool,int)));

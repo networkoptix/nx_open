@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<!-- If you delete this meta tag, the ground will open and swallow you. -->
+<meta name="viewport" content="width=device-width" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>{{productName}} notification</title>
+
+<style>
+{{>style_css}}
+</style>   
+</head>
+ 
+<body bgcolor="#FFFFFF" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0">
+
+<!-- HEADER -->
+<table class="head-wrap" bgcolor="#999999">
+    <tr>
+        <td></td>
+        <td class="header container" align="">
+            
+            <!-- /content -->
+            <div class="content">
+                <table bgcolor="#999999" >
+                    <tr>
+                        <td><img src="{{productLogoFilename}}" width="200" height="50"/></td>
+                        <td align="right"><h6 class="collapse">Newsletter</h6></td>
+                    </tr>
+                </table>
+            </div><!-- /content -->
+            
+        </td>
+        <td></td>
+    </tr>
+</table><!-- /HEADER -->
+
+<!-- BODY -->
+<table class="body-wrap" bgcolor="">
+    <tr>
+        <td></td>
+        <td class="container" align="" bgcolor="#FFFFFF">
+            
+            <!-- content -->
+            <div class="content">
+                <table>
+                    <tr>
+                        <td>
+                            
+                            <h3>Dear {{productName}} user,</h3>
+                            <p class="lead">Some events occured with your system.</p>
+                            
+                            <!-- A Real Hero (and a real human being) --><!-- /hero -->
+<!--                            <p><img src="http://placehold.it/600x300" /></p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p> -->
+                        </td>
+                    </tr>
+                </table>
+            </div><!-- /content -->
+            <!-- content -->
+            <div class="content">
+                <table bgcolor="">
+                    <tr>
+                        <td class="small" width="20%" style="vertical-align: top; padding-right:10px;"><img src="{{eventLogoFilename}}" width="75" height="75"/></td>
+                        <td>
+                            <h4>{{event}} <small>{{source}}</small></h4>
+<!--                            <p class="">{{event}} detected </p> -->
+                            {{#urlext}}
+                            <a class="btn" href="{{urlext}}">External Link &raquo;</a><a class="btn" href="{{urlint}}">Internal Link &raquo;</a>
+                            {{/urlext}}
+                        </td>
+                    </tr>
+                </table>
+            </div><!-- /content -->
+
+            {{#typeCameraMotion}}
+                {{> camera_motion}}
+            {{/typeCameraMotion}}
+
+            {{#typeCameraDisconnect}}
+                {{> camera_disconnect}}
+            {{/typeCameraDisconnect}}
+
+            {{#typeStorageFailure}}
+                {{> storage_failure}}
+            {{/typeStorageFailure}}
+
+            {{#typeNetworkIssue}}
+                {{> network_issue}}
+            {{/typeNetworkIssue}}
+
+            {{#typeCameraIpConflict}}
+                {{> camera_ip_conflict}}
+            {{/typeCameraIpConflict}}
+        
+            {{#typeCameraInput}}
+                {{> camera_input}}
+            {{/typeCameraInput}}
+
+            {{#typeMediaServerFailure}}
+                {{> media_server_failure}}
+            {{/typeMediaServerFailure}}
+
+            {{#typeMediaServerConflict}}
+                {{> media_server_conflict}}
+            {{/typeMediaServerConflict}}
+
+            <!-- content -->
+            <div class="content">
+                <table bgcolor="">
+                    <tr>
+                        <td>
+                            
+                            <!-- social & contact -->
+                            <table bgcolor="" class="social" width="100%">
+                                <tr>
+                                    <td>
+                                        
+                                        <!--- column 1 -->
+                                        <div class="column">
+                                            <table bgcolor="" cellpadding="" align="left">
+                                        <tr>
+                                            <td>                
+                                                
+                                                <h5 class="">Connect with Us:</h5>
+                                                <p class=""><a href="#" class="soc-btn fb">Facebook</a> <a href="#" class="soc-btn tw">Twitter</a> <a href="#" class="soc-btn gp">Google+</a></p>
+                        
+                                                
+                                            </td>
+                                        </tr>
+                                    </table><!-- /column 1 -->
+                                        </div>
+                                        
+                                        <!--- column 2 -->
+                                        <div class="column">
+                                            <table bgcolor="" cellpadding="" align="left">
+                                        <tr>
+                                            <td>                
+                                                                            
+                                                <h5 class="">Contact Info:</h5>                                             
+                                                <p>Phone: <strong>408.341.0600</strong><br/>
+                Email: <strong><a href="emailto:hseldon@trantor.com">hseldon@trantor.com</a></strong></p>
+                
+                                            </td>
+                                        </tr>
+                                    </table><!-- /column 2 -->  
+                                        </div>
+                                        
+                                        <div class="clear"></div>
+    
+                                    </td>
+                                </tr>
+                            </table><!-- /social & contact -->
+                            
+                        </td>
+                    </tr>
+                </table>
+            </div><!-- /content -->
+            
+
+        </td>
+        <td></td>
+    </tr>
+</table><!-- /BODY -->
+
+<!-- FOOTER -->
+<table class="footer-wrap">
+    <tr>
+        <td></td>
+        <td class="container">
+            
+                <!-- content -->
+                <div class="content">
+                    <table>
+                        <tr>
+                            <td align="center">
+                                <p>
+                                    <a href="#">Terms</a> |
+                                    <a href="#">Privacy</a> |
+                                    <a href="#"><unsubscribe>Unsubscribe</unsubscribe></a>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div><!-- /content -->
+                
+        </td>
+        <td></td>
+    </tr>
+</table><!-- /FOOTER -->
+
+</body>
+</html>

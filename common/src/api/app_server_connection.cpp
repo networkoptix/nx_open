@@ -707,11 +707,15 @@ int QnAppServerConnection::sendEmailAsync(const QString &addr, const QString &su
 
 int QnAppServerConnection::sendEmailAsync(const QStringList &to, const QString &subject, const QString &message, int timeout, QObject *target, const char *slot)
 {
+    return sendEmailAsync(to, subject, message, QnEmailAttachmentList(), timeout, target, slot);
+}
+
+int QnAppServerConnection::sendEmailAsync(const QStringList &to, const QString& subject, const QString& message, const QnEmailAttachmentList& attachments, int timeout, QObject *target, const char *slot) {
     if (message.isEmpty())
         return -1;
 
     QByteArray data;
-    m_serializer.serializeEmail(to, subject, message, timeout, data);
+    m_serializer.serializeEmail(to, subject, message, attachments, timeout, data);
 
     return addObjectAsync(EmailObject, data, QN_STRINGIZE_TYPE(bool), target, slot);
 }
