@@ -3139,7 +3139,7 @@ Make sure the server is available and try again.</source>
         <translation>复制选择到剪贴板</translation>
     </message>
     <message>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation>复制选择到档案</translation>
     </message>
     <message>
@@ -3851,7 +3851,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation>复制选择到剪贴板</translation>
     </message>
     <message>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation>输出选择到档案</translation>
     </message>
     <message>

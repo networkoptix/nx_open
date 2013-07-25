@@ -2961,7 +2961,7 @@ It might take a few moments to populate them in the tree.</source>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="52"/>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3416,7 +3416,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="77"/>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
