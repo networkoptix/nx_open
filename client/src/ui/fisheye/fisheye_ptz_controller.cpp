@@ -48,9 +48,9 @@ void QnFisheyePtzController::updateSpaceMapper(bool horizontalView, int pf)
     else {
         m_xRange = SpaceRange(gradToRad(-180.0), gradToRad(180.0));
         if (pf > 1)
-            m_yRange = SpaceRange(0, gradToRad(90.0));
+            m_yRange = SpaceRange(-gradToRad(90.0), gradToRad(90.0));
         else
-            m_yRange = SpaceRange(0.0, gradToRad(180.0 + 30.0)); // why extra ~25-30 degree is required?
+            m_yRange = SpaceRange(0.0, gradToRad(90 + 45)); // why extra ~25-30 degree is required?
         xExtrapolationMode = Qn::PeriodicExtrapolation;
     }
 

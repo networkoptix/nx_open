@@ -78,6 +78,7 @@ protected:
     int m_fovRotLocation;
     int m_dstFovLocation;
     int m_aspectRatioLocation;
+    int m_panoFactorLocation;
     int m_yCenterLocation;
     int m_maxXLocation;
     int m_maxYLocation;

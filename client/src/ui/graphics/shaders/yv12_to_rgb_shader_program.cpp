@@ -138,7 +138,8 @@ void QnFisheyeShaderProgram::setDewarpingParams(const DewarpingParams& params, f
             setUniformValue(m_yCenterLocation, (float) 1.0);
     }
 
-    setUniformValue(m_aspectRatioLocation, (float) (aspectRatio * params.panoFactor));
+    setUniformValue(m_aspectRatioLocation, (float) (aspectRatio));
+    setUniformValue(m_panoFactorLocation, (float) (params.panoFactor));
     setUniformValue(m_dstFovLocation, (float) params.fov);
 
     setUniformValue(m_maxXLocation, maxX);
@@ -155,6 +156,7 @@ bool QnFisheyeShaderProgram::link()
         m_fovRotLocation = uniformLocation("fovRot");
         m_dstFovLocation = uniformLocation("dstFov");
         m_aspectRatioLocation = uniformLocation("aspectRatio");
+        m_panoFactorLocation = uniformLocation("panoFactor");
         m_yCenterLocation = uniformLocation("yCenter");
 
         m_maxXLocation = uniformLocation("maxX");
@@ -328,6 +330,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         uniform float fovRot;
         uniform float dstFov;
         uniform float aspectRatio;
+        uniform float panoFactor;
         uniform float yCenter;
         uniform float yLevels1;
         uniform float yLevels2;
@@ -345,15 +348,21 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
                                    0.0, cos(-fovRot), -sin(-fovRot),
                                    0.0, sin(-fovRot),  cos(-fovRot));
 
+    float backAR = (1.0 - 1.0 / aspectRatio)/2.0;
+
     void main() 
     {
-        vec2 pos = (gl_TexCoord[0].xy / vec2(maxX, maxY) - vec2(0.5, yCenter)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
+        //vec2 pos = (gl_TexCoord[0].xy / vec2(maxX, maxY) - vec2(0.5, yCenter)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
+        vec2 pos = gl_TexCoord[0].xy / vec2(maxX, maxY);
+        pos.y = pos.y / aspectRatio;
+
+        pos = (pos -  vec2(0.5, yCenter)) * dstFov;
 
         float theta = pos.x + xShift;
         float roty = -fovRot* cos(theta);
         float roty2 = -fovRot*2.0*cos(theta);
         
-        pos.y = pos.y/(-aspectRatio);
+        pos.y = pos.y/(-panoFactor);
         float ymaxInv = aspectRatio / dstFov;
         float phi   = pos.y * ((ymaxInv - roty) / ymaxInv) + roty + yShift;
         
@@ -369,6 +378,10 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
 
         // return from polar coordinates
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
+
+        //pos.x = (pos.x + (aspectRatio-1.0)/2.0) / aspectRatio;
+        //pos.y = (pos.y - (aspectRatio-1.0)/2.0) * aspectRatio;
+        pos.y = (pos.y - backAR) * aspectRatio;
 
         pos.x = min(pos.x*maxX, maxX);
         pos.y = min(pos.y*maxY, maxY);
