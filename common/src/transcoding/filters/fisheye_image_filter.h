@@ -10,6 +10,8 @@ public:
     QnFisheyeImageFilter(const DewarpingParams& params);
 
     virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) override;
+
+    static QSize getOptimalSize(const QSize& srcResolution, const DewarpingParams& dewarpingParams);
 private:
     void updateFisheyeTransform(const QSize& imageSize, int plane);
     void updateFisheyeTransformRectilinear(const QSize& imageSize, int plane);

@@ -14,6 +14,7 @@
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "../client/client_settings.h"
 #include "transcoding/filters/contrast_image_filter.h"
+#include "transcoding/filters/fisheye_image_filter.h"
 
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
@@ -981,7 +982,7 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 }
 
 
-QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params)
+QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, const DewarpingParams& dewarping)
 {
     if (m_decoder.isEmpty())
         return QImage();
@@ -995,33 +996,55 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params)
         return QImage();
 
     // copy image
-    CLVideoDecoderOutput frameCopy;
-    frameCopy.setUseExternalData(false);
-    frameCopy.reallocate(lastFrame->width, lastFrame->height, lastFrame->format);
-    av_picture_copy((AVPicture*) &frameCopy, (AVPicture*) lastFrame, (PixelFormat) lastFrame->format, lastFrame->width, lastFrame->height);
-    QnContrastImageFilter filter(params);
-    filter.updateImage(&frameCopy, QRectF(0.0, 0.0, 1.0, 1.0));
+    QScopedPointer<CLVideoDecoderOutput> srcFrame(new CLVideoDecoderOutput());
+    srcFrame->setUseExternalData(false);
 
+    QSize srcSize(QSize(lastFrame->width, lastFrame->height));
+    QSize frameCopySize = QnFisheyeImageFilter::getOptimalSize(srcSize, dewarping);
+
+    srcFrame->reallocate(frameCopySize.width(), frameCopySize.height(), lastFrame->format);
+
+    if (frameCopySize == srcSize)
+        av_picture_copy((AVPicture*) srcFrame.data(), (AVPicture*) lastFrame, (PixelFormat) lastFrame->format, lastFrame->width, lastFrame->height);
+    else {
+        // resize frame
+        SwsContext* convertor = sws_getContext(
+            lastFrame->width,       lastFrame->height,  (PixelFormat) lastFrame->format,
+            srcFrame->width,        srcFrame->height, (PixelFormat) srcFrame->format,
+            SWS_BILINEAR, NULL, NULL, NULL);
+        if( !convertor )
+            return QImage();
+
+        sws_scale(convertor, lastFrame->data, lastFrame->linesize, 0, lastFrame->height, 
+                             srcFrame->data, srcFrame->linesize);
+        sws_freeContext(convertor);
+    }
+
+    QnContrastImageFilter filter(params);
+    filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+
+    QnFisheyeImageFilter filter2(dewarping);
+    filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
 
     // convert colorSpace
-    SwsContext* convertor = sws_getContext(frameCopy.width, frameCopy.height, (PixelFormat) frameCopy.format,
-        frameCopy.width, frameCopy.height, PIX_FMT_BGRA,
+    SwsContext* convertor = sws_getContext(srcFrame->width, srcFrame->height, (PixelFormat) srcFrame->format,
+        srcFrame->width, srcFrame->height, PIX_FMT_BGRA,
         SWS_POINT, NULL, NULL, NULL);
     if( !convertor )
         return QImage();
 
-    int numBytes = avpicture_get_size(PIX_FMT_RGBA, frameCopy.width, frameCopy.height);
+    int numBytes = avpicture_get_size(PIX_FMT_RGBA, srcFrame->width, srcFrame->height);
     AVPicture outPicture; 
-    avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, frameCopy.width, frameCopy.height);
+    avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, srcFrame->width, srcFrame->height);
 
-    sws_scale(convertor, frameCopy.data, frameCopy.linesize, 
-              0, frameCopy.height, 
+    sws_scale(convertor, srcFrame->data, srcFrame->linesize, 
+              0, srcFrame->height, 
               outPicture.data, outPicture.linesize);
     sws_freeContext(convertor);
     // convert to QImage
-    QImage tmp(outPicture.data[0], lastFrame->width, lastFrame->height, outPicture.linesize[0], QImage::Format_ARGB32);
-    QImage rez( lastFrame->width, lastFrame->height, QImage::Format_ARGB32);
-    rez = tmp.copy(0,0, lastFrame->width, lastFrame->height);
+    QImage tmp(outPicture.data[0], srcFrame->width, srcFrame->height, outPicture.linesize[0], QImage::Format_ARGB32);
+    QImage rez( srcFrame->width, srcFrame->height, QImage::Format_ARGB32);
+    rez = tmp.copy(0,0, srcFrame->width, srcFrame->height);
     avpicture_free(&outPicture);
     return rez;
 }
