@@ -916,15 +916,19 @@ void QnWorkbenchNavigator::updateSyncedPeriods() {
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent type) {
-    QVector<QnTimePeriodList> periodsList;
+    /* We don't want duplicate loaders. */
+    QSet<QnCachingTimePeriodLoader *> loaders;
     foreach(const QnResourceWidget *widget, m_syncedWidgets) {
-        if(type == Qn::MotionContent && !(widget->options() & QnResourceWidget::DisplayMotion)) 
-        {
+        if(type == Qn::MotionContent && !(widget->options() & QnResourceWidget::DisplayMotion)) {
             /* Ignore it. */
         } else if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource())) {
-            periodsList.push_back(loader->periods(type));
+            loaders.insert(loader);
         }
     }
+
+    QVector<QnTimePeriodList> periodsList;
+    foreach(QnCachingTimePeriodLoader *loader, loaders)
+        periodsList.push_back(loader->periods(type));
 
     QnTimePeriodList periods = QnTimePeriod::mergeTimePeriods(periodsList);
 
