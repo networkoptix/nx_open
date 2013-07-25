@@ -1005,7 +1005,6 @@ void PtzInstrument::startDragProcess(DragInfo *) {
 void PtzInstrument::startDrag(DragInfo *) {
     m_isClick = false;
     m_ptzStartedEmitted = false;
-    m_dragAddDelta = QPointF(0.0, 0.0);
 
     if(!target()) {
         /* Whoops, already destroyed. */
@@ -1021,8 +1020,8 @@ void PtzInstrument::startDrag(DragInfo *) {
         opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
         /* Everything else will be initialized in the first call to drag(). */
     } else if (target()->virtualPtzController()) {
-        m_dragFromPosition = m_ptzController->physicalPosition(target());
-        target()->setCursor(Qt::SizeAllCursor);
+        target()->virtualPtzController()->setAnimationEnabled(false);
+        target()->setCursor(Qt::BlankCursor);
     } else {
         ensureSelectionItem();
         selectionItem()->setParentItem(target());
@@ -1071,30 +1070,19 @@ void PtzInstrument::dragMove(DragInfo *info) {
 
         ptzMove(target(), QVector3D(speed));
     } else if (target()->virtualPtzController()) {
-        target()->virtualPtzController()->setAnimationEnabled(false);
-        QPointF delta = info->mouseItemPos() - info->mousePressItemPos();
-        if (!delta.isNull()) {
-            target()->setCursor(Qt::BlankCursor);
-            overlayWidget(target())->hideCursor();
+        QCursor::setPos(info->mousePressScreenPos());
+        if(info->mouseScreenPos() != info->mousePressScreenPos()) {
+            QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
+            QSizeF size = target()->size();
+            qreal scale = qMax(size.width(), size.height()) / 2.0;
+            QPointF shift(delta.x() / scale, -delta.y() / scale);
 
+            QVector3D position = m_ptzController->physicalPosition(target());
+            qreal speed = 10.0 * mm35EquivToFov(position.z());
+            QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
+            m_ptzController->setPhysicalPosition(target(), position + positionDelta);
         }
-        QSizeF size = target()->size();
-        qreal scale = qMax(size.width(), size.height()) / 2.0;
-        QPointF shift(delta.x() / scale, -delta.y() / scale);
-
-        if (qAbs(shift.x()) > 0.5 || qAbs(shift.y()) > 0.5)
-        {
-            m_dragAddDelta += shift;
-            shift = QPointF(0.0, 0.0);
-            QCursor::setPos(info->mousePressScreenPos());
-        }
-        shift += m_dragAddDelta;
-
-        qreal fov = radToGrad(mm35EquivToFov(m_dragFromPosition.z()));
-        QVector3D positionDelta(shift.x() * fov/2.0, shift.y() * fov/2.0, 0.0);
-        m_ptzController->setPhysicalPosition(target(), m_dragFromPosition + positionDelta);
-    }
-    else {
+    } else {
         ensureSelectionItem();
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
     }
@@ -1108,10 +1096,10 @@ void PtzInstrument::finishDrag(DragInfo * info) {
 
             ensureElementsWidget();
             opacityAnimator(elementsWidget()->arrowItem())->animateTo(0.0);
-        }
-        else if (target()->virtualPtzController()) {
-            overlayWidget(target())->showCursor();
-            QCursor::setPos(info->mousePressScreenPos());
+        } else if (target()->virtualPtzController()) {
+            target()->unsetCursor();
+            //overlayWidget(target())->showCursor();
+            //QCursor::setPos(info->mousePressScreenPos());
         } else {
             ensureSelectionItem();
             opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
