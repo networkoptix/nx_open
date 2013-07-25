@@ -318,8 +318,11 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
     for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
     {
         int h = height;
-        if (i > 0)
+        int w = width;
+        if (i > 0) {
             h >>= descr->log2_chroma_h;
-        copyPlane(data[i], frame->data[i], width, linesize[i], frame->linesize[i], h);
+            w >>= descr->log2_chroma_w;
+        }
+        copyPlane(data[i], frame->data[i], w, linesize[i], frame->linesize[i], h);
     }
 }
