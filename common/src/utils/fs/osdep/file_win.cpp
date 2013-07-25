@@ -161,7 +161,6 @@ bool QnFile::truncate( qint64 newFileSize)
 bool QnFile::fileExists( const QString& fileName )
 {
     struct _stat64 fstat;
-    //int retCode = _stat64( fileName.toLatin1().constData(), &fstat );
     int retCode = _wstat64( (wchar_t*)fileName.utf16(), &fstat );
     return retCode == 0;
 }
@@ -169,7 +168,6 @@ bool QnFile::fileExists( const QString& fileName )
 qint64 QnFile::getFileSize( const QString& fileName )
 {
     struct _stat64 fstat;
-    //int retCode = _stat64( fileName.toLatin1().constData(), &fstat );
     int retCode = _wstat64( (wchar_t*)fileName.utf16(), &fstat );
     if( retCode != 0 )
         return -1;
