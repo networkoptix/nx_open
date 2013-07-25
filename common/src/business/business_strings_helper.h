@@ -45,7 +45,7 @@ public:
 
     static QString renderEventDetailsText(QVariantHash contextMap);
 
-    static QString motionUrl(const QnBusinessEventParameters &params);
+    static QString motionUrl(const QnBusinessEventParameters &params, bool isPublic);
 private:
     static QString eventDetailsCombined(QVariantHash& detailsMap, const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
 

@@ -1,16 +1,17 @@
-<!-- content -->
 <div class="content"><table bgcolor="">
     <div class="callout">
-        <p>Input details:</p>
+        <p>Storage failure information:</p>
         <table>
             <tr>
-                <th>Input Port</th>
+                <th>Reason</th>
                 <th>Timestamp</th>
             </tr>
             {{#aggregated}}
-                <tr><td>{{inputPort}}</td>
-                    <td><i>{{timestamp}}</i></td></tr>
+                <tr>
+                    <td>{{reason}}</td>
+                    <td><i>{{timestamp}}</i></td>
+                </tr>
             {{/aggregated}}
         </table>
     </div>
-</table></div><!-- /content -->
+</table></div>

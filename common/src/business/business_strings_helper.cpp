@@ -118,7 +118,7 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
 
     if (useHtml && eventType == BusinessEventType::Camera_Motion) {
         result += delimiter;
-        result += tr("Url: %1").arg(motionUrl(params));
+        result += tr("Url: %1").arg(motionUrl(params, true));
     }
 
     result += delimiter;
@@ -140,8 +140,8 @@ QVariantHash QnBusinessStringsHelper::eventDescriptionMap(const QnAbstractBusine
     contextMap[tpEvent] = eventName(eventType);
     contextMap[tpSource] = eventSource(params, useIp);
     if (eventType == BusinessEventType::Camera_Motion) {
-        contextMap[tpUrlInt] = motionUrl(params);
-        contextMap[tpUrlExt] = motionUrl(params);
+        contextMap[tpUrlInt] = motionUrl(params, false);
+        contextMap[tpUrlExt] = motionUrl(params, true);
     }
     contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo);
 
@@ -323,7 +323,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstract
     return result;
 }
 
-QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params) {
+QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
     int id = params.getEventResourceId();
     QnNetworkResourcePtr res = id > 0 ? 
                             qnResPool->getResourceById(id, QnResourcePool::AllResources).dynamicCast<QnNetworkResource>() : 
@@ -335,7 +335,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (!mserverRes)
         return QString();
 
-    QUrl apPServerUrl = QnAppServerConnectionFactory::publicUrl();
+    QUrl appServerUrl = QnAppServerConnectionFactory::publicUrl();
     QUrl appServerDefaultUrl = QnAppServerConnectionFactory::defaultUrl();
     quint64 ts = params.getEventTimestamp();
 
@@ -348,16 +348,16 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     }
 
     QUrl mserverUrl = mserverRes->getUrl();
-    if (resolveAddress(apPServerUrl.host()) == QHostAddress::LocalHost) {
+    if (!isPublic || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
         if (resolveAddress(appServerDefaultUrl.host()) != QHostAddress::LocalHost) {
-            apPServerUrl = appServerDefaultUrl;
+            appServerUrl = appServerDefaultUrl;
         } else {
-            apPServerUrl.setHost(mserverUrl.host());
+            appServerUrl.setHost(mserverUrl.host());
         }
     }
 
     QString result(lit("https://%1:%2/web/camera?physical_id=%3&pos=%4"));
-    result = result.arg(apPServerUrl.host()).arg(apPServerUrl.port(80)).arg(res->getPhysicalId()).arg(ts/1000);
+    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(res->getPhysicalId()).arg(ts/1000);
 
     return result;
 }

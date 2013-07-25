@@ -1,4 +1,3 @@
-#include "utils/fs/fileutil.h"
 #include "api/model/email_attachment.h"
 
 QnEmailAttachment::QnEmailAttachment(const QString &filename_, const QString &contentFilename, const QString &mimetype_)

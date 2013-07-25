@@ -19,6 +19,7 @@
 #include "utils/common/synctime.h"
 #include <utils/common/email.h>
 #include "business_strings_helper.h"
+#include "version.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -417,9 +418,13 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(partialInfo.eventLogoFilename, lit(":/skin/email_attachments/") + partialInfo.eventLogoFilename, lit("image/png"))));
     contextMap[lit("productLogoFilename")] = lit("cid:productLogo.png");
     contextMap[lit("eventLogoFilename")] = lit("cid:") + partialInfo.eventLogoFilename;
+    contextMap[lit("companyName")] = lit(QN_ORGANIZATION_NAME);
+    contextMap[lit("companyUrl")] = lit(QN_COMPANY_URL);
+    contextMap[lit("supportEmail")] = lit(QN_SUPPORT_MAIL_ADDRESS);
+    contextMap[lit("systemName")] = QnAppServerConnectionFactory::systemName();
     attachments.append(partialInfo.attachments);
 
-    QString messageBody = renderTemplateFromFile(lit(":/skin/email_templates"), lit("container.mustache"), contextMap);
+    QString messageBody = renderTemplateFromFile(lit(":/email_templates"), lit("container.mustache"), contextMap);
 
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
     appServerConnection->sendEmailAsync(

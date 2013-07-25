@@ -1,4 +1,3 @@
-#include "utils/fs/fileutil.h"
 #include "mustache/mustache_helper.h"
 
 QString renderTemplateFromFile(const QString& path, const QString& filename, const QVariantHash& contextMap) {

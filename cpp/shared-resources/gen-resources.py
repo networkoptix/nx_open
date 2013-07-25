@@ -46,7 +46,7 @@ if __name__ == '__main__':
   os.system('lrelease ${project.build.directory}/${project.artifactId}-specifics.pro')
   
   genqrc('build/${project.artifactId}-translations.qrc','/translations',    '${basedir}/translations', ['.qm'],'.ts')  
-  genqrc('build/${project.artifactId}-custom.qrc',      '/skin',    '${basedir}/resource/custom/${custom.skin}/skin', ['.png', '.mkv', '.jpg', '.jpeg', '.mustache'],'.psd')
+  genqrc('build/${project.artifactId}-custom.qrc',      '/skin',    '${basedir}/resource/custom/${custom.skin}/skin', ['.png', '.mkv', '.jpg', '.jpeg'],'.psd')
   genqrc('build/${project.artifactId}.qrc',             '/',        '${basedir}/../cpp/shared-resources/icons/${custom.skin}', [''],'.psd')
   genqrc('build/${project.artifactId}-common.qrc',      '/',        '${basedir}/resource/common', [''],'.pdb')
   genqrc('build/${project.artifactId}-generated.qrc',   '/',        '${project.build.directory}/resource', [''],'.pdb')  

@@ -52,6 +52,7 @@ void QnServerMessageProcessor::at_connectionReset()
 
 void QnServerMessageProcessor::at_connectionOpened(QnMessage message)
 {
+    QnAppServerConnectionFactory::setSystemName(message.systemName);
     QnAppServerConnectionFactory::setPublicIp(message.publicIp);
 }
 
