@@ -11,7 +11,7 @@ class QnGridWidgetHelper: public QnWorkbenchContextAware
 public:
     QnGridWidgetHelper(QnWorkbenchContext *context);
 
-    void exportToFile(QTableView* grid);
+    void exportToFile(QTableView* grid, const QString& caption);
     void copyToClipboard(QTableView* grid);
 private:
     void getGridData(QTableView* grid, QString& textData, QString& htmlData, const QLatin1Char& textDelimiter);

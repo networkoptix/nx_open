@@ -74,7 +74,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
     m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
-    m_exportAction      = new QAction(tr("Export Selection to File"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File..."), this);
     m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
@@ -530,7 +530,7 @@ void QnEventLogDialog::at_selectAllAction()
 
 void QnEventLogDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents);
+    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents, QObject::tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_copyToClipboard()
