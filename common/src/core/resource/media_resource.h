@@ -12,6 +12,7 @@ class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 
+// TODO: #Elric rename
 enum QnStreamQuality {
     QnQualityLowest,
     QnQualityLow,
@@ -22,6 +23,7 @@ enum QnStreamQuality {
     QnQualityNotDefined
 };
 
+// TODO: #Elric rename
 enum QnSecondaryStreamQuality 
 { 
     SSQualityLow, 
@@ -30,8 +32,7 @@ enum QnSecondaryStreamQuality
     SSQualityNotDefined
 };
 
-
-QString QnStreamQualityToString(QnStreamQuality value);
+QString QnStreamQualityToDisplayString(QnStreamQuality value);
 QnStreamQuality QnStreamQualityFromString( const QString& str );
 
 /*!

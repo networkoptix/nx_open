@@ -71,31 +71,11 @@ namespace {
         cl_log.log(QString(QLatin1String("OpenGL renderer: %1.")).arg(QLatin1String(renderer.constData())), cl_logINFO);
         cl_log.log(QString(QLatin1String("OpenGL vendor: %1.")).arg(QLatin1String(vendor.constData())), cl_logINFO);
 
-#ifdef Q_OS_LINUX
-        // Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
-        // Therefore VSync is off by default in linux and is enabled only here.
-        if (!vendor.toLower().contains("nvidia")) {
-            QGLFormat format = widget->format();
-            format.setSwapInterval(1); /* Turn vsync on. */
-            widget->setFormat(format);
-        }
-#endif
-
         bool softwareTrouble = false;
         bool hardwareTrouble = false;
 
-        if (!(functions.features() & QnGlFunctions::OpenGL1_3)) {
-            qnWarning("Multitexturing is not supported.");
-            softwareTrouble = true;
-        }
-
-        if (version <= QByteArray("1.1.0")) {
+        if (!(functions.features() & QnGlFunctions::OpenGL2_0)) {
             qnWarning("OpenGL version %1 is not supported.", version);
-            softwareTrouble = true;
-        }
-
-        if (!(functions.features() & QnGlFunctions::ArbPrograms)) {
-            qnWarning("OpenGL ARB shaders not supported, using software YUV to RGB conversion.");
             softwareTrouble = true;
         }
 
