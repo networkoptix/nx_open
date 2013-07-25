@@ -212,3 +212,5 @@ nx_sdk/nx_sdk
 
 
 libonvif/.build/
+
+.vagrant
