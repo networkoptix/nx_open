@@ -354,7 +354,7 @@ public:
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
         m_modeButton->setText(lit("90"));
-        m_modeButton->setToolTip(lit("Dewarping panoram mode"));
+        m_modeButton->setToolTip(lit("Dewarping panoramic mode"));
 
         updateLayout();
     }
@@ -472,7 +472,7 @@ private:
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
         m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
         m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
-        m_modeButton->setGeometry(QRectF(rect.topRight() - xStep * 4.0 + yStep * 2.0, 3.0 * QnGeometry::toSize(xStep + yStep)));
+        m_modeButton->setGeometry(QRectF((rect.topRight() + rect.bottomRight()) / 2.0 - xStep * 4.0 - yStep * 1.5, 3.0 * QnGeometry::toSize(xStep + yStep)));
     }
 
 private:
