@@ -10,7 +10,7 @@ QnGridWidgetHelper::QnGridWidgetHelper(QnWorkbenchContext *context):
 
 }
 
-void QnGridWidgetHelper::exportToFile(QTableView* grid)
+void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
 {
     QString previousDir = qnSettings->lastExportDir();
     if (previousDir.isEmpty())
@@ -21,7 +21,7 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid)
 
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
-            QObject::tr("Export selected events to file"),
+            caption,
             previousDir,
             QObject::tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)")
             ));

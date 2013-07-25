@@ -2372,7 +2372,7 @@ Make sure the server is available and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3001,7 +3001,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
