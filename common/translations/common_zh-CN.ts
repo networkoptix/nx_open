@@ -565,72 +565,72 @@ They cannot receive system notifications via E-Mail</source>
 <context>
     <name>QnApiPbSerializer</name>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="658"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="662"/>
         <source>Cannot parse serialized cameras.</source>
         <translation>无法解析序列化的摄像机。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="667"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="671"/>
         <source>Cannot parse serialized servers.</source>
         <translation>无法解析序列化的服务器。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="676"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="680"/>
         <source>Cannot parse serialized layouts.</source>
         <translation>无法解析序列化的layout。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="696"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="700"/>
         <source>Cannot parse serialized users.</source>
         <translation>无法解析序列化的用戶。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="705"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="709"/>
         <source>Cannot parse serialized resources.</source>
         <translation>无法解析序列化的资源。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="714"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="718"/>
         <source>Cannot parse serialized resource types.</source>
         <translation>无法解析序列化的资源类型。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="723"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="727"/>
         <source>Cannot parse serialized licenses.</source>
         <translation>无法解析序列化的软件许可。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="733"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="737"/>
         <source>Cannot parse serialized camera history.</source>
         <translation>无法解析序列化的摄像机历史记录。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="743"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="747"/>
         <source>Cannot parse serialized key-value pairs.</source>
         <translation>无法解析序列化的键-值对。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="753"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="757"/>
         <source>Cannot parse serialized settings.</source>
         <translation>无法解析序列化的设定。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="763"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="767"/>
         <source>Cannot parse serialized connection information.</source>
         <translation>无法解析序列化的连接信息。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="784"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="788"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>无法解析序列化的事件/行动规则。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="797"/>
         <source>Cannot parse serialized action.</source>
         <translation>无法解析序列化的行动。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="805"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="809"/>
         <source>Cannot parse serialized actions.</source>
         <translation>无法解析序列化的行动。</translation>
     </message>
@@ -1067,42 +1067,42 @@ for recording to %1.</source>
 <context>
     <name>QnStreamRecorder</name>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="428"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="429"/>
         <source>No %1 container in FFMPEG library.</source>
         <translation>在FFMPEG库中没有%1容器。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="447"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="448"/>
         <source>Can&apos;t create output file &apos;%1&apos; for video recording.</source>
         <translation>无法为视频录像创建输出文件&apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="492"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="499"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation>无法为录像分配输出流。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="574"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="583"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation>无法分配输出音频流。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="582"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation>内部服务器错误：无效音频编码信息</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="611"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="620"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation>无法创建输出文件&apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="623"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="632"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation>视频或音频编解码器与%1格式不兼容。尝试另一种格式。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="734"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="743"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>为文件&apos;%1&apos;生成水印时发生错误。</translation>
     </message>

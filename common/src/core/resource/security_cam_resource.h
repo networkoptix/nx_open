@@ -8,6 +8,7 @@
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
 #include "network_resource.h"
+#include "fisheye/fisheye_common.h"
 
 class QnAbstractArchiveDelegate;
 
@@ -79,6 +80,7 @@ public:
     const QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
+
 
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;

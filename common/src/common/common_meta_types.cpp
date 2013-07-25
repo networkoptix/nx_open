@@ -124,6 +124,8 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
     qRegisterMetaType<QnTimeReply>();
-    
+
+    qRegisterMetaType<DewarpingParams>();
+
     qn_commonMetaTypes_initialized = true;
 }

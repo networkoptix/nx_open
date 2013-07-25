@@ -10,6 +10,7 @@
 #include <utils/math/fuzzy.h>
 #include <utils/common/id.h>
 #include "utils/color_space/image_correction.h"
+#include "fisheye/fisheye_common.h"
 
 class QnLayoutItemData {
 public:
@@ -30,12 +31,13 @@ public:
     QRectF zoomRect;
     qreal rotation;
     ImageCorrectionParams contrastParams;
+    DewarpingParams dewarpingParams;
 
     QHash<int, QVariant> dataByRole;
 
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
         if (l.uuid != r.uuid || l.flags != r.flags || l.zoomTargetUuid != r.zoomTargetUuid || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || 
-            !qFuzzyCompare(l.zoomRect, r.zoomRect) || !qFuzzyCompare(l.rotation, r.rotation) || !(l.contrastParams == r.contrastParams))
+            !qFuzzyCompare(l.zoomRect, r.zoomRect) || !qFuzzyCompare(l.rotation, r.rotation) || !(l.contrastParams == r.contrastParams) || !(l.dewarpingParams == r.dewarpingParams))
             return false;
 
         if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || !l.resource.id.isValid() || !r.resource.id.isValid()))

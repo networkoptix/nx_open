@@ -15,10 +15,10 @@
 #include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 
-
 class CLVideoDecoderOutput;
 class ScreenshotInterface;
 class QnHistogramConsumer;
+class QnFisheyePtzController;
 
 class QnGlRendererShaders: public QObject {
     Q_OBJECT;
@@ -28,6 +28,16 @@ public:
 
     QnYv12ToRgbShaderProgram *yv12ToRgb;
     QnYv12ToRgbWithGammaShaderProgram *yv12ToRgbWithGamma;
+    
+    QnFisheyeRectilinearProgram* fisheyePtzProgram;
+    QnFisheyeRectilinearProgram* fisheyePtzGammaProgram;
+
+    QnFisheyeEquirectangularHProgram* fisheyePanoHProgram;
+    QnFisheyeEquirectangularHProgram* fisheyePanoHGammaProgram;
+
+    QnFisheyeEquirectangularVProgram* fisheyePanoVProgram;
+    QnFisheyeEquirectangularVProgram* fisheyePanoVGammaProgram;
+
     QnYv12ToRgbaShaderProgram *yv12ToRgba;
     QnNv12ToRgbShaderProgram *nv12ToRgb;
 };
@@ -62,6 +72,8 @@ public:
     bool isNV12ToRgbShaderUsed() const;
 
     void setImageCorrectionParams(const ImageCorrectionParams& params) { m_imgCorrectParam = params; }
+    void setFisheyeController(QnFisheyePtzController* controller);
+    bool isFisheyeEnabled() const;
     ImageCorrectionParams getImageCorrectionParams() const { return m_imgCorrectParam; }
     
     void setPaused(bool value) { m_paused = value; }
@@ -70,6 +82,7 @@ public:
     void setDisplayedRect(const QRectF& rect);
 
     void setHistogramConsumer(QnHistogramConsumer* value);
+    int panoFactor() const;
 private:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
     ImageCorrectionResult calcImageCorrection();
@@ -83,6 +96,8 @@ private:
     QnMetaDataV1Ptr m_lastDisplayedMetadata; // TODO: #Elric get rid of this
     unsigned m_lastDisplayedFlags;
     unsigned int m_prevFrameSequence;
+
+
     QSharedPointer<QnGlRendererShaders> m_shaders;
     bool m_timeChangeEnabled;
     mutable QMutex m_mutex;
@@ -90,9 +105,10 @@ private:
     ScreenshotInterface* m_screenshotInterface;
     ImageCorrectionResult m_imageCorrector;
     ImageCorrectionParams m_imgCorrectParam;
+    QnFisheyePtzController* m_fisheyeController;
     QRectF m_displayedRect;
     QnHistogramConsumer* m_histogramConsumer;
-
+    
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen
     void drawVideoTextureDirectly(

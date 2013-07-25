@@ -289,13 +289,21 @@ void QnResourceWidgetRenderer::setChannelScreenSize(const QSize &screenSize) {
 }
 
 bool QnResourceWidgetRenderer::constantDownscaleFactor() const {
-    return false;
+    return !m_channelRenderers.empty() && m_channelRenderers[0].renderer && m_channelRenderers[0].renderer->isFisheyeEnabled();
 }
 
 QSize QnResourceWidgetRenderer::sourceSize() const {
     QMutexLocker locker(&m_mutex);
 
     return m_sourceSize;
+
+    /*
+    int panoFactor = 1;
+    if (!m_channelRenderers.empty() && m_channelRenderers[0].renderer)
+        panoFactor = m_channelRenderers[0].renderer->panoFactor();
+
+    return QSize(m_sourceSize.width() * panoFactor, m_sourceSize.height());
+    */
 }
 
 const QGLContext* QnResourceWidgetRenderer::glContext() const
@@ -319,6 +327,16 @@ void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& p
             continue;
         ctx.uploader->setImageCorrection(params);
         ctx.renderer->setImageCorrectionParams(params);
+    }
+}
+
+void QnResourceWidgetRenderer::setFisheyeController(QnFisheyePtzController* controller)
+{
+    for (int i = 0; i < m_channelRenderers.size(); ++i){
+        RenderingTools& ctx = m_channelRenderers[i];
+        if( !ctx.uploader )
+            continue;
+        ctx.renderer->setFisheyeController(controller);
     }
 }
 

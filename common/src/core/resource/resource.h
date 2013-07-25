@@ -235,6 +235,14 @@ public:
 
     static void stopAsyncTasks();
 
+    /**
+        Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
+    */
+    Qn::PtzCapabilities getPtzCapabilities() const;
+    bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
+    void setPtzCapabilities(Qn::PtzCapabilities capabilities);
+    void setPtzCapability(Qn::PtzCapabilities capability, bool value);
+
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
@@ -261,6 +269,7 @@ signals:
 
     void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
 
+    void ptzCapabilitiesChanged(const QnResourcePtr &resource);
 public:
     // this is thread to process commands like setparam
     static void startCommandProc();

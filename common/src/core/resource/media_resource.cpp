@@ -88,3 +88,33 @@ void QnMediaResource::initMediaResource()
 {
     toResource()->addFlags(QnResource::media);
 }
+
+DewarpingParams QnMediaResource::getDewarpingParams() const
+{
+    return m_dewarpingParams;
+}
+
+
+void QnMediaResource::setDewarpingParams(const DewarpingParams& params)
+{
+    bool capsChanged = params.enabled != m_dewarpingParams.enabled;
+    m_dewarpingParams = params;
+    if (capsChanged) {
+        if (params.enabled)
+            toResource()->setPtzCapabilities(Qn::AllPtzCapabilities);
+        else
+            toResource()->setPtzCapabilities(Qn::NoPtzCapabilities);
+    }
+}
+
+bool QnMediaResource::isFisheye() const
+{
+    return m_dewarpingParams.enabled;
+}
+
+void QnMediaResource::updateInner(QnResourcePtr other)
+{
+    QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
+    if (other_casted)
+        m_dewarpingParams = other_casted->m_dewarpingParams;
+}

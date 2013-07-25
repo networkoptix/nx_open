@@ -199,7 +199,7 @@ namespace nx_http
     public:
         StatusLine statusLine;
         HttpHeaders headers;
-        BufferType messageBody;
+        //BufferType messageBody; // not filled anywhere.
     };
 
     namespace MessageType

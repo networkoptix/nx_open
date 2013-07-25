@@ -50,3 +50,9 @@ QnResourcePtr QnAbstractArchiveResource::toResourcePtr()
 {
     return toSharedPointer();
 }
+
+void QnAbstractArchiveResource::updateInner(QnResourcePtr other)
+{
+    QnResource::updateInner(other);
+    QnMediaResource::updateInner(other);
+}

@@ -60,6 +60,7 @@ QnSecurityCamResource::~QnSecurityCamResource()
 void QnSecurityCamResource::updateInner(QnResourcePtr other)
 {
     QnNetworkResource::updateInner(other);
+    QnMediaResource::updateInner(other);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
@@ -503,7 +504,7 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 {
     QVariant mediaVariant;
     const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: #Elric const_cast? get rid of it!
-    return Qn::undeprecate(static_cast<Qn::CameraCapabilities>(mediaVariant.toInt()));
+    return static_cast<Qn::CameraCapabilities>(mediaVariant.toInt());
 }
 
 bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const
@@ -521,7 +522,7 @@ void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability,
 
 bool QnSecurityCamResource::setParam(const QString &name, const QVariant &val, QnDomain domain) {
     bool result = QnResource::setParam(name, val, domain);
-    if(result && name == lit("cameraCapabilities"))
+    if(result && (name == lit("cameraCapabilities")))
         emit cameraCapabilitiesChanged(::toSharedPointer(this)); // TODO: #Elric we don't check whether they have actually changed. This better be fixed.
     return result;
 }
@@ -634,3 +635,4 @@ void QnSecurityCamResource::removeStatusFlags(StatusFlags value)
 {
     m_statusFlags &= ~value;
 }
+

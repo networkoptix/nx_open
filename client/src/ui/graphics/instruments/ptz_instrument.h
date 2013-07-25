@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "drag_processing_instrument.h"
+#include "core/resource/interface/abstract_ptz_controller.h"
 
 class FixedArSelectionItem;
 class QnSplashItem;
@@ -39,6 +40,8 @@ signals:
     void ptzFinished(QnMediaResourceWidget *widget);
     void ptzProcessFinished(QnMediaResourceWidget *widget);
 
+    void doubleClicked(QnMediaResourceWidget *widget);
+
 protected:
     virtual void installedNotify() override;
     virtual void aboutToBeDisabledNotify() override;
@@ -64,10 +67,11 @@ private slots:
     void at_display_resourceAdded(const QnResourcePtr &resource);
     void at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource);
     void at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &resource);
-    void at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &camera);
+    void at_ptzController_positionChanged(const QnMediaResourceWidget* widget);
 
     void at_splashItem_destroyed();
 
+    void at_modeButton_clicked();
     void at_zoomInButton_pressed();
     void at_zoomInButton_released();
     void at_zoomOutButton_pressed();
@@ -76,7 +80,7 @@ private slots:
 
     void updateOverlayWidget();
     void updateOverlayWidget(QnMediaResourceWidget *widget);
-    void updateCapabilities(const QnSecurityCamResourcePtr &resource);
+    void updateCapabilities(const QnResourcePtr &resource);
     void updateCapabilities(QnMediaResourceWidget *widget);
 
 private:
@@ -113,11 +117,14 @@ private:
     void processPtzDrag(const QRectF &rect);
     void processPtzDoubleClick();
 
+    QVector3D physicalPositionForRect(QnMediaResourceWidget *widget, const QRectF &rect);
+    QVector3D physicalPositionForPos(QnMediaResourceWidget *widget, const QPointF &pos);
+
 private:
     struct PtzData {
         PtzData(): capabilities(0), overlayWidget(NULL) {}
 
-        Qn::CameraCapabilities capabilities;
+        Qn::PtzCapabilities capabilities;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;
         QRectF pendingAbsoluteMove;
@@ -142,9 +149,11 @@ private:
     bool m_isDoubleClick;
     bool m_ptzStartedEmitted;
     bool m_skipNextAction;
+    QVector3D m_dragFromPosition;
 
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;
+    QPointF m_dragAddDelta;
 
     struct SplashItemAnimation {
         SplashItemAnimation(): item(NULL), fadingIn(true), expansionMultiplier(0.0), opacityMultiplier(0.0) {}

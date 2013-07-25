@@ -603,11 +603,11 @@ void QnActiResource::onTimer( const quint64& timerID )
 void QnActiResource::initializePtz()
 {
     m_ptzController.reset(new QnActiPtzController(this));
-    Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
-    if(capabilities == Qn::NoCapabilities)
+    Qn::PtzCapabilities capabilities = m_ptzController->getCapabilities();
+    if(capabilities == Qn::NoPtzCapabilities)
         m_ptzController.reset();
 
-    setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
+    setPtzCapabilities((getPtzCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
 }
 
 void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInfo )

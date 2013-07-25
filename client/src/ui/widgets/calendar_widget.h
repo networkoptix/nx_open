@@ -44,6 +44,9 @@ public:
      */
     bool isEmpty();
 
+    qint64 localOffset() const;
+    void setLocalOffset(qint64 utcOffset);
+
 signals:
     /**
      * Signal is emitted when empty state is changed, e.g. loaded new time periods.
@@ -78,6 +81,8 @@ private:
 
     /** Current server time in msecs since epoch. */
     qint64 m_currentTime;
+
+    qint64 m_localOffset;
 };
 
 
