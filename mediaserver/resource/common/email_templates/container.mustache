@@ -5,22 +5,22 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>{{productName}} notification</title>
+</head>
+ 
+<body bgcolor="#FFFFFF" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0">
 
 <style>
 {{>style_css}}
 </style>   
-</head>
- 
-<body bgcolor="#FFFFFF" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0">
 
 <table class="head-wrap" bgcolor="#999999">
     <tr>
         <td></td>
         <td class="header container" align="">
-            <div class="content">
+            <div class="content logodiv">
                 <table bgcolor="#999999" >
                     <tr>
-                        <td><img src="{{productLogoFilename}}" width="200" height="50"/></td>
+                        <td><img src="{{productLogoFilename}}"/></td>
                         <td align="right"><h6 class="collapse">System Notification</h6></td>
                     </tr>
                 </table>
@@ -31,10 +31,10 @@
     </tr>
 </table>
 
-<table class="body-wrap" bgcolor="">
+<table class="body-wrap" > <!-- bgcolor="#FFFFFF" -->
     <tr>
         <td></td>
-        <td class="container" align="" bgcolor="#FFFFFF">
+        <td class="container" align="" > <!-- bgcolor="#FFFFFF" -->
             
             <!-- content -->
             <div class="content">
@@ -50,9 +50,9 @@
             </div><!-- /content -->
             <!-- content -->
             <div class="content">
-                <table bgcolor="">
+                <table > <!-- bgcolor="#FFFFFF" -->
                     <tr>
-                        <td class="small" width="20%" style="vertical-align: top; padding-right:10px;"><img src="{{eventLogoFilename}}" width="75" height="75"/></td>
+                        <td class="small" width="20%" style="vertical-align: top; padding-right:10px;"><img src="{{eventLogoFilename}}"/></td>
                         <td>
                             <h4>{{event}} <small>{{source}}</small></h4>
                             {{#urlext}}
@@ -96,16 +96,16 @@
             {{/typeMediaServerConflict}}
 
             <div class="content">
-                <table bgcolor="">
+                <table > <!-- bgcolor="#FFFFFF" -->
                     <tr>
                         <td>
                             
-                            <table bgcolor="" class="social" width="100%">
+                            <table  class="social" width="100%"> <!-- bgcolor="#FFFFFF" -->
                                 <tr>
                                     <td>
                                         
                                         <div class="column">
-                                            <table bgcolor="" cellpadding="" align="left">
+                                            <table  cellpadding="" align="left"> <!-- bgcolor="#FFFFFF" -->
                                         <tr>
                                             <td>                
                                                 <h5 class="">Support Info:</h5>
