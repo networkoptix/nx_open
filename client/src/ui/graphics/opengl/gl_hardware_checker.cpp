@@ -23,8 +23,8 @@ void QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
     cl_log.log(QString(QLatin1String("OpenGL renderer: %1.")).arg(QLatin1String(renderer.constData())), cl_logINFO);
     cl_log.log(QString(QLatin1String("OpenGL vendor: %1.")).arg(QLatin1String(vendor.constData())), cl_logINFO);
 
-    bool softwareTrouble = true;
-    bool hardwareTrouble = true;
+    bool softwareTrouble = false;
+    bool hardwareTrouble = false;
 
     if (!(functions.features() & QnGlFunctions::OpenGL2_0)) {
         qnWarning("OpenGL version %1 is not supported.", version);
