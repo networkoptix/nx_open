@@ -13,6 +13,7 @@ extern "C"
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrl>
 #include "../common/threadqueue.h"
+#include "utils/camera/camera_diagnostics.h"
 
 //#define DEBUG_TIMINGS
 
@@ -171,8 +172,8 @@ public:
     RTPSession();
     ~RTPSession();
 
-    // returns true if stream was opened, false in case of some error
-    bool open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
+    // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
+    CameraDiagnostics::ErrorCode::Value open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
 
     /*
     * Start playing RTSP sessopn.

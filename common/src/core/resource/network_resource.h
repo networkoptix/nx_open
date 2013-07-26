@@ -102,6 +102,13 @@ public:
         Q_UNUSED(endTimeMs)
         Q_UNUSED(detailLevel)
         return QnTimePeriodList(); }
+
+    //!Returns true if camera is accessible
+    /*!
+        Default implementation just establishes connection to \a getHostAddress() : \a httpPort()
+    */
+    virtual bool ping();
+
 private:
     QAuthenticator m_auth;
     bool m_authenticated;

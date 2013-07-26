@@ -14,7 +14,7 @@
 
 class ThirdPartyStreamReader
 :
-    public CLServerPushStreamreader
+    public CLServerPushStreamReader
 {
 public:
     ThirdPartyStreamReader(
@@ -26,7 +26,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual void openStream() override;
+    virtual CameraDiagnostics::ErrorCode::Value openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
     virtual int getLastResponseCode() const override;

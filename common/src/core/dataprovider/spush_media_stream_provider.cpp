@@ -5,7 +5,7 @@
 #include "utils/common/util.h"
 #include "utils/network/simple_http_client.h"
 
-CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
+CLServerPushStreamReader::CLServerPushStreamReader(QnResourcePtr dev ):
 QnLiveStreamProvider(dev),
 m_needReopen(false),
 m_cameraAudioEnabled(false)
@@ -15,13 +15,13 @@ m_cameraAudioEnabled(false)
         m_cameraAudioEnabled = camera->isAudioEnabled();
 }
 
-bool CLServerPushStreamreader::canChangeStatus() const
+bool CLServerPushStreamReader::canChangeStatus() const
 {
     const QnLiveStreamProvider* liveProvider = dynamic_cast<const QnLiveStreamProvider*>(this);
     return liveProvider && liveProvider->canChangeStatus();
 }
 
-void CLServerPushStreamreader::run()
+void CLServerPushStreamReader::run()
 {
     saveSysThreadID();
     setPriority(QThread::TimeCriticalPriority);
@@ -167,19 +167,19 @@ void CLServerPushStreamreader::run()
     CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
 }
 
-void CLServerPushStreamreader::beforeRun()
+void CLServerPushStreamReader::beforeRun()
 {
     QnAbstractMediaStreamDataProvider::beforeRun();
     getResource()->init();
 }
 
 
-void CLServerPushStreamreader::pleaseReOpen()
+void CLServerPushStreamReader::pleaseReOpen()
 {
     m_needReopen = true;
 }
 
-void CLServerPushStreamreader::afterUpdate() 
+void CLServerPushStreamReader::afterUpdate() 
 {
     QnPhysicalCameraResourcePtr camera = getResource().dynamicCast<QnPhysicalCameraResource>();
     if (camera) {
