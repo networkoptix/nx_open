@@ -190,7 +190,7 @@ void QnMediaResourceWidget::updateFisheyeController() {
     } else {
         delete m_fisheyePtz;
         m_fisheyePtz = 0;
-
+        updateAspectRatio();
         if(buttonBar()->button(FishEyeButton))
             buttonBar()->button(FishEyeButton)->setChecked(false);
     }
@@ -859,7 +859,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     QSize sourceSize = m_renderer->sourceSize();
 
-    if (item()->dewarpingParams().enabled)
+    if (item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
         sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
 
     if(sourceSize.isEmpty()) {
