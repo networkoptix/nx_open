@@ -303,6 +303,7 @@ int main(int argc, char **argv)
         bool devBackgroundEditable = false;
         bool skipMediaFolderScan = false;
         bool noFullScreen = false;
+        bool noVersionMismatchCheck = false;
 
         QnCommandLineParser commandLineParser;
         commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -316,6 +317,7 @@ int main(int argc, char **argv)
         commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
         commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
         commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
+        commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
         commandLineParser.parse(argc, argv, stderr);
 
         /* Dev mode. */
@@ -487,6 +489,8 @@ int main(int argc, char **argv)
         mainWindow->show();
         if (!noFullScreen)
             context->action(Qn::EffectiveMaximizeAction)->trigger();
+        if(noVersionMismatchCheck)
+            context->action(Qn::VersionMismatchMessageAction)->setDisabled(true);
 
         //initializing plugin manager. TODO supply plugin dir (from settings)
         PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );

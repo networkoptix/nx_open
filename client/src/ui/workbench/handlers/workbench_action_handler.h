@@ -348,7 +348,7 @@ protected slots:
 
     void at_browseUrlAction_triggered();
 
-    void at_versionMismatchWatcher_mismatchDataChanged();
+    void at_versionMismatchMessageAction_triggered();
 
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};

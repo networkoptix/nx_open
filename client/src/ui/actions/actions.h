@@ -133,13 +133,20 @@ namespace Qn {
         EscapeHotkeyAction,
 
         /**
-         * Displays messagebox with the text provided.
+         * Displays message box with the text provided.
          *
          * Parameters:
          * <tt>QString TitleRole</tt> --- title for the messagebox.
          * <tt>QString TextRole</tt> --- displayed text. If not provided, title will be used.
          */
         MessageBoxAction,
+
+        /**
+         * Displays version mismatch dialog, pulling mismatch data from 
+         * <tt>QnWorkbenchVersionMismatchWatcher</tt>. Displays nothing if there
+         * is no mismatches.
+         */
+        VersionMismatchMessageAction,
 
         /**
          * Opens the provided url in the default browser.
