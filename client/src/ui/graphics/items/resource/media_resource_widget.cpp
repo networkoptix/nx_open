@@ -123,6 +123,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fishEyeButton->setCheckable(true);
     fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
     fishEyeButton->setToolTip(tr("Dewarping"));
+    fishEyeButton->setChecked(item->dewarpingParams().enabled);
     setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_FishEye_Help);
     connect(fishEyeButton, SIGNAL(toggled(bool)), this, SLOT(at_fishEyeButton_toggled(bool)));
 

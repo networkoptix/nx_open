@@ -1098,8 +1098,6 @@ void PtzInstrument::finishDrag(DragInfo * info) {
             opacityAnimator(elementsWidget()->arrowItem())->animateTo(0.0);
         } else if (target()->virtualPtzController()) {
             target()->unsetCursor();
-            //overlayWidget(target())->showCursor();
-            //QCursor::setPos(info->mousePressScreenPos());
         } else {
             ensureSelectionItem();
             opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
