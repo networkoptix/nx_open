@@ -230,7 +230,6 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         float theta = atan(pos3d.z, pos3d.x) + fovRot;            // fisheye angle
         float r     = acos(pos3d.y / length(pos3d));              // fisheye radius
         
-        //vec2 pos = vec2(cos(theta), sin(theta)) * r * vec2(maxX_P, ar2_P) + vec2(maxXHalf, backAR);
         vec2 pos = vec2(cos(theta), sin(theta)) * r;
         pos = pos * xy3 + xy4;
 
@@ -282,13 +281,13 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         0.0,  0.0,    0.0,    opacity);
 
     mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-        0.0, cos(-fovRot), -sin(-fovRot),
-        0.0, sin(-fovRot),  cos(-fovRot));
+                                   0.0, cos(-fovRot), -sin(-fovRot),
+                                   0.0, sin(-fovRot),  cos(-fovRot));
 
     float ymaxInv = -dstFov/aspectRatio;
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5,       -yCenter) * xy1;
+    vec2 xy2 = vec2(-0.5,       -yCenter) * xy1 + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI,      maxY*aspectRatio / PI);
     vec2 xy4 = vec2(maxX / 2.0,     maxY / 2.0);
@@ -297,17 +296,18 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
     {
         vec2 pos = gl_TexCoord[0].xy * xy1 + xy2;
 
-        float theta = pos.x + xShift;
-        float roty = -fovRot* cos(theta);
+        float cosTheta = cos(pos.x);
+        float roty = -fovRot * cosTheta;
         float phi   = pos.y * (1.0 + roty*ymaxInv)  - roty - yShift;
+        float cosPhi = cos(phi);
 
         // Vector in 3D space
-        vec3 psph = vec3(cos(phi) * sin(theta),
-                         cos(phi) * cos(theta),  // only one difference between H and V shaders: this 2 lines in back order
+        vec3 psph = vec3(cosPhi * sin(pos.x),
+                         cosPhi * cosTheta,  // only one difference between H and V shaders: this 2 lines in back order
                          sin(phi))  * perspectiveMatrix;
 
         // Calculate fisheye angle and radius
-        theta   = atan(psph.z, psph.x);
+        float theta   = atan(psph.z, psph.x);
         float r = acos(psph.y);
 
         // return from polar coordinates
@@ -371,7 +371,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
     float ymaxInv = -dstFov/aspectRatio;
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5,       -yCenter) * xy1;
+    vec2 xy2 = vec2(-0.5,           -yCenter) * xy1 + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI,      maxY*aspectRatio / PI);
     vec2 xy4 = vec2(maxX / 2.0,     maxY / 2.0);
@@ -380,17 +380,18 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
     {
         vec2 pos = gl_TexCoord[0].xy * xy1 + xy2;
 
-        float theta = pos.x + xShift;
-        float roty = -fovRot* cos(theta);
-        float phi   = -(pos.y * (1.0 + roty*ymaxInv) - roty - yShift);
+        float cosTheta = cos(pos.x);
+        float roty = -fovRot * cosTheta;
+        float phi   = -(pos.y * (1.0 + roty*ymaxInv)  - roty - yShift);
+        float cosPhi = cos(phi);
         
         // Vector in 3D space
-        vec3 psph = vec3(cos(phi) * sin(theta),
+        vec3 psph = vec3(cosPhi * sin(pos.x),
                          sin(phi),  // only one difference between H and V shaders: this 2 lines in back order
-                         cos(phi) * cos(theta))  * perspectiveMatrix;
+                         cosPhi * cosTheta)  * perspectiveMatrix;
 
         // Calculate fisheye angle and radius
-        theta    = atan(psph.z, psph.x);
+        float theta    = atan(psph.z, psph.x);
         float r  = acos(psph.y);
 
         // return from polar coordinates
