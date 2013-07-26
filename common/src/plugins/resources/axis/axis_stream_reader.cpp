@@ -13,7 +13,7 @@ static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
 
 
 QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res),
+    CLServerPushStreamReader(res),
     m_rtpStreamParser(res),
     m_oldFirmwareWarned(false)
 {
@@ -45,10 +45,10 @@ int QnAxisStreamReader::toAxisQuality(QnStreamQuality quality)
     return -1;
 }
 
-void QnAxisStreamReader::openStream()
+CameraDiagnostics::ErrorCode::Value QnAxisStreamReader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::ErrorCode::noError;
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
@@ -100,14 +100,16 @@ void QnAxisStreamReader::openStream()
             if (status == CL_HTTP_AUTH_REQUIRED)
             {
                 getResource()->setStatus(QnResource::Unauthorized);
+                return CameraDiagnostics::ErrorCode::notAuthorised;
             }
             else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
             {
                 cl_log.log("Axis camera must be have old firmware!!!!  ip = ",  res->getHostAddress() , cl_logERROR);
                 m_oldFirmwareWarned = true;
+                return CameraDiagnostics::ErrorCode::noMediaTrack;
             }
 
-            return;
+            return CameraDiagnostics::ErrorCode::responseParseError;
         }
 
         QByteArray body;
@@ -171,10 +173,10 @@ void QnAxisStreamReader::openStream()
         if (status == CL_HTTP_AUTH_REQUIRED)
         {
             getResource()->setStatus(QnResource::Unauthorized);
-            return;
+            return CameraDiagnostics::ErrorCode::notAuthorised;
         }
         else if (status != CL_HTTP_SUCCESS)
-            return;
+            return CameraDiagnostics::ErrorCode::responseParseError;
 
         if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
         {
@@ -197,7 +199,7 @@ void QnAxisStreamReader::openStream()
 
     // ============== requesting a video ==========================
     m_rtpStreamParser.setRequest(request);
-    m_rtpStreamParser.openStream();
+    return m_rtpStreamParser.openStream();
 }
 
 void QnAxisStreamReader::closeStream()

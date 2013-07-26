@@ -323,6 +323,10 @@ void QnWorkbenchDisplay::deinitSceneView() {
         delete gridBackgroundItem();
 }
 
+QGLWidget *QnWorkbenchDisplay::newGlWidget() const {
+    return NULL;
+}
+
 void QnWorkbenchDisplay::initSceneView() {
     assert(m_scene && m_view);
 
@@ -1639,8 +1643,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 
-        int checkedButtons = widget->item()->data(Qn::ItemCheckedButtonsRole).toInt();
-        widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+        int checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
+        if(checkedButtons != -1)
+            widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
     }
 
     QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();

@@ -3,6 +3,7 @@
 
 #include <QtCore/QMetaType>
 
+#include <utils/camera/camera_diagnostics.h>
 #include <utils/common/json.h>
 
 struct QnTimeReply {

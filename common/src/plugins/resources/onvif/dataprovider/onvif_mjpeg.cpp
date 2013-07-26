@@ -59,7 +59,7 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 */
 
 MJPEGtreamreader::MJPEGtreamreader(QnResourcePtr res, const QString& requst)
-:CLServerPushStreamreader(res),
+:CLServerPushStreamReader(res),
 mHttpClient(0),
 m_request(requst)
 {
@@ -137,16 +137,24 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     return videoData;
 }
 
-void MJPEGtreamreader::openStream()
+CameraDiagnostics::ErrorCode::Value MJPEGtreamreader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::ErrorCode::noError;
 
     //QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
 
     mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
-    mHttpClient->doGET(m_request);
+    switch( mHttpClient->doGET(m_request) )
+    {
+        case CL_HTTP_SUCCESS:
+            return CameraDiagnostics::ErrorCode::noError;
+        case CL_HTTP_AUTH_REQUIRED:
+            return CameraDiagnostics::ErrorCode::notAuthorised;
+        default:
+            return CameraDiagnostics::ErrorCode::responseParseError;
+    }
 }
 
 void MJPEGtreamreader::closeStream()

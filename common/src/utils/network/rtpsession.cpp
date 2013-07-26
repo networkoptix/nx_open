@@ -615,7 +615,7 @@ bool RTPSession::checkIfDigestAuthIsneeded(const QByteArray& response)
     return true;
 }
 
-bool RTPSession::open(const QString& url, qint64 startTime)
+CameraDiagnostics::ErrorCode::Value RTPSession::open(const QString& url, qint64 startTime)
 {
     if ((quint64)startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
@@ -635,14 +635,12 @@ bool RTPSession::open(const QString& url, qint64 startTime)
         m_tcpSock.reopen();
 
     m_tcpSock.setReadTimeOut(TCP_CONNECT_TIMEOUT);
-    bool rez;
-    if (m_proxyPort == 0)
-        rez = m_tcpSock.connect(mUrl.host(), mUrl.port(DEFAULT_RTP_PORT));
-    else
-        rez = m_tcpSock.connect(m_proxyAddr, m_proxyPort);
+    bool rez = m_proxyPort == 0
+        ? m_tcpSock.connect(mUrl.host(), mUrl.port(DEFAULT_RTP_PORT))
+        : m_tcpSock.connect(m_proxyAddr, m_proxyPort);
 
     if (!rez)
-        return false;
+        return CameraDiagnostics::ErrorCode::cannotOpenCameraMediaPort;
 
     m_tcpSock.setNoDelay(true);
 
@@ -651,26 +649,26 @@ bool RTPSession::open(const QString& url, qint64 startTime)
 
     if (m_numOfPredefinedChannels) {
         usePredefinedTracks();
-        return true;
+        return CameraDiagnostics::ErrorCode::noError;
     }
 
     if (!sendDescribe()) {
         m_tcpSock.close();
-        return false;
+        return CameraDiagnostics::ErrorCode::connectionClosedUnexpectedly;
     }
 
     QByteArray response;
 
     if (!readTextResponce(response)) {
         m_tcpSock.close();
-        return false;
+        return CameraDiagnostics::ErrorCode::connectionClosedUnexpectedly;
     }
 
     // check digest authentication here
     if (!checkIfDigestAuthIsneeded(response))
     {
         m_tcpSock.close();
-        return false;
+        return CameraDiagnostics::ErrorCode::responseParseError;
     }
         
 
@@ -681,7 +679,7 @@ bool RTPSession::open(const QString& url, qint64 startTime)
         if (!sendDescribe() || !readTextResponce(response)) 
         {
             m_tcpSock.close();
-            return false;
+            return CameraDiagnostics::ErrorCode::connectionClosedUnexpectedly;
         }
 
     }
@@ -696,13 +694,16 @@ bool RTPSession::open(const QString& url, qint64 startTime)
         m_contentBase = tmp;
 
 
+    CameraDiagnostics::ErrorCode::Value result = CameraDiagnostics::ErrorCode::noError;
     updateResponseStatus(response);
+    if( m_responseCode == CL_HTTP_AUTH_REQUIRED )
+        result = CameraDiagnostics::ErrorCode::noMediaTrack;
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
     if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
         m_tcpSock.close();
-        return false;
+        return CameraDiagnostics::ErrorCode::noMediaTrack;
     }
 
     m_sdp = response.mid(sdp_index+4);
@@ -710,10 +711,10 @@ bool RTPSession::open(const QString& url, qint64 startTime)
 
     if (m_sdpTracks.size()<=0) {
         m_tcpSock.close();
-        return false;
+        result = CameraDiagnostics::ErrorCode::noMediaTrack;
     }
 
-    return true;
+    return result;
 }
 
 RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, double scale)

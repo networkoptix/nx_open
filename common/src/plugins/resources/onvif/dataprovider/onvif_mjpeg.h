@@ -5,7 +5,7 @@
 #include "utils/network/simple_http_client.h"
 
 
-class MJPEGtreamreader: public CLServerPushStreamreader
+class MJPEGtreamreader: public CLServerPushStreamReader
 {
 public:
     MJPEGtreamreader(QnResourcePtr res, const QString& requst);
@@ -13,7 +13,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
-    virtual void openStream();
+    virtual CameraDiagnostics::ErrorCode::Value openStream();
     virtual void closeStream() ;
     virtual bool isStreamOpened() const;
 

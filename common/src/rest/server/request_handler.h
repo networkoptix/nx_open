@@ -12,7 +12,9 @@
 class TCPSocket;
 
 /*
-*  QnRestRequestHandler MUST be thread safe and stateless
+*  QnRestRequestHandler MUST be thread safe (better reenterable, to allow multiple requests to be processed simultaneously) and stateless
+*  
+*  Single handler instance receives all requests (each request in different thread)
 */
 class QnRestRequestHandler: public QObject {
     Q_OBJECT
