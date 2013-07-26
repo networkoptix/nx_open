@@ -290,6 +290,8 @@ public:
 
     void ensureRaisedConeItem(QnResourceWidget *widget);
 
+    QGLWidget *newGlWidget() const;
+
 public slots:
     void fitInView(bool animate = true);
 
