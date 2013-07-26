@@ -359,7 +359,8 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         DewarpingParams dewarping = ui->fisheyeSettingsWidget->dewarpingParams();
         dewarping.enabled = ui->checkBoxDewarping->isChecked();
         m_camera->setDewarpingParams(dewarping);
-        m_dewarpingParamsBackup = ui->fisheyeSettingsWidget->dewarpingParams();
+        ui->fisheyeSettingsWidget->updateFromResource(m_camera);
+        m_dewarpingParamsBackup = dewarping;
 
         setHasDbChanges(false);
     }
