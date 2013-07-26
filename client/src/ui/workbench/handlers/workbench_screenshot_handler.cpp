@@ -119,7 +119,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     {
         QList<QImage> images;
         for (int i = 0; i < layout->channelCount(); ++i)
-            images.push_back(display->camDisplay()->getScreenshot(i, widget->item()->imageEnhancement()));
+            images.push_back(display->camDisplay()->getScreenshot(i, widget->item()->imageEnhancement(), widget->item()->dewarpingParams()));
         QSize channelSize = images[0].size();
         QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
         QRectF zoomRect = widget->zoomRect().isNull() ? QRectF(0, 0, 1, 1) : widget->zoomRect();

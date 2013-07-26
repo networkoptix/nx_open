@@ -25,7 +25,7 @@ cat >> ~/.profile << EOF
 
 # Network optix environment
 export environment=$WSDIR/buildenv
-export PATH=\$environment/maven/bin:\$environment/qt/bin:\$PATH
+export PATH=\$environment/maven/bin:\$environment/python/bin:\$environment/qt/bin:\$PATH
 export QTDIR=\$environment/qt
 export JAVA_HOME=/usr
 # End of network optix environment

@@ -123,6 +123,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fishEyeButton->setCheckable(true);
     fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
     fishEyeButton->setToolTip(tr("Dewarping"));
+    fishEyeButton->setChecked(item->dewarpingParams().enabled);
     setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_FishEye_Help);
     connect(fishEyeButton, SIGNAL(toggled(bool)), this, SLOT(at_fishEyeButton_toggled(bool)));
 
@@ -163,6 +164,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(context->instance<QnWorkbenchRenderWatcher>(), SIGNAL(displayingChanged(QnResourceWidget *)), this, SLOT(at_renderWatcher_displayingChanged(QnResourceWidget *)));
 
     at_camDisplay_liveChanged();
+    at_ptzButton_toggled(ptzButton->isChecked());
+    at_fishEyeButton_toggled(fishEyeButton->isChecked());
+    at_histogramButton_toggled(enhancementButton->isChecked());
     updateButtonsVisibility();
     updateIconButton();
     updateAspectRatio();
@@ -189,7 +193,7 @@ void QnMediaResourceWidget::updateFisheyeController() {
     } else {
         delete m_fisheyePtz;
         m_fisheyePtz = 0;
-
+        updateAspectRatio();
         if(buttonBar()->button(FishEyeButton))
             buttonBar()->button(FishEyeButton)->setChecked(false);
     }
@@ -858,7 +862,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     QSize sourceSize = m_renderer->sourceSize();
 
-    if (item()->dewarpingParams().enabled)
+    if (item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
         sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
 
     if(sourceSize.isEmpty()) {

@@ -209,33 +209,40 @@ QString QnFisheyeRectilinearProgram::getShaderText()
 
     // avoid function call for better shader compatibility
     vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx; 
-    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx /aspectRatio;
+    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx; // /aspectRatio;
     vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
 
     mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
                      xVect.y,   yVect.y,    center.y,
                      xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
     
-    float backAR = (1.0 - 1.0 / aspectRatio)/2.0;
     float ar2 = maxY*aspectRatio;
+    float ar2_P = ar2 / PI;
+    float ar2Inv = 1.0 / ar2;
+    float backAR = -(ar2 - ar2 / aspectRatio)/2.0 + ar2 / 2.0;
+    
+    float maxXHalf = maxX / 2.0;
+    float maxX_P = maxX / PI;
+    float maxXInv = 1.0 / maxX;
 
     void main() 
     {
-        vec3 pos3d = vec3(gl_TexCoord[0].xy / vec2(maxX, ar2) - vec2(0.5, yCenter), 1.0) * to3d; // point on the surface
+        vec3 pos3d = vec3(gl_TexCoord[0].xy * vec2(maxXInv, ar2Inv) - vec2(0.5, yCenter), 1.0) * to3d; // point on the surface
 
-        float theta = atan(pos3d.z, pos3d.x) + fovRot;                         // fisheye angle
-        float r     = acos(pos3d.y / length(pos3d)) / PI;                      // fisheye radius
-        vec2 pos = vec2(cos(theta), sin(theta)) * r + 0.5;                     // return from polar
-
-        pos.x = min(pos.x*maxX, maxX);
-        pos.y = min((pos.y - backAR)*ar2, maxY);
+        float theta = atan(pos3d.z, pos3d.x) + fovRot;            // fisheye angle
+        float r     = acos(pos3d.y / length(pos3d));              // fisheye radius
+        
+        vec2 pos = vec2(cos(theta), sin(theta)) * r * vec2(maxX_P, ar2_P) + vec2(maxXHalf, backAR);
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
-        gl_FragColor = vec4(%1,
-                            texture2D(uTexture, pos).p,
-                            texture2D(vTexture, pos).p,
-                            1.0) * colorTransform;
+        if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
+            gl_FragColor = vec4(%1,
+            texture2D(uTexture, pos).p,
+            texture2D(vTexture, pos).p,
+            1.0) * colorTransform;
+        else 
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
 }
@@ -278,43 +285,48 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         0.0, cos(-fovRot), -sin(-fovRot),
         0.0, sin(-fovRot),  cos(-fovRot));
 
-    float backAR = (1.0 - 1.0 / aspectRatio)/2.0;
     float ar2 = maxY*aspectRatio;
+    float ar2_P = ar2 / PI;
+    float ar2Inv = 1.0 / ar2;
+    float backAR = -(ar2 - ar2 / aspectRatio)/2.0 + ar2 / 2.0;
+
+    float maxXHalf = maxX / 2.0;
+    float maxX_P = maxX / PI;
+    float maxXInv = 1.0 / maxX;
+
+    float ymaxInv = -dstFov/aspectRatio;
+    float yFov = dstFov / panoFactor;
 
     void main() 
     {
-        vec2 pos = (gl_TexCoord[0].xy / vec2(maxX, ar2) - vec2(0.5, yCenter)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
+        vec2 pos = (gl_TexCoord[0].xy * vec2(maxXInv, ar2Inv) - vec2(0.5, yCenter)) * vec2(dstFov, yFov); // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
         float roty = -fovRot* cos(theta);
-        float roty2 = -fovRot*2.0*cos(theta);
 
-        pos.y = pos.y/panoFactor;
-        float ymaxInv = aspectRatio / dstFov;
-        float phi   = pos.y * ((ymaxInv - roty) / ymaxInv) - roty - yShift;
+        float phi   = pos.y * (1.0 + roty*ymaxInv)  - roty - yShift;
 
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
-            cos(phi) * cos(theta),  // only one difference between H and V shaders: this 2 lines in back order
-            sin(phi))  * perspectiveMatrix;
+                         cos(phi) * cos(theta),  // only one difference between H and V shaders: this 2 lines in back order
+                         sin(phi))  * perspectiveMatrix;
 
         // Calculate fisheye angle and radius
-        theta = atan(psph.z, psph.x);
-        phi   = acos(psph.y);
-        float r = phi / PI; // fisheye FOV
+        theta   = atan(psph.z, psph.x);
+        float r = acos(psph.y);
 
         // return from polar coordinates
-        pos = vec2(cos(theta), sin(theta)) * r + 0.5;
-
-        pos.x = min(pos.x*maxX, maxX);
-        pos.y = min((pos.y - backAR)*ar2, maxY);
+        pos = vec2(cos(theta), sin(theta)) * r * vec2(maxX_P, ar2_P) + vec2(maxXHalf, backAR);
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
-        gl_FragColor = vec4(%1,
+        if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
+            gl_FragColor = vec4(%1,
             texture2D(uTexture, pos).p,
             texture2D(vTexture, pos).p,
             1.0) * colorTransform;
+        else 
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
 }
@@ -358,20 +370,26 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
                                    0.0, cos(-fovRot), -sin(-fovRot),
                                    0.0, sin(-fovRot),  cos(-fovRot));
 
-    float backAR = (1.0 - 1.0 / aspectRatio)/2.0;
     float ar2 = maxY*aspectRatio;
+    float ar2_P = ar2 / PI;
+    float ar2Inv = 1.0 / ar2;
+    float backAR = -(ar2 - ar2 / aspectRatio)/2.0 + ar2 / 2.0;
+
+    float maxXHalf = maxX / 2.0;
+    float maxX_P = maxX / PI;
+    float maxXInv = 1.0 / maxX;
+    
+    float ymaxInv = -dstFov/aspectRatio;
+    float yFov = -dstFov / panoFactor;
 
     void main() 
     {
-        vec2 pos = (gl_TexCoord[0].xy / vec2(maxX, ar2) - vec2(0.5, yCenter)) * dstFov; // go to coordinates in range [-dstFov/2..+dstFov/2]
+        vec2 pos = (gl_TexCoord[0].xy * vec2(maxXInv, ar2Inv) - vec2(0.5, yCenter)) * vec2(dstFov, yFov); // go to coordinates in range [-dstFov/2..+dstFov/2]
 
         float theta = pos.x + xShift;
         float roty = -fovRot* cos(theta);
-        float roty2 = -fovRot*2.0*cos(theta);
         
-        pos.y = pos.y/(-panoFactor);
-        float ymaxInv = aspectRatio / dstFov;
-        float phi   = pos.y * ((ymaxInv - roty) / ymaxInv) + roty + yShift;
+        float phi   = pos.y * (1.0 + roty*ymaxInv) + roty + yShift;
         
         // Vector in 3D space
         vec3 psph = vec3(cos(phi) * sin(theta),
@@ -379,22 +397,21 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
                          cos(phi) * cos(theta))  * perspectiveMatrix;
 
         // Calculate fisheye angle and radius
-        theta = atan(psph.z, psph.x);
-        phi   = acos(psph.y);
-        float r = phi / PI; // fisheye FOV
+        theta    = atan(psph.z, psph.x);
+        float r  = acos(psph.y);
 
         // return from polar coordinates
-        pos = vec2(cos(theta), sin(theta)) * r + 0.5;
-
-        pos.x = min(pos.x*maxX, maxX);
-        pos.y = min((pos.y - backAR)*ar2, maxY);
+        pos = vec2(cos(theta), sin(theta)) * r * vec2(maxX_P, ar2_P) + vec2(maxXHalf, backAR);
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
-        gl_FragColor = vec4(%1,
-                            texture2D(uTexture, pos).p,
-                            texture2D(vTexture, pos).p,
-                            1.0) * colorTransform;
+        if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
+            gl_FragColor = vec4(%1,
+            texture2D(uTexture, pos).p,
+            texture2D(vTexture, pos).p,
+            1.0) * colorTransform;
+        else 
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
 }

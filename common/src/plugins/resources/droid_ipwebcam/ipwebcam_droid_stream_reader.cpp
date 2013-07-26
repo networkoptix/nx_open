@@ -45,7 +45,7 @@ int contain_subst(char *data, int datalen, int start_index ,  char *subdata, int
 
 
 QnPlDroidIpWebCamReader::QnPlDroidIpWebCamReader(QnResourcePtr res)
-:CLServerPushStreamreader(res),
+:CLServerPushStreamReader(res),
 mHttpClient(0)
 
 {
@@ -151,16 +151,23 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
 
 }
 
-void QnPlDroidIpWebCamReader::openStream()
+CameraDiagnostics::ErrorCode::Value QnPlDroidIpWebCamReader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::ErrorCode::noError;
 
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
     mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
-    mHttpClient->doGET(QLatin1String("videofeed"));
-
     mDataRemainedBeginIndex = -1;
+    switch( mHttpClient->doGET(QLatin1String("videofeed")) )
+    {
+        case CL_HTTP_SUCCESS:
+            return CameraDiagnostics::ErrorCode::noError;
+        case CL_HTTP_AUTH_REQUIRED:
+            return CameraDiagnostics::ErrorCode::notAuthorised;
+        default:
+            return CameraDiagnostics::ErrorCode::responseParseError;
+    }
 }
 
 void QnPlDroidIpWebCamReader::closeStream()

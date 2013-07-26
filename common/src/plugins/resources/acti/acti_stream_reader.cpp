@@ -7,7 +7,7 @@
 #include "utils/network/tcp_connection_priv.h"
 
 QnActiStreamReader::QnActiStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res),
+    CLServerPushStreamReader(res),
     m_multiCodec(res)
 {
     m_actiRes = res.dynamicCast<QnActiResource>();
@@ -36,7 +36,7 @@ QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
     return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
 }
 
-void QnActiStreamReader::openStream()
+CameraDiagnostics::ErrorCode::Value QnActiStreamReader::openStream()
 {
     // configure stream params
 
@@ -61,25 +61,25 @@ void QnActiStreamReader::openStream()
         CLHttpStatus status;
         QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(fps), status);
         if (status != CL_HTTP_SUCCESS)
-            return;
+            return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
 
         result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_RESOLUTION.arg(ch).arg(resolutionStr), status);
         if (status != CL_HTTP_SUCCESS)
-            return;
+            return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
 
         result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_BITRATE.arg(ch).arg(bitrateStr), status);
         if (status != CL_HTTP_SUCCESS)
-            return;
+            return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
 
         result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_ENCODER.arg(ch).arg(encoderStr), status);
         if (status != CL_HTTP_SUCCESS)
-            return;
+            return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
 
         if (m_actiRes->isAudioSupported())
         {
             result = m_actiRes->makeActiRequest(QLatin1String("system"), SET_AUDIO.arg(ch).arg(audioStr), status);
             if (status != CL_HTTP_SUCCESS)
-                return;
+                return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
         }
     }
 
@@ -88,10 +88,10 @@ void QnActiStreamReader::openStream()
     QString streamUrl = m_actiRes->getRtspUrl(ch);
 
     m_multiCodec.setRequest(streamUrl);
-    m_multiCodec.openStream();
+    const CameraDiagnostics::ErrorCode::Value result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
         m_resource->setStatus(QnResource::Unauthorized);
-
+    return result;
 }
 
 void QnActiStreamReader::closeStream()

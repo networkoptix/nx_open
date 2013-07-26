@@ -277,6 +277,12 @@ int QnNetworkResource::getChannel() const
     return 0;
 }
 
+bool QnNetworkResource::ping()
+{
+    //TODO/IMPL
+    return false;
+}
+
 /*
 void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 {

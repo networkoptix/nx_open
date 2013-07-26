@@ -323,6 +323,33 @@ void QnWorkbenchDisplay::deinitSceneView() {
         delete gridBackgroundItem();
 }
 
+QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags windowFlags) const {
+    QGLFormat glFormat;
+    glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
+
+#ifdef Q_OS_LINUX
+    /* Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
+     * VSync will be re-enabled later if drivers are not NVidia's. */
+    glFormat.setSwapInterval(0); /* Turn vsync off. */
+#else
+    glFormat.setSwapInterval(1); /* Turn vsync on. */
+#endif
+
+    QGLWidget *result = new QGLWidget(glFormat, parent, NULL, windowFlags);
+
+#ifdef Q_OS_LINUX
+    result->context()->makeCurrent();
+    QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+    if (!vendor.toLower().contains("nvidia")) {
+        QGLFormat format = result->format();
+        format.setSwapInterval(1); /* Turn vsync on. */
+        result->setFormat(format);
+    }
+#endif
+
+    return result;
+}
+
 void QnWorkbenchDisplay::initSceneView() {
     assert(m_scene && m_view);
 
@@ -338,7 +365,6 @@ void QnWorkbenchDisplay::initSceneView() {
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
-
     /* Init view. */
     m_view->setScene(m_scene);
     m_instrumentManager->registerView(m_view);
@@ -348,38 +374,15 @@ void QnWorkbenchDisplay::initSceneView() {
     /* Configure OpenGL */
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if(!m_view->property(qn_viewInitializedPropertyName).toBool()) {
-        if (!QGLFormat::hasOpenGL()) {
-            qnCritical("Software rendering is not supported."); // TODO: #Elric this check must be performed on startup.
-        } else {
-            QGLFormat glFormat;
-            glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
+        QGLWidget *viewport = newGlWidget(m_view);
+            
+        m_view->setViewport(viewport);
 
-#ifdef Q_OS_LINUX
-            /* Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
-             * VSync will be re-enabled later if drivers are not NVidia's. */
-            glFormat.setSwapInterval(0); /* Turn vsync off. */
-#else
-            glFormat.setSwapInterval(1); /* Turn vsync on. */
-#endif
+        viewport->makeCurrent();
+        QnGlHardwareChecker::checkCurrentContext(true);
 
-            QGLWidget *glWidget = new QGLWidget(glFormat);
-            m_view->setViewport(glWidget);
-
-#ifdef Q_OS_LINUX
-            glWidget->context()->makeCurrent();
-            QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-            if (!vendor.toLower().contains("nvidia")) {
-                QGLFormat format = glWidget->format();
-                format.setSwapInterval(1); /* Turn vsync on. */
-                glWidget->setFormat(format);
-            }
-#endif
-
-            new QnGlHardwareChecker(glWidget);
-
-            /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
-            DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(glWidget);
-        }
+        /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
+        DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
 
         /* Turn on antialiasing at QPainter level. */
         m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
@@ -1639,8 +1642,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 
-        int checkedButtons = widget->item()->data(Qn::ItemCheckedButtonsRole).toInt();
-        widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+        int checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
+        if(checkedButtons != -1)
+            widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
     }
 
     QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();

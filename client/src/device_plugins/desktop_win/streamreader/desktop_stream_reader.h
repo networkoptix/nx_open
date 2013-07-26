@@ -9,7 +9,7 @@
 #include "core/dataprovider/spush_media_stream_provider.h"
 
 
-class QnDesktopStreamreader: public CLServerPushStreamreader
+class QnDesktopStreamreader: public CLServerPushStreamReader
 {
 private:
     enum {BLOCK_SIZE = 1460};
@@ -20,7 +20,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
-    virtual void openStream();
+    virtual CameraDiagnostics::ErrorCode::Value openStream();
     virtual void closeStream();
     virtual bool isStreamOpened() const;
     

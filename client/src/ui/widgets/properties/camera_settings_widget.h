@@ -78,6 +78,7 @@ signals:
     void scheduleExported(const QnVirtualCameraResourceList &);
     void resourcesChanged();
     void fisheyeSettingChanged();
+
 protected slots:
     void at_moreLicensesRequested();
     void at_advancedSettingChanged();

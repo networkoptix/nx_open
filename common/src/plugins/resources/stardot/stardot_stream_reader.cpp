@@ -14,7 +14,7 @@ static const QByteArray STARDOT_MOTION_UUID = QByteArray::fromHex("bed9b7e0f0603
 
 
 QnStardotStreamReader::QnStardotStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res),
+    CLServerPushStreamReader(res),
     m_multiCodec(res)
 {
     m_stardotRes = res.dynamicCast<QnStardotResource>();
@@ -25,7 +25,7 @@ QnStardotStreamReader::~QnStardotStreamReader()
     stop();
 }
 
-void QnStardotStreamReader::openStream()
+CameraDiagnostics::ErrorCode::Value QnStardotStreamReader::openStream()
 {
     // configure stream params
 
@@ -42,18 +42,21 @@ void QnStardotStreamReader::openStream()
         if (status != CL_HTTP_SUCCESS) 
         {
             if (status == CL_HTTP_AUTH_REQUIRED) 
+            {
                 m_resource->setStatus(QnResource::Unauthorized);
-            return;
+                return CameraDiagnostics::ErrorCode::notAuthorised;
+            }
+            return CameraDiagnostics::ErrorCode::responseParseError;
         }
     }
 
     QString streamUrl = m_stardotRes->getRtspUrl();
 
     m_multiCodec.setRequest(streamUrl);
-    m_multiCodec.openStream();
+    const CameraDiagnostics::ErrorCode::Value result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
         m_resource->setStatus(QnResource::Unauthorized);
-
+    return result;
 }
 
 void QnStardotStreamReader::closeStream()

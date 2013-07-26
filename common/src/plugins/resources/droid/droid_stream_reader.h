@@ -8,7 +8,7 @@
 #include "utils/network/rtpsession.h"
 #include "utils/network/h264_rtp_parser.h"
 
-class PlDroidStreamReader: public CLServerPushStreamreader
+class PlDroidStreamReader: public CLServerPushStreamReader
 {
 public:
     static void setSDPInfo(quint32 ipv4, QByteArray sdpInfo);
@@ -18,7 +18,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual void openStream() override;
+    virtual CameraDiagnostics::ErrorCode::Value openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 

@@ -78,7 +78,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(recordingSettingsChanged()),     this,   SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(controlsChangesApplied()),       this,   SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged(int)));
+    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged()));
 
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_dbDataChanged()));
@@ -359,7 +359,8 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         DewarpingParams dewarping = ui->fisheyeSettingsWidget->dewarpingParams();
         dewarping.enabled = ui->checkBoxDewarping->isChecked();
         m_camera->setDewarpingParams(dewarping);
-        m_dewarpingParamsBackup = ui->fisheyeSettingsWidget->dewarpingParams();
+        ui->fisheyeSettingsWidget->updateFromResource(m_camera);
+        m_dewarpingParamsBackup = dewarping;
 
         setHasDbChanges(false);
     }
@@ -886,8 +887,7 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplie
     m_hasScheduleControlsChanges = false;
 }
 
-void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged(int state) {
-    Q_UNUSED(state) // checkbox is not tristate here
+void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
     if (m_camera && m_camera->isAnalog())
         ui->analogViewCheckBox->setChecked(ui->cameraScheduleWidget->isScheduleEnabled());
 }
@@ -922,4 +922,6 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
 {
     at_dbDataChanged();
     m_camera->setDewarpingParams(ui->fisheyeSettingsWidget->dewarpingParams());
+
+    emit fisheyeSettingChanged();
 }

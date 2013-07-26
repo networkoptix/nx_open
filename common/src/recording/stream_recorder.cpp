@@ -523,12 +523,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                     {
                         // update image aspect, keep megapixels amount unchanged
                         m_videoTranscoder->open(mediaData);
-                        QSize srcResolution = m_videoTranscoder->getResolution();
-                        int square = srcResolution.width() * srcResolution.height();
-                        float aspect = srcResolution.width() / (float) srcResolution.height() * m_dewarpingParams.panoFactor;
-                        int x = int(sqrt(square * aspect) + 0.5);
-                        int y = int(x /aspect + 0.5);
-                        QSize res = QSize(qPower2Floor(x, 16), qPower2Floor(y, 2));
+                        QSize res = QnFisheyeImageFilter::getOptimalSize(m_videoTranscoder->getResolution(), m_dewarpingParams);
                         m_videoTranscoder->setResolution(res);
                     }
                 }

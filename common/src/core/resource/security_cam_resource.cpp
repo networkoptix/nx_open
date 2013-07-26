@@ -23,9 +23,13 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     QnMediaResource::initMediaResource();
 
-    connect(
-        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
+    // TODO: #AK this is a wrong place for this connect call.
+    // You should listen to changes in resource pool instead.
+    if(QnBusinessEventConnector::instance()) {
+        connect(
+            this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
+            QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
+    }
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const

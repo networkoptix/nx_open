@@ -581,7 +581,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::MessageBoxAction).
         flags(Qn::NoTarget).
-        text(tr("Show message"));
+        text(tr("Show Message"));
+
+    factory(Qn::VersionMismatchMessageAction).
+        flags(Qn::NoTarget).
+        text(tr("Show Version Mismatch Message"));
 
     factory(Qn::BrowseUrlAction).
         flags(Qn::NoTarget).
