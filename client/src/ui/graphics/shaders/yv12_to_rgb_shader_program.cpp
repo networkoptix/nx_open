@@ -216,8 +216,8 @@ QString QnFisheyeRectilinearProgram::getShaderText()
                      xVect.y,   yVect.y,    center.y,
                      xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
     
-    float backAR = (1.0 - 1.0 / aspectRatio)/2.0;
     float ar2 = maxY*aspectRatio;
+    float backAR = -(ar2 - ar2 / aspectRatio)/2.0;
 
     void main() 
     {
@@ -228,7 +228,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         vec2 pos = vec2(cos(theta), sin(theta)) * r + 0.5;                     // return from polar
 
         pos.x = pos.x*maxX;
-        pos.y = (pos.y - backAR)*ar2;
+        pos.y = pos.y * ar2 + backAR;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
@@ -281,8 +281,8 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         0.0, cos(-fovRot), -sin(-fovRot),
         0.0, sin(-fovRot),  cos(-fovRot));
 
-    float backAR = (1.0 - 1.0 / aspectRatio)/2.0;
     float ar2 = maxY*aspectRatio;
+    float backAR = -(ar2 - ar2 / aspectRatio)/2.0;
 
     void main() 
     {
@@ -308,8 +308,8 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         // return from polar coordinates
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
-        pos.x = pos.x*maxX;
-        pos.y = (pos.y - backAR)*ar2;
+        pos.x = pos.x * maxX;
+        pos.y = pos.y * ar2 + backAR;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
@@ -363,8 +363,8 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
                                    0.0, cos(-fovRot), -sin(-fovRot),
                                    0.0, sin(-fovRot),  cos(-fovRot));
 
-    float backAR = (1.0 - 1.0 / aspectRatio)/2.0;
     float ar2 = maxY*aspectRatio;
+    float backAR = -(ar2 - ar2 / aspectRatio)/2.0;
 
     void main() 
     {
@@ -390,8 +390,8 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         // return from polar coordinates
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
-        pos.x = pos.x*maxX;
-        pos.y = (pos.y - backAR)*ar2;
+        pos.x = pos.x * maxX;
+        pos.y = pos.y * ar2 + backAR;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
