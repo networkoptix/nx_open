@@ -6,7 +6,7 @@
 class QnGlHardwareChecker {
     Q_DECLARE_TR_FUNCTIONS(QnGlHardwareChecker)
 public:
-    static void checkCurrentContext(bool displayWarnings);
+    static bool checkCurrentContext(bool displayWarnings);
 };
 
 #endif // QN_GL_HARDWARE_CHECKER_H

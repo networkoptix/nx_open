@@ -8,7 +8,7 @@
 #include <ui/graphics/opengl/gl_functions.h>
 
 
-void QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
+bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
     const QGLContext* context = QGLContext::currentContext();
 
     QnGlFunctions functions(context);
@@ -33,15 +33,19 @@ void QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
 
     /* Note that message will be shown in destructor, 
      * close to the event loop. */
-    if (hardwareTrouble) {
-        const QString message = tr("We have detected that your video card is not supported. You can proceed at your own risk.<br/>"
-            "Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.<br/>"
-            "For easy instructions on how to install or update your video driver, follow instruction at <a href=\"http://tribaltrouble.com/driversupport.php\">http://tribaltrouble.com/driversupport.php</a>");
-        QMessageBox::critical(NULL, tr("Critical Performance Tip"), message, QMessageBox::Ok);
-    } else if(softwareTrouble) {
-        const QString message = tr("We have detected that your video card drivers may be not installed or are out of date.<br/>"
-            "Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.<br/>"
-            "For easy instructions on how to install or update your video driver, follow instruction at <a href=\"http://tribaltrouble.com/driversupport.php\">http://tribaltrouble.com/driversupport.php</a>");
-        QMessageBox::critical(NULL, tr("Important Performance Tip"), message, QMessageBox::Ok);
+    if(displayWarnings) {
+        if (hardwareTrouble) {
+            const QString message = tr("We have detected that your video card is not supported. You can proceed at your own risk.<br/>"
+                "Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.<br/>"
+                "For easy instructions on how to install or update your video driver, follow instruction at <a href=\"http://tribaltrouble.com/driversupport.php\">http://tribaltrouble.com/driversupport.php</a>");
+            QMessageBox::critical(NULL, tr("Critical Performance Tip"), message, QMessageBox::Ok);
+        } else if(softwareTrouble) {
+            const QString message = tr("We have detected that your video card drivers may be not installed or are out of date.<br/>"
+                "Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.<br/>"
+                "For easy instructions on how to install or update your video driver, follow instruction at <a href=\"http://tribaltrouble.com/driversupport.php\">http://tribaltrouble.com/driversupport.php</a>");
+            QMessageBox::critical(NULL, tr("Important Performance Tip"), message, QMessageBox::Ok);
+        }
     }
+
+    return !hardwareTrouble && !softwareTrouble;
 }
