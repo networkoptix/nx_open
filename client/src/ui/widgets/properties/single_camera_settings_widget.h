@@ -96,7 +96,7 @@ signals:
     void hasChangesChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
-    void fisheyeSettingChanged(DewarpingParams params);
+    void fisheyeSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
@@ -113,7 +113,7 @@ private slots:
     void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
     void at_cameraScheduleWidget_controlsChangesApplied();
-    void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
+    void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();

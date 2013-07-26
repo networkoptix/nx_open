@@ -45,7 +45,7 @@ void QnWorkbenchPtzCameraWatcher::at_resourcePool_resourceAdded(const QnResource
     if(!camera)
         return;
 
-    connect(camera.data(), SIGNAL(ptzCapabilitiesChanged(const QnSecurityCamResourcePtr &)), this, SLOT(at_resource_ptzCapabilitiesChanged(const QnSecurityCamResourcePtr &)));
+    connect(camera.data(), SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SLOT(at_resource_ptzCapabilitiesChanged(const QnResourcePtr &)));
     at_resource_ptzCapabilitiesChanged(camera);
 }
 
