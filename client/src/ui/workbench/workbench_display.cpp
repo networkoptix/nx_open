@@ -365,7 +365,6 @@ void QnWorkbenchDisplay::initSceneView() {
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
-
     /* Init view. */
     m_view->setScene(m_scene);
     m_instrumentManager->registerView(m_view);
@@ -379,7 +378,8 @@ void QnWorkbenchDisplay::initSceneView() {
             
         m_view->setViewport(viewport);
 
-        new QnGlHardwareChecker(viewport);
+        viewport->makeCurrent();
+        QnGlHardwareChecker::checkCurrentContext(true);
 
         /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
         DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
