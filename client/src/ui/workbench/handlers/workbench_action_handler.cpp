@@ -325,6 +325,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ClearCacheAction),                       SIGNAL(triggered()),    this,   SLOT(at_clearCacheAction_triggered()));
     connect(action(Qn::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
+    connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -647,6 +648,7 @@ void QnWorkbenchActionHandler::openResourcesInNewWindow(const QnResourceList &re
 void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
     arguments << QLatin1String("--no-single-application");
+    arguments << QLatin1String("--no-version-mismatch-check");
 
     if (context()->user()) {
         arguments << QLatin1String("--auth");
@@ -3848,7 +3850,7 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
     QDesktopServices::openUrl(QUrl::fromUserInput(url));
 }
 
-void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
+void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if(!watcher->hasMismatches())
         return;
@@ -3892,4 +3894,8 @@ void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
     ).arg(components).arg(watcher->latestVersion().toString());
 
     QMessageBox::warning(mainWindow(), tr("Version Mismatch"), message);
+}
+
+void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
+    menu()->trigger(Qn::VersionMismatchMessageAction);
 }

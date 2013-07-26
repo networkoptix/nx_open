@@ -164,6 +164,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(context->instance<QnWorkbenchRenderWatcher>(), SIGNAL(displayingChanged(QnResourceWidget *)), this, SLOT(at_renderWatcher_displayingChanged(QnResourceWidget *)));
 
     at_camDisplay_liveChanged();
+    at_ptzButton_toggled(ptzButton->isChecked());
+    at_fishEyeButton_toggled(fishEyeButton->isChecked());
+    at_histogramButton_toggled(enhancementButton->isChecked());
     updateButtonsVisibility();
     updateIconButton();
     updateAspectRatio();
