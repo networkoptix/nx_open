@@ -287,7 +287,6 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
 
         float theta = pos.x + xShift;
         float roty = -fovRot* cos(theta);
-        float roty2 = -fovRot*2.0*cos(theta);
 
         pos.y = pos.y/panoFactor;
         float ymaxInv = aspectRatio / dstFov;
@@ -367,7 +366,6 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
 
         float theta = pos.x + xShift;
         float roty = -fovRot* cos(theta);
-        float roty2 = -fovRot*2.0*cos(theta);
         
         pos.y = pos.y/(-panoFactor);
         float ymaxInv = aspectRatio / dstFov;
