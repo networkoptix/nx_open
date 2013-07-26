@@ -227,15 +227,18 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         float r     = acos(pos3d.y / length(pos3d)) / PI;                      // fisheye radius
         vec2 pos = vec2(cos(theta), sin(theta)) * r + 0.5;                     // return from polar
 
-        pos.x = min(pos.x*maxX, maxX);
-        pos.y = min((pos.y - backAR)*ar2, maxY);
+        pos.x = pos.x*maxX;
+        pos.y = (pos.y - backAR)*ar2;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
-        gl_FragColor = vec4(%1,
-                            texture2D(uTexture, pos).p,
-                            texture2D(vTexture, pos).p,
-                            1.0) * colorTransform;
+        if(pos.x < 0 || pos.y < 0 || pos.x > maxX || pos.y > maxY)
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        else 
+            gl_FragColor = vec4(%1,
+                                texture2D(uTexture, pos).p,
+                                texture2D(vTexture, pos).p,
+                                1.0) * colorTransform;
     }
     ));
 }
@@ -305,12 +308,15 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         // return from polar coordinates
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
-        pos.x = min(pos.x*maxX, maxX);
-        pos.y = min((pos.y - backAR)*ar2, maxY);
+        pos.x = pos.x*maxX;
+        pos.y = (pos.y - backAR)*ar2;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
-        gl_FragColor = vec4(%1,
+        if(pos.x < 0 || pos.y < 0 || pos.x > maxX || pos.y > maxY)
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        else 
+            gl_FragColor = vec4(%1,
             texture2D(uTexture, pos).p,
             texture2D(vTexture, pos).p,
             1.0) * colorTransform;
@@ -384,15 +390,18 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         // return from polar coordinates
         pos = vec2(cos(theta), sin(theta)) * r + 0.5;
 
-        pos.x = min(pos.x*maxX, maxX);
-        pos.y = min((pos.y - backAR)*ar2, maxY);
+        pos.x = pos.x*maxX;
+        pos.y = (pos.y - backAR)*ar2;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
-        gl_FragColor = vec4(%1,
-                            texture2D(uTexture, pos).p,
-                            texture2D(vTexture, pos).p,
-                            1.0) * colorTransform;
+        if(pos.x < 0 || pos.y < 0 || pos.x > maxX || pos.y > maxY)
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        else 
+            gl_FragColor = vec4(%1,
+            texture2D(uTexture, pos).p,
+            texture2D(vTexture, pos).p,
+            1.0) * colorTransform;
     }
     ));
 }
