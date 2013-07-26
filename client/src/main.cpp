@@ -490,7 +490,7 @@ int main(int argc, char **argv)
         if (!noFullScreen)
             context->action(Qn::EffectiveMaximizeAction)->trigger();
         if(noVersionMismatchCheck)
-            context->action(Qn::VersionMismatchMessageAction)->setDisabled(true);
+            context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
         //initializing plugin manager. TODO supply plugin dir (from settings)
         PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );

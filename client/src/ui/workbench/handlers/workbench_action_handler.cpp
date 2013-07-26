@@ -333,7 +333,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
-    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), action(Qn::VersionMismatchMessageAction), SLOT(trigger()));
+    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
 
     context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
 
@@ -3894,4 +3894,8 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     ).arg(components).arg(watcher->latestVersion().toString());
 
     QMessageBox::warning(mainWindow(), tr("Version Mismatch"), message);
+}
+
+void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
+    menu()->trigger(Qn::VersionMismatchMessageAction);
 }
