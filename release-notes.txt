@@ -15,6 +15,7 @@ Since 1.5.1
    was suggested with no luck. Now warning is given instead of restart
  - Input/Output is supported by ACTI cameras
  - HD Witness licenses cannot be activated on DW Spectrum and vice versa
+ - If copy items on Scene quickly (with a big video archive), than client will be crashed.
  
 Since previous build
  - Selected item was not marked in Tree (> sign). Fixed
@@ -31,6 +32,7 @@ Since previous build
    Such setting is enabled only if a filter has been applied before the export
  - Added support timeline mode for calendar.
  - Installation. Admin password has not been filled. Fixed. 
+ - Implemented Panoramic Mode for de-warping.
  
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
