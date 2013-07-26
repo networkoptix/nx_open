@@ -334,7 +334,7 @@ void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
 
 
     // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
-    //CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
+    //CLServerPushStreamReader* sPushProvider = dynamic_cast<CLServerPushStreamReader*> (m_mediaProvider);
     bool doNotChangeParams = false; //sPushProvider && sPushProvider->isStreamOpened() && m_currentScheduleTask->getFps() >= m_panicSchedileRecord.getFps()*0.75;
     updateRecordingType(task);
     if (!doNotChangeParams)

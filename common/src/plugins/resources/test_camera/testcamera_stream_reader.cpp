@@ -5,7 +5,7 @@
 static const int TESTCAM_TIMEOUT = 5 * 1000;
 
 QnTestCameraStreamReader::QnTestCameraStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res)
+    CLServerPushStreamReader(res)
 {
     m_tcpSock.setReadTimeOut(TESTCAM_TIMEOUT);
 }
@@ -100,10 +100,10 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     return rez;
 }
 
-void QnTestCameraStreamReader::openStream()
+CameraDiagnostics::ErrorCode::Value QnTestCameraStreamReader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::ErrorCode::noError;
     
     QString urlStr = m_resource->getUrl();
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
@@ -121,10 +121,12 @@ void QnTestCameraStreamReader::openStream()
     if (!m_tcpSock.connect(url.host(), url.port()))
     {
         closeStream();
-        return;
+        return CameraDiagnostics::ErrorCode::cannotOpenCameraMediaPort;
     }
     QByteArray path = urlStr.mid(urlStr.lastIndexOf(QLatin1String("/"))).toUtf8();
     m_tcpSock.send(path.data(), path.size());
+
+    return CameraDiagnostics::ErrorCode::noError;
 }
 
 void QnTestCameraStreamReader::closeStream()

@@ -4,7 +4,7 @@
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 
-class QnPlDroidIpWebCamReader : public CLServerPushStreamreader
+class QnPlDroidIpWebCamReader : public CLServerPushStreamReader
 {
     enum {BLOCK_SIZE = 1460};
 public:
@@ -13,7 +13,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
-    virtual void openStream();
+    virtual CameraDiagnostics::ErrorCode::Value openStream();
     virtual void closeStream() ;
     virtual bool isStreamOpened() const;
 

@@ -409,11 +409,11 @@ void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* pa
 
 static int TCP_READ_BUFFER_SIZE = 512*1024;
 
-bool QnMulticodecRtpReader::openStream()
+CameraDiagnostics::ErrorCode::Value QnMulticodecRtpReader::openStream()
 {
     m_pleaseStop = false;
     if (isStreamOpened())
-        return true;
+        return CameraDiagnostics::ErrorCode::noError;
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
     QString transport;
@@ -461,33 +461,29 @@ bool QnMulticodecRtpReader::openStream()
     m_audioParser = 0;
     m_videoIO = m_audioIO = 0;
 
-    if (m_RtpSession.open(url))
-    {
+    const CameraDiagnostics::ErrorCode::Value result = m_RtpSession.open(url);
+    if( result != CameraDiagnostics::ErrorCode::noError )
+        return result;
 
-        QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
-        if (camera)
-            m_RtpSession.setAudioEnabled(camera->isAudioEnabled());
+    QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
+    if (camera)
+        m_RtpSession.setAudioEnabled(camera->isAudioEnabled());
 
-        m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
-        
-        m_videoParser = dynamic_cast<QnRtpVideoStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_VIDEO).toUpper()));
-        if (m_videoParser)
-            m_videoParser->setTimeHelper(&m_timeHelper);
-        m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_AUDIO).toUpper()));
-        if (m_audioParser)
-            m_audioParser->setTimeHelper(&m_timeHelper);
+    m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
+    
+    m_videoParser = dynamic_cast<QnRtpVideoStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_VIDEO).toUpper()));
+    if (m_videoParser)
+        m_videoParser->setTimeHelper(&m_timeHelper);
+    m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_AUDIO).toUpper()));
+    if (m_audioParser)
+        m_audioParser->setTimeHelper(&m_timeHelper);
 
-        initIO(&m_videoIO, m_videoParser, RTPSession::TT_VIDEO);
-        initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO);
-        if (!m_videoIO && !m_audioIO)
-            m_RtpSession.stop();
-        m_rtcpReportTimer.restart();
-        return m_videoIO || m_audioIO;
-    }
-    else
-    {
-        return false;
-    }
+    initIO(&m_videoIO, m_videoParser, RTPSession::TT_VIDEO);
+    initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO);
+    if (!m_videoIO && !m_audioIO)
+        m_RtpSession.stop();
+    m_rtcpReportTimer.restart();
+    return m_videoIO || m_audioIO ? CameraDiagnostics::ErrorCode::noError : CameraDiagnostics::ErrorCode::noMediaTrack;
 }
 
 int QnMulticodecRtpReader::getLastResponseCode() const

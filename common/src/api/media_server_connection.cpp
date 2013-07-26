@@ -22,6 +22,7 @@
 #include "serializer/pb_serializer.h"
 #include "event_log/events_serializer.h"
 
+
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
         ((StorageStatusObject,      "storageStatus"))
@@ -40,6 +41,7 @@ namespace {
         ((CameraAddObject,          "manualCamera/add"))
         ((EventLogObject,           "events"))
         ((ImageObject,              "image"))
+        ((CameraDiagnosticsObject,  "doCameraDiagnosticsStep"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -546,6 +548,16 @@ int QnMediaServerConnection::ptzGetPosAsync(const QnNetworkResourcePtr &camera, 
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_REPLY_TYPE(QnTimeReply), target, slot);
+}
+
+int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
+    const QnId& cameraID, CameraDiagnostics::DiagnosticsStep::Value previousStep,
+    QObject* target, const char* slot )
+{
+    QnRequestParamList params;
+    params << QnRequestParam("res_id",  cameraID);
+    params << QnRequestParam("type", CameraDiagnostics::DiagnosticsStep::toString(previousStep));
+    return sendAsyncGetRequest(CameraDiagnosticsObject, QnRequestParamList(), QN_REPLY_TYPE(QnCameraDiagnosticsReply), target, slot);
 }
 
 int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {

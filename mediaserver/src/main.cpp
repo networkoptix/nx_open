@@ -60,6 +60,7 @@
 #include "rest/handlers/file_system_handler.h"
 #include "rest/handlers/statistics_handler.h"
 #include "rest/handlers/camera_settings_handler.h"
+#include "rest/handlers/camera_diagnostics_handler.h"
 #include "rest/handlers/manual_camera_addition_handler.h"
 #include "rest/handlers/camera_event_handler.h"
 #include "rest/server/rest_connection_processor.h"
@@ -775,6 +776,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
     QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
+    QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
     QnRestConnectionProcessor::registerHandler("api/camera_event", new QnCameraEventHandler());  //used to receive event from acti camera. TODO: remove this from api
     QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
 

@@ -9,7 +9,7 @@
 extern QString getValueFromString(const QString& line);
 
 QnISDStreamReader::QnISDStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res),
+    CLServerPushStreamReader(res),
     m_rtpStreamParser(res)
 {
     //m_axisRes = getResource().dynamicCast<QnPlAxisResource>();
@@ -21,10 +21,10 @@ QnISDStreamReader::~QnISDStreamReader()
 }
 
 
-void QnISDStreamReader::openStream()
+CameraDiagnostics::ErrorCode::Value QnISDStreamReader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::ErrorCode::noError;
 
     QnResource::ConnectionRole role = getRole();
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
@@ -66,24 +66,24 @@ void QnISDStreamReader::openStream()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         res->setStatus(QnResource::Unauthorized);
-        return;
+        return CameraDiagnostics::ErrorCode::notAuthorised;
     }
 
     QString url = getValueFromString(QLatin1String(reslst));
 
     QStringList urlLst = url.split(QLatin1Char('\r'), QString::SkipEmptyParts);
     if(urlLst.size() < 1)
-        return;
+        return CameraDiagnostics::ErrorCode::noMediaTrack;
 
     url = urlLst.at(0);
     
 
     if (url.isEmpty())
-        return;
+        return CameraDiagnostics::ErrorCode::noMediaTrack;
 
 
     m_rtpStreamParser.setRequest(url);
-    m_rtpStreamParser.openStream();
+    return m_rtpStreamParser.openStream();
 }
 
 void QnISDStreamReader::closeStream()
