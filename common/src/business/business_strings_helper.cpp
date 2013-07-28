@@ -210,8 +210,8 @@ QString QnBusinessStringsHelper::eventDetailsCombined(QVariantHash& detailsMap, 
             int n = 0;
             foreach (QString ip, params.getConflicts()) {
                 QVariantHash conflict;
-                conflict[lit("ecsNumber")] = ++n;
-                conflict[lit("ecsIp")] = ip;
+                conflict[lit("number")] = ++n;
+                conflict[lit("ip")] = ip;
                 conflicts << conflict;
 
                 result += delimiter;

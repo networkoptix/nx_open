@@ -1,17 +1,17 @@
-<div class="content"><table bgcolor="">
+<div class="content">
     <div class="callout">
-        <p>Network issue information:</p>
-        <table>
+        <h4>Details:</h4>
+        <table class="details">
             <tr>
                 <th>Reason</th>
-                <th>Timestamp</th>
+                <th>When</th>
             </tr>
             {{#aggregated}}
                 <tr>
-                    <td>{{reason}}</td>
+                    <td class="error">{{reason}}</td>
                     <td><i>{{timestamp}}</i></td>
                 </tr>
             {{/aggregated}}
         </table>
     </div>
-</table></div>
+</div>

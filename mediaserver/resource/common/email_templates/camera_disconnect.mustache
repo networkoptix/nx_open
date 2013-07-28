@@ -1,13 +1,10 @@
-<div class="content"><table bgcolor="">
-    <div class="callout">
-        <p>Event details:</p>
-        <table>
-            <tr>
-                <th>Timestamp</th>
-            </tr>
-            {{#aggregated}}
-                <tr><td><i>{{timestamp}}</i></td></tr>
-            {{/aggregated}}
-        </table>
+<div class="content"><table>
+    <div class="details">
+        <h4>Date(s) when disconnect was detected:</h4>
+        <ul>
+        {{#aggregated}}
+        <li><i>{{timestamp}}</i></li>
+        {{/aggregated}}
+        </ul>
     </div>
 </table></div>
