@@ -296,7 +296,7 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataLi
         requestFinished();
         if (m_model->rowCount() == 0 && isFilterExist() && !isRuleExistByCond())
         {
-            QMessageBox::information(this, tr("No rule(s) for current filter"), tr("You have not configured business rules to match current filter condition."));
+            QMessageBox::information(this, tr("No rule(s) for current filter"), tr("You have not configured any Alarm/Event Rules to match the current filter condition."));
         }
     }
 }

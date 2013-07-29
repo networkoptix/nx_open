@@ -952,8 +952,8 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             break;
         }
     case BusinessActionType::SayText: {
-            AudioPlayer::sayTextAsync(businessAction->getParams().getSoundUrl()); //TODO: #GDM use another field instead odf soundUrl
-            qDebug() << "speech action received" << businessAction->getParams().getSoundUrl();
+            AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
+            qDebug() << "speech action received" << businessAction->getParams().getSayText();
             break;
         }
     default:
@@ -1522,10 +1522,7 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
         qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? update.engineVersion : QnSoftwareVersion());
 }
 
-QnLayoutResourceList QnWorkbenchActionHandler::alreadyExistingLayouts(const QString &name,
-                                                   const QnUserResourcePtr &user,
-                                                   const QnLayoutResourcePtr &layout) {
-
+QnLayoutResourceList QnWorkbenchActionHandler::alreadyExistingLayouts(const QString &name, const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout) {
     QnLayoutResourceList result;
     foreach (const QnLayoutResourcePtr &existingLayout, resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
         if (existingLayout == layout)
@@ -3879,7 +3876,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
             break;
         }
 
-        if(data.version != latestVersion)
+        if(!isCompatible(data.version, latestVersion))
             component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
         
         components += component;

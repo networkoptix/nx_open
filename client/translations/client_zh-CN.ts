@@ -42,7 +42,7 @@
 <context>
     <name>AdjustVideoDialog</name>
     <message>
-        <source>Adjust video</source>
+        <source>Image Enhancement...</source>
         <translation>调整视频</translation>
     </message>
     <message>
@@ -59,11 +59,19 @@
     </message>
     <message>
         <source>Black levels</source>
-        <translation>黑电平</translation>
+        <translation type="obsolete">黑电平</translation>
     </message>
     <message>
         <source>White levels</source>
-        <translation>白电平</translation>
+        <translation type="obsolete">白电平</translation>
+    </message>
+    <message>
+        <source>Black level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>White level</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -286,6 +294,17 @@
     <message>
         <source>IP, hostname, RTSP link...</source>
         <translation>IP，主机名，RTSP链接...</translation>
+    </message>
+</context>
+<context>
+    <name>CameraDiagnostics::DiagnoseTool</name>
+    <message>
+        <source>Bad reply from server %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No connection to media server %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1118,11 +1137,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation>关键性能提示</translation>
+        <translation type="obsolete">关键性能提示</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">我们偵测道您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
 </context>
 <context>
@@ -1135,11 +1154,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Critical Performance Tip</source>
-        <translation>重要性能提示</translation>
+        <translation type="obsolete">重要性能提示</translation>
     </message>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照http://tribaltrouble.com/driversupport.php</translation>
     </message>
 </context>
 <context>
@@ -1427,10 +1446,14 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation type="unfinished"></translation>
+        <translation>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
     </message>
     <message>
         <source>Continuous</source>
+        <translation>连续</translation>
+    </message>
+    <message>
+        <source>Export selected cameras to file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2405,15 +2428,15 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Show message</source>
-        <translation>显示信息</translation>
+        <translation type="obsolete">显示信息</translation>
     </message>
     <message>
         <source>Open in browser...</source>
         <translation type="obsolete">在浏览器中打开...</translation>
     </message>
     <message>
-        <source>Open Web Client...</source>
-        <translation>打开Web客户端</translation>
+        <source>Open Web Client</source>
+        <translation type="obsolete">打开Web客户端</translation>
     </message>
     <message>
         <source>Alarm/Event Log...</source>
@@ -2436,7 +2459,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>备份/还原配置...</translation>
     </message>
     <message>
-        <source>Adjust video</source>
+        <source>Image Enhancement...</source>
         <translation>调整视频</translation>
     </message>
     <message>
@@ -2468,8 +2491,8 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Ping...</translation>
     </message>
     <message>
-        <source>Server Logs...</source>
-        <translation>服务器日志</translation>
+        <source>Server Logs</source>
+        <translation type="obsolete">服务器日志</translation>
     </message>
     <message>
         <source>Server Diagnostics...</source>
@@ -2489,18 +2512,34 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Open in Browser...</source>
-        <translation type="unfinished"></translation>
+        <translation>在浏览器中打开...</translation>
     </message>
     <message>
         <source>Showcase...</source>
-        <translation type="unfinished"></translation>
+        <translation>开启网页显示软件功能...</translation>
     </message>
     <message>
         <source>Open in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>在新标签页中打开</translation>
     </message>
     <message>
         <source>Open in New Window</source>
+        <translation>在新窗口打开</translation>
+    </message>
+    <message>
+        <source>Show Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Version Mismatch Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Logs...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2511,7 +2550,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>[未选择任何项目]</translation>
     </message>
     <message>
-        <source>Adjust video - %1</source>
+        <source>Image Enhancement - %1</source>
         <translation>调整视频-%1</translation>
     </message>
 </context>
@@ -2543,7 +2582,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Interval of action : Every</source>
-        <translation type="unfinished"></translation>
+        <translation>动作的时间间隔：每</translation>
     </message>
 </context>
 <context>
@@ -2581,7 +2620,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>You have new notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>您沒有新的通知</translation>
     </message>
 </context>
 <context>
@@ -2791,7 +2830,7 @@ for recording at
     </message>
     <message>
         <source>Enter the text</source>
-        <translation type="unfinished"></translation>
+        <translation>输入文字</translation>
     </message>
 </context>
 <context>
@@ -3099,11 +3138,11 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>All cameras are already in the resource tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>所有摄像机都已经在资源树狀表中。</translation>
     </message>
     <message>
         <source>No cameras found.</source>
-        <translation type="unfinished"></translation>
+        <translation>没有找到摄像机。</translation>
     </message>
 </context>
 <context>
@@ -3139,8 +3178,8 @@ Make sure the server is available and try again.</source>
         <translation>复制选择到剪贴板</translation>
     </message>
     <message>
-        <source>Export Selection to File...</source>
-        <translation>复制选择到档案</translation>
+        <source>Export Selection to File</source>
+        <translation type="obsolete">复制选择到档案</translation>
     </message>
     <message>
         <source>Select All</source>
@@ -3153,6 +3192,10 @@ Make sure the server is available and try again.</source>
     <message>
         <source>Cameras list by media server &apos;%1&apos; - %2 camera(s) found</source>
         <translation>依媒体服务器 &apos;%1&apos; 摄像机列表-发现%2摄像机</translation>
+    </message>
+    <message>
+        <source>Export Selection to File...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3191,7 +3234,7 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Driver</source>
-        <translation type="unfinished"></translation>
+        <translation>驱动器</translation>
     </message>
 </context>
 <context>
@@ -3377,7 +3420,7 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Open in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>在新标签页中打开</translation>
     </message>
 </context>
 <context>
@@ -3851,8 +3894,8 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation>复制选择到剪贴板</translation>
     </message>
     <message>
-        <source>Export Selection to File...</source>
-        <translation>输出选择到档案</translation>
+        <source>Export Selection to File</source>
+        <translation type="obsolete">输出选择到档案</translation>
     </message>
     <message>
         <source>Select All</source>
@@ -3875,7 +3918,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation>当前过滤器无规则</translation>
     </message>
     <message>
-        <source>You have not configured business rules to match current filter condition.</source>
+        <source>You have not configured any Alarm/Event Rules to match the current filter condition.</source>
         <translation>尚未配置职务规则以符合当前的过滤条件。</translation>
     </message>
     <message>
@@ -3897,6 +3940,10 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <source>&lt; %1 cameras &gt;</source>
         <translation>&lt; %1 台摄像机&gt;</translation>
+    </message>
+    <message>
+        <source>Export Selection to File...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3974,6 +4021,25 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation>
             <numerusform>将需要%1中的%n路类比许可。</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnGlHardwareChecker</name>
+    <message>
+        <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation type="unfinished">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照http://tribaltrouble.com/driversupport.php</translation>
+    </message>
+    <message>
+        <source>Critical Performance Tip</source>
+        <translation type="unfinished">重要性能提示</translation>
+    </message>
+    <message>
+        <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation type="unfinished">我们偵测道您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>Important Performance Tip</source>
+        <translation type="unfinished">关键性能提示</translation>
     </message>
 </context>
 <context>
@@ -4248,7 +4314,7 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>The license is already activated.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4406,14 +4472,18 @@ Would you like to restart client in compatibility mode?</source>
     <message>
         <source>Cannot restart the client in compatibility mode.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>在兼容模式下无法重新启动客户端。
+请关闭应用程序并使用开始菜单中的快捷方式重新启动它。</translation>
     </message>
     <message>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
 Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>您连接到了不同版本的系统控制器:
+  - 客户端版本n: %1。
+  -系统控制器版本: %2。
+客户端版本 %2必须连接到此系统控制器。请下载版本 %2 並升级系统。</translation>
     </message>
 </context>
 <context>
@@ -4769,11 +4839,11 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>&lt;Downloading sound...&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;正在下载音效...&gt;</translation>
     </message>
     <message>
         <source>&lt;Uploading sound...&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;正在上传音效...&gt;</translation>
     </message>
 </context>
 <context>
@@ -4784,7 +4854,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
-        <translation type="unfinished"></translation>
+        <translation>关闭 (&lt;b&gt;点击右键&lt;/b&gt;)</translation>
     </message>
 </context>
 <context>
@@ -5115,29 +5185,29 @@ All changes will be lost after program exit.</source>
     <name>QnPtzPresetDialog</name>
     <message>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation>无</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation>无</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetListModel</name>
     <message>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation>无</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">名称</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <source>Hotkey</source>
-        <translation type="unfinished">热键</translation>
+        <translation>热键</translation>
     </message>
 </context>
 <context>
@@ -5244,7 +5314,7 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>Sample Tooltip</source>
-        <translation type="unfinished"></translation>
+        <translation>范例工具提示</translation>
     </message>
 </context>
 <context>
@@ -5259,7 +5329,7 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>Select resources...</source>
-        <translation type="unfinished"></translation>
+        <translation>选择资源...</translation>
     </message>
 </context>
 <context>
@@ -5336,19 +5406,19 @@ All changes will be lost after program exit.</source>
     <name>QnSayTextBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">表格</translation>
+        <translation>表格</translation>
     </message>
     <message>
         <source>Say the following:</source>
-        <translation type="unfinished"></translation>
+        <translation>说以下内容:</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation type="unfinished">音量:</translation>
+        <translation>音量:</translation>
     </message>
     <message>
         <source>Test...</source>
-        <translation type="unfinished">测试...</translation>
+        <translation>测试...</translation>
     </message>
 </context>
 <context>
@@ -6614,27 +6684,27 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Client v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>客户端版本%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Enterprise Controller v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>系统控制器版本%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Media Server v%1 at %2&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>在 %2的媒体服务器版本%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Media Server v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体服务器版本%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>一些系统组件尚未升级:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;请升级所有组件至最新版本 %2。</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>版本不匹配</translation>
     </message>
     <message>
         <source>Include timestamps (requires transcoding)</source>

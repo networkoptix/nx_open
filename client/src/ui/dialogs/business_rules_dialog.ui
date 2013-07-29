@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1078</width>
-    <height>612</height>
+    <width>1170</width>
+    <height>719</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
         <string>Add</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../x64/build/client-custom.qrc">
+        <iconset resource="../../../x86/build/client-custom.qrc">
          <normaloff>:/skin/titlebar/new_layout_hovered.png</normaloff>:/skin/titlebar/new_layout_hovered.png</iconset>
        </property>
       </widget>
@@ -156,7 +156,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../x64/build/client-custom.qrc"/>
+  <include location="../../../x86/build/client-custom.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -105,9 +105,9 @@ private:
     ScreenshotInterface* m_screenshotInterface;
     ImageCorrectionResult m_imageCorrector;
     ImageCorrectionParams m_imgCorrectParam;
+    QnHistogramConsumer* m_histogramConsumer;
     QnFisheyePtzController* m_fisheyeController;
     QRectF m_displayedRect;
-    QnHistogramConsumer* m_histogramConsumer;
     
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen

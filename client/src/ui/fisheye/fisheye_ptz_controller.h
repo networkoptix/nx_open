@@ -53,8 +53,8 @@ private:
     DewarpingParams m_dewarpingParams;
     DewarpingParams m_srcPos;
     DewarpingParams m_dstPos;
-    bool m_moveToAnimation;
     qint64 m_lastTime;
+    bool m_moveToAnimation;
     QnPtzSpaceMapper* m_spaceMapper;
 
     struct SpaceRange {

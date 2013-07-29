@@ -14,7 +14,7 @@ public:
     enum FillType {
         EmptyFill,
         RecordingFill,
-        MotionFill,
+        MotionFill
     };
 
     QnCalendarItemDelegate(QObject *parent = NULL);
@@ -25,5 +25,5 @@ public:
     void paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, bool isEnabled, bool isSelected, FillType primaryFill, FillType secondaryFill, const QString &text) const;
 };
 
-#endif QN_CALENDAR_CELL_PAINTER_H
+#endif //QN_CALENDAR_CELL_PAINTER_H
 

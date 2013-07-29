@@ -911,7 +911,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::AdjustVideoAction).
         flags(Qn::Scene | Qn::SingleTarget).
-        text(tr("Adjust video")).
+        text(tr("Image Enhancement...")).
         shortcut(tr("Alt+J")).
         autoRepeat(false).
         condition(new QnAdjustVideoActionCondition(this));

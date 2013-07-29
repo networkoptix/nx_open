@@ -1,5 +1,5 @@
-#ifndef __ABSTRACT_BUSINESS_EVENT_RULE_H__
-#define __ABSTRACT_BUSINESS_EVENT_RULE_H__
+#ifndef QN_BUSINESS_EVENT_RULE_H
+#define QN_BUSINESS_EVENT_RULE_H
 
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
@@ -88,4 +88,4 @@ typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
 Q_DECLARE_METATYPE(QnBusinessEventRulePtr)
 Q_DECLARE_METATYPE(QnBusinessEventRuleList)
 
-#endif // __ABSTRACT_BUSINESS_EVENT_RULE_H__
+#endif // QN_BUSINESS_EVENT_RULE_H

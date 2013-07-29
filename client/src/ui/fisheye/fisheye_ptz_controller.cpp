@@ -37,7 +37,7 @@ void QnFisheyePtzController::updateSpaceMapper(bool horizontalView, int pf)
         delete m_spaceMapper;
 
     QnScalarSpaceMapper zMapper(MIN_FOV, MAX_FOV*pf, MIN_FOV, MAX_FOV*pf, Qn::ConstantExtrapolation);
-    qreal minX, maxX, minY, maxY;
+    //qreal minX, maxX, minY, maxY;
     Qn::ExtrapolationMode xExtrapolationMode;
 
     if (horizontalView) {
@@ -208,8 +208,8 @@ DewarpingParams QnFisheyePtzController::updateDewarpingParams(float ar)
         newParams.xAngle = normalizeAngle(newParams.xAngle + xSpeed * timeSpend);
         newParams.yAngle += ySpeed * timeSpend;
 
-        qreal xRange = (FISHEYE_FOV - newParams.fov) / 2.0;
-        qreal yRange = xRange; // / newParams.aspectRatio;
+        //qreal xRange = (FISHEYE_FOV - newParams.fov) / 2.0;
+        //qreal yRange = xRange; // / newParams.aspectRatio;
 
         newParams.xAngle = boundXAngle(newParams.xAngle, newParams.fov);
         newParams.yAngle = boundYAngle(newParams.yAngle, newParams.fov, m_dewarpingParams.panoFactor*ar, m_dewarpingParams.horizontalView);
@@ -293,8 +293,8 @@ void QnFisheyePtzController::moveToRect(const QRectF& r)
 void QnFisheyePtzController::changePanoMode()
 {
     m_dewarpingParams.panoFactor = m_dewarpingParams.panoFactor * 2;
-    if (m_dewarpingParams.horizontalView  && m_dewarpingParams.panoFactor > 2 ||
-        !m_dewarpingParams.horizontalView && m_dewarpingParams.panoFactor > 4)
+    if ((m_dewarpingParams.horizontalView  && m_dewarpingParams.panoFactor > 2) ||
+        (!m_dewarpingParams.horizontalView && m_dewarpingParams.panoFactor > 4))
     {
         m_dewarpingParams.panoFactor = 1;
     }

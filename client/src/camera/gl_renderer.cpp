@@ -411,6 +411,8 @@ void QnGLRenderer::drawYVA12VideoTexture(
     unsigned int tex3ID,
     const float* v_array )
 {
+    Q_UNUSED(picLock)
+
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
         (float)tex0Coords.right(), (float)tex0Coords.top(),

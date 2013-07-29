@@ -338,7 +338,7 @@ QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags wind
     QGLWidget *result = new QGLWidget(glFormat, parent, NULL, windowFlags);
 
 #ifdef Q_OS_LINUX
-    result->context()->makeCurrent();
+    result->makeCurrent();
     QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
     if (!vendor.toLower().contains("nvidia")) {
         QGLFormat format = result->format();
