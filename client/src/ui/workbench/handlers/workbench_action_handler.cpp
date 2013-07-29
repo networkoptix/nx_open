@@ -952,8 +952,8 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             break;
         }
     case BusinessActionType::SayText: {
-            AudioPlayer::sayTextAsync(businessAction->getParams().getSoundUrl()); //TODO: #GDM use another field instead odf soundUrl
-            qDebug() << "speech action received" << businessAction->getParams().getSoundUrl();
+            AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
+            qDebug() << "speech action received" << businessAction->getParams().getSayText();
             break;
         }
     default:

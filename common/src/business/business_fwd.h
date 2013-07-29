@@ -113,13 +113,12 @@ namespace BusinessActionType {
         /*!
             parameters:\n
                 - soundUrl (string, required)               - url of sound, contains path to sound on the EC
-                                                                * text that will be provided to TTS engine
         */
         PlaySound,
 
         /*!
             parameters:\n
-                - text (string, required)                   - text that will be provided to TTS engine
+                - sayText (string, required)                - text that will be provided to TTS engine
         */
         SayText,
 
