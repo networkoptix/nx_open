@@ -85,7 +85,7 @@
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="118"/>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -100,12 +100,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="95"/>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
         <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="165"/>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
         <source>Can&apos;t initialize video encoder</source>
         <translation type="unfinished"></translation>
     </message>
@@ -668,27 +668,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="583"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="599"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="620"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="628"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="632"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="640"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="743"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="751"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
