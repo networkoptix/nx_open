@@ -923,8 +923,6 @@ QString QnAppServerConnectionFactory::systemName()
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         if (!factory->m_systemName.isEmpty())
             return factory->m_systemName;
-        else
-            return lit("<Name Unspecified>");
     }
 
     return QString();

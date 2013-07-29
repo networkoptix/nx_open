@@ -8,7 +8,9 @@
 #include "server_message_processor.h"
 #include "recorder/recording_manager.h"
 #include "serverutil.h"
-#include <business/business_rule_processor.h>
+#include "settings.h"
+#include "business/business_rule_processor.h"
+#include "business\business_event_connector.h"
 
 Q_GLOBAL_STATIC(QnServerMessageProcessor, QnServerMessageProcessor_instance)
 
@@ -54,6 +56,12 @@ void QnServerMessageProcessor::at_connectionOpened(QnMessage message)
 {
     QnAppServerConnectionFactory::setSystemName(message.systemName);
     QnAppServerConnectionFactory::setPublicIp(message.publicIp);
+
+    qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
+    if (lastRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
+                                                   lastRunningTime*1000,
+                                                   QnBusiness::MServerIssueStarted);
 }
 
 void QnServerMessageProcessor::at_messageReceived(QnMessage message)

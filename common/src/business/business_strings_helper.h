@@ -61,6 +61,7 @@ private:
     static QString eventReason(const QnBusinessEventParameters& params);
 
     static QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount);
+    static QString eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount);
 };
 
 #endif // __BUSINESS_STRINGS_HELPER_H__

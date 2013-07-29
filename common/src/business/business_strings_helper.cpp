@@ -162,9 +162,8 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(const QnBusinessEventParam
 QString QnBusinessStringsHelper::eventDetailsCombined(QVariantHash& detailsMap, const QnBusinessEventParameters &params, int aggregationCount, const QString &delimiter) {
     QString result;
 
-    QString timestamp = eventTimestamp(params, aggregationCount);
-    detailsMap[tpTimestamp] = timestamp;
-    result += timestamp;
+    detailsMap[tpTimestamp] = eventTimestampShort(params, aggregationCount);
+    result += eventTimestamp(params, aggregationCount);
 
     BusinessEventType::Value eventType = params.getEventType();
     switch (eventType) {
@@ -224,6 +223,21 @@ QString QnBusinessStringsHelper::eventDetailsCombined(QVariantHash& detailsMap, 
         break;
     }
     return result;
+}
+
+QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount) {
+    quint64 ts = params.getEventTimestamp();
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
+
+    int count = qMax(aggregationCount, 1);
+    if (count == 1)
+        return tr("%2 %1", "%1 means time, %2 means date")
+            .arg(time.time().toString())
+            .arg(time.date().toString());
+    else
+        return tr("%n times, first: %2 %1", "%1 means time, %2 means date", count)
+            .arg(time.time().toString())
+            .arg(time.date().toString());
 }
 
 QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount) {
