@@ -46,7 +46,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
 
     Q_ASSERT( m_glContext != NULL );
 
-    for (int i = channelCount; i < m_channelRenderers.size(); ++i)
+    for (int i = channelCount; (uint)i < m_channelRenderers.size(); ++i)
     {
         delete m_channelRenderers[i].renderer;
         delete m_channelRenderers[i].uploader;
@@ -55,7 +55,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     m_channelRenderers.resize( channelCount );
     m_renderingEnabled.resize( channelCount, true );
 
-    for( int i = 0; i < channelCount; ++i )
+    for( int i = 0; (uint)i < channelCount; ++i )
     {
         if (m_channelRenderers[i].uploader == 0) {
             RenderingTools renderingTools;
@@ -197,14 +197,14 @@ void QnResourceWidgetRenderer::setDisplayedRect(int channel, const QRectF& rect)
 
 void QnResourceWidgetRenderer::setPaused(bool value)
 {
-    for (int i = 0; i < m_channelRenderers.size(); ++i)
+    for (uint i = 0; i < m_channelRenderers.size(); ++i)
         m_channelRenderers[i].renderer->setPaused(value);
 }
 
 void QnResourceWidgetRenderer::setScreenshotInterface(ScreenshotInterface* value)
 {
     m_screenshotInterface = value;
-    for (int i = 0; i < m_channelRenderers.size(); ++i)
+    for (uint i = 0; i < m_channelRenderers.size(); ++i)
         m_channelRenderers[i].renderer->setScreenshotInterface(value);
 }
 
@@ -321,7 +321,7 @@ bool QnResourceWidgetRenderer::isDisplaying( const QSharedPointer<CLVideoDecoder
 
 void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& params)
 {
-    for (int i = 0; i < m_channelRenderers.size(); ++i){
+    for (uint i = 0; i < m_channelRenderers.size(); ++i){
         RenderingTools& ctx = m_channelRenderers[i];
         if( !ctx.uploader )
             continue;
@@ -332,7 +332,7 @@ void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& p
 
 void QnResourceWidgetRenderer::setFisheyeController(QnFisheyePtzController* controller)
 {
-    for (int i = 0; i < m_channelRenderers.size(); ++i){
+    for (uint i = 0; i < m_channelRenderers.size(); ++i){
         RenderingTools& ctx = m_channelRenderers[i];
         if( !ctx.uploader )
             continue;
@@ -342,7 +342,7 @@ void QnResourceWidgetRenderer::setFisheyeController(QnFisheyePtzController* cont
 
 void QnResourceWidgetRenderer::setHystogramConsumer(QnHistogramConsumer* value)
 {
-    for (int i = 0; i < m_channelRenderers.size(); ++i)
+    for (uint i = 0; i < m_channelRenderers.size(); ++i)
     {
         RenderingTools& ctx = m_channelRenderers[i];
         if( ctx.renderer )

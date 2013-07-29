@@ -2,6 +2,8 @@
 
 #include <QtGui/QPainter>
 
+#include <utils/common/scoped_painter_rollback.h>
+
 QnFramedLabel::QnFramedLabel(QWidget* parent):
     base_type(parent),
     m_opacity(1.0),
@@ -45,17 +47,15 @@ void QnFramedLabel::paintEvent(QPaintEvent *event) {
     }
 
     QPainter painter(this);
-    qreal opacity = painter.opacity();
     QRect fullRect = event->rect().adjusted(lineWidth() / 2, lineWidth() / 2, -lineWidth() / 2, -lineWidth() / 2);
 
     if (pixmapExists) {
-        painter.setOpacity(m_opacity);
+        QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_opacity);
         QRect pix = pixmap()->rect();
         int x = fullRect.left() + (fullRect.width() - pix.width()) / 2;
         int y = fullRect.top() + (fullRect.height() - pix.height()) / 2;
         painter.drawPixmap(x, y, *pixmap());
     }
-    painter.setOpacity(opacity);
 
     if (lineWidth() == 0)
         return;
