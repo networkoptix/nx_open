@@ -46,25 +46,25 @@ void QnFramedLabel::paintEvent(QPaintEvent *event) {
         return;
     }
 
-    QPainter painter(this);
+    QScopedPointer<QPainter> painter(new QPainter(this));
     QRect fullRect = event->rect().adjusted(lineWidth() / 2, lineWidth() / 2, -lineWidth() / 2, -lineWidth() / 2);
 
     if (pixmapExists) {
-        QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_opacity);
+        QnScopedPainterOpacityRollback opacityRollback(painter.data(), painter->opacity() * m_opacity);
         QRect pix = pixmap()->rect();
         int x = fullRect.left() + (fullRect.width() - pix.width()) / 2;
         int y = fullRect.top() + (fullRect.height() - pix.height()) / 2;
-        painter.drawPixmap(x, y, *pixmap());
+        painter->drawPixmap(x, y, *pixmap());
     }
 
     if (lineWidth() == 0)
         return;
 
+
     QPen pen;
     pen.setWidth(lineWidth());
     pen.setColor(m_frameColor);
-    painter.setPen(pen);
-    painter.drawRect(fullRect);
-
-
+    QnScopedPainterPenRollback penRollback(painter.data(), pen);
+    painter->drawRect(fullRect);
 }
+
