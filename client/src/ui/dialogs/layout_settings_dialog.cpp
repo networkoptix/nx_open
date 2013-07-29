@@ -122,7 +122,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     ui->setupUi(this);
 
     ui->imageLabel->installEventFilter(this);
-
+    ui->imageLabel->setFrameColor(qnGlobals->frameColor());
 
     ui->widthSpinBox->setMinimum(qnGlobals->layoutBackgroundMinSize().width());
     ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
@@ -362,7 +362,7 @@ void QnLayoutSettingsDialog::at_accepted() {
 }
 
 void QnLayoutSettingsDialog::at_opacitySpinBox_valueChanged(int value) {
-    ui->imageLabel->setOpacityPercent(value);
+    ui->imageLabel->setOpacity(0.01 * value);
 }
 
 void QnLayoutSettingsDialog::at_widthSpinBox_valueChanged(int value) {
@@ -512,7 +512,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
 
     if (d->state == ImageLoading)
         d->state = ImageLoaded;
-    else if (d->state = NewImageLoading)
+    else if (d->state == NewImageLoading)
         d->state = NewImageLoaded;
     d->preview = image;
 
