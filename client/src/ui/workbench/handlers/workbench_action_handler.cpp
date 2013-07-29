@@ -3879,7 +3879,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
             break;
         }
 
-        if(data.version != latestVersion)
+        if(!isCompatible(data.version, latestVersion))
             component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
         
         components += component;
