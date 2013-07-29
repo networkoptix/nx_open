@@ -34,8 +34,8 @@ QnResource::QnResource():
     m_flags(0),
     m_disabled(false),
     m_status(Offline),
-    m_initialized(false),
     m_initMutex(QMutex::Recursive),
+    m_initialized(false),
     m_lastInitTime(0)
 {
 }
