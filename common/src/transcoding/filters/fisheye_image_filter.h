@@ -2,7 +2,8 @@
 #define __FISHEYE_IMAGE_FILTER_H__
 
 #include "abstract_filter.h"
-#include "fisheye/fisheye_common.h"
+
+#include <core/resource/dewarping_params.h>
 
 class QnFisheyeImageFilter: public QnAbstractImageFilter
 {

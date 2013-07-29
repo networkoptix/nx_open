@@ -8,7 +8,6 @@
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
 #include "network_resource.h"
-#include "fisheye/fisheye_common.h"
 
 class QnAbstractArchiveDelegate;
 

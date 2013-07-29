@@ -12,7 +12,7 @@
 #include <client/client_globals.h>
 #include "camera/resource_display.h" // TODO: #Elric FWD!
 #include "utils/color_space/image_correction.h"
-#include "fisheye/fisheye_common.h"
+#include <core/resource/dewarping_params.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;

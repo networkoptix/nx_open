@@ -8,7 +8,7 @@
 #include "utils/camera_advanced_settings_xml_parser.h"
 #include "ui/workbench/workbench_context_aware.h"
 #include "utils/common/connective.h"
-#include "fisheye/fisheye_common.h"
+#include "core/resource/dewarping_params.h"
 
 
 namespace Ui {

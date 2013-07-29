@@ -9,6 +9,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
+#include <utils/common/container.h>
 #include <client/client_settings.h>
 
 #include <core/resource/media_resource.h>
@@ -50,14 +51,6 @@
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
 namespace {
-    template<class T>
-    void resizeList(T &list, int size) {
-        while(list.size() < size)
-            list.push_back(typename T::value_type());
-        while(list.size() > size)
-            list.pop_back();
-    }
-
     Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
 
 } // anonymous namespace
