@@ -28,6 +28,9 @@
    </property>
    <item>
     <widget class="QCheckBox" name="enabledCheckBox">
+     <property name="toolTip">
+      <string>Check to set aggregation period</string>
+     </property>
      <property name="text">
       <string/>
      </property>
