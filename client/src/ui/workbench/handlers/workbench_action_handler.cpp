@@ -1522,10 +1522,7 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
         qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? update.engineVersion : QnSoftwareVersion());
 }
 
-QnLayoutResourceList QnWorkbenchActionHandler::alreadyExistingLayouts(const QString &name,
-                                                   const QnUserResourcePtr &user,
-                                                   const QnLayoutResourcePtr &layout) {
-
+QnLayoutResourceList QnWorkbenchActionHandler::alreadyExistingLayouts(const QString &name, const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout) {
     QnLayoutResourceList result;
     foreach (const QnLayoutResourcePtr &existingLayout, resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
         if (existingLayout == layout)

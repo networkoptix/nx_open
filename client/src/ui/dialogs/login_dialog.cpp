@@ -288,7 +288,6 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
             m_connectionsModel->appendRow(row);
         }
     }
-
 }
 
 bool QnLoginDialog::sendCommandToLauncher(const QnSoftwareVersion &version, const QStringList &arguments) {
