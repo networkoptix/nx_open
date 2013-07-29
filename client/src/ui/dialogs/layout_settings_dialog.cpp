@@ -50,6 +50,9 @@ namespace {
         /** New image is selected being uploading to the EC. */
         NewImageUploading
     };
+
+    /** If difference between image AR and screen AR is smaller than this value, cropped preview will not be generated */
+    const qreal aspectRatioVariation = 0.05;
 }
 
 
@@ -277,10 +280,12 @@ void QnLayoutSettingsDialog::updateControls() {
     ui->clearButton->setEnabled(imagePresent && !locked);
     ui->opacitySpinBox->setEnabled(imagePresent && !locked);
     ui->selectButton->setEnabled(!locked);
-    ui->cropToMonitorCheckBox->setEnabled(imagePresent && d->canChangeAspectRatio());
+    ui->cropToMonitorCheckBox->setEnabled(imagePresent /*&& d->canChangeAspectRatio()*/ );
     // image is already cropped to monitor aspect ratio
+    /*
     if (imagePresent && !d->canChangeAspectRatio())
         ui->cropToMonitorCheckBox->setChecked(true);
+    */
 
     QImage image;
     if (!imagePresent) {
@@ -479,8 +484,6 @@ void QnLayoutSettingsDialog::selectFile() {
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
     dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
 
-    bool cropImage = ui->cropToMonitorCheckBox->isChecked();
-    dialog->addCheckBox(tr("Crop to current monitor AR"), &cropImage);
     if(!dialog->exec())
         return;
 
@@ -492,7 +495,6 @@ void QnLayoutSettingsDialog::selectFile() {
     d->imageSourcePath = files[0];
     d->imageFilename = QString();
     d->state = NewImageSelected;
-    ui->cropToMonitorCheckBox->setChecked(cropImage);
 
     loadPreview();
     updateControls();
@@ -518,8 +520,14 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
 
     /* Disable cropping for images that are quite well aspected. */
     qreal imageAspectRatio = (qreal)image.width() / (qreal)image.height();
-    if (qAbs(imageAspectRatio - screenAspectRatio()) > 0.05)
+    if (qAbs(imageAspectRatio - screenAspectRatio()) > aspectRatioVariation) {
         d->croppedPreview = cropImageToAspectRatio(image, screenAspectRatio());
+    }
+    else {
+        d->croppedPreview = QImage();
+        if (d->state == ImageLoaded)
+            ui->cropToMonitorCheckBox->setChecked(true);
+    }
 
     if (d->state == NewImageLoaded) {
         // always set flag to true for new images
@@ -530,7 +538,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     } else {
         // set to true if possible (current sizes will not be changed)
         ui->keepAspectRatioCheckBox->setChecked(cellsAreBestAspected());
-   }
+    }
 
     updateControls();
 }
