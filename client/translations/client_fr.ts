@@ -42,7 +42,7 @@
 <context>
     <name>AdjustVideoDialog</name>
     <message>
-        <source>Adjust video</source>
+        <source>Image Enhancement...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1829,7 +1829,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Adjust video</source>
+        <source>Image Enhancement...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1904,7 +1904,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Adjust video - %1</source>
+        <source>Image Enhancement - %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3025,7 +3025,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You have not configured business rules to match current filter condition.</source>
+        <source>You have not configured any Alarm/Event Rules to match the current filter condition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -42,7 +42,7 @@
 <context>
     <name>AdjustVideoDialog</name>
     <message>
-        <source>Adjust video</source>
+        <source>Image Enhancement...</source>
         <translation>调整视频</translation>
     </message>
     <message>
@@ -2436,7 +2436,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>备份/还原配置...</translation>
     </message>
     <message>
-        <source>Adjust video</source>
+        <source>Image Enhancement...</source>
         <translation>调整视频</translation>
     </message>
     <message>
@@ -2511,7 +2511,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>[未选择任何项目]</translation>
     </message>
     <message>
-        <source>Adjust video - %1</source>
+        <source>Image Enhancement - %1</source>
         <translation>调整视频-%1</translation>
     </message>
 </context>
@@ -3875,7 +3875,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation>当前过滤器无规则</translation>
     </message>
     <message>
-        <source>You have not configured business rules to match current filter condition.</source>
+        <source>You have not configured any Alarm/Event Rules to match the current filter condition.</source>
         <translation>尚未配置职务规则以符合当前的过滤条件。</translation>
     </message>
     <message>

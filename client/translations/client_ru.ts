@@ -54,7 +54,7 @@
     <name>AdjustVideoDialog</name>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="14"/>
-        <source>Adjust video</source>
+        <source>Image Enhancement...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1931,7 +1931,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="910"/>
-        <source>Adjust video</source>
+        <source>Image Enhancement...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2372,7 +2372,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="55"/>
-        <source>Adjust video - %1</source>
+        <source>Image Enhancement - %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3446,7 +3446,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="299"/>
-        <source>You have not configured business rules to match current filter condition.</source>
+        <source>You have not configured any Alarm/Event Rules to match the current filter condition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

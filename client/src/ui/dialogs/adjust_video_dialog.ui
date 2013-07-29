@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Adjust video</string>
+   <string>Image Enhancement</string>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -20,7 +20,7 @@
    <item>
     <widget class="QCheckBox" name="enableAdjustment">
      <property name="text">
-      <string>Enable adjustment</string>
+      <string>Enable enhancement</string>
      </property>
     </widget>
    </item>
