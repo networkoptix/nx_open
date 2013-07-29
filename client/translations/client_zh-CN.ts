@@ -59,11 +59,19 @@
     </message>
     <message>
         <source>Black levels</source>
-        <translation>黑电平</translation>
+        <translation type="obsolete">黑电平</translation>
     </message>
     <message>
         <source>White levels</source>
-        <translation>白电平</translation>
+        <translation type="obsolete">白电平</translation>
+    </message>
+    <message>
+        <source>Black level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>White level</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -286,6 +294,17 @@
     <message>
         <source>IP, hostname, RTSP link...</source>
         <translation>IP，主机名，RTSP链接...</translation>
+    </message>
+</context>
+<context>
+    <name>CameraDiagnostics::DiagnoseTool</name>
+    <message>
+        <source>Bad reply from server %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No connection to media server %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -599,6 +618,29 @@
     <message>
         <source>Choose one from the list below</source>
         <translation type="obsolete">从以下列表中选择一个</translation>
+    </message>
+</context>
+<context>
+    <name>FisheyeSettingsWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">表格</translation>
+    </message>
+    <message>
+        <source>Horizontal mount (camera on the wall)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical mount (camera on the ceiling)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera view angle correction:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.0</source>
+        <translation type="unfinished">0.0</translation>
     </message>
 </context>
 <context>
@@ -1095,11 +1137,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation>关键性能提示</translation>
+        <translation type="obsolete">关键性能提示</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation>我们偵测道您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation type="obsolete">我们偵测道您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
 </context>
 <context>
@@ -1112,11 +1154,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Critical Performance Tip</source>
-        <translation>重要性能提示</translation>
+        <translation type="obsolete">重要性能提示</translation>
     </message>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation>我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照http://tribaltrouble.com/driversupport.php</translation>
+        <translation type="obsolete">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照http://tribaltrouble.com/driversupport.php</translation>
     </message>
 </context>
 <context>
@@ -1409,6 +1451,10 @@ For easy instructions on how to install or update your video driver, follow inst
     <message>
         <source>Continuous</source>
         <translation>连续</translation>
+    </message>
+    <message>
+        <source>Export selected cameras to file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2382,7 +2428,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Show message</source>
-        <translation>显示信息</translation>
+        <translation type="obsolete">显示信息</translation>
     </message>
     <message>
         <source>Open in browser...</source>
@@ -2390,7 +2436,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Open Web Client</source>
-        <translation>打开Web客户端</translation>
+        <translation type="obsolete">打开Web客户端</translation>
     </message>
     <message>
         <source>Alarm/Event Log...</source>
@@ -2446,7 +2492,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Server Logs</source>
-        <translation>服务器日志</translation>
+        <translation type="obsolete">服务器日志</translation>
     </message>
     <message>
         <source>Server Diagnostics...</source>
@@ -2479,6 +2525,22 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <source>Open in New Window</source>
         <translation>在新窗口打开</translation>
+    </message>
+    <message>
+        <source>Show Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Version Mismatch Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Logs...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3117,7 +3179,7 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Export Selection to File</source>
-        <translation>复制选择到档案</translation>
+        <translation type="obsolete">复制选择到档案</translation>
     </message>
     <message>
         <source>Select All</source>
@@ -3130,6 +3192,10 @@ Make sure the server is available and try again.</source>
     <message>
         <source>Cameras list by media server &apos;%1&apos; - %2 camera(s) found</source>
         <translation>依媒体服务器 &apos;%1&apos; 摄像机列表-发现%2摄像机</translation>
+    </message>
+    <message>
+        <source>Export Selection to File...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3829,7 +3895,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Export Selection to File</source>
-        <translation>输出选择到档案</translation>
+        <translation type="obsolete">输出选择到档案</translation>
     </message>
     <message>
         <source>Select All</source>
@@ -3874,6 +3940,10 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <source>&lt; %1 cameras &gt;</source>
         <translation>&lt; %1 台摄像机&gt;</translation>
+    </message>
+    <message>
+        <source>Export Selection to File...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3951,6 +4021,25 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation>
             <numerusform>将需要%1中的%n路类比许可。</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnGlHardwareChecker</name>
+    <message>
+        <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation type="unfinished">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照http://tribaltrouble.com/driversupport.php</translation>
+    </message>
+    <message>
+        <source>Critical Performance Tip</source>
+        <translation type="unfinished">重要性能提示</translation>
+    </message>
+    <message>
+        <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation type="unfinished">我们偵测道您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>Important Performance Tip</source>
+        <translation type="unfinished">关键性能提示</translation>
     </message>
 </context>
 <context>
@@ -4490,6 +4579,10 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <message>
         <source>Zoom window</source>
         <translation>缩放窗口</translation>
+    </message>
+    <message>
+        <source>Dewarping</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6567,11 +6660,11 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Include Timestamps (Requires Transcoding)</source>
-        <translation>包括时间戳(需转码)</translation>
+        <translation type="obsolete">包括时间戳(需转码)</translation>
     </message>
     <message>
         <source>Video adjustment (Requires Transcoding)</source>
-        <translation>视频调整(需转码)</translation>
+        <translation type="obsolete">视频调整(需转码)</translation>
     </message>
     <message>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists.Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
@@ -6612,6 +6705,26 @@ and you do not have the rights to overwrite it.</source>
     <message>
         <source>Version Mismatch</source>
         <translation>版本不匹配</translation>
+    </message>
+    <message>
+        <source>Include timestamps (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply dewarping and image correction (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply image correction (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply dewarping (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7222,6 +7335,14 @@ hh:mm:ss</source>
     <message>
         <source>Expert</source>
         <translation>专家</translation>
+    </message>
+    <message>
+        <source>This is the fish-eye lens camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dewarping</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

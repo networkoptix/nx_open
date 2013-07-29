@@ -58,11 +58,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Black levels</source>
+        <source>Black level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>White levels</source>
+        <source>White level</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -250,6 +250,17 @@
     </message>
     <message>
         <source>IP, hostname, RTSP link...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CameraDiagnostics::DiagnoseTool</name>
+    <message>
+        <source>Bad reply from server %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No connection to media server %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -693,28 +704,6 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>OpenGlDriversErrorMessageDisplay</name>
-    <message>
-        <source>Important Performance Tip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>OpenGlHardwareErrorMessageDisplay</name>
-    <message>
-        <source>Critical Performance Tip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PreferencesDialog</name>
     <message>
         <source>System Settings</source>
@@ -931,6 +920,10 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Continuous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export selected cameras to file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1801,10 +1794,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open Web Client...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1894,6 +1883,14 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Server Logs...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Version Mismatch Message</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3111,6 +3108,25 @@ You will be asked to restart the client in compatibility mode.</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnGlHardwareChecker</name>
+    <message>
+        <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Critical Performance Tip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Important Performance Tip</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
