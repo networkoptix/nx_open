@@ -220,82 +220,83 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>%1 Tray Assistant version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>%1系统托盘帮手版本 %2 (%3).&lt;br/&gt;
+以%7.为%5-%6 建置。&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="396"/>
         <source>Enterprise controller has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>系统控制器已停止</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="403"/>
         <source>Enterprise controller has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>系统控制器已启动</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="422"/>
         <source>Media server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体服务器已停止</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="429"/>
         <source>Media server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体服务器已启动</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="534"/>
         <source>Media server is going to be stopped. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体服务器將停止。确定?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="556"/>
         <source>Enterprise controller is going to be stopped. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>系统控制器將停止。确定?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="633"/>
         <source>&amp;Show Media Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;显示媒体服务器日志</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="638"/>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;显示系统控制器日志</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Start Media Server</source>
-        <translation type="unfinished"></translation>
+        <translation>启动媒体服务器</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="651"/>
         <source>Stop Media Server</source>
-        <translation type="unfinished"></translation>
+        <translation>停止媒体服务器</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="656"/>
         <source>Start Enterprise Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>启动系统控制器</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="661"/>
         <source>Stop Enterprise Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>停止系统控制器</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="863"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
-        <translation type="unfinished"></translation>
+        <translation>您所做的更改需重新启动系统控制器和媒体服务器。现在重新启动？</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="865"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
-        <translation type="unfinished"></translation>
+        <translation>您所做的更改需重新启动系统控制器。现在重新启动？</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="867"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
-        <translation type="unfinished"></translation>
+        <translation>您所做的更改需重新启动媒体服务器。现在重新启动？</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="903"/>
@@ -305,7 +306,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/systraywindow.cpp" line="936"/>
         <source>enterprise controller</source>
-        <translation type="unfinished"></translation>
+        <translation>系统控制器</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="937"/>
@@ -367,7 +368,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="42"/>
         <source>Enterprise controller connection</source>
-        <translation type="unfinished"></translation>
+        <translation>系统控制器连接</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="66"/>
@@ -413,22 +414,22 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="246"/>
         <source>RTSP port</source>
-        <translation type="unfinished"></translation>
+        <translation>RTSP端口</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="269"/>
         <source>API port</source>
-        <translation type="unfinished"></translation>
+        <translation>API端口</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="376"/>
         <source>Enterprise Controller Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>系统控制器设置</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="388"/>
         <source>Enterprise controller network settings</source>
-        <translation type="unfinished"></translation>
+        <translation>系统控制器网络设置</translation>
     </message>
     <message>
         <source>RTSP Port</source>
@@ -506,7 +507,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="575"/>
         <source>(requires restart)</source>
-        <translation type="unfinished"></translation>
+        <translation>(需重新启动)</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="586"/>
