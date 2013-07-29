@@ -38,7 +38,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     m_advancedMode(false)
 {
     ui->setupUi(this);
-    setWindowState(Qt::WindowMaximized | windowState());
 
     setHelpTopic(this, Qn::EventsActions_Help);
 

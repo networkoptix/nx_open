@@ -505,9 +505,11 @@ Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parame
 }
 
 Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
     return qnSettings->isUpdatesEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
     return Qn::EnabledAction;
 }

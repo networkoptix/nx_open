@@ -30,11 +30,11 @@ static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 QnResource::QnResource(): 
     QObject(),
     m_mutex(QMutex::Recursive),
+    m_initMutex(QMutex::Recursive),
     m_resourcePool(NULL),
     m_flags(0),
     m_disabled(false),
     m_status(Offline),
-    m_initMutex(QMutex::Recursive),
     m_initialized(false),
     m_lastInitTime(0)
 {

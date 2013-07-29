@@ -96,7 +96,7 @@
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="118"/>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
         <translation>编码转换错误：无法找到编码器 %1</translation>
     </message>
@@ -111,12 +111,12 @@
         <translation>无法初始化音频解码器</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="95"/>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
         <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
         <translation>无法分派分辨率级别 %1x%2</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="165"/>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
         <source>Can&apos;t initialize video encoder</source>
         <translation>无法初始化视频编码器</translation>
     </message>
@@ -172,7 +172,7 @@
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="22"/>
         <source>Say</source>
-        <translation type="unfinished"></translation>
+        <translation>说</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="24"/>
@@ -688,171 +688,171 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="23"/>
         <source>User Defined (%1)</source>
-        <translation type="unfinished">用户定义 (%1)</translation>
+        <translation>用户定义 (%1)</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="28"/>
         <source>Motion on Camera</source>
-        <translation type="unfinished">摄像机移动侦测</translation>
+        <translation>摄像机移动侦测</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="30"/>
         <source>Input Signal on Camera</source>
-        <translation type="unfinished">摄像机输入</translation>
+        <translation>摄像机报警信号输入</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="32"/>
         <source>Camera Disconnected</source>
-        <translation type="unfinished">摄像机离线</translation>
+        <translation>摄像机离线</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="34"/>
         <source>Storage Failure</source>
-        <translation type="unfinished">存储故障</translation>
+        <translation>存储故障</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="36"/>
         <source>Network Issue</source>
-        <translation type="unfinished">网络问题</translation>
+        <translation>网络问题</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="38"/>
         <source>Camera IP Conflict</source>
-        <translation type="unfinished">摄像机IP冲突</translation>
+        <translation>摄像机IP冲突</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="40"/>
         <source>Media Server Failure</source>
-        <translation type="unfinished">媒体服务器故障</translation>
+        <translation>媒体服务器故障</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="42"/>
         <source>Media Server Conflict</source>
-        <translation type="unfinished">媒体服务器冲突</translation>
+        <translation>媒体服务器冲突</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="44"/>
         <source>Any camera issue</source>
-        <translation type="unfinished">任何摄像机问题</translation>
+        <translation>任何摄像机问题</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="46"/>
         <source>Any server issue</source>
-        <translation type="unfinished">任何服务器问题</translation>
+        <translation>任何服务器问题</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="48"/>
         <source>Any event</source>
-        <translation type="unfinished">任何事件</translation>
+        <translation>任何事件</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="59"/>
         <source>Undefined event has occured on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>未定义事件在 %1发生</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="62"/>
         <source>Camera %1 was disconnected</source>
-        <translation type="unfinished">摄像机%1离线</translation>
+        <translation>摄像机%1离线</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="65"/>
         <source>Input on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 报警输入</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="68"/>
         <source>Motion on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1侦测到移动</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="71"/>
         <source>Storage Failure at %1</source>
-        <translation type="unfinished">%1存储故障</translation>
+        <translation>%1存储故障</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="74"/>
         <source>Network Issue at %1</source>
-        <translation type="unfinished">%1网络问题</translation>
+        <translation>%1网络问题</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="77"/>
         <source>Media Server &quot;%1&quot; Failure</source>
-        <translation type="unfinished">媒体服务器&quot;%1&quot;故障</translation>
+        <translation>媒体服务器&quot;%1&quot;故障</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="80"/>
         <source>Camera IP Conflict at %1</source>
-        <translation type="unfinished">%1摄像机IP冲突</translation>
+        <translation>%1摄像机IP冲突</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="83"/>
         <source>Media Server &quot;%1&quot; Conflict</source>
-        <translation type="unfinished">媒体服务器&quot;%1&quot;冲突</translation>
+        <translation>媒体服务器&quot;%1&quot;冲突</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="88"/>
         <source>Unknown Event has occured</source>
-        <translation type="unfinished">发生未知事件</translation>
+        <translation>发生未知事件</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="105"/>
         <source>Event: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>事件: %1</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="108"/>
         <source>Source: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>来源: %1</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="112"/>
         <source>Url: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>网址: %1</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="130"/>
         <source>Input port: %1</source>
-        <translation type="unfinished">输入端口 %1</translation>
+        <translation>输入端口: %1</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="137"/>
         <source>Reason: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>原因: %1</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="142"/>
         <source>Conflict address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>冲突地址:: %1</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="147"/>
         <source>Camera #%1 MAC: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机#%1 MAC: %2</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="156"/>
         <source>Conflicting EC #%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>相冲突系统控制器 #%1: %2</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="172"/>
         <source>Time: %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished"></translation>
+        <translation>%2 時間: %1 </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="176"/>
         <source>First occurence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>第一次发生:%2 %1 (共%n次)</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="197"/>
         <source>No video frame received during last %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>过去%1 秒內没有收到视频</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="201"/>
@@ -862,22 +862,22 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="208"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2</source>
-        <translation type="unfinished"></translation>
+        <translation>侦测到RTP包丢失。前个seq.=%1，下个seq.=%2</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="213"/>
         <source>Server terminated</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器终止</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="217"/>
         <source>Server started after crash</source>
-        <translation type="unfinished">服务器故障后重启</translation>
+        <translation>服务器故障后重启</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="225"/>
         <source>Not enough HDD/SSD speed for recording to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>硬盘写入速度不足以录像至%1。</translation>
     </message>
     <message>
         <source>RTP packet loss detected. Prev seq.=%1 next seq.=%2</source>
@@ -1082,27 +1082,27 @@ for recording to %1.</source>
         <translation>无法为录像分配输出流。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="583"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation>无法分配输出音频流。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="599"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation>内部服务器错误：无效音频编码信息</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="620"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="628"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation>无法创建输出文件&apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="632"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="640"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation>视频或音频编解码器与%1格式不兼容。尝试另一种格式。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="743"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="751"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>为文件&apos;%1&apos;生成水印时发生错误。</translation>
     </message>
@@ -1112,83 +1112,89 @@ for recording to %1.</source>
     <message>
         <location filename="../src/health/system_health.cpp" line="6"/>
         <source>Your E-Mail address is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>邮件地址没有设定</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="8"/>
         <source>You have no licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>没有软件许可</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="10"/>
         <source>E-Mail server is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>邮件服务器没有设定</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="12"/>
         <source>Some users have not set their E-Mail addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>一些用户没有设定邮件地址</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="14"/>
         <source>Connection to Enterprise Controller is lost</source>
-        <translation type="unfinished"></translation>
+        <translation>与系统控制器的连接中断</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="16"/>
         <source>Error while sending E-Mail</source>
-        <translation type="unfinished"></translation>
+        <translation>传送邮件时发生错误</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="18"/>
         <source>Storages are full</source>
-        <translation type="unfinished"></translation>
+        <translation>存储空间已满</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="20"/>
         <source>Storages are not configured</source>
-        <translation type="unfinished"></translation>
+        <translation>没有设置存储空间</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="31"/>
         <source>E-Mail address is not set for user %1</source>
-        <translation type="unfinished"></translation>
+        <translation>用户 %1邮件地址没有设置。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="41"/>
         <source>Your E-Mail address is not set.
 You cannot receive system notifications via E-Mail.</source>
-        <translation type="unfinished"></translation>
+        <translation>邮件地址没有设定。
+无法通过邮件接收系统事件。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="43"/>
         <source>E-Mail server is not set.
 You cannot receive system notifications via E-Mail.</source>
-        <translation type="unfinished"></translation>
+        <translation>邮箱服务器没有设定。
+无法通过邮件接收系统事件。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="45"/>
         <source>Some users have not set their E-Mail addresses.
 They cannot receive system notifications via E-Mail.</source>
-        <translation type="unfinished"></translation>
+        <translation>一些用户没有设定邮件地址。
+他们无法通过邮件接收系统事件。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="47"/>
         <source>Storages are full on the following Media Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>以下媒体服务器存储空间已满:
+%1。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="49"/>
         <source>Storages are not configured on the following Media Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>以下媒体服务器没有设置存储空间:
+%1。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="51"/>
         <source>You have no licenses.
 You cannot record video from cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>没有软件许可。
+您不能从摄像机录制视频。</translation>
     </message>
 </context>
 <context>
@@ -1252,12 +1258,12 @@ You cannot record video from cameras.</source>
     <message>
         <location filename="../src/translation/translation_list_model.cpp" line="63"/>
         <source>%1 (built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (內建)</translation>
     </message>
     <message>
         <location filename="../src/translation/translation_list_model.cpp" line="65"/>
         <source>%1 (external)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (外部)</translation>
     </message>
 </context>
 <context>

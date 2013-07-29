@@ -164,7 +164,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 if (m_actionType == BusinessActionType::PlaySound)
                     return m_actionParams.getSoundUrl();
                 if (m_actionType == BusinessActionType::SayText)
-                    return m_actionParams.getSoundUrl();
+                    return m_actionParams.getSayText();
             } else if (column == QnBusiness::AggregationColumn)
                 return m_aggregationPeriod;
             break;
@@ -242,7 +242,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
                 setActionParams(params);
             } else if (m_actionType == BusinessActionType::SayText) {
                 QnBusinessActionParameters params;
-                params.setSoundUrl(value.toString());
+                params.setSayText(value.toString());
                 setActionParams(params);
             } else
                 setActionResources(value.value<QnResourceList>());
@@ -699,7 +699,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                 } else if (m_actionType == BusinessActionType::PlaySound) {
                     return !m_actionParams.getSoundUrl().isEmpty();
                 }  else if (m_actionType == BusinessActionType::SayText) {
-                    return !m_actionParams.getSoundUrl().isEmpty();
+                    return !m_actionParams.getSayText().isEmpty();
                 }
 
                 QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>();
@@ -820,7 +820,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         return soundModel->titleByFilename(filename);
     } else if (m_actionType == BusinessActionType::SayText) {
-        QString text = m_actionParams.getSoundUrl();
+        QString text = m_actionParams.getSayText();
         if (text.isEmpty())
             return tr("Enter the text");
         return text;
@@ -846,21 +846,21 @@ QString QnBusinessRuleViewModel::getAggregationText() const {
     const int DAY = HOUR * 24;
 
     if (BusinessActionType::hasToggleState(m_actionType))
-        return tr("not applied");
+        return tr("Not Applied");
 
     if (m_aggregationPeriod <= 0)
-        return tr("do instantly");
+        return tr("Do Instantly");
 
     if (m_aggregationPeriod >= DAY && m_aggregationPeriod % DAY == 0)
-        return tr("no more than once per %n days", "", m_aggregationPeriod / DAY);
+        return tr("Once per %n days", "", m_aggregationPeriod / DAY);
 
     if (m_aggregationPeriod >= HOUR && m_aggregationPeriod % HOUR == 0)
-        return tr("no more than once per %n hours", "", m_aggregationPeriod / HOUR);
+        return tr("Once per %n hours", "", m_aggregationPeriod / HOUR);
 
     if (m_aggregationPeriod >= MINUTE && m_aggregationPeriod % MINUTE == 0)
-        return tr("no more than once per %n minutes", "", m_aggregationPeriod / MINUTE);
+        return tr("Once per %n minutes", "", m_aggregationPeriod / MINUTE);
 
-    return tr("no more than once per %n seconds", "", m_aggregationPeriod);
+    return tr("Once per %n seconds", "", m_aggregationPeriod);
 }
 
 
@@ -951,7 +951,7 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
         case QnBusiness::SpacerColumn:      return tr("->");
         case QnBusiness::ActionColumn:      return tr("Action");
         case QnBusiness::TargetColumn:      return tr("Target");
-        case QnBusiness::AggregationColumn: return tr("Aggregation");
+        case QnBusiness::AggregationColumn: return tr("Interval of Action");
         default:
             break;
     }
