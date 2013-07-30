@@ -282,7 +282,11 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
+    if(widget->resource()->flags() & QnResource::server)
+        return Qn::InvisibleAction;
+
+    QString url = widget->resource()->getUrl().toLower();
+    if((widget->resource()->flags() & QnResource::still_image) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
         return Qn::InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->renderStatus();

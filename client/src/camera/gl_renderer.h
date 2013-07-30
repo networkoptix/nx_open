@@ -122,7 +122,8 @@ private:
     	unsigned int tex0ID,
     	unsigned int tex1ID,
     	unsigned int tex2ID,
-    	const float* v_array );
+    	const float* v_array,
+        bool isStillImage);
     //!Draws YUV420 with alpha channel
     void drawYVA12VideoTexture(
         const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
