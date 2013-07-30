@@ -267,7 +267,7 @@
 <context>
     <name>CameraListDialog</name>
     <message>
-        <source>Camera list</source>
+        <source>Camera List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -392,7 +392,7 @@
 <context>
     <name>DatabaseManagementWidget</name>
     <message>
-        <source>You can create a system configuration backup and restore it later if something goes wrong. </source>
+        <source>You can create a backup for system configurations that can be restored in case of failure.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -558,7 +558,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Activate Free License</source>
+        <source>Activate Trial License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1806,7 +1806,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cameras List...</source>
+        <source>Camera List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2019,7 +2019,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         </translation>
     </message>
     <message>
-        <source>User %1 has empty email</source>
+        <source>User '%1' has empty E-Mail</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2079,7 +2079,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>do instantly</source>
+        <source>Instant</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -3294,7 +3294,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You do not have a valid License installed. Please activate your commercial or free license.</source>
+        <source>You do not have a valid License installed. Please activate your commercial or trial license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3389,7 +3389,7 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Activate Free License</source>
+        <source>Activate Trial License</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5227,7 +5227,7 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Quater Native</source>
+        <source>Quarter Native</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5279,7 +5279,7 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio Grabbing</source>
+        <source>Audio Grabber</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
