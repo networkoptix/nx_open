@@ -75,6 +75,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_actionType(BusinessActionType::ShowPopup),
     m_aggregationPeriod(60),
     m_disabled(false),
+    m_system(false),
     m_eventTypesModel(new QStandardItemModel(this)),
     m_eventStatesModel(new QStandardItemModel(this)),
     m_actionTypesModel(new QStandardItemModel(this))

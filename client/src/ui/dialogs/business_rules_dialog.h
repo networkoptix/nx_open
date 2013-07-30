@@ -51,6 +51,7 @@ private slots:
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
     void at_resetDefaultsButton_clicked();
+    void at_clearFilterButton_clicked();
 
     void at_beforeModelChanged();
     void at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
@@ -65,6 +66,8 @@ private slots:
     void toggleAdvancedMode();
     void updateAdvancedAction();
     void updateControlButtons();
+
+    void updateFilter();
 
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog)
