@@ -166,7 +166,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Quater Native</string>
+          <string>Quarter Native</string>
          </property>
         </item>
         <item>
@@ -238,7 +238,7 @@
    <item>
     <widget class="QGroupBox" name="audioGroupBox">
      <property name="title">
-      <string>Audio Grabbing</string>
+      <string>Audio Grabber</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,1">
       <item row="0" column="0">

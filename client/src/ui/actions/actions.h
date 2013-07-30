@@ -449,6 +449,12 @@ namespace Qn {
         CameraIssuesAction,
 
         /**
+         * Opens camera diagnostics dialog that checks for problems with
+         * selected camera.
+         */
+        CameraDiagnosticsAction,
+
+        /**
          * Opens current layout settings dialog.
          */
         CurrentLayoutSettingsAction,

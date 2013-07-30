@@ -330,7 +330,7 @@
     <name>CameraListDialog</name>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui" line="14"/>
-        <source>Camera list</source>
+        <source>Camera List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -485,7 +485,7 @@
     <name>DatabaseManagementWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.ui" line="20"/>
-        <source>You can create a system configuration backup and restore it later if something goes wrong. </source>
+        <source>You can create a backup for system configurations that can be restored in case of failure.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -722,7 +722,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="197"/>
-        <source>Activate Free License</source>
+        <source>Activate Trial License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1725,7 +1725,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="631"/>
-        <source>Cameras List...</source>
+        <source>Camera List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2528,7 +2528,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="772"/>
-        <source>User %1 has empty email</source>
+        <source>User '%1' has empty E-Mail</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2599,7 +2599,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="852"/>
-        <source>do instantly</source>
+        <source>Instant</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -3791,7 +3791,7 @@ Currently using %3 digital and %4 analog licenses.</source>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="109"/>
-        <source>You do not have a valid License installed. Please activate your commercial or free license.</source>
+        <source>You do not have a valid License installed. Please activate your commercial or trial license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3872,7 +3872,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="36"/>
-        <source>Activate Free License</source>
+        <source>Activate Trial License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6242,7 +6242,7 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="241"/>
-        <source>Audio Grabbing</source>
+        <source>Audio Grabber</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6282,7 +6282,7 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="169"/>
-        <source>Quater Native</source>
+        <source>Quarter Native</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

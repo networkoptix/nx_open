@@ -221,13 +221,24 @@ private:
 // -------------------------------------------------------------------------- //
 // PtzImageButtonWidget
 // -------------------------------------------------------------------------- //
-class PtzImageButtonWidget: public QnImageButtonWidget {
-    typedef QnImageButtonWidget base_type;
+class PtzImageButtonWidget: public QnTextButtonWidget {
+    typedef QnTextButtonWidget base_type;
 
 public:
     PtzImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags)
-    {}
+    {
+        setFrameShape(Qn::EllipticalFrame);
+        setRelativeFontSize(0.5);
+        setRelativeFrameWidth(1.0 / 16.0);
+        
+        setStateOpacity(0, 0.4);
+        setStateOpacity(HOVERED, 0.7);
+        setStateOpacity(PRESSED, 1.0);
+
+        setFrameColor(ptzItemBorderColor);
+        setWindowColor(ptzItemBaseColor);
+    }
 
     QnMediaResourceWidget *target() const {
         return m_target.data();
@@ -237,70 +248,8 @@ public:
         m_target = target;
     }
 
-protected:
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override {
-        qreal opacity = painter->opacity();
-        painter->setOpacity(opacity * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
-
-        bool isPressed = (startState & PRESSED) || (endState & PRESSED);
-        {
-            QnScopedPainterPenRollback penRollback(painter, QPen(isPressed ? ptzArrowBorderColor : ptzItemBorderColor, qMax(size().height(), size().width()) / 16.0));
-            QnScopedPainterBrushRollback brushRollback(painter, isPressed ? ptzArrowBaseColor : ptzItemBaseColor);
-            painter->drawEllipse(rect);
-        }
-
-        paintContents(painter, startState, endState, progress, widget, rect);
-
-        painter->setOpacity(opacity);
-    }
-
-    virtual void paintContents(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
-        base_type::paint(painter, startState, endState, progress, widget, rect);
-    }
-
-    qreal stateOpacity(StateFlags stateFlags) {
-        return (stateFlags & HOVERED) ? 1.0 : 0.5;
-    }
-
 private:
     QWeakPointer<QnMediaResourceWidget> m_target;
-};
-
-
-// -------------------------------------------------------------------------- //
-// PtzTextButtonWidget
-// -------------------------------------------------------------------------- //
-class PtzTextButtonWidget: public PtzImageButtonWidget {
-    typedef PtzImageButtonWidget base_type;
-
-public:
-    PtzTextButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
-        base_type(parent, windowFlags)
-    {}
-
-    const QString text() const {
-        return m_text;
-    }
-
-    void setText(const QString &text) {
-        if(m_text == text)
-            return;
-
-        m_text = text;
-        update();
-    }
-
-protected:
-    virtual void paintContents(QPainter *painter, StateFlags, StateFlags, qreal, QGLWidget *, const QRectF &rect) override {
-        QFont font = this->font();
-        font.setPixelSize(rect.height() / 2);
-        QnScopedPainterFontRollback fontRollback(painter, font);
-
-        painter->drawText(rect, Qt::AlignCenter, m_text);
-    }
-
-private:
-    QString m_text;
 };
 
 
@@ -349,7 +298,7 @@ public:
         m_manipulatorWidget = new PtzManipulatorWidget(this);
         m_zoomInButton = new PtzImageButtonWidget(this);
         m_zoomOutButton = new PtzImageButtonWidget(this);
-        m_modeButton = new PtzTextButtonWidget(this);
+        m_modeButton = new PtzImageButtonWidget(this);
 
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
@@ -385,7 +334,7 @@ public:
         return m_zoomOutButton;
     }
 
-    PtzTextButtonWidget *modeButton() const {
+    PtzImageButtonWidget *modeButton() const {
         return m_modeButton;
     }
 
@@ -480,7 +429,7 @@ private:
     PtzManipulatorWidget *m_manipulatorWidget;
     PtzImageButtonWidget *m_zoomInButton;
     PtzImageButtonWidget *m_zoomOutButton;
-    PtzTextButtonWidget *m_modeButton;
+    PtzImageButtonWidget *m_modeButton;
 };
 
 
@@ -1165,7 +1114,7 @@ void PtzInstrument::at_splashItem_destroyed() {
 }
 
 void PtzInstrument::at_modeButton_clicked() {
-    PtzTextButtonWidget *button = checked_cast<PtzTextButtonWidget *>(sender());
+    PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
 
     if(QnMediaResourceWidget *widget = button->target()) {
         m_ptzController->changePanoMode(widget);

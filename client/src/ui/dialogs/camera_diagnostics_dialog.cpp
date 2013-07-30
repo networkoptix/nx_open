@@ -10,10 +10,13 @@
 
 QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
+    ui(new Ui::CameraDiagnosticsDialog),
     m_tool(NULL),
     m_started(false),
     m_finished(false)
-{}
+{
+    ui->setupUi(this);
+}
 
 QnCameraDiagnosticsDialog::~QnCameraDiagnosticsDialog() {
     stop();

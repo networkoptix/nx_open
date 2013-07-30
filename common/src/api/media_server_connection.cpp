@@ -362,13 +362,15 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     }
     case ImageObject: {
-        QnApiPbSerializer serializer;
         QImage image;
         if (response.status == 0)
             image.loadFromData(response.data);
         emitFinished(this, response.status, image, handle);
         break;
     }
+    case CameraDiagnosticsObject:
+        processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
+        break;
     default:
         assert(false); /* We should never get here. */
         break;
