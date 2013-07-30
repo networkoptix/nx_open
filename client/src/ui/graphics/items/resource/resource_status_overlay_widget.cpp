@@ -6,10 +6,12 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 
+#include <ui/animation/opacity_animator.h>
 #include <ui/style/globals.h>
 
 
@@ -37,6 +39,10 @@ namespace {
 
     Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
 
+    const QColor textColor(255, 96, 96, 128);
+    const QColor buttonBaseColor(255, 96, 96, 64);
+    const QColor buttonBorderColor(255, 96, 96, 196);
+
 } // anonymous namespace
 
 
@@ -62,9 +68,21 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_analogLicenseStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
     /* Init buttons. */
-    /*m_diagnosticsButton = new QnTextButtonWidget(this);
+    m_diagnosticsButton = new QnTextButtonWidget(this);
     m_diagnosticsButton->setText(tr("Diagnose..."));
-    m_diagnosticsButton->set*/
+    m_diagnosticsButton->setFrameShape(Qn::RectangularFrame);
+    m_diagnosticsButton->setRelativeFontSize(0.5);
+    m_diagnosticsButton->setRelativeFrameWidth(1.0 / 16.0);
+    m_diagnosticsButton->setStateOpacity(0, 0.4);
+    m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::HOVERED, 0.7);
+    m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::PRESSED, 1.0);
+    m_diagnosticsButton->setWindowColor(buttonBaseColor);
+    m_diagnosticsButton->setFrameColor(buttonBorderColor);
+
+    connect(m_diagnosticsButton, SIGNAL(clicked()), this, SIGNAL(diagnosticsRequested()));
+
+    updateLayout();
+    updateDiagnosticsButtonOpacity(false);
 }
 
 QnStatusOverlayWidget::~QnStatusOverlayWidget() {
@@ -81,7 +99,37 @@ void QnStatusOverlayWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOve
 
     m_statusOverlay = statusOverlay;
 
+    updateDiagnosticsButtonOpacity();
+
     emit statusOverlayChanged();
+}
+
+void QnStatusOverlayWidget::updateLayout() {
+    QRectF rect = this->rect();
+
+    qreal point = qMin(rect.width(), rect.height()) / 16.0;
+    QSizeF size(point * 8.0, point * 2.0);
+
+    m_diagnosticsButton->setGeometry(QRectF(rect.center() - toPoint(size) / 2.0 + QPointF(0.0, point * 4.0), size));
+}
+
+void QnStatusOverlayWidget::updateDiagnosticsButtonOpacity(bool animate) {
+    qreal opacity = m_statusOverlay == Qn::OfflineOverlay ? 1.0 : 0.0;
+
+    if(animate) {
+        opacityAnimator(m_diagnosticsButton)->animateTo(opacity);
+    } else {
+        m_diagnosticsButton->setOpacity(opacity);
+    }
+}
+
+void QnStatusOverlayWidget::setGeometry(const QRectF &geometry) {
+    QSizeF oldSize = size();
+
+    base_type::setGeometry(geometry);
+
+    if(!qFuzzyCompare(oldSize, size()))
+        updateLayout();
 }
 
 void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -162,7 +210,7 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
     font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
 
     QnScopedPainterFontRollback fontRollback(painter, font);
-    QnScopedPainterPenRollback penRollback(painter, QColor(255, 96, 96, 128));
+    QnScopedPainterPenRollback penRollback(painter, textColor);
     QnScopedPainterTransformRollback transformRollback(painter);
 
     qreal opacity = painter->opacity();

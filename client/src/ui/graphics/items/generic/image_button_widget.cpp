@@ -769,7 +769,7 @@ void QnTextButtonWidget::setGeometry(const QRectF &geometry) {
         base_type::setGeometry(geometry);
 
         if(!qFuzzyCompare(oldSize, size()))
-            setFrameWidth(qMax(size().height(), size().width()) * m_relativeFrameWidth);
+            setFrameWidth(qMin(size().height(), size().width()) * m_relativeFrameWidth);
     }
 }
 
