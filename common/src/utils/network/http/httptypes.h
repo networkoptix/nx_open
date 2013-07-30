@@ -146,6 +146,7 @@ namespace nx_http
         };
 
         StringType toString( Value );
+        StringType toString( int );
     };
 
     namespace Method
