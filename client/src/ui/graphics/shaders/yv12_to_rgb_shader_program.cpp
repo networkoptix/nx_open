@@ -131,7 +131,7 @@ void QnFisheyeShaderProgram::setDewarpingParams(const DewarpingParams& params, f
     else {
         setUniformValue(m_xShiftLocation, (float) params.xAngle);
         setUniformValue(m_fovRotLocation, (float) params.fovRot);
-        setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
+        //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
         setUniformValue(m_yShiftLocation, (float) (params.yAngle));
         if (params.horizontalView)
             setUniformValue(m_yCenterLocation, (float) 0.5);
@@ -287,7 +287,8 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
     float ymaxInv = -dstFov/aspectRatio;
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5,       -yCenter) * xy1 + vec2(xShift, 0.0);
+    vec2 xy2 = vec2(-0.5*dstFov,  -yCenter*dstFov / panoFactor) + vec2(xShift, 0.0);
+	
 
     vec2 xy3 = vec2(maxX / PI,      maxY*aspectRatio / PI);
     vec2 xy4 = vec2(maxX / 2.0,     maxY / 2.0);
@@ -371,7 +372,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
     float ymaxInv = -dstFov/aspectRatio;
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5,           -yCenter) * xy1 + vec2(xShift, 0.0);
+    vec2 xy2 = vec2(-0.5*dstFov,  -yCenter*dstFov / panoFactor) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI,      maxY*aspectRatio / PI);
     vec2 xy4 = vec2(maxX / 2.0,     maxY / 2.0);

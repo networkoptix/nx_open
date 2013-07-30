@@ -60,7 +60,7 @@ public:
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override {
-        FramedBase::paintFrame(painter, rect());
+        FramedBase::paintFrame(painter, Base::rect());
         Base::paint(painter, option, widget);
     }
 };
