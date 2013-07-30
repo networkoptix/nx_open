@@ -209,7 +209,8 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     picLock->glTextures()[2],
-                    v_array );
+                    v_array,
+                    picLock->flags() & QnAbstractMediaData::MediaFlags_StillImage);
                 break;
 
             case PIX_FMT_NV12:
@@ -292,7 +293,8 @@ void QnGLRenderer::drawYV12VideoTexture(
     unsigned int tex0ID,
     unsigned int tex1ID,
     unsigned int tex2ID,
-    const float* v_array )
+    const float* v_array,
+    bool isStillImage)
 {
     /*
     glMatrixMode(GL_PROJECTION);
@@ -366,7 +368,7 @@ void QnGLRenderer::drawYV12VideoTexture(
 
     if (gammaShader) 
     {
-        if (!isPaused()) {
+        if (!isPaused() && !isStillImage) {
             gammaShader->setImageCorrection(picLock->imageCorrectionResult());
             if (m_histogramConsumer)
                 m_histogramConsumer->setHistogramData(picLock->imageCorrectionResult());

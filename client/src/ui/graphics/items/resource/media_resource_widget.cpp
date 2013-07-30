@@ -780,7 +780,13 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
 
     //if(!(resource()->toResource()->flags() & QnResource::still_image))
-        result |= InfoButton | EnhancementButton;
+    bool rgbImage = false;
+    QString url = resource()->toResource()->getUrl().toLower();
+    if(((resource()->toResource()->flags() & QnResource::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
+        rgbImage = true;
+    if (!rgbImage)
+        result |= EnhancementButton;
+    result |= InfoButton;
 
     if (!zoomRect().isNull())
         return result;
@@ -860,7 +866,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     QSize sourceSize = m_renderer->sourceSize();
 
-    if (item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
+    if (item() && item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
         sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
 
     if(sourceSize.isEmpty()) {

@@ -80,6 +80,8 @@
 #include "ioctl.h"
 #include "dvd_device.h"
 
+#pragma GCC diagnostic ignored "-Wwrite-strings"
+
 /*****************************************************************************
  * Device reading prototypes
  *****************************************************************************/

@@ -310,7 +310,7 @@
 <context>
     <name>CameraListDialog</name>
     <message>
-        <source>Camera list</source>
+        <source>Camera List</source>
         <translation>摄像机列表</translation>
     </message>
     <message>
@@ -566,7 +566,7 @@
 <context>
     <name>DatabaseManagementWidget</name>
     <message>
-        <source>You can create a system configuration backup and restore it later if something goes wrong. </source>
+        <source>You can create a backup for system configurations that can be restored in case of failure.</source>
         <translation>您可以创建系统配置备份，今后出错时可以还原。</translation>
     </message>
     <message>
@@ -822,7 +822,7 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">激活密钥文件：</translation>
     </message>
     <message>
-        <source>Activate Free License</source>
+        <source>Activate Trial License</source>
         <translation>激活免费许可密钥</translation>
     </message>
     <message>
@@ -2447,7 +2447,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <source>Cameras List...</source>
+        <source>Camera List...</source>
         <translation>摄像机列表...</translation>
     </message>
     <message>
@@ -2742,7 +2742,7 @@ for recording at
         </translation>
     </message>
     <message>
-        <source>User %1 has empty email</source>
+        <source>User '%1' has empty E-Mail</source>
         <translation>用户 %1 邮件为空</translation>
     </message>
     <message>
@@ -2801,7 +2801,7 @@ for recording at
         <translation>不适用</translation>
     </message>
     <message>
-        <source>do instantly</source>
+        <source>Instant</source>
         <translation>立即作用</translation>
     </message>
     <message numerus="yes">
@@ -4230,7 +4230,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation>从系统控制器中取得许可...</translation>
     </message>
     <message>
-        <source>You do not have a valid License installed. Please activate your commercial or free license.</source>
+        <source>You do not have a valid License installed. Please activate your commercial or trial license.</source>
         <translation>您未安装有效的许可。请激活您所购买或免费的许可。</translation>
     </message>
     <message>
@@ -4355,7 +4355,7 @@ Archive Streams Allowed: %4</source>
         <translation>激活测试许可</translation>
     </message>
     <message>
-        <source>Activate Free License</source>
+        <source>Activate Trial License</source>
         <translation>激活免费许可</translation>
     </message>
 </context>
@@ -6956,7 +6956,7 @@ hh:mm:ss</source>
         <translation>原始的</translation>
     </message>
     <message>
-        <source>Quater Native</source>
+        <source>Quarter Native</source>
         <translation>原始的四分之一</translation>
     </message>
     <message>
@@ -6992,7 +6992,7 @@ hh:mm:ss</source>
         <translation>性能</translation>
     </message>
     <message>
-        <source>Audio grabbing</source>
+        <source>Audio Grabber</source>
         <translation type="obsolete">捕获音频</translation>
     </message>
     <message>
@@ -7032,7 +7032,7 @@ hh:mm:ss</source>
         <translation>平均</translation>
     </message>
     <message>
-        <source>Audio Grabbing</source>
+        <source>Audio Grabber</source>
         <translation>捕获音频</translation>
     </message>
     <message>
