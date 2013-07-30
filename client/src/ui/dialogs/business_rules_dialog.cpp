@@ -30,7 +30,12 @@
 #include <client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
-    base_type(parent, Qt::WindowMinMaxButtonsHint),
+    base_type(parent,
+              Qt::CustomizeWindowHint |
+              Qt::WindowTitleHint |
+              Qt::WindowMinMaxButtonsHint |
+              Qt::WindowSystemMenuHint |
+              Qt::WindowCloseButtonHint),
     QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
@@ -38,6 +43,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     m_advancedMode(false)
 {
     ui->setupUi(this);
+
+    m_resetDefaultsButton = new QPushButton(tr("Reset Default Rules"));
+    m_resetDefaultsButton->setEnabled(false);
+    ui->buttonBox->addButton(m_resetDefaultsButton, QDialogButtonBox::ResetRole);
+    connect(m_resetDefaultsButton, SIGNAL(clicked()), this, SLOT(at_resetDefaultsButton_clicked()));
 
     setHelpTopic(this, Qn::EventsActions_Help);
 
@@ -195,7 +205,6 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
 
 void QnBusinessRulesDialog::at_saveAllButton_clicked() {
     saveAll();
-
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
@@ -205,6 +214,25 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     if (model->system())
         return;
     deleteRule(model);
+}
+
+void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
+    if (!accessController()->globalPermissions() & Qn::GlobalProtectedPermission)
+        return;
+
+    if (!m_rulesViewModel->isLoaded())
+        return;
+
+    if (QMessageBox::warning(this,
+                             tr("Confirm rules reset"),
+                             tr("Are you sure you want to reset rules to the defaults?\n"\
+                                "This action CANNOT be undone!"),
+                             QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
+                             QMessageBox::Cancel) == QMessageBox::Cancel)
+        return;
+
+    QnAppServerConnectionFactory::createConnection()->resetBusinessRulesAsync(this, SLOT(updateControlButtons()));
+    m_rulesViewModel->reloadData();
 }
 
 void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok) {
@@ -349,8 +377,8 @@ void QnBusinessRulesDialog::updateControlButtons() {
     bool canDelete = hasRights && loaded && m_currentDetailsWidget->model() && !m_currentDetailsWidget->model()->system();
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights && loaded);
-
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges);
+    m_resetDefaultsButton->setEnabled(hasRights && loaded);
 
     ui->deleteRuleButton->setEnabled(canDelete);
     m_deleteAction->setEnabled(canDelete);

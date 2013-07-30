@@ -37,6 +37,7 @@ namespace {
         ((PutFileObject,            "putfile"))
         ((DeleteFileObject,         "rmfile"))
         ((ListDirObject,            "listdir"))
+        ((ResetBusinessRulesObject, "resetBusinessRules"))
     );
 
 } // anonymous namespace
@@ -887,6 +888,9 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
     return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(DisabledObject), requestHeaders, requestParams, "", target, slot);
 }
 
+int QnAppServerConnection::resetBusinessRulesAsync(QObject *target, const char *slot) {
+    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(ResetBusinessRulesObject), m_requestHeaders, m_requestParams, "", target, slot);
+}
 
 // -------------------------------------------------------------------------- //
 // QnAppServerConnectionFactory
