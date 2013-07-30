@@ -630,6 +630,9 @@
                         </Directory>
 
                         <Directory Id="${installer.customization}MediaServerDir" Name="MediaServer">
+                            <Directory Id="ServerImageFormats" Name="imageformats">
+                            </Directory>
+
                             <Component Id="ServerExecutable">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="${libdir}/bin/${build.configuration}/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
@@ -809,6 +812,18 @@
             </Component>
         </ComponentGroup>
 
+        <ComponentGroup Id="ServerImageFormats" Directory="ServerImageFormats">
+            <Component>
+                <File Id="Serverqgif$(var.suffix)4.dll" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="Serverqjpeg$(var.suffix)4.dll" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="Serverqtiff$(var.suffix)4.dll" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
+            </Component>
+        </ComponentGroup>
+
         <ComponentGroup Id="ServerOpenSSL" Directory="${installer.customization}MediaServerDir">
             <Component>
                 <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
@@ -898,6 +913,7 @@
             <ComponentRef Id="ServerRtspPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
+            <ComponentGroupRef Id="ServerImageFormats"/>
             <ComponentRef Id="ServerSigar"/>
             <ComponentRef Id="ServerQjson"/>
             <ComponentRef Id="sysfomediaservercomponent"/>
