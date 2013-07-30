@@ -190,6 +190,8 @@ void QnWorkbenchPtzController::sendGetPosition(const QnMediaResourceWidget* widg
     int handle = server->apiConnection()->ptzGetPosAsync(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, const QVector3D &, int)));
     m_cameraByHandle[handle] = camera;
     m_widgetByHandle[handle] = widget;
+
+    connect( widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_resourceWidget_aboutToBeDestroyed()) );
 }
 
 void QnWorkbenchPtzController::sendSetPosition(const QnMediaResourceWidget* widget, const QVector3D &position) 
@@ -218,6 +220,8 @@ void QnWorkbenchPtzController::sendSetPosition(const QnMediaResourceWidget* widg
     m_cameraByHandle[handle] = camera;
     m_widgetByHandle[handle] = widget;
     m_requestByHandle[handle] = position;
+
+    connect( widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_resourceWidget_aboutToBeDestroyed()) );
 }
 
 void QnWorkbenchPtzController::sendSetMovement(const QnMediaResourceWidget* widget, const QVector3D &movement) 
@@ -243,6 +247,8 @@ void QnWorkbenchPtzController::sendSetMovement(const QnMediaResourceWidget* widg
     m_cameraByHandle[handle] = camera;
     m_widgetByHandle[handle] = widget;
     m_requestByHandle[handle] = movement;
+
+    connect( widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_resourceWidget_aboutToBeDestroyed()) );
 }
 
 void QnWorkbenchPtzController::tryInitialize(const QnVirtualCameraResourcePtr &camera) {
@@ -390,6 +396,27 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
         } else {
             sendSetMovement(widget, movement);
         }
+    }
+}
+
+void QnWorkbenchPtzController::at_resourceWidget_aboutToBeDestroyed()
+{
+    //find widget and cancel request
+    QnMediaResourceWidget* widget = qobject_cast<QnMediaResourceWidget*>(QObject::sender());
+    if( !widget )
+        return; //???
+
+    //removing widget from all containers
+    m_dataByWidget.remove( widget );
+    for( QHash<int, const QnMediaResourceWidget*>::iterator
+        it = m_widgetByHandle.begin();
+        it != m_widgetByHandle.end();
+         )
+    {
+        if( it.value() == widget )
+            it = m_widgetByHandle.erase(it);
+        else
+            ++it;
     }
 }
 
