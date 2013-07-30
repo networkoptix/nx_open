@@ -59,50 +59,55 @@ namespace CameraDiagnostics
                     break;
                 case cannotEstablishConnection:
                     requiredParamCount = 1;
-                    errorMessage = QObject::tr("Cannot connect to api port %1");
+                    errorMessage = QObject::tr("Cannot connect to http port %1. Make sure the camera is plugged into the network.");
                     break;
                 case cannotOpenCameraMediaPort:
                     requiredParamCount = 1;
-                    errorMessage = QObject::tr("Cannot connect to media port %1");
+                    errorMessage = QObject::tr("Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.");
                     break;
                 case connectionClosedUnexpectedly:
                     requiredParamCount = 1;
-                    errorMessage = QObject::tr("Connection to port %1 was closed unexpectedly");
+                    errorMessage = QObject::tr("Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera");
                     break;
                 case responseParseError:
-                    errorMessage = QObject::tr("Error parsing server response");
+                    errorMessage = QObject::tr("Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page."
+                        " If the problem persists, contact support");
                     break;
                 case noMediaTrack:
-                    errorMessage = QObject::tr("No media track(s)");
+                    errorMessage = QObject::tr("No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page."
+                        " If the problem persists, contact support");
                     break;
                 case notAuthorised:
-                    errorMessage = QObject::tr("Not authorised");
+                    errorMessage = QObject::tr("Not authorized");
                     break;
                 case unsupportedProtocol:
                     requiredParamCount = 1;
-                    errorMessage = QObject::tr("Unsupported media protocol %1");
+                    errorMessage = QObject::tr("Unsupported media protocol %1. Please try to restore factory defaults on the web-page."
+                        " If the problem persists, contact support.");
                     break;
                 case cannotConfigureMediaStream:
                     requiredParamCount = 1;
-                    errorMessage = QObject::tr("Failed to configure parameter %1");
+                    errorMessage = QObject::tr("Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page."
+                        " If the problem persists, contact support.");
                     break;
                 case requestFailed:
                     requiredParamCount = 2;
-                    errorMessage = QObject::tr("Camera request %1 failed with error %2");
+                    errorMessage = QObject::tr("Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page."
+                        " If the problem persists, contact support.");
                     break;
                 case notImplemented:
                     requiredParamCount = 0;
-                    errorMessage = QObject::tr("Not implemented");
+                    errorMessage = QObject::tr("Unknown Camera Issue. Please, contact support.");
                     break;
                 case ioError:
                     requiredParamCount = 1;
-                    errorMessage = QObject::tr("I/O error. OS message: %1");
+                    errorMessage = QObject::tr("I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera");
                     break;
                 case serverTerminated:
                     errorMessage = QObject::tr("Server has been stopped");
                     break;
                 default:
-                    errorMessage = QObject::tr("Unknown error");
+                    errorMessage = QObject::tr("Unknown error. Please, contact support.");
                     if( !errorParams.isEmpty() )
                         errorMessage += QObject::tr(". Parameters: ");
                     for( int i = 0; i < errorParams.size(); ++i )

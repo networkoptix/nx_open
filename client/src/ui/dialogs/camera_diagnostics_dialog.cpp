@@ -108,11 +108,11 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     case CameraDiagnostics::Step::mediaServerAvailability:
         return tr("Checking media server availability");
     case CameraDiagnostics::Step::cameraAvailability:
-        return tr("Checking that camera responses on base API requests");
+        return tr("Checking that camera is accessible");
     case CameraDiagnostics::Step::mediaStreamAvailability:
         return tr("Checking that camera provides media stream");
     case CameraDiagnostics::Step::mediaStreamIntegrity: 
-        return tr("Checking media stream provided by camera for errors");
+        return tr("Checking media stream for errors");
     default:
         return QString();
     }

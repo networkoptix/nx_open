@@ -71,6 +71,7 @@ private slots:
     void at_ptzGetPosition_replyReceived(int status, const QVector3D &position, int handle);
     void at_ptzSetPosition_replyReceived(int status, int handle);
     void at_ptzSetMovement_replyReceived(int status, int handle);
+    void at_resourceWidget_aboutToBeDestroyed();
 
 private:
     void sendGetPosition(const QnMediaResourceWidget* widget);

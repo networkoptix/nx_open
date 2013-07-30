@@ -37,6 +37,7 @@ Since previous build
  - If change "Play sound" to "Say", "Say the following" is filled by the file name.Fixed. 
  - Incorrect version in dialog "About". Fixed.
  - Save parameters  "Dewarping" and "Image Enhancement" in layout and while openning in a new tab.
+ - Motion Visual Effect Color is changed to green
  
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
