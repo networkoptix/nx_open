@@ -122,7 +122,11 @@ namespace BusinessActionType {
         */
         SayText,
 
-        Alert,              // write a record to the server's log
+        /**
+         *  Write a record to the server's log
+         */
+        Diagnostics,
+
         Bookmark,           // mark part of camera archive as undeleted
 
         // media server based actions
@@ -132,7 +136,7 @@ namespace BusinessActionType {
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = Alert
+        Count = Bookmark
     };
 }
 

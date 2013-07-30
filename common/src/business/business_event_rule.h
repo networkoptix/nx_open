@@ -58,11 +58,12 @@ public:
     QString comments() const;
     void setComments(const QString value);
 
+    bool system() const;
+    void setSystem(bool value);
+
     /* Check if current time allowed in schedule */
     bool isScheduleMatchTime(const QDateTime& datetime) const;
 private:
-    //TODO: #GDM instant action + prolonged event: expose action when event starts or finishes
-    //TODO: #GDM schedule
     int m_id;
 
     BusinessEventType::Value m_eventType;
@@ -80,6 +81,8 @@ private:
     QString m_schedule;
     QByteArray m_binSchedule;
     QString m_comments;
+
+    bool m_system;
 };
 
 typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
