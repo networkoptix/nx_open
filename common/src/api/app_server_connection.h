@@ -185,6 +185,8 @@ public:
 
     int broadcastBusinessAction(const QnAbstractBusinessActionPtr &businessAction, QObject *target, const char *slot);
 
+    int resetBusinessRulesAsync(QObject *target, const char *slot);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 
