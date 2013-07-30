@@ -33,6 +33,7 @@ enum QnSecondaryStreamQuality
 };
 
 QString QnStreamQualityToDisplayString(QnStreamQuality value);
+QString QnStreamQualityToShortDisplayString(QnStreamQuality value);
 QnStreamQuality QnStreamQualityFromString( const QString& str );
 
 /*!

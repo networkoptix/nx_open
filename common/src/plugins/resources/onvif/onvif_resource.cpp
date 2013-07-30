@@ -418,7 +418,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     calcTimeDrift();
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isNull() || m_needUpdateOnvifUrl)
     {
@@ -433,19 +433,19 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     }
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     CameraDiagnostics::Result result = fetchAndSetVideoSource();
     if (!result)
         return result;
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     fetchAndSetAudioSource();
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     result = fetchAndSetResourceOptions();
     if (!result) 
@@ -455,7 +455,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     }
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     //if (getStatus() == QnResource::Offline || getStatus() == QnResource::Unauthorized)
     //    setStatus(QnResource::Online, true); // to avoid infinit status loop in this version
@@ -464,7 +464,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     fetchAndSetCameraSettings();
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     Qn::CameraCapabilities addFlags = Qn::NoCapabilities;
     Qn::PtzCapabilities ptzCaps = Qn::NoPtzCapabilities;
@@ -500,12 +500,12 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     }
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     fetchRelayInputInfo();
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     //if( !m_relayInputs.empty() )
     //    setCameraCapability( Qn::relayInput, true );
@@ -1784,7 +1784,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
         return result;
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
@@ -1804,7 +1804,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
     }
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     std::string srcToken = m_videoSourceToken.toStdString();
     for (uint i = 0; i < response.Configurations.size(); ++i)
@@ -1831,7 +1831,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
         }
 
         if (m_appStopping)
-            return CameraDiagnostics::UnknownErrorResult();
+            return CameraDiagnostics::ServerTerminatedResult();
     }
 
     return CameraDiagnostics::UnknownErrorResult();
@@ -2809,7 +2809,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
     }
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     //Trying to get onvif URLs
     {
@@ -2858,7 +2858,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
     }
 
     if (m_appStopping)
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::ServerTerminatedResult();
 
     //Trying to get MAC
     {
