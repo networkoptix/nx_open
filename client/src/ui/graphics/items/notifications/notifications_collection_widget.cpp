@@ -20,6 +20,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/common/geometry.h>
 #include <ui/common/ui_resource_name.h>
+#include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/particle_item.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
@@ -267,16 +268,15 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     QnNotificationItem *item = new QnNotificationItem(m_list);
 
+    QString name = getResourceName(resource);
+    BusinessEventType::Value eventType = params.getEventType();
+
     item->setText(QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree()));
     item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
-
-    QString name = getResourceName(resource);
-
-    BusinessEventType::Value eventType = params.getEventType();
+    item->setNotificationLevel(QnNotificationLevels::notificationLevel(eventType));
 
     switch (eventType) {
     case BusinessEventType::Camera_Motion: {
-        item->setNotificationLevel(Qn::CommonNotification);
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
             tr("Browse Archive"),
@@ -287,7 +287,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Input: {
-        item->setNotificationLevel(Qn::CommonNotification);
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
             tr("Open Camera"),
@@ -298,7 +297,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Disconnect: {
-        item->setNotificationLevel(Qn::ImportantNotification);
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
             tr("Camera Settings"),
@@ -309,7 +307,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Storage_Failure: {
-        item->setNotificationLevel(Qn::ImportantNotification);
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings"),
@@ -319,7 +316,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Network_Issue:{
-        item->setNotificationLevel(Qn::ImportantNotification);
         item->addActionButton(
             qnSkin->icon("events/server.png"),
             tr("Camera Settings"),
@@ -330,7 +326,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Ip_Conflict: {
-        item->setNotificationLevel(Qn::CriticalNotification);
         QString webPageAddress = params.getSource();
 
         item->addActionButton(
@@ -342,7 +337,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::MediaServer_Failure: {
-        item->setNotificationLevel(Qn::CriticalNotification);
         item->addActionButton(
             qnSkin->icon("events/server.png"),
             tr("Settings"),
@@ -352,7 +346,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::MediaServer_Conflict: {
-        item->setNotificationLevel(Qn::CriticalNotification);
         item->addActionButton(
             qnSkin->icon("events/server.png"),
             QString(),
@@ -488,7 +481,7 @@ void QnNotificationsCollectionWidget::updateBlinker() {
         return;
 
     blinker()->setNotificationCount(m_list->itemCount());
-    blinker()->setColor(QnNotificationItem::notificationColor(m_list->notificationLevel()));
+    blinker()->setColor(QnNotificationLevels::notificationColor(m_list->notificationLevel()));
 }
 
 void QnNotificationsCollectionWidget::at_settingsButton_clicked() {
