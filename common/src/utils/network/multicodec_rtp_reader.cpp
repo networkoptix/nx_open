@@ -409,11 +409,11 @@ void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* pa
 
 static int TCP_READ_BUFFER_SIZE = 512*1024;
 
-CameraDiagnostics::ErrorCode::Value QnMulticodecRtpReader::openStream()
+CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 {
     m_pleaseStop = false;
     if (isStreamOpened())
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
     QString transport;
@@ -461,8 +461,8 @@ CameraDiagnostics::ErrorCode::Value QnMulticodecRtpReader::openStream()
     m_audioParser = 0;
     m_videoIO = m_audioIO = 0;
 
-    const CameraDiagnostics::ErrorCode::Value result = m_RtpSession.open(url);
-    if( result != CameraDiagnostics::ErrorCode::noError )
+    const CameraDiagnostics::Result result = m_RtpSession.open(url);
+    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
@@ -483,7 +483,10 @@ CameraDiagnostics::ErrorCode::Value QnMulticodecRtpReader::openStream()
     if (!m_videoIO && !m_audioIO)
         m_RtpSession.stop();
     m_rtcpReportTimer.restart();
-    return m_videoIO || m_audioIO ? CameraDiagnostics::ErrorCode::noError : CameraDiagnostics::ErrorCode::noMediaTrack;
+    if( m_videoIO || m_audioIO )
+        return CameraDiagnostics::NoErrorResult();
+    else
+        return CameraDiagnostics::NoMediaTrackResult();
 }
 
 int QnMulticodecRtpReader::getLastResponseCode() const

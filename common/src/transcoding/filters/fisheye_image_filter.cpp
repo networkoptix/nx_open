@@ -180,11 +180,20 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
             qreal r     = acos(pos3d.y() / pos3d.length()) / M_PI;  // fisheye radius
 
             // return from polar coordinates
-            qreal dstX = qBound(0.0, (cos(theta) * r + 0.5) * (imageSize.width()-1),  (qreal) (imageSize.width() - 1));
+            //qreal dstX = qBound(0.0, (cos(theta) * r + 0.5) * (imageSize.width()-1),  (qreal) (imageSize.width() - 1));
+            qreal dstX = (cos(theta) * r + 0.5) * (imageSize.width()-1);
 
             qreal dstY = sin(theta) * r + 0.5;
             dstY = (dstY - backAR) * aspectRatio;
-            dstY = qBound(0.0, dstY * (imageSize.height()-1), (qreal) (imageSize.height() - 1));
+            //dstY = qBound(0.0, dstY * (imageSize.height()-1), (qreal) (imageSize.height() - 1));
+            dstY = dstY * (imageSize.height()-1);
+
+            if (dstX < 0.0 || dstX > (qreal) (imageSize.width() - 1) ||
+                dstY < 0.0 || dstY > (qreal) (imageSize.height() - 1))
+            {
+                dstX = 0.0;
+                dstY = 0.0;
+            }
 
             *dstPos++ = QPointF(dstX, dstY);
         }

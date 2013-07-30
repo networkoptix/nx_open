@@ -553,13 +553,13 @@ int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
-    const QnId& cameraID, CameraDiagnostics::DiagnosticsStep::Value previousStep,
+    const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
     QObject* target, const char* slot )
 {
     QnRequestParamList params;
     params << QnRequestParam("res_id",  cameraID);
-    params << QnRequestParam("type", CameraDiagnostics::DiagnosticsStep::toString(previousStep));
-    return sendAsyncGetRequest(CameraDiagnosticsObject, QnRequestParamList(), QN_REPLY_TYPE(QnCameraDiagnosticsReply), target, slot);
+    params << QnRequestParam("type", CameraDiagnostics::Step::toString(previousStep));
+    return sendAsyncGetRequest(CameraDiagnosticsObject, params, QN_REPLY_TYPE(QnCameraDiagnosticsReply), target, slot);
 }
 
 int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {

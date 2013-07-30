@@ -105,8 +105,6 @@ public:
                          const QnActionParameters &parameters = QnActionParameters(),
                          bool defaultAction = false);
 
-    static QColor notificationColor(Qn::NotificationLevel level);
-
     Qn::NotificationLevel notificationLevel() const;
     void setNotificationLevel(Qn::NotificationLevel notificationLevel);
 

@@ -24,6 +24,12 @@ unsigned int QnAbstractArchiveReader::getCurrentAudioChannel() const
     return 0;
 }
 
+CameraDiagnostics::Result QnAbstractArchiveReader::diagnoseMediaStreamConnection()
+{
+    //TODO/IMPL
+    return CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown );
+}
+
 QStringList QnAbstractArchiveReader::getAudioTracksInfo() const
 {
     return QStringList();

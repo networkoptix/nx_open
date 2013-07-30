@@ -23,12 +23,11 @@ QnCameraDiagnosticsHandler::QnCameraDiagnosticsHandler()
 
 int QnCameraDiagnosticsHandler::executeGet(
     const QString& /*path*/,
-    const QnRequestParamList& params,
-    QByteArray& responseMessageBody,
-    QByteArray& contentType )
+    const QnRequestParamList &params,
+    JsonResult& result )
 {
     QString resID;
-    CameraDiagnostics::DiagnosticsStep::Value diagnosticsType = CameraDiagnostics::DiagnosticsStep::none;
+    CameraDiagnostics::Step::Value diagnosticsType = CameraDiagnostics::Step::none;
     for( QnRequestParamList::const_iterator
         it = params.begin();
         it != params.end();
@@ -37,10 +36,10 @@ int QnCameraDiagnosticsHandler::executeGet(
         if( it->first == resIDParamName )
             resID = it->second;
         else if( it->first == diagnosticsTypeParamName )
-            diagnosticsType = CameraDiagnostics::DiagnosticsStep::fromString(it->second);
+            diagnosticsType = CameraDiagnostics::Step::fromString(it->second);
     }
 
-    if( resID.isEmpty() || diagnosticsType == CameraDiagnostics::DiagnosticsStep::none )
+    if( resID.isEmpty() || diagnosticsType == CameraDiagnostics::Step::none )
         return nx_http::StatusCode::badRequest;
 
     //retrieving resource
@@ -57,51 +56,40 @@ int QnCameraDiagnosticsHandler::executeGet(
     QnCameraDiagnosticsReply reply;
     reply.performedStep = diagnosticsType;
 
+    CameraDiagnostics::Result checkResult;
     //performing diagnostics on secCamRes
     switch( diagnosticsType )
     {
-        case CameraDiagnostics::DiagnosticsStep::cameraAvailability:
-            reply.errorCode = checkCameraAvailability( secCamRes, &reply.errorParams );
+        case CameraDiagnostics::Step::cameraAvailability:
+            checkResult = checkCameraAvailability( secCamRes );
             break;
-        case CameraDiagnostics::DiagnosticsStep::mediaStreamAvailability:
-            reply.errorCode = tryAcquireCameraMediaStream( secCamRes, videoCamera, &reply.errorParams );
+        case CameraDiagnostics::Step::mediaStreamAvailability:
+            checkResult = tryAcquireCameraMediaStream( secCamRes, videoCamera );
             break;
-        case CameraDiagnostics::DiagnosticsStep::mediaStreamIntegrity:
-            reply.errorCode = checkCameraMediaStreamForErrors( videoCamera, &reply.errorParams );
+        case CameraDiagnostics::Step::mediaStreamIntegrity:
+            checkResult = checkCameraMediaStreamForErrors( videoCamera );
             break;
         default:
             return nx_http::StatusCode::notImplemented;
     }
 
-    //serializing reply
-    QVariant responseData;
-    serialize( reply, &responseData );
-    responseMessageBody = responseData.toByteArray();
+    reply.errorCode = checkResult.errorCode;
+    reply.errorParams = checkResult.errorParams;
 
-    contentType = "text/plain";
+    //serializing reply
+    result.setReply( reply );
 
     return nx_http::StatusCode::ok;
-}
-
-int QnCameraDiagnosticsHandler::executePost(
-    const QString& /*path*/,
-    const QnRequestParamList& /*params*/,
-    const QByteArray& /*body*/,
-    QByteArray& /*result*/,
-    QByteArray& /*contentType*/ )
-{
-    //TODO/IMPL
-    return nx_http::StatusCode::notImplemented;
 }
 
 QString QnCameraDiagnosticsHandler::description() const
 {
     QString diagnosticsTypeStrList;
-    for( int i = CameraDiagnostics::DiagnosticsStep::none+1; i < CameraDiagnostics::DiagnosticsStep::end; ++i )
+    for( int i = CameraDiagnostics::Step::none+1; i < CameraDiagnostics::Step::end; ++i )
     {
         if( !diagnosticsTypeStrList.isEmpty() )
             diagnosticsTypeStrList += QLatin1String(", ");
-        diagnosticsTypeStrList += CameraDiagnostics::DiagnosticsStep::toString(static_cast<CameraDiagnostics::DiagnosticsStep::Value>(i));
+        diagnosticsTypeStrList += CameraDiagnostics::Step::toString(static_cast<CameraDiagnostics::Step::Value>(i));
     }
 
     return QString::fromLatin1(
@@ -111,36 +99,29 @@ QString QnCameraDiagnosticsHandler::description() const
         arg(resIDParamName).arg(diagnosticsTypeParamName).arg(diagnosticsTypeStrList);
 }
 
-CameraDiagnostics::ErrorCode::Value QnCameraDiagnosticsHandler::checkCameraAvailability(
-    const QnSecurityCamResourcePtr& cameraRes,
-    QList<QString>* const errorParams )
+CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraAvailability( const QnSecurityCamResourcePtr& cameraRes )
 {
     if( !cameraRes->ping() )
-    {
-        errorParams->push_back( cameraRes->getHostAddress() );
-        return CameraDiagnostics::ErrorCode::cannotEstablishConnection;
-    }
+        return CameraDiagnostics::CannotEstablishConnectionResult( cameraRes->httpPort() );
 
-    return CameraDiagnostics::ErrorCode::noError;
+    return cameraRes->prevInitializationResult();
 }
 
-CameraDiagnostics::ErrorCode::Value QnCameraDiagnosticsHandler::tryAcquireCameraMediaStream(
+CameraDiagnostics::Result QnCameraDiagnosticsHandler::tryAcquireCameraMediaStream(
     const QnSecurityCamResourcePtr& cameraRes,
-    QnVideoCamera* videoCamera,
-    QList<QString>* const errorParams )
+    QnVideoCamera* videoCamera )
 {
-    QnAbstractMediaStreamDataProviderPtr liveDataProvider = videoCamera->getLiveReader( QnResource::Role_LiveVideo );
-    if( !liveDataProvider )
-        return CameraDiagnostics::ErrorCode::cannotOpenCameraMediaPort;
+    QnAbstractMediaStreamDataProviderPtr streamReader = videoCamera->getLiveReader( QnResource::Role_LiveVideo );
+    if( !streamReader )
+        return CameraDiagnostics::Result(
+            CameraDiagnostics::ErrorCode::cannotConfigureMediaStream,
+            cameraRes->getHostAddress() );
 
-    //return cameraRes->;
-    return CameraDiagnostics::ErrorCode::noError;
+    return streamReader->diagnoseMediaStreamConnection();
 }
 
-CameraDiagnostics::ErrorCode::Value QnCameraDiagnosticsHandler::checkCameraMediaStreamForErrors(
-    QnVideoCamera* videoCamera,
-    QList<QString>* const errorParams )
+CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraMediaStreamForErrors( QnVideoCamera* /*videoCamera*/ )
 {
     //TODO/IMPL
-    return CameraDiagnostics::ErrorCode::noError;
+    return CameraDiagnostics::NoErrorResult();
 }

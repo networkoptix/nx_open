@@ -120,16 +120,16 @@ QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
     return QnAbstractMediaDataPtr();
 }
 
-CameraDiagnostics::ErrorCode::Value QnDesktopStreamreader::openStream()
+CameraDiagnostics::Result QnDesktopStreamreader::openStream()
 {
     if (init())
     {
         m_initialized = true;
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
     }
     else
     {
-        return CameraDiagnostics::ErrorCode::cannotEstablishConnection;
+        return CameraDiagnostics::Result(CameraDiagnostics::ErrorCode::unknown);
     }
 }
 

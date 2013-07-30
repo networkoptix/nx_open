@@ -70,6 +70,9 @@ public:
     //gets current audio channel ( if we have the only channel - returns 0 )
     virtual unsigned int getCurrentAudioChannel() const;
 
+    //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
+    virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
+
     // sets certain track
     virtual bool setAudioChannel(unsigned int num);
     virtual bool isNegativeSpeedSupported() const = 0;
@@ -105,6 +108,7 @@ public:
 
     virtual void startPaused() = 0;
     virtual void setGroupId(const QByteArray& groupId)  = 0;
+
 signals:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);

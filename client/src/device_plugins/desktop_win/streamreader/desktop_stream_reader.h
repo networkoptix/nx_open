@@ -20,7 +20,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
-    virtual CameraDiagnostics::ErrorCode::Value openStream();
+    virtual CameraDiagnostics::Result openStream();
     virtual void closeStream();
     virtual bool isStreamOpened() const;
     

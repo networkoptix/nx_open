@@ -2089,6 +2089,7 @@ void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
 
     businessEventsLogDialog()->disableUpdateData();
     businessEventsLogDialog()->setEventType(BusinessEventType::AnyCameraIssue);
+    businessEventsLogDialog()->setActionType(BusinessActionType::NotDefined);
     QDate date = QDateTime::currentDateTime().date();
     businessEventsLogDialog()->setDateRange(date, date);
     businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());

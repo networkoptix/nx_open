@@ -119,7 +119,7 @@ void QnPlVmax480Resource::setCropingPhysical(QRect croping)
     Q_UNUSED(croping)
 }
 
-bool QnPlVmax480Resource::initInternal()
+CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
 {
 
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
@@ -137,7 +137,7 @@ bool QnPlVmax480Resource::initInternal()
             m_chunkReader->start();
     }
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 qint64 QnPlVmax480Resource::startTime() const

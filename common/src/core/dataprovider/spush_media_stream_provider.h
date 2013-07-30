@@ -1,10 +1,11 @@
 #ifndef server_push_stream_reader_h2055
 #define server_push_stream_reader_h2055
 
+#include <QWaitCondition>
+
 #include "media_streamdataprovider.h"
 #include "../datapacket/media_data_packet.h"
 #include "core/dataprovider/live_stream_provider.h"
-#include "utils/camera/camera_diagnostics.h"
 
 
 struct QnAbstractMediaData;
@@ -21,8 +22,17 @@ public:
     //!Returns last HTTP response code (even if used media protocol is not http)
     virtual int getLastResponseCode() const { return 0; };
 
+    //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
+    /*!
+        Reopens media stream, if it not opened yet.
+        Blocks for media stream open attempt
+        \return error code and filled \a errorParams with parameters
+        \note If stream is opened (\a CLServerPushStreamReader::isStreamOpened() returns true) \a CameraDiagnostics::ErrorCode::noError is returned immediately
+    */
+    virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
+
 protected:
-    virtual CameraDiagnostics::ErrorCode::Value openStream() = 0;
+    virtual CameraDiagnostics::Result openStream() = 0;
     virtual void closeStream() = 0;
 	void pleaseReOpen();
     virtual void afterUpdate() override;
@@ -35,6 +45,11 @@ private:
 private:
     bool m_needReopen;
     bool m_cameraAudioEnabled;
+    CameraDiagnostics::Result m_openStreamResult;
+    //!Incremented with every open stream attempt
+    int m_openStreamCounter;
+    QWaitCondition m_cond;
+    QMutex m_openStreamMutex;
 };
 
 #endif //server_push_stream_reader_h2055

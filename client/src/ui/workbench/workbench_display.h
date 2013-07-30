@@ -400,8 +400,8 @@ protected slots:
     void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
 
     void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
-    void at_notificationTimer_timeout(const QVariant &resource);
-    void at_notificationTimer_timeout(const QnResourcePtr &resource);
+    void at_notificationTimer_timeout(const QVariant &resource, const QVariant &type);
+    void at_notificationTimer_timeout(const QnResourcePtr &resource, int type);
 
 private:
     /* Directly visible state */

@@ -45,7 +45,7 @@ int QnAxisStreamReader::toAxisQuality(QnStreamQuality quality)
     return -1;
 }
 
-CameraDiagnostics::ErrorCode::Value QnAxisStreamReader::openStream()
+CameraDiagnostics::Result QnAxisStreamReader::openStream()
 {
     if (isStreamOpened())
         return CameraDiagnostics::ErrorCode::noError;
@@ -93,23 +93,24 @@ CameraDiagnostics::ErrorCode::Value QnAxisStreamReader::openStream()
     // -------------- check if profile already exists
     {
         CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
-        CLHttpStatus status = http.doGET(QByteArray("/axis-cgi/param.cgi?action=list&group=StreamProfile"));
+        const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=list&group=StreamProfile");
+        CLHttpStatus status = http.doGET(requestPath);
 
         if (status != CL_HTTP_SUCCESS)
         {
             if (status == CL_HTTP_AUTH_REQUIRED)
             {
                 getResource()->setStatus(QnResource::Unauthorized);
-                return CameraDiagnostics::ErrorCode::notAuthorised;
+                return CameraDiagnostics::NotAuthorisedResult();
             }
             else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
             {
                 cl_log.log("Axis camera must be have old firmware!!!!  ip = ",  res->getHostAddress() , cl_logERROR);
                 m_oldFirmwareWarned = true;
-                return CameraDiagnostics::ErrorCode::noMediaTrack;
+                return CameraDiagnostics::NoMediaTrackResult();
             }
 
-            return CameraDiagnostics::ErrorCode::responseParseError;
+            return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
         }
 
         QByteArray body;
@@ -173,10 +174,10 @@ CameraDiagnostics::ErrorCode::Value QnAxisStreamReader::openStream()
         if (status == CL_HTTP_AUTH_REQUIRED)
         {
             getResource()->setStatus(QnResource::Unauthorized);
-            return CameraDiagnostics::ErrorCode::notAuthorised;
+            return CameraDiagnostics::NotAuthorisedResult();
         }
         else if (status != CL_HTTP_SUCCESS)
-            return CameraDiagnostics::ErrorCode::responseParseError;
+            return CameraDiagnostics::RequestFailedResult(CameraDiagnostics::RequestFailedResult(streamProfile, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status))));
 
         if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
         {

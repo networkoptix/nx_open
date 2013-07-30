@@ -1,6 +1,10 @@
+
+#include "ipwebcam_droid_stream_reader.h"
+
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
-#include "ipwebcam_droid_stream_reader.h"
+#include "utils/network/http/httptypes.h"
+
 
 char jpeg_start[2] = {'\xff', '\xd8'};
 char jpeg_end[2] = {'\xff', '\xd9'};
@@ -151,22 +155,23 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
 
 }
 
-CameraDiagnostics::ErrorCode::Value QnPlDroidIpWebCamReader::openStream()
+CameraDiagnostics::Result QnPlDroidIpWebCamReader::openStream()
 {
     if (isStreamOpened())
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
 
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
     mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
     mDataRemainedBeginIndex = -1;
-    switch( mHttpClient->doGET(QLatin1String("videofeed")) )
+    const CLHttpStatus status = mHttpClient->doGET(QLatin1String("videofeed"));
+    switch( status )
     {
         case CL_HTTP_SUCCESS:
-            return CameraDiagnostics::ErrorCode::noError;
+            return CameraDiagnostics::NoErrorResult();
         case CL_HTTP_AUTH_REQUIRED:
-            return CameraDiagnostics::ErrorCode::notAuthorised;
+            return CameraDiagnostics::NotAuthorisedResult();
         default:
-            return CameraDiagnostics::ErrorCode::responseParseError;
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("videofeed"), QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
     }
 }
 

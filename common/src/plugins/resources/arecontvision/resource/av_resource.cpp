@@ -203,20 +203,20 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     return result;
 }
 
-bool QnPlAreconVisionResource::initInternal()
+CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
     QRect rect = getCroping(QnDomainMemory);
     setCropingPhysical(rect);
 
     QVariant val;
     if (!getParam(QLatin1String("Firmware version"), val, QnDomainPhysical))
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     if (!getParam(QLatin1String("Image engine"), val, QnDomainPhysical ))
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     if (!getParam(QLatin1String("Net version"), val, QnDomainPhysical))
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     //if (!getDescription())
     //    return;
@@ -225,12 +225,12 @@ bool QnPlAreconVisionResource::initInternal()
 
 
     if (!setParam(QLatin1String("Enable motion detection"), QLatin1String("on"), QnDomainPhysical)) // enables motion detection;
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     // check if we've got 1024 zones
     setParam(QLatin1String("TotalZones"), 1024, QnDomainPhysical); // try to set total zones to 64; new cams support it
     if (!getParam(QLatin1String("TotalZones"), val, QnDomainPhysical))
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     if (val.toInt() == 1024)
         m_totalMdZones = 1024;
@@ -258,7 +258,7 @@ bool QnPlAreconVisionResource::initInternal()
     setParam(QLatin1String("Zone size"), zone_size, QnDomainPhysical);
     setMotionMaskPhysical(0);
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 QString QnPlAreconVisionResource::getDriverName() const
