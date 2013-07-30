@@ -23,6 +23,9 @@ public:
     Qn::ResourceStatusOverlay statusOverlay() const;
     void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay);
 
+signals:
+    void statusOverlayChanged();
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -33,6 +36,7 @@ private:
     QSharedPointer<QnPausedPainter> m_pausedPainter;
     QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
 
+    // TODO: #Elric share these.
     QStaticText m_noDataStaticText;
     QStaticText m_offlineStaticText;
     QStaticText m_unauthorizedStaticText;

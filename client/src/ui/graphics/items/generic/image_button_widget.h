@@ -41,39 +41,33 @@ public:
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
     QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
-
     virtual ~QnImageButtonWidget();
 
     const QPixmap &pixmap(StateFlags flags) const;
-
     void setPixmap(StateFlags flags, const QPixmap &pixmap);
-
     void setIcon(const QIcon &icon);
 
-    StateFlags state() const { return m_state; }
-
     bool isCheckable() const { return m_checkable; }
+    Q_SLOT void setCheckable(bool checkable);
 
-    bool isChecked() const { return state() & CHECKED; }
-
+    StateFlags state() const { return m_state; }
     bool isHovered() const { return state() & HOVERED; }
-
-    bool isDisabled() const { return !isEnabled(); }
-
+    bool isChecked() const { return state() & CHECKED; }
     bool isPressed() const { return state() & PRESSED; }
+    bool isDisabled() const { return !isEnabled(); }
+    Q_SLOT void setChecked(bool checked = true);
+    Q_SLOT void setPressed(bool pressed = true);
+    Q_SLOT void setDisabled(bool disabled = true);
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     qreal animationSpeed() const;
-
     void setAnimationSpeed(qreal animationSpeed);
 
     void setDefaultAction(QAction *action);
-
     QAction *defaultAction() const;
 
     bool isCached() const;
-
     void setCached(bool cached);
 
     void setFixedSize(qreal size);
@@ -81,11 +75,7 @@ public:
     void setFixedSize(const QSizeF &size);
 
 public slots:
-    void setPressed(bool pressed = true);
-    void setCheckable(bool checkable);
-    void setChecked(bool checked);
-    void setDisabled(bool disabled = false);
-    inline void toggle() { setChecked(!isChecked()); }
+    void toggle() { setChecked(!isChecked()); }
     void click();
 
 signals:
@@ -126,7 +116,6 @@ protected:
 
     void clickInternal(QGraphicsSceneMouseEvent *event);
 
-    void setBaseColor(const QColor &color);
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
@@ -160,11 +149,9 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)
  */
 class QnRotatingImageButtonWidget: public QnImageButtonWidget, public AnimationTimerListener {
     Q_OBJECT
-
     typedef QnImageButtonWidget base_type;
-
 public:
-    QnRotatingImageButtonWidget(QGraphicsItem *parent = NULL);
+    QnRotatingImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     qreal rotationSpeed() const {
         return m_rotationSpeed;
@@ -183,5 +170,6 @@ private:
     qreal m_rotationSpeed;
     qreal m_rotation;
 };
+
 
 #endif // QN_IMAGE_BUTTON_WIDGET_H

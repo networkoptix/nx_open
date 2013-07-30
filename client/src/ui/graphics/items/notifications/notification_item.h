@@ -11,7 +11,7 @@
 
 class QnProxyLabel;
 class QnClickableProxyLabel;
-class QnSimpleFrameWidget;
+class QnFramedWidget;
 class QGraphicsLinearLayout;
 class HoverFocusProcessor;
 class QnImageProvider;
@@ -91,9 +91,9 @@ private:
 
 
 //TODO: #GDM rename to QnNotificationWidget
-class QnNotificationItem: public Clickable<QnSimpleFrameWidget> {
+class QnNotificationItem: public Clickable<QnFramedWidget> {
     Q_OBJECT
-    typedef Clickable<QnSimpleFrameWidget> base_type;
+    typedef Clickable<QnFramedWidget> base_type;
 
 public:
     explicit QnNotificationItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0);
@@ -166,7 +166,7 @@ private:
     Qn::NotificationLevel m_notificationLevel;
     QnImageProvider* m_imageProvider;
 
-    QnSimpleFrameWidget *m_overlayWidget;
+    QnFramedWidget *m_overlayWidget;
 
     QnNotificationToolTipWidget *m_tooltipWidget;
     HoverFocusProcessor *m_toolTipHoverProcessor;

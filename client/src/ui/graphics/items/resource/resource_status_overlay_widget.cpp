@@ -71,7 +71,12 @@ Qn::ResourceStatusOverlay QnStatusOverlayWidget::statusOverlay() const {
 }
 
 void QnStatusOverlayWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay) {
+    if(m_statusOverlay == statusOverlay)
+        return;
+
     m_statusOverlay = statusOverlay;
+
+    emit statusOverlayChanged();
 }
 
 void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {

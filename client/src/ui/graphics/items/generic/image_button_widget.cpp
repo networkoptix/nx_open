@@ -266,27 +266,39 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+    bool isZero = qFuzzyIsNull(progress);
+    bool isOne = qFuzzyCompare(progress, 1.0);
+
+    const QPixmap &startPixmap = pixmap(startState);
+    const QPixmap &endPixmap = pixmap(endState);
+
+    if(isZero && startPixmap.isNull()) {
+        return;
+    } else if(isOne && endPixmap.isNull()) {
+        return;
+    } else if(startPixmap.isNull() && endPixmap.isNull()) {
+        return;
+    }
+
     painter->beginNativePainting();
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glColor(1.0, 1.0, 1.0, painter->opacity());
 
-    bool isZero = qFuzzyIsNull(progress);
-    bool isOne = qFuzzyCompare(progress, 1.0);
     if (isOne || isZero) {
         if (isZero) {
-            checkedBindTexture(widget, pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+            checkedBindTexture(widget, startPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         } else {
-            checkedBindTexture(widget, pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+            checkedBindTexture(widget, endPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         }
 
         glDrawTexturedRect(rect);
     } else {
         m_gl->glActiveTexture(GL_TEXTURE1);
-        checkedBindTexture(widget, pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+        checkedBindTexture(widget, endPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_gl->glActiveTexture(GL_TEXTURE0);
-        checkedBindTexture(widget, pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+        checkedBindTexture(widget, startPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_shader->bind();
         m_shader->setProgress(progress);
         m_shader->setTexture0(0);
@@ -661,8 +673,8 @@ void QnImageButtonWidget::invalidatePixmapCache() {
 // -------------------------------------------------------------------------- //
 // QnRotatingImageButtonWidget
 // -------------------------------------------------------------------------- //
-QnRotatingImageButtonWidget::QnRotatingImageButtonWidget(QGraphicsItem *parent):
-    base_type(parent),
+QnRotatingImageButtonWidget::QnRotatingImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags),
     m_rotationSpeed(360.0),
     m_rotation(0.0)
 {
@@ -682,3 +694,6 @@ void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
     if(state() & CHECKED)
         m_rotation += m_rotationSpeed * deltaMSecs / 1000.0;
 }
+
+
+
