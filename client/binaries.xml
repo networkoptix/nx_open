@@ -16,5 +16,15 @@
 				<exclude>**/.hidden</exclude>
 			</excludes>			
 		</fileSet>			
-	</fileSets>
+		<fileSet>
+			<directory>${libdir}/build/bin/${build.configuration}</directory>
+			<outputDirectory>../${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/lib</outputDirectory>
+			<includes>
+				<include>libcommon.${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</include>
+			</includes>
+			<excludes>
+				<exclude>**/.hidden</exclude>
+			</excludes>			
+		</fileSet>			
+	</fileSets>	
 </assembly>
