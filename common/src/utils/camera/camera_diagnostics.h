@@ -59,6 +59,7 @@ namespace CameraDiagnostics
             notImplemented,
             //!params: OS error message
             ioError,
+            serverTerminated,
             unknown
         };
 
@@ -155,6 +156,12 @@ namespace CameraDiagnostics
     {
     public:
         UnknownErrorResult() : Result( ErrorCode::unknown ) {}
+    };
+
+    class ServerTerminatedResult : public Result
+    {
+    public:
+        ServerTerminatedResult() : Result( ErrorCode::serverTerminated ) {}
     };
 }
 
