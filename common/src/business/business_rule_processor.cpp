@@ -427,14 +427,15 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     QString messageBody = renderTemplateFromFile(lit(":/email_templates"), lit("container.mustache"), contextMap);
 
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
-    appServerConnection->sendEmailAsync(
+    if (appServerConnection->sendEmailAsync(
                 recipients,
                 QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
                 messageBody,
                 attachments,
                 EMAIL_SEND_TIMEOUT,
                 this,
-                SLOT(at_sendEmailFinished(int,bool,int)));
+                SLOT(at_sendEmailFinished(int,bool,int))) == -1)
+        return false;
 
     /*
      * This action instance is not used anymore but storing into the Events Log db.
