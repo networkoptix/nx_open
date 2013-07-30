@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QThread>
 #include <QMultiMap>
+#include <QImage>
 
 #include <core/resource/resource_fwd.h>
 
@@ -134,6 +135,8 @@ private slots:
 
 
 protected:
+    virtual QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const;
+    
     bool containResource(QnResourceList resList, const QnId& resId) const;
     QnAbstractBusinessActionList matchActions(QnAbstractBusinessEventPtr bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }

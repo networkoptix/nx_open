@@ -975,7 +975,7 @@ void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRulePtr &busi
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data)
+void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, const QnEmailAttachmentList& attachments, int timeout, QByteArray& data)
 {
     pb::Emails pb_emails;
     pb_emails.set_timeout(timeout);
@@ -987,6 +987,13 @@ void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& sub
 
     email.set_subject(subject.toUtf8().constData());
     email.set_body(message.toUtf8().constData());
+
+    foreach (QnEmailAttachmentPtr attachment, attachments) {
+        pb::Attachment& pb_attachment = *email.add_attachment();
+        pb_attachment.set_filename(attachment->filename.toUtf8().constData());
+        pb_attachment.set_content(attachment->content.data(), attachment->content.length());
+        pb_attachment.set_mimetype(attachment->mimetype.toUtf8().constData());
+    }
 
     std::string str;
     pb_emails.SerializeToString(&str);

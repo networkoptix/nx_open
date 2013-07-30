@@ -470,7 +470,7 @@ QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& ac
 
     if (action.getRuntimeParams().getEventType() != BusinessEventType::Camera_Motion)
         return QString();
-    return QnBusinessStringsHelper::motionUrl(action.getRuntimeParams());
+    return QnBusinessStringsHelper::motionUrl(action.getRuntimeParams(), true);
 }
 
 bool QnEventLogModel::hasMotionUrl(const QModelIndex & index) const
