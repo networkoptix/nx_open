@@ -9,7 +9,7 @@
 
 struct QnCameraDiagnosticsReply
 {
-    //!Constant from \a CameraDiagnostics::DiagnosticsStep::Value enumeration
+    //!Constant from \a CameraDiagnostics::Step::Value enumeration
     int performedStep;
     //!Constant from CameraDiagnostics::ErrorCode namespace
     int errorCode;
@@ -18,7 +18,7 @@ struct QnCameraDiagnosticsReply
 
     QnCameraDiagnosticsReply()
     :
-        performedStep( CameraDiagnostics::DiagnosticsStep::none ),
+        performedStep( CameraDiagnostics::Step::none ),
         errorCode( CameraDiagnostics::ErrorCode::noError )
     {
     }

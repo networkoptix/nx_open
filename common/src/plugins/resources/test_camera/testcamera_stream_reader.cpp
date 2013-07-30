@@ -100,10 +100,10 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     return rez;
 }
 
-CameraDiagnostics::ErrorCode::Value QnTestCameraStreamReader::openStream()
+CameraDiagnostics::Result QnTestCameraStreamReader::openStream()
 {
     if (isStreamOpened())
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
     
     QString urlStr = m_resource->getUrl();
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
@@ -121,12 +121,12 @@ CameraDiagnostics::ErrorCode::Value QnTestCameraStreamReader::openStream()
     if (!m_tcpSock.connect(url.host(), url.port()))
     {
         closeStream();
-        return CameraDiagnostics::ErrorCode::cannotOpenCameraMediaPort;
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.port());
     }
     QByteArray path = urlStr.mid(urlStr.lastIndexOf(QLatin1String("/"))).toUtf8();
     m_tcpSock.send(path.data(), path.size());
 
-    return CameraDiagnostics::ErrorCode::noError;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 void QnTestCameraStreamReader::closeStream()

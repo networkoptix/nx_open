@@ -259,7 +259,7 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
     return !(square1 < square2);
 }
 
-bool QnPlAxisResource::initInternal()
+CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
 
     //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
@@ -283,7 +283,7 @@ bool QnPlAxisResource::initInternal()
         if (status != CL_HTTP_SUCCESS) {
             if (status == CL_HTTP_AUTH_REQUIRED)
                 setStatus(QnResource::Unauthorized);
-            return false;
+            return CameraDiagnostics::UnknownErrorResult();
         }
     }
 
@@ -295,7 +295,7 @@ bool QnPlAxisResource::initInternal()
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
             setStatus(QnResource::Unauthorized);
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
     
@@ -312,7 +312,7 @@ bool QnPlAxisResource::initInternal()
         if (paramValuePos == -1)
         {
             qWarning() << Q_FUNC_INFO << "Unexpected server answer. Can't read resolution list";
-            return false;
+            return CameraDiagnostics::UnknownErrorResult();
         }
 
         QList<QByteArray> rawResolutionList = body.mid(paramValuePos+1).split(',');
@@ -375,7 +375,7 @@ bool QnPlAxisResource::initInternal()
             qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
     }
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 QnPlAxisResource::AxisResolution QnPlAxisResource::getMaxResolution() const

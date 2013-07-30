@@ -405,54 +405,57 @@ void QnPlOnvifResource::setCropingPhysical(QRect /*croping*/)
 
 }
 
-bool QnPlOnvifResource::initInternal()
+CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 {
     setCodec(H264, true);
     setCodec(H264, false);
 
     if (getDeviceOnvifUrl().isEmpty()) {
         qCritical() << "QnPlOnvifResource::initInternal: Can't do anything: ONVIF device url is absent. Id: " << getPhysicalId();
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getDeviceOnvifUrl"), QString());
     }
 
     calcTimeDrift();
 
     if (m_appStopping)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isNull() || m_needUpdateOnvifUrl)
     {
-        if (!fetchAndSetDeviceInformation(false) && getMediaUrl().isEmpty())
+        const CameraDiagnostics::Result result = fetchAndSetDeviceInformationPriv(false);
+        if( !result && getMediaUrl().isEmpty() )
         {
             qCritical() << "QnPlOnvifResource::initInternal: ONVIF media url is absent. Id: " << getPhysicalId();
-            return false;
+            return result;
         }
         else
             m_needUpdateOnvifUrl = false;
     }
 
     if (m_appStopping)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
-    if (!fetchAndSetVideoSource())
-        return false;
+    CameraDiagnostics::Result result = fetchAndSetVideoSource();
+    if (!result)
+        return result;
 
     if (m_appStopping)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     fetchAndSetAudioSource();
 
     if (m_appStopping)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
-    if (!fetchAndSetResourceOptions()) 
+    result = fetchAndSetResourceOptions();
+    if (!result) 
     {
         m_needUpdateOnvifUrl = true;
-        return false;
+        return result;
     }
 
     if (m_appStopping)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     //if (getStatus() == QnResource::Offline || getStatus() == QnResource::Unauthorized)
     //    setStatus(QnResource::Online, true); // to avoid infinit status loop in this version
@@ -461,7 +464,7 @@ bool QnPlOnvifResource::initInternal()
     fetchAndSetCameraSettings();
 
     if (m_appStopping)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     Qn::CameraCapabilities addFlags = Qn::NoCapabilities;
     Qn::PtzCapabilities ptzCaps = Qn::NoPtzCapabilities;
@@ -497,19 +500,19 @@ bool QnPlOnvifResource::initInternal()
     }
 
     if (m_appStopping)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     fetchRelayInputInfo();
 
     if (m_appStopping)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     //if( !m_relayInputs.empty() )
     //    setCameraCapability( Qn::relayInput, true );
 
     save();
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 QSize QnPlOnvifResource::getMaxResolution() const
@@ -703,122 +706,7 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, b
 
 bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
 {
-    QAuthenticator auth(getAuth());
-    //TODO: #vasilenko UTF unuse StdString
-    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
-
-    QString user = auth.user();
-    QString password = auth.password();
-    QString hardwareId;
-    
-    //Trying to get name
-    //if (getName().isEmpty() || getModel().isEmpty() || getFirmware().isEmpty())
-    if (1)
-    {
-        DeviceInfoReq request;
-        DeviceInfoResp response;
-
-        int soapRes = soapWrapper.getDeviceInformation(request, response);
-        if (soapRes != SOAP_OK) 
-        {
-            qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: GetDeviceInformation SOAP to endpoint "
-                << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
-                << ". " << soapWrapper.getLastError();
-
-            if (soapWrapper.isNotAuthenticated())
-                setStatus(QnResource::Unauthorized);
-
-
-            return false;
-        } 
-        else
-        {
-            if (getName().isEmpty())
-                setName(QString::fromStdString(response.Manufacturer) + QLatin1String(" - ") + QString::fromStdString(response.Model));
-            if (getModel().isEmpty())
-                setModel(QLatin1String(response.Model.c_str()));
-            setFirmware(QLatin1String(response.FirmwareVersion.c_str()));
-            hardwareId = QString::fromStdString(response.HardwareId);
-
-            if (performSimpleCheck)
-                return true;
-        }
-    }
-
-    if (m_appStopping)
-        return false;
-
-    //Trying to get onvif URLs
-    {
-        CapabilitiesReq request;
-        CapabilitiesResp response;
-
-        int soapRes = soapWrapper.getCapabilities(request, response);
-        if (soapRes != SOAP_OK) 
-        {
-            qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch media and device URLs. Reason: SOAP to endpoint "
-                << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-            if (soapWrapper.isNotAuthenticated())
-                setStatus(QnResource::Unauthorized);
-            return false;
-        }
-
-        if (response.Capabilities) 
-        {
-            //TODO: #vasilenko UTF unuse std::string
-            if (response.Capabilities->Events)
-                m_eventCapabilities.reset( new onvifXsd__EventCapabilities( *response.Capabilities->Events ) );
-
-            if (response.Capabilities->Media) 
-            {
-                setMediaUrl(fromOnvifDiscoveredUrl(response.Capabilities->Media->XAddr));
-            }
-            if (response.Capabilities->Imaging)
-            {
-                setImagingUrl(fromOnvifDiscoveredUrl(response.Capabilities->Imaging->XAddr));
-            }
-            if (response.Capabilities->Device) 
-            {
-                setDeviceOnvifUrl(fromOnvifDiscoveredUrl(response.Capabilities->Device->XAddr));
-            }
-            if (response.Capabilities->PTZ) 
-            {
-                setPtzfUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
-            }
-            m_deviceIOUrl = response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO
-                ? response.Capabilities->Extension->DeviceIO->XAddr
-                : getDeviceOnvifUrl().toStdString();
-        }
-    }
-
-    if (m_appStopping)
-        return false;
-
-    //Trying to get MAC
-    {
-        NetIfacesReq request;
-        NetIfacesResp response;
-
-        int soapRes = soapWrapper.getNetworkInterfaces(request, response);
-        if( soapRes != SOAP_OK )
-        {
-            qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
-                << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-            return false;
-        }
-
-        const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
-
-        if (!mac.isEmpty()) 
-            setMAC(mac);
-
-        if (getPhysicalId().isEmpty())
-        {
-            setPhysicalId(hardwareId);
-        }
-    }
-
-    return true;
+    return fetchAndSetDeviceInformationPriv( performSimpleCheck ).errorCode == CameraDiagnostics::ErrorCode::noError;
 }
 
 /*
@@ -971,18 +859,18 @@ void QnPlOnvifResource::onTimer( const quint64& timerID )
     //setRelayOutputState( QString::fromStdString(m_relayOutputInfo.front().token), true, 5 );
 }
 
-bool QnPlOnvifResource::fetchAndSetResourceOptions()
+CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
 {
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
 
-    if (!fetchAndSetVideoEncoderOptions(soapWrapper)) {
-        return false;
-    }
+    CameraDiagnostics::Result result = fetchAndSetVideoEncoderOptions(soapWrapper);
+    if (!result)
+        return result;
 
-    if (!updateResourceCapabilities()) {
-        return false;
-    }
+    result = updateResourceCapabilities();
+    if (!result)
+        return result;
 
     //All VideoEncoder options are set, so we can calculate resolutions for the streams
     fetchAndSetPrimarySecondaryResolution();
@@ -995,7 +883,7 @@ bool QnPlOnvifResource::fetchAndSetResourceOptions()
     else
         setParam(AUDIO_SUPPORTED_PARAM_NAME, 0, QnDomainDatabase);
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 void QnPlOnvifResource::updateSecondaryResolutionList(const VideoOptionsLocal& opts)
@@ -1401,7 +1289,7 @@ int QnPlOnvifResource::getSecondaryIndex(const QList<VideoOptionsLocal>& optList
     return bestResIndex;
 }
 
-bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
+CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
     VideoConfigsReq confRequest;
     VideoConfigsResp confResponse;
@@ -1411,7 +1299,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't get list of video encoders from camera (URL: "
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() << "). GSoap error code: "
             << soapRes << ". " << soapWrapper.getLastError();
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
     }
 
     std::string login = soapWrapper.getLogin();
@@ -1464,7 +1352,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
                     << "' contains no data for H264/JPEG (URL: "  << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() << ")." << "Ignoring and use default codec list";
         }
         if (soapRes != SOAP_OK)
-            return false;
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurationOptions"), soapWrapper.getLastError());
     }
 
     qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
@@ -1473,8 +1361,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     {
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: all video options are empty. (URL: "
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() << ").";
-
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("fetchAndSetVideoEncoderOptions"), QLatin1String("no video options"));
     }
 
     /*
@@ -1523,7 +1410,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         updateSecondaryResolutionList(optionsList[secondaryIndex]);
     }
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper*/)
@@ -1691,12 +1578,12 @@ int QnPlOnvifResource::findClosestRateFloor(const std::vector<int>& values, int 
     return 0;
 }
 
-bool QnPlOnvifResource::updateResourceCapabilities()
+CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
 {
     QMutexLocker lock(&m_mutex);
 
     if (!m_videoSourceSize.isValid()) {
-        return true;
+        return CameraDiagnostics::NoErrorResult();
     }
 
     QList<QSize>::iterator it = m_resolutionList.begin();
@@ -1705,10 +1592,10 @@ bool QnPlOnvifResource::updateResourceCapabilities()
         if (it->width() > m_videoSourceSize.width() || it->height() > m_videoSourceSize.height())
             it = m_resolutionList.erase(it);
         else
-            return true;
+            return CameraDiagnostics::NoErrorResult();
         }
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 int QnPlOnvifResource::getGovLength() const
@@ -1778,7 +1665,7 @@ void QnPlOnvifResource::updateVideoSource(VideoSource* source, const QRect& maxR
     source->Bounds->height = maxRect.height();
 }
 
-bool QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source) const
+CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source) const
 {
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), getTimeDrift());
@@ -1793,10 +1680,10 @@ bool QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source) const
         qWarning() << "QnOnvifStreamReader::setVideoSourceConfiguration: can't set required values into ONVIF physical device (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() 
             << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("setVideoSourceConfiguration"), soapWrapper.getLastError());
     }
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool QnPlOnvifResource::detectVideoSourceCount()
@@ -1820,7 +1707,7 @@ bool QnPlOnvifResource::detectVideoSourceCount()
     return true;
 }
 
-bool QnPlOnvifResource::fetchVideoSourceToken()
+CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
 {
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
@@ -1836,8 +1723,11 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
             << ". " << soapWrapper.getLastError();
         if (soapWrapper.isNotAuthenticated())
+        {
+            return CameraDiagnostics::NotAuthorisedResult();
             setStatus(QnResource::Unauthorized);
-        return false;
+        }
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), soapWrapper.getLastError());
 
     }
 
@@ -1848,7 +1738,7 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
             << ". " << soapWrapper.getLastError();
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), QLatin1String("missing video source configuration (1)"));
     } 
 
     onvifXsd__VideoSource* conf = response.VideoSources.at(getChannel());
@@ -1857,9 +1747,9 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
             QMutexLocker lock(&m_mutex);
         m_videoSourceToken = QString::fromStdString(conf->token);
         //m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
-        return true;
+        return CameraDiagnostics::NoErrorResult();
     }
-    return false;
+    return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), QLatin1String("missing video source configuration (2)"));
 }
 
 QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
@@ -1887,13 +1777,14 @@ QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
     return QRect(qMax(0, br->XRange->Min), qMax(0, br->YRange->Min), br->WidthRange->Max, br->HeightRange->Max);
 }
 
-bool QnPlOnvifResource::fetchAndSetVideoSource()
+CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
 {
-    if (!fetchVideoSourceToken())
-        return false;
+    CameraDiagnostics::Result result = fetchVideoSourceToken();
+    if (!result)
+        return result;
 
     if (m_appStopping)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
@@ -1908,12 +1799,12 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
             << ". " << soapWrapper.getLastError();
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSourceConfigurations"), soapWrapper.getLastError());
 
     }
 
     if (m_appStopping)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     std::string srcToken = m_videoSourceToken.toStdString();
     for (uint i = 0; i < response.Configurations.size(); ++i)
@@ -1936,17 +1827,17 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
             return sendVideoSourceToCamera(conf);
         }
         else {
-            return true;
+            return CameraDiagnostics::NoErrorResult();
         }
 
         if (m_appStopping)
-            return false;
+            return CameraDiagnostics::UnknownErrorResult();
     }
 
-    return false;
+    return CameraDiagnostics::UnknownErrorResult();
 }
 
-bool QnPlOnvifResource::fetchAndSetAudioSource()
+CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
 {
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
@@ -1961,7 +1852,7 @@ bool QnPlOnvifResource::fetchAndSetAudioSource()
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
             << ". " << soapWrapper.getLastError();
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getAudioSourceConfigurations"), soapWrapper.getLastError());
 
     }
 
@@ -1970,18 +1861,18 @@ bool QnPlOnvifResource::fetchAndSetAudioSource()
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
             << ". " << soapWrapper.getLastError();
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getAudioSourceConfigurations"), QLatin1String("missing channel configuration (1)"));
     } else {
         onvifXsd__AudioSourceConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QMutexLocker lock(&m_mutex);
             //TODO: #vasilenko UTF unuse std::string
             m_audioSourceId = QString::fromStdString(conf->token);
-            return true;
+            return CameraDiagnostics::NoErrorResult();
         }
     }
 
-    return false;
+    return CameraDiagnostics::RequestFailedResult(QLatin1String("getAudioSourceConfigurations"), QLatin1String("missing channel configuration (2)"));
 }
 
 const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
@@ -2869,4 +2760,129 @@ void QnPlOnvifResource::afterConfigureStream()
         m_streamConfCond.wait(&m_streamConfMutex);
 
     qWarning() << "after configure stream finished";
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( bool performSimpleCheck )
+{
+    QAuthenticator auth(getAuth());
+    //TODO: #vasilenko UTF unuse StdString
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
+
+    QString user = auth.user();
+    QString password = auth.password();
+    QString hardwareId;
+    
+    //Trying to get name
+    //if (getName().isEmpty() || getModel().isEmpty() || getFirmware().isEmpty())
+    if (1)
+    {
+        DeviceInfoReq request;
+        DeviceInfoResp response;
+
+        int soapRes = soapWrapper.getDeviceInformation(request, response);
+        if (soapRes != SOAP_OK) 
+        {
+            qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: GetDeviceInformation SOAP to endpoint "
+                << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
+                << ". " << soapWrapper.getLastError();
+
+            if (soapWrapper.isNotAuthenticated())
+            {
+                setStatus(QnResource::Unauthorized);
+                return CameraDiagnostics::NotAuthorisedResult();
+            }
+
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("getDeviceInformation"), soapWrapper.getLastError());
+        } 
+        else
+        {
+            if (getName().isEmpty())
+                setName(QString::fromStdString(response.Manufacturer) + QLatin1String(" - ") + QString::fromStdString(response.Model));
+            if (getModel().isEmpty())
+                setModel(QLatin1String(response.Model.c_str()));
+            setFirmware(QLatin1String(response.FirmwareVersion.c_str()));
+            hardwareId = QString::fromStdString(response.HardwareId);
+
+            if (performSimpleCheck)
+                return CameraDiagnostics::NoErrorResult();
+        }
+    }
+
+    if (m_appStopping)
+        return CameraDiagnostics::UnknownErrorResult();
+
+    //Trying to get onvif URLs
+    {
+        CapabilitiesReq request;
+        CapabilitiesResp response;
+
+        int soapRes = soapWrapper.getCapabilities(request, response);
+        if (soapRes != SOAP_OK) 
+        {
+            qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch media and device URLs. Reason: SOAP to endpoint "
+                << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+            if (soapWrapper.isNotAuthenticated())
+            {
+                setStatus(QnResource::Unauthorized);
+                return CameraDiagnostics::NotAuthorisedResult();
+            }
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("getCapabilities"), soapWrapper.getLastError());
+        }
+
+        if (response.Capabilities) 
+        {
+            //TODO: #vasilenko UTF unuse std::string
+            if (response.Capabilities->Events)
+                m_eventCapabilities.reset( new onvifXsd__EventCapabilities( *response.Capabilities->Events ) );
+
+            if (response.Capabilities->Media) 
+            {
+                setMediaUrl(fromOnvifDiscoveredUrl(response.Capabilities->Media->XAddr));
+            }
+            if (response.Capabilities->Imaging)
+            {
+                setImagingUrl(fromOnvifDiscoveredUrl(response.Capabilities->Imaging->XAddr));
+            }
+            if (response.Capabilities->Device) 
+            {
+                setDeviceOnvifUrl(fromOnvifDiscoveredUrl(response.Capabilities->Device->XAddr));
+            }
+            if (response.Capabilities->PTZ) 
+            {
+                setPtzfUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
+            }
+            m_deviceIOUrl = response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO
+                ? response.Capabilities->Extension->DeviceIO->XAddr
+                : getDeviceOnvifUrl().toStdString();
+        }
+    }
+
+    if (m_appStopping)
+        return CameraDiagnostics::UnknownErrorResult();
+
+    //Trying to get MAC
+    {
+        NetIfacesReq request;
+        NetIfacesResp response;
+
+        int soapRes = soapWrapper.getNetworkInterfaces(request, response);
+        if( soapRes != SOAP_OK )
+        {
+            qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
+                << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("getNetworkInterfaces"), soapWrapper.getLastError());
+        }
+
+        const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
+
+        if (!mac.isEmpty()) 
+            setMAC(mac);
+
+        if (getPhysicalId().isEmpty())
+        {
+            setPhysicalId(hardwareId);
+        }
+    }
+
+    return CameraDiagnostics::NoErrorResult();
 }

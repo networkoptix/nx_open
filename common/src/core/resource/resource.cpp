@@ -835,7 +835,12 @@ void QnResource::init()
 
     if (!m_initialized) 
     {
-        m_initialized = initInternal();
+        CameraDiagnostics::Result initResult = initInternal();
+        m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+        {
+            QMutexLocker lk( &m_mutex );
+            m_prevInitializationResult = initResult;
+        }
         if( m_initialized )
             initializationDone();
         if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
@@ -861,6 +866,7 @@ public:
 private:
     QnResourcePtr m_resource;
 };
+
 
 void QnResource::stopAsyncTasks()
 {
@@ -890,6 +896,12 @@ void QnResource::initAsync(bool optional)
         lock.unlock();
         m_initAsyncPool.start(task);
     }
+}
+
+CameraDiagnostics::Result QnResource::prevInitializationResult() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_prevInitializationResult;
 }
 
 bool QnResource::isInitialized() const

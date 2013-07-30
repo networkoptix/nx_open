@@ -59,9 +59,12 @@ void QnCameraDiagnosticsDialog::restart() {
     stop();
 
     m_tool = new CameraDiagnostics::DiagnoseTool(m_resource->getId(), this);
-    connect(m_tool, SIGNAL(diagnosticsStepStarted(int)),                this, SLOT(at_tool_diagnosticsStepStarted(int)));
-    connect(m_tool, SIGNAL(diagnosticsStepResult(int, bool, QString)),  this, SLOT(at_tool_diagnosticsStepResult(int, bool, QString)));
-    connect(m_tool, SIGNAL(diagnosticsDone(int, bool, QString)),        this, SLOT(at_tool_diagnosticsDone(int, bool, QString)));
+    connect(m_tool, SIGNAL(diagnosticsStepStarted(CameraDiagnostics::Step::Value)),
+            this, SLOT(at_tool_diagnosticsStepStarted(CameraDiagnostics::Step::Value)));
+    connect(m_tool, SIGNAL(diagnosticsStepResult(CameraDiagnostics::Step::Value, bool, QString)),
+            this, SLOT(at_tool_diagnosticsStepResult(CameraDiagnostics::Step::Value, bool, QString)));
+    connect(m_tool, SIGNAL(diagnosticsDone(CameraDiagnostics::Step::Value, bool, QString)),
+            this, SLOT(at_tool_diagnosticsDone(CameraDiagnostics::Step::Value, bool, QString)));
     m_tool->start();
     
     m_started = true;
@@ -102,26 +105,26 @@ void QnCameraDiagnosticsDialog::clearLog() {
 
 QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     switch(stepType) {
-    case CameraDiagnostics::DiagnosticsStep::mediaServerAvailability:
+    case CameraDiagnostics::Step::mediaServerAvailability:
         return tr("Checking media server availability");
-    case CameraDiagnostics::DiagnosticsStep::cameraAvailability:
+    case CameraDiagnostics::Step::cameraAvailability:
         return tr("Checking that camera responses on base API requests");
-    case CameraDiagnostics::DiagnosticsStep::mediaStreamAvailability:
+    case CameraDiagnostics::Step::mediaStreamAvailability:
         return tr("Checking that camera provides media stream");
-    case CameraDiagnostics::DiagnosticsStep::mediaStreamIntegrity: 
+    case CameraDiagnostics::Step::mediaStreamIntegrity: 
         return tr("Checking media stream provided by camera for errors");
     default:
         return QString();
     }
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepStarted(int stepType) {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepStarted(CameraDiagnostics::Step::Value stepType) {
     m_lastLine = diagnosticsStepText(stepType);
 
     ui->textEdit->append(m_lastLine);
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(int stepType, bool result, const QString &errorMessage) {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(CameraDiagnostics::Step::Value stepType, bool result, const QString &errorMessage) {
     QString message;
     QColor color;
     if(result) {
@@ -137,7 +140,7 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(int stepType, bool
     ui->textEdit->append(lit("<br/>"));
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone(int finalStep, bool result, const QString &errorMessage) {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone(CameraDiagnostics::Step::Value finalStep, bool result, const QString &errorMessage) {
     ui->textEdit->append(tr("Diagnostics finished"));
 
     m_finished = true;

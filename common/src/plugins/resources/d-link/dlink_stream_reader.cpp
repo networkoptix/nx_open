@@ -3,6 +3,7 @@
 #include "dlink_resource.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
+#include "utils/network/http/httptypes.h"
 
 
 
@@ -44,7 +45,7 @@ PlDlinkStreamReader::~PlDlinkStreamReader()
 }
 
 
-CameraDiagnostics::ErrorCode::Value PlDlinkStreamReader::openStream()
+CameraDiagnostics::Result PlDlinkStreamReader::openStream()
 {
     if (isStreamOpened())
         return CameraDiagnostics::ErrorCode::noError;
@@ -63,7 +64,7 @@ CameraDiagnostics::ErrorCode::Value PlDlinkStreamReader::openStream()
     QString prifileStr = composeVideoProfile();
 
     if (prifileStr.length()==0)
-        return CameraDiagnostics::ErrorCode::noMediaTrack;
+        return CameraDiagnostics::NoMediaTrackResult();
 
     CLHttpStatus status;
     QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth()); // setup video profile
@@ -71,11 +72,11 @@ CameraDiagnostics::ErrorCode::Value PlDlinkStreamReader::openStream()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         getResource()->setStatus(QnResource::Unauthorized);
-        return CameraDiagnostics::ErrorCode::notAuthorised;
+        return CameraDiagnostics::NotAuthorisedResult();
     }
 
     if (cam_info_file.length()==0)
-        return CameraDiagnostics::ErrorCode::noMediaTrack;
+        return CameraDiagnostics::NoMediaTrackResult();
 
     if (!res->isCameraControlDisabled()) {
         if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
@@ -100,7 +101,7 @@ CameraDiagnostics::ErrorCode::Value PlDlinkStreamReader::openStream()
         if (url.isEmpty())
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting non empty rtsl url.";
-            return CameraDiagnostics::ErrorCode::responseParseError;
+            return CameraDiagnostics::CameraResponseParseErrorResult();
         }
 
         m_rtpReader.setRequest(url);
@@ -117,7 +118,7 @@ CameraDiagnostics::ErrorCode::Value PlDlinkStreamReader::openStream()
         if (info.videoProfileUrls.size() < 2)
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting video profile URL.";
-            return CameraDiagnostics::ErrorCode::responseParseError;
+            return CameraDiagnostics::CameraResponseParseErrorResult();
         }
 
 
@@ -127,10 +128,11 @@ CameraDiagnostics::ErrorCode::Value PlDlinkStreamReader::openStream()
             url = url.mid(1);
 
         mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
-        if( mHttpClient->doGET(url) == CL_HTTP_SUCCESS )
+        const CLHttpStatus status = mHttpClient->doGET(url);
+        if( status == CL_HTTP_SUCCESS )
             return CameraDiagnostics::ErrorCode::noError;
         else
-            return CameraDiagnostics::ErrorCode::responseParseError;
+            return CameraDiagnostics::RequestFailedResult(url, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
     }
 }
 

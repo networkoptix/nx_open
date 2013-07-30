@@ -152,7 +152,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
             if (server && server->getStatus() != QnResource::Offline)
             {
                 otherRtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
-                if (otherRtspSession.open(getUrl(otherCamera)) == CameraDiagnostics::ErrorCode::noError) {
+                if (otherRtspSession.open(getUrl(otherCamera)).errorCode == CameraDiagnostics::ErrorCode::noError) {
                     if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
                     {
                         minTime = qMin(minTime, otherRtspSession.startTime());
@@ -234,7 +234,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
         globalTimeBlocked = true;
     }
     
-    const bool isOpened = m_rtspSession.open(getUrl(resource), m_lastSeekTime) == CameraDiagnostics::ErrorCode::noError;
+    const bool isOpened = m_rtspSession.open(getUrl(resource), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
         qint64 endTime = m_position;
