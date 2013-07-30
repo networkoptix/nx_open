@@ -241,6 +241,9 @@ void QnFisheyePtzController::setDewarpingParams(const DewarpingParams params)
 {
     if (!(m_dewarpingParams == params)) {
         setAnimationEnabled(false);
+
+        if (params.horizontalView != m_dewarpingParams.horizontalView)
+            updateSpaceMapper(params.horizontalView, params.panoFactor);
         m_dewarpingParams = params;
         emit dewarpingParamsChanged(m_dewarpingParams);
     }
