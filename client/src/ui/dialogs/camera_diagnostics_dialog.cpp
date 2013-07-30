@@ -4,9 +4,13 @@
 #include <utils/common/delete_later.h>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_name.h>
 
 #include <camera/camera_diagnose_tool.h>
+
+#include <ui/common/ui_resource_name.h>
 #include <ui/style/globals.h>
+
 
 QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -77,7 +81,7 @@ void QnCameraDiagnosticsDialog::updateTitleText() {
     if(!m_resource) {
         ui->titleLabel->clear();
     } else {
-        ui->titleLabel->setText(tr("Diagnostics for camera %1.").arg(m_resource->getName()));
+        ui->titleLabel->setText(tr("Diagnostics for camera %1.").arg(getResourceName(m_resource)));
     }
 }
 
