@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Alarm/Event Rules</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
@@ -73,6 +73,31 @@
         <iconset>
          <normalon>:/skin/titlebar/dropdown_hovered.png</normalon>
         </iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLineEdit" name="filterLineEdit">
+       <property name="placeholderText">
+        <string>Filter by cameras...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="clearFilterButton">
+       <property name="text">
+        <string>X</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="systemRulesCheckBox">
+       <property name="text">
+        <string>Show system rules</string>
        </property>
       </widget>
      </item>

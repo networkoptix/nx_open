@@ -98,6 +98,9 @@ namespace CameraDiagnostics
                     requiredParamCount = 1;
                     errorMessage = QObject::tr("I/O error. OS message: %1");
                     break;
+                case serverTerminated:
+                    errorMessage = QObject::tr("Server has been stopped");
+                    break;
                 default:
                     errorMessage = QObject::tr("Unknown error");
                     if( !errorParams.isEmpty() )

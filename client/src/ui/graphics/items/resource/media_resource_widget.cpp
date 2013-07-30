@@ -191,10 +191,10 @@ void QnMediaResourceWidget::updateFisheyeController() {
     } else {
         delete m_fisheyePtz;
         m_fisheyePtz = 0;
-        updateAspectRatio();
         if(buttonBar()->button(FishEyeButton))
             buttonBar()->button(FishEyeButton)->setChecked(false);
     }
+    updateAspectRatio();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
