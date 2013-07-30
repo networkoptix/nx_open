@@ -229,7 +229,15 @@ public:
         base_type(parent, windowFlags)
     {
         setFrameShape(Qn::EllipticalFrame);
-        setAutomaticTextHeight(0.5);
+        setRelativeFontSize(0.5);
+        setRelativeFrameWidth(1.0 / 16.0);
+        
+        setStateOpacity(0, 0.4);
+        setStateOpacity(HOVERED, 0.7);
+        setStateOpacity(PRESSED, 1.0);
+
+        setFrameColor(ptzItemBorderColor);
+        setWindowColor(ptzItemBaseColor);
     }
 
     QnMediaResourceWidget *target() const {
@@ -238,28 +246,6 @@ public:
 
     void setTarget(QnMediaResourceWidget *target) {
         m_target = target;
-    }
-
-    virtual void setGeometry(const QRectF &rect) override {
-        QSizeF oldSize = size();
-
-        base_type::setGeometry(rect);
-
-        if(!qFuzzyCompare(oldSize, size()))
-            setFrameWidth(qMax(size().height(), size().width()) / 16.0);
-    }
-
-protected:
-    virtual qreal stateOpacity(StateFlags state) override {
-        return (state & HOVERED) ? 1.0 : 0.5;
-    }
-
-    virtual QColor stateFrameColor(StateFlags state) override {
-        return (state & PRESSED) ? ptzArrowBorderColor : ptzItemBorderColor;
-    }
-
-    virtual QColor stateWindowColor(StateFlags state) override {
-        return (state & PRESSED) ? ptzArrowBaseColor : ptzItemBaseColor;
     }
 
 private:

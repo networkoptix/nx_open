@@ -41,7 +41,7 @@ public:
     void setWindowColor(const QColor &windowColor);
 
 protected:
-    void paintFrame(QPainter *painter, const QBrush &frameBrush, const QBrush &windowBrush, const QRectF &rect);
+    void paintFrame(QPainter *painter, const QRectF &rect);
 
     void initSelf(QGraphicsWidget *self);
 
@@ -60,7 +60,7 @@ public:
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override {
-        FramedBase::paintFrame(painter, frameBrush(), windowBrush(), rect());
+        FramedBase::paintFrame(painter, rect());
         Base::paint(painter, option, widget);
     }
 };

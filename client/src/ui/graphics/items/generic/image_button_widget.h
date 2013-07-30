@@ -1,8 +1,9 @@
 #ifndef QN_IMAGE_BUTTON_WIDGET_H
 #define QN_IMAGE_BUTTON_WIDGET_H
 
+#include <boost/array.hpp>
+
 #include <QtGui/QPixmap>
-#include <QGLWidget>
 
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>
@@ -12,6 +13,7 @@
 class QAction;
 class QMenu;
 class QIcon;
+class QGLWidget;
 
 class VariantAnimator;
 class QnTextureTransitionShaderProgram;
@@ -110,7 +112,7 @@ protected:
 
     void ensurePixmapCache() const;
     void invalidatePixmapCache();
-    StateFlags displayState(StateFlags flags) const;
+    StateFlags validPixmapState(StateFlags flags) const;
 
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
     bool skipMenuEvent(QGraphicsSceneMouseEvent *event);
@@ -120,8 +122,8 @@ protected:
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
-    QPixmap m_pixmaps[FLAGS_MAX + 1];
-    mutable QPixmap m_pixmapCache[FLAGS_MAX + 1];
+    boost::array<QPixmap, FLAGS_MAX + 1> m_pixmaps;
+    mutable boost::array<QPixmap, FLAGS_MAX + 1> m_pixmapCache;
     mutable bool m_pixmapCacheValid;
 
     StateFlags m_state;
@@ -186,20 +188,29 @@ public:
     const QString &text() const;
     void setText(const QString &text);
 
-    qreal automaticTextHeight() const;
-    void setAutomaticTextHeight(qreal automaticTextHeight);
+    qreal relativeFontSize() const;
+    void setRelativeFontSize(qreal relativeFontSize);
+
+    qreal relativeFrameWidth() const;
+    void setRelativeFrameWidth(qreal relativeFrameWidth);
+
+    qreal stateOpacity(StateFlags stateFlags) const;
+    void setStateOpacity(StateFlags stateFlags, qreal opacity);
+
+    virtual void setGeometry(const QRectF &geometry) override;
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
 
-    virtual qreal stateOpacity(StateFlags state);
-    virtual QColor stateFrameColor(StateFlags state);
-    virtual QColor stateWindowColor(StateFlags state);
+protected:
+    StateFlags validOpacityState(StateFlags flags) const;
 
 private:
     QString m_text;
-    qreal m_automaticTextHeight;
+    qreal m_relativeFontSize;
+    qreal m_relativeFrameWidth;
+    boost::array<qreal, FLAGS_MAX + 1> m_opacities;
 };
 
 #endif // QN_IMAGE_BUTTON_WIDGET_H

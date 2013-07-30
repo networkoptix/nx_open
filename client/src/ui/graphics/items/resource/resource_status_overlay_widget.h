@@ -25,6 +25,7 @@ public:
 
 signals:
     void statusOverlayChanged();
+    void diagnosticsRequested();
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

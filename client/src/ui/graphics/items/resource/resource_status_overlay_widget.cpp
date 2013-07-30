@@ -60,6 +60,11 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_analogLicenseStaticText.setText(tr("Activate analog license to remove this message"));
     m_analogLicenseStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+
+    /* Init buttons. */
+    /*m_diagnosticsButton = new QnTextButtonWidget(this);
+    m_diagnosticsButton->setText(tr("Diagnose..."));
+    m_diagnosticsButton->set*/
 }
 
 QnStatusOverlayWidget::~QnStatusOverlayWidget() {

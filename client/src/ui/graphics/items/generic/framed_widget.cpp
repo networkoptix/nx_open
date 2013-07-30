@@ -94,12 +94,12 @@ void FramedBase::setWindowColor(const QColor &windowColor) {
     setWindowBrush(windowColor);
 }
 
-void FramedBase::paintFrame(QPainter *painter, const QBrush &frameBrush, const QBrush &windowBrush, const QRectF &rect) {
+void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
     if(m_frameShape == Qn::NoFrame)
         return;
 
-    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush, m_frameWidth, m_frameStyle));
-    QnScopedPainterBrushRollback brushRollback(painter, windowBrush);
+    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), m_frameWidth, m_frameStyle));
+    QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
 
     qreal d = m_frameWidth / 2.0;
     QRectF frameRect = rect.adjusted(d, d, -d, -d);
