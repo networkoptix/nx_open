@@ -1,6 +1,9 @@
 #include "ui_camera_diagnostics_dialog.h"
 #include "camera_diagnostics_dialog.h"
 
+#include <QApplication>
+#include <QClipboard>
+
 #include <utils/common/delete_later.h>
 
 #include <core/resource/camera_resource.h>
@@ -20,6 +23,10 @@ QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::Window
     m_finished(false)
 {
     ui->setupUi(this);
+    
+    QPushButton *copyButton = new QPushButton(tr("Copy to Clipboard"), this);
+    ui->buttonBox->addButton(copyButton, QDialogButtonBox::HelpRole);
+    connect(copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
 }
 
 QnCameraDiagnosticsDialog::~QnCameraDiagnosticsDialog() {
@@ -121,7 +128,7 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(int stepType, bool
         message = tr("OK");
         color = QColor(128, 255, 128);
     } else {
-        message = tr("FAILED");
+        message = tr("FAILED: %1").arg(errorMessage);
         color = qnGlobals->errorTextColor();
     }
     
@@ -138,3 +145,8 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone(int finalStep, bool resu
     updateOkButtonEnabled();
 }
 
+void QnCameraDiagnosticsDialog::at_copyButton_clicked() {
+    QClipboard *clipboard = QApplication::clipboard();
+
+    clipboard->setText(ui->textEdit->toPlainText());
+}
