@@ -78,7 +78,7 @@ public:
     void cameraMessageReceived( const QString& path, const QnRequestParamList& message );
 
 protected:
-    bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping) override;

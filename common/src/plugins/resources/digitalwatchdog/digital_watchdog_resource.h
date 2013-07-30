@@ -26,7 +26,7 @@ public:
     virtual QnAbstractPtzController *getPtzController() override;
 
 protected:
-    bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
     virtual void fetchAndSetCameraSettings() override;
     virtual bool getParamPhysical(const QnParam &param, QVariant &val) override;
     virtual bool setParamPhysical(const QnParam &param, const QVariant& val) override;

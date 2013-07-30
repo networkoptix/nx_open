@@ -127,16 +127,17 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString& name, const QVar
     return false;
 }
 
-bool QnArecontPanoramicResource::initInternal()
+CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 {
-    if (!QnPlAreconVisionResource::initInternal())
-        return false;
+    const CameraDiagnostics::Result result = QnPlAreconVisionResource::initInternal();
+    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+        return result;
 
     setRegister(3, 100, 10); // sets I frame frequency to 10
 
     setParam(QLatin1String("CnannelEnable"), 15, QnDomainPhysical); // to enable all channels
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 //=======================================================================

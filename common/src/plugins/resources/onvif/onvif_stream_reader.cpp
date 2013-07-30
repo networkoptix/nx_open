@@ -40,10 +40,10 @@ QnOnvifStreamReader::~QnOnvifStreamReader()
     delete m_tmpH264Conf;
 }
 
-CameraDiagnostics::ErrorCode::Value QnOnvifStreamReader::openStream()
+CameraDiagnostics::Result QnOnvifStreamReader::openStream()
 {
     if (isStreamOpened())
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
 
     NETOPTIX_PRIMARY_NAME = "Netoptix Primary";
     NETOPTIX_SECONDARY_NAME = "Netoptix Secondary";
@@ -85,12 +85,12 @@ CameraDiagnostics::ErrorCode::Value QnOnvifStreamReader::openStream()
 
     if (streamUrl.isEmpty()) {
         qCritical() << "QnOnvifStreamReader::openStream: can't fetch stream URL for resource with UniqueId: " << m_onvifRes->getUniqueId();
-        return CameraDiagnostics::ErrorCode::noMediaTrack;
+        return CameraDiagnostics::NoMediaTrackResult();
     }
 
 
     m_multiCodec.setRequest(streamUrl);
-    const CameraDiagnostics::ErrorCode::Value result = m_multiCodec.openStream();
+    const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())
         m_resource->setStatus(QnResource::Unauthorized);
     return result;

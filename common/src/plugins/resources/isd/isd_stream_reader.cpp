@@ -21,10 +21,10 @@ QnISDStreamReader::~QnISDStreamReader()
 }
 
 
-CameraDiagnostics::ErrorCode::Value QnISDStreamReader::openStream()
+CameraDiagnostics::Result QnISDStreamReader::openStream()
 {
     if (isStreamOpened())
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
 
     QnResource::ConnectionRole role = getRole();
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
@@ -66,20 +66,20 @@ CameraDiagnostics::ErrorCode::Value QnISDStreamReader::openStream()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         res->setStatus(QnResource::Unauthorized);
-        return CameraDiagnostics::ErrorCode::notAuthorised;
+        return CameraDiagnostics::NotAuthorisedResult();
     }
 
     QString url = getValueFromString(QLatin1String(reslst));
 
     QStringList urlLst = url.split(QLatin1Char('\r'), QString::SkipEmptyParts);
     if(urlLst.size() < 1)
-        return CameraDiagnostics::ErrorCode::noMediaTrack;
+        return CameraDiagnostics::NoMediaTrackResult();
 
     url = urlLst.at(0);
     
 
     if (url.isEmpty())
-        return CameraDiagnostics::ErrorCode::noMediaTrack;
+        return CameraDiagnostics::NoMediaTrackResult();
 
 
     m_rtpStreamParser.setRequest(url);

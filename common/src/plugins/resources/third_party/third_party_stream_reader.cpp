@@ -33,10 +33,10 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
 
 static const nxcip::Resolution DEFAULT_SECOND_STREAM_RESOLUTION = nxcip::Resolution(480, 316);
 
-CameraDiagnostics::ErrorCode::Value ThirdPartyStreamReader::openStream()
+CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
 {
     if( isStreamOpened() )
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
 
     QnResource::ConnectionRole role = getRole();
     const int encoderNumber = role == QnResource::Role_LiveVideo ? 0 : 1;
@@ -44,25 +44,25 @@ CameraDiagnostics::ErrorCode::Value ThirdPartyStreamReader::openStream()
     nxcip::CameraMediaEncoder* intf = NULL;
     int result = m_camManager.getEncoder( encoderNumber, &intf );
     if( result != nxcip::NX_NO_ERROR )
-        return CameraDiagnostics::ErrorCode::noMediaTrack;
+        return CameraDiagnostics::NoMediaTrackResult();
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
     if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
-        return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
+        return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
 
     const nxcip::Resolution& resolution = (role == QnResource::Role_LiveVideo) 
         ? getMaxResolution(encoderNumber) 
         : getNearestResolution(encoderNumber, DEFAULT_SECOND_STREAM_RESOLUTION);
     if( resolution.width*resolution.height > 0 )
         if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
-            return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
     float selectedFps = 0;
     if( cameraEncoder.setFps( getFps(), &selectedFps ) != nxcip::NX_NO_ERROR )
-        return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
+        return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
 
     QString mediaUrlStr;
     if( cameraEncoder.getMediaUrl( &mediaUrlStr ) != nxcip::NX_NO_ERROR )
-        return CameraDiagnostics::ErrorCode::noMediaTrack;
+        return CameraDiagnostics::NoMediaTrackResult();
 
     m_rtpStreamParser.setRequest( mediaUrlStr );
     return m_rtpStreamParser.openStream();

@@ -176,7 +176,7 @@ public:
         \returns Request handle
     */
     int doCameraDiagnosticsStepAsync(
-        const QnId& cameraID, CameraDiagnostics::DiagnosticsStep::Value previousStep,
+        const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
         QObject* target, const char* slot );
 
 protected:

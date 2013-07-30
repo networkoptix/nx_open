@@ -23,7 +23,7 @@ QnAbstractMediaDataPtr QnRtpStreamReader::getNextData()
     return m_rtpReader.getNextData();
 }
 
-CameraDiagnostics::ErrorCode::Value QnRtpStreamReader::openStream() 
+CameraDiagnostics::Result QnRtpStreamReader::openStream() 
 {
     //m_rtpReader.setRequest("liveVideoTest");
     //m_rtpReader.setRequest("stream1");

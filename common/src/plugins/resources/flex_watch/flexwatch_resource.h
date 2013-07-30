@@ -16,9 +16,9 @@ public:
     virtual ~QnFlexWatchResource();
 
 protected:
-    bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
 private:
-    bool fetchUpdateVideoEncoder();
+    CameraDiagnostics::Result fetchUpdateVideoEncoder();
     bool rebootDevice();
 private:
     onvifXsd__H264Configuration* m_tmpH264Conf;

@@ -173,7 +173,7 @@ public:
     ~RTPSession();
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
-    CameraDiagnostics::ErrorCode::Value open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
+    CameraDiagnostics::Result open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
 
     /*
     * Start playing RTSP sessopn.

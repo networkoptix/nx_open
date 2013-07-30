@@ -60,7 +60,7 @@ namespace CameraDiagnostics
         //!Returns object's current state
         State state() const;
         //!Valid only after \a DiagnoseTool::start call. After diagnostics is finished returns final step
-        DiagnosticsStep::Value currentStep() const;
+        Step::Value currentStep() const;
         //!Valid only after diagnostics finished
         bool result() const;
         //!Valid only after diagnostics finished
@@ -69,24 +69,32 @@ namespace CameraDiagnostics
     public slots:
         //!Receives response from media server
         /*!
-            \param performedStep Constant from \a DiagnosticsStep::Value enumeration
+            \param performedStep Constant from \a Step::Value enumeration
         */
         void onCameraDiagnosticsStepResponse( int status, QnCameraDiagnosticsReply, int handle );
 
     signals:
-        void diagnosticsStepStarted( int stepType );
-        void diagnosticsStepResult( int stepType, bool result, const QString &errorMessage );
+        /*!
+            \param stepType Value from CameraDiagnostics::Step::Value enumeration
+        */
+        void diagnosticsStepStarted( CameraDiagnostics::Step::Value stepType );
+        /*!
+            \param stepType Value from CameraDiagnostics::Step::Value enumeration
+        */
+        void diagnosticsStepResult( CameraDiagnostics::Step::Value stepType, bool result, const QString &errorMessage );
         //!Emmitted on diagnostics done (with any result)
         /*!
+            \param finalStep Value from CameraDiagnostics::Step::Value enumeration
             \param result \a true, if diagnostics found no errors
             \param finalStep Step, diagnostics has been stopped on
         */
-        void diagnosticsDone( int finalStep, bool result, const QString &errorMessage );
+        void diagnosticsDone( CameraDiagnostics::Step::Value finalStep, bool result, const QString &errorMessage );
 
     private:
         const QnId m_cameraID;
         State m_state;
-        DiagnosticsStep::Value m_step;
+        Step::Value m_step;
+        QString m_serverHostAddress;
         QnMediaServerConnectionPtr m_serverConnection;
         bool m_result;
         QString m_errorMessage;

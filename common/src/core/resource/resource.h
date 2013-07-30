@@ -9,6 +9,7 @@
 #include <QStringList>
 #include <QReadWriteLock>
 #include <QThreadPool>
+#include "utils/camera/camera_diagnostics.h"
 #include "utils/common/from_this_to_shared.h"
 #include "utils/common/id.h"
 #include "core/datapacket/abstract_data_packet.h"
@@ -150,6 +151,7 @@ public:
     // this function is called if resourse changes state from offline to online or so 
     void init();
     void initAsync(bool optional);
+    CameraDiagnostics::Result prevInitializationResult() const;
     
     // flags like network media and so on
     Flags flags() const;
@@ -297,7 +299,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
-    virtual bool initInternal() {return true;};
+    virtual CameraDiagnostics::Result initInternal() {return CameraDiagnostics::NoErrorResult();};
     //!Called just after successful \a initInternal()
     /*!
         Inherited class implementation MUST call base class method first
@@ -373,6 +375,7 @@ private:
 
     static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
+    CameraDiagnostics::Result m_prevInitializationResult;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);

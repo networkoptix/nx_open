@@ -45,7 +45,7 @@ public:
     __m128i* getMotionMaskBinData() const;
 
 protected:
-    bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping) override;
     virtual bool isResourceAccessible() override;
