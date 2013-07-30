@@ -7,10 +7,11 @@
 #include <QtCore/QUuid>
 #include <QtCore/QVariant>
 
+#include <core/resource/dewarping_params.h>
+
 #include <utils/math/fuzzy.h>
 #include <utils/common/id.h>
-#include "utils/color_space/image_correction.h"
-#include "fisheye/fisheye_common.h"
+#include <utils/color_space/image_correction.h>
 
 class QnLayoutItemData {
 public:

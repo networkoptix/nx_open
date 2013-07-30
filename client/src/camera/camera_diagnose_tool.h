@@ -52,7 +52,7 @@ namespace CameraDiagnostics
             sDone
         };
 
-        DiagnoseTool( const QnId& cameraID );
+        DiagnoseTool( const QnId& cameraID, QObject *parent = NULL );
         virtual ~DiagnoseTool();
 
         //!Starts diagnostics and returns immediately
@@ -74,14 +74,14 @@ namespace CameraDiagnostics
         void onCameraDiagnosticsStepResponse( int status, QnCameraDiagnosticsReply, int handle );
 
     signals:
-        void diagnosticsStepStarted( DiagnosticsStep::Value stepType );
-        void diagnosticsStepResult( DiagnosticsStep::Value stepType, bool result, QString errorMessage );
+        void diagnosticsStepStarted( int stepType );
+        void diagnosticsStepResult( int stepType, bool result, const QString &errorMessage );
         //!Emmitted on diagnostics done (with any result)
         /*!
             \param result \a true, if diagnostics found no errors
             \param finalStep Step, diagnostics has been stopped on
         */
-        void diagnosticsDone( bool result, DiagnosticsStep::Value finalStep, QString errorMessage );
+        void diagnosticsDone( int finalStep, bool result, const QString &errorMessage );
 
     private:
         const QnId m_cameraID;

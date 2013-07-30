@@ -9,8 +9,8 @@
 #include <QtCore/QVariant>
 
 #include <client/client_globals.h>
-#include "utils/color_space/image_correction.h"
-#include "fisheye/fisheye_common.h"
+#include <utils/color_space/image_correction.h>
+#include <core/resource/dewarping_params.h>
 
 class QnWorkbenchLayout;
 class QnLayoutItemData;

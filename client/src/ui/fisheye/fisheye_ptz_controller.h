@@ -2,9 +2,9 @@
 #define __FISHEYE_PTZ_CONTROLLER_H__
 
 #include <QVector3D>
-#include <math.h>
-#include "core/resource/interface/abstract_ptz_controller.h"
-#include "fisheye/fisheye_common.h"
+
+#include <core/resource/interface/abstract_ptz_controller.h>
+#include <core/resource/dewarping_params.h>
 
 class QnResourceWidgetRenderer;
 

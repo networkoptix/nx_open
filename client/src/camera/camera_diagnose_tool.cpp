@@ -13,8 +13,9 @@
 
 namespace CameraDiagnostics
 {
-    DiagnoseTool::DiagnoseTool( const QnId& cameraID )
+    DiagnoseTool::DiagnoseTool( const QnId& cameraID, QObject *parent )
     :
+        QObject(parent),
         m_cameraID( cameraID ),
         m_state( sInit ),
         m_step( DiagnosticsStep::mediaServerAvailability ),
@@ -124,7 +125,7 @@ namespace CameraDiagnostics
             m_result = false;
             emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
             m_state = sDone;
-            emit diagnosticsDone( m_result, m_step, m_errorMessage );
+            emit diagnosticsDone( m_step, m_result, m_errorMessage );
             return;
         }
 

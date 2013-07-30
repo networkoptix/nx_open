@@ -6,7 +6,7 @@
 #include "resource.h"
 #include "resource_media_layout.h"
 #include "utils/common/from_this_to_shared.h"
-#include "fisheye/fisheye_common.h"
+#include "dewarping_params.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
