@@ -26,6 +26,9 @@ public:
 
     virtual void setGeometry(const QRectF &geometry) override;
 
+    bool isDiagnosticsVisible() const;
+    void setDiagnosticsVisible(bool diagnosticsVisible);
+
 signals:
     void statusOverlayChanged();
     void diagnosticsRequested();
@@ -51,6 +54,7 @@ private:
     QStaticText m_loadingStaticText;
     QStaticText m_analogLicenseStaticText;
 
+    bool m_diagnosticsVisible;
     QnTextButtonWidget *m_diagnosticsButton;
 
     Qn::ResourceStatusOverlay m_statusOverlay;

@@ -147,6 +147,7 @@ private slots:
     void at_zoomWindowButton_toggled(bool checked);
     void at_histogramButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
+    void at_statusOverlayWidget_diagnosticsRequested();
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
     void at_dewarpingParamsChanged(DewarpingParams params);
     void updateFisheyeController();

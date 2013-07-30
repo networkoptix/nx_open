@@ -48,7 +48,8 @@ namespace {
 
 QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
-    m_statusOverlay(Qn::EmptyOverlay)
+    m_statusOverlay(Qn::EmptyOverlay),
+    m_diagnosticsVisible(false)
 {
     setAcceptedMouseButtons(0);
 
@@ -104,6 +105,19 @@ void QnStatusOverlayWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOve
     emit statusOverlayChanged();
 }
 
+bool QnStatusOverlayWidget::isDiagnosticsVisible() const {
+    return m_diagnosticsVisible;
+}
+
+void QnStatusOverlayWidget::setDiagnosticsVisible(bool diagnosticsVisible) {
+    if(m_diagnosticsVisible == diagnosticsVisible)
+        return;
+
+    m_diagnosticsVisible = diagnosticsVisible;
+
+    updateDiagnosticsButtonOpacity(false);
+}
+
 void QnStatusOverlayWidget::updateLayout() {
     QRectF rect = this->rect();
 
@@ -114,7 +128,7 @@ void QnStatusOverlayWidget::updateLayout() {
 }
 
 void QnStatusOverlayWidget::updateDiagnosticsButtonOpacity(bool animate) {
-    qreal opacity = m_statusOverlay == Qn::OfflineOverlay ? 1.0 : 0.0;
+    qreal opacity = (m_diagnosticsVisible && m_statusOverlay == Qn::OfflineOverlay) ? 1.0 : 0.0;
 
     if(animate) {
         opacityAnimator(m_diagnosticsButton)->animateTo(opacity);
