@@ -64,6 +64,16 @@ QnResourceCriterion::QnResourceCriterion(Qn::CameraCapabilities cameraCapabiliti
     m_customCriterion(NULL)
 {}
 
+QnResourceCriterion::QnResourceCriterion(Qn::PtzCapabilities ptzCapabilities, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
+    m_matchOperation(matchOperation),
+    m_mismatchOperation(mismatchOperation),
+    m_nextOperation(Next),
+    m_type(Containment),
+    m_propertyName(propertyName),
+    m_targetValue(ptzCapabilities),
+    m_customCriterion(NULL)
+{}
+
 QnResourceCriterion::QnResourceCriterion(const CriterionFunction &function, const QVariant &targetValue, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),

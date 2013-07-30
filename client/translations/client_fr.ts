@@ -42,7 +42,7 @@
 <context>
     <name>AdjustVideoDialog</name>
     <message>
-        <source>Adjust video</source>
+        <source>Image Enhancement...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -58,11 +58,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Black levels</source>
+        <source>Black level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>White levels</source>
+        <source>White level</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -254,9 +254,20 @@
     </message>
 </context>
 <context>
+    <name>CameraDiagnostics::DiagnoseTool</name>
+    <message>
+        <source>Bad reply from server %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No connection to media server %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CameraListDialog</name>
     <message>
-        <source>Camera list</source>
+        <source>Camera List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -381,7 +392,7 @@
 <context>
     <name>DatabaseManagementWidget</name>
     <message>
-        <source>You can create a system configuration backup and restore it later if something goes wrong. </source>
+        <source>You can create a backup for system configurations that can be restored in case of failure.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -417,6 +428,29 @@
     </message>
     <message>
         <source>Alarm/Event Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FisheyeSettingsWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal mount (camera on the wall)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical mount (camera on the ceiling)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera view angle correction:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.0</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -524,7 +558,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Activate Free License</source>
+        <source>Activate Trial License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -666,28 +700,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>OpenGlDriversErrorMessageDisplay</name>
-    <message>
-        <source>Important Performance Tip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>OpenGlHardwareErrorMessageDisplay</name>
-    <message>
-        <source>Critical Performance Tip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -908,6 +920,10 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Continuous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export selected cameras to file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1778,11 +1794,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Web Client</source>
+        <source>Open Web Client...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1794,7 +1806,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cameras List...</source>
+        <source>Camera List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1806,7 +1818,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Adjust video</source>
+        <source>Image Enhancement...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1838,10 +1850,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server Logs...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1869,6 +1877,22 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Open in New Window</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Showcase...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Logs...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Version Mismatch Message</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1877,7 +1901,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Adjust video - %1</source>
+        <source>Image Enhancement - %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1995,7 +2019,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         </translation>
     </message>
     <message>
-        <source>User %1 has empty email</source>
+        <source>User '%1' has empty E-Mail</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2055,7 +2079,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>do instantly</source>
+        <source>Instant</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -2345,7 +2369,7 @@ Make sure the server is available and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2974,7 +2998,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export Selection to File</source>
+        <source>Export Selection to File...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2998,7 +3022,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You have not configured business rules to match current filter condition.</source>
+        <source>You have not configured any Alarm/Event Rules to match the current filter condition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3084,6 +3108,25 @@ You will be asked to restart the client in compatibility mode.</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnGlHardwareChecker</name>
+    <message>
+        <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Critical Performance Tip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Important Performance Tip</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3251,7 +3294,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You do not have a valid License installed. Please activate your commercial or free license.</source>
+        <source>You do not have a valid License installed. Please activate your commercial or trial license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3346,7 +3389,7 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Activate Free License</source>
+        <source>Activate Trial License</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3374,12 +3417,6 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot restart the client in compatibility mode.
-Please close the application and start it again
-using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3452,6 +3489,18 @@ Would you like to restart client in compatibility mode?</source>
 %1?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cannot restart the client in compatibility mode.
+Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to connect to Enterprise Controller which has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
@@ -3505,6 +3554,10 @@ Would you like to restart client in compatibility mode?</source>
     </message>
     <message>
         <source>Zoom window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3579,10 +3632,6 @@ Would you like to restart client in compatibility mode?</source>
 </context>
 <context>
     <name>QnNotificationListWidget</name>
-    <message>
-        <source>Some notifications have not place to be displayed.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>%1 items more</source>
         <translation type="unfinished"></translation>
@@ -3676,6 +3725,13 @@ Would you like to restart client in compatibility mode?</source>
     </message>
 </context>
 <context>
+    <name>QnNotificationToolTipWidget</name>
+    <message>
+        <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnNotificationsCollectionWidget</name>
     <message>
         <source>Settings...</source>
@@ -3715,18 +3771,6 @@ Would you like to restart client in compatibility mode?</source>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is another mediaserver in your network that watches your cameras.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4010,6 +4054,10 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>Select users...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select resources...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4943,14 +4991,6 @@ and you do not have the rights to overwrite it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Include Timestamps (Requires Transcoding)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Video adjustment (Requires Transcoding)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists.Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4964,6 +5004,50 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Image cannot be uploaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client v%1&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enterprise Controller v%1&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media Server v%1 at %2&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media Server v%1&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version Mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include timestamps (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply dewarping and image correction (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply image correction (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply dewarping (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5143,7 +5227,7 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Quater Native</source>
+        <source>Quarter Native</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5195,7 +5279,7 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio Grabbing</source>
+        <source>Audio Grabber</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5450,6 +5534,14 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Expert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the fish-eye lens camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

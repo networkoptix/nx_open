@@ -279,7 +279,7 @@ int QnActiPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
     return 0;
 }
 
-Qn::CameraCapabilities QnActiPtzController::getCapabilities() {
+Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
     return m_capabilities;
 }
 

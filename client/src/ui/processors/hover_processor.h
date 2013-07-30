@@ -127,7 +127,7 @@ private:
     int m_hoverLeaveDelay;
     int m_focusEnterDelay;
     int m_focusLeaveDelay;
-    int m_hoverEnterTimerId;
+    int m_hoverEnterTimerId; // TODO: #Elric use QBasicTimer
     int m_hoverLeaveTimerId;
     int m_focusEnterTimerId;
     int m_focusLeaveTimerId;

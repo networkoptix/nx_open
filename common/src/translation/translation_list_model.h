@@ -21,8 +21,12 @@ public:
     virtual QVariant data(const QModelIndex &index, int role) const override;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-protected:
+private:
+    static bool isInternal(const QnTranslation &translation);
+
+private:
     QList<QnTranslation> m_translations;
+    bool m_hasExternal;
 };
 
 #endif // QN_TRANSLATION_LIST_MODEL_H

@@ -54,7 +54,7 @@ public:
     int totalMdZones() const;
 
 protected:
-    virtual bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 

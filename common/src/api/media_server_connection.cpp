@@ -22,6 +22,7 @@
 #include "serializer/pb_serializer.h"
 #include "event_log/events_serializer.h"
 
+
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
         ((StorageStatusObject,      "storageStatus"))
@@ -40,6 +41,7 @@ namespace {
         ((CameraAddObject,          "manualCamera/add"))
         ((EventLogObject,           "events"))
         ((ImageObject,              "image"))
+        ((CameraDiagnosticsObject,  "doCameraDiagnosticsStep"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -360,13 +362,15 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     }
     case ImageObject: {
-        QnApiPbSerializer serializer;
         QImage image;
         if (response.status == 0)
             image.loadFromData(response.data);
         emitFinished(this, response.status, image, handle);
         break;
     }
+    case CameraDiagnosticsObject:
+        processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
+        break;
     default:
         assert(false); /* We should never get here. */
         break;
@@ -546,6 +550,16 @@ int QnMediaServerConnection::ptzGetPosAsync(const QnNetworkResourcePtr &camera, 
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_REPLY_TYPE(QnTimeReply), target, slot);
+}
+
+int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
+    const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+    QObject* target, const char* slot )
+{
+    QnRequestParamList params;
+    params << QnRequestParam("res_id",  cameraID);
+    params << QnRequestParam("type", CameraDiagnostics::Step::toString(previousStep));
+    return sendAsyncGetRequest(CameraDiagnosticsObject, params, QN_REPLY_TYPE(QnCameraDiagnosticsReply), target, slot);
 }
 
 int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {

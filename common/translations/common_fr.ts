@@ -30,10 +30,12 @@
 <context>
     <name>Language</name>
     <message>
+        <location filename="../src/translation/translation_manager.cpp" line="137"/>
         <source>Language Name</source>
         <translation>Français</translation>
     </message>
     <message>
+        <location filename="../src/translation/translation_manager.cpp" line="138"/>
         <source>Locale Code</source>
         <translation>fr</translation>
     </message>
@@ -83,7 +85,7 @@
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="118"/>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -98,12 +100,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="95"/>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
         <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="165"/>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
         <source>Can&apos;t initialize video encoder</source>
         <translation type="unfinished"></translation>
     </message>
@@ -224,72 +226,72 @@
 <context>
     <name>QnApiPbSerializer</name>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="656"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="662"/>
         <source>Cannot parse serialized cameras.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="665"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="671"/>
         <source>Cannot parse serialized servers.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="674"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="680"/>
         <source>Cannot parse serialized layouts.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="694"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="700"/>
         <source>Cannot parse serialized users.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="703"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="709"/>
         <source>Cannot parse serialized resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="712"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="718"/>
         <source>Cannot parse serialized resource types.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="721"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="727"/>
         <source>Cannot parse serialized licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="734"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="737"/>
         <source>Cannot parse serialized camera history.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="744"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="747"/>
         <source>Cannot parse serialized key-value pairs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="754"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="757"/>
         <source>Cannot parse serialized settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="764"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="767"/>
         <source>Cannot parse serialized connection information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="785"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="788"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="794"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="797"/>
         <source>Cannot parse serialized action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="806"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="809"/>
         <source>Cannot parse serialized actions.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -581,22 +583,22 @@
 <context>
     <name>QnLicense</name>
     <message>
-        <location filename="../src/licensing/license.cpp" line="229"/>
+        <location filename="../src/licensing/license.cpp" line="233"/>
         <source>Free</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="230"/>
+        <location filename="../src/licensing/license.cpp" line="234"/>
         <source>Trial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="231"/>
+        <location filename="../src/licensing/license.cpp" line="235"/>
         <source>Analog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="232"/>
+        <location filename="../src/licensing/license.cpp" line="236"/>
         <source>Professional</source>
         <translation type="unfinished"></translation>
     </message>
@@ -650,42 +652,42 @@
 <context>
     <name>QnStreamRecorder</name>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="428"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="429"/>
         <source>No %1 container in FFMPEG library.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="447"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="448"/>
         <source>Can&apos;t create output file &apos;%1&apos; for video recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="492"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="499"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="574"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="582"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="599"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="611"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="628"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="623"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="640"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="734"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="751"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -827,6 +829,19 @@ You cannot record video from cameras.</source>
         <location filename="../src/transcoding/transcoder.cpp" line="300"/>
         <location filename="../src/transcoding/transcoder.cpp" line="334"/>
         <source>Unknown Transcode Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnTranslationListModel</name>
+    <message>
+        <location filename="../src/translation/translation_list_model.cpp" line="63"/>
+        <source>%1 (built-in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/translation/translation_list_model.cpp" line="65"/>
+        <source>%1 (external)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

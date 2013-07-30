@@ -1,6 +1,7 @@
 #include "onvif_mjpeg.h"
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
+#include "utils/network/http/httptypes.h"
 
 /*
 inline static int findJPegStartCode(const char *data, int datalen)
@@ -59,7 +60,7 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 */
 
 MJPEGtreamreader::MJPEGtreamreader(QnResourcePtr res, const QString& requst)
-:CLServerPushStreamreader(res),
+:CLServerPushStreamReader(res),
 mHttpClient(0),
 m_request(requst)
 {
@@ -137,16 +138,25 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     return videoData;
 }
 
-void MJPEGtreamreader::openStream()
+CameraDiagnostics::Result MJPEGtreamreader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::ErrorCode::noError;
 
     //QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
 
     mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
-    mHttpClient->doGET(m_request);
+    CLHttpStatus httpStatus = mHttpClient->doGET(m_request);
+    switch( httpStatus )
+    {
+        case CL_HTTP_SUCCESS:
+            return CameraDiagnostics::ErrorCode::noError;
+        case CL_HTTP_AUTH_REQUIRED:
+            return CameraDiagnostics::NotAuthorisedResult();
+        default:
+            return CameraDiagnostics::RequestFailedResult(m_request, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatus)));
+    }
 }
 
 void MJPEGtreamreader::closeStream()

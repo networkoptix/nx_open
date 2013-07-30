@@ -35,6 +35,8 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(TCPSocket* socket, QnTc
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
+
+    setObjectName( QLatin1String("QnUniversalRequestProcessor") );
 }
 
 void QnUniversalRequestProcessor::run()

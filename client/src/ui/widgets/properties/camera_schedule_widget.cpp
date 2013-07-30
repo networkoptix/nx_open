@@ -315,10 +315,12 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
         {
             switch (task.m_streamQuality)
             {
-                case QnQualityLow: shortQuality = QLatin1String("Lo"); break;
-                case QnQualityNormal: shortQuality = QLatin1String("Me"); break;
-                case QnQualityHigh: shortQuality = QLatin1String("Hi"); break;
-                case QnQualityHighest: shortQuality = QLatin1String("Bst"); break;
+                case QnQualityLow: 
+                case QnQualityNormal:
+                case QnQualityHigh: 
+                case QnQualityHighest: 
+                    shortQuality = QnStreamQualityToShortDisplayString(task.m_streamQuality);
+                    break;
                 default:
                     qWarning("QnCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d.", task.m_streamQuality);
                     break;

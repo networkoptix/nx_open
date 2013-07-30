@@ -3,15 +3,15 @@
 
 
 QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
-QnAbstractMediaStreamDataProvider(res),
-m_livemutex(QMutex::Recursive),
-m_quality(QnQualityNormal),
-m_qualityUpdatedAtLeastOnce(false),
-m_fps(-1.0),
-m_framesSinceLastMetaData(0),
-m_softMotionRole(QnResource::Role_Default),
-m_softMotionLastChannel(0),
-m_secondaryQuality(SSQualityNotDefined)
+    QnAbstractMediaStreamDataProvider(res),
+    m_livemutex(QMutex::Recursive),
+    m_quality(QnQualityNormal),
+    m_qualityUpdatedAtLeastOnce(false),
+    m_fps(-1.0),
+    m_framesSinceLastMetaData(0),
+    m_softMotionRole(QnResource::Role_Default),
+    m_softMotionLastChannel(0),
+    m_secondaryQuality(SSQualityNotDefined)
 {
     m_role = QnResource::Role_LiveVideo;
     m_timeSinceLastMetaData.restart();
@@ -140,6 +140,11 @@ void QnLiveStreamProvider::updateSoftwareMotion()
             m_motionEstimation[i].setMotionMask(region);
         }
     }
+}
+
+bool QnLiveStreamProvider::canChangeStatus() const
+{
+    return m_role == QnResource::Role_LiveVideo && m_isPhysicalResource;
 }
 
 // for live providers only

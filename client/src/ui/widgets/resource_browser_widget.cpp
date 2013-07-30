@@ -771,7 +771,7 @@ void QnResourceBrowserWidget::at_thumbnailReceived(int status, const QImage &thu
         }
         data.loadingHandle = 0;
 
-        if (m_tooltipWidget && m_tooltipWidget->resourceId() == resource->getId())
+        if (m_tooltipWidget && (uint)m_tooltipWidget->resourceId() == resource->getId())
             m_tooltipWidget->setPixmap(data.status == Loaded
                                        ? QPixmap::fromImage(data.thumbnail)
                                        : qnSkin->pixmap("events/thumb_no_data.png"));

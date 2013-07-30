@@ -49,7 +49,8 @@ public:
                                  QnStorageResourcePtr storage = QnStorageResourcePtr(), QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport, 
                                  qint64 timeOffsetMs = 0, qint64 serverTimeZoneMs = Qn::InvalidUtcOffset,
                                  QRectF srcRect = QRectF(),
-                                 const ImageCorrectionParams& contrastParams = ImageCorrectionParams());
+                                 const ImageCorrectionParams& contrastParams = ImageCorrectionParams(),
+                                 const DewarpingParams& dewarpingParams = DewarpingParams());
 
     void setResource(QnMediaResourcePtr resource);
     void setExportProgressOffset(int value);

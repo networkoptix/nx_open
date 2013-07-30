@@ -16,7 +16,7 @@ namespace BusinessActionType {
         case CameraRecording:       return QObject::tr("Camera recording");
         case PanicRecording:        return QObject::tr("Panic recording");
         case SendMail:              return QObject::tr("Send mail");
-        case Alert:                 return QObject::tr("Alert");
+        case Diagnostics:           return QObject::tr("Diagnostics");
         case ShowPopup:             return QObject::tr("Show notification");
         case PlaySound:             return QObject::tr("Play Sound");
         case SayText:               return QObject::tr("Say");
@@ -29,7 +29,7 @@ namespace BusinessActionType {
         case NotDefined:
         case PanicRecording:
         case SendMail:
-        case Alert:
+        case Diagnostics:
         case ShowPopup:
         case PlaySound:
         case SayText:
@@ -52,7 +52,7 @@ namespace BusinessActionType {
         case CameraOutputInstant:
         case Bookmark:
         case CameraRecording:
-        case Alert:
+        case Diagnostics:
         case ShowPopup:
         case PlaySound:
         case SayText:
@@ -70,7 +70,7 @@ namespace BusinessActionType {
         case CameraOutputInstant:
         case Bookmark:
         case SendMail:
-        case Alert:
+        case Diagnostics:
         case ShowPopup:
         case PlaySound:
         case SayText:

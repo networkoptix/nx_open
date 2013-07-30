@@ -26,6 +26,7 @@ void QnHistogramWidget::setHistogramParams(const ImageCorrectionParams& params)
 
 void QnHistogramWidget::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event)
     QPainter p(this);
     
     p.setBrush(QBrush(Qt::Dense5Pattern));

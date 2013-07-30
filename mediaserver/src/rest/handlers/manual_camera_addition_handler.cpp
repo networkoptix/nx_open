@@ -1,6 +1,5 @@
 #include "manual_camera_addition_handler.h"
 
-#include <QtCore/QFileInfo>
 #include <QtNetwork/QAuthenticator>
 
 #include "utils/network/tcp_connection_priv.h"

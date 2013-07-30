@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#define __USE_GNU /* to get O_DIRECT in linux */
+//#define __USE_GNU /* to get O_DIRECT in linux */ //already defined in QT
 #include <fcntl.h>
 #ifndef WIN32
 #include <unistd.h>

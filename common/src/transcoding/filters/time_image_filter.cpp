@@ -11,6 +11,7 @@
 
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
 static const int MIN_TEXT_HEIGHT = 14;
+static const double FPS_EPS = 1e-8;
 
 QnTimeImageFilter::QnTimeImageFilter(OnScreenDatePos datePos, qint64 timeOffsetMs):
     m_dateTimeXOffs(0),
@@ -77,20 +78,20 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
     switch(m_dateTextPos)
     {
     case Date_LeftTop:
-        if (updateRect.left() != 0 || updateRect.top() != 0)
+        if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
             return;
         break;
     case Date_RightTop:
-        if (updateRect.right() != 1 || updateRect.top() != 0)
+        if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
             return;
         break;
     case Date_RightBottom:
-        if (updateRect.right() != 1 || updateRect.bottom() != 1)
+        if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
             return;
         break;
     case Date_LeftBottom:
     default:
-        if (updateRect.left() != 0 || updateRect.bottom() != 1)
+        if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
             return;
         break;
     }

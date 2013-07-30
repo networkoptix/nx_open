@@ -1,6 +1,8 @@
 #ifndef QN_ACTIONS_H
 #define QN_ACTIONS_H
 
+#include <QMetaType>
+
 #include "action_fwd.h"
 
 #include <client/client_globals.h>
@@ -131,13 +133,20 @@ namespace Qn {
         EscapeHotkeyAction,
 
         /**
-         * Displays messagebox with the text provided.
+         * Displays message box with the text provided.
          *
          * Parameters:
          * <tt>QString TitleRole</tt> --- title for the messagebox.
          * <tt>QString TextRole</tt> --- displayed text. If not provided, title will be used.
          */
         MessageBoxAction,
+
+        /**
+         * Displays version mismatch dialog, pulling mismatch data from 
+         * <tt>QnWorkbenchVersionMismatchWatcher</tt>. Displays nothing if there
+         * is no mismatches.
+         */
+        VersionMismatchMessageAction,
 
         /**
          * Opens the provided url in the default browser.
@@ -438,6 +447,12 @@ namespace Qn {
          * Opens event log dialog with filter for current camera(s) issues
          */
         CameraIssuesAction,
+
+        /**
+         * Opens camera diagnostics dialog that checks for problems with
+         * selected camera.
+         */
+        CameraDiagnosticsAction,
 
         /**
          * Opens current layout settings dialog.
@@ -899,6 +914,8 @@ namespace Qn {
     };
 
 } // namespace Qn
+
+Q_DECLARE_METATYPE(Qn::ActionId);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionScopes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionParameterTypes);

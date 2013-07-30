@@ -41,7 +41,7 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (action->actionType() == BusinessActionType::SendMail || action->actionType() == BusinessActionType::Alert)
+    if (action->actionType() == BusinessActionType::SendMail || action->actionType() == BusinessActionType::Diagnostics)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
@@ -110,7 +110,7 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
     case BusinessActionType::SendMail:
         return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
 
-    case BusinessActionType::Alert:
+    case BusinessActionType::Diagnostics:
         break;
 
     case BusinessActionType::ShowPopup:

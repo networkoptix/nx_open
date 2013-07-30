@@ -1,6 +1,9 @@
-#include <QtCore/QDir>
 #include "storage_manager.h"
+
+#include <QtCore/QDir>
+
 #include "utils/common/util.h"
+#include <utils/fs/file.h>
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/resource.h"
 #include "server_stream_recorder.h"
@@ -692,6 +695,6 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
         return false;
-    catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QFileInfo(fileName).baseName().toInt(), -1, (qint16) timeZone));
+    catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QnFile::baseName(fileName).toInt(), -1, (qint16) timeZone));
     return true;
 }

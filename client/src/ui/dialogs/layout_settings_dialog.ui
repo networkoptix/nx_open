@@ -45,6 +45,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
           <item>
            <widget class="QnFramedLabel" name="imageLabel">
+            <property name="lineWidth">
+             <number>4</number>
+            </property>
             <property name="text">
              <string/>
             </property>

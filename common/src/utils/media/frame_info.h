@@ -11,7 +11,9 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 #include "core/datapacket/media_data_packet.h"
+#include <core/resource/dewarping_params.h>
 #include "utils/color_space/image_correction.h"
+
 
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
 #define AV_REVERSE_REORDERED   QnAbstractMediaData::MediaFlags_ReverseReordered
@@ -158,6 +160,8 @@ public:
     void reallocate(int newWidth, int newHeight, int format);
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
     void memZerro();
+
+    void copyDataFrom(const AVFrame* frame);
 public:
     int flags;
 
@@ -246,7 +250,7 @@ struct CLVideoData
 class ScreenshotInterface
 {
 public:
-    virtual QImage getScreenshot(const ImageCorrectionParams& params) = 0; // 8 bit Y channel only
+    virtual QImage getScreenshot(const ImageCorrectionParams& params, const DewarpingParams& dewarping) = 0; // 8 bit Y channel only
     virtual QImage getGrayscaleScreenshot() = 0;
 };
 

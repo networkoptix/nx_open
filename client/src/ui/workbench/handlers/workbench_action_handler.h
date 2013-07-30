@@ -116,6 +116,7 @@ protected:
         QColor frameColor;
         qreal rotation;
         ImageCorrectionParams contrastParams;
+        DewarpingParams dewarpingParams;
 
         AddToLayoutParams():
             usePosition(false),
@@ -253,6 +254,7 @@ protected slots:
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
+    void at_cameraDiagnosticsAction_triggered();
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
     void at_clearCameraSettingsAction_triggered();
@@ -261,6 +263,7 @@ protected slots:
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsDialog_advancedSettingChanged();
     void at_cameraSettingsDialog_cameraOpenRequested();
+    void at_cameraSettingsDialog_cameraDiagnosticsRequested();
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
@@ -347,6 +350,7 @@ protected slots:
 
     void at_browseUrlAction_triggered();
 
+    void at_versionMismatchMessageAction_triggered();
     void at_versionMismatchWatcher_mismatchDataChanged();
 
 private:

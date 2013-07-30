@@ -5,7 +5,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 class QnColorShaderProgram: public QGLShaderProgram {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnColorShaderProgram(const QGLContext *context, QObject *parent = NULL);
 

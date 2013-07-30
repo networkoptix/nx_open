@@ -226,7 +226,8 @@ void QnMServerResourceSearcher::readDataFromSocket()
         sock->sendTo(datagram.data(), datagram.size(), groupAddress, DISCOVERY_PORT);
     }
 
-    QnSleep::msleep(3000);
+    for (int i = 0; i < 600 && !m_needStop; ++i)
+        QnSleep::msleep(100);
 
     QSet<QByteArray> conflictList;
     readSocketInternal(m_receiveSocket, conflictList);

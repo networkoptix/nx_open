@@ -28,6 +28,9 @@ public:
     void setSelectedWindow(quint64 windowStart, quint64 windowEnd);
     void setEnabledWindow(quint64 windowStart, quint64 windowEnd);
 
+    qint64 localOffset() const;
+    void setLocalOffset(qint64 utcOffset);
+
 signals:
     void timeClicked(const QTime &time);
 
@@ -55,6 +58,7 @@ private:
     QnDayTimeItemDelegate *m_delegate;
     QnDayTimeTableWidget *m_tableWidget;
     QString m_timeFormat;
+    qint64 m_localOffset;
 };
 
 #endif // QN_DAY_TIME_WIDGET_H

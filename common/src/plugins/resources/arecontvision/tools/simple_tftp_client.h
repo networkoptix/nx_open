@@ -1,7 +1,10 @@
 #ifndef __SIMPLE_TFTP_CLIENT__1117
 #define __SIMPLE_TFTP_CLIENT__1117
 #include <QtCore/QString>
+
+#include "utils/camera/camera_diagnostics.h"
 #include "utils/network/socket.h"
+
 
 class QnByteArray;
 
@@ -29,6 +32,7 @@ public:
         size = m_last_packet_size;
         return m_last_packet;
     }
+    CameraDiagnostics::Result prevIOResult() const;
 
 private:
     int form_read_request(const QString& fn, char* buff);
@@ -48,6 +52,7 @@ private:
     int m_curr_blk_size;
 
     UDPSocket m_sock;
+    CameraDiagnostics::Result m_prevResult;
 };
 
 #endif //__SIMPLE_TFTP_CLIENT__1117

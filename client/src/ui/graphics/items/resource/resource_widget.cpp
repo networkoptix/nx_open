@@ -457,7 +457,7 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    QRectF rect = zoomRect().isNull() ? this->rect() : unsubRect(this->rect(), zoomRect());
+    QRectF rect = (m_options & VirtualZoomWindow) || zoomRect().isNull() ? this->rect() : unsubRect(this->rect(), zoomRect());
 
     if (m_channelsLayout->channelCount() == 1)
         return rect;

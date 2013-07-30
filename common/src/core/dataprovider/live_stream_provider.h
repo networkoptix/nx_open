@@ -43,7 +43,7 @@ public:
     void setUseSoftwareMotion(bool value);
 
     void updateSoftwareMotion();
-    bool canChangeStatus() const { return m_role == QnResource::Role_LiveVideo && m_isPhysicalResource; }
+    bool canChangeStatus() const;
 
     virtual bool secondaryResolutionIsLarge() const { return false; }
 

@@ -11,8 +11,11 @@ QnAggregationWidget::QnAggregationWidget(QWidget *parent) :
     ui->periodComboBox->addItem(tr("hrs"), 60*60);
     ui->periodComboBox->addItem(tr("days"), 60*60*24);
 
-    connect(ui->enabledCheckBox, SIGNAL(toggled(bool)), ui->valueSpinBox, SLOT(setEnabled(bool)));
-    connect(ui->enabledCheckBox, SIGNAL(toggled(bool)), ui->periodComboBox, SLOT(setEnabled(bool)));
+    // initial state: checkbox is cleared
+    ui->periodWidget->setVisible(false);
+
+    connect(ui->enabledCheckBox, SIGNAL(toggled(bool)), ui->periodWidget, SLOT(setVisible(bool)));
+    connect(ui->enabledCheckBox, SIGNAL(toggled(bool)), ui->instantLabel, SLOT(setHidden(bool)));
 
     connect(ui->enabledCheckBox,    SIGNAL(toggled(bool)),              this, SIGNAL(valueChanged()));
     connect(ui->valueSpinBox,       SIGNAL(valueChanged(int)),          this, SIGNAL(valueChanged()));
@@ -41,4 +44,8 @@ int QnAggregationWidget::value() const {
     if (!ui->enabledCheckBox->isChecked())
         return 0;
     return  ui->valueSpinBox->value() * ui->periodComboBox->itemData(ui->periodComboBox->currentIndex()).toInt();
+}
+
+void QnAggregationWidget::setShort(bool value) {
+    ui->longLabel->setVisible(!value);
 }

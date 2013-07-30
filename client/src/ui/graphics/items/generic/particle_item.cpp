@@ -41,6 +41,9 @@ void QnParticleItem::setRect(const QRectF &rect) {
 }
 
 void QnParticleItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
+
     QnScopedPainterBrushRollback brushRollback(painter, m_brush);
     QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
     painter->drawRect(rect());

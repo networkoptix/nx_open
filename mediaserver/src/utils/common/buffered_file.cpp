@@ -377,7 +377,7 @@ bool QBufferedFile::open(QIODevice::OpenMode mode)
 {
     m_openMode = mode;
     QDir dir;
-    dir.mkpath(QFileInfo(m_fileEngine.getFileName()).absoluteDir().absolutePath());
+    dir.mkpath(QnFile::absolutePath(m_fileEngine.getFileName()));
     m_isDirectIO = false;
 #ifdef Q_OS_WIN
     m_isDirectIO = m_systemDependentFlags & FILE_FLAG_NO_BUFFERING;

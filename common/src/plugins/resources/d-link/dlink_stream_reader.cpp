@@ -3,6 +3,7 @@
 #include "dlink_resource.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
+#include "utils/network/http/httptypes.h"
 
 
 
@@ -29,7 +30,7 @@ struct ACS_VideoHeader
 #pragma pack(pop)
 
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
-CLServerPushStreamreader(res),
+CLServerPushStreamReader(res),
 m_rtpReader(res),
 mHttpClient(0),
 m_h264(false),
@@ -44,10 +45,10 @@ PlDlinkStreamReader::~PlDlinkStreamReader()
 }
 
 
-void PlDlinkStreamReader::openStream()
+CameraDiagnostics::Result PlDlinkStreamReader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::ErrorCode::noError;
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
@@ -63,7 +64,7 @@ void PlDlinkStreamReader::openStream()
     QString prifileStr = composeVideoProfile();
 
     if (prifileStr.length()==0)
-        return;
+        return CameraDiagnostics::NoMediaTrackResult();
 
     CLHttpStatus status;
     QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth()); // setup video profile
@@ -71,11 +72,11 @@ void PlDlinkStreamReader::openStream()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         getResource()->setStatus(QnResource::Unauthorized);
-        return;
+        return CameraDiagnostics::NotAuthorisedResult();
     }
 
     if (cam_info_file.length()==0)
-        return;
+        return CameraDiagnostics::NoMediaTrackResult();
 
     if (!res->isCameraControlDisabled()) {
         if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
@@ -93,18 +94,18 @@ void PlDlinkStreamReader::openStream()
         if (info.videoProfileUrls.size() < 2 && role == QnResource::Role_SecondaryLiveVideo)
         {
             qWarning() << "No dualstreaming for DLink camera " << m_resource->getUrl() << ". Ignore second url request";
-            return;
+            return CameraDiagnostics::ErrorCode::noError;
         }
 
         QString url =  getRTPurl(role == QnResource::Role_SecondaryLiveVideo ? 2 : 1);
         if (url.isEmpty())
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting non empty rtsl url.";
-            return;
+            return CameraDiagnostics::CameraResponseParseErrorResult();
         }
 
         m_rtpReader.setRequest(url);
-        m_rtpReader.openStream();
+        return m_rtpReader.openStream();
     }
     else
     {
@@ -117,7 +118,7 @@ void PlDlinkStreamReader::openStream()
         if (info.videoProfileUrls.size() < 2)
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting video profile URL.";
-            return;
+            return CameraDiagnostics::CameraResponseParseErrorResult();
         }
 
 
@@ -127,10 +128,12 @@ void PlDlinkStreamReader::openStream()
             url = url.mid(1);
 
         mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
-        mHttpClient->doGET(url);
-
+        const CLHttpStatus status = mHttpClient->doGET(url);
+        if( status == CL_HTTP_SUCCESS )
+            return CameraDiagnostics::ErrorCode::noError;
+        else
+            return CameraDiagnostics::RequestFailedResult(url, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
     }
-
 }
 
 void PlDlinkStreamReader::closeStream()

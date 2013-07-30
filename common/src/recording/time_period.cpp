@@ -122,6 +122,9 @@ QnTimePeriodList QnTimePeriod::aggregateTimePeriods(const QnTimePeriodList &peri
 
 QnTimePeriodList QnTimePeriod::mergeTimePeriods(const QVector<QnTimePeriodList>& periods)
 {
+    if(periods.size() == 1)
+        return periods[0];
+
     QVector<int> minIndexes;
     minIndexes.resize(periods.size());
     QnTimePeriodList result;

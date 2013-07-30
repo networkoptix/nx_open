@@ -16,7 +16,6 @@
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
-        <?define VmsRepairing=" (REINSTALLMODE) " ?>
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
         <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
@@ -29,7 +28,6 @@
 
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
-        <SetProperty Id="APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
 
         <SetProperty Id="APPSERVER_GUID" Value="[APPSERVER_GUID32]" After="AppSearch">
             <![CDATA[ APPSERVER_GUID = "" ]]>
@@ -362,7 +360,7 @@
         <CustomAction Id="SetClientFolderToRegistry" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
 
         <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
-                      Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate" Impersonate="yes"/>
+                      Value="&quot;[#dbconfig.exe]&quot; &quot;setpw&quot; &quot;[APPSERVER_LOGIN]&quot; &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="InitDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
 
@@ -500,10 +498,10 @@
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction">
-                <![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) ]]>
+                <![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) AND APPSERVER_PASSWORD <> "" ]]>
             </Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd">
-                <![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) ]]>
+                <![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) AND APPSERVER_PASSWORD <> "" ]]>
             </Custom>
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
@@ -583,17 +581,6 @@
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
-                                </RegistryKey>
-                            </Component>
-
-                            <Component Id="AppServerConfigurationPassword" Permanent="yes">
-                                <Condition>
-                                    NOT PREVIOUSVERSIONSINSTALLED
-                                </Condition>
-
-                                <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\Enterprise Controller">
-                                    <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
                                 </RegistryKey>
                             </Component>
                         </Directory>
@@ -875,7 +862,6 @@
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="ecs.log" />           
             <ComponentRef Id="AppServerConfiguration"/>
-            <ComponentRef Id="AppServerConfigurationPassword"/>
             <ComponentRef Id="AppServerConfigurationGuid"/>
 
             <ComponentRef Id="ProxyExecutable" />

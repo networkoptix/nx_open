@@ -2,6 +2,9 @@
 #include "security_cam_resource.h"
 #include <QtCore/QMutexLocker>
 
+#include <business/business_event_connector.h>
+
+
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
     m_motionType(Qn::MT_Default),
@@ -18,6 +21,14 @@ QnSecurityCamResource::QnSecurityCamResource():
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
+
+    // TODO: #AK this is a wrong place for this connect call.
+    // You should listen to changes in resource pool instead.
+    if(QnBusinessEventConnector::instance()) {
+        connect(
+            this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
+            QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
+    }
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const
@@ -52,6 +63,7 @@ QnSecurityCamResource::~QnSecurityCamResource()
 void QnSecurityCamResource::updateInner(QnResourcePtr other)
 {
     QnNetworkResource::updateInner(other);
+    QnMediaResource::updateInner(other);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
@@ -495,7 +507,7 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 {
     QVariant mediaVariant;
     const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: #Elric const_cast? get rid of it!
-    return Qn::undeprecate(static_cast<Qn::CameraCapabilities>(mediaVariant.toInt()));
+    return static_cast<Qn::CameraCapabilities>(mediaVariant.toInt());
 }
 
 bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const
@@ -513,7 +525,7 @@ void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability,
 
 bool QnSecurityCamResource::setParam(const QString &name, const QVariant &val, QnDomain domain) {
     bool result = QnResource::setParam(name, val, domain);
-    if(result && name == lit("cameraCapabilities"))
+    if(result && (name == lit("cameraCapabilities")))
         emit cameraCapabilitiesChanged(::toSharedPointer(this)); // TODO: #Elric we don't check whether they have actually changed. This better be fixed.
     return result;
 }
@@ -626,3 +638,4 @@ void QnSecurityCamResource::removeStatusFlags(StatusFlags value)
 {
     m_statusFlags &= ~value;
 }
+

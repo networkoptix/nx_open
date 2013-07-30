@@ -186,12 +186,9 @@ void NetworkOptixModuleFinder::run()
             {
                 //invalid response
                 cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. Received invalid response from (%1:%2) on local address %3").
-                    arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress()), cl_logINFO );
+                    arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress()), cl_logDEBUG1 );
                 continue;
             }
-
-            cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. Recevied valid response from (%1:%2), server type %3, version %4").
-                        arg(remoteAddressStr).arg(remotePort).arg(response.type).arg(response.version), cl_logDEBUG1 );
 
             //received valid response, checking if already know this enterprise controller
             QHostAddress remoteAddress(remoteAddressStr);

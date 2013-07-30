@@ -146,6 +146,11 @@ namespace nx_http
 
     namespace StatusCode
     {
+        StringType toString( int val )
+        {
+            return toString(Value(val));
+        }
+
         StringType toString( Value val )
         {
             switch( val )

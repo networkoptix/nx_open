@@ -112,6 +112,7 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
         ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
         ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
     }
+    setEnabled(!m_model->system());
 
     connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
             this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
@@ -155,6 +156,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         bool isResourceRequired = BusinessActionType::requiresCameraResource(m_model->actionType())
                 || BusinessActionType::requiresUserResource(m_model->actionType());
         ui->actionResourcesFrame->setVisible(isResourceRequired);
+
         ui->actionAtLabel->setText(m_model->actionType() == BusinessActionType::SendMail ? tr("to") : tr("at"));
 
         bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
@@ -175,7 +177,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
 
     if (fields & QnBusiness::AggregationField) {
         ui->aggregationWidget->setValue(model->aggregationPeriod());
-
     }
 
     if (fields & QnBusiness::CommentsField) {

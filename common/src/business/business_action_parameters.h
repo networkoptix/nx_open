@@ -3,7 +3,8 @@
 
 #include <business/business_fwd.h>
 
-//TODO: #GDM move QnStreamQuality OUT OF THERE!
+//TODO: #rvasilenko move QnStreamQuality OUT OF THERE! --Elric
+//TODO: #rvasilenko adding new parameter is TOO complex. Structure can be simplified --gdm
 #include <core/resource/media_resource.h>
 
 class QnBusinessActionParameters 
@@ -23,6 +24,7 @@ public:
         relayAutoResetTimeoutParam,
         inputPortIdParam,
         keyParam,
+        sayTextParam,
 
         CountParam
     };
@@ -80,6 +82,10 @@ public:
     QString getInputPortId() const;
     void setInputPortId(const QString &value);
 
+    // Say Text
+    QString getSayText() const;
+    void setSayText(const QString &value);
+
     // convert/serialize/deserialize functions
 
     static QnBusinessActionParameters deserialize(const QByteArray& value);
@@ -108,6 +114,7 @@ private:
     int m_relayAutoResetTimeout;
     QString m_inputPortId;
     QString m_keyParam;
+    QString m_sayText;
 };
 
 QByteArray serializeBusinessParams(const QnBusinessParams& value);

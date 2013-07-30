@@ -74,7 +74,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
     m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
-    m_exportAction      = new QAction(tr("Export Selection to File"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File..."), this);
     m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
@@ -296,7 +296,7 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataLi
         requestFinished();
         if (m_model->rowCount() == 0 && isFilterExist() && !isRuleExistByCond())
         {
-            QMessageBox::information(this, tr("No rule(s) for current filter"), tr("You have not configured business rules to match current filter condition."));
+            QMessageBox::information(this, tr("No rule(s) for current filter"), tr("You have not configured any Alarm/Event Rules to match the current filter condition."));
         }
     }
 }
@@ -530,7 +530,7 @@ void QnEventLogDialog::at_selectAllAction()
 
 void QnEventLogDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents);
+    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents, QObject::tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_copyToClipboard()

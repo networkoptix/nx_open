@@ -45,7 +45,7 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
 
     QnSoftwareVersion version = m_mismatchData[0].version;
     foreach(const QnVersionMismatchData &data, m_mismatchData) {
-        if(data.version != version) {
+        if(!isCompatible(data.version, version)) {
             m_hasMismatches = true;
             break;
         }

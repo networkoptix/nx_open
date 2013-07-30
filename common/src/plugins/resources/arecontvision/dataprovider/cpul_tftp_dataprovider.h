@@ -16,6 +16,15 @@ public:
 
     ~AVClientPullSSTFTPStreamreader();
 
+    //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
+    /*!
+        Reopens media stream, if it not opened yet.
+        Blocks for media stream open attempt
+        \return error code and filled \a errorParams with parameters
+        \note If stream is opened (\a CLServerPushStreamReader::isStreamOpened() returns true) \a CameraDiagnostics::ErrorCode::noError is returned immediately
+    */
+    virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
+
 protected:
 
     virtual QnAbstractMediaDataPtr getNextData();
@@ -35,6 +44,7 @@ protected:
     bool m_dualsensor;
     QString m_model;
     CLSimpleTFTPClient* m_tftp_client;
+    CameraDiagnostics::Result m_prevDataReadResult;
 };
 
 #endif //cpull_httpreader_1119

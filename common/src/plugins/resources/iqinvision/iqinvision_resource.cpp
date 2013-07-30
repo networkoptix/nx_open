@@ -58,10 +58,13 @@ void QnPlIqResource::setCropingPhysical(QRect /*croping*/)
 
 }
 
-bool QnPlIqResource::initInternal() 
+CameraDiagnostics::Result QnPlIqResource::initInternal() 
 {
     CLHttpStatus status = setOID(QLatin1String("1.2.6.5"), QLatin1String("1")); // Reset crop to maximum size
-    return (status == CL_HTTP_SUCCESS || status == CL_HTTP_REDIRECT);
+    //return (status == CL_HTTP_SUCCESS || status == CL_HTTP_REDIRECT);
+    return (status == CL_HTTP_SUCCESS || status == CL_HTTP_REDIRECT)
+        ? CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::noError )
+        : CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown );
 }
 
 CLHttpStatus QnPlIqResource::readOID(const QString& oid, QString& result)
@@ -113,4 +116,3 @@ QSize QnPlIqResource::getMaxResolution() const
     QSize s;
     return s;
 }
-

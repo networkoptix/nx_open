@@ -38,7 +38,7 @@ void QnSayTextBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel
     Q_UNUSED(guard)
 
     if (fields & QnBusiness::ActionParamsField)
-        ui->textEdit->setText(model->actionParams().getSoundUrl());
+        ui->textEdit->setText(model->actionParams().getSayText());
 }
 
 void QnSayTextBusinessActionWidget::paramsChanged() {
@@ -49,7 +49,7 @@ void QnSayTextBusinessActionWidget::paramsChanged() {
     Q_UNUSED(guard)
 
     QnBusinessActionParameters params;
-    params.setSoundUrl(ui->textEdit->text());
+    params.setSayText(ui->textEdit->text());
     model()->setActionParams(params);
 }
 

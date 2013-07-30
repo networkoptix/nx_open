@@ -24,6 +24,9 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags 
     m_openButton = new QPushButton(tr("Open in New Tab"));
     m_buttonBox->addButton(m_openButton, QDialogButtonBox::HelpRole);
 
+    m_diagnoseButton = new QPushButton(tr("Camera Diagnostics"));
+    m_buttonBox->addButton(m_diagnoseButton, QDialogButtonBox::HelpRole);
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(m_settingsWidget);
     layout->addWidget(m_buttonBox);
@@ -34,8 +37,10 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags 
     connect(m_settingsWidget,   SIGNAL(hasChangesChanged()),        this,   SLOT(at_settingsWidget_hasChangesChanged()));
     connect(m_settingsWidget,   SIGNAL(modeChanged()),              this,   SLOT(at_settingsWidget_modeChanged()));
     connect(m_settingsWidget,   SIGNAL(advancedSettingChanged()),   this,   SLOT(at_advancedSettingChanged()));
+    connect(m_settingsWidget,   SIGNAL(fisheyeSettingChanged()),    this,   SIGNAL(fisheyeSettingChanged()));
     connect(m_settingsWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(m_openButton,       SIGNAL(clicked()),                  this,   SIGNAL(cameraOpenRequested()));
+    connect(m_diagnoseButton,   SIGNAL(clicked()),                  this,   SIGNAL(cameraDiagnosticsRequested()));
 
     at_settingsWidget_hasChangesChanged();
 }
@@ -58,6 +63,7 @@ void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     m_okButton->setEnabled(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
     m_openButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);
+    m_diagnoseButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);
 }
 
 void QnCameraSettingsDialog::at_advancedSettingChanged() {

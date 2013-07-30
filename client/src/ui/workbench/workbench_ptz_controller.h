@@ -13,6 +13,7 @@
 #include "workbench_context_aware.h"
 
 class QnWorkbenchPtzMapperWatcher;
+class QnMediaResourceWidget;
 
 class QnWorkbenchPtzController: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -26,20 +27,20 @@ public:
      *                                  or NaN if it is not available.
      *                                  Use <tt>qIsNaN</tt> to check for NaN.
      */
-    QVector3D position(const QnVirtualCameraResourcePtr &camera) const;
+    QVector3D position(const QnMediaResourceWidget *widget) const;
 
-    QVector3D physicalPosition(const QnVirtualCameraResourcePtr &camera) const;
+    QVector3D physicalPosition(const QnMediaResourceWidget *widget) const;
 
     /**
      * \param camera                    Camera to set PTZ position for.
      * \param position                  New PTZ position for the given camera.
      */
-    void setPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position);
+    void setPosition(const QnMediaResourceWidget *widget, const QVector3D &position);
 
-    void setPhysicalPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &physicalPosition);
+    void setPhysicalPosition(const QnMediaResourceWidget *widget, const QVector3D &physicalPosition);
 
     // TODO: #Elric remove?
-    void updatePosition(const QnVirtualCameraResourcePtr &camera);
+    void updatePosition(const QnMediaResourceWidget* widget);
 
     /**
      * \param camera                    Camera to get current PTZ continuous movement speed for.
@@ -47,17 +48,19 @@ public:
      *                                  camera, or NaN if it is not available.
      *                                  Use <tt>qIsNaN</tt> to check for NaN.
      */
-    QVector3D movement(const QnVirtualCameraResourcePtr &camera) const;
+    QVector3D movement(const QnMediaResourceWidget *widget) const;
 
     /**
      * \param camera                    Camera to set current PTZ continuous movement speed for.
      * \param movement                  New PTZ continuous movement speed for the given camera.
      */
-    void setMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement);
+    void setMovement(const QnMediaResourceWidget *widget, const QVector3D &movement);
 
+    void changePanoMode(const QnMediaResourceWidget *widget);
+    QString getPanoModeText(const QnMediaResourceWidget *widget) const;
 signals:
-    void movementChanged(const QnVirtualCameraResourcePtr &camera);
-    void positionChanged(const QnVirtualCameraResourcePtr &camera);
+    void movementChanged(const QnMediaResourceWidget* widget);
+    void positionChanged(const QnMediaResourceWidget* widget);
 
 private slots:
     void at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);
@@ -68,15 +71,16 @@ private slots:
     void at_ptzGetPosition_replyReceived(int status, const QVector3D &position, int handle);
     void at_ptzSetPosition_replyReceived(int status, int handle);
     void at_ptzSetMovement_replyReceived(int status, int handle);
+    void at_resourceWidget_aboutToBeDestroyed();
 
 private:
-    void sendGetPosition(const QnVirtualCameraResourcePtr &camera);
-    void sendSetPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position);
-    void sendSetMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement);
+    void sendGetPosition(const QnMediaResourceWidget* widget);
+    void sendSetPosition(const QnMediaResourceWidget* widget, const QVector3D &position);
+    void sendSetMovement(const QnMediaResourceWidget* widget, const QVector3D &movement);
 
     void tryInitialize(const QnVirtualCameraResourcePtr &camera);
 
-    void emitChanged(const QnVirtualCameraResourcePtr &camera, bool position, bool movement);
+    void emitChanged(const QnMediaResourceWidget* widget, bool position, bool movement);
 
 private:
     enum PtzRequestType {
@@ -99,7 +103,9 @@ private:
 
     QnWorkbenchPtzMapperWatcher *m_mapperWatcher;
     QHash<QnVirtualCameraResourcePtr, PtzData> m_dataByCamera;
+    QHash<const QnMediaResourceWidget*, PtzData> m_dataByWidget;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
+    QHash<int, const QnMediaResourceWidget*> m_widgetByHandle;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByTimerId;
     QHash<int, QVector3D> m_requestByHandle;
 };

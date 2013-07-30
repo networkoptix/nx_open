@@ -27,6 +27,8 @@
 #include <camera/resource_display.h>
 #include <camera/video_camera.h>
 
+#include <ui/common/notification_levels.h>
+
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
 #include <ui/animation/curtain_animator.h>
@@ -323,6 +325,33 @@ void QnWorkbenchDisplay::deinitSceneView() {
         delete gridBackgroundItem();
 }
 
+QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags windowFlags) const {
+    QGLFormat glFormat;
+    glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
+
+#ifdef Q_OS_LINUX
+    /* Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
+     * VSync will be re-enabled later if drivers are not NVidia's. */
+    glFormat.setSwapInterval(0); /* Turn vsync off. */
+#else
+    glFormat.setSwapInterval(1); /* Turn vsync on. */
+#endif
+
+    QGLWidget *result = new QGLWidget(glFormat, parent, NULL, windowFlags);
+
+#ifdef Q_OS_LINUX
+    result->makeCurrent();
+    QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+    if (!vendor.toLower().contains("nvidia")) {
+        QGLFormat format = result->format();
+        format.setSwapInterval(1); /* Turn vsync on. */
+        result->setFormat(format);
+    }
+#endif
+
+    return result;
+}
+
 void QnWorkbenchDisplay::initSceneView() {
     assert(m_scene && m_view);
 
@@ -338,7 +367,6 @@ void QnWorkbenchDisplay::initSceneView() {
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
-
     /* Init view. */
     m_view->setScene(m_scene);
     m_instrumentManager->registerView(m_view);
@@ -348,26 +376,15 @@ void QnWorkbenchDisplay::initSceneView() {
     /* Configure OpenGL */
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if(!m_view->property(qn_viewInitializedPropertyName).toBool()) {
-        if (!QGLFormat::hasOpenGL()) {
-            qnCritical("Software rendering is not supported."); // TODO: #Elric this check must be performed on startup.
-        } else {
-            QGLFormat glFormat;
-            glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
-#ifdef Q_OS_LINUX
-            // Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
-            // VSync will be re-enabled later in GLHardware checker if drivers are not NVidia's --gdm
-            glFormat.setSwapInterval(0); /* Turn vsync off. */
-#else
-            glFormat.setSwapInterval(1); /* Turn vsync on. */
-#endif
+        QGLWidget *viewport = newGlWidget(m_view);
+            
+        m_view->setViewport(viewport);
 
-            QGLWidget *glWidget = new QGLWidget(glFormat);
-            new QnGlHardwareChecker(glWidget);
-            m_view->setViewport(glWidget);
+        viewport->makeCurrent();
+        QnGlHardwareChecker::checkCurrentContext(true);
 
-            /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
-            DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(glWidget);
-        }
+        /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
+        DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
 
         /* Turn on antialiasing at QPainter level. */
         m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
@@ -377,13 +394,11 @@ void QnWorkbenchDisplay::initSceneView() {
 
         /* All our items save and restore painter state. */
         m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
+
 #ifndef __APPLE__
-        //on macos, this flag results in QnMaskedProxyWidget::paint never called
+        /* On macos, this flag results in QnMaskedProxyWidget::paint never called. */
         m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
 #endif
-
-        /* Don't even try to uncomment this one, it slows everything down. */
-        //m_view->setCacheMode(QGraphicsView::CacheBackground);
 
         /* We don't need scrollbars. */
         m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -1629,8 +1644,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 
-        int checkedButtons = widget->item()->data(Qn::ItemCheckedButtonsRole).toInt();
-        widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+        int checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
+        if(checkedButtons != -1)
+            widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
     }
 
     QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();
@@ -1850,16 +1866,18 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if(thumbnailed)
         return;
 
-    at_notificationTimer_timeout(resource);
-    QnVariantTimer::singleShot(500, this, SLOT(at_notificationTimer_timeout(const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource));
-    QnVariantTimer::singleShot(1000, this, SLOT(at_notificationTimer_timeout(const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource));
+    int type = businessAction->getRuntimeParams().getEventType();
+
+    at_notificationTimer_timeout(resource, type);
+    QnVariantTimer::singleShot(500, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);
+    QnVariantTimer::singleShot(1000, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);
 }
 
-void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource) {
-    at_notificationTimer_timeout(resource.value<QnResourcePtr>());
+void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource, const QVariant &type) {
+    at_notificationTimer_timeout(resource.value<QnResourcePtr>(), type.toInt());
 }
 
-void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource) {
+void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource, int type) {
     foreach(QnResourceWidget *widget, this->widgets(resource)) {
         if(widget->zoomTargetWidget())
             continue; /* Don't draw notification on zoom widgets. */
@@ -1871,8 +1889,10 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         splashItem->setSplashType(QnSplashItem::Rectangular);
         splashItem->setPos(rect.center());
         splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
-        splashItem->setColor(withAlpha(qnGlobals->errorTextColor(), 128));
+        splashItem->setColor(withAlpha(QnNotificationLevels::notificationColor(static_cast<BusinessEventType::Value>(type)), 128));
         splashItem->setOpacity(0.0);
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
     }
 }
+
+

@@ -19,7 +19,7 @@ public:
     virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
     virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;
     virtual int stopMove() override;
-    virtual Qn::CameraCapabilities getCapabilities() override;
+    virtual Qn::PtzCapabilities getCapabilities() override;
     virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
 private:
@@ -31,7 +31,7 @@ private:
 private:
     QMutex m_mutex;
     QnActiResource* m_resource;
-    Qn::CameraCapabilities m_capabilities;
+    Qn::PtzCapabilities m_capabilities;
     QnPtzSpaceMapper *m_spaceMapper;
 
     qreal m_zoomVelocity;

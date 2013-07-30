@@ -113,17 +113,20 @@ namespace BusinessActionType {
         /*!
             parameters:\n
                 - soundUrl (string, required)               - url of sound, contains path to sound on the EC
-                                                                * text that will be provided to TTS engine
         */
         PlaySound,
 
         /*!
             parameters:\n
-                - text (string, required)                   - text that will be provided to TTS engine
+                - sayText (string, required)                - text that will be provided to TTS engine
         */
         SayText,
 
-        Alert,              // write a record to the server's log
+        /**
+         *  Write a record to the server's log
+         */
+        Diagnostics,
+
         Bookmark,           // mark part of camera archive as undeleted
 
         // media server based actions
@@ -133,7 +136,7 @@ namespace BusinessActionType {
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = Alert
+        Count = Bookmark
     };
 }
 

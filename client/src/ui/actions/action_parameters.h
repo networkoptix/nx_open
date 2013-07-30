@@ -2,6 +2,7 @@
 #define QN_ACTION_PARAMETERS_H
 
 #include <QtCore/QVariant>
+#include <QtCore/QMetaType>
 
 #include <core/resource/resource_fwd.h>
 
@@ -122,5 +123,7 @@ public:
 private:
     ArgumentHash m_arguments;
 };
+
+Q_DECLARE_METATYPE(QnActionParameters)
 
 #endif // QN_ACTION_PARAMETERS_H

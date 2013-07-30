@@ -69,7 +69,7 @@ namespace QnGl {
     void APIENTRY glWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); }
     GLAPI GLenum APIENTRY glClientWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); return 0; }
 
-    void APIENTRY glBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) { WARN(); }
+    void APIENTRY glBlendColor(GLfloat, GLfloat, GLfloat, GLfloat) { WARN(); }
 
 #undef WARN
 
@@ -187,7 +187,7 @@ public:
         if(status)
             m_features |= QnGlFunctions::OpenGL3_2 | QnGlFunctions::ArbSync;
 
-        RESOLVE(PFNGLBLENDCOLORPROC,                     glBlendColor);
+        RESOLVE(PFNGLBLENDCOLORPROC,                    glBlendColor);
 
 #undef RESOLVE
 

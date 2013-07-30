@@ -185,6 +185,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         case QnBusiness::AggregationColumn:
             {
                 QnAggregationWidget* widget = new QnAggregationWidget(parent);
+                widget->setShort(true);
                 connect(widget, SIGNAL(valueChanged()), this, SLOT(at_editor_commit()));
                 return widget;
             }

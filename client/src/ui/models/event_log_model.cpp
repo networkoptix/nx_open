@@ -170,7 +170,7 @@ public:
         for (int i = 0; i < m_events.size(); ++i)
         {
             QnBusinessActionDataList& data = *m_events[i].data();
-            for (int j = 0; j < data.size(); ++j)
+            for (uint j = 0; j < data.size(); ++j)
                 *dst++ = &data[j];
         }
 

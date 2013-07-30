@@ -6,12 +6,13 @@
 #include "resource.h"
 #include "resource_media_layout.h"
 #include "utils/common/from_this_to_shared.h"
-
+#include "dewarping_params.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 
+// TODO: #Elric rename
 enum QnStreamQuality {
     QnQualityLowest,
     QnQualityLow,
@@ -22,6 +23,7 @@ enum QnStreamQuality {
     QnQualityNotDefined
 };
 
+// TODO: #Elric rename
 enum QnSecondaryStreamQuality 
 { 
     SSQualityLow, 
@@ -30,8 +32,8 @@ enum QnSecondaryStreamQuality
     SSQualityNotDefined
 };
 
-
-QString QnStreamQualityToString(QnStreamQuality value);
+QString QnStreamQualityToDisplayString(QnStreamQuality value);
+QString QnStreamQualityToShortDisplayString(QnStreamQuality value);
 QnStreamQuality QnStreamQualityFromString( const QString& str );
 
 /*!
@@ -40,6 +42,7 @@ QnStreamQuality QnStreamQualityFromString( const QString& str );
 class QnMediaResource
 {
 public:
+
     QnMediaResource();
     virtual ~QnMediaResource();
 
@@ -59,10 +62,16 @@ public:
     virtual const QnResourcePtr toResourcePtr() const = 0;
     virtual QnResourcePtr toResourcePtr() = 0;
 
+    virtual bool isFisheye() const;
+    DewarpingParams getDewarpingParams() const;
+    void setDewarpingParams(const DewarpingParams& params);
+
+protected:
+    void initMediaResource();
+    void updateInner(QnResourcePtr other);
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
-
-    void initMediaResource();
+    DewarpingParams m_dewarpingParams;
 };
 
 #endif // QN_MEDIA_RESOURCE_H

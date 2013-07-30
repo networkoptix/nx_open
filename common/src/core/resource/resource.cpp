@@ -30,12 +30,12 @@ static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 QnResource::QnResource(): 
     QObject(),
     m_mutex(QMutex::Recursive),
+    m_initMutex(QMutex::Recursive),
     m_resourcePool(NULL),
     m_flags(0),
     m_disabled(false),
     m_status(Offline),
     m_initialized(false),
-    m_initMutex(QMutex::Recursive),
     m_lastInitTime(0)
 {
 }
@@ -835,7 +835,12 @@ void QnResource::init()
 
     if (!m_initialized) 
     {
-        m_initialized = initInternal();
+        CameraDiagnostics::Result initResult = initInternal();
+        m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+        {
+            QMutexLocker lk( &m_mutex );
+            m_prevInitializationResult = initResult;
+        }
         if( m_initialized )
             initializationDone();
         if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
@@ -861,6 +866,7 @@ public:
 private:
     QnResourcePtr m_resource;
 };
+
 
 void QnResource::stopAsyncTasks()
 {
@@ -892,6 +898,12 @@ void QnResource::initAsync(bool optional)
     }
 }
 
+CameraDiagnostics::Result QnResource::prevInitializationResult() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_prevInitializationResult;
+}
+
 bool QnResource::isInitialized() const
 {
     return m_initialized;
@@ -906,4 +918,27 @@ void QnResource::setUniqId(const QString& value)
 {
     Q_UNUSED(value)
     Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented");
+}
+
+Qn::PtzCapabilities QnResource::getPtzCapabilities() const
+{
+    QVariant mediaVariant;
+    QnResource* thisCasted = const_cast<QnResource*>(this);
+    thisCasted->getParam(QLatin1String("ptzCapabilities"), mediaVariant, QnDomainMemory);
+    return Qn::undeprecatePtzCapabilities(static_cast<Qn::PtzCapabilities>(mediaVariant.toInt()));
+}
+
+bool QnResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
+{
+    return getPtzCapabilities() & capabilities;
+}
+
+void QnResource::setPtzCapabilities(Qn::PtzCapabilities capabilities) {
+    if (hasParam(lit("ptzCapabilities")))
+        setParam(lit("ptzCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
+    emit ptzCapabilitiesChanged(::toSharedPointer(this)); // TODO: #Elric we don't check whether they have actually changed. This better be fixed.
+}
+
+void QnResource::setPtzCapability(Qn::PtzCapabilities capability, bool value) {
+    setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
 }

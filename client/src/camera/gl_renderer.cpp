@@ -23,6 +23,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/common/geometry.h>
+#include "ui/fisheye/fisheye_ptz_controller.h"
 
 #include "video_camera.h"
 
@@ -68,6 +69,16 @@ QnGlRendererShaders::QnGlRendererShaders(const QGLContext *context, QObject *par
     yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(context, this);
     yv12ToRgba = new QnYv12ToRgbaShaderProgram(context, this);
     nv12ToRgb = new QnNv12ToRgbShaderProgram(context, this);
+    
+    
+    fisheyePtzProgram = new QnFisheyeRectilinearProgram(context, this);
+    fisheyePtzGammaProgram =  new QnFisheyeRectilinearProgram(context, this, QnFisheyeShaderProgram::GAMMA_STRING);
+
+    fisheyePanoHProgram = new QnFisheyeEquirectangularHProgram(context, this);
+    fisheyePanoHGammaProgram = new QnFisheyeEquirectangularHProgram(context, this, QnFisheyeShaderProgram::GAMMA_STRING);
+
+    fisheyePanoVProgram = new QnFisheyeEquirectangularVProgram(context, this);
+    fisheyePanoVGammaProgram = new QnFisheyeEquirectangularVProgram(context, this, QnFisheyeShaderProgram::GAMMA_STRING);
 }
 
 QnGlRendererShaders::~QnGlRendererShaders() {
@@ -111,13 +122,19 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_timeChangeEnabled(true),
     m_paused(false),
     m_screenshotInterface(0),
-    m_histogramConsumer(0)
+    m_histogramConsumer(0),
+    m_fisheyeController(0)
+
+    //m_extraMin(-PI/4.0),
+    //m_extraMax(PI/4.0) // rotation range
 {
     Q_ASSERT( context );
 
     applyMixerSettings( m_brightness, m_contrast, m_hue, m_saturation );
     
     m_shaders = qn_glRendererShaders_instanceStorage()->get(context);
+    
+
 
     cl_log.log( QString(QLatin1String("OpenGL max texture size: %1.")).arg(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE)), cl_logINFO );
 }
@@ -192,7 +209,8 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     picLock->glTextures()[2],
-                    v_array );
+                    v_array,
+                    picLock->flags() & QnAbstractMediaData::MediaFlags_StillImage);
                 break;
 
             case PIX_FMT_NV12:
@@ -275,8 +293,17 @@ void QnGLRenderer::drawYV12VideoTexture(
     unsigned int tex0ID,
     unsigned int tex1ID,
     unsigned int tex2ID,
-    const float* v_array )
+    const float* v_array,
+    bool isStillImage)
 {
+    /*
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-10000,10000,10000,-10000,-10000,10000);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    */
+
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
         (float)tex0Coords.right(), (float)tex0Coords.top(),
@@ -291,23 +318,63 @@ void QnGLRenderer::drawYV12VideoTexture(
     DEBUG_CODE(glCheckError("glEnable"));
 
     QnAbstractYv12ToRgbShaderProgram* shader;
-    if (m_imgCorrectParam.enabled)
-        shader = m_shaders->yv12ToRgbWithGamma;
-    else
+    QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
+    QnFisheyeShaderProgram* fisheyeShader = 0;
+    DewarpingParams params;
+    float ar = 1.0;
+    if (m_fisheyeController && m_fisheyeController->isEnabled()) 
+    {
+        ar = picLock->width()/(float)picLock->height();
+        params = m_fisheyeController->updateDewarpingParams(ar);
+        if (params.panoFactor > 1.0)
+        {
+            if (params.horizontalView)
+            {
+                if (m_imgCorrectParam.enabled)
+                    gammaShader = fisheyeShader = m_shaders->fisheyePanoHGammaProgram;
+                else
+                    fisheyeShader = m_shaders->fisheyePanoHProgram;
+            }
+            else {
+                if (m_imgCorrectParam.enabled)
+                    gammaShader = fisheyeShader = m_shaders->fisheyePanoVGammaProgram;
+                else
+                    fisheyeShader = m_shaders->fisheyePanoVProgram;
+            }
+        }
+        else {
+            if (m_imgCorrectParam.enabled)
+                gammaShader = fisheyeShader = m_shaders->fisheyePtzGammaProgram;
+            else
+                fisheyeShader = m_shaders->fisheyePtzProgram;
+        }
+        shader = fisheyeShader;
+    }
+    else if (m_imgCorrectParam.enabled) {
+        shader = gammaShader = m_shaders->yv12ToRgbWithGamma;
+    }
+    else {
         shader = m_shaders->yv12ToRgb;
+    }
     shader->bind();
     shader->setYTexture( 0 );
     shader->setUTexture( 1 );
     shader->setVTexture( 2 );
     shader->setOpacity(m_decodedPictureProvider.opacity());
-    if (m_imgCorrectParam.enabled) {
-        if (!isPaused()) {
-            m_shaders->yv12ToRgbWithGamma->setImageCorrection(picLock->imageCorrectionResult());
+
+    if (fisheyeShader) {
+        fisheyeShader->setDewarpingParams(params, ar, (float)tex0Coords.right(), (float)tex0Coords.bottom());
+    }
+
+    if (gammaShader) 
+    {
+        if (!isPaused() && !isStillImage) {
+            gammaShader->setImageCorrection(picLock->imageCorrectionResult());
             if (m_histogramConsumer)
                 m_histogramConsumer->setHistogramData(picLock->imageCorrectionResult());
         }
         else {
-            m_shaders->yv12ToRgbWithGamma->setImageCorrection(calcImageCorrection());
+            gammaShader->setImageCorrection(calcImageCorrection());
             if (m_histogramConsumer) 
                 m_histogramConsumer->setHistogramData(m_imageCorrector);
         }
@@ -346,6 +413,8 @@ void QnGLRenderer::drawYVA12VideoTexture(
     unsigned int tex3ID,
     const float* v_array )
 {
+    Q_UNUSED(picLock)
+
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
         (float)tex0Coords.right(), (float)tex0Coords.top(),
@@ -508,4 +577,24 @@ void QnGLRenderer::setDisplayedRect(const QRectF& rect)
 void QnGLRenderer::setHistogramConsumer(QnHistogramConsumer* value) 
 { 
     m_histogramConsumer = value; 
+}
+
+void QnGLRenderer::setFisheyeController(QnFisheyePtzController* controller)
+{
+    QMutexLocker lock(&m_mutex);
+    m_fisheyeController = controller;
+}
+
+bool QnGLRenderer::isFisheyeEnabled() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_fisheyeController && m_fisheyeController->isEnabled();
+}
+
+int QnGLRenderer::panoFactor() const
+{
+    if (m_fisheyeController && m_fisheyeController->isEnabled()) 
+        return (int) m_fisheyeController->getDewarpingParams().panoFactor;
+    else
+        return 1;
 }

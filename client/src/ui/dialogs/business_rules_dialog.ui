@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1078</width>
-    <height>612</height>
+    <width>1170</width>
+    <height>719</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Alarm/Event Rules</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
@@ -22,7 +22,7 @@
         <string>Add</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../x64/build/client-custom.qrc">
+        <iconset resource="../../../x86/build/client-custom.qrc">
          <normaloff>:/skin/titlebar/new_layout_hovered.png</normaloff>:/skin/titlebar/new_layout_hovered.png</iconset>
        </property>
       </widget>
@@ -73,6 +73,31 @@
         <iconset>
          <normalon>:/skin/titlebar/dropdown_hovered.png</normalon>
         </iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLineEdit" name="filterLineEdit">
+       <property name="placeholderText">
+        <string>Filter by cameras...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="clearFilterButton">
+       <property name="text">
+        <string>X</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="systemRulesCheckBox">
+       <property name="text">
+        <string>Show system rules</string>
        </property>
       </widget>
      </item>
@@ -156,7 +181,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../x64/build/client-custom.qrc"/>
+  <include location="../../../x86/build/client-custom.qrc"/>
  </resources>
  <connections/>
 </ui>

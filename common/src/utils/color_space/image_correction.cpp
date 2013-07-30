@@ -54,7 +54,6 @@ void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int he
     int xSteps = (right-left) / 4;
 
     // prepare hystogram
-    //m_mutex.lock();
     memset(hystogram, 0, sizeof(hystogram));
     for (int y = top; y < bottom; ++y)
     {
@@ -76,7 +75,6 @@ void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int he
             hystogram[(quint8) value]++;
         }
     }
-    //m_mutex.unlock();
 
     // get hystogram range
     int pixels = (right-left) * (bottom-top);

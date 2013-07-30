@@ -19,6 +19,7 @@ public:
 
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) override;
     virtual bool open(QnCompressedVideoDataPtr video) override;
+    void close();
     AVCodecContext* getCodecContext();
 
     /* Allow multithread transcoding */

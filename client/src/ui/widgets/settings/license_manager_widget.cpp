@@ -106,7 +106,7 @@ void QnLicenseManagerWidget::updateLicenses() {
             useRedLabel = false;
         } else {
             QString text = (qnProductFeatures().freeLicenseCount > 0) ?
-                tr("You do not have a valid License installed. Please activate your commercial or free license.") :
+                tr("You do not have a valid License installed. Please activate your commercial or trial license.") :
                 tr("You do not have a valid License installed. Please activate your commercial license.");
             ui->infoLabel->setText(text);
             useRedLabel = true;

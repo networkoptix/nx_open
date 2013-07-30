@@ -7,11 +7,13 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
+#include <api/model/camera_diagnostics_reply.h>
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
 
+#include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
@@ -48,6 +50,7 @@ signals:
     void finished(int status, const QnStringVariantPairList &reply, int handle);
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
+    void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
     void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
     void finished(int status, const QImage &reply, int handle);
@@ -166,6 +169,15 @@ public:
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 
     int getTimeAsync(QObject *target, const char *slot);
+
+    //!Request server to run camera \a cameraID diagnostics step following \a previousStep
+    /*!
+        \param slot Slot MUST have signature (int, QnCameraDiagnosticsReply, int)
+        \returns Request handle
+    */
+    int doCameraDiagnosticsStepAsync(
+        const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+        QObject* target, const char* slot );
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

@@ -53,6 +53,7 @@ public:
 
         ControlPtz                  = 0x100,    /**< Whether PTZ state can be controlled with mouse. */
         ControlZoomWindow           = 0x200,    /**< Whether zoom windows can be created by dragging the mouse. */
+        VirtualZoomWindow           = 0x400,    /**< Whether zoom windows is fisheye shader. */
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -342,6 +343,10 @@ protected:
 
     QnViewportBoundWidget* headerOverlayWidget() const {
         return m_headerOverlayWidget;
+    }
+
+    QnStatusOverlayWidget *statusOverlayWidget() const {
+        return m_statusOverlayWidget;
     }
 
     virtual Buttons calculateButtonsVisibility() const;
