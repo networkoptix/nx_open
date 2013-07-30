@@ -40,8 +40,8 @@ namespace {
     Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
 
     const QColor textColor(255, 96, 96, 128);
-    const QColor buttonBaseColor(255, 96, 96, 64);
-    const QColor buttonBorderColor(255, 96, 96, 196);
+    const QColor buttonBaseColor(255, 32, 32, 64);
+    const QColor buttonBorderColor(255, 32, 32, 196);
 
 } // anonymous namespace
 
