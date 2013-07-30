@@ -69,6 +69,7 @@ namespace CameraDiagnostics
     public slots:
         //!Receives response from media server
         /*!
+            \param status \a QNetworkReply::NetworkError
             \param performedStep Constant from \a Step::Value enumeration
         */
         void onCameraDiagnosticsStepResponse( int status, QnCameraDiagnosticsReply, int handle );
