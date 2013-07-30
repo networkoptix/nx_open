@@ -361,11 +361,11 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
             mserverRes = newServer;
     }
 
-    QUrl mserverUrl = mserverRes->getUrl();
     if (!isPublic || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
         if (resolveAddress(appServerDefaultUrl.host()) != QHostAddress::LocalHost) {
             appServerUrl = appServerDefaultUrl;
         } else {
+            QUrl mserverUrl = mserverRes->getUrl();
             appServerUrl.setHost(mserverUrl.host());
         }
     }

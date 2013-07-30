@@ -7,6 +7,7 @@
 
 struct QnEmailAttachment {
     QnEmailAttachment(const QString &filename_, const QString &contentFilename, const QString &mimetype_);
+    QnEmailAttachment(const QString &filename_, QIODevice& io_, const QString &mimetype_);
 
     QString filename;
     QByteArray content;

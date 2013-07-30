@@ -23,6 +23,19 @@
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
+namespace {
+    const QString tpProductLogoFilename(lit("productLogoFilename"));
+    const QString tpEventLogoFilename(lit("eventLogoFilename"));
+    const QString tpProductLogo(lit("productLogo.png"));
+    const QString tpCompanyName(lit("companyName"));
+    const QString tpCompanyUrl(lit("companyUrl"));
+    const QString tpSupportEmail(lit("supportEmail"));
+    const QString tpSystemName(lit("systemName"));
+    const QString tpImageMimeType(lit("image/png"));
+    const QString tpScreenshotFilename(lit("screenshot"));
+    const QString tpScreenshot(lit("screenshot.jpeg"));
+};
+
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
 QnBusinessRuleProcessor::QnBusinessRuleProcessor()
@@ -373,6 +386,13 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
     //TODO: #vasilenko implement me
 }
 
+QImage QnBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const
+{
+    Q_UNUSED(params);
+    Q_UNUSED(dstSize);
+
+    return QImage();
+}
 bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
 {
     Q_ASSERT( action );
@@ -414,15 +434,25 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     contextMap[partialInfo.attrName] = lit("true");
 
     QnEmailAttachmentList attachments;
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(lit("productLogo.png"), lit(":/skin/email_attachments/productLogo.png"), lit("image/png"))));
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(partialInfo.eventLogoFilename, lit(":/skin/email_attachments/") + partialInfo.eventLogoFilename, lit("image/png"))));
-    contextMap[lit("productLogoFilename")] = lit("cid:productLogo.png");
-    contextMap[lit("eventLogoFilename")] = lit("cid:") + partialInfo.eventLogoFilename;
-    contextMap[lit("companyName")] = lit(QN_ORGANIZATION_NAME);
-    contextMap[lit("companyUrl")] = lit(QN_COMPANY_URL);
-    contextMap[lit("supportEmail")] = lit(QN_SUPPORT_MAIL_ADDRESS);
-    contextMap[lit("systemName")] = QnAppServerConnectionFactory::systemName();
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(partialInfo.eventLogoFilename, lit(":/skin/email_attachments/") + partialInfo.eventLogoFilename, tpImageMimeType)));
+    contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
+    contextMap[tpEventLogoFilename] = lit("cid:") + partialInfo.eventLogoFilename;
+    contextMap[tpCompanyName] = lit(QN_ORGANIZATION_NAME);
+    contextMap[tpCompanyUrl] = lit(QN_COMPANY_URL);
+    contextMap[tpSupportEmail] = lit(QN_SUPPORT_MAIL_ADDRESS);
+    contextMap[tpSystemName] = QnAppServerConnectionFactory::systemName();
     attachments.append(partialInfo.attachments);
+
+    QImage screenshot = this->getEventScreenshot(action->getRuntimeParams(), QSize(640, 480));
+    if (!screenshot.isNull()) {
+        QByteArray screenshotData;
+        QBuffer screenshotStream(&screenshotData);
+        if (screenshot.save(&screenshotStream, "JPEG")) {
+            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
+            contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+        }
+    }
 
     QString messageBody = renderTemplateFromFile(lit(":/email_templates"), lit("container.mustache"), contextMap);
 
