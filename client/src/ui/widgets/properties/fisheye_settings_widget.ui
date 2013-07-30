@@ -60,9 +60,15 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="angleText">
-       <property name="text">
-        <string>0.0</string>
+      <widget class="QDoubleSpinBox" name="angleSpinBox">
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-30.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>30.000000000000000</double>
        </property>
       </widget>
      </item>

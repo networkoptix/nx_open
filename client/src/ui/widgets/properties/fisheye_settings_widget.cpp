@@ -11,6 +11,7 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
+    connect(ui->angleSpinBox,     SIGNAL(valueChanged(double)), this, SLOT(at_angleDataChanged()));
     connect(ui->horizontalSlider, SIGNAL(valueChanged(int)), this, SLOT(at_dataChanged()));
     connect(ui->horizontalRadioButton, SIGNAL(clicked(bool)), this, SLOT(at_dataChanged()));
     connect(ui->verticalRadioButton, SIGNAL(clicked(bool)), this, SLOT(at_dataChanged()));
@@ -43,13 +44,20 @@ qreal QnFisheyeSettingsWidget::getAngle()
     return ui->horizontalSlider->value() / 10.0;
 }
 
+void QnFisheyeSettingsWidget::at_angleDataChanged()
+{
+    ui->horizontalSlider->setValue(ui->angleSpinBox->value()*10);
+}
+
 void QnFisheyeSettingsWidget::at_dataChanged()
 {
-    ui->angleText->setText(QString::number(getAngle(), 'f', 1));
+    ui->angleSpinBox->blockSignals(true);
+    ui->angleSpinBox->setValue(getAngle());
     m_dewarpingParams.fovRot = getAngle();
     m_dewarpingParams.horizontalView = ui->horizontalRadioButton->isChecked();
     if (!m_silenseMode)
         emit dataChanged();
+    ui->angleSpinBox->blockSignals(false);
 }
 
 DewarpingParams QnFisheyeSettingsWidget::dewarpingParams() const

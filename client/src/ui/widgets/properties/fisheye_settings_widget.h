@@ -26,6 +26,7 @@ private:
     qreal getAngle();
 private slots:
     void at_dataChanged();
+    void at_angleDataChanged();
 private:
     QScopedPointer<Ui::FisheyeSettingsWidget> ui;
     bool m_silenseMode;
