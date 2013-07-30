@@ -1,29 +1,39 @@
-
 #include "media_resource.h"
 
 #include <QImage>
 
-#include "resource_media_layout.h"
+#include <utils/common/warnings.h>
 
+#include "resource_media_layout.h"
 
 QString QnStreamQualityToDisplayString(QnStreamQuality value) {
     switch(value) {
-    case QnQualityLowest:
-        return QObject::tr("Lowest");
-    case QnQualityLow:
-        return QObject::tr("Low");
-    case QnQualityNormal:
-        return QObject::tr("Normal");
-    case QnQualityHigh:
-        return QObject::tr("High");
-    case QnQualityHighest:
-        return QObject::tr("Highest");
-    case QnQualityPreSet:
-        return QObject::tr("Preset");
+    case QnQualityLowest:       return QObject::tr("Lowest");
+    case QnQualityLow:          return QObject::tr("Low");
+    case QnQualityNormal:       return QObject::tr("Normal");
+    case QnQualityHigh:         return QObject::tr("High");
+    case QnQualityHighest:      return QObject::tr("Highest");
+    case QnQualityPreSet:       return QObject::tr("Preset");
+    case QnQualityNotDefined:   return QObject::tr("Undefined");
     default:
-        break;
+        qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
+        return QString();
     }
-    return QObject::tr("Undefined");
+}
+
+QString QnStreamQualityToShortDisplayString(QnStreamQuality value) {
+    switch(value) {
+    case QnQualityLowest:       return QObject::tr("Wst",   "Short for 'Worst'");
+    case QnQualityLow:          return QObject::tr("Lo",    "Short for 'Low'");
+    case QnQualityNormal:       return QObject::tr("Me",    "Short for 'Medium'");
+    case QnQualityHigh:         return QObject::tr("Hi",    "Short for 'High'");
+    case QnQualityHighest:      return QObject::tr("Bst",   "Short for 'Best'");
+    case QnQualityPreSet:       return QObject::tr("Ps",    "Short for 'Preset'");
+    case QnQualityNotDefined:   return QObject::tr("Und",   "Short for 'Undefined'");
+    default:
+        qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
+        return QString();
+    }
 }
 
 QnStreamQuality QnStreamQualityFromString( const QString& str )
