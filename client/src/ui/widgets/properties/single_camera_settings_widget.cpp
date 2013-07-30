@@ -416,8 +416,12 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
         ui->checkBoxDewarping->setChecked(m_camera->getDewarpingParams().enabled);
         ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
-        //ui->checkBoxDewarping->setEnabled(m_camera->getPtzCapabilities() == 0);
-        ui->checkBoxDewarping->setEnabled(m_camera->hasParam(lit("ptzCapabilities")));
+
+        Qn::PtzCapabilities ptzCaps = m_camera->getPtzCapabilities();
+        ui->checkBoxDewarping->setEnabled(m_camera->hasParam(lit("ptzCapabilities")) &&
+                                          (ptzCaps == 0 || m_camera->getDewarpingParams().enabled));
+        
+
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());

@@ -2,6 +2,7 @@
 #include "av_panoramic.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
 #include "core/resource/resource_media_layout.h"
+#include "utils/network/http/httptypes.h"
 
 #define MAX_RESPONSE_LEN (4*1024)
 
@@ -136,6 +137,13 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
     setRegister(3, 100, 10); // sets I frame frequency to 10
 
     setParam(QLatin1String("CnannelEnable"), 15, QnDomainPhysical); // to enable all channels
+
+
+    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    QString request = QLatin1String("set?rotate=0");
+    CLHttpStatus response = connection.doGET(request);
+    if (response != CL_HTTP_SUCCESS)
+        return CameraDiagnostics::RequestFailedResult(lit("set?rotate=0"), lit(nx_http::StatusCode::toString((int) response)));
 
     return CameraDiagnostics::NoErrorResult();
 }
