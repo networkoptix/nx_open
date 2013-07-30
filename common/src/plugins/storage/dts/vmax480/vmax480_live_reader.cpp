@@ -75,10 +75,10 @@ bool QnVMax480LiveProvider::canChangeStatus() const
 }
 
 
-CameraDiagnostics::ErrorCode::Value QnVMax480LiveProvider::openStream()
+CameraDiagnostics::Result QnVMax480LiveProvider::openStream()
 {
     if (m_opened)
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
 
     int channel = QUrl(m_resource->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
     if (channel > 0)
@@ -90,7 +90,7 @@ CameraDiagnostics::ErrorCode::Value QnVMax480LiveProvider::openStream()
     m_opened = m_maxStream->registerConsumer(this); 
     m_lastMediaTimer.restart();
 
-    return CameraDiagnostics::ErrorCode::noError;
+    return CameraDiagnostics::NoErrorResult();
     /*
     vmaxDisconnect();
     vmaxConnect(true, channel);

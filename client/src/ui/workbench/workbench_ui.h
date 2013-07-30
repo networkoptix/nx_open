@@ -39,7 +39,7 @@ class QnResourceWidget;
 class QnMaskedProxyWidget;
 class QnAbstractRenderer;
 class QnClickableWidget;
-class QnSimpleFrameWidget;
+class QnFramedWidget;
 class QnLayoutTabBar;
 class QnActionManager;
 class QnLayoutTabBar;
@@ -374,7 +374,7 @@ private:
     QnMaskedProxyWidget *m_treeItem;
 
     /** Item that provides background for the tree. */
-    QnSimpleFrameWidget *m_treeBackgroundItem;
+    QnFramedWidget *m_treeBackgroundItem;
 
     /** Button to show/hide the tree. */
     QnImageButtonWidget *m_treeShowButton;
@@ -415,7 +415,7 @@ private:
     AnimatorGroup *m_titleOpacityAnimatorGroup;
 
     /** Background widget for the title bar. */
-    QnSimpleFrameWidget *m_titleBackgroundItem;
+    QnFramedWidget *m_titleBackgroundItem;
 
     /** Animator for title's position. */
     VariantAnimator *m_titleYAnimator;
@@ -429,7 +429,7 @@ private:
 
     /* Notifications window-related state. */
 
-    QnSimpleFrameWidget *m_notificationsBackgroundItem;
+    QnFramedWidget *m_notificationsBackgroundItem;
 
     QnNotificationsCollectionWidget *m_notificationsItem;
 

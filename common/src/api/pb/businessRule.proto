@@ -36,6 +36,8 @@ message BusinessRule {
     optional bool disabled                 = 10;
     optional string comments               = 11;
     optional string schedule               = 12;
+
+    optional bool system                   = 13; // system rule cannot be deleted from the client
 }
 
 message BusinessRules {

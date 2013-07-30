@@ -12,6 +12,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/common/geometry.h>
+#include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/processors/hover_processor.h>
@@ -160,14 +161,14 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     m_imageProvider(NULL),
     m_inToolTipPositionUpdate(false)
 {
-    m_color = notificationColor(m_notificationLevel);
+    m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
 
     setClickableButtons(Qt::RightButton | Qt::LeftButton);
     setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
     setFrameWidth(0.5);
     setWindowBrush(Qt::transparent);
 
-    m_overlayWidget = new QnSimpleFrameWidget(this);
+    m_overlayWidget = new QnFramedWidget(this);
     m_overlayWidget->setFrameStyle(Qt::NoPen);
 
     m_textLabel = new QnProxyLabel(this);
@@ -234,26 +235,12 @@ Qn::NotificationLevel QnNotificationItem::notificationLevel() const {
     return m_notificationLevel;
 }
 
-QColor QnNotificationItem::notificationColor(Qn::NotificationLevel level) {
-    switch (level) {
-    case Qn::NoNotification:        return Qt::transparent;
-    case Qn::OtherNotification:     return Qt::white;
-    case Qn::CommonNotification:    return qnGlobals->notificationColorCommon();
-    case Qn::ImportantNotification: return qnGlobals->notificationColorImportant();
-    case Qn::CriticalNotification:  return qnGlobals->notificationColorCritical();
-    case Qn::SystemNotification:    return qnGlobals->notificationColorSystem();
-    default:
-        qnWarning("Invalid notification level '%1'.", static_cast<int>(level));
-        return QColor();
-    }
-}
-
 void QnNotificationItem::setNotificationLevel(Qn::NotificationLevel notificationLevel) {
     if(m_notificationLevel == notificationLevel)
         return;
 
     m_notificationLevel = notificationLevel;
-    m_color = notificationColor(m_notificationLevel);
+    m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
 
     updateOverlayColor();
 

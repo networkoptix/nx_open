@@ -45,15 +45,20 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 
         for (i = 0; i < m_retry; ++i)
         {
-
+            m_prevResult = CameraDiagnostics::NoErrorResult();
             if (!m_sock.sendTo(buff_send,len_send))
+            {
+                m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
                 return 0;
+            }
 
             while(1)
             {
+                m_prevResult = CameraDiagnostics::NoErrorResult();
                 len_recv = m_sock.recvFrom(buff_recv, sizeof(buff_recv),temp_cam_addr, cam_dst_port);
                 if (len_recv < 0)
                 {
+                    m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
                     m_status = time_out; 
                     break;
                 }
@@ -107,18 +112,24 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 
                 //cl_log.log("sending... ", blk_cam_sending, cl_logWARNING);
 
+                m_prevResult = CameraDiagnostics::NoErrorResult();
                 if (!m_sock.sendTo(buff_send,len_send))
+                {
+                    m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
                     return 0;
+                }
 
                 //cl_log.log("send ", blk_cam_sending, cl_logWARNING);
 
                 while(1)
                 {
+                    m_prevResult = CameraDiagnostics::NoErrorResult();
                     len_recv = m_sock.recv(buff_recv, sizeof(buff_recv));
 
                     if (len_recv < 4)// unexpected answer or did not get anything
                     {
-                        m_status = time_out; 
+                        m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
+                        m_status = time_out;
                         break;
                     }
 
@@ -195,7 +206,9 @@ LAST_PACKET:
 
         // need to send ack to last pack;
         len_send = form_ack(last_pack_number, buff_send);
-        m_sock.sendTo(buff_send,len_send); // send ack
+        m_prevResult = CameraDiagnostics::NoErrorResult();
+        if( !m_sock.sendTo(buff_send,len_send) ) // send ack
+            m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
 
         return len;
     } catch (...)
@@ -203,6 +216,11 @@ LAST_PACKET:
         // Socket exception occured.
         return 0;
     }
+}
+
+CameraDiagnostics::Result CLSimpleTFTPClient::prevIOResult() const
+{
+    return m_prevResult;
 }
 
 int CLSimpleTFTPClient::form_read_request(const QString& fn, char* buff)

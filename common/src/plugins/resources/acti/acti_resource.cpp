@@ -237,7 +237,7 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
     return false;
 }
 
-bool QnActiResource::initInternal()
+CameraDiagnostics::Result QnActiResource::initInternal()
 {
     CLHttpStatus status;
         
@@ -246,11 +246,11 @@ bool QnActiResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED) 
         setStatus(QnResource::Unauthorized);
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     QByteArray serverReport = makeActiRequest(QLatin1String("system"), QLatin1String("SYSTEM_INFO"), status, true);
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     QMap<QByteArray, QByteArray> report = parseSystemInfo(serverReport);
     setFirmware(QString::fromUtf8(report.value("firmware version")));
     setMAC(QString::fromUtf8(report.value("mac address")));
@@ -260,7 +260,7 @@ bool QnActiResource::initInternal()
 
     QList<QSize> availResolutions = parseResolutionStr(resolutions);
     if (availResolutions.isEmpty() || availResolutions[0].isEmpty())
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     m_resolution[0] = availResolutions.first();
 
@@ -280,11 +280,11 @@ bool QnActiResource::initInternal()
 
     makeActiRequest(QLatin1String("system"), QLatin1String("RTP_B2=1"), status); // disable extra data aka B2 frames for RTSP (disable value:1, enable: 2)
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     QByteArray fpsString = makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_FPS_CAP"), status);
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     QList<QByteArray> fpsList = fpsString.split(';');
     
@@ -297,7 +297,7 @@ bool QnActiResource::initInternal()
 
     QByteArray rtspPortString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_PORT_RTSP"), status);
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     m_rtspPort = rtspPortString.trimmed().toInt();
     if (m_rtspPort == 0)
         m_rtspPort = DEFAULT_RTSP_PORT;
@@ -317,7 +317,7 @@ bool QnActiResource::initInternal()
     setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
     save();
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool QnActiResource::isResourceAccessible()

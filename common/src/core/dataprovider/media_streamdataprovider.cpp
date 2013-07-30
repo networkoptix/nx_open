@@ -184,3 +184,8 @@ QnMediaContextPtr QnAbstractMediaStreamDataProvider::getCodecContext() const
 {
     return QnMediaContextPtr();
 }
+
+CameraDiagnostics::Result QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection()
+{
+    return CameraDiagnostics::NotImplementedResult();
+}

@@ -53,9 +53,7 @@
 #if defined(_MSC_VER)
 #   define override override
 #elif defined(__GNUC__)
-#   if (GCC_VERSION >= 40700)
-#       define override override
-#   else
+#   if (GCC_VERSION < 40700)
 #       define override
 #   endif
 #else

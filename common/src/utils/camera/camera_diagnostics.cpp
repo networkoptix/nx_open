@@ -8,7 +8,7 @@
 
 namespace CameraDiagnostics
 {
-    namespace DiagnosticsStep
+    namespace Step
     {
         QString toString( Value val )
         {
@@ -55,18 +55,53 @@ namespace CameraDiagnostics
             {
                 case noError:
                     requiredParamCount = 0;
-                    errorMessage = QString::fromLatin1("ok");
+                    errorMessage = QObject::tr("ok");
                     break;
                 case cannotEstablishConnection:
                     requiredParamCount = 1;
-                    errorMessage = QString::fromLatin1("Camera %1 is unavailable");
+                    errorMessage = QObject::tr("Cannot connect to api port %1");
                     break;
                 case cannotOpenCameraMediaPort:
+                    requiredParamCount = 1;
+                    errorMessage = QObject::tr("Cannot connect to media port %1");
+                    break;
+                case connectionClosedUnexpectedly:
+                    requiredParamCount = 1;
+                    errorMessage = QObject::tr("Connection to port %1 was closed unexpectedly");
+                    break;
+                case responseParseError:
+                    errorMessage = QObject::tr("Error parsing server response");
+                    break;
+                case noMediaTrack:
+                    errorMessage = QObject::tr("No media track(s)");
+                    break;
+                case notAuthorised:
+                    errorMessage = QObject::tr("Not authorised");
+                    break;
+                case unsupportedProtocol:
+                    requiredParamCount = 1;
+                    errorMessage = QObject::tr("Unsupported media protocol %1");
+                    break;
+                case cannotConfigureMediaStream:
+                    requiredParamCount = 1;
+                    errorMessage = QObject::tr("Failed to configure parameter %1");
+                    break;
+                case requestFailed:
                     requiredParamCount = 2;
-                    errorMessage = QString::fromLatin1("Cannot connect to media port %1 of camera %2");
+                    errorMessage = QObject::tr("Camera request %1 failed with error %2");
+                    break;
+                case notImplemented:
+                    requiredParamCount = 0;
+                    errorMessage = QObject::tr("Not implemented");
+                    break;
+                case ioError:
+                    requiredParamCount = 1;
+                    errorMessage = QObject::tr("I/O error. OS message: %1");
                     break;
                 default:
-                    errorMessage = QString::fromLatin1("Unknown error. Parameters: ");
+                    errorMessage = QObject::tr("Unknown error");
+                    if( !errorParams.isEmpty() )
+                        errorMessage += QObject::tr(". Parameters: ");
                     for( int i = 0; i < errorParams.size(); ++i )
                     {
                         if( i > 0 )
@@ -87,5 +122,32 @@ namespace CameraDiagnostics
         {
             return toString( static_cast<Value>(val), errorParams );
         }
+    }
+
+
+    Result::Result()
+    :
+        errorCode( ErrorCode::noError )
+    {
+    }
+
+    Result::Result( ErrorCode::Value _errorCode, const QString& param1, const QString& param2 )
+    :
+        errorCode( _errorCode )
+    {
+        if( !param1.isEmpty() || !param2.isEmpty() )
+            errorParams.push_back( param1 );
+        if( !param2.isEmpty() )
+            errorParams.push_back( param2 );
+    }
+
+    QString Result::toString() const
+    {
+        return ErrorCode::toString( errorCode, errorParams );
+    }
+
+    Result::operator bool() const
+    {
+        return errorCode == ErrorCode::noError;
     }
 }

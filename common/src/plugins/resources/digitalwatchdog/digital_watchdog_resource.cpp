@@ -67,20 +67,20 @@ bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
     return true; // ignore other error (for cameras with non standart HTTP port)
 }
 
-bool QnPlWatchDogResource::initInternal() 
+CameraDiagnostics::Result QnPlWatchDogResource::initInternal() 
 {
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false) 
     {
         if (m_appStopping)
-            return false;
+            return CameraDiagnostics::UnknownErrorResult();
 
         // The camera most likely is going to reset after enabling dual streaming
         enableOnvifSecondStream();
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
         
-    bool result = QnPlOnvifResource::initInternal();
+    const CameraDiagnostics::Result result = QnPlOnvifResource::initInternal();
 
     // TODO: #Elric this code is totally evil. Better write it properly as soon as possible.
     CLSimpleHTTPClient http(getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());

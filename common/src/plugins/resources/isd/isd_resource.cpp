@@ -50,7 +50,7 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-bool QnPlIsdResource::initInternal()
+CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
     CLHttpStatus status;
     QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), 80, 3000, getAuth());
@@ -58,7 +58,7 @@ bool QnPlIsdResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Unauthorized);
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
     QStringList vals = getValues(QLatin1String(reslst));
@@ -76,7 +76,7 @@ bool QnPlIsdResource::initInternal()
     }
 
     if (resolutions.size() < 1 )
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
 
 
@@ -153,7 +153,7 @@ bool QnPlIsdResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Unauthorized);
-        return false;
+        return CameraDiagnostics::NotAuthorisedResult();
     }
 
     /**/
@@ -170,7 +170,7 @@ bool QnPlIsdResource::initInternal()
     qSort(fpsList.begin(),fpsList.end(), qGreater<int>());
 
     if (fpsList.size()<1)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     {
         
@@ -179,7 +179,7 @@ bool QnPlIsdResource::initInternal()
 
     save();
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 
 }
 

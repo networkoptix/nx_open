@@ -12,7 +12,7 @@ public:
 
     bool getParamPhysical(int cannel, const QString& name, QVariant &val);
 protected:
-    bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
 
     virtual bool setParamPhysical(const QnParam &param, const QVariant &val) override;
     virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);

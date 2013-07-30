@@ -402,6 +402,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Clear cache"));
 
+    factory(Qn::CameraDiagnosticsAction).
+        flags(Qn::ResourceTarget | Qn::SingleTarget).
+        text(tr("Camera Diagnostics...")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).
@@ -628,7 +633,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraListAction).
         flags(Qn::Main | Qn::Tree).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Cameras List...")).
+        text(tr("Camera List...")).
         shortcut(tr("Ctrl+M")).
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));

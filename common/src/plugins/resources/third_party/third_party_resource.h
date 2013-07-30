@@ -66,7 +66,7 @@ public:
 
 protected:
     //!Implementation of QnResource::initInternal
-    virtual bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
     //!Implementation of QnSecurityCamResource::startInputPortMonitoring
     virtual bool startInputPortMonitoring() override;
     //!Implementation of QnSecurityCamResource::stopInputPortMonitoring

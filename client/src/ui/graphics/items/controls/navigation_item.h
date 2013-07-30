@@ -1,7 +1,7 @@
 #ifndef QN_NAVIGATION_ITEM_H
 #define QN_NAVIGATION_ITEM_H
 
-#include <ui/graphics/items/generic/simple_frame_widget.h>
+#include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnSpeedSlider;
@@ -12,10 +12,10 @@ class QnTimeScrollBar;
 class QnWorkbenchNavigator;
 class QGraphicsProxyWidget;
 
-class QnNavigationItem : public QnSimpleFrameWidget, public QnWorkbenchContextAware {
+class QnNavigationItem : public QnFramedWidget, public QnWorkbenchContextAware {
     Q_OBJECT
 
-    typedef QnSimpleFrameWidget base_type;
+    typedef QnFramedWidget base_type;
 
 public:
     explicit QnNavigationItem(QGraphicsItem *parent = NULL);

@@ -27,6 +27,8 @@
 #include <camera/resource_display.h>
 #include <camera/video_camera.h>
 
+#include <ui/common/notification_levels.h>
+
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
 #include <ui/animation/curtain_animator.h>
@@ -1864,16 +1866,18 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if(thumbnailed)
         return;
 
-    at_notificationTimer_timeout(resource);
-    QnVariantTimer::singleShot(500, this, SLOT(at_notificationTimer_timeout(const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource));
-    QnVariantTimer::singleShot(1000, this, SLOT(at_notificationTimer_timeout(const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource));
+    int type = businessAction->getRuntimeParams().getEventType();
+
+    at_notificationTimer_timeout(resource, type);
+    QnVariantTimer::singleShot(500, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);
+    QnVariantTimer::singleShot(1000, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);
 }
 
-void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource) {
-    at_notificationTimer_timeout(resource.value<QnResourcePtr>());
+void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource, const QVariant &type) {
+    at_notificationTimer_timeout(resource.value<QnResourcePtr>(), type.toInt());
 }
 
-void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource) {
+void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource, int type) {
     foreach(QnResourceWidget *widget, this->widgets(resource)) {
         if(widget->zoomTargetWidget())
             continue; /* Don't draw notification on zoom widgets. */
@@ -1885,8 +1889,10 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         splashItem->setSplashType(QnSplashItem::Rectangular);
         splashItem->setPos(rect.center());
         splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
-        splashItem->setColor(withAlpha(qnGlobals->errorTextColor(), 128));
+        splashItem->setColor(withAlpha(QnNotificationLevels::notificationColor(static_cast<BusinessEventType::Value>(type)), 128));
         splashItem->setOpacity(0.0);
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
     }
 }
+
+

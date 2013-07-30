@@ -65,6 +65,7 @@
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
+#include <ui/dialogs/camera_diagnostics_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -273,6 +274,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
+    connect(action(Qn::CameraDiagnosticsAction),                SIGNAL(triggered()),    this,   SLOT(at_cameraDiagnosticsAction_triggered()));
     connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
     connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
     connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
@@ -2087,6 +2089,7 @@ void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
 
     businessEventsLogDialog()->disableUpdateData();
     businessEventsLogDialog()->setEventType(BusinessEventType::AnyCameraIssue);
+    businessEventsLogDialog()->setActionType(BusinessActionType::NotDefined);
     QDate date = QDateTime::currentDateTime().date();
     businessEventsLogDialog()->setDateRange(date, date);
     businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());
@@ -2099,6 +2102,16 @@ void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
         businessEventsLogDialog()->setGeometry(oldGeometry);
 }
 
+void QnWorkbenchActionHandler::at_cameraDiagnosticsAction_triggered() {
+    QnVirtualCameraResourcePtr resource = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
+    if(!resource)
+        return;
+
+    QScopedPointer<QnCameraDiagnosticsDialog> dialog(new QnCameraDiagnosticsDialog(mainWindow()));
+    dialog->setResource(resource);
+    dialog->restart();
+    dialog->exec();
+}
 
 void QnWorkbenchActionHandler::at_clearCameraSettingsAction_triggered() {
     if(cameraSettingsDialog() && cameraSettingsDialog()->isVisible())

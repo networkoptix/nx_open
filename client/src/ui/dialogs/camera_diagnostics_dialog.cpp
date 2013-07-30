@@ -1,19 +1,33 @@
 #include "ui_camera_diagnostics_dialog.h"
 #include "camera_diagnostics_dialog.h"
 
+#include <QApplication>
+#include <QClipboard>
+
 #include <utils/common/delete_later.h>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_name.h>
 
 #include <camera/camera_diagnose_tool.h>
+
+#include <ui/common/ui_resource_name.h>
 #include <ui/style/globals.h>
+
 
 QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
+    ui(new Ui::CameraDiagnosticsDialog),
     m_tool(NULL),
     m_started(false),
     m_finished(false)
-{}
+{
+    ui->setupUi(this);
+    
+    QPushButton *copyButton = new QPushButton(tr("Copy to Clipboard"), this);
+    ui->buttonBox->addButton(copyButton, QDialogButtonBox::HelpRole);
+    connect(copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
+}
 
 QnCameraDiagnosticsDialog::~QnCameraDiagnosticsDialog() {
     stop();
@@ -45,9 +59,12 @@ void QnCameraDiagnosticsDialog::restart() {
     stop();
 
     m_tool = new CameraDiagnostics::DiagnoseTool(m_resource->getId(), this);
-    connect(m_tool, SIGNAL(diagnosticsStepStarted(int)),                this, SLOT(at_tool_diagnosticsStepStarted(int)));
-    connect(m_tool, SIGNAL(diagnosticsStepResult(int, bool, QString)),  this, SLOT(at_tool_diagnosticsStepResult(int, bool, QString)));
-    connect(m_tool, SIGNAL(diagnosticsDone(int, bool, QString)),        this, SLOT(at_tool_diagnosticsDone(int, bool, QString)));
+    connect(m_tool, SIGNAL(diagnosticsStepStarted(CameraDiagnostics::Step::Value)),
+            this, SLOT(at_tool_diagnosticsStepStarted(CameraDiagnostics::Step::Value)));
+    connect(m_tool, SIGNAL(diagnosticsStepResult(CameraDiagnostics::Step::Value, bool, QString)),
+            this, SLOT(at_tool_diagnosticsStepResult(CameraDiagnostics::Step::Value, bool, QString)));
+    connect(m_tool, SIGNAL(diagnosticsDone(CameraDiagnostics::Step::Value, bool, QString)),
+            this, SLOT(at_tool_diagnosticsDone(CameraDiagnostics::Step::Value, bool, QString)));
     m_tool->start();
     
     m_started = true;
@@ -74,7 +91,7 @@ void QnCameraDiagnosticsDialog::updateTitleText() {
     if(!m_resource) {
         ui->titleLabel->clear();
     } else {
-        ui->titleLabel->setText(tr("Diagnostics for camera %1.").arg(m_resource->getName()));
+        ui->titleLabel->setText(tr("Diagnostics for camera %1.").arg(getResourceName(m_resource)));
     }
 }
 
@@ -88,33 +105,33 @@ void QnCameraDiagnosticsDialog::clearLog() {
 
 QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     switch(stepType) {
-    case CameraDiagnostics::DiagnosticsStep::mediaServerAvailability:
+    case CameraDiagnostics::Step::mediaServerAvailability:
         return tr("Checking media server availability");
-    case CameraDiagnostics::DiagnosticsStep::cameraAvailability:
+    case CameraDiagnostics::Step::cameraAvailability:
         return tr("Checking that camera responses on base API requests");
-    case CameraDiagnostics::DiagnosticsStep::mediaStreamAvailability:
+    case CameraDiagnostics::Step::mediaStreamAvailability:
         return tr("Checking that camera provides media stream");
-    case CameraDiagnostics::DiagnosticsStep::mediaStreamIntegrity: 
+    case CameraDiagnostics::Step::mediaStreamIntegrity: 
         return tr("Checking media stream provided by camera for errors");
     default:
         return QString();
     }
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepStarted(int stepType) {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepStarted(CameraDiagnostics::Step::Value stepType) {
     m_lastLine = diagnosticsStepText(stepType);
 
     ui->textEdit->append(m_lastLine);
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(int stepType, bool result, const QString &errorMessage) {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(CameraDiagnostics::Step::Value stepType, bool result, const QString &errorMessage) {
     QString message;
     QColor color;
     if(result) {
         message = tr("OK");
         color = QColor(128, 255, 128);
     } else {
-        message = tr("FAILED");
+        message = tr("FAILED: %1").arg(errorMessage);
         color = qnGlobals->errorTextColor();
     }
     
@@ -123,7 +140,7 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(int stepType, bool
     ui->textEdit->append(lit("<br/>"));
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone(int finalStep, bool result, const QString &errorMessage) {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone(CameraDiagnostics::Step::Value finalStep, bool result, const QString &errorMessage) {
     ui->textEdit->append(tr("Diagnostics finished"));
 
     m_finished = true;
@@ -131,3 +148,8 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone(int finalStep, bool resu
     updateOkButtonEnabled();
 }
 
+void QnCameraDiagnosticsDialog::at_copyButton_clicked() {
+    QClipboard *clipboard = QApplication::clipboard();
+
+    clipboard->setText(ui->textEdit->toPlainText());
+}

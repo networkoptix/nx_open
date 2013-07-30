@@ -12,6 +12,7 @@
 #include "third_party_resource.h"
 
 
+//!Stream reader for resource, implemented in external plugin
 class ThirdPartyStreamReader
 :
     public CLServerPushStreamReader
@@ -26,7 +27,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::ErrorCode::Value openStream() override;
+    virtual CameraDiagnostics::Result openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
     virtual int getLastResponseCode() const override;

@@ -25,7 +25,7 @@ QnStardotStreamReader::~QnStardotStreamReader()
     stop();
 }
 
-CameraDiagnostics::ErrorCode::Value QnStardotStreamReader::openStream()
+CameraDiagnostics::Result QnStardotStreamReader::openStream()
 {
     // configure stream params
 
@@ -44,16 +44,16 @@ CameraDiagnostics::ErrorCode::Value QnStardotStreamReader::openStream()
             if (status == CL_HTTP_AUTH_REQUIRED) 
             {
                 m_resource->setStatus(QnResource::Unauthorized);
-                return CameraDiagnostics::ErrorCode::notAuthorised;
+                return CameraDiagnostics::NotAuthorisedResult();
             }
-            return CameraDiagnostics::ErrorCode::responseParseError;
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("admin.cgi?image"), QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
         }
     }
 
     QString streamUrl = m_stardotRes->getRtspUrl();
 
     m_multiCodec.setRequest(streamUrl);
-    const CameraDiagnostics::ErrorCode::Value result = m_multiCodec.openStream();
+    const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
         m_resource->setStatus(QnResource::Unauthorized);
     return result;

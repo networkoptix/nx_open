@@ -170,15 +170,12 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             break;
 
         case Qt::TextColorRole:
-//            if (m_disabled || isValid())
-                break;
-
-//            if (!isValid(column))
-//                return QBrush(Qt::black);
-//            return QBrush(Qt::black); //test
+            if (m_system)
+                return QBrush(Qt::yellow);
+            break;
 
         case Qt::BackgroundRole:
-            if (m_disabled || isValid())
+            if (m_system || m_disabled || isValid())
                 break;
 
             if (!isValid(column))
@@ -211,6 +208,9 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
 }
 
 bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, int role) {
+    if (m_system)
+        return false;
+
     if (column == QnBusiness::DisabledColumn && role == Qt::CheckStateRole) {
         Qt::CheckState checked = (Qt::CheckState)value.toInt();
         setDisabled(checked == Qt::Unchecked);
@@ -282,6 +282,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     m_disabled = businessRule->disabled();
     m_comments = businessRule->comments();
     m_schedule = businessRule->schedule();
+    m_system = businessRule->system();
 
     updateActionTypesModel();//TODO: #GDM connect on dataChanged?
 
@@ -532,6 +533,10 @@ void QnBusinessRuleViewModel::setDisabled(const bool value) {
     emit dataChanged(this, QnBusiness::AllFieldsMask); // all fields should be redrawn
 }
 
+bool QnBusinessRuleViewModel::system() const {
+    return m_system;
+}
+
 QString QnBusinessRuleViewModel::comments() const {
     return m_comments;
 }
@@ -769,9 +774,9 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         foreach (const QnUserResourcePtr &user, users) {
             QString userMail = user->getEmail();
             if (userMail.isEmpty())
-                return tr("User %1 has empty email").arg(user->getName());
+                return tr("User '%1' has empty E-Mail").arg(user->getName());
             if (!QnEmail::isValid(userMail))
-                return tr("User %1 has invalid email address: %2").arg(user->getName()).arg(userMail);
+                return tr("User '%1' has invalid E-Mail address: %2").arg(user->getName()).arg(userMail);
             receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
         }
 
@@ -849,18 +854,18 @@ QString QnBusinessRuleViewModel::getAggregationText() const {
         return tr("Not Applied");
 
     if (m_aggregationPeriod <= 0)
-        return tr("Do Instantly");
+        return tr("Instant");
 
     if (m_aggregationPeriod >= DAY && m_aggregationPeriod % DAY == 0)
-        return tr("Once per %n days", "", m_aggregationPeriod / DAY);
+        return tr("Every %n days", "", m_aggregationPeriod / DAY);
 
     if (m_aggregationPeriod >= HOUR && m_aggregationPeriod % HOUR == 0)
-        return tr("Once per %n hours", "", m_aggregationPeriod / HOUR);
+        return tr("Every %n hours", "", m_aggregationPeriod / HOUR);
 
     if (m_aggregationPeriod >= MINUTE && m_aggregationPeriod % MINUTE == 0)
-        return tr("Once per %n minutes", "", m_aggregationPeriod / MINUTE);
+        return tr("Every %n minutes", "", m_aggregationPeriod / MINUTE);
 
-    return tr("Once per %n seconds", "", m_aggregationPeriod);
+    return tr("Every %n seconds", "", m_aggregationPeriod);
 }
 
 
@@ -994,6 +999,9 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
         default:
             break;
     }
+    if (m_rules[index.row()]->system())
+        flags &= ~Qt::ItemIsEditable;
+
     return flags;
 }
 

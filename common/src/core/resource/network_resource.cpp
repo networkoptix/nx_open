@@ -3,8 +3,10 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
+#include "utils/network/socket.h"
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
+
 
 QnNetworkResource::QnNetworkResource(): 
     QnResource(),
@@ -279,8 +281,8 @@ int QnNetworkResource::getChannel() const
 
 bool QnNetworkResource::ping()
 {
-    //TODO/IMPL
-    return false;
+    TCPSocket sock;
+    return sock.connect( getHostAddress(), httpPort() );
 }
 
 /*

@@ -486,7 +486,7 @@ int serializeBusinessActionType(BusinessActionType::Value value) {
     case BusinessActionType::CameraRecording:       return pb::CameraRecording;
     case BusinessActionType::PanicRecording:        return pb::PanicRecording;
     case BusinessActionType::SendMail:              return pb::SendMail;
-    case BusinessActionType::Alert:                 return pb::Alert;
+    case BusinessActionType::Diagnostics:           return pb::Diagnostics;
     case BusinessActionType::ShowPopup:             return pb::ShowPopup;
     case BusinessActionType::PlaySound:             return pb::PlaySound;
     case BusinessActionType::SayText:               return pb::SayText;
@@ -538,6 +538,7 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     pb_businessRule.set_disabled(businessRulePtr->disabled());
     pb_businessRule.set_comments(businessRulePtr->comments().toUtf8());
     pb_businessRule.set_schedule(businessRulePtr->schedule().toUtf8());
+    pb_businessRule.set_system(businessRulePtr->system());
 }
 
 void serializeKvPair_i(int resourceId, pb::KvPair& pb_kvPair, const QnKvPair& kvPair)
@@ -645,7 +646,7 @@ BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     case pb::CameraRecording:       return BusinessActionType::CameraRecording;
     case pb::PanicRecording:        return BusinessActionType::PanicRecording;
     case pb::SendMail:              return BusinessActionType::SendMail;
-    case pb::Alert:                 return BusinessActionType::Alert;
+    case pb::Diagnostics:           return BusinessActionType::Diagnostics;
     case pb::ShowPopup:             return BusinessActionType::ShowPopup;
     case pb::PlaySound:             return BusinessActionType::PlaySound;
     case pb::SayText:               return BusinessActionType::SayText;
@@ -1200,6 +1201,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
     businessRule->setDisabled(pb_businessRule.disabled());
     businessRule->setComments(QString::fromUtf8(pb_businessRule.comments().c_str()));
     businessRule->setSchedule(QString::fromUtf8(pb_businessRule.schedule().c_str()));
+    businessRule->setSystem(pb_businessRule.system());
 }
 
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction)

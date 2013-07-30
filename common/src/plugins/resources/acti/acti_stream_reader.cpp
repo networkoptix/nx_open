@@ -36,7 +36,7 @@ QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
     return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
 }
 
-CameraDiagnostics::ErrorCode::Value QnActiStreamReader::openStream()
+CameraDiagnostics::Result QnActiStreamReader::openStream()
 {
     // configure stream params
 
@@ -61,25 +61,25 @@ CameraDiagnostics::ErrorCode::Value QnActiStreamReader::openStream()
         CLHttpStatus status;
         QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(fps), status);
         if (status != CL_HTTP_SUCCESS)
-            return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
 
         result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_RESOLUTION.arg(ch).arg(resolutionStr), status);
         if (status != CL_HTTP_SUCCESS)
-            return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
 
         result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_BITRATE.arg(ch).arg(bitrateStr), status);
         if (status != CL_HTTP_SUCCESS)
-            return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
 
         result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_ENCODER.arg(ch).arg(encoderStr), status);
         if (status != CL_HTTP_SUCCESS)
-            return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("encoder"));
 
         if (m_actiRes->isAudioSupported())
         {
             result = m_actiRes->makeActiRequest(QLatin1String("system"), SET_AUDIO.arg(ch).arg(audioStr), status);
             if (status != CL_HTTP_SUCCESS)
-                return CameraDiagnostics::ErrorCode::cannotConfigureMediaStream;
+                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
         }
     }
 
@@ -88,7 +88,7 @@ CameraDiagnostics::ErrorCode::Value QnActiStreamReader::openStream()
     QString streamUrl = m_actiRes->getRtspUrl(ch);
 
     m_multiCodec.setRequest(streamUrl);
-    const CameraDiagnostics::ErrorCode::Value result = m_multiCodec.openStream();
+    const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
         m_resource->setStatus(QnResource::Unauthorized);
     return result;
