@@ -171,7 +171,10 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_RuntimeInfoChange:
         {
             const pb::RuntimeInfoChangeMessage& runtimeInfoChangeMessage = message.GetExtension(pb::RuntimeInfoChangeMessage::message);
-            publicIp = QString::fromStdString(runtimeInfoChangeMessage.publicip());
+            if (runtimeInfoChangeMessage.has_publicip())
+                publicIp = QString::fromStdString(runtimeInfoChangeMessage.publicip());
+            if (runtimeInfoChangeMessage.has_systemname())
+                systemName = QString::fromStdString(runtimeInfoChangeMessage.systemname());
             break;
         }
     default:

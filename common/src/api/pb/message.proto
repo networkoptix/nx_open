@@ -127,4 +127,5 @@ message RuntimeInfoChangeMessage {
     }
 
     optional string publicIp = 1;
+    optional string systemName = 2;
 }

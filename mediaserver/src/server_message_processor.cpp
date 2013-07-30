@@ -71,7 +71,11 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage message)
 
     if (message.messageType == Qn::Message_Type_RuntimeInfoChange)
     {
-        QnAppServerConnectionFactory::setPublicIp(message.publicIp);
+        if (!message.publicIp.isNull())
+            QnAppServerConnectionFactory::setPublicIp(message.publicIp);
+
+        if (!message.systemName.isNull())
+            QnAppServerConnectionFactory::setSystemName(message.systemName);
     }
     else if (message.messageType == Qn::Message_Type_License)
     {
