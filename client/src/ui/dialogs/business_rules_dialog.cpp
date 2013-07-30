@@ -80,7 +80,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     ui->tableView->clearSelection();
 
-
     // TODO: #Elric replace with a single connect call
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
     resizeSignalizer->setEventType(QEvent::Resize);
@@ -107,6 +106,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
             this,               SLOT(at_afterModelChanged(QnBusinessRulesActualModelChange, bool)));
 
     m_rulesViewModel->reloadData();
+
+    connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFilter()));
+    connect(ui->systemRulesCheckBox, SIGNAL(toggled(bool)), this, SLOT(updateFilter()));
+    connect(ui->clearFilterButton, SIGNAL(clicked()), this, SLOT(at_clearFilterButton_clicked()));
+    updateFilter();
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog()
@@ -235,6 +239,10 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
     m_rulesViewModel->reloadData();
 }
 
+void QnBusinessRulesDialog::at_clearFilterButton_clicked() {
+    ui->filterLineEdit->clear();
+}
+
 void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok) {
     if (!ok) {
         switch (change) {
@@ -254,6 +262,7 @@ void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChang
         ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     }
     updateControlButtons();
+    updateFilter();
 }
 
 void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& response, int handle) {
@@ -389,6 +398,64 @@ void QnBusinessRulesDialog::updateControlButtons() {
     m_newAction->setEnabled(hasRights && loaded);
 
     setAdvancedMode(hasRights && loaded && advancedMode());
+}
+
+void QnBusinessRulesDialog::updateFilter() {
+
+    QString filter = ui->filterLineEdit->text();
+    /* Don't allow empty filters. */
+    if (!filter.isEmpty() && filter.trimmed().isEmpty()) {
+        ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
+        return;
+    }
+    ui->clearFilterButton->setVisible(!filter.isEmpty());
+
+    if (!m_rulesViewModel->isLoaded())
+        return;
+
+    bool showSystemRules = ui->systemRulesCheckBox->isChecked();
+
+    for (int i = 0; i < m_rulesViewModel->rowCount(); ++i) {
+        QnBusinessRuleViewModel *ruleModel = m_rulesViewModel->getRuleModel(i);
+
+        // check that system rules should be displayed
+        bool passSystemFilter = (showSystemRules || !ruleModel->system());
+        bool passEventFilter = BusinessEventType::requiresCameraResource(ruleModel->eventType());
+        bool passActionFilter = BusinessActionType::requiresCameraResource(ruleModel->actionType());
+
+        // check that rule requires cameras in event field
+        // AND supports any camera
+        // OR contains camera that is passing filter
+        if (passSystemFilter
+            && !filter.isEmpty()
+            && passEventFilter
+            && !ruleModel->eventResources().isEmpty()) {
+
+            passEventFilter = false;
+            foreach (const QnResourcePtr &resource, ruleModel->eventResources()) {
+                passEventFilter = (resource->toSearchString().contains(filter));
+                if (passEventFilter)
+                    break;
+            }
+        }
+
+        // check that rule does not require cameras in action field
+        // OR contains camera that is passing filter
+        if (passSystemFilter
+            && !filter.isEmpty()
+            && passActionFilter) {
+            passActionFilter = false;
+            foreach (const QnResourcePtr &resource, ruleModel->actionResources()) {
+                passActionFilter = (resource->toSearchString().contains(filter));
+                if (passActionFilter)
+                    break;
+            }
+        }
+
+        bool visible = passSystemFilter && (filter.isEmpty() || passEventFilter || passActionFilter);
+        ui->tableView->setRowHidden(i, !visible);
+    }
+
 }
 
 bool QnBusinessRulesDialog::advancedMode() const {
