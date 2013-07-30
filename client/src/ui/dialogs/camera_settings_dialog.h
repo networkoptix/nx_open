@@ -31,7 +31,7 @@ public:
 signals:
     void buttonClicked(QDialogButtonBox::StandardButton button);
     void advancedSettingChanged();
-    void fisheyeSettingChanged(DewarpingParams params);
+    void fisheyeSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &cameras);
     void cameraOpenRequested();
 
