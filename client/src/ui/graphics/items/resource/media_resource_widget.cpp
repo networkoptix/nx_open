@@ -861,7 +861,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     QSize sourceSize = m_renderer->sourceSize();
 
-    if (item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
+    if (item() && item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
         sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
 
     if(sourceSize.isEmpty()) {
