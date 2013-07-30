@@ -42,6 +42,8 @@ private slots:
     void at_tool_diagnosticsStepResult(int stepType, bool result, const QString &errorMessage);
     void at_tool_diagnosticsDone(int finalStep, bool result, const QString &errorMessage);
 
+    void at_copyButton_clicked();
+
 private:
     QScopedPointer<Ui::CameraDiagnosticsDialog> ui;
     

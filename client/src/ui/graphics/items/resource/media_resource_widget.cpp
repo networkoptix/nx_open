@@ -19,6 +19,7 @@
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 
+#include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -37,6 +38,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 
+#include "resource_status_overlay_widget.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
@@ -150,6 +152,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         connect(m_camera.data(),    SIGNAL(scheduleTasksChanged(const QnSecurityCamResourcePtr &)),     this,   SLOT(updateIconButton()));
         connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)),this,   SLOT(updateButtonsVisibility()));
         timer->start(1000 * 60); /* Update icon button every minute. */
+
+        connect(statusOverlayWidget(), SIGNAL(diagnosticsRequested()),                                  this,   SLOT(at_statusOverlayWidget_diagnosticsRequested()));
+        statusOverlayWidget()->setDiagnosticsVisible(true);
     }
 
     connect(resource()->toResource(), SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(updateButtonsVisibility()));
@@ -951,3 +956,6 @@ void QnMediaResourceWidget::at_zoomRectChanged()
     }
 }
 
+void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
+    menu()->trigger(Qn::CameraDiagnosticsAction, m_camera);
+}

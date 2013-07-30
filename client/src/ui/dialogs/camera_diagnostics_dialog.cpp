@@ -1,19 +1,33 @@
 #include "ui_camera_diagnostics_dialog.h"
 #include "camera_diagnostics_dialog.h"
 
+#include <QApplication>
+#include <QClipboard>
+
 #include <utils/common/delete_later.h>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_name.h>
 
 #include <camera/camera_diagnose_tool.h>
+
+#include <ui/common/ui_resource_name.h>
 #include <ui/style/globals.h>
+
 
 QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
+    ui(new Ui::CameraDiagnosticsDialog),
     m_tool(NULL),
     m_started(false),
     m_finished(false)
-{}
+{
+    ui->setupUi(this);
+    
+    QPushButton *copyButton = new QPushButton(tr("Copy to Clipboard"), this);
+    ui->buttonBox->addButton(copyButton, QDialogButtonBox::HelpRole);
+    connect(copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
+}
 
 QnCameraDiagnosticsDialog::~QnCameraDiagnosticsDialog() {
     stop();
@@ -74,7 +88,7 @@ void QnCameraDiagnosticsDialog::updateTitleText() {
     if(!m_resource) {
         ui->titleLabel->clear();
     } else {
-        ui->titleLabel->setText(tr("Diagnostics for camera %1.").arg(m_resource->getName()));
+        ui->titleLabel->setText(tr("Diagnostics for camera %1.").arg(getResourceName(m_resource)));
     }
 }
 
@@ -114,7 +128,7 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(int stepType, bool
         message = tr("OK");
         color = QColor(128, 255, 128);
     } else {
-        message = tr("FAILED");
+        message = tr("FAILED: %1").arg(errorMessage);
         color = qnGlobals->errorTextColor();
     }
     
@@ -131,3 +145,8 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone(int finalStep, bool resu
     updateOkButtonEnabled();
 }
 
+void QnCameraDiagnosticsDialog::at_copyButton_clicked() {
+    QClipboard *clipboard = QApplication::clipboard();
+
+    clipboard->setText(ui->textEdit->toPlainText());
+}

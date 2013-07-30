@@ -30,7 +30,7 @@
 #include <client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
-    base_type(parent, Qt::Window),
+    base_type(parent, Qt::WindowMinMaxButtonsHint),
     QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
@@ -202,6 +202,8 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     QnBusinessRuleViewModel* model = m_currentDetailsWidget->model();
     if (!model)
         return;
+    if (model->system())
+        return;
     deleteRule(model);
 }
 
@@ -344,19 +346,19 @@ void QnBusinessRulesDialog::updateControlButtons() {
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
                 );
+    bool canDelete = hasRights && loaded && m_currentDetailsWidget->model() && !m_currentDetailsWidget->model()->system();
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights && loaded);
 
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges);
 
-    ui->deleteRuleButton->setEnabled(hasRights && loaded && m_currentDetailsWidget->model());
-    m_deleteAction->setEnabled(hasRights && loaded && m_currentDetailsWidget->model());
+    ui->deleteRuleButton->setEnabled(canDelete);
+    m_deleteAction->setEnabled(canDelete);
 
     ui->advancedButton->setEnabled(loaded && m_currentDetailsWidget->model());
     m_advancedAction->setEnabled(loaded && m_currentDetailsWidget->model());
     ui->addRuleButton->setEnabled(hasRights && loaded);
     m_newAction->setEnabled(hasRights && loaded);
-
 
     setAdvancedMode(hasRights && loaded && advancedMode());
 }

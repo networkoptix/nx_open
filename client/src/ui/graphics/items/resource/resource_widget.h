@@ -345,6 +345,10 @@ protected:
         return m_headerOverlayWidget;
     }
 
+    QnStatusOverlayWidget *statusOverlayWidget() const {
+        return m_statusOverlayWidget;
+    }
+
     virtual Buttons calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
 

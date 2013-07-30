@@ -5,7 +5,7 @@
 #include <QtGui/QBrush>
 #include <QtGui/QFont>
 
-#include "simple_frame_widget.h"
+#include "framed_widget.h"
 
 class QnProxyLabel;
 
@@ -15,9 +15,9 @@ class QnProxyLabel;
  * 
  * Use <tt>setContentsMargins</tt> to change tool tip's content margins and rounding radius.
  */
-class QnToolTipWidget: public QnSimpleFrameWidget {
+class QnToolTipWidget: public QnFramedWidget {
     Q_OBJECT;
-    typedef QnSimpleFrameWidget base_type;
+    typedef QnFramedWidget base_type;
 
 public:
     QnToolTipWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);

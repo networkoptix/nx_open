@@ -167,7 +167,7 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     setFrameWidth(0.5);
     setWindowBrush(Qt::transparent);
 
-    m_overlayWidget = new QnSimpleFrameWidget(this);
+    m_overlayWidget = new QnFramedWidget(this);
     m_overlayWidget->setFrameStyle(Qt::NoPen);
 
     m_textLabel = new QnProxyLabel(this);
