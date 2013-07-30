@@ -11,6 +11,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/math/linear_combination.h>
 #include <client/client_settings.h>
 
 #include <ui/animation/variant_animator.h>
@@ -22,6 +23,7 @@
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/common/geometry.h>
 #include <ui/common/accessor.h>
+
 
 #define QN_IMAGE_BUTTON_WIDGET_DEBUG
 
@@ -696,4 +698,80 @@ void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
 }
 
 
+// -------------------------------------------------------------------------- //
+// QnTextButtonWidget
+// -------------------------------------------------------------------------- //
+QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags),
+    m_automaticTextHeight(-1.0)
+{
+    setFrameShape(Qn::NoFrame);
+}
 
+const QString &QnTextButtonWidget::text() const {
+    return m_text;
+}
+
+void QnTextButtonWidget::setText(const QString &text) {
+    if(m_text == text)
+        return;
+
+    m_text = text;
+    update();
+}
+
+qreal QnTextButtonWidget::automaticTextHeight() const {
+    return m_automaticTextHeight;
+}
+
+void QnTextButtonWidget::setAutomaticTextHeight(qreal automaticTextHeight) {
+    if(qFuzzyCompare(m_automaticTextHeight, automaticTextHeight))
+        return;
+
+    m_automaticTextHeight = automaticTextHeight;
+    update();
+}
+
+void QnTextButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    /* Skip Framed implementation. */
+    QnImageButtonWidget::paint(painter, option, widget);
+}
+
+void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+    qreal opacity = painter->opacity();
+    painter->setOpacity(opacity * linearCombine(1.0 - progress, stateOpacity(startState), progress, stateOpacity(endState)));
+
+    /* Draw frame. */
+    paintFrame(
+        painter, 
+        linearCombine(1.0 - progress, stateFrameColor(startState), progress, stateFrameColor(endState)), 
+        linearCombine(1.0 - progress, stateWindowColor(startState), progress, stateWindowColor(endState)),
+        rect
+    );
+
+    /* Draw image. */ 
+    QnImageButtonWidget::paint(painter, startState, endState, progress, widget, rect);
+
+    /* Draw text. */
+    if(!m_text.isEmpty()) {
+        QFont font = this->font();
+        if(m_automaticTextHeight > 0)
+            font.setPixelSize(size().height() * m_automaticTextHeight);
+        QnScopedPainterFontRollback fontRollback(painter, font);
+        painter->drawText(rect, Qt::AlignCenter, m_text);
+    }
+
+    painter->setOpacity(opacity);
+}
+
+qreal QnTextButtonWidget::stateOpacity(StateFlags) {
+    return 1.0;
+}
+
+QColor QnTextButtonWidget::stateFrameColor(StateFlags) {
+    return frameColor();
+}
+
+QColor QnTextButtonWidget::stateWindowColor(StateFlags) {
+    return windowColor();
+}

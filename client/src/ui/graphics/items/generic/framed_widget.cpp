@@ -94,7 +94,7 @@ void FramedBase::setWindowColor(const QColor &windowColor) {
     setWindowBrush(windowColor);
 }
 
-void FramedBase::paint(QPainter *painter, const QBrush &frameBrush, const QBrush &windowBrush, const QRectF &rect) {
+void FramedBase::paintFrame(QPainter *painter, const QBrush &frameBrush, const QBrush &windowBrush, const QRectF &rect) {
     if(m_frameShape == Qn::NoFrame)
         return;
 

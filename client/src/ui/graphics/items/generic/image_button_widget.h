@@ -7,6 +7,7 @@
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/graphics/items/generic/framed_widget.h>
 
 class QAction;
 class QMenu;
@@ -171,5 +172,34 @@ private:
     qreal m_rotation;
 };
 
+
+
+/**
+ * An image button widget that can show text and draw a frame.
+ */
+class QnTextButtonWidget: public Framed<QnImageButtonWidget> {
+    Q_OBJECT
+    typedef Framed<QnImageButtonWidget> base_type;
+public:
+    QnTextButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+
+    const QString &text() const;
+    void setText(const QString &text);
+
+    qreal automaticTextHeight() const;
+    void setAutomaticTextHeight(qreal automaticTextHeight);
+
+protected:
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
+
+    virtual qreal stateOpacity(StateFlags state);
+    virtual QColor stateFrameColor(StateFlags state);
+    virtual QColor stateWindowColor(StateFlags state);
+
+private:
+    QString m_text;
+    qreal m_automaticTextHeight;
+};
 
 #endif // QN_IMAGE_BUTTON_WIDGET_H
