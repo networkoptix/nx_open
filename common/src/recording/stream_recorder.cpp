@@ -534,7 +534,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                     m_videoTranscoder->addFilter(new QnTimeImageFilter(QnTimeImageFilter::Date_RightBottom, m_onscreenDateOffset));
                 }
 
-                m_videoTranscoder->setQuality(QnQualityHighest);
+                m_videoTranscoder->setQuality(Qn::QualityHighest);
                 if (!m_srcRect.isEmpty() && !m_dewarpingParams.enabled)
                     m_videoTranscoder->setSrcRect(m_srcRect);
                 m_videoTranscoder->setVideoLayout(layout);

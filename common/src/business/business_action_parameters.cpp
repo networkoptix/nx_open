@@ -27,7 +27,7 @@ QnBusinessActionParameters::QnBusinessActionParameters()
 {
     m_userGroup = 0;
     m_fps = 10;
-    m_streamQuality = int(QnQualityHighest);
+    m_streamQuality = int(Qn::QualityHighest);
     m_recordingDuration = 0;
     m_before = 0;
     m_after = 0;
@@ -75,11 +75,11 @@ void QnBusinessActionParameters::setFps(int value) {
     m_fps = value;
 }
 
-QnStreamQuality QnBusinessActionParameters::getStreamQuality() const {
-    return (QnStreamQuality) m_streamQuality;
+Qn::StreamQuality QnBusinessActionParameters::getStreamQuality() const {
+    return (Qn::StreamQuality) m_streamQuality;
 }
 
-void QnBusinessActionParameters::setStreamQuality(QnStreamQuality value) {
+void QnBusinessActionParameters::setStreamQuality(Qn::StreamQuality value) {
     m_streamQuality = (int) value;
 }
 
