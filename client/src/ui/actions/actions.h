@@ -354,7 +354,12 @@ namespace Qn {
         /**
          * Opens selected layouts in a new window.
          */
-        OpenNewWindowLayoutsAction,
+        OpenLayoutsInNewWindowAction,
+
+        /**
+         * Opens current layout in a new window.
+         */
+        OpenCurrentLayoutInNewWindowAction,
 
         /**
          * Saves selected layout.

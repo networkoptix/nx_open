@@ -261,7 +261,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenSingleLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenMultipleLayoutsAction),              SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
-    connect(action(Qn::OpenNewWindowLayoutsAction),             SIGNAL(triggered()),    this,   SLOT(at_openNewWindowLayoutsAction_triggered()));
+    connect(action(Qn::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
+    connect(action(Qn::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(Qn::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
@@ -1113,12 +1114,16 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
     }
 }
 
-void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
+void QnWorkbenchActionHandler::at_openLayoutsInNewWindowAction_triggered() {
     // TODO: #GDM this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
     QnLayoutResourceList layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
     if(layouts.isEmpty())
         return;
     openResourcesInNewWindow(layouts);
+}
+
+void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered() {
+    menu()->trigger(Qn::OpenLayoutsInNewWindowAction, workbench()->currentLayout()->resource());
 }
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
@@ -2831,6 +2836,11 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(true);
     exportProgressDialog->show();
+
+    QPushButton *openNewWindowButton = new QPushButton(tr("Open New Window"));
+    exportProgressDialog->addButton(openNewWindowButton, QDialogButtonBox::HelpRole);
+    connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
+
     m_exportProgressDialog = exportProgressDialog;
 
     if (!m_layoutExportCamera)
@@ -3348,6 +3358,11 @@ Do you want to continue?"),
         exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
         exportProgressDialog->setRange(0, 100);
         exportProgressDialog->setMinimumDuration(1000);
+
+        QPushButton *openNewWindowButton = new QPushButton(tr("Open New Window"));
+        exportProgressDialog->addButton(openNewWindowButton, QDialogButtonBox::HelpRole);
+        connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
+
         m_exportProgressDialog = exportProgressDialog;
 
         m_exportedCamera = widget->display()->camera();
