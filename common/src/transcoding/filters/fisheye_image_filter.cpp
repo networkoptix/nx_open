@@ -146,7 +146,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
 
     float fovRot = sin(m_params.xAngle)*m_params.fovRot;
     qreal xShift, yShift, yCenter;
-    if (m_params.horizontalView) {
+    if (m_params.viewMode == DewarpingParams::Horizontal) {
         yShift = m_params.yAngle;
         yCenter = 0.5;
         xShift = m_params.xAngle;
@@ -215,7 +215,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     qreal backAR = (1.0 - 1.0 / aspectRatio)/2.0;
     qreal yCenter;
     qreal phiShiftSign;
-    if (m_params.horizontalView) {
+    if (m_params.viewMode == DewarpingParams::Horizontal) {
         yCenter = 0.5;
         phiShiftSign = 1.0;
     }
@@ -240,7 +240,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
 
             // Vector in 3D space
             QVector3D pos3d;
-            if (m_params.horizontalView)
+            if (m_params.viewMode == DewarpingParams::Horizontal)
                 pos3d = QVector3D(cos(phi) * sin(theta),    cos(phi) * cos(theta), sin(phi));
             else
                 pos3d = QVector3D(cos(phi) * sin(theta),    sin(phi),              cos(phi) * cos(theta));

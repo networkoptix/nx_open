@@ -115,7 +115,7 @@ void QnFisheyeShaderProgram::setDewarpingParams(const DewarpingParams& params, f
     if (params.panoFactor == 1.0)
     {
         float fovRot = sin(params.xAngle)*params.fovRot;
-        if (params.horizontalView) {
+        if (params.viewMode == DewarpingParams::Horizontal) {
             setUniformValue(m_yShiftLocation, (float) (params.yAngle));
             setUniformValue(m_yCenterLocation, (float) 0.5);
             setUniformValue(m_xShiftLocation, (float) params.xAngle);
@@ -133,7 +133,7 @@ void QnFisheyeShaderProgram::setDewarpingParams(const DewarpingParams& params, f
         setUniformValue(m_fovRotLocation, (float) params.fovRot);
         //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
         setUniformValue(m_yShiftLocation, (float) (params.yAngle));
-        if (params.horizontalView)
+        if (params.viewMode == DewarpingParams::Horizontal)
             setUniformValue(m_yCenterLocation, (float) 0.5);
         else
             setUniformValue(m_yCenterLocation, (float) 1.0);

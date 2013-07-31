@@ -328,7 +328,7 @@ void QnGLRenderer::drawYV12VideoTexture(
         params = m_fisheyeController->updateDewarpingParams(ar);
         if (params.panoFactor > 1.0)
         {
-            if (params.horizontalView)
+            if (params.viewMode == DewarpingParams::Horizontal)
             {
                 if (m_imgCorrectParam.enabled)
                     gammaShader = fisheyeShader = m_shaders->fisheyePanoHGammaProgram;

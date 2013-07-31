@@ -5,7 +5,7 @@
 bool operator==(const DewarpingParams &l, const DewarpingParams &r) {
     if (l.enabled != r.enabled)
         return false;
-    if (l.horizontalView != r.horizontalView)
+    if (l.viewMode != r.viewMode)
         return false;
     if (!qFuzzyCompare(l.xAngle, r.xAngle))
         return false;
@@ -25,7 +25,7 @@ QByteArray DewarpingParams::serialize() const {
     /* V0. */
     QByteArray result;
     result.append(enabled ? '1' : '0').append(';');
-    result.append(horizontalView ? '1' : '0').append(';');
+    result.append(QByteArray::number(viewMode)).append(';');
     result.append(QByteArray::number(xAngle)).append(';');
     result.append(QByteArray::number(xAngle)).append(';');
     result.append(QByteArray::number(fov)).append(';');
@@ -42,7 +42,7 @@ DewarpingParams DewarpingParams::deserialize(const QByteArray &data) {
         QList<QByteArray> params = data.split(';');
         resizeList(params, 7);
         result.enabled          = params[0].toInt() > 0;
-        result.horizontalView   = params[1].toInt() > 0;
+        result.viewMode         = (ViewMode) params[1].toInt();
         result.xAngle           = params[2].toDouble();
         result.yAngle           = params[3].toDouble();
         result.fov              = params[4].toDouble();
