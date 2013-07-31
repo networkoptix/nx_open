@@ -414,9 +414,9 @@ void QnProgressiveDownloadingConsumer::run()
             }
         }
 
-        QnStreamQuality quality = QnQualityNormal;
+        Qn::StreamQuality quality = Qn::QualityNormal;
         if( getDecodedUrl().hasQueryItem(QnCodecParams::quality) )
-            quality = QnStreamQualityFromString(getDecodedUrl().queryItemValue(QnCodecParams::quality));
+            quality = Qn::fromString<Qn::StreamQuality>(getDecodedUrl().queryItemValue(QnCodecParams::quality));
 
         QnCodecParams::Value codecParams;
         QList<QPair<QString, QString> > queryItems = getDecodedUrl().queryItems();

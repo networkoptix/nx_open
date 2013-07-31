@@ -30,7 +30,7 @@ private:
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
     QStringList getRTPurls() const;
-    int toAxisQuality(QnStreamQuality quality);
+    int toAxisQuality(Qn::StreamQuality quality);
     void parseMotionInfo(QnCompressedVideoDataPtr videoData);
     void processTriggerData(const quint8* payload, int len);
 

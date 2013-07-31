@@ -231,18 +231,18 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
             const QPoint cell(col, row);
 
             Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
-            QnStreamQuality streamQuality = QnQualityHighest;
+            Qn::StreamQuality streamQuality = Qn::QualityHighest;
             if (recordType != Qn::RecordingType_Never)
             {
                 QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); 
                 if (shortQuality == QLatin1String("Lo"))
-                    streamQuality = QnQualityLow;
+                    streamQuality = Qn::QualityLow;
                 else if (shortQuality == QLatin1String("Me"))
-                    streamQuality = QnQualityNormal;
+                    streamQuality = Qn::QualityNormal;
                 else if (shortQuality == QLatin1String("Hi"))
-                    streamQuality = QnQualityHigh;
+                    streamQuality = Qn::QualityHigh;
                 else if (shortQuality == QLatin1String("Bst"))
-                    streamQuality = QnQualityHighest;
+                    streamQuality = Qn::QualityHighest;
                 else
                     qWarning("SecondParam wasn't acknowledged. fallback to 'Highest'");
             }
@@ -315,11 +315,11 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
         {
             switch (task.m_streamQuality)
             {
-                case QnQualityLow: 
-                case QnQualityNormal:
-                case QnQualityHigh: 
-                case QnQualityHighest: 
-                    shortQuality = QnStreamQualityToShortDisplayString(task.m_streamQuality);
+                case Qn::QualityLow: 
+                case Qn::QualityNormal:
+                case Qn::QualityHigh: 
+                case Qn::QualityHighest: 
+                    shortQuality = Qn::toShortDisplayString(task.m_streamQuality);
                     break;
                 default:
                     qWarning("QnCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d.", task.m_streamQuality);

@@ -40,10 +40,10 @@ public:
     virtual bool isResourceAccessible();
     virtual bool updateMACAddress();
 
-    virtual QnStreamQuality getBestQualityForSuchOnScreenSize(QSize size) const;
+    virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(QSize size) const;
 
 
-    virtual QImage getImage(int channnel, QDateTime time, QnStreamQuality quality);
+    virtual QImage getImage(int channnel, QDateTime time, Qn::StreamQuality quality);
 
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames

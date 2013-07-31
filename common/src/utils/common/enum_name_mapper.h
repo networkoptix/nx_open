@@ -13,6 +13,7 @@
 #include <QtCore/QMetaObject>
 
 #include <utils/common/warnings.h>
+#include <utils/common/forward.h>
 
 /**
  * <tt>QnEnumNameMapper</tt> supplies routines for fast <tt>QString</tt>-<tt>enum</tt> conversion.
@@ -29,7 +30,7 @@ public:
 
         int index = metaObject->indexOfEnumerator(enumName);
         if(index == -1) {
-            qnWarning("Class '%1' had no enum '%2'.", metaObject->className(), enumName);
+            qnWarning("Class '%1' has no enum '%2'.", metaObject->className(), enumName);
             return;
         }
 
@@ -64,6 +65,30 @@ private:
 };
 
 
+template<class Enum>
+class QnTypedEnumNameMapper: public QnEnumNameMapper {
+    typedef QnEnumNameMapper base_type;
+public:
+    QN_FORWARD_CONSTRUCTOR(QnTypedEnumNameMapper, QnEnumNameMapper, {})
+
+    void addValue(Enum value, const char *name) {
+        base_type::addValue(value, name);
+    }
+
+    void addValue(Enum value, const QString &name) {
+        base_type::addValue(value, name);
+    }
+
+    Enum value(const QString &name, Enum defaultValue) const {
+        return static_cast<Enum>(base_type::value(name, defaultValue));
+    }
+
+    QString name(Enum value, const QString &defaultValue = QString()) const {
+        return base_type::name(value, defaultValue);
+    }
+};
+
+
 namespace Qn { namespace detail {
     inline bool isNullString(const char *s) { return s == NULL; }
     inline bool isNullString(const QString &s) { return s.isNull(); }
@@ -72,7 +97,7 @@ namespace Qn { namespace detail {
 #define QN_DEFINE_NAME_MAPPED_ENUM_VALUE_I(R, DATA, ELEMENT)                    \
     BOOST_PP_TUPLE_ELEM(0, ELEMENT),
 
-#define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I(R, DATA, ELEMENT)                     \
+#define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I(R, DATA, ELEMENT)          \
     if(!Qn::detail::isNullString(BOOST_PP_TUPLE_ELEM(1, ELEMENT)))              \
         result.addValue ELEMENT;
 
@@ -90,20 +115,20 @@ namespace Qn { namespace detail {
  * \param ELEMENTS                      Sequence of enumeration's elements with
  *                                      their string representation.
  */
-#define QN_DEFINE_NAME_MAPPED_ENUM(ENUM, ELEMENTS)                              \
+#define QN_DEFINE_NAME_MAPPED_ENUM(ENUM, ELEMENTS, ... /* PREFIX */)            \
     enum ENUM {                                                                 \
         BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_NAME_MAPPED_ENUM_VALUE_I, ~, ELEMENTS)  \
     };                                                                          \
-    QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS)
+    QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS, ##__VA_ARGS__)
 
 
-#define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS)                    \
+#define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS, ... /* PREFIX */)  \
     template<class Enum>                                                        \
-    inline QnEnumNameMapper createEnumNameMapper();                             \
+    __VA_ARGS__ inline QnTypedEnumNameMapper<Enum> createEnumNameMapper();      \
                                                                                 \
     template<>                                                                  \
-    inline QnEnumNameMapper createEnumNameMapper<ENUM>() {                      \
-        QnEnumNameMapper result;                                                \
+    __VA_ARGS__ inline QnTypedEnumNameMapper<ENUM> createEnumNameMapper<ENUM>() { \
+        QnTypedEnumNameMapper<ENUM> result;                                     \
         BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I, ~, ELEMENTS) \
         return result;                                                          \
     }
@@ -118,11 +143,11 @@ namespace Qn { namespace detail {
  */
 #define QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(ENUM)                            \
     template<class Enum>                                                        \
-    static QnEnumNameMapper createEnumNameMapper();                             \
+    static inline QnTypedEnumNameMapper<Enum> createEnumNameMapper();           \
                                                                                 \
     template<>                                                                  \
-    static QnEnumNameMapper createEnumNameMapper<ENUM>() {                      \
-        return QnEnumNameMapper(&staticMetaObject, BOOST_PP_STRINGIZE(ENUM));   \
+    static inline QnTypedEnumNameMapper<Enum> createEnumNameMapper<ENUM>() {    \
+        return QnTypedEnumNameMapper<Enum>(&staticMetaObject, BOOST_PP_STRINGIZE(ENUM)); \
     }
 
 

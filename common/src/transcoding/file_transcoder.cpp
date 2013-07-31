@@ -64,7 +64,7 @@ bool FileTranscoder::addTag( const QString& name, const QString& value )
 bool FileTranscoder::setVideoCodec(
     CodecID codec,
     QnTranscoder::TranscodeMethod transcodeMethod,
-    QnStreamQuality quality,
+    Qn::StreamQuality quality,
     const QSize& resolution,
     int bitrate,
     QnCodecParams::Value params )

@@ -3,7 +3,7 @@
 
 #include <business/business_fwd.h>
 
-//TODO: #rvasilenko move QnStreamQuality OUT OF THERE! --Elric
+//TODO: #rvasilenko move Qn::StreamQuality OUT OF THERE! --Elric
 //TODO: #rvasilenko adding new parameter is TOO complex. Structure can be simplified --gdm
 #include <core/resource/media_resource.h>
 
@@ -56,8 +56,8 @@ public:
     int getFps() const;
     void setFps(int value);
 
-    QnStreamQuality getStreamQuality() const;
-    void setStreamQuality(QnStreamQuality value);
+    Qn::StreamQuality getStreamQuality() const;
+    void setStreamQuality(Qn::StreamQuality value);
 
     int getRecordDuration() const;
     void setRecordDuration(int value);

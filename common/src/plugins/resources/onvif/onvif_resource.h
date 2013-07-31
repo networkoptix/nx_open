@@ -132,7 +132,7 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    int innerQualityToOnvif(QnStreamQuality quality) const;
+    int innerQualityToOnvif(Qn::StreamQuality quality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress()); }
 
     int getGovLength() const;
@@ -193,7 +193,7 @@ public:
 
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool secondaryResolutionIsLarge() const;
-    virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;
+    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
     void setVendorName( const QString& vendorName );
 
