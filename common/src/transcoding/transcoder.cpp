@@ -8,7 +8,7 @@
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId)
 :
     m_bitrate(-1),
-    m_quality(QnQualityNormal)
+    m_quality(Qn::QualityNormal)
 {
     m_codecId = codecId;
 }
@@ -41,7 +41,7 @@ QString QnCodecTranscoder::getLastError() const
     return m_lastErrMessage;
 }
 
-void QnCodecTranscoder::setQuality( QnStreamQuality quality )
+void QnCodecTranscoder::setQuality( Qn::StreamQuality quality )
 {
     m_quality = quality;
 }
@@ -191,11 +191,11 @@ QnTranscoder::~QnTranscoder()
 int QnTranscoder::suggestMediaStreamParams(
     CodecID codec,
     QSize resolution,
-    QnStreamQuality quality,
+    Qn::StreamQuality quality,
     QnCodecParams::Value* const params )
 {
-    // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
-    // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
+    // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
 
     if (resolution.width() == 0)
         resolution.setWidth(resolution.height()*4/3);
@@ -203,15 +203,15 @@ int QnTranscoder::suggestMediaStreamParams(
     int hiEnd;
     switch(quality)
     {
-        case QnQualityLowest:
+        case Qn::QualityLowest:
             hiEnd = 1024;
-        case QnQualityLow:
+        case Qn::QualityLow:
             hiEnd = 1024 + 512;
-        case QnQualityNormal:
+        case Qn::QualityNormal:
             hiEnd = 1024*2;
-        case QnQualityHigh:
+        case Qn::QualityHigh:
             hiEnd = 1024*3;
-        case QnQualityHighest:
+        case Qn::QualityHighest:
         default:
             hiEnd = 1024*5;
     }
@@ -229,19 +229,19 @@ int QnTranscoder::suggestMediaStreamParams(
             int qVal = 1;
             switch( quality )
             {
-                case QnQualityLowest:
+                case Qn::QualityLowest:
                     qVal = 100;
                     break;
-                case QnQualityLow:
+                case Qn::QualityLow:
                     qVal = 50;
                     break;
-                case QnQualityNormal:
+                case Qn::QualityNormal:
                     qVal = 20;
                     break;
-                case QnQualityHigh:
+                case Qn::QualityHigh:
                     qVal = 5;
                     break;
-                case QnQualityHighest:
+                case Qn::QualityHighest:
                     qVal = 1;
                     break;
                 default:
@@ -264,7 +264,7 @@ void QnTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
 int QnTranscoder::setVideoCodec(
     CodecID codec,
     TranscodeMethod method,
-    QnStreamQuality quality,
+    Qn::StreamQuality quality,
     const QSize& resolution,
     int bitrate,
     QnCodecParams::Value params )

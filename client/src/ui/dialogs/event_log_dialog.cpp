@@ -32,7 +32,12 @@
 #include <utils/common/event_processors.h>
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
-    QDialog(parent),
+    base_type(parent,
+              Qt::CustomizeWindowHint |
+              Qt::WindowTitleHint |
+              Qt::WindowMinMaxButtonsHint |
+              Qt::WindowSystemMenuHint |
+              Qt::WindowCloseButtonHint),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
     m_updateDisabled(false),
@@ -40,7 +45,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     m_lastMouseButton(Qt::NoButton)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::Window);
 
     m_rulesModel = new QnBusinessRulesActualModel(this);
 
@@ -430,20 +434,20 @@ void QnEventLogDialog::setDateRange(const QDate& from, const QDate& to)
     ui->dateEditFrom->setDate(from);
 }
 
-void QnEventLogDialog::setCameraList(QnResourceList resList)
+void QnEventLogDialog::setCameraList(const QnResourceList &cameras)
 {
-    if (resList.size() == m_filterCameraList.size())
+    if (cameras.size() == m_filterCameraList.size())
     {
         bool matched = true;
-        for (int i = 0; i < resList.size(); ++i)
+        for (int i = 0; i < cameras.size(); ++i)
         {
-            matched &= resList[i]->getId() == m_filterCameraList[i]->getId();
+            matched &= cameras[i]->getId() == m_filterCameraList[i]->getId();
         }
         if (matched)
             return;
     }
 
-    m_filterCameraList = resList;
+    m_filterCameraList = cameras;
     ui->cameraButton->setText(getTextForNCameras(m_filterCameraList.size()));
 
     updateData();

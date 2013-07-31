@@ -66,10 +66,10 @@ protected:
     void beforeDisconnectFromResource();
 
 protected:
+    mutable QMutex m_mutex;
     QList<QnAbstractDataConsumer*> m_dataprocessors;
     QHash<QByteArray, QVariant> m_streamParam;
     QnResource::ConnectionRole m_role;
-    mutable QMutex m_mutex;
 };
 
 #endif //stream_reader_514

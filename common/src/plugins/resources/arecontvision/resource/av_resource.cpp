@@ -210,13 +210,13 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 
     QVariant val;
     if (!getParam(QLatin1String("Firmware version"), val, QnDomainPhysical))
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("Firmware version"), QLatin1String("unknown"));
 
     if (!getParam(QLatin1String("Image engine"), val, QnDomainPhysical ))
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("Image engine"), QLatin1String("unknown"));
 
     if (!getParam(QLatin1String("Net version"), val, QnDomainPhysical))
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("Net version"), QLatin1String("unknown"));
 
     //if (!getDescription())
     //    return;
@@ -225,12 +225,12 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 
 
     if (!setParam(QLatin1String("Enable motion detection"), QLatin1String("on"), QnDomainPhysical)) // enables motion detection;
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("Enable motion detection"), QLatin1String("unknown"));
 
     // check if we've got 1024 zones
     setParam(QLatin1String("TotalZones"), 1024, QnDomainPhysical); // try to set total zones to 64; new cams support it
     if (!getParam(QLatin1String("TotalZones"), val, QnDomainPhysical))
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("TotalZones"), QLatin1String("unknown"));
 
     if (val.toInt() == 1024)
         m_totalMdZones = 1024;
@@ -282,12 +282,12 @@ bool QnPlAreconVisionResource::updateMACAddress()
     return true;
 }
 
-QnStreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize /*size*/) const
+Qn::StreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize /*size*/) const
 {
-    return QnQualityNormal;
+    return Qn::QualityNormal;
 }
 
-QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQuality /*quality*/)
+QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/)
 {
     return QImage();
 }

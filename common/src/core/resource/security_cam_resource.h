@@ -128,14 +128,14 @@ public:
     virtual const QnResourcePtr toResourcePtr() const override;
     //!Implementation of QnMediaResource::toResource
     virtual QnResourcePtr toResourcePtr() override;
-    void setSecondaryStreamQuality(QnSecondaryStreamQuality  quality);
-    QnSecondaryStreamQuality  secondaryStreamQuality() const;
+    void setSecondaryStreamQuality(Qn::SecondStreamQuality  quality);
+    Qn::SecondStreamQuality  secondaryStreamQuality() const;
 
     void setCameraControlDisabled(bool value);
     bool isCameraControlDisabled() const;
 
     int desiredSecondStreamFps() const;
-    QnStreamQuality getSecondaryStreamQuality() const;
+    Qn::StreamQuality getSecondaryStreamQuality() const;
 
     StatusFlags statusFlags() const;
     bool hasStatusFlags(StatusFlags value) const;
@@ -204,7 +204,7 @@ private:
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
-    QnSecondaryStreamQuality  m_secondaryQuality;
+    Qn::SecondStreamQuality  m_secondaryQuality;
     bool m_cameraControlDisabled;
     StatusFlags m_statusFlags;
 };

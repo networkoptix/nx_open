@@ -14,10 +14,14 @@ enum QnBusinessRulesActualModelChange {
 class QnBusinessRulesActualModel: public QnBusinessRulesViewModel
 {
     Q_OBJECT
+
+    typedef QnBusinessRulesViewModel base_type;
 public:
     QnBusinessRulesActualModel(QObject *parent = 0);
 
     bool isLoaded() const;
+
+    virtual void clear() override;
 signals:
     void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);

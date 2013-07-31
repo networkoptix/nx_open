@@ -116,6 +116,7 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_Initial:
         {
             const pb::InitialMessage& initialMessage = message.GetExtension(pb::InitialMessage::message);
+            systemName = QString::fromUtf8(initialMessage.systemname().c_str());
             oldHardwareId = initialMessage.oldhardwareid().c_str();
             hardwareId1 = initialMessage.hardwareid1().c_str();
             hardwareId2 = initialMessage.hardwareid2().c_str();
@@ -170,7 +171,10 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_RuntimeInfoChange:
         {
             const pb::RuntimeInfoChangeMessage& runtimeInfoChangeMessage = message.GetExtension(pb::RuntimeInfoChangeMessage::message);
-            publicIp = QString::fromStdString(runtimeInfoChangeMessage.publicip());
+            if (runtimeInfoChangeMessage.has_publicip())
+                publicIp = QString::fromStdString(runtimeInfoChangeMessage.publicip());
+            if (runtimeInfoChangeMessage.has_systemname())
+                systemName = QString::fromStdString(runtimeInfoChangeMessage.systemname());
             break;
         }
     default:

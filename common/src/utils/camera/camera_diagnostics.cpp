@@ -57,6 +57,14 @@ namespace CameraDiagnostics
                     requiredParamCount = 0;
                     errorMessage = QObject::tr("ok");
                     break;
+                case mediaServerUnavailable:
+                    requiredParamCount = 1;
+                    errorMessage = QObject::tr("Media server %1 is not available");
+                    break;
+                case mediaServerBadResponse:
+                    requiredParamCount = 2;
+                    errorMessage = QObject::tr("Received bad response from media server %1: %2");
+                    break;
                 case cannotEstablishConnection:
                     requiredParamCount = 1;
                     errorMessage = QObject::tr("Cannot connect to http port %1. Make sure the camera is plugged into the network.");
@@ -107,9 +115,9 @@ namespace CameraDiagnostics
                     errorMessage = QObject::tr("Server has been stopped");
                     break;
                 default:
-                    errorMessage = QObject::tr("Unknown error. Please, contact support.");
+                    errorMessage = QObject::tr("Unknown error. Please contact support.");
                     if( !errorParams.isEmpty() )
-                        errorMessage += QObject::tr(". Parameters: ");
+                        errorMessage += QObject::tr(" Parameters: ");
                     for( int i = 0; i < errorParams.size(); ++i )
                     {
                         if( i > 0 )

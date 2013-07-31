@@ -1101,12 +1101,6 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
-    qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
-    if (lastRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(m_mediaServer,
-                                                   lastRunningTime*1000,
-                                                   QnBusiness::MServerIssueStarted);
-
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);

@@ -33,11 +33,16 @@ namespace CameraDiagnostics
         Value fromString( const QString& str );
     }
 
+    //!Contains error codes
     namespace ErrorCode
     {
         enum Value
         {
             noError = 0,
+            //!params: server ip
+            mediaServerUnavailable,
+            //!params: server ip
+            mediaServerBadResponse,
             //!params: port
             cannotEstablishConnection,
             //!params: mediaPort
@@ -68,6 +73,9 @@ namespace CameraDiagnostics
         QString toString( int val, const QList<QString>& errorParams = QList<QString>() );
     }
 
+    /*!
+        It is strongly recommended to use inheritor classes
+    */
     class Result
     {
     public:
@@ -84,6 +92,18 @@ namespace CameraDiagnostics
     {
     public:
         NoErrorResult() : Result( ErrorCode::noError ) {}
+    };
+
+    class MediaServerUnavailableResult : public Result
+    {
+    public:
+        MediaServerUnavailableResult( const QString& mediaServerIP ) : Result( ErrorCode::mediaServerUnavailable, mediaServerIP ) {}
+    };
+
+    class MediaServerBadResponseResult : public Result
+    {
+    public:
+        MediaServerBadResponseResult( const QString& mediaServerIP, const QString& serverResponse ) : Result( ErrorCode::mediaServerBadResponse, mediaServerIP, serverResponse ) {}
     };
 
     class CannotEstablishConnectionResult : public Result

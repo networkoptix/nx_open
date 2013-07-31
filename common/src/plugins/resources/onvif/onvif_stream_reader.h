@@ -97,7 +97,7 @@ private:
 
     QString m_streamUrl;
     int m_cachedFps;
-    QnStreamQuality m_cachedQuality;
+    Qn::StreamQuality m_cachedQuality;
     QElapsedTimer m_cachedTimer;
 };
 

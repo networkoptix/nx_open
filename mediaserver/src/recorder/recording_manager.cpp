@@ -149,7 +149,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     return true;
 }
 
-bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
+bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
 {
     updateCamera(camRes); // ensure recorders are created
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);

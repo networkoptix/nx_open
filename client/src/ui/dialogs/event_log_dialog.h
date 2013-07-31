@@ -6,9 +6,12 @@
 #include <QAbstractItemModel>
 #include <QModelIndex>
 
-#include "business/actions/abstract_business_action.h"
-#include "business/events/abstract_business_event.h"
-#include "core/resource/network_resource.h"
+#include <business/actions/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
+
+#include <core/resource/resource_fwd.h>
+
+#include <ui/dialogs/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnEventLogModel;
@@ -19,9 +22,11 @@ namespace Ui {
     class EventLogDialog;
 }
 
-class QnEventLogDialog: public QDialog, public QnWorkbenchContextAware
+class QnEventLogDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
+
+    typedef QnButtonBoxDialog base_type;
 
 public:
     explicit QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context);
@@ -44,7 +49,7 @@ public:
     void disableUpdateData();
     void enableUpdateData();
     void setDateRange(const QDate& from, const QDate& to);
-    void setCameraList(QnResourceList resList);
+    void setCameraList(const QnResourceList &cameras);
     void setActionType(BusinessActionType::Value value);
     void setEventType(BusinessEventType::Value value);
 protected:

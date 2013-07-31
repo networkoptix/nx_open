@@ -34,13 +34,15 @@
 <context>
     <name>Language</name>
     <message>
-        <location filename="../src/translation/translation_manager.cpp" line="137"/>
+        <location filename="../src/translation/translation_manager.cpp" line="141"/>
         <source>Language Name</source>
+        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="../src/translation/translation_manager.cpp" line="138"/>
+        <location filename="../src/translation/translation_manager.cpp" line="144"/>
         <source>Locale Code</source>
+        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>zh-CN</translation>
     </message>
 </context>
@@ -90,35 +92,28 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
         <source>Audio context must be specified</source>
-        <translation>需指定音频内容</translation>
+        <translation type="obsolete">需指定音频内容</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="118"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation>编码转换错误：无法找到编码器 %1</translation>
+        <translation type="obsolete">编码转换错误：无法找到编码器 %1</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
         <source>Can&apos;t initialize audio encoder</source>
-        <translation>无法初始化音频编码器</translation>
+        <translation type="obsolete">无法初始化音频编码器</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
         <source>Can&apos;t initialize audio decoder</source>
-        <translation>无法初始化音频解码器</translation>
+        <translation type="obsolete">无法初始化音频解码器</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="95"/>
         <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
-        <translation>无法分派分辨率级别 %1x%2</translation>
+        <translation type="obsolete">无法分派分辨率级别 %1x%2</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="165"/>
         <source>Can&apos;t initialize video encoder</source>
-        <translation>无法初始化视频编码器</translation>
+        <translation type="obsolete">无法初始化视频编码器</translation>
     </message>
     <message>
         <source>---</source>
@@ -156,8 +151,12 @@
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="19"/>
+        <source>Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Alert</source>
-        <translation>警告</translation>
+        <translation type="obsolete">警告</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="20"/>
@@ -452,39 +451,32 @@
         <translation type="obsolete">冲突</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="12"/>
         <source>Lowest</source>
-        <translation>最低</translation>
+        <translation type="obsolete">最低</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="14"/>
         <source>Low</source>
-        <translation>低</translation>
+        <translation type="obsolete">低</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="16"/>
         <source>Normal</source>
-        <translation>普通</translation>
+        <translation type="obsolete">普通</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="18"/>
         <source>High</source>
-        <translation>高</translation>
+        <translation type="obsolete">高</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="20"/>
         <source>Highest</source>
-        <translation>最高</translation>
+        <translation type="obsolete">最高</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="22"/>
         <source>Preset</source>
-        <translation>预设</translation>
+        <translation type="obsolete">预设</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="26"/>
         <source>Undefined</source>
-        <translation>未定义</translation>
+        <translation type="obsolete">未定义</translation>
     </message>
     <message>
         <source>Your E-Mail address is not set.
@@ -538,6 +530,91 @@ They cannot receive system notifications via E-Mail</source>
         <source>They cannot receive system notifications via E-Mail.</source>
         <translation type="obsolete">他们无法通过邮件接收系统通知。</translation>
     </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
+        <source>ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="62"/>
+        <source>Media server %1 is not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="66"/>
+        <source>Received bad response from media server %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
+        <source>Cannot connect to http port %1. Make sure the camera is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="74"/>
+        <source>Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="78"/>
+        <source>Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="81"/>
+        <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="85"/>
+        <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="89"/>
+        <source>Not authorized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="93"/>
+        <source>Unsupported media protocol %1. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="98"/>
+        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="103"/>
+        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="108"/>
+        <source>Unknown Camera Issue. Please, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
+        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="115"/>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="118"/>
+        <source>Unknown error. Please contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="120"/>
+        <source> Parameters: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAbstractStorageResource</name>
@@ -565,72 +642,72 @@ They cannot receive system notifications via E-Mail</source>
 <context>
     <name>QnApiPbSerializer</name>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="658"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="663"/>
         <source>Cannot parse serialized cameras.</source>
         <translation>无法解析序列化的摄像机。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="667"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="672"/>
         <source>Cannot parse serialized servers.</source>
         <translation>无法解析序列化的服务器。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="676"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="681"/>
         <source>Cannot parse serialized layouts.</source>
         <translation>无法解析序列化的layout。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="696"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="701"/>
         <source>Cannot parse serialized users.</source>
         <translation>无法解析序列化的用戶。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="705"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="710"/>
         <source>Cannot parse serialized resources.</source>
         <translation>无法解析序列化的资源。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="714"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="719"/>
         <source>Cannot parse serialized resource types.</source>
         <translation>无法解析序列化的资源类型。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="723"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="728"/>
         <source>Cannot parse serialized licenses.</source>
         <translation>无法解析序列化的软件许可。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="733"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="738"/>
         <source>Cannot parse serialized camera history.</source>
         <translation>无法解析序列化的摄像机历史记录。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="743"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="748"/>
         <source>Cannot parse serialized key-value pairs.</source>
         <translation>无法解析序列化的键-值对。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="753"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="758"/>
         <source>Cannot parse serialized settings.</source>
         <translation>无法解析序列化的设定。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="763"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="768"/>
         <source>Cannot parse serialized connection information.</source>
         <translation>无法解析序列化的连接信息。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="784"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="789"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>无法解析序列化的事件/行动规则。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="798"/>
         <source>Cannot parse serialized action.</source>
         <translation>无法解析序列化的行动。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="805"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="810"/>
         <source>Cannot parse serialized actions.</source>
         <translation>无法解析序列化的行动。</translation>
     </message>
@@ -686,163 +763,177 @@ They cannot receive system notifications via E-Mail</source>
         <translation type="obsolete">在过去的 %1 秒中没有接收到视频。</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="23"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="33"/>
         <source>User Defined (%1)</source>
         <translation>用户定义 (%1)</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="28"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="38"/>
         <source>Motion on Camera</source>
         <translation>摄像机移动侦测</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="30"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="40"/>
         <source>Input Signal on Camera</source>
         <translation>摄像机报警信号输入</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="32"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="42"/>
         <source>Camera Disconnected</source>
         <translation>摄像机离线</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="34"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="44"/>
         <source>Storage Failure</source>
         <translation>存储故障</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="36"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="46"/>
         <source>Network Issue</source>
         <translation>网络问题</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="38"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="48"/>
         <source>Camera IP Conflict</source>
         <translation>摄像机IP冲突</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="40"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="50"/>
         <source>Media Server Failure</source>
         <translation>媒体服务器故障</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="42"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="52"/>
         <source>Media Server Conflict</source>
         <translation>媒体服务器冲突</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="44"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="54"/>
         <source>Any camera issue</source>
         <translation>任何摄像机问题</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="46"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="56"/>
         <source>Any server issue</source>
         <translation>任何服务器问题</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="48"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="58"/>
         <source>Any event</source>
         <translation>任何事件</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="59"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="69"/>
         <source>Undefined event has occured on %1</source>
         <translation>未定义事件在 %1发生</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="62"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="72"/>
         <source>Camera %1 was disconnected</source>
         <translation>摄像机%1离线</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="65"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="75"/>
         <source>Input on %1</source>
         <translation>%1 报警输入</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="68"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="78"/>
         <source>Motion on %1</source>
         <translation>%1侦测到移动</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="71"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="81"/>
         <source>Storage Failure at %1</source>
         <translation>%1存储故障</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="74"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="84"/>
         <source>Network Issue at %1</source>
         <translation>%1网络问题</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="77"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="87"/>
         <source>Media Server &quot;%1&quot; Failure</source>
         <translation>媒体服务器&quot;%1&quot;故障</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="80"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="90"/>
         <source>Camera IP Conflict at %1</source>
         <translation>%1摄像机IP冲突</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="83"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="93"/>
         <source>Media Server &quot;%1&quot; Conflict</source>
         <translation>媒体服务器&quot;%1&quot;冲突</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="88"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="98"/>
         <source>Unknown Event has occured</source>
         <translation>发生未知事件</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="105"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="114"/>
         <source>Event: %1</source>
         <translation>事件: %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="108"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="117"/>
         <source>Source: %1</source>
         <translation>来源: %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="112"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="121"/>
         <source>Url: %1</source>
         <translation>网址: %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="130"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="174"/>
         <source>Input port: %1</source>
         <translation>输入端口: %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="137"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="183"/>
         <source>Reason: %1</source>
         <translation>原因: %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="142"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="190"/>
         <source>Conflict address: %1</source>
         <translation>冲突地址:: %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="147"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="201"/>
         <source>Camera #%1 MAC: %2</source>
         <translation>摄像机#%1 MAC: %2</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="156"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="217"/>
         <source>Conflicting EC #%1: %2</source>
         <translation>相冲突系统控制器 #%1: %2</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="172"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="234"/>
+        <source>%2 %1</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/business/business_strings_helper.cpp" line="238"/>
+        <source>%n times, first: %2 %1</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="249"/>
         <source>Time: %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>%2 時間: %1 </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="176"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="253"/>
         <source>First occurence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>
@@ -850,32 +941,32 @@ They cannot receive system notifications via E-Mail</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="197"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="274"/>
         <source>No video frame received during last %1 seconds</source>
         <translation>过去%1 秒內没有收到视频</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="201"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="278"/>
         <source>Connection to camera was unexpectedly closed</source>
         <translation>摄像机连接突然被中断</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="208"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="285"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2</source>
         <translation>侦测到RTP包丢失。前个seq.=%1，下个seq.=%2</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="213"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="290"/>
         <source>Server terminated</source>
         <translation>服务器终止</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="217"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="294"/>
         <source>Server started after crash</source>
         <translation>服务器故障后重启</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="225"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="302"/>
         <source>Not enough HDD/SSD speed for recording to %1</source>
         <translation>硬盘写入速度不足以录像至%1。</translation>
     </message>
@@ -892,7 +983,7 @@ They cannot receive system notifications via E-Mail</source>
         <translation type="obsolete">服务器终止后启动。</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="221"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="298"/>
         <source>I/O Error occured at %1</source>
         <translation>在 %1 发生输入/输出故障</translation>
     </message>
@@ -951,6 +1042,29 @@ for recording to %1.</source>
     </message>
 </context>
 <context>
+    <name>QnFfmpegAudioTranscoder</name>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
+        <source>Audio context must be specified</source>
+        <translation type="unfinished">需指定音频内容</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
+        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
+        <translation type="unfinished">编码转换错误：无法找到编码器 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
+        <source>Can&apos;t initialize audio encoder</source>
+        <translation type="unfinished">无法初始化音频编码器</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
+        <source>Can&apos;t initialize audio decoder</source>
+        <translation type="unfinished">无法初始化音频解码器</translation>
+    </message>
+</context>
+<context>
     <name>QnFfmpegTranscoder</name>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="104"/>
@@ -982,6 +1096,24 @@ for recording to %1.</source>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="251"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation>视频或音频编解码器与%1格式不兼容。尝试另一种格式。</translation>
+    </message>
+</context>
+<context>
+    <name>QnFfmpegVideoTranscoder</name>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
+        <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
+        <translation type="unfinished">无法分派分辨率级别 %1x%2</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
+        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
+        <translation type="unfinished">编码转换错误：无法找到编码器 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
+        <source>Can&apos;t initialize video encoder</source>
+        <translation type="unfinished">无法初始化视频编码器</translation>
     </message>
 </context>
 <context>
@@ -1065,44 +1197,124 @@ for recording to %1.</source>
     </message>
 </context>
 <context>
+    <name>QnStreamQualityStrings</name>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="30"/>
+        <source>Lowest</source>
+        <translation type="unfinished">最低</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="31"/>
+        <source>Low</source>
+        <translation type="unfinished">低</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="32"/>
+        <source>Normal</source>
+        <translation type="unfinished">普通</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="33"/>
+        <source>High</source>
+        <translation type="unfinished">高</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="34"/>
+        <source>Highest</source>
+        <translation type="unfinished">最高</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="35"/>
+        <source>Preset</source>
+        <translation type="unfinished">预设</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="36"/>
+        <source>Undefined</source>
+        <translation type="unfinished">未定义</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="48"/>
+        <source>Wst</source>
+        <extracomment>Short for &apos;Worst&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="51"/>
+        <source>Lo</source>
+        <extracomment>Short for &apos;Low&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="54"/>
+        <source>Me</source>
+        <extracomment>Short for &apos;Medium&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="57"/>
+        <source>Hi</source>
+        <extracomment>Short for &apos;High&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="60"/>
+        <source>Bst</source>
+        <extracomment>Short for &apos;Best&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="63"/>
+        <source>Ps</source>
+        <extracomment>Short for &apos;Preset&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="66"/>
+        <source>Und</source>
+        <extracomment>Short for &apos;Undefined&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnStreamRecorder</name>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="428"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="429"/>
         <source>No %1 container in FFMPEG library.</source>
         <translation>在FFMPEG库中没有%1容器。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="447"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="448"/>
         <source>Can&apos;t create output file &apos;%1&apos; for video recording.</source>
         <translation>无法为视频录像创建输出文件&apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="492"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="499"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation>无法为录像分配输出流。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="574"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation>无法分配输出音频流。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="582"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="599"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation>内部服务器错误：无效音频编码信息</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="611"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="628"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation>无法创建输出文件&apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="623"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="640"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation>视频或音频编解码器与%1格式不兼容。尝试另一种格式。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="734"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="751"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>为文件&apos;%1&apos;生成水印时发生错误。</translation>
     </message>

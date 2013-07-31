@@ -29,7 +29,7 @@ public:
     * Both primary and secondary streams are recorded.
     * Panic mode recording has higher priority (fps may be increased if panic mode activated)
     */
-    void startForcedRecording(QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+    void startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
 
     /*
     * Switch from forced recording mode to normal recording mode specified by schedule task

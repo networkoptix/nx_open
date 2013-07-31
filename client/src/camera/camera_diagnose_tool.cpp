@@ -78,11 +78,28 @@ namespace CameraDiagnostics
     {
         if( status != 0 )
         {
-            //considering server unavailable
-            //m_errorMessage = tr("Bad reply from server %1: %2").
-            //    arg(QLatin1String("hz.hz.hz.hz")).arg(QLatin1String(nx_http::StatusCode::toString(static_cast<nx_http::StatusCode::Value>(status))));
-            //m_errorMessage = tr("Bad reply from server %1").arg(m_serverHostAddress);
-            m_errorMessage = tr("No connection to media server %1").arg(m_serverHostAddress);
+            switch( status )
+            {
+                case QNetworkReply::ContentAccessDenied:
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Access Denied")).toString();
+                    break;
+                case QNetworkReply::ContentOperationNotPermittedError:
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Forbidden")).toString();
+                    break;
+                case QNetworkReply::ContentNotFoundError:
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Not Found")).toString();
+                    break;
+                case QNetworkReply::AuthenticationRequiredError:
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Not Authorised")).toString();
+                    break;
+                case QNetworkReply::ProtocolFailure:
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QString()).toString();
+                    break;
+
+                default:
+                    m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
+            }
+
             m_result = false;
             emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
             m_state = sDone;

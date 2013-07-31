@@ -54,10 +54,10 @@ private:
     QStaticText m_loadingStaticText;
     QStaticText m_analogLicenseStaticText;
 
+    Qn::ResourceStatusOverlay m_statusOverlay;
+
     bool m_diagnosticsVisible;
     QnTextButtonWidget *m_diagnosticsButton;
-
-    Qn::ResourceStatusOverlay m_statusOverlay;
 };
 
 #endif // QN_RESOURCE_STATUS_OVERLAY_WIDGET_H

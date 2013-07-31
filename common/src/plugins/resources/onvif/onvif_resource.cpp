@@ -527,7 +527,7 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
 }
 
-int QnPlOnvifResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
+int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
 {
     return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(q, resolution, fps));
 }
@@ -976,22 +976,22 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts
     }
 }
 
-int QnPlOnvifResource::innerQualityToOnvif(QnStreamQuality quality) const
+int QnPlOnvifResource::innerQualityToOnvif(Qn::StreamQuality quality) const
 {
-    if (quality > QnQualityHighest) {
+    if (quality > Qn::QualityHighest) {
         qWarning() << "QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too big): " << quality;
         return m_maxQuality;
     }
-    if (quality < QnQualityLowest) {
+    if (quality < Qn::QualityLowest) {
         qWarning() << "QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too small): " << quality;
         return m_minQuality;
     }
 
     qDebug() << "QnPlOnvifResource::innerQualityToOnvif: in quality = " << quality << ", out qualty = "
-             << m_minQuality + (m_maxQuality - m_minQuality) * (quality - QnQualityLowest) / (QnQualityHighest - QnQualityLowest)
+             << m_minQuality + (m_maxQuality - m_minQuality) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest)
              << ", minOnvifQuality = " << m_minQuality << ", maxOnvifQuality = " << m_maxQuality;
 
-    return m_minQuality + (m_maxQuality - m_minQuality) * (quality - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
+    return m_minQuality + (m_maxQuality - m_minQuality) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
 }
 
 /*
@@ -1085,12 +1085,12 @@ QString QnPlOnvifResource::getPtzfUrl() const
 
 void QnPlOnvifResource::setMinMaxQuality(int min, int max)
 {
-    int netoptixDelta = QnQualityHighest - QnQualityLowest;
+    int netoptixDelta = Qn::QualityHighest - Qn::QualityLowest;
     int onvifDelta = max - min;
 
     if (netoptixDelta < 0 || onvifDelta < 0) {
         qWarning() << "QnPlOnvifResource::setMinMaxQuality: incorrect values: min > max: onvif ["
-                   << min << ", " << max << "] netoptix [" << QnQualityLowest << ", " << QnQualityHighest << "]";
+                   << min << ", " << max << "] netoptix [" << Qn::QualityLowest << ", " << Qn::QualityHighest << "]";
         return;
     }
 

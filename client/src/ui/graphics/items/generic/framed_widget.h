@@ -47,9 +47,9 @@ protected:
 
 private:
     QGraphicsWidget *m_self;
-    Qn::FrameShape m_frameShape;
     qreal m_frameWidth;
     Qt::PenStyle m_frameStyle;
+    Qn::FrameShape m_frameShape;
 };
 
 

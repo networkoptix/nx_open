@@ -28,7 +28,7 @@ QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
     CLServerPushStreamReader(res),
     m_multiCodec(res),
     m_cachedFps(-1),
-    m_cachedQuality(QnQualityNotDefined)
+    m_cachedQuality(Qn::QualityNotDefined)
 {
     m_onvifRes = getResource().dynamicCast<QnPlOnvifResource>();
     m_tmpH264Conf = new onvifXsd__H264Configuration();
@@ -101,7 +101,7 @@ const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl()
     //QMutexLocker lock(m_onvifRes->getStreamConfMutex());
 
     int currentFps = getFps();
-    QnStreamQuality currentQuality = getQuality();
+    Qn::StreamQuality currentQuality = getQuality();
 
     if (!m_streamUrl.isEmpty() && m_onvifRes->isCameraControlDisabled())
     {
@@ -241,7 +241,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     encoder.Encoding = m_onvifRes->getCodec(isPrimary) == QnPlOnvifResource::H264? onvifXsd__VideoEncoding__H264: onvifXsd__VideoEncoding__JPEG;
     //encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
 
-    QnStreamQuality quality = getQuality();
+    Qn::StreamQuality quality = getQuality();
     QSize resolution = isPrimary? m_onvifRes->getPrimaryResolution(): m_onvifRes->getSecondaryResolution();
 
     if (encoder.Encoding == onvifXsd__VideoEncoding__H264)
@@ -268,7 +268,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     }
 
     
-    if (quality != QnQualityPreSet) 
+    if (quality != Qn::QualityPreSet) 
     {
         encoder.Quality = m_onvifRes->innerQualityToOnvif(quality);
     }

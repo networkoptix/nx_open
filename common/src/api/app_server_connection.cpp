@@ -708,11 +708,15 @@ int QnAppServerConnection::sendEmailAsync(const QString &addr, const QString &su
 
 int QnAppServerConnection::sendEmailAsync(const QStringList &to, const QString &subject, const QString &message, int timeout, QObject *target, const char *slot)
 {
+    return sendEmailAsync(to, subject, message, QnEmailAttachmentList(), timeout, target, slot);
+}
+
+int QnAppServerConnection::sendEmailAsync(const QStringList &to, const QString& subject, const QString& message, const QnEmailAttachmentList& attachments, int timeout, QObject *target, const char *slot) {
     if (message.isEmpty())
         return -1;
 
     QByteArray data;
-    m_serializer.serializeEmail(to, subject, message, timeout, data);
+    m_serializer.serializeEmail(to, subject, message, attachments, timeout, data);
 
     return addObjectAsync(EmailObject, data, QN_STRINGIZE_TYPE(bool), target, slot);
 }
@@ -909,6 +913,23 @@ void QnAppServerConnectionFactory::setCurrentVersion(const QnSoftwareVersion &ve
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_currentVersion = version;
     }
+}
+
+void QnAppServerConnectionFactory::setSystemName(const QString& systemName)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_systemName = systemName.trimmed();
+    }
+}
+
+QString QnAppServerConnectionFactory::systemName()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        if (!factory->m_systemName.isEmpty())
+            return factory->m_systemName;
+    }
+
+    return QString();
 }
 
 void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)

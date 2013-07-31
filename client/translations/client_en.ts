@@ -37,30 +37,58 @@
     </message>
     <message numerus="yes">
         <source>no more than once per %n days</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per day</numerusform>
             <numerusform>no more than once per %n days</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n hours</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per hour</numerusform>
             <numerusform>no more than once per %n hours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n minutes</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per minute</numerusform>
             <numerusform>no more than once per %n minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n seconds</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per second</numerusform>
             <numerusform>no more than once per %n seconds</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n days</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n hours</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n minutes</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n seconds</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
