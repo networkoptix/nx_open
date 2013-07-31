@@ -118,7 +118,9 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     QImage screenshot;
     {
         QList<QImage> images;
-        DewarpingParams dewarping = widget->item()->dewarpingParams();
+        DewarpingParams dewarping;
+        if (widget->resource()->getDewarpingParams().enabled)
+            dewarping = widget->item()->dewarpingParams();
         for (int i = 0; i < layout->channelCount(); ++i)
             images.push_back(display->camDisplay()->getScreenshot(i, widget->item()->imageEnhancement(), dewarping));
         QSize channelSize = images[0].size();
