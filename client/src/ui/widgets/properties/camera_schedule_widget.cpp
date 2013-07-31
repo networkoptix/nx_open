@@ -12,7 +12,7 @@
 #include <licensing/license.h>
 
 #include <ui/common/read_only.h>
-#include <ui/dialogs/export_camera_settings_dialog.h>
+#include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -24,6 +24,110 @@
 #include <utils/common/event_processors.h>
 #include <utils/math/color_transformations.h>
 #include <utils/license_usage_helper.h>
+
+namespace {
+
+    class QnExportScheduleResourceSelectionDialogDelegate: public QnResourceSelectionDialogDelegate {
+        typedef QnResourceSelectionDialogDelegate base_type;
+    public:
+        QnExportScheduleResourceSelectionDialogDelegate(QWidget* parent,
+                                                        bool recordingEnabled,
+                                                        bool motionUsed,
+                                                        bool dualStreamingUsed
+                                                        ):
+            base_type(parent),
+            m_licensesLabel(NULL),
+            m_motionLabel(NULL),
+            m_dtsLabel(NULL),
+            m_recordingEnabled(recordingEnabled),
+            m_motionUsed(motionUsed),
+            m_dualStreamingUsed(dualStreamingUsed)
+        {
+
+
+        }
+
+        ~QnExportScheduleResourceSelectionDialogDelegate() {
+
+        }
+
+        virtual void init(QWidget* parent) override {
+            m_parentPalette = parent->palette();
+
+            m_licensesLabel = new QLabel(parent);
+            parent->layout()->addWidget(m_licensesLabel);
+
+            m_motionLabel = new QLabel(parent);
+            m_motionLabel->setText(tr("Schedule motion type is not supported by some cameras"));
+            setWarningStyle(m_motionLabel);
+            parent->layout()->addWidget(m_motionLabel);
+            m_motionLabel->setVisible(false);
+
+            m_dtsLabel = new QLabel(parent);
+            m_dtsLabel->setText(tr("Recording cannot be enabled for some cameras"));
+            setWarningStyle(m_dtsLabel);
+            parent->layout()->addWidget(m_dtsLabel);
+            m_dtsLabel->setVisible(false);
+        }
+
+        virtual bool validate(const QnResourceList &selected) override {
+            QnVirtualCameraResourceList cameras = selected.filtered<QnVirtualCameraResource>();
+
+            QnLicenseUsageHelper helper(cameras, m_recordingEnabled);
+
+            QPalette palette = m_parentPalette;
+            bool licensesOk = helper.isValid();
+            if(!licensesOk)
+                setWarningStyle(&palette);
+            m_licensesLabel->setPalette(palette);
+
+            QString usageText =
+                    tr("%n digital license(s) will be used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital()) +
+                    QLatin1Char('\n') +
+                    tr("%n analog license(s) will be used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
+            m_licensesLabel->setText(usageText);
+
+            bool motionOk = true;
+            if (m_motionUsed){
+                foreach (const QnVirtualCameraResourcePtr &camera, cameras){
+                    bool hasMotion = camera->getMotionType() != Qn::MT_NoMotion;
+                    if (!hasMotion) {
+                        motionOk = false;
+                        break;
+                    }
+                    if (m_dualStreamingUsed && !camera->hasDualStreaming()){
+                        motionOk = false;
+                        break;
+                    }
+                }
+            }
+            m_motionLabel->setVisible(!motionOk);
+
+            bool dtsOk = true;
+            foreach (const QnVirtualCameraResourcePtr &camera, cameras){
+                if (camera->isDtsBased()) {
+                    dtsOk = false;
+                    break;
+                }
+            }
+            m_dtsLabel->setVisible(!dtsOk);
+
+            return licensesOk && motionOk && dtsOk;
+        }
+
+    private:
+        QLabel* m_licensesLabel;
+        QLabel* m_motionLabel;
+        QLabel* m_dtsLabel;
+        QPalette m_parentPalette;
+
+        bool m_recordingEnabled;
+        bool m_motionUsed;
+        bool m_dualStreamingUsed;
+    };
+
+
+}
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent),
@@ -691,18 +795,20 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
 
 void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     bool recordingEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-    QnExportCameraSettingsDialog dialog(this);
-    dialog.setRecordingEnabled(recordingEnabled);
-
     bool motionUsed = recordingEnabled && hasMotionOnGrid();
     bool dualStreamingUsed = motionUsed && hasDualStreamingMotionOnGrid();
 
-    dialog.setMotionParams(motionUsed, dualStreamingUsed);
+    QnResourceSelectionDialog dialog(this);
+    dialog.setDelegate(new QnExportScheduleResourceSelectionDialogDelegate(this,
+                                                                           recordingEnabled,
+                                                                           motionUsed,
+                                                                           dualStreamingUsed));
+    dialog.setSelectedResources(m_cameras);
 
-    if (dialog.exec() == QDialog::Rejected)
+    if (dialog.exec() != QDialog::Accepted)
         return;
 
-    QnVirtualCameraResourceList cameras = dialog.getSelectedCameras();
+    QnVirtualCameraResourceList cameras = dialog.selectedResources().filtered<QnVirtualCameraResource>();
     foreach(QnVirtualCameraResourcePtr camera, cameras) {
         camera->setScheduleDisabled(!recordingEnabled);
         if (recordingEnabled){
