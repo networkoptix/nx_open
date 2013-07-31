@@ -13,7 +13,7 @@ public:
     explicit QnRecordingBusinessAction(const QnBusinessEventParameters &runtimeParams);
 
     int getFps() const;
-    QnStreamQuality getStreamQuality() const;
+    Qn::StreamQuality getStreamQuality() const;
     int getRecordDuration() const;
     int getRecordBefore() const;
     int getRecordAfter() const;

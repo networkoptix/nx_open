@@ -42,6 +42,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     setCombinedGeometry(data.combinedGeometry);
     setZoomRect(data.zoomRect);
     setImageEnhancement(data.contrastParams);
+    setDewarpingParams(data.dewarpingParams);
 
     m_dataByRole = data.dataByRole; // TODO: #Elric
 }
@@ -64,6 +65,7 @@ QnLayoutItemData QnWorkbenchItem::data() const {
     data.combinedGeometry = combinedGeometry();
     data.zoomRect = zoomRect();
     data.contrastParams = imageEnhancement();
+    data.dewarpingParams = dewarpingParams();
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QUuid();
     data.dataByRole = m_dataByRole;
 
@@ -89,6 +91,7 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
     setRotation(data.rotation);
     setZoomRect(data.zoomRect);
     setImageEnhancement(data.contrastParams);
+    setDewarpingParams(data.dewarpingParams);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
     m_dataByRole = data.dataByRole; // TODO
@@ -110,6 +113,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
     data.rotation = rotation();
     data.zoomRect = zoomRect();
     data.contrastParams = imageEnhancement();
+    data.dewarpingParams = dewarpingParams();
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QUuid();
     data.combinedGeometry = combinedGeometry();
     data.dataByRole = m_dataByRole;
@@ -240,6 +244,16 @@ void QnWorkbenchItem::setImageEnhancement(const ImageCorrectionParams& imageEnha
     emit dataChanged(Qn::ItemImageEnhancementRole);
 }
 
+void QnWorkbenchItem::setDewarpingParams(const DewarpingParams& params)
+{
+    if(m_dewarpingParams == params)
+        return;
+
+    m_dewarpingParams = params;
+
+    emit dewarpingParamsChanged();
+    emit dataChanged(Qn::ItemImageDewarpingRole);
+}
 
 QnWorkbenchItem *QnWorkbenchItem::zoomTargetItem() const {
     if(m_layout) {
@@ -299,6 +313,8 @@ QVariant QnWorkbenchItem::data(int role) const {
         return zoomRect();
     case Qn::ItemImageEnhancementRole:
         return QVariant::fromValue<ImageCorrectionParams>(imageEnhancement());
+    case Qn::ItemImageDewarpingRole:
+        return QVariant::fromValue<DewarpingParams>(dewarpingParams());
     case Qn::ItemFlagsRole:
         return static_cast<int>(flags());
     case Qn::ItemRotationRole:
@@ -355,15 +371,27 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
             return false;
         }
     }
+
     case Qn::ItemImageEnhancementRole: {
         if(value.canConvert<ImageCorrectionParams>()) {
             setImageEnhancement(value.value<ImageCorrectionParams>());
             return true;
         } else {
-            qnWarning("Provided zoom rect value '%1' is not convertible to QRectF.", value);
+            qnWarning("Provided image enhancment params is not convertible.", value);
             return false;
         }
-                               }
+    }
+
+    case Qn::ItemImageDewarpingRole: {
+        if(value.canConvert<DewarpingParams>()) {
+            setDewarpingParams(value.value<DewarpingParams>());
+            return true;
+        } else {
+            qnWarning("Provided dewarping params is not convertible.", value);
+            return false;
+        }
+    }
+                                       
     case Qn::ItemFlagsRole: {
         bool ok;
         int flags = value.toInt(&ok);

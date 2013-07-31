@@ -12,15 +12,15 @@ QnFlexWatchResource::~QnFlexWatchResource()
     delete m_tmpH264Conf;
 }
 
-bool QnFlexWatchResource::initInternal()
+CameraDiagnostics::Result QnFlexWatchResource::initInternal()
 {
-    bool rez = QnPlOnvifResource::initInternal();
-    if (rez && getChannel() == 0)
+    CameraDiagnostics::Result rez = QnPlOnvifResource::initInternal();
+    if (rez.errorCode == CameraDiagnostics::ErrorCode::noError && getChannel() == 0)
         rez = fetchUpdateVideoEncoder();
     return rez;
 }
 
-bool QnFlexWatchResource::fetchUpdateVideoEncoder()
+CameraDiagnostics::Result QnFlexWatchResource::fetchUpdateVideoEncoder()
 {
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), getTimeDrift());
@@ -33,7 +33,7 @@ bool QnFlexWatchResource::fetchUpdateVideoEncoder()
         qCritical() << "QnOnvifStreamReader::fetchUpdateVideoEncoder: can't get video encoders from camera (" 
             << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
             << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << getUniqueId();
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
     bool needReboot = false;
@@ -59,7 +59,10 @@ bool QnFlexWatchResource::fetchUpdateVideoEncoder()
     }
     if (needReboot)
         rebootDevice();
-    return !needReboot;
+    //return !needReboot;
+    return needReboot
+        ? CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown )
+        : CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::noError );
 }
 
 bool QnFlexWatchResource::rebootDevice()

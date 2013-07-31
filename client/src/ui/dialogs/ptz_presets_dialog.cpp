@@ -29,10 +29,11 @@ QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFl
     ui->buttonBox->addButton(m_removeButton, QDialogButtonBox::HelpRole);
     ui->buttonBox->addButton(m_activateButton, QDialogButtonBox::HelpRole);
 
-    connect(m_removeButton, SIGNAL(clicked()), this, SLOT(at_removeButton_clicked()));
-    connect(m_activateButton, SIGNAL(clicked()), this, SLOT(at_activateButton_clicked()));
-    connect(ui->treeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(updateRemoveButtonEnabled()));
-    connect(ui->treeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateActivateButtonEnabled()));
+    connect(m_removeButton,                 SIGNAL(clicked()),                                                          this,   SLOT(at_removeButton_clicked()));
+    connect(m_activateButton,               SIGNAL(clicked()),                                                          this,   SLOT(at_activateButton_clicked()));
+    connect(ui->treeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),   this,   SLOT(updateRemoveButtonEnabled()));
+    connect(ui->treeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),   this,   SLOT(updateActivateButtonEnabled()));
+    connect(ui->treeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),           this,   SLOT(updateActivateButtonEnabled()));
 
     updateFromResource();
 }
@@ -93,7 +94,7 @@ void QnPtzPresetsDialog::updateRemoveButtonEnabled() {
 }
 
 void QnPtzPresetsDialog::updateActivateButtonEnabled() {
-    m_activateButton->setEnabled(m_camera && ui->treeView->currentIndex().isValid());
+    m_activateButton->setEnabled(m_camera && ui->treeView->currentIndex().isValid() && ui->treeView->selectionModel()->selectedRows().size() <= 1);
 }
 
 // -------------------------------------------------------------------------- //

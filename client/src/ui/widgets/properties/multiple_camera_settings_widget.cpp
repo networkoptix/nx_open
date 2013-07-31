@@ -62,7 +62,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
 
     /* Set up context help. */
     setHelpTopic(ui->tabRecording,                                            Qn::CameraSettings_Recording_Help);
-    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Advanced_Help);
+    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Expert_Help);
 
 
     updateFromResources();
@@ -166,8 +166,8 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         if (m_hasScheduleChanges)
             camera->setScheduleTasks(scheduleTasks);
 
-        QnSecondaryStreamQuality sQuality = ui->advancedSettingsWidget->secondaryStreamQuality();
-        if (sQuality != SSQualityNotDefined)
+        Qn::SecondStreamQuality sQuality = ui->advancedSettingsWidget->secondaryStreamQuality();
+        if (sQuality != Qn::SSQualityNotDefined)
             camera->setSecondaryStreamQuality(sQuality);
         Qt::CheckState cs = ui->advancedSettingsWidget->getCameraControl();
         if (cs != Qt::PartiallyChecked)
@@ -176,6 +176,11 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
     }
 
     setHasDbChanges(false);
+}
+
+void QnMultipleCameraSettingsWidget::reject()
+{
+    updateFromResources();
 }
 
 void QnMultipleCameraSettingsWidget::updateFromResources() {

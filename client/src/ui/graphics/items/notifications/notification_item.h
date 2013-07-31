@@ -11,6 +11,7 @@
 
 class QnProxyLabel;
 class QnClickableProxyLabel;
+class QnFramedWidget;
 class QGraphicsLinearLayout;
 class HoverFocusProcessor;
 class QnImageProvider;
@@ -46,19 +47,19 @@ private:
 };
 
 
-class QnNotificationToolTipWidget: public QnStyledTooltipWidget {
+class QnNotificationToolTipWidget: public Clickable<QnStyledTooltipWidget> {
     Q_OBJECT
+    typedef Clickable<QnStyledTooltipWidget> base_type;
 
-    typedef QnStyledTooltipWidget base_type;
 public:
     QnNotificationToolTipWidget(QGraphicsItem *parent = 0);
 
     void ensureThumbnail(QnImageProvider* provider);
 
+    QString text() const;
+
     /**
-     * Set tooltip text.
      * \param text                      New text for this tool tip's label.
-     * \reimp
      */
     void setText(const QString &text);
 
@@ -68,13 +69,20 @@ public:
     //reimp
     void pointTo(const QPointF &pos);
     virtual void updateTailPos() override;
+
 signals:
     void thumbnailClicked();
+    void closeTriggered();
+
+protected:
+    virtual void clicked(Qt::MouseButton button) override;
 
 private slots:
     void at_provider_imageChanged(const QImage &image);
+    void at_thumbnailLabel_clicked(Qt::MouseButton button);
 
 private:
+    QGraphicsLinearLayout *m_layout;
     QnProxyLabel* m_textLabel;
     QnClickableProxyLabel* m_thumbnailLabel;
     QRectF m_enclosingRect;
@@ -83,9 +91,9 @@ private:
 
 
 //TODO: #GDM rename to QnNotificationWidget
-class QnNotificationItem: public QnClickableFrameWidget {
+class QnNotificationItem: public Clickable<QnFramedWidget> {
     Q_OBJECT
-    typedef QnClickableFrameWidget base_type;
+    typedef Clickable<QnFramedWidget> base_type;
 
 public:
     explicit QnNotificationItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0);
@@ -96,8 +104,6 @@ public:
     void addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
                          const QnActionParameters &parameters = QnActionParameters(),
                          bool defaultAction = false);
-
-    static QColor notificationColor(Qn::NotificationLevel level);
 
     Qn::NotificationLevel notificationLevel() const;
     void setNotificationLevel(Qn::NotificationLevel notificationLevel);
@@ -110,14 +116,19 @@ public:
     void setImageProvider(QnImageProvider *provider);
 
     void setText(const QString &text);
+    
     void setTooltipText(const QString &text);
+
+    virtual void setGeometry(const QRectF &geometry) override;
 
 signals:
     void notificationLevelChanged();
+    void closeTriggered();
     void actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void clicked(Qt::MouseButton button) override;
 
 private:
     void hideToolTip();
@@ -126,18 +137,18 @@ private:
 private slots:
     void updateToolTipVisibility();
     void updateToolTipPosition();
+    void updateOverlayVisibility(bool animate = true);
+    void updateOverlayGeometry();
+    void updateOverlayColor();
 
     void at_button_clicked();
     void at_thumbnail_clicked();
 
 private:
     struct ActionData {
-        ActionData():
-            action(Qn::NoAction){}
-        ActionData(Qn::ActionId action):
-            action(action){}
-        ActionData(Qn::ActionId action, const QnActionParameters &params):
-            action(action), params(params){}
+        ActionData(): action(Qn::NoAction){}
+        ActionData(Qn::ActionId action): action(action){}
+        ActionData(Qn::ActionId action, const QnActionParameters &params): action(action), params(params){}
 
         Qn::ActionId action;
         QnActionParameters params;
@@ -146,14 +157,18 @@ private:
     QList<ActionData> m_actions;
     int m_defaultActionIdx;
 
-    QGraphicsLinearLayout* m_layout;
-    QnProxyLabel* m_textLabel;
+    QGraphicsLinearLayout *m_layout;
+    QnProxyLabel *m_textLabel;
+    QnImageButtonWidget *m_closeButton;
     QColor m_color;
     Qn::NotificationLevel m_notificationLevel;
     QnImageProvider* m_imageProvider;
 
-    QnNotificationToolTipWidget* m_tooltipWidget;
-    HoverFocusProcessor* m_hoverProcessor;
+    QnFramedWidget *m_overlayWidget;
+
+    QnNotificationToolTipWidget *m_tooltipWidget;
+    HoverFocusProcessor *m_toolTipHoverProcessor;
+    HoverFocusProcessor *m_hoverProcessor;
     bool m_pendingPositionUpdate;
     bool m_instantPositionUpdate;
     bool m_inToolTipPositionUpdate;

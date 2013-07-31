@@ -3,8 +3,10 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
+#include "utils/network/socket.h"
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
+
 
 QnNetworkResource::QnNetworkResource(): 
     QnResource(),
@@ -275,6 +277,12 @@ bool QnNetworkResource::conflicting()
 int QnNetworkResource::getChannel() const
 {
     return 0;
+}
+
+bool QnNetworkResource::ping()
+{
+    TCPSocket sock;
+    return sock.connect( getHostAddress(), httpPort() );
 }
 
 /*

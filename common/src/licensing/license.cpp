@@ -190,7 +190,11 @@ const QByteArray& QnLicense::rawLicense() const
 
 bool QnLicense::isValid(const QByteArray& hardwareId, const QString& brand) const
 {
-    return (m_isValid1 || m_isValid2) && (hardwareId == m_hardwareId) && (m_brand == brand);
+    return (m_isValid1 || m_isValid2) && (hardwareId == m_hardwareId) &&
+        (m_brand == brand ||
+            // temporary fix for current trial DW licenses
+            // TODO: Ivan, remove it for v2.0, all trial licenses should be expired by that moment
+            (m_brand == lit("digitalwatchdog") && brand == lit("dwspectrum")));
 }
 
 bool QnLicense::isAnalog() const {

@@ -23,7 +23,7 @@ void QnCustomFileDialog::addCheckBox(const QString &text, bool *value, QnCheckbo
     QCheckBox* checkbox = new QCheckBox(this);
     checkbox->setText(text);
     checkbox->setChecked(*value);
-    m_checkboxes.insert(checkbox, value);
+    m_checkBoxes.insert(checkbox, value);
     addWidget(checkbox);
 
     if (delegate) {
@@ -50,7 +50,7 @@ void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxVa
     spinbox->setMinimum(minValue);
     spinbox->setMaximum(maxValue);
     spinbox->setValue(*value);
-    m_spinboxes.insert(spinbox, value);
+    m_spinBoxes.insert(spinbox, value);
     layout->addWidget(spinbox);
 
     if (!postfix.isEmpty()) {
@@ -79,7 +79,7 @@ void QnCustomFileDialog::addLineEdit(const QString &text, QString *value) {
 
     QLineEdit* edit = new QLineEdit(widget);
     edit->setText(*value);
-    m_lineedits.insert(edit, value);
+    m_lineEdits.insert(edit, value);
     layout->addWidget(edit);
 
     layout->addStretch();
@@ -101,12 +101,12 @@ void QnCustomFileDialog::addWidget(QWidget *widget) {
 }
 
 void QnCustomFileDialog::at_accepted() {
-    foreach(QCheckBox* key, m_checkboxes.keys())
-        *m_checkboxes[key] = key->isChecked();
+    foreach(QCheckBox* key, m_checkBoxes.keys())
+        *m_checkBoxes[key] = key->isChecked();
 
-    foreach(QSpinBox* key, m_spinboxes.keys())
-        *m_spinboxes[key] = key->value();
+    foreach(QSpinBox* key, m_spinBoxes.keys())
+        *m_spinBoxes[key] = key->value();
 
-    foreach(QLineEdit* key, m_lineedits.keys())
-        *m_lineedits[key] = key->text();
+    foreach(QLineEdit* key, m_lineEdits.keys())
+        *m_lineEdits[key] = key->text();
 }

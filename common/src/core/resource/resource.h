@@ -9,6 +9,7 @@
 #include <QStringList>
 #include <QReadWriteLock>
 #include <QThreadPool>
+#include "utils/camera/camera_diagnostics.h"
 #include "utils/common/from_this_to_shared.h"
 #include "utils/common/id.h"
 #include "core/datapacket/abstract_data_packet.h"
@@ -150,6 +151,7 @@ public:
     // this function is called if resourse changes state from offline to online or so 
     void init();
     void initAsync(bool optional);
+    CameraDiagnostics::Result prevInitializationResult() const;
     
     // flags like network media and so on
     Flags flags() const;
@@ -235,6 +237,14 @@ public:
 
     static void stopAsyncTasks();
 
+    /**
+        Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
+    */
+    Qn::PtzCapabilities getPtzCapabilities() const;
+    bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
+    void setPtzCapabilities(Qn::PtzCapabilities capabilities);
+    void setPtzCapability(Qn::PtzCapabilities capability, bool value);
+
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
@@ -261,6 +271,7 @@ signals:
 
     void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
 
+    void ptzCapabilitiesChanged(const QnResourcePtr &resource);
 public:
     // this is thread to process commands like setparam
     static void startCommandProc();
@@ -288,7 +299,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
-    virtual bool initInternal() {return true;};
+    virtual CameraDiagnostics::Result initInternal() {return CameraDiagnostics::NoErrorResult();};
     //!Called just after successful \a initInternal()
     /*!
         Inherited class implementation MUST call base class method first
@@ -364,6 +375,7 @@ private:
 
     static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
+    CameraDiagnostics::Result m_prevInitializationResult;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
@@ -373,7 +385,7 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
         return QnSharedResourcePointer<Resource>();
     } else {
-        return resource->toSharedPointer().template dynamicCast<Resource>(); // TODO: #Elric replace with staticCast once we deal with virtual inheritance
+        return resource->toSharedPointer().template staticCast<Resource>();
     }
 }
 

@@ -10,14 +10,36 @@ ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
 CONFIG_FILE="/opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf"
+ECS_CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
 if status $COMPANY_NAME-mediaserver | grep "start/running" > /dev/null; then
   stop $COMPANY_NAME-mediaserver
 fi
-    
+
+# Default ECS connection parameters
+ECS_HOST_DEFAULT="localhost"
+if [ -f "$ECS_CONFIG_FILE" ]; then
+    ECS_PORT_DEFAULT=$(cat $ECS_CONFIG_FILE | grep "^port=" | head -1 | sed 's/port=\(.*\)/\1/g')
+else
+    ECS_PORT_DEFAULT= "7001"
+fi
+ECS_LOGIN_DEFAULT="admin"
+
+# Default MS parameters
+PORT_DEFAULT="7002"
+TRANSPORT_DEAULT="auto"
+PUBLIC_IP_ENABLED_DEFAULT="auto"
+
 function read_config {
+    ECS_HOST=$ECS_HOST_DEFAULT
+    ECS_PORT=$ECS_PORT_DEFAULT
+    ECS_LOGIN=$ECS_LOGIN_DEFAULT
+    PORT=$PORT_DEFAULT
+    TRANSPORT=$TRANSPORT_DEFAULT
+    PUBLIC_IP_ENABLED=$PUBLIC_IP_ENABLED_DEFAULT
+
     [ -f $CONFIG_FILE ] || { true; return; }
 
     SERVER_GUID=$(cat $CONFIG_FILE | grep "^serverGuid=" | head -1 | sed 's/serverGuid=\(.*\)/\1/g')
@@ -34,7 +56,9 @@ function read_config {
     # Compatibility option
     if [ -z "$PORT" ]
     then
-       PORT=$(cat $CONFIG_FILE | grep rtspPort | head -1 | sed 's/rtspPort=\(.*\)/\1/g')
+        PORT=$(cat $CONFIG_FILE | grep rtspPort | head -1 | sed 's/rtspPort=\(.*\)/\1/g')
+    else
+        PORT=$PORT_DEFAULT
     fi
 }
 
@@ -82,7 +106,7 @@ function ask_for_value {
 
     # Support unattened install
     db_get $full_name
-    if [ "$RET" = "false" ]; then
+    if [ "$RET" = "" ]; then
         [ -n "$default" ] && db_set $full_name $default 
     fi
 

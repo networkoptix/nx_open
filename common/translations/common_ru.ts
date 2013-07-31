@@ -30,11 +30,15 @@
 <context>
     <name>Language</name>
     <message>
+        <location filename="../src/translation/translation_manager.cpp" line="144"/>
         <source>Locale Code</source>
+        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>ru</translation>
     </message>
     <message>
+        <location filename="../src/translation/translation_manager.cpp" line="141"/>
         <source>Language Name</source>
+        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>Русский</translation>
     </message>
 </context>
@@ -77,37 +81,6 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
-        <source>Audio context must be specified</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="118"/>
-        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
-        <source>Can&apos;t initialize audio encoder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
-        <source>Can&apos;t initialize audio decoder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="95"/>
-        <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="165"/>
-        <source>Can&apos;t initialize video encoder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="13"/>
         <source>Camera output</source>
         <translation type="unfinished"></translation>
@@ -139,7 +112,7 @@
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="19"/>
-        <source>Alert</source>
+        <source>Diagnostics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -160,41 +133,6 @@
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="24"/>
         <source>Unknown (%1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="12"/>
-        <source>Lowest</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="14"/>
-        <source>Low</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="16"/>
-        <source>Normal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="18"/>
-        <source>High</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="20"/>
-        <source>Highest</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="22"/>
-        <source>Preset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="26"/>
-        <source>Undefined</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -224,72 +162,72 @@
 <context>
     <name>QnApiPbSerializer</name>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="656"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="663"/>
         <source>Cannot parse serialized cameras.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="665"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="672"/>
         <source>Cannot parse serialized servers.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="674"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="681"/>
         <source>Cannot parse serialized layouts.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="694"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="701"/>
         <source>Cannot parse serialized users.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="703"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="710"/>
         <source>Cannot parse serialized resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="712"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="719"/>
         <source>Cannot parse serialized resource types.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="721"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="728"/>
         <source>Cannot parse serialized licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="734"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="738"/>
         <source>Cannot parse serialized camera history.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="744"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="748"/>
         <source>Cannot parse serialized key-value pairs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="754"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="758"/>
         <source>Cannot parse serialized settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="764"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="768"/>
         <source>Cannot parse serialized connection information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="785"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="789"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="794"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="798"/>
         <source>Cannot parse serialized action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="806"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="810"/>
         <source>Cannot parse serialized actions.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -297,163 +235,179 @@
 <context>
     <name>QnBusinessStringsHelper</name>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="23"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="33"/>
         <source>User Defined (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="28"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="38"/>
         <source>Motion on Camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="30"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="40"/>
         <source>Input Signal on Camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="32"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="42"/>
         <source>Camera Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="34"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="44"/>
         <source>Storage Failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="36"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="46"/>
         <source>Network Issue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="38"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="48"/>
         <source>Camera IP Conflict</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="40"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="50"/>
         <source>Media Server Failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="42"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="52"/>
         <source>Media Server Conflict</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="44"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="54"/>
         <source>Any camera issue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="46"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="56"/>
         <source>Any server issue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="48"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="58"/>
         <source>Any event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="59"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="69"/>
         <source>Undefined event has occured on %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="62"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="72"/>
         <source>Camera %1 was disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="65"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="75"/>
         <source>Input on %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="68"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="78"/>
         <source>Motion on %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="71"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="81"/>
         <source>Storage Failure at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="74"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="84"/>
         <source>Network Issue at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="77"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="87"/>
         <source>Media Server &quot;%1&quot; Failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="80"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="90"/>
         <source>Camera IP Conflict at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="83"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="93"/>
         <source>Media Server &quot;%1&quot; Conflict</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="88"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="98"/>
         <source>Unknown Event has occured</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="105"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="114"/>
         <source>Event: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="108"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="117"/>
         <source>Source: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="112"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="121"/>
         <source>Url: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="130"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="174"/>
         <source>Input port: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="137"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="183"/>
         <source>Reason: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="142"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="190"/>
         <source>Conflict address: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="147"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="201"/>
         <source>Camera #%1 MAC: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="156"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="217"/>
         <source>Conflicting EC #%1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="172"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="234"/>
+        <source>%2 %1</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/business/business_strings_helper.cpp" line="238"/>
+        <source>%n times, first: %2 %1</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="249"/>
         <source>Time: %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="176"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="253"/>
         <source>First occurence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
@@ -463,38 +417,126 @@
         </translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="197"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="274"/>
         <source>No video frame received during last %1 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="201"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="278"/>
         <source>Connection to camera was unexpectedly closed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="208"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="285"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="213"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="290"/>
         <source>Server terminated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="217"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="294"/>
         <source>Server started after crash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="225"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="302"/>
         <source>Not enough HDD/SSD speed for recording to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="221"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="298"/>
         <source>I/O Error occured at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraDiagnosticsErrorCodeStrings</name>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="25"/>
+        <source>ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
+        <source>Media server %1 is not available. Check that media server is up and running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
+        <source>Received bad response from media server %1: %2. Check media server&apos;s version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
+        <source>Cannot connect to http port %1. Make sure the camera is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
+        <source>Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="45"/>
+        <source>Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
+        <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="52"/>
+        <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
+        <source>Not authorized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="60"/>
+        <source>Unsupported media protocol %1. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="65"/>
+        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
+        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="75"/>
+        <source>Unknown Camera Issue. Please, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="79"/>
+        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
+        <source>Server has been stopped.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="85"/>
+        <source>Unknown error. Please contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
+        <source> Parameters: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -546,6 +588,29 @@
     </message>
 </context>
 <context>
+    <name>QnFfmpegAudioTranscoder</name>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
+        <source>Audio context must be specified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
+        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
+        <source>Can&apos;t initialize audio encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
+        <source>Can&apos;t initialize audio decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnFfmpegTranscoder</name>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="104"/>
@@ -580,24 +645,42 @@
     </message>
 </context>
 <context>
+    <name>QnFfmpegVideoTranscoder</name>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
+        <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
+        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
+        <source>Can&apos;t initialize video encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnLicense</name>
     <message>
-        <location filename="../src/licensing/license.cpp" line="229"/>
+        <location filename="../src/licensing/license.cpp" line="233"/>
         <source>Free</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="230"/>
+        <location filename="../src/licensing/license.cpp" line="234"/>
         <source>Trial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="231"/>
+        <location filename="../src/licensing/license.cpp" line="235"/>
         <source>Analog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="232"/>
+        <location filename="../src/licensing/license.cpp" line="236"/>
         <source>Professional</source>
         <translation type="unfinished"></translation>
     </message>
@@ -649,44 +732,124 @@
     </message>
 </context>
 <context>
+    <name>QnStreamQualityStrings</name>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="30"/>
+        <source>Lowest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="31"/>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="33"/>
+        <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="35"/>
+        <source>Preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="36"/>
+        <source>Undefined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="32"/>
+        <source>Medium</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="34"/>
+        <source>Best</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="48"/>
+        <source>Lst</source>
+        <extracomment>Short for &apos;Lowest&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="51"/>
+        <source>Lo</source>
+        <extracomment>Short for &apos;Low&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="54"/>
+        <source>Me</source>
+        <extracomment>Short for &apos;Medium&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="57"/>
+        <source>Hi</source>
+        <extracomment>Short for &apos;High&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="60"/>
+        <source>Bst</source>
+        <extracomment>Short for &apos;Best&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="63"/>
+        <source>Ps</source>
+        <extracomment>Short for &apos;Preset&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="66"/>
+        <source>-</source>
+        <extracomment>Short for &apos;Undefined&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnStreamRecorder</name>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="428"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="429"/>
         <source>No %1 container in FFMPEG library.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="447"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="448"/>
         <source>Can&apos;t create output file &apos;%1&apos; for video recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="492"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="499"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="574"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="582"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="599"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="611"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="628"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="623"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="640"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="734"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="751"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -828,6 +991,19 @@ You cannot record video from cameras.</source>
         <location filename="../src/transcoding/transcoder.cpp" line="300"/>
         <location filename="../src/transcoding/transcoder.cpp" line="334"/>
         <source>Unknown Transcode Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnTranslationListModel</name>
+    <message>
+        <location filename="../src/translation/translation_list_model.cpp" line="63"/>
+        <source>%1 (built-in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/translation/translation_list_model.cpp" line="65"/>
+        <source>%1 (external)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

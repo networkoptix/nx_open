@@ -326,7 +326,7 @@ void GraphicsWidget::handlePendingLayoutRequests(QGraphicsScene *scene) {
         sd->pendingLayoutWidgets.clear();
 
         foreach(QGraphicsWidget *widget, widgets) {
-            const char *name = sd->names.value(widget);
+            //const char *name = sd->names.value(widget);
             /* This code is copied from QGraphicsWidgetPrivate::_q_relayout(). */
             bool wasResized = widget->testAttribute(Qt::WA_Resized);
             widget->resize(widget->size());

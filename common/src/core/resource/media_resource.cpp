@@ -1,51 +1,98 @@
-
 #include "media_resource.h"
 
 #include <QImage>
+#include <QCoreApplication>
+
+#include <utils/common/warnings.h>
+#include <utils/common/enum_name_mapper.h>
 
 #include "resource_media_layout.h"
 
+namespace {
+    QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(Qn::StreamQuality, 
+        ((Qn::QualityLowest,  "lowest"))
+        ((Qn::QualityLow,     "low"))
+        ((Qn::QualityNormal,  "normal"))
+        ((Qn::QualityHigh,    "high"))
+        ((Qn::QualityHighest, "highest"))
+        ((Qn::QualityPreSet,  "preset"))
+    )
 
-QString QnStreamQualityToString(QnStreamQuality value) {
-    switch(value) {
-        case QnQualityLowest:
-            return QObject::tr("Lowest");
-        case QnQualityLow:
-            return QObject::tr("Low");
-        case QnQualityNormal:
-            return QObject::tr("Normal");
-        case QnQualityHigh:
-            return QObject::tr("High");
-        case QnQualityHighest:
-            return QObject::tr("Highest");
-        case QnQualityPreSet:
-            return QObject::tr("Preset");
-    default:
-        break;
+    Q_GLOBAL_STATIC_WITH_ARGS(QnTypedEnumNameMapper<Qn::StreamQuality>, qn_streamQuality_nameMapper, (createEnumNameMapper<Qn::StreamQuality>()))
+} // anonymous namespace
+
+
+class QnStreamQualityStrings {
+    Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
+public:
+    static QString displayString(Qn::StreamQuality value) {
+        switch(value) {
+        case Qn::QualityLowest:       return tr("Lowest");
+        case Qn::QualityLow:          return tr("Low");
+        case Qn::QualityNormal:       return tr("Medium");
+        case Qn::QualityHigh:         return tr("High");
+        case Qn::QualityHighest:      return tr("Best");
+        case Qn::QualityPreSet:       return tr("Preset");
+        case Qn::QualityNotDefined:   return tr("Undefined");
+        default:
+            qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
+            return QString();
+        }
     }
-    return QObject::tr("Undefined");
+
+    static QString shortDisplayString(Qn::StreamQuality value) {
+        /* Note that '//:' are comments for translators. */
+        switch(value) {
+        case Qn::QualityLowest:       
+            //: Short for 'Lowest'
+            return tr("Lst");
+        case Qn::QualityLow:          
+            //: Short for 'Low'
+            return tr("Lo");
+        case Qn::QualityNormal:       
+            //: Short for 'Medium'
+            return tr("Me");
+        case Qn::QualityHigh:         
+            //: Short for 'High'
+            return tr("Hi");
+        case Qn::QualityHighest:      
+            //: Short for 'Best'
+            return tr("Bst");
+        case Qn::QualityPreSet:       
+            //: Short for 'Preset'
+            return tr("Ps");
+        case Qn::QualityNotDefined:   
+            //: Short for 'Undefined'
+            return tr("-");
+        default:
+            qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
+            return QString();
+        }
+    }
+};
+
+QString Qn::toDisplayString(Qn::StreamQuality value) {
+    return QnStreamQualityStrings::displayString(value);
 }
 
-QnStreamQuality QnStreamQualityFromString( const QString& str )
-{
-    if( str == QString::fromLatin1("lowest") )
-        return QnQualityLowest;
-    else if( str == QString::fromLatin1("low") )
-        return QnQualityLow;
-    else if( str == QString::fromLatin1("normal") )
-        return QnQualityNormal;
-    else if( str == QString::fromLatin1("high") )
-        return QnQualityHigh;
-    else if( str == QString::fromLatin1("highest") )
-        return QnQualityHighest;
-    else if( str == QString::fromLatin1("preset") )
-        return QnQualityPreSet;
-    else
-        return QnQualityPreSet;
+QString Qn::toShortDisplayString(Qn::StreamQuality value) {
+    return QnStreamQualityStrings::shortDisplayString(value);
 }
 
-//QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
+template<>
+Qn::StreamQuality Qn::fromString<Qn::StreamQuality>(const QString &string) {
+    return qn_streamQuality_nameMapper()->value(string, Qn::QualityNotDefined);
+}
 
+template<>
+QString Qn::toString<Qn::StreamQuality>(Qn::StreamQuality value) {
+    return qn_streamQuality_nameMapper()->name(value, QString());
+}
+
+
+// -------------------------------------------------------------------------- //
+// QnMediaResource
+// -------------------------------------------------------------------------- //
 QnMediaResource::QnMediaResource()
 {
     m_customVideoLayout = 0;
@@ -56,7 +103,7 @@ QnMediaResource::~QnMediaResource()
     delete m_customVideoLayout;
 }
 
-QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, QnStreamQuality /*quality*/) const
+QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
 {
     return QImage();
 }
@@ -87,4 +134,34 @@ const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractStr
 void QnMediaResource::initMediaResource()
 {
     toResource()->addFlags(QnResource::media);
+}
+
+DewarpingParams QnMediaResource::getDewarpingParams() const
+{
+    return m_dewarpingParams;
+}
+
+
+void QnMediaResource::setDewarpingParams(const DewarpingParams& params)
+{
+    bool capsChanged = params.enabled != m_dewarpingParams.enabled;
+    m_dewarpingParams = params;
+    if (capsChanged) {
+        if (params.enabled)
+            toResource()->setPtzCapabilities(Qn::AllPtzCapabilities);
+        else
+            toResource()->setPtzCapabilities(Qn::NoPtzCapabilities);
+    }
+}
+
+bool QnMediaResource::isFisheye() const
+{
+    return m_dewarpingParams.enabled;
+}
+
+void QnMediaResource::updateInner(QnResourcePtr other)
+{
+    QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
+    if (other_casted)
+        m_dewarpingParams = other_casted->m_dewarpingParams;
 }

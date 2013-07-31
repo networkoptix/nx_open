@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>478</width>
-    <height>438</height>
+    <height>444</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -108,17 +108,10 @@
        <item row="3" column="0">
         <widget class="QLabel" name="simpleSignatureLabel">
          <property name="text">
-          <string>&amp;Signature:</string>
+          <string>&amp;System ID:</string>
          </property>
          <property name="buddy">
-          <cstring>simpleSignatureTextEdit</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QPlainTextEdit" name="simpleSignatureTextEdit">
-         <property name="tabChangesFocus">
-          <bool>true</bool>
+          <cstring>simpleSignatureLineEdit</cstring>
          </property>
         </widget>
        </item>
@@ -126,6 +119,13 @@
         <widget class="QLabel" name="detectErrorLabel">
          <property name="text">
           <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="simpleSignatureLineEdit">
+         <property name="placeholderText">
+          <string>Enter short system description here...</string>
          </property>
         </widget>
        </item>
@@ -272,17 +272,17 @@
          <item row="0" column="0">
           <widget class="QLabel" name="signatureLabel">
            <property name="text">
-            <string>&amp;Signature:</string>
+            <string>&amp;System ID:</string>
            </property>
            <property name="buddy">
-            <cstring>signatureTextEdit</cstring>
+            <cstring>signatureLineEdit</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QPlainTextEdit" name="signatureTextEdit">
-           <property name="tabChangesFocus">
-            <bool>true</bool>
+          <widget class="QLineEdit" name="signatureLineEdit">
+           <property name="placeholderText">
+            <string>Enter short system description here...</string>
            </property>
           </widget>
          </item>
@@ -464,7 +464,6 @@
  <tabstops>
   <tabstop>simpleEmailLineEdit</tabstop>
   <tabstop>simplePasswordLineEdit</tabstop>
-  <tabstop>simpleSignatureTextEdit</tabstop>
   <tabstop>serverLineEdit</tabstop>
   <tabstop>portComboBox</tabstop>
   <tabstop>userLineEdit</tabstop>
@@ -472,7 +471,6 @@
   <tabstop>tlsRadioButton</tabstop>
   <tabstop>sslRadioButton</tabstop>
   <tabstop>unsecuredRadioButton</tabstop>
-  <tabstop>signatureTextEdit</tabstop>
   <tabstop>advancedCheckBox</tabstop>
   <tabstop>testButton</tabstop>
   <tabstop>okTestButton</tabstop>

@@ -38,7 +38,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
-#include <ui/graphics/items/generic/simple_frame_widget.h>
+#include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
@@ -279,8 +279,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, Qt::black);
     m_treeWidget->resize(250, 0);
 
-    m_treeBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
-    m_treeBackgroundItem->setAutoFillBackground(true);
+    m_treeBackgroundItem = new QnFramedWidget(m_controlsWidget);
     {
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
@@ -351,8 +350,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Title bar. */
-    m_titleBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
-    m_titleBackgroundItem->setAutoFillBackground(true);
+    m_titleBackgroundItem = new QnFramedWidget(m_controlsWidget);
     {
         QLinearGradient gradient(0, 0, 0, 1);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
@@ -460,8 +458,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Notifications panel. */
-    m_notificationsBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
-    m_notificationsBackgroundItem->setAutoFillBackground(true);
+    m_notificationsBackgroundItem = new QnFramedWidget(m_controlsWidget);
     {
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);

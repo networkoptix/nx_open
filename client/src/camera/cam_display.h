@@ -78,7 +78,7 @@ public:
     void setMTDecoding(bool value);
 
     QSize getFrameSize(int channel) const;
-    QImage getScreenshot(int channel, const ImageCorrectionParams& params);
+    QImage getScreenshot(int channel, const ImageCorrectionParams& params, const DewarpingParams& dewarping);
     QImage getGrayscaleScreenshot(int channel);
     QSize getVideoSize() const;
     bool isRealTimeSource() const;

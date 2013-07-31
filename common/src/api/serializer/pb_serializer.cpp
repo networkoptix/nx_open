@@ -124,9 +124,10 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
 
     vCamera->setGroupId(QString::fromUtf8(pb_camera.groupid().c_str()));
     vCamera->setGroupName(QString::fromUtf8(pb_camera.groupname().c_str()));
-    vCamera->setSecondaryStreamQuality(static_cast<QnSecondaryStreamQuality>(pb_camera.secondaryquality()));
+    vCamera->setSecondaryStreamQuality(static_cast<Qn::SecondStreamQuality>(pb_camera.secondaryquality()));
     vCamera->setCameraControlDisabled(pb_camera.controldisabled());
     vCamera->setStatusFlags((QnSecurityCamResource::StatusFlags) pb_camera.statusflags());
+    vCamera->setDewarpingParams(DewarpingParams::deserialize(pb_camera.dewarpingparams().c_str()));
 
     if (pb_camera.has_region())
     {
@@ -154,7 +155,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
                                         (Qn::RecordingType) pb_scheduleTask.recordtype(),
                                         pb_scheduleTask.beforethreshold(),
                                         pb_scheduleTask.afterthreshold(),
-                                        (QnStreamQuality) pb_scheduleTask.streamquality(),
+                                        (Qn::StreamQuality) pb_scheduleTask.streamquality(),
                                         pb_scheduleTask.fps(),
                                         pb_scheduleTask.dorecordaudio()
                                        );
@@ -305,6 +306,7 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
             itemData.combinedGeometry.setBottom(pb_item.bottom());
             itemData.rotation = pb_item.rotation();
             itemData.contrastParams = ImageCorrectionParams::deserialize(QByteArray(pb_item.contrastparams().c_str()));
+            itemData.dewarpingParams = DewarpingParams::deserialize(pb_item.dewarpingparams().c_str());
 
             if(pb_item.has_zoomtargetuuid())
                 itemData.zoomTargetUuid = QUuid(QString::fromUtf8(pb_item.zoomtargetuuid().c_str()));
@@ -434,6 +436,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_secondaryquality(static_cast<pb::Camera_SecondaryQuality>(cameraPtr->secondaryStreamQuality()));
     pb_camera.set_controldisabled(cameraPtr->isCameraControlDisabled());
     pb_camera.set_statusflags((int) cameraPtr->statusFlags());
+    pb_camera.set_dewarpingparams(cameraPtr->getDewarpingParams().serialize().constData());
 
     QnParamList params = cameraPtr->getResourceParamList();
     foreach(QString key, params.keys())
@@ -483,7 +486,7 @@ int serializeBusinessActionType(BusinessActionType::Value value) {
     case BusinessActionType::CameraRecording:       return pb::CameraRecording;
     case BusinessActionType::PanicRecording:        return pb::PanicRecording;
     case BusinessActionType::SendMail:              return pb::SendMail;
-    case BusinessActionType::Alert:                 return pb::Alert;
+    case BusinessActionType::Diagnostics:           return pb::Diagnostics;
     case BusinessActionType::ShowPopup:             return pb::ShowPopup;
     case BusinessActionType::PlaySound:             return pb::PlaySound;
     case BusinessActionType::SayText:               return pb::SayText;
@@ -535,6 +538,7 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     pb_businessRule.set_disabled(businessRulePtr->disabled());
     pb_businessRule.set_comments(businessRulePtr->comments().toUtf8());
     pb_businessRule.set_schedule(businessRulePtr->schedule().toUtf8());
+    pb_businessRule.set_system(businessRulePtr->system());
 }
 
 void serializeKvPair_i(int resourceId, pb::KvPair& pb_kvPair, const QnKvPair& kvPair)
@@ -585,6 +589,7 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
             pb_item.set_bottom(itemIn.combinedGeometry.bottom());
             pb_item.set_rotation(itemIn.rotation);
             pb_item.set_contrastparams(itemIn.contrastParams.serialize().constData());
+            pb_item.set_dewarpingparams(itemIn.dewarpingParams.serialize().constData());
 
             pb_item.set_zoomtargetuuid(itemIn.zoomTargetUuid.toString().toUtf8().constData());
             pb_item.set_zoomleft(itemIn.zoomRect.left());
@@ -641,7 +646,7 @@ BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     case pb::CameraRecording:       return BusinessActionType::CameraRecording;
     case pb::PanicRecording:        return BusinessActionType::PanicRecording;
     case pb::SendMail:              return BusinessActionType::SendMail;
-    case pb::Alert:                 return BusinessActionType::Alert;
+    case pb::Diagnostics:           return BusinessActionType::Diagnostics;
     case pb::ShowPopup:             return BusinessActionType::ShowPopup;
     case pb::PlaySound:             return BusinessActionType::PlaySound;
     case pb::SayText:               return BusinessActionType::SayText;
@@ -970,7 +975,7 @@ void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRulePtr &busi
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data)
+void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, const QnEmailAttachmentList& attachments, int timeout, QByteArray& data)
 {
     pb::Emails pb_emails;
     pb_emails.set_timeout(timeout);
@@ -982,6 +987,13 @@ void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& sub
 
     email.set_subject(subject.toUtf8().constData());
     email.set_body(message.toUtf8().constData());
+
+    foreach (QnEmailAttachmentPtr attachment, attachments) {
+        pb::Attachment& pb_attachment = *email.add_attachment();
+        pb_attachment.set_filename(attachment->filename.toUtf8().constData());
+        pb_attachment.set_content(attachment->content.data(), attachment->content.length());
+        pb_attachment.set_mimetype(attachment->mimetype.toUtf8().constData());
+    }
 
     std::string str;
     pb_emails.SerializeToString(&str);
@@ -1189,6 +1201,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
     businessRule->setDisabled(pb_businessRule.disabled());
     businessRule->setComments(QString::fromUtf8(pb_businessRule.comments().c_str()));
     businessRule->setSchedule(QString::fromUtf8(pb_businessRule.schedule().c_str()));
+    businessRule->setSystem(pb_businessRule.system());
 }
 
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction)

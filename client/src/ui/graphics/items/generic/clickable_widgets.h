@@ -5,7 +5,7 @@
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 
-#include <ui/graphics/items/generic/simple_frame_widget.h>
+#include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 
 /**
@@ -29,9 +29,9 @@ signals:
 /**
  * Simple frame widget that provides signals for mouse click and double click events.
  */
-class QnClickableFrameWidget: public Clickable<QnSimpleFrameWidget> {
+class QnClickableFrameWidget: public Clickable<QnFramedWidget> {
     Q_OBJECT
-    typedef Clickable<QnSimpleFrameWidget> base_type;
+    typedef Clickable<QnFramedWidget> base_type;
 
 public:
     QnClickableFrameWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0): base_type(parent, wFlags) {}

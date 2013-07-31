@@ -42,7 +42,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     scheduleData.m_startTime = 0;
     scheduleData.m_endTime = 24*3600*7;
     scheduleData.m_recordType = Qn::RecordingType_Run;
-    scheduleData.m_streamQuality = QnQualityHighest;
+    scheduleData.m_streamQuality = Qn::QualityHighest;
     scheduleData.m_fps = getFpsForValue(0);
 
     m_panicSchedileRecord.setData(scheduleData);
@@ -142,9 +142,9 @@ void QnServerStreamRecorder::updateStreamParams()
             else {
                 Q_ASSERT(camera);
                 liveProvider->setFps(camera->getMaxFps()-5);
-                liveProvider->setQuality(QnQualityHighest);
+                liveProvider->setQuality(Qn::QualityHighest);
             }
-            liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? SSQualityNotDefined : camera->secondaryStreamQuality());
+            liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
         }
     }
 }
@@ -272,7 +272,7 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
     }
 }
 
-void QnServerStreamRecorder::startForcedRecording(QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
+void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
 {
     Q_UNUSED(beforeThreshold)
 
@@ -334,7 +334,7 @@ void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
 
 
     // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
-    //CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
+    //CLServerPushStreamReader* sPushProvider = dynamic_cast<CLServerPushStreamReader*> (m_mediaProvider);
     bool doNotChangeParams = false; //sPushProvider && sPushProvider->isStreamOpened() && m_currentScheduleTask->getFps() >= m_panicSchedileRecord.getFps()*0.75;
     updateRecordingType(task);
     if (!doNotChangeParams)

@@ -10,9 +10,12 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/graphics/items/resource/media_resource_widget.h>
+
 #include <ui/workbench/watchers/workbench_ptz_mapper_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 
 //#define QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
 #ifdef QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
@@ -57,10 +60,15 @@ QnWorkbenchPtzController::QnWorkbenchPtzController(QObject *parent):
     m_mapperWatcher(context()->instance<QnWorkbenchPtzMapperWatcher>())
 {
     QnWorkbenchPtzCameraWatcher *watcher = context()->instance<QnWorkbenchPtzCameraWatcher>();
-    connect(watcher, SIGNAL(ptzCameraAdded(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &)));
-    connect(watcher, SIGNAL(ptzCameraRemoved(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &)));
+    connect(watcher,    SIGNAL(ptzCameraAdded(const QnVirtualCameraResourcePtr &)),     this,   SLOT(at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &)));
+    connect(watcher,    SIGNAL(ptzCameraRemoved(const QnVirtualCameraResourcePtr &)),   this,   SLOT(at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &)));
     foreach(const QnVirtualCameraResourcePtr &camera, watcher->ptzCameras())
         at_ptzCameraWatcher_ptzCameraAdded(camera);
+
+    connect(display(),  SIGNAL(widgetAdded(QnResourceWidget *)),                        this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(display(),  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),             this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    foreach(QnResourceWidget *widget, display()->widgets())
+        at_display_widgetAdded(widget);
 }
 
 QnWorkbenchPtzController::~QnWorkbenchPtzController() {
@@ -70,7 +78,10 @@ QnWorkbenchPtzController::~QnWorkbenchPtzController() {
     disconnect(watcher, NULL, this, NULL);
 }
 
-QVector3D QnWorkbenchPtzController::position(const QnVirtualCameraResourcePtr &camera) const {
+QVector3D QnWorkbenchPtzController::position(const QnMediaResourceWidget *widget) const 
+{
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+
     if(!camera) {
         qnNullWarning(camera);
         return qQNaN<QVector3D>();
@@ -83,7 +94,17 @@ QVector3D QnWorkbenchPtzController::position(const QnVirtualCameraResourcePtr &c
     return pos->position;
 }
 
-QVector3D QnWorkbenchPtzController::physicalPosition(const QnVirtualCameraResourcePtr &camera) const {
+QVector3D QnWorkbenchPtzController::physicalPosition(const QnMediaResourceWidget *widget) const 
+{
+    if (widget->virtualPtzController()) {
+        qreal xPos;
+        qreal yPos;
+        qreal zPos;
+        widget->virtualPtzController()->getPosition(&xPos, &yPos, &zPos);
+        return QVector3D(xPos, yPos, zPos);
+    }
+
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera) {
         qnNullWarning(camera);
         return qQNaN<QVector3D>();
@@ -96,35 +117,46 @@ QVector3D QnWorkbenchPtzController::physicalPosition(const QnVirtualCameraResour
     return pos->physicalPosition;
 }
 
-void QnWorkbenchPtzController::setPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position) {
-    if(!camera) {
-        qnNullWarning(camera);
-        return;
-    }
-
-    sendSetPosition(camera, position);
+void QnWorkbenchPtzController::setPosition(const QnMediaResourceWidget *widget, const QVector3D &position) 
+{
+    sendSetPosition(widget, position);
 }
 
-void QnWorkbenchPtzController::setPhysicalPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &physicalPosition) {
-    if(!camera) {
-        qnNullWarning(camera);
-        return;
+void QnWorkbenchPtzController::setPhysicalPosition(const QnMediaResourceWidget *widget, const QVector3D &physicalPosition) 
+{
+    const QnPtzSpaceMapper *mapper = 0;
+    if (widget->virtualPtzController())
+    {
+        mapper = widget->virtualPtzController()->getSpaceMapper();
     }
-
-    const QnPtzSpaceMapper *mapper = m_mapperWatcher->mapper(camera);
-    if(!mapper) {
-        qnWarning("Physical position is not supported for camera '%1'.", camera->getName());
-        return;
+    else {
+        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+        if(!camera) {
+            qnNullWarning(camera);
+            return;
+        }
+        mapper = m_mapperWatcher->mapper(camera);
+        if(!mapper)
+            qnWarning("Physical position is not supported for camera '%1'.", camera->getName());
     }
-
-    setPosition(camera, mapper->toCamera().physicalToLogical(physicalPosition));
+    if (mapper)
+        setPosition(widget, mapper->toCamera().physicalToLogical(physicalPosition));
 }
 
-void QnWorkbenchPtzController::updatePosition(const QnVirtualCameraResourcePtr &camera) {
-    sendGetPosition(camera);
+
+void QnWorkbenchPtzController::updatePosition(const QnMediaResourceWidget* widget) 
+{
+    sendGetPosition(widget);
 }
 
-QVector3D QnWorkbenchPtzController::movement(const QnVirtualCameraResourcePtr &camera) const {
+QVector3D QnWorkbenchPtzController::movement(const QnMediaResourceWidget *widget) const 
+{
+    if (widget->virtualPtzController()) {
+        return m_dataByWidget[widget].movement;
+    }
+
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+
     if(!camera) {
         qnNullWarning(camera);
         return QVector3D();
@@ -137,16 +169,24 @@ QVector3D QnWorkbenchPtzController::movement(const QnVirtualCameraResourcePtr &c
     return pos->movement;
 }
 
-void QnWorkbenchPtzController::setMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &motion) {
-    if(!camera) {
-        qnNullWarning(camera);
-        return;
+void QnWorkbenchPtzController::setMovement(const QnMediaResourceWidget *widget, const QVector3D &motion) 
+{
+    if (widget->virtualPtzController()) {
+        widget->virtualPtzController()->startMove(motion.x(), motion.y(), motion.z());
+        m_dataByWidget[widget].movement = motion;
+        emit movementChanged(widget);
     }
-
-    sendSetMovement(camera, motion);
+    else {
+        sendSetMovement(widget, motion);
+    }
 }
 
-void QnWorkbenchPtzController::sendGetPosition(const QnVirtualCameraResourcePtr &camera) {
+void QnWorkbenchPtzController::sendGetPosition(const QnMediaResourceWidget *widget) 
+{
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     if(!server)
         return; // TODO. This really does happen
@@ -156,9 +196,21 @@ void QnWorkbenchPtzController::sendGetPosition(const QnVirtualCameraResourcePtr 
 
     int handle = server->apiConnection()->ptzGetPosAsync(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, const QVector3D &, int)));
     m_cameraByHandle[handle] = camera;
+    m_widgetByHandle[handle] = widget;
 }
 
-void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position) {
+void QnWorkbenchPtzController::sendSetPosition(const QnMediaResourceWidget *widget, const QVector3D &position) 
+{
+    if (widget->virtualPtzController())
+    {
+        widget->virtualPtzController()->moveTo(position.x(), position.y(), position.z());
+        return;
+    }
+
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     if(!server)
         return; // TODO. This really does happen
@@ -171,10 +223,16 @@ void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr 
 
     int handle = server->apiConnection()->ptzMoveToAsync(camera, position, data.sequenceId, data.sequenceNumber, this, SLOT(at_ptzSetPosition_replyReceived(int, int)));
     m_cameraByHandle[handle] = camera;
+    m_widgetByHandle[handle] = widget;
     m_requestByHandle[handle] = position;
 }
 
-void QnWorkbenchPtzController::sendSetMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement) {
+void QnWorkbenchPtzController::sendSetMovement(const QnMediaResourceWidget *widget, const QVector3D &movement) 
+{
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     if(!server)
         return; // TODO. This really does happen
@@ -190,7 +248,21 @@ void QnWorkbenchPtzController::sendSetMovement(const QnVirtualCameraResourcePtr 
         handle = server->apiConnection()->ptzMoveAsync(camera, movement, data.sequenceId, data.sequenceNumber, this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
     }
     m_cameraByHandle[handle] = camera;
+    m_widgetByHandle[handle] = widget;
     m_requestByHandle[handle] = movement;
+}
+
+void QnWorkbenchPtzController::changePanoMode(const QnMediaResourceWidget *widget) {
+    if (widget->virtualPtzController()) 
+        widget->virtualPtzController()->changePanoMode();
+}
+
+QString QnWorkbenchPtzController::getPanoModeText(const QnMediaResourceWidget *widget) const {
+    if (widget->virtualPtzController()) {
+        return widget->virtualPtzController()->getPanoModeText();
+    } else {
+        return QString();
+    }
 }
 
 void QnWorkbenchPtzController::tryInitialize(const QnVirtualCameraResourcePtr &camera) {
@@ -205,15 +277,15 @@ void QnWorkbenchPtzController::tryInitialize(const QnVirtualCameraResourcePtr &c
     data.initialized = true;
     data.sequenceId = QUuid::createUuid();
     data.sequenceNumber = 0;
-    sendGetPosition(camera);
-    sendSetMovement(camera, QVector3D());
+    //sendGetPosition(camera);
+    //sendSetMovement(camera, QVector3D());
 }
 
-void QnWorkbenchPtzController::emitChanged(const QnVirtualCameraResourcePtr &camera, bool position, bool movement) {
+void QnWorkbenchPtzController::emitChanged(const QnMediaResourceWidget *widget, bool position, bool movement) {
     if(position)
-        emit positionChanged(camera);
+        emit positionChanged(widget);
     if(movement)
-        emit movementChanged(camera);
+        emit movementChanged(widget);
 }
 
 
@@ -242,12 +314,15 @@ void QnWorkbenchPtzController::at_resource_statusChanged(const QnResourcePtr &re
 
 void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, const QVector3D &position, int handle) {
     QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
-    if(!camera)
+    const QnMediaResourceWidget* widget = m_widgetByHandle.value(handle);
+    if(!camera || !widget)
         return; /* Already removed from the pool. */
+
 
     TRACE("GOT POSITION" << position);
 
     m_cameraByHandle.remove(handle);
+    m_widgetByHandle.remove(handle);
     
     PtzData &data = m_dataByCamera[camera];
     if(status == 0) {
@@ -260,22 +335,24 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, const
         }
         data.attemptCount[GetPositionRequest] = 0;
 
-        emitChanged(camera, positionChanged, false);
+        emitChanged(widget, positionChanged, false);
     } else {
         if(data.attemptCount[GetPositionRequest] > maxAttempts) {
 //            qnWarning("Could not get PTZ position from '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
         } else {
-            sendGetPosition(camera);
+            sendGetPosition(widget);
         }
     }
 }
 
 void QnWorkbenchPtzController::at_ptzSetPosition_replyReceived(int status, int handle) {
     QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
-    if(!camera)
+    const QnMediaResourceWidget* widget = m_widgetByHandle.value(handle);
+    if(!camera || !widget)
         return; /* Already removed from the pool. */
 
     m_cameraByHandle.remove(handle);
+    m_widgetByHandle.remove(handle);
     QVector3D position = m_requestByHandle[handle];
     m_requestByHandle.remove(handle);
 
@@ -290,22 +367,24 @@ void QnWorkbenchPtzController::at_ptzSetPosition_replyReceived(int status, int h
         data.movement = QVector3D();
         data.attemptCount[SetPositionRequest] = 0;
 
-        emitChanged(camera, positionChanged, movementChanged);
+        emitChanged(widget, positionChanged, movementChanged);
     } else {
         if(data.attemptCount[SetPositionRequest] > maxAttempts) {
 //            qnWarning("Could not set PTZ position for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
         } else {
-            sendSetPosition(camera, position);
+            sendSetPosition(widget, position);
         }
     }
 }
 
 void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int handle) {
     QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
-    if(!camera)
+    const QnMediaResourceWidget* widget = m_widgetByHandle.value(handle);
+    if(!camera || !widget)
         return; /* Already removed from the pool. */
 
     m_cameraByHandle.remove(handle);
+    m_widgetByHandle.remove(handle);
     QVector3D movement = m_requestByHandle[handle];
     m_requestByHandle.remove(handle);
 
@@ -317,20 +396,36 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
             data.position = qQNaN<QVector3D>();
             data.physicalPosition = qQNaN<QVector3D>();
         } else if(qIsNaN(data.position)) {
-            sendGetPosition(camera);
+            sendGetPosition(widget);
         }
         
         bool movementChanged = !qFuzzyCompare(data.movement, movement);
         data.movement = movement;
         data.attemptCount[SetMovementRequest] = 0;
 
-        emitChanged(camera, positionChanged, movementChanged);
+        emitChanged(widget, positionChanged, movementChanged);
     } else {
         if(data.attemptCount[SetMovementRequest] > maxAttempts) {
 //            qnWarning("Could not set PTZ movement for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
         } else {
-            sendSetMovement(camera, movement);
+            sendSetMovement(widget, movement);
         }
     }
 }
+
+void QnWorkbenchPtzController::at_display_widgetAdded(QnResourceWidget *widget) {
+    // TODO: #Elric.
+}
+
+void QnWorkbenchPtzController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
+    // removing widget from all containers
+    m_dataByWidget.remove(static_cast<QnMediaResourceWidget *>(widget));
+    for(QHash<int, const QnMediaResourceWidget *>::iterator pos = m_widgetByHandle.begin(); pos != m_widgetByHandle.end(); ) {
+        if(pos.value() == widget)
+            pos = m_widgetByHandle.erase(pos);
+        else
+            ++pos;
+    }
+}
+
 

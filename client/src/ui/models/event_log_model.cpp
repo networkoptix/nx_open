@@ -170,7 +170,7 @@ public:
         for (int i = 0; i < m_events.size(); ++i)
         {
             QnBusinessActionDataList& data = *m_events[i].data();
-            for (int j = 0; j < data.size(); ++j)
+            for (uint j = 0; j < data.size(); ++j)
                 *dst++ = &data[j];
         }
 
@@ -470,7 +470,7 @@ QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& ac
 
     if (action.getRuntimeParams().getEventType() != BusinessEventType::Camera_Motion)
         return QString();
-    return QnBusinessStringsHelper::motionUrl(action.getRuntimeParams());
+    return QnBusinessStringsHelper::motionUrl(action.getRuntimeParams(), true);
 }
 
 bool QnEventLogModel::hasMotionUrl(const QModelIndex & index) const

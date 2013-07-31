@@ -15,24 +15,6 @@ private:
     QnMediaServerResourcePtr m_resource;
 };
 
-
-QnLocalMediaServerResource::QnLocalMediaServerResource(): 
-    QnResource()
-{
-    //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
-    addFlags(QnResource::server | QnResource::local);
-    removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
-
-    setName(QLatin1String("Local"));
-    setStatus(Online);
-}
-
-QString QnLocalMediaServerResource::getUniqueId() const
-{
-    return QLatin1String("LocalServer");
-}
-
-
 QnMediaServerResource::QnMediaServerResource():
     QnResource(),
     m_panicMode(PM_None),

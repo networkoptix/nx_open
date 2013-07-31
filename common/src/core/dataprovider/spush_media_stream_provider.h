@@ -1,6 +1,7 @@
 #ifndef server_push_stream_reader_h2055
 #define server_push_stream_reader_h2055
 
+#include <QWaitCondition>
 
 #include "media_streamdataprovider.h"
 #include "../datapacket/media_data_packet.h"
@@ -9,30 +10,46 @@
 
 struct QnAbstractMediaData;
 
-class CLServerPushStreamreader : public QnLiveStreamProvider
+class CLServerPushStreamReader : public QnLiveStreamProvider
 {
     Q_OBJECT;
 
 public:
-	CLServerPushStreamreader(QnResourcePtr dev );
-	virtual ~CLServerPushStreamreader(){stop();}
+	CLServerPushStreamReader(QnResourcePtr dev );
+	virtual ~CLServerPushStreamReader(){stop();}
 
     virtual bool isStreamOpened() const = 0;
     //!Returns last HTTP response code (even if used media protocol is not http)
     virtual int getLastResponseCode() const { return 0; };
+
+    //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
+    /*!
+        Reopens media stream, if it not opened yet.
+        Blocks for media stream open attempt
+        \return error code and filled \a errorParams with parameters
+        \note If stream is opened (\a CLServerPushStreamReader::isStreamOpened() returns true) \a CameraDiagnostics::ErrorCode::noError is returned immediately
+    */
+    virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
+
 protected:
-	
-    virtual void openStream() = 0;
+    virtual CameraDiagnostics::Result openStream() = 0;
     virtual void closeStream() = 0;
 	void pleaseReOpen();
     virtual void afterUpdate() override;
     virtual void beforeRun() override;
     virtual bool canChangeStatus() const;
+
 private:
-	void run(); // in a loop: takes data from device and puts into queue
+	virtual void run() override; // in a loop: takes data from device and puts into queue
+
 private:
     bool m_needReopen;
     bool m_cameraAudioEnabled;
+    CameraDiagnostics::Result m_openStreamResult;
+    //!Incremented with every open stream attempt
+    int m_openStreamCounter;
+    QWaitCondition m_cond;
+    QMutex m_openStreamMutex;
 };
 
 #endif //server_push_stream_reader_h2055

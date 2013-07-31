@@ -1,27 +1,46 @@
 
-#include "utils/common/sleep.h"
 #include "spush_media_stream_provider.h"
-#include "../resource/camera_resource.h"
+
+#include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "utils/network/simple_http_client.h"
+#include "../resource/camera_resource.h"
 
-CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
-QnLiveStreamProvider(dev),
-m_needReopen(false),
-m_cameraAudioEnabled(false)
+
+CLServerPushStreamReader::CLServerPushStreamReader(QnResourcePtr dev ):
+    QnLiveStreamProvider(dev),
+    m_needReopen(false),
+    m_cameraAudioEnabled(false),
+    m_openStreamResult(CameraDiagnostics::ErrorCode::unknown),
+    m_openStreamCounter(0)
 {
     QnPhysicalCameraResourcePtr camera = getResource().dynamicCast<QnPhysicalCameraResource>();
     if (camera) 
         m_cameraAudioEnabled = camera->isAudioEnabled();
 }
 
-bool CLServerPushStreamreader::canChangeStatus() const
+CameraDiagnostics::Result CLServerPushStreamReader::diagnoseMediaStreamConnection()
+{
+    QMutexLocker lk( &m_openStreamMutex );
+
+    const int openStreamCounter = m_openStreamCounter;
+    while( openStreamCounter == m_openStreamCounter
+        && !needToStop()
+        && m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError )
+    {
+        m_cond.wait( lk.mutex() );
+    }
+
+    return m_openStreamResult;
+}
+
+bool CLServerPushStreamReader::canChangeStatus() const
 {
     const QnLiveStreamProvider* liveProvider = dynamic_cast<const QnLiveStreamProvider*>(this);
     return liveProvider && liveProvider->canChangeStatus();
 }
 
-void CLServerPushStreamreader::run()
+void CLServerPushStreamReader::run()
 {
     saveSysThreadID();
     setPriority(QThread::TimeCriticalPriority);
@@ -37,7 +56,12 @@ void CLServerPushStreamreader::run()
 
         if (!isStreamOpened())
         {
-            openStream();
+            m_openStreamResult = openStream();
+            {
+                QMutexLocker lk( &m_openStreamMutex );
+                ++m_openStreamCounter;
+                m_cond.wakeAll();
+            }
             if (!isStreamOpened())
             {
                 QnSleep::msleep(100); // to avoid large CPU usage
@@ -167,19 +191,19 @@ void CLServerPushStreamreader::run()
     CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
 }
 
-void CLServerPushStreamreader::beforeRun()
+void CLServerPushStreamReader::beforeRun()
 {
     QnAbstractMediaStreamDataProvider::beforeRun();
     getResource()->init();
 }
 
 
-void CLServerPushStreamreader::pleaseReOpen()
+void CLServerPushStreamReader::pleaseReOpen()
 {
     m_needReopen = true;
 }
 
-void CLServerPushStreamreader::afterUpdate() 
+void CLServerPushStreamReader::afterUpdate() 
 {
     QnPhysicalCameraResourcePtr camera = getResource().dynamicCast<QnPhysicalCameraResource>();
     if (camera) {

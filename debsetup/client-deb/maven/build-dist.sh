@@ -37,7 +37,7 @@ mkdir -p $BINSTAGE/1.4/imageformats
 mkdir -p $BINSTAGE/1.5/imageformats
 mkdir -p $LIBSTAGE
 
-# Copy client binary, x264
+# Copy client binary, x264, old version libs
 cp -r $CLIENT_BIN_PATH/client-bin $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 cp -r $CLIENT_BIN_PATH/applauncher-bin $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}

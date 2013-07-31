@@ -23,9 +23,13 @@ public:
     */
     void setEventLogPeriod(qint64 periodUsec);
 
+protected:
+    QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const override;
+
 protected slots:
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res) override;
     void onRemoveResource(const QnResourcePtr &resource);
+
 private:
     bool executeRecordingAction(QnRecordingBusinessActionPtr action, QnResourcePtr res);
     bool executePanicAction(QnPanicBusinessActionPtr action);

@@ -134,8 +134,15 @@ QnTranslation QnTranslationManager::loadTranslationInternal(const QString &trans
 
     QTranslator translator;
     translator.load(filePath);
+
+    /* Note that '//:' denotes a comment for translators that will appear in TS files. */
+
+    //: Internal. Please don't change existing translation.
     QString languageName = translator.translate("Language", "Language Name");
+
+    //: Internal. Please don't change existing translation.
     QString localeCode = translator.translate("Language", "Locale Code");
+
     if(languageName.isEmpty() || localeCode.isEmpty())
         return QnTranslation(); /* Invalid translation. */
 
@@ -143,6 +150,6 @@ QnTranslation QnTranslationManager::loadTranslationInternal(const QString &trans
     for(int i = 0; i < m_prefixes.size(); i++)
         filePaths.push_back(translationDir + lit('/') + m_prefixes[i] + suffix);
 
-    return QnTranslation(languageName, localeCode, suffix, filePaths);
+    return QnTranslation(languageName, localeCode, filePaths);
 }
 

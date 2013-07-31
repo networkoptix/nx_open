@@ -35,6 +35,11 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 {
     qFreeAligned(m_videoEncodingBuffer);
+    close();
+}
+
+void QnFfmpegVideoTranscoder::close()
+{
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (scaleContext[i])
             sws_freeContext(scaleContext[i]);
@@ -43,10 +48,12 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
     if (m_encoderCtx) {
         avcodec_close(m_encoderCtx);
         av_free(m_encoderCtx);
+        m_encoderCtx = 0;
     }
 
     for (int i = 0; i < m_videoDecoders.size(); ++i)
         delete m_videoDecoders[i];
+    m_videoDecoders.clear();
 }
 
 int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch)
@@ -92,7 +99,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
         scaleContext[ch] = sws_getContext(decodedFrame->width, decodedFrame->height, (PixelFormat) decodedFrame->format, 
                                       dstRect.width(), dstRect.height(), (PixelFormat) PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
         if (!scaleContext) {
-            m_lastErrMessage = QObject::tr("Can't allocate scaler context for resolution %1x%2").arg(m_resolution.width()).arg(m_resolution.height());
+            m_lastErrMessage = tr("Can't allocate scaler context for resolution %1x%2").arg(m_resolution.width()).arg(m_resolution.height());
             return -4;
         }
     }
@@ -106,6 +113,8 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
 
 bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
 {
+    close();
+
     QnVideoTranscoder::open(video);
 
     int channels = m_layout ? m_layout->channelCount() : 1;
@@ -115,7 +124,7 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
     {
-        m_lastErrMessage = QObject::tr("Transcoder error: can't find encoder for codec %1").arg(m_codecId);
+        m_lastErrMessage = tr("Transcoder error: can't find encoder for codec %1").arg(m_codecId);
         return false;
     }
 
@@ -162,7 +171,7 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = QObject::tr("Can't initialize video encoder");
+        m_lastErrMessage = tr("Can't initialize video encoder");
         return false;
     }
 
@@ -210,12 +219,14 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
                 dstRectF = QRectF(dstLeft, dstTop, dstWidth, dstHeight);
 
                 frameRectF.translate(-channelRect.left(), -channelRect.top());
+                dstRectF.setRight(qMin(channelRect.right(), 1.0)); // avoid epsilon factor
+                dstRectF.setBottom(qMin(channelRect.bottom(), 1.0));
                 frameRect = QRect(frameRectF.left() * decoder->getWidth() + 0.5, frameRectF.top() * decoder->getHeight() + 0.5, 
                     frameRectF.width() * decoder->getWidth() + 0.5, frameRectF.height() * decoder->getHeight() + 0.5);
                 frameRect = roundRect(frameRect);
             }
             else {
-                dstRectF = QRectF(pos.x() / (float) lSize.width(), pos.y() / (float) lSize.height(),
+                dstRectF = QRectF(pos.x() / (qreal) lSize.width(), pos.y() / (qreal) lSize.height(),
                             1.0 / lSize.width(), 1.0 / lSize.height());
             }
         }

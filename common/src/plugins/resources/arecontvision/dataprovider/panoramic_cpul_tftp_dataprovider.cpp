@@ -44,6 +44,11 @@ AVPanoramicClientPullSSTFTPStreamreader::~AVPanoramicClientPullSSTFTPStreamreade
     delete m_tftp_client;
 }
 
+CameraDiagnostics::Result AVPanoramicClientPullSSTFTPStreamreader::diagnoseMediaStreamConnection()
+{
+    //TODO/IMPL
+    return CameraDiagnostics::NotImplementedResult();
+}
 
 QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
 {

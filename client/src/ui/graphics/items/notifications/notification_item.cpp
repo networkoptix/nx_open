@@ -11,6 +11,8 @@
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
+#include <ui/common/geometry.h>
+#include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/processors/hover_processor.h>
@@ -21,25 +23,42 @@ namespace {
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
     const qreal margin = 4.0;
-    const qreal colorSignSize = 8.0;
+    const QSize colorSignSize(8.0, 16.0);
+    const qreal closeButtonSize = 12.0;
     const qreal buttonSize = 16.0;
+
 } // anonymous namespace
+
 
 // -------------------------------------------------------------------------- //
 // QnNotificationToolTipWidget
 // -------------------------------------------------------------------------- //
 QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     base_type(parent),
-    m_textLabel(new QnProxyLabel(this)),
     m_thumbnailLabel(NULL)
 {
+    setClickableButtons(Qt::RightButton);
+
+    m_textLabel = new QnProxyLabel(this);
     m_textLabel->setAlignment(Qt::AlignLeft);
     m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+    QnImageButtonWidget *closeButton = new QnImageButtonWidget(this);
+    closeButton->setCached(true);
+    closeButton->setToolTip(tr("Close (<b>Right Click</b>)"));
+    closeButton->setIcon(qnSkin->icon("titlebar/exit.png")); // TODO: #Elric
+    closeButton->setFixedSize(closeButtonSize, closeButtonSize);
+    connect(closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
+
+    m_layout = new QGraphicsLinearLayout(Qt::Vertical);
+    m_layout->setContentsMargins(0, 0, 0, 0);
+    m_layout->addItem(m_textLabel);
+    
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addItem(m_textLabel);
+    layout->addItem(m_layout);
+    layout->addItem(closeButton);
     setLayout(layout);
 
     updateTailPos();
@@ -49,16 +68,12 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
     if (m_thumbnailLabel || !provider)
         return;
 
-    QGraphicsLinearLayout *layout = dynamic_cast<QGraphicsLinearLayout*>(this->layout());
-    if (!layout)
-        return;
-
     m_thumbnailLabel = new QnClickableProxyLabel(this);
     m_thumbnailLabel->setAlignment(Qt::AlignCenter);
-    m_thumbnailLabel->setClickableButtons(Qt::LeftButton);
+    m_thumbnailLabel->setClickableButtons(Qt::LeftButton | Qt::RightButton);
     setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
-    layout->insertItem(0, m_thumbnailLabel);
-    connect(m_thumbnailLabel, SIGNAL(clicked()), this, SIGNAL(thumbnailClicked()));
+    m_layout->insertItem(0, m_thumbnailLabel);
+    connect(m_thumbnailLabel, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_thumbnailLabel_clicked(Qt::MouseButton)));
 
     if (!provider->image().isNull()) {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
@@ -67,6 +82,10 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
         connect(provider, SIGNAL(imageChanged(const QImage &)), this, SLOT(at_provider_imageChanged(const QImage &)));
         provider->loadAsync();
     }
+}
+
+QString QnNotificationToolTipWidget::text() const {
+    return m_textLabel->text();
 }
 
 void QnNotificationToolTipWidget::setText(const QString &text) {
@@ -112,6 +131,19 @@ void QnNotificationToolTipWidget::pointTo(const QPointF &pos) {
     updateTailPos();
 }
 
+void QnNotificationToolTipWidget::clicked(Qt::MouseButton button) {
+    if(button == Qt::RightButton)
+        emit closeTriggered();
+}
+
+void QnNotificationToolTipWidget::at_thumbnailLabel_clicked(Qt::MouseButton button) {
+    if(button == Qt::RightButton) {
+        emit closeTriggered();
+    } else {
+        emit thumbnailClicked();
+    }
+}
+
 void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) {
     if (!m_thumbnailLabel)
         return;
@@ -125,48 +157,62 @@ void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) 
 QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
     m_defaultActionIdx(-1),
-    m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
-    m_textLabel(new QnProxyLabel(this)),
     m_notificationLevel(Qn::OtherNotification),
     m_imageProvider(NULL),
-    m_tooltipWidget(new QnNotificationToolTipWidget(this)),
-    m_hoverProcessor(new HoverFocusProcessor(this)),
     m_inToolTipPositionUpdate(false)
 {
-    m_color = notificationColor(m_notificationLevel);
+    m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
 
+    setClickableButtons(Qt::RightButton | Qt::LeftButton);
     setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
     setFrameWidth(0.5);
     setWindowBrush(Qt::transparent);
 
+    m_overlayWidget = new QnFramedWidget(this);
+    m_overlayWidget->setFrameStyle(Qt::NoPen);
+
+    m_textLabel = new QnProxyLabel(this);
     m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
-    m_layout->setContentsMargins(colorSignSize + margin, margin, margin, margin);
+    m_layout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_layout->setContentsMargins(margin + colorSignSize.width(), margin, margin, margin);
     m_layout->addItem(m_textLabel);
     m_layout->setStretchFactor(m_textLabel, 1.0);
 
     setLayout(m_layout);
 
+    m_tooltipWidget = new QnNotificationToolTipWidget(this);
     m_tooltipWidget->setFocusProxy(this);
     m_tooltipWidget->setOpacity(0.0);
     m_tooltipWidget->setAcceptHoverEvents(true);
     m_tooltipWidget->installEventFilter(this);
     m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
-    connect(m_tooltipWidget, SIGNAL(thumbnailClicked()), this, SLOT(at_thumbnail_clicked()));
-    connect(m_tooltipWidget, SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
-    connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
+    connect(m_tooltipWidget,            SIGNAL(thumbnailClicked()), this,   SLOT(at_thumbnail_clicked()));
+    connect(m_tooltipWidget,            SIGNAL(closeTriggered()),   this,   SIGNAL(closeTriggered()));
+    connect(m_tooltipWidget,            SIGNAL(tailPosChanged()),   this,   SLOT(updateToolTipPosition()));
+    connect(this,                       SIGNAL(geometryChanged()),  this,   SLOT(updateToolTipPosition()));
 
+    m_toolTipHoverProcessor = new HoverFocusProcessor(this);
+    m_toolTipHoverProcessor->addTargetItem(this);
+    m_toolTipHoverProcessor->addTargetItem(m_tooltipWidget);
+    m_toolTipHoverProcessor->setHoverEnterDelay(250);
+    m_toolTipHoverProcessor->setHoverLeaveDelay(250);
+    connect(m_toolTipHoverProcessor,    SIGNAL(hoverEntered()),     this,   SLOT(updateToolTipVisibility()));
+    connect(m_toolTipHoverProcessor,    SIGNAL(hoverLeft()),        this,   SLOT(updateToolTipVisibility()));
+
+    m_hoverProcessor = new HoverFocusProcessor(this);
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
-    m_hoverProcessor->setHoverEnterDelay(250);
-    m_hoverProcessor->setHoverLeaveDelay(250);
-    connect(m_hoverProcessor,    SIGNAL(hoverEntered()),  this,  SLOT(updateToolTipVisibility()));
-    connect(m_hoverProcessor,    SIGNAL(hoverLeft()),     this,  SLOT(updateToolTipVisibility()));
+    connect(m_hoverProcessor,           SIGNAL(hoverEntered()),     this,   SLOT(updateOverlayVisibility()));
+    connect(m_hoverProcessor,           SIGNAL(hoverLeft()),        this,   SLOT(updateOverlayVisibility()));
 
     updateToolTipPosition();
     updateToolTipVisibility();
+    updateOverlayGeometry();
+    updateOverlayVisibility(false);
+    updateOverlayColor();
 }
 
 QnNotificationItem::~QnNotificationItem() {
@@ -189,26 +235,14 @@ Qn::NotificationLevel QnNotificationItem::notificationLevel() const {
     return m_notificationLevel;
 }
 
-QColor QnNotificationItem::notificationColor(Qn::NotificationLevel level) {
-    switch (level) {
-    case Qn::NoNotification:        return Qt::transparent;
-    case Qn::OtherNotification:     return Qt::white;
-    case Qn::CommonNotification:    return qnGlobals->notificationColorCommon();
-    case Qn::ImportantNotification: return qnGlobals->notificationColorImportant();
-    case Qn::CriticalNotification:  return qnGlobals->notificationColorCritical();
-    case Qn::SystemNotification:    return qnGlobals->notificationColorSystem();
-    default:
-        qnWarning("Invalid notification level '%1'.", static_cast<int>(level));
-        return QColor();
-    }
-}
-
 void QnNotificationItem::setNotificationLevel(Qn::NotificationLevel notificationLevel) {
     if(m_notificationLevel == notificationLevel)
         return;
 
     m_notificationLevel = notificationLevel;
-    m_color = notificationColor(m_notificationLevel);
+    m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
+
+    updateOverlayColor();
 
     emit notificationLevelChanged();
 }
@@ -219,6 +253,15 @@ void QnNotificationItem::setImageProvider(QnImageProvider* provider) {
 
 void QnNotificationItem::setTooltipEnclosingRect(const QRectF &rect) {
     m_tooltipWidget->setEnclosingGeometry(rect);
+}
+
+void QnNotificationItem::setGeometry(const QRectF &geometry) {
+    QSizeF oldSize = size();
+
+    base_type::setGeometry(geometry);
+
+    if(!qFuzzyCompare(size(), oldSize))
+        updateOverlayGeometry();
 }
 
 void QnNotificationItem::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
@@ -246,6 +289,8 @@ void QnNotificationItem::addActionButton(const QIcon &icon, const QString &toolt
 
     connect(button, SIGNAL(clicked()), this, SLOT(at_button_clicked()));
     m_actions << ActionData(actionId, parameters);
+
+    m_textLabel->setToolTip(tooltip); // TODO: #Elric
 }
 
 void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -253,27 +298,7 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
     painter->setPen(QPen(QColor(110, 110, 110, 255), 0.5));
     painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
-
-    QRectF rect = this->rect();
-    qreal side = qMin(qMin(rect.width(), rect.height()) * 0.5, colorSignSize);
-
-    qreal left = rect.left();
-    qreal xcenter = left + side;
-
-    qreal ycenter = (rect.top() + rect.bottom()) / 2;
-    qreal top = ycenter - side;
-    qreal bottom = ycenter + side;
-
-    // TODO: cache the path?
-    QPainterPath path;
-    path.moveTo(left, top);
-    path.lineTo(xcenter, top);
-    path.lineTo(xcenter, bottom);
-    //path.arcTo(xcenter - side, ycenter - side, side * 2, side * 2, 90, -180);
-    path.lineTo(left, bottom);
-    path.closeSubpath();
-
-    painter->drawPath(path);
+    painter->drawRect(QnGeometry::aligned(colorSignSize, rect(), Qt::AlignLeft | Qt::AlignVCenter));
 }
 
 void QnNotificationItem::hideToolTip() {
@@ -286,7 +311,7 @@ void QnNotificationItem::showToolTip() {
 }
 
 void QnNotificationItem::updateToolTipVisibility() {
-    if(m_hoverProcessor->isHovered()) {
+    if(m_toolTipHoverProcessor->isHovered() && !m_tooltipWidget->text().isEmpty()) {
         showToolTip();
     } else {
         hideToolTip();
@@ -301,6 +326,44 @@ void QnNotificationItem::updateToolTipPosition() {
 
     m_tooltipWidget->updateTailPos();
     m_tooltipWidget->pointTo(QPointF(0, qRound(geometry().height() / 2 )));
+}
+
+void QnNotificationItem::updateOverlayGeometry() {
+    m_overlayWidget->setGeometry(QRectF(QPointF(0, 0), size()));
+}
+
+void QnNotificationItem::updateOverlayVisibility(bool animate) {
+    if(m_actions.isEmpty()) {
+        m_overlayWidget->setOpacity(0);
+        return; // TODO: #Elric?
+    }
+
+    qreal opacity = m_hoverProcessor->isHovered() ? 1.0 : 0.0;
+
+    if(animate) {
+        opacityAnimator(m_overlayWidget, 4.0)->animateTo(opacity);
+    } else {
+        m_overlayWidget->setOpacity(opacity);
+    }
+}
+
+void QnNotificationItem::updateOverlayColor() {
+    m_overlayWidget->setWindowBrush(toTransparent(m_color, 0.3));
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnNotificationItem::clicked(Qt::MouseButton button) {
+    if(button == Qt::RightButton) {
+        emit closeTriggered();
+    } else if(button == Qt::LeftButton) {
+        if(!m_actions.isEmpty()) {
+            ActionData data = m_actions[0]; // TODO: #Elric
+            emit actionTriggered(data.action, data.params);
+        }
+    }
 }
 
 void QnNotificationItem::at_button_clicked() {
@@ -321,3 +384,4 @@ void QnNotificationItem::at_thumbnail_clicked() {
 
     emit actionTriggered(data.action, data.params);
 }
+

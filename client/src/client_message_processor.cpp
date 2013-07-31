@@ -256,6 +256,8 @@ void QnClientMessageProcessor::updateHardwareIds(const QnMessage& message)
 
 void QnClientMessageProcessor::at_connectionOpened(QnMessage message)
 {
+    QnAppServerConnectionFactory::setSystemName(message.systemName);
+
     updateHardwareIds(message);
     processResources(message.resources);
     processLicenses(message.licenses);

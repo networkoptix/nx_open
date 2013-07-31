@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Adjust video</string>
+   <string>Image Enhancement</string>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -20,7 +20,7 @@
    <item>
     <widget class="QCheckBox" name="enableAdjustment">
      <property name="text">
-      <string>Enable adjustment</string>
+      <string>Enable enhancement</string>
      </property>
     </widget>
    </item>
@@ -97,7 +97,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Black levels</string>
+         <string>Black level</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -133,7 +133,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>White levels</string>
+         <string>White level</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

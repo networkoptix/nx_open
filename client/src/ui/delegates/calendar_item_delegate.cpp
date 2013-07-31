@@ -56,15 +56,16 @@ void QnCalendarItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     base_type::paint(painter, option, index);
 }
 
-void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, const QnTimePeriod &period, const QnTimePeriod &enabledRange, const QnTimePeriod &selectedRange, const QnTimePeriodStorage &primaryPeriods, const QnTimePeriodStorage &secondaryPeriods, const QString &text) const {
+void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, const QnTimePeriod &period, qint64 localOffset, const QnTimePeriod &enabledRange, const QnTimePeriod &selectedRange, const QnTimePeriodStorage &primaryPeriods, const QnTimePeriodStorage &secondaryPeriods, const QString &text) const {
+    QnTimePeriod localPeriod(period.startTimeMs - localOffset, period.durationMs);
     paintCell(
         painter, 
         palette, 
         rect,
-        enabledRange.intersects(period),
-        selectedRange.intersects(period),
-        fillType(period, primaryPeriods),
-        fillType(period, secondaryPeriods),
+        enabledRange.intersects(localPeriod),
+        selectedRange.intersects(localPeriod),
+        fillType(localPeriod, primaryPeriods),
+        fillType(localPeriod, secondaryPeriods),
         text
     );
 }

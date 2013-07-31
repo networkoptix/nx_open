@@ -156,8 +156,6 @@ void LauncherFSM::onBindingToLocalAddressEntered()
         emit bindFailed();
 }
 
-static const QLatin1String NON_RECENT_VERSION_ARGS_PARAM_NAME( "nonRecentVersionArgs" );
-static const QLatin1String NON_RECENT_VERSION_ARGS_DEFAULT_VALUE( "--updates-enabled=false" );
 static const QLatin1String PREVIOUS_LAUNCHED_VERSION_PARAM_NAME( "previousLaunchedVersion" );
 
 void LauncherFSM::onAddingTaskToNamedPipeEntered()
@@ -235,9 +233,6 @@ bool LauncherFSM::getVersionToLaunch( QString* const versionToLaunch, QString* c
         NX_LOG( QString::fromLatin1("Failed to generate launch task. No client installed"), cl_logDEBUG1 );
         return false;
     }
-
-    if( versionToLaunch != m_installationManager.getMostRecentVersion() )
-        *appArgs += QString::fromLatin1(" ") + m_settings.value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
 
     return true;
 }

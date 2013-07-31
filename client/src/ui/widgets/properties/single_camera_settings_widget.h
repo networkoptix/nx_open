@@ -8,6 +8,7 @@
 #include "utils/camera_advanced_settings_xml_parser.h"
 #include "ui/workbench/workbench_context_aware.h"
 #include "utils/common/connective.h"
+#include "core/resource/dewarping_params.h"
 
 
 namespace Ui {
@@ -79,6 +80,7 @@ public:
     void setReadOnly(bool readOnly);
 
     void updateFromResource();
+    void reject();
     void submitToResource();
 
     /** Check if motion region is valid */
@@ -94,6 +96,7 @@ signals:
     void hasChangesChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
+    void fisheyeSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
@@ -110,7 +113,7 @@ private slots:
     void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
     void at_cameraScheduleWidget_controlsChangesApplied();
-    void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
+    void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
@@ -118,6 +121,7 @@ private slots:
     void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
     void at_pingButton_clicked();
     void at_analogViewCheckBox_clicked();
+    void at_fisheyeSettingsChanged();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
@@ -176,6 +180,7 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
+    DewarpingParams m_dewarpingParamsBackup;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

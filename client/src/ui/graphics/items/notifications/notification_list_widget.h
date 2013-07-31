@@ -19,7 +19,7 @@ class QnNotificationListWidget : public Animated<GraphicsWidget>, public Animati
 
 public:
     explicit QnNotificationListWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags flags = 0);
-    ~QnNotificationListWidget();
+    virtual ~QnNotificationListWidget();
 
     void addItem(QnNotificationItem *item, bool locked = false);
     void removeItem(QnNotificationItem *item);
@@ -50,7 +50,7 @@ protected:
     void updateVisibleSize();
 
 private slots:
-    void at_item_clicked(Qt::MouseButton button);
+    void at_item_closeTriggered();
     void at_item_geometryChanged();
     void at_geometry_changed();
 
@@ -69,12 +69,12 @@ private:
             return state == Displaying || state == Displayed || state == Hiding || state == Collapsing;
         }
 
-        void unlockAndHide() {
+        void unlockAndHide(qreal speedUp) {
             locked = false;
-            hide();
+            hide(speedUp);
         }
 
-        void hide();
+        void hide(qreal speedUp);
 
         void setAnimation(qreal from, qreal to, qreal time);
         void animationTick(qreal deltaMSecs);
@@ -106,6 +106,7 @@ private:
 
     ItemData m_collapser;
     bool m_collapsedItemCountChanged;
+    qreal m_speedUp;
     QSizeF m_visibleSize;
     QRectF m_tooltipsEnclosingRect;
     Qn::NotificationLevel m_itemNotificationLevel;

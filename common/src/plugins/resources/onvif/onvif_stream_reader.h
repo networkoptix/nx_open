@@ -18,7 +18,7 @@ typedef onvifXsd__Profile Profile;
 typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
 typedef onvifXsd__AudioSourceConfiguration AudioSource;
 
-class QnOnvifStreamReader: public CLServerPushStreamreader
+class QnOnvifStreamReader: public CLServerPushStreamReader
 {
 public:
     /*
@@ -35,7 +35,7 @@ public:
     virtual bool secondaryResolutionIsLarge() const override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual void openStream() override;
+    virtual CameraDiagnostics::Result openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
@@ -97,7 +97,7 @@ private:
 
     QString m_streamUrl;
     int m_cachedFps;
-    QnStreamQuality m_cachedQuality;
+    Qn::StreamQuality m_cachedQuality;
     QElapsedTimer m_cachedTimer;
 };
 

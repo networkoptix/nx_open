@@ -53,9 +53,7 @@
 #if defined(_MSC_VER)
 #   define override override
 #elif defined(__GNUC__)
-#   if (GCC_VERSION >= 40700)
-#       define override override
-#   else
+#   if (GCC_VERSION < 40700)
 #       define override
 #   endif
 #else
@@ -99,6 +97,7 @@
 #ifdef _MSC_VER
 #   define _CRT_SECURE_NO_WARNINGS /* Don't warn for deprecated 'unsecure' CRT functions. */
 #   define _CRT_NONSTDC_NO_DEPRECATE /* Don't warn for deprecated POSIX functions. */
+#   define _SCL_SECURE_NO_WARNINGS /* Don't warn for 'unsafe' STL functions. */
 #
 #   /* 'Derived' : inherits 'Base::method' via dominance. 
 #    * It is buggy as described here:

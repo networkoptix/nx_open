@@ -32,7 +32,12 @@
 #include <utils/common/event_processors.h>
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
-    QDialog(parent),
+    base_type(parent,
+              Qt::CustomizeWindowHint |
+              Qt::WindowTitleHint |
+              Qt::WindowMinMaxButtonsHint |
+              Qt::WindowSystemMenuHint |
+              Qt::WindowCloseButtonHint),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
     m_updateDisabled(false),
@@ -40,7 +45,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     m_lastMouseButton(Qt::NoButton)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::Window);
 
     m_rulesModel = new QnBusinessRulesActualModel(this);
 
@@ -74,7 +78,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
     m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
-    m_exportAction      = new QAction(tr("Export Selection to File"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File..."), this);
     m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
@@ -181,9 +185,8 @@ void QnEventLogDialog::updateData()
         actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
     query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(), ui->dateEditTo->dateTime().addDays(1).toMSecsSinceEpoch(),
-          m_filterCameraList,
           eventType, actionType,
-          QnId() // todo: add businessRuleID here
+          QnId() // TODO: #rvasilenko add businessRuleID here
           );
 
     // update UI
@@ -224,7 +227,6 @@ QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
 }
 
 void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
-                             QnResourceList camList,  //TODO: #vasilenko why parameter is not used?
                              BusinessEventType::Value eventType,
                              BusinessActionType::Value actionType,
                              QnId businessRuleId)
@@ -296,7 +298,7 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataLi
         requestFinished();
         if (m_model->rowCount() == 0 && isFilterExist() && !isRuleExistByCond())
         {
-            QMessageBox::information(this, tr("No rule(s) for current filter"), tr("You have not configured business rules to match current filter condition."));
+            QMessageBox::information(this, tr("No rule(s) for current filter"), tr("You have not configured any Alarm/Event Rules to match the current filter condition."));
         }
     }
 }
@@ -430,20 +432,20 @@ void QnEventLogDialog::setDateRange(const QDate& from, const QDate& to)
     ui->dateEditFrom->setDate(from);
 }
 
-void QnEventLogDialog::setCameraList(QnResourceList resList)
+void QnEventLogDialog::setCameraList(const QnResourceList &cameras)
 {
-    if (resList.size() == m_filterCameraList.size())
+    if (cameras.size() == m_filterCameraList.size())
     {
         bool matched = true;
-        for (int i = 0; i < resList.size(); ++i)
+        for (int i = 0; i < cameras.size(); ++i)
         {
-            matched &= resList[i]->getId() == m_filterCameraList[i]->getId();
+            matched &= cameras[i]->getId() == m_filterCameraList[i]->getId();
         }
         if (matched)
             return;
     }
 
-    m_filterCameraList = resList;
+    m_filterCameraList = cameras;
     ui->cameraButton->setText(getTextForNCameras(m_filterCameraList.size()));
 
     updateData();
@@ -530,7 +532,7 @@ void QnEventLogDialog::at_selectAllAction()
 
 void QnEventLogDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents);
+    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents, QObject::tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_copyToClipboard()

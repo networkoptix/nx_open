@@ -402,6 +402,21 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Clear cache"));
 
+    factory(Qn::CameraDiagnosticsAction).
+        flags(Qn::ResourceTarget | Qn::SingleTarget).
+        text(tr("Camera Diagnostics...")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+
+    factory(Qn::OpenBusinessLogAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Log..."));
+
+    factory(Qn::OpenBusinessRulesAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Rules..."));
+
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).
@@ -581,7 +596,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::MessageBoxAction).
         flags(Qn::NoTarget).
-        text(tr("Show message"));
+        text(tr("Show Message"));
+
+    factory(Qn::VersionMismatchMessageAction).
+        flags(Qn::NoTarget).
+        text(tr("Show Version Mismatch Message"));
 
     factory(Qn::BrowseUrlAction).
         flags(Qn::NoTarget).
@@ -597,7 +616,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::WebClientAction).
         flags(Qn::Main | Qn::Tree).
-        text(tr("Open Web Client")).
+        text(tr("Open Web Client...")).
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
@@ -624,7 +643,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraListAction).
         flags(Qn::Main | Qn::Tree).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Cameras List...")).
+        text(tr("Camera List...")).
         shortcut(tr("Ctrl+M")).
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
@@ -724,10 +743,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open Layouts")).
         condition(hasFlags(QnResource::layout));
 
-    factory(Qn::OpenNewWindowLayoutsAction).
+    factory(Qn::OpenLayoutsInNewWindowAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Open Layout(s) in a New Window")). // TODO: #Elric split into sinle- & multi- action
         condition(hasFlags(QnResource::layout));
+
+    factory(Qn::OpenCurrentLayoutInNewWindowAction).
+        flags(Qn::NoTarget).
+        text(tr("Open Current Layout in a New Window"));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
@@ -839,23 +862,23 @@ QnActionManager::QnActionManager(QObject *parent):
         factory(Qn::PtzSavePresetAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Save Current Position...")).
-            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+            condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
 
         factory(Qn::PtzGoToPresetMenu).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Go to Position...")).
             childFactory(new QnPtzGoToPresetActionFactory(this)).
-            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+            condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
 
         factory(Qn::PtzManagePresetsAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Manage Saved Positions...")).
-            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+            condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
 
         factory(Qn::PtzGoToPresetAction).
             flags(Qn::SingleTarget | Qn::ResourceTarget).
             text(tr("Go To Saved Position")).
-            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+            condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
     } factory.endSubMenu();
 
 #if 0
@@ -907,7 +930,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::AdjustVideoAction).
         flags(Qn::Scene | Qn::SingleTarget).
-        text(tr("Adjust video")).
+        text(tr("Image Enhancement...")).
         shortcut(tr("Alt+J")).
         autoRepeat(false).
         condition(new QnAdjustVideoActionCondition(this));
@@ -1012,6 +1035,12 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
+    factory(Qn::CameraBusinessRulesAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Camera Rules...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::ExactlyOne, this));
+
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Camera Settings...")).
@@ -1048,7 +1077,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ServerLogsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Server Logs")).
+        text(tr("Server Logs...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory(Qn::ServerIssuesAction).

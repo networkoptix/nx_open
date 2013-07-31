@@ -25,10 +25,10 @@ struct CameraInfoParams
 //
 
 QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res),
+    CLServerPushStreamReader(res),
     m_multiCodec(res),
     m_cachedFps(-1),
-    m_cachedQuality(QnQualityNotDefined)
+    m_cachedQuality(Qn::QualityNotDefined)
 {
     m_onvifRes = getResource().dynamicCast<QnPlOnvifResource>();
     m_tmpH264Conf = new onvifXsd__H264Configuration();
@@ -40,10 +40,10 @@ QnOnvifStreamReader::~QnOnvifStreamReader()
     delete m_tmpH264Conf;
 }
 
-void QnOnvifStreamReader::openStream()
+CameraDiagnostics::Result QnOnvifStreamReader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::NoErrorResult();
 
     NETOPTIX_PRIMARY_NAME = "Netoptix Primary";
     NETOPTIX_SECONDARY_NAME = "Netoptix Secondary";
@@ -85,14 +85,15 @@ void QnOnvifStreamReader::openStream()
 
     if (streamUrl.isEmpty()) {
         qCritical() << "QnOnvifStreamReader::openStream: can't fetch stream URL for resource with UniqueId: " << m_onvifRes->getUniqueId();
-        return;
+        return CameraDiagnostics::NoMediaTrackResult();
     }
 
 
     m_multiCodec.setRequest(streamUrl);
-    m_multiCodec.openStream();
+    const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())
         m_resource->setStatus(QnResource::Unauthorized);
+    return result;
 }
 
 const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl()
@@ -100,7 +101,7 @@ const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl()
     //QMutexLocker lock(m_onvifRes->getStreamConfMutex());
 
     int currentFps = getFps();
-    QnStreamQuality currentQuality = getQuality();
+    Qn::StreamQuality currentQuality = getQuality();
 
     if (!m_streamUrl.isEmpty() && m_onvifRes->isCameraControlDisabled())
     {
@@ -240,7 +241,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     encoder.Encoding = m_onvifRes->getCodec(isPrimary) == QnPlOnvifResource::H264? onvifXsd__VideoEncoding__H264: onvifXsd__VideoEncoding__JPEG;
     //encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
 
-    QnStreamQuality quality = getQuality();
+    Qn::StreamQuality quality = getQuality();
     QSize resolution = isPrimary? m_onvifRes->getPrimaryResolution(): m_onvifRes->getSecondaryResolution();
 
     if (encoder.Encoding == onvifXsd__VideoEncoding__H264)
@@ -267,7 +268,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     }
 
     
-    if (quality != QnQualityPreSet) 
+    if (quality != Qn::QualityPreSet) 
     {
         encoder.Quality = m_onvifRes->innerQualityToOnvif(quality);
     }

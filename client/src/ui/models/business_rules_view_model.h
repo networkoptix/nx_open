@@ -126,6 +126,8 @@ public:
     QString comments() const;
     void setComments(const QString value);
 
+    bool system() const;
+
     QStandardItemModel* eventTypesModel();
     QStandardItemModel* eventStatesModel();
     QStandardItemModel* actionTypesModel();
@@ -162,6 +164,7 @@ private:
     bool m_disabled;
     QString m_comments;
     QString m_schedule;
+    bool m_system;
 
     QStandardItemModel *m_eventTypesModel;
     QStandardItemModel *m_eventStatesModel;
@@ -188,7 +191,7 @@ public:
 
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-    void clear();
+    virtual void clear();
     void addRules(const QnBusinessEventRuleList &businessRules);
     void addRule(QnBusinessEventRulePtr rule);
 

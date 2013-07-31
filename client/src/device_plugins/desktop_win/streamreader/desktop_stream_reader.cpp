@@ -24,7 +24,7 @@ struct FffmpegLog
 
 
 QnDesktopStreamreader::QnDesktopStreamreader(QnResourcePtr dev):
-    CLServerPushStreamreader(dev),
+    CLServerPushStreamReader(dev),
     m_videoBuf(0),
     m_videoBufSize(0),
     m_videoCodecCtx(0),
@@ -120,10 +120,17 @@ QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
     return QnAbstractMediaDataPtr();
 }
 
-void QnDesktopStreamreader::openStream()
+CameraDiagnostics::Result QnDesktopStreamreader::openStream()
 {
     if (init())
+    {
         m_initialized = true;
+        return CameraDiagnostics::NoErrorResult();
+    }
+    else
+    {
+        return CameraDiagnostics::Result(CameraDiagnostics::ErrorCode::unknown);
+    }
 }
 
 void QnDesktopStreamreader::closeStream()

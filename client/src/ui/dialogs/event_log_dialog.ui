@@ -199,13 +199,20 @@
      </attribute>
     </widget>
    </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
    <class>QnTableView</class>
    <extends>QTableView</extends>
-   <header>ui/widgets/table_view.h</header>
+   <header location="global">ui/widgets/table_view.h</header>
   </customwidget>
   <customwidget>
    <class>QnTreeViewComboBox</class>

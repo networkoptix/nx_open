@@ -58,7 +58,7 @@ public:
     virtual void setMotionMaskPhysical(int channel) override;
 
 protected:
-    bool initInternal() override; // does a lot of physical work 
+    virtual CameraDiagnostics::Result initInternal() override; // does a lot of physical work 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
 

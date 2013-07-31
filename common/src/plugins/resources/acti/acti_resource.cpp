@@ -14,6 +14,7 @@
 #include "acti_ptz_controller.h"
 #include "rest/server/rest_connection_processor.h"
 #include "common/global_settings.h"
+#include "business/business_event_connector.h"
 
 
 const char* QnActiResource::MANUFACTURE = "ACTI";
@@ -36,6 +37,10 @@ QnActiResource::QnActiResource()
     setAuth(QLatin1String("admin"), QLatin1String("123456"));
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
         m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
+
+    connect(
+        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
+        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
 }
 
 QnActiResource::~QnActiResource()
@@ -232,7 +237,7 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
     return false;
 }
 
-bool QnActiResource::initInternal()
+CameraDiagnostics::Result QnActiResource::initInternal()
 {
     CLHttpStatus status;
         
@@ -241,11 +246,11 @@ bool QnActiResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED) 
         setStatus(QnResource::Unauthorized);
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     QByteArray serverReport = makeActiRequest(QLatin1String("system"), QLatin1String("SYSTEM_INFO"), status, true);
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     QMap<QByteArray, QByteArray> report = parseSystemInfo(serverReport);
     setFirmware(QString::fromUtf8(report.value("firmware version")));
     setMAC(QString::fromUtf8(report.value("mac address")));
@@ -255,7 +260,7 @@ bool QnActiResource::initInternal()
 
     QList<QSize> availResolutions = parseResolutionStr(resolutions);
     if (availResolutions.isEmpty() || availResolutions[0].isEmpty())
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     m_resolution[0] = availResolutions.first();
 
@@ -275,11 +280,11 @@ bool QnActiResource::initInternal()
 
     makeActiRequest(QLatin1String("system"), QLatin1String("RTP_B2=1"), status); // disable extra data aka B2 frames for RTSP (disable value:1, enable: 2)
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     QByteArray fpsString = makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_FPS_CAP"), status);
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     QList<QByteArray> fpsList = fpsString.split(';');
     
@@ -292,7 +297,7 @@ bool QnActiResource::initInternal()
 
     QByteArray rtspPortString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_PORT_RTSP"), status);
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     m_rtspPort = rtspPortString.trimmed().toInt();
     if (m_rtspPort == 0)
         m_rtspPort = DEFAULT_RTSP_PORT;
@@ -312,7 +317,7 @@ bool QnActiResource::initInternal()
     setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
     save();
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool QnActiResource::isResourceAccessible()
@@ -559,7 +564,7 @@ bool QnActiResource::setRelayOutputState(
     QMutexLocker lk( &m_dioMutex );
 
     bool outputNumberOK = true;
-    const int outputNumber = ouputID.toInt(&outputNumberOK);
+    const int outputNumber = !ouputID.isEmpty() ? ouputID.toInt(&outputNumberOK) : 1;
     if( !outputNumberOK )
         return false;
     if( outputNumber < MIN_DIO_PORT_NUMBER || outputNumber > m_outputCount )
@@ -598,17 +603,17 @@ void QnActiResource::onTimer( const quint64& timerID )
     if( triggerOutputTask.autoResetTimeoutMS > 0 )
         m_triggerOutputTasks.insert( std::make_pair(
             TimerManager::instance()->addTimer( this, triggerOutputTask.autoResetTimeoutMS ),
-            TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, triggerOutputTask.autoResetTimeoutMS ) ) );
+            TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, 0 ) ) );
 }
 
 void QnActiResource::initializePtz()
 {
     m_ptzController.reset(new QnActiPtzController(this));
-    Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
-    if(capabilities == Qn::NoCapabilities)
+    Qn::PtzCapabilities capabilities = m_ptzController->getCapabilities();
+    if(capabilities == Qn::NoPtzCapabilities)
         m_ptzController.reset();
 
-    setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
+    setPtzCapabilities((getPtzCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
 }
 
 void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInfo )
@@ -616,8 +621,12 @@ void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInf
     QMap<QByteArray, QByteArray>::const_iterator it = systemInfo.find( "di" );
     if( it != systemInfo.end() )
         m_inputCount = it.value().toInt();
+    if( m_inputCount > 0 )
+        setCameraCapability(Qn::RelayInputCapability, true);
 
     it = systemInfo.find( "do" );
     if( it != systemInfo.end() )
         m_outputCount = it.value().toInt();
+    if( m_outputCount > 0 )
+        setCameraCapability(Qn::RelayOutputCapability, true);
 }

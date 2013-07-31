@@ -4,6 +4,7 @@
 #include <QtGui/QWidget>
 
 #include <core/misc/schedule_task.h>
+#include "core/resource/media_resource.h"
 
 class QnWorkbenchContext;
 
@@ -104,7 +105,7 @@ private slots:
     void at_exportScheduleButton_clicked();
 
 private:
-    int qualityTextToIndex(const QString &text);
+    int qualityToComboIndex(const Qn::StreamQuality& q);
 
     void connectToGridWidget();
     void disconnectFromGridWidget();

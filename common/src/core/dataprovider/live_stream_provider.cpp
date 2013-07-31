@@ -3,15 +3,15 @@
 
 
 QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
-QnAbstractMediaStreamDataProvider(res),
-m_livemutex(QMutex::Recursive),
-m_quality(QnQualityNormal),
-m_qualityUpdatedAtLeastOnce(false),
-m_fps(-1.0),
-m_framesSinceLastMetaData(0),
-m_softMotionRole(QnResource::Role_Default),
-m_softMotionLastChannel(0),
-m_secondaryQuality(SSQualityNotDefined)
+    QnAbstractMediaStreamDataProvider(res),
+    m_livemutex(QMutex::Recursive),
+    m_quality(Qn::QualityNormal),
+    m_qualityUpdatedAtLeastOnce(false),
+    m_fps(-1.0),
+    m_framesSinceLastMetaData(0),
+    m_softMotionRole(QnResource::Role_Default),
+    m_softMotionLastChannel(0),
+    m_secondaryQuality(Qn::SSQualityNotDefined)
 {
     m_role = QnResource::Role_LiveVideo;
     m_timeSinceLastMetaData.restart();
@@ -37,7 +37,7 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
 
         if (role == QnResource::Role_SecondaryLiveVideo)
         {
-            QnStreamQuality newQuality = m_cameraRes->getSecondaryStreamQuality();
+            Qn::StreamQuality newQuality = m_cameraRes->getSecondaryStreamQuality();
             if (newQuality != m_quality)
             {
                 m_quality = newQuality;
@@ -68,14 +68,14 @@ QnResource::ConnectionRole QnLiveStreamProvider::getRole() const
     return m_role;
 }
 
-void QnLiveStreamProvider::setSecondaryQuality(QnSecondaryStreamQuality  quality)
+void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
 {
     {
         QMutexLocker mtx(&m_livemutex);
         if (m_secondaryQuality == quality)
             return; // same quality
         m_secondaryQuality = quality;
-        if (m_secondaryQuality == SSQualityNotDefined)
+        if (m_secondaryQuality == Qn::SSQualityNotDefined)
             return;
     }
 
@@ -97,7 +97,7 @@ void QnLiveStreamProvider::setSecondaryQuality(QnSecondaryStreamQuality  quality
     }
 }
 
-void QnLiveStreamProvider::setQuality(QnStreamQuality q)
+void QnLiveStreamProvider::setQuality(Qn::StreamQuality q)
 {
     {
         QMutexLocker mtx(&m_livemutex);
@@ -113,7 +113,7 @@ void QnLiveStreamProvider::setQuality(QnStreamQuality q)
     updateStreamParamsBasedOnQuality();
 }
 
-QnStreamQuality QnLiveStreamProvider::getQuality() const
+Qn::StreamQuality QnLiveStreamProvider::getQuality() const
 {
     QMutexLocker mtx(&m_livemutex);
     return m_quality;
@@ -140,6 +140,11 @@ void QnLiveStreamProvider::updateSoftwareMotion()
             m_motionEstimation[i].setMotionMask(region);
         }
     }
+}
+
+bool QnLiveStreamProvider::canChangeStatus() const
+{
+    return m_role == QnResource::Role_LiveVideo && m_isPhysicalResource;
 }
 
 // for live providers only

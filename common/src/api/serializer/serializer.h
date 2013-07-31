@@ -12,6 +12,7 @@
 #include "core/resource/camera_history.h"
 #include <business/business_event_rule.h>
 #include "api/model/kvpair.h"
+#include "api/model/email_attachment.h"
 #include "licensing/license.h"
 #include "connectinfo.h"
 
@@ -74,7 +75,7 @@ public:
     virtual void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) = 0;
     virtual void serializeBusinessRules(const QnBusinessEventRuleList&, QByteArray& data) = 0;
     virtual void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) = 0;
-    virtual void serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data) = 0;
+    virtual void serializeEmail(const QStringList& to, const QString& subject, const QString& message, const QnEmailAttachmentList& attachments, int timeout, QByteArray& data) = 0;
     virtual void serializeBusinessAction(const QnAbstractBusinessActionPtr&, QByteArray& data) = 0;
     virtual void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) = 0;
     virtual void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data) = 0;

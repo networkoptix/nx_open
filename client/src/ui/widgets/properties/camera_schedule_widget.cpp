@@ -12,7 +12,7 @@
 #include <licensing/license.h>
 
 #include <ui/common/read_only.h>
-#include <ui/dialogs/export_camera_settings_dialog.h>
+#include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -24,6 +24,110 @@
 #include <utils/common/event_processors.h>
 #include <utils/math/color_transformations.h>
 #include <utils/license_usage_helper.h>
+
+namespace {
+
+    class QnExportScheduleResourceSelectionDialogDelegate: public QnResourceSelectionDialogDelegate {
+        typedef QnResourceSelectionDialogDelegate base_type;
+    public:
+        QnExportScheduleResourceSelectionDialogDelegate(QWidget* parent,
+                                                        bool recordingEnabled,
+                                                        bool motionUsed,
+                                                        bool dualStreamingUsed
+                                                        ):
+            base_type(parent),
+            m_licensesLabel(NULL),
+            m_motionLabel(NULL),
+            m_dtsLabel(NULL),
+            m_recordingEnabled(recordingEnabled),
+            m_motionUsed(motionUsed),
+            m_dualStreamingUsed(dualStreamingUsed)
+        {
+
+
+        }
+
+        ~QnExportScheduleResourceSelectionDialogDelegate() {
+
+        }
+
+        virtual void init(QWidget* parent) override {
+            m_parentPalette = parent->palette();
+
+            m_licensesLabel = new QLabel(parent);
+            parent->layout()->addWidget(m_licensesLabel);
+
+            m_motionLabel = new QLabel(parent);
+            m_motionLabel->setText(tr("Schedule motion type is not supported by some cameras"));
+            setWarningStyle(m_motionLabel);
+            parent->layout()->addWidget(m_motionLabel);
+            m_motionLabel->setVisible(false);
+
+            m_dtsLabel = new QLabel(parent);
+            m_dtsLabel->setText(tr("Recording cannot be enabled for some cameras"));
+            setWarningStyle(m_dtsLabel);
+            parent->layout()->addWidget(m_dtsLabel);
+            m_dtsLabel->setVisible(false);
+        }
+
+        virtual bool validate(const QnResourceList &selected) override {
+            QnVirtualCameraResourceList cameras = selected.filtered<QnVirtualCameraResource>();
+
+            QnLicenseUsageHelper helper(cameras, m_recordingEnabled);
+
+            QPalette palette = m_parentPalette;
+            bool licensesOk = helper.isValid();
+            if(!licensesOk)
+                setWarningStyle(&palette);
+            m_licensesLabel->setPalette(palette);
+
+            QString usageText =
+                    tr("%n digital license(s) will be used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital()) +
+                    QLatin1Char('\n') +
+                    tr("%n analog license(s) will be used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
+            m_licensesLabel->setText(usageText);
+
+            bool motionOk = true;
+            if (m_motionUsed){
+                foreach (const QnVirtualCameraResourcePtr &camera, cameras){
+                    bool hasMotion = camera->getMotionType() != Qn::MT_NoMotion;
+                    if (!hasMotion) {
+                        motionOk = false;
+                        break;
+                    }
+                    if (m_dualStreamingUsed && !camera->hasDualStreaming()){
+                        motionOk = false;
+                        break;
+                    }
+                }
+            }
+            m_motionLabel->setVisible(!motionOk);
+
+            bool dtsOk = true;
+            foreach (const QnVirtualCameraResourcePtr &camera, cameras){
+                if (camera->isDtsBased()) {
+                    dtsOk = false;
+                    break;
+                }
+            }
+            m_dtsLabel->setVisible(!dtsOk);
+
+            return licensesOk && motionOk && dtsOk;
+        }
+
+    private:
+        QLabel* m_licensesLabel;
+        QLabel* m_motionLabel;
+        QLabel* m_dtsLabel;
+        QPalette m_parentPalette;
+
+        bool m_recordingEnabled;
+        bool m_motionUsed;
+        bool m_dualStreamingUsed;
+    };
+
+
+}
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent),
@@ -37,6 +141,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     m_inUpdate(0)
 {
     ui->setupUi(this);
+
+    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityLow), Qn::QualityLow);
+    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityNormal), Qn::QualityNormal);
+    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHigh), Qn::QualityHigh);
+    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHighest), Qn::QualityHighest);
 
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
@@ -231,21 +340,9 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
             const QPoint cell(col, row);
 
             Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
-            QnStreamQuality streamQuality = QnQualityHighest;
+            Qn::StreamQuality streamQuality = Qn::QualityHighest;
             if (recordType != Qn::RecordingType_Never)
-            {
-                QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); // TODO: #GDM Oh crap. This string-switching is totally evil.
-                if (shortQuality == QLatin1String("Lo"))
-                    streamQuality = QnQualityLow;
-                else if (shortQuality == QLatin1String("Me"))
-                    streamQuality = QnQualityNormal;
-                else if (shortQuality == QLatin1String("Hi"))
-                    streamQuality = QnQualityHigh;
-                else if (shortQuality == QLatin1String("Bst"))
-                    streamQuality = QnQualityHighest;
-                else
-                    qWarning("SecondParam wasn't acknowledged. fallback to 'Highest'");
-            }
+                streamQuality = (Qn::StreamQuality) ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toInt();
             int fps = ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toInt();
             if (fps == 0 && recordType != Qn::RecordingType_Never)
                 fps = 10;
@@ -310,15 +407,17 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
 
     foreach (const QnScheduleTask::Data &task, tasks) {
         const int row = task.m_dayOfWeek - 1;
-        QString shortQuality = QLatin1String("-");
+        Qn::StreamQuality q = Qn::QualityNotDefined;
         if (task.m_recordType != Qn::RecordingType_Never)
         {
             switch (task.m_streamQuality)
             {
-                case QnQualityLow: shortQuality = QLatin1String("Lo"); break;
-                case QnQualityNormal: shortQuality = QLatin1String("Me"); break;
-                case QnQualityHigh: shortQuality = QLatin1String("Hi"); break;
-                case QnQualityHighest: shortQuality = QLatin1String("Bst"); break;
+                case Qn::QualityLow: 
+                case Qn::QualityNormal:
+                case Qn::QualityHigh: 
+                case Qn::QualityHighest: 
+                    q = task.m_streamQuality;
+                    break;
                 default:
                     qWarning("QnCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d.", task.m_streamQuality);
                     break;
@@ -334,7 +433,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             const QPoint cell(col, row);
 
             ui->gridWidget->setCellRecordingType(cell, task.m_recordType);
-            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::SecondParam, shortQuality);
+            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::SecondParam, q);
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::FirstParam, fps);
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::DiffersFlagParam, emptySource);
         }
@@ -345,37 +444,11 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
     emit scheduleTasksChanged();
 }
 
-static inline QString getShortText(const QString &text)
-{
-    if (text == QLatin1String("Low"))
-        return QLatin1String("Lo");
-    if (text == QLatin1String("Medium"))
-        return QLatin1String("Me");
-    if (text == QLatin1String("High"))
-        return QLatin1String("Hi");
-    if (text == QLatin1String("Best"))
-        return QLatin1String("Bst");
-    return QLatin1String("-");
-}
-
-static inline QString getLongText(const QString &text)
-{
-    if (text == QLatin1String("Lo"))
-        return QLatin1String("Low");
-    if (text == QLatin1String("Me"))
-        return QLatin1String("Medium");
-    if (text == QLatin1String("Hi"))
-        return QLatin1String("High");
-    if (text == QLatin1String("Bst"))
-        return QLatin1String("Best");
-    return QLatin1String("-");
-}
-
-int QnCameraScheduleWidget::qualityTextToIndex(const QString &text)
+int QnCameraScheduleWidget::qualityToComboIndex(const Qn::StreamQuality& q)
 {
     for (int i = 0; i < ui->qualityComboBox->count(); ++i)
     {
-        if (ui->qualityComboBox->itemText(i) == text)
+        if (ui->qualityComboBox->itemData(i).toInt() == q)
             return i;
     }
     return 0;
@@ -413,12 +486,12 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
         if (ui->noRecordButton->isChecked())
         {
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QLatin1String("-"));
-            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, QLatin1String("-"));
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, Qn::QualityNotDefined);
         }
         else
         {
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QString::number(ui->fpsSpinBox->value()));
-            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, getShortText(ui->qualityComboBox->currentText()));
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()));
         }
     }
 
@@ -641,7 +714,7 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
 
     Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
     double fps(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toDouble());
-    QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString());
+    Qn::StreamQuality q = (Qn::StreamQuality) ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toInt();
 
     switch (recordType) {
         case Qn::RecordingType_Run:
@@ -661,7 +734,7 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
     if (recordType != Qn::RecordingType_Never)
     {
         ui->fpsSpinBox->setValue(fps);
-        ui->qualityComboBox->setCurrentIndex(qualityTextToIndex(getLongText(shortQuality)));
+        ui->qualityComboBox->setCurrentIndex(qualityToComboIndex(q));
     }
     m_disableUpdateGridParams = false;
     updateGridParams(true);
@@ -722,18 +795,20 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
 
 void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     bool recordingEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-    QnExportCameraSettingsDialog dialog(this);
-    dialog.setRecordingEnabled(recordingEnabled);
-
     bool motionUsed = recordingEnabled && hasMotionOnGrid();
     bool dualStreamingUsed = motionUsed && hasDualStreamingMotionOnGrid();
 
-    dialog.setMotionParams(motionUsed, dualStreamingUsed);
+    QnResourceSelectionDialog dialog(this);
+    dialog.setDelegate(new QnExportScheduleResourceSelectionDialogDelegate(this,
+                                                                           recordingEnabled,
+                                                                           motionUsed,
+                                                                           dualStreamingUsed));
+    dialog.setSelectedResources(m_cameras);
 
-    if (dialog.exec() == QDialog::Rejected)
+    if (dialog.exec() != QDialog::Accepted)
         return;
 
-    QnVirtualCameraResourceList cameras = dialog.getSelectedCameras();
+    QnVirtualCameraResourceList cameras = dialog.selectedResources().filtered<QnVirtualCameraResource>();
     foreach(QnVirtualCameraResourcePtr camera, cameras) {
         camera->setScheduleDisabled(!recordingEnabled);
         if (recordingEnabled){

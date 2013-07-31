@@ -13,7 +13,7 @@ enum BusinessActionType
     CameraRecording     = 3;    // start camera recording
     PanicRecording      = 4;    // activate panic recording mode
     SendMail            = 5;    // send mail from the EC
-    Alert               = 6;    // NOT_IMPLEMENTED
+    Diagnostics         = 6;    // write a record to the server's log
     ShowPopup           = 7;    // show popup on the client
     CameraOutputInstant = 8;    // same as Camera Output but has not toggle state
     PlaySound           = 9;    // play sound on the client

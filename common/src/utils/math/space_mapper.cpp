@@ -156,7 +156,6 @@ bool deserialize(const QVariant &value, QnVectorSpaceMapper *target) {
     return true;
 }
 
-
 // -------------------------------------------------------------------------- //
 // QnPtzSpaceMapper
 // -------------------------------------------------------------------------- //

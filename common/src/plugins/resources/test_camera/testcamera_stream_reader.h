@@ -8,7 +8,7 @@
 #include "utils/network/rtpsession.h"
 #include "utils/network/h264_rtp_parser.h"
 
-class QnTestCameraStreamReader: public CLServerPushStreamreader
+class QnTestCameraStreamReader: public CLServerPushStreamReader
 {
 public:
     QnTestCameraStreamReader(QnResourcePtr res);
@@ -16,7 +16,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual void openStream() override;
+    virtual CameraDiagnostics::Result openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
