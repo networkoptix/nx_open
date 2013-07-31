@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_VIDEO_TRANSCODER_H__
 #define __FFMPEG_VIDEO_TRANSCODER_H__
 
+#include <QCoreApplication>
+
 #include "transcoder.h"
 
 extern "C"
@@ -12,6 +14,7 @@ extern "C"
 #include "decoders/video/ffmpeg.h"
 
 class QnFfmpegVideoTranscoder: public QnVideoTranscoder
+    Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 {
 public:
     QnFfmpegVideoTranscoder(CodecID codecId);
