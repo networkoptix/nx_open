@@ -21,6 +21,7 @@ signals:
     void connectionReset();
     void businessRuleChanged(QnBusinessEventRulePtr bEvent);
     void businessRuleDeleted(int id);
+    void businessRuleReset(QnBusinessEventRuleList rules);
     void businessActionReceived(QnAbstractBusinessActionPtr bAction);
 
 public slots:

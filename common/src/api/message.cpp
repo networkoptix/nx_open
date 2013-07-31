@@ -17,6 +17,7 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& oldHardwareId);
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
+void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules);
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
 
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
@@ -177,6 +178,13 @@ bool QnMessage::load(const pb::Message &message)
                 systemName = QString::fromStdString(runtimeInfoChangeMessage.systemname());
             break;
         }
+        case pb::Message_Type_BusinessRuleReset:
+        {
+            const pb::BusinessRuleResetMessage& businessRuleResetMessage = message.GetExtension(pb::BusinessRuleResetMessage::message);
+            parseBusinessRules(businessRules, businessRuleResetMessage.businessrule());
+            break;
+        }
+
     default:
         break;
     }

@@ -24,6 +24,7 @@ signals:
 
     void businessRuleChanged(const QnBusinessEventRulePtr &rule);
     void businessRuleDeleted(int id);
+    void businessRuleReset(QnBusinessEventRuleList rules);
 
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
 
