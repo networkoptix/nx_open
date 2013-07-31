@@ -128,7 +128,7 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
         return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
 
     case BusinessActionType::Diagnostics:
-        break;
+        return true;
 
     case BusinessActionType::ShowPopup:
     case BusinessActionType::PlaySound:

@@ -743,10 +743,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open Layouts")).
         condition(hasFlags(QnResource::layout));
 
-    factory(Qn::OpenNewWindowLayoutsAction).
+    factory(Qn::OpenLayoutsInNewWindowAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Open Layout(s) in a New Window")). // TODO: #Elric split into sinle- & multi- action
         condition(hasFlags(QnResource::layout));
+
+    factory(Qn::OpenCurrentLayoutInNewWindowAction).
+        flags(Qn::NoTarget).
+        text(tr("Open Current Layout in a New Window"));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
