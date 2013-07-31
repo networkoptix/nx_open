@@ -171,81 +171,32 @@
         <translation>Inconnue (%1)</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="11"/>
         <source>Lowest</source>
-        <translation>Trés bas</translation>
+        <translation type="obsolete">Trés bas</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="12"/>
         <source>Low</source>
-        <translation>Bas</translation>
+        <translation type="obsolete">Bas</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="13"/>
         <source>Normal</source>
-        <translation>Normal</translation>
+        <translation type="obsolete">Normal</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="14"/>
         <source>High</source>
-        <translation>Élevé</translation>
+        <translation type="obsolete">Élevé</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="15"/>
         <source>Highest</source>
-        <translation>Trés élevé</translation>
+        <translation type="obsolete">Trés élevé</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="16"/>
         <source>Preset</source>
-        <translation>Préréglage</translation>
+        <translation type="obsolete">Préréglage</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="17"/>
         <source>Undefined</source>
-        <translation>Indéfini</translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="26"/>
-        <source>Wst</source>
-        <comment>Short for &apos;Worst&apos;</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="27"/>
-        <source>Lo</source>
-        <comment>Short for &apos;Low&apos;</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="28"/>
-        <source>Me</source>
-        <comment>Short for &apos;Medium&apos;</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="29"/>
-        <source>Hi</source>
-        <comment>Short for &apos;High&apos;</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="30"/>
-        <source>Bst</source>
-        <comment>Short for &apos;Best&apos;</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="31"/>
-        <source>Ps</source>
-        <comment>Short for &apos;Preset&apos;</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="32"/>
-        <source>Und</source>
-        <comment>Short for &apos;Undefined&apos;</comment>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Indéfini</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
@@ -324,12 +275,12 @@
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="118"/>
-        <source>Unknown error. Please, contact support.</source>
+        <source>Unknown error. Please contact support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="120"/>
-        <source>. Parameters: </source>
+        <source> Parameters: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -800,6 +751,86 @@
         <location filename="../src/export/sign_helper.cpp" line="262"/>
         <source>Watermark: </source>
         <translation>Filigrane: </translation>
+    </message>
+</context>
+<context>
+    <name>QnStreamQualityStrings</name>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="30"/>
+        <source>Lowest</source>
+        <translation type="unfinished">Trés bas</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="31"/>
+        <source>Low</source>
+        <translation type="unfinished">Bas</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="32"/>
+        <source>Normal</source>
+        <translation type="unfinished">Normal</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="33"/>
+        <source>High</source>
+        <translation type="unfinished">Élevé</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="34"/>
+        <source>Highest</source>
+        <translation type="unfinished">Trés élevé</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="35"/>
+        <source>Preset</source>
+        <translation type="unfinished">Préréglage</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="36"/>
+        <source>Undefined</source>
+        <translation type="unfinished">Indéfini</translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="48"/>
+        <source>Wst</source>
+        <extracomment>Short for &apos;Worst&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="51"/>
+        <source>Lo</source>
+        <extracomment>Short for &apos;Low&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="54"/>
+        <source>Me</source>
+        <extracomment>Short for &apos;Medium&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="57"/>
+        <source>Hi</source>
+        <extracomment>Short for &apos;High&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="60"/>
+        <source>Bst</source>
+        <extracomment>Short for &apos;Best&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="63"/>
+        <source>Ps</source>
+        <extracomment>Short for &apos;Preset&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="66"/>
+        <source>Und</source>
+        <extracomment>Short for &apos;Undefined&apos;</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
