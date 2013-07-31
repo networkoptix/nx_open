@@ -389,19 +389,19 @@
     </message>
     <message>
         <source>Low</source>
-        <translation>低</translation>
+        <translation type="obsolete">低</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation>中</translation>
+        <translation type="obsolete">中</translation>
     </message>
     <message>
         <source>High</source>
-        <translation>高</translation>
+        <translation type="obsolete">高</translation>
     </message>
     <message>
         <source>Best</source>
-        <translation>最高</translation>
+        <translation type="obsolete">最高</translation>
     </message>
     <message>
         <source>Record always</source>
@@ -2591,6 +2591,14 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Server Logs...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Open Current Layout in a New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -3589,6 +3597,10 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Camera Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Rules</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5843,7 +5855,7 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>&amp;Signature:</source>
-        <translation>&amp;签名:</translation>
+        <translation type="obsolete">&amp;签名:</translation>
     </message>
     <message>
         <source>Server:</source>
@@ -5940,6 +5952,14 @@ You have only %2Gb left for video archive.</source>
     <message>
         <source>Error</source>
         <translation>错误</translation>
+    </message>
+    <message>
+        <source>&amp;System ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter short system description here...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6909,6 +6929,10 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open New Window</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

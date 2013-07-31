@@ -16,6 +16,7 @@ Since 1.5.1
  - Input/Output is supported by ACTI cameras
  - HD Witness licenses cannot be activated on DW Spectrum and vice versa
  - If copy items on Scene quickly (with a big video archive), than client will be crashed.
+ - Added filter for camera in "Event/Actions rule". Also added "Camera rules" in resource tree and on "Camera settings".
  
 Since previous build
  - Selected item was not marked in Tree (> sign). Fixed
@@ -38,6 +39,10 @@ Since previous build
  - Incorrect version in dialog "About". Fixed.
  - Save parameters  "Dewarping" and "Image Enhancement" in layout and while openning in a new tab.
  - Motion Visual Effect Color is changed to green
+ - Color Correction does not work on images. Fixed.
+ - Incorrect screenshot from zoom item for fisheye camera.Fixed. 
+ - When release "This is the fish-yey lens camera", items returns to the normal size.
+ - While items searching thumbnails look incorrect in resource tree.
  
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 

@@ -320,19 +320,19 @@
     </message>
     <message>
         <source>Low</source>
-        <translation>Bas</translation>
+        <translation type="obsolete">Bas</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation>Moyen</translation>
+        <translation type="obsolete">Moyen</translation>
     </message>
     <message>
         <source>High</source>
-        <translation>Haut</translation>
+        <translation type="obsolete">Haut</translation>
     </message>
     <message>
         <source>Best</source>
-        <translation>Meilleur</translation>
+        <translation type="obsolete">Meilleur</translation>
     </message>
     <message>
         <source> s</source>
@@ -2024,6 +2024,14 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Server Logs...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Open Current Layout in a New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -2842,6 +2850,10 @@ Assurez-vous que le serveur est disponible et réessayez.</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Rules</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4637,7 +4649,7 @@ Tous les changements vont être perdus à la sortie du programme.</translation>
     </message>
     <message>
         <source>&amp;Signature:</source>
-        <translation>S&amp;ignature:</translation>
+        <translation type="obsolete">S&amp;ignature:</translation>
     </message>
     <message>
         <source>Server:</source>
@@ -4730,6 +4742,14 @@ Tous les changements vont être perdus à la sortie du programme.</translation>
     <message>
         <source>Error</source>
         <translation>Erreur</translation>
+    </message>
+    <message>
+        <source>&amp;System ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter short system description here...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5451,6 +5471,10 @@ et vous n&apos;avez pas les droits pour l&apos;écraser.</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open New Window</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
