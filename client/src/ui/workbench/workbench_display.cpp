@@ -835,7 +835,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
     connect(item, SIGNAL(zoomRectChanged()),                            this, SLOT(at_item_zoomRectChanged()));
-    connect(item, SIGNAL(dataChanged(Qn::ItemDataRole)),                this, SLOT(at_item_dataChanged(Qn::ItemDataRole)));
+    connect(item, SIGNAL(dataChanged(int)),                             this, SLOT(at_item_dataChanged(int)));
 
     m_widgets.push_back(widget);
     m_widgetByItem.insert(item, widget);
@@ -1714,7 +1714,7 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     }
 }
 
-void QnWorkbenchDisplay::at_item_dataChanged(Qn::ItemDataRole role) {
+void QnWorkbenchDisplay::at_item_dataChanged(int role) {
     if(role == Qn::ItemFlipRole)
         synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), false);
 }
