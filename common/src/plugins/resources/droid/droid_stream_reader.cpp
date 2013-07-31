@@ -72,7 +72,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStream()
     
     QString portStr = m_resource->getUrl();
     if (!portStr.startsWith(QLatin1String("raw://")))
-        return CameraDiagnostics::UnsupportedProtocolResult(QUrl(portStr).scheme());
+        return CameraDiagnostics::UnsupportedProtocolResult(portStr, QUrl(portStr).scheme());
     portStr = portStr.mid(QString(QLatin1String("raw://")).length());
 
     QStringList ports = portStr.split(QLatin1Char(','));
@@ -99,7 +99,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStream()
     if (!m_tcpSock.connect(host, m_connectionPort))
     {
         closeStream();
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(m_connectionPort);
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(m_resource->getUrl(), m_connectionPort);
     }
 
     m_videoIoDevice = new RTPIODevice(&m_rtpSession, false);
@@ -119,7 +119,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStream()
     {
         qWarning() << "Can't send request to droid device.";
         closeStream();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_connectionPort);
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_resource->getUrl(), m_connectionPort);
     }
 
     return CameraDiagnostics::NoErrorResult();
