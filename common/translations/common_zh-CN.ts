@@ -530,91 +530,6 @@ They cannot receive system notifications via E-Mail</source>
         <source>They cannot receive system notifications via E-Mail.</source>
         <translation type="obsolete">他们无法通过邮件接收系统通知。</translation>
     </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
-        <source>ok</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="62"/>
-        <source>Media server %1 is not available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="66"/>
-        <source>Received bad response from media server %1: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
-        <source>Cannot connect to http port %1. Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="74"/>
-        <source>Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="78"/>
-        <source>Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="81"/>
-        <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="85"/>
-        <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="89"/>
-        <source>Not authorized</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="93"/>
-        <source>Unsupported media protocol %1. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="98"/>
-        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="103"/>
-        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="108"/>
-        <source>Unknown Camera Issue. Please, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
-        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="115"/>
-        <source>Server has been stopped</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="118"/>
-        <source>Unknown error. Please contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="120"/>
-        <source> Parameters: </source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnAbstractStorageResource</name>
@@ -995,6 +910,94 @@ for recording to %1.</source>
     </message>
 </context>
 <context>
+    <name>QnCameraDiagnosticsErrorCodeStrings</name>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="25"/>
+        <source>ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
+        <source>Media server %1 is not available. Check that media server is up and running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
+        <source>Received bad response from media server %1: %2. Check media server&apos;s version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
+        <source>Cannot connect to http port %1. Make sure the camera is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
+        <source>Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="45"/>
+        <source>Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
+        <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="52"/>
+        <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
+        <source>Not authorized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="60"/>
+        <source>Unsupported media protocol %1. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="65"/>
+        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
+        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="75"/>
+        <source>Unknown Camera Issue. Please, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="79"/>
+        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
+        <source>Server has been stopped.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="85"/>
+        <source>Unknown error. Please contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
+        <source> Parameters: </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnCommandLineParser</name>
     <message>
         <location filename="../src/utils/common/command_line_parser.cpp" line="153"/>
@@ -1209,9 +1212,8 @@ for recording to %1.</source>
         <translation type="unfinished">低</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="32"/>
         <source>Normal</source>
-        <translation type="unfinished">普通</translation>
+        <translation type="obsolete">普通</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="33"/>
@@ -1219,9 +1221,8 @@ for recording to %1.</source>
         <translation type="unfinished">高</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="34"/>
         <source>Highest</source>
-        <translation type="unfinished">最高</translation>
+        <translation type="obsolete">最高</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="35"/>
@@ -1234,9 +1235,19 @@ for recording to %1.</source>
         <translation type="unfinished">未定义</translation>
     </message>
     <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="32"/>
+        <source>Medium</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/core/resource/media_resource.cpp" line="34"/>
+        <source>Best</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/core/resource/media_resource.cpp" line="48"/>
-        <source>Wst</source>
-        <extracomment>Short for &apos;Worst&apos;</extracomment>
+        <source>Lst</source>
+        <extracomment>Short for &apos;Lowest&apos;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1271,7 +1282,7 @@ for recording to %1.</source>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="66"/>
-        <source>Und</source>
+        <source>-</source>
         <extracomment>Short for &apos;Undefined&apos;</extracomment>
         <translation type="unfinished"></translation>
     </message>

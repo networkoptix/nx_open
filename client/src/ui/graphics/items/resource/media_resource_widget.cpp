@@ -485,6 +485,7 @@ void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &ima
     m_renderer->setImageCorrection(imageEnhancement);
 }
 
+
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
