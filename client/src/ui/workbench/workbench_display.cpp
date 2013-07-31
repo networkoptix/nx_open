@@ -835,6 +835,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
     connect(item, SIGNAL(zoomRectChanged()),                            this, SLOT(at_item_zoomRectChanged()));
+    connect(item, SIGNAL(dataChanged(Qn::ItemDataRole)),                this, SLOT(at_item_dataChanged(Qn::ItemDataRole)));
 
     m_widgets.push_back(widget);
     m_widgetByItem.insert(item, widget);
@@ -1295,14 +1296,19 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Update enclosing aspect ratio. */
     widget->setEnclosingAspectRatio(enclosingGeometry.width() / enclosingGeometry.height());
 
+    /* Calculate rotation. */
+    qreal rotation = item->rotation();
+    if(item->data<bool>(Qn::ItemFlipRole, false))
+        rotation += 180;
+
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
     if(animate) {
-        animator->moveTo(enclosingGeometry, item->rotation());
+        animator->moveTo(enclosingGeometry, rotation);
     } else {
         animator->stop();
         widget->setEnclosingGeometry(enclosingGeometry);
-        widget->setRotation(item->rotation());
+        widget->setRotation(rotation);
     }
 }
 
@@ -1706,6 +1712,11 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
         }
         return;
     }
+}
+
+void QnWorkbenchDisplay::at_item_dataChanged(Qn::ItemDataRole role) {
+    if(role == Qn::ItemFlipRole)
+        synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), false);
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {
