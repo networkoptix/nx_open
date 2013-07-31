@@ -115,9 +115,9 @@ namespace CameraDiagnostics
                     errorMessage = QObject::tr("Server has been stopped");
                     break;
                 default:
-                    errorMessage = QObject::tr("Unknown error. Please, contact support.");
+                    errorMessage = QObject::tr("Unknown error. Please contact support.");
                     if( !errorParams.isEmpty() )
-                        errorMessage += QObject::tr(". Parameters: ");
+                        errorMessage += QObject::tr(" Parameters: ");
                     for( int i = 0; i < errorParams.size(); ++i )
                     {
                         if( i > 0 )
