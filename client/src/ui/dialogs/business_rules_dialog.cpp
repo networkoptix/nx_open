@@ -265,9 +265,9 @@ void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChang
         ui->tableView->resizeColumnsToContents();
         ui->tableView->horizontalHeader()->setStretchLastSection(true);
         ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
+        updateFilter();
     }
     updateControlButtons();
-    updateFilter();
 }
 
 void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& response, int handle) {
