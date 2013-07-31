@@ -11,7 +11,6 @@
 namespace {
     QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(Qn::StreamQuality, 
         ((Qn::QualityLowest,  "lowest"))
-        ((Qn::QualityLowest,  "lowest"))
         ((Qn::QualityLow,     "low"))
         ((Qn::QualityNormal,  "normal"))
         ((Qn::QualityHigh,    "high"))
@@ -91,6 +90,9 @@ QString Qn::toString<Qn::StreamQuality>(Qn::StreamQuality value) {
 }
 
 
+// -------------------------------------------------------------------------- //
+// QnMediaResource
+// -------------------------------------------------------------------------- //
 QnMediaResource::QnMediaResource()
 {
     m_customVideoLayout = 0;
