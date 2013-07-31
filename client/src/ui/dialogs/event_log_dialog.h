@@ -32,20 +32,6 @@ public:
     explicit QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context);
     virtual ~QnEventLogDialog();
 
-    /*
-    * Get data from media server
-    * \param fromMsec start date. UTC msecs
-    * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
-    * \param camRes optional camera resource
-    * \param businessRuleId optional business rule id
-    */
-    void query(qint64 fromMsec, qint64 toMsec,
-               QnResourceList camList,
-               BusinessEventType::Value eventType,
-               BusinessActionType::Value actionType,
-               QnId businessRuleId);
-
-
     void disableUpdateData();
     void enableUpdateData();
     void setDateRange(const QDate& from, const QDate& to);
@@ -79,6 +65,18 @@ private:
     bool isRuleExistByCond() const;
     bool isCameraMatched(QnBusinessRuleViewModel* ruleModel) const;
     void updateActionList(bool instantOnly);
+
+    /*
+    * Get data from media server
+    * \param fromMsec start date. UTC msecs
+    * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
+    * \param camRes optional camera resource
+    * \param businessRuleId optional business rule id
+    */
+    void query(qint64 fromMsec, qint64 toMsec,
+               BusinessEventType::Value eventType,
+               BusinessActionType::Value actionType,
+               QnId businessRuleId);
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
 

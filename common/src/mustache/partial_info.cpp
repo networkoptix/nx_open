@@ -48,5 +48,8 @@ QnPartialInfo::QnPartialInfo (BusinessEventType::Value value) {
             eventLogoFilename = lit("server.png");
             break;
         }
+
+    default:
+        break;
     }
 }

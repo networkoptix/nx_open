@@ -185,9 +185,8 @@ void QnEventLogDialog::updateData()
         actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
     query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(), ui->dateEditTo->dateTime().addDays(1).toMSecsSinceEpoch(),
-          m_filterCameraList,
           eventType, actionType,
-          QnId() // todo: add businessRuleID here
+          QnId() // TODO: #rvasilenko add businessRuleID here
           );
 
     // update UI
@@ -228,7 +227,6 @@ QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
 }
 
 void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
-                             QnResourceList camList,  //TODO: #vasilenko why parameter is not used?
                              BusinessEventType::Value eventType,
                              BusinessActionType::Value actionType,
                              QnId businessRuleId)

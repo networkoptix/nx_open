@@ -34,7 +34,8 @@ signals:
     void fisheyeSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &cameras);
     void cameraOpenRequested();
-    void cameraDiagnosticsRequested();
+    void cameraIssuesRequested();
+    void cameraRulesRequested();
 
 private slots:
     void at_buttonBox_clicked(QAbstractButton *button);
@@ -48,7 +49,7 @@ private:
     QWeakPointer<QnWorkbenchContext> m_context;
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
-    QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton;
+    QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;
     bool m_ignoreAccept;
 };
 
