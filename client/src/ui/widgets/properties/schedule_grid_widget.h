@@ -25,8 +25,8 @@ public:
         SecondParam,
         RecordTypeParam,
         DiffersFlagParam,
-
-        ParamType_Count };
+        ParamType_Count 
+    };
 
     void setDefaultParam(ParamType number, const QVariant& value);
     void setShowFirstParam(bool value);

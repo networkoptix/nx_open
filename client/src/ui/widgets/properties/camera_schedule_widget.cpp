@@ -234,7 +234,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
             QnStreamQuality streamQuality = QnQualityHighest;
             if (recordType != Qn::RecordingType_Never)
             {
-                QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); // TODO: #GDM Oh crap. This string-switching is totally evil.
+                QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); 
                 if (shortQuality == QLatin1String("Lo"))
                     streamQuality = QnQualityLow;
                 else if (shortQuality == QLatin1String("Me"))
