@@ -54,6 +54,12 @@ class QProgressBar;
 class QTimer;
 class QnProgressDialogPrivate;
 
+/**
+ * A progress dialog that does not call <tt>QApplication::processEvents</tt>
+ * when its value changes as the progress dialog from Qt does.
+ * 
+ * This behavior is controlled via <tt>isEventProcessor</tt> property.
+ */
 class QnProgressDialog : public QDialog {
     Q_OBJECT
     Q_PROPERTY(bool wasCanceled READ wasCanceled)
@@ -64,6 +70,7 @@ class QnProgressDialog : public QDialog {
     Q_PROPERTY(bool autoClose READ autoClose WRITE setAutoClose)
     Q_PROPERTY(int minimumDuration READ minimumDuration WRITE setMinimumDuration)
     Q_PROPERTY(QString labelText READ labelText WRITE setLabelText)
+    Q_PROPERTY(bool isEventProcessor READ isEventProcessor WRITE setEventProcessor)
 
 public:
     explicit QnProgressDialog(QWidget *parent = 0, Qt::WindowFlags flags = 0);
