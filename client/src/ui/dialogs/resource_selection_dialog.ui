@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>638</width>
-    <height>389</height>
+    <width>460</width>
+    <height>452</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,13 +24,60 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
      <item>
       <widget class="QnResourceTreeWidget" name="resourcesWidget" native="true"/>
      </item>
      <item>
       <widget class="QWidget" name="detailsWidget" native="true">
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0">
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QnFramedLabel" name="screenshotLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="lineWidth">
+           <number>4</number>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="margin">
+           <number>2</number>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QLabel" name="detailsLabel">
           <property name="sizePolicy">
@@ -55,7 +102,7 @@
            <string/>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignBottom|Qt::AlignHCenter</set>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -63,32 +110,17 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="screenshotLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-          <property name="minimumSize">
+          <property name="sizeHint" stdset="0">
            <size>
-            <width>300</width>
-            <height>0</height>
+            <width>20</width>
+            <height>40</height>
            </size>
           </property>
-          <property name="maximumSize">
-           <size>
-            <width>300</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
+         </spacer>
         </item>
        </layout>
       </widget>
@@ -118,6 +150,11 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/resource_tree_widget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnFramedLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">ui/widgets/framed_label.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
