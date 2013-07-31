@@ -29,9 +29,9 @@ public:
         switch(value) {
         case Qn::QualityLowest:       return tr("Lowest");
         case Qn::QualityLow:          return tr("Low");
-        case Qn::QualityNormal:       return tr("Normal");
+        case Qn::QualityNormal:       return tr("Medium");
         case Qn::QualityHigh:         return tr("High");
-        case Qn::QualityHighest:      return tr("Highest");
+        case Qn::QualityHighest:      return tr("Best");
         case Qn::QualityPreSet:       return tr("Preset");
         case Qn::QualityNotDefined:   return tr("Undefined");
         default:
@@ -44,8 +44,8 @@ public:
         /* Note that '//:' are comments for translators. */
         switch(value) {
         case Qn::QualityLowest:       
-            //: Short for 'Worst'
-            return tr("Wst");
+            //: Short for 'Lowest'
+            return tr("Lst");
         case Qn::QualityLow:          
             //: Short for 'Low'
             return tr("Lo");
@@ -63,7 +63,7 @@ public:
             return tr("Ps");
         case Qn::QualityNotDefined:   
             //: Short for 'Undefined'
-            return tr("Und");
+            return tr("-");
         default:
             qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
             return QString();
