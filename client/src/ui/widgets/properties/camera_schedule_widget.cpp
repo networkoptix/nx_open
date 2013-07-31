@@ -38,6 +38,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
+    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityLow), Qn::QualityLow);
+    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityNormal), Qn::QualityNormal);
+    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHigh), Qn::QualityHigh);
+    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHighest), Qn::QualityHighest);
+
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     // init buttons
@@ -233,19 +238,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
             Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
             Qn::StreamQuality streamQuality = Qn::QualityHighest;
             if (recordType != Qn::RecordingType_Never)
-            {
-                QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); 
-                if (shortQuality == QLatin1String("Lo"))
-                    streamQuality = Qn::QualityLow;
-                else if (shortQuality == QLatin1String("Me"))
-                    streamQuality = Qn::QualityNormal;
-                else if (shortQuality == QLatin1String("Hi"))
-                    streamQuality = Qn::QualityHigh;
-                else if (shortQuality == QLatin1String("Bst"))
-                    streamQuality = Qn::QualityHighest;
-                else
-                    qWarning("SecondParam wasn't acknowledged. fallback to 'Highest'");
-            }
+                streamQuality = (Qn::StreamQuality) ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toInt();
             int fps = ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toInt();
             if (fps == 0 && recordType != Qn::RecordingType_Never)
                 fps = 10;
@@ -310,7 +303,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
 
     foreach (const QnScheduleTask::Data &task, tasks) {
         const int row = task.m_dayOfWeek - 1;
-        QString shortQuality = QLatin1String("-");
+        Qn::StreamQuality q = Qn::QualityNotDefined;
         if (task.m_recordType != Qn::RecordingType_Never)
         {
             switch (task.m_streamQuality)
@@ -319,7 +312,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
                 case Qn::QualityNormal:
                 case Qn::QualityHigh: 
                 case Qn::QualityHighest: 
-                    shortQuality = Qn::toShortDisplayString(task.m_streamQuality);
+                    q = task.m_streamQuality;
                     break;
                 default:
                     qWarning("QnCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d.", task.m_streamQuality);
@@ -336,7 +329,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             const QPoint cell(col, row);
 
             ui->gridWidget->setCellRecordingType(cell, task.m_recordType);
-            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::SecondParam, shortQuality);
+            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::SecondParam, q);
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::FirstParam, fps);
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::DiffersFlagParam, emptySource);
         }
@@ -347,37 +340,11 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
     emit scheduleTasksChanged();
 }
 
-static inline QString getShortText(const QString &text)
-{
-    if (text == QLatin1String("Low"))
-        return QLatin1String("Lo");
-    if (text == QLatin1String("Medium"))
-        return QLatin1String("Me");
-    if (text == QLatin1String("High"))
-        return QLatin1String("Hi");
-    if (text == QLatin1String("Best"))
-        return QLatin1String("Bst");
-    return QLatin1String("-");
-}
-
-static inline QString getLongText(const QString &text)
-{
-    if (text == QLatin1String("Lo"))
-        return QLatin1String("Low");
-    if (text == QLatin1String("Me"))
-        return QLatin1String("Medium");
-    if (text == QLatin1String("Hi"))
-        return QLatin1String("High");
-    if (text == QLatin1String("Bst"))
-        return QLatin1String("Best");
-    return QLatin1String("-");
-}
-
-int QnCameraScheduleWidget::qualityTextToIndex(const QString &text)
+int QnCameraScheduleWidget::qualityToComboIndex(const Qn::StreamQuality& q)
 {
     for (int i = 0; i < ui->qualityComboBox->count(); ++i)
     {
-        if (ui->qualityComboBox->itemText(i) == text)
+        if (ui->qualityComboBox->itemData(i).toInt() == q)
             return i;
     }
     return 0;
@@ -415,12 +382,12 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
         if (ui->noRecordButton->isChecked())
         {
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QLatin1String("-"));
-            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, QLatin1String("-"));
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, Qn::QualityNotDefined);
         }
         else
         {
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QString::number(ui->fpsSpinBox->value()));
-            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, getShortText(ui->qualityComboBox->currentText()));
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()));
         }
     }
 
@@ -643,7 +610,7 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
 
     Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
     double fps(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toDouble());
-    QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString());
+    Qn::StreamQuality q = (Qn::StreamQuality) ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toInt();
 
     switch (recordType) {
         case Qn::RecordingType_Run:
@@ -663,7 +630,7 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
     if (recordType != Qn::RecordingType_Never)
     {
         ui->fpsSpinBox->setValue(fps);
-        ui->qualityComboBox->setCurrentIndex(qualityTextToIndex(getLongText(shortQuality)));
+        ui->qualityComboBox->setCurrentIndex(qualityToComboIndex(q));
     }
     m_disableUpdateGridParams = false;
     updateGridParams(true);

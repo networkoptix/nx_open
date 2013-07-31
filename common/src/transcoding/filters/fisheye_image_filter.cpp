@@ -178,6 +178,8 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
             pos3d = to3d * pos3d;  // 3d vector on surface, rotate and scale
             qreal theta = atan2(pos3d.z(), pos3d.x()) + fovRot;     // fisheye angle
             qreal r     = acos(pos3d.y() / pos3d.length()) / M_PI;  // fisheye radius
+            if (qIsNaN(r))
+                r = 0.0;
 
             // return from polar coordinates
             //qreal dstX = qBound(0.0, (cos(theta) * r + 0.5) * (imageSize.width()-1),  (qreal) (imageSize.width() - 1));
