@@ -385,7 +385,7 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
         return QnSharedResourcePointer<Resource>();
     } else {
-        return resource->toSharedPointer().template dynamicCast<Resource>(); // TODO: #Elric replace with staticCast once we deal with virtual inheritance
+        return resource->toSharedPointer().template staticCast<Resource>();
     }
 }
 
