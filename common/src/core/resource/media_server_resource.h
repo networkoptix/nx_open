@@ -10,21 +10,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/abstract_storage_resource.h>
 
-// TODO: #Elric remove
-class QnLocalMediaServerResource : public QnResource
-{
-    Q_OBJECT
-
-public:
-    QnLocalMediaServerResource();
-
-    virtual QString getUniqueId() const;
-
-protected:
-
-};
-
-
 class QnMediaServerResource : public QnResource
 {
     Q_OBJECT

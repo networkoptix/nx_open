@@ -117,7 +117,6 @@ signals:
 private:
     mutable QMutex m_resourcesMtx;
     bool m_updateLayouts;
-    QnResourcePtr localServer;
     QHash<QString, QnResourcePtr> m_resources;
     //!Resources with flag \a QnResource::foreign set
     /*!
