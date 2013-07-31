@@ -170,6 +170,11 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
                     0.0,        0.0,        0.0,            1.0);
 
     QPointF* dstPos = m_transform[plane];
+    int dstDelta = 1;
+    if (m_params.viewMode == DewarpingParams::VerticalDown) {
+        dstPos += imageSize.height()*imageSize.width() - 1;
+        dstDelta = -1;
+    }
     for (int y = 0; y < imageSize.height(); ++y)
     {
         for (int x = 0; x < imageSize.width(); ++x)
@@ -197,7 +202,8 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
                 dstY = 0.0;
             }
 
-            *dstPos++ = QPointF(dstX, dstY);
+            *dstPos = QPointF(dstX, dstY);
+            dstPos += dstDelta;
         }
     }
 }
@@ -225,6 +231,13 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     }
 
     QPointF* dstPos = m_transform[plane];
+
+    int dstDelta = 1;
+    if (m_params.viewMode == DewarpingParams::VerticalDown) {
+        dstPos += imageSize.height()*imageSize.width() - 1;
+        dstDelta = -1;
+    }
+
     for (int y = 0; y < imageSize.height(); ++y)
     {
         for (int x = 0; x < imageSize.width(); ++x)
@@ -252,13 +265,21 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
             float r = phi / M_PI; // fisheye FOV
 
             // return from polar coordinates
-            qreal dstX = qBound(0.0, (cos(theta) * r + 0.5) * (imageSize.width()-1),  (qreal) (imageSize.width() - 1));
+            qreal dstX = (cos(theta) * r + 0.5) * (imageSize.width()-1);
             
             qreal dstY = sin(theta) * r + 0.5;
             dstY = (dstY - backAR) * aspectRatio;
-            dstY = qBound(0.0, dstY * (imageSize.height()-1), (qreal) (imageSize.height() - 1));
+            dstY = dstY * (imageSize.height()-1);
 
-            *dstPos++ = QPointF(dstX, dstY);
+            if (dstX < 0.0 || dstX > (qreal) (imageSize.width() - 1) ||
+                dstY < 0.0 || dstY > (qreal) (imageSize.height() - 1))
+            {
+                dstX = 0.0;
+                dstY = 0.0;
+            }
+            
+            *dstPos = QPointF(dstX, dstY);
+            dstPos += dstDelta;
         }
     }
 }
