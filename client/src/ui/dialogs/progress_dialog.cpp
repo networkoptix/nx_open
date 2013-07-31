@@ -99,9 +99,9 @@ public:
     QnProgressDialog *q_ptr;
 
     QLabel *label;
+    QPushButton *cancel;
     QProgressBar *bar;
     QDialogButtonBox *buttonBox;
-    QPushButton *cancel;
     QVBoxLayout *layout;
 
     QTimer *forceTimer;
