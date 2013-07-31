@@ -35,6 +35,7 @@ message Message {
         FileUpdate              = 13;
         
         RuntimeInfoChange       = 14;
+        BusinessRuleReset       = 15;
     }
 
     required Type type = 1;
@@ -128,4 +129,12 @@ message RuntimeInfoChangeMessage {
 
     optional string publicIp = 1;
     optional string systemName = 2;
+}
+
+message BusinessRuleResetMessage {
+    extend Message {
+        required BusinessRuleResetMessage message = 110;
+    }
+
+    repeated BusinessRule businessRule = 1;
 }

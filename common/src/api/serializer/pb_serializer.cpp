@@ -44,6 +44,7 @@ void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::Camera
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
+void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules);
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
 void parseBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const pb::BusinessActionList& pb_businessActionList);
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
@@ -394,17 +395,6 @@ void parseSettings(QnKvPairList& kvPairs, const PbSettingList& pb_settings)
     }
 }
 
-
-void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules) {
-    for (PbBusinessRuleList::const_iterator ci = pb_businessRules.begin(); ci != pb_businessRules.end(); ++ci)
-    {
-        const pb::BusinessRule& pb_businessRule = *ci;
-
-        QnBusinessEventRulePtr businessRule;
-        parseBusinessRule(businessRule, pb_businessRule);
-        businessRules.append(businessRule);
-    }
-}
 } // namespace {}
 
 void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraResourcePtr& cameraPtr)
@@ -1202,6 +1192,17 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
     businessRule->setComments(QString::fromUtf8(pb_businessRule.comments().c_str()));
     businessRule->setSchedule(QString::fromUtf8(pb_businessRule.schedule().c_str()));
     businessRule->setSystem(pb_businessRule.system());
+}
+
+void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules) {
+    for (PbBusinessRuleList::const_iterator ci = pb_businessRules.begin(); ci != pb_businessRules.end(); ++ci)
+    {
+        const pb::BusinessRule& pb_businessRule = *ci;
+
+        QnBusinessEventRulePtr businessRule;
+        parseBusinessRule(businessRule, pb_businessRule);
+        businessRules.append(businessRule);
+    }
 }
 
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction)

@@ -31,6 +31,7 @@ void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, 
 
     connect(this, SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)), qnBusinessRuleProcessor, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
     connect(this, SIGNAL(businessRuleDeleted(int)), qnBusinessRuleProcessor, SLOT(at_businessRuleDeleted(int)));
+    connect(this, SIGNAL(businessRuleReset(QnBusinessEventRuleList)), qnBusinessRuleProcessor, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 }
 
 QnServerMessageProcessor::QnServerMessageProcessor()
@@ -84,12 +85,6 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage message)
     }
     else if (message.messageType == Qn::Message_Type_CameraServerItem)
     {
-/*        QString mac = message.dict["mac"].toString();
-        QString serverGuid = message.dict["server_guid"].toString();
-        qint64 timestamp_ms = message.dict["timestamp"].toLongLong();
-
-        QnCameraHistoryItem historyItem(mac, timestamp_ms, serverGuid);*/
-
         QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
     }
     else if (message.messageType == Qn::Message_Type_ResourceChange)
@@ -158,6 +153,10 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage message)
     } else if (message.messageType == Qn::Message_Type_BusinessRuleDelete)
     {
         emit businessRuleDeleted(message.resourceId.toInt());
+    } else if (message.messageType == Qn::Message_Type_BusinessRuleReset)
+    {
+       emit businessRuleReset(message.businessRules);
+
     } else if (message.messageType == Qn::Message_Type_BroadcastBusinessAction)
     {
         emit businessActionReceived(message.businessAction);

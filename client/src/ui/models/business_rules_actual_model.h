@@ -41,6 +41,7 @@ private slots:
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
     void at_message_ruleDeleted(int id);
+    void at_message_ruleReset(QnBusinessEventRuleList rules);
 
 private:
     int m_loadingHandle;

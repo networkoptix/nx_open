@@ -505,9 +505,8 @@ bool QnBusinessRuleProcessor::broadcastBusinessAction(QnAbstractBusinessActionPt
     return true;
 }
 
-void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRule)
+void QnBusinessRuleProcessor::at_businessRuleChanged_i(QnBusinessEventRulePtr bRule)
 {
-    QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_rules.size(); ++i)
     {
         if (m_rules[i]->id() == bRule->id())
@@ -526,6 +525,30 @@ void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRul
     m_rules << bRule;
     if( !bRule->disabled() )
         notifyResourcesAboutEventIfNeccessary( bRule, true );
+}
+
+void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRule)
+{
+    QMutexLocker lock(&m_mutex);
+    at_businessRuleChanged_i(bRule);
+}
+
+void QnBusinessRuleProcessor::at_businessRuleReset(QnBusinessEventRuleList rules)
+{
+    QMutexLocker lock(&m_mutex);
+
+    // Remove all rules
+    for (int i = 0; i < m_rules.size(); ++i)
+    {
+        if( !m_rules[i]->disabled() )
+            notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
+        terminateRunningRule(m_rules[i]);
+        m_rules.removeAt(i);
+    }
+
+    foreach(QnBusinessEventRulePtr rule, rules) {
+        at_businessRuleChanged_i(rule);
+    }
 }
 
 void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
@@ -565,6 +588,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
 void QnBusinessRuleProcessor::at_businessRuleDeleted(int id)
 {
     QMutexLocker lock(&m_mutex);
+
     for (int i = 0; i < m_rules.size(); ++i)
     {
         if (m_rules[i]->id() == id)
