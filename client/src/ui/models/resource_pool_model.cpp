@@ -367,7 +367,6 @@ public:
     QVariant data(int role, int column) const {
         switch(role) {
         case Qt::DisplayRole:
-        case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
@@ -375,6 +374,8 @@ public:
             if (column == Qn::NameColumn)
                 return m_displayName + (m_modified ? QLatin1String("*") : QString());
             break;
+        case Qt::ToolTipRole:
+            return m_displayName;
         case Qt::DecorationRole:
             if (column == Qn::NameColumn)
                 return m_icon;

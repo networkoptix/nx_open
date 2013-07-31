@@ -39,6 +39,7 @@ void QnResourceSelectionDialog::init(Qn::NodeType rootNodeType) {
 
     ui.reset(new Ui::QnResourceSelectionDialog);
     ui->setupUi(this);
+    ui->detailsWidget->hide();
 
     m_flat = rootNodeType == Qn::UsersNode; //TODO: #GDM servers?
     m_resourceModel = new QnResourcePoolModel(rootNodeType, m_flat, this);
@@ -169,21 +170,19 @@ QModelIndex QnResourceSelectionDialog::itemIndexAt(const QPoint &pos) const {
 void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
     QVariant toolTip = index.data(Qt::ToolTipRole);
     QString toolTipText = toolTip.convert(QVariant::String) ? toolTip.toString() : QString();
+    ui->detailsLabel->setText(toolTipText);
 
-    if (toolTipText.isEmpty()) {
-        ui->detailsWidget->hide();
-    }
-    else {
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
-            m_tooltipResourceId = resource->getId();
-            m_thumbnailManager->selectResource(resource);
-            ui->detailsLabel->setText(toolTipText);
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
+        m_tooltipResourceId = resource->getId();
+        m_thumbnailManager->selectResource(resource);
+        ui->screenshotLabel->show();
+        if (!ui->detailsWidget->isVisible()) {
             ui->detailsWidget->show();
-        } else {
-            ui->detailsWidget->hide();
+            this->setGeometry(this->geometry().adjusted(0, 0, ui->detailsWidget->width(), 0));
         }
-    }
+    } else
+        ui->screenshotLabel->hide();
 }
 
 void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
