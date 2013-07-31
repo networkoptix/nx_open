@@ -47,6 +47,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtGui/QDialog>
+#include <QtGui/QDialogButtonBox>
 
 class QPushButton;
 class QLabel;
@@ -74,12 +75,12 @@ class QnProgressDialog : public QDialog {
 
 public:
     explicit QnProgressDialog(QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    QnProgressDialog(const QString &labelText, const QString &cancelButtonText,
-                    int minimum, int maximum, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    ~QnProgressDialog();
+    QnProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    virtual ~QnProgressDialog();
 
     void setLabel(QLabel *label);
     void setCancelButton(QPushButton *button);
+    void addButton(QPushButton *button, QDialogButtonBox::ButtonRole role);
     void setBar(QProgressBar *bar);
 
     bool wasCanceled() const;
@@ -88,8 +89,6 @@ public:
     int maximum() const;
 
     int value() const;
-
-    QSize sizeHint() const;
 
     QString labelText() const;
     int minimumDuration() const;
@@ -123,7 +122,6 @@ private Q_SLOTS:
     void _q_disconnectOnClose();
 
 protected:
-    void resizeEvent(QResizeEvent *event);
     void closeEvent(QCloseEvent *event);
     void changeEvent(QEvent *event);
     void showEvent(QShowEvent *event);
