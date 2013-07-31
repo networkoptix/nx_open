@@ -1666,6 +1666,23 @@ void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
         m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
         newlyCreated = true;
     }
+
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    BusinessEventType::Value eventType = parameters.argument(Qn::IssueFilterRole, BusinessEventType::AnyBusinessEvent);
+    QnVirtualCameraResourceList cameras = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
+
+    // show diagnostics if Issues action was triggered
+    if (eventType != BusinessEventType::AnyBusinessEvent || !cameras.isEmpty()) {
+        businessEventsLogDialog()->disableUpdateData();
+        businessEventsLogDialog()->setEventType(eventType);
+        businessEventsLogDialog()->setActionType(BusinessActionType::Diagnostics);
+        QDate date = QDateTime::currentDateTime().date();
+        businessEventsLogDialog()->setDateRange(date, date);
+        businessEventsLogDialog()->setCameraList(cameras);
+        businessEventsLogDialog()->enableUpdateData();
+    }
+
     QRect oldGeometry = businessEventsLogDialog()->geometry();
     businessEventsLogDialog()->show();
     businessEventsLogDialog()->raise();
@@ -2082,25 +2099,9 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
 {
-    bool newlyCreated = false;
-    if(!businessEventsLogDialog()) {
-        m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
-        newlyCreated = true;
-    }
-
-    businessEventsLogDialog()->disableUpdateData();
-    businessEventsLogDialog()->setEventType(BusinessEventType::AnyCameraIssue);
-    businessEventsLogDialog()->setActionType(BusinessActionType::NotDefined);
-    QDate date = QDateTime::currentDateTime().date();
-    businessEventsLogDialog()->setDateRange(date, date);
-    businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());
-    businessEventsLogDialog()->enableUpdateData();
-
-    QRect oldGeometry = businessEventsLogDialog()->geometry();
-    businessEventsLogDialog()->show();
-    businessEventsLogDialog()->raise();
-    if(!newlyCreated)
-        businessEventsLogDialog()->setGeometry(oldGeometry);
+    menu()->trigger(Qn::BusinessEventsLogAction,
+                    menu()->currentParameters(sender())
+                    .withArgument(Qn::IssueFilterRole, BusinessEventType::AnyCameraIssue));
 }
 
 void QnWorkbenchActionHandler::at_cameraDiagnosticsAction_triggered() {
@@ -2232,24 +2233,8 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
-    bool newlyCreated = false;
-    if(!businessEventsLogDialog()) {
-        m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
-        newlyCreated = true;
-    }
-
-    businessEventsLogDialog()->disableUpdateData();
-    businessEventsLogDialog()->setEventType(BusinessEventType::AnyServerIssue);
-    QDate date = QDateTime::currentDateTime().date();
-    businessEventsLogDialog()->setDateRange(date, date);
-    businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());
-    businessEventsLogDialog()->enableUpdateData();
-
-    QRect oldGeometry = businessEventsLogDialog()->geometry();
-    businessEventsLogDialog()->show();
-    businessEventsLogDialog()->raise();
-    if(!newlyCreated)
-        businessEventsLogDialog()->setGeometry(oldGeometry);
+    menu()->trigger(Qn::BusinessEventsLogAction,
+                    QnActionParameters().withArgument(Qn::IssueFilterRole, BusinessEventType::AnyServerIssue));
 }
 
 void QnWorkbenchActionHandler::at_pingAction_triggered() {

@@ -235,8 +235,9 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
                              QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
 
-    QnAppServerConnectionFactory::createConnection()->resetBusinessRulesAsync(this, SLOT(updateControlButtons()));
-    m_rulesViewModel->reloadData();
+    QnAppServerConnectionFactory::createConnection()->resetBusinessRulesAsync(m_rulesViewModel, SLOT(reloadData()));
+    m_rulesViewModel->clear();
+//    updateControlButtons();
 }
 
 void QnBusinessRulesDialog::at_clearFilterButton_clicked() {
@@ -433,7 +434,7 @@ void QnBusinessRulesDialog::updateFilter() {
 
             passEventFilter = false;
             foreach (const QnResourcePtr &resource, ruleModel->eventResources()) {
-                passEventFilter = (resource->toSearchString().contains(filter));
+                passEventFilter = (resource->toSearchString().contains(filter, Qt::CaseInsensitive));
                 if (passEventFilter)
                     break;
             }
@@ -446,7 +447,7 @@ void QnBusinessRulesDialog::updateFilter() {
             && passActionFilter) {
             passActionFilter = false;
             foreach (const QnResourcePtr &resource, ruleModel->actionResources()) {
-                passActionFilter = (resource->toSearchString().contains(filter));
+                passActionFilter = (resource->toSearchString().contains(filter, Qt::CaseInsensitive));
                 if (passActionFilter)
                     break;
             }

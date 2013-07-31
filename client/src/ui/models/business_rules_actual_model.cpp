@@ -77,3 +77,8 @@ bool QnBusinessRulesActualModel::isLoaded() const
 {
     return m_isDataLoaded;
 }
+
+void QnBusinessRulesActualModel::clear() {
+    base_type::clear();
+    m_isDataLoaded = false;
+}
