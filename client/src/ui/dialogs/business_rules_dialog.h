@@ -36,6 +36,7 @@ public:
     explicit QnBusinessRulesDialog(QWidget *parent = 0);
     virtual ~QnBusinessRulesDialog();
 
+    void setFilter(const QString &filter);
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
     virtual void keyPressEvent(QKeyEvent *event) override;

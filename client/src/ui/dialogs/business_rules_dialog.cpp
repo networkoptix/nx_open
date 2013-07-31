@@ -117,6 +117,10 @@ QnBusinessRulesDialog::~QnBusinessRulesDialog()
 {
 }
 
+void QnBusinessRulesDialog::setFilter(const QString &filter) {
+    ui->filterLineEdit->setText(filter);
+}
+
 void QnBusinessRulesDialog::accept()
 {
     if (!saveAll())

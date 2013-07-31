@@ -156,6 +156,20 @@ namespace Qn {
          */
         BrowseUrlAction,
 
+        /**
+         * Opens the Business Events Log dialog.
+         * Supports cameras list in the resources field as a cameras filter.
+         * Parameters:
+         * <tt>BusinessEventType::Value EventTypeRole</tt> --- filter by event type.
+         */
+        OpenBusinessLogAction,
+
+        /**
+         * Opens the Business Rules dialog.
+         * Supports cameras list in the resources field as a cameras filter.
+         */
+        OpenBusinessRulesAction,
+
 
         /* Main menu actions. */
 
@@ -447,6 +461,11 @@ namespace Qn {
          * Opens event log dialog with filter for current camera(s) issues
          */
         CameraIssuesAction,
+
+        /**
+         * Opens business rules dialog with filter for current camera(s) rules
+         */
+        CameraBusinessRulesAction,
 
         /**
          * Opens camera diagnostics dialog that checks for problems with

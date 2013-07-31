@@ -191,7 +191,7 @@ public:
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
-        IssueFilterRole,                            /**< Role for business event type. Used in BusinessEventsLogAction. */
+        EventTypeRole,                            /**< Role for business event type. Used in BusinessEventsLogAction. */
 
 
         /* Others. */

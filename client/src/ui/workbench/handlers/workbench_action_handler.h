@@ -241,7 +241,9 @@ protected slots:
     void at_showcaseAction_triggered();
     void at_aboutAction_triggered();
     void at_businessEventsAction_triggered();
+    void at_openBusinessRulesAction_triggered();
     void at_businessEventsLogAction_triggered();
+    void at_openBusinessLogAction_triggered();
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
     void at_preferencesGeneralTabAction_triggered();
@@ -254,6 +256,7 @@ protected slots:
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
+    void at_cameraBusinessRulesAction_triggered();
     void at_cameraDiagnosticsAction_triggered();
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
@@ -263,7 +266,8 @@ protected slots:
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsDialog_advancedSettingChanged();
     void at_cameraSettingsDialog_cameraOpenRequested();
-    void at_cameraSettingsDialog_cameraDiagnosticsRequested();
+    void at_cameraSettingsDialog_cameraIssuesRequested();
+    void at_cameraSettingsDialog_cameraRulesRequested();
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();

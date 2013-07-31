@@ -248,7 +248,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
+    connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
     connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
+    connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
@@ -274,6 +276,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
+    connect(action(Qn::CameraBusinessRulesAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(Qn::CameraDiagnosticsAction),                SIGNAL(triggered()),    this,   SLOT(at_cameraDiagnosticsAction_triggered()));
     connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
     connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
@@ -1640,11 +1643,26 @@ void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
+    menu()->trigger(Qn::OpenBusinessRulesAction);
+}
+
+void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
     bool newlyCreated = false;
     if(!businessRulesDialog()) {
         m_businessRulesDialog = new QnBusinessRulesDialog(mainWindow());
         newlyCreated = true;
     }
+
+    QString filter;
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnVirtualCameraResourceList cameras = parameters.resources().filtered<QnVirtualCameraResource>();
+    if (!cameras.isEmpty()) {
+        foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+            filter += camera->getPhysicalId(); //getUniqueId() cannot be used here --gdm
+        }
+    }
+    businessRulesDialog()->setFilter(filter);
+
     QRect oldGeometry = businessRulesDialog()->geometry();
     businessRulesDialog()->show();
     businessRulesDialog()->raise();
@@ -1661,6 +1679,10 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
+    menu()->trigger(Qn::OpenBusinessLogAction);
+}
+
+void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
     bool newlyCreated = false;
     if(!businessEventsLogDialog()) {
         m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
@@ -1669,8 +1691,8 @@ void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
 
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    BusinessEventType::Value eventType = parameters.argument(Qn::IssueFilterRole, BusinessEventType::AnyBusinessEvent);
-    QnVirtualCameraResourceList cameras = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
+    BusinessEventType::Value eventType = parameters.argument(Qn::EventTypeRole, BusinessEventType::AnyBusinessEvent);
+    QnVirtualCameraResourceList cameras = parameters.resources().filtered<QnVirtualCameraResource>();
 
     // show diagnostics if Issues action was triggered
     if (eventType != BusinessEventType::AnyBusinessEvent || !cameras.isEmpty()) {
@@ -2070,7 +2092,8 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         connect(cameraSettingsDialog(), SIGNAL(rejected()),                                             this, SLOT(at_cameraSettingsDialog_rejected()));
         connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                               this, SLOT(at_cameraSettingsDialog_advancedSettingChanged()));
         connect(cameraSettingsDialog(), SIGNAL(cameraOpenRequested()),                                  this, SLOT(at_cameraSettingsDialog_cameraOpenRequested()));
-        connect(cameraSettingsDialog(), SIGNAL(cameraDiagnosticsRequested()),                           this, SLOT(at_cameraSettingsDialog_cameraDiagnosticsRequested()));
+        connect(cameraSettingsDialog(), SIGNAL(cameraIssuesRequested()),                                this, SLOT(at_cameraSettingsDialog_cameraIssuesRequested()));
+        connect(cameraSettingsDialog(), SIGNAL(cameraRulesRequested()),                                 this, SLOT(at_cameraSettingsDialog_cameraRulesRequested()));
     }
 
     if(cameraSettingsDialog()->widget()->resources() != resources) {
@@ -2099,9 +2122,14 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
 {
-    menu()->trigger(Qn::BusinessEventsLogAction,
+    menu()->trigger(Qn::OpenBusinessLogAction,
                     menu()->currentParameters(sender())
-                    .withArgument(Qn::IssueFilterRole, BusinessEventType::AnyCameraIssue));
+                    .withArgument(Qn::EventTypeRole, BusinessEventType::AnyCameraIssue));
+}
+
+void QnWorkbenchActionHandler::at_cameraBusinessRulesAction_triggered() {
+    menu()->trigger(Qn::OpenBusinessRulesAction,
+                    menu()->currentParameters(sender()));
 }
 
 void QnWorkbenchActionHandler::at_cameraDiagnosticsAction_triggered() {
@@ -2142,9 +2170,17 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraOpenRequested() {
     m_selectionUpdatePending = false;
 }
 
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraDiagnosticsRequested() {
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraIssuesRequested() {
     QnResourceList resources = cameraSettingsDialog()->widget()->resources();
     menu()->trigger(Qn::CameraIssuesAction, resources);
+
+    cameraSettingsDialog()->widget()->setResources(resources);
+    m_selectionUpdatePending = false;
+}
+
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraRulesRequested() {
+    QnResourceList resources = cameraSettingsDialog()->widget()->resources();
+    menu()->trigger(Qn::CameraBusinessRulesAction, resources);
 
     cameraSettingsDialog()->widget()->setResources(resources);
     m_selectionUpdatePending = false;
@@ -2233,8 +2269,8 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
-    menu()->trigger(Qn::BusinessEventsLogAction,
-                    QnActionParameters().withArgument(Qn::IssueFilterRole, BusinessEventType::AnyServerIssue));
+    menu()->trigger(Qn::OpenBusinessLogAction,
+                    QnActionParameters().withArgument(Qn::EventTypeRole, BusinessEventType::AnyServerIssue));
 }
 
 void QnWorkbenchActionHandler::at_pingAction_triggered() {
@@ -2246,7 +2282,7 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     QString cmd = QLatin1String("cmd /C ping %1 -t");
 #else
     QString cmd = QLatin1String("xterm -e ping %1");
-#endif //TODO: #GDM MacOS ping?
+#endif //TODO: #ivan MacOS ping?
     QUrl url = QUrl::fromUserInput(resource->getUrl());
     QString host = url.host();
     QProcess::startDetached(cmd.arg(host));
