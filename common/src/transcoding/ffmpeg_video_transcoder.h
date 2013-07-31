@@ -14,8 +14,8 @@ extern "C"
 #include "decoders/video/ffmpeg.h"
 
 class QnFfmpegVideoTranscoder: public QnVideoTranscoder
-    Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 {
+    Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
     QnFfmpegVideoTranscoder(CodecID codecId);
     ~QnFfmpegVideoTranscoder();

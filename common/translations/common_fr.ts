@@ -81,35 +81,28 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
         <source>Audio context must be specified</source>
-        <translation>Un  contexte audio doit être spécifiée</translation>
+        <translation type="obsolete">Un  contexte audio doit être spécifiée</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation>Erreur transcoder: Ne peut pas trouver le codec pour l&apos;encodeur %1</translation>
+        <translation type="obsolete">Erreur transcoder: Ne peut pas trouver le codec pour l&apos;encodeur %1</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
         <source>Can&apos;t initialize audio encoder</source>
-        <translation>Impossible d&apos;initialiser l&apos;encodeur audio</translation>
+        <translation type="obsolete">Impossible d&apos;initialiser l&apos;encodeur audio</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
         <source>Can&apos;t initialize audio decoder</source>
-        <translation>Impossible d&apos;initialiser le décodeur audio</translation>
+        <translation type="obsolete">Impossible d&apos;initialiser le décodeur audio</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
         <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
-        <translation>Impossible d&apos;allouer un échelle contextuelle pour la résolution %1x%2</translation>
+        <translation type="obsolete">Impossible d&apos;allouer un échelle contextuelle pour la résolution %1x%2</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
         <source>Can&apos;t initialize video encoder</source>
-        <translation>Impossible d&apos;initialiser l&apos;encodeur vidéo</translation>
+        <translation type="obsolete">Impossible d&apos;initialiser l&apos;encodeur vidéo</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="13"/>
@@ -651,6 +644,29 @@
     </message>
 </context>
 <context>
+    <name>QnFfmpegAudioTranscoder</name>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
+        <source>Audio context must be specified</source>
+        <translation type="unfinished">Un  contexte audio doit être spécifiée</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
+        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
+        <translation type="unfinished">Erreur transcoder: Ne peut pas trouver le codec pour l&apos;encodeur %1</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
+        <source>Can&apos;t initialize audio encoder</source>
+        <translation type="unfinished">Impossible d&apos;initialiser l&apos;encodeur audio</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
+        <source>Can&apos;t initialize audio decoder</source>
+        <translation type="unfinished">Impossible d&apos;initialiser le décodeur audio</translation>
+    </message>
+</context>
+<context>
     <name>QnFfmpegTranscoder</name>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="104"/>
@@ -682,6 +698,24 @@
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="251"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation>Le Codec vidéo ou audio est incompatible avec le format %1. Essayez un autre format.</translation>
+    </message>
+</context>
+<context>
+    <name>QnFfmpegVideoTranscoder</name>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
+        <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
+        <translation type="unfinished">Impossible d&apos;allouer un échelle contextuelle pour la résolution %1x%2</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
+        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
+        <translation type="unfinished">Erreur transcoder: Ne peut pas trouver le codec pour l&apos;encodeur %1</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
+        <source>Can&apos;t initialize video encoder</source>
+        <translation type="unfinished">Impossible d&apos;initialiser l&apos;encodeur vidéo</translation>
     </message>
 </context>
 <context>

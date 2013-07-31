@@ -63,6 +63,7 @@ namespace {
     }
 
     class ArchiveSpaceSlider: public QSlider {
+        Q_DECLARE_TR_FUNCTIONS(ArchiveSpaceSlider)
         typedef QSlider base_type;
     public:
         ArchiveSpaceSlider(QWidget *parent = NULL):
@@ -94,7 +95,7 @@ namespace {
                 if(isSliderDown()) {
                     return formatStorageSize(sliderPosition() * bytesInMiB);
                 } else {
-                    return tr("%1%").arg(static_cast<int>(relativePosition() * 100)); // TODO: #Elric no Q_OBJECT macro and a call to tr()
+                    return tr("%1%").arg(static_cast<int>(relativePosition() * 100));
                 }
             }
         }

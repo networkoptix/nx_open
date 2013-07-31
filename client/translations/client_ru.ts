@@ -149,7 +149,7 @@
 <context>
     <name>ArchiveSpaceSlider</name>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="97"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="98"/>
         <source>%1%</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4906,17 +4906,17 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnServerResourceWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="498"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="499"/>
         <source>Show Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="506"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="507"/>
         <source>Check Issues</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="690"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="691"/>
         <source>%1 (%2)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4924,37 +4924,37 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="241"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="242"/>
         <source>Remove Storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="303"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="304"/>
         <source>Not available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="372"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="373"/>
         <source>Loading...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="379"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="380"/>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="379"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="380"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="523"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="524"/>
         <source>Could not load storages from server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="560"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="561"/>
         <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6743,7 +6743,7 @@ Error description: &apos;%2&apos;</source>
 <context>
     <name>StatisticsOverlayWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="443"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="444"/>
         <source>%1%</source>
         <translation type="unfinished"></translation>
     </message>

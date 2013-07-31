@@ -92,35 +92,28 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
         <source>Audio context must be specified</source>
-        <translation>需指定音频内容</translation>
+        <translation type="obsolete">需指定音频内容</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation>编码转换错误：无法找到编码器 %1</translation>
+        <translation type="obsolete">编码转换错误：无法找到编码器 %1</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
         <source>Can&apos;t initialize audio encoder</source>
-        <translation>无法初始化音频编码器</translation>
+        <translation type="obsolete">无法初始化音频编码器</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
         <source>Can&apos;t initialize audio decoder</source>
-        <translation>无法初始化音频解码器</translation>
+        <translation type="obsolete">无法初始化音频解码器</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
         <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
-        <translation>无法分派分辨率级别 %1x%2</translation>
+        <translation type="obsolete">无法分派分辨率级别 %1x%2</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
         <source>Can&apos;t initialize video encoder</source>
-        <translation>无法初始化视频编码器</translation>
+        <translation type="obsolete">无法初始化视频编码器</translation>
     </message>
     <message>
         <source>---</source>
@@ -1049,6 +1042,29 @@ for recording to %1.</source>
     </message>
 </context>
 <context>
+    <name>QnFfmpegAudioTranscoder</name>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
+        <source>Audio context must be specified</source>
+        <translation type="unfinished">需指定音频内容</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
+        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
+        <translation type="unfinished">编码转换错误：无法找到编码器 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
+        <source>Can&apos;t initialize audio encoder</source>
+        <translation type="unfinished">无法初始化音频编码器</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
+        <source>Can&apos;t initialize audio decoder</source>
+        <translation type="unfinished">无法初始化音频解码器</translation>
+    </message>
+</context>
+<context>
     <name>QnFfmpegTranscoder</name>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="104"/>
@@ -1080,6 +1096,24 @@ for recording to %1.</source>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="251"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation>视频或音频编解码器与%1格式不兼容。尝试另一种格式。</translation>
+    </message>
+</context>
+<context>
+    <name>QnFfmpegVideoTranscoder</name>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
+        <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
+        <translation type="unfinished">无法分派分辨率级别 %1x%2</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
+        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
+        <translation type="unfinished">编码转换错误：无法找到编码器 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
+        <source>Can&apos;t initialize video encoder</source>
+        <translation type="unfinished">无法初始化视频编码器</translation>
     </message>
 </context>
 <context>

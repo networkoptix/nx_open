@@ -81,37 +81,6 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
-        <source>Audio context must be specified</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
-        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
-        <source>Can&apos;t initialize audio encoder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
-        <source>Can&apos;t initialize audio decoder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
-        <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
-        <source>Can&apos;t initialize video encoder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="13"/>
         <source>Camera output</source>
         <translation type="unfinished"></translation>
@@ -616,6 +585,29 @@
     </message>
 </context>
 <context>
+    <name>QnFfmpegAudioTranscoder</name>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
+        <source>Audio context must be specified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
+        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
+        <source>Can&apos;t initialize audio encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
+        <source>Can&apos;t initialize audio decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnFfmpegTranscoder</name>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="104"/>
@@ -646,6 +638,24 @@
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="251"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnFfmpegVideoTranscoder</name>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
+        <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
+        <source>Transcoder error: can&apos;t find encoder for codec %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
+        <source>Can&apos;t initialize video encoder</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
