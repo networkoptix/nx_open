@@ -64,7 +64,7 @@ void QnCameraDiagnosticsDialog::restart() {
     connect(m_tool, SIGNAL(diagnosticsStepResult(CameraDiagnostics::Step::Value, bool, QString)),
             this, SLOT(at_tool_diagnosticsStepResult(CameraDiagnostics::Step::Value, bool, QString)));
     connect(m_tool, SIGNAL(diagnosticsDone(CameraDiagnostics::Step::Value, bool, QString)),
-            this, SLOT(at_tool_diagnosticsDone(CameraDiagnostics::Step::Value, bool, QString)));
+            this, SLOT(at_tool_diagnosticsDone()));
     m_tool->start();
     
     m_started = true;
@@ -124,7 +124,7 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepStarted(CameraDiagnostics
     ui->textEdit->append(m_lastLine);
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(CameraDiagnostics::Step::Value stepType, bool result, const QString &errorMessage) {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(CameraDiagnostics::Step::Value, bool result, const QString &errorMessage) {
     QString message;
     QColor color;
     if(result) {
@@ -140,7 +140,7 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(CameraDiagnostics:
     ui->textEdit->append(lit("<br/>"));
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone(CameraDiagnostics::Step::Value finalStep, bool result, const QString &errorMessage) {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone() {
     ui->textEdit->append(tr("Diagnostics finished"));
 
     m_finished = true;
