@@ -10,7 +10,7 @@
 #include "serverutil.h"
 #include "settings.h"
 #include "business/business_rule_processor.h"
-#include "business\business_event_connector.h"
+#include "business/business_event_connector.h"
 
 Q_GLOBAL_STATIC(QnServerMessageProcessor, QnServerMessageProcessor_instance)
 
