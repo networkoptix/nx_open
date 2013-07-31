@@ -46,6 +46,7 @@ cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.5
 cp -r $CLIENT_BIN_PATH/vox $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 cp -r ${project.build.directory}/1.4/bin/client-bin $BINSTAGE/1.4
 cp -r ${project.build.directory}/1.5/bin/client-bin $BINSTAGE/1.5
+cp ${project.build.directory}/1.5/lib/*.* $LIBSTAGE
 cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.4
 cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.5
 cp -r ${project.build.directory}/bin/applauncher* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
