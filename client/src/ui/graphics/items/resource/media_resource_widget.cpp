@@ -930,8 +930,7 @@ void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
         buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
 }
 
-void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
-{
+void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
     ImageCorrectionParams params = item()->imageEnhancement();
     if (params.enabled == checked)
         return;
@@ -945,8 +944,7 @@ void QnMediaResourceWidget::at_renderWatcher_displayingChanged(QnResourceWidget 
         updateRendererEnabled();
 }
 
-void QnMediaResourceWidget::at_zoomRectChanged()
-{
+void QnMediaResourceWidget::at_zoomRectChanged() {
     updateButtonsVisibility();
     updateAspectRatio();
     updateIconButton();
