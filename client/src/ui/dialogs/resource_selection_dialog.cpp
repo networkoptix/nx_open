@@ -6,6 +6,8 @@
 
 #include "ui_resource_selection_dialog.h"
 
+#include <camera/camera_thumbnail_manager.h>
+
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -33,6 +35,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
 
 void QnResourceSelectionDialog::init(Qn::NodeType rootNodeType) {
     m_delegate = NULL;
+    m_tooltipResourceId = 0;
 
     ui.reset(new Ui::QnResourceSelectionDialog);
     ui->setupUi(this);
@@ -64,8 +67,14 @@ void QnResourceSelectionDialog::init(Qn::NodeType rootNodeType) {
     ui->resourcesWidget->setFilterVisible(true);
     ui->resourcesWidget->setEditingEnabled(false);
     ui->resourcesWidget->setSimpleSelectionEnabled(true);
+    ui->resourcesWidget->treeView()->setMouseTracking(true);
 
+    connect(ui->resourcesWidget->treeView(), SIGNAL(entered(QModelIndex)), this, SLOT(updateThumbnail(QModelIndex)));
     ui->delegateFrame->setVisible(false);
+
+    m_thumbnailManager = new QnCameraThumbnailManager(this);
+    connect(m_thumbnailManager, SIGNAL(thumbnailReady(int,QPixmap)), this, SLOT(at_thumbnailReady(int, QPixmap)));
+    updateThumbnail(QModelIndex());
 }
 
 QnResourceSelectionDialog::~QnResourceSelectionDialog() {
@@ -149,7 +158,40 @@ QnResourceSelectionDialogDelegate* QnResourceSelectionDialog::delegate() const {
     return m_delegate;
 }
 
+QModelIndex QnResourceSelectionDialog::itemIndexAt(const QPoint &pos) const {
+    QAbstractItemView *treeView = ui->resourcesWidget->treeView();
+    if(!treeView->model())
+        return QModelIndex();
+    QPoint childPos = treeView->mapFrom(const_cast<QnResourceSelectionDialog *>(this), pos);
+    return treeView->indexAt(childPos);
+}
+
+void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
+    QVariant toolTip = index.data(Qt::ToolTipRole);
+    QString toolTipText = toolTip.convert(QVariant::String) ? toolTip.toString() : QString();
+
+    if (toolTipText.isEmpty()) {
+        ui->detailsWidget->hide();
+    }
+    else {
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
+            m_tooltipResourceId = resource->getId();
+            m_thumbnailManager->selectResource(resource);
+            ui->detailsLabel->setText(toolTipText);
+            ui->detailsWidget->show();
+        } else {
+            ui->detailsWidget->hide();
+        }
+    }
+}
+
 void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(selectedResources()));
 }
 
+void QnResourceSelectionDialog::at_thumbnailReady(int resourceId, const QPixmap &thumbnail) {
+    if (m_tooltipResourceId != resourceId)
+        return;
+    ui->screenshotLabel->setPixmap(thumbnail);
+}

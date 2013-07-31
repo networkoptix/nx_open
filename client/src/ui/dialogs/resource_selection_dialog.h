@@ -1,7 +1,8 @@
 #ifndef SELECT_CAMERAS_DIALOG_H
 #define SELECT_CAMERAS_DIALOG_H
 
-#include <QDialog>
+#include <QtCore/QModelIndex>
+#include <QtGui/QDialog>
 
 #include <core/resource/resource_fwd.h>
 
@@ -15,6 +16,7 @@ namespace Ui {
 }
 
 class QnResourcePoolModel;
+class QnCameraThumbnailManager;
 
 // TODO: #GDM enable with QIdentityProxyModel in QT 4.8
 /*class QnColoringProxyModel: public QIdentityProxyModel {
@@ -52,7 +54,10 @@ protected:
 
 private slots:
     void at_resourceModel_dataChanged();
+    void at_thumbnailReady(int resourceId, const QPixmap &thumbnail);
 
+    QModelIndex itemIndexAt(const QPoint &pos) const;
+    void updateThumbnail(const QModelIndex &index);
 private:
     void init(Qn::NodeType rootNodeType);
 
@@ -60,7 +65,9 @@ private:
     QScopedPointer<Ui::QnResourceSelectionDialog> ui;
     QnResourcePoolModel *m_resourceModel;
     QnResourceSelectionDialogDelegate* m_delegate;
+    QnCameraThumbnailManager *m_thumbnailManager;
     bool m_flat;
+    int m_tooltipResourceId;
 };
 
 #endif // SELECT_CAMERAS_DIALOG_H
