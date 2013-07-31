@@ -129,7 +129,7 @@ protected:
 
     int loadThumbnailForResource(const QnResourcePtr &resource);
 
-    QnResourceTreeWidget *currentItemView() const;
+    QnResourceTreeWidget *currentTreeWidget() const;
     QItemSelectionModel *currentSelectionModel() const;
     QModelIndex itemIndexAt(const QPoint &pos) const;
 

@@ -305,7 +305,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
     if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
         manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: #Elric implement with action parameters
 
-    if(currentItemView() == ui->searchTreeWidget) {
+    if(currentTreeWidget() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
         manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
     } else {
@@ -324,10 +324,10 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
 
     /* Process tree-local actions. */
     if(action == m_renameAction)
-        currentItemView()->edit();
+        currentTreeWidget()->edit();
 }
 
-QnResourceTreeWidget *QnResourceBrowserWidget::currentItemView() const {
+QnResourceTreeWidget *QnResourceBrowserWidget::currentTreeWidget() const {
     if (ui->tabWidget->currentIndex() == ResourcesTab) {
         return ui->resourceTreeWidget;
     } else {
@@ -336,14 +336,14 @@ QnResourceTreeWidget *QnResourceBrowserWidget::currentItemView() const {
 }
 
 QItemSelectionModel *QnResourceBrowserWidget::currentSelectionModel() const {
-    return currentItemView()->selectionModel();
+    return currentTreeWidget()->selectionModel();
 }
 
 QModelIndex QnResourceBrowserWidget::itemIndexAt(const QPoint &pos) const {
-    QAbstractItemView *treeView = ui->resourceTreeWidget->treeView();
+    QAbstractItemView *treeView = currentTreeWidget()->treeView();
     if(!treeView->model())
         return QModelIndex();
-    QPoint childPos = treeView->mapFrom(const_cast<QnResourceBrowserWidget*>(this), pos);
+    QPoint childPos = treeView->mapFrom(const_cast<QnResourceBrowserWidget *>(this), pos);
     return treeView->indexAt(childPos);
 }
 
@@ -632,7 +632,7 @@ void QnResourceBrowserWidget::keyPressEvent(QKeyEvent *event) {
         if (ui->filterLineEdit->hasFocus())
             return;
 
-        QPoint pos = currentItemView()->selectionPos();
+        QPoint pos = currentTreeWidget()->selectionPos();
         if (pos.isNull())
             return;
         showContextMenuAt(display()->view()->mapToGlobal(pos));
@@ -709,7 +709,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged() {
     ui->filterLineEdit->setText(layoutFilter(layout));
 
     /* Bold state has changed. */
-    currentItemView()->update();
+    currentTreeWidget()->update();
 
     connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),               this,   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),             this,   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
@@ -722,12 +722,12 @@ void QnResourceBrowserWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
 
 void QnResourceBrowserWidget::at_layout_itemAdded(QnWorkbenchItem *) {
     /* Bold state has changed. */
-    currentItemView()->update();
+    currentTreeWidget()->update();
 }
 
 void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
     /* Bold state has changed. */
-    currentItemView()->update();
+    currentTreeWidget()->update();
 }
 
 void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
