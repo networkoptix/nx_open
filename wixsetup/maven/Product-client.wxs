@@ -133,6 +133,10 @@
                 </Component>
             </Directory>
 
+            <Directory Id="MyPicturesFolder">
+                <Directory Id="${installer.customization}BgDir" Name="${product.name} Backgrounds"/>
+            </Directory>
+
             <Directory Id="$(var.ProgramFilesFolder)">
                 <Directory Id="NetworkOptix" Name="${company.name}">
                     <Directory Id="INSTALLDIR" Name="${product.name}">
