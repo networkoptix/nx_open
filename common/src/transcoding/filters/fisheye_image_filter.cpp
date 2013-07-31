@@ -231,7 +231,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     }
 
     QPointF* dstPos = m_transform[plane];
-	float ymaxInv = aspectRatio / m_params.fov;
+    float ymaxInv = (m_params.fov / m_params.panoFactor) / aspectRatio;
 	
     int dstDelta = 1;
     if (m_params.viewMode == DewarpingParams::VerticalDown) {
@@ -249,7 +249,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
             float theta = pos.x() + m_params.xAngle;
             float roty = -m_params.fovRot * cos(theta);
             pos.setY(pos.y() / (phiShiftSign * m_params.panoFactor));
-            float phi   = pos.y() * ((ymaxInv - roty) / ymaxInv) - phiShiftSign*(roty + m_params.yAngle);
+            float phi   = pos.y() * (1.0 - roty*ymaxInv) - phiShiftSign*(roty + m_params.yAngle);
 
 
             // Vector in 3D space
