@@ -534,11 +534,6 @@ namespace Qn {
         YouTubeUploadAction,
 
         /**
-         * Opens tags editing dialog.
-         */
-        EditTagsAction,
-
-        /**
          * Opens a folder that contains the file resource.
          */
         OpenInFolderAction,
