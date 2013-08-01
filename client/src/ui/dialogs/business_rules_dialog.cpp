@@ -238,9 +238,9 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
                              QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
 
-    QnAppServerConnectionFactory::createConnection()->resetBusinessRulesAsync(m_rulesViewModel, SLOT(reloadData()));
-    m_rulesViewModel->clear();
-//    updateControlButtons();
+    QnAppServerConnectionFactory::createConnection()->resetBusinessRulesAsync(/*m_rulesViewModel, SLOT(reloadData())*/ NULL, NULL);
+//  m_rulesViewModel->clear();
+//  updateControlButtons();
 }
 
 void QnBusinessRulesDialog::at_clearFilterButton_clicked() {

@@ -12,6 +12,8 @@
 #include <QFileInfo>
 #include <QHostInfo>
 
+#include "version.h"
+
 
 bool removeDir(const QString &dirName)
 {
@@ -50,6 +52,15 @@ QString fromNativePath(const QString &path)
 QString getMoviesDirectory()
 {
     return QDesktopServices::storageLocation(QDesktopServices::MoviesLocation);
+}
+
+QString getBackgroundsDirectory() {
+    QString baseDir = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
+    QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(lit(QN_PRODUCT_NAME_LONG)));
+
+    return QDir(productDir).exists()
+            ? productDir
+            : baseDir;
 }
 
 int digitsInNumber(unsigned num)

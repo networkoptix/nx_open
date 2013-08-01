@@ -194,7 +194,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::CloseLayoutAction));
     addAction(action(Qn::MainMenuAction));
     addAction(action(Qn::YouTubeUploadAction));
-    addAction(action(Qn::EditTagsAction));
     addAction(action(Qn::OpenInFolderAction));
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
