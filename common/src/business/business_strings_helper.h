@@ -40,6 +40,7 @@ public:
                                     const QnBusinessAggregationInfo &aggregationInfo,
                                     bool useIp);
 
+    static QString eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
     static QString eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
     static QVariantHash eventDetailsMap(const QnBusinessEventParameters &params, int aggregationCount);
 
@@ -47,8 +48,6 @@ public:
 
     static QString motionUrl(const QnBusinessEventParameters &params, bool isPublic);
 private:
-    static QString eventDetailsCombined(QVariantHash& detailsMap, const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
-
     /** Details of event: aggregation info, date and time, other info */
     static QString aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
                                               const QnBusinessAggregationInfo& aggregationInfo,

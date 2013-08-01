@@ -148,82 +148,107 @@ QVariantHash QnBusinessStringsHelper::eventDescriptionMap(const QnAbstractBusine
     return contextMap;
 }
 
-QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) {
-    QVariantHash dummy;
-    return eventDetailsCombined(dummy, params, aggregationCount, delimiter);
+QString QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) 
+{
+    return eventTimestamp(params, aggregationCount) + delimiter + eventDetails(params, aggregationCount, delimiter);
 }
 
-QVariantHash QnBusinessStringsHelper::eventDetailsMap(const QnBusinessEventParameters &params, int aggregationCount) {
-    QVariantHash result;
-    eventDetailsCombined(result, params, aggregationCount, QString());
-    return result;
-}
-
-QString QnBusinessStringsHelper::eventDetailsCombined(QVariantHash& detailsMap, const QnBusinessEventParameters &params, int aggregationCount, const QString &delimiter) {
+QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) 
+{
     QString result;
-
-    detailsMap[tpTimestamp] = eventTimestampShort(params, aggregationCount);
-    result += eventTimestamp(params, aggregationCount);
 
     BusinessEventType::Value eventType = params.getEventType();
     switch (eventType) {
     case BusinessEventType::Camera_Input: {
-            detailsMap[tpInputPort] = params.getInputPortId();
-
-            result += delimiter;
-            result = tr("Input port: %1").arg(params.getInputPortId());
-            break;
-        }
+        result = tr("Input port: %1").arg(params.getInputPortId());
+        break;
+                                          }
     case BusinessEventType::Storage_Failure:
     case BusinessEventType::Network_Issue:
     case BusinessEventType::MediaServer_Failure: {
-            detailsMap[tpReason] = eventReason(params);
-
-            result += delimiter;
-            result += tr("Reason: %1").arg(eventReason(params));
-            break;
-        }
+        result += tr("Reason: %1").arg(eventReason(params));
+        break;
+                                                 }
     case BusinessEventType::Camera_Ip_Conflict: {
-            detailsMap[lit("cameraConflictAddress")] = params.getSource();
+        result += tr("Conflict address: %1").arg(params.getSource());
+
+        int n = 0;
+        foreach (QString mac, params.getConflicts()) {
+            result += delimiter;
+            result += tr("Camera #%1 MAC: %2").arg(n).arg(mac);
+        }
+        break;
+                                                }
+    case BusinessEventType::MediaServer_Conflict: {
+        QVariantList conflicts;
+        int n = 0;
+        foreach (QString ip, params.getConflicts()) {
+            QVariantHash conflict;
+            conflict[lit("number")] = ++n;
+            conflict[lit("ip")] = ip;
+            conflicts << conflict;
 
             result += delimiter;
-            result += tr("Conflict address: %1").arg(params.getSource());
-
-            QVariantList conflicts;
-            int n = 0;
-            foreach (QString mac, params.getConflicts()) {
-                QVariantHash conflict;
-                conflict[lit("number")] = ++n;
-                conflict[lit("mac")] = mac;
-                conflicts << conflict;
-
-                result += delimiter;
-                result += tr("Camera #%1 MAC: %2").arg(n).arg(mac);
-            }
-            detailsMap[lit("cameraConflicts")] = conflicts;
-
-            break;
+            result += tr("Conflicting EC #%1: %2").arg(n).arg(ip);
         }
-    case BusinessEventType::MediaServer_Conflict: {
-            QVariantList conflicts;
-            int n = 0;
-            foreach (QString ip, params.getConflicts()) {
-                QVariantHash conflict;
-                conflict[lit("number")] = ++n;
-                conflict[lit("ip")] = ip;
-                conflicts << conflict;
-
-                result += delimiter;
-                result += tr("Conflicting EC #%1: %2").arg(n).arg(ip);
-            }
-            detailsMap[lit("msConflicts")] = conflicts;
-            break;
-        }
+        break;
+                                                  }
     default:
         break;
     }
     return result;
 }
+
+QVariantHash QnBusinessStringsHelper::eventDetailsMap(const QnBusinessEventParameters &params, int aggregationCount) 
+{
+    QVariantHash detailsMap;
+
+    detailsMap[tpTimestamp] = eventTimestampShort(params, aggregationCount);
+
+    BusinessEventType::Value eventType = params.getEventType();
+    switch (eventType) {
+    case BusinessEventType::Camera_Input: {
+        detailsMap[tpInputPort] = params.getInputPortId();
+        break;
+                                          }
+    case BusinessEventType::Storage_Failure:
+    case BusinessEventType::Network_Issue:
+    case BusinessEventType::MediaServer_Failure: {
+        detailsMap[tpReason] = eventReason(params);
+        break;
+                                                 }
+    case BusinessEventType::Camera_Ip_Conflict: {
+        detailsMap[lit("cameraConflictAddress")] = params.getSource();
+        QVariantList conflicts;
+        int n = 0;
+        foreach (QString mac, params.getConflicts()) {
+            QVariantHash conflict;
+            conflict[lit("number")] = ++n;
+            conflict[lit("mac")] = mac;
+            conflicts << conflict;
+        }
+        detailsMap[lit("cameraConflicts")] = conflicts;
+
+        break;
+                                                }
+    case BusinessEventType::MediaServer_Conflict: {
+        QVariantList conflicts;
+        int n = 0;
+        foreach (QString ip, params.getConflicts()) {
+            QVariantHash conflict;
+            conflict[lit("number")] = ++n;
+            conflict[lit("ip")] = ip;
+            conflicts << conflict;
+        }
+        detailsMap[lit("msConflicts")] = conflicts;
+        break;
+                                                  }
+    default:
+        break;
+    }
+    return detailsMap;
+}
+
 
 QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount) {
     quint64 ts = params.getEventTimestamp();
@@ -313,13 +338,13 @@ QString QnBusinessStringsHelper::aggregatedEventDetails(const QnAbstractBusiness
                                               const QString& delimiter) {
     QString result;
     if (aggregationInfo.isEmpty()) {
-        result += eventDetails(action->getRuntimeParams(), action->getAggregationCount(), delimiter);
+        result += eventDetailsWithTimestamp(action->getRuntimeParams(), action->getAggregationCount(), delimiter);
     }
 
     foreach (QnInfoDetail detail, aggregationInfo.toList()) {
         if (!result.isEmpty())
             result += delimiter;
-        result += eventDetails(detail.runtimeParams, detail.count, delimiter);
+        result += eventDetailsWithTimestamp(detail.runtimeParams, detail.count, delimiter);
     }
     return result;
 }
