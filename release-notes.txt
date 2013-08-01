@@ -17,7 +17,10 @@ Since 1.5.1
  - HD Witness licenses cannot be activated on DW Spectrum and vice versa
  - If copy items on Scene quickly (with a big video archive), than client will be crashed.
  - Added filter for camera in "Event/Actions rule". Also added "Camera rules" in resource tree and on "Camera settings".
- 
+ - Added a new E-Mail templates
+ - Added thumbnails in dialog "Select cameras"
+ - Added a new action for camera and server diagnostics.
+
 Since previous build
  - Selected item was not marked in Tree (> sign). Fixed
  - Network Statistics sometimes displayed 0 Mbps usage for a short time. Fixed
