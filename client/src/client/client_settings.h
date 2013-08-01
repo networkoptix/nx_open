@@ -85,6 +85,9 @@ public:
         /** Last used value for the 'Keep aspect ratio' flag in the layout settings. */
         LAYOUT_KEEP_ASPECT_RATIO,
 
+        /** Last used path for the layout backgrounds */
+        BACKGROUNDS_FOLDER,
+
         VARIABLE_COUNT
     };
 
@@ -154,6 +157,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        autoStart,              setAutoStart,               AUTO_START,                 false)
         QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)
         QN_DECLARE_RW_PROPERTY(bool,                        layoutKeepAspectRatio,  setLayoutKeepAspectRatio,   LAYOUT_KEEP_ASPECT_RATIO,   true)
+        QN_DECLARE_RW_PROPERTY(QString,                     backgroundsFolder,      setBackgroundsFolder,       BACKGROUNDS_FOLDER,         QString())
     QN_END_PROPERTY_STORAGE()
 
 private:
