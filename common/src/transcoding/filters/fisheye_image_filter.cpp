@@ -251,7 +251,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
 
             float cosTheta = cos(pos.x());
             float roty = -m_params.fovRot * cosTheta;
-            float phi   = phiShiftSign*(phiShiftSign*pos.y() * (1.0 - roty*xy1.y())  - roty - m_params.yAngle);
+            float phi   = phiShiftSign * (pos.y() * (1.0 - roty*xy1.y())  - roty - m_params.yAngle);
             float cosPhi = cos(phi);
 
             // Vector in 3D space
@@ -265,6 +265,8 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
             // Calculate fisheye angle and radius
             float theta = atan2(psph.z(), psph.x());
             float r = acos(psph.y());
+            if (qIsNaN(r))
+                r = 0.0;
 
             // return from polar coordinates
             pos = QVector2D(cos(theta), sin(theta)) * r;
