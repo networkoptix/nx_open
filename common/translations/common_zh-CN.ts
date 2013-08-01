@@ -152,7 +152,7 @@
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="19"/>
         <source>Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>診断</translation>
     </message>
     <message>
         <source>Alert</source>
@@ -831,14 +831,14 @@ They cannot receive system notifications via E-Mail</source>
         <location filename="../src/business/business_strings_helper.cpp" line="234"/>
         <source>%2 %1</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished"></translation>
+        <translation>%2 %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="238"/>
         <source>%n times, first: %2 %1</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n次, 首次: %2 %1</numerusform>
         </translation>
     </message>
     <message>
@@ -914,87 +914,87 @@ for recording to %1.</source>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="25"/>
         <source>ok</source>
-        <translation type="unfinished"></translation>
+        <translation>好</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
         <source>Media server %1 is not available. Check that media server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体服务器 %1 不可用。检查該媒体服务器已启用並且正在运行。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
         <source>Received bad response from media server %1: %2. Check media server&apos;s version.</source>
-        <translation type="unfinished"></translation>
+        <translation>从 %1媒体服务器器收到不良回应: %2。确认媒体服务器版本。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
         <source>Cannot connect to http port %1. Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接到HTTP端口%1。确认摄像机连上网络。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
         <source>Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接到媒体端口 %1。确认访问端口 %1可以存取（转发等）。请尝试重新启摄像机，然后在网页上复原为出厂默认值。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="45"/>
         <source>Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 端口上的连接被意外关闭。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
         <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
-        <translation type="unfinished"></translation>
+        <translation>解析摄像机错误回应。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="52"/>
         <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
-        <translation type="unfinished"></translation>
+        <translation>没有媒体路径。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
         <source>Not authorized.</source>
-        <translation type="unfinished"></translation>
+        <translation>未经授权。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="60"/>
         <source>Unsupported media protocol %1. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>不支援的媒体协议%1。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="65"/>
         <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>配置参数 %1失败。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
         <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机請求%1出現%2錯誤。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="75"/>
         <source>Unknown Camera Issue. Please, contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>未知摄像机的问题。请联系支援团队。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="79"/>
         <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O错误。 OS信息e: %1。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
         <source>Server has been stopped.</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器已停止。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="85"/>
         <source>Unknown error. Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>未知错误。请联系支援团队。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
         <source> Parameters: </source>
-        <translation type="unfinished"></translation>
+        <translation>参数:</translation>
     </message>
 </context>
 <context>
@@ -1049,22 +1049,22 @@ for recording to %1.</source>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
         <source>Audio context must be specified</source>
-        <translation type="unfinished">需指定音频内容</translation>
+        <translation>需指定音频内容</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation type="unfinished">编码转换错误：无法找到编码器 %1</translation>
+        <translation>编码转换错误：无法找到编码器 %1</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
         <source>Can&apos;t initialize audio encoder</source>
-        <translation type="unfinished">无法初始化音频编码器</translation>
+        <translation>无法初始化音频编码器</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
         <source>Can&apos;t initialize audio decoder</source>
-        <translation type="unfinished">无法初始化音频解码器</translation>
+        <translation>无法初始化音频解码器</translation>
     </message>
 </context>
 <context>
@@ -1106,17 +1106,17 @@ for recording to %1.</source>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
         <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
-        <translation type="unfinished">无法分派分辨率级别 %1x%2</translation>
+        <translation>无法分派分辨率级别 %1x%2</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation type="unfinished">编码转换错误：无法找到编码器 %1</translation>
+        <translation>编码转换错误：无法找到编码器 %1</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
         <source>Can&apos;t initialize video encoder</source>
-        <translation type="unfinished">无法初始化视频编码器</translation>
+        <translation>无法初始化视频编码器</translation>
     </message>
 </context>
 <context>
@@ -1204,12 +1204,12 @@ for recording to %1.</source>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="30"/>
         <source>Lowest</source>
-        <translation type="unfinished">最低</translation>
+        <translation>最低</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="31"/>
         <source>Low</source>
-        <translation type="unfinished">低</translation>
+        <translation>低</translation>
     </message>
     <message>
         <source>Normal</source>
@@ -1218,7 +1218,7 @@ for recording to %1.</source>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="33"/>
         <source>High</source>
-        <translation type="unfinished">高</translation>
+        <translation>高</translation>
     </message>
     <message>
         <source>Highest</source>
@@ -1227,64 +1227,64 @@ for recording to %1.</source>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="35"/>
         <source>Preset</source>
-        <translation type="unfinished">预设</translation>
+        <translation>预设</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="36"/>
         <source>Undefined</source>
-        <translation type="unfinished">未定义</translation>
+        <translation>未定义</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="32"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>中</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="34"/>
         <source>Best</source>
-        <translation type="unfinished"></translation>
+        <translation>最佳</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="48"/>
         <source>Lst</source>
         <extracomment>Short for &apos;Lowest&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>最低</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="51"/>
         <source>Lo</source>
         <extracomment>Short for &apos;Low&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>低</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="54"/>
         <source>Me</source>
         <extracomment>Short for &apos;Medium&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>中</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="57"/>
         <source>Hi</source>
         <extracomment>Short for &apos;High&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>高</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="60"/>
         <source>Bst</source>
         <extracomment>Short for &apos;Best&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>最佳</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="63"/>
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="66"/>
         <source>-</source>
         <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
 </context>
 <context>
