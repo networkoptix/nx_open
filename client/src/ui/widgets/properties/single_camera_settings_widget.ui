@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -277,7 +277,7 @@
        <item>
         <widget class="QCheckBox" name="checkBoxDewarping">
          <property name="text">
-          <string>This is the fish-eye lens camera</string>
+          <string>This is a fish-eye lens camera</string>
          </property>
         </widget>
        </item>
