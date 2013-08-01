@@ -71,7 +71,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     QStringList actionItems;
     actionItems << tr("Any action");
-    for (int i = 0; i < (int) BusinessActionType::NotDefined; ++i)
+    for (int i = 0; i < (int) BusinessActionType::Count; ++i)
         actionItems << BusinessActionType::toString(BusinessActionType::Value(i));
     ui->actionComboBox->addItems(actionItems);
 
