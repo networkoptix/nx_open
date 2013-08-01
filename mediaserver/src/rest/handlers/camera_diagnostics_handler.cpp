@@ -104,6 +104,9 @@ CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraAvailability( c
     if( !cameraRes->ping() )
         return CameraDiagnostics::CannotEstablishConnectionResult( cameraRes->httpPort() );
 
+    if( cameraRes->initializationAttemptCount() == 0 )  //there was no attempt yet to initialize camera
+        cameraRes->init();  //initializing camera to receive valid initialization result
+
     return cameraRes->prevInitializationResult();
 }
 
@@ -113,9 +116,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsHandler::tryAcquireCameraMediaStrea
 {
     QnAbstractMediaStreamDataProviderPtr streamReader = videoCamera->getLiveReader( QnResource::Role_LiveVideo );
     if( !streamReader )
-        return CameraDiagnostics::Result(
-            CameraDiagnostics::ErrorCode::cannotConfigureMediaStream,
-            cameraRes->getHostAddress() );
+        return CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown, "no stream reader" ); //NOTE we should never get here 
 
     return streamReader->diagnoseMediaStreamConnection();
 }
@@ -123,5 +124,5 @@ CameraDiagnostics::Result QnCameraDiagnosticsHandler::tryAcquireCameraMediaStrea
 CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraMediaStreamForErrors( QnVideoCamera* /*videoCamera*/ )
 {
     //TODO/IMPL
-    return CameraDiagnostics::NoErrorResult();
+    return CameraDiagnostics::NotImplementedResult();
 }

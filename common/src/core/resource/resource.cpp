@@ -36,7 +36,8 @@ QnResource::QnResource():
     m_disabled(false),
     m_status(Offline),
     m_initialized(false),
-    m_lastInitTime(0)
+    m_lastInitTime(0),
+    m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown)
 {
 }
 
@@ -841,6 +842,7 @@ void QnResource::init()
             QMutexLocker lk( &m_mutex );
             m_prevInitializationResult = initResult;
         }
+        m_initializationAttemptCount.fetchAndAddOrdered(1);
         if( m_initialized )
             initializationDone();
         if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
@@ -902,6 +904,11 @@ CameraDiagnostics::Result QnResource::prevInitializationResult() const
 {
     QMutexLocker lk( &m_mutex );
     return m_prevInitializationResult;
+}
+
+int QnResource::initializationAttemptCount() const
+{
+    return m_initializationAttemptCount;
 }
 
 bool QnResource::isInitialized() const

@@ -152,6 +152,8 @@ public:
     void init();
     void initAsync(bool optional);
     CameraDiagnostics::Result prevInitializationResult() const;
+    //!Returns counter of resiource initialization attempts (every attempt: successfull or not)
+    int initializationAttemptCount() const;
     
     // flags like network media and so on
     Flags flags() const;
@@ -376,6 +378,7 @@ private:
     static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
     CameraDiagnostics::Result m_prevInitializationResult;
+    QAtomicInt m_initializationAttemptCount;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
