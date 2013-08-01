@@ -101,14 +101,6 @@ qreal QnFisheyePtzController::boundYAngle(qreal value, qreal fov, qreal aspectRa
     else
         //return qBound(m_yRange.min, value, m_yRange.max - yFov * 3.0/4.0);
         return qBound(m_yRange.min, value, m_yRange.max - yFov);
-
-    /*
-    qreal yRange = FISHEYE_FOV - fov/ aspectRatio;
-    if (m_dewarpingParams.horizontalView)
-        return qBound(-yRange/2.0, value, yRange/2.0);
-    else
-        return qBound(0.0, value, yRange);
-    */
 }
 
 int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
@@ -208,13 +200,10 @@ DewarpingParams QnFisheyePtzController::updateDewarpingParams(float ar)
         newParams.xAngle = normalizeAngle(newParams.xAngle + xSpeed * timeSpend);
         newParams.yAngle += ySpeed * timeSpend;
 
-        //qreal xRange = (FISHEYE_FOV - newParams.fov) / 2.0;
-        //qreal yRange = xRange; // / newParams.aspectRatio;
-
-        newParams.xAngle = boundXAngle(newParams.xAngle, newParams.fov);
-        newParams.yAngle = boundYAngle(newParams.yAngle, newParams.fov, m_dewarpingParams.panoFactor*ar, m_dewarpingParams.viewMode);
         m_lastTime = newTime;
     }
+    newParams.xAngle = boundXAngle(newParams.xAngle, newParams.fov);
+    newParams.yAngle = boundYAngle(newParams.yAngle, newParams.fov, m_dewarpingParams.panoFactor*ar, m_dewarpingParams.viewMode);
     newParams.enabled = m_dewarpingParams.enabled;
 
     DewarpingParams camParams = m_resource->getDewarpingParams();
@@ -302,7 +291,10 @@ void QnFisheyePtzController::changePanoMode()
     {
         m_dewarpingParams.panoFactor = 1;
     }
-    m_dewarpingParams.fov = MAX_FOV * m_dewarpingParams.panoFactor;
+    if (m_dewarpingParams.panoFactor == 1)
+        m_dewarpingParams.fov = DewarpingParams().fov;
+    else
+        m_dewarpingParams.fov = MAX_FOV * m_dewarpingParams.panoFactor;
     emit dewarpingParamsChanged(m_dewarpingParams);
     updateSpaceMapper(m_dewarpingParams.viewMode, m_dewarpingParams.panoFactor);
 }
