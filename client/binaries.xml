@@ -21,7 +21,7 @@
 			<outputDirectory>../${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/lib</outputDirectory>
 			<includes>
 				<include>libcommon.so.${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</include>
-				<include>libQtSolutions_ColorPicker-2.6.so</include>				
+				<include>libQtSolutions_ColorPicker-2.6.so.1</include>				
 			</includes>
 			<excludes>
 				<exclude>**/.hidden</exclude>
