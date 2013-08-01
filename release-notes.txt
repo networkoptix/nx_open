@@ -21,6 +21,7 @@ Since 1.5.1
  - Added a new E-Mail templates
  - Added thumbnails in dialog "Select cameras"
  - Added a new action for camera and server diagnostics.
+ - Added the "Open New Window" button to export dialog (with progress bar)
 
 Since previous build
  - Selected item was not marked in Tree (> sign). Fixed
@@ -47,6 +48,7 @@ Since previous build
  - Incorrect screenshot from zoom item for fisheye camera.Fixed. 
  - When release "This is the fish-yey lens camera", items returns to the normal size.
  - While items searching thumbnails look incorrect in resource tree.
+ - Added  "Camera Diagnostics" button to Camera Settings.
  
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
