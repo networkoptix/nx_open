@@ -291,6 +291,7 @@ void QnEventLogDialog::updateHeaderWidth()
     ui->gridEvents->horizontalHeader()->resizeSection(3, ui->actionComboBox->width() + space);
 
     int w = 0;
+    QSet<QString> cache;
     QFontMetrics fm(ui->gridEvents->font());
     for (int i = 0; i < m_model->rowCount(); ++i)
     {
@@ -299,7 +300,7 @@ void QnEventLogDialog::updateHeaderWidth()
         int spaceIdx = targetText.indexOf(L' ');
         int prevPos = 0;
         if (spaceIdx == -1) {
-            w = qMax(w, fm.size(0, targetText).width());
+            cache << targetText;
         }
         else {
             while (spaceIdx >= 0) {
@@ -307,9 +308,13 @@ void QnEventLogDialog::updateHeaderWidth()
                 prevPos = spaceIdx;
                 spaceIdx = targetText.indexOf(L' ', spaceIdx+1);
             }
-            w = qMax(w, fm.size(0, targetText.mid(prevPos, targetText.length() - prevPos)).width());
+            cache << targetText.mid(prevPos, targetText.length() - prevPos);
         }
     }
+    
+    foreach(const QString& str, cache)
+        w = qMax(w, fm.size(0, str).width());
+
     ui->gridEvents->horizontalHeader()->resizeSection(4, qMax(w + 32, ui->cameraButton->width() + space));
 }
 
