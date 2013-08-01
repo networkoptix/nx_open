@@ -76,7 +76,11 @@ void QnBusinessRulesActualModel::at_message_ruleDeleted(int id) {
 }
 
 void QnBusinessRulesActualModel::at_message_ruleReset(QnBusinessEventRuleList rules) {
-    //TODO: #GDM please process business rules reset here
+    emit beforeModelChanged();
+    clear();
+    foreach (const QnBusinessEventRulePtr &rule, rules)
+        addRule(rule);
+    emit afterModelChanged(RulesLoaded, true);
 }
 
 bool QnBusinessRulesActualModel::isLoaded() const
@@ -84,7 +88,3 @@ bool QnBusinessRulesActualModel::isLoaded() const
     return m_isDataLoaded;
 }
 
-void QnBusinessRulesActualModel::clear() {
-    base_type::clear();
-    m_isDataLoaded = false;
-}

@@ -581,7 +581,7 @@ void QnEventLogDialog::setVisible(bool value)
 void QnEventLogDialog::updateActionList(bool instantOnly)
 {
     QStandardItemModel* model = dynamic_cast<QStandardItemModel*> (ui->actionComboBox->model());
-    for (int i = 0; i < (int) BusinessActionType::NotDefined; ++i) 
+    for (int i = 0; i < (int) BusinessActionType::Count; ++i)
     {
         BusinessActionType::Value actionType = BusinessActionType::Value(i);
         QModelIndex index = model->index(i+1, 0);
