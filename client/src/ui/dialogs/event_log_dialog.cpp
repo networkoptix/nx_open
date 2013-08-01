@@ -4,7 +4,6 @@
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
 #include <QtGui/QMenu>
-#include <QtGui/QMessageBox>
 #include <QtGui/QMouseEvent>
 
 #include <client/client_globals.h>
@@ -23,13 +22,15 @@
 #include <ui/common/grid_widget_helper.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/models/business_rules_actual_model.h>
+#include <ui/models/business_rule_view_model.h>
 #include <ui/models/event_log_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
+#include <ui/style/warning_style.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/event_processors.h>
+
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent,
@@ -45,8 +46,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     m_lastMouseButton(Qt::NoButton)
 {
     ui->setupUi(this);
-
-    m_rulesModel = new QnBusinessRulesActualModel(this);
+    setWarningStyle(ui->warningLabel);
 
     QList<QnEventLogModel::Column> columns;
         columns << QnEventLogModel::DateTimeColumn << QnEventLogModel::EventColumn << QnEventLogModel::EventCameraColumn <<
@@ -99,6 +99,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->cameraButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera | QnResourceIconCache::Online));
     ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
     ui->eventRulesButton->setIcon(qnSkin->icon("tree/layout.png"));
+    ui->loadingProgressBar->hide();
 
     connect(m_filterAction,         SIGNAL(triggered()),                this, SLOT(at_filterAction()));
     connect(m_resetFilterAction,    SIGNAL(triggered()),                this, SLOT(at_resetFilterAction()));
@@ -120,8 +121,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     ui->mainGridLayout->activate();
     updateHeaderWidth();
-
-    m_rulesModel->reloadData();
 }
 
 QnEventLogDialog::~QnEventLogDialog()
@@ -185,9 +184,7 @@ void QnEventLogDialog::updateData()
         actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
 
     query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(), ui->dateEditTo->dateTime().addDays(1).toMSecsSinceEpoch(),
-          eventType, actionType,
-          QnId() // TODO: #rvasilenko add businessRuleID here
-          );
+          eventType, actionType);
 
     // update UI
 
@@ -199,11 +196,13 @@ void QnEventLogDialog::updateData()
 
     if (!m_requests.isEmpty()) {
         ui->gridEvents->setDisabled(true);
+        ui->stackedWidget->setCurrentWidget(ui->gridPage);
         setCursor(Qt::BusyCursor);
+        ui->loadingProgressBar->show();
     }
     else {
         requestFinished(); // just clear grid
-        QMessageBox::warning(this, tr("No online media servers"), tr("All media server(s) is offline. No data is selected"));
+        ui->stackedWidget->setCurrentWidget(ui->warnPage);
     }
 
     ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
@@ -228,8 +227,7 @@ QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
 
 void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                              BusinessEventType::Value eventType,
-                             BusinessActionType::Value actionType,
-                             QnId businessRuleId)
+                             BusinessActionType::Value actionType)
 {
     m_requests.clear();
     m_allEvents.clear();
@@ -245,7 +243,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                 m_filterCameraList,
                 eventType,
                 actionType,
-                businessRuleId,
+                QnId(),
                 this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
         }
     }
@@ -296,10 +294,6 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataLi
         m_allEvents << events;
     if (m_requests.isEmpty()) {
         requestFinished();
-        if (m_model->rowCount() == 0 && isFilterExist() && !isRuleExistByCond())
-        {
-            QMessageBox::information(this, tr("No rule(s) for current filter"), tr("You have not configured any Alarm/Event Rules to match the current filter condition."));
-        }
     }
 }
 
@@ -325,38 +319,6 @@ bool QnEventLogDialog::isCameraMatched(QnBusinessRuleViewModel* ruleModel) const
     return false;
 }
 
-bool QnEventLogDialog::isRuleExistByCond() const
-{
-    if (!m_rulesModel->isLoaded())
-        return true;
-
-    QModelIndex idx = ui->eventComboBox->currentIndex();
-    BusinessEventType::Value eventType = (BusinessEventType::Value) ui->eventComboBox->model()->data(idx, Qn::FirstItemDataRole).toInt();
-
-    BusinessActionType::Value actionType = BusinessActionType::NotDefined;
-    if (ui->actionComboBox->currentIndex() > 0)
-        actionType = BusinessActionType::Value(ui->actionComboBox->currentIndex()-1);
-
-
-    for (int i = 0; i < m_rulesModel->rowCount(); ++i)
-    {
-        QnBusinessRuleViewModel* ruleModel = m_rulesModel->getRuleModel(i);
-        if (ruleModel->disabled())
-            continue;
-        bool isEventMatch = eventType == BusinessEventType::NotDefined ||
-                            eventType == BusinessEventType::AnyBusinessEvent ||
-                            ruleModel->eventType() == eventType ||
-                            BusinessEventType::parentEvent(ruleModel->eventType()) == eventType;
-        if (isEventMatch && isCameraMatched(ruleModel))
-        {
-            if (actionType == BusinessActionType::NotDefined || actionType == ruleModel->actionType())
-                return true;
-        }
-    }
-
-    return false;
-}
-
 void QnEventLogDialog::requestFinished()
 {
     m_model->setEvents(m_allEvents);
@@ -365,14 +327,15 @@ void QnEventLogDialog::requestFinished()
     setCursor(Qt::ArrowCursor);
     updateHeaderWidth();
     if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
-        setWindowTitle(tr("Event log for period from %1 to %2 - %3 event(s) found")
+        ui->statusLabel->setText(tr("Event log for period from %1 to %2 - %3 event(s) found")
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
         .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate))
         .arg(m_model->rowCount()));
     else
-        setWindowTitle(tr("Event log for %1  - %2 event(s) found")
+        ui->statusLabel->setText(tr("Event log for %1  - %2 event(s) found")
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
         .arg(m_model->rowCount()));
+    ui->loadingProgressBar->hide();
 }
 
 void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)

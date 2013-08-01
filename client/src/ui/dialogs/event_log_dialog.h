@@ -15,7 +15,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnEventLogModel;
-class QnBusinessRulesActualModel;
 class QnBusinessRuleViewModel;
 
 namespace Ui {
@@ -62,21 +61,18 @@ private:
     void updateHeaderWidth();
     bool isFilterExist() const;
     void requestFinished();
-    bool isRuleExistByCond() const;
     bool isCameraMatched(QnBusinessRuleViewModel* ruleModel) const;
     void updateActionList(bool instantOnly);
 
-    /*
+    /**
     * Get data from media server
     * \param fromMsec start date. UTC msecs
     * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
     * \param camRes optional camera resource
-    * \param businessRuleId optional business rule id
     */
     void query(qint64 fromMsec, qint64 toMsec,
                BusinessEventType::Value eventType,
-               BusinessActionType::Value actionType,
-               QnId businessRuleId);
+               BusinessActionType::Value actionType);
 private:
     Q_DISABLE_COPY(QnEventLogDialog)
 
@@ -94,7 +90,6 @@ private:
     QAction* m_selectAllAction;
     QAction* m_exportAction;
     QAction* m_clipboardAction;
-    QnBusinessRulesActualModel* m_rulesModel;
     Qt::MouseButton m_lastMouseButton;
 };
 
