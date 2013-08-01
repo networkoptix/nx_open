@@ -2663,7 +2663,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>一次每</translation>
     </message>
     <message>
-        <source>Do Instantly</source>
+        <source>Instant</source>
         <translation>立即作用</translation>
     </message>
 </context>
@@ -2883,7 +2883,7 @@ for recording at
         <translation type="obsolete">不适用</translation>
     </message>
     <message>
-        <source>do instantly</source>
+        <source>Instant</source>
         <translation type="obsolete">立即作用</translation>
     </message>
     <message numerus="yes">
@@ -5199,7 +5199,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
 <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-        <source>Show for Administrators only</source>
+        <source>Show to Administrators only</source>
         <translation>仅显示给管理员</translation>
     </message>
     <message>

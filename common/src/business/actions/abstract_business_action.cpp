@@ -18,7 +18,7 @@ namespace BusinessActionType {
         case SendMail:              return QObject::tr("Send mail");
         case Diagnostics:           return QObject::tr("Diagnostics");
         case ShowPopup:             return QObject::tr("Show notification");
-        case PlaySound:             return QObject::tr("Play Sound");
+        case PlaySound:             return QObject::tr("Play sound");
         case SayText:               return QObject::tr("Say");
         }
         return QObject::tr("Unknown (%1)").arg((int)val);

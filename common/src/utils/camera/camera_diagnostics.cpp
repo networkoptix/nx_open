@@ -76,7 +76,7 @@ public:
                 break;
             case ioError:
                 requiredParamCount = 1;
-                errorMessage = tr("I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera.");
+                errorMessage = tr("I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot the camera.");
                 break;
             case serverTerminated:
                 errorMessage = tr("Server has been stopped.");

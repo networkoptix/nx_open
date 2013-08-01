@@ -3,9 +3,9 @@
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType) {
     switch (messageType) {
     case QnSystemHealth::EmailIsEmpty:
-        return tr("Your E-Mail address is not set");
+        return tr("E-Mail address is not set");
     case QnSystemHealth::NoLicenses:
-        return tr("You have no licenses");
+        return tr("No licenses");
     case QnSystemHealth::SmtpIsNotSet:
         return tr("E-Mail server is not set");
     case QnSystemHealth::UsersEmailIsEmpty:
@@ -38,7 +38,7 @@ QString QnSystemHealthStringsHelper::messageName(QnSystemHealth::MessageType mes
 QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, QString resourceName) {
     switch (messageType) {
     case QnSystemHealth::EmailIsEmpty:
-        return tr("Your E-Mail address is not set.\nYou cannot receive system notifications via E-Mail.");
+        return tr("E-Mail address is not set.\nYou cannot receive system notifications via E-Mail.");
     case QnSystemHealth::SmtpIsNotSet:
         return tr("E-Mail server is not set.\nYou cannot receive system notifications via E-Mail.");
     case QnSystemHealth::UsersEmailIsEmpty:
