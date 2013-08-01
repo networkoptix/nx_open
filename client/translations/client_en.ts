@@ -65,30 +65,30 @@
     </message>
     <message numerus="yes">
         <source>Every %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Every day</numerusform>
+            <numerusform>Every %n days</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n hours</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Every hour</numerusform>
+            <numerusform>Every %n hours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n minutes</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Every minute</numerusform>
+            <numerusform>Every %n minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n seconds</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Every second</numerusform>
+            <numerusform>Every %n seconds</numerusform>
         </translation>
     </message>
 </context>
@@ -192,14 +192,14 @@ It might take a few moments to populate them in the tree.</numerusform>
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n digital license will be used out of %1.</numerusform>
             <numerusform>%n digital licenses will be used out of %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) will be used out of %1.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n analog license will be used out of %1.</numerusform>
             <numerusform>%n analog licenses will be used out of %1.</numerusform>
         </translation>
