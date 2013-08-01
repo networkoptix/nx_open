@@ -96,7 +96,7 @@ public:
 
         requiredParamCount = std::min<int>(requiredParamCount, errorParams.size());
         for( int i = 0; i < requiredParamCount; ++i )
-            errorMessage = errorMessage.arg(errorParams[i]);
+            errorMessage = errorMessage.arg(!errorParams[i].isEmpty() ? errorParams[i] : tr("(unknown)"));
 
         return errorMessage;
     }
@@ -166,10 +166,8 @@ namespace CameraDiagnostics
     :
         errorCode( _errorCode )
     {
-        if( !param1.isEmpty() || !param2.isEmpty() )
-            errorParams.push_back( param1 );
-        if( !param2.isEmpty() )
-            errorParams.push_back( param2 );
+        errorParams.push_back(param1);
+        errorParams.push_back(param2);
     }
 
     QString Result::toString() const
