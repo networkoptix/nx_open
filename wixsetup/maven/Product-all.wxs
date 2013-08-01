@@ -535,8 +535,12 @@
             <Directory Id="CLIENT_DIRECTORY" Name="Client Media">
                 <Component Id="ClientDirectoryComponent" Permanent="yes">
                     <CreateFolder Directory="CLIENT_DIRECTORY"/>
-                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\${client.name}' Type='string' Value='' KeyPath='yes' />
+                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\${client.name} Media' Type='string' Value='' KeyPath='yes' />
                 </Component>
+            </Directory>
+
+            <Directory Id="MyPicturesFolder">
+                <Directory Id="${installer.customization}BgDir" Name="${product.name} Backgrounds"/>
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">

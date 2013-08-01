@@ -204,6 +204,11 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             emit businessRuleChanged(message.businessRule);
             break;
         }
+    case Qn::Message_Type_BusinessRuleReset:
+        {
+            emit businessRuleReset(message.businessRules);
+            break;
+        }
     case Qn::Message_Type_BusinessRuleDelete:
         {
             emit businessRuleDeleted(message.resourceId.toInt());

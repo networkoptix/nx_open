@@ -219,72 +219,72 @@
 <context>
     <name>QnApiPbSerializer</name>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="663"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="653"/>
         <source>Cannot parse serialized cameras.</source>
         <translation>Impossible d&apos;analyser les caméras sérialisées.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="672"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="662"/>
         <source>Cannot parse serialized servers.</source>
         <translation>Impossible d&apos;analyser les serveurs sérialisés.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="681"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="671"/>
         <source>Cannot parse serialized layouts.</source>
         <translation>Impossible d&apos;analyser les mises en page sérialisées.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="701"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="691"/>
         <source>Cannot parse serialized users.</source>
         <translation>Impossible d&apos;analyser les utilisateurs sérialisés.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="710"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="700"/>
         <source>Cannot parse serialized resources.</source>
         <translation>Impossible d&apos;analyser les ressources sérialisées.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="719"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="709"/>
         <source>Cannot parse serialized resource types.</source>
         <translation>Impossible d&apos;analyser les types de ressources sérialisées.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="728"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="718"/>
         <source>Cannot parse serialized licenses.</source>
         <translation>Impossible d&apos;analyser les licences sérialisées.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="738"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="728"/>
         <source>Cannot parse serialized camera history.</source>
         <translation>Impossible d&apos;analyser l&apos;historique caméra  sérialisé.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="748"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="738"/>
         <source>Cannot parse serialized key-value pairs.</source>
         <translation>Impossible d&apos;analyser les paires valeur clé sérialisées.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="758"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="748"/>
         <source>Cannot parse serialized settings.</source>
         <translation>Impossible d&apos;analyser la configuration sérialisée.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="768"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="758"/>
         <source>Cannot parse serialized connection information.</source>
         <translation>Impossible d&apos;analyser l&apos;information de connexion sérialisée.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="789"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="779"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>Impossible d&apos;analyser les règles évènement/action sérialisées.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="798"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="788"/>
         <source>Cannot parse serialized action.</source>
         <translation>Impossible d&apos;analyser l&apos;action sérialisée.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="810"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="800"/>
         <source>Cannot parse serialized actions.</source>
         <translation>Impossible d&apos;analyser les actions sérialisées.</translation>
     </message>
@@ -531,16 +531,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
-        <source>Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="45"/>
-        <source>Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
         <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
         <translation type="unfinished"></translation>
@@ -556,8 +546,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
+        <source>Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="45"/>
+        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="60"/>
-        <source>Unsupported media protocol %1. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <source>Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -747,7 +747,7 @@
 <context>
     <name>QnMediaServerResource</name>
     <message>
-        <location filename="../src/core/resource/media_server_resource.cpp" line="44"/>
+        <location filename="../src/core/resource/media_server_resource.cpp" line="26"/>
         <source>Server</source>
         <translation>Serveur</translation>
     </message>

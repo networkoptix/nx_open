@@ -120,6 +120,7 @@ public slots:
 
     void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
     void at_businessRuleDeleted(int id);
+    void at_businessRuleReset(QnBusinessEventRuleList rules);
 protected slots:
     /*
     * Execute action physically. Return true if action success executed
@@ -149,9 +150,7 @@ protected:
     void terminateRunningRule(QnBusinessEventRulePtr rule);
 
 private:
-    QList<QnBusinessEventRulePtr> m_rules;
-    //QnBusinessMessageBus m_messageBus;
-    static QnBusinessRuleProcessor* m_instance;
+    void at_businessRuleChanged_i(QnBusinessEventRulePtr bRule);
 
     bool sendMail(const QnSendMailBusinessActionPtr& action );
 
@@ -159,6 +158,11 @@ private:
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     bool checkRuleCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
     QString formatEmailList(const QStringList& value);
+
+private:
+    QList<QnBusinessEventRulePtr> m_rules;
+    //QnBusinessMessageBus m_messageBus;
+    static QnBusinessRuleProcessor* m_instance;
 
     struct RunningRuleInfo
     {
