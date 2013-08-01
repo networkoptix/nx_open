@@ -4,6 +4,9 @@
 #include "../camera_settings/camera_settings.h"
 #include "soap_wrapper.h"
 
+#include <utils/camera/camera_diagnostics.h>
+
+
 //
 // OnvifCameraSettingsResp
 //
@@ -30,7 +33,7 @@ public:
     ~OnvifCameraSettingsResp();
 
     bool isEmpty() const;
-    bool makeGetRequest();
+    CameraDiagnostics::Result makeGetRequest();
     bool makeSetRequest();
     const ImagingOptionsResp& getRangesResponse() const;
     const ImagingSettingsResp& getValsResponse() const;
