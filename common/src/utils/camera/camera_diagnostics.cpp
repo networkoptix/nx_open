@@ -82,16 +82,27 @@ public:
                 errorMessage = tr("Server has been stopped.");
                 break;
             default:
-                errorMessage = tr("Unknown error. Please contact support.");
-                if( !errorParams.isEmpty() )
-                    errorMessage += tr(" Parameters: ");
+            {
+                int nonEmptyParamCount = 0;
                 for( int i = 0; i < errorParams.size(); ++i )
+                {
+                    if( !errorParams[i].isEmpty() )
+                        ++nonEmptyParamCount;
+                    else
+                        break;
+                }
+
+                errorMessage = tr("Unknown error. Please contact support.");
+                if( nonEmptyParamCount )
+                    errorMessage += tr(" Parameters: ");
+                for( int i = 0; i < nonEmptyParamCount; ++i )
                 {
                     if( i > 0 )
                         errorMessage += QLatin1String(", ");
                     errorMessage += errorParams[i];
                 }
                 break;
+            }
         }
 
         requiredParamCount = std::min<int>(requiredParamCount, errorParams.size());
