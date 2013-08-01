@@ -21,6 +21,7 @@
 	<name>HD Witness Common Lib</name>
 
 	<properties>
+        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
 		<!--Global libs-->
 		<global.libs/>      
 		<!--Specific os libs used-->

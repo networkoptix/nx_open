@@ -49,7 +49,6 @@
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/login_dialog.h>
-#include <ui/dialogs/tags_edit_dialog.h>
 #include <ui/dialogs/server_settings_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/camera_settings_dialog.h>
@@ -290,7 +289,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
     connect(action(Qn::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
     connect(action(Qn::YouTubeUploadAction),                    SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
-    connect(action(Qn::EditTagsAction),                         SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
     connect(action(Qn::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
     connect(action(Qn::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
     connect(action(Qn::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
@@ -1907,16 +1905,6 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     notificationsHandler()->clear();
 
     qnSettings->setStoredPassword(QString());
-}
-
-void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
-    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
-    if(!resource)
-        return;
-
-    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resource->getUniqueId(), mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {

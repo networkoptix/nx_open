@@ -412,7 +412,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     if (getDeviceOnvifUrl().isEmpty()) {
         qCritical() << "QnPlOnvifResource::initInternal: Can't do anything: ONVIF device url is absent. Id: " << getPhysicalId();
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("getDeviceOnvifUrl"), QString());
+        return m_prevOnvifResultCode.errorCode != CameraDiagnostics::ErrorCode::noError
+            ? m_prevOnvifResultCode
+            : CameraDiagnostics::RequestFailedResult(QLatin1String("getDeviceOnvifUrl"), QString());
     }
 
     calcTimeDrift();
@@ -1890,8 +1892,11 @@ const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractS
 
 bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
+    m_prevOnvifResultCode = CameraDiagnostics::NoErrorResult();
+
     QMutexLocker lock(&m_physicalParamsMutex);
     if (!m_onvifAdditionalSettings) {
+        m_prevOnvifResultCode = CameraDiagnostics::UnknownErrorResult();
         return false;
     }
 
@@ -1909,9 +1914,9 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
     QDateTime currTime = QDateTime::currentDateTime();
     if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(currTime) > ADVANCED_SETTINGS_VALID_TIME) {
-        if (!m_onvifAdditionalSettings->makeGetRequest()) {
+        m_prevOnvifResultCode = m_onvifAdditionalSettings->makeGetRequest();
+        if( m_prevOnvifResultCode.errorCode != CameraDiagnostics::ErrorCode::noError )
             return false;
-        }
         m_advSettingsLastUpdated = currTime;
     }
 

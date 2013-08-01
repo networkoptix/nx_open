@@ -1004,13 +1004,6 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(hasFlags(QnResource::ARCHIVE));
 
-    factory(Qn::EditTagsAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
-        text(tr("Edit tags...")).
-        //shortcut(tr("Alt+T")).
-        autoRepeat(false).
-        condition(hasFlags(QnResource::media));
-
     factory(Qn::DeleteFromDiskAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Delete from Disk")).
