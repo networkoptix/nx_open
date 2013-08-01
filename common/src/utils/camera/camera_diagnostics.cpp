@@ -37,12 +37,12 @@ public:
                 errorMessage = tr("Cannot connect to http port %1. Make sure the camera is plugged into the network.");
                 break;
             case cannotOpenCameraMediaPort:
-                requiredParamCount = 1;
-                errorMessage = tr("Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.");
+                requiredParamCount = 2;
+                errorMessage = tr("Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.");
                 break;
             case connectionClosedUnexpectedly:
-                requiredParamCount = 1;
-                errorMessage = tr("Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot the camera.");
+                requiredParamCount = 2;
+                errorMessage = tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.");
                 break;
             case responseParseError:
                 errorMessage = tr("Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page."
@@ -56,9 +56,9 @@ public:
                 errorMessage = tr("Not authorized.");
                 break;
             case unsupportedProtocol:
-                requiredParamCount = 1;
-                errorMessage = tr("Unsupported media protocol %1. Please try to restore factory defaults on the web-page."
-                    " If the problem persists, contact support.");
+                requiredParamCount = 2;
+                errorMessage = tr("Cannot open media url %1. Unsupported media protocol %2. "
+                    "Please try to restore factory defaults on the web-page. If the problem persists, contact support.");
                 break;
             case cannotConfigureMediaStream:
                 requiredParamCount = 1;

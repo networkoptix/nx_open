@@ -14,7 +14,8 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     connect(ui->angleSpinBox,     SIGNAL(valueChanged(double)), this, SLOT(at_angleDataChanged()));
     connect(ui->horizontalSlider, SIGNAL(valueChanged(int)), this, SLOT(at_dataChanged()));
     connect(ui->horizontalRadioButton, SIGNAL(clicked(bool)), this, SLOT(at_dataChanged()));
-    connect(ui->verticalRadioButton, SIGNAL(clicked(bool)), this, SLOT(at_dataChanged()));
+    connect(ui->viewDownButton, SIGNAL(clicked(bool)), this, SLOT(at_dataChanged()));
+    connect(ui->viewUpButton, SIGNAL(clicked(bool)), this, SLOT(at_dataChanged()));
 }
 
 QnFisheyeSettingsWidget::~QnFisheyeSettingsWidget()
@@ -29,9 +30,20 @@ void QnFisheyeSettingsWidget::updateFromResource(QnSecurityCamResourcePtr camera
     m_silenseMode = true;
 
     m_dewarpingParams = camera->getDewarpingParams();
-    ui->horizontalRadioButton->setChecked(m_dewarpingParams.horizontalView);
-    ui->verticalRadioButton->setChecked(!m_dewarpingParams.horizontalView);
-    ui->horizontalSlider->setValue(m_dewarpingParams.fovRot * 10);
+    switch (m_dewarpingParams.viewMode)
+    {
+        case DewarpingParams::Horizontal:
+            ui->horizontalRadioButton->setChecked(true);
+            break;
+        case DewarpingParams::VerticalUp:
+            ui->viewUpButton->setChecked(true);
+            break;
+        case DewarpingParams::VerticalDown:
+            ui->viewDownButton->setChecked(true);
+            break;
+        default:
+            Q_ASSERT_X( __LINE__, Q_FUNC_INFO, "Unsupported value");
+    }
      
     if (!m_silenseMode)
         emit dataChanged();
@@ -54,7 +66,14 @@ void QnFisheyeSettingsWidget::at_dataChanged()
     ui->angleSpinBox->blockSignals(true);
     ui->angleSpinBox->setValue(getAngle());
     m_dewarpingParams.fovRot = getAngle();
-    m_dewarpingParams.horizontalView = ui->horizontalRadioButton->isChecked();
+
+    if (ui->horizontalRadioButton->isChecked())
+        m_dewarpingParams.viewMode = DewarpingParams::Horizontal;
+    else if (ui->viewDownButton->isChecked())
+        m_dewarpingParams.viewMode = DewarpingParams::VerticalDown;
+    else
+        m_dewarpingParams.viewMode = DewarpingParams::VerticalUp;
+
     if (!m_silenseMode)
         emit dataChanged();
     ui->angleSpinBox->blockSignals(false);

@@ -549,11 +549,16 @@
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="30"/>
+        <source>Vertical mount (camera on the floor)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="37"/>
         <source>Vertical mount (camera on the ceiling)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="39"/>
+        <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="49"/>
         <source>Camera view angle correction:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2727,84 +2732,84 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnBusinessRulesDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="146"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="145"/>
         <source>Confirm exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="147"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="146"/>
         <source>Unsaved changes will be lost. Save?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="255"/>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="258"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="254"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="257"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="258"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="257"/>
         <source>Error while saving rule.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="315"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="314"/>
         <source>Hide Advanced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="315"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="314"/>
         <source>Show Advanced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="255"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="254"/>
         <source>Error while receiving rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="47"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="46"/>
         <source>Reset Default Rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="235"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="234"/>
         <source>Confirm rules reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="236"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="235"/>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="278"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="277"/>
         <source>Error while deleting rule</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="319"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="318"/>
         <source>&amp;New...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="322"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="321"/>
         <source>&amp;Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="329"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="328"/>
         <source>&amp;Schedule...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="346"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="345"/>
         <source>Confirm save invalid rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="347"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="346"/>
         <source>Some rules are not valid. Should we disable them?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3160,33 +3165,33 @@ It might take a few moments to populate them in the tree.</source>
 <context>
     <name>QnCameraScheduleWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="215"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="319"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="225"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="329"/>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="416"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="422"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="520"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="526"/>
         <source>FPS value is too high</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="417"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="521"/>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="423"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="527"/>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="492"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="596"/>
         <source>%n digital license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3195,7 +3200,7 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="501"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="605"/>
         <source>%n analog license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3204,7 +3209,7 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="528"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="632"/>
         <source>Activate %n more digital license(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3213,7 +3218,7 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="530"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="634"/>
         <source>Activate %n more analog license(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3222,7 +3227,7 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="537"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="641"/>
         <source>%n more digital license(s) will be used.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3231,7 +3236,7 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="539"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="643"/>
         <source>%n more analog license(s) will be used.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3240,40 +3245,40 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="523"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="627"/>
         <source>Activate %1 more digital and %2 more analog licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="532"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="636"/>
         <source>%1 more digital and %2 more analog licenses will be used.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="680"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="683"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="685"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="687"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="784"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="787"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="789"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="791"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="680"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="784"/>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="683"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="787"/>
         <source>Dual-Streaming is not supported by this camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="685"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="789"/>
         <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="687"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="791"/>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3615,24 +3620,19 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
 </context>
 <context>
-    <name>QnExportCameraSettingsDialog</name>
+    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message>
-        <location filename="../src/ui/dialogs/export_camera_settings_dialog.ui" line="20"/>
-        <source>Copy schedule...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/export_camera_settings_dialog.ui" line="41"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="61"/>
         <source>Schedule motion type is not supported by some cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/export_camera_settings_dialog.ui" line="51"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="67"/>
         <source>Recording cannot be enabled for some cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/export_camera_settings_dialog.cpp" line="115"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="85"/>
         <source>%n digital license(s) will be used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3641,7 +3641,7 @@ You will be asked to restart the client in compatibility mode.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/export_camera_settings_dialog.cpp" line="117"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="87"/>
         <source>%n analog license(s) will be used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -4160,47 +4160,47 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="452"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="453"/>
         <source>Zoom window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="746"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="747"/>
         <source> (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="752"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="753"/>
         <source> Lo-Res</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="752"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="753"/>
         <source> Hi-Res</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="761"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="762"/>
         <source>	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="763"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="764"/>
         <source>LIVE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="768"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="769"/>
         <source> HW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="768"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="769"/>
         <source> SW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="769"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="770"/>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7%8</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4807,17 +4807,17 @@ Recording Schedule is always based on Server Time.</source>
     <name>QnResourceSelectionDialog</name>
     <message>
         <location filename="../src/ui/dialogs/resource_selection_dialog.ui" line="20"/>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="51"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="52"/>
         <source>Select cameras...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="48"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="49"/>
         <source>Select users...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="54"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="55"/>
         <source>Select resources...</source>
         <translation type="unfinished"></translation>
     </message>

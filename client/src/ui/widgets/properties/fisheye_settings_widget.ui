@@ -20,14 +20,24 @@
       <string>Horizontal mount (camera on the wall)</string>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="verticalRadioButton">
+    <widget class="QRadioButton" name="viewUpButton">
+     <property name="text">
+      <string>Vertical mount (camera on the floor)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="viewDownButton">
      <property name="text">
       <string>Vertical mount (camera on the ceiling)</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

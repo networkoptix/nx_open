@@ -134,6 +134,8 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
 }
 
 QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const {
+    // TODO: rvasilenko, please review
+
     QImage result;
 
     // By now only motion screenshot is supported

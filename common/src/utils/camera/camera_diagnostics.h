@@ -45,7 +45,7 @@ namespace CameraDiagnostics
             mediaServerBadResponse,
             //!params: port
             cannotEstablishConnection,
-            //!params: mediaPort
+            //!params: mediaURL, mediaPort
             cannotOpenCameraMediaPort,
             //!params: mediaPort
             connectionClosedUnexpectedly,
@@ -55,7 +55,7 @@ namespace CameraDiagnostics
             noMediaTrack,
             //!no params
             notAuthorised,
-            //!params: protocolName
+            //!params: mediaURL, protocolName
             unsupportedProtocol,
             //!params: failed param
             cannotConfigureMediaStream,
@@ -115,13 +115,13 @@ namespace CameraDiagnostics
     class CannotOpenCameraMediaPortResult : public Result
     {
     public:
-        CannotOpenCameraMediaPortResult( const int mediaPort ) : Result( ErrorCode::cannotOpenCameraMediaPort, QString::number(mediaPort) ) {}
+        CannotOpenCameraMediaPortResult( const QString& mediaURL, const int mediaPort ) : Result( ErrorCode::cannotOpenCameraMediaPort, mediaURL, QString::number(mediaPort) ) {}
     };
 
     class ConnectionClosedUnexpectedlyResult : public Result
     {
     public:
-        ConnectionClosedUnexpectedlyResult( const int mediaPort ) : Result( ErrorCode::connectionClosedUnexpectedly, QString::number(mediaPort) ) {}
+        ConnectionClosedUnexpectedlyResult( const QString& mediaURL, const int mediaPort ) : Result( ErrorCode::connectionClosedUnexpectedly, mediaURL, QString::number(mediaPort) ) {}
     };
 
     class CameraResponseParseErrorResult : public Result
@@ -145,7 +145,7 @@ namespace CameraDiagnostics
     class UnsupportedProtocolResult : public Result
     {
     public:
-        UnsupportedProtocolResult( const QString& protocolName ) : Result( ErrorCode::unsupportedProtocol, protocolName ) {}
+        UnsupportedProtocolResult( const QString& mediaURL, const QString& protocolName ) : Result( ErrorCode::unsupportedProtocol, mediaURL, protocolName ) {}
     };
 
     class CannotConfigureMediaStreamResult : public Result

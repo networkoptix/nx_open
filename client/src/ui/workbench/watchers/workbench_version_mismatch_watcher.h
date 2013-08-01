@@ -32,9 +32,7 @@ signals:
     bool mismatchDataChanged();
 
 private slots:
-    void at_messageProcessor_connectionClosed();
-    void at_messageProcessor_connectionOpened();
-
+    void updateMismatchData();
     void updateHasMismatches();
 
 private:

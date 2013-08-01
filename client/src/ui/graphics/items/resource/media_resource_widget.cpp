@@ -216,6 +216,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 void QnMediaResourceWidget::at_dewarpingParamsChanged(DewarpingParams params)
 {
     item()->setDewarpingParams(params);
+    item()->setData(Qn::ItemFlipRole, params.viewMode == DewarpingParams::VerticalDown);
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
