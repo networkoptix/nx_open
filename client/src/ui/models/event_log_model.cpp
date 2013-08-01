@@ -19,6 +19,8 @@
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
+QHash<QnId, QnResourcePtr> QnEventLogModel::m_resourcesHash;
+
 class QnEventLogModel::DataIndex
 {
 public:
@@ -220,6 +222,8 @@ QnEventLogModel::QnEventLogModel(QObject *parent):
 {
     m_linkFont.setUnderline(true);
     m_index = new DataIndex();
+
+    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resource_removed(QnResourcePtr)));
 }
 
 QnEventLogModel::~QnEventLogModel() {
@@ -319,16 +323,26 @@ QnResourcePtr QnEventLogModel::getResource(const QModelIndex& idx) const
 
 QnResourcePtr QnEventLogModel::getResourceById(const QnId& id)
 {
-    QnResourcePtr resource = qnResPool->getResourceById(id);
+    if (!id.isValid())
+        return QnResourcePtr();
+
+    QnResourcePtr resource = m_resourcesHash.value(id);
+    if (resource)
+        return resource;
+
+    resource = qnResPool->getResourceById(id);
     if (resource && resource->isDisabled())
     {
         QnServerCameraPtr localCam = resource.dynamicCast<QnServerCamera>();
         if (localCam) {
             localCam = localCam->findEnabledSubling();
             if (localCam)
-                return localCam;
+                resource = localCam;
         }
     }
+    if (resource)
+        m_resourcesHash.insert(id, resource);
+
     return resource;
 }
 
@@ -561,4 +575,9 @@ void QnEventLogModel::rebuild()
 {
     setRowCount(m_index->size());
     reset();
+}
+
+void QnEventLogModel::at_resource_removed(QnResourcePtr res)
+{
+    m_resourcesHash.remove(res->getId());
 }
