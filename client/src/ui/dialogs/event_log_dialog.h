@@ -56,8 +56,6 @@ private:
     QString getTextForNCameras(int n) const;
     QStandardItem* createEventTree(QStandardItem* rootItem, BusinessEventType::Value value);
 
-    bool setEventTypeRecursive(BusinessEventType::Value value, QAbstractItemModel* model, const QModelIndex& parentItem);
-
     void updateHeaderWidth();
     bool isFilterExist() const;
     void requestFinished();
@@ -77,7 +75,11 @@ private:
     Q_DISABLE_COPY(QnEventLogDialog)
 
     QScopedPointer<Ui::EventLogDialog> ui;
+
     QnEventLogModel *m_model;
+    QStandardItemModel *m_eventTypesModel;
+    QStandardItemModel *m_actionTypesModel;
+
     QSet<int> m_requests;
 
     QVector <QnBusinessActionDataListPtr> m_allEvents;
