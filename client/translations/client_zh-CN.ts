@@ -669,6 +669,10 @@
         <source>Camera view angle correction:</source>
         <translation>摄像机视角校正:</translation>
     </message>
+    <message>
+        <source>Vertical mount (camera on the floor)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
@@ -4172,11 +4176,11 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnExportCameraSettingsDialog</name>
     <message>
         <source>Copy schedule...</source>
-        <translation>复制日程...</translation>
+        <translation type="obsolete">复制日程...</translation>
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras</source>
-        <translation>一些摄像机不支持移动侦测录像日程</translation>
+        <translation type="obsolete">一些摄像机不支持移动侦测录像日程</translation>
     </message>
     <message>
         <source>%n license(s) will be used out of %1.</source>
@@ -4184,7 +4188,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras</source>
-        <translation>一些摄像机无法启用录像</translation>
+        <translation type="obsolete">一些摄像机无法启用录像</translation>
     </message>
     <message>
         <source>%1 digital license(s) will be used out of %2.
@@ -4193,7 +4197,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>将需要%1中的%n路数码许可。</numerusform>
         </translation>
     </message>
@@ -4205,7 +4209,30 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
+            <numerusform>将需要%1中的%n路类比许可。</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
+    <message>
+        <source>Schedule motion type is not supported by some cameras</source>
+        <translation type="unfinished">一些摄像机不支持移动侦测录像日程</translation>
+    </message>
+    <message>
+        <source>Recording cannot be enabled for some cameras</source>
+        <translation type="unfinished">一些摄像机无法启用录像</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n digital license(s) will be used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform>将需要%1中的%n路数码许可。</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) will be used out of %1.</source>
+        <translation type="unfinished">
             <numerusform>将需要%1中的%n路类比许可。</numerusform>
         </translation>
     </message>

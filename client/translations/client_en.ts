@@ -168,7 +168,7 @@ It might take a few moments to populate them in the tree.</numerusform>
     <name>QnExportCameraSettingsDialog</name>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%n digital license will be used out of %1.</numerusform>
             <numerusform>%n digital licenses will be used out of %1.</numerusform>
         </translation>
@@ -182,7 +182,24 @@ It might take a few moments to populate them in the tree.</numerusform>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
+            <numerusform>%n analog license will be used out of %1.</numerusform>
+            <numerusform>%n analog licenses will be used out of %1.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
+    <message numerus="yes">
+        <source>%n digital license(s) will be used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform>%n digital license will be used out of %1.</numerusform>
+            <numerusform>%n digital licenses will be used out of %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) will be used out of %1.</source>
+        <translation type="unfinished">
             <numerusform>%n analog license will be used out of %1.</numerusform>
             <numerusform>%n analog licenses will be used out of %1.</numerusform>
         </translation>

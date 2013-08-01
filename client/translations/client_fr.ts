@@ -492,6 +492,10 @@
         <source>Camera view angle correction:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Vertical mount (camera on the floor)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
@@ -3401,26 +3405,51 @@ Vous serez invité à redémarrer le client en mode compatibilité.</translation
     <name>QnExportCameraSettingsDialog</name>
     <message>
         <source>Copy schedule...</source>
-        <translation>Copier l&apos;horaire...</translation>
+        <translation type="obsolete">Copier l&apos;horaire...</translation>
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras</source>
-        <translation>L&apos;horaire de mouvement n&apos;est pas supporté par certaines caméras</translation>
+        <translation type="obsolete">L&apos;horaire de mouvement n&apos;est pas supporté par certaines caméras</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras</source>
-        <translation>L&apos;enregistrement ne peut être activé sur certaines caméras</translation>
+        <translation type="obsolete">L&apos;enregistrement ne peut être activé sur certaines caméras</translation>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%n licence digitale va être utilisée sur %1.</numerusform>
             <numerusform>%n licences digitales vont être utilisée sur %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
+            <numerusform>%n licence analogue va être utilisée sur %1.</numerusform>
+            <numerusform>%n licence analogues vont être utilisée sur %1.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
+    <message>
+        <source>Schedule motion type is not supported by some cameras</source>
+        <translation type="unfinished">L&apos;horaire de mouvement n&apos;est pas supporté par certaines caméras</translation>
+    </message>
+    <message>
+        <source>Recording cannot be enabled for some cameras</source>
+        <translation type="unfinished">L&apos;enregistrement ne peut être activé sur certaines caméras</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n digital license(s) will be used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform>%n licence digitale va être utilisée sur %1.</numerusform>
+            <numerusform>%n licences digitales vont être utilisée sur %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) will be used out of %1.</source>
+        <translation type="unfinished">
             <numerusform>%n licence analogue va être utilisée sur %1.</numerusform>
             <numerusform>%n licence analogues vont être utilisée sur %1.</numerusform>
         </translation>
