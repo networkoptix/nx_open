@@ -105,7 +105,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraAvailability( c
         return CameraDiagnostics::CannotEstablishConnectionResult( cameraRes->httpPort() );
 
     if( cameraRes->initializationAttemptCount() == 0 )  //there was no attempt yet to initialize camera
-        cameraRes->init();  //initializing camera to receive valid initialization result
+        cameraRes->blockingInit();  //initializing camera to receive valid initialization result
 
     return cameraRes->prevInitializationResult();
 }

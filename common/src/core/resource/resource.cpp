@@ -826,13 +826,13 @@ void QnResource::setDisabled(bool disabled)
         emit disabledChanged(toSharedPointer(this));
 }
 
-void QnResource::init()
+bool QnResource::init()
 {
     if (m_appStopping)
-        return;
+        return false;
 
     if (!m_initMutex.tryLock())
-        return; // if init already running, skip new request
+        return false; // if init already running, skip new request
 
     if (!m_initialized) 
     {
@@ -849,6 +849,17 @@ void QnResource::init()
             setStatus(Offline);
     }
     m_initMutex.unlock();
+
+    return true;
+}
+
+void QnResource::blockingInit()
+{
+    if( !init() )
+    {
+        //init is running in another thread, waiting for it to complete...
+        QMutexLocker lk( &m_initMutex );
+    }
 }
 
 void QnResource::initAndEmit()

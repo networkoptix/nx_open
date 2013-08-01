@@ -148,8 +148,16 @@ public:
     virtual void setStatus(Status newStatus, bool silenceMode = false);
     QDateTime getLastStatusUpdateTime() const;
 
-    // this function is called if resourse changes state from offline to online or so 
-    void init();
+    //!this function is called if resourse changes state from offline to online or so 
+    /*!
+        \note If \a QnResource::init is already running in another thread, this method exits immediately and returns false
+        \return true, if initialization attempt is done (with success or failure). false, if \a QnResource::init is already running in other thread
+    */
+    bool init();
+    /*!
+        Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
+    */
+    void blockingInit();
     void initAsync(bool optional);
     CameraDiagnostics::Result prevInitializationResult() const;
     //!Returns counter of resiource initialization attempts (every attempt: successfull or not)
