@@ -404,7 +404,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CameraDiagnosticsAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget).
-        text(tr("Camera Diagnostics...")).
+        text(tr("Check Camera Issues...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
     factory(Qn::OpenBusinessLogAction).
@@ -1024,7 +1024,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CameraIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Camera Diagnostics...")).
+        text(tr("Check Camera Issues...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
