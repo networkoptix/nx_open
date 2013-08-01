@@ -82,21 +82,32 @@ public:
                 errorMessage = tr("Server has been stopped.");
                 break;
             default:
-                errorMessage = tr("Unknown error. Please contact support.");
-                if( !errorParams.isEmpty() )
-                    errorMessage += tr(" Parameters: ");
+            {
+                int nonEmptyParamCount = 0;
                 for( int i = 0; i < errorParams.size(); ++i )
+                {
+                    if( !errorParams[i].isEmpty() )
+                        ++nonEmptyParamCount;
+                    else
+                        break;
+                }
+
+                errorMessage = tr("Unknown error. Please contact support.");
+                if( nonEmptyParamCount )
+                    errorMessage += tr(" Parameters: ");
+                for( int i = 0; i < nonEmptyParamCount; ++i )
                 {
                     if( i > 0 )
                         errorMessage += QLatin1String(", ");
                     errorMessage += errorParams[i];
                 }
                 break;
+            }
         }
 
         requiredParamCount = std::min<int>(requiredParamCount, errorParams.size());
         for( int i = 0; i < requiredParamCount; ++i )
-            errorMessage = errorMessage.arg(errorParams[i]);
+            errorMessage = errorMessage.arg(!errorParams[i].isEmpty() ? errorParams[i] : tr("(unknown)"));
 
         return errorMessage;
     }
@@ -166,10 +177,8 @@ namespace CameraDiagnostics
     :
         errorCode( _errorCode )
     {
-        if( !param1.isEmpty() || !param2.isEmpty() )
-            errorParams.push_back( param1 );
-        if( !param2.isEmpty() )
-            errorParams.push_back( param2 );
+        errorParams.push_back(param1);
+        errorParams.push_back(param2);
     }
 
     QString Result::toString() const
