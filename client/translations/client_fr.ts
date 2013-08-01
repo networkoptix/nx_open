@@ -2088,7 +2088,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do Instantly</source>
+        <source>Instant</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2244,7 +2244,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">Non appliqué</translation>
     </message>
     <message>
-        <source>do instantly</source>
+        <source>Instant</source>
         <translation type="obsolete">Faire instantanément</translation>
     </message>
     <message numerus="yes">
@@ -4194,7 +4194,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
 <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-        <source>Show for Administrators only</source>
+        <source>Show to Administrators only</source>
         <translation>Afficher aux Administrateurs seulement</translation>
     </message>
     <message>

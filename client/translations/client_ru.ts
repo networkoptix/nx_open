@@ -2407,7 +2407,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="91"/>
-        <source>Do Instantly</source>
+        <source>Instant</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4526,7 +4526,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <name>QnPopupBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui" line="23"/>
-        <source>Show for Administrators only</source>
+        <source>Show to Administrators only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

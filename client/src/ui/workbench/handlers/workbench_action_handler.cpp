@@ -681,7 +681,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
-        QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
+        QString message = tr(" Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
         int button = QMessageBox::warning(mainWindow(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry) {
             cameraSettingsDialog()->ignoreAcceptOnce();
@@ -714,7 +714,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
 
     QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
     if (!helper.isValid()) {
-        QString message = tr("Licenses limit exceeded. Your changes will be saved, but will not take effect.");
+        QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
         QMessageBox::warning(mainWindow(), tr("Could not apply changes"), message);
         cameraSettingsDialog()->widget()->setScheduleEnabled(false);
     }

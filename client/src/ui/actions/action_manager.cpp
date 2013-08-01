@@ -661,7 +661,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ShowcaseAction).
         flags(Qn::Main).
-        text(tr("Showcase...")).
+        text(tr("How-to Videos & FAQ...")).
         condition(new QnShowcaseActionCondition(this));
 
     factory(Qn::CheckForUpdatesAction).

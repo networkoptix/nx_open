@@ -48,7 +48,7 @@
         <item row="0" column="1">
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Warning! Please read documentation before change these settings!</string>
+           <string>Warning! Please read documentation prior to change these settings!</string>
           </property>
          </widget>
         </item>
@@ -75,14 +75,14 @@
         <item row="0" column="0">
          <widget class="QCheckBox" name="checkBoxDisableControl">
           <property name="text">
-           <string>Keep camera streams settings</string>
+           <string>Keep camera streams' and profiles' settings</string>
           </property>
          </widget>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Warning! In this case FPS/Quality settings in Recording Schedule will not work!</string>
+           <string>Warning! FPS/Quality settings in Recording Schedule will not work!</string>
           </property>
          </widget>
         </item>
@@ -246,7 +246,7 @@
       <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Warning! Low quality may result in crappy picture, high stream may overload Media Server's CPU or network connection</string>
+         <string>Warning! Low quality may result in low resolution image. High quality may result in Media Server’s CPU overload and network connection errors.</string>
         </property>
        </widget>
       </item>
@@ -275,7 +275,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Your combined cameras with and without dual streaming. Stream quality control is disabled</string>
+         <string>Combined cameras with and without dual streaming. Stream quality control is disabled</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

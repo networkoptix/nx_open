@@ -88,7 +88,7 @@
    <item>
     <widget class="QLabel" name="instantLabel">
      <property name="text">
-      <string>Do Instantly</string>
+      <string>Instant</string>
      </property>
     </widget>
    </item>

@@ -20,7 +20,7 @@
    <item>
     <widget class="QCheckBox" name="adminsCheckBox">
      <property name="text">
-      <string>Show for Administrators only</string>
+      <string>Show to Administrators only</string>
      </property>
     </widget>
    </item>

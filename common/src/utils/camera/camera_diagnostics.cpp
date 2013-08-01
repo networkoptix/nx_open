@@ -42,7 +42,7 @@ public:
                 break;
             case connectionClosedUnexpectedly:
                 requiredParamCount = 1;
-                errorMessage = tr("Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.");
+                errorMessage = tr("Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot the camera.");
                 break;
             case responseParseError:
                 errorMessage = tr("Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page."
@@ -76,7 +76,7 @@ public:
                 break;
             case ioError:
                 requiredParamCount = 1;
-                errorMessage = tr("I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera.");
+                errorMessage = tr("I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot the camera.");
                 break;
             case serverTerminated:
                 errorMessage = tr("Server has been stopped.");
