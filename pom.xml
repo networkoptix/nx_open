@@ -42,9 +42,9 @@
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
         <dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
-        <sigar.version>1.6-SNAPSHOT</sigar.version>
+        <sigar.version>1.7-SNAPSHOT</sigar.version>
         <festival.version>2.1-SNAPSHOT</festival.version>
-        <boost.version>1.51.0</boost.version>
+        <boost.version>1.54-SNAPSHOT</boost.version>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
         <customization>default</customization>
@@ -175,7 +175,7 @@
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
-                <compiler>msvc2012</compiler>
+                <compiler>msvc2012u3</compiler>
                 <arch>x86</arch>
                 <platform>windows</platform>
             </properties>

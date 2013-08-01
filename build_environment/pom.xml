@@ -54,7 +54,7 @@
 			<artifactId>festival</artifactId>
 			<version>${festival.version}</version>
 			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
+			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>                               	
 		<dependency>
 			<groupId>org.festival</groupId>
@@ -251,7 +251,7 @@
 				<dependency>
 					<groupId>org.boost</groupId>
 					<artifactId>boost</artifactId>
-					<version>1.53-SNAPSHOT</version>
+					<version>1.54-SNAPSHOT</version>
 					<type>zip</type>
 					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>
@@ -288,7 +288,7 @@
 					<artifactId>qtcolorpicker</artifactId>
 					<version>2.6.1-SNAPSHOT</version>
 					<type>zip</type>
-					<classifier>${platform}-${arch}</classifier>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>              
 				<dependency>
 					<groupId>com.microsoft.directx</groupId>
@@ -328,7 +328,7 @@
 				<dependency>
 					<groupId>net.sourceforge</groupId>
 					<artifactId>qjson</artifactId>
-					<version>0.7.1-SNAPSHOT</version>
+					<version>0.8.1-SNAPSHOT</version>
 					<type>zip</type>
 					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>
