@@ -38,37 +38,38 @@ public:
                 break;
             case cannotOpenCameraMediaPort:
                 requiredParamCount = 2;
-                errorMessage = tr("Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.");
+                errorMessage = tr("Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). "
+                    "Please try to reboot the camera, then restore factory defaults on the web-page.");
                 break;
             case connectionClosedUnexpectedly:
                 requiredParamCount = 2;
                 errorMessage = tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.");
                 break;
             case responseParseError:
-                errorMessage = tr("Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page."
-                    " If the problem persists, contact support");
+                errorMessage = tr("Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support");
                 break;
             case noMediaTrack:
-                errorMessage = tr("No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page."
-                    " If the problem persists, contact support");
+                errorMessage = tr("No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support");
                 break;
             case notAuthorised:
                 errorMessage = tr("Not authorized.");
                 break;
             case unsupportedProtocol:
                 requiredParamCount = 2;
-                errorMessage = tr("Cannot open media url %1. Unsupported media protocol %2. "
-                    "Please try to restore factory defaults on the web-page. If the problem persists, contact support.");
+                errorMessage = tr("Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support.");
                 break;
             case cannotConfigureMediaStream:
                 requiredParamCount = 1;
-                errorMessage = tr("Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page."
-                    " If the problem persists, contact support.");
+                errorMessage = tr("Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support.");
                 break;
             case requestFailed:
                 requiredParamCount = 2;
-                errorMessage = tr("Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page."
-                    " If the problem persists, contact support.");
+                errorMessage = tr("Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support.");
                 break;
             case notImplemented:
                 requiredParamCount = 0;
