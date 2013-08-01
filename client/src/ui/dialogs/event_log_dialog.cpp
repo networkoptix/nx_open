@@ -304,7 +304,7 @@ void QnEventLogDialog::updateHeaderWidth()
         }
         else {
             while (spaceIdx >= 0) {
-                w = qMax(w, fm.size(0, targetText.mid(prevPos, spaceIdx - prevPos)).width());
+                cache << targetText.mid(prevPos, spaceIdx - prevPos);
                 prevPos = spaceIdx;
                 spaceIdx = targetText.indexOf(L' ', spaceIdx+1);
             }
