@@ -40,7 +40,7 @@ public:
 
     Recorders findRecorders(QnResourcePtr res) const;
 
-    bool startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+    bool startForcedRecording(QnSecurityCamResourcePtr camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
 
     bool stopForcedRecording(QnSecurityCamResourcePtr camRes, bool afterThresholdCheck = true);
 

@@ -153,21 +153,27 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     settingsButton->setToolTip(tr("Settings..."));
     settingsButton->setFixedSize(buttonSize);
     settingsButton->setCached(true);
-    connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
+    connect(settingsButton,   SIGNAL(clicked()),
+            this->context()->action(Qn::BusinessEventsAction), SIGNAL(triggered()));
+//    connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 
     QnImageButtonWidget *filterButton = new QnImageButtonWidget(m_headerWidget);
     filterButton->setIcon(qnSkin->icon("events/filter.png"));
     filterButton->setToolTip(tr("Filter..."));
     filterButton->setFixedSize(buttonSize);
     filterButton->setCached(true);
-    connect(filterButton, SIGNAL(clicked()), this, SLOT(at_filterButton_clicked()));
+    connect(filterButton,   SIGNAL(clicked()),
+            this->context()->action(Qn::PreferencesNotificationTabAction), SIGNAL(triggered()));
+    //connect(filterButton, SIGNAL(clicked()), this, SLOT(at_filterButton_clicked()));
 
     QnImageButtonWidget *eventLogButton = new QnImageButtonWidget(m_headerWidget);
     eventLogButton->setIcon(qnSkin->icon("events/log.png"));
     eventLogButton->setToolTip(tr("Event Log"));
     eventLogButton->setFixedSize(buttonSize);
     eventLogButton->setCached(true);
-    connect(eventLogButton, SIGNAL(clicked()), this, SLOT(at_eventLogButton_clicked()));
+    connect(eventLogButton,   SIGNAL(clicked()),
+            this->context()->action(Qn::BusinessEventsLogAction), SIGNAL(triggered()));
+    //connect(eventLogButton, SIGNAL(clicked()), this, SLOT(at_eventLogButton_clicked()));
 
     QnImageButtonWidget *debugButton = NULL;
     if(qnSettings->isDevMode()) {
@@ -516,6 +522,8 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
             break;
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::StoragesAreFull:
+            if (!sampleServer)
+                continue;
             resource = sampleServer;
             break;
         default:
@@ -533,37 +541,48 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         params.setEventTimestamp((quint64)QDateTime::currentMSecsSinceEpoch() * 1000ull);
         switch(eventType) {
         case BusinessEventType::Camera_Motion: {
+                if (!sampleCamera)
+                    continue;
                 params.setEventResourceId(sampleCamera->getId());
-
                 break;
             }
 
         case BusinessEventType::Camera_Input: {
+                if (!sampleCamera)
+                    continue;
                 params.setEventResourceId(sampleCamera->getId());
                 params.setInputPortId(lit("01"));
                 break;
             }
 
         case BusinessEventType::Camera_Disconnect: {
+                if (!sampleCamera)
+                    continue;
                 params.setEventResourceId(sampleCamera->getId());
                 break;
             }
 
-        case BusinessEventType::Network_Issue:{
+        case BusinessEventType::Network_Issue: {
+                if (!sampleCamera)
+                    continue;
                 params.setEventResourceId(sampleCamera->getId());
                 params.setReasonCode(QnBusiness::NetworkIssueNoFrame);
                 params.setReasonText(lit("15"));
                 break;
             }
 
-        case BusinessEventType::Storage_Failure:{
+        case BusinessEventType::Storage_Failure: {
+                if (!sampleServer)
+                    continue;
                 params.setEventResourceId(sampleServer->getId());
                 params.setReasonCode(QnBusiness::StorageIssueNotEnoughSpeed);
                 params.setReasonText(lit("C: E:"));
                 break;
             }
 
-        case BusinessEventType::Camera_Ip_Conflict:{
+        case BusinessEventType::Camera_Ip_Conflict: {
+                if (!sampleServer)
+                    continue;
                 params.setEventResourceId(sampleServer->getId());
                 params.setSource(lit("192.168.0.5"));
 
@@ -577,13 +596,17 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                 params.setConflicts(conflicts);
                 break;
             }
-        case BusinessEventType::MediaServer_Failure:{
+        case BusinessEventType::MediaServer_Failure: {
+                if (!sampleServer)
+                    continue;
                 params.setEventResourceId(sampleServer->getId());
                 params.setReasonCode(QnBusiness::MServerIssueTerminated);
                 break;
             }
 
         case BusinessEventType::MediaServer_Conflict: {
+                if (!sampleServer)
+                    continue;
                 params.setEventResourceId(sampleServer->getId());
                 params.setSource(lit("10.0.2.187"));
 

@@ -121,7 +121,7 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStream()
     if (!m_tcpSock.connect(url.host(), url.port()))
     {
         closeStream();
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.port());
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), url.port());
     }
     QByteArray path = urlStr.mid(urlStr.lastIndexOf(QLatin1String("/"))).toUtf8();
     m_tcpSock.send(path.data(), path.size());

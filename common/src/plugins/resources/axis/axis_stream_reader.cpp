@@ -25,21 +25,21 @@ QnAxisStreamReader::~QnAxisStreamReader()
     stop();
 }
 
-int QnAxisStreamReader::toAxisQuality(QnStreamQuality quality)
+int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
 {
     switch(quality)
     {
-        case QnQualityLowest:
+        case Qn::QualityLowest:
             return 50;
-        case QnQualityLow:
+        case Qn::QualityLow:
             return 50;
-        case QnQualityNormal:
+        case Qn::QualityNormal:
             return 30;
-        case QnQualityHigh:
+        case Qn::QualityHigh:
             return 20;
-        case QnQualityHighest:
+        case Qn::QualityHighest:
             return 15;
-        case QnQualityPreSet:
+        case Qn::QualityPreSet:
             return -1;
     }
     return -1;
@@ -141,7 +141,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
     }
     if (resolution.size.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
-    QnStreamQuality quality = getQuality();
+    Qn::StreamQuality quality = getQuality();
 
     QByteArray paramsStr;
     paramsStr.append("videocodec=h264");
@@ -149,7 +149,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
         paramsStr.append("&resolution=").append(resolution.resolutionStr);
     //paramsStr.append("&text=0"); // do not use onscreen text message (fps e.t.c)
     paramsStr.append("&fps=").append(QByteArray::number(fps));
-    if (quality != QnQualityPreSet)
+    if (quality != Qn::QualityPreSet)
         paramsStr.append("&compression=").append(QByteArray::number(toAxisQuality(quality)));
     paramsStr.append("&audio=").append(res->isAudioEnabled() ? "1" : "0");
 

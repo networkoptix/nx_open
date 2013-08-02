@@ -4,6 +4,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <QtCore/QMultiMap>
+#include <QtCore/QImage>
 
 #include <core/resource/resource_fwd.h>
 
@@ -119,6 +120,7 @@ public slots:
 
     void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
     void at_businessRuleDeleted(int id);
+    void at_businessRuleReset(QnBusinessEventRuleList rules);
 protected slots:
     /*
     * Execute action physically. Return true if action success executed
@@ -134,6 +136,8 @@ private slots:
 
 
 protected:
+    virtual QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const;
+    
     bool containResource(QnResourceList resList, const QnId& resId) const;
     QnAbstractBusinessActionList matchActions(QnAbstractBusinessEventPtr bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
@@ -146,9 +150,7 @@ protected:
     void terminateRunningRule(QnBusinessEventRulePtr rule);
 
 private:
-    QList<QnBusinessEventRulePtr> m_rules;
-    //QnBusinessMessageBus m_messageBus;
-    static QnBusinessRuleProcessor* m_instance;
+    void at_businessRuleChanged_i(QnBusinessEventRulePtr bRule);
 
     bool sendMail(const QnSendMailBusinessActionPtr& action );
 
@@ -156,6 +158,11 @@ private:
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     bool checkRuleCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
     QString formatEmailList(const QStringList& value);
+
+private:
+    QList<QnBusinessEventRulePtr> m_rules;
+    //QnBusinessMessageBus m_messageBus;
+    static QnBusinessRuleProcessor* m_instance;
 
     struct RunningRuleInfo
     {

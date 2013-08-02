@@ -44,6 +44,7 @@ void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::Camera
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
+void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules);
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
 void parseBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const pb::BusinessActionList& pb_businessActionList);
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
@@ -124,7 +125,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
 
     vCamera->setGroupId(QString::fromUtf8(pb_camera.groupid().c_str()));
     vCamera->setGroupName(QString::fromUtf8(pb_camera.groupname().c_str()));
-    vCamera->setSecondaryStreamQuality(static_cast<QnSecondaryStreamQuality>(pb_camera.secondaryquality()));
+    vCamera->setSecondaryStreamQuality(static_cast<Qn::SecondStreamQuality>(pb_camera.secondaryquality()));
     vCamera->setCameraControlDisabled(pb_camera.controldisabled());
     vCamera->setStatusFlags((QnSecurityCamResource::StatusFlags) pb_camera.statusflags());
     vCamera->setDewarpingParams(DewarpingParams::deserialize(pb_camera.dewarpingparams().c_str()));
@@ -155,7 +156,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
                                         (Qn::RecordingType) pb_scheduleTask.recordtype(),
                                         pb_scheduleTask.beforethreshold(),
                                         pb_scheduleTask.afterthreshold(),
-                                        (QnStreamQuality) pb_scheduleTask.streamquality(),
+                                        (Qn::StreamQuality) pb_scheduleTask.streamquality(),
                                         pb_scheduleTask.fps(),
                                         pb_scheduleTask.dorecordaudio()
                                        );
@@ -394,17 +395,6 @@ void parseSettings(QnKvPairList& kvPairs, const PbSettingList& pb_settings)
     }
 }
 
-
-void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules) {
-    for (PbBusinessRuleList::const_iterator ci = pb_businessRules.begin(); ci != pb_businessRules.end(); ++ci)
-    {
-        const pb::BusinessRule& pb_businessRule = *ci;
-
-        QnBusinessEventRulePtr businessRule;
-        parseBusinessRule(businessRule, pb_businessRule);
-        businessRules.append(businessRule);
-    }
-}
 } // namespace {}
 
 void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraResourcePtr& cameraPtr)
@@ -975,7 +965,7 @@ void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRulePtr &busi
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data)
+void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, const QnEmailAttachmentList& attachments, int timeout, QByteArray& data)
 {
     pb::Emails pb_emails;
     pb_emails.set_timeout(timeout);
@@ -987,6 +977,13 @@ void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& sub
 
     email.set_subject(subject.toUtf8().constData());
     email.set_body(message.toUtf8().constData());
+
+    foreach (QnEmailAttachmentPtr attachment, attachments) {
+        pb::Attachment& pb_attachment = *email.add_attachment();
+        pb_attachment.set_filename(attachment->filename.toUtf8().constData());
+        pb_attachment.set_content(attachment->content.data(), attachment->content.length());
+        pb_attachment.set_mimetype(attachment->mimetype.toUtf8().constData());
+    }
 
     std::string str;
     pb_emails.SerializeToString(&str);
@@ -1195,6 +1192,17 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
     businessRule->setComments(QString::fromUtf8(pb_businessRule.comments().c_str()));
     businessRule->setSchedule(QString::fromUtf8(pb_businessRule.schedule().c_str()));
     businessRule->setSystem(pb_businessRule.system());
+}
+
+void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules) {
+    for (PbBusinessRuleList::const_iterator ci = pb_businessRules.begin(); ci != pb_businessRules.end(); ++ci)
+    {
+        const pb::BusinessRule& pb_businessRule = *ci;
+
+        QnBusinessEventRulePtr businessRule;
+        parseBusinessRule(businessRule, pb_businessRule);
+        businessRules.append(businessRule);
+    }
 }
 
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction)

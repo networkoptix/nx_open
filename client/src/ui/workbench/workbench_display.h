@@ -380,6 +380,7 @@ protected slots:
     void at_item_geometryDeltaChanged();
     void at_item_zoomRectChanged();
     void at_item_rotationChanged();
+    void at_item_dataChanged(int role);
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
     void at_curtainActivityInstrument_activityStopped();
@@ -424,7 +425,7 @@ private:
     QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;
 
     /** Renderer to widget mapping. */
-    QHash<QnAbstractRenderer *, QnResourceWidget *> m_widgetByRenderer;
+    QHash<QnAbstractRenderer *, QnResourceWidget *> m_widgetByRenderer; // TODO: #Elric not used anymore?
 
     /** Resource to widget mapping. */
     QHash<QnResourcePtr, QList<QnResourceWidget *> > m_widgetsByResource;

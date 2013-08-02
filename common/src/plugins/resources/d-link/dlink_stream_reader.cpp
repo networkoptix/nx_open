@@ -215,23 +215,23 @@ QString PlDlinkStreamReader::getQualityString() const
         int q;
         switch (getQuality())
         {
-        case QnQualityHighest:
+        case Qn::QualityHighest:
             q = 90;
             break;
 
-        case QnQualityHigh:
+        case Qn::QualityHigh:
             q = 80;
             break;
 
-        case QnQualityNormal:
+        case Qn::QualityNormal:
             q = 70;
             break;
 
-        case QnQualityLow:
+        case Qn::QualityLow:
             q = 50;
             break;
 
-        case QnQualityLowest:
+        case Qn::QualityLowest:
             q = 40;
             break;
 
@@ -241,7 +241,7 @@ QString PlDlinkStreamReader::getQualityString() const
         }
         return QString::number(q);
     }
-    int qualityIndex = scaleInt((int) getQuality(), QnQualityHighest-QnQualityLowest+1, info.possibleQualities.size());
+    int qualityIndex = scaleInt((int) getQuality(), Qn::QualityHighest-Qn::QualityLowest+1, info.possibleQualities.size());
     if (isTextQualities(info.possibleQualities))
         qualityIndex = info.possibleQualities.size()-1 - qualityIndex; // index 0 is best quality if quality is text
     return info.possibleQualities[qualityIndex];

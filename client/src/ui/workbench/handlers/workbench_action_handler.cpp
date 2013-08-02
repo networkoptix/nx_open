@@ -49,7 +49,6 @@
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/login_dialog.h>
-#include <ui/dialogs/tags_edit_dialog.h>
 #include <ui/dialogs/server_settings_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/camera_settings_dialog.h>
@@ -248,7 +247,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
+    connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
     connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
+    connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
@@ -261,7 +262,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenSingleLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenMultipleLayoutsAction),              SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
-    connect(action(Qn::OpenNewWindowLayoutsAction),             SIGNAL(triggered()),    this,   SLOT(at_openNewWindowLayoutsAction_triggered()));
+    connect(action(Qn::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
+    connect(action(Qn::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(Qn::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
@@ -274,6 +276,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
+    connect(action(Qn::CameraBusinessRulesAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(Qn::CameraDiagnosticsAction),                SIGNAL(triggered()),    this,   SLOT(at_cameraDiagnosticsAction_triggered()));
     connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
     connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
@@ -286,7 +289,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
     connect(action(Qn::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
     connect(action(Qn::YouTubeUploadAction),                    SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
-    connect(action(Qn::EditTagsAction),                         SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
     connect(action(Qn::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
     connect(action(Qn::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
     connect(action(Qn::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
@@ -677,7 +679,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
-        QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
+        QString message = tr(" Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
         int button = QMessageBox::warning(mainWindow(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry) {
             cameraSettingsDialog()->ignoreAcceptOnce();
@@ -710,7 +712,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
 
     QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
     if (!helper.isValid()) {
-        QString message = tr("Licenses limit exceeded. Your changes will be saved, but will not take effect.");
+        QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
         QMessageBox::warning(mainWindow(), tr("Could not apply changes"), message);
         cameraSettingsDialog()->widget()->setScheduleEnabled(false);
     }
@@ -1113,12 +1115,16 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
     }
 }
 
-void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
+void QnWorkbenchActionHandler::at_openLayoutsInNewWindowAction_triggered() {
     // TODO: #GDM this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
     QnLayoutResourceList layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
     if(layouts.isEmpty())
         return;
     openResourcesInNewWindow(layouts);
+}
+
+void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered() {
+    menu()->trigger(Qn::OpenLayoutsInNewWindowAction, workbench()->currentLayout()->resource());
 }
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
@@ -1603,7 +1609,7 @@ void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {
-    QDesktopServices::openUrl(QUrl(QLatin1String(QN_SHOWCASE_URL), QUrl::TolerantMode));
+    QDesktopServices::openUrl(qnSettings->showcaseUrl());
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
@@ -1640,11 +1646,26 @@ void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
+    menu()->trigger(Qn::OpenBusinessRulesAction);
+}
+
+void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
     bool newlyCreated = false;
     if(!businessRulesDialog()) {
         m_businessRulesDialog = new QnBusinessRulesDialog(mainWindow());
         newlyCreated = true;
     }
+
+    QString filter;
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnVirtualCameraResourceList cameras = parameters.resources().filtered<QnVirtualCameraResource>();
+    if (!cameras.isEmpty()) {
+        foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+            filter += camera->getPhysicalId(); //getUniqueId() cannot be used here --gdm
+        }
+    }
+    businessRulesDialog()->setFilter(filter);
+
     QRect oldGeometry = businessRulesDialog()->geometry();
     businessRulesDialog()->show();
     businessRulesDialog()->raise();
@@ -1661,11 +1682,32 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
+    menu()->trigger(Qn::OpenBusinessLogAction);
+}
+
+void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
     bool newlyCreated = false;
     if(!businessEventsLogDialog()) {
         m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
         newlyCreated = true;
     }
+
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    BusinessEventType::Value eventType = parameters.argument(Qn::EventTypeRole, BusinessEventType::AnyBusinessEvent);
+    QnVirtualCameraResourceList cameras = parameters.resources().filtered<QnVirtualCameraResource>();
+
+    // show diagnostics if Issues action was triggered
+    if (eventType != BusinessEventType::AnyBusinessEvent || !cameras.isEmpty()) {
+        businessEventsLogDialog()->disableUpdateData();
+        businessEventsLogDialog()->setEventType(eventType);
+        businessEventsLogDialog()->setActionType(BusinessActionType::Diagnostics);
+        QDate date = QDateTime::currentDateTime().date();
+        businessEventsLogDialog()->setDateRange(date, date);
+        businessEventsLogDialog()->setCameraList(cameras);
+        businessEventsLogDialog()->enableUpdateData();
+    }
+
     QRect oldGeometry = businessEventsLogDialog()->geometry();
     businessEventsLogDialog()->show();
     businessEventsLogDialog()->raise();
@@ -1865,16 +1907,6 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     qnSettings->setStoredPassword(QString());
 }
 
-void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
-    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
-    if(!resource)
-        return;
-
-    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resource->getUniqueId(), mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
 void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
@@ -2053,7 +2085,8 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         connect(cameraSettingsDialog(), SIGNAL(rejected()),                                             this, SLOT(at_cameraSettingsDialog_rejected()));
         connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                               this, SLOT(at_cameraSettingsDialog_advancedSettingChanged()));
         connect(cameraSettingsDialog(), SIGNAL(cameraOpenRequested()),                                  this, SLOT(at_cameraSettingsDialog_cameraOpenRequested()));
-        connect(cameraSettingsDialog(), SIGNAL(cameraDiagnosticsRequested()),                           this, SLOT(at_cameraSettingsDialog_cameraDiagnosticsRequested()));
+        connect(cameraSettingsDialog(), SIGNAL(cameraIssuesRequested()),                                this, SLOT(at_cameraSettingsDialog_cameraIssuesRequested()));
+        connect(cameraSettingsDialog(), SIGNAL(cameraRulesRequested()),                                 this, SLOT(at_cameraSettingsDialog_cameraRulesRequested()));
     }
 
     if(cameraSettingsDialog()->widget()->resources() != resources) {
@@ -2082,25 +2115,14 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
 {
-    bool newlyCreated = false;
-    if(!businessEventsLogDialog()) {
-        m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
-        newlyCreated = true;
-    }
+    menu()->trigger(Qn::OpenBusinessLogAction,
+                    menu()->currentParameters(sender())
+                    .withArgument(Qn::EventTypeRole, BusinessEventType::AnyCameraIssue));
+}
 
-    businessEventsLogDialog()->disableUpdateData();
-    businessEventsLogDialog()->setEventType(BusinessEventType::AnyCameraIssue);
-    businessEventsLogDialog()->setActionType(BusinessActionType::NotDefined);
-    QDate date = QDateTime::currentDateTime().date();
-    businessEventsLogDialog()->setDateRange(date, date);
-    businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());
-    businessEventsLogDialog()->enableUpdateData();
-
-    QRect oldGeometry = businessEventsLogDialog()->geometry();
-    businessEventsLogDialog()->show();
-    businessEventsLogDialog()->raise();
-    if(!newlyCreated)
-        businessEventsLogDialog()->setGeometry(oldGeometry);
+void QnWorkbenchActionHandler::at_cameraBusinessRulesAction_triggered() {
+    menu()->trigger(Qn::OpenBusinessRulesAction,
+                    menu()->currentParameters(sender()));
 }
 
 void QnWorkbenchActionHandler::at_cameraDiagnosticsAction_triggered() {
@@ -2141,9 +2163,17 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraOpenRequested() {
     m_selectionUpdatePending = false;
 }
 
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraDiagnosticsRequested() {
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraIssuesRequested() {
     QnResourceList resources = cameraSettingsDialog()->widget()->resources();
     menu()->trigger(Qn::CameraIssuesAction, resources);
+
+    cameraSettingsDialog()->widget()->setResources(resources);
+    m_selectionUpdatePending = false;
+}
+
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraRulesRequested() {
+    QnResourceList resources = cameraSettingsDialog()->widget()->resources();
+    menu()->trigger(Qn::CameraBusinessRulesAction, resources);
 
     cameraSettingsDialog()->widget()->setResources(resources);
     m_selectionUpdatePending = false;
@@ -2232,24 +2262,8 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
-    bool newlyCreated = false;
-    if(!businessEventsLogDialog()) {
-        m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
-        newlyCreated = true;
-    }
-
-    businessEventsLogDialog()->disableUpdateData();
-    businessEventsLogDialog()->setEventType(BusinessEventType::AnyServerIssue);
-    QDate date = QDateTime::currentDateTime().date();
-    businessEventsLogDialog()->setDateRange(date, date);
-    businessEventsLogDialog()->setCameraList(menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>());
-    businessEventsLogDialog()->enableUpdateData();
-
-    QRect oldGeometry = businessEventsLogDialog()->geometry();
-    businessEventsLogDialog()->show();
-    businessEventsLogDialog()->raise();
-    if(!newlyCreated)
-        businessEventsLogDialog()->setGeometry(oldGeometry);
+    menu()->trigger(Qn::OpenBusinessLogAction,
+                    QnActionParameters().withArgument(Qn::EventTypeRole, BusinessEventType::AnyServerIssue));
 }
 
 void QnWorkbenchActionHandler::at_pingAction_triggered() {
@@ -2261,7 +2275,7 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     QString cmd = QLatin1String("cmd /C ping %1 -t");
 #else
     QString cmd = QLatin1String("xterm -e ping %1");
-#endif //TODO: #GDM MacOS ping?
+#endif //TODO: #ivan MacOS ping?
     QUrl url = QUrl::fromUserInput(resource->getUrl());
     QString host = url.host();
     QProcess::startDetached(cmd.arg(host));
@@ -2846,6 +2860,11 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(true);
     exportProgressDialog->show();
+
+    QPushButton *openNewWindowButton = new QPushButton(tr("Open New Window"));
+    exportProgressDialog->addButton(openNewWindowButton, QDialogButtonBox::HelpRole);
+    connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
+
     m_exportProgressDialog = exportProgressDialog;
 
     if (!m_layoutExportCamera)
@@ -3363,6 +3382,11 @@ Do you want to continue?"),
         exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
         exportProgressDialog->setRange(0, 100);
         exportProgressDialog->setMinimumDuration(1000);
+
+        QPushButton *openNewWindowButton = new QPushButton(tr("Open New Window"));
+        exportProgressDialog->addButton(openNewWindowButton, QDialogButtonBox::HelpRole);
+        connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
+
         m_exportProgressDialog = exportProgressDialog;
 
         m_exportedCamera = widget->display()->camera();

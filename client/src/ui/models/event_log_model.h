@@ -62,11 +62,14 @@ private:
     static QnResourcePtr getResourceById(const QnId& id);
     static QString getResourceNameString(QnId id);
     static QString getUserGroupString(QnBusinessActionParameters::UserGroup value);
+private slots:
+    void at_resource_removed(QnResourcePtr res);
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
     QFont m_linkFont;
     DataIndex* m_index;
+    static QHash<QnId, QnResourcePtr> m_resourcesHash;
 };
 
 #endif // QN_EVENT_LOG_MODEL_H

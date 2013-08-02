@@ -12,29 +12,35 @@ class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 
-// TODO: #Elric rename
-enum QnStreamQuality {
-    QnQualityLowest,
-    QnQualityLow,
-    QnQualityNormal,
-    QnQualityHigh,
-    QnQualityHighest,
-    QnQualityPreSet,
-    QnQualityNotDefined
-};
+namespace Qn {
 
-// TODO: #Elric rename
-enum QnSecondaryStreamQuality 
-{ 
-    SSQualityLow, 
-    SSQualityMedium, 
-    SSQualityHigh, 
-    SSQualityNotDefined
-};
+    enum StreamQuality {
+        QualityLowest,
+        QualityLow,
+        QualityNormal,
+        QualityHigh,
+        QualityHighest,
+        QualityPreSet,
+        QualityNotDefined
+    };
 
-QString QnStreamQualityToDisplayString(QnStreamQuality value);
-QString QnStreamQualityToShortDisplayString(QnStreamQuality value);
-QnStreamQuality QnStreamQualityFromString( const QString& str );
+    enum SecondStreamQuality { 
+        SSQualityLow, 
+        SSQualityMedium, 
+        SSQualityHigh, 
+        SSQualityNotDefined
+    };
+
+    QString toDisplayString(Qn::StreamQuality value);
+    QString toShortDisplayString(Qn::StreamQuality value);
+
+    // TODO: #Elric move out as generic interface
+    template<class Enum> Enum fromString(const QString &string);
+    template<class Enum> QString toString(Enum value);
+
+    template<> Qn::StreamQuality fromString<Qn::StreamQuality>(const QString &string);
+    template<> QString toString<Qn::StreamQuality>(Qn::StreamQuality value);
+}
 
 /*!
     \note Derived class MUST call \a initMediaResource() just after object instanciation
@@ -42,16 +48,15 @@ QnStreamQuality QnStreamQualityFromString( const QString& str );
 class QnMediaResource
 {
 public:
-
     QnMediaResource();
     virtual ~QnMediaResource();
 
     // size - is size of one channel; we assume all channels have the same size
-    virtual QnStreamQuality getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const { return QnQualityNormal; }
+    virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const { return Qn::QualityNormal; }
 
     // returns one image best for such time
     // in case of live video time should be ignored
-    virtual QImage getImage(int channel, QDateTime time, QnStreamQuality quality) const;
+    virtual QImage getImage(int channel, QDateTime time, Qn::StreamQuality quality) const;
 
     // resource can use DataProvider for addition info (optional)
     virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0);

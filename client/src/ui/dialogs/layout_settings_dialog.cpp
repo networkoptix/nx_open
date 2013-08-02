@@ -474,6 +474,7 @@ void QnLayoutSettingsDialog::selectFile() {
 
     QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Open file")));
     dialog->setFileMode(QFileDialog::ExistingFile);
+    dialog->setDirectory(qnSettings->backgroundsFolder());
 
     QString nameFilter;
     foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
@@ -490,6 +491,7 @@ void QnLayoutSettingsDialog::selectFile() {
     QStringList files = dialog->selectedFiles();
     if (files.size() < 0)
         return;
+    qnSettings->setBackgroundsFolder(dialog->directory().absolutePath());
 
     d->clear();
     d->imageSourcePath = files[0];

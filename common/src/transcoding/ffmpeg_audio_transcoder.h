@@ -1,11 +1,14 @@
 #ifndef __FFMPEG_AUDIO_TRANSCODER_H__
 #define __FFMPEG_AUDIO_TRANSCODER_H__
 
+#include <QCoreApplication>
+
 #include "transcoder.h"
 #include "utils/common/byte_array.h"
 
 class QnFfmpegAudioTranscoder: public QnAudioTranscoder
 {
+    Q_DECLARE_TR_FUNCTIONS(QnFfmpegAudioTranscoder)
 public:
     QnFfmpegAudioTranscoder(CodecID codecId);
     ~QnFfmpegAudioTranscoder();

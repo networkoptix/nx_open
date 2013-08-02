@@ -14,6 +14,7 @@
 
 class QnWorkbenchPtzMapperWatcher;
 class QnMediaResourceWidget;
+class QnResourceWidget;
 
 class QnWorkbenchPtzController: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -58,9 +59,10 @@ public:
 
     void changePanoMode(const QnMediaResourceWidget *widget);
     QString getPanoModeText(const QnMediaResourceWidget *widget) const;
+
 signals:
-    void movementChanged(const QnMediaResourceWidget* widget);
-    void positionChanged(const QnMediaResourceWidget* widget);
+    void movementChanged(const QnMediaResourceWidget *widget);
+    void positionChanged(const QnMediaResourceWidget *widget);
 
 private slots:
     void at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);
@@ -71,16 +73,18 @@ private slots:
     void at_ptzGetPosition_replyReceived(int status, const QVector3D &position, int handle);
     void at_ptzSetPosition_replyReceived(int status, int handle);
     void at_ptzSetMovement_replyReceived(int status, int handle);
-    void at_resourceWidget_aboutToBeDestroyed();
+
+    void at_display_widgetAdded(QnResourceWidget *widget);
+    void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
 
 private:
-    void sendGetPosition(const QnMediaResourceWidget* widget);
-    void sendSetPosition(const QnMediaResourceWidget* widget, const QVector3D &position);
-    void sendSetMovement(const QnMediaResourceWidget* widget, const QVector3D &movement);
+    void sendGetPosition(const QnMediaResourceWidget *widget);
+    void sendSetPosition(const QnMediaResourceWidget *widget, const QVector3D &position);
+    void sendSetMovement(const QnMediaResourceWidget *widget, const QVector3D &movement);
 
     void tryInitialize(const QnVirtualCameraResourcePtr &camera);
 
-    void emitChanged(const QnMediaResourceWidget* widget, bool position, bool movement);
+    void emitChanged(const QnMediaResourceWidget *widget, bool position, bool movement);
 
 private:
     enum PtzRequestType {

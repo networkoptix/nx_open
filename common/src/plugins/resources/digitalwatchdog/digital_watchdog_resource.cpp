@@ -131,10 +131,10 @@ void QnPlWatchDogResource::enableOnvifSecondStream()
     // camera rebooting ....
 }
 
-int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
+int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
 {
-    // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
-    // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
+    // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
 
     int hiEnd = 1024*9;
     int lowEnd = 1024*1.8;
@@ -145,7 +145,7 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     float frameRateFactor = fps/30.0;
     frameRateFactor = pow(frameRateFactor, (float)0.4);
 
-    int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
+    int result = lowEnd + (hiEnd - lowEnd) * (q - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(1024,result);

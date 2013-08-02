@@ -17,7 +17,7 @@ public:
     QnAdvancedSettingsWidget(QWidget* parent = 0);
     virtual ~QnAdvancedSettingsWidget();
 
-    QnSecondaryStreamQuality secondaryStreamQuality() const;
+    Qn::SecondStreamQuality secondaryStreamQuality() const;
     Qt::CheckState getCameraControl() const;
 
     void updateFromResource(QnSecurityCamResourcePtr camera);
@@ -32,7 +32,7 @@ private slots:
 
 private:
     void setKeepQualityVisible(bool value);
-    void setQualitySlider(QnSecondaryStreamQuality quality);
+    void setQualitySlider(Qn::SecondStreamQuality quality);
     bool isKeepQualityVisible() const;
     void updateControlsState();
 private:

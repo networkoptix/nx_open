@@ -21,8 +21,16 @@
         <source>First occurence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>First occurence: %1 on %2 (%n time total)</numerusform>
+            <numerusform>First occurence: %1 on %2 (%n times total)</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n times, first: %2 %1</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform>%n time, first: %2 %1</numerusform>
+            <numerusform>%n times, first: %2 %1</numerusform>
         </translation>
     </message>
 </context>

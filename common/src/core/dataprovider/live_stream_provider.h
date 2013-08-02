@@ -24,9 +24,9 @@ public:
     QnResource::ConnectionRole getRole() const;
 
 
-    void setSecondaryQuality(QnSecondaryStreamQuality  quality);
-    virtual void setQuality(QnStreamQuality q);
-    QnStreamQuality getQuality() const;
+    void setSecondaryQuality(Qn::SecondStreamQuality  quality);
+    virtual void setQuality(Qn::StreamQuality q);
+    Qn::StreamQuality getQuality() const;
 
     // for live providers only 
     virtual void setFps(float f);
@@ -62,7 +62,7 @@ protected:
 
 private:
     //int m_NumaberOfVideoChannels;
-    QnStreamQuality m_quality;
+    Qn::StreamQuality m_quality;
     bool m_qualityUpdatedAtLeastOnce;
 
     mutable float m_fps; //used only for live providers
@@ -75,7 +75,7 @@ private:
     const QnResourceVideoLayout* m_layout;
     QnPhysicalCameraResourcePtr m_cameraRes;
     bool m_isPhysicalResource;
-    QnSecondaryStreamQuality  m_secondaryQuality;
+    Qn::SecondStreamQuality  m_secondaryQuality;
 };
 
 #endif //live_strem_provider_h_1508

@@ -13,8 +13,8 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
 {
     ui->setupUi(this);
 
-    for (int i = QnQualityLowest; i <= QnQualityHighest; i++) {
-        ui->qualityComboBox->addItem(QnStreamQualityToDisplayString((QnStreamQuality)i), i);
+    for (int i = Qn::QualityLowest; i <= Qn::QualityHighest; i++) {
+        ui->qualityComboBox->addItem(Qn::toDisplayString((Qn::StreamQuality)i), i);
     }
 
     ui->beforeLabel->setVisible(false);
@@ -84,6 +84,6 @@ void QnRecordingBusinessActionWidget::paramsChanged() {
 
     params.setFps(ui->fpsSpinBox->value());
     params.setRecordAfter(ui->afterSpinBox->value());
-    params.setStreamQuality((QnStreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
+    params.setStreamQuality((Qn::StreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
     model()->setActionParams(params);
 }

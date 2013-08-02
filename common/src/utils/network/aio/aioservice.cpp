@@ -113,8 +113,12 @@ namespace aio
         if( !threadToUse )
         {
             //creating new thread
-            std::auto_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
 
+#if (GCC_VERSION >= 40700)
+            std::unique_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
+#else
+            std::auto_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
+#endif
             newThread->start();
             if( !newThread->isRunning() )
                 return false;

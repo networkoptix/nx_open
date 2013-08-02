@@ -649,7 +649,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         destinationPort = m_proxyPort;
     }
     if( !m_tcpSock.connect(targetAddress, destinationPort) )
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(destinationPort);
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, destinationPort);
 
     m_tcpSock.setNoDelay(true);
 
@@ -663,14 +663,14 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
 
     if (!sendDescribe()) {
         m_tcpSock.close();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(destinationPort);
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
     }
 
     QByteArray response;
 
     if (!readTextResponce(response)) {
         m_tcpSock.close();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(destinationPort);
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
     }
 
     // check digest authentication here
@@ -688,7 +688,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         if (!sendDescribe() || !readTextResponce(response)) 
         {
             m_tcpSock.close();
-            return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(destinationPort);
+            return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
         }
     }
 

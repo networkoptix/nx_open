@@ -47,6 +47,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QDialog>
+#include <QtWidgets/QDialogButtonBox>
 
 class QPushButton;
 class QLabel;
@@ -54,6 +55,12 @@ class QProgressBar;
 class QTimer;
 class QnProgressDialogPrivate;
 
+/**
+ * A progress dialog that does not call <tt>QApplication::processEvents</tt>
+ * when its value changes as the progress dialog from Qt does.
+ * 
+ * This behavior is controlled via <tt>isEventProcessor</tt> property.
+ */
 class QnProgressDialog : public QDialog {
     Q_OBJECT
     Q_PROPERTY(bool wasCanceled READ wasCanceled)
@@ -64,15 +71,16 @@ class QnProgressDialog : public QDialog {
     Q_PROPERTY(bool autoClose READ autoClose WRITE setAutoClose)
     Q_PROPERTY(int minimumDuration READ minimumDuration WRITE setMinimumDuration)
     Q_PROPERTY(QString labelText READ labelText WRITE setLabelText)
+    Q_PROPERTY(bool isEventProcessor READ isEventProcessor WRITE setEventProcessor)
 
 public:
     explicit QnProgressDialog(QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    QnProgressDialog(const QString &labelText, const QString &cancelButtonText,
-                    int minimum, int maximum, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    ~QnProgressDialog();
+    QnProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    virtual ~QnProgressDialog();
 
     void setLabel(QLabel *label);
     void setCancelButton(QPushButton *button);
+    void addButton(QPushButton *button, QDialogButtonBox::ButtonRole role);
     void setBar(QProgressBar *bar);
 
     bool wasCanceled() const;
@@ -81,8 +89,6 @@ public:
     int maximum() const;
 
     int value() const;
-
-    QSize sizeHint() const;
 
     QString labelText() const;
     int minimumDuration() const;
@@ -116,7 +122,6 @@ private Q_SLOTS:
     void _q_disconnectOnClose();
 
 protected:
-    void resizeEvent(QResizeEvent *event);
     void closeEvent(QCloseEvent *event);
     void changeEvent(QEvent *event);
     void showEvent(QShowEvent *event);

@@ -40,9 +40,9 @@ public:
         imageOpacity(0.7),
         imageIsLocal(false),
         connected(false),
-    #ifdef NATIVE_PAINT_BACKGROUND
+#ifdef NATIVE_PAINT_BACKGROUND
         imgUploaded(false),
-    #endif
+#endif
         imageStatus(ImageStatus::None)
     {}
     virtual ~QnGridBackgroundItemPrivate() {}

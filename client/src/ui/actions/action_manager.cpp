@@ -404,8 +404,18 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CameraDiagnosticsAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget).
-        text(tr("Camera Diagnostics...")).
+        text(tr("Check Camera Issues...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+
+    factory(Qn::OpenBusinessLogAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Log..."));
+
+    factory(Qn::OpenBusinessRulesAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Rules..."));
 
     /* Context menu actions. */
 
@@ -582,7 +592,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: #Elric icon?
+        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
 
     factory(Qn::MessageBoxAction).
         flags(Qn::NoTarget).
@@ -651,7 +661,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ShowcaseAction).
         flags(Qn::Main).
-        text(tr("Showcase...")).
+        text(tr("How-to Videos and FAQ...")).
         condition(new QnShowcaseActionCondition(this));
 
     factory(Qn::CheckForUpdatesAction).
@@ -733,10 +743,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open Layouts")).
         condition(hasFlags(QnResource::layout));
 
-    factory(Qn::OpenNewWindowLayoutsAction).
+    factory(Qn::OpenLayoutsInNewWindowAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Open Layout(s) in a New Window")). // TODO: #Elric split into sinle- & multi- action
         condition(hasFlags(QnResource::layout));
+
+    factory(Qn::OpenCurrentLayoutInNewWindowAction).
+        flags(Qn::NoTarget).
+        text(tr("Open Current Layout in a New Window"));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
@@ -990,13 +1004,6 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(hasFlags(QnResource::ARCHIVE));
 
-    factory(Qn::EditTagsAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
-        text(tr("Edit tags...")).
-        //shortcut(tr("Alt+T")).
-        autoRepeat(false).
-        condition(hasFlags(QnResource::media));
-
     factory(Qn::DeleteFromDiskAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Delete from Disk")).
@@ -1017,9 +1024,15 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CameraIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Camera Diagnostics...")).
+        text(tr("Check Camera Issues...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+
+    factory(Qn::CameraBusinessRulesAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Camera Rules...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::ExactlyOne, this));
 
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).

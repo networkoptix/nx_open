@@ -216,6 +216,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 void QnMediaResourceWidget::at_dewarpingParamsChanged(DewarpingParams params)
 {
     item()->setDewarpingParams(params);
+    item()->setData(Qn::ItemFlipRole, params.viewMode == DewarpingParams::VerticalDown);
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
@@ -484,6 +485,7 @@ void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &ima
     item()->setImageEnhancement(imageEnhancement);
     m_renderer->setImageCorrection(imageEnhancement);
 }
+
 
 // -------------------------------------------------------------------------- //
 // Painting
@@ -925,12 +927,11 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     setOption(ControlZoomWindow, checked);
 
-    if(checked) {
+    if(checked)
         buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
-    }
 }
-void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
-{
+
+void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
     ImageCorrectionParams params = item()->imageEnhancement();
     if (params.enabled == checked)
         return;
@@ -944,8 +945,7 @@ void QnMediaResourceWidget::at_renderWatcher_displayingChanged(QnResourceWidget 
         updateRendererEnabled();
 }
 
-void QnMediaResourceWidget::at_zoomRectChanged()
-{
+void QnMediaResourceWidget::at_zoomRectChanged() {
     updateButtonsVisibility();
     updateAspectRatio();
     updateIconButton();

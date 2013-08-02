@@ -134,8 +134,15 @@ QnTranslation QnTranslationManager::loadTranslationInternal(const QString &trans
 
     QTranslator translator;
     translator.load(filePath);
+
+    /* Note that '//:' denotes a comment for translators that will appear in TS files. */
+
+    //: Internal. Please don't change existing translation.
     QString languageName = translator.translate("Language", "Language Name");
+
+    //: Internal. Please don't change existing translation.
     QString localeCode = translator.translate("Language", "Locale Code");
+
     if(languageName.isEmpty() || localeCode.isEmpty())
         return QnTranslation(); /* Invalid translation. */
 

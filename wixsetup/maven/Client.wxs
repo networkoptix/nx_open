@@ -424,6 +424,7 @@
             <ComponentRef Id="clientShortcutDesktop"/>
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>
+            <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentRef Id="ClientConfiguration" />
             <ComponentGroupRef Id="ClientQuickSync"/>
             <ComponentGroupRef Id="ClientFFmpegLibraries"/>

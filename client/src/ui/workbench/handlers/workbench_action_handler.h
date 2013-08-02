@@ -212,11 +212,12 @@ protected slots:
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
-    void at_openNewWindowLayoutsAction_triggered();
     void at_openNewTabAction_triggered();
     void at_openInLayoutAction_triggered();
     void at_openInCurrentLayoutAction_triggered();
     void at_openInNewLayoutAction_triggered();
+    void at_openLayoutsInNewWindowAction_triggered();
+    void at_openCurrentLayoutInNewWindowAction_triggered();
     void at_openInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
     void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
@@ -241,7 +242,9 @@ protected slots:
     void at_showcaseAction_triggered();
     void at_aboutAction_triggered();
     void at_businessEventsAction_triggered();
+    void at_openBusinessRulesAction_triggered();
     void at_businessEventsLogAction_triggered();
+    void at_openBusinessLogAction_triggered();
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
     void at_preferencesGeneralTabAction_triggered();
@@ -254,6 +257,7 @@ protected slots:
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
+    void at_cameraBusinessRulesAction_triggered();
     void at_cameraDiagnosticsAction_triggered();
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
@@ -263,7 +267,8 @@ protected slots:
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsDialog_advancedSettingChanged();
     void at_cameraSettingsDialog_cameraOpenRequested();
-    void at_cameraSettingsDialog_cameraDiagnosticsRequested();
+    void at_cameraSettingsDialog_cameraIssuesRequested();
+    void at_cameraSettingsDialog_cameraRulesRequested();
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
@@ -271,7 +276,6 @@ protected slots:
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
     void at_youtubeUploadAction_triggered();
-    void at_editTagsAction_triggered();
     void at_thumbnailsSearchAction_triggered();
 
     void at_openInFolderAction_triggered();

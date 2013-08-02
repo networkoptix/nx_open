@@ -155,7 +155,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QStringList conflicts;
             foreach(QnNetworkResourcePtr camRes, itr.value()) 
             {
-                conflicts << camRes->getMAC().toString();
+                conflicts << camRes->getPhysicalId();
                 QnVirtualCameraResourcePtr cam = camRes.dynamicCast<QnVirtualCameraResource>();
                 if (cam)
                     cam->issueOccured();

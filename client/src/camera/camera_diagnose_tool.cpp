@@ -81,16 +81,14 @@ namespace CameraDiagnostics
             switch( status )
             {
                 case QNetworkReply::ContentAccessDenied:
-                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Access Denied")).toString();
+                case QNetworkReply::AuthenticationRequiredError:
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Unauthorized")).toString();    //401
                     break;
                 case QNetworkReply::ContentOperationNotPermittedError:
-                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Forbidden")).toString();
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Forbidden")).toString();       //403
                     break;
                 case QNetworkReply::ContentNotFoundError:
-                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Not Found")).toString();
-                    break;
-                case QNetworkReply::AuthenticationRequiredError:
-                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Not Authorised")).toString();
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Not Found")).toString();       //404
                     break;
                 case QNetworkReply::ProtocolFailure:
                     m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QString()).toString();

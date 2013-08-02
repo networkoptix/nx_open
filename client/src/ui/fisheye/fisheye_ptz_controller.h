@@ -44,8 +44,8 @@ private slots:
 
 private:
     qreal boundXAngle(qreal value, qreal fov) const;
-    qreal boundYAngle(qreal value, qreal fov, qreal aspectRatio, bool horizontal) const;
-    void updateSpaceMapper(bool horizontalView, int pf);
+    qreal boundYAngle(qreal value, qreal fov, qreal aspectRatio, DewarpingParams::ViewMode viewMode) const;
+    void updateSpaceMapper(DewarpingParams::ViewMode viewMode, int pf);
 
 private:
     QVector3D m_motion;
@@ -65,6 +65,7 @@ private:
     };
     SpaceRange m_xRange;
     SpaceRange m_yRange;
+    qreal m_lastAR;
 };
 
 #endif // __FISHEYE_PTZ_CONTROLLER_H__

@@ -75,7 +75,7 @@ public:
     bool setVideoCodec(
         CodecID codec,
         QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_FfmpegTranscode,
-        QnStreamQuality quality = QnQualityHighest,
+        Qn::StreamQuality quality = Qn::QualityHighest,
         const QSize& resolution = QSize(0,0),
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value() );

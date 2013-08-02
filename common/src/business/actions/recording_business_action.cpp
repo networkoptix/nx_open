@@ -14,7 +14,7 @@ int QnRecordingBusinessAction::getFps() const {
     return m_params.getFps();
 }
 
-QnStreamQuality QnRecordingBusinessAction::getStreamQuality() const {
+Qn::StreamQuality QnRecordingBusinessAction::getStreamQuality() const {
     return m_params.getStreamQuality();
 }
 

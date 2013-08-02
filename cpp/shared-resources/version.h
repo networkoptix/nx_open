@@ -34,6 +34,7 @@
 #   define QN_APPLAUNCHER_EXECUTABLE_NAME "applauncher-bin"
 #endif
 #define QN_LICENSING_MAIL_ADDRESS       "${company.license.address}"
+#define QN_COMPANY_URL                  "${company.url}"
 #define QN_SUPPORT_MAIL_ADDRESS         "${company.support.address}"
 #define QN_FREE_LICENSE_COUNT           ${freeLicenseCount}
 #define QN_FREE_LICENSE_KEY             "${freeLicenseKey}"
@@ -41,7 +42,8 @@
 #define QN_LICENSE_URL                  "${license.url}"
 #define QN_RSA_PUBLIC_KEY               ${rsa.public.key}
 #define QN_SHOWCASE_URL                 "${showcase.url}"
-
+#define QN_SETTINGS_URL                 "${settings.url}"
+#define QN_PRODUCT_NAME_LONG            "${product.name}"
 #define QN_BUILDENV_PATH                "${environment.dir}"
 
 /* 

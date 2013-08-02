@@ -1014,7 +1014,7 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget
     if(!resourceWidget)
         return; /* We may also get NULL if the widget being rotated gets deleted. */
 
-    resourceWidget->item()->setRotation(widget->rotation());
+    resourceWidget->item()->setRotation(widget->rotation() - (resourceWidget->item()->data<bool>(Qn::ItemFlipRole, false) ? 180.0: 0.0));
 }
 
 void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect) {

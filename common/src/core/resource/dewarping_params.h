@@ -5,11 +5,17 @@
 
 class DewarpingParams: public boost::equality_comparable1<DewarpingParams> {
 public:
-    DewarpingParams(): enabled(false), horizontalView(false), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0), panoFactor(1.0) {}
+    enum ViewMode {
+        Horizontal,
+        VerticalDown,
+        VerticalUp
+    };
+
+    DewarpingParams(): enabled(false), viewMode(VerticalDown), xAngle(0.0), yAngle(0.0), fov(70.0 * M_PI / 180.0), fovRot(0.0), panoFactor(1.0) {}
     
     DewarpingParams(const DewarpingParams &other) {
         enabled = other.enabled;
-        horizontalView = other.horizontalView;
+        viewMode = other.viewMode;
         xAngle = other.xAngle;
         yAngle = other.yAngle;
         fov = other.fov;
@@ -24,7 +30,7 @@ public:
 
 public:
     bool enabled;
-    bool horizontalView;
+    ViewMode viewMode;
     // view angle and FOV at radians
     qreal xAngle;
     qreal yAngle;

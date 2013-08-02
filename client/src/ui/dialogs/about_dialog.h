@@ -3,15 +3,17 @@
 
 #include <QtCore/QScopedPointer>
 
-#include <QtWidgets/QDialog>
+#include <ui/dialogs/button_box_dialog.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
     class AboutDialog;
 }
 
-class QnAboutDialog : public QDialog {
-    Q_OBJECT;
+class QnAboutDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware {
+    Q_OBJECT
 
+    typedef QnButtonBoxDialog base_type;
 public:
     explicit QnAboutDialog(QWidget *parent = 0);
     virtual ~QnAboutDialog();

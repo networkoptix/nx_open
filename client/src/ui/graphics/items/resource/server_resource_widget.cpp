@@ -304,6 +304,7 @@ private:
 // StatisticsOverlayWidget
 // -------------------------------------------------------------------------- //
 class StatisticsOverlayWidget: public GraphicsWidget {
+    Q_DECLARE_TR_FUNCTIONS(StatisticsOverlayWidget)
     typedef GraphicsWidget base_type;
 public:
     StatisticsOverlayWidget(QnServerResourceWidget* widget):

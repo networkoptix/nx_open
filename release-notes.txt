@@ -15,9 +15,19 @@ Since 1.5.1
    was suggested with no luck. Now warning is given instead of restart
  - Input/Output is supported by ACTI cameras
  - HD Witness licenses cannot be activated on DW Spectrum and vice versa
- - If copy items on Scene quickly (with a big video archive), than client will be crashed.
  
+ - Fixed Client crash that occurred if quickly duplicate cameras with a large video archive on Scene
+ - Added filter in "Event/Actions" dialog. It is possible to display only rules that are applied to particular Camera(s)
+ - Also added "Camera rules" in resource tree and on "Camera settings"
+ - Arecont Panoramic sensors were mixed up if apply flip. Fixed
+ - Added new E-Mail templates
+ - Added thumbnails in the "Select cameras" dialog (when configuring Event Rules or copying Recording Schedule to Cameras)
+ - Added the "Open New Window" button to export dialog (with progress bar). It is possible to open a new Client instance 
+   and continue working during export.
+ - If video card drivers are not installed the software gives warning before start (used to be after software start that could cause crash)
+
 Since previous build
+ - Added a new action for camera and server diagnostics (only for log).
  - Selected item was not marked in Tree (> sign). Fixed
  - Network Statistics sometimes displayed 0 Mbps usage for a short time. Fixed
  - If PTZ is enabled zoom windows' positions are still displayed
@@ -38,6 +48,11 @@ Since previous build
  - Incorrect version in dialog "About". Fixed.
  - Save parameters  "Dewarping" and "Image Enhancement" in layout and while openning in a new tab.
  - Motion Visual Effect Color is changed to green
+ - Color Correction does not work on images. Fixed.
+ - Incorrect screenshot from zoom item for fisheye camera.Fixed. 
+ - When release "This is the fish-yey lens camera", items returns to the normal size.
+ - While items searching thumbnails look incorrect in resource tree.
+ - Added  "Camera Diagnostics" button to Camera Settings.
  
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 

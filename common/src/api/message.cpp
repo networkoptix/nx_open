@@ -17,6 +17,7 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& oldHardwareId);
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
+void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules);
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
 
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
@@ -116,6 +117,7 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_Initial:
         {
             const pb::InitialMessage& initialMessage = message.GetExtension(pb::InitialMessage::message);
+            systemName = QString::fromUtf8(initialMessage.systemname().c_str());
             oldHardwareId = initialMessage.oldhardwareid().c_str();
             hardwareId1 = initialMessage.hardwareid1().c_str();
             hardwareId2 = initialMessage.hardwareid2().c_str();
@@ -170,9 +172,19 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_RuntimeInfoChange:
         {
             const pb::RuntimeInfoChangeMessage& runtimeInfoChangeMessage = message.GetExtension(pb::RuntimeInfoChangeMessage::message);
-            publicIp = QString::fromStdString(runtimeInfoChangeMessage.publicip());
+            if (runtimeInfoChangeMessage.has_publicip())
+                publicIp = QString::fromStdString(runtimeInfoChangeMessage.publicip());
+            if (runtimeInfoChangeMessage.has_systemname())
+                systemName = QString::fromStdString(runtimeInfoChangeMessage.systemname());
             break;
         }
+        case pb::Message_Type_BusinessRuleReset:
+        {
+            const pb::BusinessRuleResetMessage& businessRuleResetMessage = message.GetExtension(pb::BusinessRuleResetMessage::message);
+            parseBusinessRules(businessRules, businessRuleResetMessage.businessrule());
+            break;
+        }
+
     default:
         break;
     }

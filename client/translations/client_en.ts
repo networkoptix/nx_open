@@ -37,30 +37,58 @@
     </message>
     <message numerus="yes">
         <source>no more than once per %n days</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per day</numerusform>
             <numerusform>no more than once per %n days</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n hours</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per hour</numerusform>
             <numerusform>no more than once per %n hours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n minutes</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per minute</numerusform>
             <numerusform>no more than once per %n minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n seconds</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per second</numerusform>
             <numerusform>no more than once per %n seconds</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n days</source>
+        <translation>
+            <numerusform>Every day</numerusform>
+            <numerusform>Every %n days</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n hours</source>
+        <translation>
+            <numerusform>Every hour</numerusform>
+            <numerusform>Every %n hours</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n minutes</source>
+        <translation>
+            <numerusform>Every minute</numerusform>
+            <numerusform>Every %n minutes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n seconds</source>
+        <translation>
+            <numerusform>Every second</numerusform>
+            <numerusform>Every %n seconds</numerusform>
         </translation>
     </message>
 </context>
@@ -140,7 +168,7 @@ It might take a few moments to populate them in the tree.</numerusform>
     <name>QnExportCameraSettingsDialog</name>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%n digital license will be used out of %1.</numerusform>
             <numerusform>%n digital licenses will be used out of %1.</numerusform>
         </translation>
@@ -150,6 +178,23 @@ It might take a few moments to populate them in the tree.</numerusform>
         <translation type="obsolete">
             <numerusform>%n analog license will be used out of %1.</numerusform>
             <numerusform>%n analog  licenses will be used out of %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) will be used out of %1.</source>
+        <translation type="obsolete">
+            <numerusform>%n analog license will be used out of %1.</numerusform>
+            <numerusform>%n analog licenses will be used out of %1.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
+    <message numerus="yes">
+        <source>%n digital license(s) will be used out of %1.</source>
+        <translation>
+            <numerusform>%n digital license will be used out of %1.</numerusform>
+            <numerusform>%n digital licenses will be used out of %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">

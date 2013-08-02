@@ -24,20 +24,20 @@ QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
 
 }
 
-QnSecondaryStreamQuality QnAdvancedSettingsWidget::secondaryStreamQuality() const
+Qn::SecondStreamQuality QnAdvancedSettingsWidget::secondaryStreamQuality() const
 {
     int val = ui->qualitySlider->value();
     if (isKeepQualityVisible()) {
         if (val == 0)
-            return SSQualityNotDefined;
+            return Qn::SSQualityNotDefined;
         val--;
     }
     if (val == Quality_Low)
-        return SSQualityLow;
+        return Qn::SSQualityLow;
     else if (val == Quality_Medium)
-        return SSQualityMedium;
+        return Qn::SSQualityMedium;
     else 
-        return SSQualityHigh;
+        return Qn::SSQualityHigh;
 }
 
 Qt::CheckState QnAdvancedSettingsWidget::getCameraControl() const
@@ -45,12 +45,12 @@ Qt::CheckState QnAdvancedSettingsWidget::getCameraControl() const
     return ui->checkBoxDisableControl->checkState();
 }
 
-void QnAdvancedSettingsWidget::setQualitySlider(QnSecondaryStreamQuality quality)
+void QnAdvancedSettingsWidget::setQualitySlider(Qn::SecondStreamQuality quality)
 {
     int offset = isKeepQualityVisible() ? 1 : 0;
-    if (quality == SSQualityLow)
+    if (quality == Qn::SSQualityLow)
         ui->qualitySlider->setValue(Quality_Low + offset);
-    else if (quality == SSQualityHigh)
+    else if (quality == Qn::SSQualityHigh)
         ui->qualitySlider->setValue(Quality_High + offset);
     else
         ui->qualitySlider->setValue(Quality_Medium + offset);
@@ -97,7 +97,7 @@ void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList c
 
     bool sameQuality = true;
     bool sameControlState = true;
-    QnSecondaryStreamQuality quality = cameras[0]->secondaryStreamQuality();
+    Qn::SecondStreamQuality quality = cameras[0]->secondaryStreamQuality();
     bool controlState = cameras[0]->isCameraControlDisabled();
     m_hasDualStreaming = cameras[0]->hasDualStreaming();
     bool arecontCameraExists = false;

@@ -6,6 +6,115 @@
 #include "camera_diagnostics.h"
 
 
+class QnCameraDiagnosticsErrorCodeStrings
+{
+    Q_DECLARE_TR_FUNCTIONS(QnCameraDiagnosticsErrorCodeStrings);
+
+public:
+    //!Returns textual description of error with  parameters
+    static QString toString( CameraDiagnostics::ErrorCode::Value val, const QList<QString>& errorParams )
+    {
+        using namespace CameraDiagnostics::ErrorCode;
+
+        int requiredParamCount = 0;
+        QString errorMessage;
+        switch( val )
+        {
+            case noError:
+                requiredParamCount = 0;
+                errorMessage = tr("ok");
+                break;
+            case mediaServerUnavailable:
+                requiredParamCount = 1;
+                errorMessage = tr("Media server %1 is not available. Check that media server is up and running.");
+                break;
+            case mediaServerBadResponse:
+                requiredParamCount = 2;
+                errorMessage = tr("Received bad response from media server %1: %2. Check media server's version.");
+                break;
+            case cannotEstablishConnection:
+                requiredParamCount = 1;
+                errorMessage = tr("Cannot connect to http port %1. Make sure the camera is plugged into the network.");
+                break;
+            case cannotOpenCameraMediaPort:
+                requiredParamCount = 2;
+                errorMessage = tr("Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). "
+                    "Please try to reboot the camera, then restore factory defaults on the web-page.");
+                break;
+            case connectionClosedUnexpectedly:
+                requiredParamCount = 2;
+                errorMessage = tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.");
+                break;
+            case responseParseError:
+                errorMessage = tr("Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support");
+                break;
+            case noMediaTrack:
+                errorMessage = tr("No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support");
+                break;
+            case notAuthorised:
+                errorMessage = tr("Not authorized.");
+                break;
+            case unsupportedProtocol:
+                requiredParamCount = 2;
+                errorMessage = tr("Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support.");
+                break;
+            case cannotConfigureMediaStream:
+                requiredParamCount = 1;
+                errorMessage = tr("Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support.");
+                break;
+            case requestFailed:
+                requiredParamCount = 2;
+                errorMessage = tr("Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support.");
+                break;
+            case notImplemented:
+                requiredParamCount = 0;
+                errorMessage = tr("Unknown Camera Issue. Please, contact support.");
+                break;
+            case ioError:
+                requiredParamCount = 1;
+                errorMessage = tr("I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot the camera.");
+                break;
+            case serverTerminated:
+                errorMessage = tr("Server has been stopped.");
+                break;
+            default:
+            {
+                int nonEmptyParamCount = 0;
+                for( int i = 0; i < errorParams.size(); ++i )
+                {
+                    if( !errorParams[i].isEmpty() )
+                        ++nonEmptyParamCount;
+                    else
+                        break;
+                }
+
+                errorMessage = tr("Unknown error. Please contact support.");
+                if( nonEmptyParamCount )
+                    errorMessage += tr(" Parameters: ");
+                for( int i = 0; i < nonEmptyParamCount; ++i )
+                {
+                    if( i > 0 )
+                        errorMessage += QLatin1String(", ");
+                    errorMessage += errorParams[i];
+                }
+                break;
+            }
+        }
+
+        requiredParamCount = std::min<int>(requiredParamCount, errorParams.size());
+        for( int i = 0; i < requiredParamCount; ++i )
+            errorMessage = errorMessage.arg(!errorParams[i].isEmpty() ? errorParams[i] : tr("(unknown)"));
+
+        return errorMessage;
+    }
+};
+
+
 namespace CameraDiagnostics
 {
     namespace Step
@@ -49,89 +158,7 @@ namespace CameraDiagnostics
         //!Returns textual description of error with  parameters
         QString toString( Value val, const QList<QString>& errorParams )
         {
-            int requiredParamCount = 0;
-            QString errorMessage;
-            switch( val )
-            {
-                case noError:
-                    requiredParamCount = 0;
-                    errorMessage = QObject::tr("ok");
-                    break;
-                case mediaServerUnavailable:
-                    requiredParamCount = 1;
-                    errorMessage = QObject::tr("Media server %1 is not available");
-                    break;
-                case mediaServerBadResponse:
-                    requiredParamCount = 2;
-                    errorMessage = QObject::tr("Received bad response from media server %1: %2");
-                    break;
-                case cannotEstablishConnection:
-                    requiredParamCount = 1;
-                    errorMessage = QObject::tr("Cannot connect to http port %1. Make sure the camera is plugged into the network.");
-                    break;
-                case cannotOpenCameraMediaPort:
-                    requiredParamCount = 1;
-                    errorMessage = QObject::tr("Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.");
-                    break;
-                case connectionClosedUnexpectedly:
-                    requiredParamCount = 1;
-                    errorMessage = QObject::tr("Connection to port %1 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera");
-                    break;
-                case responseParseError:
-                    errorMessage = QObject::tr("Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page."
-                        " If the problem persists, contact support");
-                    break;
-                case noMediaTrack:
-                    errorMessage = QObject::tr("No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page."
-                        " If the problem persists, contact support");
-                    break;
-                case notAuthorised:
-                    errorMessage = QObject::tr("Not authorized");
-                    break;
-                case unsupportedProtocol:
-                    requiredParamCount = 1;
-                    errorMessage = QObject::tr("Unsupported media protocol %1. Please try to restore factory defaults on the web-page."
-                        " If the problem persists, contact support.");
-                    break;
-                case cannotConfigureMediaStream:
-                    requiredParamCount = 1;
-                    errorMessage = QObject::tr("Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page."
-                        " If the problem persists, contact support.");
-                    break;
-                case requestFailed:
-                    requiredParamCount = 2;
-                    errorMessage = QObject::tr("Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page."
-                        " If the problem persists, contact support.");
-                    break;
-                case notImplemented:
-                    requiredParamCount = 0;
-                    errorMessage = QObject::tr("Unknown Camera Issue. Please, contact support.");
-                    break;
-                case ioError:
-                    requiredParamCount = 1;
-                    errorMessage = QObject::tr("I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera");
-                    break;
-                case serverTerminated:
-                    errorMessage = QObject::tr("Server has been stopped");
-                    break;
-                default:
-                    errorMessage = QObject::tr("Unknown error. Please, contact support.");
-                    if( !errorParams.isEmpty() )
-                        errorMessage += QObject::tr(". Parameters: ");
-                    for( int i = 0; i < errorParams.size(); ++i )
-                    {
-                        if( i > 0 )
-                            errorMessage += QLatin1String(", ");
-                        errorMessage += errorParams[i];
-                    }
-                    break;
-            }
-
-            requiredParamCount = std::min<int>(requiredParamCount, errorParams.size());
-            for( int i = 0; i < requiredParamCount; ++i )
-                errorMessage = errorMessage.arg(errorParams[i]);
-
-            return errorMessage;
+            return QnCameraDiagnosticsErrorCodeStrings::toString( val, errorParams );
         }
 
         QString toString( int val, const QList<QString>& errorParams )
@@ -151,10 +178,8 @@ namespace CameraDiagnostics
     :
         errorCode( _errorCode )
     {
-        if( !param1.isEmpty() || !param2.isEmpty() )
-            errorParams.push_back( param1 );
-        if( !param2.isEmpty() )
-            errorParams.push_back( param2 );
+        errorParams.push_back(param1);
+        errorParams.push_back(param2);
     }
 
     QString Result::toString() const

@@ -40,8 +40,8 @@ namespace {
     Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
 
     const QColor textColor(255, 96, 96, 128);
-    const QColor buttonBaseColor(255, 32, 32, 64);
-    const QColor buttonBorderColor(255, 32, 32, 196);
+    const QColor buttonBaseColor(255, 32, 32, 160);
+    const QColor buttonBorderColor(255, 32, 32, 255);
 
 } // anonymous namespace
 
@@ -122,7 +122,7 @@ void QnStatusOverlayWidget::updateLayout() {
     QRectF rect = this->rect();
 
     qreal point = qMin(rect.width(), rect.height()) / 16.0;
-    QSizeF size(point * 8.0, point * 2.0);
+    QSizeF size(point * 6.0, point * 1.5);
 
     m_diagnosticsButton->setGeometry(QRectF(rect.center() - toPoint(size) / 2.0 + QPointF(0.0, point * 4.0), size));
 }

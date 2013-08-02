@@ -9,7 +9,7 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_dpFactory(0),
     m_motionType(Qn::MT_Default),
     m_recActionCnt(0),
-    m_secondaryQuality(SSQualityMedium),
+    m_secondaryQuality(Qn::SSQualityMedium),
     m_cameraControlDisabled(false),
     m_statusFlags(0)
 {
@@ -569,12 +569,12 @@ void QnSecurityCamResource::setGroupId(const QString& value)
     m_groupId = value;
 }
 
-void QnSecurityCamResource::setSecondaryStreamQuality(QnSecondaryStreamQuality  quality)
+void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality  quality)
 {
     m_secondaryQuality = quality;
 }
 
-QnSecondaryStreamQuality QnSecurityCamResource::secondaryStreamQuality() const
+Qn::SecondStreamQuality QnSecurityCamResource::secondaryStreamQuality() const
 {
     return m_secondaryQuality;
 }
@@ -593,11 +593,11 @@ int QnSecurityCamResource::desiredSecondStreamFps() const
 {
     switch (secondaryStreamQuality())
     {
-    case SSQualityMedium:
+    case Qn::SSQualityMedium:
         return 7;
-    case SSQualityLow: 
+    case Qn::SSQualityLow: 
         return 2;
-    case SSQualityHigh:
+    case Qn::SSQualityHigh:
         return 12;
     default:
         break;
@@ -606,12 +606,12 @@ int QnSecurityCamResource::desiredSecondStreamFps() const
     return 7;
 }
 
-QnStreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const
+Qn::StreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const
 {
-    if (secondaryStreamQuality() != SSQualityHigh)
-        return QnQualityLowest;
+    if (secondaryStreamQuality() != Qn::SSQualityHigh)
+        return Qn::QualityLowest;
     else
-        return QnQualityNormal;
+        return Qn::QualityNormal;
 }
 
 QnSecurityCamResource::StatusFlags QnSecurityCamResource::statusFlags() const

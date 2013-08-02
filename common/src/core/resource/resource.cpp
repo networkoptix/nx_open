@@ -36,7 +36,8 @@ QnResource::QnResource():
     m_disabled(false),
     m_status(Offline),
     m_initialized(false),
-    m_lastInitTime(0)
+    m_lastInitTime(0),
+    m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown)
 {
 }
 
@@ -825,13 +826,13 @@ void QnResource::setDisabled(bool disabled)
         emit disabledChanged(toSharedPointer(this));
 }
 
-void QnResource::init()
+bool QnResource::init()
 {
     if (m_appStopping)
-        return;
+        return false;
 
     if (!m_initMutex.tryLock())
-        return; // if init already running, skip new request
+        return false; // if init already running, skip new request
 
     if (!m_initialized) 
     {
@@ -841,12 +842,24 @@ void QnResource::init()
             QMutexLocker lk( &m_mutex );
             m_prevInitializationResult = initResult;
         }
+        m_initializationAttemptCount.fetchAndAddOrdered(1);
         if( m_initialized )
             initializationDone();
         if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
             setStatus(Offline);
     }
     m_initMutex.unlock();
+
+    return true;
+}
+
+void QnResource::blockingInit()
+{
+    if( !init() )
+    {
+        //init is running in another thread, waiting for it to complete...
+        QMutexLocker lk( &m_initMutex );
+    }
 }
 
 void QnResource::initAndEmit()
@@ -902,6 +915,11 @@ CameraDiagnostics::Result QnResource::prevInitializationResult() const
 {
     QMutexLocker lk( &m_mutex );
     return m_prevInitializationResult;
+}
+
+int QnResource::initializationAttemptCount() const
+{
+    return m_initializationAttemptCount;
 }
 
 bool QnResource::isInitialized() const

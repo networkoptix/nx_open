@@ -93,7 +93,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
         } else {
             ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
-                                              "Currently using %3 digital and %4 analog licenses."))
+                                              "%3 digital and %4 analog licenses are currently in use."))
                                    .arg(helper.totalDigital())
                                    .arg(helper.totalAnalog())
                                    .arg(helper.usedDigital())
@@ -106,8 +106,8 @@ void QnLicenseManagerWidget::updateLicenses() {
             useRedLabel = false;
         } else {
             QString text = (qnProductFeatures().freeLicenseCount > 0) ?
-                tr("You do not have a valid License installed. Please activate your commercial or trial license.") :
-                tr("You do not have a valid License installed. Please activate your commercial license.");
+                tr("You do not have a valid license installed. Please activate your commercial or trial license.") :
+                tr("You do not have a valid license installed. Please activate your commercial license.");
             ui->infoLabel->setText(text);
             useRedLabel = true;
         }
