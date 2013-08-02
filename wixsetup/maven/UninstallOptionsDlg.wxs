@@ -12,8 +12,20 @@
                                                     <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
                                                     <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
                                                     <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
-                                                    <Control Id="groupBox1" Type="GroupBox" Height="41" Width="346" X="9" Y="61" Text="Uninstall options" />
-                                                    <Control Id="checkBox1" Type="CheckBox" Height="18" Width="326" X="15" Y="75" Text="Remove ${product.name} Database" Property="REMOVE_DATABASE" CheckBoxValue="1"/>
+                                                    <Control Id="groupBox1" Type="GroupBox" Height="160" Width="346" X="9" Y="61" Text="Uninstall options" />
+                                                    <Control Id="radioButtonGroupBox1" Type="RadioButtonGroup" Height="68" Width="335" X="15" Y="75" Property="REMOVE_DATABASE">
+                                                        <RadioButtonGroup Property="REMOVE_DATABASE">
+                                                            <RadioButton X="4" Y="2" Height="18" Width="331" Text="Keep ${product.name} Database" Value="0" />
+                                                            <RadioButton X="4" Y="25" Height="18" Width="331" Text="Remove ${product.name} Database" Value="1" />
+                                                            <RadioButton X="4" Y="47" Height="18" Width="331" Text="Restore previous database version" Value="2" />
+                                                        </RadioButtonGroup>
+                                                    </Control>
+                                                    <Control Id="versionsCombo" Type="ComboBox" Height="16" Width="91" X="116" Y="144" ComboList="yes" Property="VERSIONS_TO_RESTORE">
+                                                        <ComboBox Property="VERSIONS_TO_RESTORE">
+                                                            <ListItem Text="Dummy" Value="Dummy"/>
+                                                        </ComboBox>
+                                                    </Control>
+                                                    <Control Id="label1" Type="Text" Height="17" Width="75" X="37" Y="146" Text="Version to restore:" />
                                                 </Dialog>
         </UI>
     </Fragment>

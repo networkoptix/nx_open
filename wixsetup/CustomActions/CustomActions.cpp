@@ -300,7 +300,7 @@ UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
-    hr = WcaInitialize(hInstall, "DeleteFile");
+    hr = WcaInitialize(hInstall, "DeleteDatabaseFile");
     ExitOnFailure(hr, "Failed to initialize");
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
@@ -308,6 +308,86 @@ UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
     {
         CString fileToDelete = GetProperty(hInstall, L"CustomActionData");
         DeleteFile(fileToDelete);
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    CString pid;
+    pid.Format(L"%d", GetCurrentProcessId());
+    MessageBox(0, pid, L"", MB_OK);
+    hr = WcaInitialize(hInstall, "BackupDatabaseFile");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CAtlString params, fromFile, versionPath, versionName;
+        params = GetProperty(hInstall, L"CustomActionData");
+
+        // Extract "from" and "to" files from filesString
+        int curPos = 0;
+        fromFile = params.Tokenize(_T(";"), curPos);
+        versionPath = params.Tokenize(_T(";"), curPos);
+        versionName = params.Tokenize(_T(";"), curPos);
+
+        CRegKey key;
+        LPTSTR szBuffer = new TCHAR[50];
+        ULONG cchBuffer = 257;
+        if (key.Open(HKEY_LOCAL_MACHINE, versionPath, KEY_READ) == ERROR_SUCCESS) {
+            ULONG chars;
+            CAtlString version;
+
+            if (key.QueryStringValue(versionName, 0, &chars) == ERROR_SUCCESS) {
+                key.QueryStringValue(versionName, version.GetBuffer(chars), &chars);
+                version.ReleaseBuffer();
+            }
+
+            key.DeleteValue(versionName);
+            key.Close();
+
+            if (!version.IsEmpty())
+                CopyFile(fromFile, fromFile + "." + version, FALSE);
+        }
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall PopulateRestoreVersions(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    CString pid;
+    pid.Format(L"%d", GetCurrentProcessId());
+    hr = WcaInitialize(hInstall, "PopulateRestoreVersions");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        MSIHANDLE hTable = NULL; 
+        MSIHANDLE hColumns = NULL; 
+
+        hr = WcaAddTempRecord(&hTable, &hColumns, L"ListBox", NULL, 0, 4, L"VERSIONS_TO_RESTORE", 0, L"Item 1", L"Item 1");
+
+        if (hColumns) 
+            MsiCloseHandle(hColumns);
+
+        if (hTable) 
+            MsiCloseHandle(hTable);
     }
 
 LExit:

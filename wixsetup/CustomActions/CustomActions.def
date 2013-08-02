@@ -13,3 +13,5 @@ CopyAppServerProfile
 CopyAppServerNotificationFiles
 IsClientFolderExists
 DeleteDatabaseFile
+BackupDatabaseFile
+PopulateRestoreVersions

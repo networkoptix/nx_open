@@ -319,7 +319,7 @@
                             Win64="no"/>
         </Property>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\${build.configuration}\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Debug\CustomActions.dll" />
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
@@ -329,7 +329,9 @@
         <CustomAction Id="CopyAppServerNotificationFiles" BinaryKey="CustomActions.dll" DllEntry="CopyAppServerNotificationFiles" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
+        <CustomAction Id="BackupDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="BackupDatabaseFile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
+        <CustomAction Id="PopulateRestoreVersions" BinaryKey="CustomActions.dll" DllEntry="PopulateRestoreVersions" Execute="immediate" Impersonate="no"/>
 
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
 
@@ -369,6 +371,11 @@
         <CustomAction Id="SyncDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
 
+        <CustomAction Id="SaveLastDatabaseVersion_Cmd" Property="SaveLastDatabaseVersion"
+                      Value="&quot;[#dbconfig.exe]&quot; &quot;swversion&quot; &quot;save&quot;" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="SaveLastDatabaseVersion" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="check" Impersonate="no" />
+
         <CustomAction Id="CopyAppServerProfile_Cmd" Property="CopyAppServerProfile" Execute="immediate" Impersonate="yes"
             Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller;[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller"/>
 
@@ -393,6 +400,8 @@
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
+        <CustomAction Id="BackupDatabaseFile_Cmd" Property="BackupDatabaseFile" Execute="immediate" Impersonate="yes"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;Software\${company.name}\${appserver.name};lastDbVersion"/>
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db"/>
 
@@ -445,6 +454,7 @@
             <Custom Action="FixClientFolder" After="SetClientFolderToRegistry">1</Custom>
             <Custom Action="IsClientFolderExists" After="FixClientFolder">1</Custom>
             <Custom Action="SetClientFolderToDefault" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
+            <Custom Action="PopulateRestoreVersions" After="CostInitialize">REMOVE="ALL"</Custom>
 
         </InstallUISequence>
 
@@ -492,7 +502,13 @@
             <Custom Action="CertGenAction" After="CertGenAction_Cmd">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="SyncDatabaseAction_Cmd" After="CopyAppServerProfile">
+            <Custom Action="SaveLastDatabaseVersion_Cmd" After="CertGenAction"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SaveLastDatabaseVersion" After="SaveLastDatabaseVersion_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="BackupDatabaseFile_Cmd" After="SaveLastDatabaseVersion"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="SyncDatabaseAction_Cmd" After="BackupDatabaseFile">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
