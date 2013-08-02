@@ -25,7 +25,7 @@
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
         <install.type>all</install.type>
-        <ClientBgSourceDir>${project.build.sourceDirectory}/maven-bin-resources/custom/${installer.customization}/Backgrounds</ClientBgSourceDir>
+        <ClientBgSourceDir>${basedir}/../client/resource/common/backgrounds</ClientBgSourceDir>
     </properties>
 
     <dependencies>

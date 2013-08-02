@@ -543,8 +543,8 @@ void QnBusinessRuleProcessor::at_businessRuleReset(QnBusinessEventRuleList rules
         if( !m_rules[i]->disabled() )
             notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
         terminateRunningRule(m_rules[i]);
-        m_rules.removeAt(i);
     }
+    m_rules.clear();
 
     foreach(QnBusinessEventRulePtr rule, rules) {
         at_businessRuleChanged_i(rule);

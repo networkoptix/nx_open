@@ -175,7 +175,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         int n = 0;
         foreach (QString mac, params.getConflicts()) {
             result += delimiter;
-            result += tr("Camera #%1 MAC: %2").arg(n).arg(mac);
+            result += tr("Camera #%1 MAC: %2").arg(++n).arg(mac);
         }
         break;
                                                 }
@@ -183,11 +183,6 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         QVariantList conflicts;
         int n = 0;
         foreach (QString ip, params.getConflicts()) {
-            QVariantHash conflict;
-            conflict[lit("number")] = ++n;
-            conflict[lit("ip")] = ip;
-            conflicts << conflict;
-
             result += delimiter;
             result += tr("Conflicting EC #%1: %2").arg(n).arg(ip);
         }
