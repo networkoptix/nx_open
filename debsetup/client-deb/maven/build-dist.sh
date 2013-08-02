@@ -8,6 +8,7 @@ ARCHITECTURE=${os.arch}
 
 TARGET=/opt/$COMPANY_NAME/client
 BINTARGET=$TARGET/bin
+BGTARGET=$TARGET/share/pictures/sample-backgrounds
 LIBTARGET=$TARGET/lib
 USRTARGET=/usr
 INITTARGET=/etc/init
@@ -16,6 +17,7 @@ INITDTARGET=/etc/init.d
 STAGEBASE=deb
 STAGE=$STAGEBASE/${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}-beta
 BINSTAGE=$STAGE$BINTARGET
+BGSTAGE=$STAGE$BGTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 
 CLIENT_BIN_PATH=${libdir}/bin/${build.configuration}
@@ -23,6 +25,7 @@ CLIENT_HELP_PATH=${libdir}/bin/help
 CLIENT_STYLES_PATH=$CLIENT_BIN_PATH/styles
 CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
 CLIENT_SQLDRIVERS_PATH=$CLIENT_BIN_PATH/sqldrivers
+CLIENT_BG_PATH=${libdir}/../../client/resource/common/backgrounds
 CLIENT_LIB_PATH=${libdir}/build/bin/${build.configuration}
 
 . $CLIENT_BIN_PATH/env.sh
@@ -36,6 +39,7 @@ mkdir -p $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/i
 mkdir -p $BINSTAGE/1.4/imageformats
 mkdir -p $BINSTAGE/1.5/imageformats
 mkdir -p $LIBSTAGE
+mkdir -p $BGSTAGE
 
 # Copy client binary, x264, old version libs
 cp -r $CLIENT_BIN_PATH/client-bin $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
@@ -61,6 +65,9 @@ cp -P -Rf usr $STAGE
 
 # Copy help
 cp -r $CLIENT_HELP_PATH $BINSTAGE
+
+# Copy backgrounds
+cp -r $CLIENT_BG_PATH/* $BGSTAGE
 
 # Copy libraries, styles, imageformats
 cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE
