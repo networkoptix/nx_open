@@ -134,7 +134,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
 }
 
 QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const {
-    // TODO: rvasilenko, please review
+    // TODO: this code is copy-pasted from getImageHandler. need refactoring to avoid code duplicate
 
     QImage result;
 
