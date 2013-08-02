@@ -1,4 +1,5 @@
 TEMPLATE = lib
+QT += core gui network opengl xml sql
 
 win32 {
   pb.commands = ${libdir}/build/bin/protoc --proto_path=${project.build.sourceDirectory}/api/pb --cpp_out=$${MOC_DIR} ${project.build.sourceDirectory}/api/pb/${QMAKE_FILE_BASE}.proto

@@ -1,5 +1,4 @@
 #define QT_NO_CAST_FROM_ASCII
-#define USE_NX_HTTP
 
 #include <common/config.h>
 #ifdef __cplusplus

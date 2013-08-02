@@ -62,7 +62,7 @@
 
 
 /* Define noexcept. */
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER < 1700
 #   define noexcept throw()
 #elif defined(__GNUC__)
 #   if (GCC_VERSION >= 40600)
@@ -70,8 +70,8 @@
 #   else
 #       define noexcept throw()
 #   endif
-#else
-#   define noexcept
+//#else
+//#   define noexcept
 #endif
 
 

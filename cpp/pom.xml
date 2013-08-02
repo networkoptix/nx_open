@@ -325,7 +325,7 @@
 			</activation>
 			<properties>
 				<!-- <compiler>msvc2008</compiler> -->
-				<arch>x86</arch>
+				<!-- <arch>x86</arch> -->
 				<platform>windows</platform>
 				<exclude_platform>unix</exclude_platform>
 			</properties>
@@ -343,13 +343,15 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>qmake</executable>
+									<executable>${environment.dir}/qt5/qtbase-${arch}/bin/qmake</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
+										<commandlineArgs>-spec</commandlineArgs>
+										<commandlineArgs>win32-msvc2012</commandlineArgs>
 										<commandlineArgs>-tp</commandlineArgs>
 										<commandlineArgs>vc</commandlineArgs>
 										<commandlineArgs>-o</commandlineArgs>
-										<commandlineArgs>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj</commandlineArgs>
+										<commandlineArgs>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</commandlineArgs>
 										<commandlineArgs>${project.build.directory}/${project.artifactId}.pro</commandlineArgs>
 									</arguments>
 								</configuration>

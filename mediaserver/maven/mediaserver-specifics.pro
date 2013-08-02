@@ -1,5 +1,7 @@
 TEMPLATE = app
 CONFIG += console
+QT += core network xml sql
+
 
 include(${environment.dir}/qt5/qt-custom/qtservice/src/qtservice.pri)
 #include(${environment.dir}/qt5/qt-custom/qtsingleapplication/src/qtsingleapplication.pri)

@@ -1,4 +1,6 @@
 TEMPLATE = lib
+QT += core opengl
+
 
 win32 {
   QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE

@@ -32,7 +32,7 @@ CONFIG(debug, debug|release) {
   MOC_DIR = ../${arch}/build/debug/generated
   UI_DIR = ../${arch}/build/debug/generated
   RCC_DIR = ../${arch}/build/debug/generated
-  LIBS = -L${libdir}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug
+  LIBS = -L${libdir}/build/bin/debug -L${environment.dir}/qt5/qtbase-${arch}/lib
 }
 
 CONFIG(release, debug|release) {
@@ -46,7 +46,7 @@ CONFIG(release, debug|release) {
   MOC_DIR = ../${arch}/build/release/generated
   UI_DIR = ../${arch}/build/release/generated
   RCC_DIR = ../${arch}/build/release/generated
-  LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
+  LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt5/qtbase-${arch}/lib
 }
 
 !contains(TARGET,common){
@@ -56,12 +56,10 @@ CONFIG(release, debug|release) {
 LIBS += ${global.libs}
 DEFINES += ${global.defines}
 
-QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
-
 !mac {
     include(${environment.dir}/qt5/qt-custom/QtCore/private/qtcore.pri)
 }
-INCLUDEPATH += ${environment.dir}/qt5/qt/include ${environment.dir}/qt5/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt5/qt-custom ${environment.dir}/qt5/qt-custom/QtCore
+INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include ${environment.dir}/qt5/qtbase-${arch}/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt5/qt-custom ${environment.dir}/qt5/qt-custom/QtCore
 DEPENDPATH *= $${INCLUDEPATH}
 
 !mac {

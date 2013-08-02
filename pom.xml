@@ -49,14 +49,14 @@
         <buildNumber>0</buildNumber>
         <customization>default</customization>
         <!--QT libs used--> 
-        <qtlib1>core</qtlib1>
-        <qtlib2>gui</qtlib2>
-        <qtlib3>network</qtlib3>
-        <qtlib4>opengl</qtlib4>
-        <qtlib5>xml</qtlib5>
-        <qtlib6>multimedia</qtlib6>
-        <qtlib7>sql</qtlib7>
-        <qtlib8/>
+        <qtlib1>Core</qtlib1>
+        <qtlib2>Gui</qtlib2>
+        <qtlib3>Network</qtlib3>
+        <qtlib4>Opengl</qtlib4>
+        <qtlib5>Xml</qtlib5>
+        <qtlib6>Multimedia</qtlib6>
+        <qtlib7>Sql</qtlib7>
+        <qtlib8>Widgets</qtlib8>
         <qtlib9/>
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>

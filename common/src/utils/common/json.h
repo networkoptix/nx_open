@@ -293,7 +293,7 @@ QN_DEFINE_CONTAINER_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T)
 QN_DEFINE_CONTAINER_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), any_map);
 #undef QN_DEFINE_CONTAINER_SERIALIZATION_FUNCTIONS
 
-struct QUuid;
+class QUuid;
 void serialize(const QUuid &value, QVariant *target);
 bool deserialize(const QVariant &value, QUuid *target);
 
