@@ -107,7 +107,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     m_rulesViewModel->reloadData();
 
     connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFilter()));
-    connect(ui->systemRulesCheckBox, SIGNAL(toggled(bool)), this, SLOT(updateFilter()));
     connect(ui->clearFilterButton, SIGNAL(clicked()), this, SLOT(at_clearFilterButton_clicked()));
     updateFilter();
 }
@@ -417,13 +416,11 @@ void QnBusinessRulesDialog::updateFilter() {
     if (!m_rulesViewModel->isLoaded())
         return;
 
-    bool showSystemRules = ui->systemRulesCheckBox->isChecked();
-
     for (int i = 0; i < m_rulesViewModel->rowCount(); ++i) {
         QnBusinessRuleViewModel *ruleModel = m_rulesViewModel->getRuleModel(i);
 
-        // check that system rules should be displayed
-        bool passSystemFilter = (showSystemRules || !ruleModel->system());
+        // system rules should never be displayed
+        bool passSystemFilter = !ruleModel->system();
         bool passEventFilter = BusinessEventType::requiresCameraResource(ruleModel->eventType());
         bool passActionFilter = BusinessActionType::requiresCameraResource(ruleModel->actionType());
 
