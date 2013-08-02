@@ -44,6 +44,8 @@ void QnFisheyeSettingsWidget::updateFromResource(QnSecurityCamResourcePtr camera
         default:
             Q_ASSERT_X( __LINE__, Q_FUNC_INFO, "Unsupported value");
     }
+
+    ui->horizontalSlider->setValue(m_dewarpingParams.fovRot * 10);
      
     if (!m_silenseMode)
         emit dataChanged();
