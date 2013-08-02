@@ -16,6 +16,7 @@
 #include "core/resource/resource_type.h"
 #include "core/resource_managment/resource_pool.h"
 
+#include <ui/actions/action_manager.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -42,10 +43,12 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::About_Help);
 
-    QPushButton* showcaseButton = new QPushButton(this);
-    showcaseButton->setText(action(Qn::ShowcaseAction)->text());
-    connect(showcaseButton, SIGNAL(clicked()), action(Qn::ShowcaseAction), SLOT(trigger()));
-    ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
+    if(menu()->canTrigger(Qn::ShowcaseAction)) {
+        QPushButton* showcaseButton = new QPushButton(this);
+        showcaseButton->setText(action(Qn::ShowcaseAction)->text());
+        connect(showcaseButton, SIGNAL(clicked()), action(Qn::ShowcaseAction), SLOT(trigger()));
+        ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
+    }
 
     m_copyButton = new QPushButton(this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
