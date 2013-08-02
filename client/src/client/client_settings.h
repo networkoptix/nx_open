@@ -15,6 +15,8 @@
 #include <client/client_model_types.h>
 
 class QSettings;
+class QNetworkAccessManager;
+class QNetworkReply;
 
 class QnClientSettings: public QnPropertyStorage, public Singleton<QnClientSettings> {
     Q_OBJECT
@@ -52,6 +54,11 @@ public:
         UPDATE_FEED_URL,
         UPDATES_ENABLED,
         IGNORED_UPDATE_VERSION,
+
+        SHOWCASE_URL,
+        SHOWCASE_ENABLED,
+
+        SETTINGS_URL,
 
         TOUR_CYCLE_TIME,
         IP_SHOWN_IN_TREE,
@@ -112,6 +119,11 @@ protected:
     virtual UpdateStatus updateValue(int id, const QVariant &value) override;
 
 private:
+    void loadFromWebsite();
+
+    Q_SLOT void at_accessManager_finished(QNetworkReply *reply);
+
+private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(int,                         maxVideoItems,          setMaxVideoItems,           MAX_VIDEO_ITEMS,            24)
         QN_DECLARE_RW_PROPERTY(bool,                        isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false)
@@ -137,6 +149,9 @@ private:
         QN_DECLARE_RW_PROPERTY(QUrl,                        updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QUrl())
         QN_DECLARE_RW_PROPERTY(bool,                        isUpdatesEnabled,       setUpdatesEnabled,          UPDATES_ENABLED,            true)
         QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,           ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())
+        QN_DECLARE_RW_PROPERTY(QUrl,                        showcaseUrl,            setShowcaseUrl,             SHOWCASE_URL,               QUrl())
+        QN_DECLARE_RW_PROPERTY(bool,                        isShowcaseEnabled,      setShowcaseEnabled,         SHOWCASE_ENABLED,           false)
+        QN_DECLARE_RW_PROPERTY(QUrl,                        settingsUrl,            setSettingsUrl,             SETTINGS_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(bool,                        isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
         QN_DECLARE_RW_PROPERTY(bool,                        isHardwareDecodingUsed, setUseHardwareDecoding,     USE_HARDWARE_DECODING,      false)
@@ -161,6 +176,7 @@ private:
     QN_END_PROPERTY_STORAGE()
 
 private:
+    QNetworkAccessManager *m_accessManager;
     QSettings *m_settings;
     bool m_loading;
 };

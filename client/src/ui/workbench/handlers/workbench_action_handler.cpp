@@ -1609,7 +1609,7 @@ void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {
-    QDesktopServices::openUrl(QUrl(QLatin1String(QN_SHOWCASE_URL), QUrl::TolerantMode));
+    QDesktopServices::openUrl(qnSettings->showcaseUrl());
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {

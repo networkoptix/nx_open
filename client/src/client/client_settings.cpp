@@ -4,6 +4,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QSettings>
 
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+
 #include <client/config.h>
 
 #include <utils/common/util.h>
@@ -47,8 +50,11 @@ namespace {
 QnClientSettings::QnClientSettings(QObject *parent):
     base_type(parent),
     m_settings(new QSettings(this)),
+    m_accessManager(new QNetworkAccessManager(this)),
     m_loading(true)
 {
+    connect(m_accessManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(at_accessManager_finished(QNetworkReply *)));
+
     init();
 
     /* Set default values. */
@@ -57,6 +63,8 @@ QnClientSettings::QnClientSettings(QObject *parent):
 #ifdef Q_OS_DARWIN
     setAudioDownmixed(true); /* Mac version uses SPDIF by default for multichannel audio. */
 #endif
+    setShowcaseUrl(QUrl(lit(QN_SHOWCASE_URL)));
+    setSettingsUrl(QUrl(lit(QN_SETTINGS_URL)));
 
     /* Set names. */
     setName(MEDIA_FOLDER,           lit("mediaRoot"));
@@ -78,7 +86,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QVariantMap json;
         if(!QJson::deserialize(file.readAll(), &json)) {
-            qWarning() << "Client settings file could not be parsed!";
+            qnWarning("Could not parse client settings file.");
         } else {
             updateFromJson(json.value(lit("settings")).toMap());
         }
@@ -86,6 +94,9 @@ QnClientSettings::QnClientSettings(QObject *parent):
 
     /* Load from settings. */
     load();
+
+    /* Load from external source. */
+    loadFromWebsite();
 
     setThreadSafe(true);
 
@@ -201,6 +212,9 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         }
     case DEBUG_COUNTER:
     case UPDATE_FEED_URL:
+    //case SHOWCASE_URL:
+    //case SHOWCASE_ENABLED:
+    case SETTINGS_URL:
     case DEV_MODE:
     case UPDATES_ENABLED:
         break; /* Not to be saved to settings. */
@@ -236,4 +250,24 @@ void QnClientSettings::save() {
 
 bool QnClientSettings::isWritable() const {
     return m_settings->isWritable();
+}
+
+void QnClientSettings::loadFromWebsite() {
+    m_accessManager->get(QNetworkRequest(settingsUrl()));
+}
+
+void QnClientSettings::at_accessManager_finished(QNetworkReply *reply) {
+    if(reply->error() != QNetworkReply::NoError) {
+        qnWarning("Could not download client settings from '%1': %2.", reply->url().toString(), reply->errorString());
+        return;
+    }
+
+    QVariantMap json;
+    if(!QJson::deserialize(reply->readAll(), &json)) {
+        qnWarning("Could not parse client settings downloaded from '%1'.", reply->url().toString());
+    } else {
+        updateFromJson(json.value(lit("settings")).toMap());
+    }
+
+    reply->deleteLater();
 }
