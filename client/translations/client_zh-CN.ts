@@ -94,15 +94,15 @@
     </message>
     <message>
         <source>Warning! Please read documentation before change these settings!</source>
-        <translation>警告！更改这些设置之前，请阅读文档!</translation>
+        <translation type="obsolete">警告！更改这些设置之前，请阅读文档!</translation>
     </message>
     <message>
         <source>Keep camera streams settings</source>
-        <translation>保留摄像机视频流设置</translation>
+        <translation type="obsolete">保留摄像机视频流设置</translation>
     </message>
     <message>
         <source>Warning! In this case FPS/Quality settings in Recording Schedule will not work!</source>
-        <translation>警告！在这种情况下，录影排程中的每秒帧数/画质设置将无法正常运作!</translation>
+        <translation type="obsolete">警告！在这种情况下，录影排程中的每秒帧数/画质设置将无法正常运作!</translation>
     </message>
     <message>
         <source>Secondary stream quality</source>
@@ -126,11 +126,31 @@
     </message>
     <message>
         <source>Warning! Low quality may result in crappy picture, high stream may overload Media Server&apos;s CPU or network connection</source>
-        <translation>警告！低画质可能会导致糟糕的影像，高码流則可能超载媒体服务器的CPU或网络连接</translation>
+        <translation type="obsolete">警告！低画质可能会导致糟糕的影像，高码流則可能超载媒体服务器的CPU或网络连接</translation>
     </message>
     <message>
         <source>Your combined cameras with and without dual streaming. Stream quality control is disabled</source>
-        <translation>结合支援和不支援双码流的摄像机。禁用流的质量控制</translation>
+        <translation type="obsolete">结合支援和不支援双码流的摄像机。禁用流的质量控制</translation>
+    </message>
+    <message>
+        <source>Warning! Please read documentation prior to change these settings!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep camera streams&apos; and profiles&apos; settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Warning! Low quality may result in low resolution image. High quality may result in Media Server’s CPU overload and network connection errors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Combined cameras with and without dual streaming. Stream quality control is disabled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -172,7 +192,7 @@
     </message>
     <message>
         <source>Show system rules</source>
-        <translation>显示系统规则</translation>
+        <translation type="obsolete">显示系统规则</translation>
     </message>
 </context>
 <context>
@@ -638,6 +658,10 @@
     <message>
         <source>Alarm/Event Rules</source>
         <translation>报警/事件规则</translation>
+    </message>
+    <message>
+        <source>All media servers are offline. Logs are not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1998,7 +2022,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Edit tags...</source>
-        <translation>编辑标签...</translation>
+        <translation type="obsolete">编辑标签...</translation>
     </message>
     <message>
         <source>Alt+T</source>
@@ -2522,7 +2546,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Camera Diagnostics...</source>
-        <translation>摄像机诊断...</translation>
+        <translation type="obsolete">摄像机诊断...</translation>
     </message>
     <message>
         <source>Add Camera(s)...</source>
@@ -2562,7 +2586,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Showcase...</source>
-        <translation>开启网页显示软件功能...</translation>
+        <translation type="obsolete">开启网页显示软件功能...</translation>
     </message>
     <message>
         <source>Open in New Tab</source>
@@ -2603,6 +2627,14 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <source>Camera Rules...</source>
         <translation>摄像机规则...</translation>
+    </message>
+    <message>
+        <source>Check Camera Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How-to Videos and FAQ...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2884,7 +2916,7 @@ for recording at
     </message>
     <message>
         <source>Instant</source>
-        <translation type="obsolete">立即作用</translation>
+        <translation type="unfinished">立即作用</translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n days</source>
@@ -2925,10 +2957,6 @@ for recording at
     <message>
         <source>Not Applied</source>
         <translation>不适用</translation>
-    </message>
-    <message>
-        <source>Instant</source>
-        <translation>立即</translation>
     </message>
     <message numerus="yes">
         <source>Every %n days</source>
@@ -4094,15 +4122,15 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>No online media servers</source>
-        <translation>没有在线的媒体服务器</translation>
+        <translation type="obsolete">没有在线的媒体服务器</translation>
     </message>
     <message>
         <source>All media server(s) is offline. No data is selected</source>
-        <translation>所有媒体服务器已离线。沒有选择任何数据</translation>
+        <translation type="obsolete">所有媒体服务器已离线。沒有选择任何数据</translation>
     </message>
     <message>
         <source>No rule(s) for current filter</source>
-        <translation>当前过滤器无规则</translation>
+        <translation type="obsolete">当前过滤器无规则</translation>
     </message>
     <message>
         <source>You have not configured business rules to match current filter condition.</source>
@@ -4134,7 +4162,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>You have not configured any Alarm/Event Rules to match the current filter condition.</source>
-        <translation>您还没有配置任何报警/事件规则以匹配当前的过滤条件。</translation>
+        <translation type="obsolete">您还没有配置任何报警/事件规则以匹配当前的过滤条件。</translation>
     </message>
 </context>
 <context>
@@ -4494,7 +4522,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>You do not have a valid License installed. Please activate your commercial license.</source>
-        <translation>您未安装有效的许可。请激活您所购买的许可。</translation>
+        <translation type="obsolete">您未安装有效的许可。请激活您所购买的许可。</translation>
     </message>
     <message>
         <source>Never</source>
@@ -4508,7 +4536,7 @@ Required at least %3 digital and %4 analog licenses.</source>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 Currently using %3 digital and %4 analog licenses.</source>
-        <translation>本软件许可支持%1 路数码和%2 路类比摄像机。当前使用%3 路数码和%4 路类比许可。</translation>
+        <translation type="obsolete">本软件许可支持%1 路数码和%2 路类比摄像机。当前使用%3 路数码和%4 路类比许可。</translation>
     </message>
     <message>
         <source>&lt;b&gt;Generic:&lt;/b&gt;&lt;br /&gt;
@@ -4532,7 +4560,20 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>You do not have a valid License installed. Please activate your commercial or trial license.</source>
-        <translation>您未安装有效的许可。请激活您的免费许可。</translation>
+        <translation type="obsolete">您未安装有效的许可。请激活您的免费许可。</translation>
+    </message>
+    <message>
+        <source>The software is licensed to %1 digital and %2 analog cameras.
+%3 digital and %4 analog licenses are currently in use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed. Please activate your commercial license.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6741,7 +6782,7 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Licenses limit exceeded. Your changes will be saved, but will not take effect.</source>
-        <translation>超过许可限制。您的修改将会保存，但不会生效。</translation>
+        <translation type="obsolete">超过许可限制。您的修改将会保存，但不会生效。</translation>
     </message>
     <message>
         <source>Could not apply changes</source>
@@ -6858,7 +6899,7 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source> Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation>您的录像修改尚未保存。請选择录像方式，FPS和质量并将此修改标记在日程中。</translation>
+        <translation type="obsolete">您的录像修改尚未保存。請选择录像方式，FPS和质量并将此修改标记在日程中。</translation>
     </message>
     <message>
         <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
@@ -6963,6 +7004,14 @@ and you do not have the rights to overwrite it.</source>
     <message>
         <source>Open New Window</source>
         <translation>开启新窗口</translation>
+    </message>
+    <message>
+        <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7524,7 +7573,7 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Software (On media server, max fps may be slightly decreased)</source>
-        <translation>软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
+        <translation type="obsolete">软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
     </message>
     <message>
         <source>Sensitivity:</source>
@@ -7584,11 +7633,19 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>This is the fish-eye lens camera</source>
-        <translation>这是鱼眼镜头摄像机</translation>
+        <translation type="obsolete">这是鱼眼镜头摄像机</translation>
     </message>
     <message>
         <source>Dewarping</source>
         <translation>扭曲影像還原</translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Software (Max fps may be slightly decreased on media server)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7621,39 +7678,39 @@ hh:mm:ss</source>
     <name>TagsEditDialog</name>
     <message>
         <source>Edit File Tags</source>
-        <translation>编辑文件标签</translation>
+        <translation type="obsolete">编辑文件标签</translation>
     </message>
     <message>
         <source>New Tag</source>
-        <translation>新标签</translation>
+        <translation type="obsolete">新标签</translation>
     </message>
     <message>
         <source>Add Tag</source>
-        <translation>添加标签</translation>
+        <translation type="obsolete">添加标签</translation>
     </message>
     <message>
         <source>Set Tag</source>
-        <translation>设定标签</translation>
+        <translation type="obsolete">设定标签</translation>
     </message>
     <message>
         <source>Unset Tag</source>
-        <translation>取消标签设定</translation>
+        <translation type="obsolete">取消标签设定</translation>
     </message>
     <message>
         <source>Filter</source>
-        <translation>过滤器</translation>
+        <translation type="obsolete">过滤器</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation>清除过滤器</translation>
+        <translation type="obsolete">清除过滤器</translation>
     </message>
     <message>
         <source>Assigned Tags</source>
-        <translation>分配的标签</translation>
+        <translation type="obsolete">分配的标签</translation>
     </message>
     <message>
         <source>All Tags</source>
-        <translation>所有的标签</translation>
+        <translation type="obsolete">所有的标签</translation>
     </message>
 </context>
 <context>
@@ -7723,7 +7780,7 @@ hh:mm:ss</source>
     <name>WeekTimeScheduleWidget</name>
     <message>
         <source>WeekTime Schedule Editor</source>
-        <translation>日程编辑器</translation>
+        <translation type="obsolete">日程编辑器</translation>
     </message>
     <message>
         <source>Schedule Grid</source>
@@ -7744,6 +7801,10 @@ hh:mm:ss</source>
     <message>
         <source>Off</source>
         <translation>关</translation>
+    </message>
+    <message>
+        <source>Weekly Schedule Editor</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

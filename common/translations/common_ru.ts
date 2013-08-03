@@ -122,7 +122,7 @@
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="21"/>
-        <source>Play Sound</source>
+        <source>Play sound</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -360,38 +360,38 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="174"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="163"/>
         <source>Input port: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="183"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="169"/>
         <source>Reason: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="190"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="173"/>
         <source>Conflict address: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="201"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="178"/>
         <source>Camera #%1 MAC: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="217"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="187"/>
         <source>Conflicting EC #%1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="234"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="254"/>
         <source>%2 %1</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="238"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="258"/>
         <source>%n times, first: %2 %1</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
@@ -401,13 +401,13 @@
         </translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="249"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="269"/>
         <source>Time: %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="253"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="273"/>
         <source>First occurence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
@@ -417,37 +417,37 @@
         </translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="274"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="294"/>
         <source>No video frame received during last %1 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="278"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="298"/>
         <source>Connection to camera was unexpectedly closed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="285"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="305"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="290"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="310"/>
         <source>Server terminated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="294"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="314"/>
         <source>Server started after crash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="302"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="322"/>
         <source>Not enough HDD/SSD speed for recording to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="298"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="318"/>
         <source>I/O Error occured at %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -475,17 +475,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
-        <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="49"/>
+        <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="52"/>
-        <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
+        <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="61"/>
+        <source>Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="66"/>
+        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="71"/>
+        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="80"/>
+        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="111"/>
+        <source>(unknown)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="57"/>
         <source>Not authorized.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -495,47 +520,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="45"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="46"/>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="60"/>
-        <source>Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="65"/>
-        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
-        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="75"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="76"/>
         <source>Unknown Camera Issue. Please, contact support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="79"/>
-        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="83"/>
         <source>Server has been stopped.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="85"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
         <source>Unknown error. Please contact support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="98"/>
         <source> Parameters: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -858,12 +863,12 @@
     <name>QnSystemHealthStringsHelper</name>
     <message>
         <location filename="../src/health/system_health.cpp" line="6"/>
-        <source>Your E-Mail address is not set</source>
+        <source>E-Mail address is not set</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="8"/>
-        <source>You have no licenses</source>
+        <source>No licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -903,7 +908,7 @@
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="41"/>
-        <source>Your E-Mail address is not set.
+        <source>E-Mail address is not set.
 You cannot receive system notifications via E-Mail.</source>
         <translation type="unfinished"></translation>
     </message>
