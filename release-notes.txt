@@ -16,17 +16,22 @@ Since 1.5.1
  - Input/Output is supported by ACTI cameras
  - HD Witness licenses cannot be activated on DW Spectrum and vice versa
  
- - Fixed Client crash that occurred if quickly duplicate cameras with a large video archive on Scene
- - Added filter in "Event/Actions" dialog. It is possible to display only rules that are applied to particular Camera(s)
- - Also added "Camera rules" in resource tree and on "Camera settings"
- - Arecont Panoramic sensors were mixed up if apply flip. Fixed
+ - Fixed Client crash that occurred if a lot of cameras with a lot of recording fragments are opened simultaneously
+ - The filter in the "Event/Actions" dialog is added. It is possible to display only rules that are applied to particular Camera(s)
+ 
  - Added new E-Mail templates
- - Added thumbnails in the "Select cameras" dialog (when configuring Event Rules or copying Recording Schedule to Cameras)
- - Added the "Open New Window" button to export dialog (with progress bar). It is possible to open a new Client instance 
+ - Thumbnails are displayed if hover with a mouse cursor on a camera in the "Select cameras" dialog (when configuring Event 
+   Rules or copying Recording Schedule to Cameras)
+ - The "Open New Window" button is added to the export dialog with progress bar. It is possible to open a new Client instance 
    and continue working during export.
  - If video card drivers are not installed the software gives warning before start (used to be after software start that could cause crash)
+ - Crash occurred if open Health monitoring while running client on old video cards, RDP sessions etc. Fixed 
+ - All video streams currently opened are paused during export to save bandwidth
+ - Old version of the database can be backed up during the upgrade. In case of failure the database can be restored to a previous version.
 
 Since previous build
+ - The "Camera rules" button is added in resource tree and on "Camera settings"
+ - Visual Notifications on Cameras (motion, network issues) do not occur if view archive
  - Added a new action for camera and server diagnostics (only for log).
  - Selected item was not marked in Tree (> sign). Fixed
  - Network Statistics sometimes displayed 0 Mbps usage for a short time. Fixed
@@ -184,15 +189,15 @@ NEW FEATURES:
  
 IMPROVEMENTS:  
  - Ability to run client when the computer boots up
-        - Client only installer is available
-        - UI state (pinned or hidden tabs) are always saved between Client launches
+ - Client only installer is available
+ - UI state (pinned or hidden tabs) are always saved between Client launches
  - Added ping button to Media Server settings dialog. It may be useful to check computer state: if the computer is pinging but 
    Media Server appears offline, then this is software problem. Otherwise it is likely to be hardware problem and hard reset may be needed
  - Health monitor improvements:
     - Added ping, show log and server issues button.
-        - Added checkbox graphs enabling/disabling.
+    - Added checkbox graphs enabling/disabling.
     - Added network usage in Health Monitoring.
-        - Added timestamp option to screenshot, export selected area and multi-video
+    - Added timestamp option to screenshot, export selected area and multi-video
  - Current time is always displayed under playback buttons
  - Changed default motion sensitivity for motion dialog to 5 (used to be 8)
  - Main window is Repainted when aero is turned on/off
