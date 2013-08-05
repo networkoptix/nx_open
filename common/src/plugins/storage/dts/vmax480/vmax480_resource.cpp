@@ -191,13 +191,15 @@ void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
 QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
 {
     QUrl url(getUrl());
-    QList<QPair<QString, QString> > items = url.queryItems();
+    QUrlQuery urlQuery(url.query());
+    QList<QPair<QString, QString> > items = urlQuery.queryItems();
     for (int i = 0; i < items.size(); ++i)
     {
         if (items[i].first == lit("channel"))
             items[i].second = QString::number(channel+1);
     }
-    url.setQueryItems(items);
+    urlQuery.setQueryItems(items);
+    url.setQuery(urlQuery);
     QString urlStr = url.toString();
     return qnResPool->getResourceByUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
 }

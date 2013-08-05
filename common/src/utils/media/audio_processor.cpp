@@ -71,7 +71,7 @@ int QnAudioProcessor::downmix(quint8* data, int size, AVCodecContext* ctx)
 
 QnCodecAudioFormat QnAudioProcessor::downmix(QnByteArray& audio, QnCodecAudioFormat format)
 {
-    if (format.channels() > 2)
+    if (format.channelCount() > 2)
     {
         if (format.sampleSize() == 8)
             down_mix_to_stereo<qint8>((qint8*)(audio.data()), format.channelCount(), audio.size());
@@ -84,7 +84,7 @@ QnCodecAudioFormat QnAudioProcessor::downmix(QnByteArray& audio, QnCodecAudioFor
             Q_ASSERT_X(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
         }
         audio.resize(audio.size() / format.channelCount() * 2);
-        format.setChannels(2);
+        format.setChannelCount(2);
     }
     return format;
 }

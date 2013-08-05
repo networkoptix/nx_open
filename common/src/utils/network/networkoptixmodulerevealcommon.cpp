@@ -76,7 +76,7 @@ namespace Serialization
             return false;
         if( bufEnd - *bufStart < val.size() )
             return false;
-        memcpy( *bufStart, val.toAscii().data(), val.size() );
+        memcpy( *bufStart, val.toLatin1().data(), val.size() );
         *bufStart += val.size();
         return true;
     }
@@ -88,21 +88,21 @@ namespace Serialization
             return false;
         if( bufEnd - *bufStart < (qint32)strLength )
             return false;
-        *val = QString::fromAscii( reinterpret_cast<const char*>(*bufStart), strLength );
+        *val = QString::fromLatin1( reinterpret_cast<const char*>(*bufStart), strLength );
         *bufStart += strLength;
         return true;
     }
 }
 
 
-static const QString revealRequestStr = QString::fromAscii("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
+static const QString revealRequestStr = QString::fromLatin1("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
 
 bool RevealRequest::serialize( quint8** const bufStart, const quint8* bufEnd )
 {
     if( bufEnd - *bufStart < revealRequestStr.size() )
         return false;
 
-    memcpy( *bufStart, revealRequestStr.toAscii().data(), revealRequestStr.size() );
+    memcpy( *bufStart, revealRequestStr.toLatin1().data(), revealRequestStr.size() );
     *bufStart += revealRequestStr.size();
     return true;
 }
@@ -112,7 +112,7 @@ bool RevealRequest::deserialize( const quint8** bufStart, const quint8* bufEnd )
     if( bufEnd - *bufStart < revealRequestStr.size() )
         return false;
 
-    if( memcmp( *bufStart, revealRequestStr.toAscii().data(), revealRequestStr.size() ) != 0 )
+    if( memcmp( *bufStart, revealRequestStr.toLatin1().data(), revealRequestStr.size() ) != 0 )
         return false;
     *bufStart += revealRequestStr.size();
     return true;
@@ -133,7 +133,7 @@ RevealResponse::RevealResponse()
 
 bool RevealResponse::serialize( quint8** const bufStart, const quint8* bufEnd )
 {
-    QString str = QString::fromAscii(
+    QString str = QString::fromLatin1(
         "{\n"
             "'application': %1,\n"
             "'version': %2,\n"
@@ -143,9 +143,9 @@ bool RevealResponse::serialize( quint8** const bufStart, const quint8* bufEnd )
         it != typeSpecificParameters.end();
         ++it )
     {
-        str += QString::fromAscii(",\n '%1': '%2'").arg(it.key()).arg(it.value());
+        str += QString::fromLatin1(",\n '%1': '%2'").arg(it.key()).arg(it.value());
     }
-    str += QString::fromAscii("}");
+    str += QString::fromLatin1("}");
 
     return Serialization::serialize( str, bufStart, bufEnd );
 }
@@ -199,13 +199,13 @@ bool RevealResponse::deserialize( const quint8** bufStart, const quint8* bufEnd 
                 {
                     state = sReadingMapKey;
                     currentToken.clear();
-                    currentToken += QString::fromAscii(ch, 1);
+                    currentToken += QString::fromLatin1(ch, 1);
                 }
                 break;
 
             case sReadingMapKey:
                 if( isPrintedChar )
-                    currentToken += QString::fromAscii(ch, 1);
+                    currentToken += QString::fromLatin1(ch, 1);
                 else if( isSeparator || *ch == '"' || *ch == '\'' )
                 {
                     state = waitingMapKeyValueSeparator;
@@ -223,7 +223,7 @@ bool RevealResponse::deserialize( const quint8** bufStart, const quint8* bufEnd 
                 {
                     currentToken.clear();
                     state = sReadingMapValue;
-                    currentToken += QString::fromAscii(ch, 1);
+                    currentToken += QString::fromLatin1(ch, 1);
                     currentTokenQuoted = false;
                 }
                 else if( *ch == '\'' || *ch == '"' )
@@ -237,7 +237,7 @@ bool RevealResponse::deserialize( const quint8** bufStart, const quint8* bufEnd 
             case sReadingMapValue:
                 if( isPrintedChar || (isSeparator && currentTokenQuoted) )
                 {
-                    currentToken += QString::fromAscii(ch, 1);
+                    currentToken += QString::fromLatin1(ch, 1);
                     break;
                 }
                 else if( isSeparator || *ch == '"' || *ch == '\'' )
@@ -272,11 +272,11 @@ bool RevealResponse::deserialize( const quint8** bufStart, const quint8* bufEnd 
         it != mapElements.end();
         ++it )
     {
-        if( it->first == QString::fromAscii("application") )
+        if( it->first == QString::fromLatin1("application") )
             type = it->second;
-        else if( it->first == QString::fromAscii("version") )
+        else if( it->first == QString::fromLatin1("version") )
             version = it->second;
-        else if( it->first == QString::fromAscii("seed") )
+        else if( it->first == QString::fromLatin1("seed") )
             seed = it->second;
         else
             typeSpecificParameters.insert( it->first, it->second );

@@ -230,7 +230,9 @@ void QnLog::log(QnLogLevel logLevel, const char* format, ...) {
     va_end(args);
 }
 
-void qnLogMsgHandler(QtMsgType type, const char *msg) {
+void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg) {
+    //TODO: ak use ctx
+
     QnLogLevel logLevel;
     switch (type) {
     case QtFatalMsg:
@@ -248,7 +250,7 @@ void qnLogMsgHandler(QtMsgType type, const char *msg) {
         break;
     }
 
-    cl_log.log(QString::fromLocal8Bit(msg), logLevel);
+    cl_log.log(msg, logLevel);
 }
 
 QString QnLog::logFileName()

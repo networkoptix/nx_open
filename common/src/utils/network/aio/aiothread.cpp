@@ -234,7 +234,7 @@ namespace aio
                 QSharedPointer<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(it.userData())->data;
                 QMutexLocker lk( &processEventsMutex );
                 handlingData->beingProcessed.ref();
-                if( handlingData->markedForRemoval > 0 ) //socket has been removed from watch
+                if( handlingData->markedForRemoval.load() > 0 ) //socket has been removed from watch
                 {
                     handlingData->beingProcessed.deref();
                     continue;
@@ -265,7 +265,7 @@ namespace aio
                 QSharedPointer<AIOEventHandlingData> handlingData = periodicTaskData.data;
                 QMutexLocker lk( &processEventsMutex );
                 handlingData->beingProcessed.ref();
-                if( handlingData->markedForRemoval > 0 ) //task has been removed from watch
+                if( handlingData->markedForRemoval.load() > 0 ) //task has been removed from watch
                 {
                     handlingData->beingProcessed.deref();
                     continue;

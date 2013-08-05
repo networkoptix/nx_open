@@ -27,7 +27,7 @@ namespace {
             return image;
 
         // Get bitmap bits
-        uchar *data = (uchar *) qMalloc(bmi.bmiHeader.biSizeImage);
+        uchar *data = (uchar *) malloc(bmi.bmiHeader.biSizeImage);
 
         if (GetDIBits(hdc, bitmap, 0, h, data, &bmi, DIB_RGB_COLORS)) {
             // Create image and copy data into image.
@@ -39,7 +39,7 @@ namespace {
         } else {
             qWarning("qt_fromWinHBITMAP(), failed to get bitmap bits");
         }
-        qFree(data);
+        free(data);
 
         return image;
     }
@@ -133,7 +133,8 @@ namespace {
 
 QCursor QnPlatformImages::bitmapCursor(Qt::CursorShape shape) const {
     QCursor cursor(shape);
-    HCURSOR handle = cursor.handle();
+    //HCURSOR handle = cursor.handle();
+    HCURSOR handle = NULL;
     // TODO: There is a bug in Qt 4.7.4 that results in drag cursors returning NULL handle. We don't care.
 
     QPoint hotSpot;

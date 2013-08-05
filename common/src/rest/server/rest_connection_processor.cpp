@@ -107,7 +107,7 @@ void QnRestConnectionProcessor::run()
             QnRestRequestHandlerPtr handler = findHandler(url.path());
             if (handler) 
             {
-                QList<QPair<QString, QString> > params = url.queryItems();
+                QList<QPair<QString, QString> > params = QUrlQuery(url.query()).queryItems();
 #ifdef USE_NX_HTTP
                 if (d->owner->authenticate(d->request, d->response))
                 {
@@ -162,7 +162,7 @@ void QnRestConnectionProcessor::run()
                     if (str.startsWith(QLatin1String("api/")))
                     {
                         d->responseBody.append("<TR><TD>");
-                        d->responseBody.append(str.toAscii());
+                        d->responseBody.append(str.toLatin1());
                         d->responseBody.append("<TD>");
                         d->responseBody.append(itr.value()->description());
                         d->responseBody.append("</TD>");

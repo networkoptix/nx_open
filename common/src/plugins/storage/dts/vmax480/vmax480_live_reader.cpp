@@ -80,7 +80,7 @@ CameraDiagnostics::Result QnVMax480LiveProvider::openStream()
     if (m_opened)
         return CameraDiagnostics::NoErrorResult();
 
-    int channel = QUrl(m_resource->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
+    int channel = QUrlQuery(QUrl(m_resource->getUrl()).query()).queryItemValue(QLatin1String("channel")).toInt();
     if (channel > 0)
         channel--;
 

@@ -48,9 +48,9 @@ namespace SystemError
                     break;
             }
         }
-        return QString::fromAscii( msgBuf );
+        return QString::fromLatin1( msgBuf );
 #else
-        return QString::fromAscii( strerror( errorCode ) );
+        return QString::fromLatin1( strerror( errorCode ) );
 #endif
     }
 

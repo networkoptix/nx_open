@@ -62,17 +62,17 @@
 
 
 /* Define noexcept. */
-#if defined(_MSC_VER) && _MSC_VER < 1700
-#   define noexcept throw()
-#elif defined(__GNUC__)
-#   if (GCC_VERSION >= 40600)
-#       define noexcept noexcept
-#   else
-#       define noexcept throw()
-#   endif
-//#else
-//#   define noexcept
-#endif
+//#if defined(_MSC_VER) && _MSC_VER < 1700
+//#   define noexcept throw()
+//#elif defined(__GNUC__)
+//#   if (GCC_VERSION >= 40600)
+//#       define noexcept noexcept
+//#   else
+//#       define noexcept throw()
+//#   endif
+////#else
+////#   define noexcept
+//#endif
 
 
 /* Define foreach */

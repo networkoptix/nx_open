@@ -742,7 +742,7 @@ int QnAppServerConnection::addStoredFileAsync(const QString &filename, const QBy
 
     QByteArray data("--" + bound);
     data += "\r\n";
-    data += "Content-Disposition: form-data; name=\"filedata\"; filename=\"" + filename.toAscii() + "\"\r\n";
+    data += "Content-Disposition: form-data; name=\"filedata\"; filename=\"" + filename.toLatin1() + "\"\r\n";
     data += "Content-Type: application/octet-stream\r\n\r\n";
     data += filedata;
     data += "\r\n";

@@ -86,7 +86,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         if (existsRes && (existsRes->getStatus() == QnResource::Online || existsRes->getStatus() == QnResource::Recording)) 
         {
             resource->setName(existsRes->getName());
-            int existHttpPort = QUrl(existsRes->getUrl()).queryItemValue(lit("http_port")).toInt();
+            int existHttpPort = QUrlQuery(QUrl(existsRes->getUrl()).query()).queryItemValue(lit("http_port")).toInt();
             existHttpPort = existHttpPort ? existHttpPort : 80;
             apiPort = QUrl(existsRes->getUrl()).port(VMAX_API_PORT);
             // Prevent constant http pullig. But if http port is changed update api port as well.
@@ -270,7 +270,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     int channels = -1;
     int apiPort = VMAX_API_PORT;
     int httpPort = 80;
-    QString httpPortStr = url.queryItemValue(lit("http_port"));
+    QString httpPortStr = QUrlQuery(url.query()).queryItemValue(lit("http_port"));
     if (httpPortStr.isEmpty())
     {
         // first discovery: port used as http port, API port is unknown
@@ -301,7 +301,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
             channels = extractChannelCount(existsRes->getModel().toUtf8()); // avoid real requests
             QUrl url(existsRes->getUrl());
             apiPort = url.port(VMAX_API_PORT);
-            int existHttpPort = url.queryItemValue(lit("http_port")).toInt();
+            int existHttpPort = QUrlQuery(url.query()).queryItemValue(lit("http_port")).toInt();
             if (existHttpPort > 0)
                 httpPort = existHttpPort;
         }

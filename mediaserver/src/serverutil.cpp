@@ -60,6 +60,7 @@ QString getDataDirectory()
     QString varDirName = qSettings.value("varDir", defVarDirName).toString();
     return varDirName;
 #else
-    return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+    return dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
 }

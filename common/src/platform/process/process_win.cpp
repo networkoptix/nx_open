@@ -95,7 +95,7 @@ private:
     bool valid;
     qint64 pid;
     HANDLE handle;
-    QWeakPointer<QProcess> process;
+    QPointer<QProcess> process;
 };
 
 

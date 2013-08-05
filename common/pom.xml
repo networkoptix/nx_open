@@ -31,7 +31,7 @@
 		<!--Global defines-->
 		<global.defines/>
 		<!--Specific os defines-->
-		<windows.defines/>
+		<windows.defines>_USING_V110_SDK71_</windows.defines>
 		<linux.defines/>
 		<mac.defines/>      
 	</properties>   

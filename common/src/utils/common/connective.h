@@ -6,7 +6,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
-#include <QtCore/QWeakPointer>
+#include <QtCore/QPointer>
 
 #include "forward.h"
 
@@ -22,9 +22,9 @@ struct Connection {
         }
     }
 
-    QWeakPointer<QObject> sender;
+    QPointer<QObject> sender;
     const char *signal;
-    QWeakPointer<QObject> receiver;
+    QPointer<QObject> receiver;
     const char *method;
 };
 
@@ -44,7 +44,7 @@ namespace Qn {
     }
 
     template<class T>
-    inline QObject *connector(const QWeakPointer<T> &object) {
+    inline QObject *connector(const QPointer<T> &object) {
         return connector(object.data());
     }
 

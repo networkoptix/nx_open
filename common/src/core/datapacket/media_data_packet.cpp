@@ -420,3 +420,61 @@ QnCompressedAudioData* QnCompressedAudioData::clone()
     rez->assign(this);
     return rez;
 }
+
+void QnCodecAudioFormat::setFrequency( int _freq )
+{
+    m_frequency = _freq;
+}
+
+int QnCodecAudioFormat::frequency() const
+{
+    return m_frequency;
+}
+
+void QnCodecAudioFormat::fromAvStream(AVCodecContext* c)
+{
+    if (c->sample_rate)
+        setFrequency(c->sample_rate);
+
+    if (c->channels) 
+        setChannelCount(c->channels);
+
+    //setCodec("audio/pcm");
+    setByteOrder(QnAudioFormat::LittleEndian);
+
+    switch(c->sample_fmt)
+    {
+    case AV_SAMPLE_FMT_U8: ///< unsigned 8 bits
+        setSampleSize(8);
+        setSampleType(QnAudioFormat::UnSignedInt);
+        break;
+
+    case AV_SAMPLE_FMT_S16: ///< signed 16 bits
+        setSampleSize(16);
+        setSampleType(QnAudioFormat::SignedInt);
+        break;
+
+    case AV_SAMPLE_FMT_S32:///< signed 32 bits
+        setSampleSize(32);
+        setSampleType(QnAudioFormat::SignedInt);
+        break;
+
+    case AV_SAMPLE_FMT_FLT:
+        setSampleSize(32);
+        setSampleType(QnAudioFormat::Float);
+        break;
+
+    default:
+        break;
+    }
+
+    if (c->extradata_size > 0)
+    {
+        extraData.resize(c->extradata_size);
+        memcpy(&extraData[0], c->extradata, c->extradata_size);
+    }
+    bitrate = c->bit_rate;
+    channel_layout = c->channel_layout;
+    block_align = c->block_align;
+    m_bitsPerSample = c->bits_per_coded_sample;
+}

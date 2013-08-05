@@ -919,7 +919,7 @@ CameraDiagnostics::Result QnResource::prevInitializationResult() const
 
 int QnResource::initializationAttemptCount() const
 {
-    return m_initializationAttemptCount;
+    return m_initializationAttemptCount.load();
 }
 
 bool QnResource::isInitialized() const

@@ -108,7 +108,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     QnPlOnvifResourcePtr rpResource = qnResPool->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
     if (rpResource) 
     {
-        int channel = url.queryItemValue(QLatin1String("channel")).toInt();
+        int channel = QUrlQuery(url.query()).queryItemValue(QLatin1String("channel")).toInt();
         
         if (channel == 0 && !hasRunningLiveProvider(rpResource)) {
             resource->calcTimeDrift();

@@ -216,7 +216,7 @@ qint64 QnLicense::expirationTime() const {
 }
 
 QnLicense::Type QnLicense::type() const {
-    if (key() == qnProductFeatures().freeLicenseKey.toAscii())
+    if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
         return FreeLicense;
 
     if (!expiration().isEmpty())

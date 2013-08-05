@@ -15,7 +15,7 @@ extern "C"
 #ifndef Q_OS_WIN
 #   include "utils/media/audioformat.h"
 #else
-#   include <QAudioFormat>
+#   include <QtMultimedia/QAudioFormat>
 #   define QnAudioFormat QAudioFormat
 #endif
 #include "utils/math/math.h"
@@ -285,7 +285,8 @@ public:
         bitrate(0),
         channel_layout(0),
         block_align(0),
-        m_bitsPerSample(0)
+        m_bitsPerSample(0),
+        m_frequency(0)
     {}
 
     QnCodecAudioFormat(QnMediaContextPtr ctx)
@@ -299,59 +300,19 @@ public:
         return *this;
     }
 
-    void fromAvStream(AVCodecContext* c)
-    {
-        if (c->sample_rate)
-            setFrequency(c->sample_rate);
+    void setFrequency( int _freq );
+    int frequency() const;
 
-        if (c->channels) 
-            setChannels(c->channels);
-
-        //setCodec("audio/pcm");
-        setByteOrder(QnAudioFormat::LittleEndian);
-
-        switch(c->sample_fmt)
-        {
-        case AV_SAMPLE_FMT_U8: ///< unsigned 8 bits
-            setSampleSize(8);
-            setSampleType(QnAudioFormat::UnSignedInt);
-            break;
-
-        case AV_SAMPLE_FMT_S16: ///< signed 16 bits
-            setSampleSize(16);
-            setSampleType(QnAudioFormat::SignedInt);
-            break;
-
-        case AV_SAMPLE_FMT_S32:///< signed 32 bits
-            setSampleSize(32);
-            setSampleType(QnAudioFormat::SignedInt);
-            break;
-
-        case AV_SAMPLE_FMT_FLT:
-            setSampleSize(32);
-            setSampleType(QnAudioFormat::Float);
-            break;
-
-        default:
-            break;
-        }
-
-        if (c->extradata_size > 0)
-        {
-            extraData.resize(c->extradata_size);
-            memcpy(&extraData[0], c->extradata, c->extradata_size);
-        }
-        bitrate = c->bit_rate;
-        channel_layout = c->channel_layout;
-        block_align = c->block_align;
-        m_bitsPerSample = c->bits_per_coded_sample;
-    }
+    void fromAvStream(AVCodecContext* c);
 
     QVector<quint8> extraData; // codec extra data
     int bitrate;
     int channel_layout;
     int block_align;
     int m_bitsPerSample;
+
+private:
+    int m_frequency;
 };
 
 

@@ -75,7 +75,7 @@ PMTStreamInfo::PMTStreamInfo(int streamType, int pid, quint8* esInfoData, int es
     m_esInfoLen = esInfoLen;
     m_codecReader = codecReader;
     memset(m_lang, 0, sizeof(m_lang));
-    memcpy(m_lang, lang.toAscii(), lang.size() < 3 ? lang.size() : 3);
+    memcpy(m_lang, lang.toLatin1(), lang.size() < 3 ? lang.size() : 3);
     m_pmtPID = -1;
     m_priorityStream = false;
     m_isSecondary = secondary;
@@ -788,8 +788,8 @@ int MPLSParser::compose(quint8* buffer, int bufferSize, MPLSParser::DiskType dt)
         version_number = QLatin1String("0200");
     else
         version_number = QLatin1String("0100");
-    CLPIStreamInfo::writeString(m_type_indicator.toAscii(), writer, 4);
-    CLPIStreamInfo::writeString(version_number.toAscii(), writer, 4);
+    CLPIStreamInfo::writeString(m_type_indicator.toLatin1(), writer, 4);
+    CLPIStreamInfo::writeString(version_number.toLatin1(), writer, 4);
     quint32* playList_bit_pos = (quint32*) (buffer + writer.getBitsCount()/8);
     writer.putBits(32,0);
     quint32* playListMark_bit_pos = (quint32*) (buffer + writer.getBitsCount()/8);
@@ -1012,7 +1012,7 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, int playItemNum, QV
     int beforeCount = writer.getBitsCount()/8;
 
     QString clip_Information_file_name = strPadLeft(QString::number(playItemNum + m_m2tsOffset),5, '0');
-    CLPIStreamInfo::writeString(clip_Information_file_name.toAscii(), writer, 5);
+    CLPIStreamInfo::writeString(clip_Information_file_name.toLatin1(), writer, 5);
     char clip_codec_identifier[] = "M2TS";
     CLPIStreamInfo::writeString(clip_codec_identifier, writer, 4);
     int connection_condition = playItemNum == 0 ? 1 : 6;
@@ -1216,7 +1216,7 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, int playItemNum, QVect
     writer.putBits(16,0); // skip lengthField
     int beforeCount = writer.getBitsCount()/8;
     QString clip_Information_file_name = strPadLeft(QString::number(playItemNum + m_m2tsOffset),5, '0');
-    CLPIStreamInfo::writeString(clip_Information_file_name.toAscii(), writer, 5);
+    CLPIStreamInfo::writeString(clip_Information_file_name.toLatin1(), writer, 5);
     char clip_codec_identifier[] = "M2TS";
     CLPIStreamInfo::writeString(clip_codec_identifier, writer, 4);
     writer.putBits(11, 0); // reserved_for_future_use 11 bslbf

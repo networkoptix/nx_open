@@ -347,11 +347,11 @@
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
 										<commandlineArgs>-spec</commandlineArgs>
-										<commandlineArgs>win32-msvc2012</commandlineArgs>
+										<commandlineArgs>win32-msvc2008</commandlineArgs>
 										<commandlineArgs>-tp</commandlineArgs>
 										<commandlineArgs>vc</commandlineArgs>
 										<commandlineArgs>-o</commandlineArgs>
-										<commandlineArgs>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</commandlineArgs>
+										<commandlineArgs>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj</commandlineArgs>
 										<commandlineArgs>${project.build.directory}/${project.artifactId}.pro</commandlineArgs>
 									</arguments>
 								</configuration>

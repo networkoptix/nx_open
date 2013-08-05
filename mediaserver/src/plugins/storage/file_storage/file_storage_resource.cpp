@@ -251,7 +251,7 @@ bool QnFileStorageResource::readTabFile( const QString& filePath, QStringList* c
 
     while( !tabFile.atEnd() )
     {
-        QString line = QString::fromAscii(tabFile.readLine().trimmed());
+        QString line = QString::fromLatin1(tabFile.readLine().trimmed());
         if( line.isEmpty() || line.startsWith('#') )
             continue;
 

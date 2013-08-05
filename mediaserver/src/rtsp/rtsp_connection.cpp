@@ -1,4 +1,5 @@
 
+#include <QtCore/QUrlQuery>
 #include <QtCore/QUuid>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
@@ -249,12 +250,14 @@ void QnRtspConnectionProcessor::parseRequest()
         d->socket->setReadTimeOut(d->sessionTimeOut * 1500);
     }
 
-    QString pos = url.queryItemValue("pos").split('/')[0];
+    const QUrlQuery urlQuery( url.query() );
+
+    QString pos = urlQuery.queryItemValue("pos").split('/')[0];
     if (pos.isEmpty())
         processRangeHeader();
     else
         d->startTime = pos.toLongLong();
-    QByteArray resolutionStr = url.queryItemValue("resolution").split('/')[0].toUtf8();
+    QByteArray resolutionStr = urlQuery.queryItemValue("resolution").split('/')[0].toUtf8();
     if (!resolutionStr.isEmpty())
     {
         QSize videoSize(640,480);

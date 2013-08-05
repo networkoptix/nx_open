@@ -418,14 +418,14 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 }
 #endif
 
-static QtMsgHandler defaultMsgHandler = 0;
+static QtMessageHandler defaultMsgHandler = 0;
 
-static void myMsgHandler(QtMsgType type, const char *msg)
+static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
     if (defaultMsgHandler)
-        defaultMsgHandler(type, msg);
+        defaultMsgHandler(type, ctx, msg);
 
-    qnLogMsgHandler(type, msg);
+    qnLogMsgHandler(type, ctx, msg);
 }
 
 int serverMain(int argc, char *argv[])
@@ -482,7 +482,7 @@ int serverMain(int argc, char *argv[])
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
-    defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
+    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
     platform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
 
@@ -531,15 +531,17 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
     appServerEventsUrl.setPath("/events/");
-    appServerEventsUrl.addQueryItem("xid", mediaServer->getId().toString());
-    appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
-    appServerEventsUrl.addQueryItem("version", QN_ENGINE_VERSION);
-    appServerEventsUrl.addQueryItem("format", "pb");
+    QUrlQuery appServerEventsUrlQuery;
+    appServerEventsUrlQuery.addQueryItem("xid", mediaServer->getId().toString());
+    appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
+    appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
+    appServerEventsUrlQuery.addQueryItem("format", "pb");
+    appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
+    eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toLatin1(), EVENT_RECONNECT_TIMEOUT);
 }
 
 QnMain::QnMain(int argc, char* argv[])

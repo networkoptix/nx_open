@@ -47,7 +47,7 @@ NamedMutex::NamedMutex( const QString& name )
 #endif
 {
 #ifdef _WIN32
-    m_impl->mutexHandle = CreateMutex( NULL, FALSE, name.utf16() );
+    m_impl->mutexHandle = CreateMutex( NULL, FALSE, reinterpret_cast<const wchar_t*>(name.utf16()) );
     if( m_impl->mutexHandle == NULL )
         m_impl->prevErrorCode = GetLastError();
 #endif

@@ -59,7 +59,16 @@ DEFINES += ${global.defines}
 !mac {
     include(${environment.dir}/qt5/qt-custom/QtCore/private/qtcore.pri)
 }
-INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include ${environment.dir}/qt5/qtbase-${arch}/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt5/qt-custom ${environment.dir}/qt5/qt-custom/QtCore
+INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include \
+		${environment.dir}/qt5/qtbase-${arch}/include/QtCore \
+		${project.build.sourceDirectory} \
+		${project.build.directory} \
+		${basedir}/../common/src ${libdir}/build/include \
+		${project.build.directory}/build/include \
+		${environment.dir}/qt5/qt-custom \
+		${environment.dir}/qt5/qt-custom/QtCore \
+		${environment.dir}\qt5\qtbase-${arch}\include\QtCore\5.1.0\ \
+		${environment.dir}\qt5\qtbase-${arch}\include\QtCore\5.1.0\QtCore\
 DEPENDPATH *= $${INCLUDEPATH}
 
 !mac {
@@ -75,7 +84,7 @@ win* {
   
   CONFIG += ${arch}
   LIBS += ${windows.oslibs}
-  DEFINES += ${windows.defines}  
+  DEFINES += _USING_V110_SDK71_ ${windows.defines}  
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
 	# /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.

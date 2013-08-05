@@ -72,7 +72,7 @@ throw() {
         userMessage.append(QLatin1String(strerror(errno)));
     }
 
-    QByteArray data = userMessage.toAscii();
+    QByteArray data = userMessage.toLatin1();
     strncpy(m_message, data.data(), MAX_ERROR_MSG_LENGTH-1);
     m_message[MAX_ERROR_MSG_LENGTH-1] = 0;
 }
@@ -204,8 +204,8 @@ unsigned short Socket::resolveService(const QString &service,
                                       const QString &protocol) {
     struct servent *serv;        /* Structure containing service information */
 
-    if ((serv = getservbyname(service.toAscii(), protocol.toAscii())) == NULL)
-        return atoi(service.toAscii());  /* Service is port number */
+    if ((serv = getservbyname(service.toLatin1(), protocol.toLatin1())) == NULL)
+        return atoi(service.toLatin1());  /* Service is port number */
     else
         return ntohs(serv->s_port);    /* Found port (network byte order) by name */
 }
@@ -339,7 +339,7 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
     hints.ai_next = NULL;
 
     addrinfo *addressInfo;
-    int status = getaddrinfo(address.toAscii(), 0, &hints, &addressInfo);
+    int status = getaddrinfo(address.toLatin1(), 0, &hints, &addressInfo);
     if (status != 0) {
 #ifdef UNICODE
         QString errorMessage = QString::fromWCharArray(gai_strerror(status));
@@ -947,7 +947,7 @@ bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
 {
 #ifdef Q_OS_LINUX
     setLocalPort(0);
-    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length()) >= 0;
+    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toLatin1().constData(), iface.name.length()) >= 0;
 #else
     bool res = setLocalAddressAndPort(iface.address.toString(), 0);
 #endif
@@ -1035,7 +1035,7 @@ bool UDPSocket::setMulticastIF(const QString& multicastIF)
 bool UDPSocket::joinGroup(const QString &multicastGroup)  {
     struct ip_mreq multicastRequest;
 
-    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
+    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         (raw_type *) &multicastRequest,
@@ -1049,8 +1049,8 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)  {
 bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicastIF)  {
     struct ip_mreq multicastRequest;
 
-    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
-    multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toAscii());
+    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
+    multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         (raw_type *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
@@ -1063,7 +1063,7 @@ bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicas
 bool UDPSocket::leaveGroup(const QString &multicastGroup)  {
     struct ip_mreq multicastRequest;
 
-    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
+    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
     if (setsockopt(sockDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP,
         (raw_type *) &multicastRequest,
@@ -1077,8 +1077,8 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup)  {
 bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multicastIF)  {
     struct ip_mreq multicastRequest;
 
-    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
-    multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toAscii());
+    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
+    multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
     if (setsockopt(sockDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP,
         (raw_type *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {

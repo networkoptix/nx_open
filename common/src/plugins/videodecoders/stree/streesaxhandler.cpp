@@ -55,7 +55,7 @@ namespace stree
         if( !newNode.get())
             return false;
 
-        int valuePos = atts.index(QString::fromAscii("value"));
+        int valuePos = atts.index(QString::fromLatin1("value"));
         if( !m_nodes.empty() )
             if( !m_nodes.top()->addChild( valuePos == -1 ? QVariant() : QVariant(atts.value(valuePos)), newNode.get() ) )
             {
@@ -97,14 +97,14 @@ namespace stree
 
     bool SaxHandler::error( const QXmlParseException& exception )
     {
-        m_errorDescription = QString::fromAscii("Parse error. line %1, col %2, parser message: %3").
+        m_errorDescription = QString::fromLatin1("Parse error. line %1, col %2, parser message: %3").
             arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
         return false;
     }
 
     bool SaxHandler::fatalError( const QXmlParseException& exception )
     {
-        m_errorDescription = QString::fromAscii("Fatal parse error. line %1, col %2, parser message: %3").
+        m_errorDescription = QString::fromLatin1("Fatal parse error. line %1, col %2, parser message: %3").
             arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
         return false;
     }
@@ -123,32 +123,32 @@ namespace stree
 
     AbstractNode* SaxHandler::createNode( const QString& nodeName, const QXmlAttributes& atts ) const
     {
-        if( nodeName == QString::fromAscii("condition") )
+        if( nodeName == QString::fromLatin1("condition") )
         {
             //resName, matchType
-            int resNamePos = atts.index(QString::fromAscii("resName"));
+            int resNamePos = atts.index(QString::fromLatin1("resName"));
             if( resNamePos == -1 )
             {
-                m_errorDescription = QString::fromAscii( "No required attribute \"resName\" in ConditionNode" );
+                m_errorDescription = QString::fromLatin1( "No required attribute \"resName\" in ConditionNode" );
                 return NULL;
             }
             const QString& resName = atts.value(resNamePos);
             const ResourceNameSet::ResourceDescription& res = m_resourceNameSet.findResourceByName(resName);
             if( res.id == -1 )
             {
-                m_errorDescription = QString::fromAscii( "Unknown resource %1 found as \"resName\" attribute of ConditionNode" ).arg(resName);
+                m_errorDescription = QString::fromLatin1( "Unknown resource %1 found as \"resName\" attribute of ConditionNode" ).arg(resName);
                 return NULL;
             }
 
             MatchType::Value matchType = MatchType::equal;
-            int matchTypePos = atts.index(QString::fromAscii("matchType"));
+            int matchTypePos = atts.index(QString::fromLatin1("matchType"));
             if( matchTypePos >= 0 )
             {
                 const QString& matchTypeStr = atts.value(matchTypePos);
                 matchType = MatchType::fromString( matchTypeStr );
                 if( matchType == MatchType::unknown )
                 {
-                    m_errorDescription = QString::fromAscii( "ConditionNode does not support match type %1" ).arg(matchTypeStr);
+                    m_errorDescription = QString::fromLatin1( "ConditionNode does not support match type %1" ).arg(matchTypeStr);
                     return NULL;
                 }
             }
@@ -166,35 +166,35 @@ namespace stree
                 case QVariant::String:
                     return createConditionNodeForStringRes( matchType, res.id );
                 default:
-                    m_errorDescription = QString::fromAscii( "ConditionNode currently does not support resource of type %1 (resource name %2). "
-                        "Only %3 types are supported" ).arg(res.type).arg(resName).arg(QString::fromAscii("int, double, string"));
+                    m_errorDescription = QString::fromLatin1( "ConditionNode currently does not support resource of type %1 (resource name %2). "
+                        "Only %3 types are supported" ).arg(res.type).arg(resName).arg(QString::fromLatin1("int, double, string"));
                     return NULL;
             }
         }
-        else if( nodeName == QString::fromAscii("sequence") )
+        else if( nodeName == QString::fromLatin1("sequence") )
         {
             return new SequenceNode();
         }
-        else if( nodeName == QString::fromAscii("set") )
+        else if( nodeName == QString::fromLatin1("set") )
         {
-            int resNamePos = atts.index(QString::fromAscii("resName"));
+            int resNamePos = atts.index(QString::fromLatin1("resName"));
             if( resNamePos == -1 )
             {
-                m_errorDescription = QString::fromAscii( "No required attribute \"resName\" in SetNode" );
+                m_errorDescription = QString::fromLatin1( "No required attribute \"resName\" in SetNode" );
                 return NULL;
             }
             const QString& resName = atts.value(resNamePos);
-            int resValuePos = atts.index(QString::fromAscii("resValue"));
+            int resValuePos = atts.index(QString::fromLatin1("resValue"));
             if( resValuePos == -1 )
             {
-                m_errorDescription = QString::fromAscii( "No required attribute \"resValue\" in SetNode" );
+                m_errorDescription = QString::fromLatin1( "No required attribute \"resValue\" in SetNode" );
                 return NULL;
             }
 
             const ResourceNameSet::ResourceDescription& res = m_resourceNameSet.findResourceByName( resName );
             if( res.id == -1 )
             {
-                m_errorDescription = QString::fromAscii( "Unknown resource %1 found as \"resName\" attribute of SetNode" ).arg(resName);
+                m_errorDescription = QString::fromLatin1( "Unknown resource %1 found as \"resName\" attribute of SetNode" ).arg(resName);
                 return NULL;
             }
 
@@ -203,7 +203,7 @@ namespace stree
             QVariant resValue( resValueStr );
             if( !resValue.convert( res.type ) )
             {
-                m_errorDescription = QString::fromAscii( "Could not convert value %1 of resource %2 to type %3" ).arg(resValueStr).arg(resName).arg(res.type);
+                m_errorDescription = QString::fromLatin1( "Could not convert value %1 of resource %2 to type %3" ).arg(resValueStr).arg(resName).arg(res.type);
                 return NULL;
             }
 

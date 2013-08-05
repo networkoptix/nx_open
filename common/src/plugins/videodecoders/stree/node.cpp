@@ -81,13 +81,13 @@ namespace stree
     {
         Value fromString( const QString& str )
         {
-            if( str == QString::fromAscii("equal") )
+            if( str == QString::fromLatin1("equal") )
                 return equal;
-            else if( str == QString::fromAscii("greater") )
+            else if( str == QString::fromLatin1("greater") )
                 return greater;
-            else if( str == QString::fromAscii("less") )
+            else if( str == QString::fromLatin1("less") )
                 return less;
-            else if( str == QString::fromAscii("wildcard") )
+            else if( str == QString::fromLatin1("wildcard") )
                 return wildcard;
             else
                 return unknown;

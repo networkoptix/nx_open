@@ -6,6 +6,7 @@
 #endif
 
 #include <QtCore/QDateTime>
+#include <QtCore/QStandardPaths>
 #include <QtGui/QDesktopServices>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
@@ -51,11 +52,13 @@ QString fromNativePath(const QString &path)
 
 QString getMoviesDirectory()
 {
-    return QDesktopServices::storageLocation(QDesktopServices::MoviesLocation);
+    const QStringList& moviesDirs = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation);
+    return moviesDirs.isEmpty() ? QString() : moviesDirs[0];
 }
 
 QString getBackgroundsDirectory() {
-    QString baseDir = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
+    const QStringList& pictureFolderList = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
+    QString baseDir = pictureFolderList.isEmpty() ? QString(): pictureFolderList[0];
     QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(lit(QN_PRODUCT_NAME_LONG)));
 
     return QDir(productDir).exists()

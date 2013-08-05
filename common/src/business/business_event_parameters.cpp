@@ -185,7 +185,7 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
                     result.m_source = QString::fromUtf8(field.data(), field.size());
                     break;
                 case conflictsParam:
-                    result.m_conflicts = QString::fromAscii(field.data(), field.size()).split(QLatin1Char(STRING_LIST_DELIM)); // optimization. mac address list here. UTF is not required
+                    result.m_conflicts = QString::fromLatin1(field.data(), field.size()).split(QLatin1Char(STRING_LIST_DELIM)); // optimization. mac address list here. UTF is not required
                     break;
             default:
                 break;

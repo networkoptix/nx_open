@@ -1,10 +1,10 @@
 
-#include "rtpsession.h"
-#include "rtp_stream_parser.h"
-
 #if defined(Q_OS_WIN)
 #  include <winsock2.h>
 #endif
+
+#include "rtpsession.h"
+#include "rtp_stream_parser.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QUuid>
