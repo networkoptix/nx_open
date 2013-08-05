@@ -239,7 +239,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
             }
 
             QByteArray networkBlock = extractXmlBody(data, "network"), interfaceBlock; {
-                qDebug() << "network statistics" << networkBlock;
                 int from = 0;
                 do {
                     interfaceBlock = extractXmlBody(networkBlock, "interface", &from);
