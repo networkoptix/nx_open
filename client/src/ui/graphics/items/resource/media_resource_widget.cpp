@@ -193,6 +193,7 @@ void QnMediaResourceWidget::updateFisheyeController() {
         m_fisheyePtz = 0;
         if(buttonBar()->button(FishEyeButton))
             buttonBar()->button(FishEyeButton)->setChecked(false);
+        at_dewarpingParamsChanged(item()->dewarpingParams());
     }
     updateAspectRatio();
 }
@@ -216,7 +217,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 void QnMediaResourceWidget::at_dewarpingParamsChanged(DewarpingParams params)
 {
     item()->setDewarpingParams(params);
-    item()->setData(Qn::ItemFlipRole, params.viewMode == DewarpingParams::VerticalDown);
+    item()->setData(Qn::ItemFlipRole, params.enabled && params.viewMode == DewarpingParams::VerticalDown);
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
