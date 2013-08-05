@@ -2746,25 +2746,20 @@ QMutex* QnPlOnvifResource::getStreamConfMutex()
 
 void QnPlOnvifResource::beforeConfigureStream()
 {
-    qWarning() << "before configure stream started";
     QMutexLocker lock (&m_streamConfMutex);
     ++m_streamConfCounter;
     while (m_streamConfCounter > 1)
         m_streamConfCond.wait(&m_streamConfMutex);
-    qWarning() << "before configure stream finished";
 }
 
 void QnPlOnvifResource::afterConfigureStream()
 {
-    qWarning() << "after configure stream started";
-
     QMutexLocker lock (&m_streamConfMutex);
     --m_streamConfCounter;
     m_streamConfCond.wakeAll();
     while (m_streamConfCounter > 0)
         m_streamConfCond.wait(&m_streamConfMutex);
 
-    qWarning() << "after configure stream finished";
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( bool performSimpleCheck )
