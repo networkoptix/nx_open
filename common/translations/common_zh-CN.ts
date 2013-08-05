@@ -157,7 +157,7 @@
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="21"/>
         <source>Play sound</source>
-        <translation type="unfinished"></translation>
+        <translation>播放音效</translation>
     </message>
     <message>
         <source>Alert</source>
@@ -938,37 +938,37 @@ for recording to %1.</source>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="49"/>
         <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
-        <translation type="unfinished"></translation>
+        <translation>解析摄像机错误回应。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
         <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
-        <translation type="unfinished"></translation>
+        <translation>没有媒体路径。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="61"/>
         <source>Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接到媒体端口 %1。不支援的媒体协议%2。请尝试在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="66"/>
         <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>配置参数 %1失败。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="71"/>
         <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机請求%1出現%2錯誤。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="80"/>
         <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O错误。 OS信息e: %1。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="111"/>
         <source>(unknown)</source>
-        <translation type="unfinished"></translation>
+        <translation>(未知)</translation>
     </message>
     <message>
         <source>Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
@@ -998,12 +998,12 @@ for recording to %1.</source>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
         <source>Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接到媒体 url %1。无法连接到媒体端口 %2。确认访问端口 %2可以存取(转发等)。请尝试重新启摄像机，然后在网页上复原为出厂默认值。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="46"/>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接到媒体 url %1。%2 端口上的连接被意外关闭。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
@@ -1384,12 +1384,12 @@ for recording to %1.</source>
     <message>
         <location filename="../src/health/system_health.cpp" line="6"/>
         <source>E-Mail address is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>邮件地址没有设定</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="8"/>
         <source>No licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>没有软件许可</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="10"/>
@@ -1430,7 +1430,8 @@ for recording to %1.</source>
         <location filename="../src/health/system_health.cpp" line="41"/>
         <source>E-Mail address is not set.
 You cannot receive system notifications via E-Mail.</source>
-        <translation type="unfinished"></translation>
+        <translation>邮件地址没有设定。
+无法通过邮件接收系统通知。</translation>
     </message>
     <message>
         <source>Your E-Mail address is not set.
@@ -1443,7 +1444,7 @@ You cannot receive system notifications via E-Mail.</source>
         <source>E-Mail server is not set.
 You cannot receive system notifications via E-Mail.</source>
         <translation>邮箱服务器没有设定。
-无法通过邮件接收系统事件。</translation>
+无法通过邮件接收系统通知。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="45"/>

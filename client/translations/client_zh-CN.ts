@@ -134,23 +134,23 @@
     </message>
     <message>
         <source>Warning! Please read documentation prior to change these settings!</source>
-        <translation type="unfinished"></translation>
+        <translation>警告!更改这些设置之前请阅读文档!</translation>
     </message>
     <message>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation type="unfinished"></translation>
+        <translation>保留摄像机视频流&apos; 及 profiles&apos; 设置</translation>
     </message>
     <message>
         <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
+        <translation>警告！录影排程中的每秒帧数/画质设置将无法正常运作!</translation>
     </message>
     <message utf8="true">
         <source>Warning! Low quality may result in low resolution image. High quality may result in Media Server’s CPU overload and network connection errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>警告!低画质可能会产生低分辨率影像。高画质則可能超载媒体服务器的CPU或网络连接错误。</translation>
     </message>
     <message>
         <source>Combined cameras with and without dual streaming. Stream quality control is disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>结合支援和不支援双码流的摄像机。禁用流的质量控制</translation>
     </message>
 </context>
 <context>
@@ -661,7 +661,7 @@
     </message>
     <message>
         <source>All media servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>所有媒体服务器皆为离线状态。无法取得事件日志。</translation>
     </message>
 </context>
 <context>
@@ -695,7 +695,7 @@
     </message>
     <message>
         <source>Vertical mount (camera on the floor)</source>
-        <translation type="unfinished"></translation>
+        <translation>垂直安装(摄像机安装在地板上)</translation>
     </message>
 </context>
 <context>
@@ -2630,11 +2630,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Check Camera Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>检查摄像机的问题...</translation>
     </message>
     <message>
         <source>How-to Videos and FAQ...</source>
-        <translation type="unfinished"></translation>
+        <translation>解说视频及常见问题</translation>
     </message>
 </context>
 <context>
@@ -2916,7 +2916,7 @@ for recording at
     </message>
     <message>
         <source>Instant</source>
-        <translation type="unfinished">立即作用</translation>
+        <translation>立即作用</translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n days</source>
@@ -4246,21 +4246,21 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message>
         <source>Schedule motion type is not supported by some cameras</source>
-        <translation type="unfinished">一些摄像机不支持移动侦测录像日程</translation>
+        <translation>一些摄像机不支持移动侦测录像日程</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras</source>
-        <translation type="unfinished">一些摄像机无法启用录像</translation>
+        <translation>一些摄像机无法启用录像</translation>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>将需要%1中的%n路数码许可。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) will be used out of %1.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>将需要%1中的%n路类比许可。</numerusform>
         </translation>
     </message>
@@ -4531,7 +4531,7 @@ Try to activate your License manually.</source>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 Required at least %3 digital and %4 analog licenses.</source>
-        <translation>本软件许可支持%1 路数码和%2 路类比摄像机。需要至少%3 路数码和%4 路类比许可。</translation>
+        <translation>本许可支持%1 路数码和%2 路类比摄像机。需要至少%3 路数码和%4 路类比许可。</translation>
     </message>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
@@ -4556,7 +4556,7 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>The license is already activated.</source>
-        <translation></translation>
+        <translation>许可已激活。</translation>
     </message>
     <message>
         <source>You do not have a valid License installed. Please activate your commercial or trial license.</source>
@@ -4565,15 +4565,16 @@ Archive Streams Allowed: %4</source>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 %3 digital and %4 analog licenses are currently in use.</source>
-        <translation type="unfinished"></translation>
+        <translation>本软件许可支持%1 路数码和%2 路类比摄像机。
+当前使用%3 路数码和%4 路类比许可。</translation>
     </message>
     <message>
         <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>您未安装有效的许可。请激活您所购买或试用版的许可。</translation>
     </message>
     <message>
         <source>You do not have a valid license installed. Please activate your commercial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>您未安装有效的许可。请激活您所购买的许可。</translation>
     </message>
 </context>
 <context>
@@ -7007,11 +7008,11 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation>您的录像修改尚未保存。請选择录像方式，FPS和画质并将此修改标记在日程中。</translation>
     </message>
     <message>
         <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
-        <translation type="unfinished"></translation>
+        <translation>超过许可限制。您的修改将会保存，但不会生效。</translation>
     </message>
 </context>
 <context>
@@ -7641,11 +7642,11 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished"></translation>
+        <translation>这是鱼眼镜头摄像机</translation>
     </message>
     <message>
         <source>Software (Max fps may be slightly decreased on media server)</source>
-        <translation type="unfinished"></translation>
+        <translation>软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
     </message>
 </context>
 <context>
@@ -7804,7 +7805,7 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Weekly Schedule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>每周日程编辑器</translation>
     </message>
 </context>
 <context>
