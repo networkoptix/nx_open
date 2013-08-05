@@ -442,7 +442,7 @@ void DeviceFileCatalog::deserializeTitleFile()
     if (needRewriteCatalog)
         rewriteCatalog();
 
-    qWarning() << QString("Check archive for camera %1 for role %2 time: %3 ms").arg(m_macAddress).arg(m_role).arg(t.elapsed());
+    NX_LOG(QString("Check archive for camera %1 for role %2 time: %3 ms").arg(m_macAddress).arg(m_role).arg(t.elapsed()), cl_logINFO);
 }
 
 void DeviceFileCatalog::rewriteCatalog()
