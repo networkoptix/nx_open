@@ -2866,6 +2866,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
 
     m_exportProgressDialog = exportProgressDialog;
+    action(Qn::PlayPauseAction)->setChecked(false);
 
     if (!m_layoutExportCamera)
         m_layoutExportCamera = new QnVideoCamera(QnMediaResourcePtr(0));
@@ -2876,7 +2877,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
-    #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
     if (m_layoutFileName.endsWith(QLatin1String(".exe")))
     {
         if (QnNovLauncher::createLaunchingFile(fileName) != 0)
@@ -2964,7 +2965,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i) {
         if (m_layoutExportResources[i]->toResource()->hasFlags(QnResource::utc))
-            flags |= 2;
+            flags |= 2; // TODO: #VASILENKO MAGIC NUMBERS!!!!!!!!
     }
     device->write((const char*) &flags, sizeof(flags));
     delete device;
@@ -3388,6 +3389,7 @@ Do you want to continue?"),
         connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
 
         m_exportProgressDialog = exportProgressDialog;
+        action(Qn::PlayPauseAction)->setChecked(false);
 
         m_exportedCamera = widget->display()->camera();
 
@@ -3415,6 +3417,7 @@ Do you want to continue?"),
                                                   itemData.zoomRect,
                                                   contrastParams,
                                                   dewarpingParams);
+
         exportProgressDialog->exec();
     }
 }
