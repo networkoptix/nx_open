@@ -44,7 +44,7 @@ void CLServerPushStreamReader::run()
 {
     saveSysThreadID();
     setPriority(QThread::TimeCriticalPriority);
-    qDebug() << "stream reader started.";
+    NX_LOG("stream reader started", cl_logDEBUG1);
 
     beforeRun();
 
@@ -188,7 +188,7 @@ void CLServerPushStreamReader::run()
 
     afterRun();
 
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
+    NX_LOG("stream reader stopped", cl_logDEBUG1);
 }
 
 void CLServerPushStreamReader::beforeRun()
