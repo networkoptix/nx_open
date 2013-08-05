@@ -898,7 +898,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     bool ptzEnabled = 
-        checked && (m_camera && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)));
+        checked && (m_camera && (m_camera->getPtzCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)));
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);
