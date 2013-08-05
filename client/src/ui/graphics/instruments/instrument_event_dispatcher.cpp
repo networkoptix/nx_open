@@ -51,8 +51,10 @@ void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrum
 
     foreach(QEvent::Type eventType, instrument->watchedEventTypes(TARGET_TYPE)) {
         typename QHash<QPair<T *, QEvent::Type>, TargetData>::iterator pos = m_dataByTarget.find(qMakePair(target, eventType));
-        if (pos == m_dataByTarget.end())
-            pos = m_dataByTarget.insert(qMakePair(target, eventType), TargetData(&typeid(*target)));
+        if (pos == m_dataByTarget.end()) {
+            assert(!dispatching()); // TODO: #Elric
+            pos = m_dataByTarget.insert(qMakePair(target, eventType), TargetData(&typeid(*target))); // TODO: can't do this while dispatching.
+        }
 
         insertInstrument(instrument, mode, reference, &pos->instruments);
     }
@@ -69,8 +71,11 @@ void InstrumentEventDispatcher<T>::uninstallInstrumentInternal(Instrument *instr
     m_instrumentTargets.erase(pos);
 
     foreach(QEvent::Type eventType, instrument->watchedEventTypes(TARGET_TYPE)) {
-        QList<Instrument *> &instruments = m_dataByTarget[qMakePair(target, eventType)].instruments;
+        typename QHash<QPair<T *, QEvent::Type>, TargetData>::iterator pos = m_dataByTarget.find(qMakePair(target, eventType));
+        if(pos == m_dataByTarget.end())
+            continue; 
 
+        QList<Instrument *> &instruments = pos->instruments;
         if(!dispatching()) {
             instruments.removeOne(instrument);
         } else {
