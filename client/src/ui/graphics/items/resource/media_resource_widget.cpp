@@ -193,6 +193,7 @@ void QnMediaResourceWidget::updateFisheyeController() {
         m_fisheyePtz = 0;
         if(buttonBar()->button(FishEyeButton))
             buttonBar()->button(FishEyeButton)->setChecked(false);
+        at_dewarpingParamsChanged(item()->dewarpingParams());
     }
     updateAspectRatio();
 }
@@ -216,7 +217,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 void QnMediaResourceWidget::at_dewarpingParamsChanged(DewarpingParams params)
 {
     item()->setDewarpingParams(params);
-    item()->setData(Qn::ItemFlipRole, params.viewMode == DewarpingParams::VerticalDown);
+    item()->setData(Qn::ItemFlipRole, params.enabled && params.viewMode == DewarpingParams::VerticalDown);
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
@@ -898,7 +899,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     bool ptzEnabled = 
-        checked && (m_camera && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)));
+        checked && (m_camera && (m_camera->getPtzCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)));
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);

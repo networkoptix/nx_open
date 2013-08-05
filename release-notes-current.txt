@@ -71,28 +71,21 @@ IMPROVEMENTS:
    - Ability to run client when the computer boots up
    - If Client connects to the systen that contain different versions of server components (i.e EC 1.5.1, MS1 1.5.0 and MS2 1.5.1), 
      the warning will be given
-   - Login dialog opens much faster
      
  - Client UI Main Controls:
 
    - Scene:
-     - It is possible to traverse all items without mouse (UP, LEFT, RIGHT, DOWN). In previous versions the navigation worked a bit differently
+     - The algorithm for navigation through items with arrow keys (UP, LEFT, RIGHT, DOWN) is improved
      - Current time is always displayed under playback buttons         
-     - UI tabs settings (pinned or hidden tabs) are always saved between Client launches     
-     - Added proper cursors when resize rotated items     
+     - UI tabs settings (pinned or hidden tabs) are always saved between Client launches
      - If resize a video on scene, then all texts (Unauthorized, NO SIGNAL etc.) on it were the same size. Now they are resized as well
    - Tree: 
-     - If a camera has issues, it is marked by the exclamation point
-     - Events and Actions can be called from the Tree Context menu (System)
-     - Backup/Restore can be invoked from the "System" Context Menu in Tree...
+     - If a camera has issues (at least 3 network issues during the last minute), it is marked by the exclamation point
+     - New Context Menu items: Backup/Restore and Alarm/Event Rules ("System")
      - Thumbnails are shown in Resource Tree if hover with a mouse cursor on a camera     
    
-   - Main window is repainted when aero is turned on/off
-   - User settings dialog can be resized horizontally
    - Added ping button to Media Server settings dialog. It may be useful to check computer state: if the computer is pinging but 
      Media Server appears offline, then this is software problem. Otherwise it is likely to be hardware problem and hard reset may be needed     
-   - Camera selection form (in Events/Actions and Copy Schedule dialogs) is redesigned: click marks camera as selected
-   - Smart Search and Motion Mask configuration are more intuitive (different cursors are used)
    
  - Screen Recording:
    - Recorded files are displayed correctly in Windows Media Player even if had been recorded with high quality
@@ -104,19 +97,18 @@ IMPROVEMENTS:
      on a camera's web page and these particular settings will be used in the software. Warning: this is the expert mode feature!
    - Default motion sensitivity for motion dialog is changed to 5 (used to be 8)
    - "Open Item" button is added to Camera Setings form. It opens the current camera in a new tab   
-   - If a user did not apply current motion mask by mistake (during camera setting) the warning will be shown
    
  - Health monitoring:
-   - Added buttons for showing log and checking server issues
    - Added checkbox graphs enabling/disabling
    - Added network usage in Health Monitoring
+   - Added buttons for showing log and checking server issues   
 
  - Layout/Multi Videos:   
    - Improved behavior if local files are saved on a layout
    - Local files are not allowed in Multi-Videos
  
  - Web Client:
-   - Web Client can be opened from the tree Context menu (System)
+   - Web Client can be opened from the tree Context menu (System) and from Main Menu
    - Panoramic cameras are supported (1st sensor is displayed)
    
  - Licenses:
@@ -125,8 +117,6 @@ IMPROVEMENTS:
    - HD Witness licenses cannot be activated on DW Spectrum and vice versa
    
  - PTZ:
-   - If an item has been zoomed using mouse wheel, then double click unzooms it and does full PTZ unzoom as well
-   - PTZ Controls are rotated automatically if rotate the item and remain in proper positions     
    - Hotkeys can be assigned for PTZ presets (0-9)
 
  - Events and Actions:
@@ -154,18 +144,13 @@ BUGS FIXED:
    - If log out and open a local file in a new window, Client tried connected to EC. Fixed  
    - It was possible to resize recording icon on the item sometimes. Fixed
    - On panoramic cameras "NO SIGNAL" and other texts were drawn multiple times. Fixed
-   - If two resources next to each other both had text the overlays could interfere. Fixed
    - If zoom to an item and then close client (ALT + F4), all panels were hidden after restarting. Fixed
-   - If resize rotated item arrows were drawn incorrectly. Fixed
    - Client could hang if add a media folder containing too many files (>100k). Now no more than 1000 files are added in this case
    
  - Events/Actions:
    - Auto-reset for camera output didn't work for some cameras
-   - If press Add and Apply on the Events/Actions dialog, event rule could be duplicated incorrectly that might cause improper work. Fixed.
-   - If an external storages was unplugged, HDD/SSD error was produced every minute. Fixed
-   - It was not possible to change notification from "All users" to "For Administrators only". Fixed
-   - Fixed incorrect tab order in Events and Actions form
-   - If change aggregation period in advanced settings it was not suggested to apply changes. Fixed
+   - If press Add and Apply on the Events/Actions dialog, event rule could be duplicated incorrectly that might cause improper work. Fixed
+   - It was not possible to change notification from "All users" to "For Administrators only" on the Alarm/Event Rules form (only in advanced settings). Fixed
    
  - Recording:  
    - Panic recording could not be stopped if recording for all cameras had been turned off. Fixed
@@ -173,25 +158,19 @@ BUGS FIXED:
    - Storages that was mounted as local disks were not displayed in the storage list (Linux)
 
  - Playback:  
-   - If the same camera without archive was opened twice, the streams were synchronized incorrectly on live
    - If stop tour by double-click, side panels did not come back. Fixed 
    - CLND could be used for local file if open it in a new layout after using calendar search on a camera. Fixed
    - ACTI cameras sometimes started displaying grey picture. Fixed
    
  - Time Line:
    - Thumbnails are displayed correctly for panoramic cameras (1st sensor is displayed)
-   - Fixed visual chunks flickering in some cases (especally while zooming)
  
  - Export:
    - Audio was not exported properly in AC3 format if trying to export Multi-Video 
 
  - Installer:
    - If uninstall EC then ports were busy for a while so if reinstall it the ports were changed. Fixed 
-   - If cancel installation if different customizations (HD Witness, DW Spectrum) were installed, then the software 
-   still was in the installed programs list, but could not be removed. Fixed
    - If change installed components and remove EC it was not suggested to delete DB. Fixed
-   - Upgrade failed sometimes if different customizations (HD Witness, DW Spectrum) were installed simultaneously
-   - If run client after installation (check the flag), it was not possible to delete the directory the installer was downloaded to. Fixed
    
  - Camera Addition and Configuration:
    - Sometimes the following error was displayed for manual camera addition: "This server version supports only searching by IP address". Fixed
@@ -205,15 +184,14 @@ BUGS FIXED:
  - Compatibility (old versions support):
    - If try to connect to a newer version of EC (i.e. 1.4 client to 1.5 EC) and the newer version is not installed the restart 
      was suggested with no luck. Now warning is given instead of restart
-   - If old version was launched in compatibility mode, then upgrade notification was invoked. Now not
+   - If the old version was launched in compatibility mode, then upgrade notification was invoked. Now not
 
  - Miscellaneous:
    - Screen recording crashed on start if resolution was not multiple of 8. Fixed 
-   - If delete an offline server in multi-server environment, all its active cameras disappeared and could not be discovered. 
+   - If delete an offline server in multi-server environment, all its active cameras disappeared and could not be discovered again
      Now the active cameras are distributed to other servers
-   - If disconnect Media Server from EC and reconnect it back its cameras are displaying NO SIGNAL. Fixed
+   - If disconnect Media Server from EC and reconnect it back its cameras were displaying NO SIGNAL. Fixed
    - If Media Server's IP was changed in all-in-one installation, then the server's ip was not updated in the tree unless it was reconnected to EC. Fixed
-   - If restore item from the fullscreen, resolution wasn't changed to low sometimes. Fixed
    - Fixed incorrect playback slider position that occured in preview search in some cases
-   - Web-client. Video didn't play if camera had been moved from one server to another. FixedVideo didn't play if camera had been moved from one server to another. Fixed
+   - Web-client. Video didn't play if camera had been moved from one server to another. 
    - If restore database from another server, then licences were removed, but recording continues until Media Server restart. Fixed
