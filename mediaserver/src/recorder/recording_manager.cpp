@@ -225,7 +225,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
                 if (!recorderHiRes->isRunning()) {
                     if (!updateCameraHistory(res))
                         return;
-                    cl_log.log("Recording started for camera ", res->getUniqueId(), cl_logINFO);
+                    NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
                 }
                 recorderHiRes->start();
             }
@@ -241,8 +241,9 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             if (runSecondStream)
             {
                 if (recorderLowRes) {
-                    if (!recorderLowRes->isRunning())
-                        cl_log.log("Recording started (secondary stream) for camera ", res->getUniqueId(), cl_logINFO);
+                    if (!recorderLowRes->isRunning()) {
+                        NX_LOG(QString(lit("Recording started (secondary stream) for camera  %1")).arg(res->getUniqueId()), cl_logINFO);
+                    }
                     recorderLowRes->start();
                 }
                 providerLow->start();
