@@ -23,7 +23,6 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
         return;
     }
 
-
     QByteArray data;
 
     /* Generate vertex data. */
