@@ -107,7 +107,7 @@ void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument, Ins
     insertInstrument(instrument, mode, reference, &m_instruments);
 
     if(instrument->watches(TARGET_TYPE))
-        for(QHash<T *, const std::type_info *>::iterator pos = m_typeInfoByTarget.begin(); pos != m_typeInfoByTarget.end(); pos++)
+        for(typename QHash<T *, const std::type_info *>::iterator pos = m_typeInfoByTarget.begin(); pos != m_typeInfoByTarget.end(); pos++)
             installInstrumentInternal(instrument, pos.key(), mode, reference);
 }
 
@@ -123,7 +123,7 @@ void InstrumentEventDispatcher<T>::uninstallInstrument(Instrument *instrument) {
     m_instruments.removeOne(instrument);
 
     if(instrument->watches(TARGET_TYPE))
-        for(QHash<T *, const std::type_info *>::iterator pos = m_typeInfoByTarget.begin(); pos != m_typeInfoByTarget.end(); pos++)
+        for(typename QHash<T *, const std::type_info *>::iterator pos = m_typeInfoByTarget.begin(); pos != m_typeInfoByTarget.end(); pos++)
             uninstallInstrumentInternal(instrument, pos.key());
 }
 
