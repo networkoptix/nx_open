@@ -21,7 +21,6 @@ public:
 
     bool isLoaded() const;
 
-    virtual void clear() override;
 signals:
     void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);

@@ -15,10 +15,24 @@ Since 1.5.1
    was suggested with no luck. Now warning is given instead of restart
  - Input/Output is supported by ACTI cameras
  - HD Witness licenses cannot be activated on DW Spectrum and vice versa
- - If copy items on Scene quickly (with a big video archive), than client will be crashed.
- - Added filter for camera in "Event/Actions rule". Also added "Camera rules" in resource tree and on "Camera settings".
  
+ - Fixed Client crash that occurred if a lot of cameras with a lot of recording fragments are opened simultaneously
+ - The filter in the "Event/Actions" dialog is added. It is possible to display only rules that are applied to particular Camera(s)
+ 
+ - Added new E-Mail templates
+ - Thumbnails are displayed if hover with a mouse cursor on a camera in the "Select cameras" dialog (when configuring Event 
+   Rules or copying Recording Schedule to Cameras)
+ - The "Open New Window" button is added to the export dialog with progress bar. It is possible to open a new Client instance 
+   and continue working during export.
+ - If video card drivers are not installed the software gives warning before start (used to be after software start that could cause crash)
+ - Crash occurred if open Health monitoring while running client on old video cards, RDP sessions etc. Fixed 
+ - All video streams currently opened are paused during export to save bandwidth
+ - Old version of the database can be backed up during the upgrade. In case of failure the database can be restored to a previous version.
+
 Since previous build
+ - The "Camera rules" button is added in resource tree and on "Camera settings"
+ - Visual Notifications on Cameras (motion, network issues) do not occur if view archive
+ - Added a new action for camera and server diagnostics (only for log).
  - Selected item was not marked in Tree (> sign). Fixed
  - Network Statistics sometimes displayed 0 Mbps usage for a short time. Fixed
  - If PTZ is enabled zoom windows' positions are still displayed
@@ -43,6 +57,7 @@ Since previous build
  - Incorrect screenshot from zoom item for fisheye camera.Fixed. 
  - When release "This is the fish-yey lens camera", items returns to the normal size.
  - While items searching thumbnails look incorrect in resource tree.
+ - Added  "Camera Diagnostics" button to Camera Settings.
  
 ----------------------------------------------- 1.6 beta-2 ---------------------------------------------
 
@@ -174,15 +189,15 @@ NEW FEATURES:
  
 IMPROVEMENTS:  
  - Ability to run client when the computer boots up
-        - Client only installer is available
-        - UI state (pinned or hidden tabs) are always saved between Client launches
+ - Client only installer is available
+ - UI state (pinned or hidden tabs) are always saved between Client launches
  - Added ping button to Media Server settings dialog. It may be useful to check computer state: if the computer is pinging but 
    Media Server appears offline, then this is software problem. Otherwise it is likely to be hardware problem and hard reset may be needed
  - Health monitor improvements:
     - Added ping, show log and server issues button.
-        - Added checkbox graphs enabling/disabling.
+    - Added checkbox graphs enabling/disabling.
     - Added network usage in Health Monitoring.
-        - Added timestamp option to screenshot, export selected area and multi-video
+    - Added timestamp option to screenshot, export selected area and multi-video
  - Current time is always displayed under playback buttons
  - Changed default motion sensitivity for motion dialog to 5 (used to be 8)
  - Main window is Repainted when aero is turned on/off

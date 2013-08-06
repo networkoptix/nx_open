@@ -1893,6 +1893,10 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         if(widget->zoomTargetWidget())
             continue; /* Don't draw notification on zoom widgets. */
 
+        QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+        if(mediaWidget && !mediaWidget->display()->camDisplay()->isRealTimeSource())
+            continue;
+
         QRectF rect = widget->rect();
         qreal expansion = qMin(rect.width(), rect.height()) / 2.0;
 

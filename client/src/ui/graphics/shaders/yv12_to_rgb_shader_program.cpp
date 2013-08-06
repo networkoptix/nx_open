@@ -218,7 +218,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
                      xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
     
     vec2 xy1 = vec2(1.0 / maxX, 1.0 / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5,       -yCenter);
+    vec2 xy2 = vec2(-0.5,       -yCenter/ aspectRatio);
 
     vec2 xy3 = vec2(maxX / PI,  maxY*aspectRatio / PI);
     vec2 xy4 = vec2(maxX / 2.0, maxY / 2.0);
@@ -280,13 +280,12 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         1.0,  1.772,  0.0,   -0.886,
         0.0,  0.0,    0.0,    opacity);
 
-    mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                   0.0, cos(-fovRot), -sin(-fovRot),
-                                   0.0, sin(-fovRot),  cos(-fovRot));
+    mat3 perspectiveMatrix = mat3( vec3(1.0, 0.0,              0.0),
+                                   vec3(0.0, cos(-fovRot), -sin(-fovRot)),
+                                   vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yCenter*dstFov / panoFactor) + vec2(xShift, 0.0);
-	
+    vec2 xy2 = vec2(-0.5*dstFov,  -yCenter*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI,      maxY*aspectRatio / PI);
     vec2 xy4 = vec2(maxX / 2.0,     maxY / 2.0);
@@ -363,12 +362,12 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
                                 1.0,  1.772,  0.0,   -0.886,
                                 0.0,  0.0,    0.0,    opacity);
 
-    mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                   0.0, cos(-fovRot), -sin(-fovRot),
-                                   0.0, sin(-fovRot),  cos(-fovRot));
+    mat3 perspectiveMatrix = mat3( vec3(1.0, 0.0,              0.0),
+                                   vec3(0.0, cos(-fovRot), -sin(-fovRot)),
+                                   vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yCenter*dstFov / panoFactor) + vec2(xShift, 0.0);
+    vec2 xy2 = vec2(-0.5*dstFov,  -yCenter*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI,      maxY*aspectRatio / PI);
     vec2 xy4 = vec2(maxX / 2.0,     maxY / 2.0);

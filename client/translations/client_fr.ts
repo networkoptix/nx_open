@@ -95,15 +95,15 @@
     </message>
     <message>
         <source>Warning! Please read documentation before change these settings!</source>
-        <translation>Attention! S’il vous plait, lisez la documentation avant de modifier ces paramètres!</translation>
+        <translation type="obsolete">Attention! S’il vous plait, lisez la documentation avant de modifier ces paramètres!</translation>
     </message>
     <message>
         <source>Keep camera streams settings</source>
-        <translation>Conserver les paramètres de flux de la caméra</translation>
+        <translation type="obsolete">Conserver les paramètres de flux de la caméra</translation>
     </message>
     <message>
         <source>Warning! In this case FPS/Quality settings in Recording Schedule will not work!</source>
-        <translation>Attention! Dans ce cas, les paramètres IPS/Qualité de l&apos;enregistrement programmé ne fonctionneront pas!</translation>
+        <translation type="obsolete">Attention! Dans ce cas, les paramètres IPS/Qualité de l&apos;enregistrement programmé ne fonctionneront pas!</translation>
     </message>
     <message>
         <source>Secondary stream quality</source>
@@ -127,11 +127,31 @@
     </message>
     <message>
         <source>Warning! Low quality may result in crappy picture, high stream may overload Media Server&apos;s CPU or network connection</source>
-        <translation>Attention! &apos;Qualité - Basse&apos; peut entrainer une image vraiment mauvaise, &apos;Qualité - Haute&apos; peut surcharger le CPU du Serveur Média ou la connexion réseau</translation>
+        <translation type="obsolete">Attention! &apos;Qualité - Basse&apos; peut entrainer une image vraiment mauvaise, &apos;Qualité - Haute&apos; peut surcharger le CPU du Serveur Média ou la connexion réseau</translation>
     </message>
     <message>
         <source>Your combined cameras with and without dual streaming. Stream quality control is disabled</source>
-        <translation>Vos caméras combinées avec et sans double flux. Le contrôle de la qualité du flux est désactivé</translation>
+        <translation type="obsolete">Vos caméras combinées avec et sans double flux. Le contrôle de la qualité du flux est désactivé</translation>
+    </message>
+    <message>
+        <source>Warning! Please read documentation prior to change these settings!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep camera streams&apos; and profiles&apos; settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Warning! Low quality may result in low resolution image. High quality may result in Media Server’s CPU overload and network connection errors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Combined cameras with and without dual streaming. Stream quality control is disabled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -170,10 +190,6 @@
     <message>
         <source>X</source>
         <translation type="unfinished">X</translation>
-    </message>
-    <message>
-        <source>Show system rules</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -473,6 +489,10 @@
         <source>Alarm/Event Rules</source>
         <translation>Règles Alarme/Événement</translation>
     </message>
+    <message>
+        <source>All media servers are offline. Logs are not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FisheyeSettingsWidget</name>
@@ -490,6 +510,10 @@
     </message>
     <message>
         <source>Camera view angle correction:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical mount (camera on the floor)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1482,7 +1506,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Edit tags...</source>
-        <translation>Éditer les balises...</translation>
+        <translation type="obsolete">Éditer les balises...</translation>
     </message>
     <message>
         <source>Alt+T</source>
@@ -1950,7 +1974,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Camera Diagnostics...</source>
-        <translation>Disagnostiques Caméra...</translation>
+        <translation type="obsolete">Disagnostiques Caméra...</translation>
     </message>
     <message>
         <source>Add Camera(s)...</source>
@@ -2013,10 +2037,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Showcase...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2030,6 +2050,14 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Camera Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check Camera Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How-to Videos and FAQ...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2088,8 +2116,8 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do Instantly</source>
-        <translation type="unfinished"></translation>
+        <source>Instant</source>
+        <translation type="unfinished">Faire instantanément</translation>
     </message>
 </context>
 <context>
@@ -2244,8 +2272,8 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">Non appliqué</translation>
     </message>
     <message>
-        <source>do instantly</source>
-        <translation type="obsolete">Faire instantanément</translation>
+        <source>Instant</source>
+        <translation type="unfinished">Faire instantanément</translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n days</source>
@@ -2289,10 +2317,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Not Applied</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Instant</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -3316,15 +3340,15 @@ Vous serez invité à redémarrer le client en mode compatibilité.</translation
     </message>
     <message>
         <source>No online media servers</source>
-        <translation>Aucun serveur Médai en ligne</translation>
+        <translation type="obsolete">Aucun serveur Médai en ligne</translation>
     </message>
     <message>
         <source>All media server(s) is offline. No data is selected</source>
-        <translation>Tous les serveur(s) Média sont hors ligne. Aucune donnée sélectionnée</translation>
+        <translation type="obsolete">Tous les serveur(s) Média sont hors ligne. Aucune donnée sélectionnée</translation>
     </message>
     <message>
         <source>No rule(s) for current filter</source>
-        <translation>Aucune règle(s) pour le filtre actuelle</translation>
+        <translation type="obsolete">Aucune règle(s) pour le filtre actuelle</translation>
     </message>
     <message>
         <source>You have not configured business rules to match current filter condition.</source>
@@ -3355,10 +3379,6 @@ Vous serez invité à redémarrer le client en mode compatibilité.</translation
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You have not configured any Alarm/Event Rules to match the current filter condition.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3401,26 +3421,51 @@ Vous serez invité à redémarrer le client en mode compatibilité.</translation
     <name>QnExportCameraSettingsDialog</name>
     <message>
         <source>Copy schedule...</source>
-        <translation>Copier l&apos;horaire...</translation>
+        <translation type="obsolete">Copier l&apos;horaire...</translation>
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras</source>
-        <translation>L&apos;horaire de mouvement n&apos;est pas supporté par certaines caméras</translation>
+        <translation type="obsolete">L&apos;horaire de mouvement n&apos;est pas supporté par certaines caméras</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras</source>
-        <translation>L&apos;enregistrement ne peut être activé sur certaines caméras</translation>
+        <translation type="obsolete">L&apos;enregistrement ne peut être activé sur certaines caméras</translation>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%n licence digitale va être utilisée sur %1.</numerusform>
             <numerusform>%n licences digitales vont être utilisée sur %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
+            <numerusform>%n licence analogue va être utilisée sur %1.</numerusform>
+            <numerusform>%n licence analogues vont être utilisée sur %1.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
+    <message>
+        <source>Schedule motion type is not supported by some cameras</source>
+        <translation type="unfinished">L&apos;horaire de mouvement n&apos;est pas supporté par certaines caméras</translation>
+    </message>
+    <message>
+        <source>Recording cannot be enabled for some cameras</source>
+        <translation type="unfinished">L&apos;enregistrement ne peut être activé sur certaines caméras</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n digital license(s) will be used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform>%n licence digitale va être utilisée sur %1.</numerusform>
+            <numerusform>%n licences digitales vont être utilisée sur %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) will be used out of %1.</source>
+        <translation type="unfinished">
             <numerusform>%n licence analogue va être utilisée sur %1.</numerusform>
             <numerusform>%n licence analogues vont être utilisée sur %1.</numerusform>
         </translation>
@@ -3644,7 +3689,7 @@ Essayez d&apos;activer la licence manuellement.</translation>
     </message>
     <message>
         <source>You do not have a valid License installed. Please activate your commercial license.</source>
-        <translation>Vous n&apos;avez pas de licence valide activée. S&apos;il vous plait, activez votre licence commerciale.</translation>
+        <translation type="obsolete">Vous n&apos;avez pas de licence valide activée. S&apos;il vous plait, activez votre licence commerciale.</translation>
     </message>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
@@ -3655,7 +3700,7 @@ Au moins %3 digitale et %4 analogue licences nécessaires.</translation>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 Currently using %3 digital and %4 analog licenses.</source>
-        <translation>Ce logiciel est sous licence pour %1 digitale et %2 analogue caméras.
+        <translation type="obsolete">Ce logiciel est sous licence pour %1 digitale et %2 analogue caméras.
 Actuellement %3 digitale et %4 analogue sont utilisées.</translation>
     </message>
     <message>
@@ -3679,7 +3724,16 @@ Flux d&apos;archive autorisé: %4</translation>
         <translation>La licence est déjà activée.</translation>
     </message>
     <message>
-        <source>You do not have a valid License installed. Please activate your commercial or trial license.</source>
+        <source>The software is licensed to %1 digital and %2 analog cameras.
+%3 digital and %4 analog licenses are currently in use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed. Please activate your commercial license.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4194,7 +4248,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
 <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-        <source>Show for Administrators only</source>
+        <source>Show to Administrators only</source>
         <translation>Afficher aux Administrateurs seulement</translation>
     </message>
     <message>
@@ -5261,7 +5315,7 @@ Voulez-vous continuer?</translation>
     </message>
     <message>
         <source>Licenses limit exceeded. Your changes will be saved, but will not take effect.</source>
-        <translation>Limite de licences dépassée. Vos modifications seront enregistrées, mais ne prendront pas effet.</translation>
+        <translation type="obsolete">Limite de licences dépassée. Vos modifications seront enregistrées, mais ne prendront pas effet.</translation>
     </message>
     <message>
         <source>Could not apply changes</source>
@@ -5371,7 +5425,7 @@ et vous n&apos;avez pas les droits pour l&apos;écraser.</translation>
     </message>
     <message>
         <source> Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation> Vos changements d&apos;enregistrement n&apos;ont pas été enregistrés. Choisir le type d&apos;enregistrement désiré, ISP,  la qualité et marquer les changements dans l&apos;horaire.</translation>
+        <translation type="obsolete"> Vos changements d&apos;enregistrement n&apos;ont pas été enregistrés. Choisir le type d&apos;enregistrement désiré, ISP,  la qualité et marquer les changements dans l&apos;horaire.</translation>
     </message>
     <message>
         <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
@@ -5475,6 +5529,14 @@ et vous n&apos;avez pas les droits pour l&apos;écraser.</translation>
     </message>
     <message>
         <source>Open New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5919,7 +5981,7 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Software (On media server, max fps may be slightly decreased)</source>
-        <translation>Logiciel (Sur le Média Serveur, le maximum IPS peut être légèrement diminué)</translation>
+        <translation type="obsolete">Logiciel (Sur le Média Serveur, le maximum IPS peut être légèrement diminué)</translation>
     </message>
     <message>
         <source>Sensitivity:</source>
@@ -5978,11 +6040,15 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
         <translation>Expert</translation>
     </message>
     <message>
-        <source>This is the fish-eye lens camera</source>
+        <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Dewarping</source>
+        <source>This is a fish-eye lens camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Software (Max fps may be slightly decreased on media server)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6016,39 +6082,39 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
     <name>TagsEditDialog</name>
     <message>
         <source>Edit File Tags</source>
-        <translation>Éditer les balises fichier</translation>
+        <translation type="obsolete">Éditer les balises fichier</translation>
     </message>
     <message>
         <source>New Tag</source>
-        <translation>Nouvelle balise</translation>
+        <translation type="obsolete">Nouvelle balise</translation>
     </message>
     <message>
         <source>Add Tag</source>
-        <translation>Ajouter balise</translation>
+        <translation type="obsolete">Ajouter balise</translation>
     </message>
     <message>
         <source>Set Tag</source>
-        <translation>Régler Balise</translation>
+        <translation type="obsolete">Régler Balise</translation>
     </message>
     <message>
         <source>Unset Tag</source>
-        <translation>Balise non défini</translation>
+        <translation type="obsolete">Balise non défini</translation>
     </message>
     <message>
         <source>Filter</source>
-        <translation>Filtre</translation>
+        <translation type="obsolete">Filtre</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation>Effacer le filtre</translation>
+        <translation type="obsolete">Effacer le filtre</translation>
     </message>
     <message>
         <source>Assigned Tags</source>
-        <translation>Balises assignés</translation>
+        <translation type="obsolete">Balises assignés</translation>
     </message>
     <message>
         <source>All Tags</source>
-        <translation>Toutes les balises</translation>
+        <translation type="obsolete">Toutes les balises</translation>
     </message>
 </context>
 <context>
@@ -6098,7 +6164,7 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
     <name>WeekTimeScheduleWidget</name>
     <message>
         <source>WeekTime Schedule Editor</source>
-        <translation>Éditeur d&apos;horaire de temps semaine</translation>
+        <translation type="obsolete">Éditeur d&apos;horaire de temps semaine</translation>
     </message>
     <message>
         <source>Schedule Grid</source>
@@ -6119,6 +6185,10 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
     <message>
         <source>Off</source>
         <translation>Désactivé</translation>
+    </message>
+    <message>
+        <source>Weekly Schedule Editor</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

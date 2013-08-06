@@ -114,7 +114,7 @@ inline bool deserialize(const QVariant &value, PtzPresetData *target) {
         !QJson::deserialize(map, "name", &name) ||
         !QJson::deserialize(map, "logicalPosition", &logicalPosition)
     ) {
-            return false;
+        return false;
     }
     
     /* Optional field. */

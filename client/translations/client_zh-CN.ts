@@ -67,19 +67,19 @@
     </message>
     <message>
         <source>Image Enhancement</source>
-        <translation type="unfinished">图像增强</translation>
+        <translation>图像增强</translation>
     </message>
     <message>
         <source>Enable enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>启用增强</translation>
     </message>
     <message>
         <source>Black level</source>
-        <translation type="unfinished"></translation>
+        <translation>黑电平</translation>
     </message>
     <message>
         <source>White level</source>
-        <translation type="unfinished"></translation>
+        <translation>白电平</translation>
     </message>
 </context>
 <context>
@@ -94,15 +94,15 @@
     </message>
     <message>
         <source>Warning! Please read documentation before change these settings!</source>
-        <translation>警告！更改这些设置之前，请阅读文档!</translation>
+        <translation type="obsolete">警告！更改这些设置之前，请阅读文档!</translation>
     </message>
     <message>
         <source>Keep camera streams settings</source>
-        <translation>保留摄像机视频流设置</translation>
+        <translation type="obsolete">保留摄像机视频流设置</translation>
     </message>
     <message>
         <source>Warning! In this case FPS/Quality settings in Recording Schedule will not work!</source>
-        <translation>警告！在这种情况下，录影排程中的每秒帧数/画质设置将无法正常运作!</translation>
+        <translation type="obsolete">警告！在这种情况下，录影排程中的每秒帧数/画质设置将无法正常运作!</translation>
     </message>
     <message>
         <source>Secondary stream quality</source>
@@ -126,10 +126,30 @@
     </message>
     <message>
         <source>Warning! Low quality may result in crappy picture, high stream may overload Media Server&apos;s CPU or network connection</source>
-        <translation>警告！低画质可能会导致糟糕的影像，高码流則可能超载媒体服务器的CPU或网络连接</translation>
+        <translation type="obsolete">警告！低画质可能会导致糟糕的影像，高码流則可能超载媒体服务器的CPU或网络连接</translation>
     </message>
     <message>
         <source>Your combined cameras with and without dual streaming. Stream quality control is disabled</source>
+        <translation type="obsolete">结合支援和不支援双码流的摄像机。禁用流的质量控制</translation>
+    </message>
+    <message>
+        <source>Warning! Please read documentation prior to change these settings!</source>
+        <translation>警告!更改这些设置之前请阅读文档!</translation>
+    </message>
+    <message>
+        <source>Keep camera streams&apos; and profiles&apos; settings</source>
+        <translation>保留摄像机视频流&apos; 及 profiles&apos; 设置</translation>
+    </message>
+    <message>
+        <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
+        <translation>警告！录影排程中的每秒帧数/画质设置将无法正常运作!</translation>
+    </message>
+    <message utf8="true">
+        <source>Warning! Low quality may result in low resolution image. High quality may result in Media Server’s CPU overload and network connection errors.</source>
+        <translation>警告!低画质可能会产生低分辨率影像。高画质則可能超载媒体服务器的CPU或网络连接错误。</translation>
+    </message>
+    <message>
+        <source>Combined cameras with and without dual streaming. Stream quality control is disabled</source>
         <translation>结合支援和不支援双码流的摄像机。禁用流的质量控制</translation>
     </message>
 </context>
@@ -164,15 +184,15 @@
     </message>
     <message>
         <source>Filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>以摄像机过滤...</translation>
     </message>
     <message>
         <source>X</source>
-        <translation type="unfinished">X</translation>
+        <translation>X</translation>
     </message>
     <message>
         <source>Show system rules</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">显示系统规则</translation>
     </message>
 </context>
 <context>
@@ -320,18 +340,18 @@
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
         <source>No connection to media server %1</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接到媒体服务器 %1</translation>
     </message>
 </context>
 <context>
     <name>CameraDiagnosticsDialog</name>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机诊断</translation>
     </message>
     <message>
         <source>Diagnostics for camera</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机诊断</translation>
     </message>
 </context>
 <context>
@@ -606,7 +626,7 @@
     </message>
     <message>
         <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>您可以创建系统配置备份，出错时可以还原。</translation>
     </message>
 </context>
 <context>
@@ -639,6 +659,10 @@
         <source>Alarm/Event Rules</source>
         <translation>报警/事件规则</translation>
     </message>
+    <message>
+        <source>All media servers are offline. Logs are not available.</source>
+        <translation>所有媒体服务器皆为离线状态。无法取得事件日志。</translation>
+    </message>
 </context>
 <context>
     <name>FindAppServerDialog</name>
@@ -655,19 +679,23 @@
     <name>FisheyeSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">表格</translation>
+        <translation>表格</translation>
     </message>
     <message>
         <source>Horizontal mount (camera on the wall)</source>
-        <translation type="unfinished"></translation>
+        <translation>水平安装(摄像机安装在墙壁上)</translation>
     </message>
     <message>
         <source>Vertical mount (camera on the ceiling)</source>
-        <translation type="unfinished"></translation>
+        <translation>垂直安装(摄像机安装在天花板上)</translation>
     </message>
     <message>
         <source>Camera view angle correction:</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机视角校正:</translation>
+    </message>
+    <message>
+        <source>Vertical mount (camera on the floor)</source>
+        <translation>垂直安装(摄像机安装在地板上)</translation>
     </message>
 </context>
 <context>
@@ -1338,7 +1366,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>PTZ Presets</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ预置</translation>
     </message>
 </context>
 <context>
@@ -1485,7 +1513,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Export selected cameras to file</source>
-        <translation type="unfinished"></translation>
+        <translation>输出选取的摄像机至档案</translation>
     </message>
 </context>
 <context>
@@ -1585,13 +1613,14 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>関于</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt; 版本 %2 (%3).&lt;br/&gt;
+以%7为 %5-%6 创建。&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -1993,7 +2022,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Edit tags...</source>
-        <translation>编辑标签...</translation>
+        <translation type="obsolete">编辑标签...</translation>
     </message>
     <message>
         <source>Alt+T</source>
@@ -2517,7 +2546,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Camera Diagnostics...</source>
-        <translation>摄像机诊断...</translation>
+        <translation type="obsolete">摄像机诊断...</translation>
     </message>
     <message>
         <source>Add Camera(s)...</source>
@@ -2557,7 +2586,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Showcase...</source>
-        <translation>开启网页显示软件功能...</translation>
+        <translation type="obsolete">开启网页显示软件功能...</translation>
     </message>
     <message>
         <source>Open in New Tab</source>
@@ -2569,35 +2598,43 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Show Message</source>
-        <translation type="unfinished"></translation>
+        <translation>显示信息</translation>
     </message>
     <message>
         <source>Show Version Mismatch Message</source>
-        <translation type="unfinished"></translation>
+        <translation>显示版本不匹配信息</translation>
     </message>
     <message>
         <source>Open Web Client...</source>
-        <translation type="unfinished"></translation>
+        <translation>打开Web客户端...</translation>
     </message>
     <message>
         <source>Camera List...</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机列表...</translation>
     </message>
     <message>
         <source>Image Enhancement...</source>
-        <translation type="unfinished"></translation>
+        <translation>图像增强...</translation>
     </message>
     <message>
         <source>Server Logs...</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器日志...</translation>
     </message>
     <message>
         <source>Open Current Layout in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>在新窗口打开当前Layout</translation>
     </message>
     <message>
         <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机规则...</translation>
+    </message>
+    <message>
+        <source>Check Camera Issues...</source>
+        <translation>检查摄像机的问题...</translation>
+    </message>
+    <message>
+        <source>How-to Videos and FAQ...</source>
+        <translation>解说视频及常见问题</translation>
     </message>
 </context>
 <context>
@@ -2612,7 +2649,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Image Enhancement - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>图像增强 - %1</translation>
     </message>
 </context>
 <context>
@@ -2647,19 +2684,19 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Check to set aggregation period</source>
-        <translation type="unfinished"></translation>
+        <translation>勾选以设置聚合期</translation>
     </message>
     <message>
         <source>Interval of action :</source>
-        <translation type="unfinished"></translation>
+        <translation>动作的时间间隔：</translation>
     </message>
     <message>
         <source>Once per</source>
-        <translation type="unfinished"></translation>
+        <translation>一次每</translation>
     </message>
     <message>
-        <source>Do Instantly</source>
-        <translation type="unfinished"></translation>
+        <source>Instant</source>
+        <translation>立即作用</translation>
     </message>
 </context>
 <context>
@@ -2878,8 +2915,8 @@ for recording at
         <translation type="obsolete">不适用</translation>
     </message>
     <message>
-        <source>do instantly</source>
-        <translation type="obsolete">立即作用</translation>
+        <source>Instant</source>
+        <translation>立即作用</translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n days</source>
@@ -2911,42 +2948,38 @@ for recording at
     </message>
     <message>
         <source>User &apos;%1&apos; has empty E-Mail</source>
-        <translation type="unfinished"></translation>
+        <translation>用户 %1 邮件为空</translation>
     </message>
     <message>
         <source>User &apos;%1&apos; has invalid E-Mail address: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>用户 %1 拥有无效的邮件地址:%2</translation>
     </message>
     <message>
         <source>Not Applied</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Instant</source>
-        <translation type="unfinished"></translation>
+        <translation>不适用</translation>
     </message>
     <message numerus="yes">
         <source>Every %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>每 %n 天</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n hours</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>每 %n 小时</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n minutes</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>每 %n 分钟</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n seconds</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>每 %n </numerusform>
         </translation>
     </message>
 </context>
@@ -3077,16 +3110,17 @@ for recording at
     </message>
     <message>
         <source>Reset Default Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>重置默认规则</translation>
     </message>
     <message>
         <source>Confirm rules reset</source>
-        <translation type="unfinished"></translation>
+        <translation>确认规则重置</translation>
     </message>
     <message>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>您确定要重置到默认的规则吗？
+此操作无法取消！</translation>
     </message>
 </context>
 <context>
@@ -3125,7 +3159,7 @@ This action CANNOT be undone!</source>
     </message>
     <message>
         <source>Interval of Action</source>
-        <translation type="unfinished"></translation>
+        <translation>动作的时间间隔</translation>
     </message>
 </context>
 <context>
@@ -3283,39 +3317,39 @@ Make sure the server is available and try again.</source>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished">复制到剪贴板</translation>
+        <translation>复制到剪贴板</translation>
     </message>
     <message>
         <source>Diagnostics for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机 %1的诊断。</translation>
     </message>
     <message>
         <source>Checking media server availability</source>
-        <translation type="unfinished"></translation>
+        <translation>检查媒体服务器的可用性</translation>
     </message>
     <message>
         <source>Checking that camera is accessible</source>
-        <translation type="unfinished"></translation>
+        <translation>检查摄像机可否存取</translation>
     </message>
     <message>
         <source>Checking that camera provides media stream</source>
-        <translation type="unfinished"></translation>
+        <translation>检查该摄像机提供媒体流</translation>
     </message>
     <message>
         <source>Checking media stream for errors</source>
-        <translation type="unfinished"></translation>
+        <translation>检查媒体流的错误</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">好</translation>
+        <translation>好</translation>
     </message>
     <message>
         <source>FAILED: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>失败: %1</translation>
     </message>
     <message>
         <source>Diagnostics finished</source>
-        <translation type="unfinished"></translation>
+        <translation>诊断完成</translation>
     </message>
 </context>
 <context>
@@ -3368,7 +3402,7 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>输出选择到档案...</translation>
     </message>
 </context>
 <context>
@@ -3597,11 +3631,11 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机诊断</translation>
     </message>
     <message>
         <source>Camera Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机规则</translation>
     </message>
 </context>
 <context>
@@ -4088,15 +4122,15 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>No online media servers</source>
-        <translation>没有在线的媒体服务器</translation>
+        <translation type="obsolete">没有在线的媒体服务器</translation>
     </message>
     <message>
         <source>All media server(s) is offline. No data is selected</source>
-        <translation>所有媒体服务器已离线。沒有选择任何数据</translation>
+        <translation type="obsolete">所有媒体服务器已离线。沒有选择任何数据</translation>
     </message>
     <message>
         <source>No rule(s) for current filter</source>
-        <translation>当前过滤器无规则</translation>
+        <translation type="obsolete">当前过滤器无规则</translation>
     </message>
     <message>
         <source>You have not configured business rules to match current filter condition.</source>
@@ -4124,11 +4158,11 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>输出选择到档案...</translation>
     </message>
     <message>
         <source>You have not configured any Alarm/Event Rules to match the current filter condition.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">您还没有配置任何报警/事件规则以匹配当前的过滤条件。</translation>
     </message>
 </context>
 <context>
@@ -4170,11 +4204,11 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnExportCameraSettingsDialog</name>
     <message>
         <source>Copy schedule...</source>
-        <translation>复制日程...</translation>
+        <translation type="obsolete">复制日程...</translation>
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras</source>
-        <translation>一些摄像机不支持移动侦测录像日程</translation>
+        <translation type="obsolete">一些摄像机不支持移动侦测录像日程</translation>
     </message>
     <message>
         <source>%n license(s) will be used out of %1.</source>
@@ -4182,7 +4216,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras</source>
-        <translation>一些摄像机无法启用录像</translation>
+        <translation type="obsolete">一些摄像机无法启用录像</translation>
     </message>
     <message>
         <source>%1 digital license(s) will be used out of %2.
@@ -4191,7 +4225,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>将需要%1中的%n路数码许可。</numerusform>
         </translation>
     </message>
@@ -4199,6 +4233,29 @@ You will be asked to restart the client in compatibility mode.</source>
         <source>%n analog  license(s) will be used out of %1.</source>
         <translation type="obsolete">
             <numerusform>%1中的%n路模拟许可将被使用。</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) will be used out of %1.</source>
+        <translation type="obsolete">
+            <numerusform>将需要%1中的%n路类比许可。</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
+    <message>
+        <source>Schedule motion type is not supported by some cameras</source>
+        <translation>一些摄像机不支持移动侦测录像日程</translation>
+    </message>
+    <message>
+        <source>Recording cannot be enabled for some cameras</source>
+        <translation>一些摄像机无法启用录像</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n digital license(s) will be used out of %1.</source>
+        <translation>
+            <numerusform>将需要%1中的%n路数码许可。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -4212,19 +4269,19 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="unfinished">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照http://tribaltrouble.com/driversupport.php</translation>
+        <translation>我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照&lt;a href=http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
-        <translation type="unfinished">重要性能提示</translation>
+        <translation>重要性能提示</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="unfinished">我们偵测道您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation>我们偵测到您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation type="unfinished">关键性能提示</translation>
+        <translation>关键性能提示</translation>
     </message>
 </context>
 <context>
@@ -4465,7 +4522,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>You do not have a valid License installed. Please activate your commercial license.</source>
-        <translation>您未安装有效的许可。请激活您所购买的许可。</translation>
+        <translation type="obsolete">您未安装有效的许可。请激活您所购买的许可。</translation>
     </message>
     <message>
         <source>Never</source>
@@ -4474,12 +4531,12 @@ Try to activate your License manually.</source>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 Required at least %3 digital and %4 analog licenses.</source>
-        <translation>本软件许可支持%1 路数码和%2 路类比摄像机。需要至少%3 路数码和%4 路类比许可。</translation>
+        <translation>本许可支持%1 路数码和%2 路类比摄像机。需要至少%3 路数码和%4 路类比许可。</translation>
     </message>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 Currently using %3 digital and %4 analog licenses.</source>
-        <translation>本软件许可支持%1 路数码和%2 路类比摄像机。当前使用%3 路数码和%4 路类比许可。</translation>
+        <translation type="obsolete">本软件许可支持%1 路数码和%2 路类比摄像机。当前使用%3 路数码和%4 路类比许可。</translation>
     </message>
     <message>
         <source>&lt;b&gt;Generic:&lt;/b&gt;&lt;br /&gt;
@@ -4499,11 +4556,25 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>The license is already activated.</source>
-        <translation></translation>
+        <translation>许可已激活。</translation>
     </message>
     <message>
         <source>You do not have a valid License installed. Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">您未安装有效的许可。请激活您的免费许可。</translation>
+    </message>
+    <message>
+        <source>The software is licensed to %1 digital and %2 analog cameras.
+%3 digital and %4 analog licenses are currently in use.</source>
+        <translation>本软件许可支持%1 路数码和%2 路类比摄像机。
+当前使用%3 路数码和%4 路类比许可。</translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
+        <translation>您未安装有效的许可。请激活您所购买或试用版的许可。</translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed. Please activate your commercial license.</source>
+        <translation>您未安装有效的许可。请激活您所购买的许可。</translation>
     </message>
 </context>
 <context>
@@ -4771,7 +4842,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>扭曲影像還原</translation>
     </message>
 </context>
 <context>
@@ -5170,7 +5241,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
 <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-        <source>Show for Administrators only</source>
+        <source>Show to Administrators only</source>
         <translation>仅显示给管理员</translation>
     </message>
     <message>
@@ -5611,7 +5682,7 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>Type any text here</source>
-        <translation type="unfinished"></translation>
+        <translation>键入任何文字在这里</translation>
     </message>
 </context>
 <context>
@@ -5955,11 +6026,11 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>&amp;System ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;系统 ID:</translation>
     </message>
     <message>
         <source>Enter short system description here...</source>
-        <translation type="unfinished"></translation>
+        <translation>在这里输入短的系统描述...</translation>
     </message>
 </context>
 <context>
@@ -6001,7 +6072,7 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>Diagnose...</source>
-        <translation type="unfinished"></translation>
+        <translation>诊断...</translation>
     </message>
 </context>
 <context>
@@ -6712,7 +6783,7 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Licenses limit exceeded. Your changes will be saved, but will not take effect.</source>
-        <translation>超过许可限制。您的修改将会保存，但不会生效。</translation>
+        <translation type="obsolete">超过许可限制。您的修改将会保存，但不会生效。</translation>
     </message>
     <message>
         <source>Could not apply changes</source>
@@ -6829,7 +6900,7 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source> Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation>您的录像修改尚未保存。請选择录像方式，FPS和质量并将此修改标记在日程中。</translation>
+        <translation type="obsolete">您的录像修改尚未保存。請选择录像方式，FPS和质量并将此修改标记在日程中。</translation>
     </message>
     <message>
         <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
@@ -6913,27 +6984,35 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Include timestamps (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>包括时间戳(需转码)</translation>
     </message>
     <message>
         <source>Apply dewarping and image correction (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>实行扭曲影像還原和图像校正(需转码)</translation>
     </message>
     <message>
         <source>Apply image correction (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>实行图像校正(需转码)</translation>
     </message>
     <message>
         <source>Apply dewarping (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>实行扭曲影像還原(需转码)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>您將输出的视频包含过滤器需要转码。转码可能需要很长的时间。要继续吗？</translation>
     </message>
     <message>
         <source>Open New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>开启新窗口</translation>
+    </message>
+    <message>
+        <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
+        <translation>您的录像修改尚未保存。請选择录像方式，FPS和画质并将此修改标记在日程中。</translation>
+    </message>
+    <message>
+        <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
+        <translation>超过许可限制。您的修改将会保存，但不会生效。</translation>
     </message>
 </context>
 <context>
@@ -7266,11 +7345,11 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Quarter Native</source>
-        <translation type="unfinished"></translation>
+        <translation>四分之一原始画面</translation>
     </message>
     <message>
         <source>Audio Grabber</source>
-        <translation type="unfinished"></translation>
+        <translation>音频采集</translation>
     </message>
 </context>
 <context>
@@ -7495,7 +7574,7 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Software (On media server, max fps may be slightly decreased)</source>
-        <translation>软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
+        <translation type="obsolete">软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
     </message>
     <message>
         <source>Sensitivity:</source>
@@ -7555,11 +7634,19 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>This is the fish-eye lens camera</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">这是鱼眼镜头摄像机</translation>
     </message>
     <message>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>扭曲影像還原</translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens camera</source>
+        <translation>这是鱼眼镜头摄像机</translation>
+    </message>
+    <message>
+        <source>Software (Max fps may be slightly decreased on media server)</source>
+        <translation>软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
     </message>
 </context>
 <context>
@@ -7592,39 +7679,39 @@ hh:mm:ss</source>
     <name>TagsEditDialog</name>
     <message>
         <source>Edit File Tags</source>
-        <translation>编辑文件标签</translation>
+        <translation type="obsolete">编辑文件标签</translation>
     </message>
     <message>
         <source>New Tag</source>
-        <translation>新标签</translation>
+        <translation type="obsolete">新标签</translation>
     </message>
     <message>
         <source>Add Tag</source>
-        <translation>添加标签</translation>
+        <translation type="obsolete">添加标签</translation>
     </message>
     <message>
         <source>Set Tag</source>
-        <translation>设定标签</translation>
+        <translation type="obsolete">设定标签</translation>
     </message>
     <message>
         <source>Unset Tag</source>
-        <translation>取消标签设定</translation>
+        <translation type="obsolete">取消标签设定</translation>
     </message>
     <message>
         <source>Filter</source>
-        <translation>过滤器</translation>
+        <translation type="obsolete">过滤器</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation>清除过滤器</translation>
+        <translation type="obsolete">清除过滤器</translation>
     </message>
     <message>
         <source>Assigned Tags</source>
-        <translation>分配的标签</translation>
+        <translation type="obsolete">分配的标签</translation>
     </message>
     <message>
         <source>All Tags</source>
-        <translation>所有的标签</translation>
+        <translation type="obsolete">所有的标签</translation>
     </message>
 </context>
 <context>
@@ -7694,7 +7781,7 @@ hh:mm:ss</source>
     <name>WeekTimeScheduleWidget</name>
     <message>
         <source>WeekTime Schedule Editor</source>
-        <translation>日程编辑器</translation>
+        <translation type="obsolete">日程编辑器</translation>
     </message>
     <message>
         <source>Schedule Grid</source>
@@ -7715,6 +7802,10 @@ hh:mm:ss</source>
     <message>
         <source>Off</source>
         <translation>关</translation>
+    </message>
+    <message>
+        <source>Weekly Schedule Editor</source>
+        <translation>每周日程编辑器</translation>
     </message>
 </context>
 <context>

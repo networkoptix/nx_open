@@ -49,7 +49,6 @@
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/login_dialog.h>
-#include <ui/dialogs/tags_edit_dialog.h>
 #include <ui/dialogs/server_settings_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/camera_settings_dialog.h>
@@ -290,7 +289,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
     connect(action(Qn::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
     connect(action(Qn::YouTubeUploadAction),                    SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
-    connect(action(Qn::EditTagsAction),                         SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
     connect(action(Qn::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
     connect(action(Qn::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
     connect(action(Qn::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
@@ -681,7 +679,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
-        QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
+        QString message = tr(" Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
         int button = QMessageBox::warning(mainWindow(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry) {
             cameraSettingsDialog()->ignoreAcceptOnce();
@@ -714,7 +712,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
 
     QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
     if (!helper.isValid()) {
-        QString message = tr("Licenses limit exceeded. Your changes will be saved, but will not take effect.");
+        QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
         QMessageBox::warning(mainWindow(), tr("Could not apply changes"), message);
         cameraSettingsDialog()->widget()->setScheduleEnabled(false);
     }
@@ -1611,7 +1609,7 @@ void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {
-    QDesktopServices::openUrl(QUrl(QLatin1String(QN_SHOWCASE_URL), QUrl::TolerantMode));
+    QDesktopServices::openUrl(qnSettings->showcaseUrl());
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
@@ -1907,16 +1905,6 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     notificationsHandler()->clear();
 
     qnSettings->setStoredPassword(QString());
-}
-
-void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
-    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
-    if(!resource)
-        return;
-
-    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resource->getUniqueId(), mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
@@ -2878,6 +2866,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
 
     m_exportProgressDialog = exportProgressDialog;
+    action(Qn::PlayPauseAction)->setChecked(false);
 
     if (!m_layoutExportCamera)
         m_layoutExportCamera = new QnVideoCamera(QnMediaResourcePtr(0));
@@ -2888,7 +2877,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
-    #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
     if (m_layoutFileName.endsWith(QLatin1String(".exe")))
     {
         if (QnNovLauncher::createLaunchingFile(fileName) != 0)
@@ -2976,7 +2965,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i) {
         if (m_layoutExportResources[i]->toResource()->hasFlags(QnResource::utc))
-            flags |= 2;
+            flags |= 2; // TODO: #VASILENKO MAGIC NUMBERS!!!!!!!!
     }
     device->write((const char*) &flags, sizeof(flags));
     delete device;
@@ -3400,6 +3389,7 @@ Do you want to continue?"),
         connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
 
         m_exportProgressDialog = exportProgressDialog;
+        action(Qn::PlayPauseAction)->setChecked(false);
 
         m_exportedCamera = widget->display()->camera();
 
@@ -3427,6 +3417,7 @@ Do you want to continue?"),
                                                   itemData.zoomRect,
                                                   contrastParams,
                                                   dewarpingParams);
+
         exportProgressDialog->exec();
     }
 }

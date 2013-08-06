@@ -42,7 +42,8 @@
 #define QN_LICENSE_URL                  "${license.url}"
 #define QN_RSA_PUBLIC_KEY               ${rsa.public.key}
 #define QN_SHOWCASE_URL                 "${showcase.url}"
-
+#define QN_SETTINGS_URL                 "${settings.url}"
+#define QN_PRODUCT_NAME_LONG            "${product.name}"
 #define QN_BUILDENV_PATH                "${environment.dir}"
 
 /* 

@@ -11,7 +11,7 @@ public:
         VerticalUp
     };
 
-    DewarpingParams(): enabled(false), viewMode(VerticalDown), xAngle(0.0), yAngle(0.0), fov(M_PI/2.0), fovRot(0.0), panoFactor(1.0) {}
+    DewarpingParams(): enabled(false), viewMode(VerticalDown), xAngle(0.0), yAngle(0.0), fov(70.0 * M_PI / 180.0), fovRot(0.0), panoFactor(1.0) {}
     
     DewarpingParams(const DewarpingParams &other) {
         enabled = other.enabled;

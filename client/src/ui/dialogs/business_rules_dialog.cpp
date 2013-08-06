@@ -107,7 +107,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     m_rulesViewModel->reloadData();
 
     connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFilter()));
-    connect(ui->systemRulesCheckBox, SIGNAL(toggled(bool)), this, SLOT(updateFilter()));
     connect(ui->clearFilterButton, SIGNAL(clicked()), this, SLOT(at_clearFilterButton_clicked()));
     updateFilter();
 }
@@ -238,9 +237,9 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
                              QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
 
-    QnAppServerConnectionFactory::createConnection()->resetBusinessRulesAsync(m_rulesViewModel, SLOT(reloadData()));
-    m_rulesViewModel->clear();
-//    updateControlButtons();
+    QnAppServerConnectionFactory::createConnection()->resetBusinessRulesAsync(/*m_rulesViewModel, SLOT(reloadData())*/ NULL, NULL);
+//  m_rulesViewModel->clear();
+//  updateControlButtons();
 }
 
 void QnBusinessRulesDialog::at_clearFilterButton_clicked() {
@@ -404,60 +403,65 @@ void QnBusinessRulesDialog::updateControlButtons() {
     setAdvancedMode(hasRights && loaded && advancedMode());
 }
 
-void QnBusinessRulesDialog::updateFilter() {
+bool isRuleVisible(QnBusinessRuleViewModel *ruleModel,
+                   const QString &filter,
+                   bool anyCameraPassFilter) {
 
+    // system rules should never be displayed
+    if (ruleModel->system())
+        return false;
+
+    // all rules shoud be visible if filter is empty
+    if (filter.isEmpty())
+        return true;
+
+    if (BusinessEventType::requiresCameraResource(ruleModel->eventType())) {
+        // rule supports any camera (assuming there is any camera that passing filter)
+        if (ruleModel->eventResources().isEmpty() && anyCameraPassFilter)
+            return true;
+
+        // rule contains camera passing the filter
+        foreach (const QnResourcePtr &resource, ruleModel->eventResources()) {
+            if (resource->toSearchString().contains(filter, Qt::CaseInsensitive))
+                return true;
+        }
+    }
+
+    if (BusinessActionType::requiresCameraResource(ruleModel->actionType())) {
+        foreach (const QnResourcePtr &resource, ruleModel->actionResources()) {
+            if (resource->toSearchString().contains(filter, Qt::CaseInsensitive))
+                return true;
+        }
+    }
+
+    return false;
+
+}
+
+void QnBusinessRulesDialog::updateFilter() {
     QString filter = ui->filterLineEdit->text();
     /* Don't allow empty filters. */
     if (!filter.isEmpty() && filter.trimmed().isEmpty()) {
         ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
         return;
     }
+
     ui->clearFilterButton->setVisible(!filter.isEmpty());
 
     if (!m_rulesViewModel->isLoaded())
         return;
 
-    bool showSystemRules = ui->systemRulesCheckBox->isChecked();
+    filter = filter.trimmed();
+    bool anyCameraPassFilter = false;
+    foreach (const QnResourcePtr camera, qnResPool->getAllEnabledCameras())  {
+        anyCameraPassFilter = camera->toSearchString().contains(filter, Qt::CaseInsensitive);
+        if (anyCameraPassFilter)
+            break;
+    }
 
     for (int i = 0; i < m_rulesViewModel->rowCount(); ++i) {
         QnBusinessRuleViewModel *ruleModel = m_rulesViewModel->getRuleModel(i);
-
-        // check that system rules should be displayed
-        bool passSystemFilter = (showSystemRules || !ruleModel->system());
-        bool passEventFilter = BusinessEventType::requiresCameraResource(ruleModel->eventType());
-        bool passActionFilter = BusinessActionType::requiresCameraResource(ruleModel->actionType());
-
-        // check that rule requires cameras in event field
-        // AND supports any camera
-        // OR contains camera that is passing filter
-        if (passSystemFilter
-            && !filter.isEmpty()
-            && passEventFilter
-            && !ruleModel->eventResources().isEmpty()) {
-
-            passEventFilter = false;
-            foreach (const QnResourcePtr &resource, ruleModel->eventResources()) {
-                passEventFilter = (resource->toSearchString().contains(filter, Qt::CaseInsensitive));
-                if (passEventFilter)
-                    break;
-            }
-        }
-
-        // check that rule does not require cameras in action field
-        // OR contains camera that is passing filter
-        if (passSystemFilter
-            && !filter.isEmpty()
-            && passActionFilter) {
-            passActionFilter = false;
-            foreach (const QnResourcePtr &resource, ruleModel->actionResources()) {
-                passActionFilter = (resource->toSearchString().contains(filter, Qt::CaseInsensitive));
-                if (passActionFilter)
-                    break;
-            }
-        }
-
-        bool visible = passSystemFilter && (filter.isEmpty() || passEventFilter || passActionFilter);
-        ui->tableView->setRowHidden(i, !visible);
+        ui->tableView->setRowHidden(i, !isRuleVisible(ruleModel, filter, anyCameraPassFilter));
     }
 
 }

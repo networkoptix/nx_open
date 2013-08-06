@@ -5,17 +5,16 @@
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
-#include <client_message_processor.h>
+#include <ui/workbench/workbench_context.h>
+
 #include <version.h>
 
 QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_messageProcessor_connectionClosed()));
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_messageProcessor_connectionOpened()));
-
-    at_messageProcessor_connectionClosed();
+    connect(context(),  SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateMismatchData()));
+    updateMismatchData();
 }
 
 QnWorkbenchVersionMismatchWatcher::~QnWorkbenchVersionMismatchWatcher() {
@@ -52,7 +51,7 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
     }
 }
 
-void QnWorkbenchVersionMismatchWatcher::at_messageProcessor_connectionClosed() {
+void QnWorkbenchVersionMismatchWatcher::updateMismatchData() {
     m_mismatchData.clear();
 
     QnVersionMismatchData clientData;
@@ -60,29 +59,19 @@ void QnWorkbenchVersionMismatchWatcher::at_messageProcessor_connectionClosed() {
     clientData.version = QnSoftwareVersion(QN_ENGINE_VERSION);
     m_mismatchData.push_back(clientData);
 
-    updateHasMismatches();
-    emit mismatchDataChanged();
-}
+    if(context()->user()) {
+        QnVersionMismatchData ecData;
+        ecData.component = Qn::EnterpriseControllerComponent;
+        ecData.version = QnAppServerConnectionFactory::currentVersion();
+        m_mismatchData.push_back(ecData);
 
-void QnWorkbenchVersionMismatchWatcher::at_messageProcessor_connectionOpened() {
-    m_mismatchData.clear();
-    
-    QnVersionMismatchData clientData;
-    clientData.component = Qn::ClientComponent;
-    clientData.version = QnSoftwareVersion(QN_ENGINE_VERSION);
-    m_mismatchData.push_back(clientData);
-
-    QnVersionMismatchData ecData;
-    ecData.component = Qn::EnterpriseControllerComponent;
-    ecData.version = QnAppServerConnectionFactory::currentVersion();
-    m_mismatchData.push_back(ecData);
-
-    foreach(const QnMediaServerResourcePtr &mediaServerResource, resourcePool()->getResources().filtered<QnMediaServerResource>()) {
-        QnVersionMismatchData msData;
-        msData.component = Qn::MediaServerComponent;
-        msData.resource = mediaServerResource;
-        msData.version = mediaServerResource->getVersion();
-        m_mismatchData.push_back(msData);
+        foreach(const QnMediaServerResourcePtr &mediaServerResource, resourcePool()->getResources().filtered<QnMediaServerResource>()) {
+            QnVersionMismatchData msData;
+            msData.component = Qn::MediaServerComponent;
+            msData.resource = mediaServerResource;
+            msData.version = mediaServerResource->getVersion();
+            m_mismatchData.push_back(msData);
+        }
     }
 
     updateHasMismatches();

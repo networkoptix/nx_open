@@ -33,6 +33,11 @@ QString fromNativePath(const QString &path);
 QString getMoviesDirectory();
 
 /**
+ * \returns                             User backrounds directory.
+ */
+QString getBackgroundsDirectory();
+
+/**
  * \param num                           Number.
  * \returns                             Number of digits in decimal representation of the given number.
  */

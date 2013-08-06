@@ -38,37 +38,38 @@ public:
                 break;
             case cannotOpenCameraMediaPort:
                 requiredParamCount = 2;
-                errorMessage = tr("Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.");
+                errorMessage = tr("Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). "
+                    "Please try to reboot the camera, then restore factory defaults on the web-page.");
                 break;
             case connectionClosedUnexpectedly:
                 requiredParamCount = 2;
                 errorMessage = tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.");
                 break;
             case responseParseError:
-                errorMessage = tr("Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page."
-                    " If the problem persists, contact support");
+                errorMessage = tr("Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support");
                 break;
             case noMediaTrack:
-                errorMessage = tr("No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page."
-                    " If the problem persists, contact support");
+                errorMessage = tr("No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support");
                 break;
             case notAuthorised:
                 errorMessage = tr("Not authorized.");
                 break;
             case unsupportedProtocol:
                 requiredParamCount = 2;
-                errorMessage = tr("Cannot open media url %1. Unsupported media protocol %2. "
-                    "Please try to restore factory defaults on the web-page. If the problem persists, contact support.");
+                errorMessage = tr("Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support.");
                 break;
             case cannotConfigureMediaStream:
                 requiredParamCount = 1;
-                errorMessage = tr("Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page."
-                    " If the problem persists, contact support.");
+                errorMessage = tr("Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support.");
                 break;
             case requestFailed:
                 requiredParamCount = 2;
-                errorMessage = tr("Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page."
-                    " If the problem persists, contact support.");
+                errorMessage = tr("Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, contact support.");
                 break;
             case notImplemented:
                 requiredParamCount = 0;
@@ -76,27 +77,38 @@ public:
                 break;
             case ioError:
                 requiredParamCount = 1;
-                errorMessage = tr("I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera.");
+                errorMessage = tr("I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot the camera.");
                 break;
             case serverTerminated:
                 errorMessage = tr("Server has been stopped.");
                 break;
             default:
-                errorMessage = tr("Unknown error. Please contact support.");
-                if( !errorParams.isEmpty() )
-                    errorMessage += tr(" Parameters: ");
+            {
+                int nonEmptyParamCount = 0;
                 for( int i = 0; i < errorParams.size(); ++i )
+                {
+                    if( !errorParams[i].isEmpty() )
+                        ++nonEmptyParamCount;
+                    else
+                        break;
+                }
+
+                errorMessage = tr("Unknown error. Please contact support.");
+                if( nonEmptyParamCount )
+                    errorMessage += tr(" Parameters: ");
+                for( int i = 0; i < nonEmptyParamCount; ++i )
                 {
                     if( i > 0 )
                         errorMessage += QLatin1String(", ");
                     errorMessage += errorParams[i];
                 }
                 break;
+            }
         }
 
         requiredParamCount = std::min<int>(requiredParamCount, errorParams.size());
         for( int i = 0; i < requiredParamCount; ++i )
-            errorMessage = errorMessage.arg(errorParams[i]);
+            errorMessage = errorMessage.arg(!errorParams[i].isEmpty() ? errorParams[i] : tr("(unknown)"));
 
         return errorMessage;
     }
@@ -166,10 +178,8 @@ namespace CameraDiagnostics
     :
         errorCode( _errorCode )
     {
-        if( !param1.isEmpty() || !param2.isEmpty() )
-            errorParams.push_back( param1 );
-        if( !param2.isEmpty() )
-            errorParams.push_back( param2 );
+        errorParams.push_back(param1);
+        errorParams.push_back(param2);
     }
 
     QString Result::toString() const

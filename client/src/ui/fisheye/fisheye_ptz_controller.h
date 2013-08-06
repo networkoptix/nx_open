@@ -65,6 +65,7 @@ private:
     };
     SpaceRange m_xRange;
     SpaceRange m_yRange;
+    qreal m_lastAR;
 };
 
 #endif // __FISHEYE_PTZ_CONTROLLER_H__

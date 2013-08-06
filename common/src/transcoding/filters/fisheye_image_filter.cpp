@@ -139,7 +139,6 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
 void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageSize, int plane)
 {
     qreal aspectRatio = imageSize.width() / (qreal) imageSize.height();
-    qreal backAR = (1.0 - 1.0 / aspectRatio)/2.0;
 
     qreal kx = 2.0*tan(m_params.fov/2.0);
     qreal ky = kx/aspectRatio;
@@ -175,25 +174,31 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
         dstPos += imageSize.height()*imageSize.width() - 1;
         dstDelta = -1;
     }
+
+    QVector2D xy1 = QVector2D(1.0,         1.0 / aspectRatio);
+    QVector2D xy2 = QVector2D(-0.5,        -yCenter/ aspectRatio);
+
+    QVector2D xy3 = QVector2D(1.0 / M_PI,  aspectRatio / M_PI);
+    QVector2D xy4 = QVector2D(1.0 / 2.0,   1.0 / 2.0);
+
     for (int y = 0; y < imageSize.height(); ++y)
     {
         for (int x = 0; x < imageSize.width(); ++x)
         {
-            QVector3D pos3d(x / (qreal) (imageSize.width()-1) - 0.5, y / (qreal) (imageSize.height()-1) / aspectRatio - yCenter, 1.0);
+            QVector2D pos = QVector2D(x / qreal(imageSize.width()-1), y / qreal(imageSize.height()-1)) * xy1 + xy2;
+            QVector3D pos3d(pos.x(), pos.y(), 1.0);
             pos3d = to3d * pos3d;  // 3d vector on surface, rotate and scale
+
             qreal theta = atan2(pos3d.z(), pos3d.x()) + fovRot;     // fisheye angle
-            qreal r     = acos(pos3d.y() / pos3d.length()) / M_PI;  // fisheye radius
+            qreal r     = acos(pos3d.y() / pos3d.length());
             if (qIsNaN(r))
                 r = 0.0;
 
-            // return from polar coordinates
-            //qreal dstX = qBound(0.0, (cos(theta) * r + 0.5) * (imageSize.width()-1),  (qreal) (imageSize.width() - 1));
-            qreal dstX = (cos(theta) * r + 0.5) * (imageSize.width()-1);
+            pos = QVector2D(cos(theta), sin(theta)) * r;
+            pos = pos * xy3 + xy4;
 
-            qreal dstY = sin(theta) * r + 0.5;
-            dstY = (dstY - backAR) * aspectRatio;
-            //dstY = qBound(0.0, dstY * (imageSize.height()-1), (qreal) (imageSize.height() - 1));
-            dstY = dstY * (imageSize.height()-1);
+            qreal dstX = pos.x() * (imageSize.width()-1);
+            qreal dstY = pos.y() * (imageSize.height()-1);
 
             if (dstX < 0.0 || dstX > (qreal) (imageSize.width() - 1) ||
                 dstY < 0.0 || dstY > (qreal) (imageSize.height() - 1))
@@ -218,7 +223,6 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     );
 
     qreal aspectRatio = (imageSize.width()/m_params.panoFactor) / (qreal) imageSize.height();
-    qreal backAR = (1.0 - 1.0 / aspectRatio)/2.0;
     qreal yCenter;
     qreal phiShiftSign;
     if (m_params.viewMode == DewarpingParams::Horizontal) {
@@ -231,7 +235,6 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     }
 
     QPointF* dstPos = m_transform[plane];
-    float ymaxInv = (m_params.fov / m_params.panoFactor) / aspectRatio;
 	
     int dstDelta = 1;
     if (m_params.viewMode == DewarpingParams::VerticalDown) {
@@ -239,38 +242,43 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
         dstDelta = -1;
     }
 
+    QVector2D xy1 = QVector2D(m_params.fov, (m_params.fov / m_params.panoFactor) / aspectRatio);
+    QVector2D xy2 = QVector2D(-0.5,  -yCenter)*xy1 + QVector2D(m_params.xAngle, 0.0);
+
+    QVector2D xy3 = QVector2D(1.0 / M_PI,    aspectRatio / M_PI);
+    QVector2D xy4 = QVector2D(1.0 / 2.0,     1.0 / 2.0);
+
     for (int y = 0; y < imageSize.height(); ++y)
     {
         for (int x = 0; x < imageSize.width(); ++x)
         {
-            QVector2D pos(x / (qreal) (imageSize.width()-1) - 0.5, y / (qreal) (imageSize.height()-1) / aspectRatio - yCenter);
-            pos *= m_params.fov;
+            QVector2D pos = QVector2D(x / (qreal) (imageSize.width()-1), y / (qreal) (imageSize.height()-1)) * xy1 + xy2;
 
-            float theta = pos.x() + m_params.xAngle;
-            float roty = -m_params.fovRot * cos(theta);
-            pos.setY(pos.y() / (phiShiftSign * m_params.panoFactor));
-            float phi   = pos.y() * (1.0 - roty*ymaxInv) - phiShiftSign*(roty + m_params.yAngle);
-
+            float cosTheta = cos(pos.x());
+            float roty = -m_params.fovRot * cosTheta;
+            float phi   = phiShiftSign * (pos.y() * (1.0 - roty*xy1.y())  - roty - m_params.yAngle);
+            float cosPhi = cos(phi);
 
             // Vector in 3D space
             QVector3D pos3d;
             if (m_params.viewMode == DewarpingParams::Horizontal)
-                pos3d = QVector3D(cos(phi) * sin(theta),    cos(phi) * cos(theta), sin(phi));
+                pos3d = QVector3D(cosPhi * sin(pos.x()),    cosPhi * cosTheta, sin(phi));
             else
-                pos3d = QVector3D(cos(phi) * sin(theta),    sin(phi),              cos(phi) * cos(theta));
+                pos3d = QVector3D(cosPhi * sin(pos.x()),    sin(phi),          cosPhi * cosTheta);
             QVector3D psph = perspectiveMatrix * pos3d;
 
             // Calculate fisheye angle and radius
-            theta = atan2(psph.z(), psph.x());
-            phi   = acos(psph.y());
-            float r = phi / M_PI; // fisheye FOV
+            float theta = atan2(psph.z(), psph.x());
+            float r = acos(psph.y());
+            if (qIsNaN(r))
+                r = 0.0;
 
             // return from polar coordinates
-            qreal dstX = (cos(theta) * r + 0.5) * (imageSize.width()-1);
+            pos = QVector2D(cos(theta), sin(theta)) * r;
+            pos = pos * xy3 + xy4;
             
-            qreal dstY = sin(theta) * r + 0.5;
-            dstY = (dstY - backAR) * aspectRatio;
-            dstY = dstY * (imageSize.height()-1);
+            qreal dstX = pos.x() * (imageSize.width()-1);
+            qreal dstY = pos.y() * (imageSize.height()-1);
 
             if (dstX < 0.0 || dstX > (qreal) (imageSize.width() - 1) ||
                 dstY < 0.0 || dstY > (qreal) (imageSize.height() - 1))
