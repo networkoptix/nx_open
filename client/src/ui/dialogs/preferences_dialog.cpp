@@ -172,8 +172,11 @@ void QnPreferencesDialog::submitToSettings() {
 
     QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
     if(!translation.isEmpty()) {
-        if(!translation.filePaths().isEmpty())
-            m_settings->setTranslationPath(translation.filePaths()[0]);
+        if(!translation.filePaths().isEmpty()) {
+            QString currentTranslationPath = m_settings->translationPath();
+            if(!translation.filePaths().contains(currentTranslationPath))
+                m_settings->setTranslationPath(translation.filePaths()[0]);
+        }
     }
 
     if (m_recordingSettingsWidget)
