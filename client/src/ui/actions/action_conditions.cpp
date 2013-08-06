@@ -503,17 +503,14 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
     return Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parameters) {
-    Q_UNUSED(parameters)
+Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &) {
     return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &parameters) {
-    Q_UNUSED(parameters)
+Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &) {
     return qnSettings->isUpdatesEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &parameters) {
-    Q_UNUSED(parameters)
-    return Qn::EnabledAction;
+Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &) {
+    return qnSettings->isShowcaseEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }

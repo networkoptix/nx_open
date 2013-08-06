@@ -333,12 +333,15 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
             qint64 currentUsecTime = getUsecTimer();
             if (currentUsecTime - m_lastWarnTime > 2000 * 1000ll)
             {
-                if (camTimeChanged)
-                    qWarning() << "Camera time has been changed or receiving latency > 10 seconds. Resync time for camera" << m_resId;
-                else if (localTimeChanged)
-                    qWarning() << "Local time has been changed. Resync time for camera" << m_resId;
-                else
-                    qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs << "seconds. Resync time for camera" << m_resId;
+                if (camTimeChanged) {
+                    NX_LOG(QString(lit("Camera time has been changed or receiving latency > 10 seconds. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
+                }
+                else if (localTimeChanged) {
+                    NX_LOG(QString(lit("Local time has been changed. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
+                }
+                else {
+                    NX_LOG(QString(lit("RTSP time drift reached %1 seconds. Resync time for camera %2")).arg(localTimeInSecs - resultInSecs).arg(m_resId), cl_logWARNING);
+                }
                 m_lastWarnTime = currentUsecTime;
             }
             reset();

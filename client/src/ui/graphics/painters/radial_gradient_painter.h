@@ -19,6 +19,7 @@ public:
     void paint();
 
 private:
+    bool m_initialized;
     GLuint m_buffer;
     int m_vertexOffset, m_colorOffset, m_vertexCount;
     QSharedPointer<QnColorShaderProgram> m_shader;

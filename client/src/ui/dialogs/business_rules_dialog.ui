@@ -94,13 +94,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="systemRulesCheckBox">
-       <property name="text">
-        <string>Show system rules</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>

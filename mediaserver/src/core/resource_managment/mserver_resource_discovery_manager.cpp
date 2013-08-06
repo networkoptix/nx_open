@@ -582,7 +582,8 @@ void QnMServerResourceDiscoveryManager::check_if_accessible(QnResourceList& just
     Q_UNUSED(threads);
     foreach(check_if_accessible_STRUCT t, checkLst)
     {
-        qDebug() << "Checking conflicts for " << t.resourceNet->getHostAddress() << "  name = " << t.resourceNet->getName();
+        NX_LOG(QString(lit("Checking conflicts for %1 name = %2")).arg(t.resourceNet->getHostAddress()).arg(t.resourceNet->getName()), cl_logDEBUG1);
+
         t.f();
     }
 #else
