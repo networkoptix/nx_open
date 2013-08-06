@@ -14,6 +14,7 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
+#include <utils/applauncher_utils.h>
 #include <client/client_settings.h>
 #include <client/client_translation_manager.h>
 #include <common/common_module.h>
@@ -45,7 +46,8 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_settings(qnSettings),
     m_licenseTabIndex(0),
     m_serverSettingsTabIndex(0),
-    m_popupSettingsTabIndex(0)
+    m_popupSettingsTabIndex(0),
+    m_restartPending(false)
 {
     ui->setupUi(this);
 
@@ -145,11 +147,24 @@ void QnPreferencesDialog::accept() {
             QMessageBox::Ok, 
             QMessageBox::Cancel
         );
-        if (button == QMessageBox::Ok)
-            qApp->exit();
+        if (button == QMessageBox::Ok) {
+            m_restartPending = restartClient();
+            if (!m_restartPending) {
+                QMessageBox::critical(
+                            this,
+                            tr("Launcher process is not found"),
+                            tr("Cannot restart the client.\n"
+                               "Please close the application and start it again using the shortcut in the start menu.")
+                            );
+            }
+        }
     }
     
     base_type::accept();
+}
+
+bool QnPreferencesDialog::restartPending() const {
+    return m_restartPending;
 }
 
 void QnPreferencesDialog::submitToSettings() {

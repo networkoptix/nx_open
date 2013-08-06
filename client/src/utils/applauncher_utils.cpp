@@ -17,7 +17,7 @@ bool sendCommandToLauncher(const QnSoftwareVersion &version, const QStringList &
         return false;
     }
 
-    const QByteArray &serializedTask = applauncher::api::StartApplicationTask(stripVersion(version.toString()), arguments).serialize();
+    const QByteArray &serializedTask = applauncher::api::StartApplicationTask(version.toString(QnSoftwareVersion::MinorFormat), arguments).serialize();
     if(sock.write(serializedTask.data(), serializedTask.size()) != serializedTask.size()) {
         qDebug() << "Failed to send launch task to local server" << launcherPipeName << sock.errorString();
         return false;
@@ -28,7 +28,13 @@ bool sendCommandToLauncher(const QnSoftwareVersion &version, const QStringList &
     return true;
 }
 
-bool restartClient(const QnSoftwareVersion &version, const QByteArray &auth) {
+bool canRestart(QnSoftwareVersion version) {
+    if (version.isNull())
+        version = QnSoftwareVersion(QN_ENGINE_VERSION);
+    return QFile::exists(qApp->applicationDirPath() + QLatin1String("/../") + version.toString(QnSoftwareVersion::MinorFormat));
+}
+
+bool restartClient(QnSoftwareVersion version, const QByteArray &auth) {
     if (version.isNull())
         version = QnSoftwareVersion(QN_ENGINE_VERSION);
 

@@ -368,8 +368,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
         }
 
         if(m_restartPending) {
-            bool canRestart = QFile::exists(qApp->applicationDirPath() + QLatin1String("/../") + stripVersion(connectInfo->version.toString()));
-            if(canRestart) {
+            if(canRestart(connectInfo->version)) {
                 int button = QMessageBox::warning(
                     this,
                     tr("Could not connect to Enterprise Controller"),
