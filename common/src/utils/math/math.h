@@ -73,7 +73,6 @@ bool qBetween(const T &value, const T &min, const T &max) {
     return min <= value && value < max;
 }
 
-
 #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
 /**
  * Converts the given 64-bit number from host byte order to network byte order.

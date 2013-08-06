@@ -53,9 +53,9 @@ extern "C" {
 #include <QtWidgets/QAction>
 
 #ifdef Q_OS_WIN
-#   include <QAudio>
-#   include <QAudioFormat>
-#   include <QAudioOutput>
+#   include <QtMultimedia/QAudio>
+#   include <QtMultimedia/QAudioFormat>
+#   include <QtMultimedia/QAudioOutput>
 #endif
 
 #include <QAuthenticator>
