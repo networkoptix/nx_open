@@ -51,7 +51,7 @@ public:
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
-    virtual void showEvent(QShowEvent *event) override;
+    virtual bool event(QEvent *event) override;
 
 private slots:
     void at_resourceModel_dataChanged();
