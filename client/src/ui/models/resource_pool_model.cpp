@@ -749,6 +749,10 @@ void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
     m_rootNodes[m_rootNodeType]->updateRecursive();
 }
 
+Qn::NodeType QnResourcePoolModel::rootNodeType() const {
+    return m_rootNodeType;
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: QAbstractItemModel implementation
