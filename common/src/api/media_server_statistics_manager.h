@@ -52,6 +52,7 @@ public:
 
     /** Filter statistics items of some deviceType by flags (ignore all replies that do not contain flags provided). */
     void setFlagsFilter(QnStatisticsDeviceType deviceType, int flags);
+
 private:
     QHash<QString, QnMediaServerStatisticsStorage *> m_statistics;
     QHash<QnStatisticsDeviceType, int> m_flagsFilter;

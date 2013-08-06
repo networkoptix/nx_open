@@ -39,7 +39,6 @@ void QnResourceSelectionDialog::init(Qn::NodeType rootNodeType) {
 
     ui.reset(new Ui::QnResourceSelectionDialog);
     ui->setupUi(this);
-    ui->detailsWidget->hide();
 
     m_flat = rootNodeType == Qn::UsersNode; //TODO: #GDM servers?
     m_resourceModel = new QnResourcePoolModel(rootNodeType, m_flat, this);
@@ -47,12 +46,16 @@ void QnResourceSelectionDialog::init(Qn::NodeType rootNodeType) {
     switch (rootNodeType) {
     case Qn::UsersNode:
         setWindowTitle(tr("Select users..."));
+        ui->detailsWidget->hide();
+        resize(minimumSize());
         break;
     case Qn::ServersNode:
         setWindowTitle(tr("Select cameras..."));
         break;
     default:
         setWindowTitle(tr("Select resources..."));
+        ui->detailsWidget->hide();
+        resize(minimumSize());
         break;
     }
 
@@ -145,6 +148,15 @@ void QnResourceSelectionDialog::keyPressEvent(QKeyEvent *event) {
     base_type::keyPressEvent(event);
 }
 
+bool QnResourceSelectionDialog::event(QEvent *event) {
+    bool result = base_type::event(event);
+
+    if(event->type() == QEvent::Polish) {
+    }
+
+    return result;
+}
+
 void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *delegate) {
     Q_ASSERT(!m_delegate);
     m_delegate = delegate;
@@ -177,10 +189,6 @@ void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
         m_tooltipResourceId = resource->getId();
         m_thumbnailManager->selectResource(resource);
         ui->screenshotLabel->show();
-        if (!ui->detailsWidget->isVisible()) {
-            ui->detailsWidget->show();
-            this->setGeometry(this->geometry().adjusted(0, 0, ui->detailsWidget->width(), 0));
-        }
     } else
         ui->screenshotLabel->hide();
 }

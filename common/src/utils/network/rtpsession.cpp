@@ -10,6 +10,7 @@
 #include <QUuid>
 
 #include "utils/common/util.h"
+#include "utils/network/http/httptypes.h"
 #include "../common/sleep.h"
 #include "tcp_connection_processor.h"
 #include "simple_http_client.h"
@@ -573,6 +574,10 @@ void RTPSession::updateResponseStatus(const QByteArray& response)
         QList<QByteArray> params = response.left(firstLineEnd).split(' ');
         if (params.size() >= 2) {
             m_responseCode = params[1].trimmed().toInt();
+            
+            nx_http::StatusLine statusLine; //TODO: #ak use statusLine one line above after release 1.6 (to prevent bike invention)
+            statusLine.parse( nx_http::ConstBufferRefType(response, firstLineEnd) );
+            m_reasonPhrase = QLatin1String(statusLine.reasonPhrase);
         }
     }
 }
@@ -705,16 +710,26 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         m_contentBase = tmp;
 
 
-    CameraDiagnostics::Result result( CameraDiagnostics::ErrorCode::noError );
+    CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
     updateResponseStatus(response);
-    if( m_responseCode == CL_HTTP_AUTH_REQUIRED )
-        result = CameraDiagnostics::ErrorCode::noMediaTrack;
+    switch( m_responseCode )
+    {
+        case CL_HTTP_SUCCESS:
+            break;
+        case CL_HTTP_AUTH_REQUIRED:
+            m_tcpSock.close();
+            return CameraDiagnostics::NotAuthorisedResult( url );
+        default:
+            m_tcpSock.close();
+            return CameraDiagnostics::RequestFailedResult( QLatin1String("DESCRIBE"), m_reasonPhrase );
+
+    }
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
     if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
         m_tcpSock.close();
-        return CameraDiagnostics::NoMediaTrackResult();
+        return CameraDiagnostics::NoMediaTrackResult( url );
     }
 
     m_sdp = response.mid(sdp_index+4);
@@ -722,7 +737,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
 
     if (m_sdpTracks.size()<=0) {
         m_tcpSock.close();
-        result = CameraDiagnostics::NoMediaTrackResult();
+        result = CameraDiagnostics::NoMediaTrackResult( url );
     }
 
     return result;

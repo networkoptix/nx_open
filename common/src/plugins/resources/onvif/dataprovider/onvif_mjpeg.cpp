@@ -153,7 +153,14 @@ CameraDiagnostics::Result MJPEGtreamreader::openStream()
         case CL_HTTP_SUCCESS:
             return CameraDiagnostics::ErrorCode::noError;
         case CL_HTTP_AUTH_REQUIRED:
-            return CameraDiagnostics::NotAuthorisedResult();
+        {
+            QUrl requestedUrl;
+            requestedUrl.setHost( nres->getHostAddress() );
+            requestedUrl.setPort( nres->httpPort() );
+            requestedUrl.setScheme( QLatin1String("http") );
+            requestedUrl.setPath( m_request );
+            return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
+        }
         default:
             return CameraDiagnostics::RequestFailedResult(m_request, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatus)));
     }

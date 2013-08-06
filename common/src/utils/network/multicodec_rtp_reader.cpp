@@ -486,7 +486,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if( m_videoIO || m_audioIO )
         return CameraDiagnostics::NoErrorResult();
     else
-        return CameraDiagnostics::NoMediaTrackResult();
+        return CameraDiagnostics::NoMediaTrackResult( url );
 }
 
 int QnMulticodecRtpReader::getLastResponseCode() const

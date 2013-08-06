@@ -50,11 +50,13 @@ public:
                     "Finally, try to update firmware. If the problem persists, contact support");
                 break;
             case noMediaTrack:
-                errorMessage = tr("No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. "
+                requiredParamCount = 1;
+                errorMessage = tr("No supported media track(s) at url %1. Please try to reboot the camera, then restore factory defaults on the web-page. "
                     "Finally, try to update firmware. If the problem persists, contact support");
                 break;
             case notAuthorised:
-                errorMessage = tr("Not authorized.");
+                requiredParamCount = 1;
+                errorMessage = tr("Not authorized. Url %1");
                 break;
             case unsupportedProtocol:
                 requiredParamCount = 2;
@@ -63,8 +65,8 @@ public:
                 break;
             case cannotConfigureMediaStream:
                 requiredParamCount = 1;
-                errorMessage = tr("Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. "
-                    "Finally, try to update firmware. If the problem persists, contact support.");
+                errorMessage = tr("Failed to configure parameter %1. First, try to turn on recording (if it's off) and decrease fps in camera settings. "
+                    "If no success, restore factory defaults on the camera web-page. If the problem persists, contact support.");
                 break;
             case requestFailed:
                 requiredParamCount = 2;

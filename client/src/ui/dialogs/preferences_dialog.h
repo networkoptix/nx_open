@@ -37,6 +37,8 @@ public:
 
     virtual void accept() override;
 
+    bool restartPending() const;
+
 private:
     void updateFromSettings();
     void submitToSettings();
@@ -71,6 +73,8 @@ private:
     int m_serverSettingsTabIndex;
 
     int m_popupSettingsTabIndex;
+
+    bool m_restartPending;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H
