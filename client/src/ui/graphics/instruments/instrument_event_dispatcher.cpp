@@ -44,17 +44,18 @@ bool InstrumentEventDispatcher<T>::registeredNotify(Instrument *instrument, QGra
 
 template<class T>
 void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrument, T *target, InstallationMode::Mode mode, Instrument *reference) {
+    assert(!dispatching()); /* Can't install while dispatching as it will invalidate the iterators. */
+
     if(!registeredNotify(instrument, target))
         return;
 
     m_instrumentTargets.insert(qMakePair(instrument, target));
 
+    const std::type_info *typeInfo = m_typeInfoByTarget.value(target);
     foreach(QEvent::Type eventType, instrument->watchedEventTypes(TARGET_TYPE)) {
         typename QHash<QPair<T *, QEvent::Type>, TargetData>::iterator pos = m_dataByTarget.find(qMakePair(target, eventType));
-        if (pos == m_dataByTarget.end()) {
-            assert(!dispatching()); // TODO: #Elric
-            pos = m_dataByTarget.insert(qMakePair(target, eventType), TargetData(&typeid(*target))); // TODO: can't do this while dispatching.
-        }
+        if (pos == m_dataByTarget.end())
+            pos = m_dataByTarget.insert(qMakePair(target, eventType), TargetData(typeInfo));
 
         insertInstrument(instrument, mode, reference, &pos->instruments);
     }
@@ -78,6 +79,8 @@ void InstrumentEventDispatcher<T>::uninstallInstrumentInternal(Instrument *instr
         QList<Instrument *> &instruments = pos->instruments;
         if(!dispatching()) {
             instruments.removeOne(instrument);
+            if(instruments.isEmpty() && !m_typeInfoByTarget.contains(target))
+                m_dataByTarget.erase(pos);
         } else {
             /* This list may currently be in use by dispatch routine. 
              * So don't make any structural modifications, just NULL out the
@@ -104,8 +107,8 @@ void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument, Ins
     insertInstrument(instrument, mode, reference, &m_instruments);
 
     if(instrument->watches(TARGET_TYPE))
-        foreach(T *target, m_targets)
-            installInstrumentInternal(instrument, target, mode, reference);
+        for(QHash<T *, const std::type_info *>::iterator pos = m_typeInfoByTarget.begin(); pos != m_typeInfoByTarget.end(); pos++)
+            installInstrumentInternal(instrument, pos.key(), mode, reference);
 }
 
 template<class T>
@@ -120,20 +123,20 @@ void InstrumentEventDispatcher<T>::uninstallInstrument(Instrument *instrument) {
     m_instruments.removeOne(instrument);
 
     if(instrument->watches(TARGET_TYPE))
-        foreach(T *target, m_targets)
-            uninstallInstrumentInternal(instrument, target);
+        for(QHash<T *, const std::type_info *>::iterator pos = m_typeInfoByTarget.begin(); pos != m_typeInfoByTarget.end(); pos++)
+            uninstallInstrumentInternal(instrument, pos.key());
 }
 
 template<class T>
 void InstrumentEventDispatcher<T>::registerTarget(T *target) {
     assert(target != NULL);
 
-    if(m_targets.contains(target)) {
+    if(m_typeInfoByTarget.contains(target)) {
         qnWarning("Given target is already registered with this instrument event dispatcher.");
         return;
     }
 
-    m_targets.insert(target);
+    m_typeInfoByTarget.insert(target, &typeid(*target));
 
     foreach(Instrument *instrument, m_instruments)
         installInstrumentInternal(instrument, target, InstallFirst, NULL);
@@ -143,12 +146,12 @@ template<class T>
 void InstrumentEventDispatcher<T>::unregisterTarget(T *target) {
     assert(target != NULL);
 
-    if(!m_targets.contains(target)) {
+    if(!m_typeInfoByTarget.contains(target)) {
         qnWarning("Given target is not registered with this instrument event dispatcher.");
         return;
     }
 
-    m_targets.remove(target);
+    m_typeInfoByTarget.remove(target);
 
     foreach(Instrument *instrument, m_instruments) 
         uninstallInstrumentInternal(instrument, target);
@@ -159,15 +162,14 @@ bool InstrumentEventDispatcher<T>::dispatch(T *target, QEvent *event) {
     typename QHash<QPair<T *, QEvent::Type>, TargetData>::iterator pos = m_dataByTarget.find(qMakePair(target, event->type()));
     if (pos == m_dataByTarget.end()) {
 #ifdef _DEBUG
-        if(!m_targets.contains(target))
+        if(!m_typeInfoByTarget.contains(target))
             qnWarning("Received an event from a target that is not registered with this instrument event dispatcher.");
 #endif
         return false;
     }
 
     QList<Instrument *> &instruments = pos->instruments;
-    if (instruments.empty())
-        return false;
+    assert(!instruments.isEmpty()); /* We remove empty lists right away, so this assertion is valid. */
 
     /* Check if target is not being destroyed. 
      * 
@@ -206,8 +208,11 @@ bool InstrumentEventDispatcher<T>::dispatch(T *target, QEvent *event) {
 
     m_dispatchDepth--;
 
-    if (hasNullInstruments && m_dispatchDepth == 0)
+    if (hasNullInstruments && m_dispatchDepth == 0) {
         instruments.removeAll(NULL);
+        if(instruments.isEmpty() && !m_typeInfoByTarget.contains(target))
+            m_dataByTarget.erase(pos);
+    }
 
     return result;
 }
