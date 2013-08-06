@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -497,6 +497,16 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabFisheyeSettings">
+      <attribute name="title">
+       <string>Dewarping</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <widget class="QnFisheyeSettingsWidget" name="fisheyeSettingsWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="cameraPropertiesTab">
       <attribute name="title">
        <string>Advanced</string>
@@ -512,16 +522,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabFisheyeSettings">
-      <attribute name="title">
-       <string>Dewarping</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_10">
-       <item>
-        <widget class="QnFisheyeSettingsWidget" name="fisheyeSettingsWidget" native="true"/>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
   </layout>
@@ -534,15 +534,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnTextTickSlider</class>
-   <extends>QSlider</extends>
-   <header>ui/widgets/properties/text_tick_slider.h</header>
-  </customwidget>
-  <customwidget>
    <class>QnAdvancedSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/expert_settings_widget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnTextTickSlider</class>
+   <extends>QSlider</extends>
+   <header>ui/widgets/properties/text_tick_slider.h</header>
   </customwidget>
   <customwidget>
    <class>QnFisheyeSettingsWidget</class>
