@@ -9,16 +9,12 @@
 #include <QDesktopWidget>
 #include <QDir>
 
-#include <QtNetwork/QLocalSocket>
-
 #include <client/client_connection_data.h>
 
 #include <core/resource/resource.h>
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
-#include <api/ipc_pipe_names.h>
-#include <api/start_application_task.h>
 
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/widgets/rendering_widget.h>
@@ -26,6 +22,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
+#include <utils/applauncher_utils.h>
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
@@ -290,48 +288,6 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
     }
 }
 
-bool QnLoginDialog::sendCommandToLauncher(const QnSoftwareVersion &version, const QStringList &arguments) {
-    QLocalSocket sock;
-    sock.connectToServer(launcherPipeName);
-    if(!sock.waitForConnected(-1)) {
-        qnDebug("Failed to connect to local server %1: %2.", launcherPipeName, sock.errorString());
-        return false;
-    }
-
-    const QByteArray &serializedTask = applauncher::api::StartApplicationTask(stripVersion(version.toString()), arguments).serialize();
-    if(sock.write(serializedTask.data(), serializedTask.size()) != serializedTask.size()) {
-        qnDebug("Failed to send launch task to local server %1: %2.", launcherPipeName, sock.errorString());
-        return false;
-    }
-
-    sock.waitForReadyRead(-1);
-//    QByteArray result =
-            sock.readAll();
-//    if (result != "ok")
-//        return false;
-    return true;
-}
-
-bool QnLoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
-    QStringList arguments;
-    arguments << QLatin1String("--no-single-application");
-    arguments << QLatin1String("--auth");
-    arguments << QLatin1String(currentUrl().toEncoded());
-    arguments << QLatin1String("--screen");
-    arguments << QString::number(qApp->desktop()->screenNumber(this));
-
-    bool result = sendCommandToLauncher(connectInfo->version, arguments);
-    if (!result) {
-        QMessageBox::critical(
-            this,
-            tr("Launcher process is not found"),
-            tr("Cannot restart the client in compatibility mode.\n"
-                "Please close the application and start it again using the shortcut in the start menu.")
-        );
-    }
-    return result;
-}
-
 void QnLoginDialog::updateAcceptibility() {
     bool acceptable = 
         !ui->passwordLineEdit->text().isEmpty() &&
@@ -426,7 +382,14 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                     QMessageBox::Cancel
                 );
                 if(button == QMessageBox::Ok) {
-                    restartInCompatibilityMode(connectInfo);
+                    if (!restartClient(connectInfo->version, currentUrl().toEncoded())) {
+                        QMessageBox::critical(
+                                    this,
+                                    tr("Launcher process is not found"),
+                                    tr("Cannot restart the client in compatibility mode.\n"
+                                       "Please close the application and start it again using the shortcut in the start menu.")
+                                    );
+                    }
                 } else {
                     m_restartPending = false;
                 }
