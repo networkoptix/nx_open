@@ -78,8 +78,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (healthMessage >= 0) {
         int resourceId = params.getEventResourceId();
         QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
-        if (resource) //all incoming systemhealth events should contain source resource
-           addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
+        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
         return;
     }
 
