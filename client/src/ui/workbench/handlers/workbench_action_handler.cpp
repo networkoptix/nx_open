@@ -1622,6 +1622,8 @@ void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+    if (dialog->restartPending())
+        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
@@ -1629,6 +1631,8 @@ void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
     dialog->openLicensesPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+    if (dialog->restartPending())
+        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
@@ -1636,6 +1640,8 @@ void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
     dialog->openServerSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+    if (dialog->restartPending())
+        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
@@ -1643,6 +1649,8 @@ void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
     dialog->openPopupSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+    if (dialog->restartPending())
+        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {

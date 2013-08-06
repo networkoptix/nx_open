@@ -145,6 +145,15 @@ void QnResourceSelectionDialog::keyPressEvent(QKeyEvent *event) {
     base_type::keyPressEvent(event);
 }
 
+void QnResourceSelectionDialog::showEvent(QShowEvent *event) {
+    if (m_resourceModel->rootNodeType() == Qn::ServersNode &&
+        !ui->detailsWidget->isVisible()) {
+        ui->detailsWidget->show();
+        this->setGeometry(this->geometry().adjusted(0, 0, ui->detailsWidget->width(), 0));
+    }
+    base_type::showEvent(event);
+}
+
 void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *delegate) {
     Q_ASSERT(!m_delegate);
     m_delegate = delegate;
@@ -177,10 +186,6 @@ void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
         m_tooltipResourceId = resource->getId();
         m_thumbnailManager->selectResource(resource);
         ui->screenshotLabel->show();
-        if (!ui->detailsWidget->isVisible()) {
-            ui->detailsWidget->show();
-            this->setGeometry(this->geometry().adjusted(0, 0, ui->detailsWidget->width(), 0));
-        }
     } else
         ui->screenshotLabel->hide();
 }
