@@ -29,6 +29,7 @@
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
+        <SetProperty Id="AppserverDbDir" Value="[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db" After="CostInitialize">1</SetProperty>
         <SetProperty Id="APPSERVER_GUID" Value="[APPSERVER_GUID32]" After="AppSearch">
             <![CDATA[ APPSERVER_GUID = "" ]]>
         </SetProperty>
@@ -106,6 +107,7 @@
         <Property Id="MEDIASERVER_REGISTRY_PATH" Value="Software\${company.name}\${mediaserver.name}"/>
 
         <Property Id="REMOVE_DATABASE" Secure="yes"/>
+        <Property Id="VERSION_TO_RESTORE" Secure="yes" Value="Current"/>
 
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
@@ -330,6 +332,7 @@
         <CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
         <CustomAction Id="BackupDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="BackupDatabaseFile" Execute="deferred" Impersonate="no"/>
+        <CustomAction Id="RestoreDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="RestoreDatabaseFile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="PopulateRestoreVersions" BinaryKey="CustomActions.dll" DllEntry="PopulateRestoreVersions" Execute="immediate" Impersonate="no"/>
 
@@ -402,6 +405,8 @@
 
         <CustomAction Id="BackupDatabaseFile_Cmd" Property="BackupDatabaseFile" Execute="immediate" Impersonate="yes"
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;Software\${company.name}\${appserver.name};lastDbVersion"/>
+        <CustomAction Id="RestoreDatabaseFile_Cmd" Property="RestoreDatabaseFile" Execute="immediate" Impersonate="yes"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;[VERSION_TO_RESTORE]"/>
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db"/>
 
@@ -454,7 +459,7 @@
             <Custom Action="FixClientFolder" After="SetClientFolderToRegistry">1</Custom>
             <Custom Action="IsClientFolderExists" After="FixClientFolder">1</Custom>
             <Custom Action="SetClientFolderToDefault" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
-            <Custom Action="PopulateRestoreVersions" After="CostInitialize">REMOVE="ALL"</Custom>
+            <Custom Action="PopulateRestoreVersions" After="SetAppserverDbDir">1</Custom>
 
         </InstallUISequence>
 
@@ -522,6 +527,8 @@
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
+            <Custom Action="RestoreDatabaseFile_Cmd" After="StopServices"><![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
+            <Custom Action="RestoreDatabaseFile" After="RestoreDatabaseFile_Cmd"><![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
 
             <Custom Action="LaunchTrayTool" After="InstallFinalize">
                 <![CDATA[ (!AppServerFeature=3 OR INSTALL_ECS OR !ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>

@@ -321,9 +321,6 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
-    CString pid;
-    pid.Format(L"%d", GetCurrentProcessId());
-    MessageBox(0, pid, L"", MB_OK);
     hr = WcaInitialize(hInstall, "BackupDatabaseFile");
     ExitOnFailure(hr, "Failed to initialize");
 
@@ -365,13 +362,39 @@ LExit:
     return WcaFinalize(er);
 }
 
+UINT __stdcall RestoreDatabaseFile(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "RestoreDatabaseFile");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CAtlString params, toFile, version;
+        params = GetProperty(hInstall, L"CustomActionData");
+
+        // Extract "to" file and version from filesString
+        int curPos = 0;
+        toFile = params.Tokenize(_T(";"), curPos);
+        version = params.Tokenize(_T(";"), curPos);
+
+        CopyFile(toFile + "." + version, toFile, FALSE);
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
 UINT __stdcall PopulateRestoreVersions(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
-    CString pid;
-    pid.Format(L"%d", GetCurrentProcessId());
     hr = WcaInitialize(hInstall, "PopulateRestoreVersions");
     ExitOnFailure(hr, "Failed to initialize");
 
@@ -381,7 +404,46 @@ UINT __stdcall PopulateRestoreVersions(MSIHANDLE hInstall)
         MSIHANDLE hTable = NULL; 
         MSIHANDLE hColumns = NULL; 
 
-        hr = WcaAddTempRecord(&hTable, &hColumns, L"ListBox", NULL, 0, 4, L"VERSIONS_TO_RESTORE", 0, L"Item 1", L"Item 1");
+        WIN32_FIND_DATA fdFile; 
+        HANDLE hFind = NULL; 
+
+        wchar_t sPath[2048]; 
+
+        CAtlString sDir = GetProperty(hInstall, L"AppserverDbDir");
+        wsprintf(sPath, L"%s\\ecs.db.*", sDir);
+
+        if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE) {
+            goto LExit;
+        } 
+
+        int n = 100;
+        do { 
+            if(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                continue;
+
+            SYSTEMTIME st;
+            wchar_t szLocalDate[255], szLocalTime[255];
+
+            int major, minor;
+            if (swscanf(fdFile.cFileName, L"ecs.db.%d.%d", &major, &minor) != 2)
+                continue;
+
+            wchar_t version[1024];
+            wsprintf(version, L"%d.%d", major, minor);
+
+            FILETIME ft = fdFile.ftLastWriteTime;
+            FileTimeToLocalFileTime(&ft, &ft);
+            FileTimeToSystemTime(&ft, &st);
+            GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, szLocalDate, 255);
+            GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, NULL, szLocalTime, 255);
+            
+            wchar_t label[1024];
+            wsprintf(label, L"%s, Last use: %s %s", version, szLocalDate, szLocalTime);
+            hr = WcaAddTempRecord(&hTable, &hColumns, L"ComboBox", NULL, 0, 4, L"VERSION_TO_RESTORE", n--, version, label);
+        } 
+        while (FindNextFile(hFind, &fdFile));
+
+        FindClose(hFind);
 
         if (hColumns) 
             MsiCloseHandle(hColumns);
