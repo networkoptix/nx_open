@@ -153,7 +153,12 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Unauthorized);
-        return CameraDiagnostics::NotAuthorisedResult();
+        QUrl requestedUrl;
+        requestedUrl.setHost( getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList") );
+        return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
     }
 
     /**/

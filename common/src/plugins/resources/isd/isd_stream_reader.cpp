@@ -66,20 +66,39 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         res->setStatus(QnResource::Unauthorized);
-        return CameraDiagnostics::NotAuthorisedResult();
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( urlrequest );
+        return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
     }
 
     QString url = getValueFromString(QLatin1String(reslst));
 
     QStringList urlLst = url.split(QLatin1Char('\r'), QString::SkipEmptyParts);
     if(urlLst.size() < 1)
-        return CameraDiagnostics::NoMediaTrackResult();
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( urlrequest );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
 
     url = urlLst.at(0);
     
 
     if (url.isEmpty())
-        return CameraDiagnostics::NoMediaTrackResult();
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( urlrequest );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
 
 
     m_rtpStreamParser.setRequest(url);

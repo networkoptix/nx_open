@@ -169,7 +169,14 @@ CameraDiagnostics::Result QnPlDroidIpWebCamReader::openStream()
         case CL_HTTP_SUCCESS:
             return CameraDiagnostics::NoErrorResult();
         case CL_HTTP_AUTH_REQUIRED:
-            return CameraDiagnostics::NotAuthorisedResult();
+        {
+            QUrl requestedUrl;
+            requestedUrl.setHost( nres->getHostAddress() );
+            requestedUrl.setPort( nres->httpPort() );
+            requestedUrl.setScheme( QLatin1String("http") );
+            requestedUrl.setPath( QLatin1String("videofeed") );
+            return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
+        }
         default:
             return CameraDiagnostics::RequestFailedResult(QLatin1String("videofeed"), QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
     }

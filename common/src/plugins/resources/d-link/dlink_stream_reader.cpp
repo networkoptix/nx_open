@@ -64,7 +64,13 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
     QString prifileStr = composeVideoProfile();
 
     if (prifileStr.length()==0)
-        return CameraDiagnostics::NoMediaTrackResult();
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
 
     CLHttpStatus status;
     QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth()); // setup video profile
@@ -72,11 +78,23 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         getResource()->setStatus(QnResource::Unauthorized);
-        return CameraDiagnostics::NotAuthorisedResult();
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( prifileStr );
+        return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
     }
 
     if (cam_info_file.length()==0)
-        return CameraDiagnostics::NoMediaTrackResult();
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( prifileStr );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
 
     if (!res->isCameraControlDisabled()) {
         if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
