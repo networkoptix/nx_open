@@ -313,6 +313,10 @@ private:
     MotionInfoContainerType m_srcMotionInfo;
     float m_speed;
     bool m_initializationMode;
+    bool m_streamIsAnnexB;
+    //!Length (in bytes) of "nal unit size" field in source data
+    int m_nalLengthSize;
+    std::basic_string<uint8_t> m_tempFrameBuffer;
 #ifdef USE_OPENCL
     cl_context m_clContext;
     cl_int m_prevCLStatus;
@@ -386,6 +390,9 @@ private:
         On return, \a seqHeader contains NALUs, reader from \a data->context->ctx()->extradata
     */
     bool readH264SeqHeaderFromExtraData( const QnCompressedVideoDataPtr data, std::basic_string<mfxU8>* const seqHeader );
+
+    mfxStatus doDecodingStep( mfxBitstream* const inputStream, mfxFrameSurface1** decodedFrame );
+    mfxStatus doProcessingStep( QSharedPointer<SurfaceContext> decodedFrameCtx, QSharedPointer<SurfaceContext>* const scaledFrameCtx );
 };
 
 #endif  //QUICKSYNCVIDEODECODER_H
