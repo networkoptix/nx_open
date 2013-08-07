@@ -94,6 +94,13 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     at_onDecoderPluginsListChanged();
 
+    setWarningStyle(ui->hwAccelerationWarningLabel);
+    setWarningStyle(ui->downmixWarningLabel);
+    setWarningStyle(ui->languageWarningLabel);
+    ui->hwAccelerationWarningLabel->setVisible(false);
+    ui->languageWarningLabel->setVisible(false);
+    ui->downmixWarningLabel->setVisible(false);
+
     connect( PluginManager::instance(), SIGNAL(pluginLoaded()), this, SLOT(at_onDecoderPluginsListChanged()) );
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
@@ -105,10 +112,14 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
     connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
     connect(ui->clearCacheButton,                       SIGNAL(clicked()),                                          action(Qn::ClearCacheAction), SLOT(trigger()));
+    connect(ui->hardwareDecodingCheckBox, SIGNAL(toggled(bool)), ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
 
     initTranslations();
     updateFromSettings();
     at_context_userChanged();
+
+    connect(ui->downmixAudioCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_downmixAudioCheckBox_toggled(bool)));
+    connect(ui->languageComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_languageComboBox_currentIndexChanged(int)));
 
     if (m_settings->isWritable()) {
         ui->readOnlyWarningLabel->hide();
@@ -135,19 +146,20 @@ void QnPreferencesDialog::initTranslations() {
 }
 
 void QnPreferencesDialog::accept() {
-    QString oldTranslationPath = m_settings->translationPath();
-    
-    submitToSettings();
-    
-    if (oldTranslationPath != m_settings->translationPath()) {
-        QMessageBox::StandardButton button = QMessageBox::information(
-            this, 
-            tr("Information"), 
-            tr("The language change will take effect after application restart. Press OK to close application now."),
-            QMessageBox::Ok, 
-            QMessageBox::Cancel
+    QMessageBox::StandardButton button = QMessageBox::Yes;
+
+    if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
+        m_oldLanguage != ui->languageComboBox->currentIndex()) {
+        button = QMessageBox::information(
+                    this,
+                    tr("Information"),
+                    tr("Some changes will take effect only after application restart. Press OK to restart the application now."),
+                    QMessageBox::StandardButtons(QMessageBox::Yes |
+                                                 QMessageBox::No |
+                                                 QMessageBox::Cancel),
+                    QMessageBox::Yes
         );
-        if (button == QMessageBox::Ok) {
+        if (button == QMessageBox::Yes) {
             m_restartPending = restartClient();
             if (!m_restartPending) {
                 QMessageBox::critical(
@@ -160,6 +172,10 @@ void QnPreferencesDialog::accept() {
         }
     }
     
+    if (button == QMessageBox::Cancel)
+        return;
+
+    submitToSettings();
     base_type::accept();
 }
 
@@ -232,6 +248,9 @@ void QnPreferencesDialog::updateFromSettings() {
             break;
         }
     }
+
+    m_oldDownmix = ui->downmixAudioCheckBox->isChecked();
+    m_oldLanguage = ui->languageComboBox->currentIndex();
 }
 
 void QnPreferencesDialog::openLicensesPage() {
@@ -324,4 +343,12 @@ void QnPreferencesDialog::at_onDecoderPluginsListChanged()
 
     ui->hardwareDecodingCheckBox->hide();
     ui->hardwareDecodingLabel->hide();
+}
+
+void QnPreferencesDialog::at_downmixAudioCheckBox_toggled(bool checked) {
+    ui->downmixWarningLabel->setVisible(m_oldDownmix != checked);
+}
+
+void QnPreferencesDialog::at_languageComboBox_currentIndexChanged(int index) {
+    ui->languageWarningLabel->setVisible(m_oldLanguage != index);
 }
