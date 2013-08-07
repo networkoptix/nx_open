@@ -90,7 +90,7 @@ QN_HELP_TOPIC(CameraSettings_Recording_Help,                    "editing_recordi
 QN_HELP_TOPIC(CameraSettings_Recording_Export_Help,             "copying_recording_schedule_fro.htm")
 QN_HELP_TOPIC(CameraSettings_Motion_Help,                       "setting_up_motion_mask_and_motion_sensitivity_(adm.htm")
 QN_HELP_TOPIC(CameraSettings_Properties_Help,                   "configuring_proprietary_camera_parameters.htm")
-QN_HELP_TOPIC(CameraSettings_Advanced_Help,                     "expert_camera_parameters.htm")
+QN_HELP_TOPIC(CameraSettings_Expert_Help,						"expert_camera_parameters.htm") // TODO
 QN_HELP_TOPIC(CameraSettings_SecondStream_Help,                 "adjusting_second_stream_qualit.htm") // TODO
 QN_HELP_TOPIC(CameraSettings_Dewarping_Help,                    "working_with_fish-eye_cameras.htm")
 

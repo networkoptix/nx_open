@@ -62,7 +62,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
 
     /* Set up context help. */
     setHelpTopic(ui->tabRecording,                                            Qn::CameraSettings_Recording_Help);
-    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Advanced_Help);
+    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Expert_Help);
 
 
     updateFromResources();
