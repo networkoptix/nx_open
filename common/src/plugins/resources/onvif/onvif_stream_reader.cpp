@@ -135,14 +135,14 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
     CameraInfoParams info;
 
     CameraDiagnostics::Result result = fetchUpdateVideoEncoder(soapWrapper, info, isPrimary);
-    if( result != CameraDiagnostics::ErrorCode::noError )
+    if( !result  )
         return result;
     info.videoSourceId = m_onvifRes->getVideoSourceId();
 
     fetchUpdateAudioEncoder(soapWrapper, info, isPrimary);
 
     result = fetchUpdateProfile(soapWrapper, info, isPrimary);
-    if( result != CameraDiagnostics::ErrorCode::noError ) {
+    if( !result ) {
         qWarning() << "ONVIF camera " << getResource()->getUrl() << ": can't prepare profile";
         return result;
     }

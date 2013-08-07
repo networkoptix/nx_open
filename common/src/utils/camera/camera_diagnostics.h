@@ -79,13 +79,19 @@ namespace CameraDiagnostics
     class Result
     {
     public:
+        typedef void (Result::*safe_bool_type)() const;
+
         ErrorCode::Value errorCode;
         QList<QString> errorParams;
 
         Result();
-        Result( ErrorCode::Value _errorCode, const QString& param1 = QString(), const QString& param2 = QString() );
+        explicit Result( ErrorCode::Value _errorCode, const QString& param1 = QString(), const QString& param2 = QString() );
+
         QString toString() const;
-        operator bool() const;
+        operator safe_bool_type() const;
+
+    private:
+        void safe_bool_type_retval() const {}
     };
 
     class NoErrorResult : public Result
