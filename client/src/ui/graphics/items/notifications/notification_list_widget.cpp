@@ -6,7 +6,7 @@
 
 #include <QtCore/QDateTime>
 
-#include <ui/graphics/items/notifications/notification_item.h>
+#include <ui/graphics/items/notifications/notification_widget.h>
 #include <ui/processors/hover_processor.h>
 
 #include <ui/style/globals.h>
@@ -39,7 +39,7 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
 
-    m_collapser.item = new QnNotificationItem(this);
+    m_collapser.item = new QnNotificationWidget(this);
     m_collapser.item->setNotificationLevel(Qn::OtherNotification);
     m_collapser.item->setMinimumSize(QSizeF(widgetWidth, collapserHeight));
     m_collapser.item->setMaximumSize(QSizeF(widgetWidth, collapserHeight));
@@ -71,7 +71,7 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
 
     QSizeF result(widgetWidth, 0);
     // preferred height is height of the most bottom item + height of all hidden items
-    foreach(QnNotificationItem *item, m_items | boost::adaptors::reversed) {
+    foreach(QnNotificationWidget *item, m_items | boost::adaptors::reversed) {
         ItemData* data = m_itemDataByItem[item];
         if (data->state == ItemData::Collapsed) {
             result.setHeight(result.height() + item->geometry().height());
@@ -88,7 +88,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
     qreal bottomY = 0;
 
     bool canShowNew = true;
-    foreach (QnNotificationItem* item, m_items) {
+    foreach (QnNotificationWidget* item, m_items) {
         ItemData* data = m_itemDataByItem[item];
         if (!data->isVisible())
             continue;
@@ -97,10 +97,10 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
     }
 
     // updating state and animating
-    QList<QnNotificationItem *> itemsToDelete;
+    QList<QnNotificationWidget *> itemsToDelete;
     int collapsedItemsCount = 0;
 
-    foreach (QnNotificationItem* item, m_items) {
+    foreach (QnNotificationWidget* item, m_items) {
         ItemData* data = m_itemDataByItem[item];
         switch (data->state) {
         case ItemData::Collapsing: {
@@ -182,7 +182,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
     // moving items up
     ItemData *previous = NULL;
-    foreach (QnNotificationItem* item, m_items) {
+    foreach (QnNotificationWidget* item, m_items) {
         ItemData* data = m_itemDataByItem[item];
         if (!data->isVisible())
             continue;
@@ -212,7 +212,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
     bool itemNotificationLevelChange = false;
 
     // remove unused items
-    foreach(QnNotificationItem* item, itemsToDelete) {
+    foreach(QnNotificationWidget* item, itemsToDelete) {
         ItemData* data = m_itemDataByItem[item];
         delete data;
 
@@ -232,8 +232,8 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
     }
 
     if (itemNotificationLevelChange && !m_items.isEmpty()) {
-        QnNotificationItem *maxLevelItem = m_items.first();
-        foreach (QnNotificationItem* item, m_items) {
+        QnNotificationWidget *maxLevelItem = m_items.first();
+        foreach (QnNotificationWidget* item, m_items) {
             if (item->notificationLevel() > maxLevelItem->notificationLevel())
                 maxLevelItem = item;
         }
@@ -258,7 +258,7 @@ void QnNotificationListWidget::updateVisibleSize() {
     if (!qFuzzyIsNull(m_collapser.item->opacity())) {
         size.setHeight(m_collapser.item->geometry().bottom());
     } else {
-        foreach(QnNotificationItem *item, m_items | boost::adaptors::reversed) {
+        foreach(QnNotificationWidget *item, m_items | boost::adaptors::reversed) {
             ItemData* data = m_itemDataByItem[item];
             if (!data->isVisible())
                 continue;
@@ -275,7 +275,7 @@ void QnNotificationListWidget::updateVisibleSize() {
     updateGeometry();
 }
 
-void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
+void QnNotificationListWidget::addItem(QnNotificationWidget *item, bool locked)  {
     item->setVisible(false);
     item->setMinimumWidth(widgetWidth);
     item->setMaximumWidth(widgetWidth);
@@ -303,7 +303,7 @@ void QnNotificationListWidget::addItem(QnNotificationItem *item, bool locked)  {
     updateGeometry();
 }
 
-void QnNotificationListWidget::removeItem(QnNotificationItem *item) {
+void QnNotificationListWidget::removeItem(QnNotificationWidget *item) {
     ItemData* data = m_itemDataByItem[item];
     if (data->isVisible())
         data->hide(m_speedUp);
@@ -313,7 +313,7 @@ void QnNotificationListWidget::removeItem(QnNotificationItem *item) {
 }
 
 void QnNotificationListWidget::clear() {
-    foreach (QnNotificationItem* item, m_items) {
+    foreach (QnNotificationWidget* item, m_items) {
         ItemData* data = m_itemDataByItem[item];
         if (data->isVisible())
             data->hide(m_speedUp);
@@ -341,13 +341,13 @@ void QnNotificationListWidget::setToolTipsEnclosingRect(const QRectF &rect) {
         return;
     m_tooltipsEnclosingRect = rect;
 
-    foreach(QnNotificationItem *item, m_items)
+    foreach(QnNotificationWidget *item, m_items)
         item->setTooltipEnclosingRect(rect);
     m_collapser.item->setTooltipEnclosingRect(rect);
 }
 
 void QnNotificationListWidget::at_item_closeTriggered() {
-    QnNotificationItem *item = dynamic_cast<QnNotificationItem *>(sender());
+    QnNotificationWidget *item = dynamic_cast<QnNotificationWidget *>(sender());
     if (!item)
         return;
 
@@ -355,7 +355,7 @@ void QnNotificationListWidget::at_item_closeTriggered() {
 }
 
 void QnNotificationListWidget::at_item_geometryChanged() {
-    QnNotificationItem *item = dynamic_cast<QnNotificationItem *>(sender());
+    QnNotificationWidget *item = dynamic_cast<QnNotificationWidget *>(sender());
     if (!item)
         return;
     ItemData* data = m_itemDataByItem[item];
@@ -367,7 +367,7 @@ void QnNotificationListWidget::at_item_geometryChanged() {
 }
 
 void QnNotificationListWidget::at_geometry_changed() {
-    foreach(QnNotificationItem *item, m_items | boost::adaptors::reversed) {
+    foreach(QnNotificationWidget *item, m_items | boost::adaptors::reversed) {
         ItemData* data = m_itemDataByItem[item];
         if (!data->isVisible())
             continue;

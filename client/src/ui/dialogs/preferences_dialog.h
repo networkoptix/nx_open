@@ -53,6 +53,8 @@ private slots:
     void at_context_userChanged();
     void at_timeModeComboBox_activated();
     void at_onDecoderPluginsListChanged();
+    void at_downmixAudioCheckBox_toggled(bool checked);
+    void at_languageComboBox_currentIndexChanged(int index);
 
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
@@ -74,6 +76,8 @@ private:
 
     int m_popupSettingsTabIndex;
 
+    bool m_oldDownmix;
+    int m_oldLanguage;
     bool m_restartPending;
 };
 
