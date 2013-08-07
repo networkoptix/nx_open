@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>712</width>
-    <height>591</height>
+    <height>632</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -497,7 +497,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabFisheyeSettings">
+     <widget class="QWidget" name="fisheyeTab">
       <attribute name="title">
        <string>Dewarping</string>
       </attribute>
@@ -507,18 +507,18 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="cameraPropertiesTab">
+     <widget class="QWidget" name="advancedTab">
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
      </widget>
-     <widget class="QWidget" name="tabAdvancedSettings">
+     <widget class="QWidget" name="expertTab">
       <attribute name="title">
        <string>Expert</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QnAdvancedSettingsWidget" name="advancedSettingsWidget" native="true"/>
+        <widget class="QnAdvancedSettingsWidget" name="expertSettingsWidget" native="true"/>
        </item>
       </layout>
      </widget>

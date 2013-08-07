@@ -3,9 +3,7 @@
 
 #include <QtGui/QWidget>
 
-#include <core/resource/camera_resource.h>
-
-#include <QWidget>
+#include <core/resource/resource_fwd.h>
 
 namespace Ui {
     class AdvancedSettingsWidget;
@@ -17,30 +15,30 @@ public:
     QnAdvancedSettingsWidget(QWidget* parent = 0);
     virtual ~QnAdvancedSettingsWidget();
 
-    Qn::SecondStreamQuality secondaryStreamQuality() const;
-    Qt::CheckState getCameraControl() const;
-
-    void updateFromResource(QnSecurityCamResourcePtr camera);
-    void updateFromResources(QnVirtualCameraResourceList camera);
+    void updateFromResources(const QnVirtualCameraResourceList &cameras);
+    void submitToResources(const QnVirtualCameraResourceList &cameras);
 
 signals:
     void dataChanged();
 
 private slots:
-    void at_ui_DataChanged();
-    void at_restoreDefault();
+    void at_dataChanged();
+
+    void at_restoreDefaultsButton_clicked();
+    void at_qualitySlider_valueChanged(int value);
+
+    /** Update UI controls related to camera settings group */
+    void at_settingsAssureCheckBox_toggled(bool checked);
+
+    /** Update UI controls related to second stream quality group */
+    void at_qualityAssureCheckBox_toggled(bool checked);
 
 private:
-    void setKeepQualityVisible(bool value);
-    void setQualitySlider(Qn::SecondStreamQuality quality);
-    bool isKeepQualityVisible() const;
-    void updateControlsState();
-private:
-    enum SliderQuality {Quality_Low, Quality_Medium, Quality_High};
+    bool isArecontCamera(const QnVirtualCameraResourcePtr &camera) const;
+    bool isDefaultValues() const;
 
     QScopedPointer<Ui::AdvancedSettingsWidget> ui;
-    bool m_disableUpdate;
-    bool m_hasDualStreaming;
+    bool m_updating;
 };
 
 #endif // QN_ADVANCED_SETTINGS_WIDGET_H
