@@ -78,7 +78,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStream()
     QStringList ports = portStr.split(QLatin1Char(','));
     if (ports.size() < 2) {
         qWarning() << "Invalid droid URL format. Expected at least 4 ports";
-        return CameraDiagnostics::CameraResponseParseErrorResult();
+        return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), QString() );
     }
 
     if (ports[0].contains(QLatin1Char(':')))

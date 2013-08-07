@@ -121,13 +121,14 @@ namespace CameraDiagnostics
     class ConnectionClosedUnexpectedlyResult : public Result
     {
     public:
-        ConnectionClosedUnexpectedlyResult( const QString& mediaURL, const int mediaPort ) : Result( ErrorCode::connectionClosedUnexpectedly, mediaURL, QString::number(mediaPort) ) {}
+        ConnectionClosedUnexpectedlyResult( const QString& mediaURL, const int mediaPort )
+            : Result( ErrorCode::connectionClosedUnexpectedly, mediaURL, QString::number(mediaPort) ) {}
     };
 
     class CameraResponseParseErrorResult : public Result
     {
     public:
-        CameraResponseParseErrorResult() : Result( ErrorCode::responseParseError ) {}
+        CameraResponseParseErrorResult( const QString& requestedURL, const QString requestName ) : Result( ErrorCode::responseParseError, requestedURL, requestName ) {}
     };
 
     class NoMediaTrackResult : public Result
