@@ -20,6 +20,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
@@ -50,6 +52,8 @@ public:
 
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
+
+        setHelpTopic(this, Qn::MainWindow_MediaItem_ZoomWindows_Help);
 
         updateInteractivity();
     }

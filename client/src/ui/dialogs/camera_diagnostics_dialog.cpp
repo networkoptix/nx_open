@@ -13,6 +13,8 @@
 
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/globals.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 
 QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
@@ -27,6 +29,8 @@ QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::Window
     QPushButton *copyButton = new QPushButton(tr("Copy to Clipboard"), this);
     ui->buttonBox->addButton(copyButton, QDialogButtonBox::HelpRole);
     connect(copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
+
+    setHelpTopic(this, Qn::CameraDiagnostics_Help);
 }
 
 QnCameraDiagnosticsDialog::~QnCameraDiagnosticsDialog() {

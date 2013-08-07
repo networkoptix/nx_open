@@ -32,11 +32,11 @@ public:
     QList<Column> columns() const;
     void setColumns(const QList<Column> &columns);
 
-    virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override;
-    virtual void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder ) override;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
-    bool hasMotionUrl(const QModelIndex & index) const;
-    QnResourcePtr getResource(const QModelIndex& idx) const;
+    bool hasMotionUrl(const QModelIndex &index) const;
+    QnResourcePtr getResource(const QModelIndex &index) const;
 
     BusinessEventType::Value eventType(int row) const;
     QnResourcePtr eventResource(int row) const;

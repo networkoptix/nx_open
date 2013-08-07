@@ -473,6 +473,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_notificationsItem = new QnNotificationsCollectionWidget(m_controlsWidget, 0, context());
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
+    setHelpTopic(m_notificationsItem, Qn::MainWindow_Notifications_Help);
 
     m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
@@ -530,11 +531,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_notificationsItem,                SIGNAL(visibleSizeChanged()),   this,   SLOT(at_notificationsItem_geometryChanged()));
     connect(m_notificationsItem,                SIGNAL(sizeHintChanged()),      this,   SLOT(updateNotificationsGeometry()));
 
+
     /* Calendar. */
     QnCalendarWidget *calendarWidget = new QnCalendarWidget();
+    setHelpTopic(calendarWidget, Qn::MainWindow_Calendar_Help);
     navigator()->setCalendar(calendarWidget);
 
     m_dayTimeWidget = new QnDayTimeWidget();
+    setHelpTopic(m_dayTimeWidget, Qn::MainWindow_DayTimePicker_Help);
     navigator()->setDayTimeWidget(m_dayTimeWidget);
 
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);

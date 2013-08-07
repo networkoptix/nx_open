@@ -315,13 +315,13 @@ QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnBusiness
     return QVariant();
 }
 
-QnResourcePtr QnEventLogModel::getResource(const QModelIndex& idx) const
+QnResourcePtr QnEventLogModel::getResource(const QModelIndex &index) const
 {
-    return getResourceById(data(idx, Qn::ResourceRole).toInt());
+    return getResourceById(data(index, Qn::ResourceRole).toInt()); 
 }
 
 
-QnResourcePtr QnEventLogModel::getResourceById(const QnId& id)
+QnResourcePtr QnEventLogModel::getResourceById(const QnId &id)
 {
     if (!id.isValid())
         return QnResourcePtr();
@@ -487,12 +487,12 @@ QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& ac
     return QnBusinessStringsHelper::motionUrl(action.getRuntimeParams(), true);
 }
 
-bool QnEventLogModel::hasMotionUrl(const QModelIndex & index) const
+bool QnEventLogModel::hasMotionUrl(const QModelIndex &index) const
 {
     if (!index.isValid() || index.column() != DescriptionColumn)
         return false;
 
-    const QnBusinessActionData& action = m_index->at(index.row());
+    const QnBusinessActionData &action = m_index->at(index.row());
     if (!action.hasFlags(QnBusinessActionData::MotionExists))
         return false;
     if (!action.getRuntimeParams().getEventResourceId())
@@ -501,13 +501,13 @@ bool QnEventLogModel::hasMotionUrl(const QModelIndex & index) const
     return true;
 }
 
-QVariant QnEventLogModel::data( const QModelIndex & index, int role) const
+QVariant QnEventLogModel::data(const QModelIndex &index, int role) const
 {
-    if (index.row() >= m_index->size())
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    const Column& column = m_columns[index.column()];
-    const QnBusinessActionData& action = m_index->at(index.row());
+    const Column &column = m_columns[index.column()];
+    const QnBusinessActionData &action = m_index->at(index.row());
     
     switch(role)
     {
@@ -522,7 +522,7 @@ QVariant QnEventLogModel::data( const QModelIndex & index, int role) const
         case Qn::ItemMouseCursorRole:
             return mouseCursorData(column, action);
         case Qn::ResourceRole:
-            return resourceData(column, action);
+            return resourceData(column, action); // TODO: #VASILENKO ResourceRole docs says that return value is of type QnResourcePtr.
         case Qn::DisplayHtmlRole: {
             QString text = textData(column, action);
             QString url = motionUrl(column, action);
@@ -543,8 +543,7 @@ BusinessEventType::Value QnEventLogModel::eventType(int row) const
     if (row >= 0) {
         const QnBusinessActionData& action = m_index->at(row);
         return action.getRuntimeParams().getEventType();
-    }
-    else {
+    } {
         return BusinessEventType::NotDefined;
     }
 }
@@ -554,8 +553,7 @@ QnResourcePtr QnEventLogModel::eventResource(int row) const
     if (row >= 0) {
         const QnBusinessActionData& action = m_index->at(row);
         return qnResPool->getResourceById(action.getRuntimeParams().getEventResourceId());
-    }
-    else {
+    } else {
         return QnResourcePtr();
     }
 }
@@ -565,8 +563,7 @@ qint64 QnEventLogModel::eventTimestamp(int row) const
     if (row >= 0) {
         const QnBusinessActionData& action = m_index->at(row);
         return action.timestamp();
-    }
-    else {
+    } else {
         return AV_NOPTS_VALUE;
     }
 }

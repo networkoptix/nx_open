@@ -79,8 +79,7 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
 
     connect(ui->aggregationWidget,          SIGNAL(valueChanged()),             this, SLOT(updateModelAggregationPeriod()));
 
-
-    connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
+    connect(ui->commentsLineEdit,           SIGNAL(textChanged(QString)),       this, SLOT(at_commentsLineEdit_textChanged(QString)));
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
