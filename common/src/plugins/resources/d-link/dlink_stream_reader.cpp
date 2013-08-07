@@ -115,11 +115,12 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
             return CameraDiagnostics::ErrorCode::noError;
         }
 
-        QString url =  getRTPurl(role == QnResource::Role_SecondaryLiveVideo ? 2 : 1);
+        const int dlinkProfile = role == QnResource::Role_SecondaryLiveVideo ? 2 : 1;
+        QString url =  getRTPurl( dlinkProfile );
         if (url.isEmpty())
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting non empty rtsl url.";
-            return CameraDiagnostics::CameraResponseParseErrorResult();
+            return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), QString::fromLatin1("config/rtspurl.cgi?profileid=%1").arg(dlinkProfile) );
         }
 
         m_rtpReader.setRequest(url);
@@ -136,7 +137,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         if (info.videoProfileUrls.size() < 2)
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting video profile URL.";
-            return CameraDiagnostics::CameraResponseParseErrorResult();
+            return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), QLatin1String("config/stream_info.cgi") );
         }
 
 

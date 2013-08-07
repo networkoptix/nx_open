@@ -574,9 +574,9 @@ void RTPSession::updateResponseStatus(const QByteArray& response)
         QList<QByteArray> params = response.left(firstLineEnd).split(' ');
         if (params.size() >= 2) {
             m_responseCode = params[1].trimmed().toInt();
-            
-            nx_http::StatusLine statusLine; //TODO: #ak use statusLine one line above after release 1.6 (to prevent bike invention)
-            statusLine.parse( nx_http::ConstBufferRefType(response, firstLineEnd) );
+
+            nx_http::StatusLine statusLine; //TODO: #ak use statusLine one line above after release 1.6
+            statusLine.parse( nx_http::ConstBufferRefType(response, 0, firstLineEnd) );
             m_reasonPhrase = QLatin1String(statusLine.reasonPhrase);
         }
     }
@@ -685,7 +685,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     if (!checkIfDigestAuthIsneeded(response))
     {
         m_tcpSock.close();
-        return CameraDiagnostics::CameraResponseParseErrorResult();
+        return CameraDiagnostics::CameraResponseParseErrorResult( url, QLatin1String("DESCRIBE") );
     }
         
 
@@ -721,8 +721,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
             return CameraDiagnostics::NotAuthorisedResult( url );
         default:
             m_tcpSock.close();
-            return CameraDiagnostics::RequestFailedResult( QLatin1String("DESCRIBE"), m_reasonPhrase );
-
+            return CameraDiagnostics::RequestFailedResult( QString::fromLatin1("DESCRIBE %1").arg(url), m_reasonPhrase );
     }
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
