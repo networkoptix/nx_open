@@ -1280,8 +1280,11 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2">
                 <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid) AND $(var.Inst_C1) ]]>
             </Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg" Order="2">
+                <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND $(var.Inst_C0) AND $(var.Remove_E1) ]]>
+            </Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">
-                <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND $(var.Inst_C0) ]]>
+                <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND $(var.Inst_C0) AND NOT $(var.Remove_E1) ]]>
             </Publish>
 
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST]" Order="4">1</Publish>
@@ -1425,8 +1428,11 @@
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
 
             <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">
+                <![CDATA[ $(var.Remove_E1) AND $(var.Inst_S1) ]]>
+            </Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">
-                <![CDATA[ $(var.Remove_E1) ]]>
+                <![CDATA[ $(var.Remove_E1) AND $(var.Inst_S0) ]]>
             </Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">
                 <![CDATA[ NOT $(var.Remove_E1) ]]>
