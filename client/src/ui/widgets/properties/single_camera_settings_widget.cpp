@@ -62,7 +62,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->recordingTab,                                            Qn::CameraSettings_Recording_Help);
     setHelpTopic(ui->motionTab,                                               Qn::CameraSettings_Motion_Help);
     setHelpTopic(ui->cameraPropertiesTab,                                     Qn::CameraSettings_Properties_Help);
-    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Expert_Help);
+    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Advanced_Help);
     setHelpTopic(ui->tabFisheyeSettings,                                      Qn::CameraSettings_Dewarping_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));

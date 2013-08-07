@@ -32,10 +32,12 @@ QN_HELP_TOPIC(MainWindow_Tree_Exported_Help,                    "viewing_videos_
 QN_HELP_TOPIC(MainWindow_Tree_MultiVideo_Help,                  "viewing_multi-channel_videos.htm")
 QN_HELP_TOPIC(MainWindow_Tree_Local_Help,                       "playing_back_local_files_in_hd_witness.htm")
 QN_HELP_TOPIC(MainWindow_Scene_Help,                            "hd_witness_user_interface_overview.htm")
+QN_HELP_TOPIC(MainWindow_Scene_EMapping_Help,                   "e-mapping.htm") // TODO
 QN_HELP_TOPIC(MainWindow_Playback_Help,                         "playback_panel.htm")
 QN_HELP_TOPIC(MainWindow_Navigation_Help,                       "navigating_through_archive_and.htm")
 QN_HELP_TOPIC(MainWindow_Sync_Help,                             "navigating_through_several_cameras_synchronously.htm")
 QN_HELP_TOPIC(MainWindow_Calendar_Help,                         "using_calendar.htm")
+QN_HELP_TOPIC(MainWindow_DayTimePicker_Help,                    "using_calendar.htm") // TODO
 QN_HELP_TOPIC(MainWindow_Thumbnails_Help,                       "using_thumbnails_for_better_navigation.htm")
 QN_HELP_TOPIC(MainWindow_ThumbnailSearch_Help,                  "thumbnail_search.htm") // TODO
 QN_HELP_TOPIC(MainWindow_MediaItem_Help,                        "viewing_camera_stream_information.htm")
@@ -44,7 +46,12 @@ QN_HELP_TOPIC(MainWindow_MediaItem_Ptz_Help,                    "setting_up_ptz.
 QN_HELP_TOPIC(MainWindow_MediaItem_FishEye_Help,                "setting_up_ptz.htm") // TODO
 QN_HELP_TOPIC(MainWindow_MediaItem_SmartSearch_Help,            "performing_smart_search.htm")
 QN_HELP_TOPIC(MainWindow_MediaItem_AnalogLicense_Help,          "obtaining_and_activating_hd_witness_licenses.htm")
+QN_HELP_TOPIC(MainWindow_MediaItem_ZoomWindows_Help,			"zoom_windows.htm") // TODO
+QN_HELP_TOPIC(MainWindow_MediaItem_Dewarping_Help,				"working_with_fish-eye_cameras.htm") // TODO
+QN_HELP_TOPIC(MainWindow_MediaItem_Diagnostics_Help,			"diagnosing_offline_cameras.htm") // TODO
 QN_HELP_TOPIC(MainWindow_MonitoringItem_Help,                   "monitoring_media_servers.htm")
+QN_HELP_TOPIC(MainWindow_Notifications_Help,					"notifications.htm") // TODO
+
 
 QN_HELP_TOPIC(Login_Help,                                       "connecting_to_enterprise_contr.htm")
 
@@ -83,10 +90,26 @@ QN_HELP_TOPIC(CameraSettings_Recording_Help,                    "editing_recordi
 QN_HELP_TOPIC(CameraSettings_Recording_Export_Help,             "copying_recording_schedule_fro.htm")
 QN_HELP_TOPIC(CameraSettings_Motion_Help,                       "setting_up_motion_mask_and_motion_sensitivity_(adm.htm")
 QN_HELP_TOPIC(CameraSettings_Properties_Help,                   "configuring_proprietary_camera_parameters.htm")
-QN_HELP_TOPIC(CameraSettings_Expert_Help,                       "expert_camera_parameters.htm")
-QN_HELP_TOPIC(CameraSettings_Dewarping_Help,                    "dewarping_parameters.htm")
+QN_HELP_TOPIC(CameraSettings_Advanced_Help,                     "expert_camera_parameters.htm")
+QN_HELP_TOPIC(CameraSettings_SecondStream_Help,                 "adjusting_second_stream_qualit.htm") // TODO
+QN_HELP_TOPIC(CameraSettings_Dewarping_Help,                    "working_with_fish-eye_cameras.htm")
 
 QN_HELP_TOPIC(EventsActions_Help,								"configuring_events_and_actions.htm")
+QN_HELP_TOPIC(EventsActions_PlaySound_Help,						"play_sound.htm") // TODO
+QN_HELP_TOPIC(EventsActions_Speech_Help,						"say_text.htm") // TODO
+QN_HELP_TOPIC(EventsActions_InstantOutput_Help,					"trigger_camera_output.htm") // TODO
 
+QN_HELP_TOPIC(LayoutSettings_Locking_Help,						"locking_layouts.htm") // TODO
+QN_HELP_TOPIC(LayoutSettings_EMapping_Help,						"e-mapping.htm") // TODO
+
+QN_HELP_TOPIC(EventLog_Help,									"viewing_events_log.htm") // TODO
+
+QN_HELP_TOPIC(CameraList_Help,									"viewing_full_cameras_list.htm") // TODO
+
+QN_HELP_TOPIC(ImageEnhancement_Help,							"color_correction.htm") // TODO
+
+QN_HELP_TOPIC(CameraDiagnostics_Help,							"diagnosing_offline_cameras.htm") // TODO
+
+QN_HELP_TOPIC(VersionMismatch_Help,								"launching_product_name_in_comp.htm") // TODO
 
 #undef QN_HELP_TOPIC
