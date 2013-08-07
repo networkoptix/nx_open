@@ -507,8 +507,8 @@
             <Custom Action="CertGenAction" After="CertGenAction_Cmd">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="SaveLastDatabaseVersion_Cmd" After="CertGenAction"><![CDATA[ $(var.VmsUpgrading) AND $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="SaveLastDatabaseVersion" After="SaveLastDatabaseVersion_Cmd"><![CDATA[ $(var.VmsUpgrading) AND $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SaveLastDatabaseVersion_Cmd" After="CertGenAction"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SaveLastDatabaseVersion" After="SaveLastDatabaseVersion_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="BackupDatabaseFile_Cmd" After="SaveLastDatabaseVersion"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
