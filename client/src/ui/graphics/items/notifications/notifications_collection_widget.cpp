@@ -25,6 +25,8 @@
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
@@ -171,6 +173,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     eventLogButton->setToolTip(tr("Event Log"));
     eventLogButton->setFixedSize(buttonSize);
     eventLogButton->setCached(true);
+    setHelpTopic(eventLogButton, Qn::MainWindow_Notifications_EventLog_Help);
     connect(eventLogButton,   SIGNAL(clicked()),
             this->context()->action(Qn::BusinessEventsLogAction), SIGNAL(triggered()));
     //connect(eventLogButton, SIGNAL(clicked()), this, SLOT(at_eventLogButton_clicked()));

@@ -133,13 +133,13 @@ namespace CameraDiagnostics
     class NoMediaTrackResult : public Result
     {
     public:
-        NoMediaTrackResult() : Result( ErrorCode::noMediaTrack ) {}
+        NoMediaTrackResult( const QString& requestedURL ) : Result( ErrorCode::noMediaTrack, requestedURL ) {}
     };
 
     class NotAuthorisedResult : public Result
     {
     public:
-        NotAuthorisedResult() : Result( ErrorCode::notAuthorised ) {}
+        NotAuthorisedResult( const QString& requestedURL ) : Result( ErrorCode::notAuthorised, requestedURL ) {}
     };
 
     class UnsupportedProtocolResult : public Result

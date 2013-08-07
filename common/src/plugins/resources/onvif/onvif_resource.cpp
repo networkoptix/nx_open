@@ -1731,8 +1731,8 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
             << ". " << soapWrapper.getLastError();
         if (soapWrapper.isNotAuthenticated())
         {
-            return CameraDiagnostics::NotAuthorisedResult();
             setStatus(QnResource::Unauthorized);
+            return CameraDiagnostics::NotAuthorisedResult( getMediaUrl() );
         }
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), soapWrapper.getLastError());
 
@@ -2028,7 +2028,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     m_onvifAdditionalSettings = settings;    
 }
 
-int QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder) const
+CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder) const
 {
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
@@ -2044,9 +2044,11 @@ int QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder) const
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() 
             << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
         if (soapWrapper.getLastError().contains(QLatin1String("not possible to set")))
-            soapRes = -2;
+            return CameraDiagnostics::CannotConfigureMediaStreamResult( QLatin1String("fps") );   //TODO: #ak find param name
+        else
+            return CameraDiagnostics::CannotConfigureMediaStreamResult( QString() );
     }
-    return soapRes;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 void QnPlOnvifResource::onRenewSubscriptionTimer()
@@ -2124,8 +2126,8 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
         for (int i = 0; i < getMaxOnvifRequestTries(); ++i)
         {
             vEncoder->RateControl->FrameRateLimit = currentFps;
-            int errCode = sendVideoEncoderToCamera(*vEncoder);
-            if (errCode == SOAP_OK) 
+            CameraDiagnostics::Result result = sendVideoEncoderToCamera(*vEncoder);
+            if (result.errorCode == CameraDiagnostics::ErrorCode::noError) 
             {
                 if (currentFps >= maxFpsOrig-2) {
                     // If first try success, does not change maxFps at all. (HikVision has working range 0..15, and 25 fps, so try from max-1 checking)
@@ -2135,7 +2137,8 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
                 success = true;
                 break;
             }
-            else if (errCode == -2)
+            else if (result.errorCode == CameraDiagnostics::ErrorCode::cannotConfigureMediaStream &&
+                     result.errorParams.indexOf(QLatin1String("fps")) != -1 )
             {
                 invalidFpsDetected = true;
                 break; // invalid fps
@@ -2794,7 +2797,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
             if (soapWrapper.isNotAuthenticated())
             {
                 setStatus(QnResource::Unauthorized);
-                return CameraDiagnostics::NotAuthorisedResult();
+                return CameraDiagnostics::NotAuthorisedResult( getDeviceOnvifUrl() );
             }
 
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getDeviceInformation"), soapWrapper.getLastError());
@@ -2829,7 +2832,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
             if (soapWrapper.isNotAuthenticated())
             {
                 setStatus(QnResource::Unauthorized);
-                return CameraDiagnostics::NotAuthorisedResult();
+                return CameraDiagnostics::NotAuthorisedResult( getDeviceOnvifUrl() );
             }
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getCapabilities"), soapWrapper.getLastError());
         }

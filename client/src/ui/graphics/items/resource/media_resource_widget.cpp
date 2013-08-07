@@ -119,7 +119,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
     fishEyeButton->setToolTip(tr("Dewarping"));
     fishEyeButton->setChecked(item->dewarpingParams().enabled);
-    setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_FishEye_Help);
+    setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
     connect(fishEyeButton, SIGNAL(toggled(bool)), this, SLOT(at_fishEyeButton_toggled(bool)));
 
     QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget();
@@ -127,6 +127,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     zoomWindowButton->setCheckable(true);
     zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
     zoomWindowButton->setToolTip(tr("Create Zoom Window"));
+    setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
     connect(zoomWindowButton, SIGNAL(toggled(bool)), this, SLOT(at_zoomWindowButton_toggled(bool)));
 
     QnImageButtonWidget *enhancementButton = new QnImageButtonWidget();
@@ -667,10 +668,20 @@ QnVirtualPtzController* QnMediaResourceWidget::virtualPtzController() const {
 // Handlers
 // -------------------------------------------------------------------------- //
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
-    if(calculateStatusOverlay() == Qn::AnalogWithoutLicenseOverlay) {
+    Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
+
+    if(statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
+    } else if(statusOverlay == Qn::OfflineOverlay) {
+        return Qn::MainWindow_MediaItem_Diagnostics_Help;
     } else if(options() & ControlPtz) {
-        return Qn::MainWindow_MediaItem_Ptz_Help;
+        if(m_fisheyePtz) {
+            return Qn::MainWindow_MediaItem_Dewarping_Help;
+        } else {
+            return Qn::MainWindow_MediaItem_Ptz_Help;
+        }
+    } else if(!zoomRect().isNull()) {
+        return Qn::MainWindow_MediaItem_ZoomWindows_Help;
     } else if(options() & DisplayMotionSensitivity) {
         return Qn::CameraSettings_Motion_Help;
     } else if(options() & DisplayMotion) {

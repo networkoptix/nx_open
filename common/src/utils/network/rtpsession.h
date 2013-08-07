@@ -347,6 +347,7 @@ private:
     static QMutex m_guidMutex;
 
     QVector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
+    QString m_reasonPhrase;
 };
 
 #endif //rtp_session_h_1935_h

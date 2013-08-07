@@ -294,14 +294,14 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     case Qn::MotionSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->motionTab);
         break;
-    case Qn::CameraPropertiesTab:
-        ui->tabWidget->setCurrentWidget(ui->cameraPropertiesTab);
+    case Qn::FisheyeCameraSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->tabFisheyeSettings);
         break;
     case Qn::AdvancedCameraSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabAdvancedSettings);
         break;
-    case Qn::FisheyeCameraSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabFisheyeSettings);
+    case Qn::CameraPropertiesTab:
+        ui->tabWidget->setCurrentWidget(ui->cameraPropertiesTab);
         break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
