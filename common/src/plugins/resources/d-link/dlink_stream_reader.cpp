@@ -48,7 +48,7 @@ PlDlinkStreamReader::~PlDlinkStreamReader()
 CameraDiagnostics::Result PlDlinkStreamReader::openStream()
 {
     if (isStreamOpened())
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
@@ -112,7 +112,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         if (info.videoProfileUrls.size() < 2 && role == QnResource::Role_SecondaryLiveVideo)
         {
             qWarning() << "No dualstreaming for DLink camera " << m_resource->getUrl() << ". Ignore second url request";
-            return CameraDiagnostics::ErrorCode::noError;
+            return CameraDiagnostics::NoErrorResult();
         }
 
         const int dlinkProfile = role == QnResource::Role_SecondaryLiveVideo ? 2 : 1;
@@ -149,7 +149,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
         const CLHttpStatus status = mHttpClient->doGET(url);
         if( status == CL_HTTP_SUCCESS )
-            return CameraDiagnostics::ErrorCode::noError;
+            return CameraDiagnostics::NoErrorResult();
         else
             return CameraDiagnostics::RequestFailedResult(url, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
     }

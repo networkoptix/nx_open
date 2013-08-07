@@ -191,8 +191,8 @@ namespace CameraDiagnostics
         return ErrorCode::toString( errorCode, errorParams );
     }
 
-    Result::operator bool() const
+    Result::operator safe_bool_type() const
     {
-        return errorCode == ErrorCode::noError;
+        return errorCode == ErrorCode::noError ? &Result::safe_bool_type_retval : 0;
     }
 }

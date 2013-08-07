@@ -48,7 +48,7 @@ int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
 CameraDiagnostics::Result QnAxisStreamReader::openStream()
 {
     if (isStreamOpened())
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
