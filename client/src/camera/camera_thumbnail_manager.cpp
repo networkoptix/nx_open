@@ -8,11 +8,17 @@
 
 #include <ui/style/skin.h>
 
+namespace {
+    QSize defaultThumbnailSize(0, 200);
+}
+
 QnCameraThumbnailManager::QnCameraThumbnailManager(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_thumnailSize(0, 0)
 {
     connect(qnResPool,  SIGNAL(resourceRemoved(QnResourcePtr)),         this,   SLOT(at_resPool_resourceRemoved(QnResourcePtr)));
     connect(this,       SIGNAL(thumbnailReadyDelayed(int,QPixmap)),     this,   SIGNAL(thumbnailReady(int,QPixmap)), Qt::QueuedConnection);
+    setThumbnailSize(defaultThumbnailSize);
 }
 
 QnCameraThumbnailManager::~QnCameraThumbnailManager() {}
@@ -32,19 +38,26 @@ void QnCameraThumbnailManager::selectResource(const QnResourcePtr &resource) {
     case None: //should never come here
         break;
     case Loading:
-        thumbnail = qnSkin->pixmap("events/thumb_loading.png");
+    case NoData:
+    case NoSignal:
+        thumbnail = m_statusPixmaps[data.status];
         break;
     case Loaded:
         thumbnail = QPixmap::fromImage(data.thumbnail);
         break;
-    case NoData:
-        thumbnail = qnSkin->pixmap("events/thumb_no_data.png");
-        break;
-    case NoSignal:
-        thumbnail = qnSkin->pixmap("events/thumb_no_signal.png");
-        break;
     }
     emit thumbnailReadyDelayed(resource->getId(), thumbnail);
+}
+
+void QnCameraThumbnailManager::setThumbnailSize(const QSize &size) {
+    if (m_thumnailSize == size)
+        return;
+
+    m_thumnailSize = size;
+    m_statusPixmaps.clear();
+    m_statusPixmaps[Loading] = qnSkin->pixmap("events/thumb_loading.png").scaled(m_thumnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    m_statusPixmaps[NoData] = qnSkin->pixmap("events/thumb_no_data.png").scaled(m_thumnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    m_statusPixmaps[NoSignal] = qnSkin->pixmap("events/thumb_no_signal.png").scaled(m_thumnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &resource) {
@@ -63,7 +76,7 @@ int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &reso
     return serverConnection->getThumbnailAsync(
                 resource.dynamicCast<QnNetworkResource>(),
                 -1,
-                QSize(0, 200),
+                m_thumnailSize,
                 QLatin1String("png"),
                 QnMediaServerConnection::IFrameAfterTime,
                 this,

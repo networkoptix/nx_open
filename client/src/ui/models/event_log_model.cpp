@@ -315,9 +315,17 @@ QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnBusiness
     return QVariant();
 }
 
-QnResourcePtr QnEventLogModel::getResource(const QModelIndex &index) const
+QnResourcePtr QnEventLogModel::getResource(const Column &column, const QnBusinessActionData &action) const
 {
-    return getResourceById(data(index, Qn::ResourceRole).toInt()); 
+    switch(column) {
+        case EventCameraColumn: 
+            return getResourceById(action.getRuntimeParams().getEventResourceId());
+        case ActionCameraColumn: 
+            return getResourceById(action.getRuntimeParams().getActionResourceId());
+        default:
+            return QnResourcePtr();
+    }
+    return QnResourcePtr();
 }
 
 
@@ -384,19 +392,6 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
         return qnResIconCache->icon(res->flags(), res->getStatus());
     else
         return QVariant();
-}
-
-QVariant QnEventLogModel::resourceData(const Column& column, const QnBusinessActionData &action)
-{
-    switch(column) {
-        case EventCameraColumn: 
-            return action.getRuntimeParams().getEventResourceId();
-        case ActionCameraColumn: 
-            return action.getRuntimeParams().getActionResourceId();
-        default:
-            return QVariant();
-    }
-    return QVariant();
 }
 
 QString QnEventLogModel::getResourceNameString(QnId id)
@@ -522,7 +517,7 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const
         case Qn::ItemMouseCursorRole:
             return mouseCursorData(column, action);
         case Qn::ResourceRole:
-            return resourceData(column, action); // TODO: #VASILENKO ResourceRole docs says that return value is of type QnResourcePtr.
+            return QVariant::fromValue<QnResourcePtr>(getResource(column, action));
         case Qn::DisplayHtmlRole: {
             QString text = textData(column, action);
             QString url = motionUrl(column, action);

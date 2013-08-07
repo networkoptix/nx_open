@@ -23,7 +23,7 @@
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/particle_item.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
-#include <ui/graphics/items/notifications/notification_item.h>
+#include <ui/graphics/items/notifications/notification_widget.h>
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -208,7 +208,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     m_list = new QnNotificationListWidget(this);
     layout->addItem(m_list);
 
-    connect(m_list, SIGNAL(itemRemoved(QnNotificationItem*)), this, SLOT(at_list_itemRemoved(QnNotificationItem*)));
+    connect(m_list, SIGNAL(itemRemoved(QnNotificationWidget*)), this, SLOT(at_list_itemRemoved(QnNotificationWidget*)));
     connect(m_list, SIGNAL(visibleSizeChanged()), this, SIGNAL(visibleSizeChanged()));
     connect(m_list, SIGNAL(sizeHintChanged()), this, SIGNAL(sizeHintChanged()));
 
@@ -258,7 +258,7 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
     }
 }
 
-void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
+void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
 {
     QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, QSize(0, thumbnailHeight), item);
     item->setImageProvider(loader);
@@ -275,7 +275,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     if(m_list->itemCount() >= maxNotificationItems)
         return; /* Just drop the notification if we already have too many of them in queue. */
 
-    QnNotificationItem *item = new QnNotificationItem(m_list);
+    QnNotificationWidget *item = new QnNotificationWidget(m_list);
 
     QString name = getResourceName(resource);
     BusinessEventType::Value eventType = params.getEventType();
@@ -371,9 +371,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     m_list->addItem(item);
 }
 
-QnNotificationItem* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
-    QList<QnNotificationItem*> items = m_itemsByMessageType.values(message);
-    foreach (QnNotificationItem* item, items) {
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
+    QList<QnNotificationWidget*> items = m_itemsByMessageType.values(message);
+    foreach (QnNotificationWidget* item, items) {
         if (resource != item->property(itemResourcePropertyName).value<QnResourcePtr>())
             continue;
         return item;
@@ -382,11 +382,11 @@ QnNotificationItem* QnNotificationsCollectionWidget::findItem(QnSystemHealth::Me
 }
 
 void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
-    QnNotificationItem *item = findItem(message, resource);
+    QnNotificationWidget *item = findItem(message, resource);
     if (item)
         return;
 
-    item = new QnNotificationItem(m_list);
+    item = new QnNotificationWidget(m_list);
 
     switch (message) {
     case QnSystemHealth::EmailIsEmpty:
@@ -467,13 +467,13 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
 
 void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
     if (!resource) {
-        foreach (QnNotificationItem* item, m_itemsByMessageType.values(message))
+        foreach (QnNotificationWidget* item, m_itemsByMessageType.values(message))
             m_list->removeItem(item);
         m_itemsByMessageType.remove(message);
         return;
     }
 
-    QnNotificationItem* target = findItem(message, resource);
+    QnNotificationWidget* target = findItem(message, resource);
     if (!target)
         return;
     m_list->removeItem(target);
@@ -630,7 +630,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
     }
 }
 
-void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationItem *item) {
+void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget *item) {
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
         QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
         if (m_itemsByMessageType.remove(message, item) > 0)

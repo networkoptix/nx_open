@@ -36,7 +36,6 @@ public:
     virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
     bool hasMotionUrl(const QModelIndex &index) const;
-    QnResourcePtr getResource(const QModelIndex &index) const;
 
     BusinessEventType::Value eventType(int row) const;
     QnResourcePtr eventResource(int row) const;
@@ -47,6 +46,7 @@ public slots:
     void clear();
     void rebuild();
 private:
+    QnResourcePtr getResource(const Column &column, const QnBusinessActionData &action) const;
     QVariant fontData(const Column& column, const QnBusinessActionData &action) const;
     QVariant foregroundData(const Column& column, const QnBusinessActionData &action) const;
 
@@ -54,7 +54,6 @@ private:
     
     static QVariant iconData(const Column& column, const QnBusinessActionData &action);
     static QVariant mouseCursorData(const Column& column, const QnBusinessActionData &action);
-    static QVariant resourceData(const Column& column, const QnBusinessActionData &action);
     static QString textData(const Column& column,const QnBusinessActionData &action);
 
     static QString motionUrl(Column column, const QnBusinessActionData& action);

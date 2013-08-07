@@ -1,4 +1,4 @@
-#include "notification_item.h"
+#include "notification_widget.h"
 
 #include <limits>
 
@@ -14,7 +14,6 @@
 #include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/proxy_label.h>
-#include <ui/graphics/items/notifications/notification_item.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -54,7 +53,7 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addItem(m_textLabel);
-    
+
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addItem(m_layout);
@@ -152,9 +151,9 @@ void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) 
 
 
 // -------------------------------------------------------------------------- //
-// QnNotificationItem
+// QnNotificationWidget
 // -------------------------------------------------------------------------- //
-QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags flags) :
+QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
     m_defaultActionIdx(-1),
     m_notificationLevel(Qn::OtherNotification),
@@ -215,27 +214,27 @@ QnNotificationItem::QnNotificationItem(QGraphicsItem *parent, Qt::WindowFlags fl
     updateOverlayColor();
 }
 
-QnNotificationItem::~QnNotificationItem() {
+QnNotificationWidget::~QnNotificationWidget() {
     return;
 }
 
-QString QnNotificationItem::text() const {
+QString QnNotificationWidget::text() const {
     return m_textLabel->text();
 }
 
-void QnNotificationItem::setText(const QString &text) {
+void QnNotificationWidget::setText(const QString &text) {
     m_textLabel->setText(text);
 }
 
-void QnNotificationItem::setTooltipText(const QString &text) {
+void QnNotificationWidget::setTooltipText(const QString &text) {
     m_tooltipWidget->setText(text);
 }
 
-Qn::NotificationLevel QnNotificationItem::notificationLevel() const {
+Qn::NotificationLevel QnNotificationWidget::notificationLevel() const {
     return m_notificationLevel;
 }
 
-void QnNotificationItem::setNotificationLevel(Qn::NotificationLevel notificationLevel) {
+void QnNotificationWidget::setNotificationLevel(Qn::NotificationLevel notificationLevel) {
     if(m_notificationLevel == notificationLevel)
         return;
 
@@ -247,15 +246,15 @@ void QnNotificationItem::setNotificationLevel(Qn::NotificationLevel notification
     emit notificationLevelChanged();
 }
 
-void QnNotificationItem::setImageProvider(QnImageProvider* provider) {
+void QnNotificationWidget::setImageProvider(QnImageProvider* provider) {
     m_imageProvider = provider;
 }
 
-void QnNotificationItem::setTooltipEnclosingRect(const QRectF &rect) {
+void QnNotificationWidget::setTooltipEnclosingRect(const QRectF &rect) {
     m_tooltipWidget->setEnclosingGeometry(rect);
 }
 
-void QnNotificationItem::setGeometry(const QRectF &geometry) {
+void QnNotificationWidget::setGeometry(const QRectF &geometry) {
     QSizeF oldSize = size();
 
     base_type::setGeometry(geometry);
@@ -264,7 +263,7 @@ void QnNotificationItem::setGeometry(const QRectF &geometry) {
         updateOverlayGeometry();
 }
 
-void QnNotificationItem::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
+void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
                                          const QnActionParameters &parameters, bool defaultAction)
 {
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
@@ -293,7 +292,7 @@ void QnNotificationItem::addActionButton(const QIcon &icon, const QString &toolt
     m_textLabel->setToolTip(tooltip); // TODO: #Elric
 }
 
-void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void QnNotificationWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     base_type::paint(painter, option, widget);
 
     painter->setPen(QPen(QColor(110, 110, 110, 255), 0.5));
@@ -301,16 +300,16 @@ void QnNotificationItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     painter->drawRect(QnGeometry::aligned(colorSignSize, rect(), Qt::AlignLeft | Qt::AlignVCenter));
 }
 
-void QnNotificationItem::hideToolTip() {
+void QnNotificationWidget::hideToolTip() {
     opacityAnimator(m_tooltipWidget, 2.0)->animateTo(0.0);
 }
 
-void QnNotificationItem::showToolTip() {
+void QnNotificationWidget::showToolTip() {
     m_tooltipWidget->ensureThumbnail(m_imageProvider);
     opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
 }
 
-void QnNotificationItem::updateToolTipVisibility() {
+void QnNotificationWidget::updateToolTipVisibility() {
     if(m_toolTipHoverProcessor->isHovered() && !m_tooltipWidget->text().isEmpty()) {
         showToolTip();
     } else {
@@ -318,7 +317,7 @@ void QnNotificationItem::updateToolTipVisibility() {
     }
 }
 
-void QnNotificationItem::updateToolTipPosition() {
+void QnNotificationWidget::updateToolTipPosition() {
     if(m_inToolTipPositionUpdate)
         return;
 
@@ -328,11 +327,11 @@ void QnNotificationItem::updateToolTipPosition() {
     m_tooltipWidget->pointTo(QPointF(0, qRound(geometry().height() / 2 )));
 }
 
-void QnNotificationItem::updateOverlayGeometry() {
+void QnNotificationWidget::updateOverlayGeometry() {
     m_overlayWidget->setGeometry(QRectF(QPointF(0, 0), size()));
 }
 
-void QnNotificationItem::updateOverlayVisibility(bool animate) {
+void QnNotificationWidget::updateOverlayVisibility(bool animate) {
     if(m_actions.isEmpty()) {
         m_overlayWidget->setOpacity(0);
         return; // TODO: #Elric?
@@ -347,7 +346,7 @@ void QnNotificationItem::updateOverlayVisibility(bool animate) {
     }
 }
 
-void QnNotificationItem::updateOverlayColor() {
+void QnNotificationWidget::updateOverlayColor() {
     m_overlayWidget->setWindowBrush(toTransparent(m_color, 0.3));
 }
 
@@ -355,7 +354,7 @@ void QnNotificationItem::updateOverlayColor() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnNotificationItem::clicked(Qt::MouseButton button) {
+void QnNotificationWidget::clicked(Qt::MouseButton button) {
     if(button == Qt::RightButton) {
         emit closeTriggered();
     } else if(button == Qt::LeftButton) {
@@ -366,7 +365,7 @@ void QnNotificationItem::clicked(Qt::MouseButton button) {
     }
 }
 
-void QnNotificationItem::at_button_clicked() {
+void QnNotificationWidget::at_button_clicked() {
     int idx = sender()->property(actionIndexPropertyName).toInt();
     if (m_actions.size() <= idx)
         return;
@@ -375,7 +374,7 @@ void QnNotificationItem::at_button_clicked() {
     emit actionTriggered(data.action, data.params);
 }
 
-void QnNotificationItem::at_thumbnail_clicked() {
+void QnNotificationWidget::at_thumbnail_clicked() {
     if (m_defaultActionIdx < 0)
         return;
     if (m_actions.size() <= m_defaultActionIdx)

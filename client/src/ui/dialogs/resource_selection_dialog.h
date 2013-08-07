@@ -69,6 +69,8 @@ private:
     QnCameraThumbnailManager *m_thumbnailManager;
     bool m_flat;
     int m_tooltipResourceId;
+
+    int m_screenshotIndex;
 };
 
 #endif // SELECT_CAMERAS_DIALOG_H

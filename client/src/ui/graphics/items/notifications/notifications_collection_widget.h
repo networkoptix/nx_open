@@ -20,7 +20,7 @@
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
-class QnNotificationItem;
+class QnNotificationWidget;
 class QnParticleItem;
 class QnToolTipWidget;
 
@@ -101,7 +101,7 @@ private slots:
     void at_filterButton_clicked();
     void at_eventLogButton_clicked();
     void at_debugButton_clicked();
-    void at_list_itemRemoved(QnNotificationItem *item);
+    void at_list_itemRemoved(QnNotificationWidget *item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
 
 private:
@@ -111,15 +111,15 @@ private:
      * @param resource                      Camera resource - thumbnail provider
      * @param usecSinceEpoch                Timestamp for the thumbnail, -1 means latest available
      */
-    void loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
+    void loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
 
 private:
-    QnNotificationItem* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+    QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
 
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 
-    QMultiHash<QnSystemHealth::MessageType, QnNotificationItem*> m_itemsByMessageType;
+    QMultiHash<QnSystemHealth::MessageType, QnNotificationWidget*> m_itemsByMessageType;
     QWeakPointer<QnBlinkingImageButtonWidget> m_blinker;
 };
 
