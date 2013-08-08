@@ -79,6 +79,7 @@ private:
     bool m_oldDownmix;
     int m_oldLanguage;
     bool m_restartPending;
+    bool m_oldHardwareAcceleration;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H

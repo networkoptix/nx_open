@@ -112,7 +112,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
     connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
     connect(ui->clearCacheButton,                       SIGNAL(clicked()),                                          action(Qn::ClearCacheAction), SLOT(trigger()));
-    connect(ui->hardwareDecodingCheckBox, SIGNAL(toggled(bool)), ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
+    connect(ui->hardwareDecodingCheckBox,               SIGNAL(toggled(bool)),                                      ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
 
     initTranslations();
     updateFromSettings();
@@ -147,6 +147,21 @@ void QnPreferencesDialog::initTranslations() {
 
 void QnPreferencesDialog::accept() {
     QMessageBox::StandardButton button = QMessageBox::Yes;
+
+    bool newHardwareAcceleration = ui->hardwareDecodingCheckBox->isChecked();
+    if(newHardwareAcceleration && m_oldHardwareAcceleration != newHardwareAcceleration) {
+        button = QMessageBox::warning(
+            this,
+            tr("Warning"),
+            tr("Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?"),
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+            QMessageBox::No
+        );
+        if(button == QMessageBox::Cancel)
+            return;
+        if(button == QMessageBox::No)
+            ui->hardwareDecodingCheckBox->setCheckState(Qt::Unchecked);
+    }
 
     if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
         m_oldLanguage != ui->languageComboBox->currentIndex()) {
@@ -251,6 +266,7 @@ void QnPreferencesDialog::updateFromSettings() {
 
     m_oldDownmix = ui->downmixAudioCheckBox->isChecked();
     m_oldLanguage = ui->languageComboBox->currentIndex();
+    m_oldHardwareAcceleration = ui->hardwareDecodingCheckBox->isChecked();
 }
 
 void QnPreferencesDialog::openLicensesPage() {

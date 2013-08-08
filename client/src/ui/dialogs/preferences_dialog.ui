@@ -397,7 +397,7 @@
             <item>
              <widget class="QLabel" name="hwAccelerationWarningLabel">
               <property name="text">
-               <string>(May cause glitches. Use with care.)</string>
+               <string>(Experimental, may result in glitches. Use with care.)</string>
               </property>
              </widget>
             </item>
