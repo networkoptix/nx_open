@@ -79,9 +79,9 @@ QN_HELP_TOPIC(NewUser_Help,                                     "creating_a_new_
 
 QN_HELP_TOPIC(NewLayout_Help,                                   "creating_a_new_layout_(admin_only).htm") // TODO
 
-QN_HELP_TOPIC(ManualCameraAddition_Help,                        "adding_cameras_manually.htm") // TODO
+QN_HELP_TOPIC(ManualCameraAddition_Help,                        "adding_cameras_manually.htm")
 
-QN_HELP_TOPIC(CameraSettings_Multi_Help,                        "setting_same_parameters_for_multiple_cameras_(admi.htm") // TODO
+QN_HELP_TOPIC(CameraSettings_Multi_Help,                        "setting_same_parameters_for_multiple_cameras_(admi.htm")
 QN_HELP_TOPIC(CameraSettings_General_Name_Help,                 "renaming_a_camera.htm")
 QN_HELP_TOPIC(CameraSettings_General_Address_Help,              "obtaining_cameras_ip_and_mac.htm")
 QN_HELP_TOPIC(CameraSettings_General_Audio_Help,                "configuring_audio_for_the_camera_(admin_only).htm")
@@ -90,8 +90,8 @@ QN_HELP_TOPIC(CameraSettings_Recording_Help,                    "editing_recordi
 QN_HELP_TOPIC(CameraSettings_Recording_Export_Help,             "copying_recording_schedule_fro.htm")
 QN_HELP_TOPIC(CameraSettings_Motion_Help,                       "setting_up_motion_mask_and_motion_sensitivity_(adm.htm")
 QN_HELP_TOPIC(CameraSettings_Properties_Help,                   "configuring_proprietary_camera_parameters.htm")
-QN_HELP_TOPIC(CameraSettings_Expert_Help,						"expert_camera_parameters.htm") // TODO
-QN_HELP_TOPIC(CameraSettings_SecondStream_Help,                 "adjusting_second_stream_qualit.htm") // TODO
+QN_HELP_TOPIC(CameraSettings_Expert_Help,						"expert_camera_parameters.htm")
+QN_HELP_TOPIC(CameraSettings_SecondStream_Help,                 "adjusting_second_stream_qualit.htm")
 QN_HELP_TOPIC(CameraSettings_Dewarping_Help,                    "working_with_fish-eye_cameras.htm")
 
 QN_HELP_TOPIC(EventsActions_Help,								"configuring_events_and_actions.htm")
@@ -104,9 +104,9 @@ QN_HELP_TOPIC(LayoutSettings_EMapping_Help,						"e-mapping.htm")
 
 QN_HELP_TOPIC(EventLog_Help,									"viewing_events_log.htm")
 
-QN_HELP_TOPIC(CameraList_Help,									"viewing_full_cameras_list.htm") // TODO
+QN_HELP_TOPIC(CameraList_Help,									"viewing_full_cameras_list.htm")
 
-QN_HELP_TOPIC(ImageEnhancement_Help,							"color_correction.htm") // TODO
+QN_HELP_TOPIC(ImageEnhancement_Help,							"color_correction.htm")
 
 QN_HELP_TOPIC(CameraDiagnostics_Help,							"diagnosing_offline_cameras.htm")
 

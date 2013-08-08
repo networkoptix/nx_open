@@ -14,6 +14,9 @@
 #include <ui/actions/action_manager.h>
 #include "ui/common/grid_widget_helper.h"
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *context):
     QDialog(parent,
               Qt::Window |
@@ -64,6 +67,8 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     connect(m_selectAllAction,      SIGNAL(triggered()),                this, SLOT(at_selectAllAction()));
 
     ui->gridCameras->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+
+    setHelpTopic(this, Qn::CameraList_Help);
 }
 
 QnCameraListDialog::~QnCameraListDialog()

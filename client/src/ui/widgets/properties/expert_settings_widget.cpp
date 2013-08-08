@@ -9,6 +9,9 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     QWidget(parent),
     ui(new Ui::AdvancedSettingsWidget),
@@ -40,6 +43,9 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     connect(ui->settingsDisableControlCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->qualityAssureCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_dataChanged()));
+
+    setHelpTopic(this, Qn::CameraSettings_Expert_Help);
+    setHelpTopic(ui->qualityGroupBox, Qn::CameraSettings_SecondStream_Help);
 }
 
 QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
