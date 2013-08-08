@@ -1,14 +1,14 @@
 /**
- * \file 
- * 
+ * \file
+ *
  * This file is intended for multiple inclusion, hence no include guards.
- * 
+ *
  * Define <tt>QN_HELP_TOPIC</tt> macro before including this file.
  */
 
 /**
  * \def QN_HELP_TOPIC(ID, URL)
- * 
+ *
  * \param ID                            Identifier of the help topic.
  * \param URL                           Url assigned to this help topic.
  */
@@ -94,10 +94,10 @@ QN_HELP_TOPIC(CameraSettings_Expert_Help,						"expert_camera_parameters.htm")
 QN_HELP_TOPIC(CameraSettings_SecondStream_Help,                 "adjusting_second_stream_qualit.htm")
 QN_HELP_TOPIC(CameraSettings_Dewarping_Help,                    "working_with_fish-eye_cameras.htm")
 
-QN_HELP_TOPIC(EventsActions_Help,								"configuring_events_and_actions.htm")
-QN_HELP_TOPIC(EventsActions_PlaySound_Help,						"play_sound.htm") // TODO
-QN_HELP_TOPIC(EventsActions_Speech_Help,						"say_text.htm") // TODO
-QN_HELP_TOPIC(EventsActions_InstantOutput_Help,					"trigger_camera_output.htm") // TODO
+QN_HELP_TOPIC(EventsActions_Help,                               "configuring_events_and_actions.htm")
+QN_HELP_TOPIC(EventsActions_PlaySound_Help,                     "play_sound.htm")
+QN_HELP_TOPIC(EventsActions_Speech_Help,                        "say_text.htm")
+QN_HELP_TOPIC(EventsActions_InstantOutput_Help,                 "trigger_camera_output.htm")
 
 QN_HELP_TOPIC(LayoutSettings_Locking_Help,						"locking_layouts.htm")
 QN_HELP_TOPIC(LayoutSettings_EMapping_Help,						"e-mapping.htm")

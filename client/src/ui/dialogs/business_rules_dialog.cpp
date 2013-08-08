@@ -134,6 +134,7 @@ int QnBusinessRulesDialog::helpTopicAt(const QPointF &pos) const {
                 case BusinessActionType::SayText:
                     return Qn::EventsActions_Speech_Help;
                 case BusinessActionType::CameraOutputInstant:
+                case BusinessActionType::CameraOutput:
                     return Qn::EventsActions_InstantOutput_Help;
                 default:
                     break;
