@@ -65,6 +65,7 @@ namespace CameraDiagnostics
             //!params: OS error message
             ioError,
             serverTerminated,
+            cameraInvalidParams,
             unknown
         };
 
@@ -165,6 +166,12 @@ namespace CameraDiagnostics
     {
     public:
         RequestFailedResult( const QString& requestName, const QString& serverResponse ) : Result( ErrorCode::requestFailed, requestName, serverResponse ) {}
+    };
+
+    class CameraInvalidParams : public Result
+    {
+    public:
+        CameraInvalidParams( const QString& errorString) : Result( ErrorCode::cameraInvalidParams, errorString) {}
     };
 
     class NotImplementedResult : public Result
