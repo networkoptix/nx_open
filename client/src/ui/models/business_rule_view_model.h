@@ -42,6 +42,7 @@ namespace QnBusiness {
     };
     Q_DECLARE_FLAGS(Fields, Field)
 
+    // TODO: #GDM move to common Qn roles
     enum ItemDataRole {
         ModifiedRole   = Qt::UserRole + 1,
         DisabledRole,
@@ -76,6 +77,7 @@ public:
 
     QVariant getText(const int column, const bool detailed = true) const;
     QVariant getIcon(const int column) const;
+    QVariant getHelpTopic(const int column) const;
 
     bool isValid(int column) const;
     bool isValid() const; //checks validity for all row

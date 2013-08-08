@@ -13,6 +13,7 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/recording_business_action.h>
 
+#include <ui/help/help_topics.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/style/skin.h>
@@ -194,6 +195,9 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             return m_actionType;
         case QnBusiness::ActionResourcesRole:
             return QVariant::fromValue<QnResourceList>(m_actionResources);
+
+        case Qn::HelpTopicIdRole:
+            return getHelpTopic(column);
         default:
             break;
     }
@@ -653,6 +657,31 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
             break;
     }
     return QVariant();
+}
+
+QVariant QnBusinessRuleViewModel::getHelpTopic(const int column) const {
+    switch (column) {
+    case QnBusiness::ActionColumn:
+        {
+            switch (m_actionType) {
+            case BusinessActionType::PlaySound:
+                return Qn::EventsActions_PlaySound_Help;
+            case BusinessActionType::SayText:
+                return Qn::EventsActions_Speech_Help;
+            case BusinessActionType::CameraOutputInstant:
+            case BusinessActionType::CameraOutput:
+                return Qn::EventsActions_InstantOutput_Help;
+            default:
+                break;
+            }
+        }
+
+        break;
+    default:
+        break;
+    }
+    return Qn::EventsActions_Help;
+
 }
 
 bool QnBusinessRuleViewModel::isValid() const {

@@ -121,34 +121,6 @@ void QnBusinessRulesDialog::setFilter(const QString &filter) {
     ui->filterLineEdit->setText(filter);
 }
 
-int QnBusinessRulesDialog::helpTopicAt(const QPointF &pos) const {
-    QModelIndex index = ui->tableView->indexAt(pos.toPoint());
-    if (index.isValid()) {
-        switch (index.column()) {
-        case QnBusiness::ActionColumn:
-            {
-                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(Qt::EditRole).toInt();
-                switch (actionType) {
-                case BusinessActionType::PlaySound:
-                    return Qn::EventsActions_PlaySound_Help;
-                case BusinessActionType::SayText:
-                    return Qn::EventsActions_Speech_Help;
-                case BusinessActionType::CameraOutputInstant:
-                case BusinessActionType::CameraOutput:
-                    return Qn::EventsActions_InstantOutput_Help;
-                default:
-                    break;
-                }
-            }
-
-            break;
-        default:
-            break;
-        }
-    }
-    return Qn::EventsActions_Help;
-}
-
 void QnBusinessRulesDialog::accept()
 {
     if (!saveAll())

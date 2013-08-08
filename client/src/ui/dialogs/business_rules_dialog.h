@@ -13,7 +13,6 @@
 
 #include <business/business_event_rule.h>
 
-#include <ui/common/help_topic_queryable.h>
 #include <ui/dialogs/button_box_dialog.h>
 #include <ui/models/business_rules_actual_model.h>
 #include <ui/widgets/business/business_rule_widget.h>
@@ -25,7 +24,7 @@ namespace Ui {
     class BusinessRulesDialog;
 }
 
-class QnBusinessRulesDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware, public HelpTopicQueryable
+class QnBusinessRulesDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -36,8 +35,6 @@ public:
     virtual ~QnBusinessRulesDialog();
 
     void setFilter(const QString &filter);
-
-    virtual int helpTopicAt(const QPointF &pos) const override;
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
