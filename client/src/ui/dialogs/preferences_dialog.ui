@@ -307,7 +307,7 @@
             <item>
              <widget class="QLabel" name="languageWarningLabel">
               <property name="text">
-               <string>(Restart required)</string>
+               <string>Restart required.</string>
               </property>
              </widget>
             </item>
@@ -352,7 +352,7 @@
             <item>
              <widget class="QLabel" name="downmixWarningLabel">
               <property name="text">
-               <string>(Restart required)</string>
+               <string>Restart required.</string>
               </property>
              </widget>
             </item>
@@ -397,7 +397,7 @@
             <item>
              <widget class="QLabel" name="hwAccelerationWarningLabel">
               <property name="text">
-               <string>(Experimental, may result in glitches. Use with care.)</string>
+               <string>Experimental. May result in glitches.</string>
               </property>
              </widget>
             </item>
