@@ -55,7 +55,6 @@ namespace QnBusiness {
         ActionTypeRole,
         ActionResourcesRole
     };
-
 }
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusiness::Fields)
@@ -168,7 +167,6 @@ private:
     QStandardItemModel *m_eventTypesModel;
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
-
 };
 
 #endif // BUSINESS_RULE_VIEW_MODEL_H
