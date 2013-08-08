@@ -460,87 +460,104 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
-        <source>Media server %1 is not available. Check that media server is up and running.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
-        <source>Received bad response from media server %1: %2. Check media server&apos;s version.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
-        <source>Cannot connect to http port %1. Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="49"/>
-        <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
-        <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="61"/>
-        <source>Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="66"/>
-        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="71"/>
-        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="80"/>
-        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="111"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="118"/>
         <source>(unknown)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="57"/>
-        <source>Not authorized.</source>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
+        <source>Media server %1 is not available.
+ Check that media server is up and running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
+        <source>Received bad response from media server %1: &quot;%2&quot;.
+ Check media server&apos;s version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
+        <source>Cannot connect to http port %1.
+ Make sure the camera is plugged into the network.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
-        <source>Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <source>Cannot open media url %1. Failed to connect to media port %2.
+ Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="46"/>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
+        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
+ Make sure the camera is plugged into the network. Try to reboot camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="76"/>
-        <source>Unknown Camera Issue. Please, contact support.</source>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="51"/>
+        <source>Error parsing camera response. Url %1, request name %2.
+ Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="83"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
+        <source>No supported media track(s) at url %1.
+ Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="61"/>
+        <source>Not authorized. Url %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="65"/>
+        <source>Cannot open media url %1. Unsupported media protocol %2.
+ Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
+        <source>Failed to configure parameter %1.
+ First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If no success, restore factory defaults on the camera web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="75"/>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
+ Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="80"/>
+        <source>Unknown Camera Issue.
+ Please, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="84"/>
+        <source>I/O error. OS message: &quot;%1&quot;.
+ Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
         <source>Server has been stopped.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="90"/>
+        <source>Invalid data received from camera: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="103"/>
         <source>Unknown error. Please contact support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="98"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="105"/>
         <source> Parameters: </source>
         <translation type="unfinished"></translation>
     </message>

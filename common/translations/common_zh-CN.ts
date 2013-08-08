@@ -921,52 +921,43 @@ for recording to %1.</source>
         <translation>好</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
         <source>Media server %1 is not available. Check that media server is up and running.</source>
-        <translation>媒体服务器 %1 不可用。检查該媒体服务器已启用並且正在运行。</translation>
+        <translation type="obsolete">媒体服务器 %1 不可用。检查該媒体服务器已启用並且正在运行。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
         <source>Received bad response from media server %1: %2. Check media server&apos;s version.</source>
-        <translation>从 %1媒体服务器器收到不良回应: %2。确认媒体服务器版本。</translation>
+        <translation type="obsolete">从 %1媒体服务器器收到不良回应: %2。确认媒体服务器版本。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
         <source>Cannot connect to http port %1. Make sure the camera is plugged into the network.</source>
-        <translation>无法连接到HTTP端口%1。确认摄像机连上网络。</translation>
+        <translation type="obsolete">无法连接到HTTP端口%1。确认摄像机连上网络。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="49"/>
         <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
-        <translation>解析摄像机错误回应。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队</translation>
+        <translation type="obsolete">解析摄像机错误回应。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
         <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
-        <translation>没有媒体路径。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队</translation>
+        <translation type="obsolete">没有媒体路径。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="61"/>
         <source>Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation>无法连接到媒体端口 %1。不支援的媒体协议%2。请尝试在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
+        <translation type="obsolete">无法连接到媒体端口 %1。不支援的媒体协议%2。请尝试在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="66"/>
         <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation>配置参数 %1失败。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
+        <translation type="obsolete">配置参数 %1失败。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="71"/>
         <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation>摄像机請求%1出現%2錯誤。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
+        <translation type="obsolete">摄像机請求%1出現%2錯誤。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="80"/>
         <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>I/O错误。 OS信息e: %1。确认摄像机连上网络。尝试重新启动摄像机。</translation>
+        <translation type="obsolete">I/O错误。 OS信息e: %1。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="111"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="118"/>
         <source>(unknown)</source>
         <translation>(未知)</translation>
     </message>
@@ -987,23 +978,20 @@ for recording to %1.</source>
         <translation type="obsolete">没有媒体路径。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="57"/>
         <source>Not authorized.</source>
-        <translation>未经授权。</translation>
+        <translation type="obsolete">未经授权。</translation>
     </message>
     <message>
         <source>Unsupported media protocol %1. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
         <translation type="obsolete">不支援的媒体协议%1。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
         <source>Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>无法连接到媒体 url %1。无法连接到媒体端口 %2。确认访问端口 %2可以存取(转发等)。请尝试重新启摄像机，然后在网页上复原为出厂默认值。</translation>
+        <translation type="obsolete">无法连接到媒体 url %1。无法连接到媒体端口 %2。确认访问端口 %2可以存取(转发等)。请尝试重新启摄像机，然后在网页上复原为出厂默认值。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="46"/>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
-        <translation>无法连接到媒体 url %1。%2 端口上的连接被意外关闭。确认摄像机连上网络。尝试重新启动摄像机。</translation>
+        <translation type="obsolete">无法连接到媒体 url %1。%2 端口上的连接被意外关闭。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
@@ -1014,26 +1002,107 @@ for recording to %1.</source>
         <translation type="obsolete">摄像机請求%1出現%2錯誤。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="76"/>
         <source>Unknown Camera Issue. Please, contact support.</source>
-        <translation>未知摄像机的问题。请联系支援团队。</translation>
+        <translation type="obsolete">未知摄像机的问题。请联系支援团队。</translation>
     </message>
     <message>
         <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera.</source>
         <translation type="obsolete">I/O错误。 OS信息e: %1。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="83"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
+        <source>Media server %1 is not available.
+ Check that media server is up and running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
+        <source>Received bad response from media server %1: &quot;%2&quot;.
+ Check media server&apos;s version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
+        <source>Cannot connect to http port %1.
+ Make sure the camera is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
+        <source>Cannot open media url %1. Failed to connect to media port %2.
+ Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="46"/>
+        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
+ Make sure the camera is plugged into the network. Try to reboot camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="51"/>
+        <source>Error parsing camera response. Url %1, request name %2.
+ Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
+        <source>No supported media track(s) at url %1.
+ Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="61"/>
+        <source>Not authorized. Url %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="65"/>
+        <source>Cannot open media url %1. Unsupported media protocol %2.
+ Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
+        <source>Failed to configure parameter %1.
+ First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If no success, restore factory defaults on the camera web-page. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="75"/>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
+ Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="80"/>
+        <source>Unknown Camera Issue.
+ Please, contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="84"/>
+        <source>I/O error. OS message: &quot;%1&quot;.
+ Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
         <source>Server has been stopped.</source>
         <translation>服务器已停止。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="90"/>
+        <source>Invalid data received from camera: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="103"/>
         <source>Unknown error. Please contact support.</source>
         <translation>未知错误。请联系支援团队。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="98"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="105"/>
         <source> Parameters: </source>
         <translation>参数:</translation>
     </message>

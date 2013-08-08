@@ -90,7 +90,7 @@
     </message>
     <message>
         <source>TextLabel</source>
-        <translation>文本标签</translation>
+        <translation type="obsolete">文本标签</translation>
     </message>
     <message>
         <source>Warning! Please read documentation before change these settings!</source>
@@ -106,11 +106,11 @@
     </message>
     <message>
         <source>Secondary stream quality</source>
-        <translation>次视频流画质</translation>
+        <translation type="obsolete">次视频流画质</translation>
     </message>
     <message>
         <source>Keep current</source>
-        <translation>保留当前状态不变</translation>
+        <translation type="obsolete">保留当前状态不变</translation>
     </message>
     <message>
         <source>Low quality</source>
@@ -146,11 +146,35 @@
     </message>
     <message utf8="true">
         <source>Warning! Low quality may result in low resolution image. High quality may result in Media Server’s CPU overload and network connection errors.</source>
-        <translation>警告!低画质可能会产生低分辨率影像。高画质則可能超载媒体服务器的CPU或网络连接错误。</translation>
+        <translation type="obsolete">警告!低画质可能会产生低分辨率影像。高画质則可能超载媒体服务器的CPU或网络连接错误。</translation>
     </message>
     <message>
         <source>Combined cameras with and without dual streaming. Stream quality control is disabled</source>
-        <translation>结合支援和不支援双码流的摄像机。禁用流的质量控制</translation>
+        <translation type="obsolete">结合支援和不支援双码流的摄像机。禁用流的质量控制</translation>
+    </message>
+    <message>
+        <source>Camera Settings Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I have read the manual and understand the risks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secondary Stream Quality Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore Defaults</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1337,6 +1361,10 @@ For easy instructions on how to install or update your video driver, follow inst
     <message>
         <source>Run Application when PC Boots up:</source>
         <translation>电脑开机同时运行应用程序:</translation>
+    </message>
+    <message>
+        <source>(Experimental, may result in glitches. Use with care.)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5431,7 +5459,24 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>The language change will take effect after application restart. Press OK to close application now.</source>
-        <translation>应用程序重启后语言修改才会生效。现在点击&quot;好&quot;来关闭程序。</translation>
+        <translation type="obsolete">应用程序重启后语言修改才会生效。现在点击&quot;好&quot;来关闭程序。</translation>
+    </message>
+    <message>
+        <source>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some changes will take effect only after application restart. Press OK to restart the application now.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process is not found</source>
+        <translation type="unfinished">未发现启动过程</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.
+Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6026,11 +6071,15 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>&amp;System ID:</source>
-        <translation>&amp;系统 ID:</translation>
+        <translation type="obsolete">&amp;系统 ID:</translation>
     </message>
     <message>
         <source>Enter short system description here...</source>
         <translation>在这里输入短的系统描述...</translation>
+    </message>
+    <message>
+        <source>&amp;System Signature:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

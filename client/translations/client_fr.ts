@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>TextLabel</source>
-        <translation>Étiquette du texte</translation>
+        <translation type="obsolete">Étiquette du texte</translation>
     </message>
     <message>
         <source>Warning! Please read documentation before change these settings!</source>
@@ -107,11 +107,11 @@
     </message>
     <message>
         <source>Secondary stream quality</source>
-        <translation>Qualité du flux secondaire</translation>
+        <translation type="obsolete">Qualité du flux secondaire</translation>
     </message>
     <message>
         <source>Keep current</source>
-        <translation>Maintenir</translation>
+        <translation type="obsolete">Maintenir</translation>
     </message>
     <message>
         <source>Low quality</source>
@@ -145,12 +145,28 @@
         <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
         <translation type="unfinished"></translation>
     </message>
-    <message utf8="true">
-        <source>Warning! Low quality may result in low resolution image. High quality may result in Media Server’s CPU overload and network connection errors.</source>
+    <message>
+        <source>Camera Settings Control</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Combined cameras with and without dual streaming. Stream quality control is disabled</source>
+        <source>I have read the manual and understand the risks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secondary Stream Quality Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore Defaults</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -887,6 +903,10 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Run Application when PC Boots up:</source>
         <translation>Exécuter l&apos;application lorsque le PC démarre:</translation>
+    </message>
+    <message>
+        <source>(Experimental, may result in glitches. Use with care.)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4353,7 +4373,24 @@ Tous les changements vont être perdus à la sortie du programme.</translation>
     </message>
     <message>
         <source>The language change will take effect after application restart. Press OK to close application now.</source>
-        <translation>Le changement de langue ne prendera effet qu&apos;après le redémarrage de l&apos;application. Appuyez sur OK pour fermer l&apos;application maintenant.</translation>
+        <translation type="obsolete">Le changement de langue ne prendera effet qu&apos;après le redémarrage de l&apos;application. Appuyez sur OK pour fermer l&apos;application maintenant.</translation>
+    </message>
+    <message>
+        <source>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some changes will take effect only after application restart. Press OK to restart the application now.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process is not found</source>
+        <translation type="unfinished">Le processus du lanceur n&apos;a pas été trouvé</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.
+Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4798,11 +4835,11 @@ Tous les changements vont être perdus à la sortie du programme.</translation>
         <translation>Erreur</translation>
     </message>
     <message>
-        <source>&amp;System ID:</source>
+        <source>Enter short system description here...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter short system description here...</source>
+        <source>&amp;System Signature:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

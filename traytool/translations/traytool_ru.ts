@@ -367,6 +367,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/settings.ui" line="314"/>
+        <source>Allow access to media server via public IP address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/settings.ui" line="376"/>
         <source>Enterprise Controller Settings</source>
         <translation type="unfinished"></translation>
@@ -374,6 +379,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="388"/>
         <source>Enterprise controller network settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="494"/>
+        <source>Allow access to enterprise controller via public IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -405,11 +415,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="314"/>
-        <source>Allow access to the server via public IP address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/settings.ui" line="323"/>
         <location filename="../src/settings.ui" line="503"/>
         <source>Use specified IP or host name</source>
@@ -424,11 +429,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="424"/>
         <source>Media proxy port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/settings.ui" line="494"/>
-        <source>Allow access to the enterprise controller via public IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

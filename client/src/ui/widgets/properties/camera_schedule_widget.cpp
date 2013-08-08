@@ -1,6 +1,7 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule_widget.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtGui/QMessageBox>
 
 //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
@@ -28,6 +29,7 @@
 namespace {
 
     class QnExportScheduleResourceSelectionDialogDelegate: public QnResourceSelectionDialogDelegate {
+        Q_DECLARE_TR_FUNCTIONS(QnExportScheduleResourceSelectionDialogDelegate);
         typedef QnResourceSelectionDialogDelegate base_type;
     public:
         QnExportScheduleResourceSelectionDialogDelegate(QWidget* parent,
