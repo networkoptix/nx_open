@@ -113,6 +113,23 @@ It might take a few moments to populate them in the tree.</numerusform>
     </message>
 </context>
 <context>
+    <name>QnCameraListDialog</name>
+    <message numerus="yes">
+        <source>Camera List - %n camera(s) found</source>
+        <translation>
+            <numerusform>Camera List - %n camera found</numerusform>
+            <numerusform>Camera List - %n cameras found</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
+        <translation>
+            <numerusform>Camera List for media server &apos;%1&apos; - %n camera found</numerusform>
+            <numerusform>Camera List for media server &apos;%1&apos; - %n cameras found</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnCameraScheduleWidget</name>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>

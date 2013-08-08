@@ -744,8 +744,14 @@ p, li { white-space: pre-wrap; }
     <name>LoginDialog</name>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="14"/>
+        <source>Connect to Enterprise Controller</source>
+        <comment>Window Title</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="56"/>
         <source>Connect to Enterprise Controller</source>
+        <comment>Groupbox Title</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3047,15 +3053,19 @@ It might take a few moments to populate them in the tree.</source>
         <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="149"/>
-        <source>Cameras list - %1 camera(s) found</source>
-        <translation type="unfinished"></translation>
+        <source>Camera List - %n camera(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="151"/>
-        <source>Cameras list by media server &apos;%1&apos; - %2 camera(s) found</source>
-        <translation type="unfinished"></translation>
+        <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

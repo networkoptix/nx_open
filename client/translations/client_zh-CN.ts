@@ -961,7 +961,7 @@ p, li { white-space: pre-wrap; }
     <name>LoginDialog</name>
     <message>
         <source>Connect to Enterprise Controller</source>
-        <translation>连接到系统控制器</translation>
+        <translation type="obsolete">连接到系统控制器</translation>
     </message>
     <message>
         <source>...</source>
@@ -1126,6 +1126,16 @@ Would you like to restart client in compatibility mode?</source>
     <message>
         <source>&amp;Auto-Login</source>
         <translation>&amp;自动登录</translation>
+    </message>
+    <message>
+        <source>Connect to Enterprise Controller</source>
+        <comment>Window Title</comment>
+        <translation type="unfinished">连接到系统控制器</translation>
+    </message>
+    <message>
+        <source>Connect to Enterprise Controller</source>
+        <comment>Groupbox Title</comment>
+        <translation type="unfinished">连接到系统控制器</translation>
     </message>
 </context>
 <context>
@@ -3426,15 +3436,27 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Cameras list - %1 camera(s) found</source>
-        <translation>摄像机列表-发现%1摄像机</translation>
+        <translation type="obsolete">摄像机列表-发现%1摄像机</translation>
     </message>
     <message>
         <source>Cameras list by media server &apos;%1&apos; - %2 camera(s) found</source>
-        <translation>依媒体服务器 &apos;%1&apos; 摄像机列表-发现%2摄像机</translation>
+        <translation type="obsolete">依媒体服务器 &apos;%1&apos; 摄像机列表-发现%2摄像机</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
         <translation>输出选择到档案...</translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera List - %n camera(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

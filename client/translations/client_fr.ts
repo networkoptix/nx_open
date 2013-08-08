@@ -702,7 +702,7 @@ p, li { white-space: pre-wrap; }
     <name>LoginDialog</name>
     <message>
         <source>Connect to Enterprise Controller</source>
-        <translation>Connection sur Contrôleur d&apos;entreprise</translation>
+        <translation type="obsolete">Connection sur Contrôleur d&apos;entreprise</translation>
     </message>
     <message>
         <source>&amp;Host:</source>
@@ -739,6 +739,16 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>&amp;Auto-Login</source>
         <translation>&amp;Connexion-Auto</translation>
+    </message>
+    <message>
+        <source>Connect to Enterprise Controller</source>
+        <comment>Window Title</comment>
+        <translation type="unfinished">Connection sur Contrôleur d&apos;entreprise</translation>
+    </message>
+    <message>
+        <source>Connect to Enterprise Controller</source>
+        <comment>Groupbox Title</comment>
+        <translation type="unfinished">Connection sur Contrôleur d&apos;entreprise</translation>
     </message>
 </context>
 <context>
@@ -2719,15 +2729,29 @@ Assurez-vous que le serveur est disponible et réessayez.</translation>
     </message>
     <message>
         <source>Cameras list - %1 camera(s) found</source>
-        <translation>Cameras List - %1 caméra(s) found</translation>
+        <translation type="obsolete">Cameras List - %1 caméra(s) found</translation>
     </message>
     <message>
         <source>Cameras list by media server &apos;%1&apos; - %2 camera(s) found</source>
-        <translation>Liste de caméras par le Média Serveur &apos;%1&apos; - %2 caméra(s) trouvée(s)</translation>
+        <translation type="obsolete">Liste de caméras par le Média Serveur &apos;%1&apos; - %2 caméra(s) trouvée(s)</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
         <translation>Exporter la sélection vers un fichier...</translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera List - %n camera(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
