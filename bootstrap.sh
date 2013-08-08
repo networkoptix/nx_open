@@ -3,7 +3,7 @@
 if [ $(id -u) -eq 0 ]
 then
     apt-get update
-    apt-get install -y mercurial vim curl openjdk-7-jre-headless protobuf-compiler build-essential unzip zip libz-dev python-dev libasound2 libxrender-dev libfreetype6-dev libfontconfig1-dev libxrandr-dev libxinerama-dev libxcursor-dev libopenal-dev mesa-common-dev freeglut3 freeglut3-dev libglu1-mesa-dev chrpath python-virtualenv screen libogg-dev libaudio2 libxi6
+    apt-get install -y mercurial vim curl openjdk-7-jre-headless protobuf-compiler build-essential unzip zip libz-dev python-dev libasound2 libxrender-dev libfreetype6-dev libfontconfig1-dev libxrandr-dev libxinerama-dev libxcursor-dev libopenal-dev mesa-common-dev freeglut3 freeglut3-dev libglu1-mesa-dev chrpath python-virtualenv screen libogg-dev libaudio2 libxi6 libxslt1
 
     su - vagrant $0
     exit 0
