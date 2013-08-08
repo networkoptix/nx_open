@@ -10,7 +10,6 @@ V10 = Version(1, 0)
 V11 = Version(1, 1)
 V12 = Version(1, 2)
 V13 = Version(1, 3)
-V131 = Version(1, 3, 1)
 V14 = Version(1, 4)
 V15 = Version(1, 5)
 V16 = Version(1, 6)
@@ -18,7 +17,6 @@ V16 = Version(1, 6)
 COMPATIBILITY_INFO = (
     (V16, (IOSCL,), V15), # iOS V1.6 can connect to 1.5
     (V15, (IOSCL,), V16), # iOS V1.5 can connect to 1.6
-    (V16, (ANDROID,), V131), # android V1.6 can connect to 1.3.1
     (V16, (ANDROID,), V14), # android V1.6 can connect to 1.4
     (V16, (ANDROID,), V15), # android V1.6 can connect to 1.5
 #    (V13, (CL,), Range(V12, V12)),
