@@ -439,6 +439,11 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation>Port API</translation>
     </message>
     <message>
+        <location filename="../src/settings.ui" line="314"/>
+        <source>Allow access to media server via public IP address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/settings.ui" line="376"/>
         <source>Enterprise Controller Settings</source>
         <translation>Configurations du contrôleur entreprise</translation>
@@ -447,6 +452,11 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <location filename="../src/settings.ui" line="388"/>
         <source>Enterprise controller network settings</source>
         <translation>Configurations réseau du contrôleur entreprise</translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="494"/>
+        <source>Allow access to enterprise controller via public IP address</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>RTSP Port</source>
@@ -477,9 +487,8 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation>TCP</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="314"/>
         <source>Allow access to the server via public IP address</source>
-        <translation>Autoriser l&apos;accès au serveur via l&apos;adresse IP publique</translation>
+        <translation type="obsolete">Autoriser l&apos;accès au serveur via l&apos;adresse IP publique</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="323"/>
@@ -507,9 +516,8 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation>Port du proxy média</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="494"/>
         <source>Allow access to the enterprise controller via public IP address</source>
-        <translation>Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publiques</translation>
+        <translation type="obsolete">Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publiques</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="553"/>

@@ -957,7 +957,7 @@ for recording to %1.</source>
         <translation type="obsolete">I/O错误。 OS信息e: %1。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="118"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="119"/>
         <source>(unknown)</source>
         <translation>(未知)</translation>
     </message>
@@ -1092,17 +1092,17 @@ for recording to %1.</source>
         <translation>服务器已停止。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="90"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="91"/>
         <source>Invalid data received from camera: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="103"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="104"/>
         <source>Unknown error. Please contact support.</source>
         <translation>未知错误。请联系支援团队。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="105"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="106"/>
         <source> Parameters: </source>
         <translation>参数:</translation>
     </message>
