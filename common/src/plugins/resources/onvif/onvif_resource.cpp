@@ -425,10 +425,12 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isNull() || m_needUpdateOnvifUrl)
     {
         const CameraDiagnostics::Result result = fetchAndSetDeviceInformationPriv(false);
-        if( !result && getMediaUrl().isEmpty() )
+        if (!result)
+            return result;
+        if( getMediaUrl().isEmpty() )
         {
             qCritical() << "QnPlOnvifResource::initInternal: ONVIF media url is absent. Id: " << getPhysicalId();
-            return result;
+            return CameraDiagnostics::CameraInvalidParams(lit("ONVIF media URL is not filled by camera"));
         }
         else
             m_needUpdateOnvifUrl = false;
