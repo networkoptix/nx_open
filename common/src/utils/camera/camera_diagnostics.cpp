@@ -86,6 +86,9 @@ public:
             case serverTerminated:
                 errorMessage = tr("Server has been stopped.");
                 break;
+            case cameraInvalidParams:
+                errorMessage = tr("Invalid data received from camera: %1");
+                break;
             default:
             {
                 int nonEmptyParamCount = 0;
