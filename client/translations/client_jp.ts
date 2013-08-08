@@ -955,7 +955,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="310"/>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="355"/>
-        <source>(Restart required)</source>
+        <source>Restart required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/preferences_dialog.ui" line="400"/>
+        <source>Experimental. May result in glitches.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -971,11 +976,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="364"/>
         <source>Run Application when PC Boots up:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.ui" line="400"/>
-        <source>(Experimental, may result in glitches. Use with care.)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
