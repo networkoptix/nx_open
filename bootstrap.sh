@@ -13,10 +13,16 @@ fi
 WSDIR=$HOME/workspace
 
 [ -f ~/.hgrc ] || cat > ~/.hgrc << EOF
-username=<Your Name> <yourmail@host.com>
+[ui]
+username = My Name <my@email.com>
+verbose = True
+
 [extensions]
 eol =
-hgext.purge=
+extdiff = 
+purge = 
+mq =
+fetch = 
 EOF
 
 grep environment ~/.profile > /dev/null 2>&1 || {
@@ -31,6 +37,17 @@ export JAVA_HOME=/usr
 # End of network optix environment
 EOF
 }
+
+cat >> ~/.vimrc << EOF
+syntax on
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set ai
+set ruler
+set hlsearch
+set nobomb 
+EOF
 
 mkdir $WSDIR
 
