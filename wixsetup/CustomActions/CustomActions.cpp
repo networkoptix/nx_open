@@ -339,7 +339,7 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
         CRegKey key;
         LPTSTR szBuffer = new TCHAR[50];
         ULONG cchBuffer = 257;
-        if (key.Open(HKEY_LOCAL_MACHINE, versionPath, KEY_READ) == ERROR_SUCCESS) {
+        if (key.Open(HKEY_LOCAL_MACHINE, versionPath, KEY_READ | KEY_WRITE) == ERROR_SUCCESS) {
             ULONG chars;
             CAtlString version;
 
