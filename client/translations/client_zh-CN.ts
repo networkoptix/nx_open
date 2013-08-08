@@ -1356,14 +1356,18 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>(Restart required)</source>
-        <translation>（需重新启动）</translation>
+        <translation type="obsolete">（需重新启动）</translation>
     </message>
     <message>
         <source>Run Application when PC Boots up:</source>
         <translation>电脑开机同时运行应用程序:</translation>
     </message>
     <message>
-        <source>(Experimental, may result in glitches. Use with care.)</source>
+        <source>Restart required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Experimental. May result in glitches.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
