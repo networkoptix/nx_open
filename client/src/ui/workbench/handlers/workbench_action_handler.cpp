@@ -1677,6 +1677,7 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
     QRect oldGeometry = businessRulesDialog()->geometry();
     businessRulesDialog()->show();
     businessRulesDialog()->raise();
+    businessRulesDialog()->activateWindow();
     if(!newlyCreated)
         businessRulesDialog()->setGeometry(oldGeometry);
 }
@@ -1719,6 +1720,7 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
     QRect oldGeometry = businessEventsLogDialog()->geometry();
     businessEventsLogDialog()->show();
     businessEventsLogDialog()->raise();
+    businessEventsLogDialog()->activateWindow();
     if(!newlyCreated)
         businessEventsLogDialog()->setGeometry(oldGeometry);
 }
@@ -1736,6 +1738,7 @@ void QnWorkbenchActionHandler::at_cameraListAction_triggered()
     cameraListDialog()->setMediaServerResource(server);
     cameraListDialog()->show();
     cameraListDialog()->raise();
+    cameraListDialog()->activateWindow();
     if(!newlyCreated)
         cameraListDialog()->setGeometry(oldGeometry);
 }

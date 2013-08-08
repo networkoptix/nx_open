@@ -15,12 +15,18 @@
 #include "ui/common/grid_widget_helper.h"
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *context):
-    QDialog(parent),
+    QDialog(parent,
+              Qt::Window |
+              Qt::CustomizeWindowHint |
+              Qt::WindowTitleHint |
+              Qt::WindowMinMaxButtonsHint |
+              Qt::WindowSystemMenuHint |
+              Qt::WindowContextHelpButtonHint |
+              Qt::WindowCloseButtonHint),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::CameraListDialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::Window);
 
     m_model = new QnCameraListModel(context);
     connect(qnResPool,  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));

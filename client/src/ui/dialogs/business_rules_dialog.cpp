@@ -30,10 +30,12 @@
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     base_type(parent,
+              Qt::Window |
               Qt::CustomizeWindowHint |
               Qt::WindowTitleHint |
               Qt::WindowMinMaxButtonsHint |
               Qt::WindowSystemMenuHint |
+              Qt::WindowContextHelpButtonHint |
               Qt::WindowCloseButtonHint),
     QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRulesDialog()),

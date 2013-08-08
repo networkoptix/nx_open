@@ -40,10 +40,12 @@ namespace {
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent,
+              Qt::Window |
               Qt::CustomizeWindowHint |
               Qt::WindowTitleHint |
               Qt::WindowMinMaxButtonsHint |
               Qt::WindowSystemMenuHint |
+              Qt::WindowContextHelpButtonHint |
               Qt::WindowCloseButtonHint),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
