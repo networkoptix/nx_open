@@ -146,9 +146,9 @@ void QnCameraListDialog::at_copyToClipboard()
 void QnCameraListDialog::at_modelChanged()
 {
     if (m_mediaServer == 0)
-        setWindowTitle(tr("Cameras list - %1 camera(s) found").arg(m_resourceSearch->rowCount()));
+        setWindowTitle(tr("Camera List - %n camera(s) found", "", m_resourceSearch->rowCount()));
     else
-        setWindowTitle(tr("Cameras list by media server '%1' - %2 camera(s) found").arg(QUrl(m_mediaServer->getUrl()).host()).arg(m_resourceSearch->rowCount()));
+        setWindowTitle(tr("Camera List for media server '%1' - %n camera(s) found", "", m_resourceSearch->rowCount()).arg(QUrl(m_mediaServer->getUrl()).host()));
 }
 
 void QnCameraListDialog::at_resPool_resourceRemoved(const QnResourcePtr & resource)
