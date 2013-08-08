@@ -105,7 +105,9 @@ INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
 
-(cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
+install -m 755 debian/prerm $STAGE/DEBIAN
+
+(cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 sudo chown -R root:root $STAGEBASE
 
