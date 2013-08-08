@@ -67,19 +67,19 @@
     </message>
     <message>
         <source>Image Enhancement</source>
-        <translation type="unfinished">Amélioration de l&apos;image</translation>
+        <translation>Amélioration de l&apos;image</translation>
     </message>
     <message>
         <source>Enable enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer l&apos;amélioration</translation>
     </message>
     <message>
         <source>Black level</source>
-        <translation type="unfinished"></translation>
+        <translation>Niveau de noir</translation>
     </message>
     <message>
         <source>White level</source>
-        <translation type="unfinished"></translation>
+        <translation>Niveau de blanc</translation>
     </message>
 </context>
 <context>
@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>TextLabel</source>
-        <translation type="obsolete">Étiquette du texte</translation>
+        <translation>Étiquette du texte</translation>
     </message>
     <message>
         <source>Warning! Please read documentation before change these settings!</source>
@@ -107,23 +107,23 @@
     </message>
     <message>
         <source>Secondary stream quality</source>
-        <translation type="obsolete">Qualité du flux secondaire</translation>
+        <translation>Qualité du flux secondaire</translation>
     </message>
     <message>
         <source>Keep current</source>
-        <translation type="obsolete">Maintenir</translation>
+        <translation>Maintenir</translation>
     </message>
     <message>
         <source>Low quality</source>
-        <translation>Qualité - Basse</translation>
+        <translation>Basse qualité</translation>
     </message>
     <message>
         <source>Medium quality</source>
-        <translation>Qualité - Moyenne</translation>
+        <translation>Moyenne qualité</translation>
     </message>
     <message>
         <source>High quality</source>
-        <translation>Qualité - Haute</translation>
+        <translation>Haute qualité</translation>
     </message>
     <message>
         <source>Warning! Low quality may result in crappy picture, high stream may overload Media Server&apos;s CPU or network connection</source>
@@ -135,39 +135,23 @@
     </message>
     <message>
         <source>Warning! Please read documentation prior to change these settings!</source>
-        <translation type="unfinished"></translation>
+        <translation>Attention! S’il vous plait, lisez la documentation avant de modifier ces paramètres!</translation>
     </message>
     <message>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Conserver les paramètres de flux de la caméra et profiles</translation>
     </message>
     <message>
         <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
+        <translation>Attention! Les paramètres IPS/Qualité de l&apos;enregistrement programmé ne fonctionneront pas!</translation>
     </message>
     <message>
-        <source>Camera Settings Control</source>
-        <translation type="unfinished"></translation>
+        <source>Warning! Low quality may result in low resolution image. High quality may result in Media Server’s CPU overload and network connection errors.</source>
+        <translation>Attention! Une basse qualité peut entrainer une image de basse résolution. Haute qualité peut surcharger le CPU du Serveur Média et d&apos;erreurs sur la connexion réseau.</translation>
     </message>
     <message>
-        <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Secondary Stream Quality Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <source>Combined cameras with and without dual streaming. Stream quality control is disabled</source>
+        <translation>Caméra combinée avec et sans flux double. Le contrôle de qualité du flux est désactivé</translation>
     </message>
 </context>
 <context>
@@ -201,11 +185,11 @@
     </message>
     <message>
         <source>Filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrer par caméras...</translation>
     </message>
     <message>
         <source>X</source>
-        <translation type="unfinished">X</translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -319,18 +303,18 @@
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
         <source>No connection to media server %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune connexion sur le serveur média %1</translation>
     </message>
 </context>
 <context>
     <name>CameraDiagnosticsDialog</name>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Caméra</translation>
     </message>
     <message>
         <source>Diagnostics for camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics de caméra</translation>
     </message>
 </context>
 <context>
@@ -475,7 +459,7 @@
     </message>
     <message>
         <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous pouvez créer une sauvegarde de la configuration du système que vous pourrez restaurer en cas de défaillance.</translation>
     </message>
 </context>
 <context>
@@ -507,30 +491,31 @@
     </message>
     <message>
         <source>All media servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous les serveurs média sont hors ligne. Les journaux ne sont pas disponibles.</translation>
     </message>
 </context>
 <context>
     <name>FisheyeSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>?</translatorcomment>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <source>Horizontal mount (camera on the wall)</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation horizontale (Caméra sur le mur)</translation>
     </message>
     <message>
         <source>Vertical mount (camera on the ceiling)</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation verticale (Caméra sur le plafond)</translation>
     </message>
     <message>
         <source>Camera view angle correction:</source>
-        <translation type="unfinished"></translation>
+        <translation>Correction de l&apos;angle de vision de caméra:</translation>
     </message>
     <message>
         <source>Vertical mount (camera on the floor)</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation verticale (Caméra sur le plancher)</translation>
     </message>
 </context>
 <context>
@@ -693,7 +678,7 @@ p, li { white-space: pre-wrap; }
     <name>LoginDialog</name>
     <message>
         <source>Connect to Enterprise Controller</source>
-        <translation>Connectez sur Contrôleur d&apos;entreprise</translation>
+        <translation>Connection sur Contrôleur d&apos;entreprise</translation>
     </message>
     <message>
         <source>&amp;Host:</source>
@@ -852,8 +837,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Look and Feel</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&quot;Look and Feel&quot;</translation>
+        <translation>Affichage</translation>
     </message>
     <message>
         <source>Misc</source>
@@ -904,10 +888,6 @@ p, li { white-space: pre-wrap; }
         <source>Run Application when PC Boots up:</source>
         <translation>Exécuter l&apos;application lorsque le PC démarre:</translation>
     </message>
-    <message>
-        <source>(Experimental, may result in glitches. Use with care.)</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>PtzPresetDialog</name>
@@ -932,7 +912,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>PTZ Presets</source>
-        <translation type="unfinished"></translation>
+        <translation>Préréglages PTZ</translation>
     </message>
 </context>
 <context>
@@ -1053,7 +1033,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Export selected cameras to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportez les caméras sélectionnées vers un fichier</translation>
     </message>
 </context>
 <context>
@@ -1130,13 +1110,15 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
     </message>
     <message>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>À propos</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
+Construit pour %5-%6 avec %7.&lt;br/&gt;
+</translation>
     </message>
 </context>
 <context>
@@ -1334,7 +1316,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Exit Fullscreen</source>
-        <translation>Quitter le  plein écran</translation>
+        <translation>Quitter le plein écran</translation>
     </message>
     <message>
         <source>Ctrl+F</source>
@@ -2042,43 +2024,44 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Show Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher Message</translation>
     </message>
     <message>
         <source>Show Version Mismatch Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher les messages d&apos;incompatibilité de version</translation>
     </message>
     <message>
         <source>Open Web Client...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir le client web...</translation>
     </message>
     <message>
         <source>Camera List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste de Caméras...</translation>
     </message>
     <message>
         <source>Image Enhancement...</source>
-        <translation type="unfinished"></translation>
+        <translation>Amélioration de l&apos;image...</translation>
     </message>
     <message>
         <source>Server Logs...</source>
-        <translation type="unfinished"></translation>
+        <translation>Journals Serveur...</translation>
     </message>
     <message>
         <source>Open Current Layout in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir la mise en page actuelle dans une nouvelle fenêtre</translation>
     </message>
     <message>
         <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles de caméra...</translation>
     </message>
     <message>
         <source>Check Camera Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier les problèmes de caméra...</translation>
     </message>
     <message>
         <source>How-to Videos and FAQ...</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Added a note saying to french speaking that these video/faq are in english</translatorcomment>
+        <translation>(Anglais)Vidéo &apos;Comment faire...&apos; et FAQ...</translation>
     </message>
 </context>
 <context>
@@ -2093,7 +2076,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Image Enhancement - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Amélioration de l&apos;image - %1</translation>
     </message>
 </context>
 <context>
@@ -2125,19 +2108,19 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Check to set aggregation period</source>
-        <translation type="unfinished"></translation>
+        <translation>Cochez pour définir la période de globalisation</translation>
     </message>
     <message>
         <source>Interval of action :</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalle d&apos;actions :</translation>
     </message>
     <message>
         <source>Once per</source>
-        <translation type="unfinished"></translation>
+        <translation>Une fois par</translation>
     </message>
     <message>
         <source>Instant</source>
-        <translation type="unfinished">Faire instantanément</translation>
+        <translation>Instantanément</translation>
     </message>
 </context>
 <context>
@@ -2293,7 +2276,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Instant</source>
-        <translation type="unfinished">Faire instantanément</translation>
+        <translation>Immédiatement</translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n days</source>
@@ -2329,42 +2312,42 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>User &apos;%1&apos; has empty E-Mail</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;utilisateur %1 n&apos;a aucun courriel</translation>
     </message>
     <message>
         <source>User &apos;%1&apos; has invalid E-Mail address: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;utilisateur %1 a une adresse courriel invalide: %2</translation>
     </message>
     <message>
         <source>Not Applied</source>
-        <translation type="unfinished"></translation>
+        <translation>Non appliqué</translation>
     </message>
     <message numerus="yes">
         <source>Every %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Tous les %n jour</numerusform>
+            <numerusform>Tous les %n jours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n hours</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Toutes les %n heure</numerusform>
+            <numerusform>Toutes les %n heures</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n minutes</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Toutes les %n minute</numerusform>
+            <numerusform>Toutes les %n minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n seconds</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Toutes les %n seconde</numerusform>
+            <numerusform>Toutes les %n secondes</numerusform>
         </translation>
     </message>
 </context>
@@ -2478,16 +2461,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Reset Default Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Réinitialiser les règles par défaut</translation>
     </message>
     <message>
         <source>Confirm rules reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmez la réinitialisation des règles</translation>
     </message>
     <message>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes-vous sûr que vous voulez réinitialiser les règles par défaut? 
+Cette action ne peut être annulée!</translation>
     </message>
 </context>
 <context>
@@ -2527,7 +2511,7 @@ This action CANNOT be undone!</source>
     </message>
     <message>
         <source>Interval of Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalle d&apos;actions</translation>
     </message>
 </context>
 <context>
@@ -2623,39 +2607,39 @@ Assurez-vous que le serveur est disponible et réessayez.</translation>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished">Copier vers Presse-Papier</translation>
+        <translation>Copier vers Presse-Papier</translation>
     </message>
     <message>
         <source>Diagnostics for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics pour la caméra %1.</translation>
     </message>
     <message>
         <source>Checking media server availability</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification de la disponibilité du média serveur</translation>
     </message>
     <message>
         <source>Checking that camera is accessible</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification que la caméra est accessible</translation>
     </message>
     <message>
         <source>Checking that camera provides media stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification que la caméra fournie un flux média</translation>
     </message>
     <message>
         <source>Checking media stream for errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification d&apos;erreur du flux média</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>FAILED: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ÉCHEC: %1</translation>
     </message>
     <message>
         <source>Diagnostics finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics terminés</translation>
     </message>
 </context>
 <context>
@@ -2711,7 +2695,7 @@ Assurez-vous que le serveur est disponible et réessayez.</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter la sélection vers un fichier...</translation>
     </message>
 </context>
 <context>
@@ -2894,11 +2878,11 @@ Assurez-vous que le serveur est disponible et réessayez.</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Caméra</translation>
     </message>
     <message>
         <source>Camera Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles de caméra</translation>
     </message>
 </context>
 <context>
@@ -3399,7 +3383,7 @@ Vous serez invité à redémarrer le client en mode compatibilité.</translation
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter la sélection vers un fichier...</translation>
     </message>
 </context>
 <context>
@@ -3470,22 +3454,22 @@ Vous serez invité à redémarrer le client en mode compatibilité.</translation
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message>
         <source>Schedule motion type is not supported by some cameras</source>
-        <translation type="unfinished">L&apos;horaire de mouvement n&apos;est pas supporté par certaines caméras</translation>
+        <translation>L&apos;horaire de mouvement n&apos;est pas supporté par certaines caméras</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras</source>
-        <translation type="unfinished">L&apos;enregistrement ne peut être activé sur certaines caméras</translation>
+        <translation>L&apos;enregistrement ne peut être activé sur certaines caméras</translation>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n licence digitale va être utilisée sur %1.</numerusform>
             <numerusform>%n licences digitales vont être utilisée sur %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) will be used out of %1.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n licence analogue va être utilisée sur %1.</numerusform>
             <numerusform>%n licence analogues vont être utilisée sur %1.</numerusform>
         </translation>
@@ -3495,19 +3479,19 @@ Vous serez invité à redémarrer le client en mode compatibilité.</translation
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="unfinished">Nous avons détecté que votre carte vidéo n&apos;est pas supportée. Vous pouvez procéder à vos propres risques .&lt;br/&gt;Installer ou mettre à jour les pilotes de votre carte vidéo peut regler le problème, mais rien ne garantie que cela va aider. .&lt;br/&gt; Pour des instructions sur comment installer ou mettre à jour vos pilotes vidéo, allez sur ce lien (Anglais Seul.) &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation>Nous avons détecté que votre carte vidéo n&apos;est pas supportée. Vous pouvez procéder à vos propres risques .&lt;br/&gt;Installer ou mettre à jour les pilotes de votre carte vidéo peut regler le problème, mais rien ne garantie que cela va aider. .&lt;br/&gt; Pour des instructions sur comment installer ou mettre à jour vos pilotes vidéo, allez sur ce lien (Anglais Seul.) &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
-        <translation type="unfinished">Conseil Critique - Performance</translation>
+        <translation>Conseil Critique - Performance</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="unfinished">Nous avons détecté que les pilotes de votre carte vidéo ne sont pas installés ou à jour. &lt;br/&gt;Installer ou mettre à jour les pilotes de votre carte vidéo peut améliorer considérablement les performances de votre système lors de la visualisation vidéo. .&lt;br/&gt; Pour des instructions sur comment installer ou mettre à jour vos pilotes vidéo, allez sur ce lien (Anglais Seul.)  &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a</translation>
+        <translation>Nous avons détecté que les pilotes de votre carte vidéo ne sont pas installés ou à jour. &lt;br/&gt;Installer ou mettre à jour les pilotes de votre carte vidéo peut améliorer considérablement les performances de votre système lors de la visualisation vidéo. .&lt;br/&gt; Pour des instructions sur comment installer ou mettre à jour vos pilotes vidéo, allez sur ce lien (Anglais Seul.)  &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation type="unfinished"> Conseil Important - Performance</translation>
+        <translation> Conseil Important - Performance</translation>
     </message>
 </context>
 <context>
@@ -3746,15 +3730,16 @@ Flux d&apos;archive autorisé: %4</translation>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 %3 digital and %4 analog licenses are currently in use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce logiciel est sous licence pour %1 digitale et %2 analogue caméras.
+%3 digitale et %4 analogue licences sont utilisées en ce moment.</translation>
     </message>
     <message>
         <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous n&apos;avez pas une licence valide d&apos;installée. S’il vous plait, activer votre licence commerciale ou gratuite.</translation>
     </message>
     <message>
         <source>You do not have a valid license installed. Please activate your commercial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous n&apos;avez pas de licence valide activée. S&apos;il vous plait, activez votre licence commerciale.</translation>
     </message>
 </context>
 <context>
@@ -3917,14 +3902,18 @@ Voulez-vous redémarrer le client en mode compatible?</translation>
     <message>
         <source>Cannot restart the client in compatibility mode.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de redémarrer le client en mode de compatibilité.
+S’il vous plait, fermer l&apos;application et redémarrer en utilisant le raccourci dans le menu démarrer.</translation>
     </message>
     <message>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
 Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous êtes sur le point de vous connecter sur un Contrôleur Entreprise avec une version différente:
+- Version Cliente: %1
+- Version EC: %2
+La version cliente %2 est requise pour vous connecter sur ce Serveur Entreprise. S&apos;il vous plait télécharger la version %2 du produit et faites la mise à jour.</translation>
     </message>
 </context>
 <context>
@@ -3983,7 +3972,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>Dérouler</translation>
     </message>
 </context>
 <context>
@@ -4164,7 +4153,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <name>QnNotificationToolTipWidget</name>
     <message>
         <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer (&lt;b&gt;Clique Droit&lt;/b&gt;)</translation>
     </message>
 </context>
 <context>
@@ -4373,24 +4362,7 @@ Tous les changements vont être perdus à la sortie du programme.</translation>
     </message>
     <message>
         <source>The language change will take effect after application restart. Press OK to close application now.</source>
-        <translation type="obsolete">Le changement de langue ne prendera effet qu&apos;après le redémarrage de l&apos;application. Appuyez sur OK pour fermer l&apos;application maintenant.</translation>
-    </message>
-    <message>
-        <source>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some changes will take effect only after application restart. Press OK to restart the application now.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Launcher process is not found</source>
-        <translation type="unfinished">Le processus du lanceur n&apos;a pas été trouvé</translation>
-    </message>
-    <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le changement de langue ne prendera effet qu&apos;après le redémarrage de l&apos;application. Appuyez sur OK pour fermer l&apos;application maintenant.</translation>
     </message>
 </context>
 <context>
@@ -4529,7 +4501,7 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>Select resources...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner les ressources...</translation>
     </message>
 </context>
 <context>
@@ -4583,7 +4555,7 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>Type any text here</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrez n’importe quel texte ici</translation>
     </message>
 </context>
 <context>
@@ -4835,12 +4807,12 @@ Please close the application and start it again using the shortcut in the start 
         <translation>Erreur</translation>
     </message>
     <message>
-        <source>Enter short system description here...</source>
-        <translation type="unfinished"></translation>
+        <source>&amp;System ID:</source>
+        <translation>&amp;ID Système:</translation>
     </message>
     <message>
-        <source>&amp;System Signature:</source>
-        <translation type="unfinished"></translation>
+        <source>Enter short system description here...</source>
+        <translation>Entrez une courte description ici...</translation>
     </message>
 </context>
 <context>
@@ -4882,7 +4854,7 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>Diagnose...</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostiquer...</translation>
     </message>
 </context>
 <context>
@@ -5522,59 +5494,59 @@ et vous n&apos;avez pas les droits pour l&apos;écraser.</translation>
     </message>
     <message>
         <source>Include timestamps (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Inclure une marque de temps (Nécessite Transcodage)</translation>
     </message>
     <message>
         <source>Apply dewarping and image correction (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer un dérouler et une correction d&apos;image (Nécessite Transcodage)</translation>
     </message>
     <message>
         <source>Apply image correction (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer une correction d&apos;image (Nécessite Transcodage)</translation>
     </message>
     <message>
         <source>Apply dewarping (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer un dérouler (Nécessite Transcodage)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous êtes sur le point d&apos;exporter une vidéo avec filtres qui requière un transcodage. Le transcodage peut prendre beaucoup de temps. Voulez-vous continuer ?</translation>
     </message>
     <message>
         <source>Client v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Client v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Enterprise Controller v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôleur Entreprise v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Media Server v%1 at %2&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur Média  v%1 at %2&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Media Server v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur Média v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Certains composants du système ne sont pas mis à niveau:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;s’il vous plait mettre à jour tous les composants à la dernière version %2.</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>Incompatibilité de version</translation>
     </message>
     <message>
         <source>Open New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir une nouvelle fenêtre</translation>
     </message>
     <message>
         <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les changements d&apos;enregistrement n&apos;ont pas été enregistrés. Choisissez un type d&apos;enregistrement désiré, IPS, qualité et de marquer les changements sur le calendrier.</translation>
     </message>
     <message>
         <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Limite de licences dépassée. Les modifications seront enregistrées, mais ne prendront pas effet.</translation>
     </message>
 </context>
 <context>
@@ -5836,11 +5808,11 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Quarter Native</source>
-        <translation type="unfinished"></translation>
+        <translation>Quart natif</translation>
     </message>
     <message>
         <source>Audio Grabber</source>
-        <translation type="unfinished"></translation>
+        <translation>Capture Audio</translation>
     </message>
 </context>
 <context>
@@ -6078,15 +6050,15 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>Dérouler</translation>
     </message>
     <message>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceci est une lentille &apos;fish-eye&apos;</translation>
     </message>
     <message>
         <source>Software (Max fps may be slightly decreased on media server)</source>
-        <translation type="unfinished"></translation>
+        <translation>Logiciel (Lle maximum IPS peut être légèrement diminué sur le média serveur)</translation>
     </message>
 </context>
 <context>
@@ -6225,7 +6197,7 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Weekly Schedule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Éditeur d&apos;horaire hebdomadaire</translation>
     </message>
 </context>
 </TS>

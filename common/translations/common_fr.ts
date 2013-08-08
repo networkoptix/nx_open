@@ -137,12 +137,12 @@
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="19"/>
         <source>Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="21"/>
         <source>Play sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Jouer Son</translation>
     </message>
     <message>
         <source>Alert</source>
@@ -449,15 +449,15 @@
         <location filename="../src/business/business_strings_helper.cpp" line="254"/>
         <source>%2 %1</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished"></translation>
+        <translation>%2 %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="258"/>
         <source>%n times, first: %2 %1</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n fois, Première: %2 %1</numerusform>
+            <numerusform>%n fois, Première: %2 %1</numerusform>
         </translation>
     </message>
     <message>
@@ -517,109 +517,92 @@
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="25"/>
         <source>ok</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="118"/>
-        <source>(unknown)</source>
-        <translation type="unfinished"></translation>
+        <translation>ok</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
-        <source>Media server %1 is not available.
- Check that media server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <source>Media server %1 is not available. Check that media server is up and running.</source>
+        <translation>Le Serveur Média %1 n&apos;est pas disponible. Vérifier que ce serveur média est fonctionnel.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
-        <source>Received bad response from media server %1: &quot;%2&quot;.
- Check media server&apos;s version.</source>
-        <translation type="unfinished"></translation>
+        <source>Received bad response from media server %1: %2. Check media server&apos;s version.</source>
+        <translation>Reçu une mauvaise réponse depuis le serveur média %1: %2. Vérifier la version du serveur média.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
-        <source>Cannot connect to http port %1.
- Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <source>Cannot connect to http port %1. Make sure the camera is plugged into the network.</source>
+        <translation>Impossible de se connecter sur le port http %1. Assurez-vous que la caméra est branchée sur le réseau.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
-        <source>Cannot open media url %1. Failed to connect to media port %2.
- Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="49"/>
+        <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
+        <translation>Erreur d&apos;analyse de la réponse de caméra. S&apos;il vous plait, redémarrer la caméra et ensuite restaurer les paramètres par défaut à partir de la page web. Ensuite, mettre à jour le micrologiciel. Si le problème persiste, contactez le support</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="46"/>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
- Make sure the camera is plugged into the network. Try to reboot camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="51"/>
-        <source>Error parsing camera response. Url %1, request name %2.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
-        <source>No supported media track(s) at url %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
+        <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
+        <translation>Aucune piste(s) média. S&apos;il vous plait, redémarrer la caméra et ensuite restaurer les paramètres par défaut à partir de la page web. Ensuite, mettre à jour le micrologiciel. Si le problème persiste, contactez le support</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="61"/>
-        <source>Not authorized. Url %1</source>
-        <translation type="unfinished"></translation>
+        <source>Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation>Impossible d&apos;ouvrir l&apos;URL média %1. Protocole média %2 non supporté. S&apos;il vous plait, restaurer les valeurs par défaut sur la page web.Ensuite, essayez de mettre à jour le micrologiciel. Si le problème persiste, contacter le support.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="65"/>
-        <source>Cannot open media url %1. Unsupported media protocol %2.
- Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="66"/>
+        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation>Échec de la configuration du paramètre %1. S&apos;il vous plait, redémarrer la caméra et ensuite restaurer les paramètres par défaut à partir de la page web. Ensuite, mettre à jour le micrologiciel. Si le problème persiste, contactez le support.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
-        <source>Failed to configure parameter %1.
- First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If no success, restore factory defaults on the camera web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="75"/>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="71"/>
+        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation>Échec sur la requête de caméra %1 avec erreur %2 . S&apos;il vous plait, redémarrer la caméra et ensuite restaurer les paramètres par défaut à partir de la page web. Ensuite, essayez de mettre à jour le micrologiciel. Si le problème persiste, contactez le support.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="80"/>
-        <source>Unknown Camera Issue.
- Please, contact support.</source>
-        <translation type="unfinished"></translation>
+        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation>Erreur I/O. Message: %1. Soyez sûr que la caméra est branchée dans le réseau. Essayez de redémarrer la caméra.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="84"/>
-        <source>I/O error. OS message: &quot;%1&quot;.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="111"/>
+        <source>(unknown)</source>
+        <translation>(inconnu)</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="57"/>
+        <source>Not authorized.</source>
+        <translation>Non autorisé.</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
+        <source>Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation>Impossible d&apos;ouvrir l&apos;URL média %1. Échec de connexion sur le port média %2. Assurez-vous que le port%2 est accessible (redirigé, etc.) S’il vous plait, essayez de redémarrer la caméra, puis restaurer les valeurs par défaut sur la page web.</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="46"/>
+        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
+        <translation>Impossible d&apos;ouvrir l&apos;URL média %1. La connexion au port %2 a été fermé de façon inattendue. Assurez-vous que la caméra est branchée sur le réseau. Essayez de redémarrer la caméra.</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="76"/>
+        <source>Unknown Camera Issue. Please, contact support.</source>
+        <translation>Problème de caméra inconnu. S’il vous plait, contactez le support.</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="83"/>
         <source>Server has been stopped.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le serveur a été arrêté.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="90"/>
-        <source>Invalid data received from camera: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="103"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
         <source>Unknown error. Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur inconnue. S’il vous plait, contactez le support.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="105"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="98"/>
         <source> Parameters: </source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres:</translation>
     </message>
 </context>
 <context>
@@ -677,22 +660,22 @@
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
         <source>Audio context must be specified</source>
-        <translation type="unfinished">Un  contexte audio doit être spécifiée</translation>
+        <translation>Un contexte audio doit être spécifiée</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation type="unfinished">Erreur transcoder: Ne peut pas trouver le codec pour l&apos;encodeur %1</translation>
+        <translation>Erreur de transcodeur: Ne peut pas trouver l&apos;encodeur pour le codec %1</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
         <source>Can&apos;t initialize audio encoder</source>
-        <translation type="unfinished">Impossible d&apos;initialiser l&apos;encodeur audio</translation>
+        <translation>Impossible d&apos;initialiser l&apos;encodeur audio</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
         <source>Can&apos;t initialize audio decoder</source>
-        <translation type="unfinished">Impossible d&apos;initialiser le décodeur audio</translation>
+        <translation>Impossible d&apos;initialiser le décodeur audio</translation>
     </message>
 </context>
 <context>
@@ -734,17 +717,17 @@
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
         <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
-        <translation type="unfinished">Impossible d&apos;allouer un échelle contextuelle pour la résolution %1x%2</translation>
+        <translation>Impossible d&apos;allouer un échelle contextuelle pour la résolution %1x%2</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation type="unfinished">Erreur transcoder: Ne peut pas trouver le codec pour l&apos;encodeur %1</translation>
+        <translation>Erreur de transcodeur: Ne peut pas trouver l&apos;encodeur pour le codec %1</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
         <source>Can&apos;t initialize video encoder</source>
-        <translation type="unfinished">Impossible d&apos;initialiser l&apos;encodeur vidéo</translation>
+        <translation>Impossible d&apos;initialiser l&apos;encodeur vidéo</translation>
     </message>
 </context>
 <context>
@@ -821,12 +804,12 @@
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="30"/>
         <source>Lowest</source>
-        <translation type="unfinished">Trés bas</translation>
+        <translation>Trés basse</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="31"/>
         <source>Low</source>
-        <translation type="unfinished">Bas</translation>
+        <translation>Basse</translation>
     </message>
     <message>
         <source>Normal</source>
@@ -835,7 +818,7 @@
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="33"/>
         <source>High</source>
-        <translation type="unfinished">Élevé</translation>
+        <translation>Élevée</translation>
     </message>
     <message>
         <source>Highest</source>
@@ -844,64 +827,64 @@
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="35"/>
         <source>Preset</source>
-        <translation type="unfinished">Préréglage</translation>
+        <translation>Préréglage</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="36"/>
         <source>Undefined</source>
-        <translation type="unfinished">Indéfini</translation>
+        <translation>Indéfini</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="32"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Moyenne</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="34"/>
         <source>Best</source>
-        <translation type="unfinished"></translation>
+        <translation>Meilleure</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="48"/>
         <source>Lst</source>
         <extracomment>Short for &apos;Lowest&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>TB</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="51"/>
         <source>Lo</source>
         <extracomment>Short for &apos;Low&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="54"/>
         <source>Me</source>
         <extracomment>Short for &apos;Medium&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Mo</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="57"/>
         <source>Hi</source>
         <extracomment>Short for &apos;High&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>H</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="60"/>
         <source>Bst</source>
         <extracomment>Short for &apos;Best&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Me</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="63"/>
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Pr</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="66"/>
         <source>-</source>
         <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
 </context>
 <context>
@@ -960,12 +943,12 @@
     <message>
         <location filename="../src/health/system_health.cpp" line="6"/>
         <source>E-Mail address is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse courriel n&apos;est pas définie</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="8"/>
         <source>No licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Auncune Licences</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="10"/>
@@ -1006,7 +989,8 @@
         <location filename="../src/health/system_health.cpp" line="41"/>
         <source>E-Mail address is not set.
 You cannot receive system notifications via E-Mail.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse courriel n&apos;est pas défini.
+Vous ne pouvez pas recevoir les notifications  système via courriel.</translation>
     </message>
     <message>
         <source>Your E-Mail address is not set.
@@ -1111,12 +1095,12 @@ Vous ne pouvez pas enregistrer du vidéo à partir des caméras.</translation>
     <message>
         <location filename="../src/translation/translation_list_model.cpp" line="63"/>
         <source>%1 (built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (Intégré)</translation>
     </message>
     <message>
         <location filename="../src/translation/translation_list_model.cpp" line="65"/>
         <source>%1 (external)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (Externe)</translation>
     </message>
 </context>
 <context>
