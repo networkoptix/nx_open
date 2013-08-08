@@ -37,8 +37,8 @@ function read_config {
     ECS_PROXY_PORT=$(cat $CONFIG_FILE | grep proxyPort | head -1 | sed 's/proxyPort\s*=\s*\(.*\)/\1/g')
     ECS_PROXY_AUTH_KEY=$(cat $CONFIG_FILE | grep proxyAuthKey | head -1 | sed 's/proxyAuthKey\s*=\s*\(.*\)/\1/g')
 
-    [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT
-    [ -z "$ECS_PROXY_PORT" ] && ECS_PORT=$ECS_PROXY_PORT_DEFAULT
+    [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT || true
+    [ -z "$ECS_PROXY_PORT" ] && ECS_PORT=$ECS_PROXY_PORT_DEFAULT || true
 }
 
 function write_config {
@@ -132,11 +132,17 @@ case "$1" in
 
       write_config
 
+      dbversion=$("$BINDIR/dbconfig" swversion)
+      if [ $dbversion != "0" ]
+      then
+          cp -p /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db{,.$dbversion}
+      fi
+
       "$BINDIR/dbsync"
 
       if [ -n "$ECS_PASSWORD" ]
       then
-        "$BINDIR/dbconfig" setpw admin "$ECS_PASSWORD"
+          "$BINDIR/dbconfig" setpw admin "$ECS_PASSWORD"
       fi
 
       "$BINDIR/certgen" -i
