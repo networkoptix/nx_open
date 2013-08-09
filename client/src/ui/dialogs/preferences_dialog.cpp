@@ -169,12 +169,10 @@ void QnPreferencesDialog::accept() {
                     this,
                     tr("Information"),
                     tr("Some changes will take effect only after application restart. Press OK to restart the application now."),
-                    QMessageBox::StandardButtons(QMessageBox::Yes |
-                                                 QMessageBox::No |
-                                                 QMessageBox::Cancel),
-                    QMessageBox::Yes
+                    QMessageBox::Ok | QMessageBox::Cancel,
+                    QMessageBox::Ok
         );
-        if (button == QMessageBox::Yes) {
+        if (button == QMessageBox::Ok) {
             m_restartPending = restartClient();
             if (!m_restartPending) {
                 QMessageBox::critical(
