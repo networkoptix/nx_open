@@ -4597,7 +4597,7 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="155"/>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="343"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="341"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4617,33 +4617,33 @@ All changes will be lost after program exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="182"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="180"/>
         <source>Launcher process is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="183"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="181"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="253"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="251"/>
         <source>IP Address: %1, Network Mask: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="315"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="313"/>
         <source>Folder is already added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="315"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="313"/>
         <source>This folder is already added.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="343"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="341"/>
         <source>This settings will not affect Recording Schedule. 
 Recording Schedule is always based on Server Time.</source>
         <translation type="unfinished"></translation>

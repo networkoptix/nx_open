@@ -169,7 +169,7 @@
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attention! Moyenne Qualité peut entrainer une image de basse résolution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
-    <message>
+    <message utf8="true">
         <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
         <translation>Attention! Haute qualité peut surcharger le CPU du Serveur Média, causer d&apos;erreurs sur la connexion réseau et autres problèmes.</translation>
     </message>
