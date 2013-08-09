@@ -743,7 +743,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Connect to Enterprise Controller</source>
         <comment>Window Title</comment>
-        <translation>Connection sur Contrôleur Entreprise</translation>
+        <translation>Connectez sur le Contrôleur Entreprise</translation>
     </message>
     <message>
         <source>Connect to Enterprise Controller</source>
@@ -1366,7 +1366,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
     </message>
     <message>
         <source>Alt+Enter</source>
-        <translation>Alt+Entrer</translation>
+        <translation>Alt+Entrée</translation>
     </message>
     <message>
         <source>Alt+Return</source>
