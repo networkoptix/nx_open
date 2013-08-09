@@ -155,27 +155,27 @@
     </message>
     <message>
         <source>Camera Settings Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôle de configurations de caméra</translation>
     </message>
     <message>
         <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished"></translation>
+        <translation>J&apos;ai lu le manuel et comprends les risques</translation>
     </message>
     <message>
         <source>Secondary Stream Quality Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôle de la qualité du flux secondaire</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attention! Moyenne Qualité peut entrainer une image de basse résolution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
-    <message utf8="true">
+    <message>
         <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>Attention! Haute qualité peut surcharger le CPU du Serveur Média, causer d&apos;erreurs sur la connexion réseau et autres problèmes.</translation>
     </message>
     <message>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Restaurer par défauts</translation>
     </message>
 </context>
 <context>
@@ -421,23 +421,23 @@
     </message>
     <message>
         <source>Record Always</source>
-        <translation>Toujours enregistrer</translation>
+        <translation>Toujours enreg.</translation>
     </message>
     <message>
         <source>Motion Only</source>
-        <translation>Sur mouvement seulement</translation>
+        <translation>Mouv. Seul.</translation>
     </message>
     <message>
         <source>Motion+ Lo-Res Always</source>
-        <translation>Mouvement + Toujours Basse réso</translation>
+        <translation>Mouv + Toujours-BasseQuali.</translation>
     </message>
     <message>
         <source>Do not Record</source>
-        <translation>Ne pas enregistrer</translation>
+        <translation>Aucun Enregist.</translation>
     </message>
     <message>
         <source>Motion Recording</source>
-        <translation>Enregistrement sur mouvement</translation>
+        <translation>Enregist. sur mouvement</translation>
     </message>
     <message>
         <source>Pre-Recording</source>
@@ -499,7 +499,7 @@
     <message>
         <source>&lt; Any camera &gt;</source>
         <translatorcomment>?</translatorcomment>
-        <translation>&lt; Any camera &gt;</translation>
+        <translation>&lt; toute caméra &gt;</translation>
     </message>
     <message>
         <source>Refresh</source>
@@ -743,12 +743,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Connect to Enterprise Controller</source>
         <comment>Window Title</comment>
-        <translation type="unfinished">Connection sur Contrôleur d&apos;entreprise</translation>
+        <translation>Connection sur Contrôleur Entreprise</translation>
     </message>
     <message>
         <source>Connect to Enterprise Controller</source>
         <comment>Groupbox Title</comment>
-        <translation type="unfinished">Connection sur Contrôleur d&apos;entreprise</translation>
+        <translation>Connection sur Contrôleur Entreprise</translation>
     </message>
 </context>
 <context>
@@ -924,11 +924,11 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Restart required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Redémarrage nécessaire.</translation>
     </message>
     <message>
         <source>Experimental. May result in glitches.</source>
-        <translation type="unfinished"></translation>
+        <translation>Expérimentale. Peut entrainer des bogues.</translation>
     </message>
 </context>
 <context>
@@ -1124,7 +1124,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
 &lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
 &lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
 </source>
-        <translation>&lt;b&gt;%1 %2&lt;/b&gt; utilise les librairies externes suivants:&lt;br/&gt;
+        <translation>&lt;b&gt;%1 %2&lt;/b&gt; utilise les librairies externes suivantes:&lt;br/&gt;
 &lt;br /&gt;
 &lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
 &lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
@@ -1358,7 +1358,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
     </message>
     <message>
         <source>Exit Fullscreen</source>
-        <translation>Quitter le plein écran</translation>
+        <translation>Quitter plein écran</translation>
     </message>
     <message>
         <source>Ctrl+F</source>
@@ -2222,7 +2222,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
     <message>
         <source>&lt;Any Camera&gt;</source>
         <translatorcomment>?</translatorcomment>
-        <translation>&lt;Any Camera&gt;</translation>
+        <translation>&lt; toute caméra &gt;</translation>
     </message>
     <message>
         <source>Recording or motion detection is disabled for %1</source>
@@ -2318,7 +2318,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
     </message>
     <message>
         <source>Instant</source>
-        <translation>Immédiatement</translation>
+        <translation>immédiat</translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n days</source>
@@ -2417,7 +2417,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
     <message>
         <source>&lt;Any Camera&gt;</source>
         <translatorcomment>?</translatorcomment>
-        <translation>&lt;Any Camera&gt;</translation>
+        <translation>&lt; toute caméra &gt;</translation>
     </message>
     <message>
         <source>Schedule...</source>
@@ -2741,16 +2741,16 @@ Assurez-vous que le serveur est disponible et réessayez.</translation>
     </message>
     <message numerus="yes">
         <source>Camera List - %n camera(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Liste de Caméra - %n caméra trouvée</numerusform>
+            <numerusform>Liste de Caméras - %n caméras trouvées</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Liste de caméra pour le Média Serveur &apos;%1&apos; - %n caméra trouvée</numerusform>
+            <numerusform>Liste de caméras pour le Média Serveur &apos;%1&apos; - %n caméras trouvées</numerusform>
         </translation>
     </message>
 </context>
@@ -3425,7 +3425,7 @@ Vous serez invité à redémarrer le client en mode compatibilité.</translation
     <message>
         <source>&lt; Any camera &gt;</source>
         <translatorcomment>?</translatorcomment>
-        <translation>&lt; Any camera &gt;</translation>
+        <translation>&lt; toute caméra &gt;</translation>
     </message>
     <message>
         <source>&lt; 1 camera &gt;</source>
@@ -4422,20 +4422,21 @@ Tous les changements vont être perdus à la sortie du programme.</translation>
     </message>
     <message>
         <source>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;accélération matérielle est expérimentale et peut entrainer des plantages sur certaines configurations. Êtes-vous sûr de vouloir l&apos;activer ?</translation>
     </message>
     <message>
         <source>Some changes will take effect only after application restart. Press OK to restart the application now.</source>
-        <translation type="unfinished"></translation>
+        <translation>Certains changements ne prendront effet qu&apos;après le redémarrage de l&apos;application. Appuyez sur OK pour redémarrer l&apos;application maintenant.</translation>
     </message>
     <message>
         <source>Launcher process is not found</source>
-        <translation type="unfinished">Le processus du lanceur n&apos;a pas été trouvé</translation>
+        <translation>Le processus du lanceur n&apos;a pas été trouvé</translation>
     </message>
     <message>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de redémarrer le client.
+S’il vous plait, fermer l&apos;application et recommencer en utilisant le raccourci dans le menu Démarrer.</translation>
     </message>
 </context>
 <context>
@@ -4719,7 +4720,7 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>Do not record motion</source>
-        <translation>N&apos;enregistre pas  sur mouvement</translation>
+        <translation>N&apos;enregistre pas sur mouvement</translation>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
@@ -4773,7 +4774,7 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translatorcomment>?</translatorcomment>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommendée)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Secure connection using TLS</source>
@@ -4889,7 +4890,7 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>S&amp;ignature Système:</translation>
     </message>
 </context>
 <context>
@@ -6091,7 +6092,7 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Reset motion regions</source>
-        <translation></translation>
+        <translation>Réinitialiser les zones de mouvement</translation>
     </message>
     <message>
         <source>Advanced</source>
@@ -6135,7 +6136,7 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Software (Max fps may be slightly decreased on media server)</source>
-        <translation>Logiciel (Lle maximum IPS peut être légèrement diminué sur le média serveur)</translation>
+        <translation>Logiciel (Le maximum IPS peut être légèrement diminué sur le serveur média)</translation>
     </message>
 </context>
 <context>

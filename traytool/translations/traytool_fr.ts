@@ -441,7 +441,7 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="314"/>
         <source>Allow access to media server via public IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoriser l&apos;accès au serveur média via l&apos;adresse IP publique</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="376"/>
@@ -456,7 +456,7 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="494"/>
         <source>Allow access to enterprise controller via public IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publique</translation>
     </message>
     <message>
         <source>RTSP Port</source>
