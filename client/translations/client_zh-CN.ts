@@ -154,27 +154,27 @@
     </message>
     <message>
         <source>Camera Settings Control</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机设置控制</translation>
     </message>
     <message>
         <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished"></translation>
+        <translation>我已阅读使用手册，并了解风险</translation>
     </message>
     <message>
         <source>Secondary Stream Quality Control</source>
-        <translation type="unfinished"></translation>
+        <translation>次视频流画质控制</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;警告!低画质可能会产生低分辨率影像。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message utf8="true">
         <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>警告!高画质可能超载媒体服务器的CPU或网络连接错误等问题。</translation>
     </message>
     <message>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>还原为默认值</translation>
     </message>
 </context>
 <context>
@@ -1130,12 +1130,12 @@ Would you like to restart client in compatibility mode?</source>
     <message>
         <source>Connect to Enterprise Controller</source>
         <comment>Window Title</comment>
-        <translation type="unfinished">连接到系统控制器</translation>
+        <translation>连接到系统控制器</translation>
     </message>
     <message>
         <source>Connect to Enterprise Controller</source>
         <comment>Groupbox Title</comment>
-        <translation type="unfinished">连接到系统控制器</translation>
+        <translation>连接到系统控制器</translation>
     </message>
 </context>
 <context>
@@ -1374,11 +1374,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Restart required.</source>
-        <translation type="unfinished"></translation>
+        <translation>需重新启动。</translation>
     </message>
     <message>
         <source>Experimental. May result in glitches.</source>
-        <translation type="unfinished"></translation>
+        <translation>试验阶段。可能会导致故障。</translation>
     </message>
 </context>
 <context>
@@ -3448,14 +3448,14 @@ Make sure the server is available and try again.</source>
     </message>
     <message numerus="yes">
         <source>Camera List - %n camera(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>摄像机列表-找到%n台摄像机</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>依媒体服务器 &apos;%1&apos; 摄像机列表-找到%n台摄像机</numerusform>
         </translation>
     </message>
 </context>
@@ -5489,20 +5489,21 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</source>
-        <translation type="unfinished"></translation>
+        <translation>硬件加速是高度实验性的，并可能在一些配置上导致死机。你确定你要启用它吗？</translation>
     </message>
     <message>
         <source>Some changes will take effect only after application restart. Press OK to restart the application now.</source>
-        <translation type="unfinished"></translation>
+        <translation>某些更改需要重新启动应用程序后才会生效。按&quot;好&quot;现在重新启动应用程序。</translation>
     </message>
     <message>
         <source>Launcher process is not found</source>
-        <translation type="unfinished">未发现启动过程</translation>
+        <translation>未发现启动过程</translation>
     </message>
     <message>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法重新启动客户端。
+请关闭应用程序并使用开始菜单中的快捷方式重新启动它。</translation>
     </message>
 </context>
 <context>
@@ -6105,7 +6106,7 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;系统签名:</translation>
     </message>
 </context>
 <context>
