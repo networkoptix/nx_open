@@ -1,17 +1,14 @@
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QTime>
 #include <QtCore/QUrl>
+#include <QtZlib/zlib.h>
 
 #include "rest_connection_processor.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
 #include "rest_server.h"
 #include "request_handler.h"
-#include <QtCore/QTime>
-
-extern "C" {
-    quint32 crc32 (quint32 crc, char *buf, quint32 len);
-}
 
 
 static const int CONNECTION_TIMEOUT = 60 * 1000;
@@ -59,7 +56,7 @@ QByteArray compressData(const QByteArray& data)
     result.reserve(cleanData.size() + GZIP_HEADER_SIZE);
     result.append((const char*) GZIP_HEADER, GZIP_HEADER_SIZE);
     result.append(cleanData);
-    quint32 tmp = crc32(0, (char*) data.data(), data.size());
+    quint32 tmp = crc32(0, (const Bytef*) data.data(), data.size());
     result.append((const char*) &tmp, sizeof(quint32));
     tmp = (quint32)data.size();
     result.append((const char*) &tmp, sizeof(quint32));
