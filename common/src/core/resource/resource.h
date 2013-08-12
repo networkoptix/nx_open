@@ -46,7 +46,7 @@ public:
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
-    Q_FLAGS(Flags Flag)
+    Q_FLAGS(Flags Flag Qn::PtzCapabilities)
     Q_ENUMS(ConnectionRole Status)
     Q_PROPERTY(QnId id READ getId WRITE setId)
     Q_PROPERTY(QnId typeId READ getTypeId WRITE setTypeId)
@@ -60,6 +60,8 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
     Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
+    Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
+
 
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
