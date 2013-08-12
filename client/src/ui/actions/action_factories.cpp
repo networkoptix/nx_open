@@ -12,6 +12,8 @@
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_ptz_preset_manager.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+
 
 namespace {
     struct LayoutNameCmp {
@@ -62,8 +64,9 @@ void QnOpenCurrentUserLayoutActionFactory::at_action_triggered() {
 QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
     QList<QAction *> result;
 
+    QnResourceWidget *widget = parameters.widget();
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    if(!camera || !widget)
         return result;
 
     QList<QnPtzPreset> presets = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera);
@@ -74,7 +77,7 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
         action->setText(preset.name);
         if(preset.hotkey >= 0)
             action->setShortcut(Qt::Key_0 + preset.hotkey);
-        action->setData(QVariant::fromValue<QnVirtualCameraResourcePtr>(camera));
+        action->setData(QVariant::fromValue<QnResourceWidget *>(widget));
         connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
 
         result.push_back(action);
@@ -87,9 +90,9 @@ void QnPtzGoToPresetActionFactory::at_action_triggered() {
     if(!action)
         return;
 
-    QnVirtualCameraResourcePtr camera = action->data().value<QnVirtualCameraResourcePtr>();
-    if(!camera)
+    QnResourceWidget *widget = action->data().value<QnResourceWidget *>();
+    if(!widget)
         return;
 
-    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, action->text()));
+    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(widget).withArgument(Qn::ResourceNameRole, action->text()));
 }

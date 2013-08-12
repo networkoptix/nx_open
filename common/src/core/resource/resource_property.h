@@ -16,6 +16,7 @@ namespace QnResourceProperty {
         const char *url = "url";
         const char *tags = "tags";
         const char *cameraCapabilities = "cameraCapabilities"; // TODO: #Elric gcc warn: defined but not used
+        const char *ptzCapabilities = "ptzCapabilities";
 
         const char *properties[] = {id, typeId, uniqueId, name, searchString, status, flags, url, tags, cameraCapabilities, NULL};
 
