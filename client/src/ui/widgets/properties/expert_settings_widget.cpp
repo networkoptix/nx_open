@@ -58,7 +58,9 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
 {
     QnScopedValueRollback<bool> guard(&m_updating, true); Q_UNUSED(guard)
 
+    ui->settingsAssureCheckBox->setEnabled(true);
     ui->settingsAssureCheckBox->setChecked(false);
+    ui->qualityAssureCheckBox->setEnabled(true);
     ui->qualityAssureCheckBox->setChecked(false);
 
     if (cameras.isEmpty()) {
@@ -101,12 +103,14 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
     ui->qualityGroupBox->setEnabled(anyHasDualStreaming);
     if (ui->qualityGroupBox->isEnabled() && sameQuality && quality != Qn::SSQualityMedium && quality != Qn::SSQualityNotDefined) {
         ui->qualityAssureCheckBox->setChecked(true);
+        ui->qualityAssureCheckBox->setEnabled(false);
         ui->qualitySlider->setValue(quality);
     }
 
     ui->settingsGroupBox->setEnabled(arecontCamerasCount != cameras.size());
     if (ui->settingsGroupBox->isEnabled() && sameControlState && controlDisabled) {
         ui->settingsAssureCheckBox->setChecked(true);
+        ui->settingsAssureCheckBox->setEnabled(false);
         ui->settingsDisableControlCheckBox->setChecked(true);
     }
 
@@ -114,10 +118,6 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
 }
 
 void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceList &cameras) {
-
-    if (isDefaultValues())
-        return;
-
     bool disableControls = ui->settingsDisableControlCheckBox->isChecked();
     Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) ui->qualitySlider->value();
 
@@ -137,8 +137,8 @@ bool QnAdvancedSettingsWidget::isArecontCamera(const QnVirtualCameraResourcePtr 
 
 
 bool QnAdvancedSettingsWidget::isDefaultValues() const {
-    return (!ui->settingsAssureCheckBox->isChecked() &&
-            !ui->qualityAssureCheckBox->isChecked());
+    return (!ui->settingsDisableControlCheckBox->isChecked() &&
+            ui->qualitySlider->value() == Qn::SSQualityMedium);
 }
 
 void QnAdvancedSettingsWidget::at_dataChanged()
@@ -150,8 +150,15 @@ void QnAdvancedSettingsWidget::at_dataChanged()
 
 void QnAdvancedSettingsWidget::at_restoreDefaultsButton_clicked()
 {
-    ui->settingsAssureCheckBox->setChecked(false);
-    ui->qualityAssureCheckBox->setChecked(false);
+    if (ui->settingsAssureCheckBox->isEnabled())
+        ui->settingsAssureCheckBox->setChecked(false);
+    else
+        ui->settingsDisableControlCheckBox->setChecked(false);
+
+    if (ui->qualityAssureCheckBox->isEnabled())
+        ui->qualityAssureCheckBox->setChecked(false);
+    else
+        ui->qualitySlider->setValue(Qn::SSQualityMedium);
 }
 
 void QnAdvancedSettingsWidget::at_qualitySlider_valueChanged(int value) {
