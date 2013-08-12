@@ -5,7 +5,7 @@
 
 #include <QtGui/QCursor>
 #include <QtGui/QPixmap>
-#include <QtGui/QX11Info>
+#include <QtX11Extras//QX11Info>
 #include <QtWidgets/QApplication>
 
 #include <X11/Xlib.h>

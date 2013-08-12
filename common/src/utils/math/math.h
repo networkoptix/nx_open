@@ -98,7 +98,7 @@ inline quint64 qn_htonll(quint64 x) {
  * \param x                             Value to convert, in network byte order.
  * \returns                             Converted value, in host byte order.
  */
-inline quint64 qn_ntohll(quint64 x) { return htonll(x); }
+inline quint64 qn_ntohll(quint64 x) { return qn_htonll(x); }
 
 #else
 inline quint64 qn_htonll(quint64 x) { return x;}

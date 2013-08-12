@@ -102,7 +102,7 @@ private:
     bool current;
     bool valid;
     qint64 pid;
-    QWeakPointer<QProcess> process;
+    QPointer<QProcess>  process;
 };
 
 
