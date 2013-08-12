@@ -2014,7 +2014,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
 
-    if (!m_ptzController) 
+    if (!getPtzfUrl().isEmpty() && !m_ptzController)
     {
         QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(this));
         if (!controller->getPtzConfigurationToken().isEmpty())
