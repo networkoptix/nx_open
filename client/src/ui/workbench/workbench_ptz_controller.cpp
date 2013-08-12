@@ -414,8 +414,12 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
 }
 
 void QnWorkbenchPtzController::at_display_widgetAdded(QnResourceWidget *widget) {
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
+        return;
+
     // TODO: #Elric
-    PtzData &data = m_dataByWidget[camera];
+    PtzData &data = m_dataByWidget[mediaWidget];
     data.initialized = true;
     data.sequenceId = QUuid::createUuid();
     data.sequenceNumber = 0;
