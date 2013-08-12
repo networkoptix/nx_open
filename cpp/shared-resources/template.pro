@@ -56,9 +56,6 @@ CONFIG(release, debug|release) {
 LIBS += ${global.libs}
 DEFINES += ${global.defines}
 
-!mac {
-    include(${environment.dir}/qt5/qt-custom/QtCore/private/qtcore.pri)
-}
 INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include \
 		${environment.dir}/qt5/qtbase-${arch}/include/QtCore \
 		${project.build.sourceDirectory} \
