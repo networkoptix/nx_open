@@ -414,7 +414,11 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
 }
 
 void QnWorkbenchPtzController::at_display_widgetAdded(QnResourceWidget *widget) {
-    // TODO: #Elric.
+    // TODO: #Elric
+    PtzData &data = m_dataByWidget[camera];
+    data.initialized = true;
+    data.sequenceId = QUuid::createUuid();
+    data.sequenceNumber = 0;
 }
 
 void QnWorkbenchPtzController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
