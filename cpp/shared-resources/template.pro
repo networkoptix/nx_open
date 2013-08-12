@@ -64,8 +64,8 @@ INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include \
 		${project.build.directory}/build/include \
 		${environment.dir}/qt5/qt-custom \
 		${environment.dir}/qt5/qt-custom/QtCore \
-		${environment.dir}\qt5\qtbase-${arch}\include\QtCore\5.1.0\ \
-		${environment.dir}\qt5\qtbase-${arch}\include\QtCore\5.1.0\QtCore\
+		${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.0/ \
+		${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.0/QtCore/
 DEPENDPATH *= $${INCLUDEPATH}
 
 !mac {
