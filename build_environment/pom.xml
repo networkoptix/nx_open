@@ -372,6 +372,31 @@
 							</execution>
 						</executions>
 					</plugin>									
+					<plugin>
+						<groupId>com.google.code.maven-replacer-plugin</groupId>
+						<artifactId>replacer</artifactId>
+						<version>1.5.2</version>
+						<executions>
+							<execution>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+								<configuration>
+									<includes>
+										<include>**/libdir.properties</include>
+									</includes>
+									<replacements>
+										<replacement>
+											<token>\\\\</token>
+											<value>/</value>
+										</replacement>         
+									</replacements>
+									<skip>${replace.skip}</skip>
+								</configuration>								
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>

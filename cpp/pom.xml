@@ -347,11 +347,11 @@
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
 										<commandlineArgs>-spec</commandlineArgs>
-										<commandlineArgs>win32-msvc2008</commandlineArgs>
+										<commandlineArgs>win32-msvc2012</commandlineArgs>
 										<commandlineArgs>-tp</commandlineArgs>
 										<commandlineArgs>vc</commandlineArgs>
 										<commandlineArgs>-o</commandlineArgs>
-										<commandlineArgs>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj</commandlineArgs>
+										<commandlineArgs>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</commandlineArgs>
 										<commandlineArgs>${project.build.directory}/${project.artifactId}.pro</commandlineArgs>
 									</arguments>
 								</configuration>
@@ -394,6 +394,41 @@
 											<token>Win32</token>
 											<value>${arch}</value>
 										</replacement>         
+									</replacements>
+									<skip>${replace.skip}</skip>
+								</configuration>								
+							</execution>
+
+							<!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
+							<execution>
+								<id>add_protoc_run</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+								<configuration>
+									<unescape>no</unescape>
+									<includes>
+										<include>**/${project.artifactId}-*.vcxproj</include>
+									</includes>
+									<replacements>
+										<replacement>
+											<xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
+ 											<token><![CDATA[<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>]]></token>
+<value><![CDATA[
+    <CustomBuild Include="$1/$2.$3">
+      <AdditionalInputs>${libdir}/build/bin/protoc;$1/$2.$3;%(AdditionalInputs)</AdditionalInputs>
+      <Command         >${libdir}/build/bin/protoc --proto_path=${root}/${project.artifactId}/src/api/pb --cpp_out=../x86/build/\$(Configuration)/generated ${root}/${project.artifactId}/src/$1/$2.$3</Command>
+      <Message         >Generating code from $1/$2.$3 to $2.pb.cc</Message>
+      <Outputs         >../x86/build/\$(Configuration)/generated/$2.pb.cc;%(Outputs)</Outputs>
+    </CustomBuild>
+]]></value>
+										</replacement>
+										<replacement>
+											<xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.pb.cc')]</xpath>
+ 											<token>CustomBuild</token>
+											<value>ClCompile</value>
+										</replacement>
 									</replacements>
 									<skip>${replace.skip}</skip>
 								</configuration>								
