@@ -277,9 +277,10 @@
 									<include name="**/*.cpp" />
 									<include name="**/*.cc" />
 									<include name="**/*.c" />
-									<exclude name="youtube/**" />									
-									<exclude name="**/*_${exclude_platform}/**" />	
-									<exclude name="**/*_${exclude_platform}.*" />																				
+									<exclude name="youtube/**" />
+									<exclude name="**/*_${exclude_platform}/**" />
+									<exclude name="**/*_${exclude_platform}.*" />
+									<exclude name="StdAfx.cpp" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="sources" refid="sources_path">
 									<map from="" to="SOURCES += "/>
@@ -399,7 +400,7 @@
 								</configuration>								
 							</execution>
 
-							<!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
+							<!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unneccessary (when qmake is fixed) -->
 							<execution>
 								<id>add_protoc_run</id>
 								<phase>process-resources</phase>
@@ -412,6 +413,7 @@
 										<include>**/${project.artifactId}-*.vcxproj</include>
 									</includes>
 									<replacements>
+										<!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
 										<replacement>
 											<xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
  											<token><![CDATA[<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>]]></token>
@@ -424,10 +426,26 @@
     </CustomBuild>
 ]]></value>
 										</replacement>
+
+										<!-- Fixing compiling of *.pb.cc files -->
 										<replacement>
 											<xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.pb.cc')]</xpath>
  											<token>CustomBuild</token>
 											<value>ClCompile</value>
+										</replacement>
+
+										<!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
+										<replacement>
+											<xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.res')]</xpath>
+ 											<token>CustomBuild</token>
+											<value>None</value>
+										</replacement>
+
+										<!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->
+										<replacement>
+											<xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
+ 											<token>CustomBuild</token>
+											<value>None</value>
 										</replacement>
 									</replacements>
 									<skip>${replace.skip}</skip>
