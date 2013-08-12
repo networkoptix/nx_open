@@ -30,7 +30,7 @@ public:
                 break;
             case mediaServerBadResponse:
                 requiredParamCount = 2;
-                errorMessage = tr("Received bad response from media server %1: \"%2\".\n Check media server's version.");
+                errorMessage = tr("Received bad response from media server %1: \"%2\".\n Check if Media Server is up and has the proper version.");
                 break;
             case cannotEstablishConnection:
                 requiredParamCount = 1;
