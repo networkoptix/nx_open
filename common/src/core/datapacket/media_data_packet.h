@@ -300,9 +300,6 @@ public:
         return *this;
     }
 
-    void setFrequency( int _freq );
-    int frequency() const;
-
     void fromAvStream(AVCodecContext* c);
 
     QVector<quint8> extraData; // codec extra data

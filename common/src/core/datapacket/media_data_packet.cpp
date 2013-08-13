@@ -421,20 +421,10 @@ QnCompressedAudioData* QnCompressedAudioData::clone()
     return rez;
 }
 
-void QnCodecAudioFormat::setFrequency( int _freq )
-{
-    m_frequency = _freq;
-}
-
-int QnCodecAudioFormat::frequency() const
-{
-    return m_frequency;
-}
-
 void QnCodecAudioFormat::fromAvStream(AVCodecContext* c)
 {
     if (c->sample_rate)
-        setFrequency(c->sample_rate);
+        setSampleRate(c->sample_rate);
 
     if (c->channels) 
         setChannelCount(c->channels);
