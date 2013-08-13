@@ -19,7 +19,7 @@
 #include "cached_output_stream.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
-static const int MAX_QUEUE_SIZE = 10;
+static const int MAX_QUEUE_SIZE = 30;
 
 QnProgressiveDownloadingServer::QnProgressiveDownloadingServer(const QHostAddress& address, int port):
     QnTcpListener(address, port)
@@ -48,7 +48,8 @@ public:
         QnProgressiveDownloadingConsumer* owner,
         bool standFrameDuration,
         bool dropLateFrames,
-        unsigned int maxFramesToCacheBeforeDrop = DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP )
+        unsigned int maxFramesToCacheBeforeDrop,
+        bool liveMode)
     :
         QnAbstractDataConsumer(50),
         m_owner(owner),
@@ -58,7 +59,9 @@ public:
         m_maxFramesToCacheBeforeDrop( maxFramesToCacheBeforeDrop ),
         m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),
         m_rtStartTime( AV_NOPTS_VALUE ),
-        m_lastRtTime( 0 )
+        m_lastRtTime( 0 ),
+        m_liveMode(liveMode),
+        m_needKeyData(false)
     {
         if( dropLateFrames )
         {
@@ -101,6 +104,37 @@ public:
     }
 
 protected:
+
+    virtual bool canAcceptData() const override
+    {
+        if (m_liveMode)
+            return true;
+        else 
+            return QnAbstractDataConsumer::canAcceptData();
+    }
+
+    void putData(QnAbstractDataPacketPtr data) override
+    {
+        if (m_liveMode)
+        {
+            if (m_dataQueue.size() > m_dataQueue.maxSize())
+            {
+                m_needKeyData = true;
+                return;
+            }
+        }
+        QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+        if (m_needKeyData && media)
+        {
+            if (!(media->flags & AV_PKT_FLAG_KEY))
+                return;
+            m_needKeyData = false;
+        }
+
+        QnAbstractDataConsumer::putData(data);
+    }
+
+
     virtual bool processData(QnAbstractDataPacketPtr data) override
     {
         if( m_standFrameDuration )
@@ -221,6 +255,8 @@ private:
     QnAdaptiveSleep m_adaptiveSleep;
     qint64 m_rtStartTime;
     qint64 m_lastRtTime;
+    bool m_liveMode;
+    bool m_needKeyData;
 
     QByteArray toHttpChunk( const char* data, size_t size )
     {
@@ -468,11 +504,6 @@ void QnProgressiveDownloadingConsumer::run()
 
         const bool standFrameDuration = getDecodedUrl().hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
-        QnProgressiveDownloadingDataConsumer dataConsumer(
-            this,
-            standFrameDuration,
-            dropLateFrames,
-            maxFramesToCacheBeforeDrop );
         QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();
         bool isUTCRequest = !getDecodedUrl().queryItemValue("posonly").isNull();
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
@@ -480,7 +511,16 @@ void QnProgressiveDownloadingConsumer::run()
         //QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
         //if (camRes && camRes->isAudioEnabled())
         //    d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
-        if (position.isEmpty() || position == "now")
+        bool isLive = position.isEmpty() || position == "now";
+
+        QnProgressiveDownloadingDataConsumer dataConsumer(
+            this,
+            standFrameDuration,
+            dropLateFrames,
+            maxFramesToCacheBeforeDrop,
+            isLive);
+
+        if (isLive)
         {
             if (resource->getStatus() != QnResource::Online && resource->getStatus() != QnResource::Recording)
             {
