@@ -14,6 +14,7 @@ struct QnConnectInfo {
     int proxyPort;
     QString ecsGuid;
     QString publicIp;
+    QString brand;
 };
 
 // TODO: #Elric remove shared pointer.
