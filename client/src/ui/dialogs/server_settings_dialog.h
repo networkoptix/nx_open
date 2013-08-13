@@ -57,7 +57,7 @@ private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
     QList<QString> m_storageProtocols;
-    QWeakPointer<QLabel> m_tableBottomLabel;
+    QPointer<QLabel> m_tableBottomLabel;
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;

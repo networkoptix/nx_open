@@ -241,7 +241,7 @@ static bool textToWavInternal( const QString& text, QIODevice* const dest )
 {
     // Convert to a waveform
     EST_Wave wave;
-    EST_String srcText( text.toAscii().constData() );
+    EST_String srcText( text.toLatin1().constData() );
     bool result = my_festival_text_to_wave( srcText, wave );
 
     if( result )

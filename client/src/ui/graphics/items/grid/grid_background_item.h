@@ -53,7 +53,7 @@ private:
     QnAppServerImageCache* cache();
 
     Q_DECLARE_PRIVATE(QnGridBackgroundItem)
-    QWeakPointer<QnWorkbenchGridMapper> m_mapper;
+    QPointer<QnWorkbenchGridMapper> m_mapper;
     std::auto_ptr<DecodedPictureToOpenGLUploader> m_imgUploader;
     std::auto_ptr<QnGLRenderer> m_renderer;
     QSharedPointer<CLVideoDecoderOutput> m_imgAsFrame;

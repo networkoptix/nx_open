@@ -41,7 +41,7 @@ protected:
     void showSelectedOverlay(QnResourceWidget *widget, bool show);
 
 private:
-    QWeakPointer<QnResourceWidget> m_singleSelectedWidget;
+    QPointer<QnResourceWidget> m_singleSelectedWidget;
 };
 
 

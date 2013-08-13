@@ -122,11 +122,11 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     m_header = new QnCheckBoxedHeaderView(this);
     ui->camerasTable->setHorizontalHeader(m_header);
     m_header->setVisible(true);
-    m_header->setResizeMode(CheckBoxColumn, QHeaderView::ResizeToContents);
-    m_header->setResizeMode(ManufColumn, QHeaderView::ResizeToContents);
-    m_header->setResizeMode(NameColumn, QHeaderView::ResizeToContents);
-    m_header->setResizeMode(UrlColumn, QHeaderView::Stretch);
-    m_header->setClickable(true);
+    m_header->setSectionResizeMode(CheckBoxColumn, QHeaderView::ResizeToContents);
+    m_header->setSectionResizeMode(ManufColumn, QHeaderView::ResizeToContents);
+    m_header->setSectionResizeMode(NameColumn, QHeaderView::ResizeToContents);
+    m_header->setSectionResizeMode(UrlColumn, QHeaderView::Stretch);
+    m_header->setSectionsClickable(true);
 
     connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)),                   this,   SLOT(at_startIPLineEdit_textChanged(QString)));
     connect(ui->startIPLineEdit,    SIGNAL(editingFinished()),                      this,   SLOT(at_startIPLineEdit_editingFinished()));

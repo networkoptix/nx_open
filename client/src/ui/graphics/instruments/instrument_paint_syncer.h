@@ -23,7 +23,7 @@ protected:
 
 private:
     QAnimationTimer *m_animationTimer;
-    QWeakPointer<QObject> m_currentWatched;
+    QPointer<QObject> m_currentWatched;
     QWidget *m_currentWidget;
 };
 

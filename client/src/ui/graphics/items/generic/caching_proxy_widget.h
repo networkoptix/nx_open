@@ -35,7 +35,7 @@ private:
     }
 
 private:
-    QWeakPointer<QWidget> m_currentWidget;
+    QPointer<QWidget> m_currentWidget;
     int m_maxTextureSize;
     QPoint m_offset;
     QImage m_image;

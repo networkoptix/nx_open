@@ -4,7 +4,7 @@
 #include <QtGui/QKeyEvent>
 
 
-        QnReadOnlyEventEater::QnReadOnlyEventEater(QObject *parent = NULL): QnMultiEventEater(parent) {
+        QnReadOnlyEventEater::QnReadOnlyEventEater(QObject *parent): QnMultiEventEater(parent) {
             addEventType(QEvent::MouseButtonPress);
             addEventType(QEvent::MouseButtonRelease);
             addEventType(QEvent::MouseButtonDblClick);

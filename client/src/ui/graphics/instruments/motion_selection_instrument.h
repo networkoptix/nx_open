@@ -75,8 +75,8 @@ protected:
 private:
     QBrush m_brush;
     QPen m_pen;
-    QWeakPointer<SelectionItem> m_selectionItem;
-    QWeakPointer<QnMediaResourceWidget> m_target;
+    QPointer<SelectionItem> m_selectionItem;
+    QPointer<QnMediaResourceWidget> m_target;
     bool m_selectionStartedEmitted;
     bool m_isClick;
     bool m_clearingBlocked;

@@ -24,7 +24,7 @@ protected:
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
 
 private:
-    QWeakPointer<QnWorkbench> m_workbench;
+    QPointer<QnWorkbench> m_workbench;
     QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon, m_buggyIcon;
 };
 

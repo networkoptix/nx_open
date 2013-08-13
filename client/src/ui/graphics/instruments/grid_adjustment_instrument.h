@@ -38,8 +38,8 @@ private:
     }
 
 private:
-    QWeakPointer<QWidget> m_currentViewport;
-    QWeakPointer<QnWorkbench> m_workbench;
+    QPointer<QWidget> m_currentViewport;
+    QPointer<QnWorkbench> m_workbench;
     QSizeF m_speed;
     QSizeF m_maxSpacing;
 };

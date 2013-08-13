@@ -3,7 +3,7 @@
 
 #include <QtCore/qmath.h>
 #include <QtCore/QUrl>
-#include <QtWidgets/QResizeEvent>
+#include <QtGui/QResizeEvent>
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>

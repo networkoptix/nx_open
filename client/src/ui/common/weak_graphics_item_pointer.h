@@ -55,7 +55,7 @@ public:
     }
     
 private:
-    QWeakPointer<QObject> m_guard;
+    QPointer<QObject> m_guard;
     QGraphicsItem *m_item;
 };
 

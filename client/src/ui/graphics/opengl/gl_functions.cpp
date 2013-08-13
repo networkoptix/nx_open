@@ -197,7 +197,7 @@ public:
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
         
 #ifdef Q_OS_LINUX
-        QDir atiProcDir(QString::fromAscii("/proc/ati"));
+        QDir atiProcDir(QString::fromLatin1("/proc/ati"));
         if(atiProcDir.exists()) /* Checking for fglrx driver. */
             m_features |= QnGlFunctions::NoOpenGLFullScreen;
 #endif

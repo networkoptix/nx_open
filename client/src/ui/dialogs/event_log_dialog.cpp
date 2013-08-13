@@ -3,7 +3,7 @@
 
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
-#include <QtGui/QMenu>
+#include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
 #include <client/client_globals.h>
@@ -67,7 +67,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->dateEditTo->setDate(dt);
 
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
-    headers->setResizeMode(QHeaderView::Fixed);
+    headers->setSectionResizeMode(QHeaderView::Fixed);
 
     // init events model
     {

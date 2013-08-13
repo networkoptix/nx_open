@@ -48,7 +48,7 @@ bool WinAudioExtendInfo::getDeviceInfo(IMMDevice *pMMDevice, bool isDefault)
 
     //PropVariantToGUID(pv, &m_jackSubType);
     const ushort* guidData16 = (const ushort*) pv.pbVal;
-    QByteArray arr = QString::fromUtf16(guidData16).toAscii();
+    QByteArray arr = QString::fromUtf16(guidData16).toLatin1();
     const char* data8 = arr.constData();
     char guidBuffer[24];
     sscanf( data8,
@@ -128,7 +128,7 @@ QPixmap WinAudioExtendInfo::deviceIcon()
 {
     QStringList params = m_iconPath.split(QLatin1Char(','));
     if (params.size() < 2)
-        return 0;
+        return QPixmap();
     int persent1 = params[0].indexOf(QLatin1Char('%'));
     while (persent1 >= 0)
     {
@@ -144,7 +144,7 @@ QPixmap WinAudioExtendInfo::deviceIcon()
 
     HMODULE library = LoadLibrary((LPCWSTR) params[0].constData());
     if (!library)
-        return false;
+        return QPixmap();
     int resNumber = params[1].toInt();
     if (resNumber < 0) {
         resNumber = -resNumber;

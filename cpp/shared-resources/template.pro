@@ -84,7 +84,7 @@ win* {
   DEFINES += _USING_V110_SDK71_ ${windows.defines}  
   QMAKE_CXXFLAGS += /MP
   win32-msvc* {
-    QMAKE_CXXFLAGS += /Fd$$OBJECTS_DIR
+    # QMAKE_CXXFLAGS += /Fd$$OBJECTS_DIR
 	# /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
 	QMAKE_CFLAGS_RELEASE += /Zi
 	QMAKE_CXXFLAGS_RELEASE += /Zi

@@ -255,7 +255,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
             audioFormat = QnAudioProcessor::float2int16(m_decodedAudioBuffer, audioFormat);
         else if (m_sampleConvertMethod == SampleConvert_Int32ToInt16)
             audioFormat = QnAudioProcessor::int32Toint16(m_decodedAudioBuffer, audioFormat);
-        if (audioFormat.channels() > 2 && m_downmixing)
+        if (audioFormat.channelCount() > 2 && m_downmixing)
             audioFormat = QnAudioProcessor::downmix(m_decodedAudioBuffer, audioFormat);
 
         //resume(); // does nothing if resumed already

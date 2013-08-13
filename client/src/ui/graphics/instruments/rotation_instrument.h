@@ -59,8 +59,8 @@ private:
     void startInternal(QGraphicsView *view, QMouseEvent *event, QGraphicsWidget *target, bool instantStart);
 
 private:
-    QWeakPointer<RotationItem> m_rotationItem;
-    QWeakPointer<QGraphicsWidget> m_target;
+    QPointer<RotationItem> m_rotationItem;
+    QPointer<QGraphicsWidget> m_target;
     bool m_rotationStartedEmitted;
     qreal m_originAngle;
     qreal m_lastRotation;

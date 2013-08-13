@@ -34,7 +34,7 @@ private:
 
 private:
     QDialogButtonBox::StandardButton m_clickedButton;
-    QWeakPointer<QDialogButtonBox> m_buttonBox;
+    QPointer<QDialogButtonBox> m_buttonBox;
 };
 
 #endif // QN_BUTTON_BOX_DIALOG_H

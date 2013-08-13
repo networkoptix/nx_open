@@ -255,7 +255,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
     unsigned int tex0ID,
     const float* v_array )
 {
-    cl_log.log( QString::fromAscii("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
+    cl_log.log( QString::fromLatin1("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
 
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),

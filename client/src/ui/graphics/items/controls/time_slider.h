@@ -339,7 +339,7 @@ private:
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
 
-    QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
+    QPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     qreal m_thumbnailsAspectRatio;
     QTimer *m_thumbnailsUpdateTimer;
     qint64 m_lastThumbnailsUpdateTime;

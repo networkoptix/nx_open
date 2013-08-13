@@ -71,7 +71,7 @@ public:
     QElapsedTimer firstRepeat;
 #endif
 
-    QWeakPointer<QWidget> mouseWidget;
+    QPointer<QWidget> mouseWidget;
     Qt::MouseButtons mouseButtons;
     QPoint mouseScreenPos;
 

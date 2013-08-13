@@ -28,7 +28,7 @@ protected:
     virtual void finishKinetic() override;
 
 private:
-    QWeakPointer<QWidget> m_currentViewport;
+    QPointer<QWidget> m_currentViewport;
     QPoint m_viewportAnchor;
 };
 

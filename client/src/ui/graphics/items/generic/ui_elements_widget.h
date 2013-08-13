@@ -30,7 +30,7 @@ private slots:
     void updateSize(QGraphicsView *view);
 
 private:
-    QWeakPointer<Instrument> m_instrument;
+    QPointer<Instrument> m_instrument;
 };
 
 

@@ -165,8 +165,8 @@ private:
 private:
     bool m_interactive;
     QColor m_frameColor;
-    QWeakPointer<ZoomOverlayWidget> m_overlay;
-    QWeakPointer<QnMediaResourceWidget> m_zoomWidget;
+    QPointer<ZoomOverlayWidget> m_overlay;
+    QPointer<QnMediaResourceWidget> m_zoomWidget;
 };
 
 

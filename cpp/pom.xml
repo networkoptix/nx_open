@@ -419,10 +419,10 @@
  											<token><![CDATA[<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>]]></token>
 <value><![CDATA[
     <CustomBuild Include="$1/$2.$3">
-      <AdditionalInputs>${libdir}/build/bin/protoc;$1/$2.$3;%(AdditionalInputs)</AdditionalInputs>
-      <Command         >${libdir}/build/bin/protoc --proto_path=${root}/${project.artifactId}/src/api/pb --cpp_out=../x86/build/\$(Configuration)/generated ${root}/${project.artifactId}/src/$1/$2.$3</Command>
+      <AdditionalInputs>${libdir}/build/bin/protoc;$1/$2.$3</AdditionalInputs>
+      <Command         >${libdir}/build/bin/protoc --proto_path=${root}/${project.artifactId}/src/api/pb --cpp_out=${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/ ${root}/${project.artifactId}/src/$1/$2.$3</Command>
       <Message         >Generating code from $1/$2.$3 to $2.pb.cc</Message>
-      <Outputs         >../x86/build/\$(Configuration)/generated/$2.pb.cc;%(Outputs)</Outputs>
+      <Outputs         >${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/$2.pb.cc</Outputs>
     </CustomBuild>
 ]]></value>
 										</replacement>

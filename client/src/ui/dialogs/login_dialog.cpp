@@ -562,7 +562,7 @@ void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, 
     if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
         return;
 
-    QString host = isLocal ? QString::fromAscii("127.0.0.1") : remoteHostAddress;
+    QString host = isLocal ? QString::fromLatin1("127.0.0.1") : remoteHostAddress;
     QUrl url;
     url.setHost(host);
 

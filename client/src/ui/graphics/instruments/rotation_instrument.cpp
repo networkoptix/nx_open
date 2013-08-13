@@ -210,7 +210,7 @@ private:
     QWidget *m_viewport;
 
     /** Widget being rotated. */
-    QWeakPointer<QGraphicsWidget> m_target;
+    QPointer<QGraphicsWidget> m_target;
 
     /** Head of the rotation item, in scene coordinates. */
     QPointF m_sceneHead;

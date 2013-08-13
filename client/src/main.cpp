@@ -276,7 +276,7 @@ int main(int argc, char **argv)
     win32_exception::install_handler();
 #endif
 
-    QApplication::setGraphicsSystem(QLatin1String("raster"));
+    //QApplication::setGraphicsSystem(QLatin1String("raster")); //TODO: #ak could not find sinonym in qt5.1
     //QApplication::setColorSpec(QApplication::ManyColor);
 
     QStringList pluginDirs = QApplication::libraryPaths();

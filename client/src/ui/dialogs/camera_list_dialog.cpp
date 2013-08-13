@@ -57,7 +57,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
     connect(m_selectAllAction,      SIGNAL(triggered()),                this, SLOT(at_selectAllAction()));
 
-    ui->gridCameras->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui->gridCameras->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 QnCameraListDialog::~QnCameraListDialog()

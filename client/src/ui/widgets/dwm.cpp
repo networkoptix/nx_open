@@ -146,7 +146,7 @@ void QnDwmPrivate::init(QWidget *widget) {
     hasApi = widget != NULL && qn_dwm_isSupported();
 
 #ifdef QN_HAS_DWM
-    QLibrary dwmLib(QString::fromAscii("dwmapi"));
+    QLibrary dwmLib(QString::fromLatin1("dwmapi"));
     dwmIsCompositionEnabled         = (PtrDwmIsCompositionEnabled)      dwmLib.resolve("DwmIsCompositionEnabled");
     dwmExtendFrameIntoClientArea    = (PtrDwmExtendFrameIntoClientArea) dwmLib.resolve("DwmExtendFrameIntoClientArea");
     dwmEnableBlurBehindWindow       = (PtrDwmEnableBlurBehindWindow)    dwmLib.resolve("DwmEnableBlurBehindWindow");

@@ -57,7 +57,7 @@ private slots:
 
 private:
     /* Rubber band item. */
-    QWeakPointer<RubberBandItem> m_rubberBand;
+    QPointer<RubberBandItem> m_rubberBand;
 
     /** Set of items that were selected when rubber banding has started. 
      *

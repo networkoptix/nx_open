@@ -46,10 +46,10 @@ protected:
 private:
     QnResourceList m_resources;
     
-    QWeakPointer<QnWorkbenchContext> m_context;
+    QPointer<QnWorkbenchContext> m_context;
     QScopedPointer<SceneEventFilterItem> m_filterItem;
-    QWeakPointer<DestructionGuardItem> m_guard;
-    QWeakPointer<QGraphicsObject> m_surface;
+    QPointer<DestructionGuardItem> m_guard;
+    QPointer<QGraphicsObject> m_surface;
     bool m_intoNewLayout;
 };
 

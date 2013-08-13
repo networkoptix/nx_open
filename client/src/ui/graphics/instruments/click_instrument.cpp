@@ -27,8 +27,8 @@ struct ClickInstrument::ClickData {
 
     QGraphicsSceneMouseEvent event;
     WeakGraphicsItemPointer item;
-    QWeakPointer<QGraphicsScene> scene;
-    QWeakPointer<QGraphicsView> view;
+    QPointer<QGraphicsScene> scene;
+    QPointer<QGraphicsView> view;
 };
 
 ClickInstrument::ClickInstrument(Qt::MouseButtons buttons, int clickDelayMSec, WatchedType watchedType, QObject *parent): 

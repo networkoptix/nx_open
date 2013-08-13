@@ -160,7 +160,7 @@ private:
     QnActionTargetProvider *m_targetProvider;
 
     /** Guard for target provider. */
-    QWeakPointer<QObject> m_targetProviderGuard;
+    QPointer<QObject> m_targetProviderGuard;
 
     /** Currently active action that was activated via a shortcut. */
     QnAction *m_shortcutAction;

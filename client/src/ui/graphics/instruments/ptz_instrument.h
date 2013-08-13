@@ -137,11 +137,11 @@ private:
     int m_clickDelayMSec;
     qreal m_expansionSpeed;
 
-    QWeakPointer<FixedArSelectionItem> m_selectionItem;
-    QWeakPointer<PtzElementsWidget> m_elementsWidget;
-    QWeakPointer<QWidget> m_viewport;
-    QWeakPointer<QnMediaResourceWidget> m_target;
-    QWeakPointer<PtzManipulatorWidget> m_manipulator;
+    QPointer<FixedArSelectionItem> m_selectionItem;
+    QPointer<PtzElementsWidget> m_elementsWidget;
+    QPointer<QWidget> m_viewport;
+    QPointer<QnMediaResourceWidget> m_target;
+    QPointer<PtzManipulatorWidget> m_manipulator;
     QHash<QObject *, PtzData> m_dataByWidget;
     QBasicTimer m_movementTimer;
 

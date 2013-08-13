@@ -36,7 +36,7 @@ private slots:
     void updateOrigin();
 
 private:
-    QWeakPointer<QGraphicsWidget> m_target;
+    QPointer<QGraphicsWidget> m_target;
 };
 
 
