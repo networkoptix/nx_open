@@ -179,11 +179,11 @@
     </message>
     <message>
         <source>Override current value</source>
-        <translation type="unfinished"></translation>
+        <translation>Remplacer la valeur actuelle</translation>
     </message>
     <message>
         <source>Selected camera(s) have no expert settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Les caméras sélectionnées n&apos;ont pas de configuration experte</translation>
     </message>
 </context>
 <context>
