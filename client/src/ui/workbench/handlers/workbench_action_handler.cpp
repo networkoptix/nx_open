@@ -3593,8 +3593,14 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(parameters.widget());
-    if(!camera || !widget)
+    if(!camera)
+        return;
+    
+    QList<QnResourceWidget *> widgets = display()->widgets(camera);
+    if(widgets.empty())
+        return;
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]);
+    if(!widget)
         return;
 
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();

@@ -876,7 +876,7 @@ QnActionManager::QnActionManager(QObject *parent):
             condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
 
         factory(Qn::PtzGoToPresetAction).
-            flags(Qn::SingleTarget | Qn::WidgetTarget).
+            flags(Qn::SingleTarget | Qn::ResourceTarget).
             text(tr("Go To Saved Position")).
             condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
     } factory.endSubMenu();

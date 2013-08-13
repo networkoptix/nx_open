@@ -744,7 +744,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         if(preset.isNull())
             break;
 
-        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(widget).withArgument(Qn::ResourceNameRole, preset.name));
+        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, preset.name));
     }
     default:
         event->ignore(); /* Wasn't recognized? Ignore. */
