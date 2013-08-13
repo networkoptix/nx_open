@@ -64,8 +64,10 @@ Q_DECLARE_METATYPE(TypeSpecificParamMap);
 class RevealResponse
 {
 public:
+    //!Name of module (enterprise controller, media server, etc...)
     QString type;
     QString version;
+    QString customization;
     //!random string, unique for particular module instance
     QString seed;
     TypeSpecificParamMap typeSpecificParameters;
