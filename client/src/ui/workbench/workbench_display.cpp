@@ -877,8 +877,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 mediaWidget->display()->archiveReader()->setPlaybackRange(item->layout()->resource()->getLocalRange());
 
             if(startDisplay) {
-                quint64 time = item->data(Qn::ItemTimeRole).toULongLong();
-                if (time != DATETIME_NOW)
+                qint64 time = item->data(Qn::ItemTimeRole).toLongLong();
+                if (time > 0 && time != DATETIME_NOW)
                     time *= 1000;
                 if (time > 0)
                     mediaWidget->display()->archiveReader()->jumpTo(time, time);
@@ -1619,7 +1619,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
 
         if(!thumbnailed) {
             QnResourcePtr resource = widget->resource()->toResourcePtr();
-            if(time != -1) {
+            if(time > 0) {
                 qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
                 if(widget->display()->archiveReader())
                     widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);

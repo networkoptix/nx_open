@@ -112,7 +112,7 @@ protected:
         QPointF position;
         QRectF zoomWindow;
         QUuid zoomUuid;
-        quint64 time;
+        qint64 time;
         QColor frameColor;
         qreal rotation;
         ImageCorrectionParams contrastParams;
@@ -122,7 +122,7 @@ protected:
             usePosition(false),
             position(QPointF()),
             zoomUuid(QUuid()),
-            time(0),
+            time(-1),
             rotation(0)
         {}
     };

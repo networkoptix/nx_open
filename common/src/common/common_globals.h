@@ -206,7 +206,7 @@ public:
         ItemFrameColorRole,                         /**< Role for item's frame color. Value of type QColor. */
         ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
 
-        ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. */
+        ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
         ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
