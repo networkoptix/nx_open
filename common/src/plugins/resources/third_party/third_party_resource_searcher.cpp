@@ -285,6 +285,6 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
 
     QString groupName = QString(lit("%1-%2")).arg(discoveryManager->getVendorName()).arg(resource->getHostAddress());
     resource->setGroupName(groupName);
-    resource->setGroupId(groupName);
+    resource->setGroupId(groupName.toLower().trimmed());
     return resource;
 }
