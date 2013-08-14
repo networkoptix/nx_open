@@ -1836,7 +1836,27 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         connectionInfo = result.reply<QnConnectInfoPtr>();
     }
 
-    // TODO: #Elric maybe we need to check server-client compatibility here?
+    // TODO: #Elric maybe we need to check server-client compatibility here? --done //GDM
+    { // I think we should move this common code to common place --gdm
+        bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
+                || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+        if (!compatibleProduct)
+            return;
+
+        QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
+        QnCompatibilityChecker localChecker(localCompatibilityItems());
+        QnCompatibilityChecker* compatibilityChecker;
+        if (remoteChecker.size() > localChecker.size()) {
+            compatibilityChecker = &remoteChecker;
+        } else {
+            compatibilityChecker = &localChecker;
+        }
+
+        if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version))
+            return;
+    }
+
+
 
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectionInfo->proxyPort);
 
