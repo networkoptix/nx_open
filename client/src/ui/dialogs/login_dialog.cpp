@@ -326,7 +326,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
 
     updateUsability();
 
-    if(status != 0) {
+    if(status != 0 || (!connectInfo->brand.isEmpty() && connectInfo->brand != PRODUCT_NAME_SHORT)) {
         QMessageBox::warning(
             this, 
             tr("Could not connect to Enterprise Controller"), 
