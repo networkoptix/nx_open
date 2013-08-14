@@ -1,29 +1,33 @@
 ////////////////////////////////////////////////////////////
-// 14 mar 2013    Andrey Kolesnikov
+// 14 aug 2013    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifndef TASK_SERVER_H
-#define TASK_SERVER_H
+#ifndef TASK_SERVER_NEW_H
+#define TASK_SERVER_NEW_H
 
 #include <memory>
 
 #include <QObject>
-#include <QLocalServer>
 #include <QSharedPointer>
 
 #include <api/start_application_task.h>
+#include <utils/common/long_runnable.h>
+
 #include "blocking_queue.h"
+#include "named_pipe_server.h"
 
 
 //!Accepts tasks from application instances and stores them in a task queue
-class TaskServer
+class TaskServerNew
 :
-    public QObject
+    public QnLongRunnable
 {
-    Q_OBJECT
-
 public:
-    TaskServer( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue );
+    TaskServerNew( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue );
+    virtual ~TaskServerNew();
+
+    //!Implementation of QnLongRunnable::pleaseStop
+    virtual void pleaseStop() override;
 
     //!
     /*!
@@ -32,12 +36,16 @@ public:
     */
     bool listen( const QString& pipeName );
 
+protected:
+    virtual void run() override;
+
 private:
     BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const m_taskQueue;
-    QLocalServer m_server;
+    NamedPipeServer m_server;
+    QString m_pipeName;
+    bool m_terminated;
 
-private slots:
-    void onNewConnection();
+    void processNewConnection( NamedPipeSocket* clientConnection );
 };
 
-#endif  //TASK_SERVER_H
+#endif  //TASK_SERVER_NEW_H

@@ -7,13 +7,16 @@
 
 #include <memory>
 
-#include <QLocalSocket>
 #include <QSettings>
 #include <QStateMachine>
 
 #include "installation_manager.h"
 #include "launcher_common_data.h"
+//#ifdef _WIN32
+//#include "task_server_new.h"
+//#else
 #include "task_server.h"
+//#endif
 #include "task_queue_watcher.h"
 
 
@@ -50,10 +53,14 @@ private:
     InstallationManager m_installationManager;
     LauncherCommonData m_fsmSharedData;
     BlockingQueue<QSharedPointer<applauncher::api::BaseTask> > m_taskQueue;
+//#ifdef _WIN32
+//    TaskServerNew m_taskServer;
+//#else
     TaskServer m_taskServer;
+//#endif
     QSettings m_settings;
     int m_bindTriesCount;
-    QLocalSocket::LocalSocketError m_previousAddTaskToPipeOperationResult;
+    bool m_isLocalServerWasNotFound;
     TaskQueueWatcher m_taskQueueWatcher;
 
     void initFSM();

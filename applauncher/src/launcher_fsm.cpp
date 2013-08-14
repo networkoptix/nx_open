@@ -5,6 +5,7 @@
 #include "launcher_fsm.h"
 
 #include <QFinalState>
+#include <QLocalSocket>
 
 #include <api/ipc_pipe_names.h>
 #include <utils/common/log.h>
@@ -23,7 +24,7 @@ LauncherFSM::LauncherFSM( bool quitMode )
     m_taskServer( &m_taskQueue ),
     m_settings( QN_ORGANIZATION_NAME, QN_APPLICATION_NAME ),
     m_bindTriesCount( 0 ),
-    m_previousAddTaskToPipeOperationResult( QLocalSocket::UnknownSocketError ),
+    m_isLocalServerWasNotFound( false ),
     m_taskQueueWatcher( &m_taskQueue )
 {
     initFSM();
@@ -42,9 +43,7 @@ int LauncherFSM::bindTriesCount() const
 
 bool LauncherFSM::isLocalServerWasNotFound() const
 {
-    return m_previousAddTaskToPipeOperationResult == QLocalSocket::ServerNotFoundError
-        || m_previousAddTaskToPipeOperationResult == QLocalSocket::ConnectionRefusedError
-        || m_previousAddTaskToPipeOperationResult == QLocalSocket::PeerClosedError;
+    return m_isLocalServerWasNotFound;
 }
 
 bool LauncherFSM::quitMode() const
@@ -186,7 +185,10 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
     sock.connectToServer( launcherPipeName );
     if( !sock.waitForConnected( -1 ) )
     {
-        m_previousAddTaskToPipeOperationResult = sock.error();
+        m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
+                                     sock.error() == QLocalSocket::ConnectionRefusedError ||
+                                     sock.error() == QLocalSocket::PeerClosedError;
+        const QString& errStr = sock.errorString();
         NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
         return;
@@ -194,7 +196,9 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
 
     if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
     {
-        m_previousAddTaskToPipeOperationResult = sock.error();
+        m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
+                                     sock.error() == QLocalSocket::ConnectionRefusedError ||
+                                     sock.error() == QLocalSocket::PeerClosedError;
         NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
         return;
