@@ -3347,7 +3347,7 @@ It might take a few moments to populate them in the tree.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="94"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="97"/>
         <source>Connection to the Enterprise Controller could not be established.
 Connection details that you have entered are incorrect, please try again.
 
@@ -3355,7 +3355,7 @@ If this error persists, please contact your VMS administrator.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="102"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="105"/>
         <source>Enterprise Controller has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -3363,7 +3363,7 @@ Compatibility mode for versions lower than %3 is not supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="111"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="114"/>
         <source>Enterprise Controller has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -3371,12 +3371,12 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="130"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="133"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="130"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="133"/>
         <source>Failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3987,40 +3987,40 @@ Try to activate your License manually.</source>
 <context>
     <name>QnLoginDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="161"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="163"/>
         <source>Invalid Login Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="161"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="163"/>
         <source>The Login Information you have entered is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="236"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="238"/>
         <source>Saved Sessions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="254"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="256"/>
         <source>Auto-Discovered ECs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="276"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="278"/>
         <source>&lt;none&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="332"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="358"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="374"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="399"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="337"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="363"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="379"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="404"/>
         <source>Could not connect to Enterprise Controller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="333"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="338"/>
         <source>Connection to the Enterprise Controller could not be established.
 Connection details that you have entered are incorrect, please try again.
 
@@ -4028,7 +4028,7 @@ If this error persists, please contact your VMS administrator.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="359"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="364"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -4036,7 +4036,7 @@ Compatibility mode for versions lower than %3 is not supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="375"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="380"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -4044,18 +4044,18 @@ Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="387"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="392"/>
         <source>Launcher process is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="388"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="393"/>
         <source>Cannot restart the client in compatibility mode.
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="400"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="405"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -4063,59 +4063,59 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="432"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="447"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="453"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="437"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="452"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="458"/>
         <source>Invalid parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="432"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="437"/>
         <source>The information you have entered is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="447"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="452"/>
         <source>Entered hostname is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="453"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="458"/>
         <source>Host field cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="462"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="467"/>
         <source>%1 at %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="463"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="468"/>
         <source>Save connection as...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="463"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="468"/>
         <source>Enter name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="471"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="476"/>
         <source>Connection already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="472"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="477"/>
         <source>Connection with the same name already exists. Overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="507"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="512"/>
         <source>Delete connections</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="508"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="513"/>
         <source>Are you sure you want to delete the connection
 %1?</source>
         <translation type="unfinished"></translation>
@@ -5530,13 +5530,13 @@ AVAILABLE</source>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="759"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3188"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3208"/>
         <source>Could not save parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="760"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3189"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3209"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
         <translation type="unfinished"></translation>
@@ -5570,26 +5570,26 @@ AVAILABLE</source>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1201"/>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1221"/>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1549"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2397"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2505"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2417"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2525"/>
         <source>Layout already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1202"/>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1222"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2398"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2506"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2418"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2526"/>
         <source>Layout with the same name already exists
 and you do not have the rights to overwrite it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1379"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3683"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3745"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3762"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3785"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3703"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3765"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3782"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3805"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5687,27 +5687,27 @@ and you do not have the rights to overwrite it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1965"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1985"/>
         <source>Could not perform preview search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1965"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1985"/>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2051"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2071"/>
         <source>Preview Search for %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2110"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2130"/>
         <source>Camera(s) not Saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2111"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2131"/>
         <source>Save changes to the following %n camera(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5715,12 +5715,12 @@ and you do not have the rights to overwrite it.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2319"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2339"/>
         <source>Delete Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2320"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2340"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5728,12 +5728,12 @@ and you do not have the rights to overwrite it.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2336"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2356"/>
         <source>Remove Items</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2337"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2357"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5741,22 +5741,22 @@ and you do not have the rights to overwrite it.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2378"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2398"/>
         <source>Rename</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2379"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2399"/>
         <source>Enter new name for the selected item:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2443"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2463"/>
         <source>Delete Resources</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2444"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2464"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5764,156 +5764,156 @@ and you do not have the rights to overwrite it.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2489"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2509"/>
         <source>New Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2490"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2510"/>
         <source>Enter the name of the layout to create:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2577"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2597"/>
         <source>User Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2667"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3232"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2687"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3252"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2668"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2688"/>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2707"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2716"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2853"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2727"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2736"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2873"/>
         <source>Could not save a layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2708"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2728"/>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2717"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2737"/>
         <source>Current layout contains several cameras and local files. You have to keep only cameras or only local files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2729"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2749"/>
         <source>Executable %1 Media File (x86) (*.exe)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2731"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2751"/>
         <source>Executable %1 Media File (x64) (*.exe)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2758"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2778"/>
         <source>Save local layout As...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2760"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2780"/>
         <source>Export Layout As...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2775"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2795"/>
         <source>Media File (*.nov)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2794"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2814"/>
         <source>Make file read-only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2812"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3315"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3329"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2832"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3335"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3349"/>
         <source>Save As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2813"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3330"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2833"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3350"/>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2825"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3363"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2845"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3383"/>
         <source>Could not overwrite file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2826"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2896"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3364"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2846"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2916"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3384"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2854"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2874"/>
         <source>Another export in progress. Please wait</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2870"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2890"/>
         <source>Exporting Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2875"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3398"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2895"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3418"/>
         <source>Open New Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2954"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2974"/>
         <source>Could not create output file %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3079"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3448"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3099"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3468"/>
         <source>Export finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3079"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3448"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3099"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3468"/>
         <source>Export successfully finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3157"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3177"/>
         <source>Exporting %1 to &quot;%2&quot;...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3166"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3186"/>
         <source>Could not export layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3214"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3234"/>
         <source>Could not export file</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3215"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3235"/>
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5921,131 +5921,131 @@ Do you want to continue?</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3233"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3253"/>
         <source>You are about to export a video sequence that is longer than 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3247"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3267"/>
         <source>AVI (*.avi)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3248"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3268"/>
         <source>Matroska (*.mkv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3276"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3296"/>
         <source>Export Video As...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3287"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3307"/>
         <source>Include timestamps (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3292"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3312"/>
         <source>Apply dewarping and image correction (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3294"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3314"/>
         <source>Apply image correction (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3296"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3316"/>
         <source>Apply dewarping (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3316"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3336"/>
         <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3349"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3369"/>
         <source>AVI format is not recommended</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3350"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3370"/>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists.Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3393"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3413"/>
         <source>Exporting Video</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3394"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3414"/>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3473"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3493"/>
         <source>Could not export video</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3562"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3572"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3582"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3592"/>
         <source>Could not get position from camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3563"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3583"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3573"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3593"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 The camera is probably in continuous movement mode. Please stop the camera and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3585"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3605"/>
         <source>Save Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3617"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3637"/>
         <source>Could not set position from camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3618"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3638"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3648"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3668"/>
         <source>Updating background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3649"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3669"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3683"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3703"/>
         <source>Image cannot be uploaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3746"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3766"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6053,7 +6053,7 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3747"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3767"/>
         <source>Do you want to restore these %n layout(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6061,7 +6061,7 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3763"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3783"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6069,19 +6069,19 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3775"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3795"/>
         <source>Could not delete resource</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3775"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3795"/>
         <source>An error has occurred while trying to delete a resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3786"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3806"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6089,32 +6089,32 @@ Error description: &apos;%2&apos;</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3928"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3948"/>
         <source>Client v%1&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3931"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3951"/>
         <source>Enterprise Controller v%1&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3936"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3956"/>
         <source>Media Server v%1 at %2&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3938"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3958"/>
         <source>Media Server v%1&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3951"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3971"/>
         <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3959"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3979"/>
         <source>Version Mismatch</source>
         <translation type="unfinished"></translation>
     </message>
