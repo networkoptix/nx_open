@@ -4906,6 +4906,10 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
         <source>Dewarping</source>
         <translation>扭曲影像還原</translation>
     </message>
+    <message>
+        <source>Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMotionEnabledDelegate</name>

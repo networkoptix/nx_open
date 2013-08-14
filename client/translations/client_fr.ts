@@ -4038,6 +4038,10 @@ La version cliente %2 est requise pour vous connecter sur ce Serveur Entreprise.
         <source>Dewarping</source>
         <translation>Dérouler</translation>
     </message>
+    <message>
+        <source>Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMotionEnabledDelegate</name>

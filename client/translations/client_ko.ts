@@ -4104,71 +4104,76 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <name>QnMediaResourceWidget</name>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="104"/>
+        <source>Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="111"/>
         <source>Smart Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="112"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="119"/>
         <source>PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="120"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="127"/>
         <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="129"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="136"/>
         <source>Create Zoom Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="137"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="144"/>
         <source>Image Enhancement</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="455"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="463"/>
         <source>Zoom window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="759"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="767"/>
         <source> (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="765"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="773"/>
         <source> Lo-Res</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="765"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="773"/>
         <source> Hi-Res</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="774"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="782"/>
         <source>	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="776"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="784"/>
         <source>LIVE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="781"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="789"/>
         <source> HW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="781"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="789"/>
         <source> SW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="782"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="790"/>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7%8</source>
         <translation type="unfinished"></translation>
     </message>
