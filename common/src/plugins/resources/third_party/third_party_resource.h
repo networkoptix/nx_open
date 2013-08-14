@@ -33,6 +33,11 @@ public:
     virtual QnAbstractPtzController* getPtzController() override;
     //!Implementation of QnNetworkResource::isResourceAccessible
     virtual bool isResourceAccessible() override;
+    //!Implementation of QnNetworkResource::ping
+    /*!
+        At the moment always returns \a true
+    */
+    virtual bool ping() override;
     //!Implementation of QnSecurityCamResource::manufacture
     virtual QString getDriverName() const override;
     //!Implementation of QnSecurityCamResource::setIframeDistance

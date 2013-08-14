@@ -45,6 +45,12 @@ bool QnThirdPartyResource::isResourceAccessible()
     return updateMACAddress();
 }
 
+bool QnThirdPartyResource::ping()
+{
+    //TODO: should check if camera supports http and, if supports, check http port
+    return true;
+}
+
 QString QnThirdPartyResource::getDriverName() const
 {
     return m_discoveryManager.getVendorName();
