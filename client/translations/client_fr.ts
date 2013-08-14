@@ -4040,7 +4040,7 @@ La version cliente %2 est requise pour vous connecter sur ce Serveur Entreprise.
     </message>
     <message>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Prendre une capture d&apos;écran</translation>
     </message>
 </context>
 <context>
