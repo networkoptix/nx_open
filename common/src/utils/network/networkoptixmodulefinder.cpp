@@ -37,7 +37,8 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
 :
     m_pingTimeoutMillis( pingTimeoutMillis == 0 ? defaultPingTimeoutMillis : pingTimeoutMillis ),
     m_keepAliveMultiply( keepAliveMultiply == 0 ? keepAliveMultiply : defaultKeepAliveMultiply ),
-    m_prevPingClock( 0 )
+    m_prevPingClock( 0 ),
+    m_compatibilityMode(false)
 {
     const QList<QHostAddress>& interfaceAddresses = QNetworkInterface::allAddresses();
     for( QList<QHostAddress>::const_iterator
@@ -83,6 +84,14 @@ NetworkOptixModuleFinder::~NetworkOptixModuleFinder()
 bool NetworkOptixModuleFinder::isValid() const
 {
     return !m_sockets.empty();
+}
+
+bool NetworkOptixModuleFinder::isCompatibilityMode() const {
+    return m_compatibilityMode;
+}
+
+void NetworkOptixModuleFinder::setCompatibilityMode(bool value) {
+    m_compatibilityMode = value;
 }
 
 void NetworkOptixModuleFinder::pleaseStop()
@@ -191,7 +200,7 @@ void NetworkOptixModuleFinder::run()
                 continue;
             }
 
-            if( Qn::calculateCustomization(response.customization.toLatin1().constData()) != qnCustomization() )
+            if(!m_compatibilityMode && Qn::calculateCustomization(response.customization.toLatin1().constData()) != qnCustomization() )
             {
                 NX_LOG( QString::fromAscii("NetworkOptixModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
                     arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress()), cl_logDEBUG2 );
