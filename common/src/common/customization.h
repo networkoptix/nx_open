@@ -23,7 +23,7 @@ namespace Qn {
     };
 
     inline Qn::Customization calculateCustomization(const char *customizationName) {
-        if(std::strcmp(customizationName, "Vms") == 0) {
+        if(std::strcmp(customizationName, "Vms") == 0 || std::strcmp(customizationName, "default") == 0) {
             return HdWitnessCustomization;
         } else if(std::strcmp(customizationName, "digitalwatchdog") == 0) {
             return DwSpectrumCustomization;
