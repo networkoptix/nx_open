@@ -120,7 +120,7 @@ private:
     GraphicsWidget* m_headerWidget;
 
     QMultiHash<QnSystemHealth::MessageType, QnNotificationItem*> m_itemsByMessageType;
-    QWeakPointer<QnBlinkingImageButtonWidget> m_blinker;
+    QPointer<QnBlinkingImageButtonWidget> m_blinker;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

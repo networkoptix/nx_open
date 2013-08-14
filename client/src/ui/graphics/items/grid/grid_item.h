@@ -1,7 +1,7 @@
 #ifndef QN_GRID_ITEM_H
 #define QN_GRID_ITEM_H
 
-#include <QtCore/QWeakPointer>
+
 #include <QtWidgets/QGraphicsObject>
 
 #include <utils/common/hash.h> /* For qHash(QPoint). */
@@ -34,9 +34,7 @@ public:
 
     virtual QRectF boundingRect() const override;
 
-    QnWorkbenchGridMapper *mapper() const {
-        return m_mapper.data();
-    }
+    QnWorkbenchGridMapper *mapper() const;
 
     void setMapper(QnWorkbenchGridMapper *mapper);
 
@@ -91,7 +89,7 @@ private:
     };
 
     QRectF m_boundingRect;
-    QWeakPointer<QnWorkbenchGridMapper> m_mapper;
+    QPointer<QnWorkbenchGridMapper> m_mapper;
     QColor m_color;
     qreal m_lineWidth;
     QHash<int, QColor> m_colorByState;

@@ -440,10 +440,10 @@ private:
     QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
 
     /** Grid item. */
-    QWeakPointer<QnGridItem> m_gridItem;
+    QPointer<QnGridItem> m_gridItem;
 
     /** Grid background item. */
-    QWeakPointer<QnGridBackgroundItem> m_gridBackgroundItem;
+    QPointer<QnGridBackgroundItem> m_gridBackgroundItem;
 
     /** Current frame opacity for widgets. */
     qreal m_frameOpacity;
@@ -494,7 +494,7 @@ private:
     ViewportAnimator *m_viewportAnimator;
 
     /** Curtain item. */
-    QWeakPointer<QnCurtainItem> m_curtainItem;
+    QPointer<QnCurtainItem> m_curtainItem;
 
     /** Curtain animator. */
     QnCurtainAnimator *m_curtainAnimator;

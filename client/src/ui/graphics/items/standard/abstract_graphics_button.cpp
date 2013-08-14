@@ -264,7 +264,7 @@ QList<AbstractGraphicsButton *>AbstractGraphicsButtonPrivate::queryButtonList() 
         return group->d_func()->buttonList;
 #endif
 
-    QList<AbstractGraphicsButton*>candidates = qFindChildren<AbstractGraphicsButton *>(q_func()->parent());
+    QList<AbstractGraphicsButton*>candidates = q_func()->parent()->findChildren<AbstractGraphicsButton *>();
     if (autoExclusive) {
         for (int i = candidates.count() - 1; i >= 0; --i) {
             AbstractGraphicsButton *candidate = candidates.at(i);
@@ -451,7 +451,7 @@ void AbstractGraphicsButtonPrivate::refresh()
         return;
     q->update();
 #ifndef QT_NO_ACCESSIBILITY
-    QAccessible::updateAccessibility(q, 0, QAccessible::StateChanged);
+    QAccessible::updateAccessibility(new QAccessibleEvent(q, QAccessible::StateChanged));
 #endif
 }
 
@@ -597,7 +597,7 @@ void AbstractGraphicsButton::setText(const QString &text)
     update();
     updateGeometry();
 #ifndef QT_NO_ACCESSIBILITY
-    QAccessible::updateAccessibility(this, 0, QAccessible::NameChanged);
+    QAccessible::updateAccessibility(new QAccessibleEvent(this, QAccessible::NameChanged));
 #endif
 }
 

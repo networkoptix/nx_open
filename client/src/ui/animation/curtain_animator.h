@@ -3,7 +3,7 @@
 
 #include <QtGui/QColor>
 #include <QtCore/QObject>
-#include <QtCore/QWeakPointer>
+
 
 #include "animator_group.h"
 

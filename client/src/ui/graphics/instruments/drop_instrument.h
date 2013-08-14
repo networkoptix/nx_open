@@ -35,13 +35,8 @@ protected:
     virtual bool dragLeaveEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
     virtual bool dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
 
-    DestructionGuardItem *guard() const {
-        return m_guard.data();
-    }
-
-    SceneEventFilterItem *filterItem() const {
-        return m_filterItem.data();
-    }
+    DestructionGuardItem *guard() const;
+    SceneEventFilterItem *filterItem() const;
 
 private:
     QnResourceList m_resources;

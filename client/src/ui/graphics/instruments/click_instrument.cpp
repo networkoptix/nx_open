@@ -1,6 +1,6 @@
 #include "click_instrument.h"
 #include <QtWidgets/QGraphicsSceneMouseEvent>
-#include <QtCore/QWeakPointer>
+
 #include <QtWidgets/QApplication>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>

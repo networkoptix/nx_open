@@ -143,8 +143,9 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
 }
 
 void QnBusinessRulesViewModel::clear() {
+    beginResetModel();
     m_rules.clear();
-    reset();
+    endResetModel();
 }
 
 void QnBusinessRulesViewModel::addRules(const QnBusinessEventRuleList &businessRules) {

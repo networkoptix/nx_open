@@ -573,8 +573,9 @@ qint64 QnEventLogModel::eventTimestamp(int row) const
 
 void QnEventLogModel::rebuild()
 {
+    beginResetModel();
     setRowCount(m_index->size());
-    reset();
+    endResetModel();
 }
 
 void QnEventLogModel::at_resource_removed(QnResourcePtr res)

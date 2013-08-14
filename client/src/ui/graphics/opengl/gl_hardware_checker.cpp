@@ -1,6 +1,6 @@
 #include "gl_hardware_checker.h"
 
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 #include <utils/common/log.h>
 #include <utils/common/warnings.h>

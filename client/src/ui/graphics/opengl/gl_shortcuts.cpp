@@ -4,6 +4,8 @@
 #   include <Glu.h>
 #endif
 
+#include <GL/glu.h>
+
 #include <utils/common/warnings.h>
 
 

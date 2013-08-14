@@ -2,7 +2,7 @@
 #define QN_DRAG_PROCESSOR_H
 
 #include <QtCore/QObject>
-#include <QtCore/QWeakPointer>
+
 
 #include <ui/common/geometry.h>
 
@@ -231,7 +231,7 @@ private:
     QWidget *m_viewport;
 
     /** Current object that is being worked on. */
-    QWeakPointer<QObject> m_object;
+    QPointer<QObject> m_object;
 
     /** Identifier of a timer used to track mouse press time. */
     int m_dragTimerId; // TODO: #Elric use QBasicTimer

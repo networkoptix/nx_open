@@ -361,4 +361,7 @@ QSet<QGraphicsItem *> RubberBandInstrument::toSet(QList<QGraphicsItem *> items) 
     return result;
 }
 
+RubberBandItem* RubberBandInstrument::rubberBand() const  {
+    return m_rubberBand.data();
+}
 

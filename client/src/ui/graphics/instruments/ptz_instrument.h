@@ -1,7 +1,7 @@
 #ifndef QN_ABSOLUTE_PTZ_INSTRUMENT_H
 #define QN_ABSOLUTE_PTZ_INSTRUMENT_H
 
-#include <QtCore/QWeakPointer>
+
 #include <QtCore/QBasicTimer>
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
@@ -84,24 +84,16 @@ private slots:
     void updateCapabilities(QnMediaResourceWidget *widget);
 
 private:
-    QnMediaResourceWidget *target() const {
-        return m_target.data();
-    }
+    QnMediaResourceWidget *target() const;
 
-    PtzManipulatorWidget *manipulator() const {
-        return m_manipulator.data();
-    }
+    PtzManipulatorWidget *manipulator() const;
 
     QnSplashItem *newSplashItem(QGraphicsItem *parentItem);
 
-    FixedArSelectionItem *selectionItem() const {
-        return m_selectionItem.data();
-    }
+    FixedArSelectionItem *selectionItem() const;
     void ensureSelectionItem();
 
-    PtzElementsWidget *elementsWidget() const {
-        return m_elementsWidget.data();
-    }
+    PtzElementsWidget *elementsWidget() const;
     void ensureElementsWidget();
 
     PtzOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;

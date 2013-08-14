@@ -48,9 +48,7 @@ protected:
 
     static QSet<QGraphicsItem *> toSet(QList<QGraphicsItem *> items);
 
-    RubberBandItem *rubberBand() const {
-        return m_rubberBand.data();
-    }
+    RubberBandItem *rubberBand() const;
 
 private slots:
     void at_scene_selectionChanged();

@@ -249,7 +249,7 @@ public:
     }
 
 private:
-    QWeakPointer<QnMediaResourceWidget> m_target;
+    QPointer<QnMediaResourceWidget> m_target;
 };
 
 
@@ -495,6 +495,15 @@ PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
 }
 
+
+QnMediaResourceWidget *PtzInstrument::target() const {
+    return m_target.data();
+}
+
+PtzManipulatorWidget *PtzInstrument::manipulator() const {
+    return m_manipulator.data();
+}
+
 QnSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     QnSplashItem *result;
     if(!m_freeAnimations.empty()) {
@@ -543,6 +552,11 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     return overlay;
 }
 
+FixedArSelectionItem *PtzInstrument::selectionItem() const {
+    return m_selectionItem.data();
+}
+
+
 void PtzInstrument::ensureSelectionItem() {
     if(selectionItem())
         return;
@@ -556,6 +570,10 @@ void PtzInstrument::ensureSelectionItem() {
 
     if(scene())
         scene()->addItem(selectionItem());
+}
+
+PtzElementsWidget *PtzInstrument::elementsWidget() const {
+    return m_elementsWidget.data();
 }
 
 void PtzInstrument::ensureElementsWidget() {

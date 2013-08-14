@@ -63,7 +63,7 @@ public:
     static qint64 sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown, bool bound);
 
 private:
-    QWeakPointer<QStyle> m_baseStyle;
+    QPointer<QStyle> m_baseStyle;
     mutable const QGraphicsWidget *m_graphicsWidget;
 };
 

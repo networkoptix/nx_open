@@ -20,6 +20,7 @@ class QnWorkbenchLayoutSnapshotManager;
 class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
     Q_OBJECT
 
+    typedef QAbstractItemModel base_type;
 public:
     explicit QnResourcePoolModel(Qn::NodeType rootNodeType = Qn::RootNode, bool isFlat = false, QObject *parent = NULL);
     virtual ~QnResourcePoolModel();
@@ -34,6 +35,7 @@ public:
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    virtual QHash<int,QByteArray> roleNames() const;
 
     virtual QStringList mimeTypes() const override;
     virtual QMimeData *mimeData(const QModelIndexList &indexes) const override;

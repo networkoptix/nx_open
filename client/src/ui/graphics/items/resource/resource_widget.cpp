@@ -278,6 +278,10 @@ QnResourcePtr QnResourceWidget::resource() const {
     return m_resource;
 }
 
+QnWorkbenchItem* QnResourceWidget::item() const {
+    return m_item.data();
+}
+
 const QRectF &QnResourceWidget::zoomRect() const {
     return m_zoomRect;
 }

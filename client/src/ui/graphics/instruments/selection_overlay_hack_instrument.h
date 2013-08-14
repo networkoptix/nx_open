@@ -1,7 +1,7 @@
 #ifndef QN_SELECTION_OVERLAY_HACK_INSTRUMENT_H
 #define QN_SELECTION_OVERLAY_HACK_INSTRUMENT_H
 
-#include <QtCore/QWeakPointer>
+
 
 #include "instrument.h"
 
@@ -34,9 +34,7 @@ protected:
     virtual bool registeredNotify(QGraphicsItem *item) override;
     virtual void unregisteredNotify(QGraphicsItem *item) override;
 
-    QnResourceWidget *singleSelectedWidget() {
-        return m_singleSelectedWidget.data();
-    }
+    QnResourceWidget *singleSelectedWidget();
 
     void showSelectedOverlay(QnResourceWidget *widget, bool show);
 

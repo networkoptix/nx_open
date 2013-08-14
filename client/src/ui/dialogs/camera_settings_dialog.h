@@ -46,7 +46,7 @@ private slots:
     void acceptIfSafe();
 
 private:
-    QWeakPointer<QnWorkbenchContext> m_context;
+    QPointer<QnWorkbenchContext> m_context;
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
     QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;

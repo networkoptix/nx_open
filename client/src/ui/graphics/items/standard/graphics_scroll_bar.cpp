@@ -3,7 +3,7 @@
 
 #include <limits.h>
 
-#include <QtCore/QWeakPointer>
+
 
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsSceneContextMenuEvent>
@@ -51,7 +51,7 @@ bool GraphicsScrollBarPrivate::updateHoverControl(const QPointF &pos)
     Q_Q(GraphicsScrollBar);
     QRect lastHoverRect = hoverRect;
     QStyle::SubControl lastHoverControl = hoverControl;
-    bool doesHover = q->acceptsHoverEvents();
+    bool doesHover = q->acceptHoverEvents();
     if (lastHoverControl != newHoverControl(pos) && doesHover) {
         q->update(lastHoverRect);
         q->update(hoverRect);
@@ -178,7 +178,7 @@ void GraphicsScrollBar::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
 #ifndef QT_NO_MENU
     bool horiz = d_func()->orientation == Qt::Horizontal;
-    QWeakPointer<QMenu> guard = new QMenu(event->widget());
+    QPointer<QMenu> guard = new QMenu(event->widget());
     QMenu *menu = guard.data();
 
     QAction *actScrollHere = menu->addAction(tr("Scroll here"));

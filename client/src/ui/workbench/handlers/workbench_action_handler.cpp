@@ -788,6 +788,30 @@ QnWorkbenchNotificationsHandler* QnWorkbenchActionHandler::notificationsHandler(
     return context()->instance<QnWorkbenchNotificationsHandler>();
 }
 
+QnCameraSettingsDialog *QnWorkbenchActionHandler::cameraSettingsDialog() const {
+    return m_cameraSettingsDialog.data();
+}
+
+QnBusinessRulesDialog *QnWorkbenchActionHandler::businessRulesDialog() const {
+    return m_businessRulesDialog.data();
+}
+
+QnEventLogDialog *QnWorkbenchActionHandler::businessEventsLogDialog() const {
+    return m_businessEventsLogDialog.data();
+}
+
+QnCameraListDialog *QnWorkbenchActionHandler::cameraListDialog() const {
+    return m_cameraListDialog.data();
+}
+
+QnCameraAdditionDialog *QnWorkbenchActionHandler::cameraAdditionDialog() const {
+    return m_cameraAdditionDialog.data();
+}
+
+QnLoginDialog *QnWorkbenchActionHandler::loginDialog() const {
+    return m_loginDialog.data();
+}
+
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
     if(!cameraSettingsDialog())
         return;
@@ -999,7 +1023,7 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*> (menu()->currentParameters(sender()).widget());
     if(!widget)
         return;
-    QWeakPointer<QnResourceWidget> guard(widget);
+    QPointer<QnResourceWidget> guard(widget);
 
     
 

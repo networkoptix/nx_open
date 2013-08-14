@@ -259,7 +259,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Fps counter. */
     m_fpsItem = new QnProxyLabel(m_controlsWidget);
     m_fpsItem->setAcceptedMouseButtons(0);
-    m_fpsItem->setAcceptsHoverEvents(false);
+    m_fpsItem->setAcceptHoverEvents(false);
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText,  QColor(63, 159, 216));
 

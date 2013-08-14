@@ -90,7 +90,7 @@ protected slots:
 private:
     Q_DISABLE_COPY(QnProxyStyle)
 
-    QWeakPointer<QStyle> m_style;
+    QPointer<QStyle> m_style;
 };
 
 #endif // QN_PROXY_STYLE_H

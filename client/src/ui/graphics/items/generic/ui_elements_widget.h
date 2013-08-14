@@ -1,7 +1,7 @@
 #ifndef QN_UI_ELEMENTS_WIDGET_H
 #define QN_UI_ELEMENTS_WIDGET_H
 
-#include <QtCore/QWeakPointer>
+
 #include <QtWidgets/QGraphicsWidget>
 
 #include <ui/graphics/items/standard/graphics_widget.h>

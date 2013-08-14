@@ -3,8 +3,8 @@
 #include "version.h"
 
 #include <QtCore/QFile>
-#include <QtCore/QUrl>
 #include <QtCore/QTextStream>
+#include <QtCore/QUrlQuery>
 
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QTreeWidgetItem>
@@ -134,7 +134,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
     QNetworkRequest request;
     request.setUrl(url);
 
-    QUrl params;
+    QUrlQuery params;
     params.addQueryItem(QLatin1String("license_key"), QLatin1String(licenseKey));
 
     int n = 1;
@@ -149,7 +149,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
     params.addQueryItem(QLatin1String("brand"), QLatin1String(QN_PRODUCT_NAME_SHORT));
     params.addQueryItem(QLatin1String("version"), QLatin1String(QN_ENGINE_VERSION));
 
-    QNetworkReply *reply = m_httpClient->post(request, params.encodedQuery());  
+    QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());
     m_replyKeyMap[reply] = licenseKey;
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));

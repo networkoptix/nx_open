@@ -46,6 +46,10 @@ QnGridItem::~QnGridItem() {
     return;
 }
 
+QnWorkbenchGridMapper* QnGridItem::mapper() const {
+    return m_mapper.data();
+}
+
 void QnGridItem::setMapper(QnWorkbenchGridMapper *mapper) {
     m_mapper = mapper;
 }

@@ -74,3 +74,7 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
     event->accept();
     return false;
 }
+
+QnWorkbench *GridAdjustmentInstrument::workbench() const {
+    return m_workbench.data();
+}

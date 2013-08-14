@@ -4,8 +4,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QUuid>
 #include <QtCore/QTimer>
-
-#include <QtGui/QDesktopServices>
+#include <QtCore/QStandardPaths>
 
 #include <api/app_server_connection.h>
 
@@ -25,11 +24,11 @@ QnAppServerFileCache::~QnAppServerFileCache(){}
 // -------------- Utility methods ----------------
 
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
-    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QUrl url = QnAppServerConnectionFactory::defaultUrl();
     return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/%4/%5"))
                                     .arg(path)
-                                    .arg(QLatin1String(url.encodedHost()))
+                                    .arg(url.host(QUrl::FullyEncoded))
                                     .arg(url.port())
                                     .arg(m_folderName)
                                     .arg(filename)
@@ -46,7 +45,7 @@ QString QnAppServerFileCache::folderName() const {
 }
 
 void QnAppServerFileCache::clearLocalCache() {
-    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QString dir = QDir::toNativeSeparators(QString(QLatin1String("%1/cache/")).arg(path));
     removeDir(dir);
 }

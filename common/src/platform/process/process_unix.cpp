@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #include <QtCore/QProcess>
-#include <QtCore/QWeakPointer>
+
 
 #include <utils/common/warnings.h>
 

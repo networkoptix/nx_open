@@ -168,3 +168,11 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
     event->acceptProposedAction();
     return true;
 }
+
+DestructionGuardItem *DropInstrument::guard() const {
+    return m_guard.data();
+}
+
+SceneEventFilterItem *DropInstrument::filterItem() const {
+    return m_filterItem.data();
+}

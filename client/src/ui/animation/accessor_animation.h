@@ -3,7 +3,7 @@
 
 #include <QtCore/QVariantAnimation>
 #include <QtCore/QScopedPointer>
-#include <QtCore/QWeakPointer>
+
 
 #include <ui/common/accessor.h>
 
@@ -47,7 +47,7 @@ protected:
 
 private:
     QScopedPointer<AbstractAccessor> m_accessor;
-    QWeakPointer<QObject> m_target;
+    QPointer<QObject> m_target;
 };
 
 #endif // QN_ACCESSOR_ANIMATION_H

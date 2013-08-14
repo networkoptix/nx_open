@@ -1,7 +1,7 @@
 #ifndef QN_BUTTON_BOX_DIALOG_H
 #define QN_BUTTON_BOX_DIALOG_H
 
-#include <QtCore/QWeakPointer>
+
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 

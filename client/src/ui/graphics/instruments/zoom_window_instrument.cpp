@@ -256,7 +256,7 @@ private:
 
 private:
     QHash<ZoomWindowWidget *, QRectF> m_rectByWidget;
-    QWeakPointer<QnMediaResourceWidget> m_target;
+    QPointer<QnMediaResourceWidget> m_target;
     bool m_interactive;
 };
 
@@ -371,6 +371,18 @@ ZoomOverlayWidget *ZoomWindowInstrument::ensureOverlayWidget(QnMediaResourceWidg
 
 ZoomWindowWidget *ZoomWindowInstrument::windowWidget(QnMediaResourceWidget *widget) const {
     return m_dataByWidget[widget].windowWidget;
+}
+
+QnMediaResourceWidget *ZoomWindowInstrument::target() const {
+    return m_target.data();
+}
+
+ZoomWindowWidget *ZoomWindowInstrument::windowTarget() const {
+    return m_windowTarget.data();
+}
+
+FixedArSelectionItem *ZoomWindowInstrument::selectionItem() const {
+    return m_selectionItem.data();
 }
 
 void ZoomWindowInstrument::ensureSelectionItem() {

@@ -296,6 +296,15 @@ void RotationInstrument::start(QGraphicsView *view, QGraphicsWidget *target) {
     startInternal(view, &event, target, true);
 }
 
+RotationItem *RotationInstrument::rotationItem() const {
+    return m_rotationItem.data();
+}
+
+QGraphicsWidget *RotationInstrument::target() const {
+    return m_target.data();
+}
+
+
 void RotationInstrument::startInternal(QGraphicsView *view, QMouseEvent *event, QGraphicsWidget *target, bool instantStart) {
     m_target = target;
     m_originAngle = calculateSceneAngle(target, view->mapToScene(event->pos()), calculateOrigin(view, target));

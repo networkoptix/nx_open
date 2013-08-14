@@ -271,3 +271,12 @@ void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
 
     emit selectionProcessFinished(info->view(), target());
 }
+
+SelectionItem *MotionSelectionInstrument::selectionItem() const {
+    return m_selectionItem.data();
+}
+
+QnMediaResourceWidget *MotionSelectionInstrument::target() const {
+    return m_target.data();
+}
+

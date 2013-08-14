@@ -1,7 +1,6 @@
 #ifndef QN_ACTION_H
 #define QN_ACTION_H
 
-#include <QtCore/QWeakPointer>
 #include <QtCore/QMetaType>
 #include <QtWidgets/QAction>
 

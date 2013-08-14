@@ -33,9 +33,7 @@ protected:
     virtual bool wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) override;
 
 private:
-    QnWorkbench *workbench() const {
-        return m_workbench.data();
-    }
+    QnWorkbench *workbench() const;
 
 private:
     QPointer<QWidget> m_currentViewport;

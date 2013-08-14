@@ -2,7 +2,7 @@
 #define QN_WORKBENCH_MOTION_DISPLAY_WATCHER_H
 
 #include <QtCore/QObject>
-#include <QtCore/QWeakPointer>
+
 #include <QtCore/QSet>
 
 #include <ui/workbench/workbench_context_aware.h>

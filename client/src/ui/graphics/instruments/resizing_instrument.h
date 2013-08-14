@@ -1,7 +1,7 @@
 #ifndef QN_RESIZING_INSTRUMENT_H
 #define QN_RESIZING_INSTRUMENT_H
 
-#include <QtCore/QWeakPointer>
+
 #include <QtGui/QTransform>
 
 #include "drag_processing_instrument.h"
