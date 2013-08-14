@@ -67,6 +67,7 @@ namespace CameraDiagnostics
             serverTerminated,
             cameraInvalidParams,
             badMediaStream,
+            noMediaStream,
             unknown
         };
 
@@ -138,6 +139,13 @@ namespace CameraDiagnostics
     public:
         BadMediaStreamResult()
             : Result( ErrorCode::badMediaStream) {}
+    };
+
+    class NoMediaStreamResult : public Result
+    {
+    public:
+        NoMediaStreamResult()
+            : Result( ErrorCode::noMediaStream) {}
     };
 
     class CameraResponseParseErrorResult : public Result

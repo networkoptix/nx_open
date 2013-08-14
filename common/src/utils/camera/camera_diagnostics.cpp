@@ -93,6 +93,9 @@ public:
             case badMediaStream:
                 errorMessage = tr("Too many media errors. Please open camera issues dialog for more details");
                 break;
+            case noMediaStream:
+                errorMessage = tr("Media stream is opened but no any media data was received");
+                break;
             default:
             {
                 int nonEmptyParamCount = 0;

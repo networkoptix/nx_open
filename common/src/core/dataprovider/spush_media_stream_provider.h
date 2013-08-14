@@ -50,6 +50,7 @@ private:
     int m_openStreamCounter;
     QWaitCondition m_cond;
     QMutex m_openStreamMutex;
+    int m_FrameCnt;
 };
 
 #endif //server_push_stream_reader_h2055
