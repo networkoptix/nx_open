@@ -326,6 +326,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
 
     updateUsability();
 
+
     if(status != 0) {
         QMessageBox::warning(
             this, 
