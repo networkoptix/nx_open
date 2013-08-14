@@ -176,6 +176,14 @@
         <source>Restore Defaults</source>
         <translation>还原为默认值</translation>
     </message>
+    <message>
+        <source>Override current value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected camera(s) have no expert settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ArchiveSpaceSlider</name>

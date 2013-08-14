@@ -91,63 +91,72 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="201"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="214"/>
         <source>Warning! Please read documentation prior to change these settings!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="33"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="46"/>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="20"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="40"/>
         <source>Camera Settings Control</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="26"/>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="56"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="27"/>
         <source>I have read the manual and understand the risks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="40"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="53"/>
         <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="50"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="63"/>
         <source>Secondary Stream Quality Control</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="147"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="69"/>
+        <source>Override current value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="160"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="154"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="167"/>
         <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="221"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="234"/>
         <source>Restore Defaults</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="88"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="250"/>
+        <source>Selected camera(s) have no expert settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="101"/>
         <source>Low quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="111"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="124"/>
         <source>Medium quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="134"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="147"/>
         <source>High quality</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5580,10 +5589,10 @@ AVAILABLE</source>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1379"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3677"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3739"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3756"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3779"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3683"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3745"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3762"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3785"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5756,12 +5765,12 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3769"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3775"/>
         <source>Could not delete resource</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3769"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3775"/>
         <source>An error has occurred while trying to delete a resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
@@ -6058,34 +6067,34 @@ The camera is probably in continuous movement mode. Please stop the camera and t
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3611"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3617"/>
         <source>Could not set position from camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3612"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3618"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3642"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3648"/>
         <source>Updating background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3643"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3649"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3677"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3683"/>
         <source>Image cannot be uploaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3740"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3746"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6094,7 +6103,7 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3741"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3747"/>
         <source>Do you want to restore these %n layout(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6103,7 +6112,7 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3757"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3763"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6112,7 +6121,7 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3780"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3786"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6121,32 +6130,32 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3922"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3928"/>
         <source>Client v%1&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3925"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3931"/>
         <source>Enterprise Controller v%1&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3930"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3936"/>
         <source>Media Server v%1 at %2&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3932"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3938"/>
         <source>Media Server v%1&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3945"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3951"/>
         <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3953"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3959"/>
         <source>Version Mismatch</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6263,12 +6272,12 @@ Error description: &apos;%2&apos;</source>
 <context>
     <name>QnWorkbenchNavigator</name>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="958"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="961"/>
         <source>All Cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1183"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1186"/>
         <source>&apos;Live&apos;</source>
         <comment>LIVE_TOOL_TIP_FORMAT</comment>
         <translation type="unfinished"></translation>

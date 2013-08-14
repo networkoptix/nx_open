@@ -177,6 +177,14 @@
         <source>Restore Defaults</source>
         <translation>Restaurer par défauts</translation>
     </message>
+    <message>
+        <source>Override current value</source>
+        <translation>Remplacer la valeur actuelle</translation>
+    </message>
+    <message>
+        <source>Selected camera(s) have no expert settings</source>
+        <translation>Les caméras sélectionnées n&apos;ont pas de configuration experte</translation>
+    </message>
 </context>
 <context>
     <name>ArchiveSpaceSlider</name>
