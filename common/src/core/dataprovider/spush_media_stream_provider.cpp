@@ -105,7 +105,7 @@ void CLServerPushStreamReader::run()
             {
                 if (canChangeStatus())
                     getResource()->setStatus(QnResource::Offline);
-
+                m_resource->setLastMediaIssue(CameraDiagnostics::BadMediaStreamResult());
                 m_stat[0].onLostConnection();
             }
 
@@ -131,7 +131,7 @@ void CLServerPushStreamReader::run()
             {
                 m_stat[0].onEvent(CL_STAT_CAMRESETED);
             }
-
+            m_resource->setLastMediaIssue(CameraDiagnostics::NoErrorResult());
             mFramesLost = 0;
         }
 

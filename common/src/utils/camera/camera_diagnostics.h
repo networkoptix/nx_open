@@ -66,6 +66,7 @@ namespace CameraDiagnostics
             ioError,
             serverTerminated,
             cameraInvalidParams,
+            badMediaStream,
             unknown
         };
 
@@ -130,6 +131,13 @@ namespace CameraDiagnostics
     public:
         ConnectionClosedUnexpectedlyResult( const QString& mediaURL, const int mediaPort )
             : Result( ErrorCode::connectionClosedUnexpectedly, mediaURL, QString::number(mediaPort) ) {}
+    };
+
+    class BadMediaStreamResult : public Result
+    {
+    public:
+        BadMediaStreamResult()
+            : Result( ErrorCode::badMediaStream) {}
     };
 
     class CameraResponseParseErrorResult : public Result

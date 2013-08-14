@@ -28,7 +28,7 @@ protected:
 private:
     CameraDiagnostics::Result checkCameraAvailability( const QnSecurityCamResourcePtr& cameraRes );
     CameraDiagnostics::Result tryAcquireCameraMediaStream( const QnSecurityCamResourcePtr& cameraRes, QnVideoCamera* videoCamera );
-    CameraDiagnostics::Result checkCameraMediaStreamForErrors( QnVideoCamera* videoCamera );
+    CameraDiagnostics::Result checkCameraMediaStreamForErrors( QnResourcePtr res );
 };
 
 #endif  //CAMERA_DIAGNOSTICS_HANDLER_H

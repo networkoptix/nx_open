@@ -156,6 +156,10 @@ public:
         \return true, if initialization attempt is done (with success or failure). false, if \a QnResource::init is already running in other thread
     */
     bool init();
+
+    void setLastMediaIssue(const CameraDiagnostics::Result& issue);
+    CameraDiagnostics::Result getLastMediaIssue() const;
+
     /*!
         Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
     */
@@ -388,6 +392,7 @@ private:
     static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
     CameraDiagnostics::Result m_prevInitializationResult;
+    CameraDiagnostics::Result m_lastMediaIssue;
     QAtomicInt m_initializationAttemptCount;
 };
 

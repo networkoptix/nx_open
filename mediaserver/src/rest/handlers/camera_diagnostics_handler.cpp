@@ -67,7 +67,7 @@ int QnCameraDiagnosticsHandler::executeGet(
             checkResult = tryAcquireCameraMediaStream( secCamRes, videoCamera );
             break;
         case CameraDiagnostics::Step::mediaStreamIntegrity:
-            checkResult = checkCameraMediaStreamForErrors( videoCamera );
+            checkResult = checkCameraMediaStreamForErrors( resource );
             break;
         default:
             return nx_http::StatusCode::notImplemented;
@@ -121,8 +121,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsHandler::tryAcquireCameraMediaStrea
     return streamReader->diagnoseMediaStreamConnection();
 }
 
-CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraMediaStreamForErrors( QnVideoCamera* /*videoCamera*/ )
+CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraMediaStreamForErrors( QnResourcePtr res )
 {
-    //TODO/IMPL
-    return CameraDiagnostics::NotImplementedResult();
+    return res->getLastMediaIssue();
 }

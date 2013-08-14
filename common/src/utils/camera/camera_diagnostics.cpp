@@ -90,6 +90,9 @@ public:
                 requiredParamCount = 1;
                 errorMessage = tr("Invalid data received from camera: %1");
                 break;
+            case badMediaStream:
+                errorMessage = tr("Too many media errors. Please open camera issues dialog for more details");
+                break;
             default:
             {
                 int nonEmptyParamCount = 0;
