@@ -181,7 +181,7 @@
 
         <ComponentGroup Id="ClientQuickSync" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
-                <File Id="ClientQuickSyncDll" Name="quicksyncdecoder1.dll" Source="${libdir}/bin/${build.configuration}/quicksyncdecoder1.dll"/>
+                <File Id="ClientQuickSyncDll" Name="quicksyncdecoder1.dll" Source="${libdir}/bin/${build.configuration}/quicksyncdecoder2.dll"/>
             </Component>
             <Component>
                 <File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="${libdir}/bin/${build.configuration}/hw_decoding_conf.xml"/>                               
