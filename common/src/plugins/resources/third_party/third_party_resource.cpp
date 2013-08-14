@@ -162,12 +162,18 @@ void QnThirdPartyResource::inputPortStateChanged(
 
 const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( int encoderNumber ) const
 {
+    QMutexLocker lk( &m_mutex );
     return m_encoderData[encoderNumber].resolutionList;
 }
 
 CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
     m_camManager.setCredentials( getAuth().user(), getAuth().password() );
+
+    {
+        QMutexLocker lk( &m_mutex );
+        m_encoderData.clear();
+    }
 
     int result = m_camManager.getCameraInfo( &m_camInfo );
     if( result != nxcip::NX_NO_ERROR )
@@ -226,8 +232,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
     //    setCameraCapability( Qn:: );
 
-    m_encoderData.clear();
-    m_encoderData.resize( encoderCount );
+    QVector<EncoderData> encoderDataTemp;
+    encoderDataTemp.resize( encoderCount );
 
     //reading resolution list
     QVector<nxcip::ResolutionInfo> resolutionInfoList;
@@ -254,10 +260,15 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         }
         for( int j = 0; j < resolutionInfoList.size(); ++j )
         {
-            m_encoderData[encoderNumber].resolutionList.push_back( resolutionInfoList[j].resolution );
+            encoderDataTemp[encoderNumber].resolutionList.push_back( resolutionInfoList[j].resolution );
             if( resolutionInfoList[j].maxFps > maxFps )
                 maxFps = resolutionInfoList[j].maxFps;
         }
+    }
+
+    {
+        QMutexLocker lk( &m_mutex );
+        m_encoderData = encoderDataTemp;
     }
 
     if( !setParam( MAX_FPS_PARAM_NAME, maxFps, QnDomainDatabase ) )
