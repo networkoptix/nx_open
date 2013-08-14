@@ -282,5 +282,9 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid) );
+
+    QString groupName = QString(lit("%1-%2")).arg(discoveryManager->getVendorName()).arg(resource->getHostAddress());
+    resource->setGroupName(groupName);
+    resource->setGroupId(groupName);
     return resource;
 }
