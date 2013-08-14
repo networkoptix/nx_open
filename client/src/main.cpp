@@ -18,6 +18,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QTranslator>
+#include <QtCore/QStandardPaths>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
@@ -241,12 +242,12 @@ void initAppServerConnection()
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
 }
 
-static QtMsgHandler defaultMsgHandler = 0;
+static QtMessageHandler defaultMsgHandler = 0;
 
-static void myMsgHandler(QtMsgType type, const char *msg)
+static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
     if (defaultMsgHandler) {
-        defaultMsgHandler(type, msg);
+        defaultMsgHandler(type, ctx, msg);
     } else { /* Default message handler. */
 #ifndef QN_NO_STDERR_MESSAGE_OUTPUT
         QTextStream err(stderr);
@@ -254,7 +255,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #endif
     }
 
-    qnLogMsgHandler( type, msg );
+    qnLogMsgHandler(type, ctx, msg);
 }
 
 #ifdef Q_WS_X11
@@ -387,7 +388,7 @@ int main(int argc, char **argv)
 
 
         /* Initialize log. */
-        const QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+        const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
         if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
             return 0;
         if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
@@ -403,7 +404,7 @@ int main(int argc, char **argv)
         cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
         cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
-        defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
+        defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
 
         // Create and start SessionManager

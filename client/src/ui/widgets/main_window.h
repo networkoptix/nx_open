@@ -38,7 +38,7 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option);
 
-    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WFlags flags = 0);
+    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~QnMainWindow();
 
     bool isTitleVisible() const {
