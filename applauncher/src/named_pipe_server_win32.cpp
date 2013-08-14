@@ -2,14 +2,14 @@
 // 18 aug 2013    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
+#ifdef _WIN32
+
 #include "named_pipe_server.h"
 
 #include <aclapi.h>
 
 #include "named_pipe_socket_win32.h"
 
-
-#ifdef _WIN32
 
 ////////////////////////////////////////////////////////////
 //// class NamedPipeServerImpl
