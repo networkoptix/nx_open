@@ -176,11 +176,6 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
     m_camManager.setCredentials( getAuth().user(), getAuth().password() );
 
-    {
-        QMutexLocker lk( &m_mutex );
-        m_encoderData.clear();
-    }
-
     int result = m_camManager.getCameraInfo( &m_camInfo );
     if( result != nxcip::NX_NO_ERROR )
     {
