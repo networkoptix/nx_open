@@ -89,7 +89,10 @@ void QnConnectionTestingDialog::testResults(int status, QnConnectInfoPtr connect
     bool success = true;
     QString detail;
 
-    if (status != 0) {
+    bool compatibleProduct = qnSettings->isDevMode() || connectInfo->brand.isEmpty()
+            || connectInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+
+    if (status != 0 || !compatibleProduct) {
         success = false;
         detail = tr("Connection to the Enterprise Controller could not be established.\n"\
                     "Connection details that you have entered are incorrect, please try again.\n\n"\
