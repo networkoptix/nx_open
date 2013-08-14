@@ -24,65 +24,6 @@ public:
         hPipe( INVALID_HANDLE_VALUE )
     {
     }
-
-    bool fillSecurityDescriptor( PSECURITY_DESCRIPTOR pSD )
-    {
-        bool result = true;
-
-        DWORD dwRes;
-        PSID pEveryoneSID = NULL;
-        PACL pACL = NULL;
-        EXPLICIT_ACCESS ea[1];
-        SID_IDENTIFIER_AUTHORITY SIDAuthWorld = SECURITY_WORLD_SID_AUTHORITY;
-
-        // Create a well-known SID for the Everyone group.
-        if( !AllocateAndInitializeSid(
-                &SIDAuthWorld, 1,
-                SECURITY_WORLD_RID,
-                0, 0, 0, 0, 0, 0, 0,
-                &pEveryoneSID) )
-        {
-            result = false;
-            goto Cleanup;
-        }
-
-        // Initialize an EXPLICIT_ACCESS structure for an ACE.
-        // The ACE will allow Everyone read access to the key.
-        ZeroMemory(ea, sizeof(ea));
-        ea[0].grfAccessPermissions = GENERIC_READ | GENERIC_WRITE;
-        ea[0].grfAccessMode = SET_ACCESS;
-        ea[0].grfInheritance = NO_INHERITANCE;
-        ea[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
-        ea[0].Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
-        ea[0].Trustee.ptstrName  = (LPTSTR) pEveryoneSID;
-
-        // Create a new ACL that contains the new ACEs.
-        dwRes = SetEntriesInAcl(1, ea, NULL, &pACL);
-        if( ERROR_SUCCESS != dwRes )
-        {
-            result = false;
-            goto Cleanup;
-        }
-
-        // Add the ACL to the security descriptor. 
-        if( !SetSecurityDescriptorDacl(
-                pSD, 
-                TRUE,     // bDaclPresent flag   
-                pACL, 
-                FALSE) )   // not a default DACL 
-        {  
-            result = false;
-            goto Cleanup;
-        } 
-
-Cleanup:
-        if( pEveryoneSID )
-            FreeSid(pEveryoneSID);
-        if( pACL )
-            LocalFree(pACL);
-
-        return result;
-    }
 };
 
 ////////////////////////////////////////////////////////////
@@ -114,7 +55,6 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
     PACL pACL = NULL;
     EXPLICIT_ACCESS ea[1];
     SID_IDENTIFIER_AUTHORITY SIDAuthWorld = SECURITY_WORLD_SID_AUTHORITY;
-    SECURITY_ATTRIBUTES sa;
 
     PSECURITY_DESCRIPTOR pSD = NULL;
     for( ;; )   //for break
@@ -130,7 +70,7 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
         }
 
         // Initialize an EXPLICIT_ACCESS structure for an ACE.
-        // The ACE will allow Everyone read access to the key.
+        // The ACE will allow Everyone read & write access to the pipe
         ZeroMemory(ea, sizeof(ea));
         ea[0].grfAccessPermissions = GENERIC_READ | GENERIC_WRITE;
         ea[0].grfAccessMode = SET_ACCESS;
@@ -166,16 +106,16 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
 
     const QString win32PipeName = QString::fromLatin1("\\\\.\\pipe\\%1").arg(pipeName);
     m_impl->hPipe = CreateNamedPipe(
-        win32PipeName.utf16(),             // pipe name 
+        win32PipeName.utf16(),              // pipe name 
         FILE_FLAG_FIRST_PIPE_INSTANCE | PIPE_ACCESS_DUPLEX,       // read/write access 
-        PIPE_TYPE_MESSAGE |       // message type pipe 
-            PIPE_READMODE_MESSAGE |   // message-read mode 
-            PIPE_WAIT,                // blocking mode 
-        PIPE_UNLIMITED_INSTANCES, // max. instances  
-        NamedPipeSocketImpl::BUFSIZE,      // output buffer size 
-        NamedPipeSocketImpl::BUFSIZE,      // input buffer size 
-        0,                        // client time-out 
-        pSD ? &secAttrs : NULL );                    // default security attribute 
+        PIPE_TYPE_MESSAGE |                 // message type pipe 
+            PIPE_READMODE_MESSAGE |         // message-read mode 
+            PIPE_WAIT,                      // blocking mode 
+        PIPE_UNLIMITED_INSTANCES,           // max. instances  
+        NamedPipeSocketImpl::BUFSIZE,       // output buffer size 
+        NamedPipeSocketImpl::BUFSIZE,       // input buffer size 
+        0,                                  // client time-out 
+        pSD ? &secAttrs : NULL );
 
     if( pEveryoneSID )
         FreeSid(pEveryoneSID);

@@ -52,12 +52,6 @@ bool TaskServerNew::listen( const QString& pipeName )
         return false;
     }
 
-#ifndef _WIN32
-    //removing unix socket file in case it hanged after process crash
-    const QByteArray filePath = (QLatin1String("/tmp/")+pipeName).toLatin1();
-    unlink( filePath.constData() );
-#endif
-
     const SystemError::ErrorCode osError = m_server.listen( pipeName );
     if( osError != SystemError::noError )
     {
@@ -127,6 +121,8 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
     if( task->type == applauncher::api::TaskType::startApplication )
         ((applauncher::api::StartApplicationTask*)task)->version = "debug";
 #endif
+    if( task->type == applauncher::api::TaskType::quit )
+        m_terminated = true;
 
     m_taskQueue->push( QSharedPointer<applauncher::api::BaseTask>(task) );
 }
