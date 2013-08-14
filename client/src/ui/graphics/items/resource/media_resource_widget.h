@@ -24,11 +24,13 @@ class QnMediaResourceWidget: public QnResourceWidget {
     typedef QnResourceWidget base_type;
 
 public:
-    static const Button MotionSearchButton = static_cast<Button>(0x08);
-    static const Button PtzButton = static_cast<Button>(0x10);
-    static const Button FishEyeButton = static_cast<Button>(0x20);
-    static const Button ZoomWindowButton = static_cast<Button>(0x40);
-    static const Button EnhancementButton = static_cast<Button>(0x80);
+    static const Button ScreenshotButton    = static_cast<Button>(0x008);
+    static const Button MotionSearchButton  = static_cast<Button>(0x010);
+    static const Button PtzButton           = static_cast<Button>(0x020);
+    static const Button FishEyeButton       = static_cast<Button>(0x040);
+    static const Button ZoomWindowButton    = static_cast<Button>(0x080);
+    static const Button EnhancementButton   = static_cast<Button>(0x100);
+#define ScreenshotButton ScreenshotButton
 #define MotionSearchButton MotionSearchButton
 #define PtzButton PtzButton
 #define FishEyeButton FishEyeButton
@@ -141,6 +143,7 @@ protected:
 
 private slots:
     void at_resource_resourceChanged();
+    void at_screenshotButton_clicked();
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
     void at_fishEyeButton_toggled(bool checked);

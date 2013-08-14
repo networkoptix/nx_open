@@ -97,6 +97,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     /* Set up buttons. */
 
+    QnImageButtonWidget *screenshotButton = new QnImageButtonWidget();
+    screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
+    screenshotButton->setCheckable(false);
+    screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
+    screenshotButton->setToolTip(tr("Screenshot"));
+    connect(screenshotButton, SIGNAL(clicked()), this, SLOT(at_screenshotButton_clicked()));
+
     QnImageButtonWidget *searchButton = new QnImageButtonWidget();
     searchButton->setIcon(qnSkin->icon("item/search.png"));
     searchButton->setCheckable(true);
@@ -138,6 +145,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     enhancementButton->setChecked(item->imageEnhancement().enabled);
     connect(enhancementButton, SIGNAL(toggled(bool)), this, SLOT(at_histogramButton_toggled(bool)));
 
+    buttonBar()->addButton(ScreenshotButton,    screenshotButton);
     buttonBar()->addButton(MotionSearchButton,  searchButton);
     buttonBar()->addButton(PtzButton,           ptzButton);
     buttonBar()->addButton(FishEyeButton,       fishEyeButton);
@@ -791,16 +799,17 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
-    Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
+    Buttons result = base_type::calculateButtonsVisibility();
 
-    //if(!(resource()->toResource()->flags() & QnResource::still_image))
+    if(!(resource()->toResource()->flags() & QnResource::still_image))
+        result |= ScreenshotButton;
+
     bool rgbImage = false;
     QString url = resource()->toResource()->getUrl().toLower();
     if(((resource()->toResource()->flags() & QnResource::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
         rgbImage = true;
     if (!rgbImage)
         result |= EnhancementButton;
-    result |= InfoButton;
 
     if (!zoomRect().isNull())
         return result;
@@ -901,6 +910,10 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged() {
         buttonBar()->setButtonsChecked(PtzButton, false);
 }
 
+void QnMediaResourceWidget::at_screenshotButton_clicked() {
+    menu()->trigger(Qn::TakeScreenshotAction, this);
+}
+
 void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
 
@@ -921,8 +934,7 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
-    bool fishEyeEnabled = 
-        checked && m_fisheyePtz;
+    bool fishEyeEnabled = checked && m_fisheyePtz;
 
     setOption(ControlPtz, fishEyeEnabled);
     setOption(DisplayCrosshair, fishEyeEnabled);
