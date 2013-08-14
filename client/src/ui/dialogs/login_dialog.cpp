@@ -113,6 +113,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     updateFocus();
 
     m_entCtrlFinder = new NetworkOptixModuleFinder();
+    if (qnSettings->isDevMode())
+        m_entCtrlFinder->setCompatibilityMode(true);
     connect(m_entCtrlFinder,    SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
             this,               SLOT(at_entCtrlFinder_remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
     connect(m_entCtrlFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
@@ -326,8 +328,10 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
 
     updateUsability();
 
+    bool compatibleProduct = qnSettings->isDevMode() || connectInfo->brand.isEmpty()
+            || connectInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
 
-    if(status != 0) {
+    if(status != 0 || !compatibleProduct) {
         QMessageBox::warning(
             this, 
             tr("Could not connect to Enterprise Controller"), 
