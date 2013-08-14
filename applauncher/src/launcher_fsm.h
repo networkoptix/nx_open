@@ -12,11 +12,11 @@
 
 #include "installation_manager.h"
 #include "launcher_common_data.h"
-//#ifdef _WIN32
-//#include "task_server_new.h"
-//#else
+#ifdef _WIN32
+#include "task_server_new.h"
+#else
 #include "task_server.h"
-//#endif
+#endif
 #include "task_queue_watcher.h"
 
 
@@ -53,11 +53,11 @@ private:
     InstallationManager m_installationManager;
     LauncherCommonData m_fsmSharedData;
     BlockingQueue<QSharedPointer<applauncher::api::BaseTask> > m_taskQueue;
-//#ifdef _WIN32
-//    TaskServerNew m_taskServer;
-//#else
+#ifdef _WIN32
+    TaskServerNew m_taskServer;
+#else
     TaskServer m_taskServer;
-//#endif
+#endif
     QSettings m_settings;
     int m_bindTriesCount;
     bool m_isLocalServerWasNotFound;
@@ -70,6 +70,7 @@ private slots:
     void onAddingTaskToNamedPipeEntered();
     bool addTaskToTheQueue();
     bool getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs );
+    bool addTaskToThePipe( const QByteArray& serializedTask );
 };
 
 #endif  //LAUNCHER_FSM_H

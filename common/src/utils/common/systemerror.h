@@ -28,10 +28,12 @@ namespace SystemError
     static const ErrorCode wouldBlock = WSAEWOULDBLOCK;
     static const ErrorCode inProgress = WSAEWOULDBLOCK;
     static const ErrorCode timedOut = WSAETIMEDOUT;
+    static const ErrorCode fileNotFound = ERROR_FILE_NOT_FOUND;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
     static const ErrorCode timedOut = ETIMEDOUT;
+    static const ErrorCode fileNotFound = ENOENT;
 #endif
 
     //!Returns error code of previous system call

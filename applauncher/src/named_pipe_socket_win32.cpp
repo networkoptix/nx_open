@@ -14,7 +14,8 @@
 ////////////////////////////////////////////////////////////
 NamedPipeSocketImpl::NamedPipeSocketImpl()
 :
-    hPipe( INVALID_HANDLE_VALUE )
+    hPipe( INVALID_HANDLE_VALUE ),
+    onServerSide( false )
 {
 }
 
@@ -31,8 +32,10 @@ NamedPipeSocket::NamedPipeSocket()
 NamedPipeSocket::~NamedPipeSocket()
 {
     FlushFileBuffers( m_impl->hPipe );
-    DisconnectNamedPipe( m_impl->hPipe );
-    CloseHandle( m_impl->hPipe );
+    if( m_impl->onServerSide )
+        DisconnectNamedPipe( m_impl->hPipe );
+    else
+        CloseHandle( m_impl->hPipe );
     m_impl->hPipe = INVALID_HANDLE_VALUE;
 
     delete m_impl;
@@ -49,17 +52,17 @@ SystemError::ErrorCode NamedPipeSocket::connectToServerSync( const QString& pipe
     //TODO/IMPL: #ak timeoutMillis support
 
     const QString win32PipeName = QString::fromLatin1("\\\\.\\pipe\\%1").arg(pipeName);
-    m_impl->hPipe = CreateNamedPipe(
+
+    //TODO: use WaitNamedPipe
+
+    m_impl->hPipe = CreateFile(
         win32PipeName.utf16(),             // pipe name 
-        PIPE_ACCESS_DUPLEX,       // read/write access 
-        PIPE_TYPE_MESSAGE |       // message type pipe 
-            PIPE_READMODE_MESSAGE |   // message-read mode 
-            PIPE_WAIT,                // blocking mode 
-        PIPE_UNLIMITED_INSTANCES, // max. instances  
-        NamedPipeSocketImpl::BUFSIZE,          // output buffer size 
-        NamedPipeSocketImpl::BUFSIZE,          // input buffer size 
-        0,                        // client time-out 
-        NULL );                    // default security attribute 
+        GENERIC_READ | GENERIC_WRITE,       // read/write access 
+        0,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL );
 
     return m_impl->hPipe != INVALID_HANDLE_VALUE
         ? SystemError::noError

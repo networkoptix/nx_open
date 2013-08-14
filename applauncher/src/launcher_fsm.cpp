@@ -180,34 +180,10 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
         serializedTask = applauncher::api::QuitTask().serialize();
     }
 
-    //posting to the pipe 
-    QLocalSocket sock;
-    sock.connectToServer( launcherPipeName );
-    if( !sock.waitForConnected( -1 ) )
-    {
-        m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
-                                     sock.error() == QLocalSocket::ConnectionRefusedError ||
-                                     sock.error() == QLocalSocket::PeerClosedError;
-        const QString& errStr = sock.errorString();
-        NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
+    if( addTaskToThePipe( serializedTask ) )
+        emit taskAddedToThePipe();
+    else
         emit failedToAddTaskToThePipe();
-        return;
-    }
-
-    if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
-    {
-        m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
-                                     sock.error() == QLocalSocket::ConnectionRefusedError ||
-                                     sock.error() == QLocalSocket::PeerClosedError;
-        NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
-        emit failedToAddTaskToThePipe();
-        return;
-    }
-
-    sock.waitForReadyRead(-1);
-    sock.readAll();
-
-    emit taskAddedToThePipe();
 }
 
 bool LauncherFSM::addTaskToTheQueue()
@@ -239,4 +215,62 @@ bool LauncherFSM::getVersionToLaunch( QString* const versionToLaunch, QString* c
     }
 
     return true;
+}
+
+static const int MAX_MSG_LEN = 1024;
+
+bool LauncherFSM::addTaskToThePipe( const QByteArray& serializedTask )
+{
+    //posting to the pipe 
+#ifdef _WIN32
+    NamedPipeSocket sock;
+    SystemError::ErrorCode result = sock.connectToServerSync( launcherPipeName );
+    if( result != SystemError::noError )
+    {
+        m_isLocalServerWasNotFound = result == SystemError::fileNotFound;
+        NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(result)), cl_logDEBUG1 );
+        return false;
+    }
+
+    unsigned int bytesWritten = 0;
+    result = sock.write( serializedTask.constData(), serializedTask.size(), &bytesWritten );
+    if( (result != SystemError::noError) || (bytesWritten != serializedTask.size()) )
+    {
+        m_isLocalServerWasNotFound = result == SystemError::fileNotFound;
+        NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(result)), cl_logDEBUG1 );
+        return false;
+    }
+
+    char buf[MAX_MSG_LEN];
+    unsigned int bytesRead = 0;
+    sock.read( buf, sizeof(buf), &bytesRead );  //ignoring return code
+
+    return true;
+#else
+    QLocalSocket sock;
+    sock.connectToServer( launcherPipeName );
+    if( !sock.waitForConnected( -1 ) )
+    {
+        m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
+                                     sock.error() == QLocalSocket::ConnectionRefusedError ||
+                                     sock.error() == QLocalSocket::PeerClosedError;
+        const QString& errStr = sock.errorString();
+        NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
+        return false;
+    }
+
+    if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
+    {
+        m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
+                                     sock.error() == QLocalSocket::ConnectionRefusedError ||
+                                     sock.error() == QLocalSocket::PeerClosedError;
+        NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
+        return false;
+    }
+
+    sock.waitForReadyRead(-1);
+    sock.readAll();
+
+    return true;
+#endif
 }

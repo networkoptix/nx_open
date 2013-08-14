@@ -59,6 +59,7 @@ bool TaskServerNew::listen( const QString& pipeName )
     const SystemError::ErrorCode osError = m_server.listen( pipeName );
     if( osError != SystemError::noError )
     {
+        const QString& str = SystemError::toString(osError);
         NX_LOG( QString::fromLatin1("Failed to listen to pipe %1. %2").arg(pipeName).arg(SystemError::toString(osError)), cl_logDEBUG1 );
         return false;
     }
