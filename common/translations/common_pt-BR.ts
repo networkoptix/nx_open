@@ -551,7 +551,7 @@
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="97"/>
-        <source>Media stream is opened but no any media data was received</source>
+        <source>Media stream is opened but no media data was received</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

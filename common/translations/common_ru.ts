@@ -466,6 +466,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="97"/>
+        <source>Media stream is opened but no media data was received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="125"/>
         <source>(unknown)</source>
         <translation type="unfinished"></translation>
@@ -554,11 +559,6 @@
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="94"/>
         <source>Too many media errors. Please open camera issues dialog for more details</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="97"/>
-        <source>Media stream is opened but no any media data was received</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

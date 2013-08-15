@@ -77,7 +77,7 @@ public:
                 break;
             case notImplemented:
                 requiredParamCount = 0;
-                errorMessage = tr("Unknown Camera Issue.\n Please, contact support.");
+                errorMessage = tr("Unknown Camera Issue.\n Please, contact support."); // TODO: #Elric Please without ","
                 break;
             case ioError:
                 requiredParamCount = 1;
@@ -94,7 +94,7 @@ public:
                 errorMessage = tr("Too many media errors. Please open camera issues dialog for more details");
                 break;
             case noMediaStream:
-                errorMessage = tr("Media stream is opened but no any media data was received");
+                errorMessage = tr("Media stream is opened but no media data was received");
                 break;
             default:
             {
