@@ -18,11 +18,15 @@ class NamedPipeServerImpl
 {
 public:
     HANDLE hPipe;
+    HANDLE overlappedIOEvent;
+    struct _OVERLAPPED overlappedInfo;
 
     NamedPipeServerImpl()
     :
-        hPipe( INVALID_HANDLE_VALUE )
+        hPipe( INVALID_HANDLE_VALUE ),
+        overlappedIOEvent( NULL )
     {
+        memset( &overlappedInfo, 0, sizeof(overlappedInfo) );
     }
 };
 
@@ -39,6 +43,9 @@ NamedPipeServer::~NamedPipeServer()
 {
     CloseHandle( m_impl->hPipe );
     m_impl->hPipe = INVALID_HANDLE_VALUE;
+
+    CloseHandle( m_impl->overlappedIOEvent );
+    m_impl->overlappedIOEvent = NULL;
 
     delete m_impl;
     m_impl = NULL;
@@ -107,7 +114,7 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
     const QString win32PipeName = QString::fromLatin1("\\\\.\\pipe\\%1").arg(pipeName);
     m_impl->hPipe = CreateNamedPipe(
         win32PipeName.utf16(),              // pipe name 
-        FILE_FLAG_FIRST_PIPE_INSTANCE | PIPE_ACCESS_DUPLEX,       // read/write access 
+        FILE_FLAG_FIRST_PIPE_INSTANCE | PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,       // read/write access, overlapped I/O
         PIPE_TYPE_MESSAGE |                 // message type pipe 
             PIPE_READMODE_MESSAGE |         // message-read mode 
             PIPE_WAIT,                      // blocking mode 
@@ -124,9 +131,24 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
     if( pSD )
         LocalFree( pSD );
 
-    return m_impl->hPipe != INVALID_HANDLE_VALUE
-        ? SystemError::noError
-        : SystemError::getLastOSErrorCode();
+    if( m_impl->hPipe == INVALID_HANDLE_VALUE )
+        return SystemError::getLastOSErrorCode();
+
+    //creating event for overlapped I/O
+    m_impl->overlappedIOEvent = CreateEvent(
+        NULL,
+        TRUE,
+        FALSE,
+        NULL );
+    if( m_impl->overlappedIOEvent == NULL )
+    {
+        const SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
+        CloseHandle( m_impl->hPipe );
+        m_impl->hPipe = INVALID_HANDLE_VALUE;
+        return osErrorCode;
+    }
+
+    return SystemError::noError;
 }
 
 /*!
@@ -134,12 +156,51 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
     \param timeoutMillis max time to wait for incoming connection (millis)
     \param sock If return value \a SystemError::noError, \a *sock is assigned with newly-created socket. It must be freed by calling party
 */
-SystemError::ErrorCode NamedPipeServer::accept( NamedPipeSocket** sock, int /*timeoutMillis*/ )
+SystemError::ErrorCode NamedPipeServer::accept( NamedPipeSocket** sock, int timeoutMillis )
 {
-    //TODO/IMPL: #ak timeoutMillis support
+    memset( &m_impl->overlappedInfo, 0, sizeof(m_impl->overlappedInfo) );
+    m_impl->overlappedInfo.hEvent = m_impl->overlappedIOEvent;
+    ResetEvent( m_impl->overlappedInfo.hEvent );
 
-    if( !ConnectNamedPipe( m_impl->hPipe, NULL ) )
-        return SystemError::getLastOSErrorCode();
+    if( !ConnectNamedPipe( m_impl->hPipe, &m_impl->overlappedInfo ) )
+    {
+        switch( GetLastError() )
+        {
+            case ERROR_PIPE_CONNECTED:
+                //connection has already been established
+                break;
+
+            case ERROR_IO_PENDING:
+            {
+                //waiting for new connection
+                switch( WaitForSingleObject(
+                            m_impl->overlappedInfo.hEvent,
+                            timeoutMillis == -1 ? INFINITE : timeoutMillis ) )
+                {
+                    case WAIT_OBJECT_0:
+                    {
+                        DWORD numberOfBytesTransferred = 0;
+                        if( !GetOverlappedResult( m_impl->hPipe, &m_impl->overlappedInfo, &numberOfBytesTransferred, FALSE ) )
+                            return SystemError::getLastOSErrorCode();
+                        break;
+                    }
+
+                    case WAIT_TIMEOUT:
+                        CancelIo( m_impl->hPipe );
+                        return SystemError::timedOut;
+
+                    case WAIT_FAILED:
+                    default:
+                        CancelIo( m_impl->hPipe );
+                        return SystemError::getLastOSErrorCode();
+                }
+                break;
+            }
+
+            default:
+                return SystemError::getLastOSErrorCode();
+        }
+    }
 
     NamedPipeSocketImpl* sockImpl = new NamedPipeSocketImpl();
     sockImpl->hPipe = m_impl->hPipe;
