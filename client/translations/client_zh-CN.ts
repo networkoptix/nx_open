@@ -4908,7 +4908,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>截屏</translation>
     </message>
 </context>
 <context>
