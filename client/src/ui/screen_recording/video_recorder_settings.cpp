@@ -4,6 +4,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QFileDialog>
+#include <QtMultimedia/QAudioDeviceInfo>
+
 #ifdef Q_OS_WIN32
 #   include "device_plugins/desktop_win/win_audio_helper.h"
 #endif
