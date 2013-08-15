@@ -593,7 +593,8 @@ Vérifier la version du serveur média.</translation>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
         <source>Received bad response from media server %1: &quot;%2&quot;.
  Check if Media Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Reçu une mauvaise réponse depuis le serveur média %1: &quot;%2&quot;.
+Vérifier si le serveur média est fonctionnel et a la bonne version.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
@@ -683,12 +684,12 @@ Assurez-vos que la caméra est branchée sur le réseau. Essayez de redémarrer 
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="94"/>
         <source>Too many media errors. Please open camera issues dialog for more details</source>
-        <translation type="unfinished"></translation>
+        <translation>Trop d&apos;erreurs média. S&apos;il vous plait, ouvrez le dialogue de problème pour plus de détails</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="97"/>
         <source>Media stream is opened but no media data was received</source>
-        <translation type="unfinished"></translation>
+        <translation>Le flux média est ouvert, mais aucun data média a été reçu</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="110"/>
