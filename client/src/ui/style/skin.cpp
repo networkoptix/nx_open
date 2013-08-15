@@ -8,6 +8,9 @@
 #include <QtGui/QPixmapCache>
 #include <QtWidgets/QStyleFactory>
 
+#include <QtCore/QPluginLoader>
+#include <QtWidgets/QApplication>
+
 #include <iostream>
 
 #include <utils/common/warnings.h>
@@ -179,8 +182,9 @@ QPixmap QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::S
 
 QStyle *QnSkin::style() {
     QStyle *baseStyle = QStyleFactory::create(QLatin1String("Bespin"));
-    if( !baseStyle )
+    if (!baseStyle) {
         qWarning() << "Bespin style could not be loaded";
+    }
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
     return style;
 }
