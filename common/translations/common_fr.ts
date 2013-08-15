@@ -278,17 +278,17 @@
         <translation>Impossible d&apos;analyser l&apos;information de connexion sérialisée.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="779"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="780"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>Impossible d&apos;analyser les règles évènement/action sérialisées.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="788"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="789"/>
         <source>Cannot parse serialized action.</source>
         <translation>Impossible d&apos;analyser l&apos;action sérialisée.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="800"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
         <source>Cannot parse serialized actions.</source>
         <translation>Impossible d&apos;analyser les actions sérialisées.</translation>
     </message>
@@ -556,7 +556,7 @@
         <translation type="obsolete">Erreur I/O. Message: %1. Soyez sûr que la caméra est branchée dans le réseau. Essayez de redémarrer la caméra.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="119"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="125"/>
         <source>(unknown)</source>
         <translation>(inconnu)</translation>
     </message>
@@ -584,11 +584,16 @@
 Vérifier que ce serveur média est fonctionnel.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
         <source>Received bad response from media server %1: &quot;%2&quot;.
  Check media server&apos;s version.</source>
-        <translation>Reçu une mauvaise réponse depuis le serveur média %1: &quot;%2&quot;.
+        <translation type="obsolete">Reçu une mauvaise réponse depuis le serveur média %1: &quot;%2&quot;.
 Vérifier la version du serveur média.</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
+        <source>Received bad response from media server %1: &quot;%2&quot;.
+ Check if Media Server is up and has the proper version.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
@@ -676,12 +681,22 @@ Assurez-vos que la caméra est branchée sur le réseau. Essayez de redémarrer 
         <translation>Données invalides reçues depuis la caméra: %1</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="104"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="94"/>
+        <source>Too many media errors. Please open camera issues dialog for more details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="97"/>
+        <source>Media stream is opened but no any media data was received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="110"/>
         <source>Unknown error. Please contact support.</source>
         <translation>Erreur inconnue. S’il vous plait, contactez le support.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="106"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
         <source> Parameters: </source>
         <translation>Paramètres:</translation>
     </message>

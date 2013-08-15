@@ -616,17 +616,17 @@ They cannot receive system notifications via E-Mail</source>
         <translation>无法解析序列化的连接信息。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="779"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="780"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>无法解析序列化的事件/行动规则。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="788"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="789"/>
         <source>Cannot parse serialized action.</source>
         <translation>无法解析序列化的行动。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="800"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
         <source>Cannot parse serialized actions.</source>
         <translation>无法解析序列化的行动。</translation>
     </message>
@@ -957,7 +957,7 @@ for recording to %1.</source>
         <translation type="obsolete">I/O错误。 OS信息e: %1。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="119"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="125"/>
         <source>(unknown)</source>
         <translation>(未知)</translation>
     </message>
@@ -1017,11 +1017,16 @@ for recording to %1.</source>
 确认該媒体服务器已启用並且正在运行。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
         <source>Received bad response from media server %1: &quot;%2&quot;.
  Check media server&apos;s version.</source>
-        <translation>从 %1媒体服务器器收到不良回应: %2。
+        <translation type="obsolete">从 %1媒体服务器器收到不良回应: %2。
 确认媒体服务器版本。</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
+        <source>Received bad response from media server %1: &quot;%2&quot;.
+ Check if Media Server is up and has the proper version.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
@@ -1108,12 +1113,22 @@ for recording to %1.</source>
         <translation>从摄像机 %1接收的数据无效</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="104"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="94"/>
+        <source>Too many media errors. Please open camera issues dialog for more details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="97"/>
+        <source>Media stream is opened but no any media data was received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="110"/>
         <source>Unknown error. Please contact support.</source>
         <translation>未知错误。请联系支援团队。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="106"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
         <source> Parameters: </source>
         <translation>参数:</translation>
     </message>
