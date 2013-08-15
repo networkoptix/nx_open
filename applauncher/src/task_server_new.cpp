@@ -80,9 +80,10 @@ void TaskServerNew::run()
         const SystemError::ErrorCode osError = m_server.accept( &clientConnection, MAX_MILLIS_TO_WAIT_CLIENT_CONNECTION );
         if( osError != SystemError::noError )
         {
+            if( osError == SystemError::timedOut )
+                continue;
             NX_LOG( QString::fromLatin1("Failed to listen to pipe %1. %2").arg(m_pipeName).arg(SystemError::toString(osError)), cl_logDEBUG1 );
-            if( osError != SystemError::timedOut )
-                msleep( ERROR_SLEEP_TIMEOUT_MS );
+            msleep( ERROR_SLEEP_TIMEOUT_MS );
             continue;
         }
 

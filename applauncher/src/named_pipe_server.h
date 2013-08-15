@@ -26,7 +26,7 @@ public:
     SystemError::ErrorCode listen( const QString& pipeName );
     /*!
         Blocks till new connection is accepted, timeout expires or error occurs
-        \param timeoutMillis max time to wait for incoming connection (millis)
+        \param timeoutMillis max time to wait for incoming connection (millis). If -1, wait is infinite
         \param sock If return value \a SystemError::noError, \a *sock is assigned with newly-created socket. It must be freed by calling party
     */
     SystemError::ErrorCode accept( NamedPipeSocket** sock, int timeoutMillis = -1 );
