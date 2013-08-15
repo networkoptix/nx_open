@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include <QtCore/QProcess>
+#include <QtCore/QPointer>
 
 
 #include <utils/common/warnings.h>
