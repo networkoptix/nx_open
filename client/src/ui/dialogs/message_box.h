@@ -8,7 +8,7 @@ class QnMessageBox: public QMessageBox {
     typedef QMessageBox base_type;
 
 public:
-    explicit QnMessageBox(QWidget *parent = NULL)
+    explicit QnMessageBox(QWidget *parent = NULL);
     QnMessageBox(Icon icon, const QString &title, const QString &text, StandardButtons buttons = NoButton, int helpTopicId = -1, QWidget *parent = NULL, Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
     static StandardButton information(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons = Ok, StandardButton defaultButton = NoButton, int helpTopicId = -1);
