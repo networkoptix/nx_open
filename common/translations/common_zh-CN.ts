@@ -1026,7 +1026,7 @@ for recording to %1.</source>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
         <source>Received bad response from media server %1: &quot;%2&quot;.
  Check if Media Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>从 %1媒体服务器器收到不良回应: %2。确认媒体服务器版本。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
@@ -1115,12 +1115,12 @@ for recording to %1.</source>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="94"/>
         <source>Too many media errors. Please open camera issues dialog for more details</source>
-        <translation type="unfinished"></translation>
+        <translation>太多媒体错误. 请打开&quot;相机问题对话&quot;获得更多细节</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="97"/>
         <source>Media stream is opened but no media data was received</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体流已开启 但无接收任何媒体数据</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="110"/>
