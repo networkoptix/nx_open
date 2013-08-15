@@ -178,11 +178,11 @@
     </message>
     <message>
         <source>Override current value</source>
-        <translation type="unfinished"></translation>
+        <translation>覆盖当前值</translation>
     </message>
     <message>
         <source>Selected camera(s) have no expert settings</source>
-        <translation type="unfinished"></translation>
+        <translation>所选摄像机无专家设置</translation>
     </message>
 </context>
 <context>
@@ -4906,10 +4906,6 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
         <source>Dewarping</source>
         <translation>扭曲影像還原</translation>
     </message>
-    <message>
-        <source>Screenshot</source>
-        <translation>截屏</translation>
-    </message>
 </context>
 <context>
     <name>QnMotionEnabledDelegate</name>
@@ -5998,7 +5994,7 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(建议)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Secure connection using TLS</source>
