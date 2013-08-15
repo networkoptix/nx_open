@@ -3,6 +3,7 @@ import string
 from compatibility import *
 
 CL = Component('Client', 'HD Witness Client')
+MS = Component('MediaServer', 'HD Witness MediaServer')
 IOSCL = Component('iOSClient', 'iOS HD Witness Client')
 ANDROID = Component('android', 'Android HD Witness Client')
 
@@ -25,8 +26,12 @@ COMPATIBILITY_INFO = (
     (V16, (ANDROID,), V14), # android V1.6 can connect to 1.4
     (V16, (ANDROID,), V15), # android V1.6 can connect to 1.5
     (V16, (ANDROID,), V20), # android V1.6 can connect to 2.0
+    
     (V16, (CL,), V20), # client V1.6 can connect to 2.0
     (V20, (CL,), V16), # client V2.0 can connect to 1.6
+    
+    (V16, (MS,), V20), # MediaServer V1.6 can connect to 2.0
+    (V20, (MS,), V16), # MediaServer V2.0 can connect to 1.6
 #    (V13, (CL,), Range(V12, V12)),
 #    (V14, (CL,), Range(V12, V13)),
 )
