@@ -87,6 +87,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
     setHelpTopic(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
+    setHelpTopic(ui->hardwareDecodingLabel,   ui->hardwareDecodingCheckBox,   Qn::SystemSettings_General_HWAcceleration_Help);
     if(m_recordingSettingsWidget)
         setHelpTopic(m_recordingSettingsWidget,                               Qn::SystemSettings_ScreenRecording_Help);
     if(m_licenseManagerWidget)

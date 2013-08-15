@@ -102,6 +102,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     screenshotButton->setCheckable(false);
     screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
     screenshotButton->setToolTip(tr("Screenshot"));
+    setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
     connect(screenshotButton, SIGNAL(clicked()), this, SLOT(at_screenshotButton_clicked()));
 
     QnImageButtonWidget *searchButton = new QnImageButtonWidget();
@@ -143,6 +144,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
     enhancementButton->setToolTip(tr("Image Enhancement"));
     enhancementButton->setChecked(item->imageEnhancement().enabled);
+    setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
     connect(enhancementButton, SIGNAL(toggled(bool)), this, SLOT(at_histogramButton_toggled(bool)));
 
     buttonBar()->addButton(ScreenshotButton,    screenshotButton);

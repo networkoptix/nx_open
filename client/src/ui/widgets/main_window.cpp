@@ -245,7 +245,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->setSpacing(2);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction), false, 1.0, Qn::MainWindow_Panic_Help));

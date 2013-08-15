@@ -1186,6 +1186,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         dialog->setWindowTitle(tr("Save Layout As"));
         dialog->setText(tr("Enter layout name:"));
         dialog->setName(layout->getName());
+        setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
 
         QMessageBox::Button button;
         do {
@@ -1520,6 +1521,7 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
 
     QnCheckableMessageBox::question(
         mainWindow(),
+        Qn::Upgrade_Help,
         tr("Software update is available"),
         tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
         tr("Don't notify again about this update."),
@@ -2355,6 +2357,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
             mainWindow(),
             QnActionParameterTypes::resources(items),
+            Qn::RemoveItems_Help,
             tr("Remove Items"),
             tr("Are you sure you want to remove these %n item(s) from layout?", "", items.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No

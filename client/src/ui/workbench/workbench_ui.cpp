@@ -407,7 +407,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout = new QGraphicsLinearLayout();
     m_titleRightButtonsLayout->setSpacing(2);
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
     m_titleRightButtonsLayout->addStretch(0x1000);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction), 1.0, Qn::MainWindow_Panic_Help));

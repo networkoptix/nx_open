@@ -218,7 +218,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
-    if (!accessController()->globalPermissions() & Qn::GlobalProtectedPermission)
+    if (!(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
         return;
 
     if (!m_rulesViewModel->isLoaded())
