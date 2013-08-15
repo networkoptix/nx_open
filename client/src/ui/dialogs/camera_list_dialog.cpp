@@ -18,7 +18,7 @@
 #include <ui/help/help_topics.h>
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *context):
-    QDialog(parent),
+    QDialog(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::CameraListDialog)
 {
