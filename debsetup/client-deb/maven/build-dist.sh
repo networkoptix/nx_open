@@ -24,7 +24,7 @@ CLIENT_BIN_PATH=${libdir}/bin/${build.configuration}
 CLIENT_HELP_PATH=${libdir}/bin/help
 CLIENT_STYLES_PATH=$CLIENT_BIN_PATH/styles
 CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
-CLIENT_SQLDRIVERS_PATH=$CLIENT_BIN_PATH/sqldrivers
+#CLIENT_SQLDRIVERS_PATH=$CLIENT_BIN_PATH/sqldrivers
 CLIENT_BG_PATH=${libdir}/../../client/resource/common/backgrounds
 CLIENT_LIB_PATH=${libdir}/build/bin/${build.configuration}
 
@@ -77,7 +77,7 @@ cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/1.5/styles
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/imageformats
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.4/imageformats
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.5/imageformats
-cp -r $CLIENT_SQLDRIVERS_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/sqldrivers
+#cp -r $CLIENT_SQLDRIVERS_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/sqldrivers
 
 for f in `find $LIBSTAGE -type f` `find $BINSTAGE/**/styles -type f` $BINSTAGE/**/client-bin
 do
@@ -87,7 +87,8 @@ done
 
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
-chmod 755 $BINSTAGE/1.*/* $BINSTAGE/*.*
+chmod 755 $BINSTAGE/1.*/* 
+chmod 755 $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/*
 
 # Must use system libraries due to compatibility issues
 # cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
