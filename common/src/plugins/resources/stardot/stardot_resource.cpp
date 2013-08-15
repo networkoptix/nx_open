@@ -196,7 +196,7 @@ QString QnStardotResource::getRtspUrl() const
     url.setScheme(lit("rtsp"));
     url.setHost(getHostAddress());
     url.setPort(m_rtspPort);
-    url.setPath(lit("nph-h264.cgi"));
+    url.setPath(lit("/nph-h264.cgi/"));
     return url.toString();
 }
 

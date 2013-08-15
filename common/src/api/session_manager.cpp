@@ -125,7 +125,7 @@ QByteArray QnSessionManager::formatNetworkError(int error) {
 QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const {
     QUrl url(baseUrl);
 
-    QString path = QLatin1String("api/") + objectName + QLatin1Char('/');
+    QString path = QLatin1String("/api/") + objectName + QLatin1Char('/');
     url.setPath(path);
 
     QUrlQuery urlQuery(url.query());

@@ -82,12 +82,12 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
                 QUrl proxyUrl = QnAppServerConnectionFactory::defaultUrl();
 #if 0
                 // do proxy via EC builtin proxy. It is dosn't work. I don't know why
-                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction")).arg(serverUrl.host()).arg(serverUrl.port()));
+                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
 #else
                 // do proxy via CPP media proxy
                 proxyUrl.setScheme(QLatin1String("http"));
                 proxyUrl.setPort(QnAppServerConnectionFactory::defaultMediaProxyPort());
-                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction")).arg(serverUrl.host()).arg(serverUrl.port()));
+                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
 #endif
 
                 QString url = proxyUrl.toString();
