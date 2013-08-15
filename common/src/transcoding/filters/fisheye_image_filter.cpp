@@ -1,4 +1,7 @@
+
 #include "fisheye_image_filter.h"
+
+#include <QtGui/QMatrix4x4>
 
 extern "C" {
 #ifdef WIN32

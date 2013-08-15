@@ -5,6 +5,8 @@
 
 #include "camera_diagnostics.h"
 
+#include <QtCore/QCoreApplication>
+
 
 class QnCameraDiagnosticsErrorCodeStrings
 {

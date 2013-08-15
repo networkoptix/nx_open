@@ -54,7 +54,6 @@ extern "C" {
 #include <boost/array.hpp>
 
 /* QT headers. */
-#include <QtWidgets/QAction>
 
 //#ifdef Q_OS_WIN
 //#include <QtMultimedia/QAudio>
@@ -67,12 +66,9 @@ extern "C" {
 #include <QCheckBox>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QColor>
-#include <QtWidgets/QCompleter>
 #include <QtCore/QDataStream>
 #include <QtCore/QDateTime>
 #include <QtGui/QDesktopServices>
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QDialogButtonBox>
 #include <QtCore/QDir>
 #include <QtXml/QDomDocument>
 #include <QtXml/QDomElement>
@@ -87,22 +83,14 @@ extern "C" {
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHBoxLayout>
 #include <QtNetwork/QHostAddress>
 #ifndef USE_NX_HTTP
 #include <QHttp>
 #endif
 #include <QtCore/QIODevice>
-#include <QtWidgets/QInputDialog>
 #include <QtGui/QKeyEvent>
-#include <QtWidgets/QLayout>
-#include <QtWidgets/QLineEdit>
 #include <QtCore/QList>
-#include <QtWidgets/QListView>
 #include <QtCore/QMap>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QMouseEvent>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
@@ -119,43 +107,32 @@ extern "C" {
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
 #include <QtCore/QPropertyAnimation>
-#include <QtWidgets/QPushButton>
 #include <QtCore/QQueue>
 #include <QtGui/QRadialGradient>
-#include <QtWidgets/QRadioButton>
 #include <QtCore/QRect>
 #include <QtCore/QRectF>
-#include <QtWidgets/QScrollBar>
 #include <QtCore/QSemaphore>
 #include <QtCore/QSet>
 #include <QtCore/QSize>
-#include <QtWidgets/QSlider>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QStringListModel>
-#include <QtWidgets/QStyle>
-#include <QtWidgets/QStyleOption>
 #include <QStyleOptionGraphicsItem>
-#include <QtWidgets/QTabWidget>
 #include <QtCore/QTextStream>
 #include <QtCore/QThread>
 #include <QtCore/QThreadPool>
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
 #include <QtNetwork/QUdpSocket>
-#include <QtWidgets/QVBoxLayout>
 #include <QtCore/QWaitCondition>
 #include <QtGui/QWheelEvent>
-#include <QtWidgets/QWidget>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/qmath.h>
 #include <QtCore/QtDebug>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QMainWindow>
 #include <QtGui/QPainter>
 #include <QtGui/QResizeEvent>
-#include <QtWidgets/QtWidgets>
 #include <QtOpenGL/QGLWidget>
 #include <QFileSystemWatcher>
+#include <QtCore/QUrlQuery>
 
 #endif

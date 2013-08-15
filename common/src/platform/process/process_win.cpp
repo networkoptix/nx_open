@@ -1,8 +1,12 @@
+
 #include "process_win.h"
 
 #include <Windows.h>
 
 #include <utils/common/warnings.h>
+
+#include <QtCore/QProcess>
+#include <QtCore/QPointer>
 
 #define INVALID_PRIORITY_CLASS 0xDEADF00D
 

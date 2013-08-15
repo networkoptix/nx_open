@@ -1,11 +1,15 @@
+
 #include "environment.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
+#if defined(Q_OS_WIN)
+#include <QtWidgets/QMessageBox>
+#endif
+
 
 QString QnEnvironment::searchInPath(QString executable) {
     if (executable.isEmpty())

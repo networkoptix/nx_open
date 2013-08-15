@@ -9,6 +9,8 @@
 
 #include <Dbghelp.h>
 
+#include <QtCore/QCoreApplication>
+
 
 using std::string;
 

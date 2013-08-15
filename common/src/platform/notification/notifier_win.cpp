@@ -2,7 +2,6 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
-#include <QtWidgets/QWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/invocation_event.h>
