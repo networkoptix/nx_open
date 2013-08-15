@@ -180,7 +180,7 @@ QPixmap QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::S
 QStyle *QnSkin::style() {
     QStyle *baseStyle = QStyleFactory::create(QLatin1String("Bespin"));
     if( !baseStyle )
-        std::cout<<"HUUUUUUUUUUUUUUUUUUUUUUUUY!!!!!!!!!!!!!!!\n";
+        qWarning() << "Bespin style could not be loaded";
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
     return style;
 }
