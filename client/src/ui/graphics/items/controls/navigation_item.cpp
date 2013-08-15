@@ -76,6 +76,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setAutoFillBackground(true);
     setPaletteColor(this, QPalette::Window, Qt::black);
 
+    setHelpTopic(this, Qn::MainWindow_Playback_Help);
 
     /* Create buttons. */
     m_jumpBackwardButton = newActionButton(action(Qn::JumpToStartAction));
@@ -167,7 +168,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     GraphicsWidget *leftWidget = new GraphicsWidget();
     leftWidget->setLayout(leftLayoutV);
-    setHelpTopic(leftWidget, Qn::MainWindow_Playback_Help);
 
     QGraphicsLinearLayout *rightLayoutHU = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHU->setContentsMargins(0, 0, 0, 0);

@@ -9,13 +9,17 @@ class QnMessageBox: public QMessageBox {
 
 public:
     explicit QnMessageBox(QWidget *parent = NULL);
-    QnMessageBox(Icon icon, const QString &title, const QString &text, StandardButtons buttons = NoButton, int helpTopicId = -1, QWidget *parent = NULL, Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    QnMessageBox(Icon icon, int helpTopicId, const QString &title, const QString &text, StandardButtons buttons = NoButton, QWidget *parent = NULL, Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
-    static StandardButton information(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons = Ok, StandardButton defaultButton = NoButton, int helpTopicId = -1);
-    static StandardButton question(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons = Ok, StandardButton defaultButton = NoButton, int helpTopicId = -1); 
-    static StandardButton warning(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons = Ok, StandardButton defaultButton = NoButton, int helpTopicId = -1);
-    static StandardButton critical(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons = Ok, StandardButton defaultButton = NoButton, int helpTopicId = -1);
+    using base_type::information;
+    using base_type::question;
+    using base_type::warning;
+    using base_type::critical;
 
+    static StandardButton information(QWidget *parent, int helpTopicId, const QString &title, const QString &text, StandardButtons buttons = Ok, StandardButton defaultButton = NoButton);
+    static StandardButton question(QWidget *parent, int helpTopicId, const QString &title, const QString &text, StandardButtons buttons = Ok, StandardButton defaultButton = NoButton); 
+    static StandardButton warning(QWidget *parent, int helpTopicId, const QString &title, const QString &text, StandardButtons buttons = Ok, StandardButton defaultButton = NoButton);
+    static StandardButton critical(QWidget *parent, int helpTopicId, const QString &title, const QString &text, StandardButtons buttons = Ok, StandardButton defaultButton = NoButton);
         
 };
 

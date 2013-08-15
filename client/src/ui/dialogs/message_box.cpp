@@ -4,8 +4,8 @@
 
 #include <ui/help/help_topic_accessor.h>
 
-static QMessageBox::StandardButton showNewMessageBox(QWidget *parent, QMessageBox::Icon icon, const QString& title, const QString& text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton, int helpTopicId) {
-    QnMessageBox msgBox(icon, title, text, QMessageBox::NoButton, helpTopicId, parent);
+static QMessageBox::StandardButton showNewMessageBox(QWidget *parent, QMessageBox::Icon icon, int helpTopicId, const QString& title, const QString& text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton) {
+    QnMessageBox msgBox(icon, helpTopicId, title, text, QMessageBox::NoButton, parent);
     QDialogButtonBox *buttonBox = qFindChild<QDialogButtonBox *>(&msgBox);
     assert(buttonBox != 0);
 
@@ -33,25 +33,25 @@ QnMessageBox::QnMessageBox(QWidget *parent):
     base_type(parent) 
 {}
 
-QnMessageBox::QnMessageBox(Icon icon, const QString &title, const QString &text, StandardButtons buttons, int helpTopicId, QWidget *parent, Qt::WindowFlags flags):
+QnMessageBox::QnMessageBox(Icon icon, int helpTopicId, const QString &title, const QString &text, StandardButtons buttons, QWidget *parent, Qt::WindowFlags flags):
     base_type(icon, title, text, buttons, parent, helpTopicId == -1 ? flags : flags | Qt::WindowContextHelpButtonHint)
 {
     setHelpTopic(this, helpTopicId);
 }
 
-QnMessageBox::StandardButton QnMessageBox::information(QWidget *parent, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton, int helpTopicId) {
-    return showNewMessageBox(parent, Information, title, text, buttons, defaultButton, helpTopicId);
+QnMessageBox::StandardButton QnMessageBox::information(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
+    return showNewMessageBox(parent, Information, helpTopicId, title, text, buttons, defaultButton);
 }
 
-QMessageBox::StandardButton QnMessageBox::question(QWidget *parent, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton, int helpTopicId) {
-    return showNewMessageBox(parent, Question, title, text, buttons, defaultButton, helpTopicId);
+QMessageBox::StandardButton QnMessageBox::question(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
+    return showNewMessageBox(parent, Question, helpTopicId, title, text, buttons, defaultButton);
 }
 
-QMessageBox::StandardButton QnMessageBox::warning(QWidget *parent, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton, int helpTopicId) {
-    return showNewMessageBox(parent, Warning, title, text, buttons, defaultButton, helpTopicId);
+QMessageBox::StandardButton QnMessageBox::warning(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
+    return showNewMessageBox(parent, Warning, helpTopicId, title, text, buttons, defaultButton);
 }
 
-QMessageBox::StandardButton QnMessageBox::critical(QWidget *parent, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton, int helpTopicId) {
-    return showNewMessageBox(parent, Critical, title, text, buttons, defaultButton, helpTopicId);
+QMessageBox::StandardButton QnMessageBox::critical(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
+    return showNewMessageBox(parent, Critical, helpTopicId, title, text, buttons, defaultButton);
 }
 

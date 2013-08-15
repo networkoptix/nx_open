@@ -40,7 +40,7 @@
           <widget class="QLineEdit" name="nameEdit"/>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_7">
+          <widget class="QLabel" name="modelLabel">
            <property name="text">
             <string>Model:</string>
            </property>
@@ -61,7 +61,7 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QLabel" name="label_firmware">
+          <widget class="QLabel" name="firmwareLabel">
            <property name="text">
             <string>Firmware:</string>
            </property>

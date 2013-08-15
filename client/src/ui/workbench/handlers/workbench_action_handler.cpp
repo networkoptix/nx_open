@@ -65,6 +65,7 @@
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
+#include <ui/dialogs/message_box.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -1376,6 +1377,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         QnResourceListDialog::exec(
             mainWindow(),
             errorResources,
+            Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
             tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()),
             QDialogButtonBox::Ok
@@ -3976,7 +3978,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please upgrade all components to the latest version %2."
     ).arg(components).arg(watcher->latestVersion().toString());
 
-    QMessageBox::warning(mainWindow(), tr("Version Mismatch"), message);
+    QnMessageBox::warning(mainWindow(), Qn::VersionMismatch_Help, tr("Version Mismatch"), message);
 }
 
 void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {

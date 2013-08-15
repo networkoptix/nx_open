@@ -682,6 +682,8 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
     } else if(statusOverlay == Qn::OfflineOverlay) {
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
+    } else if(statusOverlay == Qn::UnauthorizedOverlay) {
+        return Qn::MainWindow_MediaItem_Unauthorized_Help;
     } else if(options() & ControlPtz) {
         if(m_fisheyePtz) {
             return Qn::MainWindow_MediaItem_Dewarping_Help;
@@ -696,6 +698,8 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
     } else if(m_resource->toResource()->flags() & QnResource::local) {
         return Qn::MainWindow_MediaItem_Local_Help;
+    } else if(m_camera && m_camera->isAnalog()) {
+        return Qn::MainWindow_MediaItem_AnalogCamera_Help;
     } else {
         return Qn::MainWindow_MediaItem_Help;
     }

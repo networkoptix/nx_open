@@ -20,7 +20,6 @@ public:
         ActionColumn,
         ActionCameraColumn,
         DescriptionColumn,
-        
         ColumnCount
     };
 

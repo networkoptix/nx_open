@@ -16,6 +16,7 @@
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 
+#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/widgets/rendering_widget.h>
 #include <ui/style/skin.h>
@@ -332,8 +333,9 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
             || connectInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
 
     if(status != 0 || !compatibleProduct) {
-        QMessageBox::warning(
+        QnMessageBox::warning(
             this, 
+            Qn::Login_Help,
             tr("Could not connect to Enterprise Controller"), 
             tr("Connection to the Enterprise Controller could not be established.\n"
                "Connection details that you have entered are incorrect, please try again.\n\n"
@@ -358,8 +360,9 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
 
         m_restartPending = true;
         if (connectInfo->version < minSupportedVersion) {
-            QMessageBox::warning(
+            QnMessageBox::warning(
                 this,
+                Qn::VersionMismatch_Help,
                 tr("Could not connect to Enterprise Controller"),
                 tr("You are about to connect to Enterprise Controller which has a different version:\n"
                    " - Client version: %1.\n"
@@ -374,8 +377,9 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
 
         if(m_restartPending) {
             if(canRestart(connectInfo->version)) {
-                int button = QMessageBox::warning(
+                int button = QnMessageBox::warning(
                     this,
+                    Qn::VersionMismatch_Help,
                     tr("Could not connect to Enterprise Controller"),
                     tr("You are about to connect to Enterprise Controller which has a different version:\n"
                         " - Client version: %1.\n"
@@ -399,8 +403,9 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                 }
             } else {
                 m_restartPending = false;
-                QMessageBox::warning(
+                QnMessageBox::warning(
                     this,
+                    Qn::VersionMismatch_Help,
                     tr("Could not connect to Enterprise Controller"),
                     tr("You are about to connect to Enterprise Controller which has a different version:\n"
                         " - Client version: %1.\n"
