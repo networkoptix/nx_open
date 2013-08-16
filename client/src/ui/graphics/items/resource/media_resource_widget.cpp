@@ -610,13 +610,13 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
 void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor) {
     // 4-6 fps
 
-    QnScopedPainterTransformRollback transformRollback(painter); Q_UNUSED(transformRollback)
-
-    QnScopedPainterBrushRollback brushRollback(painter, color); Q_UNUSED(brushRollback)
+    QnScopedPainterTransformRollback transformRollback(painter); Q_UNUSED(transformRollback);
+    QnScopedPainterBrushRollback brushRollback(painter, color); Q_UNUSED(brushRollback);
+    QnScopedPainterPenRollback penRollback(painter); Q_UNUSED(penRollback);
 
     painter->translate(rect.topLeft());
     painter->scale(rect.width() / MD_WIDTH, rect.height() / MD_HEIGHT);
-    painter->setPen(QPen(penColor));
+    painter->setPen(QPen(penColor, 0.1)); //#TODO #QT5PORT - width was not set earlier
     painter->drawPath(path);
 }
 
