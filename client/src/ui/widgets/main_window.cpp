@@ -215,7 +215,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
-    m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
+    //TODO: #Elric #QT5PORT
+//    m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 
 
