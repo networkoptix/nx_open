@@ -14,7 +14,7 @@ RectAnimator::RectAnimator(QObject *parent):
 RectAnimator::~RectAnimator() {}
 
 void RectAnimator::updateInternalType(int newType) {
-    if(newType != QMetaType::Void && newType != QMetaType::QRectF)
+    if(newType != QMetaType::UnknownType && newType != QMetaType::Void && newType != QMetaType::QRectF)
         qnWarning("Type '%1' is not supported by this animator.", QMetaType::typeName(newType));
 
     base_type::updateInternalType(newType);

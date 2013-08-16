@@ -508,7 +508,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsXAnimator->setTimer(m_instrumentManager->animationTimer());
     m_notificationsXAnimator->setTargetObject(m_notificationsItem);
     m_notificationsXAnimator->setAccessor(new PropertyAccessor("x"));
-    m_notificationsXAnimator->setSpeed(m_notificationsItem->size().width() * 2.0);
     m_notificationsXAnimator->setTimeLimit(500);
 
     m_notificationsOpacityAnimatorGroup = new AnimatorGroup(this);

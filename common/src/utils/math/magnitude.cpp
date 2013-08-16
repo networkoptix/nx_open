@@ -42,6 +42,7 @@ namespace {
     public:
         Storage() {
             insert(new NoopMagnitudeCalculator());
+            insert(QMetaType::Void, new NoopMagnitudeCalculator());
             insert(new StandardMagnitudeCalculator<int>());
             insert(new StandardMagnitudeCalculator<long>());
             insert(new StandardMagnitudeCalculator<long long>());
