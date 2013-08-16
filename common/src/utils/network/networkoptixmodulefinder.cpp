@@ -218,6 +218,7 @@ void NetworkOptixModuleFinder::run()
                 //new enterprise controller found
                 const QHostAddress& localAddress = QHostAddress(udpSocket->getLocalAddress());
                 if( p.second )  //new module found
+                {
                     NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. New remote server of type %1 found at address (%2:%3) on local interface %4").
                         arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
                 }

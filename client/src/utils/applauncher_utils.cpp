@@ -1,6 +1,6 @@
 #include "applauncher_utils.h"
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 
 #include <QtNetwork/QLocalSocket>
 

@@ -6,7 +6,7 @@
 
 static QMessageBox::StandardButton showNewMessageBox(QWidget *parent, QMessageBox::Icon icon, int helpTopicId, const QString& title, const QString& text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton) {
     QnMessageBox msgBox(icon, helpTopicId, title, text, QMessageBox::NoButton, parent);
-    QDialogButtonBox *buttonBox = qFindChild<QDialogButtonBox *>(&msgBox);
+    QDialogButtonBox *buttonBox = msgBox.findChild<QDialogButtonBox *>();
     assert(buttonBox != 0);
 
     uint mask = QMessageBox::FirstButton;

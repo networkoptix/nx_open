@@ -2,8 +2,8 @@
 
 #include <limits>
 
-#include <QtGui/QApplication>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
