@@ -11,6 +11,7 @@
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QScopedPointer>
 #include <QtCore/QMutex>
+
 #include <QtWidgets/QErrorMessage>
 
 #include <utils/common/warnings.h>
@@ -123,7 +124,8 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_paused(false),
     m_screenshotInterface(0),
     m_histogramConsumer(0),
-    m_fisheyeController(0)
+    m_fisheyeController(0),
+    m_functions(new QOpenGLFunctions(context->contextHandle()))
 
     //m_extraMin(-PI/4.0),
     //m_extraMax(PI/4.0) // rotation range
@@ -380,18 +382,17 @@ void QnGLRenderer::drawYV12VideoTexture(
         }
     }
 
-    glActiveTexture(GL_TEXTURE2);
-    DEBUG_CODE(glCheckError("glActiveTexture"));
+    QOpenGLFunctions func(context()->contextHandle());
+
+    func.glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, tex2ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    glActiveTexture(GL_TEXTURE1);
-    DEBUG_CODE(glCheckError("glActiveTexture"));
+    func.glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, tex1ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    glActiveTexture(GL_TEXTURE0);
-    DEBUG_CODE(glCheckError("glActiveTexture"));
+    func.glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
@@ -435,23 +436,19 @@ void QnGLRenderer::drawYVA12VideoTexture(
     m_shaders->yv12ToRgba->setATexture( 3 );
     m_shaders->yv12ToRgba->setOpacity(m_decodedPictureProvider.opacity() );
 
-    glActiveTexture(GL_TEXTURE3);
-    DEBUG_CODE(glCheckError("glActiveTexture"));
+    m_functions->glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, tex3ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    glActiveTexture(GL_TEXTURE2);
-    DEBUG_CODE(glCheckError("glActiveTexture"));
+    m_functions->glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, tex2ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    glActiveTexture(GL_TEXTURE1);
-    DEBUG_CODE(glCheckError("glActiveTexture"));
+    m_functions->glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, tex1ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    glActiveTexture(GL_TEXTURE0);
-    DEBUG_CODE(glCheckError("glActiveTexture"));
+    m_functions->glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
@@ -483,13 +480,11 @@ void QnGLRenderer::drawNV12VideoTexture(
     m_shaders->nv12ToRgb->setOpacity( m_decodedPictureProvider.opacity() );
     m_shaders->nv12ToRgb->setColorTransform( QnNv12ToRgbShaderProgram::colorTransform(QnNv12ToRgbShaderProgram::YuvEbu) );
 
-    glActiveTexture(GL_TEXTURE1);
-    DEBUG_CODE(glCheckError("glActiveTexture"));
+    m_functions->glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, yPlaneTexID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    glActiveTexture(GL_TEXTURE0);
-    DEBUG_CODE(glCheckError("glActiveTexture"));
+    m_functions->glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, uvPlaneTexID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
@@ -541,8 +536,10 @@ bool QnGLRenderer::isHardwareDecoderUsed() const
 
 bool QnGLRenderer::isYV12ToRgbShaderUsed() const
 {
+    bool openGL1_3 = m_functions->hasOpenGLFeature(QOpenGLFunctions::Multitexture);
+
     return (features() & QnGlFunctions::ArbPrograms)
-        && (features() & QnGlFunctions::OpenGL1_3)
+        && openGL1_3
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_shaders->yv12ToRgb
@@ -551,8 +548,10 @@ bool QnGLRenderer::isYV12ToRgbShaderUsed() const
 
 bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
 {
+    bool openGL1_3 = m_functions->hasOpenGLFeature(QOpenGLFunctions::Multitexture);
+
     return (features() & QnGlFunctions::ArbPrograms)
-        && (features() & QnGlFunctions::OpenGL1_3)
+        && openGL1_3
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_shaders->yv12ToRgba
@@ -561,8 +560,10 @@ bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
 
 bool QnGLRenderer::isNV12ToRgbShaderUsed() const
 {
+    bool openGL1_3 = m_functions->hasOpenGLFeature(QOpenGLFunctions::Multitexture);
+
     return (features() & QnGlFunctions::ArbPrograms)
-        && (features() & QnGlFunctions::OpenGL1_3)
+        && openGL1_3
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_shaders->nv12ToRgb

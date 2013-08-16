@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include <QtCore/QMutexLocker>
+#include <QtGui/QOpenGLFunctions>
 
 #ifdef _WIN32
 #include <D3D9.h>
@@ -157,7 +158,8 @@ class DecodedPictureToOpenGLUploaderPrivate
 public:
     DecodedPictureToOpenGLUploaderPrivate(const QGLContext *context):
         QnGlFunctions(context),
-        supportsNonPower2Textures(false)
+        supportsNonPower2Textures(false),
+        m_functions(new QOpenGLFunctions(context->contextHandle()))
     {
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
@@ -207,6 +209,10 @@ public:
         return filler.data;
     }
 
+    QOpenGLFunctions* functions() {
+        return m_functions.data();
+    }
+
 public:
     GLint clampConstant;
     bool supportsNonPower2Textures;
@@ -229,6 +235,7 @@ private:
 
     QMutex m_fillerMutex;
     Filler m_fillers[FILLER_COUNT];
+    QScopedPointer<QOpenGLFunctions> m_functions;
 };
 
 // -------------------------------------------------------------------------- //
@@ -2200,8 +2207,10 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
 
 bool DecodedPictureToOpenGLUploader::usingShaderYuvToRgb() const
 {
+    bool openGL1_3 = d->functions()->hasOpenGLFeature(QOpenGLFunctions::Multitexture);
+
     return (d->features() & QnGlFunctions::ArbPrograms)
-        && (d->features() & QnGlFunctions::OpenGL1_3)
+        && openGL1_3
         && !(d->features() & QnGlFunctions::ShadersBroken)
         && m_yv12SharedUsed
         && !m_forceSoftYUV;
@@ -2209,8 +2218,10 @@ bool DecodedPictureToOpenGLUploader::usingShaderYuvToRgb() const
 
 bool DecodedPictureToOpenGLUploader::usingShaderNV12ToRgb() const
 {
+    bool openGL1_3 = d->functions()->hasOpenGLFeature(QOpenGLFunctions::Multitexture);
+
     return (d->features() & QnGlFunctions::ArbPrograms)
-        && (d->features() & QnGlFunctions::OpenGL1_3)
+        && openGL1_3
         && !(d->features() & QnGlFunctions::ShadersBroken)
         && m_nv12SharedUsed
         && !m_forceSoftYUV;

@@ -157,11 +157,6 @@ public:
             m_features |= QnGlFunctions::ArbPrograms;
 
         status = true;
-        RESOLVE(PFNGLACTIVETEXTUREPROC,                 glActiveTexture);
-        if(status)
-            m_features |= QnGlFunctions::OpenGL1_3;
-
-        status = true;
         RESOLVE(PFNGLBINDBUFFERPROC,                    glBindBuffer);
         RESOLVE(PFNGLDELETEBUFFERSPROC,                 glDeleteBuffers);
         RESOLVE(PFNGLGENBUFFERSPROC,                    glGenBuffers);
@@ -222,8 +217,6 @@ public:
     PFNGLDELETEPROGRAMSARBPROC glDeleteProgramsARB;
     PFNGLGENPROGRAMSARBPROC glGenProgramsARB;
     PFNGLPROGRAMLOCALPARAMETER4FARBPROC glProgramLocalParameter4fARB;
-
-    PFNGLACTIVETEXTUREPROC glActiveTexture;
 
     PFNGLBINDBUFFERPROC glBindBuffer;
     PFNGLDELETEBUFFERSPROC glDeleteBuffers;
@@ -318,10 +311,6 @@ void QnGlFunctions::glGenProgramsARB(GLsizei n, GLuint *programs) const {
 
 void QnGlFunctions::glProgramLocalParameter4fARB(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const {
     d->glProgramLocalParameter4fARB(target, index, x, y, z, w);
-}
-
-void QnGlFunctions::glActiveTexture(GLenum texture) {
-    d->glActiveTexture(texture);
 }
 
 void QnGlFunctions::glGenBuffers(GLsizei n, GLuint *buffers) {

@@ -23,7 +23,6 @@ typedef uint64_t GLuint64;
 class QnGlFunctions {
 public:
     enum Feature {
-        OpenGL1_3           = 0x00000001,   /**< Implements OpenGL1.3 spec. */
         OpenGL1_5           = 0x00000002,   /**< Implements OpenGL1.5 spec. */
         OpenGL2_0           = 0x00000004,   /**< Implements OpenGL2.0 spec. */
         OpenGL3_2           = 0x00000008,   /**< Implements OpenGL3.2 spec. */
@@ -87,10 +86,6 @@ public:
     void glDeleteProgramsARB(GLsizei n, const GLuint *programs) const;
     void glGenProgramsARB(GLsizei n, GLuint *programs) const;
     void glProgramLocalParameter4fARB(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const;
-
-    /* OpenGL1_3 group. */
-
-    void glActiveTexture(GLenum texture);
 
     /* OpenGL1_5 group. */
     
