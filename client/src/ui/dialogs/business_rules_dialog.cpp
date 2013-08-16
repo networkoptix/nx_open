@@ -29,14 +29,7 @@
 #include <client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
-    base_type(parent,
-              Qt::Window |
-              Qt::CustomizeWindowHint |
-              Qt::WindowTitleHint |
-              Qt::WindowMinMaxButtonsHint |
-              Qt::WindowSystemMenuHint |
-              Qt::WindowContextHelpButtonHint |
-              Qt::WindowCloseButtonHint),
+    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint),
     QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
@@ -225,7 +218,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
-    if (!accessController()->globalPermissions() & Qn::GlobalProtectedPermission)
+    if (!(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
         return;
 
     if (!m_rulesViewModel->isLoaded())

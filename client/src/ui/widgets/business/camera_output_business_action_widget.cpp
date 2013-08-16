@@ -22,7 +22,7 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *
     connect(ui->autoResetCheckBox, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));
     connect(ui->autoResetSpinBox, SIGNAL(valueChanged(int)), this, SLOT(paramsChanged()));
 
-    setHelpTopic(this, Qn::EventsActions_InstantOutput_Help);
+    setHelpTopic(this, Qn::EventsActions_CameraOutput_Help);
 }
 
 QnCameraOutputBusinessActionWidget::~QnCameraOutputBusinessActionWidget()

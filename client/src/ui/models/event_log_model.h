@@ -20,7 +20,6 @@ public:
         ActionColumn,
         ActionCameraColumn,
         DescriptionColumn,
-        
         ColumnCount
     };
 
@@ -54,7 +53,8 @@ private:
     
     static QVariant iconData(const Column& column, const QnBusinessActionData &action);
     static QVariant mouseCursorData(const Column& column, const QnBusinessActionData &action);
-    static QString textData(const Column& column,const QnBusinessActionData &action);
+    static QString textData(const Column& column, const QnBusinessActionData &action);
+    static int helpTopicIdData(const Column& column, const QnBusinessActionData &action);
 
     static QString motionUrl(Column column, const QnBusinessActionData& action);
     static QString formatUrl(const QString& url);

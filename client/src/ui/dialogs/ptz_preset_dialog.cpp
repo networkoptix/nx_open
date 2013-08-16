@@ -3,11 +3,16 @@
 
 #include <utils/common/variant.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     ui(new Ui::PtzPresetDialog())
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::PtzPresets_Help);
 
     connect(ui->nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateOkButtonEnabled()));
 

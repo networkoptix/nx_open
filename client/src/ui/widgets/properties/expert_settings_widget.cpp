@@ -48,7 +48,6 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_dataChanged()));
 
-    setHelpTopic(this, Qn::CameraSettings_Expert_Help);
     setHelpTopic(ui->qualityGroupBox, Qn::CameraSettings_SecondStream_Help);
 }
 

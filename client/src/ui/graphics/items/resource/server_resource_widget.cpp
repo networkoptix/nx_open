@@ -17,6 +17,7 @@
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
@@ -497,6 +498,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     showLogButton->setCheckable(false);
     showLogButton->setProperty(Qn::NoBlockMotionSelection, true);
     showLogButton->setToolTip(tr("Show Log"));
+    setHelpTopic(showLogButton, Qn::MainWindow_MonitoringItem_Log_Help);
     connect(showLogButton, SIGNAL(clicked()), this, SLOT(at_showLogButton_clicked()));
     buttonBar()->addButton(ShowLogButton, showLogButton);
 

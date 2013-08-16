@@ -27,6 +27,7 @@
 #include <ui/graphics/items/notifications/notification_list_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/help/business_help.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
@@ -283,6 +284,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     item->setText(QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree()));
     item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
     item->setNotificationLevel(QnNotificationLevels::notificationLevel(eventType));
+    setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 
     switch (eventType) {
     case BusinessEventType::Camera_Motion: {
@@ -458,6 +460,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
     item->setNotificationLevel(Qn::SystemNotification);
     item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
+    setHelpTopic(item, QnBusiness::healthHelpId(message));
 
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
 

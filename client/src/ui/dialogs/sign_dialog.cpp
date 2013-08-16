@@ -71,7 +71,7 @@ private:
 // ------------------------------------
 
 SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
-    QDialog(parent, Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
+    QDialog(parent),
     ui(new Ui::SignDialog),
     m_camDispay(NULL),
     m_reader(NULL),

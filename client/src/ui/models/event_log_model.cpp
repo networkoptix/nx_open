@@ -10,6 +10,7 @@
 #include "business/events/reasoned_business_event.h"
 #include "core/resource_managment/resource_pool.h"
 #include "ui/style/resource_icon_cache.h"
+#include <ui/help/business_help.h>
 #include "business/business_strings_helper.h"
 #include "client/client_globals.h"
 #include <utils/math/math.h>
@@ -414,56 +415,60 @@ QString QnEventLogModel::getUserGroupString(QnBusinessActionParameters::UserGrou
 
 QString QnEventLogModel::textData(const Column& column,const QnBusinessActionData& action)
 {
-    switch(column) 
-    {
-        case DateTimeColumn: {
-            qint64 timestampUsec = action.getRuntimeParams().getEventTimestamp();
-            QDateTime dt = QDateTime::fromMSecsSinceEpoch(timestampUsec/1000);
-            return dt.toString(Qt::SystemLocaleShortDate);
-            break;
-        }
-        case EventColumn:
-            return QnBusinessStringsHelper::eventName(action.getRuntimeParams().getEventType());
-            break;
-        case EventCameraColumn:
-            return getResourceNameString(action.getRuntimeParams().getEventResourceId());
-            break;
-        case ActionColumn:
-            return BusinessActionType::toString(action.actionType());
-            break;
-        case ActionCameraColumn: {
-            BusinessActionType::Value actionType = action.actionType();
-            if (actionType == BusinessActionType::SendMail)
-                return action.getParams().getEmailAddress();
-            else if (actionType == BusinessActionType::ShowPopup)
-                return getUserGroupString(action.getParams().getUserGroup());
-            else
-                return getResourceNameString(action.getRuntimeParams().getActionResourceId());
-            break;
-        }
-        case DescriptionColumn: {
-            BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
-            QString result;
-
-            if (eventType == BusinessEventType::Camera_Motion) {
-                if (action.hasFlags(QnBusinessActionData::MotionExists))
-                    result = lit("Motion video");
-            }
-            else {
-                result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, lit("\n"));
-            }
-
-            if (!BusinessEventType::hasToggleState(eventType)) {
-                int cnt = action.getAggregationCount();
-                if (cnt > 1)
-                    result += QString(lit(" (%1 times)")).arg(cnt);
-            }
-            return result;
-        }
-        default:
-            break;
+    switch(column) {
+    case DateTimeColumn: {
+        qint64 timestampUsec = action.getRuntimeParams().getEventTimestamp();
+        QDateTime dt = QDateTime::fromMSecsSinceEpoch(timestampUsec/1000);
+        return dt.toString(Qt::SystemLocaleShortDate);
     }
-    return QString();
+    case EventColumn:
+        return QnBusinessStringsHelper::eventName(action.getRuntimeParams().getEventType());
+    case EventCameraColumn:
+        return getResourceNameString(action.getRuntimeParams().getEventResourceId());
+    case ActionColumn:
+        return BusinessActionType::toString(action.actionType());
+    case ActionCameraColumn: {
+        BusinessActionType::Value actionType = action.actionType();
+        if (actionType == BusinessActionType::SendMail)
+            return action.getParams().getEmailAddress();
+        else if (actionType == BusinessActionType::ShowPopup)
+            return getUserGroupString(action.getParams().getUserGroup());
+        else
+            return getResourceNameString(action.getRuntimeParams().getActionResourceId());
+    }
+    case DescriptionColumn: {
+        BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
+        QString result;
+
+        if (eventType == BusinessEventType::Camera_Motion) {
+            if (action.hasFlags(QnBusinessActionData::MotionExists))
+                result = lit("Motion video");
+        }
+        else {
+            result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, lit("\n"));
+        }
+
+        if (!BusinessEventType::hasToggleState(eventType)) {
+            int cnt = action.getAggregationCount();
+            if (cnt > 1)
+                result += QString(lit(" (%1 times)")).arg(cnt);
+        }
+        return result;
+    }
+    default:
+        return QString();
+    }
+}
+
+int QnEventLogModel::helpTopicIdData(const Column& column, const QnBusinessActionData &action) {
+    switch(column) {
+    case EventColumn:
+        return QnBusiness::eventHelpId(action.getRuntimeParams().getEventType());
+    case ActionColumn:
+        return QnBusiness::actionHelpId(action.actionType());
+    default:
+        return -1;
+    }
 }
 
 void QnEventLogModel::sort(int column, Qt::SortOrder order)
@@ -526,6 +531,8 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const
             else 
                 return QString(lit("<a href=\"%1\">%2</a>")).arg(url, text);
         }
+        case Qn::HelpTopicIdRole:
+            return helpTopicIdData(column, action);
         default:
             return QVariant();
     }

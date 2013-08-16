@@ -65,6 +65,7 @@
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
+#include <ui/dialogs/message_box.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -1185,6 +1186,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         dialog->setWindowTitle(tr("Save Layout As"));
         dialog->setText(tr("Enter layout name:"));
         dialog->setName(layout->getName());
+        setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
 
         QMessageBox::Button button;
         do {
@@ -1376,6 +1378,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         QnResourceListDialog::exec(
             mainWindow(),
             errorResources,
+            Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
             tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()),
             QDialogButtonBox::Ok
@@ -1518,6 +1521,7 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
 
     QnCheckableMessageBox::question(
         mainWindow(),
+        Qn::Upgrade_Help,
         tr("Software update is available"),
         tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
         tr("Don't notify again about this update."),
@@ -2353,6 +2357,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
             mainWindow(),
             QnActionParameterTypes::resources(items),
+            Qn::RemoveItems_Help,
             tr("Remove Items"),
             tr("Are you sure you want to remove these %n item(s) from layout?", "", items.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
@@ -3976,7 +3981,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please upgrade all components to the latest version %2."
     ).arg(components).arg(watcher->latestVersion().toString());
 
-    QMessageBox::warning(mainWindow(), tr("Version Mismatch"), message);
+    QnMessageBox::warning(mainWindow(), Qn::VersionMismatch_Help, tr("Version Mismatch"), message);
 }
 
 void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
