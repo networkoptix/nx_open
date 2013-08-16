@@ -202,7 +202,7 @@ void NetworkOptixModuleFinder::run()
 
             if(!m_compatibilityMode && Qn::calculateCustomization(response.customization.toLatin1().constData()) != qnCustomization() )
             {
-                NX_LOG( QString::fromAscii("NetworkOptixModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
+                NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
                     arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress()), cl_logDEBUG2 );
                 continue;
             }
