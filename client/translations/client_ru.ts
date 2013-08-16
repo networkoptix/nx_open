@@ -22,30 +22,30 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.ui" line="22"/>
+        <location filename="../src/ui/dialogs/about_dialog.ui" line="20"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.ui" line="28"/>
-        <location filename="../src/ui/dialogs/about_dialog.ui" line="47"/>
-        <location filename="../src/ui/dialogs/about_dialog.ui" line="66"/>
-        <location filename="../src/ui/dialogs/about_dialog.ui" line="85"/>
+        <location filename="../src/ui/dialogs/about_dialog.ui" line="26"/>
+        <location filename="../src/ui/dialogs/about_dialog.ui" line="45"/>
+        <location filename="../src/ui/dialogs/about_dialog.ui" line="64"/>
+        <location filename="../src/ui/dialogs/about_dialog.ui" line="83"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.ui" line="41"/>
+        <location filename="../src/ui/dialogs/about_dialog.ui" line="39"/>
         <source>Credits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.ui" line="60"/>
+        <location filename="../src/ui/dialogs/about_dialog.ui" line="58"/>
         <source>GPU Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.ui" line="79"/>
+        <location filename="../src/ui/dialogs/about_dialog.ui" line="77"/>
         <source>Connected servers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -91,58 +91,73 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="31"/>
-        <source>TextLabel</source>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="214"/>
+        <source>Warning! Please read documentation prior to change these settings!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="51"/>
-        <source>Warning! Please read documentation before change these settings!</source>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="46"/>
+        <source>Keep camera streams&apos; and profiles&apos; settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="78"/>
-        <source>Keep camera streams settings</source>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="40"/>
+        <source>Camera Settings Control</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="85"/>
-        <source>Warning! In this case FPS/Quality settings in Recording Schedule will not work!</source>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="27"/>
+        <source>I have read the manual and understand the risks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="125"/>
-        <source>Secondary stream quality</source>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="53"/>
+        <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="191"/>
-        <source>Keep current</source>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="63"/>
+        <source>Secondary Stream Quality Control</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="201"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="69"/>
+        <source>Override current value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="160"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="167"/>
+        <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="234"/>
+        <source>Restore Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="250"/>
+        <source>Selected camera(s) have no expert settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="101"/>
         <source>Low quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="211"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="124"/>
         <source>Medium quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="221"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="147"/>
         <source>High quality</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="249"/>
-        <source>Warning! Low quality may result in crappy picture, high stream may overload Media Server&apos;s CPU or network connection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="278"/>
-        <source>Your combined cameras with and without dual streaming. Stream quality control is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -189,11 +204,6 @@
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="93"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="100"/>
-        <source>Show system rules</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -510,27 +520,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="46"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="62"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="87"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="128"/>
         <source>&lt; Any camera &gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="116"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="259"/>
+        <source>All media servers are offline. Logs are not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="106"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="145"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="87"/>
         <source>Clear filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="161"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="151"/>
         <source>Alarm/Event Rules</source>
         <translation type="unfinished"></translation>
     </message>
@@ -738,8 +753,14 @@ p, li { white-space: pre-wrap; }
     <name>LoginDialog</name>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="14"/>
+        <source>Connect to Enterprise Controller</source>
+        <comment>Window Title</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="56"/>
         <source>Connect to Enterprise Controller</source>
+        <comment>Groupbox Title</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -758,32 +779,32 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="125"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="108"/>
         <source>&amp;Host:</source>
         <translation>&amp;Хост</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="155"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="142"/>
         <source>P&amp;ort:</source>
         <translation>П&amp;орт</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="196"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="170"/>
         <source>&amp;Login:</source>
         <translation>&amp;Логин</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="241"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="199"/>
         <source>&amp;Password:</source>
         <translation>&amp;Пароль</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="279"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="243"/>
         <source>&amp;Test</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="288"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="255"/>
         <source>&amp;Auto-Login</source>
         <translation type="unfinished"></translation>
     </message>
@@ -912,8 +933,14 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.ui" line="290"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.ui" line="283"/>
         <source>Clear local cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/preferences_dialog.ui" line="310"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.ui" line="355"/>
+        <source>Restart required.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -927,8 +954,8 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.ui" line="355"/>
-        <source>(Restart required)</source>
+        <location filename="../src/ui/dialogs/preferences_dialog.ui" line="400"/>
+        <source>Experimental. May result in glitches.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -967,7 +994,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.ui" line="381"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.ui" line="412"/>
         <source>Network Interfaces</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1021,50 +1048,50 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="56"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="54"/>
         <source>While %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="58"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="56"/>
         <source>On %1 %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="35"/>
-        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="42"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="33"/>
+        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="44"/>
         <source>Stops</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="37"/>
-        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="44"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="35"/>
+        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="46"/>
         <source>Starts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="39"/>
-        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="47"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="37"/>
+        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="49"/>
         <source>Starts/Stops</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="46"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="44"/>
         <source>start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="47"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="45"/>
         <source>stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="49"/>
+        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="51"/>
         <source>Occurs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="535"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="522"/>
         <source>Export selected events to file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1145,7 +1172,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="127"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="131"/>
         <source>Export selected cameras to file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1153,41 +1180,41 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>QnAboutDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.cpp" line="68"/>
+        <location filename="../src/ui/dialogs/about_dialog.cpp" line="78"/>
         <source>Copy to Clipboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.cpp" line="70"/>
+        <location filename="../src/ui/dialogs/about_dialog.cpp" line="80"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.cpp" line="73"/>
+        <location filename="../src/ui/dialogs/about_dialog.cpp" line="83"/>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.cpp" line="89"/>
+        <location filename="../src/ui/dialogs/about_dialog.cpp" line="99"/>
         <source>&lt;b&gt;Enterprise controller&lt;/b&gt; not connected.&lt;br&gt;
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.cpp" line="91"/>
+        <location filename="../src/ui/dialogs/about_dialog.cpp" line="101"/>
         <source>&lt;b&gt;Enterprise controller&lt;/b&gt; version %1 at %2:%3.&lt;br&gt;
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.cpp" line="102"/>
+        <location filename="../src/ui/dialogs/about_dialog.cpp" line="112"/>
         <source>&lt;b&gt;Media Server&lt;/b&gt; version %2 at %3.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.cpp" line="109"/>
+        <location filename="../src/ui/dialogs/about_dialog.cpp" line="119"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; uses the following external libraries:&lt;br/&gt;
 &lt;br /&gt;
 &lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
@@ -1201,12 +1228,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.cpp" line="130"/>
+        <location filename="../src/ui/dialogs/about_dialog.cpp" line="140"/>
         <source>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/about_dialog.cpp" line="136"/>
+        <location filename="../src/ui/dialogs/about_dialog.cpp" line="146"/>
         <source>&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br/&gt;
 &lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;
 &lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br/&gt;
@@ -1333,6 +1360,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="398"/>
         <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="407"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1027"/>
+        <source>Check Camera Issues...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1551,6 +1584,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="664"/>
+        <source>How-to Videos and FAQ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="674"/>
         <source>About...</source>
         <translation type="unfinished"></translation>
@@ -1636,62 +1674,62 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1040"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1033"/>
         <source>Camera Rules...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1080"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1073"/>
         <source>Server Logs...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1217"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1210"/>
         <source>Preview Search...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1239"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1232"/>
         <source>Calibrate PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1332"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
         <source>Show Title Bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1333"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1326"/>
         <source>Hide Title Bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1331"/>
         <source>Pin Tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1339"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1332"/>
         <source>Unpin Tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1344"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1337"/>
         <source>Show Tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1345"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
         <source>Hide Tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1350"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1343"/>
         <source>Show Timeline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1351"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1344"/>
         <source>Hide Timeline</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1745,11 +1783,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="654"/>
         <source>Backup/Restore Configuration...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="664"/>
-        <source>Showcase...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2012,80 +2045,69 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1009"/>
-        <source>Edit tags...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1023"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1016"/>
         <source>Set as Layout Background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="407"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1034"/>
-        <source>Camera Diagnostics...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1052"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1175"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1045"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1168"/>
         <source>Layout Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1062"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1055"/>
         <source>Clear Camera Settings Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1066"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1059"/>
         <source>Add Camera(s)...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1071"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1064"/>
         <source>Camera(s) List by Server...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1076"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1069"/>
         <source>Ping...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1085"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1078"/>
         <source>Server Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1096"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1089"/>
         <source>Change Cell Aspect Ratio...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1120"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1113"/>
         <source>Change Cell Spacing...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1164"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1180"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1157"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1173"/>
         <source>Alt+T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1355"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1348"/>
         <source>Pin Notifications</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1356"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1349"/>
         <source>Unpin Notifications</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1016"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1009"/>
         <source>Delete from Disk</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2095,132 +2117,132 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1029"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1022"/>
         <source>User Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1046"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1039"/>
         <source>Camera Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1058"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1051"/>
         <source>Open in Camera Settings Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1090"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1083"/>
         <source>Server Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1104"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1097"/>
         <source>4:3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1111"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1104"/>
         <source>16:9</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1128"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1121"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1135"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1128"/>
         <source>Small</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1142"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1135"/>
         <source>Medium</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1149"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1142"/>
         <source>Large</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1162"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1155"/>
         <source>Start Tour</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1163"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1156"/>
         <source>Stop Tour</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1186"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1179"/>
         <source>Mark Selection Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1187"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1180"/>
         <source>[</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1193"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1186"/>
         <source>Mark Selection End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1194"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1187"/>
         <source>]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1200"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1193"/>
         <source>Clear Selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1322"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1315"/>
         <source>Show Thumbnails</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1323"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1316"/>
         <source>Hide Thumbnails</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1245"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1238"/>
         <source>Play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1246"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1239"/>
         <source>Pause</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1311"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1304"/>
         <source>Synchronize Streams</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1312"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1305"/>
         <source>Disable Stream Synchronization</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1327"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1320"/>
         <source>Show Calendar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1328"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1321"/>
         <source>Hide Calendar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1224"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1217"/>
         <source>Ctrl+Alt+Shift++</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2230,147 +2252,147 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1205"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1198"/>
         <source>Export Selected Area...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1211"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1204"/>
         <source>Export Multi-Video...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1225"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
         <source>Increment Debug Counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1229"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1222"/>
         <source>Ctrl+Alt+Shift+-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1230"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1223"/>
         <source>Decrement Debug Counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1234"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1227"/>
         <source>Ctrl+Alt+Shift+R</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1235"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1228"/>
         <source>Show Resource Pool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1244"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1237"/>
         <source>Space</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1251"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1244"/>
         <source>Ctrl+-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1252"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1245"/>
         <source>Speed Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1257"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1250"/>
         <source>Ctrl++</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1258"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1251"/>
         <source>Speed Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1263"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1256"/>
         <source>Ctrl+Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1264"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1257"/>
         <source>Previous Frame</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1269"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1262"/>
         <source>Ctrl+Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1270"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1263"/>
         <source>Next Frame</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1275"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1268"/>
         <source>Z</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1276"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1269"/>
         <source>To Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1281"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1274"/>
         <source>X</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1282"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1275"/>
         <source>To End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1292"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1285"/>
         <source>Ctrl+Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1281"/>
         <source>Volume Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1287"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1280"/>
         <source>Ctrl+Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1293"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1286"/>
         <source>Volume Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1290"/>
         <source>M</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1298"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1291"/>
         <source>Toggle Mute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1303"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1296"/>
         <source>L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1304"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
         <source>Jump to Live</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1310"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1303"/>
         <source>S</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2378,12 +2400,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnAdjustVideoDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="54"/>
+        <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="59"/>
         <source>[No item selected]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="55"/>
+        <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="60"/>
         <source>Image Enhancement - %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2469,12 +2491,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="64"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="66"/>
         <source>You have new notifications</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="115"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="117"/>
         <source>You have %n notifications</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2499,31 +2521,31 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="738"/>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="764"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="746"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="772"/>
         <source>&lt;Any Camera&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="742"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="750"/>
         <source>Recording or motion detection is disabled for %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="780"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="788"/>
         <source>User &apos;%1&apos; has invalid E-Mail address: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="818"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="826"/>
         <source>%1 of %2 cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="748"/>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="766"/>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="821"/>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="844"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="756"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="774"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="829"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="852"/>
         <source>%n Camera(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2532,7 +2554,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="745"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="753"/>
         <source>%1 of %n cameras</source>
         <comment>...for</comment>
         <translation type="unfinished">
@@ -2542,18 +2564,18 @@ Built for %5-%6 with %7.&lt;br/&gt;
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="753"/>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="837"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="761"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="845"/>
         <source>&lt;System&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="759"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="767"/>
         <source>&lt;Any Server&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="761"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="769"/>
         <source>%n Server(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2562,73 +2584,73 @@ Built for %5-%6 with %7.&lt;br/&gt;
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="778"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="786"/>
         <source>User &apos;%1&apos; has empty E-Mail</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="790"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="798"/>
         <source>Invalid email address: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="795"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="803"/>
         <source>Select at least one user</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="798"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="806"/>
         <source>Send mail to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="800"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="808"/>
         <source>%1 users, %2 additional</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="801"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="809"/>
         <source>%1 users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="805"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="813"/>
         <source>Administrators only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="807"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="815"/>
         <source>All users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="811"/>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="842"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="819"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="850"/>
         <source>Select at least one camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="815"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="823"/>
         <source>Recording is disabled for %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="825"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="833"/>
         <source>Select a sound</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="831"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="839"/>
         <source>Enter the text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="855"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="863"/>
         <source>Not Applied</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="861"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="869"/>
         <source>Every %n days</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2637,7 +2659,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="864"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="872"/>
         <source>Every %n hours</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2646,7 +2668,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="867"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="875"/>
         <source>Every %n minutes</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2655,7 +2677,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="869"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="877"/>
         <source>Every %n seconds</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2664,7 +2686,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="858"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="866"/>
         <source>Instant</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2689,7 +2711,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="79"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="224"/>
-        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="160"/>
+        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="163"/>
         <source>at</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2724,7 +2746,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="160"/>
+        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="163"/>
         <source>to</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2732,84 +2754,84 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnBusinessRulesDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="145"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="139"/>
         <source>Confirm exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="146"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="140"/>
         <source>Unsaved changes will be lost. Save?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="254"/>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="257"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="248"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="251"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="257"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="251"/>
         <source>Error while saving rule.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="314"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="308"/>
         <source>Hide Advanced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="314"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="308"/>
         <source>Show Advanced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="254"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="248"/>
         <source>Error while receiving rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="46"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="41"/>
         <source>Reset Default Rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="234"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="228"/>
         <source>Confirm rules reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="235"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="229"/>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="277"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="271"/>
         <source>Error while deleting rule</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="318"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="312"/>
         <source>&amp;New...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="321"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="315"/>
         <source>&amp;Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="328"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="322"/>
         <source>&amp;Schedule...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="345"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="339"/>
         <source>Confirm save invalid rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="346"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="340"/>
         <source>Some rules are not valid. Should we disable them?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2817,42 +2839,42 @@ This action CANNOT be undone!</source>
 <context>
     <name>QnBusinessRulesViewModel</name>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="953"/>
+        <location filename="../src/ui/models/business_rules_view_model.cpp" line="89"/>
         <source>#</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="954"/>
+        <location filename="../src/ui/models/business_rules_view_model.cpp" line="90"/>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="955"/>
+        <location filename="../src/ui/models/business_rules_view_model.cpp" line="91"/>
         <source>Event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="956"/>
+        <location filename="../src/ui/models/business_rules_view_model.cpp" line="92"/>
         <source>Source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="957"/>
+        <location filename="../src/ui/models/business_rules_view_model.cpp" line="93"/>
         <source>-&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="958"/>
+        <location filename="../src/ui/models/business_rules_view_model.cpp" line="94"/>
         <source>Action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="959"/>
+        <location filename="../src/ui/models/business_rules_view_model.cpp" line="95"/>
         <source>Target</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rules_view_model.cpp" line="960"/>
+        <location filename="../src/ui/models/business_rules_view_model.cpp" line="96"/>
         <source>Interval of Action</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2967,47 +2989,47 @@ It might take a few moments to populate them in the tree.</source>
 <context>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="27"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="29"/>
         <source>Copy to Clipboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="94"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="98"/>
         <source>Diagnostics for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="109"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="113"/>
         <source>Checking media server availability</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="111"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="115"/>
         <source>Checking that camera is accessible</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="113"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="117"/>
         <source>Checking that camera provides media stream</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="115"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="119"/>
         <source>Checking media stream for errors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="131"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="135"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="134"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="138"/>
         <source>FAILED: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="144"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="148"/>
         <source>Diagnostics finished</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3046,70 +3068,78 @@ It might take a few moments to populate them in the tree.</source>
 <context>
     <name>QnCameraListDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="48"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="50"/>
         <source>Copy Selection to Clipboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="52"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="54"/>
         <source>Export Selection to File...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="53"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="55"/>
         <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="138"/>
-        <source>Cameras list - %1 camera(s) found</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="142"/>
+        <source>Camera List - %n camera(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="140"/>
-        <source>Cameras list by media server &apos;%1&apos; - %2 camera(s) found</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="144"/>
+        <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>QnCameraListModel</name>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="105"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="106"/>
         <source>Recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="106"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="107"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="107"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="108"/>
         <source>Driver</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="108"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="109"/>
         <source>Model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="109"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="110"/>
         <source>Firmware</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="110"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="111"/>
         <source>IP/Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="111"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="112"/>
         <source>ID/MAC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="112"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="113"/>
         <source>Server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3157,7 +3187,7 @@ It might take a few moments to populate them in the tree.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/business/camera_output_business_action_widget.cpp" line="68"/>
+        <location filename="../src/ui/widgets/business/camera_output_business_action_widget.cpp" line="72"/>
         <source>&lt;automatic&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3165,33 +3195,33 @@ It might take a few moments to populate them in the tree.</source>
 <context>
     <name>QnCameraScheduleWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="319"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="321"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="329"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="331"/>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="520"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="526"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="522"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="528"/>
         <source>FPS value is too high</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="521"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="523"/>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="527"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="529"/>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="596"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="598"/>
         <source>%n digital license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3200,7 +3230,7 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="605"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="607"/>
         <source>%n analog license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3209,7 +3239,7 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="632"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="634"/>
         <source>Activate %n more digital license(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3218,7 +3248,7 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="634"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="636"/>
         <source>Activate %n more analog license(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3227,7 +3257,7 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="641"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="643"/>
         <source>%n more digital license(s) will be used.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3236,7 +3266,7 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="643"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="645"/>
         <source>%n more analog license(s) will be used.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3245,40 +3275,40 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="627"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="629"/>
         <source>Activate %1 more digital and %2 more analog licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="636"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="638"/>
         <source>%1 more digital and %2 more analog licenses will be used.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="784"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="787"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="786"/>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="789"/>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="791"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="793"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="784"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="786"/>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="787"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="789"/>
         <source>Dual-Streaming is not supported by this camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="789"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="791"/>
         <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="791"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="793"/>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3330,12 +3360,12 @@ It might take a few moments to populate them in the tree.</source>
 <context>
     <name>QnConnectionTestingDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="66"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="70"/>
         <source>Request timed out.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="94"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="102"/>
         <source>Connection to the Enterprise Controller could not be established.
 Connection details that you have entered are incorrect, please try again.
 
@@ -3343,7 +3373,7 @@ If this error persists, please contact your VMS administrator.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="102"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="110"/>
         <source>Enterprise Controller has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -3351,7 +3381,7 @@ Compatibility mode for versions lower than %3 is not supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="111"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="120"/>
         <source>Enterprise Controller has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -3359,12 +3389,12 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="130"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="140"/>
         <source>Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="130"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="140"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3501,77 +3531,57 @@ You will be asked to restart the client in compatibility mode.</source>
 <context>
     <name>QnEventLogDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="73"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="80"/>
         <source>Any action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="78"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="100"/>
         <source>Filter Similar Rows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="80"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="102"/>
         <source>Copy Selection to Clipboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="81"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="103"/>
         <source>Export Selection to File...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="82"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="104"/>
         <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="85"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="107"/>
         <source>Clear Filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="206"/>
-        <source>No online media servers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="206"/>
-        <source>All media server(s) is offline. No data is selected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="301"/>
-        <source>No rule(s) for current filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="301"/>
-        <source>You have not configured any Alarm/Event Rules to match the current filter condition.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="368"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="362"/>
         <source>Event log for period from %1 to %2 - %3 event(s) found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="373"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="367"/>
         <source>Event log for %1  - %2 event(s) found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="419"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="406"/>
         <source>&lt; Any camera &gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="421"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="408"/>
         <source>&lt; 1 camera &gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="423"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="410"/>
         <source>&lt; %1 cameras &gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3579,42 +3589,42 @@ You will be asked to restart the client in compatibility mode.</source>
 <context>
     <name>QnEventLogModel</name>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="263"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="267"/>
         <source>Date/Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="264"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="268"/>
         <source>Event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="265"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="269"/>
         <source>Source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="266"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="270"/>
         <source>Action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="267"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="271"/>
         <source>Target</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="268"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="272"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="397"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="406"/>
         <source>All users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="399"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="408"/>
         <source>Administrators Only</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3622,17 +3632,17 @@ You will be asked to restart the client in compatibility mode.</source>
 <context>
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="61"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="63"/>
         <source>Schedule motion type is not supported by some cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="67"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="69"/>
         <source>Recording cannot be enabled for some cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="85"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="87"/>
         <source>%n digital license(s) will be used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3641,7 +3651,7 @@ You will be asked to restart the client in compatibility mode.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="87"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="89"/>
         <source>%n analog license(s) will be used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3781,28 +3791,28 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="294"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="299"/>
         <source>&lt;No image&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="413"/>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="510"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="418"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="517"/>
         <source>&lt;Image cannot be loaded&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="426"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="431"/>
         <source>&lt;Image cannot be uploaded&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="475"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="480"/>
         <source>Open file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="485"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="491"/>
         <source>Pictures %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3873,24 +3883,24 @@ Required at least %3 digital and %4 analog licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="95"/>
-        <source>The software is licensed to %1 digital and %2 analog cameras.
-Currently using %3 digital and %4 analog licenses.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="105"/>
         <source>Obtaining licenses from Enterprise Controller...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="95"/>
+        <source>The software is licensed to %1 digital and %2 analog cameras.
+%3 digital and %4 analog licenses are currently in use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="109"/>
-        <source>You do not have a valid License installed. Please activate your commercial or trial license.</source>
+        <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="110"/>
-        <source>You do not have a valid License installed. Please activate your commercial license.</source>
+        <source>You do not have a valid license installed. Please activate your commercial license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3998,51 +4008,51 @@ Try to activate your License manually.</source>
 <context>
     <name>QnLoginDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="163"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="164"/>
         <source>Invalid Login Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="163"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="164"/>
         <source>The Login Information you have entered is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="238"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="239"/>
         <source>Saved Sessions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="256"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="257"/>
         <source>Auto-Discovered ECs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="278"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="279"/>
         <source>&lt;none&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="327"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="396"/>
         <source>Launcher process is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="328"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="397"/>
         <source>Cannot restart the client in compatibility mode.
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="376"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="402"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="419"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="437"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="339"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="366"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="383"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="409"/>
         <source>Could not connect to Enterprise Controller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="377"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="340"/>
         <source>Connection to the Enterprise Controller could not be established.
 Connection details that you have entered are incorrect, please try again.
 
@@ -4050,7 +4060,7 @@ If this error persists, please contact your VMS administrator.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="403"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="367"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -4058,7 +4068,7 @@ Compatibility mode for versions lower than %3 is not supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="420"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="384"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -4066,7 +4076,7 @@ Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="438"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="410"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -4074,59 +4084,59 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="470"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="485"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="491"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="442"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="457"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="463"/>
         <source>Invalid parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="470"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="442"/>
         <source>The information you have entered is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="485"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="457"/>
         <source>Entered hostname is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="491"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="463"/>
         <source>Host field cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="500"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="472"/>
         <source>%1 at %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="501"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="473"/>
         <source>Save connection as...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="501"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="473"/>
         <source>Enter name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="509"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="481"/>
         <source>Connection already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="510"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="482"/>
         <source>Connection with the same name already exists. Overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="545"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="517"/>
         <source>Delete connections</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="546"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="518"/>
         <source>Are you sure you want to delete the connection
 %1?</source>
         <translation type="unfinished"></translation>
@@ -4136,71 +4146,76 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <name>QnMediaResourceWidget</name>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="104"/>
+        <source>Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="111"/>
         <source>Smart Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="112"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="119"/>
         <source>PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="120"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="127"/>
         <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="129"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="136"/>
         <source>Create Zoom Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="136"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="144"/>
         <source>Image Enhancement</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="453"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="463"/>
         <source>Zoom window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="747"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="771"/>
         <source> (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="753"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="777"/>
         <source> Lo-Res</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="753"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="777"/>
         <source> Hi-Res</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="762"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="786"/>
         <source>	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="764"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="788"/>
         <source>LIVE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="769"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="793"/>
         <source> HW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="769"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="793"/>
         <source> SW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="770"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="794"/>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7%8</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4216,19 +4231,19 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="283"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="276"/>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="291"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="284"/>
         <source>&lt;multiple values&gt;</source>
         <comment>PasswordEdit</comment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="422"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="415"/>
         <source>%n digital license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -4237,7 +4252,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="431"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="424"/>
         <source>%n analog license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -4408,7 +4423,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
 <context>
     <name>QnNotificationToolTipWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notification_item.cpp" line="49"/>
+        <location filename="../src/ui/graphics/items/notifications/notification_widget.cpp" line="48"/>
         <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4416,77 +4431,77 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
 <context>
     <name>QnNotificationsCollectionWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="153"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="155"/>
         <source>Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="162"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="164"/>
         <source>Filter...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="171"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="173"/>
         <source>Event Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="182"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="185"/>
         <source>DEBUG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="288"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="291"/>
         <source>Browse Archive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="298"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="301"/>
         <source>Open Camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="308"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="327"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="311"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="330"/>
         <source>Camera Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="318"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="436"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="444"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="321"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="439"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="447"/>
         <source>Server settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="339"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="342"/>
         <source>Open camera web page...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="348"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="351"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="392"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="414"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="395"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="417"/>
         <source>User Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="400"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="403"/>
         <source>Licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="407"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="429"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="410"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="432"/>
         <source>SMTP Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="422"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="425"/>
         <source>Connect to server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4571,84 +4586,101 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
 <context>
     <name>QnPreferencesDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="52"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="54"/>
         <source>Server Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="53"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="55"/>
         <source>Client Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="57"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="59"/>
         <source>Screen Recorder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="66"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="68"/>
         <source>Notifications</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="70"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="72"/>
         <source>YouTube</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="75"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="77"/>
         <source>Licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="79"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="81"/>
         <source>Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="117"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="130"/>
         <source>Settings file is read-only. Please contact your system administrator.
 All changes will be lost after program exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="119"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="132"/>
         <source>Settings cannot be saved. Please contact your system administrator.
 All changes will be lost after program exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="143"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="156"/>
+        <source>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="170"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="144"/>
-        <source>The language change will take effect after application restart. Press OK to close application now.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="204"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="251"/>
         <source>IP Address: %1, Network Mask: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="262"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="313"/>
         <source>Folder is already added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="262"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="313"/>
         <source>This folder is already added.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="290"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="155"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="341"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="290"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="171"/>
+        <source>Some changes will take effect only after application restart. Press OK to restart the application now.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="180"/>
+        <source>Launcher process is not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="181"/>
+        <source>Cannot restart the client.
+Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="341"/>
         <source>This settings will not affect Recording Schedule. 
 Recording Schedule is always based on Server Time.</source>
         <translation type="unfinished"></translation>
@@ -4665,7 +4697,7 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnPtzPresetDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/ptz_preset_dialog.cpp" line="64"/>
+        <location filename="../src/ui/dialogs/ptz_preset_dialog.cpp" line="69"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4807,7 +4839,7 @@ Recording Schedule is always based on Server Time.</source>
     <name>QnResourceSelectionDialog</name>
     <message>
         <location filename="../src/ui/dialogs/resource_selection_dialog.ui" line="20"/>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="52"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="54"/>
         <source>Select cameras...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4817,7 +4849,7 @@ Recording Schedule is always based on Server Time.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="55"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="57"/>
         <source>Select resources...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4982,23 +5014,23 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="810"/>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="814"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="808"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="812"/>
         <source>&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="441"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="439"/>
         <source>Hardware (Camera built-in)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="443"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="441"/>
         <source>Do not record motion</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="627"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="625"/>
         <source>%n digital license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5007,7 +5039,7 @@ Recording Schedule is always based on Server Time.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="636"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="634"/>
         <source>%n analog license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5042,7 +5074,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="111"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="275"/>
-        <source>&amp;System ID:</source>
+        <source>&amp;System Signature:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5343,105 +5375,105 @@ AVAILABLE</source>
 <context>
     <name>QnUserSettingsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="441"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="446"/>
         <source>Viewer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="438"/>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="457"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="443"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="462"/>
         <source>Administrator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="108"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="113"/>
         <source>New Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="110"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="115"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="297"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="302"/>
         <source>Login cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="301"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="306"/>
         <source>User with specified login already exists.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="310"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="315"/>
         <source>To change your password, please
  enter your current password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="313"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="318"/>
         <source>Invalid current password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="326"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="331"/>
         <source>Password cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="320"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="325"/>
         <source>Passwords do not match.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="332"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="337"/>
         <source>Choose access rights.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="344"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="349"/>
         <source>Invalid email address.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="434"/>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="455"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="439"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="460"/>
         <source>Owner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="440"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="445"/>
         <source>Advanced Viewer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="442"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="447"/>
         <source>Live Viewer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="444"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="449"/>
         <source>Custom...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="460"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="465"/>
         <source>Can adjust camera settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="461"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="466"/>
         <source>Can use PTZ controls</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="462"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="467"/>
         <source>Can view video archives</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="463"/>
+        <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="468"/>
         <source>Can export video</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5475,12 +5507,12 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="521"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="520"/>
         <source>Close Layouts</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="522"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="521"/>
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5489,12 +5521,12 @@ AVAILABLE</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="550"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="549"/>
         <source>Saving Layouts</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="551"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="550"/>
         <source>The following %n layout(s) are being saved.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5503,59 +5535,69 @@ AVAILABLE</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="552"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="551"/>
         <source>Please wait.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="685"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="694"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="683"/>
+        <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="684"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="693"/>
         <source>Changes are not applied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="693"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="692"/>
         <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="762"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3189"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="716"/>
+        <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="761"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3211"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="928"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="927"/>
         <source>Connect to Server...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="940"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="939"/>
         <source>Connect to Another Server...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1024"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1023"/>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1187"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1186"/>
         <source>Save Layout As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1188"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1187"/>
         <source>Enter layout name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1381"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3675"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3737"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3754"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3777"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3705"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3767"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3784"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3807"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5638,17 +5680,12 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1203"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1223"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1202"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1222"/>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1551"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2398"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2506"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2419"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2527"/>
         <source>Layout already exists</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="684"/>
-        <source> Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5657,12 +5694,12 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2111"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2132"/>
         <source>Camera(s) not Saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2112"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2133"/>
         <source>Save changes to the following %n camera(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5671,12 +5708,12 @@ AVAILABLE</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2320"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2341"/>
         <source>Delete Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2321"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2342"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5685,12 +5722,12 @@ AVAILABLE</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2337"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2358"/>
         <source>Remove Items</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2338"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2359"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5699,22 +5736,22 @@ AVAILABLE</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2379"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2400"/>
         <source>Rename</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2380"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2401"/>
         <source>Enter new name for the selected item:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2444"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2465"/>
         <source>Delete Resources</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2445"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2466"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5723,98 +5760,98 @@ AVAILABLE</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2490"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2511"/>
         <source>New Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2491"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2512"/>
         <source>Enter the name of the layout to create:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3767"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3797"/>
         <source>Could not delete resource</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3767"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3797"/>
         <source>An error has occurred while trying to delete a resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2578"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2599"/>
         <source>User Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2668"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3232"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2689"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3254"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2669"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2690"/>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2709"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2730"/>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2730"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2751"/>
         <source>Executable %1 Media File (x86) (*.exe)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2732"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2753"/>
         <source>Executable %1 Media File (x64) (*.exe)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2759"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2780"/>
         <source>Save local layout As...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2761"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2782"/>
         <source>Export Layout As...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2776"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2797"/>
         <source>Media File (*.nov)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2826"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3363"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2847"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3385"/>
         <source>Could not overwrite file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3214"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3236"/>
         <source>Could not export file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3247"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3269"/>
         <source>AVI (*.avi)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3248"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3270"/>
         <source>Matroska (*.mkv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3349"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3371"/>
         <source>AVI format is not recommended</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5824,38 +5861,33 @@ Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2813"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3315"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3329"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2834"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3337"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3351"/>
         <source>Save As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1966"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1987"/>
         <source>Could not perform preview search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="717"/>
-        <source>Licenses limit exceeded. Your changes will be saved, but will not take effect.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="718"/>
         <source>Could not apply changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="761"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3188"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="760"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3210"/>
         <source>Could not save parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1204"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1224"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2399"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2507"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1203"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1223"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2420"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2528"/>
         <source>Layout with the same name already exists
 and you do not have the rights to overwrite it.</source>
         <translation type="unfinished"></translation>
@@ -5866,90 +5898,90 @@ and you do not have the rights to overwrite it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1966"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1987"/>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2052"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2073"/>
         <source>Preview Search for %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2708"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2717"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2854"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2729"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2738"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2875"/>
         <source>Could not save a layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2718"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2739"/>
         <source>Current layout contains several cameras and local files. You have to keep only cameras or only local files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2795"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2816"/>
         <source>Make file read-only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2814"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3330"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2835"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3352"/>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2827"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2896"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3364"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2848"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2918"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3386"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2855"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2876"/>
         <source>Another export in progress. Please wait</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2871"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2892"/>
         <source>Exporting Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2876"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3398"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2897"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3420"/>
         <source>Open New Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2954"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2976"/>
         <source>Could not create output file %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3079"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3446"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3101"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3470"/>
         <source>Export finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3079"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3446"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3101"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3470"/>
         <source>Export successfully finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3157"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3179"/>
         <source>Exporting %1 to &quot;%2&quot;...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3166"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3188"/>
         <source>Could not export layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3215"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3237"/>
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -5958,116 +5990,116 @@ and you do not have the rights to overwrite it.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3233"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3255"/>
         <source>You are about to export a video sequence that is longer than 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3276"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3298"/>
         <source>Export Video As...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3287"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3309"/>
         <source>Include timestamps (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3292"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3314"/>
         <source>Apply dewarping and image correction (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3294"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3316"/>
         <source>Apply image correction (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3296"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3318"/>
         <source>Apply dewarping (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3316"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3338"/>
         <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3350"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3372"/>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists.Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3393"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3415"/>
         <source>Exporting Video</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3394"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3416"/>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3471"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3495"/>
         <source>Could not export video</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3560"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3570"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3584"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3594"/>
         <source>Could not get position from camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3561"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3585"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3571"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3595"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 The camera is probably in continuous movement mode. Please stop the camera and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3583"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3607"/>
         <source>Save Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3609"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3639"/>
         <source>Could not set position from camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3610"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3640"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3640"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3670"/>
         <source>Updating background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3641"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3671"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3675"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3705"/>
         <source>Image cannot be uploaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3738"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3768"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6076,7 +6108,7 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3739"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3769"/>
         <source>Do you want to restore these %n layout(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6085,7 +6117,7 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3755"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3785"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6094,7 +6126,7 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3778"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3808"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6103,32 +6135,32 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3920"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3950"/>
         <source>Client v%1&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3923"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3953"/>
         <source>Enterprise Controller v%1&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3928"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3958"/>
         <source>Media Server v%1 at %2&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3930"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3960"/>
         <source>Media Server v%1&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3943"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3973"/>
         <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3951"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3981"/>
         <source>Version Mismatch</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6245,12 +6277,12 @@ Error description: &apos;%2&apos;</source>
 <context>
     <name>QnWorkbenchNavigator</name>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="958"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="961"/>
         <source>All Cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1183"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1186"/>
         <source>&apos;Live&apos;</source>
         <comment>LIVE_TOOL_TIP_FORMAT</comment>
         <translation type="unfinished"></translation>
@@ -6665,7 +6697,12 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="280"/>
-        <source>This is the fish-eye lens camera</source>
+        <source>This is a fish-eye lens camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="360"/>
+        <source>Software (Max fps may be slightly decreased on media server)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6699,11 +6736,6 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="360"/>
-        <source>Software (On media server, max fps may be slightly decreased)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="372"/>
         <source>Sensitivity:</source>
         <translation type="unfinished"></translation>
@@ -6734,17 +6766,17 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="502"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="512"/>
         <source>Advanced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="507"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="517"/>
         <source>Expert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="517"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="502"/>
         <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6777,54 +6809,6 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="47"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TagsEditDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/tags_edit_dialog.ui" line="17"/>
-        <source>Edit File Tags</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/tags_edit_dialog.ui" line="38"/>
-        <source>New Tag</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/tags_edit_dialog.ui" line="45"/>
-        <source>Add Tag</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/tags_edit_dialog.ui" line="80"/>
-        <source>Set Tag</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/tags_edit_dialog.ui" line="93"/>
-        <source>Unset Tag</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/tags_edit_dialog.ui" line="128"/>
-        <source>Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/tags_edit_dialog.ui" line="135"/>
-        <source>Clear Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/tags_edit_dialog.cpp" line="161"/>
-        <source>Assigned Tags</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/tags_edit_dialog.cpp" line="162"/>
-        <source>All Tags</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6885,7 +6869,7 @@ Error description: &apos;%2&apos;</source>
     <name>WeekTimeScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/weektime_schedule_widget.ui" line="14"/>
-        <source>WeekTime Schedule Editor</source>
+        <source>Weekly Schedule Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

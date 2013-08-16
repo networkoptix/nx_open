@@ -47,6 +47,7 @@ public:
     bool isUrlsShown();
     void setUrlsShown(bool urlsShown);
 
+    Qn::NodeType rootNodeType() const;
 private:
     class Node;
 

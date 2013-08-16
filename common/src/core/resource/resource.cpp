@@ -37,7 +37,8 @@ QnResource::QnResource():
     m_status(Offline),
     m_initialized(false),
     m_lastInitTime(0),
-    m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown)
+    m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
+    m_lastMediaIssue(CameraDiagnostics::NoErrorResult())
 {
 }
 
@@ -851,6 +852,18 @@ bool QnResource::init()
     m_initMutex.unlock();
 
     return true;
+}
+
+void QnResource::setLastMediaIssue(const CameraDiagnostics::Result& issue)
+{
+    QMutexLocker lk( &m_mutex );
+    m_lastMediaIssue = issue;
+}
+
+CameraDiagnostics::Result QnResource::getLastMediaIssue() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_lastMediaIssue;
 }
 
 void QnResource::blockingInit()

@@ -6,8 +6,7 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
-#include <client/client_globals.h>
-#include <client/client_settings.h>
+#include <utils/common/event_processors.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -15,11 +14,16 @@
 #include <business/events/abstract_business_event.h>
 #include <business/business_strings_helper.h>
 
+#include <client/client_globals.h>
+#include <client/client_settings.h>
+
 #include <device_plugins/server_camera/server_camera.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
 #include <ui/common/grid_widget_helper.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/models/business_rule_view_model.h>
@@ -29,20 +33,13 @@
 #include <ui/style/warning_style.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/common/event_processors.h>
-
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
 }
 
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
-    base_type(parent,
-              Qt::CustomizeWindowHint |
-              Qt::WindowTitleHint |
-              Qt::WindowMinMaxButtonsHint |
-              Qt::WindowSystemMenuHint |
-              Qt::WindowCloseButtonHint),
+    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
     m_eventTypesModel(new QStandardItemModel()),
@@ -53,6 +50,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 {
     ui->setupUi(this);
     setWarningStyle(ui->warningLabel);
+
+    setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
 
     QList<QnEventLogModel::Column> columns;
         columns << QnEventLogModel::DateTimeColumn << QnEventLogModel::EventColumn << QnEventLogModel::EventCameraColumn <<
@@ -483,7 +482,7 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
-        QnResourcePtr resource = m_model->getResource(idx);
+        QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
         if (resource) {
             menu = manager->newMenu(Qn::TreeScope, QnActionParameters(resource));

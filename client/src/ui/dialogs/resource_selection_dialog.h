@@ -51,6 +51,7 @@ public:
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual bool event(QEvent *event) override;
 
 private slots:
     void at_resourceModel_dataChanged();
@@ -68,6 +69,8 @@ private:
     QnCameraThumbnailManager *m_thumbnailManager;
     bool m_flat;
     int m_tooltipResourceId;
+
+    int m_screenshotIndex;
 };
 
 #endif // SELECT_CAMERAS_DIALOG_H

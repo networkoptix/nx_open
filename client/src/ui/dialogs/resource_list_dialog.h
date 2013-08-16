@@ -38,6 +38,8 @@ public:
 
     static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);
     static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);
+    static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, int helpTopicId, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);
+    static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, int helpTopicId, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);
 
 protected:
     virtual void accept() override;

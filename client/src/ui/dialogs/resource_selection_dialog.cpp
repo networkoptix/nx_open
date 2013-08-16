@@ -12,8 +12,8 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
+#include <ui/common/palette.h>
 #include <ui/models/resource_pool_model.h>
-
 #include <ui/workbench/workbench_context.h>
 
 // -------------------------------------------------------------------------- //
@@ -36,10 +36,10 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
 void QnResourceSelectionDialog::init(Qn::NodeType rootNodeType) {
     m_delegate = NULL;
     m_tooltipResourceId = 0;
+    m_screenshotIndex = 0;
 
     ui.reset(new Ui::QnResourceSelectionDialog);
     ui->setupUi(this);
-    ui->detailsWidget->hide();
 
     m_flat = rootNodeType == Qn::UsersNode; //TODO: #GDM servers?
     m_resourceModel = new QnResourcePoolModel(rootNodeType, m_flat, this);
@@ -47,12 +47,16 @@ void QnResourceSelectionDialog::init(Qn::NodeType rootNodeType) {
     switch (rootNodeType) {
     case Qn::UsersNode:
         setWindowTitle(tr("Select users..."));
+        ui->detailsWidget->hide();
+        resize(minimumSize());
         break;
     case Qn::ServersNode:
         setWindowTitle(tr("Select cameras..."));
         break;
     default:
         setWindowTitle(tr("Select resources..."));
+        ui->detailsWidget->hide();
+        resize(minimumSize());
         break;
     }
 
@@ -74,6 +78,7 @@ void QnResourceSelectionDialog::init(Qn::NodeType rootNodeType) {
     ui->delegateFrame->setVisible(false);
 
     m_thumbnailManager = new QnCameraThumbnailManager(this);
+    m_thumbnailManager->setThumbnailSize(ui->screenshotLabel->size());
     connect(m_thumbnailManager, SIGNAL(thumbnailReady(int,QPixmap)), this, SLOT(at_thumbnailReady(int, QPixmap)));
     updateThumbnail(QModelIndex());
 }
@@ -145,6 +150,15 @@ void QnResourceSelectionDialog::keyPressEvent(QKeyEvent *event) {
     base_type::keyPressEvent(event);
 }
 
+bool QnResourceSelectionDialog::event(QEvent *event) {
+    bool result = base_type::event(event);
+
+    if(event->type() == QEvent::Polish) {
+    }
+
+    return result;
+}
+
 void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *delegate) {
     Q_ASSERT(!m_delegate);
     m_delegate = delegate;
@@ -176,13 +190,9 @@ void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
     if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
         m_tooltipResourceId = resource->getId();
         m_thumbnailManager->selectResource(resource);
-        ui->screenshotLabel->show();
-        if (!ui->detailsWidget->isVisible()) {
-            ui->detailsWidget->show();
-            this->setGeometry(this->geometry().adjusted(0, 0, ui->detailsWidget->width(), 0));
-        }
+        ui->screenshotWidget->show();
     } else
-        ui->screenshotLabel->hide();
+        ui->screenshotWidget->hide();
 }
 
 void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
@@ -192,5 +202,10 @@ void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
 void QnResourceSelectionDialog::at_thumbnailReady(int resourceId, const QPixmap &thumbnail) {
     if (m_tooltipResourceId != resourceId)
         return;
-    ui->screenshotLabel->setPixmap(thumbnail);
+    m_screenshotIndex = 1 - m_screenshotIndex;
+    ui->screenshotWidget->setCurrentIndex(m_screenshotIndex);
+    if (m_screenshotIndex == 0)
+        ui->screenshotLabel->setPixmap(thumbnail);
+    else
+        ui->screenshotLabel_2->setPixmap(thumbnail);
 }

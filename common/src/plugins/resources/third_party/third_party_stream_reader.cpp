@@ -44,7 +44,13 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
     nxcip::CameraMediaEncoder* intf = NULL;
     int result = m_camManager.getEncoder( encoderNumber, &intf );
     if( result != nxcip::NX_NO_ERROR )
-        return CameraDiagnostics::NoMediaTrackResult();
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( m_thirdPartyRes->getHostAddress() );
+        requestedUrl.setPort( m_thirdPartyRes->httpPort() );
+        requestedUrl.setScheme( QLatin1String("http") );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
     if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
@@ -62,7 +68,13 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
 
     QString mediaUrlStr;
     if( cameraEncoder.getMediaUrl( &mediaUrlStr ) != nxcip::NX_NO_ERROR )
-        return CameraDiagnostics::NoMediaTrackResult();
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( m_thirdPartyRes->getHostAddress() );
+        requestedUrl.setPort( m_thirdPartyRes->httpPort() );
+        requestedUrl.setScheme( QLatin1String("http") );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
 
     m_rtpStreamParser.setRequest( mediaUrlStr );
     return m_rtpStreamParser.openStream();

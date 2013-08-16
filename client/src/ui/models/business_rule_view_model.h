@@ -42,6 +42,7 @@ namespace QnBusiness {
     };
     Q_DECLARE_FLAGS(Fields, Field)
 
+    // TODO: #GDM move to common Qn roles
     enum ItemDataRole {
         ModifiedRole   = Qt::UserRole + 1,
         DisabledRole,
@@ -54,7 +55,6 @@ namespace QnBusiness {
         ActionTypeRole,
         ActionResourcesRole
     };
-
 }
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusiness::Fields)
@@ -76,6 +76,7 @@ public:
 
     QVariant getText(const int column, const bool detailed = true) const;
     QVariant getIcon(const int column) const;
+    QVariant getHelpTopic(const int column) const;
 
     bool isValid(int column) const;
     bool isValid() const; //checks validity for all row
@@ -166,7 +167,6 @@ private:
     QStandardItemModel *m_eventTypesModel;
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
-
 };
 
 #endif // BUSINESS_RULE_VIEW_MODEL_H

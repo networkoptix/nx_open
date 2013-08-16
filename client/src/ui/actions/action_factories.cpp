@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_ptz_preset_manager.h>
 
+
 namespace {
     struct LayoutNameCmp {
         bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
@@ -74,7 +75,7 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
         action->setText(preset.name);
         if(preset.hotkey >= 0)
             action->setShortcut(Qt::Key_0 + preset.hotkey);
-        action->setData(QVariant::fromValue<QnVirtualCameraResourcePtr>(camera));
+        action->setData(QVariant::fromValue<QnResourcePtr>(camera));
         connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
 
         result.push_back(action);
@@ -87,7 +88,7 @@ void QnPtzGoToPresetActionFactory::at_action_triggered() {
     if(!action)
         return;
 
-    QnVirtualCameraResourcePtr camera = action->data().value<QnVirtualCameraResourcePtr>();
+    QnResourcePtr camera = action->data().value<QnResourcePtr>();
     if(!camera)
         return;
 

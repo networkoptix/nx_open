@@ -33,10 +33,8 @@ private:
 
     /**
      * Updates ui elements depending of the test result
-     *
-     * \param success - Status of the connection test
      */
-    void updateUi(bool success, const QString &details);
+    void updateUi(bool success, const QString &details, int helpTopicId);
 
 private:
     Q_DISABLE_COPY(QnConnectionTestingDialog)

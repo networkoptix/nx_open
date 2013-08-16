@@ -191,7 +191,7 @@ public:
 
     bool detectVideoSourceCount();
 
-    int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
+    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool secondaryResolutionIsLarge() const;
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 

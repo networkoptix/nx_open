@@ -422,6 +422,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>API端口</translation>
     </message>
     <message>
+        <location filename="../src/settings.ui" line="314"/>
+        <source>Allow access to media server via public IP address</source>
+        <translation>允许通过公网IP地址存取媒体服务器</translation>
+    </message>
+    <message>
         <location filename="../src/settings.ui" line="376"/>
         <source>Enterprise Controller Settings</source>
         <translation>系统控制器设置</translation>
@@ -430,6 +435,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/settings.ui" line="388"/>
         <source>Enterprise controller network settings</source>
         <translation>系统控制器网络设置</translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="494"/>
+        <source>Allow access to enterprise controller via public IP address</source>
+        <translation>允许通过公网IP地址存取系统服务器</translation>
     </message>
     <message>
         <source>RTSP Port</source>
@@ -460,9 +470,8 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>TCP</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="314"/>
         <source>Allow access to the server via public IP address</source>
-        <translation>允许通过公共IP地址访问服务器</translation>
+        <translation type="obsolete">允许通过公共IP地址访问服务器</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="323"/>
@@ -490,9 +499,8 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>媒体代理端口</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="494"/>
         <source>Allow access to the enterprise controller via public IP address</source>
-        <translation>允许通过公共IP地址访问系统控制器</translation>
+        <translation type="obsolete">允许通过公共IP地址访问系统控制器</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="553"/>

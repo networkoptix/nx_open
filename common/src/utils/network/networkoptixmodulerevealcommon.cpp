@@ -137,7 +137,8 @@ bool RevealResponse::serialize( quint8** const bufStart, const quint8* bufEnd )
         "{\n"
             "'application': %1,\n"
             "'version': %2,\n"
-            "'seed': %3").arg(type).arg(version).arg(seed);
+            "'customization': %3,\n"
+            "'seed': %4").arg(type).arg(version).arg(customization).arg(seed);
     for( TypeSpecificParamMap::const_iterator
         it = typeSpecificParameters.begin();
         it != typeSpecificParameters.end();
@@ -276,6 +277,8 @@ bool RevealResponse::deserialize( const quint8** bufStart, const quint8* bufEnd 
             type = it->second;
         else if( it->first == QString::fromLatin1("version") )
             version = it->second;
+        else if( it->first == QString::fromLatin1("customization") )
+            customization = it->second;
         else if( it->first == QString::fromLatin1("seed") )
             seed = it->second;
         else

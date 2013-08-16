@@ -5,6 +5,10 @@
 #include "vmax480_chunk_reader.h"
 #include "core/resource_managment/resource_pool.h"
 
+QMutex QnPlVmax480Resource::m_chunkReaderMutex;
+QMap<QString, QnVMax480ChunkReader*> QnPlVmax480Resource::m_chunkReaderMap;
+
+
 const char* QnPlVmax480Resource::MANUFACTURE = "VMAX";
 
 QnPlVmax480Resource::QnPlVmax480Resource():
@@ -17,7 +21,11 @@ QnPlVmax480Resource::QnPlVmax480Resource():
 
 QnPlVmax480Resource::~QnPlVmax480Resource()
 {
-    delete m_chunkReader;
+    QMutexLocker lock(&m_chunkReaderMutex);
+    if (m_chunkReader) {
+        m_chunkReaderMap.remove(getHostAddress());
+        delete m_chunkReader;
+    }
 }
 
 int QnPlVmax480Resource::getMaxFps() 
@@ -43,10 +51,25 @@ void QnPlVmax480Resource::setIframeDistance(int frames, int timems)
 
 bool QnPlVmax480Resource::setHostAddress(const QString &ip, QnDomain domain) 
 {
+    QString oldHostAddr = getHostAddress();
+
     Q_UNUSED(domain)
     QUrl url(getUrl());
+
+    if (url.host() == ip)
+        return true;
+
     url.setHost(ip);
     setUrl(url.toString());
+
+    {
+        QMutexLocker lock(&m_chunkReaderMutex);
+        if (m_chunkReader) {
+            m_chunkReaderMap.remove(oldHostAddr);
+            m_chunkReaderMap.insert(getHostAddress(), m_chunkReader);
+        }
+    }
+
     return true;
 }
 
@@ -126,15 +149,13 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     setCameraCapabilities(getCameraCapabilities() | addFlags);
     save();
 
-    if (getChannel() == 0)
-    {
-        if (!m_chunkReader) {
-            m_chunkReader = new QnVMax480ChunkReader(toSharedPointer());
-            connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)));
-            m_chunkReader->start();
-        }
-        if (!m_chunkReader->isRunning())
-            m_chunkReader->start();
+    QMutexLocker lock(&m_chunkReaderMutex);
+    QnVMax480ChunkReader* chunkReader = m_chunkReaderMap.value(getHostAddress());
+    if (chunkReader == 0) {
+        m_chunkReader = new QnVMax480ChunkReader(toSharedPointer());
+        m_chunkReaderMap.insert(getHostAddress(), m_chunkReader);
+        connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)));
+        m_chunkReader->start();
     }
 
     return CameraDiagnostics::NoErrorResult();

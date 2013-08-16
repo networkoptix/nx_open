@@ -1,5 +1,5 @@
-#ifndef QN_NOTIFICATION_ITEM_H
-#define QN_NOTIFICATION_ITEM_H
+#ifndef NOTIFICATION_WIDGET_H
+#define NOTIFICATION_WIDGET_H
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
@@ -89,15 +89,13 @@ private:
     QPointF m_pointTo;
 };
 
-
-//TODO: #GDM rename to QnNotificationWidget
-class QnNotificationItem: public Clickable<QnFramedWidget> {
+class QnNotificationWidget: public Clickable<QnFramedWidget> {
     Q_OBJECT
     typedef Clickable<QnFramedWidget> base_type;
 
 public:
-    explicit QnNotificationItem(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0);
-    virtual ~QnNotificationItem();
+    explicit QnNotificationWidget(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0);
+    virtual ~QnNotificationWidget();
 
     QString text() const;
 
@@ -108,15 +106,15 @@ public:
     Qn::NotificationLevel notificationLevel() const;
     void setNotificationLevel(Qn::NotificationLevel notificationLevel);
 
-    /** 
-     * \param rect                      Rectangle where all tooltips should fit, in parent(!) coordinates. 
+    /**
+     * \param rect                      Rectangle where all tooltips should fit, in parent(!) coordinates.
      */
     void setTooltipEnclosingRect(const QRectF &rect);
 
     void setImageProvider(QnImageProvider *provider);
 
     void setText(const QString &text);
-    
+
     void setTooltipText(const QString &text);
 
     virtual void setGeometry(const QRectF &geometry) override;
@@ -174,4 +172,5 @@ private:
     bool m_inToolTipPositionUpdate;
 };
 
-#endif // QN_NOTIFICATION_ITEM_H
+
+#endif // NOTIFICATION_WIDGET_H

@@ -55,15 +55,18 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui->cameraScheduleWidget->setContext(context());
 
     /* Set up context help. */
-    setHelpTopic(ui->nameLabel,       ui->nameEdit,                           Qn::CameraSettings_General_Name_Help);
-    setHelpTopic(ui->addressGroupBox,                                         Qn::CameraSettings_General_Address_Help);
-    setHelpTopic(ui->enableAudioCheckBox,                                     Qn::CameraSettings_General_Audio_Help);
-    setHelpTopic(ui->authenticationGroupBox,                                  Qn::CameraSettings_General_Auth_Help);
-    setHelpTopic(ui->recordingTab,                                            Qn::CameraSettings_Recording_Help);
-    setHelpTopic(ui->motionTab,                                               Qn::CameraSettings_Motion_Help);
-    setHelpTopic(ui->cameraPropertiesTab,                                     Qn::CameraSettings_Properties_Help);
-    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Expert_Help);
-    setHelpTopic(ui->tabFisheyeSettings,                                      Qn::CameraSettings_Dewarping_Help);
+    setHelpTopic(this,                                                      Qn::CameraSettings_Help);
+    setHelpTopic(ui->checkBoxDewarping,                                     Qn::CameraSettings_Dewarping_Help);
+    setHelpTopic(ui->nameLabel,         ui->nameEdit,                       Qn::CameraSettings_General_Name_Help);
+    setHelpTopic(ui->modelLabel,        ui->modelEdit,                      Qn::CameraSettings_General_Model_Help);
+    setHelpTopic(ui->firmwareLabel,     ui->firmwareEdit,                   Qn::CameraSettings_General_Firmware_Help);
+    setHelpTopic(ui->addressGroupBox,                                       Qn::CameraSettings_General_Address_Help);
+    setHelpTopic(ui->enableAudioCheckBox,                                   Qn::CameraSettings_General_Audio_Help);
+    setHelpTopic(ui->authenticationGroupBox,                                Qn::CameraSettings_General_Auth_Help);
+    setHelpTopic(ui->recordingTab,                                          Qn::CameraSettings_Recording_Help);
+    setHelpTopic(ui->motionTab,                                             Qn::CameraSettings_Motion_Help);
+    setHelpTopic(ui->advancedTab,                                           Qn::CameraSettings_Properties_Help);
+    setHelpTopic(ui->fisheyeTab,                                            Qn::CameraSettings_Dewarping_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
@@ -99,7 +102,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
-    connect(ui->advancedSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+    connect(ui->expertSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
 
     updateFromResource();
@@ -134,10 +137,10 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
     {
         if (!m_widgetsRecreator)
         {
-            QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->cameraPropertiesTab->layout());
+            QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->advancedTab->layout());
             if(!layout) {
-                delete ui->cameraPropertiesTab->layout();
-                ui->cameraPropertiesTab->setLayout(layout = new QHBoxLayout());
+                delete ui->advancedTab->layout();
+                ui->advancedTab->setLayout(layout = new QHBoxLayout());
             }
 
             QSplitter* advancedSplitter = new QSplitter();
@@ -269,11 +272,11 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
         return Qn::RecordingSettingsTab;
     } else if(tab == ui->motionTab) {
         return Qn::MotionSettingsTab;
-    } else if(tab == ui->cameraPropertiesTab) {
-        return Qn::CameraPropertiesTab;
-    } else if(tab == ui->tabAdvancedSettings) {
+    } else if(tab == ui->advancedTab) {
         return Qn::AdvancedCameraSettingsTab;
-    } else if(tab == ui->tabFisheyeSettings) {
+    } else if(tab == ui->expertTab) {
+        return Qn::ExpertCameraSettingsTab;
+    } else if(tab == ui->fisheyeTab) {
         return Qn::FisheyeCameraSettingsTab;
     } else {
         qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
@@ -294,14 +297,14 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     case Qn::MotionSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->motionTab);
         break;
-    case Qn::CameraPropertiesTab:
-        ui->tabWidget->setCurrentWidget(ui->cameraPropertiesTab);
+    case Qn::FisheyeCameraSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->fisheyeTab);
         break;
     case Qn::AdvancedCameraSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabAdvancedSettings);
+        ui->tabWidget->setCurrentWidget(ui->advancedTab);
         break;
-    case Qn::FisheyeCameraSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabFisheyeSettings);
+    case Qn::ExpertCameraSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->expertTab);
         break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
@@ -349,12 +352,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
             submitMotionWidgetToResource();
         }
 
-        Qn::SecondStreamQuality sQuality = ui->advancedSettingsWidget->secondaryStreamQuality();
-        if (sQuality != Qn::SSQualityNotDefined)
-            m_camera->setSecondaryStreamQuality(sQuality);
-        Qt::CheckState cs = ui->advancedSettingsWidget->getCameraControl();
-        if (cs != Qt::PartiallyChecked)
-            m_camera->setCameraControlDisabled(cs == Qt::Checked);
+        ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
 
         DewarpingParams dewarping = ui->fisheyeSettingsWidget->dewarpingParams();
         dewarping.enabled = ui->checkBoxDewarping->isChecked();
@@ -429,8 +427,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         bool dtsBased = m_camera->isDtsBased();
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
-        ui->tabWidget->setTabEnabled(Qn::CameraPropertiesTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased);
+        ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased);
 
         ui->analogGroupBox->setVisible(m_camera->isAnalog());
         ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
@@ -472,7 +470,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
-            ui->advancedSettingsWidget->updateFromResource(m_camera);
+            ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
             ui->fisheyeSettingsWidget->updateFromResource(m_camera);
             m_dewarpingParamsBackup = m_camera->getDewarpingParams();
         }

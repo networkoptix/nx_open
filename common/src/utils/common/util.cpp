@@ -59,7 +59,11 @@ QString getMoviesDirectory()
 QString getBackgroundsDirectory() {
     const QStringList& pictureFolderList = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
     QString baseDir = pictureFolderList.isEmpty() ? QString(): pictureFolderList[0];
+#ifdef Q_OS_WIN
     QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(lit(QN_PRODUCT_NAME_LONG)));
+#else
+    QString productDir = QDir::toNativeSeparators(QString(lit("/opt/%1/client/share/pictures/sample-backgrounds")).arg(lit(VER_LINUX_ORGANIZATION_NAME)));
+#endif
 
     return QDir(productDir).exists()
             ? productDir

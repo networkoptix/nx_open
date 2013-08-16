@@ -99,7 +99,7 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     if(model == lit("DWC-MPTZ20X")) {
         m_ptzCapabilities |= Qn::OctagonalPtzCapability;
     }
-    if(model == lit("FD8161") || model == lit("FD8362E") || model == lit("FD8361") || model == lit("FD8136") || model == lit("FD8162") || model == lit("FD8372") || model == lit("FD8135H") || model == lit("IP8151") || model == lit("IP8335H") || model == lit("IP8362") || model == lit("MD8562")) {
+    if(model == lit("DM368") || model == lit("FD8161") || model == lit("FD8362E") || model == lit("FD8361") || model == lit("FD8136") || model == lit("FD8162") || model == lit("FD8372") || model == lit("FD8135H") || model == lit("IP8151") || model == lit("IP8335H") || model == lit("IP8362") || model == lit("MD8562")) {
         m_ptzCapabilities = Qn::NoPtzCapabilities;
     }
 

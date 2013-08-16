@@ -4,6 +4,9 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
     ui(new Ui::AdjustVideoDialog),
@@ -24,6 +27,8 @@ QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, Qt::WindowFlags window
     connect(ui->enableAdjustment, SIGNAL(toggled(bool)), this, SLOT(at_sliderValueChanged()));
     
     connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonClicked(QAbstractButton*)));
+
+    setHelpTopic(this, Qn::ImageEnhancement_Help);
 }
 
 QnAdjustVideoDialog::~QnAdjustVideoDialog() {

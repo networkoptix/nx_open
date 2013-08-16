@@ -48,7 +48,7 @@ PlDlinkStreamReader::~PlDlinkStreamReader()
 CameraDiagnostics::Result PlDlinkStreamReader::openStream()
 {
     if (isStreamOpened())
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
@@ -64,7 +64,13 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
     QString prifileStr = composeVideoProfile();
 
     if (prifileStr.length()==0)
-        return CameraDiagnostics::NoMediaTrackResult();
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
 
     CLHttpStatus status;
     QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth()); // setup video profile
@@ -72,11 +78,23 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         getResource()->setStatus(QnResource::Unauthorized);
-        return CameraDiagnostics::NotAuthorisedResult();
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( prifileStr );
+        return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
     }
 
     if (cam_info_file.length()==0)
-        return CameraDiagnostics::NoMediaTrackResult();
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( prifileStr );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
 
     if (!res->isCameraControlDisabled()) {
         if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
@@ -94,14 +112,15 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         if (info.videoProfileUrls.size() < 2 && role == QnResource::Role_SecondaryLiveVideo)
         {
             qWarning() << "No dualstreaming for DLink camera " << m_resource->getUrl() << ". Ignore second url request";
-            return CameraDiagnostics::ErrorCode::noError;
+            return CameraDiagnostics::NoErrorResult();
         }
 
-        QString url =  getRTPurl(role == QnResource::Role_SecondaryLiveVideo ? 2 : 1);
+        const int dlinkProfile = role == QnResource::Role_SecondaryLiveVideo ? 2 : 1;
+        QString url =  getRTPurl( dlinkProfile );
         if (url.isEmpty())
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting non empty rtsl url.";
-            return CameraDiagnostics::CameraResponseParseErrorResult();
+            return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), QString::fromLatin1("config/rtspurl.cgi?profileid=%1").arg(dlinkProfile) );
         }
 
         m_rtpReader.setRequest(url);
@@ -118,7 +137,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         if (info.videoProfileUrls.size() < 2)
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting video profile URL.";
-            return CameraDiagnostics::CameraResponseParseErrorResult();
+            return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), QLatin1String("config/stream_info.cgi") );
         }
 
 
@@ -130,7 +149,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
         const CLHttpStatus status = mHttpClient->doGET(url);
         if( status == CL_HTTP_SUCCESS )
-            return CameraDiagnostics::ErrorCode::noError;
+            return CameraDiagnostics::NoErrorResult();
         else
             return CameraDiagnostics::RequestFailedResult(url, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
     }

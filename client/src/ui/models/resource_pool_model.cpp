@@ -411,6 +411,8 @@ public:
                 return Qn::MainWindow_Tree_Users_Help;
             } else if(m_type == Qn::LocalNode) {
                 return Qn::MainWindow_Tree_Local_Help;
+            } else if(m_type == Qn::RecorderNode) {
+                return Qn::MainWindow_Tree_Recorder_Help;
             } else if(m_flags & QnResource::layout) {
                 if(m_model->context()->snapshotManager()->isFile(m_resource.dynamicCast<QnLayoutResource>())) {
                     return Qn::MainWindow_Tree_MultiVideo_Help;
@@ -737,6 +739,10 @@ void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
     m_urlsShown = urlsShown;
 
     m_rootNodes[m_rootNodeType]->updateRecursive();
+}
+
+Qn::NodeType QnResourcePoolModel::rootNodeType() const {
+    return m_rootNodeType;
 }
 
 

@@ -147,6 +147,7 @@
             <Directory Id="ProgramMenuFolder" Name="Programs">
                 <Directory Id="ProgramMenuDir" Name="${company.name}">
                     <Component Id="UninstallProgramMenuFolder" DiskId="1">
+                        <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
                         <RemoveFolder Id='DashMenuDirRem' On='uninstall' />
                     </Component>
                 </Directory>

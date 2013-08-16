@@ -56,6 +56,17 @@ public:
     //!Returns true, if object has been succesfully initialized (socket is created and binded to local address)
     bool isValid() const;
 
+    /**
+     * Returns true if compatibility mode is ON.
+     * In this mode all EC are supported regardless of its customization.
+     * Default value is OFF.
+     */
+    bool isCompatibilityMode() const;
+
+    /**
+     * Set compatibility mode. In this mode all EC are supported regardless of its customization.
+     */
+    void setCompatibilityMode(bool value);
 public slots:
     virtual void pleaseStop() override;
 
@@ -116,6 +127,7 @@ private:
     //!map<seed, module data>
     std::map<QString, ModuleContext> m_knownEnterpriseControllers;
     std::set<QString> m_localNetworkAdresses;
+    bool m_compatibilityMode;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

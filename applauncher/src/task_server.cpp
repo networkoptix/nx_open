@@ -42,7 +42,6 @@ bool TaskServer::listen( const QString& pipeName )
     {
         NX_LOG( QString::fromLatin1("Failed to listen to pipe %1. %2").arg(pipeName).arg(m_server.errorString()), cl_logDEBUG1 );
         return false;
-
     }
 
     NX_LOG( QString::fromLatin1("Listening pipe %1").arg(pipeName), cl_logDEBUG1 );
@@ -79,5 +78,4 @@ void TaskServer::onNewConnection()
 #endif
 
     m_taskQueue->push( QSharedPointer<applauncher::api::BaseTask>(task) );
-    emit taskReceived();
 }

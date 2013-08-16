@@ -2,21 +2,53 @@
 #include "ui_expert_settings_widget.h"
 
 #include <ui/style/skin.h>
-#include "core/resource/resource_type.h"
+#include <ui/style/warning_style.h>
+
+#include <core/resource/resource_type.h>
+#include <core/resource/camera_resource.h>
+
+#include <utils/common/scoped_value_rollback.h>
+
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     QWidget(parent),
     ui(new Ui::AdvancedSettingsWidget),
-    m_disableUpdate(false),
-    m_hasDualStreaming(false)
+    m_updating(false)
 {
     ui->setupUi(this);
-    ui->iconLabel->setPixmap(qnSkin->pixmap("warning.png"));
 
-    connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_ui_DataChanged()) );
-    connect(ui->checkBoxDisableControl, SIGNAL(stateChanged(int)), this, SLOT(at_ui_DataChanged()) );
+    setWarningStyle(ui->settingsWarningLabel);
+    setWarningStyle(ui->highQualityWarningLabel);
+    setWarningStyle(ui->lowQualityWarningLabel);
+    setWarningStyle(ui->generalWarningLabel);
 
-    connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_restoreDefault()));
+    // if "I have read manual" is set, all controls should be enabled
+    connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureCheckBox, SLOT(setDisabled(bool)));
+    connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureWidget, SLOT(setEnabled(bool)));
+    ui->assureWidget->setEnabled(false);
+
+    connect(ui->settingsDisableControlCheckBox, SIGNAL(toggled(bool)), ui->qualityGroupBox, SLOT(setDisabled(bool)));
+    connect(ui->settingsDisableControlCheckBox, SIGNAL(toggled(bool)), ui->settingsWarningLabel, SLOT(setVisible(bool)));
+    ui->settingsWarningLabel->setVisible(false);
+
+    connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), ui->qualitySlider, SLOT(setVisible(bool)));
+    connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), ui->qualityLabelsWidget, SLOT(setVisible(bool)));
+    ui->qualitySlider->setVisible(false);
+    ui->qualityLabelsWidget->setVisible(false);
+
+    connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_qualitySlider_valueChanged(int)));
+    ui->highQualityWarningLabel->setVisible(false);
+    ui->lowQualityWarningLabel->setVisible(false);
+
+    connect(ui->restoreDefaultsButton, SIGNAL(clicked()), this, SLOT(at_restoreDefaultsButton_clicked()));
+
+    connect(ui->settingsDisableControlCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dataChanged()));
+    connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
+    connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_dataChanged()));
+
+    setHelpTopic(ui->qualityGroupBox, Qn::CameraSettings_SecondStream_Help);
 }
 
 QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
@@ -24,138 +56,121 @@ QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
 
 }
 
-Qn::SecondStreamQuality QnAdvancedSettingsWidget::secondaryStreamQuality() const
+
+void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResourceList &cameras)
 {
-    int val = ui->qualitySlider->value();
-    if (isKeepQualityVisible()) {
-        if (val == 0)
-            return Qn::SSQualityNotDefined;
-        val--;
-    }
-    if (val == Quality_Low)
-        return Qn::SSQualityLow;
-    else if (val == Quality_Medium)
-        return Qn::SSQualityMedium;
-    else 
-        return Qn::SSQualityHigh;
-}
-
-Qt::CheckState QnAdvancedSettingsWidget::getCameraControl() const
-{
-    return ui->checkBoxDisableControl->checkState();
-}
-
-void QnAdvancedSettingsWidget::setQualitySlider(Qn::SecondStreamQuality quality)
-{
-    int offset = isKeepQualityVisible() ? 1 : 0;
-    if (quality == Qn::SSQualityLow)
-        ui->qualitySlider->setValue(Quality_Low + offset);
-    else if (quality == Qn::SSQualityHigh)
-        ui->qualitySlider->setValue(Quality_High + offset);
-    else
-        ui->qualitySlider->setValue(Quality_Medium + offset);
-}
-
-void QnAdvancedSettingsWidget::updateFromResource(QnSecurityCamResourcePtr camera)
-{
-    if (!camera)
-        return;
-
-    m_disableUpdate = true;
-
-    setKeepQualityVisible(false);
-    setQualitySlider(camera->secondaryStreamQuality());
-    ui->checkBoxDisableControl->setChecked(camera->isCameraControlDisabled());
-    m_hasDualStreaming = camera->hasDualStreaming();
-    updateControlsState();
-    m_disableUpdate = false;
-    ui->labelWarn->setVisible(false);
-    bool arecontCameraExists = false;
-    QnResourceTypePtr cameraType = qnResTypePool->getResourceType(camera->getTypeId());
-    if (cameraType && cameraType->getManufacture() == lit("ArecontVision"))
-        arecontCameraExists = true;
-    ui->checkBoxDisableControl->setEnabled(!arecontCameraExists);
-}
-
-void QnAdvancedSettingsWidget::updateControlsState()
-{
-    bool val = m_hasDualStreaming && ui->checkBoxDisableControl->checkState() == Qt::Unchecked;
-    ui->qualitySlider->setEnabled(val);
-    ui->labelQuality->setEnabled(val);
-    ui->keepQualityLabel->setEnabled(val);
-    ui->labelLowQuality->setEnabled(val);
-    ui->labelMedQuality->setEnabled(val);
-    ui->labelHiQuality->setEnabled(val);
-}
-
-void QnAdvancedSettingsWidget::updateFromResources(QnVirtualCameraResourceList cameras)
-{
-    if (cameras.isEmpty())
-        return;
-
-    m_disableUpdate = true;
+    QnScopedValueRollback<bool> guard(&m_updating, true); Q_UNUSED(guard)
 
     bool sameQuality = true;
     bool sameControlState = true;
-    Qn::SecondStreamQuality quality = cameras[0]->secondaryStreamQuality();
-    bool controlState = cameras[0]->isCameraControlDisabled();
-    m_hasDualStreaming = cameras[0]->hasDualStreaming();
-    bool arecontCameraExists = false;
-    bool mixedDualStreaming = false;
-    for (int i = 1; i < cameras.size(); ++i)
-    {
-        if (cameras[i]->secondaryStreamQuality() != quality)
-            sameQuality = false;
-        if (cameras[i]->isCameraControlDisabled() != controlState)
-            sameControlState = false;
-        if (cameras[i]->hasDualStreaming() != m_hasDualStreaming)
-            mixedDualStreaming = true;
-        if (!cameras[i]->hasDualStreaming())
-            m_hasDualStreaming = false;
-        QnResourceTypePtr cameraType = qnResTypePool->getResourceType(cameras[i]->getTypeId());
-        if (cameraType && cameraType->getManufacture() == lit("ArecontVision"))
-            arecontCameraExists = true;
+
+    Qn::SecondStreamQuality quality = Qn::SSQualityNotDefined;
+    bool controlDisabled = false;
+
+    int arecontCamerasCount = 0;
+    bool anyHasDualStreaming = false;
+
+    bool isFirstQuality = true;
+    bool isFirstControl = true;
+
+
+    foreach(const QnVirtualCameraResourcePtr &camera, cameras) {
+        if (isArecontCamera(camera))
+            arecontCamerasCount++;
+        anyHasDualStreaming |= camera->hasDualStreaming();
+
+        if (camera->hasDualStreaming()) {
+            if (isFirstQuality) {
+                isFirstQuality = false;
+                quality = camera->secondaryStreamQuality();
+            } else {
+                sameQuality &= camera->secondaryStreamQuality() == quality;
+            }
+        }
+
+        if (!isArecontCamera(camera)) {
+            if (isFirstControl) {
+                isFirstControl = false;
+                controlDisabled = camera->isCameraControlDisabled();
+            } else {
+                sameControlState &= camera->isCameraControlDisabled() == controlDisabled;
+            }
+        }
     }
-    setKeepQualityVisible(!sameQuality);
-    
-    if (sameQuality)
-        setQualitySlider(quality);
-    else
-        ui->qualitySlider->setValue(0);
 
+    ui->qualityGroupBox->setVisible(anyHasDualStreaming);
+    if (sameQuality && quality != Qn::SSQualityNotDefined) {
+        ui->qualityOverrideCheckBox->setChecked(true);
+        ui->qualityOverrideCheckBox->setVisible(false);
+        ui->qualitySlider->setValue(quality);
+    }
+    else {
+        ui->qualityOverrideCheckBox->setChecked(false);
+        ui->qualityOverrideCheckBox->setVisible(true);
+        ui->qualitySlider->setValue(Qn::SSQualityMedium );
+    }
+
+    ui->settingsGroupBox->setVisible(arecontCamerasCount != cameras.size());
+    ui->settingsDisableControlCheckBox->setTristate(!sameControlState);
     if (sameControlState)
-        ui->checkBoxDisableControl->setChecked(controlState);
+        ui->settingsDisableControlCheckBox->setChecked(controlDisabled);
     else
-        ui->checkBoxDisableControl->setCheckState(Qt::PartiallyChecked);
+        ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
-    updateControlsState();
-    m_disableUpdate = false;
-    ui->labelWarn->setVisible(mixedDualStreaming);
-    ui->checkBoxDisableControl->setEnabled(!arecontCameraExists);
+    bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
+            && ui->qualitySlider->value() == Qn::SSQualityMedium;
+
+    ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
+    ui->assureCheckBox->setChecked(!defaultValues);
+
+    if (arecontCamerasCount != cameras.size() || anyHasDualStreaming)
+        ui->stackedWidget->setCurrentWidget(ui->pageSettings);
+    else
+        ui->stackedWidget->setCurrentWidget(ui->pageNoSettings);
 }
 
-bool QnAdvancedSettingsWidget::isKeepQualityVisible() const
-{
-    return ui->keepQualityLabel->isVisible();
+void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceList &cameras) {
+    if (!ui->assureCheckBox->isChecked())
+        return;
+
+    bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
+    bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
+
+    Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) ui->qualitySlider->value();
+
+    foreach(const QnVirtualCameraResourcePtr &camera, cameras) {
+        if (!isArecontCamera(camera)) {
+            if (disableControls)
+                camera->setCameraControlDisabled(true);
+            else if (enableControls)
+                camera->setCameraControlDisabled(false);
+        }
+
+        if (enableControls && ui->qualityOverrideCheckBox->isChecked() && camera->hasDualStreaming())
+            camera->setSecondaryStreamQuality(quality);
+    }
 }
 
-void QnAdvancedSettingsWidget::setKeepQualityVisible(bool value)
-{
-    ui->keepQualityLabel->setVisible(value);
-    ui->qualitySlider->setMaximum(Quality_High + (value ? 1 : 0));
+
+bool QnAdvancedSettingsWidget::isArecontCamera(const QnVirtualCameraResourcePtr &camera) const {
+    QnResourceTypePtr cameraType = qnResTypePool->getResourceType(camera->getTypeId());
+    return cameraType && cameraType->getManufacture() == lit("ArecontVision");
 }
 
-void QnAdvancedSettingsWidget::at_ui_DataChanged()
+void QnAdvancedSettingsWidget::at_dataChanged()
 {
-    updateControlsState();
-    if (!m_disableUpdate)
+    if (!m_updating)
         emit dataChanged();
 }
 
-void QnAdvancedSettingsWidget::at_restoreDefault()
+void QnAdvancedSettingsWidget::at_restoreDefaultsButton_clicked()
 {
-    setKeepQualityVisible(false);
-    ui->checkBoxDisableControl->setChecked(false);
-    ui->qualitySlider->setValue(Quality_Medium);
+    ui->settingsDisableControlCheckBox->setCheckState(Qt::Unchecked);
+    ui->qualityOverrideCheckBox->setChecked(true);
+    ui->qualitySlider->setValue(Qn::SSQualityMedium);
 }
 
+void QnAdvancedSettingsWidget::at_qualitySlider_valueChanged(int value) {
+    ui->lowQualityWarningLabel->setVisible(value == Qn::SSQualityLow);
+    ui->highQualityWarningLabel->setVisible(value == Qn::SSQualityHigh);
+}

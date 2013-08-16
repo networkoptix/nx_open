@@ -8,10 +8,18 @@
 
 QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context):
     QnGlFunctions(context),
+    m_initialized(false),
     m_shader(QnColorShaderProgram::instance(context))
 {
-    if(context != QGLContext::currentContext())
+    if(context != QGLContext::currentContext()) {
         qnWarning("Invalid current OpenGL context.");
+        return;
+    }
+
+    if(!(features() & OpenGL2_0)) {
+        qnWarning("OpenGL version 2.0 is required.");
+        return;
+    }
 
     QByteArray data;
 
@@ -35,13 +43,19 @@ QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &
     glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
     glBufferData(GL_ARRAY_BUFFER, data.size(), data.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    m_initialized = true;
 }
 
 QnRadialGradientPainter::~QnRadialGradientPainter() {
-    glDeleteBuffers(1, &m_buffer);
+    if(m_initialized)
+        glDeleteBuffers(1, &m_buffer);
 }
 
 void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
+    if(!m_initialized)
+        return;
+
     m_shader->bind();
     m_shader->setColorMultiplier(colorMultiplier);
 

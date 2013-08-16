@@ -280,9 +280,9 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         1.0,  1.772,  0.0,   -0.886,
         0.0,  0.0,    0.0,    opacity);
 
-    mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                   0.0, cos(-fovRot), -sin(-fovRot),
-                                   0.0, sin(-fovRot),  cos(-fovRot));
+    mat3 perspectiveMatrix = mat3( vec3(1.0, 0.0,              0.0),
+                                   vec3(0.0, cos(-fovRot), -sin(-fovRot)),
+                                   vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
     vec2 xy2 = vec2(-0.5*dstFov,  -yCenter*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
@@ -362,9 +362,9 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
                                 1.0,  1.772,  0.0,   -0.886,
                                 0.0,  0.0,    0.0,    opacity);
 
-    mat3 perspectiveMatrix = mat3( 1.0, 0.0,              0.0,
-                                   0.0, cos(-fovRot), -sin(-fovRot),
-                                   0.0, sin(-fovRot),  cos(-fovRot));
+    mat3 perspectiveMatrix = mat3( vec3(1.0, 0.0,              0.0),
+                                   vec3(0.0, cos(-fovRot), -sin(-fovRot)),
+                                   vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
     vec2 xy2 = vec2(-0.5*dstFov,  -yCenter*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);

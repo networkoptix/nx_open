@@ -80,6 +80,14 @@ QnWorkbenchPtzController::~QnWorkbenchPtzController() {
 
 QVector3D QnWorkbenchPtzController::position(const QnMediaResourceWidget *widget) const 
 {
+    if (widget->virtualPtzController()) {
+        qreal xPos;
+        qreal yPos;
+        qreal zPos;
+        widget->virtualPtzController()->getPosition(&xPos, &yPos, &zPos);
+        return QVector3D(xPos, yPos, zPos);
+    }
+
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
 
     if(!camera) {
@@ -414,7 +422,20 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
 }
 
 void QnWorkbenchPtzController::at_display_widgetAdded(QnResourceWidget *widget) {
-    // TODO: #Elric.
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
+        return;
+
+    // TODO: #Elric
+    PtzData &data = m_dataByWidget[mediaWidget];
+    data.initialized = true;
+    data.sequenceId = QUuid::createUuid();
+    data.sequenceNumber = 0;
+
+    if(!mediaWidget->virtualPtzController()) {
+        sendGetPosition(mediaWidget);
+        sendSetMovement(mediaWidget, QVector3D());
+    }
 }
 
 void QnWorkbenchPtzController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {

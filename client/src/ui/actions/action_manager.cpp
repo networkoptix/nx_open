@@ -922,7 +922,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnCheckFileSignatureActionCondition(this));
 
     factory(Qn::TakeScreenshotAction).
-        flags(Qn::Scene | Qn::SingleTarget).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::HotkeyOnly).
         text(tr("Take Screenshot")).
         shortcut(tr("Alt+S")).
         autoRepeat(false).

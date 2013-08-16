@@ -141,7 +141,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
 CameraDiagnostics::Result MJPEGtreamreader::openStream()
 {
     if (isStreamOpened())
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
 
     //QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
@@ -151,9 +151,16 @@ CameraDiagnostics::Result MJPEGtreamreader::openStream()
     switch( httpStatus )
     {
         case CL_HTTP_SUCCESS:
-            return CameraDiagnostics::ErrorCode::noError;
+            return CameraDiagnostics::NoErrorResult();
         case CL_HTTP_AUTH_REQUIRED:
-            return CameraDiagnostics::NotAuthorisedResult();
+        {
+            QUrl requestedUrl;
+            requestedUrl.setHost( nres->getHostAddress() );
+            requestedUrl.setPort( nres->httpPort() );
+            requestedUrl.setScheme( QLatin1String("http") );
+            requestedUrl.setPath( m_request );
+            return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
+        }
         default:
             return CameraDiagnostics::RequestFailedResult(m_request, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatus)));
     }

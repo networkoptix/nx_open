@@ -233,82 +233,84 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <source>%1 Tray Assistant version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Version de l&apos;assistant de notification %2 (%3).&lt;br/&gt;
+Construit pour %5-%6 par %7.&lt;br/&gt;
+</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="396"/>
         <source>Enterprise controller has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Le contrôleur entreprise a été arrêté</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="403"/>
         <source>Enterprise controller has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>Le contrôleur entreprise a été démarré</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="422"/>
         <source>Media server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Le serveur média a été arrêté</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="429"/>
         <source>Media server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>Le serveur média a été démarré</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="534"/>
         <source>Media server is going to be stopped. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le serveur média va être arrêté. Êtes-vous sûr?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="556"/>
         <source>Enterprise controller is going to be stopped. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le contrôleur entreprise va être arrêté. Êtes-vous sûr?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="633"/>
         <source>&amp;Show Media Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Afficher le journal du Média Serveur</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="638"/>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Afficher le journal du Contrôleur Entreprise</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Start Media Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer le Média Serveur</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="651"/>
         <source>Stop Media Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrêter le Média Serveur</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="656"/>
         <source>Start Enterprise Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer le Contrôleur Entreprise</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="661"/>
         <source>Stop Enterprise Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrêter le Contrôleur Entreprise</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="863"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Les changements que vous avez faits exigent que le contrôleur entreprise et le média serveur soient redémarrés. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="865"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Les changements que vous avez faits exigent que le contrôleur entreprise soit redémarré. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="867"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Les changements que vous avez faits exigent que le serveur média soit redémarré. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="903"/>
@@ -318,7 +320,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/systraywindow.cpp" line="936"/>
         <source>enterprise controller</source>
-        <translation type="unfinished"></translation>
+        <translation>contrôleur entreprise</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="937"/>
@@ -381,7 +383,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="42"/>
         <source>Enterprise controller connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion au contrôleur Entreprise</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="66"/>
@@ -429,22 +431,32 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="246"/>
         <source>RTSP port</source>
-        <translation type="unfinished"></translation>
+        <translation>Port RTSP</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="269"/>
         <source>API port</source>
-        <translation type="unfinished"></translation>
+        <translation>Port API</translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="314"/>
+        <source>Allow access to media server via public IP address</source>
+        <translation>Autoriser l&apos;accès au serveur média via l&apos;adresse IP publique</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="376"/>
         <source>Enterprise Controller Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurations du contrôleur entreprise</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="388"/>
         <source>Enterprise controller network settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurations réseau du contrôleur entreprise</translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="494"/>
+        <source>Allow access to enterprise controller via public IP address</source>
+        <translation>Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publique</translation>
     </message>
     <message>
         <source>RTSP Port</source>
@@ -475,9 +487,8 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>TCP</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="314"/>
         <source>Allow access to the server via public IP address</source>
-        <translation>Autoriser l&apos;accès au serveur via l&apos;adresse IP publique</translation>
+        <translation type="obsolete">Autoriser l&apos;accès au serveur via l&apos;adresse IP publique</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="323"/>
@@ -505,9 +516,8 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Port du proxy média</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="494"/>
         <source>Allow access to the enterprise controller via public IP address</source>
-        <translation>Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publiques</translation>
+        <translation type="obsolete">Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publiques</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="553"/>

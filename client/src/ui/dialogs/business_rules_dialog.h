@@ -14,9 +14,7 @@
 #include <business/business_event_rule.h>
 
 #include <ui/dialogs/button_box_dialog.h>
-
 #include <ui/models/business_rules_actual_model.h>
-
 #include <ui/widgets/business/business_rule_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 

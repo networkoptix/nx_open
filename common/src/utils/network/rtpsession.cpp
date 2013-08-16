@@ -10,6 +10,7 @@
 #include <QtCore/QUuid>
 
 #include "utils/common/util.h"
+#include "utils/network/http/httptypes.h"
 #include "../common/sleep.h"
 #include "tcp_connection_processor.h"
 #include "simple_http_client.h"
@@ -333,12 +334,15 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
             qint64 currentUsecTime = getUsecTimer();
             if (currentUsecTime - m_lastWarnTime > 2000 * 1000ll)
             {
-                if (camTimeChanged)
-                    qWarning() << "Camera time has been changed or receiving latency > 10 seconds. Resync time for camera" << m_resId;
-                else if (localTimeChanged)
-                    qWarning() << "Local time has been changed. Resync time for camera" << m_resId;
-                else
-                    qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs << "seconds. Resync time for camera" << m_resId;
+                if (camTimeChanged) {
+                    NX_LOG(QString(lit("Camera time has been changed or receiving latency > 10 seconds. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
+                }
+                else if (localTimeChanged) {
+                    NX_LOG(QString(lit("Local time has been changed. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
+                }
+                else {
+                    NX_LOG(QString(lit("RTSP time drift reached %1 seconds. Resync time for camera %2")).arg(localTimeInSecs - resultInSecs).arg(m_resId), cl_logWARNING);
+                }
                 m_lastWarnTime = currentUsecTime;
             }
             reset();
@@ -570,6 +574,10 @@ void RTPSession::updateResponseStatus(const QByteArray& response)
         QList<QByteArray> params = response.left(firstLineEnd).split(' ');
         if (params.size() >= 2) {
             m_responseCode = params[1].trimmed().toInt();
+
+            nx_http::StatusLine statusLine; //TODO: #ak use statusLine one line above after release 1.6
+            statusLine.parse( nx_http::ConstBufferRefType(response, 0, firstLineEnd) );
+            m_reasonPhrase = QLatin1String(statusLine.reasonPhrase);
         }
     }
 }
@@ -677,7 +685,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     if (!checkIfDigestAuthIsneeded(response))
     {
         m_tcpSock.close();
-        return CameraDiagnostics::CameraResponseParseErrorResult();
+        return CameraDiagnostics::CameraResponseParseErrorResult( url, QLatin1String("DESCRIBE") );
     }
         
 
@@ -702,16 +710,25 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         m_contentBase = tmp;
 
 
-    CameraDiagnostics::Result result( CameraDiagnostics::ErrorCode::noError );
+    CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
     updateResponseStatus(response);
-    if( m_responseCode == CL_HTTP_AUTH_REQUIRED )
-        result = CameraDiagnostics::ErrorCode::noMediaTrack;
+    switch( m_responseCode )
+    {
+        case CL_HTTP_SUCCESS:
+            break;
+        case CL_HTTP_AUTH_REQUIRED:
+            m_tcpSock.close();
+            return CameraDiagnostics::NotAuthorisedResult( url );
+        default:
+            m_tcpSock.close();
+            return CameraDiagnostics::RequestFailedResult( QString::fromLatin1("DESCRIBE %1").arg(url), m_reasonPhrase );
+    }
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
     if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
         m_tcpSock.close();
-        return CameraDiagnostics::NoMediaTrackResult();
+        return CameraDiagnostics::NoMediaTrackResult( url );
     }
 
     m_sdp = response.mid(sdp_index+4);
@@ -719,7 +736,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
 
     if (m_sdpTracks.size()<=0) {
         m_tcpSock.close();
-        result = CameraDiagnostics::NoMediaTrackResult();
+        result = CameraDiagnostics::NoMediaTrackResult( url );
     }
 
     return result;

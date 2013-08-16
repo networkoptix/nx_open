@@ -47,8 +47,12 @@ public:
             m_deviceInfo.modelName = ch;
         else if( m_currentElementName == QLatin1String("serialNumber") )
             m_deviceInfo.serialNumber = ch;
-        else if( m_currentElementName == QLatin1String("presentationURL") )
-            m_deviceInfo.presentationUrl = ch;
+        else if( m_currentElementName == QLatin1String("presentationURL") ) {
+            if (ch.endsWith(lit("/")))
+                m_deviceInfo.presentationUrl = ch.left(ch.length()-1);
+            else
+                m_deviceInfo.presentationUrl = ch;
+        }
 
         return true;
     }

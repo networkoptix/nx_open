@@ -194,6 +194,7 @@ void ProcessingApplicationTask::initFsm()
         //from launchingApplication
     launchingApplication->addTransition( launchingApplication, SIGNAL(succeeded()), finalState );
 
+#if 0
     {
         QAbstractTransition* tran = new ConditionalSignalTransition(
             launchingApplication,
@@ -215,4 +216,8 @@ void ProcessingApplicationTask::initFsm()
         connect( tran, SIGNAL(triggered()), launchingApplication, SLOT(prepareResultMessage()) );
         launchingApplication->addTransition( tran );
     }
+#else
+    //for now, ignoring launch failure...
+    launchingApplication->addTransition( launchingApplication, SIGNAL(failed()), finalState );
+#endif
 }

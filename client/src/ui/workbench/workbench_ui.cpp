@@ -407,7 +407,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout = new QGraphicsLinearLayout();
     m_titleRightButtonsLayout->setSpacing(2);
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
     m_titleRightButtonsLayout->addStretch(0x1000);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction), 1.0, Qn::MainWindow_Panic_Help));
@@ -473,6 +473,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_notificationsItem = new QnNotificationsCollectionWidget(m_controlsWidget, 0, context());
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
+    setHelpTopic(m_notificationsItem, Qn::MainWindow_Notifications_Help);
 
     m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
@@ -529,11 +530,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_notificationsItem,                SIGNAL(visibleSizeChanged()),   this,   SLOT(at_notificationsItem_geometryChanged()));
     connect(m_notificationsItem,                SIGNAL(sizeHintChanged()),      this,   SLOT(updateNotificationsGeometry()));
 
+
     /* Calendar. */
     QnCalendarWidget *calendarWidget = new QnCalendarWidget();
+    setHelpTopic(calendarWidget, Qn::MainWindow_Calendar_Help);
     navigator()->setCalendar(calendarWidget);
 
     m_dayTimeWidget = new QnDayTimeWidget();
+    setHelpTopic(m_dayTimeWidget, Qn::MainWindow_DayTimePicker_Help);
     navigator()->setDayTimeWidget(m_dayTimeWidget);
 
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);

@@ -1,6 +1,7 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule_widget.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtWidgets/QMessageBox>
 
 //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
@@ -28,6 +29,7 @@
 namespace {
 
     class QnExportScheduleResourceSelectionDialogDelegate: public QnResourceSelectionDialogDelegate {
+        Q_DECLARE_TR_FUNCTIONS(QnExportScheduleResourceSelectionDialogDelegate);
         typedef QnResourceSelectionDialogDelegate base_type;
     public:
         QnExportScheduleResourceSelectionDialogDelegate(QWidget* parent,
@@ -798,17 +800,14 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     bool motionUsed = recordingEnabled && hasMotionOnGrid();
     bool dualStreamingUsed = motionUsed && hasDualStreamingMotionOnGrid();
 
-    QnResourceSelectionDialog dialog(this);
-    dialog.setDelegate(new QnExportScheduleResourceSelectionDialogDelegate(this,
-                                                                           recordingEnabled,
-                                                                           motionUsed,
-                                                                           dualStreamingUsed));
-    dialog.setSelectedResources(m_cameras);
-
-    if (dialog.exec() != QDialog::Accepted)
+    QScopedPointer<QnResourceSelectionDialog> dialog(new QnResourceSelectionDialog(this));
+    dialog->setDelegate(new QnExportScheduleResourceSelectionDialogDelegate(this, recordingEnabled, motionUsed, dualStreamingUsed));
+    dialog->setSelectedResources(m_cameras);
+    setHelpTopic(dialog.data(), Qn::CameraSettings_Recording_Export_Help);
+    if (dialog->exec() != QDialog::Accepted)
         return;
 
-    QnVirtualCameraResourceList cameras = dialog.selectedResources().filtered<QnVirtualCameraResource>();
+    QnVirtualCameraResourceList cameras = dialog->selectedResources().filtered<QnVirtualCameraResource>();
     foreach(QnVirtualCameraResourcePtr camera, cameras) {
         camera->setScheduleDisabled(!recordingEnabled);
         if (recordingEnabled){

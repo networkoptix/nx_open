@@ -18,7 +18,7 @@ void QnClientPullMediaStreamProvider::run()
 {
     saveSysThreadID();
     setPriority(QThread::HighPriority);
-    qDebug() << "stream reader started.";
+    NX_LOG("stream reader started", cl_logDEBUG1);
 
     int numberOfChnnels = 1;
 
@@ -153,7 +153,7 @@ void QnClientPullMediaStreamProvider::run()
 
     afterRun();
 
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
+    NX_LOG("stream reader stopped", cl_logDEBUG1);
 }
 
 void QnClientPullMediaStreamProvider::beforeRun()

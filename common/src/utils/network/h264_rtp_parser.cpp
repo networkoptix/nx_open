@@ -237,16 +237,19 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
     
     if (m_videoFrameSize > MAX_ALLOWED_FRAME_SIZE)
     {
-        qWarning() << "Too large RTP/H.264 frame. Truncate video buffer";
+        NX_LOG("Too large RTP/H.264 frame. Truncate video buffer", cl_logWARNING);
         clearInternalBuffer();
         isPacketLost = true;
     }
 
     if (isPacketLost) {
-        if (m_timeHelper)
-            qWarning() << "RTP Packet loss detected for camera " << m_timeHelper->getResID() << ".old seq=" << m_prevSequenceNum << "new seq=" << sequenceNum;
-        else
-            qWarning() << "RTP Packet loss detected!!!!";
+        if (m_timeHelper) {
+            NX_LOG(QString(lit("RTP Packet loss detected for camera %1. Old seq=%2, new seq=%3"))
+                .arg(m_timeHelper->getResID()).arg(m_prevSequenceNum).arg(sequenceNum), cl_logWARNING);
+        }
+        else {
+            NX_LOG("RTP Packet loss detected!!!!", cl_logWARNING);
+        }
         clearInternalBuffer();
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
     }

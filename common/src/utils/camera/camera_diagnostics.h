@@ -65,6 +65,9 @@ namespace CameraDiagnostics
             //!params: OS error message
             ioError,
             serverTerminated,
+            cameraInvalidParams,
+            badMediaStream,
+            noMediaStream,
             unknown
         };
 
@@ -79,13 +82,19 @@ namespace CameraDiagnostics
     class Result
     {
     public:
+        typedef void (Result::*safe_bool_type)() const;
+
         ErrorCode::Value errorCode;
         QList<QString> errorParams;
 
         Result();
-        Result( ErrorCode::Value _errorCode, const QString& param1 = QString(), const QString& param2 = QString() );
+        explicit Result( ErrorCode::Value _errorCode, const QString& param1 = QString(), const QString& param2 = QString() );
+
         QString toString() const;
-        operator bool() const;
+        operator safe_bool_type() const;
+
+    private:
+        void safe_bool_type_retval() const {}
     };
 
     class NoErrorResult : public Result
@@ -121,25 +130,40 @@ namespace CameraDiagnostics
     class ConnectionClosedUnexpectedlyResult : public Result
     {
     public:
-        ConnectionClosedUnexpectedlyResult( const QString& mediaURL, const int mediaPort ) : Result( ErrorCode::connectionClosedUnexpectedly, mediaURL, QString::number(mediaPort) ) {}
+        ConnectionClosedUnexpectedlyResult( const QString& mediaURL, const int mediaPort )
+            : Result( ErrorCode::connectionClosedUnexpectedly, mediaURL, QString::number(mediaPort) ) {}
+    };
+
+    class BadMediaStreamResult : public Result
+    {
+    public:
+        BadMediaStreamResult()
+            : Result( ErrorCode::badMediaStream) {}
+    };
+
+    class NoMediaStreamResult : public Result
+    {
+    public:
+        NoMediaStreamResult()
+            : Result( ErrorCode::noMediaStream) {}
     };
 
     class CameraResponseParseErrorResult : public Result
     {
     public:
-        CameraResponseParseErrorResult() : Result( ErrorCode::responseParseError ) {}
+        CameraResponseParseErrorResult( const QString& requestedURL, const QString requestName ) : Result( ErrorCode::responseParseError, requestedURL, requestName ) {}
     };
 
     class NoMediaTrackResult : public Result
     {
     public:
-        NoMediaTrackResult() : Result( ErrorCode::noMediaTrack ) {}
+        NoMediaTrackResult( const QString& requestedURL ) : Result( ErrorCode::noMediaTrack, requestedURL ) {}
     };
 
     class NotAuthorisedResult : public Result
     {
     public:
-        NotAuthorisedResult() : Result( ErrorCode::notAuthorised ) {}
+        NotAuthorisedResult( const QString& requestedURL ) : Result( ErrorCode::notAuthorised, requestedURL ) {}
     };
 
     class UnsupportedProtocolResult : public Result
@@ -158,6 +182,12 @@ namespace CameraDiagnostics
     {
     public:
         RequestFailedResult( const QString& requestName, const QString& serverResponse ) : Result( ErrorCode::requestFailed, requestName, serverResponse ) {}
+    };
+
+    class CameraInvalidParams : public Result
+    {
+    public:
+        CameraInvalidParams( const QString& errorString) : Result( ErrorCode::cameraInvalidParams, errorString) {}
     };
 
     class NotImplementedResult : public Result

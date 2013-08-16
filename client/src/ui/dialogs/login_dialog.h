@@ -62,14 +62,6 @@ protected:
      */
     void resetAutoFoundConnectionsModel();
 
-    /**
-     * Send the required version to the applauncher,
-     * close the current instance of the client.
-     */
-    bool restartInCompatibilityMode(QnConnectInfoPtr connectInfo);
-
-    bool sendCommandToLauncher(const QnSoftwareVersion &version, const QStringList &arguments);
-
 private slots:
     void updateAcceptibility();
     void updateFocus();

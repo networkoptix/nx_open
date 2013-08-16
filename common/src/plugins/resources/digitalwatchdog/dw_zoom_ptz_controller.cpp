@@ -61,7 +61,7 @@ int QnDwZoomPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
 }
 
 Qn::PtzCapabilities QnDwZoomPtzController::getCapabilities() {
-    return Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability | Qn::OctagonalPtzCapability;
+    return Qn::ContinuousZoomCapability;
 }
 
 const QnPtzSpaceMapper *QnDwZoomPtzController::getSpaceMapper() {

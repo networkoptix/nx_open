@@ -8,45 +8,6 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/math/math.h>
 
-namespace Qn {
-    enum PtzCapability {
-        NoPtzCapabilities                   = 0x000,
-        AbsolutePtzCapability               = 0x020,
-        ContinuousPanTiltCapability         = 0x040,
-        ContinuousZoomCapability            = 0x080,
-        OctagonalPtzCapability              = 0x100, // TODO: #Elric deprecate this shit. Not really a capability.
-
-        /* Shortcuts */
-        AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability | OctagonalPtzCapability,
-
-        /* Deprecated capabilities. */
-        DeprecatedContinuousPtzCapability   = 0x001,
-        DeprecatedZoomCapability            = 0x002,
-    };
-    Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
-
-    /**
-     * \param capabilities              Camera capability flags containing some deprecated values.
-     * \returns                         Camera capability flags with deprecated values replaced with new ones.
-     */
-    inline Qn::PtzCapabilities undeprecatePtzCapabilities(Qn::PtzCapabilities capabilities) {
-        Qn::PtzCapabilities result = capabilities;
-
-        if(result & Qn::DeprecatedContinuousPtzCapability) {
-            result &= ~Qn::DeprecatedContinuousPtzCapability;
-            result |= Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability;
-        }
-
-        if(result & Qn::DeprecatedZoomCapability) {
-            result &= ~Qn::DeprecatedZoomCapability;
-            result |= Qn::ContinuousZoomCapability;
-        }
-
-        return result;
-    }
-}
-
 namespace {
     qreal gradToRad(qreal x) { return x * M_PI / 180.0; }
     qreal radToGrad(qreal x) { return x * 180.0 / M_PI; }

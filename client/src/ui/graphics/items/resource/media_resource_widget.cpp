@@ -97,6 +97,14 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     /* Set up buttons. */
 
+    QnImageButtonWidget *screenshotButton = new QnImageButtonWidget();
+    screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
+    screenshotButton->setCheckable(false);
+    screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
+    screenshotButton->setToolTip(tr("Screenshot"));
+    setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
+    connect(screenshotButton, SIGNAL(clicked()), this, SLOT(at_screenshotButton_clicked()));
+
     QnImageButtonWidget *searchButton = new QnImageButtonWidget();
     searchButton->setIcon(qnSkin->icon("item/search.png"));
     searchButton->setCheckable(true);
@@ -119,7 +127,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
     fishEyeButton->setToolTip(tr("Dewarping"));
     fishEyeButton->setChecked(item->dewarpingParams().enabled);
-    setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_FishEye_Help);
+    setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
     connect(fishEyeButton, SIGNAL(toggled(bool)), this, SLOT(at_fishEyeButton_toggled(bool)));
 
     QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget();
@@ -127,6 +135,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     zoomWindowButton->setCheckable(true);
     zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
     zoomWindowButton->setToolTip(tr("Create Zoom Window"));
+    setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
     connect(zoomWindowButton, SIGNAL(toggled(bool)), this, SLOT(at_zoomWindowButton_toggled(bool)));
 
     QnImageButtonWidget *enhancementButton = new QnImageButtonWidget();
@@ -135,8 +144,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
     enhancementButton->setToolTip(tr("Image Enhancement"));
     enhancementButton->setChecked(item->imageEnhancement().enabled);
+    setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
     connect(enhancementButton, SIGNAL(toggled(bool)), this, SLOT(at_histogramButton_toggled(bool)));
 
+    buttonBar()->addButton(ScreenshotButton,    screenshotButton);
     buttonBar()->addButton(MotionSearchButton,  searchButton);
     buttonBar()->addButton(PtzButton,           ptzButton);
     buttonBar()->addButton(FishEyeButton,       fishEyeButton);
@@ -193,6 +204,7 @@ void QnMediaResourceWidget::updateFisheyeController() {
         m_fisheyePtz = 0;
         if(buttonBar()->button(FishEyeButton))
             buttonBar()->button(FishEyeButton)->setChecked(false);
+        at_dewarpingParamsChanged(item()->dewarpingParams());
     }
     updateAspectRatio();
 }
@@ -216,7 +228,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 void QnMediaResourceWidget::at_dewarpingParamsChanged(DewarpingParams params)
 {
     item()->setDewarpingParams(params);
-    item()->setData(Qn::ItemFlipRole, params.viewMode == DewarpingParams::VerticalDown);
+    item()->setData(Qn::ItemFlipRole, params.enabled && params.viewMode == DewarpingParams::VerticalDown);
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
@@ -666,16 +678,30 @@ QnVirtualPtzController* QnMediaResourceWidget::virtualPtzController() const {
 // Handlers
 // -------------------------------------------------------------------------- //
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
-    if(calculateStatusOverlay() == Qn::AnalogWithoutLicenseOverlay) {
+    Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
+
+    if(statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
+    } else if(statusOverlay == Qn::OfflineOverlay) {
+        return Qn::MainWindow_MediaItem_Diagnostics_Help;
+    } else if(statusOverlay == Qn::UnauthorizedOverlay) {
+        return Qn::MainWindow_MediaItem_Unauthorized_Help;
     } else if(options() & ControlPtz) {
-        return Qn::MainWindow_MediaItem_Ptz_Help;
+        if(m_fisheyePtz) {
+            return Qn::MainWindow_MediaItem_Dewarping_Help;
+        } else {
+            return Qn::MainWindow_MediaItem_Ptz_Help;
+        }
+    } else if(!zoomRect().isNull()) {
+        return Qn::MainWindow_MediaItem_ZoomWindows_Help;
     } else if(options() & DisplayMotionSensitivity) {
         return Qn::CameraSettings_Motion_Help;
     } else if(options() & DisplayMotion) {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
     } else if(m_resource->toResource()->flags() & QnResource::local) {
         return Qn::MainWindow_MediaItem_Local_Help;
+    } else if(m_camera && m_camera->isAnalog()) {
+        return Qn::MainWindow_MediaItem_AnalogCamera_Help;
     } else {
         return Qn::MainWindow_MediaItem_Help;
     }
@@ -779,16 +805,17 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
-    Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
+    Buttons result = base_type::calculateButtonsVisibility();
 
-    //if(!(resource()->toResource()->flags() & QnResource::still_image))
+    if(!(resource()->toResource()->flags() & QnResource::still_image))
+        result |= ScreenshotButton;
+
     bool rgbImage = false;
     QString url = resource()->toResource()->getUrl().toLower();
     if(((resource()->toResource()->flags() & QnResource::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
         rgbImage = true;
     if (!rgbImage)
         result |= EnhancementButton;
-    result |= InfoButton;
 
     if (!zoomRect().isNull())
         return result;
@@ -889,6 +916,10 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged() {
         buttonBar()->setButtonsChecked(PtzButton, false);
 }
 
+void QnMediaResourceWidget::at_screenshotButton_clicked() {
+    menu()->trigger(Qn::TakeScreenshotAction, this);
+}
+
 void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
 
@@ -898,7 +929,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     bool ptzEnabled = 
-        checked && (m_camera && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)));
+        checked && (m_camera && (m_camera->getPtzCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)));
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);
@@ -909,8 +940,7 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
-    bool fishEyeEnabled = 
-        checked && m_fisheyePtz;
+    bool fishEyeEnabled = checked && m_fisheyePtz;
 
     setOption(ControlPtz, fishEyeEnabled);
     setOption(DisplayCrosshair, fishEyeEnabled);

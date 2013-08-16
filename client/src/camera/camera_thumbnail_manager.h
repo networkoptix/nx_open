@@ -15,7 +15,7 @@ public:
     virtual ~QnCameraThumbnailManager();
     
     void selectResource(const QnResourcePtr &resource);
-    
+    void setThumbnailSize(const QSize &size);
 signals:
     void thumbnailReady(int resourceId, const QPixmap& thumbnail);
 
@@ -43,7 +43,8 @@ private:
     };
 
     QHash<QnResourcePtr, ThumbnailData> m_thumbnailByResource;
-
+    QSize m_thumnailSize;
+    QHash<ThumbnailStatus, QPixmap> m_statusPixmaps;
 };
 
 #endif // CAMERA_THUMBNAIL_MANAGER_H

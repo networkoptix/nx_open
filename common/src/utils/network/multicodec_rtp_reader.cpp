@@ -218,7 +218,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     }
     if (m_RtpSession.isOpened() && !m_pleaseStop && m_gotSomeFrame) 
     {
-        qWarning() << "RTP read timeout for camera " << getResource()->getUniqueId() << ". Reopen stream";
+        NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
 
         int elapsed = dataTimer.elapsed();
         QnBusiness::EventReason reason = elapsed > MAX_FRAME_DURATION*2 ? QnBusiness::NetworkIssueNoFrame : QnBusiness::NetworkIssueConnectionClosed;
@@ -332,7 +332,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
         return result;
     }
 
-    qWarning() << "RTP read timeout for camera " << getResource()->getUniqueId() << ". Reopen stream";
+    NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
     return result;
 }
 
@@ -486,7 +486,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if( m_videoIO || m_audioIO )
         return CameraDiagnostics::NoErrorResult();
     else
-        return CameraDiagnostics::NoMediaTrackResult();
+        return CameraDiagnostics::NoMediaTrackResult( url );
 }
 
 int QnMulticodecRtpReader::getLastResponseCode() const

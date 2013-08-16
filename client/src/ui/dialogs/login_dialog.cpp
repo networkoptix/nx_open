@@ -9,23 +9,22 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtCore/QDir>
 
-#include <QtNetwork/QLocalSocket>
-
 #include <client/client_connection_data.h>
 
 #include <core/resource/resource.h>
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
-#include <api/ipc_pipe_names.h>
-#include <api/start_application_task.h>
 
+#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/widgets/rendering_widget.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
+#include <utils/applauncher_utils.h>
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
@@ -115,6 +114,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     updateFocus();
 
     m_entCtrlFinder = new NetworkOptixModuleFinder();
+    if (qnSettings->isDevMode())
+        m_entCtrlFinder->setCompatibilityMode(true);
     connect(m_entCtrlFinder,    SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
             this,               SLOT(at_entCtrlFinder_remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
     connect(m_entCtrlFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
@@ -290,48 +291,6 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
     }
 }
 
-bool QnLoginDialog::sendCommandToLauncher(const QnSoftwareVersion &version, const QStringList &arguments) {
-    QLocalSocket sock;
-    sock.connectToServer(launcherPipeName);
-    if(!sock.waitForConnected(-1)) {
-        qnDebug("Failed to connect to local server %1: %2.", launcherPipeName, sock.errorString());
-        return false;
-    }
-
-    const QByteArray &serializedTask = applauncher::api::StartApplicationTask(stripVersion(version.toString()), arguments).serialize();
-    if(sock.write(serializedTask.data(), serializedTask.size()) != serializedTask.size()) {
-        qnDebug("Failed to send launch task to local server %1: %2.", launcherPipeName, sock.errorString());
-        return false;
-    }
-
-    sock.waitForReadyRead(-1);
-//    QByteArray result =
-            sock.readAll();
-//    if (result != "ok")
-//        return false;
-    return true;
-}
-
-bool QnLoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
-    QStringList arguments;
-    arguments << QLatin1String("--no-single-application");
-    arguments << QLatin1String("--auth");
-    arguments << QLatin1String(currentUrl().toEncoded());
-    arguments << QLatin1String("--screen");
-    arguments << QString::number(qApp->desktop()->screenNumber(this));
-
-    bool result = sendCommandToLauncher(connectInfo->version, arguments);
-    if (!result) {
-        QMessageBox::critical(
-            this,
-            tr("Launcher process is not found"),
-            tr("Cannot restart the client in compatibility mode.\n"
-                "Please close the application and start it again using the shortcut in the start menu.")
-        );
-    }
-    return result;
-}
-
 void QnLoginDialog::updateAcceptibility() {
     bool acceptable = 
         !ui->passwordLineEdit->text().isEmpty() &&
@@ -370,9 +329,13 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
 
     updateUsability();
 
-    if(status != 0) {
-        QMessageBox::warning(
+    bool compatibleProduct = qnSettings->isDevMode() || connectInfo->brand.isEmpty()
+            || connectInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+
+    if(status != 0 || !compatibleProduct) {
+        QnMessageBox::warning(
             this, 
+            Qn::Login_Help,
             tr("Could not connect to Enterprise Controller"), 
             tr("Connection to the Enterprise Controller could not be established.\n"
                "Connection details that you have entered are incorrect, please try again.\n\n"
@@ -397,8 +360,9 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
 
         m_restartPending = true;
         if (connectInfo->version < minSupportedVersion) {
-            QMessageBox::warning(
+            QnMessageBox::warning(
                 this,
+                Qn::VersionMismatch_Help,
                 tr("Could not connect to Enterprise Controller"),
                 tr("You are about to connect to Enterprise Controller which has a different version:\n"
                    " - Client version: %1.\n"
@@ -412,10 +376,10 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
         }
 
         if(m_restartPending) {
-            bool canRestart = QFile::exists(qApp->applicationDirPath() + QLatin1String("/../") + stripVersion(connectInfo->version.toString()));
-            if(canRestart) {
-                int button = QMessageBox::warning(
+            if(canRestart(connectInfo->version)) {
+                int button = QnMessageBox::warning(
                     this,
+                    Qn::VersionMismatch_Help,
                     tr("Could not connect to Enterprise Controller"),
                     tr("You are about to connect to Enterprise Controller which has a different version:\n"
                         " - Client version: %1.\n"
@@ -426,14 +390,22 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                     QMessageBox::Cancel
                 );
                 if(button == QMessageBox::Ok) {
-                    restartInCompatibilityMode(connectInfo);
+                    if (!restartClient(connectInfo->version, currentUrl().toEncoded())) {
+                        QMessageBox::critical(
+                                    this,
+                                    tr("Launcher process is not found"),
+                                    tr("Cannot restart the client in compatibility mode.\n"
+                                       "Please close the application and start it again using the shortcut in the start menu.")
+                                    );
+                    }
                 } else {
                     m_restartPending = false;
                 }
             } else {
                 m_restartPending = false;
-                QMessageBox::warning(
+                QnMessageBox::warning(
                     this,
+                    Qn::VersionMismatch_Help,
                     tr("Could not connect to Enterprise Controller"),
                     tr("You are about to connect to Enterprise Controller which has a different version:\n"
                         " - Client version: %1.\n"

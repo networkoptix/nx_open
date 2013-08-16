@@ -12,7 +12,8 @@ CLServerPushStreamReader::CLServerPushStreamReader(QnResourcePtr dev ):
     m_needReopen(false),
     m_cameraAudioEnabled(false),
     m_openStreamResult(CameraDiagnostics::ErrorCode::unknown),
-    m_openStreamCounter(0)
+    m_openStreamCounter(0),
+    m_FrameCnt(0)
 {
     QnPhysicalCameraResourcePtr camera = getResource().dynamicCast<QnPhysicalCameraResource>();
     if (camera) 
@@ -44,7 +45,7 @@ void CLServerPushStreamReader::run()
 {
     saveSysThreadID();
     setPriority(QThread::TimeCriticalPriority);
-    qDebug() << "stream reader started.";
+    NX_LOG("stream reader started", cl_logDEBUG1);
 
     beforeRun();
 
@@ -56,6 +57,7 @@ void CLServerPushStreamReader::run()
 
         if (!isStreamOpened())
         {
+            m_FrameCnt = 0;
             m_openStreamResult = openStream();
             {
                 QMutexLocker lk( &m_openStreamMutex );
@@ -105,12 +107,16 @@ void CLServerPushStreamReader::run()
             {
                 if (canChangeStatus())
                     getResource()->setStatus(QnResource::Offline);
-
+                if (m_FrameCnt > 0)
+                    m_resource->setLastMediaIssue(CameraDiagnostics::BadMediaStreamResult());
+                else
+                    m_resource->setLastMediaIssue(CameraDiagnostics::NoMediaStreamResult());
                 m_stat[0].onLostConnection();
             }
 
             continue;
         }
+        m_FrameCnt++;
 
         if (getResource()->hasFlags(QnResource::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
@@ -131,7 +137,7 @@ void CLServerPushStreamReader::run()
             {
                 m_stat[0].onEvent(CL_STAT_CAMRESETED);
             }
-
+            m_resource->setLastMediaIssue(CameraDiagnostics::NoErrorResult());
             mFramesLost = 0;
         }
 
@@ -188,7 +194,7 @@ void CLServerPushStreamReader::run()
 
     afterRun();
 
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
+    NX_LOG("stream reader stopped", cl_logDEBUG1);
 }
 
 void CLServerPushStreamReader::beforeRun()

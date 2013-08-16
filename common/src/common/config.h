@@ -113,6 +113,7 @@
 #   pragma warning(error: 4150) /* deletion of pointer to incomplete type 'X'; no destructor called */
 #   pragma warning(error: 4715) /* not all control paths return a value */
 #   pragma warning(error: 4005) /* macro redefinition */
+#   pragma warning(error: 4806) /* unsafe operation: no value of type 'INTEGRAL' promoted to type 'ENUM' can equal the given constant */
 #endif
 
 

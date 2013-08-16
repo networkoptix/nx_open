@@ -398,7 +398,6 @@ int main(int argc, char **argv)
         QnHelpHandler helpHandler;
         qApp->installEventFilter(&helpHandler);
 
-
         QnLog::initLog(logLevel);
         cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
         cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);

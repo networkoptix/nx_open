@@ -46,7 +46,7 @@ public:
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
-    Q_FLAGS(Flags Flag)
+    Q_FLAGS(Flags Flag Qn::PtzCapabilities)
     Q_ENUMS(ConnectionRole Status)
     Q_PROPERTY(QnId id READ getId WRITE setId)
     Q_PROPERTY(QnId typeId READ getTypeId WRITE setTypeId)
@@ -60,6 +60,8 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
     Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
+    Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
+
 
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
@@ -154,6 +156,10 @@ public:
         \return true, if initialization attempt is done (with success or failure). false, if \a QnResource::init is already running in other thread
     */
     bool init();
+
+    void setLastMediaIssue(const CameraDiagnostics::Result& issue);
+    CameraDiagnostics::Result getLastMediaIssue() const;
+
     /*!
         Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
     */
@@ -386,6 +392,7 @@ private:
     static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
     CameraDiagnostics::Result m_prevInitializationResult;
+    CameraDiagnostics::Result m_lastMediaIssue;
     QAtomicInt m_initializationAttemptCount;
 };
 

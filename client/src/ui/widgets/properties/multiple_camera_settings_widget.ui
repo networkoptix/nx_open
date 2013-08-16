@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
@@ -163,13 +163,13 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabAdvancedSettings">
+     <widget class="QWidget" name="expertTab">
       <attribute name="title">
        <string>Expert</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QnAdvancedSettingsWidget" name="advancedSettingsWidget" native="true"/>
+        <widget class="QnAdvancedSettingsWidget" name="expertSettingsWidget" native="true"/>
        </item>
       </layout>
      </widget>

@@ -9,7 +9,7 @@
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 
-class QnNotificationItem;
+class QnNotificationWidget;
 class HoverFocusProcessor;
 
 class QnNotificationListWidget : public Animated<GraphicsWidget>, public AnimationTimerListener
@@ -21,8 +21,8 @@ public:
     explicit QnNotificationListWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags flags = 0);
     virtual ~QnNotificationListWidget();
 
-    void addItem(QnNotificationItem *item, bool locked = false);
-    void removeItem(QnNotificationItem *item);
+    void addItem(QnNotificationWidget *item, bool locked = false);
+    void removeItem(QnNotificationWidget *item);
     void clear();
 
     QSizeF visibleSize() const;
@@ -37,7 +37,7 @@ signals:
     void visibleSizeChanged();
     void sizeHintChanged();
 
-    void itemRemoved(QnNotificationItem *item); // TODO: #GDM symmetry break, where is itemAdded signal?
+    void itemRemoved(QnNotificationWidget *item); // TODO: #GDM symmetry break, where is itemAdded signal?
     void itemCountChanged();
     void notificationLevelChanged();
 
@@ -87,7 +87,7 @@ private:
             qreal length;
         } animation;
 
-        QnNotificationItem* item;
+        QnNotificationWidget* item;
         State state;
         bool locked;
         int cachedHeight;
@@ -100,9 +100,9 @@ private:
      *                      (Displayed|Hiding|Hidden)* (Displaying)? (Collapsing)* (Collapsed)*
      *                      Item that is closer to the beginning of the list is displayed earlier.
      */
-    QLinkedList<QnNotificationItem *> m_items;
+    QLinkedList<QnNotificationWidget *> m_items;
 
-    QMap<QnNotificationItem*, ItemData*> m_itemDataByItem;
+    QMap<QnNotificationWidget*, ItemData*> m_itemDataByItem;
 
     ItemData m_collapser;
     bool m_collapsedItemCountChanged;

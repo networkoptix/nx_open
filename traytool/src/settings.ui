@@ -311,7 +311,7 @@
           <item>
            <widget class="QGroupBox" name="groupBoxPublicIP">
             <property name="title">
-             <string>Allow access to the server via public IP address</string>
+             <string>Allow access to media server via public IP address</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -491,7 +491,7 @@
        <item>
         <widget class="QGroupBox" name="ecsAllowPublicIpGroupBox">
          <property name="title">
-          <string>Allow access to the enterprise controller via public IP address</string>
+          <string>Allow access to enterprise controller via public IP address</string>
          </property>
          <property name="checkable">
           <bool>true</bool>

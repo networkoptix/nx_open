@@ -17,6 +17,8 @@
 #include <ui/common/geometry.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/widgets/framed_label.h>
 
@@ -123,6 +125,9 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     m_isUpdating(false)
 {
     ui->setupUi(this);
+
+    setHelpTopic(ui->imageLabel,        Qn::LayoutSettings_EMapping_Help);
+    setHelpTopic(ui->lockedCheckBox,    Qn::LayoutSettings_Locking_Help);
 
     ui->imageLabel->installEventFilter(this);
     ui->imageLabel->setFrameColor(qnGlobals->frameColor());

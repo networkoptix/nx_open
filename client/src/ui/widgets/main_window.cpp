@@ -232,7 +232,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
     m_windowButtonsLayout->setSpacing(2);
     m_windowButtonsLayout->addSpacing(6);
-    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::WhatsThisAction)));
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::WhatsThisAction), false, 1.0, Qn::MainWindow_ContextHelp_Help));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::ExitAction)));
@@ -246,7 +246,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->setSpacing(2);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction), false, 1.0, Qn::MainWindow_Panic_Help));

@@ -44,7 +44,12 @@ CameraDiagnostics::Result QnStardotStreamReader::openStream()
             if (status == CL_HTTP_AUTH_REQUIRED) 
             {
                 m_resource->setStatus(QnResource::Unauthorized);
-                return CameraDiagnostics::NotAuthorisedResult();
+                QUrl requestedUrl;
+                requestedUrl.setHost( m_stardotRes->getHostAddress() );
+                requestedUrl.setPort( m_stardotRes->httpPort() );
+                requestedUrl.setScheme( QLatin1String("http") );
+                requestedUrl.setPath( request );
+                return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
             }
             return CameraDiagnostics::RequestFailedResult(QLatin1String("admin.cgi?image"), QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
         }

@@ -48,7 +48,7 @@ int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
 CameraDiagnostics::Result QnAxisStreamReader::openStream()
 {
     if (isStreamOpened())
-        return CameraDiagnostics::ErrorCode::noError;
+        return CameraDiagnostics::NoErrorResult();
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
@@ -101,13 +101,13 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
             if (status == CL_HTTP_AUTH_REQUIRED)
             {
                 getResource()->setStatus(QnResource::Unauthorized);
-                return CameraDiagnostics::NotAuthorisedResult();
+                return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
             }
             else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
             {
                 cl_log.log("Axis camera must be have old firmware!!!!  ip = ",  res->getHostAddress() , cl_logERROR);
                 m_oldFirmwareWarned = true;
-                return CameraDiagnostics::NoMediaTrackResult();
+                return CameraDiagnostics::RequestFailedResult( requestPath, QLatin1String("old firmware") );
             }
 
             return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
@@ -174,7 +174,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
         if (status == CL_HTTP_AUTH_REQUIRED)
         {
             getResource()->setStatus(QnResource::Unauthorized);
-            return CameraDiagnostics::NotAuthorisedResult();
+            return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
         }
         else if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::RequestFailedResult(CameraDiagnostics::RequestFailedResult(streamProfile, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status))));

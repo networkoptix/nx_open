@@ -65,6 +65,7 @@
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
+#include <ui/dialogs/message_box.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -1097,7 +1098,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         AddToLayoutParams addParams;
         addParams.usePosition = !position.isNull();
         addParams.position = position;
-        addParams.time = parameters.argument(Qn::ItemTimeRole, (quint64)0);
+        addParams.time = parameters.argument(Qn::ItemTimeRole, -1);
         addToLayout(layout, resources, addParams);
         return;
     }
@@ -1209,6 +1210,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         dialog->setWindowTitle(tr("Save Layout As"));
         dialog->setText(tr("Enter layout name:"));
         dialog->setName(layout->getName());
+        setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
 
         QMessageBox::Button button;
         do {
@@ -1400,6 +1402,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         QnResourceListDialog::exec(
             mainWindow(),
             errorResources,
+            Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
             tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()),
             QDialogButtonBox::Ok
@@ -1542,6 +1545,7 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
 
     QnCheckableMessageBox::question(
         mainWindow(),
+        Qn::Upgrade_Help,
         tr("Software update is available"),
         tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
         tr("Don't notify again about this update."),
@@ -1646,6 +1650,8 @@ void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+    if (dialog->restartPending())
+        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
@@ -1653,6 +1659,8 @@ void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
     dialog->openLicensesPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+    if (dialog->restartPending())
+        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
@@ -1660,6 +1668,8 @@ void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
     dialog->openServerSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+    if (dialog->restartPending())
+        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
@@ -1667,6 +1677,8 @@ void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
     dialog->openPopupSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+    if (dialog->restartPending())
+        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
@@ -1693,6 +1705,7 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
     QRect oldGeometry = businessRulesDialog()->geometry();
     businessRulesDialog()->show();
     businessRulesDialog()->raise();
+    businessRulesDialog()->activateWindow();
     if(!newlyCreated)
         businessRulesDialog()->setGeometry(oldGeometry);
 }
@@ -1735,6 +1748,7 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
     QRect oldGeometry = businessEventsLogDialog()->geometry();
     businessEventsLogDialog()->show();
     businessEventsLogDialog()->raise();
+    businessEventsLogDialog()->activateWindow();
     if(!newlyCreated)
         businessEventsLogDialog()->setGeometry(oldGeometry);
 }
@@ -1752,6 +1766,7 @@ void QnWorkbenchActionHandler::at_cameraListAction_triggered()
     cameraListDialog()->setMediaServerResource(server);
     cameraListDialog()->show();
     cameraListDialog()->raise();
+    cameraListDialog()->activateWindow();
     if(!newlyCreated)
         cameraListDialog()->setGeometry(oldGeometry);
 }
@@ -1849,7 +1864,27 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         connectionInfo = result.reply<QnConnectInfoPtr>();
     }
 
-    // TODO: #Elric maybe we need to check server-client compatibility here?
+    // TODO: #Elric maybe we need to check server-client compatibility here? --done //GDM
+    { // I think we should move this common code to common place --gdm
+        bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
+                || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+        if (!compatibleProduct)
+            return;
+
+        QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
+        QnCompatibilityChecker localChecker(localCompatibilityItems());
+        QnCompatibilityChecker* compatibilityChecker;
+        if (remoteChecker.size() > localChecker.size()) {
+            compatibilityChecker = &remoteChecker;
+        } else {
+            compatibilityChecker = &localChecker;
+        }
+
+        if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version))
+            return;
+    }
+
+
 
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectionInfo->proxyPort);
 
@@ -2346,6 +2381,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
             mainWindow(),
             QnActionParameterTypes::resources(items),
+            Qn::RemoveItems_Help,
             tr("Remove Items"),
             tr("Are you sure you want to remove these %n item(s) from layout?", "", items.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
@@ -2890,6 +2926,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
 
     m_exportProgressDialog = exportProgressDialog;
+    action(Qn::PlayPauseAction)->setChecked(false);
 
     if (!m_layoutExportCamera)
         m_layoutExportCamera = new QnVideoCamera(QnMediaResourcePtr(0));
@@ -2900,7 +2937,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
-    #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
     if (m_layoutFileName.endsWith(QLatin1String(".exe")))
     {
         if (QnNovLauncher::createLaunchingFile(fileName) != 0)
@@ -2988,7 +3025,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i) {
         if (m_layoutExportResources[i]->toResource()->hasFlags(QnResource::utc))
-            flags |= 2;
+            flags |= 2; // TODO: #VASILENKO MAGIC NUMBERS!!!!!!!!
     }
     device->write((const char*) &flags, sizeof(flags));
     delete device;
@@ -3412,6 +3449,7 @@ Do you want to continue?"),
         connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
 
         m_exportProgressDialog = exportProgressDialog;
+        action(Qn::PlayPauseAction)->setChecked(false);
 
         m_exportedCamera = widget->display()->camera();
 
@@ -3439,6 +3477,7 @@ Do you want to continue?"),
                                                   itemData.zoomRect,
                                                   contrastParams,
                                                   dewarpingParams);
+
         exportProgressDialog->exec();
     }
 }
@@ -3603,8 +3642,14 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(parameters.widget());
-    if(!camera || !widget)
+    if(!camera)
+        return;
+    
+    QList<QnResourceWidget *> widgets = display()->widgets(camera);
+    if(widgets.empty())
+        return;
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]);
+    if(!widget)
         return;
 
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
@@ -3960,7 +4005,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please upgrade all components to the latest version %2."
     ).arg(components).arg(watcher->latestVersion().toString());
 
-    QMessageBox::warning(mainWindow(), tr("Version Mismatch"), message);
+    QnMessageBox::warning(mainWindow(), Qn::VersionMismatch_Help, tr("Version Mismatch"), message);
 }
 
 void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {

@@ -45,6 +45,12 @@ bool QnThirdPartyResource::isResourceAccessible()
     return updateMACAddress();
 }
 
+bool QnThirdPartyResource::ping()
+{
+    //TODO: should check if camera supports http and, if supports, check http port
+    return true;
+}
+
 QString QnThirdPartyResource::getDriverName() const
 {
     return m_discoveryManager.getVendorName();
@@ -162,6 +168,7 @@ void QnThirdPartyResource::inputPortStateChanged(
 
 const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( int encoderNumber ) const
 {
+    QMutexLocker lk( &m_mutex );
     return m_encoderData[encoderNumber].resolutionList;
 }
 
@@ -227,8 +234,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
     //    setCameraCapability( Qn:: );
 
-    m_encoderData.clear();
-    m_encoderData.resize( encoderCount );
+    QVector<EncoderData> encoderDataTemp;
+    encoderDataTemp.resize( encoderCount );
 
     //reading resolution list
     QVector<nxcip::ResolutionInfo> resolutionInfoList;
@@ -255,10 +262,15 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         }
         for( int j = 0; j < resolutionInfoList.size(); ++j )
         {
-            m_encoderData[encoderNumber].resolutionList.push_back( resolutionInfoList[j].resolution );
+            encoderDataTemp[encoderNumber].resolutionList.push_back( resolutionInfoList[j].resolution );
             if( resolutionInfoList[j].maxFps > maxFps )
                 maxFps = resolutionInfoList[j].maxFps;
         }
+    }
+
+    {
+        QMutexLocker lk( &m_mutex );
+        m_encoderData = encoderDataTemp;
     }
 
     if( !setParam( MAX_FPS_PARAM_NAME, maxFps, QnDomainDatabase ) )

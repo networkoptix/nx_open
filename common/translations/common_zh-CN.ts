@@ -155,6 +155,11 @@
         <translation>診断</translation>
     </message>
     <message>
+        <location filename="../src/business/actions/abstract_business_action.cpp" line="21"/>
+        <source>Play sound</source>
+        <translation>播放音效</translation>
+    </message>
+    <message>
         <source>Alert</source>
         <translation type="obsolete">警告</translation>
     </message>
@@ -164,9 +169,8 @@
         <translation>显示通知</translation>
     </message>
     <message>
-        <location filename="../src/business/actions/abstract_business_action.cpp" line="21"/>
         <source>Play Sound</source>
-        <translation>播放音效</translation>
+        <translation type="obsolete">播放音效</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="22"/>
@@ -612,17 +616,17 @@ They cannot receive system notifications via E-Mail</source>
         <translation>无法解析序列化的连接信息。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="779"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="780"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>无法解析序列化的事件/行动规则。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="788"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="789"/>
         <source>Cannot parse serialized action.</source>
         <translation>无法解析序列化的行动。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="800"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
         <source>Cannot parse serialized actions.</source>
         <translation>无法解析序列化的行动。</translation>
     </message>
@@ -803,38 +807,38 @@ They cannot receive system notifications via E-Mail</source>
         <translation>网址: %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="174"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="163"/>
         <source>Input port: %1</source>
         <translation>输入端口: %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="183"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="169"/>
         <source>Reason: %1</source>
         <translation>原因: %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="190"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="173"/>
         <source>Conflict address: %1</source>
         <translation>冲突地址:: %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="201"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="178"/>
         <source>Camera #%1 MAC: %2</source>
         <translation>摄像机#%1 MAC: %2</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="217"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="187"/>
         <source>Conflicting EC #%1: %2</source>
         <translation>相冲突系统控制器 #%1: %2</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="234"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="254"/>
         <source>%2 %1</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>%2 %1</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="238"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="258"/>
         <source>%n times, first: %2 %1</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>
@@ -842,13 +846,13 @@ They cannot receive system notifications via E-Mail</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="249"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="269"/>
         <source>Time: %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>%2 時間: %1 </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="253"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="273"/>
         <source>First occurence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>
@@ -856,32 +860,32 @@ They cannot receive system notifications via E-Mail</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="274"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="294"/>
         <source>No video frame received during last %1 seconds</source>
         <translation>过去%1 秒內没有收到视频</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="278"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="298"/>
         <source>Connection to camera was unexpectedly closed</source>
         <translation>摄像机连接突然被中断</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="285"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="305"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2</source>
         <translation>侦测到RTP包丢失。前个seq.=%1，下个seq.=%2</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="290"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="310"/>
         <source>Server terminated</source>
         <translation>服务器终止</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="294"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="314"/>
         <source>Server started after crash</source>
         <translation>服务器故障后重启</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="302"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="322"/>
         <source>Not enough HDD/SSD speed for recording to %1</source>
         <translation>硬盘写入速度不足以录像至%1。</translation>
     </message>
@@ -898,7 +902,7 @@ They cannot receive system notifications via E-Mail</source>
         <translation type="obsolete">服务器终止后启动。</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="298"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="318"/>
         <source>I/O Error occured at %1</source>
         <translation>在 %1 发生输入/输出故障</translation>
     </message>
@@ -917,19 +921,45 @@ for recording to %1.</source>
         <translation>好</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
         <source>Media server %1 is not available. Check that media server is up and running.</source>
-        <translation>媒体服务器 %1 不可用。检查該媒体服务器已启用並且正在运行。</translation>
+        <translation type="obsolete">媒体服务器 %1 不可用。检查該媒体服务器已启用並且正在运行。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
         <source>Received bad response from media server %1: %2. Check media server&apos;s version.</source>
-        <translation>从 %1媒体服务器器收到不良回应: %2。确认媒体服务器版本。</translation>
+        <translation type="obsolete">从 %1媒体服务器器收到不良回应: %2。确认媒体服务器版本。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
         <source>Cannot connect to http port %1. Make sure the camera is plugged into the network.</source>
-        <translation>无法连接到HTTP端口%1。确认摄像机连上网络。</translation>
+        <translation type="obsolete">无法连接到HTTP端口%1。确认摄像机连上网络。</translation>
+    </message>
+    <message>
+        <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
+        <translation type="obsolete">解析摄像机错误回应。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队</translation>
+    </message>
+    <message>
+        <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
+        <translation type="obsolete">没有媒体路径。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队</translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation type="obsolete">无法连接到媒体端口 %1。不支援的媒体协议%2。请尝试在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
+    </message>
+    <message>
+        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation type="obsolete">配置参数 %1失败。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
+    </message>
+    <message>
+        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation type="obsolete">摄像机請求%1出現%2錯誤。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
+    </message>
+    <message>
+        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation type="obsolete">I/O错误。 OS信息e: %1。确认摄像机连上网络。尝试重新启动摄像机。</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="125"/>
+        <source>(unknown)</source>
+        <translation>(未知)</translation>
     </message>
     <message>
         <source>Cannot connect to media port %1. Make sure port %1 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
@@ -940,71 +970,165 @@ for recording to %1.</source>
         <translation type="obsolete">%1 端口上的连接被意外关闭。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
         <source>Error parsing camera response. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
-        <translation>解析摄像机错误回应。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
+        <translation type="obsolete">解析摄像机错误回应。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="52"/>
         <source>No media track(s). Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support</source>
-        <translation>没有媒体路径。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
+        <translation type="obsolete">没有媒体路径。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
         <source>Not authorized.</source>
-        <translation>未经授权。</translation>
+        <translation type="obsolete">未经授权。</translation>
     </message>
     <message>
         <source>Unsupported media protocol %1. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
         <translation type="obsolete">不支援的媒体协议%1。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
         <source>Cannot open media url %1. Failed to connect to media port %2. Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">无法连接到媒体 url %1。无法连接到媒体端口 %2。确认访问端口 %2可以存取(转发等)。请尝试重新启摄像机，然后在网页上复原为出厂默认值。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="45"/>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly. Make sure the camera is plugged into the network. Try to reboot camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">无法连接到媒体 url %1。%2 端口上的连接被意外关闭。确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="60"/>
-        <source>Cannot open media url %1. Unsupported media protocol %2. Please try to restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation type="unfinished"></translation>
+        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="obsolete">配置参数 %1失败。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
+    </message>
+    <message>
+        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
+        <translation type="obsolete">摄像机請求%1出現%2錯誤。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
+    </message>
+    <message>
+        <source>Unknown Camera Issue. Please, contact support.</source>
+        <translation type="obsolete">未知摄像机的问题。请联系支援团队。</translation>
+    </message>
+    <message>
+        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera.</source>
+        <translation type="obsolete">I/O错误。 OS信息e: %1。确认摄像机连上网络。尝试重新启动摄像机。</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
+        <source>Media server %1 is not available.
+ Check that media server is up and running.</source>
+        <translation>媒体服务器 %1 不可用。
+确认該媒体服务器已启用並且正在运行。</translation>
+    </message>
+    <message>
+        <source>Received bad response from media server %1: &quot;%2&quot;.
+ Check media server&apos;s version.</source>
+        <translation type="obsolete">从 %1媒体服务器器收到不良回应: %2。
+确认媒体服务器版本。</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
+        <source>Received bad response from media server %1: &quot;%2&quot;.
+ Check if Media Server is up and has the proper version.</source>
+        <translation>从 %1媒体服务器器收到不良回应: %2。确认媒体服务器版本。</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
+        <source>Cannot connect to http port %1.
+ Make sure the camera is plugged into the network.</source>
+        <translation>无法连接到HTTP端口%1。
+确认摄像机连上网络。</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
+        <source>Cannot open media url %1. Failed to connect to media port %2.
+ Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation>无法连接到媒体 url %1。无法连接到媒体端口 %2。
+确认访问端口 %2可以存取(转发等)。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="46"/>
+        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
+ Make sure the camera is plugged into the network. Try to reboot camera.</source>
+        <translation>无法连接到媒体 url %1。%2 端口上的连接被意外关闭。
+确认摄像机连上网络。尝试重新启动摄像机。</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="51"/>
+        <source>Error parsing camera response. Url %1, request name %2.
+ Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
+        <translation>解析摄像机错误回应。Url %1，请求名称 %2。
+请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团隊</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
+        <source>No supported media track(s) at url %1.
+ Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
+        <translation>没有支援的媒体路径%1。
+请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="61"/>
+        <source>Not authorized. Url %1</source>
+        <translation>未经授权。Url %1</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="65"/>
-        <source>Failed to configure parameter %1. Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation>配置参数 %1失败。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
+        <source>Cannot open media url %1. Unsupported media protocol %2.
+ Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation>无法连接到媒体 url %1。不支援的媒体协议%2。
+请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
-        <source>Camera request %1 failed with error %2.  Please try to reboot the camera, then restore factory defaults on the web-page. If the problem persists, contact support.</source>
-        <translation>摄像机請求%1出現%2錯誤。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。如果问题仍然存在，请联系支援团队</translation>
+        <source>Failed to configure parameter %1.
+ First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If no success, restore factory defaults on the camera web-page. If the problem persists, contact support.</source>
+        <translation>配置参数 %1失败。
+请尝试重新启动摄像机，然后降低摄像机fps设置。如不成功，在摄像机网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="75"/>
-        <source>Unknown Camera Issue. Please, contact support.</source>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
+ Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
+        <translation>摄像机請求%1出現%2錯誤。
+请尝试重新启动摄像机，然后在网页上复原为出厂默认值。最后，尝试更新韧体。如果问题仍然存在，请联系支援团队。</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="80"/>
+        <source>Unknown Camera Issue.
+ Please, contact support.</source>
         <translation>未知摄像机的问题。请联系支援团队。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="79"/>
-        <source>I/O error. OS message: %1. Make sure the camera is plugged into the network. Try to reboot camera.</source>
-        <translation>I/O错误。 OS信息e: %1。确认摄像机连上网络。尝试重新启动摄像机。</translation>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="84"/>
+        <source>I/O error. OS message: &quot;%1&quot;.
+ Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation>I/O错误。 OS信息e: %1。
+确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
         <source>Server has been stopped.</source>
         <translation>服务器已停止。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="85"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="91"/>
+        <source>Invalid data received from camera: %1</source>
+        <translation>从摄像机 %1接收的数据无效</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="94"/>
+        <source>Too many media errors. Please open camera issues dialog for more details</source>
+        <translation>太多媒体错误. 请打开&quot;相机问题对话&quot;获得更多细节</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="97"/>
+        <source>Media stream is opened but no media data was received</source>
+        <translation>媒体流已开启 但无接收任何媒体数据</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="110"/>
         <source>Unknown error. Please contact support.</source>
         <translation>未知错误。请联系支援团队。</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
         <source> Parameters: </source>
         <translation>参数:</translation>
     </message>
@@ -1345,13 +1469,21 @@ for recording to %1.</source>
 <context>
     <name>QnSystemHealthStringsHelper</name>
     <message>
-        <location filename="../src/health/system_health.cpp" line="6"/>
         <source>Your E-Mail address is not set</source>
+        <translation type="obsolete">邮件地址没有设定</translation>
+    </message>
+    <message>
+        <source>You have no licenses</source>
+        <translation type="obsolete">没有软件许可</translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="6"/>
+        <source>E-Mail address is not set</source>
         <translation>邮件地址没有设定</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="8"/>
-        <source>You have no licenses</source>
+        <source>No licenses</source>
         <translation>没有软件许可</translation>
     </message>
     <message>
@@ -1391,9 +1523,15 @@ for recording to %1.</source>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="41"/>
-        <source>Your E-Mail address is not set.
+        <source>E-Mail address is not set.
 You cannot receive system notifications via E-Mail.</source>
         <translation>邮件地址没有设定。
+无法通过邮件接收系统通知。</translation>
+    </message>
+    <message>
+        <source>Your E-Mail address is not set.
+You cannot receive system notifications via E-Mail.</source>
+        <translation type="obsolete">邮件地址没有设定。
 无法通过邮件接收系统事件。</translation>
     </message>
     <message>
@@ -1401,7 +1539,7 @@ You cannot receive system notifications via E-Mail.</source>
         <source>E-Mail server is not set.
 You cannot receive system notifications via E-Mail.</source>
         <translation>邮箱服务器没有设定。
-无法通过邮件接收系统事件。</translation>
+无法通过邮件接收系统通知。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="45"/>

@@ -58,11 +58,11 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
     connect(ui->moreLicensesButton,     SIGNAL(clicked()),                      this,   SIGNAL(moreLicensesRequested()));
 
-    connect(ui->advancedSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+    connect(ui->expertSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
 
     /* Set up context help. */
-    setHelpTopic(ui->tabRecording,                                            Qn::CameraSettings_Recording_Help);
-    setHelpTopic(ui->tabAdvancedSettings,                                     Qn::CameraSettings_Expert_Help);
+    setHelpTopic(this,                  Qn::CameraSettings_Multi_Help);
+    setHelpTopic(ui->tabRecording,      Qn::CameraSettings_Recording_Help);
 
 
     updateFromResources();
@@ -94,8 +94,8 @@ Qn::CameraSettingsTab QnMultipleCameraSettingsWidget::currentTab() const {
 
     if(tab == ui->tabRecording) {
         return Qn::RecordingSettingsTab;
-    } else if(tab == ui->tabAdvancedSettings) {
-        return Qn::AdvancedCameraSettingsTab;
+    } else if(tab == ui->expertTab) {
+        return Qn::ExpertCameraSettingsTab;
     } else {
         qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
         return Qn::GeneralSettingsTab;
@@ -111,11 +111,11 @@ void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
         break;
     case Qn::RecordingSettingsTab:
     case Qn::MotionSettingsTab:
-    case Qn::CameraPropertiesTab:
+    case Qn::AdvancedCameraSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabRecording);
         break;
-    case Qn::AdvancedCameraSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabAdvancedSettings);
+    case Qn::ExpertCameraSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->expertTab);
         break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
@@ -165,15 +165,8 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
         if (m_hasScheduleChanges)
             camera->setScheduleTasks(scheduleTasks);
-
-        Qn::SecondStreamQuality sQuality = ui->advancedSettingsWidget->secondaryStreamQuality();
-        if (sQuality != Qn::SSQualityNotDefined)
-            camera->setSecondaryStreamQuality(sQuality);
-        Qt::CheckState cs = ui->advancedSettingsWidget->getCameraControl();
-        if (cs != Qt::PartiallyChecked)
-            camera->setCameraControlDisabled(cs == Qt::Checked);
-
     }
+    ui->expertSettingsWidget->submitToResources(m_cameras);
 
     setHasDbChanges(false);
 }
@@ -205,7 +198,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->checkBoxEnableAudio->setEnabled(true);
     
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
-        ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, true);
+        ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, true);
         ui->analogGroupBox->setVisible(true);
 
         bool firstCamera = true;
@@ -219,7 +212,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             if (camera->isDtsBased()) {
                 ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
-        		ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, false);
+        		ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, false);
             }
 
             if (camera->isAnalog()) {
@@ -243,7 +236,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             firstCamera = false;
         }
 
-        ui->advancedSettingsWidget->updateFromResources(m_cameras);
+        ui->expertSettingsWidget->updateFromResources(m_cameras);
 
         bool isScheduleEqual = true;
         QList<QnScheduleTask::Data> scheduleTasksData;
