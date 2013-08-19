@@ -43,6 +43,13 @@
 			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>
 		<dependency>
+			<groupId>com.google</groupId>
+			<artifactId>protobuf</artifactId>
+			<version>${protobuf.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}-${compiler}</classifier>
+		</dependency>
+		<dependency>
 			<groupId>org</groupId>
 			<artifactId>onvif</artifactId>
 			<version>${onvif.version}</version>
@@ -56,6 +63,13 @@
 			<type>zip</type>
 			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>                               	
+		<dependency>
+			<groupId>net.sourceforge</groupId>
+			<artifactId>qjson</artifactId>
+			<version>${qjson.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}-${compiler}</classifier>
+		</dependency>
 	</dependencies>		
 
 	<build>
@@ -255,13 +269,6 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.google</groupId>
-					<artifactId>protobuf</artifactId>
-					<version>${protobuf.version}</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>                           
-				<dependency>
 					<groupId>org.openssl</groupId>
 					<artifactId>openssl</artifactId>
 					<version>${openssl.version}</version>
@@ -317,13 +324,6 @@
 					<type>zip</type>
 					<classifier>${platform}-${arch}</classifier>
 				</dependency>		
-				<dependency>
-					<groupId>net.sourceforge</groupId>
-					<artifactId>qjson</artifactId>
-					<version>0.8.1-SNAPSHOT</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>
 				<dependency>
 					<groupId>com.sourceforge.cloudcity</groupId>
 					<artifactId>bespin</artifactId>
@@ -408,6 +408,10 @@
 					<family>unix</family>
 					<name>linux</name>
 				</os>		
+				<property>
+					<name>build.type</name>
+					<value>native</value>
+				</property>
 			</activation>
 			<properties>
 				<compiler>gcc</compiler>
@@ -415,23 +419,9 @@
 			</properties>
 			<dependencies>
 				<dependency>
-					<groupId>com.google</groupId>
-					<artifactId>protobuf</artifactId>
-					<version>${protobuf.version}</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>                           
-				<dependency>
 					<groupId>org.openssl</groupId>
 					<artifactId>openssl</artifactId>
 					<version>${openssl.version}</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>
-				<dependency>
-					<groupId>net.sourceforge</groupId>
-					<artifactId>qjson</artifactId>
-					<version>0.7.1-SNAPSHOT</version>
 					<type>zip</type>
 					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>
@@ -543,6 +533,117 @@
 			</build>			
 		</profile>		
 
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+				</os>		
+				<property>
+					<name>build.type</name>
+					<value>cross</value>
+				</property>
+			</activation>
+			<properties>
+				<compiler>gcc</compiler>
+				<rename-skip>false</rename-skip>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.openssl</groupId>
+					<artifactId>openssl</artifactId>
+					<version>${openssl.version}</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>
+			</dependencies>
+			<build>	
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>rsync-buildenv</id>
+								<phase>initialize</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${environment.dir}/get_buildenv.sh</executable>
+									<workingDirectory>${environment.dir}</workingDirectory>		
+									<skip>${rsync.skip}</skip>
+								</configuration>
+							</execution>
+							<execution>
+								<id>prepare-deb</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.build.directory}/prepare-package.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+		    							<skip>${assembly-skip}</skip>
+								</configuration>
+							</execution>							
+						</executions>
+					</plugin>				
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>copy-platform-libs</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+								</configuration>
+							</execution>							
+						</executions>
+					</plugin>
+
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.7</version>
+						<executions>
+							<execution>
+								<id>generate-qt-project</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<failOnError>false</failOnError>
+									<target>							
+										<chmod file="${project.build.directory}/*.sh" perm="755"/>
+										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
+											<arg line="-a -u *.zip -x **/include/** *.a"/>
+										</exec>
+										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
+											<arg line="-a -u *.zip **/include/**"/>
+										</exec>
+										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
+											<arg line="-a -u *.zip *.a"/>
+										</exec>
+										<exec dir="${libdir}" executable="rm" failifexecutionfails="false">
+											<arg line="*.zip"/>
+										</exec>
+									</target>										
+								</configuration>
+							</execution>				
+						</executions>
+					</plugin>					
+				</plugins>	
+			</build>			
+		</profile>		
+
                 <profile>
                         <id>macosx</id>
                         <activation>
@@ -552,20 +653,6 @@
                         </activation>
 
 			<dependencies>
-				<dependency>
-					<groupId>com.google</groupId>
-					<artifactId>protobuf</artifactId>
-					<version>${protobuf.version}</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>
-	             		<dependency>
-				        <groupId>net.sourceforge</groupId>
-            				<artifactId>qjson</artifactId>
-		 			<version>0.8.1-SNAPSHOT</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}-qt502</classifier>
-				</dependency>
 				<dependency>
 					<groupId>com.sourceforge.cloudcity</groupId>
 					<artifactId>bespin</artifactId>

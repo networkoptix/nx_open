@@ -47,6 +47,7 @@
         <festival.version>2.1-SNAPSHOT</festival.version>
 
         <build.configuration>release</build.configuration>
+        <build.type>native</build.type>   <!-- native or cross -->
         <buildNumber>0</buildNumber>
         <customization>default</customization>
         <!--QT libs used--> 
@@ -176,6 +177,7 @@
             <properties>
                 <protobuf.version>2.5.0</protobuf.version>
                 <boost.version>1.54-SNAPSHOT</boost.version>
+                <qjson.version>0.8.1-SNAPSHOT</qjson.version>
 
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
@@ -217,6 +219,7 @@
             <properties>
                 <protobuf.version>2.4.1</protobuf.version>
                 <boost.version>1.52-SNAPSHOT</boost.version>
+                <qjson.version>0.7.1-SNAPSHOT</qjson.version>
 
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin</python.dir>				
@@ -237,7 +240,9 @@
             <properties>
                 <protobuf.version>2.5.0</protobuf.version>
                 <boost.version>1.54-SNAPSHOT</boost.version>
+                <qjson.version>0.8.1-SNAPSHOT</qjson.version>
 
+                <build.type>cross</build.type>
                 <compiler>2011.09</compiler>
             </properties>
         </profile>	
@@ -308,6 +313,7 @@
             <properties>
                 <boost.version>1.52-SNAPSHOT</boost.version>
                 <protobuf.version>2.5.0</protobuf.version>
+                <qjson.version>0.8.1-SNAPSHOT</qjson.version>
 
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin/</python.dir>				
