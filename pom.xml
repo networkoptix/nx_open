@@ -38,13 +38,14 @@
         <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/${build.configuration}/vox</ClientVoxSourceDir>		                                  	
         <unpack.skip>false</unpack.skip>
+
         <ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
         <dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
         <sigar.version>1.7-SNAPSHOT</sigar.version>
         <festival.version>2.1-SNAPSHOT</festival.version>
-        <boost.version>1.54-SNAPSHOT</boost.version>
+
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
         <customization>default</customization>
@@ -173,6 +174,9 @@
                 <module>wixsetup</module>
             </modules>
             <properties>
+                <protobuf.version>2.5.0</protobuf.version>
+                <boost.version>1.54-SNAPSHOT</boost.version>
+
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
                 <compiler>msvc2012u3</compiler>
@@ -210,13 +214,10 @@
                     <name>linux</name>
                 </os> 
             </activation>
-            <modules>
-                <!--<module>xvbadecoder</module>-->
-                <module>debsetup/client-deb</module>
-                <module>debsetup/mediaserver-deb</module>
-                <module>debsetup/appserver-deb</module>
-            </modules>
             <properties>
+                <protobuf.version>2.4.1</protobuf.version>
+                <boost.version>1.52-SNAPSHOT</boost.version>
+
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin</python.dir>				
                 <qt.dir>${env.QTDIR}</qt.dir>				
@@ -225,15 +226,41 @@
             </properties>
         </profile>	
         <profile>
+            <id>linux-arm</id>
+            <activation>
+		<activeByDefault>false</activeByDefault>
+                <property>
+                    <name>arch</name>
+                    <value>arm</value>
+                </property>
+            </activation>
+            <properties>
+                <protobuf.version>2.5.0</protobuf.version>
+                <boost.version>1.54-SNAPSHOT</boost.version>
+
+                <compiler>2011.09</compiler>
+            </properties>
+        </profile>	
+        <profile>
             <id>linux-x64</id>
             <activation>
                 <os>
                     <arch>amd64</arch>
                 </os> 
+                <property>
+                    <name>arch</name>
+                    <value>x64</value>
+                </property>
             </activation>
             <properties>
                 <arch>x64</arch>
             </properties>
+            <modules>
+                <!--<module>xvbadecoder</module>-->
+                <module>debsetup/client-deb</module>
+                <module>debsetup/mediaserver-deb</module>
+                <module>debsetup/appserver-deb</module>
+            </modules>
         </profile>
         <profile>
             <id>linux-x86</id>
@@ -241,16 +268,26 @@
                 <os>
                     <arch>i386</arch>
                     <!--<arch>i586</arch>
-					<arch>i686</arch>-->
-                </os> 
+		    <arch>i686</arch>-->
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
             </activation>
             <properties>
                 <arch>x86</arch>
             </properties>
+            <modules>
+                <!--<module>xvbadecoder</module>-->
+                <module>debsetup/client-deb</module>
+                <module>debsetup/mediaserver-deb</module>
+                <module>debsetup/appserver-deb</module>
+            </modules>
         </profile>	
         <profile>
             <id>android</id>
-            <activation>
+            <acivation>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -269,6 +306,9 @@
                 <module>ios-client</module>
             </modules>
             <properties>
+                <boost.version>1.52-SNAPSHOT</boost.version>
+                <protobuf.version>2.5.0</protobuf.version>
+
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin/</python.dir>				
                 <qt.dir/>
