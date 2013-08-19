@@ -33,7 +33,7 @@ protected:
 
 private:
     void fixButtonDownPositions(QGraphicsSceneMouseEvent *event) {
-        for (int i = 0x1; i <= 0x10; i <<= 1) {
+        for (uint i = 0x1; i <= 0x10; i <<= 1) {
             if((event->buttons() & i) || event->button() == i)
                 continue;
 

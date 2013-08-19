@@ -55,7 +55,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     m_channelRenderers.resize( channelCount );
     m_renderingEnabled.resize( channelCount, true );
 
-    for( int i = 0; (uint)i < channelCount; ++i )
+    for( int i = 0; i < channelCount; ++i )
     {
         if (m_channelRenderers[i].uploader == 0) {
             RenderingTools renderingTools;

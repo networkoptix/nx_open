@@ -241,6 +241,8 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             emit fileUpdated(message.filename);
             break;
         }
+    case Qn::Message_Type_RuntimeInfoChange:
+        break; //TODO: #ivigasin what means this message for the client?
     }
     // default-case is not used for a reason
 

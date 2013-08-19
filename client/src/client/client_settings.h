@@ -176,8 +176,8 @@ private:
     QN_END_PROPERTY_STORAGE()
 
 private:
-    QNetworkAccessManager *m_accessManager;
     QSettings *m_settings;
+    QNetworkAccessManager *m_accessManager;
     bool m_loading;
 };
 
