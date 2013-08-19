@@ -13,6 +13,8 @@
 #include <QtGui/QWheelEvent>
 #include <QtGui/QGraphicsLinearLayout>
 
+#include <camera/camera_thumbnail_manager.h>
+
 #include <client/client_settings.h>
 
 #include <common/common_meta_types.h>
@@ -42,6 +44,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -148,8 +151,9 @@ void QnResourceBrowserToolTipWidget::at_provider_imageChanged(const QImage &imag
 }
 
 
-/********** QnResourceBrowserWidget *********************/
-
+// -------------------------------------------------------------------------- //
+// QnResourceBrowserWidget
+// -------------------------------------------------------------------------- //
 QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
     QnWorkbenchContextAware(parent, context),
@@ -157,7 +161,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     m_ignoreFilterChanges(false),
     m_filterTimerId(0),
     m_tooltipWidget(NULL),
-    m_hoverProcessor(NULL)
+    m_hoverProcessor(NULL),
+    m_thumbnailManager(new QnCameraThumbnailManager(this))
 {
     ui->setupUi(this);
 
@@ -198,6 +203,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
 
+    connect(m_thumbnailManager,     SIGNAL(thumbnailReady(int,QPixmap)), this,              SLOT(at_thumbnailReady(int,QPixmap)));
+
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
     ui->searchTreeWidget->setWorkbench(workbench());
@@ -206,8 +213,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
-
-    connect(qnResPool,          SIGNAL(resourceRemoved(QnResourcePtr)),             this,   SLOT(at_resPool_resourceRemoved(QnResourcePtr)));
 
     /* Run handlers. */
     updateFilter();
@@ -304,7 +309,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
     if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
         manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: #Elric implement with action parameters
 
-    if(currentItemView() == ui->searchTreeWidget) {
+    if(currentTreeWidget() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
         manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
     } else {
@@ -323,10 +328,10 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
 
     /* Process tree-local actions. */
     if(action == m_renameAction)
-        currentItemView()->edit();
+        currentTreeWidget()->edit();
 }
 
-QnResourceTreeWidget *QnResourceBrowserWidget::currentItemView() const {
+QnResourceTreeWidget *QnResourceBrowserWidget::currentTreeWidget() const {
     if (ui->tabWidget->currentIndex() == ResourcesTab) {
         return ui->resourceTreeWidget;
     } else {
@@ -335,14 +340,14 @@ QnResourceTreeWidget *QnResourceBrowserWidget::currentItemView() const {
 }
 
 QItemSelectionModel *QnResourceBrowserWidget::currentSelectionModel() const {
-    return currentItemView()->selectionModel();
+    return currentTreeWidget()->selectionModel();
 }
 
 QModelIndex QnResourceBrowserWidget::itemIndexAt(const QPoint &pos) const {
-    QAbstractItemView *treeView = ui->resourceTreeWidget->treeView();
+    QAbstractItemView *treeView = currentTreeWidget()->treeView();
     if(!treeView->model())
         return QModelIndex();
-    QPoint childPos = treeView->mapFrom(const_cast<QnResourceBrowserWidget*>(this), pos);
+    QPoint childPos = treeView->mapFrom(const_cast<QnResourceBrowserWidget *>(this), pos);
     return treeView->indexAt(childPos);
 }
 
@@ -444,31 +449,7 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
             m_tooltipWidget->setResourceId(resource->getId());
-            ThumbnailData& data = m_thumbnailByResource[resource];
-            if (data.status == None) {
-                data.loadingHandle = loadThumbnailForResource(resource);
-                if (data.loadingHandle != 0)
-                    data.status = Loading;
-                else
-                    data.status = NoSignal;
-            }
-
-            switch (data.status) {
-            case None: //should never come here
-                break;
-            case Loading:
-                m_tooltipWidget->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
-                break;
-            case Loaded:
-                m_tooltipWidget->setPixmap(QPixmap::fromImage(data.thumbnail));
-                break;
-            case NoData:
-                m_tooltipWidget->setPixmap(qnSkin->pixmap("events/thumb_no_data.png"));
-                break;
-            case NoSignal:
-                m_tooltipWidget->setPixmap(qnSkin->pixmap("events/thumb_no_signal.png"));
-                break;
-            }
+            m_thumbnailManager->selectResource(resource);
         } else {
             m_tooltipWidget->setResourceId(0);
             m_tooltipWidget->setPixmap(QPixmap());
@@ -477,29 +458,6 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
         showToolTip();
     }
     return true;
-}
-
-int QnResourceBrowserWidget::loadThumbnailForResource(const QnResourcePtr &resource) {
-    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (!networkResource)
-        return 0;
-
-    QnMediaServerResourcePtr serverResource = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(resource->getParentId()));
-    if (!serverResource)
-        return 0;
-
-    QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
-    if (!serverConnection)
-        return 0;
-
-    return serverConnection->getThumbnailAsync(
-                resource.dynamicCast<QnNetworkResource>(),
-                -1,
-                QSize(0, 200),
-                QLatin1String("png"),
-                QnMediaServerConnection::IFrameAfterTime,
-                this,
-                SLOT(at_thumbnailReceived(int, const QImage&, int)));
 }
 
 void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
@@ -631,7 +589,7 @@ void QnResourceBrowserWidget::keyPressEvent(QKeyEvent *event) {
         if (ui->filterLineEdit->hasFocus())
             return;
 
-        QPoint pos = currentItemView()->selectionPos();
+        QPoint pos = currentTreeWidget()->selectionPos();
         if (pos.isNull())
             return;
         showContextMenuAt(display()->view()->mapToGlobal(pos));
@@ -708,7 +666,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged() {
     ui->filterLineEdit->setText(layoutFilter(layout));
 
     /* Bold state has changed. */
-    currentItemView()->update();
+    currentTreeWidget()->update();
 
     connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),               this,   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),             this,   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
@@ -721,12 +679,12 @@ void QnResourceBrowserWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
 
 void QnResourceBrowserWidget::at_layout_itemAdded(QnWorkbenchItem *) {
     /* Bold state has changed. */
-    currentItemView()->update();
+    currentTreeWidget()->update();
 }
 
 void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
     /* Bold state has changed. */
-    currentItemView()->update();
+    currentTreeWidget()->update();
 }
 
 void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
@@ -755,27 +713,10 @@ void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
     m_resourceModel->setUrlsShown(urlsShown);
 }
 
-void QnResourceBrowserWidget::at_thumbnailReceived(int status, const QImage &thumbnail, int handle) {
-    foreach (QnResourcePtr resource, m_thumbnailByResource.keys()) {
-        ThumbnailData &data = m_thumbnailByResource[resource];
-        if (data.loadingHandle != handle)
-            continue;
-
-        if (status == 0) {
-            data.thumbnail = thumbnail;
-            data.status = Loaded;
-        }
-        else {
-            data.status = NoData;
-        }
-        data.loadingHandle = 0;
-
-        if (m_tooltipWidget && m_tooltipWidget->resourceId() == resource->getId())
-            m_tooltipWidget->setPixmap(data.status == Loaded
-                                       ? QPixmap::fromImage(data.thumbnail)
-                                       : qnSkin->pixmap("events/thumb_no_data.png"));
-        break;
-    }
+void QnResourceBrowserWidget::at_thumbnailReady(int resourceId, const QPixmap &pixmap) {
+    if (m_tooltipWidget && m_tooltipWidget->resourceId() != resourceId)
+        return;
+    m_tooltipWidget->setPixmap(pixmap);
 }
 
 void QnResourceBrowserWidget::at_thumbnailClicked() {
@@ -787,6 +728,4 @@ void QnResourceBrowserWidget::at_thumbnailClicked() {
     menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resource));
 }
 
-void QnResourceBrowserWidget::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
-    m_thumbnailByResource.remove(resource);
-}
+

@@ -1,16 +1,19 @@
 #ifndef QN_IMAGE_BUTTON_WIDGET_H
 #define QN_IMAGE_BUTTON_WIDGET_H
 
+#include <boost/array.hpp>
+
 #include <QtGui/QPixmap>
-#include <QGLWidget>
 
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/graphics/items/generic/framed_widget.h>
 
 class QAction;
 class QMenu;
 class QIcon;
+class QGLWidget;
 
 class VariantAnimator;
 class QnTextureTransitionShaderProgram;
@@ -41,39 +44,33 @@ public:
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
     QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
-
     virtual ~QnImageButtonWidget();
 
     const QPixmap &pixmap(StateFlags flags) const;
-
     void setPixmap(StateFlags flags, const QPixmap &pixmap);
-
     void setIcon(const QIcon &icon);
 
-    StateFlags state() const { return m_state; }
-
     bool isCheckable() const { return m_checkable; }
+    Q_SLOT void setCheckable(bool checkable);
 
-    bool isChecked() const { return state() & CHECKED; }
-
+    StateFlags state() const { return m_state; }
     bool isHovered() const { return state() & HOVERED; }
-
-    bool isDisabled() const { return !isEnabled(); }
-
+    bool isChecked() const { return state() & CHECKED; }
     bool isPressed() const { return state() & PRESSED; }
+    bool isDisabled() const { return !isEnabled(); }
+    Q_SLOT void setChecked(bool checked = true);
+    Q_SLOT void setPressed(bool pressed = true);
+    Q_SLOT void setDisabled(bool disabled = true);
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     qreal animationSpeed() const;
-
     void setAnimationSpeed(qreal animationSpeed);
 
     void setDefaultAction(QAction *action);
-
     QAction *defaultAction() const;
 
     bool isCached() const;
-
     void setCached(bool cached);
 
     void setFixedSize(qreal size);
@@ -81,11 +78,7 @@ public:
     void setFixedSize(const QSizeF &size);
 
 public slots:
-    void setPressed(bool pressed = true);
-    void setCheckable(bool checkable);
-    void setChecked(bool checked);
-    void setDisabled(bool disabled = false);
-    inline void toggle() { setChecked(!isChecked()); }
+    void toggle() { setChecked(!isChecked()); }
     void click();
 
 signals:
@@ -93,6 +86,7 @@ signals:
     void toggled(bool checked);
     void pressed();
     void released();
+    void stateChanged();
 
 protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
@@ -118,19 +112,18 @@ protected:
 
     void ensurePixmapCache() const;
     void invalidatePixmapCache();
-    StateFlags displayState(StateFlags flags) const;
+    StateFlags validPixmapState(StateFlags flags) const;
 
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
     bool skipMenuEvent(QGraphicsSceneMouseEvent *event);
 
     void clickInternal(QGraphicsSceneMouseEvent *event);
 
-    void setBaseColor(const QColor &color);
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
-    QPixmap m_pixmaps[FLAGS_MAX + 1];
-    mutable QPixmap m_pixmapCache[FLAGS_MAX + 1];
+    boost::array<QPixmap, FLAGS_MAX + 1> m_pixmaps;
+    mutable boost::array<QPixmap, FLAGS_MAX + 1> m_pixmapCache;
     mutable bool m_pixmapCacheValid;
 
     StateFlags m_state;
@@ -159,11 +152,9 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)
  */
 class QnRotatingImageButtonWidget: public QnImageButtonWidget, public AnimationTimerListener {
     Q_OBJECT
-
     typedef QnImageButtonWidget base_type;
-
 public:
-    QnRotatingImageButtonWidget(QGraphicsItem *parent = NULL);
+    QnRotatingImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     qreal rotationSpeed() const {
         return m_rotationSpeed;
@@ -181,6 +172,45 @@ protected:
 private:
     qreal m_rotationSpeed;
     qreal m_rotation;
+};
+
+
+
+/**
+ * An image button widget that can show text and draw a frame.
+ */
+class QnTextButtonWidget: public Framed<QnImageButtonWidget> {
+    Q_OBJECT
+    typedef Framed<QnImageButtonWidget> base_type;
+public:
+    QnTextButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+
+    const QString &text() const;
+    void setText(const QString &text);
+
+    qreal relativeFontSize() const;
+    void setRelativeFontSize(qreal relativeFontSize);
+
+    qreal relativeFrameWidth() const;
+    void setRelativeFrameWidth(qreal relativeFrameWidth);
+
+    qreal stateOpacity(StateFlags stateFlags) const;
+    void setStateOpacity(StateFlags stateFlags, qreal opacity);
+
+    virtual void setGeometry(const QRectF &geometry) override;
+
+protected:
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
+
+protected:
+    StateFlags validOpacityState(StateFlags flags) const;
+
+private:
+    QString m_text;
+    qreal m_relativeFontSize;
+    qreal m_relativeFrameWidth;
+    boost::array<qreal, FLAGS_MAX + 1> m_opacities;
 };
 
 #endif // QN_IMAGE_BUTTON_WIDGET_H

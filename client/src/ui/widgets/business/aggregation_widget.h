@@ -18,6 +18,8 @@ public:
     Q_SLOT void setValue(int secs);
     int value() const;
 
+    void setShort(bool value);
+
 signals:
     void valueChanged();
 

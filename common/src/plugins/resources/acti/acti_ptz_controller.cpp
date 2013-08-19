@@ -98,6 +98,9 @@ void QnActiPtzController::init()
     m_capabilities |= Qn::ContinuousPanTiltCapability;
     m_capabilities |= Qn::ContinuousZoomCapability;
 
+    if(m_resource->getModel() == lit("KCM3311"))
+        m_capabilities &= ~Qn::ContinuousPanTiltCapability;
+
     qreal minPanLogical = -17500, maxPanLogical = 17500; // todo: move to camera XML
     qreal minPanPhysical = 360, maxPanPhysical = 0; // todo: move to camera XML
     qreal minTiltLogical = 0, maxTiltLogical = 9000; //  // todo: move to camera XML
@@ -279,7 +282,7 @@ int QnActiPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
     return 0;
 }
 
-Qn::CameraCapabilities QnActiPtzController::getCapabilities() {
+Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
     return m_capabilities;
 }
 

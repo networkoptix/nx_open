@@ -11,7 +11,7 @@
 
 
 QnAbstractPtzController::QnAbstractPtzController(QnResource* resource) {
-    m_resource = dynamic_cast<QnSecurityCamResource*>(resource);
+    m_resource = dynamic_cast<QnMediaResource*>(resource);
     if(!m_resource)
         qnWarning("Invalid non-camera resource '%1' provided to ptz controller.", resource ? resource->getName() : QLatin1String("NULL"));
 }
@@ -64,20 +64,20 @@ bool QnAbstractPtzController::calibrate(qreal xVelocityCoeff, qreal yVelocityCoe
 qreal QnAbstractPtzController::getXVelocityCoeff() const
 {
     QVariant val = 1.0;
-    m_resource->getParam(QLatin1String("xVelocityCoeff"), val, QnDomainDatabase);
+    m_resource->toResource()->getParam(QLatin1String("xVelocityCoeff"), val, QnDomainDatabase);
     return val.toFloat();
 }
 
 qreal QnAbstractPtzController::getYVelocityCoeff() const
 {
     QVariant val = 1.0;
-    m_resource->getParam(QLatin1String("yVelocityCoeff"), val, QnDomainDatabase);
+    m_resource->toResource()->getParam(QLatin1String("yVelocityCoeff"), val, QnDomainDatabase);
     return val.toFloat();
 }
 
 qreal QnAbstractPtzController::getZoomVelocityCoeff() const
 {
     QVariant val = 1.0;
-    m_resource->getParam(QLatin1String("zoomVelocityCoeff"), val, QnDomainDatabase);
+    m_resource->toResource()->getParam(QLatin1String("zoomVelocityCoeff"), val, QnDomainDatabase);
     return val.toFloat();
 }

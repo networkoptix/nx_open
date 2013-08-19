@@ -20,10 +20,7 @@
 QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
     m_updateLayouts(true)
-{
-    localServer = QnResourcePtr(new QnLocalMediaServerResource);
-    addResource(localServer);
-}
+{}
 
 QnResourcePool::~QnResourcePool()
 {
@@ -37,17 +34,17 @@ QnResourcePool::~QnResourcePool()
 
 //Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
-static QnResourcePool* resourcePool = NULL;
+static QnResourcePool* resourcePool_instance = NULL;
 
 void QnResourcePool::initStaticInstance( QnResourcePool* inst )
 {
-    resourcePool = inst;
+    resourcePool_instance = inst;
 }
 
 QnResourcePool* QnResourcePool::instance()
 {
     //return globalResourcePool();
-    return resourcePool;
+    return resourcePool_instance;
 }
 
 bool QnResourcePool::isLayoutsUpdated() const {
@@ -77,14 +74,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         if(resource->resourcePool() != NULL)
             qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
             
-
-        // if resources are local assign localserver as parent
-        if (!resource->getParentId().isValid())
-        {
-            if (resource->hasFlags(QnResource::local))
-                resource->setParentId(localServer->getId());
-        }
-
         if (!resource->getId().isValid())
         {
             // must be just found local resource; => shold not be in the pool already
@@ -185,9 +174,6 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, resources)
     {
         if (!resource)
-            continue;
-
-        if (resource == localServer) // special case
             continue;
 
         if(resource->resourcePool() != this)
@@ -460,7 +446,7 @@ QStringList QnResourcePool::allTags() const
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources.values())
-        result << resource->tagList();
+        result << resource->getTags();
 
     return result;
 }
@@ -494,7 +480,6 @@ void QnResourcePool::clear()
 {
     QMutexLocker lk( &m_resourcesMtx );
 
-    localServer.clear();
     m_resources.clear();
     m_foreignResources.clear();
 }

@@ -6,11 +6,11 @@
 static const int POSTPONE_FILES_INTERVAL = 1000*60;
 static const int SPACE_CLEARANCE_INTERVAL = 15 * 1000;
 
-Q_GLOBAL_STATIC (QnFileDeletor, inst);
+Q_GLOBAL_STATIC (QnFileDeletor, QnFileDeletor_inst);
 
 QnFileDeletor* QnFileDeletor::instance()
 {
-    return inst();
+    return QnFileDeletor_inst();
 }
 
 QnFileDeletor::QnFileDeletor()

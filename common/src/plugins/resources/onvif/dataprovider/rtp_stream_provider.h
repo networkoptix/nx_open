@@ -5,7 +5,7 @@
 #include "utils/network/multicodec_rtp_reader.h"
 
 
-class QnRtpStreamReader: public CLServerPushStreamreader
+class QnRtpStreamReader: public CLServerPushStreamReader
 {
 public:
     QnRtpStreamReader(QnResourcePtr res, const QString& request = QString());
@@ -17,7 +17,7 @@ protected:
     
 
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual void openStream() override;
+    virtual CameraDiagnostics::Result openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 

@@ -54,6 +54,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
             break;
         }
         break;
+    case Qn::DisplayHtmlRole:
     case Qt::DisplayRole:
         switch (column) {
             case RecordingColumn: {

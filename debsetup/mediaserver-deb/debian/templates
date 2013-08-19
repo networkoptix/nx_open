@@ -1,12 +1,12 @@
 
 Template: ${deb.customization.company.name}-mediaserver/ecsHost
 Type: string
-Default: localhost
+Default:
 Description: Enterprise Controller host:
 
 Template: ${deb.customization.company.name}-mediaserver/ecsPort
 Type: string
-Default: 7001
+Default:
 Description: Enterprise Controller port:
 
 Template: ${deb.customization.company.name}-mediaserver/ecsPort_invalid
@@ -15,7 +15,7 @@ Description: Enterprise Controller port is invalid. Please try again.
 
 Template: ${deb.customization.company.name}-mediaserver/ecsLogin
 Type: string
-Default: admin
+Default:
 Description: Enterprise Controller login:
 
 Template: ${deb.customization.company.name}-mediaserver/ecsPassword
@@ -29,7 +29,7 @@ Description: Enterprise Controller can't be empty
 
 Template: ${deb.customization.company.name}-mediaserver/port
 Type: string
-Default: 7002
+Default:
 Description: Media Server port:
 
 Template: ${deb.customization.company.name}-mediaserver/port_invalid

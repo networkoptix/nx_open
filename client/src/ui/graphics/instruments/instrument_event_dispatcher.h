@@ -135,8 +135,8 @@ protected:
     /** Current dispatch depth. */
     int m_dispatchDepth;
 
-    /** Set of all registered targets. */
-    QSet<T *> m_targets;
+    /** Mapping from target to its runtime type. */
+    QHash<T *, const std::type_info *> m_typeInfoByTarget;
 
     /** List of all installed instruments, in installation order. */
     QList<Instrument *> m_instruments;
@@ -144,7 +144,7 @@ protected:
     /** Set of all functional instrument-target pairs. */
     QSet<QPair<Instrument *, T*> > m_instrumentTargets;
 
-    /** Target to instruments mapping. */
+    /** Main dispatch structure. Mapping from target-event pair to list of associated instruments. */
     QHash<QPair<T *, QEvent::Type>, TargetData> m_dataByTarget;
 };
 

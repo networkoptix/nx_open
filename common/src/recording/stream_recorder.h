@@ -16,6 +16,7 @@ extern "C"
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/dewarping_params.h>
 #include "utils/color_space/image_correction.h"
 
 class QnAbstractMediaStreamDataProvider;
@@ -88,6 +89,8 @@ public:
     void setOnScreenDateOffset(qint64 timeOffsetMs);
 
     void setContrastParams(const ImageCorrectionParams& params);
+
+    void setDewarpingParams(const DewarpingParams& params);
 
     /*
     * Server time zone. Used for export to avi/mkv files
@@ -180,6 +183,7 @@ private:
     qint64 m_truncateIntervalEps;
     QRectF m_srcRect;
     ImageCorrectionParams m_contrastParams;
+    DewarpingParams m_dewarpingParams;
 };
 
 #endif // _STREAM_RECORDER_H__

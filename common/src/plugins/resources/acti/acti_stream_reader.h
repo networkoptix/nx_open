@@ -5,7 +5,7 @@
 #include "utils/network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 
-class QnActiStreamReader: public CLServerPushStreamreader
+class QnActiStreamReader: public CLServerPushStreamReader
 {
 public:
     QnActiStreamReader(QnResourcePtr res);
@@ -14,7 +14,7 @@ public:
     const QnResourceAudioLayout* getDPAudioLayout() const;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual void openStream() override;
+    virtual CameraDiagnostics::Result openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 

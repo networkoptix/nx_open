@@ -49,7 +49,7 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping) override;
-    virtual bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
     void setChunks(const QnTimePeriodList& chunks);
     QnPhysicalCameraResourcePtr getOtherResource(int channel);
 private slots:
@@ -58,11 +58,15 @@ private:
     qint64 m_startTime;
     qint64 m_endTime;
     QnVMax480ChunkReader* m_chunkReader;
+    QString m_chunkReaderKey;
     QnTimePeriodList m_chunks;
     
     QMutex m_mutexChunks;
     //QWaitCondition m_chunksCond;
     bool m_chunksReady;
+
+    static QMutex m_chunkReaderMutex;
+    static QMap<QString, QnVMax480ChunkReader*> m_chunkReaderMap;
 };
 
 typedef QnSharedResourcePointer<QnPlVmax480Resource> QnPlVmax480ResourcePtr;

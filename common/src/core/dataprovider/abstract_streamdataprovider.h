@@ -64,9 +64,10 @@ signals:
 protected:
     virtual void putData(QnAbstractDataPacketPtr data);
     void beforeDisconnectFromResource();
+
 protected:
-    QList<QnAbstractDataConsumer*> m_dataprocessors;
     mutable QMutex m_mutex;
+    QList<QnAbstractDataConsumer*> m_dataprocessors;
     QHash<QByteArray, QVariant> m_streamParam;
     QnResource::ConnectionRole m_role;
 };

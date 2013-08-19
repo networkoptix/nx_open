@@ -25,7 +25,7 @@ namespace SystemError
     QString toString( ErrorCode errorCode )
     {
 #ifdef _WIN32
-        char msgBuf[1024];
+        wchar_t msgBuf[1024];
         memset( msgBuf, 0, sizeof(msgBuf) );
 
         FormatMessage(
@@ -37,18 +37,18 @@ namespace SystemError
             sizeof(msgBuf),
             NULL );
         
-        size_t msgLen = strlen( msgBuf );
+        size_t msgLen = wcslen( msgBuf );
         if( msgLen > 0 )
         {
             for( size_t i = msgLen; i > 0; --i )
             {
-                if( (msgBuf[i-1] == '\n') || (msgBuf[i-1] == '\r') )
-                    msgBuf[i-1] = 0;
+                if( (msgBuf[i-1] == L'\n') || (msgBuf[i-1] == L'\r') )
+                    msgBuf[i-1] = L' ';
                 else
                     break;
             }
         }
-        return QString::fromAscii( msgBuf );
+        return QString::fromUtf16( msgBuf );
 #else
         return QString::fromAscii( strerror( errorCode ) );
 #endif

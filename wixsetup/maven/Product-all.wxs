@@ -6,41 +6,16 @@
     <Product Id="*" Name="${product.name}" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
         <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
-        <?define arch = "${arch}"?>
-        <?define vmax = "${vmax}"?>
-
         <?include ControlPanel.wxi ?>
+        <?include BuildVars.wxi ?>
+
+        <Property Id="REINSTALLMODE" Value="amus"/>
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
-
-        <?if $(var.arch) = x86?>
-        <?define ProgramFilesFolder = "ProgramFilesFolder"?>
-        <?define SystemFolderActual = "SystemFolder"?>
-        <?else?>
-        <?define ProgramFilesFolder = "ProgramFiles64Folder"?>
-        <?define SystemFolderActual = "System64Folder"?>
-        <?endif?>
-
-        <!-- Wix Variables -->
-
-        <?ifdef env.CommonProgramFiles(x86) ?>
-        <?define commonProgramFiles = "c:\Program Files (x86)\Common Files\" ?>
-        <?else?>
-        <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
-        <?endif?>
-
-        <?if ${build.configuration} = debug ?>
-        <?define suffix = "d" ?>
-		<?define vmaxsuffix = "dd" ?>
-        <?else?>
-        <?define suffix = "" ?>
-		<?define vmaxsuffix = "r" ?>
-        <?endif?>
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
-        <?define VmsRepairing=" (REINSTALLMODE) " ?>
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
         <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
@@ -53,8 +28,8 @@
 
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
-        <SetProperty Id="APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
 
+        <SetProperty Id="AppserverDbDir" Value="[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db" After="CostInitialize">1</SetProperty>
         <SetProperty Id="APPSERVER_GUID" Value="[APPSERVER_GUID32]" After="AppSearch">
             <![CDATA[ APPSERVER_GUID = "" ]]>
         </SetProperty>
@@ -131,7 +106,8 @@
 
         <Property Id="MEDIASERVER_REGISTRY_PATH" Value="Software\${company.name}\${mediaserver.name}"/>
 
-        <Property Id="REMOVE_DATABASE" Secure="yes"/>
+        <Property Id="REMOVE_DATABASE" Secure="yes" Value="0"/>
+        <Property Id="VERSION_TO_RESTORE" Secure="yes" Value="Current"/>
 
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
@@ -355,7 +331,10 @@
         <CustomAction Id="CopyAppServerNotificationFiles" BinaryKey="CustomActions.dll" DllEntry="CopyAppServerNotificationFiles" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
+        <CustomAction Id="BackupDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="BackupDatabaseFile" Execute="deferred" Impersonate="no"/>
+        <CustomAction Id="RestoreDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="RestoreDatabaseFile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
+        <CustomAction Id="PopulateRestoreVersions" BinaryKey="CustomActions.dll" DllEntry="PopulateRestoreVersions" Execute="immediate" Impersonate="no"/>
 
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
 
@@ -386,7 +365,7 @@
         <CustomAction Id="SetClientFolderToRegistry" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
 
         <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
-                      Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate" Impersonate="yes"/>
+                      Value="&quot;[#dbconfig.exe]&quot; &quot;setpw&quot; &quot;[APPSERVER_LOGIN]&quot; &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="InitDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
 
@@ -395,12 +374,17 @@
         <CustomAction Id="SyncDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
 
+        <CustomAction Id="SaveLastDatabaseVersion_Cmd" Property="SaveLastDatabaseVersion"
+                      Value="&quot;[#dbconfig.exe]&quot; &quot;swversion&quot; &quot;save&quot;" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="SaveLastDatabaseVersion" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="check" Impersonate="no" />
+
         <CustomAction Id="CopyAppServerProfile_Cmd" Property="CopyAppServerProfile" Execute="immediate" Impersonate="yes"
             Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller;[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller"/>
 
         <CustomAction Id="CopyAppServerNotificationFiles_Cmd" Property="CopyAppServerNotificationFiles" Execute="immediate" Impersonate="yes"
             Value="[${installer.customization}AppServerDir]hostedfiles\notifications;[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles\notifications"/>
-        
+
         <CustomAction Id="CopyMediaServerProfile_Cmd" Property="CopyMediaServerProfile" Execute="immediate" Impersonate="yes"
             Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server;[System64Folder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server"/>
 
@@ -419,6 +403,10 @@
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
+        <CustomAction Id="BackupDatabaseFile_Cmd" Property="BackupDatabaseFile" Execute="immediate" Impersonate="yes"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;Software\${company.name}\${appserver.name};lastDbVersion"/>
+        <CustomAction Id="RestoreDatabaseFile_Cmd" Property="RestoreDatabaseFile" Execute="immediate" Impersonate="yes"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;[VERSION_TO_RESTORE]"/>
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db"/>
 
@@ -435,7 +423,7 @@
             DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
             MigrateFeatures="yes" />
 
-<!--        <Upgrade Id="${customization.clientUpgradeCode}">
+        <!--        <Upgrade Id="${customization.clientUpgradeCode}">
             <UpgradeVersion OnlyDetect='yes' Property='NEWERCLIENTINSTALLED' Minimum='${release.version}.${buildNumber}' IncludeMinimum='no' />
         </Upgrade> -->
 
@@ -471,6 +459,7 @@
             <Custom Action="FixClientFolder" After="SetClientFolderToRegistry">1</Custom>
             <Custom Action="IsClientFolderExists" After="FixClientFolder">1</Custom>
             <Custom Action="SetClientFolderToDefault" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
+            <Custom Action="PopulateRestoreVersions" After="SetAppserverDbDir">1</Custom>
 
         </InstallUISequence>
 
@@ -507,7 +496,7 @@
                 <![CDATA[ (INSTALL_ECS OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyAppServerNotificationFiles" After="CopyAppServerNotificationFiles_Cmd">
                 <![CDATA[ (INSTALL_ECS OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-            
+
             <Custom Action="CopyMediaServerProfile_Cmd" After="CopyAppServerNotificationFiles">
                 <![CDATA[ (INSTALL_SERVER OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyMediaServerProfile" After="CopyMediaServerProfile_Cmd">
@@ -518,20 +507,28 @@
             <Custom Action="CertGenAction" After="CertGenAction_Cmd">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="SyncDatabaseAction_Cmd" After="CopyAppServerProfile">
+            <Custom Action="SaveLastDatabaseVersion_Cmd" After="CertGenAction"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SaveLastDatabaseVersion" After="SaveLastDatabaseVersion_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="BackupDatabaseFile_Cmd" After="SaveLastDatabaseVersion"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="SyncDatabaseAction_Cmd" After="BackupDatabaseFile">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction">
-                <![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) ]]>
+                <![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) AND APPSERVER_PASSWORD <> "" ]]>
             </Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd">
-                <![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) ]]>
+                <![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) AND APPSERVER_PASSWORD <> "" ]]>
             </Custom>
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
+            <Custom Action="RestoreDatabaseFile_Cmd" After="StopServices"><![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
+            <Custom Action="RestoreDatabaseFile" After="RestoreDatabaseFile_Cmd"><![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
 
             <Custom Action="LaunchTrayTool" After="InstallFinalize">
                 <![CDATA[ (!AppServerFeature=3 OR INSTALL_ECS OR !ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
@@ -561,8 +558,12 @@
             <Directory Id="CLIENT_DIRECTORY" Name="Client Media">
                 <Component Id="ClientDirectoryComponent" Permanent="yes">
                     <CreateFolder Directory="CLIENT_DIRECTORY"/>
-                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\${client.name}' Type='string' Value='' KeyPath='yes' />
+                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\${client.name} Media' Type='string' Value='' KeyPath='yes' />
                 </Component>
+            </Directory>
+
+            <Directory Id="MyPicturesFolder">
+                <Directory Id="${installer.customization}BgDir" Name="${product.name} Backgrounds"/>
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">
@@ -607,17 +608,6 @@
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
-                                </RegistryKey>
-                            </Component>
-
-                            <Component Id="AppServerConfigurationPassword" Permanent="yes">
-                                <Condition>
-                                    NOT PREVIOUSVERSIONSINSTALLED
-                                </Condition>
-
-                                <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\Enterprise Controller">
-                                    <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
                                 </RegistryKey>
                             </Component>
                         </Directory>
@@ -667,6 +657,9 @@
                         </Directory>
 
                         <Directory Id="${installer.customization}MediaServerDir" Name="MediaServer">
+                            <Directory Id="ServerImageFormats" Name="imageformats">
+                            </Directory>
+
                             <Component Id="ServerExecutable">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="${libdir}/bin/${build.configuration}/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
@@ -706,7 +699,7 @@
 
                             <Directory Id="ServerSqlDrivers" Name="sqldrivers">
                                 <Component Id="ServerSqlDrivers">
-                                    <File Id="qsqlite$(var.suffix)4.dll" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\sqldrivers\qsqlite$(var.suffix)4.dll" />
+                                    <File Id="qsqlite$(var.suffix)4.dll" Name="qsqlite4.dll" Source="${libdir}/bin/${build.configuration}\sqldrivers\qsqlite$(var.suffix)4.dll" />
                                 </Component>
                             </Directory>
 
@@ -734,129 +727,6 @@
                                 </Component>
                             </Directory>
 
-                        </Directory>
-
-                        <Directory Id="${installer.customization}ClientDir" Name="Client">
-                            <Directory Id="${installer.customization}HelpDir" Name="help"/>                         
-
-                            <Directory Id="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}">
-
-                                <Component Id="AppLauncherExecutable">
-                                    <File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="${libdir}/bin/${build.configuration}/applauncher.exe" KeyPath="yes">
-                                        <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
-                                              WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
-                                        </Shortcut>
-                                    </File>
-
-                                    <!--<ServiceInstall Id="${installer.customization}AppLauncherService"
-                                                Name="${installer.customization}AppLauncher"
-                                                DisplayName="${applauncher.name}"
-                                                Type="ownProcess"
-                                                Start="auto"
-                                                ErrorControl="normal"
-                                                Description="${applauncher.name}">
-                                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
-                                </ServiceInstall>                               
-                                
-                                <ServiceControl Id="Start${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Start="install" Wait="no" />
-                                <ServiceControl Id="Stop${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Stop="both" Wait="yes" Remove="uninstall" />   -->
-                                </Component>
-
-                                <Component Id="AppLauncherConfiguration" Permanent="yes">
-                                    <!--<Condition>
-                                        NOT PREVIOUSVERSIONSINSTALLED
-                                    </Condition> -->
-
-                                    <RegistryKey Root="HKCU"
-                                                 Key="Software\[Manufacturer]\${applauncher.name}">
-                                        <RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
-                                    </RegistryKey>
-                                </Component>                                
-
-                                <Component Id="clientShortcutDesktop">
-                                    <Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
-
-                                    <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${applauncher.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
-
-                                    <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-                                          WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
-                                    </Shortcut>
-                                </Component>                            
-
-                                <Directory Id="styles" Name="styles">
-                                    <Component Id="bespin">
-                                        <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
-                                    </Component>
-                                </Directory>
-
-                                <Directory Id="ImageFormats" Name="imageformats">
-                                </Directory>    
-
-                                <Directory Id="${installer.customization}VoxDir" Name="vox"/>                                
-
-                                <Component Id="ClientExecutable">
-                                    <File Id="client.exe" Name="${product.name}.exe" Source="${libdir}/bin/${build.configuration}/client.exe" KeyPath="yes">
-                                        <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
-                                    </File>
-                                </Component>                                
-
-                                <Component Id="ClientConfiguration" Permanent="yes">
-                                    <Condition>
-                                        NOT PREVIOUSVERSIONSINSTALLED
-                                    </Condition>
-
-                                    <RegistryKey Root="HKCU"
-                                                 Key="Software\[Manufacturer]\${client.name}">
-                                        <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
-                                        <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
-                                        <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
-                                        <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
-                                        <RegistryValue Type="string" Name="mediaRoot" Value="[CLIENT_DIRECTORY]"/>
-                                    </RegistryKey>
-                                </Component>
-
-                                <Component Id="ClientQjson">
-                                    <File Id="ClientQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
-                                </Component>                            
-
-                                <Component Id="ClientSigar">
-                                    <File Id="ClientSigar.dll" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
-                                </Component>
-
-                                <Component Id="ClientQtColorPicker">
-                                    <File Id="ColorPicker26$(var.suffix).dll" Name="QtSolutions_ColorPicker-2.6$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
-                                </Component>
-
-                                <Component Id="ClientVsRedistributable">
-                                    <File Id="VcRedistexe" Name="vcredist_${arch}.exe" Source="${libdir}/bin/${build.configuration}\vcredist_${arch}.exe"/>
-                                </Component>
-                            </Directory>    
-
-                            <Directory Id="${installer.customization}_1_4_Dir" Name="1.4">
-
-                                <Directory Id="styles_1_4" Name="styles">
-                                    <Component Id="bespin_1_4">
-                                        <File Id="bespin$(var.suffix).dll_1_4" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
-                                    </Component>
-                                </Directory>
-
-                                <Directory Id="ImageFormats_1_4" Name="imageformats">
-                                </Directory>                            
-
-                                <Component Id="ClientExecutable_1_4">
-                                    <File Id="client.exe_1_4" Name="${product.name}.exe" Source="${project.build.directory}/1.4/bin/client.exe" KeyPath="yes">
-                                        <fire:FirewallException Id="FirewallExceptionClient_1_4" Name="${product.name} 1.4" Scope="any" IgnoreFailure="yes"/>
-                                    </File>
-                                </Component>
-
-                                <Component Id="ClientSigar_1_4">
-                                    <File Id="ClientSigar.dll_1_4" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
-                                </Component>
-
-                                <Component Id="ClientQtColorPicker_1_4">
-                                    <File Id="ColorPicker26$(var.suffix).dll_1_4" Name="QtSolutions_ColorPicker-2.6$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
-                                </Component>
-                            </Directory>                            
                         </Directory>
                     </Directory>
                 </Directory>
@@ -896,7 +766,7 @@
                 <File Id="TrayToolssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
             </Component>
         </ComponentGroup>
-        
+
         <ComponentGroup Id="ProxyQTLibraries" Directory="${installer.customization}ProxyServerDir">
             <Component>
                 <File Id="ProxyQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
@@ -969,96 +839,24 @@
             </Component>
         </ComponentGroup>
 
+        <ComponentGroup Id="ServerImageFormats" Directory="ServerImageFormats">
+            <Component>
+                <File Id="Serverqgif$(var.suffix)4.dll" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="Serverqjpeg$(var.suffix)4.dll" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
+            </Component>
+            <Component>
+                <File Id="Serverqtiff$(var.suffix)4.dll" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
+            </Component>
+        </ComponentGroup>
+
         <ComponentGroup Id="ServerOpenSSL" Directory="${installer.customization}MediaServerDir">
             <Component>
                 <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
             </Component>
             <Component>
                 <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
-            </Component>
-        </ComponentGroup>
-
-        <ComponentGroup Id="ClientFFmpegLibraries" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
-            <Component>
-                <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientAvdeviceDll" Name="avdevice-53.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientAvfilterDll" Name="avfilter-2.dll" Source="${libdir}/bin/${build.configuration}/avfilter-2.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientAvformatDll" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientOggDll" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientX264" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
-            </Component>
-        </ComponentGroup>
-
-        <ComponentGroup Id="ClientQuickSync" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
-            <Component>
-                <File Id="ClientQuickSyncDll" Name="quicksyncdecoder1.dll" Source="${libdir}/bin/${build.configuration}/quicksyncdecoder1.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="${libdir}/bin/${build.configuration}/hw_decoding_conf.xml"/>                               
-            </Component>
-        </ComponentGroup>                            
-
-        <ComponentGroup Id="ClientQTLibraries" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
-            <Component>
-                <File Id="ClientQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="ClientQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="ClientQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="ClientQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="ClientQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtOpenGL$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="ClientQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
-            </Component>
-        </ComponentGroup>
-
-        <ComponentGroup Id="ClientOpenAL" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
-            <Component>
-                <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
-            </Component>
-            <Component>
-                <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="${libdir}/bin/${build.configuration}\wrap_oal.dll"/>
-            </Component>
-        </ComponentGroup>
-
-        <ComponentGroup Id="ClientOpenSSL" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
-            <Component>
-                <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
-            </Component>
-            <Component>
-                <File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
             </Component>
         </ComponentGroup>
 
@@ -1073,118 +871,12 @@
 
         <ComponentGroup Id="VmaxProxySDK" Directory="${installer.customization}VmaxDir">
             <Component>
-            	<File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll"/>
+                <File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll"/>
             </Component>
             <Component>
                 <File Id="VmaxProxyPid.dat" Name="pid.dat" Source="${libdir}/bin/${build.configuration}/vmaxproxy/pid.dat"/>
             </Component>
         </ComponentGroup>                            
-
-        <ComponentGroup Id="ClientFFmpegLibraries_1_4" Directory="${installer.customization}_1_4_Dir">
-            <Component>
-                <File Id="ClientAvcodecDll_1_4" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientAvdeviceDll_1_4" Name="avdevice-53.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientAvfilterDll_1_4" Name="avfilter-2.dll" Source="${libdir}/bin/${build.configuration}/avfilter-2.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientAvformatDll_1_4" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientAvutilDll_1_4" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientSwscaleDll_1_4" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientOggDll_1_4" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientVorbisDll_1_4" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientMp3lameDll_1_4" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientVorbisEncDll_1_4" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientX264_1_4" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
-            </Component>
-        </ComponentGroup>                            
-
-        <ComponentGroup Id="ClientQTLibraries_1_4" Directory="${installer.customization}_1_4_Dir">
-            <Component>
-                <File Id="ClientQtCore$(var.suffix)4.dll_1_4" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="ClientQtGui$(var.suffix)4.dll_1_4" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="ClientQtMultimedia$(var.suffix)4.dll_1_4" Name="QtMultimedia$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="ClientQtNetwork$(var.suffix)4.dll_1_4" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="ClientQtOpenGL$(var.suffix)4.dll_1_4" Name="QtOpenGL$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtOpenGL$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="ClientQtXml$(var.suffix)4.dll_1_4" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
-            </Component>
-        </ComponentGroup>
-
-        <ComponentGroup Id="ClientOpenAL_1_4" Directory="${installer.customization}_1_4_Dir">
-            <Component>
-                <File Id="OpenAL32.dll_1_4" Name="OpenAL32.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
-            </Component>
-            <Component>
-                <File Id="wrap_oal.dll_1_4" Name="wrap_oal.dll" Source="${libdir}/bin/${build.configuration}\wrap_oal.dll"/>
-            </Component>
-        </ComponentGroup>
-
-        <ComponentGroup Id="ClientOpenSSL_1_4" Directory="${installer.customization}_1_4_Dir">
-            <Component>
-                <File Id="Clientlibeay32.dll_1_4" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
-            </Component>
-            <Component>
-                <File Id="Clientssleay32.dll_1_4" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
-            </Component>
-        </ComponentGroup>                        
-        
-        <ComponentGroup Id="ImageFormats" Directory="ImageFormats">
-            <Component>
-                <File Id="qgif$(var.suffix)4.dll" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="qjpeg$(var.suffix)4.dll" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="qtiff$(var.suffix)4.dll" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
-            </Component>
-        </ComponentGroup>
-        
-        <ComponentGroup Id="ImageFormats_1_4" Directory="ImageFormats_1_4">
-            <Component>
-                <File Id="qgif4.dll_1_4" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="qjpeg4.dll_1_4" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
-            </Component>
-            <Component>
-                <File Id="qtiff4.dll_1_4" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
-            </Component>
-        </ComponentGroup>
-
-        <?if $(var.arch) = x86 ?>
-        <?define archSuffix = "x86" ?>
-        <?else?>
-        <?define archSuffix = "x86_x64" ?>
-        <?endif?>
-
 
         <DirectoryRef Id="TARGETDIR">
             <Merge Id="VCRedist1" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC90_CRT_$(var.archSuffix).msm" DiskId="1" Language="0"/>
@@ -1212,7 +904,6 @@
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="ecs.log" />           
             <ComponentRef Id="AppServerConfiguration"/>
-            <ComponentRef Id="AppServerConfigurationPassword"/>
             <ComponentRef Id="AppServerConfigurationGuid"/>
 
             <ComponentRef Id="ProxyExecutable" />
@@ -1249,6 +940,7 @@
             <ComponentRef Id="ServerRtspPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
+            <ComponentGroupRef Id="ServerImageFormats"/>
             <ComponentRef Id="ServerSigar"/>
             <ComponentRef Id="ServerQjson"/>
             <ComponentRef Id="sysfomediaservercomponent"/>
@@ -1260,43 +952,7 @@
             <?endif?>       
         </Feature>
 
-        <Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
-                 ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
-            <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ClientFeature <> 3 ]]> </Condition>-->
-
-            <ComponentRef Id="NovFileAssociation"/>
-
-            <ComponentRef Id="AppLauncherExecutable" />
-            <ComponentRef Id="AppLauncherConfiguration" />          
-            <ComponentRef Id="ClientExecutable" />
-            <ComponentRef Id="clientShortcutDesktop"/>
-            <ComponentGroupRef Id="ClientHelpComponent"/>
-            <ComponentGroupRef Id="ClientVoxComponent"/>
-            <ComponentRef Id="ClientConfiguration" />
-            <ComponentGroupRef Id="ClientQuickSync"/>
-            <ComponentGroupRef Id="ClientFFmpegLibraries"/>
-            <ComponentGroupRef Id="ClientQTLibraries" />
-            <ComponentGroupRef Id="ImageFormats" />
-            <ComponentGroupRef Id="ClientOpenAL" />
-            <ComponentGroupRef Id="ClientOpenSSL" />
-            <ComponentRef Id="ClientSigar"/>    
-            <ComponentRef Id="ClientQjson"/>            
-            <ComponentRef Id="ClientQtColorPicker"/>
-            <ComponentRef Id="ClientVsRedistributable"/>
-            <ComponentRef Id="bespin" />
-
-            <ComponentRef Id="ClientExecutable_1_4" />          
-            <ComponentGroupRef Id="ClientFFmpegLibraries_1_4"/>
-            <ComponentGroupRef Id="ClientQTLibraries_1_4" />
-            <ComponentGroupRef Id="ImageFormats_1_4" />
-            <ComponentGroupRef Id="ClientOpenAL_1_4" />
-            <ComponentGroupRef Id="ClientOpenSSL_1_4" />
-            <ComponentRef Id="ClientSigar_1_4"/>            
-            <ComponentRef Id="ClientQtColorPicker_1_4"/>
-            <ComponentRef Id="bespin_1_4" />            
-
-            <ComponentRef Id='ClientDirectoryComponent'/>
-        </Feature>
+        <FeatureRef Id="ClientFeature"/>
 
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
         <Property Id="WIXUI_CLIENT_DIRECTORY" Value="CLIENT_DIRECTORY"/>
@@ -1454,14 +1110,14 @@
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="AppServerDlg">
                 <![CDATA[ $(var.Changing_E1) ]]>
             </Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">
-                <![CDATA[ $(var.Remove_E1) ]]>
-            </Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">
                 <![CDATA[ $(var.Changing_E0S1) ]]>
             </Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="ClientDlg">
                 <![CDATA[ $(var.Changing_E0S0C1) ]]>
+            </Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">
+                <![CDATA[ $(var.ChangingNothing) AND $(var.Remove_E1) ]]>
             </Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">
                 <![CDATA[ $(var.ChangingNothing) AND NOT $(var.Remove_E1) ]]>
@@ -1624,8 +1280,11 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2">
                 <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid) AND $(var.Inst_C1) ]]>
             </Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg" Order="2">
+                <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND $(var.Inst_C0) AND $(var.Remove_E1) ]]>
+            </Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">
-                <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND $(var.Inst_C0) ]]>
+                <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND $(var.Inst_C0) AND NOT $(var.Remove_E1) ]]>
             </Publish>
 
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST]" Order="4">1</Publish>
@@ -1655,7 +1314,13 @@
             <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="2">
                 <![CDATA[ $(var.Inst_S1) ]]>
             </Publish>
-            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
+
+            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg" Order="2">
+                <![CDATA[ $(var.Remove_E1) ]]>
+            </Publish>
+            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">
+                <![CDATA[ NOT $(var.Remove_E1) ]]>
+            </Publish>
 
             <?define EditingSettings="(($(var.VmsInstalling) AND INSTALLTYPE=1) OR $(var.VmsChanging))"?>
 
@@ -1754,9 +1419,6 @@
             </Publish>
 
 
-            <!--            <Publish Dialog="VerifyReadyDlg" Control="Next" Event="ReinstallMode" Value="m" Order="1">WixUI_InstallMode = Change</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Next" Event="Reinstall" Value="Registry" Order="2">WixUI_InstallMode = Change</Publish>
--->            
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
@@ -1765,12 +1427,24 @@
                 <![CDATA[ !AppServerFeature = 3 ]]>
             </Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">
-                <![CDATA[ !AppServerFeature <> 3 ]]></Publish>
+                <![CDATA[ !AppServerFeature <> 3 ]]>
+            </Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
 
             <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ $(var.Remove_E1) ]]></Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ NOT $(var.Remove_E1) ]]></Publish>
+
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="ClientDlg">
+                <![CDATA[ $(var.Remove_E1) AND $(var.Inst_C1) ]]>
+            </Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">
+                <![CDATA[ $(var.Remove_E1) AND $(var.Inst_S1C0) ]]>
+            </Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">
+                <![CDATA[ $(var.Remove_E1) AND $(var.Inst_S0) ]]>
+            </Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">
+                <![CDATA[ NOT $(var.Remove_E1) ]]>
+            </Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE_DATABASE" Value="0">1</Publish>
         </UI>

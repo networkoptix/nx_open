@@ -18,8 +18,6 @@ namespace BusinessEventType
 
     Value parentEvent(Value value);
 
-    QString toString( Value val );
-
     bool isResourceRequired(Value val);
 
     bool hasToggleState(Value val);

@@ -45,7 +45,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const Business
     {
         case BusinessActionType::NotDefined:
         case BusinessActionType::Bookmark:
-        case BusinessActionType::Alert:
+        case BusinessActionType::Diagnostics:
         case BusinessActionType::ShowPopup:
         case BusinessActionType::PlaySound:
         case BusinessActionType::SayText:

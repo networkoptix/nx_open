@@ -116,6 +116,7 @@ public:
     GLenum glClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
 
     /* OpenGL4 group. */
+
     void glBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
 
 private:

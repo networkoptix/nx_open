@@ -13,7 +13,7 @@ static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
 
 
 QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res),
+    CLServerPushStreamReader(res),
     m_rtpStreamParser(res),
     m_oldFirmwareWarned(false)
 {
@@ -25,30 +25,30 @@ QnAxisStreamReader::~QnAxisStreamReader()
     stop();
 }
 
-int QnAxisStreamReader::toAxisQuality(QnStreamQuality quality)
+int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
 {
     switch(quality)
     {
-        case QnQualityLowest:
+        case Qn::QualityLowest:
             return 50;
-        case QnQualityLow:
+        case Qn::QualityLow:
             return 50;
-        case QnQualityNormal:
+        case Qn::QualityNormal:
             return 30;
-        case QnQualityHigh:
+        case Qn::QualityHigh:
             return 20;
-        case QnQualityHighest:
+        case Qn::QualityHighest:
             return 15;
-        case QnQualityPreSet:
+        case Qn::QualityPreSet:
             return -1;
     }
     return -1;
 }
 
-void QnAxisStreamReader::openStream()
+CameraDiagnostics::Result QnAxisStreamReader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::NoErrorResult();
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
@@ -93,21 +93,24 @@ void QnAxisStreamReader::openStream()
     // -------------- check if profile already exists
     {
         CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
-        CLHttpStatus status = http.doGET(QByteArray("/axis-cgi/param.cgi?action=list&group=StreamProfile"));
+        const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=list&group=StreamProfile");
+        CLHttpStatus status = http.doGET(requestPath);
 
         if (status != CL_HTTP_SUCCESS)
         {
             if (status == CL_HTTP_AUTH_REQUIRED)
             {
                 getResource()->setStatus(QnResource::Unauthorized);
+                return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
             }
             else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
             {
                 cl_log.log("Axis camera must be have old firmware!!!!  ip = ",  res->getHostAddress() , cl_logERROR);
                 m_oldFirmwareWarned = true;
+                return CameraDiagnostics::RequestFailedResult( requestPath, QLatin1String("old firmware") );
             }
 
-            return;
+            return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
         }
 
         QByteArray body;
@@ -138,7 +141,7 @@ void QnAxisStreamReader::openStream()
     }
     if (resolution.size.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
-    QnStreamQuality quality = getQuality();
+    Qn::StreamQuality quality = getQuality();
 
     QByteArray paramsStr;
     paramsStr.append("videocodec=h264");
@@ -146,7 +149,7 @@ void QnAxisStreamReader::openStream()
         paramsStr.append("&resolution=").append(resolution.resolutionStr);
     //paramsStr.append("&text=0"); // do not use onscreen text message (fps e.t.c)
     paramsStr.append("&fps=").append(QByteArray::number(fps));
-    if (quality != QnQualityPreSet)
+    if (quality != Qn::QualityPreSet)
         paramsStr.append("&compression=").append(QByteArray::number(toAxisQuality(quality)));
     paramsStr.append("&audio=").append(res->isAudioEnabled() ? "1" : "0");
 
@@ -171,10 +174,10 @@ void QnAxisStreamReader::openStream()
         if (status == CL_HTTP_AUTH_REQUIRED)
         {
             getResource()->setStatus(QnResource::Unauthorized);
-            return;
+            return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
         }
         else if (status != CL_HTTP_SUCCESS)
-            return;
+            return CameraDiagnostics::RequestFailedResult(CameraDiagnostics::RequestFailedResult(streamProfile, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status))));
 
         if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
         {
@@ -197,7 +200,7 @@ void QnAxisStreamReader::openStream()
 
     // ============== requesting a video ==========================
     m_rtpStreamParser.setRequest(request);
-    m_rtpStreamParser.openStream();
+    return m_rtpStreamParser.openStream();
 }
 
 void QnAxisStreamReader::closeStream()

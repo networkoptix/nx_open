@@ -7,24 +7,21 @@
 
 #include <api/model/statistics_reply.h>
 
+#include <ui/animation/animated.h>
+#include <ui/animation/animation_timer_listener.h>
+
 #include "resource_widget.h"
 
 class QnRadialGradientPainter;
 class QnMediaServerStatisticsManager;
 class StatisticsOverlayWidget;
+class QnGlFunctions;
 
-enum LegendButtonBar {
-    CommonButtonBar,
-    NetworkOutButtonBar,
-    NetworkInButtonBar,
 
-    ButtonBarCount
-};
-
-class QnServerResourceWidget: public QnResourceWidget {
+class QnServerResourceWidget: public Animated<QnResourceWidget>, AnimationTimerListener {
     Q_OBJECT
 
-    typedef QnResourceWidget base_type;
+    typedef Animated<QnResourceWidget> base_type;
 
 public:
     static const Button PingButton = static_cast<Button>(0x08);
@@ -58,18 +55,26 @@ protected:
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+    virtual void tick(int deltaMSecs) override;
 
 private slots:
     void at_statistics_received();
-    void at_legend_checkedButtonsChanged();
-    void at_headerOverlayWidget_opacityChanged(const QVariant &value);
     void at_pingButton_clicked();
     void at_showLogButton_clicked();
     void at_checkIssuesButton_clicked();
-
+    
+    void updateHoverKey();
+    void updateGraphVisibility();
+    void updateInfoOpacity();
 
 private:
+    enum LegendButtonBar {
+        CommonButtonBar,
+        NetworkButtonBar,
+        ButtonBarCount
+    };
+
     /** Background painting function. */
     void drawBackground(const QRectF &rect, QPainter *painter);
 
@@ -123,16 +128,22 @@ private:
     QSharedPointer<QnRadialGradientPainter> m_backgroundGradientPainter;
 
     /** Button bars with corresponding buttons */
-    QnImageButtonBar* m_legendButtonBar[ButtonBarCount];
+    QnImageButtonBar *m_legendButtonBar[ButtonBarCount];
+
+    struct GraphData {
+        GraphData(): bar(NULL), button(NULL), mask(0), visible(false), opacity(1.0) {}
+
+        QnImageButtonBar *bar;
+        QnImageButtonWidget *button;
+        int mask;
+        bool visible;
+        qreal opacity;
+    };
 
     /** Which buttons are checked on each button bar */
-    QHash<QString, bool> m_checkedFlagByKey[ButtonBarCount];
+    QHash<QString, GraphData> m_graphDataByKey;
 
-    /** Masks to get corresponding button from button bar */
-    QHash<QString, int> m_buttonMaskByKey[ButtonBarCount];
-
-    /** Mask generate variables */
-    int m_maxMaskUsed[ButtonBarCount];
+    QString m_hoveredKey;
 
     qreal m_infoOpacity;
 };

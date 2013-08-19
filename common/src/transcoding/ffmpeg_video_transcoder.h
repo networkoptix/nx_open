@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_VIDEO_TRANSCODER_H__
 #define __FFMPEG_VIDEO_TRANSCODER_H__
 
+#include <QCoreApplication>
+
 #include "transcoder.h"
 
 extern "C"
@@ -13,12 +15,14 @@ extern "C"
 
 class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
+    Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
     QnFfmpegVideoTranscoder(CodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) override;
     virtual bool open(QnCompressedVideoDataPtr video) override;
+    void close();
     AVCodecContext* getCodecContext();
 
     /* Allow multithread transcoding */

@@ -56,9 +56,11 @@ public:
 public slots:
     void issueOccured();
     void noCameraIssues();
-
+private slots:
+    void at_saveAsyncFinished(int, const QnResourceList &, int);
 protected:
     void save();
+    int saveAsync(QObject *target, const char *slot);
 
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
@@ -78,7 +80,7 @@ private:
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
 const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
-const QSize SECONDARY_STREAM_MAX_RESOLUTION(1280, 720);
+const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
 
 class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource
 {
@@ -89,7 +91,7 @@ public:
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
 
-    virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const;
+    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const;
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
@@ -98,7 +100,7 @@ protected:
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList); // find resolution helper function
 private:
-    int m_channelNumer; // video/audio source number
+    int m_channelNumber; // video/audio source number
 };
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);

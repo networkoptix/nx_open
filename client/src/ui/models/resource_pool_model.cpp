@@ -367,7 +367,6 @@ public:
     QVariant data(int role, int column) const {
         switch(role) {
         case Qt::DisplayRole:
-        case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
@@ -375,6 +374,8 @@ public:
             if (column == Qn::NameColumn)
                 return m_displayName + (m_modified ? QLatin1String("*") : QString());
             break;
+        case Qt::ToolTipRole:
+            return m_displayName;
         case Qt::DecorationRole:
             if (column == Qn::NameColumn)
                 return m_icon;
@@ -410,6 +411,8 @@ public:
                 return Qn::MainWindow_Tree_Users_Help;
             } else if(m_type == Qn::LocalNode) {
                 return Qn::MainWindow_Tree_Local_Help;
+            } else if(m_type == Qn::RecorderNode) {
+                return Qn::MainWindow_Tree_Recorder_Help;
             } else if(m_flags & QnResource::layout) {
                 if(m_model->context()->snapshotManager()->isFile(m_resource.dynamicCast<QnLayoutResource>())) {
                     return Qn::MainWindow_Tree_MultiVideo_Help;
@@ -746,6 +749,10 @@ void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
     m_urlsShown = urlsShown;
 
     m_rootNodes[m_rootNodeType]->updateRecursive();
+}
+
+Qn::NodeType QnResourcePoolModel::rootNodeType() const {
+    return m_rootNodeType;
 }
 
 

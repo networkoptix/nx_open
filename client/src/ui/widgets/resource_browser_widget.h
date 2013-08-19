@@ -34,6 +34,7 @@ class QnResourcePoolModel;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;
+class QnCameraThumbnailManager;
 
 namespace Ui {
     class ResourceBrowserWidget;
@@ -127,9 +128,7 @@ protected:
     virtual QString toolTipAt(const QPointF &pos) const override;
     virtual bool showOwnTooltip(const QPointF &pos) override;
 
-    int loadThumbnailForResource(const QnResourcePtr &resource);
-
-    QnResourceTreeWidget *currentItemView() const;
+    QnResourceTreeWidget *currentTreeWidget() const;
     QItemSelectionModel *currentSelectionModel() const;
     QModelIndex itemIndexAt(const QPoint &pos) const;
 
@@ -161,28 +160,9 @@ private slots:
 
     void at_showUrlsInTree_changed();
 
-    void at_thumbnailReceived(int status, const QImage& thumbnail, int handle);
+    void at_thumbnailReady(int resourceId, const QPixmap &pixmap);
     void at_thumbnailClicked();
-
-    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 private:
-    enum ThumbnailStatus {
-        None,
-        Loading,
-        Loaded,
-        NoData,
-        NoSignal
-    };
-
-    struct ThumbnailData {
-        ThumbnailData(): status(None), loadingHandle(0) {}
-
-        QImage thumbnail;
-        ThumbnailStatus status;
-        int loadingHandle;
-    };
-
-
     QScopedPointer<Ui::ResourceBrowserWidget> ui;
 
     bool m_ignoreFilterChanges;
@@ -191,7 +171,8 @@ private:
     QnResourcePoolModel *m_resourceModel;
     QnResourceBrowserToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
-    QHash<QnResourcePtr, ThumbnailData> m_thumbnailByResource;
+
+    QnCameraThumbnailManager *m_thumbnailManager;
 
     QAction *m_renameAction;
 };

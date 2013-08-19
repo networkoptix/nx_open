@@ -290,6 +290,8 @@ public:
 
     void ensureRaisedConeItem(QnResourceWidget *widget);
 
+    QGLWidget *newGlWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) const;
+
 public slots:
     void fitInView(bool animate = true);
 
@@ -378,6 +380,7 @@ protected slots:
     void at_item_geometryDeltaChanged();
     void at_item_zoomRectChanged();
     void at_item_rotationChanged();
+    void at_item_dataChanged(int role);
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
     void at_curtainActivityInstrument_activityStopped();
@@ -398,8 +401,8 @@ protected slots:
     void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
 
     void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
-    void at_notificationTimer_timeout(const QVariant &resource);
-    void at_notificationTimer_timeout(const QnResourcePtr &resource);
+    void at_notificationTimer_timeout(const QVariant &resource, const QVariant &type);
+    void at_notificationTimer_timeout(const QnResourcePtr &resource, int type);
 
 private:
     /* Directly visible state */
@@ -422,7 +425,7 @@ private:
     QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;
 
     /** Renderer to widget mapping. */
-    QHash<QnAbstractRenderer *, QnResourceWidget *> m_widgetByRenderer;
+    QHash<QnAbstractRenderer *, QnResourceWidget *> m_widgetByRenderer; // TODO: #Elric not used anymore?
 
     /** Resource to widget mapping. */
     QHash<QnResourcePtr, QList<QnResourceWidget *> > m_widgetsByResource;

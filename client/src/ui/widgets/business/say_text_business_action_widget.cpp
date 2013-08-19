@@ -8,6 +8,9 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/media/audio_player.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnSayTextBusinessActionWidget)
@@ -17,6 +20,8 @@ QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(QWidget *parent) :
     connect(ui->textEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
     connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(at_volumeSlider_valueChanged(int)));
+
+    setHelpTopic(this, Qn::EventsActions_Speech_Help);
 }
 
 QnSayTextBusinessActionWidget::~QnSayTextBusinessActionWidget()
@@ -38,7 +43,7 @@ void QnSayTextBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel
     Q_UNUSED(guard)
 
     if (fields & QnBusiness::ActionParamsField)
-        ui->textEdit->setText(model->actionParams().getSoundUrl());
+        ui->textEdit->setText(model->actionParams().getSayText());
 }
 
 void QnSayTextBusinessActionWidget::paramsChanged() {
@@ -49,7 +54,7 @@ void QnSayTextBusinessActionWidget::paramsChanged() {
     Q_UNUSED(guard)
 
     QnBusinessActionParameters params;
-    params.setSoundUrl(ui->textEdit->text());
+    params.setSayText(ui->textEdit->text());
     model()->setActionParams(params);
 }
 

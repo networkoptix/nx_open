@@ -12,6 +12,7 @@
 #include "aiothread.h"
 #include "qglobal.h"
 
+
 using namespace std;
 
 namespace aio
@@ -64,7 +65,7 @@ namespace aio
         return !m_threadPool.empty();
     }
 
-    //!Monitor socket \a sock for event \a eventToWatch occurence and trigger \a eventHandler on event
+    //!Monitor socket \a sock for event \a eventToWatch occurrence and trigger \a eventHandler on event
     /*!
         \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
     */
@@ -75,6 +76,10 @@ namespace aio
     {
         QMutexLocker lk( &m_mutex );
 
+        const int sockTimeoutMS = eventToWatch == PollSet::etRead
+            ? sock->getReadTimeOut()
+            : (eventToWatch == PollSet::etWrite ? sock->getWriteTimeOut() : 0);
+
         //checking, if that socket is already monitored
         const pair<Socket*, PollSet::EventType>& sockCtx = make_pair( sock.data(), eventToWatch );
         map<pair<Socket*, PollSet::EventType>, AIOThread*>::const_iterator it = m_sockets.lower_bound( sockCtx );
@@ -84,7 +89,7 @@ namespace aio
         if( (it != m_sockets.end()) && (it->first.first == sockCtx.first) )
         {
             //socket is already monitored for other event. Trying to use same thread
-            if( it->second->watchSocket( sock, eventToWatch, eventHandler ) )
+            if( it->second->watchSocket( sock, eventToWatch, eventHandler, sockTimeoutMS ) )
             {
                 m_sockets.insert( it, make_pair( sockCtx, it->second ) );
                 return true;
@@ -108,12 +113,12 @@ namespace aio
         if( !threadToUse )
         {
             //creating new thread
+
 #if (GCC_VERSION >= 40700)
             std::unique_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
 #else
             std::auto_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
 #endif
-
             newThread->start();
             if( !newThread->isRunning() )
                 return false;
@@ -121,7 +126,7 @@ namespace aio
             m_threadPool.push_back( newThread.release() );
         }
 
-        if( threadToUse->watchSocket( sock, eventToWatch, eventHandler ) )
+        if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, sockTimeoutMS ) )
         {
             m_sockets.insert( make_pair( sockCtx, threadToUse ) );
             return true;

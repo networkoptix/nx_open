@@ -48,6 +48,8 @@ bool IsPortAvailable(int port)
     channel.sin_addr.s_addr = INADDR_ANY;
     channel.sin_port = htons(port);
 
+    int reuse = 1;
+    setsockopt(serverfd, SOL_SOCKET, SO_REUSEADDR, (char *)&reuse, sizeof(reuse));
     int bind_status = bind(serverfd, (sockaddr *) &channel, sizeof(channel));
     closesocket(serverfd);
 

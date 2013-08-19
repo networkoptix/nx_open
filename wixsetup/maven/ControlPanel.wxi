@@ -39,15 +39,15 @@
         <!-- Create alternative ARP entry that lets us launch uninstall with
             full UI.  Setting ARPSYSTEMCOMPONENT above hides WI generated key
                     that uses the product GUID.-->
-        <Component Id="ARPAltRegistryEntries" Win64="no">
+        <Component Id="ARPAltRegistryEntries" Win64="yes">
             <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${product.name}">
                 <RegistryValue Type="string" Name="DisplayName" Value="[ProductName]"/>
-                <RegistryValue Type="string" Name="UninstallString" Value="[SystemFolder]msiexec.exe /i [ProductCode]"/>
+                <RegistryValue Type="string" Name="UninstallString" Value="[SystemFolder64]msiexec.exe /i [ProductCode]"/>
                 <RegistryValue Type="string" Name="DisplayIcon" Value="[INSTALLDIR]Common\Resource\eve_logo.ico"/>
                 <RegistryValue Type="string" Name="HelpLink" Value="${product.url}"/>
                 <RegistryValue Type="string" Name="InstallLocation" Value="[INSTALLDIR]"/>
                 <RegistryValue Type="string" Name="Publisher" Value="[Manufacturer]"/>
-                <RegistryValue Type="string" Name="UninstallPath" Value="[SystemFolder]msiexec.exe /i [ProductCode]"/>
+                <RegistryValue Type="string" Name="UninstallPath" Value="[SystemFolder64]msiexec.exe /i [ProductCode]"/>
                 <RegistryValue Type="string" Name="DisplayVersion" Value="[ProductVersion]"/>
                 <RegistryValue Type="string" Name="InstallSource" Value="[SourceDir]"/>
                 <RegistryValue Type="string" Name="Language" Value="#[ProductLanguage]"/>

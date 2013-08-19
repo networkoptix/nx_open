@@ -1,0 +1,34 @@
+<Include>
+    <?define arch = "${arch}"?>
+    <?define vmax = "${vmax}"?>
+
+    <?if $(var.arch) = x86?>
+    <?define ProgramFilesFolder = "ProgramFilesFolder"?>
+    <?define SystemFolderActual = "SystemFolder"?>
+    <?else?>
+    <?define ProgramFilesFolder = "ProgramFiles64Folder"?>
+    <?define SystemFolderActual = "System64Folder"?>
+    <?endif?>
+
+    <!-- Wix Variables -->
+
+    <?ifdef env.CommonProgramFiles(x86) ?>
+    <?define commonProgramFiles = "c:\Program Files (x86)\Common Files\" ?>
+    <?else?>
+    <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
+    <?endif?>
+
+    <?if ${build.configuration} = debug ?>
+    <?define suffix = "d" ?>
+    <?define vmaxsuffix = "dd" ?>
+    <?else?>
+    <?define suffix = "" ?>
+    <?define vmaxsuffix = "r" ?>
+    <?endif?>
+
+    <?if $(var.arch) = x86 ?>
+    <?define archSuffix = "x86" ?>
+    <?else?>
+    <?define archSuffix = "x86_x64" ?>
+    <?endif?>
+</Include>

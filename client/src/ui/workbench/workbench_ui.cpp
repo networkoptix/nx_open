@@ -38,7 +38,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
-#include <ui/graphics/items/generic/simple_frame_widget.h>
+#include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
@@ -279,8 +279,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, Qt::black);
     m_treeWidget->resize(250, 0);
 
-    m_treeBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
-    m_treeBackgroundItem->setAutoFillBackground(true);
+    m_treeBackgroundItem = new QnFramedWidget(m_controlsWidget);
     {
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
@@ -351,8 +350,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Title bar. */
-    m_titleBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
-    m_titleBackgroundItem->setAutoFillBackground(true);
+    m_titleBackgroundItem = new QnFramedWidget(m_controlsWidget);
     {
         QLinearGradient gradient(0, 0, 0, 1);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
@@ -409,7 +407,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout = new QGraphicsLinearLayout();
     m_titleRightButtonsLayout->setSpacing(2);
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
     m_titleRightButtonsLayout->addStretch(0x1000);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction), 1.0, Qn::MainWindow_Panic_Help));
@@ -460,8 +458,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Notifications panel. */
-    m_notificationsBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
-    m_notificationsBackgroundItem->setAutoFillBackground(true);
+    m_notificationsBackgroundItem = new QnFramedWidget(m_controlsWidget);
     {
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
@@ -476,6 +473,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_notificationsItem = new QnNotificationsCollectionWidget(m_controlsWidget, 0, context());
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
+    setHelpTopic(m_notificationsItem, Qn::MainWindow_Notifications_Help);
 
     m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
@@ -533,11 +531,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_notificationsItem,                SIGNAL(visibleSizeChanged()),   this,   SLOT(at_notificationsItem_geometryChanged()));
     connect(m_notificationsItem,                SIGNAL(sizeHintChanged()),      this,   SLOT(updateNotificationsGeometry()));
 
+
     /* Calendar. */
     QnCalendarWidget *calendarWidget = new QnCalendarWidget();
+    setHelpTopic(calendarWidget, Qn::MainWindow_Calendar_Help);
     navigator()->setCalendar(calendarWidget);
 
     m_dayTimeWidget = new QnDayTimeWidget();
+    setHelpTopic(m_dayTimeWidget, Qn::MainWindow_DayTimePicker_Help);
     navigator()->setDayTimeWidget(m_dayTimeWidget);
 
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
@@ -1185,6 +1186,9 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
     } else {
         setCalendarVisible(calendarVisible, animate);
     }
+
+    if(!calendarVisible)
+        setCalendarOpened(false);
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
@@ -1267,7 +1271,7 @@ void QnWorkbenchUi::updateTreeGeometry() {
     m_treeItem->resize(geometry.size());
 }
 
-QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry, qreal *maxHeight) {
+QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry, const QRectF &dayTimeGeometry, qreal *maxHeight) {
     QPointF pos(
         notificationsGeometry.x(),
         ((!m_titleVisible || !m_titleUsed) && m_notificationsVisible) ? 30.0 : qMax(titleGeometry.bottom() + 30.0, 30.0)
@@ -1275,7 +1279,7 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
 
     *maxHeight = qMin(
                 m_sliderVisible ? sliderGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0,
-                m_calendarVisible ? calendarGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0
+                m_calendarVisible ? qMin(calendarGeometry.y(), dayTimeGeometry.y()) - 30.0 : m_controlsWidgetRect.bottom() - 30.0
             ) - pos.y();
     qreal preferredHeight = m_notificationsItem->preferredHeight();
     QSizeF size(notificationsGeometry.width(), qMin(*maxHeight, preferredHeight));
@@ -1286,7 +1290,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
     qreal maxHeight = 0;
 
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedNotificationsGeometry(m_notificationsItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry(), m_calendarItem->paintGeometry(), &maxHeight);
+    QRectF geometry = updatedNotificationsGeometry(m_notificationsItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry(), m_calendarItem->paintGeometry(), m_dayTimeItem->paintGeometry(), &maxHeight);
     //m_notificationsItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
@@ -1327,12 +1331,24 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
     } else {
         titlePos = m_titleItem->pos();
     }
+    
+    QPointF dayTimePos;
+    if(!m_calendarVisible && m_notificationsVisible) {
+        dayTimePos = QPointF(m_dayTimeItem->pos().x(), m_controlsWidgetRect.bottom());
+    } else if(m_dayTimeSizeAnimator->isRunning()) {
+        dayTimePos = QPointF(m_dayTimeItem->pos().x(), calendarPos.y() - m_dayTimeSizeAnimator->targetValue().toSizeF().height());
+        defer |= !qFuzzyCompare(dayTimePos, m_dayTimeItem->pos()); /* If animation is running, then geometry sync should be deferred. */
+    } else {
+        dayTimePos = m_dayTimeItem->pos();
+    }
+
 
     /* Calculate target geometry. */
     geometry = updatedNotificationsGeometry(m_notificationsItem->geometry(),
                                             QRectF(titlePos, m_titleItem->size()),
                                             QRectF(sliderPos, m_sliderItem->size()),
                                             QRectF(calendarPos, m_calendarItem->paintSize()),
+                                            QRectF(dayTimePos, m_dayTimeItem->paintSize()),
                                             &maxHeight);
     if(qFuzzyCompare(geometry, m_notificationsItem->geometry()))
         return;

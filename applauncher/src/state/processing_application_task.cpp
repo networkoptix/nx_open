@@ -19,6 +19,8 @@
 #include "state/launching_application.h"
 #include "../launcher_common_data.h"
 
+#define NO_DOWNLOAD_IMPLEMENTED
+
 
 ProcessingApplicationTask::ProcessingApplicationTask(
     QState* const parent,
@@ -83,10 +85,13 @@ void ProcessingApplicationTask::initFsm()
             analyzingTopTaskInQueue,
             launchingApplication );
         tran->addCondition( new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "currentTaskType", (int)applauncher::api::TaskType::startApplication) );
+#ifndef NO_DOWNLOAD_IMPLEMENTED
         tran->addCondition( new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "isRequiredVersionInstalled", true) );
+#endif
         analyzingTopTaskInQueue->addTransition( tran );
     }
 
+#ifndef NO_DOWNLOAD_IMPLEMENTED
     {
         ConditionalSignalTransition* tran = new ConditionalSignalTransition(
             analyzingTopTaskInQueue,
@@ -97,6 +102,7 @@ void ProcessingApplicationTask::initFsm()
         tran->addCondition( new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "isRequiredVersionInstalled", false) );
         analyzingTopTaskInQueue->addTransition( tran );
     }
+#endif
 
     {
         ConditionalSignalTransition* tran = new ConditionalSignalTransition(
@@ -188,6 +194,7 @@ void ProcessingApplicationTask::initFsm()
         //from launchingApplication
     launchingApplication->addTransition( launchingApplication, SIGNAL(succeeded()), finalState );
 
+#if 0
     {
         QAbstractTransition* tran = new ConditionalSignalTransition(
             launchingApplication,
@@ -209,4 +216,8 @@ void ProcessingApplicationTask::initFsm()
         connect( tran, SIGNAL(triggered()), launchingApplication, SLOT(prepareResultMessage()) );
         launchingApplication->addTransition( tran );
     }
+#else
+    //for now, ignoring launch failure...
+    launchingApplication->addTransition( launchingApplication, SIGNAL(failed()), finalState );
+#endif
 }

@@ -7,6 +7,7 @@
 #include "core/resource_managment/resource_pool.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "utils/common/synctime.h"
+#include "licensing/license.h"
 
 #include "client_message_processor.h"
 
@@ -203,6 +204,11 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             emit businessRuleChanged(message.businessRule);
             break;
         }
+    case Qn::Message_Type_BusinessRuleReset:
+        {
+            emit businessRuleReset(message.businessRules);
+            break;
+        }
     case Qn::Message_Type_BusinessRuleDelete:
         {
             emit businessRuleDeleted(message.resourceId.toInt());
@@ -246,8 +252,18 @@ void QnClientMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
         QnCameraHistoryPool::instance()->addCameraHistory(history);
 }
 
+void QnClientMessageProcessor::updateHardwareIds(const QnMessage& message)
+{
+    qnLicensePool->setOldHardwareId(message.oldHardwareId);
+    qnLicensePool->setHardwareId1(message.hardwareId1);
+    qnLicensePool->setHardwareId2(message.hardwareId2);
+}
+
 void QnClientMessageProcessor::at_connectionOpened(QnMessage message)
 {
+    QnAppServerConnectionFactory::setSystemName(message.systemName);
+
+    updateHardwareIds(message);
     processResources(message.resources);
     processLicenses(message.licenses);
     processCameraServerItems(message.cameraServerItems);

@@ -37,30 +37,58 @@
     </message>
     <message numerus="yes">
         <source>no more than once per %n days</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per day</numerusform>
             <numerusform>no more than once per %n days</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n hours</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per hour</numerusform>
             <numerusform>no more than once per %n hours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n minutes</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per minute</numerusform>
             <numerusform>no more than once per %n minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>no more than once per %n seconds</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>no more than once per second</numerusform>
             <numerusform>no more than once per %n seconds</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n days</source>
+        <translation>
+            <numerusform>Every day</numerusform>
+            <numerusform>Every %n days</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n hours</source>
+        <translation>
+            <numerusform>Every hour</numerusform>
+            <numerusform>Every %n hours</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n minutes</source>
+        <translation>
+            <numerusform>Every minute</numerusform>
+            <numerusform>Every %n minutes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Every %n seconds</source>
+        <translation>
+            <numerusform>Every second</numerusform>
+            <numerusform>Every %n seconds</numerusform>
         </translation>
     </message>
 </context>
@@ -81,6 +109,23 @@ It might take a few moments to populate them in the tree.</numerusform>
         <translation>
             <numerusform>Error while adding a camera</numerusform>
             <numerusform>Error while adding cameras</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraListDialog</name>
+    <message numerus="yes">
+        <source>Camera List - %n camera(s) found</source>
+        <translation>
+            <numerusform>Camera List - %n camera found</numerusform>
+            <numerusform>Camera List - %n cameras found</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
+        <translation>
+            <numerusform>Camera List for media server &apos;%1&apos; - %n camera found</numerusform>
+            <numerusform>Camera List for media server &apos;%1&apos; - %n cameras found</numerusform>
         </translation>
     </message>
 </context>
@@ -140,7 +185,7 @@ It might take a few moments to populate them in the tree.</numerusform>
     <name>QnExportCameraSettingsDialog</name>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%n digital license will be used out of %1.</numerusform>
             <numerusform>%n digital licenses will be used out of %1.</numerusform>
         </translation>
@@ -150,6 +195,23 @@ It might take a few moments to populate them in the tree.</numerusform>
         <translation type="obsolete">
             <numerusform>%n analog license will be used out of %1.</numerusform>
             <numerusform>%n analog  licenses will be used out of %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) will be used out of %1.</source>
+        <translation type="obsolete">
+            <numerusform>%n analog license will be used out of %1.</numerusform>
+            <numerusform>%n analog licenses will be used out of %1.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
+    <message numerus="yes">
+        <source>%n digital license(s) will be used out of %1.</source>
+        <translation>
+            <numerusform>%n digital license will be used out of %1.</numerusform>
+            <numerusform>%n digital licenses will be used out of %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -313,17 +375,6 @@ It might take a few moments to populate them in the tree.</numerusform>
             <numerusform>Could not save changes made to the following resource.</numerusform>
             <numerusform>Could not save changes made to the following %n resources.</numerusform>
         </translation>
-    </message>
-</context>
-<context>
-    <name>Language</name>
-    <message>
-        <source>Locale Code</source>
-        <translation>en</translation>
-    </message>
-    <message>
-        <source>Language Name</source>
-        <translation>English</translation>
     </message>
 </context>
 </TS>

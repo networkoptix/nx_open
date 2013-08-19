@@ -22,6 +22,8 @@
 
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
@@ -175,6 +177,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     rotateButton->setToolTip(tr("Rotate"));
+    setHelpTopic(rotateButton, Qn::MainWindow_MediaItem_Rotate_Help);
     connect(rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
     connect(rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
 
@@ -457,7 +460,7 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    QRectF rect = zoomRect().isNull() ? this->rect() : unsubRect(this->rect(), zoomRect());
+    QRectF rect = (m_options & VirtualZoomWindow) || zoomRect().isNull() ? this->rect() : unsubRect(this->rect(), zoomRect());
 
     if (m_channelsLayout->channelCount() == 1)
         return rect;

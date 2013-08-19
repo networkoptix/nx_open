@@ -28,12 +28,23 @@ public:
 
     static QDialogButtonBox::StandardButton
     question(QWidget *parent,
-             const QString &title,
-             const QString &question,
-             const QString &checkBoxText,
-             bool *checkBoxSetting,
-             QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Yes | QDialogButtonBox::No,
-             QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::No);
+        int helpTopicId,
+        const QString &title,
+        const QString &question,
+        const QString &checkBoxText,
+        bool *checkBoxSetting,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Yes | QDialogButtonBox::No,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::No);
+
+    static QDialogButtonBox::StandardButton
+    question(QWidget *parent,
+        const QString &title,
+        const QString &question,
+        const QString &checkBoxText,
+        bool *checkBoxSetting,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Yes | QDialogButtonBox::No,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::No);
+
 
     QString text() const;
     void setText(const QString &);

@@ -20,6 +20,8 @@
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
@@ -64,6 +66,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
 {
     ui->setupUi(this);
 
+    setHelpTopic(ui->scheduleButton, Qn::EventsActions_Schedule_Help);
+
     ui->eventDefinitionGroupBox->installEventFilter(this);
     ui->actionDefinitionGroupBox->installEventFilter(this);
 
@@ -79,8 +83,7 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
 
     connect(ui->aggregationWidget,          SIGNAL(valueChanged()),             this, SLOT(updateModelAggregationPeriod()));
 
-
-    connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
+    connect(ui->commentsLineEdit,           SIGNAL(textChanged(QString)),       this, SLOT(at_commentsLineEdit_textChanged(QString)));
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
@@ -112,6 +115,7 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
         ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
         ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
     }
+    setEnabled(!m_model->system());
 
     connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
             this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
@@ -155,6 +159,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         bool isResourceRequired = BusinessActionType::requiresCameraResource(m_model->actionType())
                 || BusinessActionType::requiresUserResource(m_model->actionType());
         ui->actionResourcesFrame->setVisible(isResourceRequired);
+
         ui->actionAtLabel->setText(m_model->actionType() == BusinessActionType::SendMail ? tr("to") : tr("at"));
 
         bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
@@ -175,7 +180,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
 
     if (fields & QnBusiness::AggregationField) {
         ui->aggregationWidget->setValue(model->aggregationPeriod());
-
     }
 
     if (fields & QnBusiness::CommentsField) {
@@ -343,7 +347,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
 
     if (dialog.exec() != QDialog::Accepted)
         return;
-    m_model->setEventResources(dialog.getSelectedResources());
+    m_model->setEventResources(dialog.selectedResources());
 }
 
 void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
@@ -358,7 +362,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     if (node == Qn::BastardNode)
         return;
 
-    QnResourceSelectionDialog dialog(this, node);
+    QnResourceSelectionDialog dialog(node, this);
 
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)
@@ -371,18 +375,19 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
 
     if (dialog.exec() != QDialog::Accepted)
         return;
-    m_model->setActionResources(dialog.getSelectedResources());
+    m_model->setActionResources(dialog.selectedResources());
 }
 
 void QnBusinessRuleWidget::at_scheduleButton_clicked() {
     if (!m_model)
         return;
 
-    QnWeekTimeScheduleWidget dialog(this);
-    dialog.setScheduleTasks(m_model->schedule());
-    if (dialog.exec() != QDialog::Accepted)
+    QScopedPointer<QnWeekTimeScheduleWidget> dialog(new QnWeekTimeScheduleWidget(this));
+    dialog->setScheduleTasks(m_model->schedule());
+    setHelpTopic(dialog.data(), Qn::EventsActions_Schedule_Help);
+    if (dialog->exec() != QDialog::Accepted)
         return;
-    m_model->setSchedule(dialog.scheduleTasks());
+    m_model->setSchedule(dialog->scheduleTasks());
 }
 
 

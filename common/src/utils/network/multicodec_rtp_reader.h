@@ -3,6 +3,7 @@
 
 #include "core/resource/resource_consumer.h"
 #include "core/datapacket/media_data_packet.h"
+#include "utils/camera/camera_diagnostics.h"
 #include "utils/network/rtpsession.h"
 
 #include <business/business_fwd.h>
@@ -37,7 +38,7 @@ public:
     /*!
         \return true, if successfully opened stream or stream is already opened. false, if failed. For more detail, call \a getLastResponseCode()
     */
-    bool openStream();
+    CameraDiagnostics::Result openStream();
     void closeStream() ;
     bool isStreamOpened() const;
     const QnResourceAudioLayout* getAudioLayout() const;

@@ -14,10 +14,13 @@ enum QnBusinessRulesActualModelChange {
 class QnBusinessRulesActualModel: public QnBusinessRulesViewModel
 {
     Q_OBJECT
+
+    typedef QnBusinessRulesViewModel base_type;
 public:
     QnBusinessRulesActualModel(QObject *parent = 0);
 
     bool isLoaded() const;
+
 signals:
     void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
@@ -37,6 +40,7 @@ private slots:
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
     void at_message_ruleDeleted(int id);
+    void at_message_ruleReset(QnBusinessEventRuleList rules);
 
 private:
     int m_loadingHandle;

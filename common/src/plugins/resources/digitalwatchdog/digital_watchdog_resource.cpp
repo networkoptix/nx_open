@@ -67,20 +67,20 @@ bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
     return true; // ignore other error (for cameras with non standart HTTP port)
 }
 
-bool QnPlWatchDogResource::initInternal() 
+CameraDiagnostics::Result QnPlWatchDogResource::initInternal() 
 {
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false) 
     {
         if (m_appStopping)
-            return false;
+            return CameraDiagnostics::UnknownErrorResult();
 
         // The camera most likely is going to reset after enabling dual streaming
         enableOnvifSecondStream();
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
         
-    bool result = QnPlOnvifResource::initInternal();
+    const CameraDiagnostics::Result result = QnPlOnvifResource::initInternal();
 
     // TODO: #Elric this code is totally evil. Better write it properly as soon as possible.
     CLSimpleHTTPClient http(getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
@@ -131,12 +131,12 @@ void QnPlWatchDogResource::enableOnvifSecondStream()
     // camera rebooting ....
 }
 
-int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
+int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
 {
-    // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
-    // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
+    // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
 
-    int hiEnd = 1024*11;
+    int hiEnd = 1024*9;
     int lowEnd = 1024*1.8;
 
     float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
@@ -145,7 +145,7 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     float frameRateFactor = fps/30.0;
     frameRateFactor = pow(frameRateFactor, (float)0.4);
 
-    int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
+    int result = lowEnd + (hiEnd - lowEnd) * (q - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(1024,result);
@@ -172,8 +172,8 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
     if (!suffix.isEmpty()) {
         bool hasFocus = suffix.endsWith(QLatin1String("-FOCUS"));
         if(hasFocus) {
-            setCameraCapability(Qn::ContinuousZoomCapability, true);
             m_ptzController.reset(new QnDwZoomPtzController(this));
+            setPtzCapabilities(m_ptzController->getCapabilities());
         }
 
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];

@@ -32,10 +32,6 @@ public:
     */
     bool listen( const QString& pipeName );
 
-signals:
-    //!Emited after task has been posted to the queue
-    void taskReceived();
-
 private:
     BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const m_taskQueue;
     QLocalServer m_server;

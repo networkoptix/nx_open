@@ -82,7 +82,7 @@ public:
      */
     struct PartitionSpace {
         PartitionSpace(): type(UnknownPartition), freeBytes(0), sizeBytes(0) {}
-        PartitionSpace(const QString &path, quint64 freeBytes, quint64 sizeBytes):
+        PartitionSpace(const QString &path, qint64 freeBytes, qint64 sizeBytes):
             path(path), type(UnknownPartition), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
 
         /** Partition's root path. */
@@ -92,10 +92,10 @@ public:
         PartitionType type;
 
         /** Free space of this partition in bytes */
-        quint64 freeBytes;
+        qint64 freeBytes;
 
         /** Total size of this partition in bytes */
-        quint64 sizeBytes;
+        qint64 sizeBytes;
     };
 
     enum NetworkInterfaceType {
@@ -110,7 +110,7 @@ public:
      * Network load entry
      */
     struct NetworkLoad {
-        NetworkLoad(): type(UnknownInterface), bytesPerSecIn(0), bytesPerSecOut(0) {}
+        NetworkLoad(): type(UnknownInterface), bytesPerSecIn(0), bytesPerSecOut(0), bytesPerSecMax(0) {}
 
         /** Network interface name */
         QString interfaceName;
@@ -122,10 +122,13 @@ public:
         NetworkInterfaceType type;
 
         /** Current download speed in bytes per second */
-        quint64 bytesPerSecIn;
+        qint64 bytesPerSecIn;
 
         /** Current upload speed in bytes per second */
-        quint64 bytesPerSecOut;
+        qint64 bytesPerSecOut;
+
+        /** Maximal transfer speed of the interface, in bytes per second. */
+        qint64 bytesPerSecMax;
     };
 
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}

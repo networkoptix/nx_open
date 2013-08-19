@@ -1,6 +1,5 @@
 #include "manual_camera_addition_handler.h"
 
-#include <QtCore/QFileInfo>
 #include <QtNetwork/QAuthenticator>
 
 #include "utils/network/tcp_connection_priv.h"
@@ -8,6 +7,7 @@
 #include "core/resource/resource.h"
 #include "core/resource_managment/resource_searcher.h"
 #include "core/resource_managment/resource_pool.h"
+#include "core/resource/camera_resource.h"
 
 QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
 {
@@ -109,8 +109,15 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList &params
                     QnNetworkResourcePtr netRes = resource.dynamicCast<QnNetworkResource>();
                     if (netRes) {
                         QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
-                        if (!existResList.isEmpty())
-                            existResource = true;
+                        foreach(QnNetworkResourcePtr existRes, existResList) 
+                        {
+                            if (existRes->getTypeId() != netRes->getTypeId())
+                                existResource = true; // camera found by different drivers
+
+                            QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
+                            if (!existCam->isManuallyAdded())
+                                existResource = true; // block manual and auto add in same time
+                        }
                     }
                 }
                 resultByteArray.append(QString("<exists>%1</exists>\n").arg(existResource ? 1 : 0));

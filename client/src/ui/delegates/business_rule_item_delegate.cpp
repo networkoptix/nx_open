@@ -5,6 +5,7 @@
 #include <QtGui/QComboBox>
 
 #include <business/business_action_parameters.h>
+#include <business/business_strings_helper.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -56,13 +57,13 @@ void QnSelectResourcesDialogButton::setNodeType(Qn::NodeType nodeType) {
 }
 
 void QnSelectResourcesDialogButton::at_clicked() {
-    QnResourceSelectionDialog dialog(this, m_nodeType); //TODO: #GDM servers dialog?
+    QnResourceSelectionDialog dialog(m_nodeType, this); //TODO: #GDM servers dialog?
     dialog.setSelectedResources(m_resources);
     dialog.setDelegate(m_dialogDelegate);
     int result = dialog.exec();
     if (result != QDialog::Accepted)
         return;
-    m_resources = dialog.getSelectedResources();
+    m_resources = dialog.selectedResources();
     emit commit();
 }
 
@@ -163,7 +164,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 QComboBox* comboBox = new QComboBox(parent);
                 for (int i = 0; i < BusinessEventType::Count; i++) {
                     BusinessEventType::Value val = (BusinessEventType::Value)i;
-                    comboBox->addItem(BusinessEventType::toString(val), val);
+                    comboBox->addItem(QnBusinessStringsHelper::eventName(val), val);
                 }
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                 return comboBox;
@@ -184,6 +185,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         case QnBusiness::AggregationColumn:
             {
                 QnAggregationWidget* widget = new QnAggregationWidget(parent);
+                widget->setShort(true);
                 connect(widget, SIGNAL(valueChanged()), this, SLOT(at_editor_commit()));
                 return widget;
             }

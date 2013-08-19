@@ -13,11 +13,28 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include "mustache/mustache_helper.h"
+#include "mustache/partial_info.h"
+
 #include "utils/common/synctime.h"
 #include <utils/common/email.h>
 #include "business_strings_helper.h"
+#include "version.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
+
+namespace {
+    const QString tpProductLogoFilename(lit("productLogoFilename"));
+    const QString tpEventLogoFilename(lit("eventLogoFilename"));
+    const QString tpProductLogo(lit("productLogo.png"));
+    const QString tpCompanyName(lit("companyName"));
+    const QString tpCompanyUrl(lit("companyUrl"));
+    const QString tpSupportEmail(lit("supportEmail"));
+    const QString tpSystemName(lit("systemName"));
+    const QString tpImageMimeType(lit("image/png"));
+    const QString tpScreenshotFilename(lit("screenshot"));
+    const QString tpScreenshot(lit("screenshot.jpeg"));
+};
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -41,7 +58,7 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (action->actionType() == BusinessActionType::SendMail || action->actionType() == BusinessActionType::Alert)
+    if (action->actionType() == BusinessActionType::SendMail || action->actionType() == BusinessActionType::Diagnostics)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
@@ -110,8 +127,8 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
     case BusinessActionType::SendMail:
         return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
 
-    case BusinessActionType::Alert:
-        break;
+    case BusinessActionType::Diagnostics:
+        return true;
 
     case BusinessActionType::ShowPopup:
     case BusinessActionType::PlaySound:
@@ -189,6 +206,17 @@ bool QnBusinessRuleProcessor::checkRuleCondition(QnAbstractBusinessEventPtr bEve
     if (!rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
         return false;
     return true;
+}
+
+QString QnBusinessRuleProcessor::formatEmailList(const QStringList &value) {
+    QString result;
+    for (int i = 0; i < value.size(); ++i)
+    {
+        if (i > 0)
+            result.append(L' ');
+        result.append(QString(QLatin1String("%1")).arg(value[i].trimmed()));
+    }
+    return result;
 }
 
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
@@ -358,6 +386,13 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
     //TODO: #vasilenko implement me
 }
 
+QImage QnBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const
+{
+    Q_UNUSED(params);
+    Q_UNUSED(dstSize);
+
+    return QImage();
+}
 bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
 {
     Q_ASSERT( action );
@@ -392,15 +427,52 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
 
+    QVariantHash contextMap = QnBusinessStringsHelper::eventDescriptionMap(action, action->aggregationInfo(), true);
+    QnPartialInfo partialInfo(action->getRuntimeParams().getEventType());
+
+    assert(!partialInfo.attrName.isEmpty());
+    contextMap[partialInfo.attrName] = lit("true");
+
+    QnEmailAttachmentList attachments;
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(partialInfo.eventLogoFilename, lit(":/skin/email_attachments/") + partialInfo.eventLogoFilename, tpImageMimeType)));
+    contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
+    contextMap[tpEventLogoFilename] = lit("cid:") + partialInfo.eventLogoFilename;
+    contextMap[tpCompanyName] = lit(QN_ORGANIZATION_NAME);
+    contextMap[tpCompanyUrl] = lit(QN_COMPANY_URL);
+    contextMap[tpSupportEmail] = lit(QN_SUPPORT_MAIL_ADDRESS);
+    contextMap[tpSystemName] = QnAppServerConnectionFactory::systemName();
+    attachments.append(partialInfo.attachments);
+
+    QImage screenshot = this->getEventScreenshot(action->getRuntimeParams(), QSize(640, 480));
+    if (!screenshot.isNull()) {
+        QByteArray screenshotData;
+        QBuffer screenshotStream(&screenshotData);
+        if (screenshot.save(&screenshotStream, "JPEG")) {
+            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
+            contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+        }
+    }
+
+    QString messageBody = renderTemplateFromFile(lit(":/email_templates"), lit("container.mustache"), contextMap);
+
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
-    appServerConnection->sendEmailAsync(
+    if (appServerConnection->sendEmailAsync(
                 recipients,
-                QnBusinessStringsHelper::shortEventDescription(action->getRuntimeParams()),
-                QnBusinessStringsHelper::longEventDescriptionHtml(action, action->aggregationInfo()),
+                QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
+                messageBody,
+                attachments,
                 EMAIL_SEND_TIMEOUT,
                 this,
-                SLOT(at_sendEmailFinished(int,bool,int)));
-    action->getParams().setEmailAddress(QnBusinessStringsHelper::formatEmailList(recipients)); // update final email list in action (for storing into DB)
+                SLOT(at_sendEmailFinished(int,bool,int))) == -1)
+        return false;
+
+    /*
+     * This action instance is not used anymore but storing into the Events Log db.
+     * Therefore we are storing all used emails in order to not recalculate them in
+     * the event log processing methods. --rvasilenko
+     */
+    action->getParams().setEmailAddress(formatEmailList(recipients));
     return true;
 }
 
@@ -433,9 +505,8 @@ bool QnBusinessRuleProcessor::broadcastBusinessAction(QnAbstractBusinessActionPt
     return true;
 }
 
-void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRule)
+void QnBusinessRuleProcessor::at_businessRuleChanged_i(QnBusinessEventRulePtr bRule)
 {
-    QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_rules.size(); ++i)
     {
         if (m_rules[i]->id() == bRule->id())
@@ -454,6 +525,30 @@ void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRul
     m_rules << bRule;
     if( !bRule->disabled() )
         notifyResourcesAboutEventIfNeccessary( bRule, true );
+}
+
+void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRule)
+{
+    QMutexLocker lock(&m_mutex);
+    at_businessRuleChanged_i(bRule);
+}
+
+void QnBusinessRuleProcessor::at_businessRuleReset(QnBusinessEventRuleList rules)
+{
+    QMutexLocker lock(&m_mutex);
+
+    // Remove all rules
+    for (int i = 0; i < m_rules.size(); ++i)
+    {
+        if( !m_rules[i]->disabled() )
+            notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
+        terminateRunningRule(m_rules[i]);
+    }
+    m_rules.clear();
+
+    foreach(QnBusinessEventRulePtr rule, rules) {
+        at_businessRuleChanged_i(rule);
+    }
 }
 
 void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
@@ -493,6 +588,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
 void QnBusinessRuleProcessor::at_businessRuleDeleted(int id)
 {
     QMutexLocker lock(&m_mutex);
+
     for (int i = 0; i < m_rules.size(); ++i)
     {
         if (m_rules[i]->id() == id)

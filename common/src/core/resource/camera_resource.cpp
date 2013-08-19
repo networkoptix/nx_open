@@ -16,15 +16,15 @@ QnVirtualCameraResource::QnVirtualCameraResource():
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): 
     QnVirtualCameraResource(),
-    m_channelNumer(0)
+    m_channelNumber(0)
 {
     setFlags(local_live_cam);
 }
 
-int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
+int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
 {
-    // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
-    // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
+    // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
 
     int hiEnd = 1024*10;
     int lowEnd = 1024*1;
@@ -35,7 +35,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolu
     float frameRateFactor = fps/30.0;
     frameRateFactor = pow(frameRateFactor, (float)0.4);
 
-    int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
+    int result = lowEnd + (hiEnd - lowEnd) * (q - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(192,result);
@@ -44,18 +44,17 @@ int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolu
 int QnPhysicalCameraResource::getChannel() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_channelNumer;
+    return m_channelNumber;
 }
 
 void QnPhysicalCameraResource::setUrl(const QString &url)
 {
-    QUrl u(url);
+    QnVirtualCameraResource::setUrl(url); /* This call emits, so we should not invoke it under lock. */
 
     QMutexLocker lock(&m_mutex);
-    QnVirtualCameraResource::setUrl(url);
-    m_channelNumer = u.queryItemValue(QLatin1String("channel")).toInt();
-    if (m_channelNumer > 0)
-        m_channelNumer--; // convert human readable channel in range [1..x] to range [0..x]
+    m_channelNumber = QUrl(url).queryItemValue(QLatin1String("channel")).toInt();
+    if (m_channelNumber > 0)
+        m_channelNumber--; // convert human readable channel in range [1..x] to range [0..x-1]
 }
 
 float QnPhysicalCameraResource::getResolutionAspectRatio(const QSize& resolution)
@@ -242,6 +241,12 @@ void QnVirtualCameraResource::save()
     }
 }
 
+int QnVirtualCameraResource::saveAsync(QObject *target, const char *slot)
+{
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+    return conn->saveAsync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), target, slot);
+}
+
 QString QnVirtualCameraResource::toSearchString() const
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
@@ -260,9 +265,15 @@ void QnVirtualCameraResource::issueOccured()
     if (m_issueTimes.size() >= MAX_ISSUE_CNT) {
         if (!hasStatusFlags(HasIssuesFlag)) {
             addStatusFlags(HasIssuesFlag);
-            save();
+            lock.unlock();
+            saveAsync(this, SLOT(at_saveAsyncFinished(int, const QnResourceList &, int)));
         }
     }
+}
+
+void QnVirtualCameraResource::at_saveAsyncFinished(int, const QnResourceList &, int)
+{
+    // not used
 }
 
 void QnVirtualCameraResource::noCameraIssues()
@@ -274,6 +285,7 @@ void QnVirtualCameraResource::noCameraIssues()
 
     if (m_issueTimes.empty() && hasStatusFlags(HasIssuesFlag)) {
         removeStatusFlags(HasIssuesFlag);
-        save();
+        lock.unlock();
+        saveAsync(this, SLOT(at_saveAsyncFinished(int, const QnResourceList &, int)));
     }
 }

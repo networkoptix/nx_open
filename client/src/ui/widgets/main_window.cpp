@@ -194,7 +194,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::CloseLayoutAction));
     addAction(action(Qn::MainMenuAction));
     addAction(action(Qn::YouTubeUploadAction));
-    addAction(action(Qn::EditTagsAction));
     addAction(action(Qn::OpenInFolderAction));
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
@@ -217,7 +216,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
-
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 
 
@@ -233,7 +231,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
     m_windowButtonsLayout->setSpacing(2);
     m_windowButtonsLayout->addSpacing(6);
-    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::WhatsThisAction)));
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::WhatsThisAction), false, 1.0, Qn::MainWindow_ContextHelp_Help));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::ExitAction)));
@@ -247,7 +245,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->setSpacing(2);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction), false, 1.0, Qn::MainWindow_Panic_Help));

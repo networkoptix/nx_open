@@ -22,15 +22,15 @@ QnPlSonyResource::~QnPlSonyResource() {
 
 }
 
-bool QnPlSonyResource::updateResourceCapabilities()
+CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
 {
-    if (!QnPlOnvifResource::updateResourceCapabilities()) {
-        return false;
-    }
+    CameraDiagnostics::Result result = QnPlOnvifResource::updateResourceCapabilities();
+    if (!result)
+        return result;
 
     std::string confToken = getPrimaryVideoEncoderId().toStdString();
     if (confToken.empty()) {
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getPrimaryVideoEncoderId"), QString());
     }
 
     QAuthenticator auth(getAuth());
@@ -48,7 +48,7 @@ bool QnPlSonyResource::updateResourceCapabilities()
         qWarning() << "QnPlSonyResource::updateResourceCapabilities: can't get video encoder (or received data is null) (token="
             << confToken.c_str() << ") from camera (URL: " << soapWrapperGet.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). GSoap error code: " << soapRes << ". " << soapWrapperGet.getLastError();
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfiguration"), soapWrapperGet.getLastError());
     }
 
     typedef QSharedPointer<QList<QSize> > ResolutionListPtr;
@@ -87,7 +87,9 @@ bool QnPlSonyResource::updateResourceCapabilities()
                 qWarning() << "QnPlSonyResource::updateResourceCapabilities: can't set video encoder options (token="
                     << confToken.c_str() << ") from camera (URL: " << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
                     << "). GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-                return false;
+                return CameraDiagnostics::RequestFailedResult(
+                    QString::fromLatin1("setVideoEncoderConfiguration(%1x%2)").arg(it->width()).arg(it->height()),
+                    soapWrapper.getLastError() );
             }
         }
 
@@ -101,22 +103,24 @@ bool QnPlSonyResource::updateResourceCapabilities()
     }
 
     if (soapRes != SOAP_OK) {
-        return false;
+        return CameraDiagnostics::RequestFailedResult( QString::fromLatin1("setVideoEncoderConfiguration"), soapWrapper.getLastError() );
     }
 
     if (triesNumLeft == MAX_RESOLUTION_DECREASES_NUM) {
-        return true;
+        return CameraDiagnostics::NoErrorResult();
     }
 
     QMutexLocker lock(&m_mutex);
     m_resolutionList = *resolutionListPtr.data();
-    return true;
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnPlSonyResource::initInternal()
+CameraDiagnostics::Result QnPlSonyResource::initInternal()
 {
-    if( !QnPlOnvifResource::initInternal() )
-        return false;
+    const CameraDiagnostics::Result result = QnPlOnvifResource::initInternal();
+    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+        return result;
 
     //TODO/IMPL if no input, exiting
 
@@ -135,7 +139,7 @@ bool QnPlSonyResource::initInternal()
 
     startInputPortMonitoring();
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool QnPlSonyResource::startInputPortMonitoring()

@@ -720,6 +720,8 @@ void QnWorkbenchNavigator::updateLocalOffset() {
     if(qnSettings->timeMode() == Qn::ServerTimeMode && m_currentMediaWidget && (m_currentWidgetFlags & WidgetUsesUTC))
         localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_currentMediaWidget->resource(), 0);
     m_timeSlider->setLocalOffset(localOffset);
+    m_calendar->setLocalOffset(localOffset);
+    m_dayTimeWidget->setLocalOffset(localOffset);
 }
 
 void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
@@ -807,15 +809,18 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
     if(!m_pausedOverride) {
         qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();
-        if(isSearch && (quint64)timeUSec == AV_NOPTS_VALUE) {
-            timeUSec = m_currentMediaWidget->item()->data<qint64>(Qn::ItemTimeRole, AV_NOPTS_VALUE);
-            if((quint64)timeUSec != AV_NOPTS_VALUE)
+        if ((quint64)timeUSec == AV_NOPTS_VALUE)
+            timeUSec = -1;
+
+        if(isSearch && timeUSec < 0) {
+            timeUSec = m_currentMediaWidget->item()->data<qint64>(Qn::ItemTimeRole, -1);
+            if (timeUSec != DATETIME_NOW && timeUSec >= 0)
                 timeUSec *= 1000;
         }
-        qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : ((quint64)timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
+        qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec < 0 ? m_timeSlider->value() : timeUSec / 1000);
         qint64 timeNext = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? AV_NOPTS_VALUE : m_currentMediaWidget->display()->camDisplay()->getNextTime();
 
-        if (timeUSec != DATETIME_NOW && (quint64)timeUSec != AV_NOPTS_VALUE) {
+        if (timeUSec != DATETIME_NOW && timeUSec >= 0) {
             qint64 now = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
             if (m_lastUpdateSlider && m_lastCameraTime == timeMSec && (quint64)timeNext != AV_NOPTS_VALUE && timeNext - timeMSec <= MAX_FRAME_DURATION){
                 qint64 timeDiff = (now - m_lastUpdateSlider) * speed();
@@ -829,7 +834,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
         m_timeSlider->setValue(timeMSec, keepInWindow);
 
-        if((quint64)timeUSec != AV_NOPTS_VALUE)
+        if(timeUSec >= 0)
             updateLive();
 
         bool sync = (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods));
@@ -914,15 +919,19 @@ void QnWorkbenchNavigator::updateSyncedPeriods() {
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent type) {
-    QVector<QnTimePeriodList> periodsList;
+    /* We don't want duplicate loaders. */
+    QSet<QnCachingTimePeriodLoader *> loaders;
     foreach(const QnResourceWidget *widget, m_syncedWidgets) {
-        if(type == Qn::MotionContent && !(widget->options() & QnResourceWidget::DisplayMotion)) 
-        {
+        if(type == Qn::MotionContent && !(widget->options() & QnResourceWidget::DisplayMotion)) {
             /* Ignore it. */
         } else if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource())) {
-            periodsList.push_back(loader->periods(type));
+            loaders.insert(loader);
         }
     }
+
+    QVector<QnTimePeriodList> periodsList;
+    foreach(QnCachingTimePeriodLoader *loader, loaders)
+        periodsList.push_back(loader->periods(type));
 
     QnTimePeriodList periods = QnTimePeriod::mergeTimePeriods(periodsList);
 
@@ -1356,8 +1365,8 @@ void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased() {
 
 void QnWorkbenchNavigator::at_calendar_dateClicked(const QDate &date){
     QDateTime dateTime(date);
-    qint64 startMSec = dateTime.toMSecsSinceEpoch();
-    qint64 endMSec = dateTime.addDays(1).toMSecsSinceEpoch();
+    qint64 startMSec = dateTime.toMSecsSinceEpoch() - m_calendar->localOffset();
+    qint64 endMSec = dateTime.addDays(1).toMSecsSinceEpoch() - m_calendar->localOffset();
 
     m_timeSlider->finishAnimations();
     if (QApplication::keyboardModifiers() == Qt::ControlModifier) {
@@ -1382,8 +1391,8 @@ void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time) {
 
     QDateTime dateTime = QDateTime(date, time);
 
-    qint64 startMSec = dateTime.toMSecsSinceEpoch();
-    qint64 endMSec = dateTime.addSecs(60 * 60).toMSecsSinceEpoch();
+    qint64 startMSec = dateTime.toMSecsSinceEpoch() - m_dayTimeWidget->localOffset();
+    qint64 endMSec = dateTime.addSecs(60 * 60).toMSecsSinceEpoch() - m_dayTimeWidget->localOffset();
 
     m_timeSlider->finishAnimations();
     m_timeSlider->setWindow(startMSec, endMSec, true);

@@ -20,6 +20,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
@@ -43,15 +45,17 @@ class ZoomWindowWidget: public Instrumented<QnClickableWidget>, public Constrain
     typedef Instrumented<QnClickableWidget> base_type;
 public:
     ZoomWindowWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
-        base_type(parent, windowFlags)
+        base_type(parent, windowFlags),
+        m_interactive(true)
     {
         setWindowFrameMargins(zoomFrameWidth, zoomFrameWidth, zoomFrameWidth, zoomFrameWidth);
 
-        setAcceptedMouseButtons(Qt::LeftButton);
-        setClickableButtons(Qt::LeftButton);
-
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
+
+        setHelpTopic(this, Qn::MainWindow_MediaItem_ZoomWindows_Help);
+
+        updateInteractivity();
     }
 
     virtual ~ZoomWindowWidget();
@@ -80,8 +84,26 @@ public:
         m_frameColor = frameColor;
     }
 
+    bool isInteractive() const {
+        return m_interactive;
+    }
+
+    void setInteractive(bool interactive) {
+        if(m_interactive == interactive)
+            return;
+
+        m_interactive = interactive;
+
+        updateInteractivity();
+    }
+
 protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override {
+        if(!m_interactive) {
+            base_type::wheelEvent(event);
+            return;
+        }
+
         qreal scale = std::pow(2.0, (-event->delta() / 8.0) / 180.0);
 
         QRectF geometry = this->geometry();
@@ -120,6 +142,9 @@ protected:
     }
 
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override {
+        if(!m_interactive)
+            return Qn::NoSection;
+
         Qn::WindowFrameSections result = base_type::windowFrameSectionsAt(region);
 
         if(result & Qn::SideSections)
@@ -131,6 +156,18 @@ protected:
     }
 
 private:
+    void updateInteractivity() {
+        if(m_interactive) {
+            setAcceptedMouseButtons(Qt::LeftButton);
+            setClickableButtons(Qt::LeftButton);
+        } else {
+            setAcceptedMouseButtons(Qt::NoButton);
+            setClickableButtons(Qt::NoButton);
+        }
+    }
+
+private:
+    bool m_interactive;
     QColor m_frameColor;
     QWeakPointer<ZoomOverlayWidget> m_overlay;
     QWeakPointer<QnMediaResourceWidget> m_zoomWidget;
@@ -144,7 +181,8 @@ class ZoomOverlayWidget: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 public:
     ZoomOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
-        base_type(parent, windowFlags)
+        base_type(parent, windowFlags),
+        m_interactive(true)
     {
         setAcceptedMouseButtons(0);
     }
@@ -160,6 +198,7 @@ public:
     void addWidget(ZoomWindowWidget *widget) {
         widget->setOverlay(this);
         widget->setParentItem(this);
+        widget->setInteractive(m_interactive);
         m_rectByWidget.insert(widget, QRectF(0.0, 0.0, 1.0, 1.0));
         
         updateLayout(widget);
@@ -186,6 +225,20 @@ public:
         return m_rectByWidget.value(widget, QRectF());
     }
 
+    bool isInteractive() const {
+        return m_interactive;
+    }
+
+    void setInteractive(bool interactive) {
+        if(m_interactive == interactive)
+            return;
+
+        m_interactive = interactive;
+
+        foreach(ZoomWindowWidget *widget, m_rectByWidget.keys())
+            widget->setInteractive(m_interactive);
+    }
+
     virtual void setGeometry(const QRectF &rect) override {
         QSizeF oldSize = size();
 
@@ -208,6 +261,7 @@ private:
 private:
     QHash<ZoomWindowWidget *, QRectF> m_rectByWidget;
     QWeakPointer<QnMediaResourceWidget> m_target;
+    bool m_interactive;
 };
 
 
@@ -313,8 +367,8 @@ ZoomOverlayWidget *ZoomWindowInstrument::ensureOverlayWidget(QnMediaResourceWidg
     overlayWidget->setTarget(widget);
     data.overlayWidget = overlayWidget;
 
-    widget->addOverlayWidget(overlayWidget, QnResourceWidget::AutoVisible, false, false, false);
-    updateOverlayVisibility(widget);
+    widget->addOverlayWidget(overlayWidget, QnResourceWidget::UserVisible, false, false, false);
+    updateOverlayMode(widget);
 
     return overlayWidget;
 }
@@ -394,20 +448,31 @@ void ZoomWindowInstrument::unregisterLink(QnMediaResourceWidget *widget, QnMedia
     data.windowWidget = NULL;
 }
 
-void ZoomWindowInstrument::updateOverlayVisibility(QnMediaResourceWidget *widget) {
+void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget *widget) {
     ZoomOverlayWidget *overlayWidget = this->overlayWidget(widget);
     if(!overlayWidget)
         return;
 
-    QnResourceWidget::OverlayVisibility visibility;
+    qreal opacity = 0.0;
+    bool interactive = false;
     if(widget == display()->widget(Qn::ZoomedRole)) {
-        visibility = QnResourceWidget::Invisible;
-    } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity | QnResourceWidget::DisplayCrosshair)) {
-        visibility = QnResourceWidget::Invisible;
+        /* Leave invisible. */
+    } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity)) {
+        /* Leave invisible. */
+    } else if(widget->options() & QnResourceWidget::DisplayCrosshair) {
+        if(widget->virtualPtzController()) {
+            /* Leave invisible. */
+        } else {
+            opacity = 0.4;
+            interactive = false;
+        }
     } else {
-        visibility = QnResourceWidget::Visible;
+        opacity = 1.0;
+        interactive = true;
     }
-    widget->setOverlayWidgetVisibility(overlayWidget, visibility);
+    
+    opacityAnimator(overlayWidget, 1.0)->animateTo(opacity);
+    overlayWidget->setInteractive(interactive);
 }
 
 void ZoomWindowInstrument::updateWindowFromWidget(QnMediaResourceWidget *widget) {
@@ -593,7 +658,7 @@ void ZoomWindowInstrument::at_widget_frameColorChanged() {
 }
 
 void ZoomWindowInstrument::at_widget_optionsChanged() {
-    updateOverlayVisibility(checked_cast<QnMediaResourceWidget *>(sender()));
+    updateOverlayMode(checked_cast<QnMediaResourceWidget *>(sender()));
 }
 
 void ZoomWindowInstrument::at_windowWidget_geometryChanged() {
@@ -614,12 +679,12 @@ void ZoomWindowInstrument::at_display_widgetChanged(Qn::ItemRole role) {
         return;
 
     if(m_zoomedWidget)
-        updateOverlayVisibility(m_zoomedWidget.data());
+        updateOverlayMode(m_zoomedWidget.data());
     
     m_zoomedWidget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(role));
 
     if(m_zoomedWidget)
-        updateOverlayVisibility(m_zoomedWidget.data());
+        updateOverlayMode(m_zoomedWidget.data());
 }
 
 void ZoomWindowInstrument::at_display_zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget) {

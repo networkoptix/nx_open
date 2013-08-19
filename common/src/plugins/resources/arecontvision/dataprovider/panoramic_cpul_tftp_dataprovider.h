@@ -15,6 +15,9 @@ public:
 
     ~AVPanoramicClientPullSSTFTPStreamreader();
 
+    //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
+    virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
+
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
     virtual QnMetaDataV1Ptr getCameraMetadata() override;

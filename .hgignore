@@ -187,6 +187,8 @@ ios-client/target
 
 ios-client/Settings.bundle/Root.plist
 ios-client/HDWitness/HDWitness-Info.plist
+ios-client/HDWitness/HDWCompatibilityItems.m
+ios-client/HDWitness/version.h
 ios-client/Podfile
 
 launcher/x86
@@ -209,3 +211,5 @@ nx_sdk/nx_sdk
 
 
 libonvif/.build/
+
+.vagrant

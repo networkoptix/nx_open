@@ -23,7 +23,7 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
-    enum StatusFlag { 
+    enum StatusFlag {
         HasIssuesFlag = 0x1
     };
     Q_DECLARE_FLAGS(StatusFlags, StatusFlag)
@@ -80,6 +80,7 @@ public:
 
     virtual bool hasDualStreaming() const;
 
+
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
 
@@ -101,6 +102,7 @@ public:
 
     /*!
         Change output with id \a ouputID state to \a activate
+        \param ouputID If empty, implementation MUST select any output port
         \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
         \return true in case of success. false, if nothing has been done
     */
@@ -126,14 +128,14 @@ public:
     virtual const QnResourcePtr toResourcePtr() const override;
     //!Implementation of QnMediaResource::toResource
     virtual QnResourcePtr toResourcePtr() override;
-    void setSecondaryStreamQuality(QnSecondaryStreamQuality  quality);
-    QnSecondaryStreamQuality  secondaryStreamQuality() const;
+    void setSecondaryStreamQuality(Qn::SecondStreamQuality  quality);
+    Qn::SecondStreamQuality  secondaryStreamQuality() const;
 
     void setCameraControlDisabled(bool value);
     bool isCameraControlDisabled() const;
 
     int desiredSecondStreamFps() const;
-    QnStreamQuality getSecondaryStreamQuality() const;
+    Qn::StreamQuality getSecondaryStreamQuality() const;
 
     StatusFlags statusFlags() const;
     bool hasStatusFlags(StatusFlags value) const;
@@ -151,6 +153,18 @@ public slots:
 signals:
     void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    //!Emitted on camera input port state has been changed
+    /*!
+        \param resource Smart pointer to \a this
+        \param inputPortID
+        \param value true if input is connected, false otherwise
+        \param timestamp MSecs since epoch, UTC
+    */
+    void cameraInput(
+        QnResourcePtr resource,
+        const QString& inputPortID,
+        bool value,
+        qint64 timestamp );
 
 protected slots:
     virtual void at_disabledChanged();
@@ -190,7 +204,7 @@ private:
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
-    QnSecondaryStreamQuality  m_secondaryQuality;
+    Qn::SecondStreamQuality  m_secondaryQuality;
     bool m_cameraControlDisabled;
     StatusFlags m_statusFlags;
 };

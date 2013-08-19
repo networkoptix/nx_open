@@ -9,12 +9,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>1.5.3-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>1.5.3-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wixsetup</artifactId>
     <packaging>pom</packaging>
@@ -25,6 +25,7 @@
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
         <install.type>all</install.type>
+        <ClientBgSourceDir>${basedir}/../client/resource/common/backgrounds</ClientBgSourceDir>
     </properties>
 
     <dependencies>
@@ -202,6 +203,21 @@
                             </execution>                            
 
                             <execution>
+                                <id>bg-heat</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${python.dir}/python</executable>
+                                    <arguments>
+                                        <argument>generate-bg-wxs.py</argument>
+                                    </arguments>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                </configuration>                    
+                            </execution>                            
+
+                            <execution>
                                 <id>package-CustomActions-with-msbuild</id>
                                 <phase>generate-resources</phase>
                                 <goals>
@@ -226,6 +242,7 @@
                                         <argument>-dAppServerSourceDir="${AppServerDir}"</argument>
                                         <argument>-dClientHelpSourceDir="${ClientHelpSourceDir}"</argument>
                                         <argument>-dClientVoxSourceDir="${ClientVoxSourceDir}"</argument>
+                                        <argument>-dClientBgSourceDir="${ClientBgSourceDir}"</argument>
                                         <argument>-arch</argument>
                                         <argument>${arch}</argument>
                                         <argument>-out</argument>
@@ -260,7 +277,9 @@
                                         <argument>AppServerFiles.wxs</argument>
                                         <argument>ClientHelp.wxs</argument>
                                         <argument>ClientVox.wxs</argument>
+                                        <argument>ClientBg.wxs</argument>
                                         <argument>AppServerDlg.wxs</argument> 
+                                        <argument>Client.wxs</argument> 
                                     </arguments>
                                 </configuration>                    
                             </execution>

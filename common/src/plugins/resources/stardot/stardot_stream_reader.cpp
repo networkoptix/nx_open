@@ -14,7 +14,7 @@ static const QByteArray STARDOT_MOTION_UUID = QByteArray::fromHex("bed9b7e0f0603
 
 
 QnStardotStreamReader::QnStardotStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res),
+    CLServerPushStreamReader(res),
     m_multiCodec(res)
 {
     m_stardotRes = res.dynamicCast<QnStardotResource>();
@@ -25,7 +25,7 @@ QnStardotStreamReader::~QnStardotStreamReader()
     stop();
 }
 
-void QnStardotStreamReader::openStream()
+CameraDiagnostics::Result QnStardotStreamReader::openStream()
 {
     // configure stream params
 
@@ -42,18 +42,26 @@ void QnStardotStreamReader::openStream()
         if (status != CL_HTTP_SUCCESS) 
         {
             if (status == CL_HTTP_AUTH_REQUIRED) 
+            {
                 m_resource->setStatus(QnResource::Unauthorized);
-            return;
+                QUrl requestedUrl;
+                requestedUrl.setHost( m_stardotRes->getHostAddress() );
+                requestedUrl.setPort( m_stardotRes->httpPort() );
+                requestedUrl.setScheme( QLatin1String("http") );
+                requestedUrl.setPath( request );
+                return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
+            }
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("admin.cgi?image"), QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
         }
     }
 
     QString streamUrl = m_stardotRes->getRtspUrl();
 
     m_multiCodec.setRequest(streamUrl);
-    m_multiCodec.openStream();
+    const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
         m_resource->setStatus(QnResource::Unauthorized);
-
+    return result;
 }
 
 void QnStardotStreamReader::closeStream()

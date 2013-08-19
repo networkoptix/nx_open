@@ -22,6 +22,7 @@
 #include "serializer/pb_serializer.h"
 #include "event_log/events_serializer.h"
 
+
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
         ((StorageStatusObject,      "storageStatus"))
@@ -38,8 +39,9 @@ namespace {
         ((TimeObject,               "gettime"))
         ((CameraSearchObject,       "manualCamera/search"))
         ((CameraAddObject,          "manualCamera/add"))
-        ((eventLogObject,           "events"))
+        ((EventLogObject,           "events"))
         ((ImageObject,              "image"))
+        ((CameraDiagnosticsObject,  "doCameraDiagnosticsStep"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -62,13 +64,6 @@ namespace {
 
     template<class T>
     const char *check_reply_type() { return NULL; }
-
-    const quint64 saneNetworkSpeed = 100ull*1000ull*1000ull*1000ull; //let it be 100 gigabits
-    qreal checkedNetworkSpeed(const quint64 bytesPerSec) {
-        return (bytesPerSec < saneNetworkSpeed)
-                ? static_cast<qreal>(bytesPerSec)
-                : -1;
-    }
 
 } // anonymous namespace
 
@@ -244,27 +239,20 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
             }
 
             QByteArray networkBlock = extractXmlBody(data, "network"), interfaceBlock; {
-                qDebug() << "network statistics" << networkBlock;
                 int from = 0;
                 do {
                     interfaceBlock = extractXmlBody(networkBlock, "interface", &from);
                     if (interfaceBlock.length() == 0)
                         break;
+
                     QString interfaceName = QLatin1String(extractXmlBody(interfaceBlock, "name"));
                     int interfaceType = extractXmlBody(interfaceBlock, "type").toInt();
+                    qint64 bytesIn = extractXmlBody(interfaceBlock, "in").toLongLong();
+                    qint64 bytesOut = extractXmlBody(interfaceBlock, "out").toLongLong();
+                    qint64 bytesMax = extractXmlBody(interfaceBlock, "max").toLongLong();
 
-                    reply.statistics.append(QnStatisticsDataItem(
-                                                interfaceName + QChar(0x21e9),
-                                                checkedNetworkSpeed(extractXmlBody(interfaceBlock, "in").toULongLong() * 8), //converting from bytes per sec to bits per sec
-                                                NETWORK_IN,
-                                                interfaceType
-                    ));
-                    reply.statistics.append(QnStatisticsDataItem(
-                                                interfaceName + QChar(0x21e7),
-                                                checkedNetworkSpeed(extractXmlBody(interfaceBlock, "out").toULongLong() * 8), //converting from bytes per sec to bits per sec
-                                                NETWORK_OUT,
-                                                interfaceType
-                    ));
+                    if(bytesMax != 0)
+                        reply.statistics.push_back(QnStatisticsDataItem(interfaceName, static_cast<qreal>(qMax(bytesIn, bytesOut)) / bytesMax, NETWORK, interfaceType));
                 } while (networkBlock.length() > 0);
             }
 
@@ -364,7 +352,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, reply, handle);
         break;
     }
-    case eventLogObject: {
+    case EventLogObject: {
         QnApiPbSerializer serializer;
         QnBusinessActionDataListPtr events(new QnBusinessActionDataList);
         if (response.status == 0)
@@ -373,13 +361,15 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     }
     case ImageObject: {
-        QnApiPbSerializer serializer;
         QImage image;
         if (response.status == 0)
             image.loadFromData(response.data);
         emitFinished(this, response.status, image, handle);
         break;
     }
+    case CameraDiagnosticsObject:
+        processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
+        break;
     default:
         assert(false); /* We should never get here. */
         break;
@@ -561,6 +551,16 @@ int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_REPLY_TYPE(QnTimeReply), target, slot);
 }
 
+int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
+    const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+    QObject* target, const char* slot )
+{
+    QnRequestParamList params;
+    params << QnRequestParam("res_id",  cameraID);
+    params << QnRequestParam("type", CameraDiagnostics::Step::toString(previousStep));
+    return sendAsyncGetRequest(CameraDiagnosticsObject, params, QN_REPLY_TYPE(QnCameraDiagnosticsReply), target, slot);
+}
+
 int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(StorageSpaceObject, QnRequestParamList(), QN_REPLY_TYPE(QnStorageSpaceReply), target, slot);
 }
@@ -607,6 +607,6 @@ int QnMediaServerConnection::getEventLogAsync(
     if (actionType != BusinessActionType::NotDefined)
         params << QnRequestParam( "action", (int) actionType);
 
-    return sendAsyncGetRequest(eventLogObject, params, QN_REPLY_TYPE(QnBusinessActionDataListPtr), target, slot);
+    return sendAsyncGetRequest(EventLogObject, params, QN_REPLY_TYPE(QnBusinessActionDataListPtr), target, slot);
 }
 

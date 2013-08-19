@@ -9,6 +9,7 @@
 #include <QStringList>
 #include <QReadWriteLock>
 #include <QThreadPool>
+#include "utils/camera/camera_diagnostics.h"
 #include "utils/common/from_this_to_shared.h"
 #include "utils/common/id.h"
 #include "core/datapacket/abstract_data_packet.h"
@@ -21,6 +22,15 @@
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
+
+class QnInitResPool: public QThreadPool
+{
+public:
+    QnInitResPool() : QThreadPool() 
+    {
+        setMaxThreadCount(64);
+    }
+};
 
 class QnResourceParameters: public QMap<QString, QString> {
     typedef QMap<QString, QString> base_type;
@@ -36,7 +46,7 @@ public:
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
-    Q_FLAGS(Flags Flag)
+    Q_FLAGS(Flags Flag Qn::PtzCapabilities)
     Q_ENUMS(ConnectionRole Status)
     Q_PROPERTY(QnId id READ getId WRITE setId)
     Q_PROPERTY(QnId typeId READ getTypeId WRITE setTypeId)
@@ -49,7 +59,9 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(Flags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
-    Q_PROPERTY(QStringList tags READ tagList WRITE setTags)
+    Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
+    Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
+
 
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
@@ -138,9 +150,24 @@ public:
     virtual void setStatus(Status newStatus, bool silenceMode = false);
     QDateTime getLastStatusUpdateTime() const;
 
-    // this function is called if resourse changes state from offline to online or so 
-    void init();
-    void initAsync();
+    //!this function is called if resourse changes state from offline to online or so 
+    /*!
+        \note If \a QnResource::init is already running in another thread, this method exits immediately and returns false
+        \return true, if initialization attempt is done (with success or failure). false, if \a QnResource::init is already running in other thread
+    */
+    bool init();
+
+    void setLastMediaIssue(const CameraDiagnostics::Result& issue);
+    CameraDiagnostics::Result getLastMediaIssue() const;
+
+    /*!
+        Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
+    */
+    void blockingInit();
+    void initAsync(bool optional);
+    CameraDiagnostics::Result prevInitializationResult() const;
+    //!Returns counter of resiource initialization attempts (every attempt: successfull or not)
+    int initializationAttemptCount() const;
     
     // flags like network media and so on
     Flags flags() const;
@@ -216,7 +243,7 @@ public:
     void setTags(const QStringList& tags);
     void removeTag(const QString& tag);
     bool hasTag(const QString& tag) const;
-    QStringList tagList() const;
+    QStringList getTags() const;
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
     bool hasUnprocessedCommands() const;
@@ -225,6 +252,15 @@ public:
     virtual QnAbstractPtzController* getPtzController(); // TODO: #vasilenko: OMG what is THIS doing here???
 
     static void stopAsyncTasks();
+
+    /**
+        Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
+    */
+    Qn::PtzCapabilities getPtzCapabilities() const;
+    bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
+    void setPtzCapabilities(Qn::PtzCapabilities capabilities);
+    void setPtzCapability(Qn::PtzCapabilities capability, bool value);
+
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
@@ -251,6 +287,7 @@ signals:
 
     void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
 
+    void ptzCapabilitiesChanged(const QnResourcePtr &resource);
 public:
     // this is thread to process commands like setparam
     static void startCommandProc();
@@ -278,7 +315,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
-    virtual bool initInternal() {return true;};
+    virtual CameraDiagnostics::Result initInternal() {return CameraDiagnostics::NoErrorResult();};
     //!Called just after successful \a initInternal()
     /*!
         Inherited class implementation MUST call base class method first
@@ -308,6 +345,7 @@ protected:
 
     /** Mutex that is to be used when accessing resource fields. */
     mutable QMutex m_mutex;
+    QMutex m_initMutex;
 
     mutable QnParamList m_resourceParamList;
 
@@ -349,10 +387,13 @@ private:
     QStringList m_tags;
 
     bool m_initialized;    
-    QMutex m_initMutex;
+    QMutex m_initAsyncMutex;
 
-    static QThreadPool m_initAsyncPool;
+    static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
+    CameraDiagnostics::Result m_prevInitializationResult;
+    CameraDiagnostics::Result m_lastMediaIssue;
+    QAtomicInt m_initializationAttemptCount;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
@@ -362,7 +403,7 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
         return QnSharedResourcePointer<Resource>();
     } else {
-        return resource->toSharedPointer().template dynamicCast<Resource>(); // TODO: #Elric replace with staticCast once we deal with virtual inheritance
+        return resource->toSharedPointer().template staticCast<Resource>();
     }
 }
 

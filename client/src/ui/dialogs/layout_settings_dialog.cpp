@@ -14,8 +14,11 @@
 #include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
 
+#include <ui/common/geometry.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/widgets/framed_label.h>
 
@@ -49,6 +52,9 @@ namespace {
         /** New image is selected being uploading to the EC. */
         NewImageUploading
     };
+
+    /** If difference between image AR and screen AR is smaller than this value, cropped preview will not be generated */
+    const qreal aspectRatioVariation = 0.05;
 }
 
 
@@ -60,8 +66,8 @@ public:
         state(NoImage),
         cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio())
     {}
+    
     virtual ~QnLayoutSettingsDialogPrivate(){}
-
 
     void clear() {
         state = NoImage;
@@ -79,12 +85,11 @@ public:
 
     bool imageIsLoading() const {
         return
-                state == ImageDownloading ||
-                state == ImageLoading ||
-                state == NewImageLoading ||
-                state == NewImageUploading;
+            state == ImageDownloading ||
+            state == ImageLoading ||
+            state == NewImageLoading ||
+            state == NewImageUploading;
     }
-
 
     bool canChangeAspectRatio() const {
         return !croppedPreview.isNull();
@@ -121,8 +126,11 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->imageLabel->installEventFilter(this);
+    setHelpTopic(ui->imageLabel,        Qn::LayoutSettings_EMapping_Help);
+    setHelpTopic(ui->lockedCheckBox,    Qn::LayoutSettings_Locking_Help);
 
+    ui->imageLabel->installEventFilter(this);
+    ui->imageLabel->setFrameColor(qnGlobals->frameColor());
 
     ui->widthSpinBox->setMinimum(qnGlobals->layoutBackgroundMinSize().width());
     ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
@@ -149,14 +157,15 @@ QnLayoutSettingsDialog::~QnLayoutSettingsDialog()
 }
 
 bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
-    Q_D(const QnLayoutSettingsDialog);
-    if (target == ui->imageLabel &&
-            event->type() == QEvent::MouseButtonRelease) {
+    Q_D(QnLayoutSettingsDialog);
+
+    if (target == ui->imageLabel && event->type() == QEvent::MouseButtonRelease) {
         if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == Error) )
             selectFile();
         else
             viewFile();
     }
+
     return base_type::eventFilter(target, event);
 }
 
@@ -253,6 +262,7 @@ bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
 void QnLayoutSettingsDialog::updateControls() {
     if (m_isUpdating)
         return;
+
     QnScopedValueRollback<bool> guard(&m_isUpdating, true);
     Q_UNUSED(guard)
 
@@ -275,15 +285,17 @@ void QnLayoutSettingsDialog::updateControls() {
     ui->clearButton->setEnabled(imagePresent && !locked);
     ui->opacitySpinBox->setEnabled(imagePresent && !locked);
     ui->selectButton->setEnabled(!locked);
-    ui->cropToMonitorCheckBox->setEnabled(imagePresent && d->canChangeAspectRatio());
+    ui->cropToMonitorCheckBox->setEnabled(imagePresent /*&& d->canChangeAspectRatio()*/ );
     // image is already cropped to monitor aspect ratio
+    /*
     if (imagePresent && !d->canChangeAspectRatio())
         ui->cropToMonitorCheckBox->setChecked(true);
+    */
 
     QImage image;
     if (!imagePresent) {
         ui->imageLabel->setPixmap(QPixmap());
-        ui->imageLabel->setText(d->state != Error
+        ui->imageLabel->setText(d->state != Error 
                             ? tr("<No image>")
                             : d->errorText);
     } else {
@@ -296,25 +308,17 @@ void QnLayoutSettingsDialog::updateControls() {
     qreal targetAspectRatio = bestAspectRatioForCells();
     // TODO: #GDM do not change if values were changed manually?
     if (ui->keepAspectRatioCheckBox->isChecked() && targetAspectRatio > 0 && !cellsAreBestAspected()) {
-        int w, h;
-        if (targetAspectRatio >= 1.0) { // width is greater than height
-            w = qnGlobals->layoutBackgroundMaxSize().width();
-            h = qRound((qreal)w / targetAspectRatio);
-        } else {
-            h = qnGlobals->layoutBackgroundMaxSize().height();
-            w = qRound((qreal)h * targetAspectRatio);
-        }
-        ui->widthSpinBox->setMaximum(w);
-        ui->heightSpinBox->setMaximum(h);
+        QSize minSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMinSize(), Qt::KeepAspectRatioByExpanding).toSize();
+        QSize maxSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMaxSize(), Qt::KeepAspectRatio).toSize();
+
+        ui->widthSpinBox->setRange(minSize.width(), maxSize.width());
+        ui->heightSpinBox->setRange(minSize.height(), maxSize.height());
 
         // limit w*h <= recommended area; minor variations are allowed, e.g. 17*6 ~~= 100;
-        qreal areaCoef = qSqrt((qreal)w * h / qnGlobals->layoutBackgroundRecommendedArea());
-        if (areaCoef > 1.0) {
-            w = qRound((qreal)w / areaCoef);
-            h = qRound((qreal)h / areaCoef);
-        }
-        ui->widthSpinBox->setValue(w);
-        ui->heightSpinBox->setValue(h);
+        qreal height = qSqrt(qnGlobals->layoutBackgroundRecommendedArea() / targetAspectRatio);
+        qreal width = height * targetAspectRatio;
+        ui->widthSpinBox->setValue(width);
+        ui->heightSpinBox->setValue(height);
     } else {
         ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
         ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
@@ -368,7 +372,7 @@ void QnLayoutSettingsDialog::at_accepted() {
 }
 
 void QnLayoutSettingsDialog::at_opacitySpinBox_valueChanged(int value) {
-    ui->imageLabel->setOpacityPercent(value);
+    ui->imageLabel->setOpacity(0.01 * value);
 }
 
 void QnLayoutSettingsDialog::at_widthSpinBox_valueChanged(int value) {
@@ -475,6 +479,7 @@ void QnLayoutSettingsDialog::selectFile() {
 
     QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Open file")));
     dialog->setFileMode(QFileDialog::ExistingFile);
+    dialog->setDirectory(qnSettings->backgroundsFolder());
 
     QString nameFilter;
     foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
@@ -485,20 +490,18 @@ void QnLayoutSettingsDialog::selectFile() {
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
     dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
 
-    bool cropImage = ui->cropToMonitorCheckBox->isChecked();
-    dialog->addCheckBox(tr("Crop to current monitor AR"), &cropImage);
     if(!dialog->exec())
         return;
 
     QStringList files = dialog->selectedFiles();
     if (files.size() < 0)
         return;
+    qnSettings->setBackgroundsFolder(dialog->directory().absolutePath());
 
     d->clear();
     d->imageSourcePath = files[0];
     d->imageFilename = QString();
     d->state = NewImageSelected;
-    ui->cropToMonitorCheckBox->setChecked(cropImage);
 
     loadPreview();
     updateControls();
@@ -518,14 +521,20 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
 
     if (d->state == ImageLoading)
         d->state = ImageLoaded;
-    else if (d->state = NewImageLoading)
+    else if (d->state == NewImageLoading)
         d->state = NewImageLoaded;
     d->preview = image;
 
     /* Disable cropping for images that are quite well aspected. */
     qreal imageAspectRatio = (qreal)image.width() / (qreal)image.height();
-    if (qAbs(imageAspectRatio - screenAspectRatio()) > 0.05)
+    if (qAbs(imageAspectRatio - screenAspectRatio()) > aspectRatioVariation) {
         d->croppedPreview = cropImageToAspectRatio(image, screenAspectRatio());
+    }
+    else {
+        d->croppedPreview = QImage();
+        if (d->state == ImageLoaded)
+            ui->cropToMonitorCheckBox->setChecked(true);
+    }
 
     if (d->state == NewImageLoaded) {
         // always set flag to true for new images
@@ -536,7 +545,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     } else {
         // set to true if possible (current sizes will not be changed)
         ui->keepAspectRatioCheckBox->setChecked(cellsAreBestAspected());
-   }
+    }
 
     updateControls();
 }

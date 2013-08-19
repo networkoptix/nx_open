@@ -12,6 +12,8 @@
 #include <utils/common/email.h>
 
 #include <ui/common/read_only.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/style/warning_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -19,7 +21,7 @@
 
 #define CUSTOM_RIGHTS (quint64)0x0FFFFFFF
 
-namespace Qn{
+namespace Qn {
     const quint64 ExcludingOwnerPermission = GlobalOwnerPermissions & ~GlobalAdminPermissions;
     const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
 }
@@ -45,6 +47,9 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     }
 
     ui->setupUi(this);
+
+    setHelpTopic(ui->accessRightsLabel, ui->accessRightsComboBox,   Qn::UserSettings_UserRoles_Help);
+    setHelpTopic(ui->accessRightsGroupbox,                          Qn::UserSettings_UserRoles_Help);
 
     ui->accessRightsGroupbox->hide();
 

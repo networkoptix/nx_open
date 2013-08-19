@@ -19,7 +19,29 @@ QList<QnCompatibilityItem> localCompatibilityItems()
     sorted_matrix.sort(key=lambda x: x.v1[1] * 100 + hash(x.comp1) + x.v2[1])
 
     for ci in sorted_matrix:
-        print >> xfile, '    items.append(QnCompatibilityItem("%s", "%s", "%s"));' % (version_to_string(ci.v1), ci.comp1, version_to_string(ci.v2))
+        print >> xfile, '    items.append(QnCompatibilityItem(QLatin1String("%s"), QLatin1String("%s"), QLatin1String("%s")));' % (version_to_string(ci.v1), ci.comp1, version_to_string(ci.v2))
+    print >> xfile, footer
+
+def gencomp_objc(xfile):
+    header = """#import "HDWCompatibility.h"
+
+NSArray *localCompatibilityItems()
+{
+    NSMutableArray *items = [NSMutableArray array];
+"""
+
+    footer = """
+    return items;
+}"""
+
+    fill_compatibility_matrix()
+
+    print >> xfile, header
+    sorted_matrix = list(COMPATIBILITY_MATRIX)
+    sorted_matrix.sort(key=lambda x: x.v1[1] * 100 + hash(x.comp1) + x.v2[1])
+
+    for ci in sorted_matrix:
+        print >> xfile, '    [items addObject:[HDWCompatibilityItem itemForVersion:@"%s" ofComponent:@"%s" andSystemVersion:@"%s"]];' % (version_to_string(ci.v1), ci.comp1, version_to_string(ci.v2))
     print >> xfile, footer
 
 def gencomp_py(xfile):
@@ -41,5 +63,13 @@ def gencomp_py(xfile):
 
 if __name__ == '__main__':
     import sys
-    gencomp_py(sys.stdout)
+    import argparse
+
+    handlers = {'python': gencomp_py, 'c++': gencomp_cpp, 'objc': gencomp_objc}
+    parser = argparse.ArgumentParser()
+    parser.add_argument('lang', choices=['python', 'c++', 'objc'])
+    args = parser.parse_args()
+    handlers[args.lang](sys.stdout)
+    
+    #gencomp_objc(sys.stdout)
 #    gencomp_cpp(open('build/compatibility.cpp'))

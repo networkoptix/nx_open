@@ -1,20 +1,37 @@
+#define QT_NO_CAST_FROM_ASCII
+
+#include <common/config.h>
+#ifdef __cplusplus
+#   include <common/common_globals.h>
+#endif
+
+/* Windows headers. */
 #ifdef _WIN32
-#define __STDC_CONSTANT_MACROS
-#define NOMINMAX 
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#   include <iphlpapi.h>
+#endif
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <iphlpapi.h>
+#ifdef __cplusplus
 
-// stl headers
+/* STL headers. */
 #include <algorithm>
 #include <functional>
 
 /* Boost headers. */
 #include <boost/foreach.hpp>
+#include <boost/array.hpp>
 
-// QT headers
+/* QT headers. */
 #include <QAction>
+
+#ifdef Q_OS_WIN
+#include <QAudio>
+#include <QAudioFormat>
+#include <QAudioOutput>
+#endif
+
+#include <QAuthenticator>
 #include <QBuffer>
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -26,6 +43,8 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDir>
+#include <QDomDocument>
+#include <QDomElement>
 #include <QEasingCurve>
 #include <QFile>
 #include <QFileInfo>
@@ -40,6 +59,7 @@
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHostAddress>
+#include <QHttp>
 #include <QIODevice>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -89,12 +109,20 @@
 #include <QThreadPool>
 #include <QTime>
 #include <QTimer>
+#include <QUdpSocket>
 #include <QVBoxLayout>
 #include <QWaitCondition>
 #include <QWheelEvent>
 #include <QWidget>
 #include <QtConcurrentMap>
+#include <QtCore/qmath.h>
 #include <QtDebug>
+#include <QtGui/QApplication>
+#include <QtGui/QMainWindow>
+#include <QtGui/QPainter>
+#include <QtGui/QResizeEvent>
 #include <QtGui>
+#include <QtOpenGL/QGLWidget>
+#include <QFileSystemWatcher>
 
 #endif

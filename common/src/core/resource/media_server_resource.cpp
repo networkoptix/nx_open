@@ -15,24 +15,6 @@ private:
     QnMediaServerResourcePtr m_resource;
 };
 
-
-QnLocalMediaServerResource::QnLocalMediaServerResource(): 
-    QnResource()
-{
-    //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
-    addFlags(QnResource::server | QnResource::local);
-    removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
-
-    setName(QLatin1String("Local"));
-    setStatus(Online);
-}
-
-QString QnLocalMediaServerResource::getUniqueId() const
-{
-    return QLatin1String("LocalServer");
-}
-
-
 QnMediaServerResource::QnMediaServerResource():
     QnResource(),
     m_panicMode(PM_None),
@@ -325,12 +307,16 @@ int QnMediaServerResource::getProxyPort()
     return connection ? connection->getProxyPort() : 0;
 }
 
-QString QnMediaServerResource::getVersion() const
+QnSoftwareVersion QnMediaServerResource::getVersion() const
 {
+    QMutexLocker lock(&m_mutex);
+
     return m_version;
 }
 
-void QnMediaServerResource::setVersion(const QString &version)
+void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
 {
+    QMutexLocker lock(&m_mutex);
+
     m_version = version;
 }

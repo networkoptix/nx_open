@@ -282,7 +282,11 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
+    if(widget->resource()->flags() & QnResource::server)
+        return Qn::InvisibleAction;
+
+    QString url = widget->resource()->getUrl().toLower();
+    if((widget->resource()->flags() & QnResource::still_image) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
         return Qn::InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->renderStatus();
@@ -499,11 +503,14 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
     return Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parameters) {
-    Q_UNUSED(parameters)
+Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &) {
     return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &parameters) {
+Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &) {
     return qnSettings->isUpdatesEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &) {
+    return qnSettings->isShowcaseEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }

@@ -3,14 +3,35 @@ import string
 from compatibility import *
 
 CL = Component('Client', 'HD Witness Client')
+MS = Component('MediaServer', 'HD Witness MediaServer')
+IOSCL = Component('iOSClient', 'iOS HD Witness Client')
+ANDROID = Component('android', 'Android HD Witness Client')
 
 V10 = Version(1, 0)
 V11 = Version(1, 1)
 V12 = Version(1, 2)
 V13 = Version(1, 3)
 V14 = Version(1, 4)
+V15 = Version(1, 5)
+V16 = Version(1, 6)
+V20 = Version(2, 0)
            
 COMPATIBILITY_INFO = (
+    (V15, (IOSCL,), V16), # iOS V1.5 can connect to 1.6
+    (V15, (IOSCL,), V20), # iOS V1.5 can connect to 2.0
+
+    (V20, (IOSCL,), V15), # iOS V2.0 can connect to 1.5
+    (V20, (IOSCL,), V16), # iOS V2.0 can connect to 1.6
+
+    (V16, (ANDROID,), V14), # android V1.6 can connect to 1.4
+    (V16, (ANDROID,), V15), # android V1.6 can connect to 1.5
+    (V16, (ANDROID,), V20), # android V1.6 can connect to 2.0
+    
+    (V16, (CL,), V20), # client V1.6 can connect to 2.0
+    (V20, (CL,), V16), # client V2.0 can connect to 1.6
+    
+    (V16, (MS,), V20), # MediaServer V1.6 can connect to 2.0
+    (V20, (MS,), V16), # MediaServer V2.0 can connect to 1.6
 #    (V13, (CL,), Range(V12, V12)),
 #    (V14, (CL,), Range(V12, V13)),
 )
@@ -55,5 +76,7 @@ if __name__ == '__main__':
         print version_to_string(ci.v1), ci.comp1, version_to_string(ci.v2)
 
     print is_compatible('Client', '1.3', 'Server', '1.2')
+    print is_compatible('Client', '1.6', 'Server', '2.0')
+    print is_compatible('Client', '2.0', 'Server', '1.6')
 
     

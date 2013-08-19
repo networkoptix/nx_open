@@ -5,7 +5,7 @@
 #include "utils/network/simple_http_client.h"
 #include "utils/network/multicodec_rtp_reader.h"
 
-class PlDlinkStreamReader: public CLServerPushStreamreader
+class PlDlinkStreamReader: public CLServerPushStreamReader
 {
 public:
     PlDlinkStreamReader(QnResourcePtr res);
@@ -13,7 +13,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual void openStream() override;
+    virtual CameraDiagnostics::Result openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 

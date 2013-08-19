@@ -34,7 +34,8 @@ namespace Qn {
         Message_Type_FileAdd = 11,
         Message_Type_FileRemove = 12,
         Message_Type_FileUpdate = 13,
-        Message_Type_RuntimeInfoChange = 14
+        Message_Type_RuntimeInfoChange = 14,
+        Message_Type_BusinessRuleReset = 15
     };
 
     QString toString( Message_Type val );
@@ -59,12 +60,18 @@ struct QnMessage
     QnLicensePtr license;
     QnCameraHistoryItemPtr cameraServerItem;
     QnBusinessEventRulePtr businessRule;
+    QnBusinessEventRuleList businessRules;
     QnAbstractBusinessActionPtr businessAction;
 
     QnResourceTypeList resourceTypes;
     QnResourceList resources;
     QnLicenseList licenses;
     QnCameraHistoryList cameraServerItems;
+
+    QString systemName;
+    QByteArray oldHardwareId;
+    QByteArray hardwareId1;
+    QByteArray hardwareId2;
 
     QString filename;
     QString publicIp;

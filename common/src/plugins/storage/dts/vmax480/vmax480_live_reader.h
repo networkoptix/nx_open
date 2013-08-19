@@ -11,7 +11,7 @@
 class QnVMax480ConnectionProcessor;
 class VMaxStreamFetcher;
 
-class QnVMax480LiveProvider: public CLServerPushStreamreader, public QnVmax480DataConsumer
+class QnVMax480LiveProvider: public CLServerPushStreamReader, public QnVmax480DataConsumer
 {
 public:
     QnVMax480LiveProvider(QnResourcePtr dev );
@@ -20,7 +20,7 @@ public:
     virtual int getChannel() const override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual void openStream() override;
+    virtual CameraDiagnostics::Result openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 

@@ -256,13 +256,6 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QCheckBox" name="hardwareDecodingCheckBox">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
           <item row="4" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
@@ -311,6 +304,13 @@
               </property>
              </spacer>
             </item>
+            <item>
+             <widget class="QLabel" name="languageWarningLabel">
+              <property name="text">
+               <string>Restart required.</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item row="2" column="0">
@@ -350,9 +350,9 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="label_5">
+             <widget class="QLabel" name="downmixWarningLabel">
               <property name="text">
-               <string>(Restart required)</string>
+               <string>Restart required.</string>
               </property>
              </widget>
             </item>
@@ -371,6 +371,37 @@
              <string/>
             </property>
            </widget>
+          </item>
+          <item row="2" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QCheckBox" name="hardwareDecodingCheckBox">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="hwAccelerationWarningLabel">
+              <property name="text">
+               <string>Experimental. May result in glitches.</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>

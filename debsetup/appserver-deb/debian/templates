@@ -1,7 +1,7 @@
 
 Template: ${deb.customization.company.name}-entcontroller/ecsPort
 Type: string
-Default: 7001
+Default:
 Description: Enterprise Controller port:
 
 Template: ${deb.customization.company.name}-entcontroller/ecsPort_invalid
@@ -10,7 +10,7 @@ Description: The port is invalid. Please try again.
 
 Template: ${deb.customization.company.name}-entcontroller/ecsProxyPort
 Type: string
-Default: 7004
+Default:
 Description: Enterprise Controller Media Proxy port:
 
 Template: ${deb.customization.company.name}-entcontroller/ecsProxyPort_invalid
@@ -21,8 +21,22 @@ Template: ${deb.customization.company.name}-entcontroller/ecsPassword
 Type: string
 Default: 
 Description: Enterprise Controller password:
+ If upgrading leave empty to keep the old password
 
 Template: ${deb.customization.company.name}-entcontroller/ecsPassword_invalid
 Type: error
 Description: The password should not be empty
 
+Template: ${deb.customization.company.name}-entcontroller/publicIPEnabled
+Type: select
+Choices: auto, disabled, manual
+Description: Select public IP address usage policy. If unsure leave default value.
+
+Template: ${deb.customization.company.name}-entcontroller/staticPublicIP
+Type: string
+Description: Your system public IP address:
+
+Template: ${deb.customization.company.name}-entcontroller/removeDatabase
+Type: select
+Choices: ${choices}
+Description: Keep the database, remove or revert to previous version (if any)

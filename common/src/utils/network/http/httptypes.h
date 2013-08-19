@@ -140,10 +140,13 @@ namespace nx_http
             multipleChoices = 300,
             badRequest = 400,
             unauthorized = 401,
-            internalServerError = 500
+            notFound = 404,
+            internalServerError = 500,
+            notImplemented = 501
         };
 
         StringType toString( Value );
+        StringType toString( int );
     };
 
     namespace Method
@@ -197,7 +200,7 @@ namespace nx_http
     public:
         StatusLine statusLine;
         HttpHeaders headers;
-        BufferType messageBody;
+        //BufferType messageBody; // not filled anywhere.
     };
 
     namespace MessageType

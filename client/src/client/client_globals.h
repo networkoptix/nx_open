@@ -22,84 +22,6 @@ namespace Qn {
 
 
     /**
-     * Generic enumeration holding different data roles used in Qn classes.
-     */
-    enum ItemDataRole {
-        FirstItemDataRole   = Qt::UserRole,
-
-        /* Tree-based. */
-        NodeTypeRole        = FirstItemDataRole,    /**< Role for node type, see <tt>Qn::NodeType</tt>. */
-
-        /* Resource-based. */
-        ResourceRole,                               /**< Role for QnResourcePtr. */
-        UserResourceRole,                           /**< Role for QnUserResourcePtr. */
-        LayoutResourceRole,                         /**< Role for QnLayoutResourcePtr. */
-        MediaServerResourceRole,                    /**< Role for QnMediaServerResourcePtr. */
-        ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
-        ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (QnResource::Flags). */
-        ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
-        ResourceStatusRole,                         /**< Role for resource status. Value of type int (QnResource::Status). */
-        ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
-
-        /* Layout-based. */
-        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
-        LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
-        LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
-        LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
-        LayoutSearchStateRole,                      /**< */
-        LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
-        LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
-        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QUuid>. */
-
-        /* Item-based. */
-        ItemUuidRole,                               /**< Role for item's UUID. Value of type QUuid. */
-        ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
-        ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
-        ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
-        ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
-        ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
-        ItemImageEnhancementRole,                   /**< Role for item's image enhancement params. Value of type ImageCorrectionParams. */
-        ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
-        ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
-        ItemFrameColorRole,                         /**< Role for item's frame color. Value of type QColor. */
-
-        ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. */
-        ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
-        ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
-        ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
-        ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
-        ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
-
-        /* Context-based. */
-        CurrentLayoutResourceRole,
-        CurrentUserResourceRole,
-        CurrentLayoutMediaItemsRole,
-        CurrentMediaServerResourcesRole,
-
-        /* Arguments. */
-        SerializedDataRole,
-        ConnectionInfoRole,
-        FocusElementRole,
-        TimePeriodRole,
-        TimePeriodsRole,
-        MergedTimePeriodsRole,
-        AutoConnectRole,
-        FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
-        TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
-        TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
-
-
-        /* Others. */
-        HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
-        PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
-
-        ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
-        DisplayHtmlRole                             /**< Same as Display role, but use HTML format. */
-    };
-
-
-    /**
      * Role of an item on the scene. 
      * 
      * Note that at any time there may exist no more than one item for each role.
@@ -229,6 +151,7 @@ namespace Qn {
         GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
         GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
         GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
+        GlobalPanicPermission                   = 0x00001000,   /**< Can trigger panic recording. */
         
         /* Deprecated permissions. */
         DeprecatedEditCamerasPermission         = 0x00000010,   /**< Can edit camera settings and change camera's PTZ state. */
@@ -238,7 +161,7 @@ namespace Qn {
         GlobalLiveViewerPermissions             = GlobalViewLivePermission,
         GlobalViewerPermissions                 = GlobalLiveViewerPermissions       | GlobalViewArchivePermission | GlobalExportPermission,
         GlobalAdvancedViewerPermissions         = GlobalViewerPermissions           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
+        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions | GlobalPanicPermission,
         GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
             
         AllPermissions                          = 0xFFFFFFFF
@@ -263,6 +186,9 @@ namespace Qn {
             result &= ~Qn::DeprecatedViewExportArchivePermission;
             result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
         }
+
+        if(result & Qn::GlobalProtectedPermission)
+            result |= Qn::GlobalPanicPermission;
 
         return result;
     }
@@ -322,6 +248,17 @@ namespace Qn {
         ResolutionModeCount
     };
 
+    /**
+     * Importance level of a notification. 
+     */
+    enum NotificationLevel {
+        NoNotification,
+        OtherNotification,
+        CommonNotification,
+        ImportantNotification,
+        CriticalNotification,
+        SystemNotification,
+    };
 
 } // namespace Qn
 

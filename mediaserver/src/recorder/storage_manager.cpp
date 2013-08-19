@@ -1,6 +1,10 @@
-#include <QDir>
+
 #include "storage_manager.h"
+
+#include <QDir>
+
 #include "utils/common/util.h"
+#include <utils/fs/file.h>
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/resource.h"
 #include "server_stream_recorder.h"
@@ -12,7 +16,7 @@
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 
-Q_GLOBAL_STATIC(QnStorageManager, inst)
+Q_GLOBAL_STATIC(QnStorageManager, QnStorageManager_inst)
 
 class TestStorageThread: public QnLongRunnable
 {
@@ -248,7 +252,7 @@ QnStorageManager::~QnStorageManager()
 
 QnStorageManager* QnStorageManager::instance()
 {
-    return inst();
+    return QnStorageManager_inst();
 }
 
 QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone)
@@ -419,7 +423,8 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     QSet<QnStorageResourcePtr> result;
     QSet<QnStorageResourcePtr> smallStorages;
 
-    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    QnStorageManager::StorageMap storageRoots = getAllStorages();
+    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
         if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
@@ -691,6 +696,6 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
         return false;
-    catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QFileInfo(fileName).baseName().toInt(), -1, (qint16) timeZone));
+    catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QnFile::baseName(fileName).toInt(), -1, (qint16) timeZone));
     return true;
 }

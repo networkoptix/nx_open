@@ -10,8 +10,6 @@
 
 #include <QStringList>
 
-#include <business/business_event_connector.h>
-
 #include "api/app_server_connection.h"
 #include "third_party_stream_reader.h"
 
@@ -29,9 +27,6 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_refCounter( 2 )
 {
     setAuth( QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword) );
-    connect(
-        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
 }
 
 QnThirdPartyResource::~QnThirdPartyResource()
@@ -48,6 +43,12 @@ QnAbstractPtzController* QnThirdPartyResource::getPtzController()
 bool QnThirdPartyResource::isResourceAccessible()
 {
     return updateMACAddress();
+}
+
+bool QnThirdPartyResource::ping()
+{
+    //TODO: should check if camera supports http and, if supports, check http port
+    return true;
 }
 
 QString QnThirdPartyResource::getDriverName() const
@@ -167,10 +168,11 @@ void QnThirdPartyResource::inputPortStateChanged(
 
 const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( int encoderNumber ) const
 {
+    QMutexLocker lk( &m_mutex );
     return m_encoderData[encoderNumber].resolutionList;
 }
 
-bool QnThirdPartyResource::initInternal()
+CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
     m_camManager.setCredentials( getAuth().user(), getAuth().password() );
 
@@ -181,7 +183,7 @@ bool QnThirdPartyResource::initInternal()
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? QnResource::Unauthorized : QnResource::Offline );
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
     setFirmware( QString::fromUtf8(m_camInfo.firmware) );
@@ -194,14 +196,14 @@ bool QnThirdPartyResource::initInternal()
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? QnResource::Unauthorized : QnResource::Offline );
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
     if( encoderCount == 0 )
     {
         NX_LOG( QString::fromLatin1("Third-party camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
             arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
     //setting camera capabilities
@@ -213,7 +215,7 @@ bool QnThirdPartyResource::initInternal()
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? QnResource::Unauthorized : QnResource::Offline );
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability )
         setCameraCapability( Qn::RelayInputCapability, true );
@@ -221,7 +223,7 @@ bool QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::RelayOutputCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
-        setCameraCapability( Qn::AbsolutePtzCapability, true );
+        setPtzCapability( Qn::AbsolutePtzCapability, true );
         //TODO/IMPL requesting nxcip::CameraPTZManager interface and setting capabilities
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
@@ -231,8 +233,8 @@ bool QnThirdPartyResource::initInternal()
     //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
     //    setCameraCapability( Qn:: );
 
-    m_encoderData.clear();
-    m_encoderData.resize( encoderCount );
+    QVector<EncoderData> encoderDataTemp;
+    encoderDataTemp.resize( encoderCount );
 
     //reading resolution list
     QVector<nxcip::ResolutionInfo> resolutionInfoList;
@@ -255,14 +257,19 @@ bool QnThirdPartyResource::initInternal()
                 arg(encoderNumber).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
             if( result == nxcip::NX_NOT_AUTHORIZED )
                 setStatus( QnResource::Unauthorized );
-            return false;
+            return CameraDiagnostics::UnknownErrorResult();
         }
         for( int j = 0; j < resolutionInfoList.size(); ++j )
         {
-            m_encoderData[encoderNumber].resolutionList.push_back( resolutionInfoList[j].resolution );
+            encoderDataTemp[encoderNumber].resolutionList.push_back( resolutionInfoList[j].resolution );
             if( resolutionInfoList[j].maxFps > maxFps )
                 maxFps = resolutionInfoList[j].maxFps;
         }
+    }
+
+    {
+        QMutexLocker lk( &m_mutex );
+        m_encoderData = encoderDataTemp;
     }
 
     if( !setParam( MAX_FPS_PARAM_NAME, maxFps, QnDomainDatabase ) )
@@ -287,7 +294,7 @@ bool QnThirdPartyResource::initInternal()
             qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
     }
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool QnThirdPartyResource::startInputPortMonitoring()

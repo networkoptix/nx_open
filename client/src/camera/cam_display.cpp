@@ -218,9 +218,9 @@ void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
     }
 }
 
-QImage QnCamDisplay::getScreenshot(int channel, const ImageCorrectionParams& params)
+QImage QnCamDisplay::getScreenshot(int channel, const ImageCorrectionParams& params, const DewarpingParams& dewarping)
 {
-    return m_display[channel]->getScreenshot(params);
+    return m_display[channel]->getScreenshot(params, dewarping);
 }
 
 QImage QnCamDisplay::getGrayscaleScreenshot(int channel)

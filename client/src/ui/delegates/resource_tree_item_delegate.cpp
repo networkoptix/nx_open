@@ -64,29 +64,9 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
             raisedItem = workbench()->item(Qn::ZoomedRole);
     }
 
-#if 0
-    QRect firstDecorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
-
     /* Draw 'raised' icon */
-    if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
-        QRect decorationRect = firstDecorationRect;
-        m_raisedIcon.paint(painter, decorationRect);
-
-        QRect rect = optionV4.rect;
-        QRect skipRect(
-            rect.topLeft(),
-            QPoint(
-                decorationRect.right() + decorationRect.left() - rect.left(),
-                rect.bottom()
-            )
-        );
-        rect.setLeft(skipRect.right() + 1);
-
-        optionV4.rect = skipRect;
-        style->drawPrimitive(QStyle::PE_PanelItemViewItem, &optionV4, painter, optionV4.widget);
-        optionV4.rect = rect;
-    }
-#endif
+    if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId())))
+        optionV4.text = lit("> ") + optionV4.text;
 
     QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget).adjusted(-4, 0, -4, 0);
 

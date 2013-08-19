@@ -2,6 +2,7 @@
 #include "device_file_catalog.h"
 #include "storage_manager.h"
 #include "utils/common/util.h"
+#include <utils/fs/file.h>
 #include "recorder/file_deletor.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "recording/stream_recorder.h"
@@ -76,7 +77,7 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     devTitleFile += QString("title.csv");
     m_file.setFileName(devTitleFile);
     QDir dir;
-    dir.mkpath(QFileInfo(devTitleFile).absolutePath());
+    dir.mkpath(QnFile::absolutePath(devTitleFile));
     if (!m_file.open(QFile::ReadWrite))
     {
         cl_log.log("Can't create title file ", devTitleFile, cl_logERROR);
@@ -288,7 +289,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(QnStorageResourcePtr s
     if (avi->open(res) && avi->findStreams() && avi->endTime() != (qint64)AV_NOPTS_VALUE) {
         qint64 startTimeMs = avi->startTime()/1000;
         qint64 endTimeMs = avi->endTime()/1000;
-        int fileIndex = QFileInfo(fileName).baseName().toInt();
+        int fileIndex = QnFile::baseName(fileName).toInt();
         chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, currentTimeZone()/60);
     }
     delete avi;
@@ -441,7 +442,7 @@ void DeviceFileCatalog::deserializeTitleFile()
     if (needRewriteCatalog)
         rewriteCatalog();
 
-    qWarning() << QString("Check archive for camera %1 for role %2 time: %3 ms").arg(m_macAddress).arg(m_role).arg(t.elapsed());
+    NX_LOG(QString("Check archive for camera %1 for role %2 time: %3 ms").arg(m_macAddress).arg(m_role).arg(t.elapsed()), cl_logINFO);
 }
 
 void DeviceFileCatalog::rewriteCatalog()
