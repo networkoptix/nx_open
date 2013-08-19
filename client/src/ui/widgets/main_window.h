@@ -67,7 +67,7 @@ protected:
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
 #ifdef Q_OS_WIN
-    virtual bool winEvent(MSG *message, long *result) override;
+    virtual bool winEvent(MSG *message, long *result) override; // use nativeEvent for Qt5
 #endif
 
 protected slots:
