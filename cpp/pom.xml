@@ -384,6 +384,7 @@
 									<goal>replace</goal>
 								</goals>
 								<configuration>
+                                    <encoding>utf-8</encoding>
 									<includes>
 										<include>**/${project.artifactId}-x64.vcproj</include>
 									</includes>
@@ -408,7 +409,9 @@
 									<goal>replace</goal>
 								</goals>
 								<configuration>
+                                    <encoding>utf-8</encoding>
 									<unescape>no</unescape>
+                                    <ignoreErrors>true</ignoreErrors>
 									<includes>
 										<include>**/${project.artifactId}-*.vcxproj</include>
 									</includes>
@@ -447,6 +450,7 @@
  											<token>CustomBuild</token>
 											<value>None</value>
 										</replacement>
+   
 									</replacements>
 									<skip>${replace.skip}</skip>
 								</configuration>								
