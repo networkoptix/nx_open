@@ -122,6 +122,15 @@ void QnTcpListener::removeOwnership(QnLongRunnable* processor)
     }
 }
 
+void QnTcpListener::addOwnership(QnLongRunnable* processor)
+{
+    Q_D(QnTcpListener);
+
+    QMutexLocker lock(&d->connectionMtx);
+    d->connections << processor;
+}
+
+
 void QnTcpListener::pleaseStop()
 {
     QnLongRunnable::pleaseStop();

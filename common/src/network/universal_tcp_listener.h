@@ -37,10 +37,14 @@ public:
     }
 
     QnTCPConnectionProcessor* createNativeProcessor(TCPSocket* clientSocket, const QByteArray& protocol, const QString& path);
+
+    void addBackConnectionPool(const QUrl& url, int size);
+    void onBackConnectSpent(QnLongRunnable* processor);
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner);
 private:
     QList<HandlerInfo> m_handlers;
+    QUrl m_backConnectUrl;
 };
 
 #endif // __UNIVERSAL_TCP_LISTENER_H__

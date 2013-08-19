@@ -96,7 +96,6 @@
 #include "core/resource_managment/camera_driver_restriction_list.h"
 #include <utils/network/multicodec_rtp_reader.h>
 
-
 #define USE_SINGLE_STREAMING_PORT
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
@@ -117,6 +116,8 @@ void stopServer(int signal);
 
 static const int DEFAUT_RTSP_PORT = 50000;
 static const int DEFAULT_STREAMING_PORT = 50000;
+
+static const int BACK_CONNECTION_POOL_SIZE = 8;
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -589,6 +590,7 @@ void QnMain::stopObjects()
         m_progressiveDownloadingServer->pleaseStop();
     if (m_rtspListener)
         m_rtspListener->pleaseStop();
+    
     if (m_universalTcpListener) {
         m_universalTcpListener->pleaseStop();
         delete m_universalTcpListener;
@@ -611,6 +613,7 @@ void QnMain::stopObjects()
         delete m_rtspListener;
         m_rtspListener = 0;
     }
+
 }
 
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
@@ -786,6 +789,7 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     m_universalTcpListener->start();
+
 #else
     int apiPort = qSettings.value("apiPort", DEFAULT_REST_PORT).toInt();
     int streamingPort = qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt();
@@ -897,7 +901,6 @@ void QnMain::run()
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
     QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
-
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
     QnMServerResourceSearcher::instance()->start();
@@ -951,6 +954,10 @@ void QnMain::run()
     } while (appserverHost.toIPv4Address() == 0);
 
     initTcpListener();
+
+    QUrl backUrl = appServerConnection->url();
+    backUrl.setPort(connectInfo->proxyPort);
+    m_universalTcpListener->addBackConnectionPool(backUrl, BACK_CONNECTION_POOL_SIZE);
 
     QHostAddress publicAddress = getPublicAddress();
 

@@ -30,6 +30,8 @@ public:
     /** Remove ownership from connection.*/
     void removeOwnership(QnLongRunnable* processor);
 
+    void addOwnership(QnLongRunnable* processor);
+
 public slots:
     virtual void pleaseStop() override;
 

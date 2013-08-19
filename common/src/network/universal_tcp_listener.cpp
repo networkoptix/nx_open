@@ -1,77 +1,8 @@
 #include "universal_tcp_listener.h"
 #include "utils/network/tcp_connection_priv.h"
 #include <QUrl>
-
-class QnUniversalRequestProcessorPrivate;
-
-class QnUniversalRequestProcessor: public QnTCPConnectionProcessor
-{
-public:
-    QnUniversalRequestProcessor(TCPSocket* socket, QnTcpListener* owner);
-    virtual ~QnUniversalRequestProcessor();
-
-protected:
-    virtual void run() override;
-    virtual void pleaseStop() override;
-
-private:
-    Q_DECLARE_PRIVATE(QnUniversalRequestProcessor);
-};
-
-class QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessorPrivate
-{
-public:
-    QnTCPConnectionProcessor* processor;
-    QMutex mutex;
-};
-
-QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
-{
-    stop();
-}
-
-QnUniversalRequestProcessor::QnUniversalRequestProcessor(TCPSocket* socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
-{
-    Q_D(QnUniversalRequestProcessor);
-    d->processor = 0;
-
-    setObjectName( QLatin1String("QnUniversalRequestProcessor") );
-}
-
-void QnUniversalRequestProcessor::run()
-{
-    Q_D(QnUniversalRequestProcessor);
-    saveSysThreadID();
-    if (readRequest()) 
-    {
-        QList<QByteArray> header = d->clientRequest.left(d->clientRequest.indexOf('\n')).split(' ');
-        if (header.size() > 2) 
-        {
-            QByteArray protocol = header[2].split('/')[0].toUpper();
-            QMutexLocker lock(&d->mutex);
-            d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, protocol, QUrl(QString::fromUtf8(header[1])).path());
-            if (d->processor && !needToStop()) 
-            {
-                copyClientRequestTo(*d->processor);
-                d->ssl = 0;
-                d->socket = 0;
-                d->processor->execute(d->mutex);
-            }
-            delete d->processor;
-            d->processor = 0;
-        }
-    }
-}
-
-void QnUniversalRequestProcessor::pleaseStop()
-{
-    Q_D(QnUniversalRequestProcessor);
-    QMutexLocker lock(&d->mutex);
-    QnTCPConnectionProcessor::pleaseStop();
-    if (d->processor)
-        d->processor->pleaseStop();
-}
+#include "universal_request_processor.h"
+#include "back_tcp_connection.h"
 
 // -------------------------------- QnUniversalListener ---------------------------------
 
@@ -116,4 +47,21 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(TCPSocke
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
 {
     return new QnUniversalRequestProcessor(clientSocket, owner);
+}
+
+void QnUniversalTcpListener::addBackConnectionPool(const QUrl& url, int size)
+{
+    m_backConnectUrl = url;
+    for (int i = 0; i < size; ++i) {
+        QnBackTcpConnection* connect = new QnBackTcpConnection(url, this);
+        connect->start();
+    }
+}
+
+void QnUniversalTcpListener::onBackConnectSpent(QnLongRunnable* processor)
+{
+    addOwnership(processor);
+
+    QnBackTcpConnection* connect = new QnBackTcpConnection(m_backConnectUrl, this);
+    connect->start();
 }
