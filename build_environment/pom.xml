@@ -29,13 +29,6 @@
 			<classifier>${customization}</classifier>
 		</dependency>
 		<dependency>
-			<groupId>org.ffmpeg</groupId>
-			<artifactId>ffmpeg</artifactId>
-			<version>${ffmpeg.version}</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>      
-		<dependency>
 			<groupId>org.boost</groupId>
 			<artifactId>boost</artifactId>
 			<version>${boost.version}</version>
@@ -269,6 +262,13 @@
 			</activation>
 			<dependencies>
 				<dependency>
+					<groupId>org.ffmpeg</groupId>
+					<artifactId>ffmpeg</artifactId>
+					<version>${ffmpeg.version}</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>      
+				<dependency>
 					<groupId>org.openssl</groupId>
 					<artifactId>openssl</artifactId>
 					<version>${openssl.version}</version>
@@ -347,7 +347,6 @@
 				</dependency>                         
 			</dependencies>			
 			<properties>
-				<!-- <compiler>msvc2008</compiler> -->
 				<arch>x86</arch>
 				<platform>windows</platform>
 			</properties>
@@ -407,17 +406,22 @@
 				<os>
 					<family>unix</family>
 					<name>linux</name>
-				</os>		
+				</os> 
 				<property>
-					<name>build.type</name>
-					<value>native</value>
+					<name>!cross-arch</name>
 				</property>
 			</activation>
 			<properties>
-				<compiler>gcc</compiler>
 				<rename-skip>false</rename-skip>
 			</properties>
 			<dependencies>
+				<dependency>
+					<groupId>org.ffmpeg</groupId>
+					<artifactId>ffmpeg</artifactId>
+					<version>${ffmpeg.version}</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>      
 				<dependency>
 					<groupId>org.openssl</groupId>
 					<artifactId>openssl</artifactId>
@@ -534,22 +538,28 @@
 		</profile>		
 
 		<profile>
-			<id>linux</id>
+			<id>linux-arm</id>
 			<activation>
 				<os>
 					<family>unix</family>
 					<name>linux</name>
-				</os>		
+				</os> 
 				<property>
-					<name>build.type</name>
-					<value>cross</value>
+					<name>cross-arch</name>
+					<value>arm</value>
 				</property>
 			</activation>
 			<properties>
-				<compiler>gcc</compiler>
 				<rename-skip>false</rename-skip>
 			</properties>
 			<dependencies>
+				<dependency>
+					<groupId>org.ffmpeg</groupId>
+					<artifactId>ffmpeg</artifactId>
+					<version>${ffmpeg.version}</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>      
 				<dependency>
 					<groupId>org.openssl</groupId>
 					<artifactId>openssl</artifactId>
@@ -653,6 +663,13 @@
                         </activation>
 
 			<dependencies>
+				<dependency>
+					<groupId>org.ffmpeg</groupId>
+					<artifactId>ffmpeg</artifactId>
+					<version>${ffmpeg.version}</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>      
 				<dependency>
 					<groupId>com.sourceforge.cloudcity</groupId>
 					<artifactId>bespin</artifactId>

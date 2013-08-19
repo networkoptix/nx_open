@@ -47,7 +47,6 @@
         <festival.version>2.1-SNAPSHOT</festival.version>
 
         <build.configuration>release</build.configuration>
-        <build.type>native</build.type>   <!-- native or cross -->
         <buildNumber>0</buildNumber>
         <customization>default</customization>
         <!--QT libs used--> 
@@ -65,6 +64,7 @@
         <qtplugin2>sqldrivers</qtplugin2>
         <qtplugin3>enter its name here...</qtplugin3>	
     </properties>
+
     <modules>
         <module>build_environment</module>
         <module>appserver</module>
@@ -232,8 +232,12 @@
             <id>linux-arm</id>
             <activation>
 		<activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
                 <property>
-                    <name>arch</name>
+                    <name>cross-arch</name>
                     <value>arm</value>
                 </property>
             </activation>
@@ -241,8 +245,9 @@
                 <protobuf.version>2.5.0</protobuf.version>
                 <boost.version>1.54-SNAPSHOT</boost.version>
                 <qjson.version>0.8.1-SNAPSHOT</qjson.version>
+                <ffmpeg.version>N-55599-g66f1de6-faac-SNAPSHOT</ffmpeg.version>
 
-                <build.type>cross</build.type>
+                <arch>${cross-arch}</arch>
                 <compiler>2011.09</compiler>
             </properties>
         </profile>	
@@ -250,11 +255,12 @@
             <id>linux-x64</id>
             <activation>
                 <os>
+                    <family>unix</family>
+                    <name>linux</name>
                     <arch>amd64</arch>
                 </os> 
                 <property>
-                    <name>arch</name>
-                    <value>x64</value>
+                    <name>!cross-arch</name>
                 </property>
             </activation>
             <properties>
@@ -271,13 +277,12 @@
             <id>linux-x86</id>
             <activation>
                 <os>
-                    <arch>i386</arch>
-                    <!--<arch>i586</arch>
-		    <arch>i686</arch>-->
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>amd64</arch>
                 </os>
                 <property>
-                    <name>arch</name>
-                    <value>x86</value>
+                    <name>!cross-arch</name>
                 </property>
             </activation>
             <properties>
@@ -292,7 +297,7 @@
         </profile>	
         <profile>
             <id>android</id>
-            <acivation>
+            <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -324,5 +329,6 @@
             </properties>
         </profile>	
     </profiles>	
+
 </project>
 
