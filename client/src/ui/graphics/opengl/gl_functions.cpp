@@ -15,6 +15,7 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #include <QtCore/QMutex>
+#include <QOpenGLContext>
 
 #include <utils/common/warnings.h>
 
@@ -157,32 +158,12 @@ public:
             m_features |= QnGlFunctions::ArbPrograms;
 
         status = true;
-        RESOLVE(PFNGLBINDBUFFERPROC,                    glBindBuffer);
-        RESOLVE(PFNGLDELETEBUFFERSPROC,                 glDeleteBuffers);
-        RESOLVE(PFNGLGENBUFFERSPROC,                    glGenBuffers);
-        RESOLVE(PFNGLBUFFERDATAPROC,                    glBufferData);
-        RESOLVE(PFNGLBUFFERSUBDATAPROC,                 glBufferSubData);
-        RESOLVE(PFNGLMAPBUFFERPROC,                     glMapBuffer);
-        RESOLVE(PFNGLUNMAPBUFFERPROC,                   glUnmapBuffer);
-        if(status)
-            m_features |= QnGlFunctions::OpenGL1_5;
-
-        status = true;
-        RESOLVE(PFNGLVERTEXATTRIBPOINTERPROC,           glVertexAttribPointer);
-        RESOLVE(PFNGLDISABLEVERTEXATTRIBARRAYPROC,      glDisableVertexAttribArray);
-        RESOLVE(PFNGLENABLEVERTEXATTRIBARRAYPROC,       glEnableVertexAttribArray);
-        if(status)
-            m_features |= QnGlFunctions::OpenGL2_0;
-
-        status = true;
         RESOLVE(PFNGLFENCESYNCPROC,                     glFenceSync);
         RESOLVE(PFNGLDELETESYNCPROC,                    glDeleteSync);
         RESOLVE(PFNGLCLIENTWAITSYNCPROC,                glClientWaitSync);
         RESOLVE(PFNGLWAITSYNCPROC,                      glWaitSync);
         if(status)
             m_features |= QnGlFunctions::OpenGL3_2 | QnGlFunctions::ArbSync;
-
-        RESOLVE(PFNGLBLENDCOLORPROC,                    glBlendColor);
 
 #undef RESOLVE
 
@@ -218,14 +199,6 @@ public:
     PFNGLGENPROGRAMSARBPROC glGenProgramsARB;
     PFNGLPROGRAMLOCALPARAMETER4FARBPROC glProgramLocalParameter4fARB;
 
-    PFNGLBINDBUFFERPROC glBindBuffer;
-    PFNGLDELETEBUFFERSPROC glDeleteBuffers;
-    PFNGLGENBUFFERSPROC glGenBuffers;
-    PFNGLBUFFERDATAPROC glBufferData;
-    PFNGLBUFFERSUBDATAPROC glBufferSubData;
-    PFNGLMAPBUFFERPROC glMapBuffer;
-    PFNGLUNMAPBUFFERPROC glUnmapBuffer;
-
     PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
     PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
     PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
@@ -234,9 +207,6 @@ public:
     PFNGLDELETESYNCPROC glDeleteSync;
     PFNGLCLIENTWAITSYNCPROC glClientWaitSync;
     PFNGLWAITSYNCPROC glWaitSync;
-
-    PFNGLBLENDCOLORPROC glBlendColor;
-
 private:
     template<class Function>
     bool resolve(const char *name, const Function &defaultValue, Function *result) {
@@ -313,46 +283,6 @@ void QnGlFunctions::glProgramLocalParameter4fARB(GLenum target, GLuint index, GL
     d->glProgramLocalParameter4fARB(target, index, x, y, z, w);
 }
 
-void QnGlFunctions::glGenBuffers(GLsizei n, GLuint *buffers) {
-    d->glGenBuffers(n, buffers);
-}
-
-void QnGlFunctions::glBindBuffer(GLenum target, GLuint buffer) {
-    d->glBindBuffer(target, buffer);
-}
-
-void QnGlFunctions::glDeleteBuffers(GLsizei n, const GLuint *buffers) {
-    d->glDeleteBuffers(n, buffers);
-}
-
-void QnGlFunctions::glBufferData(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage) {
-    d->glBufferData(target, size, data, usage);
-}
-
-void QnGlFunctions::glBufferSubData(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data) {
-    d->glBufferSubData( target, offset, size, data );
-}
-
-GLvoid *QnGlFunctions::glMapBuffer(GLenum target, GLenum access) {
-    return d->glMapBuffer(target, access);
-}
-
-GLboolean QnGlFunctions::glUnmapBuffer(GLenum target) {
-    return d->glUnmapBuffer(target);
-}
-
-void QnGlFunctions::glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer) {
-    d->glVertexAttribPointer(index, size, type, normalized, stride, pointer);
-}
-
-void QnGlFunctions::glEnableVertexAttribArray(GLuint index) {
-    d->glEnableVertexAttribArray(index);
-}
-
-void QnGlFunctions::glDisableVertexAttribArray(GLuint index) {
-    d->glDisableVertexAttribArray(index);
-}
-
 GLsync QnGlFunctions::glFenceSync(GLenum condition, GLbitfield flags)
 {
     return d->glFenceSync(condition, flags);
@@ -371,11 +301,6 @@ void QnGlFunctions::glWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
 GLenum QnGlFunctions::glClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
 {
     return d->glClientWaitSync(sync, flags, timeout);
-}
-
-void QnGlFunctions::glBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
-{
-    return d->glBlendColor(red, green, blue, alpha);
 }
 
 #ifdef Q_OS_WIN

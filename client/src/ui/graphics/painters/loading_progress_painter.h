@@ -3,14 +3,13 @@
 
 #include <QtCore/QSharedPointer>
 #include <QtGui/QColor>
-
-#include <ui/graphics/opengl/gl_functions.h>
+#include <QtGui/QOpenGLFunctions>
 
 class QGLContext;
 
 class QnColorShaderProgram;
 
-class QnLoadingProgressPainter: public QnGlFunctions {
+class QnLoadingProgressPainter: protected QOpenGLFunctions {
 public:
     /**
      * \param innerRadius           Number in [0, 1] defining the inner radius of the progress sign.

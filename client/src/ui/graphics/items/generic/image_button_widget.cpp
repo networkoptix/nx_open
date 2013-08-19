@@ -20,7 +20,6 @@
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/common/geometry.h>
 #include <ui/common/accessor.h>
 
@@ -352,7 +351,7 @@ void QnImageButtonWidget::click() {
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
     if(m_shader.isNull()) {
         m_shader = qn_textureTransitionShaderProgramStorage()->get(QGLContext::currentContext());
-        m_gl.reset(new QOpenGLFunctions(QGLContext::currentContext()->contextHandle()));
+        initializeOpenGLFunctions();
     }
 
     StateFlags hoverState = m_state | HOVERED;
@@ -391,9 +390,9 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         glDrawTexturedRect(rect);
     } else {
 
-        m_gl->glActiveTexture(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE1);
         checkedBindTexture(widget, endPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
-        m_gl->glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE0);
         checkedBindTexture(widget, startPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_shader->bind();
         m_shader->setProgress(progress);

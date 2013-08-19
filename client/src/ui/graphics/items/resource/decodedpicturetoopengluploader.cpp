@@ -151,15 +151,15 @@ static BitrateCalculator bitrateCalculator;
 // -------------------------------------------------------------------------- //
 class DecodedPictureToOpenGLUploaderPrivate
 :
-    public QnGlFunctions
+    public QOpenGLFunctions
 {
-    Q_DECLARE_TR_FUNCTIONS(DecodedPictureToOpenGLUploaderPrivate);
+    Q_DECLARE_TR_FUNCTIONS(DecodedPictureToOpenGLUploaderPrivate)
 
 public:
     DecodedPictureToOpenGLUploaderPrivate(const QGLContext *context):
-        QnGlFunctions(context),
+        QOpenGLFunctions(context->contextHandle()),
         supportsNonPower2Textures(false),
-        m_functions(new QOpenGLFunctions(context->contextHandle()))
+        functions(new QnGlFunctions(context))
     {
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
@@ -209,13 +209,10 @@ public:
         return filler.data;
     }
 
-    QOpenGLFunctions* functions() {
-        return m_functions.data();
-    }
-
 public:
     GLint clampConstant;
     bool supportsNonPower2Textures;
+    QScopedPointer<QnGlFunctions> functions;
 private:
     struct Filler
     {
@@ -235,7 +232,6 @@ private:
 
     QMutex m_fillerMutex;
     Filler m_fillers[FILLER_COUNT];
-    QScopedPointer<QOpenGLFunctions> m_functions;
 };
 
 // -------------------------------------------------------------------------- //
@@ -509,7 +505,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_pts( 0 ),
     m_skippingForbidden( false ),
     m_flags( 0 ),
-    m_glFence( uploader->d.data() ),
+    m_glFence( uploader->d->functions.data() ),
     m_displayedRect(0.0, 0.0, 1.0, 1.0)
 {
     //TODO/IMPL allocate textures when needed, because not every format require 3 planes
@@ -2207,22 +2203,16 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
 
 bool DecodedPictureToOpenGLUploader::usingShaderYuvToRgb() const
 {
-    bool openGL1_3 = d->functions()->hasOpenGLFeature(QOpenGLFunctions::Multitexture);
-
-    return (d->features() & QnGlFunctions::ArbPrograms)
-        && openGL1_3
-        && !(d->features() & QnGlFunctions::ShadersBroken)
+    return (d->functions->features() & QnGlFunctions::ArbPrograms)
+        && !(d->functions->features() & QnGlFunctions::ShadersBroken)
         && m_yv12SharedUsed
         && !m_forceSoftYUV;
 }
 
 bool DecodedPictureToOpenGLUploader::usingShaderNV12ToRgb() const
 {
-    bool openGL1_3 = d->functions()->hasOpenGLFeature(QOpenGLFunctions::Multitexture);
-
-    return (d->features() & QnGlFunctions::ArbPrograms)
-        && openGL1_3
-        && !(d->features() & QnGlFunctions::ShadersBroken)
+    return (d->functions->features() & QnGlFunctions::ArbPrograms)
+        && !(d->functions->features() & QnGlFunctions::ShadersBroken)
         && m_nv12SharedUsed
         && !m_forceSoftYUV;
 }

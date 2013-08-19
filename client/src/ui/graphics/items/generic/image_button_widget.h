@@ -22,7 +22,7 @@ class QnTextureTransitionShaderProgram;
 /**
  * A lightweight button widget that does not use styles for painting.
  */
-class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> > {
+class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> >, protected QOpenGLFunctions {
     Q_OBJECT
     Q_FLAGS(StateFlags StateFlag)
     Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable)
@@ -141,7 +141,6 @@ private:
     bool m_actionIconOverridden;
 
     QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
-    QScopedPointer<QOpenGLFunctions> m_gl;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)

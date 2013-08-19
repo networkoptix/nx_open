@@ -23,8 +23,6 @@ typedef uint64_t GLuint64;
 class QnGlFunctions {
 public:
     enum Feature {
-        OpenGL1_5           = 0x00000002,   /**< Implements OpenGL1.5 spec. */
-        OpenGL2_0           = 0x00000004,   /**< Implements OpenGL2.0 spec. */
         OpenGL3_2           = 0x00000008,   /**< Implements OpenGL3.2 spec. */
 
         ArbPrograms         = 0x00010000,   /**< Supports ARB shader programs. */
@@ -86,22 +84,6 @@ public:
     void glDeleteProgramsARB(GLsizei n, const GLuint *programs) const;
     void glGenProgramsARB(GLsizei n, GLuint *programs) const;
     void glProgramLocalParameter4fARB(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const;
-
-    /* OpenGL1_5 group. */
-    
-    void glGenBuffers(GLsizei n, GLuint *buffers);
-    void glBindBuffer(GLenum target, GLuint buffer);
-    void glDeleteBuffers(GLsizei n, const GLuint *buffers);
-    void glBufferData(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage);
-    void glBufferSubData(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data);
-    GLvoid *glMapBuffer(GLenum target, GLenum access);
-    GLboolean glUnmapBuffer(GLenum target);
-
-    /* OpenGL2_0 group. */
-    
-    void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
-    void glEnableVertexAttribArray(GLuint index);
-    void glDisableVertexAttribArray(GLuint index);
 
     /* OpenGL3_2 group. */
 

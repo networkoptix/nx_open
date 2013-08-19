@@ -44,9 +44,7 @@ public:
 };
 
 
-class QnGLRenderer
-:
-    public QnGlFunctions
+class QnGLRenderer : protected QnGlFunctions, protected QOpenGLFunctions
 {
 public:
     static bool isPixelFormatSupported(PixelFormat pixfmt);
@@ -109,7 +107,6 @@ private:
     QnHistogramConsumer* m_histogramConsumer;
     QnFisheyePtzController* m_fisheyeController;
     QRectF m_displayedRect;
-    QScopedPointer<QOpenGLFunctions> m_functions;
     
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen

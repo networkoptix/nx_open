@@ -2,14 +2,13 @@
 #define QN_PAUSED_PAINTER_H
 
 #include <QtCore/QSharedPointer>
-
-#include <ui/graphics/opengl/gl_functions.h>
+#include <QtGui/QOpenGLFunctions>
 
 class QGLContext;
 
 class QnColorShaderProgram;
 
-class QnPausedPainter: public QnGlFunctions {
+class QnPausedPainter: protected QOpenGLFunctions {
 public:
     QnPausedPainter(const QGLContext *context);
 

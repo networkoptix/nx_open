@@ -5,17 +5,12 @@
 #include <ui/graphics/shaders/color_shader_program.h>
 
 QnPausedPainter::QnPausedPainter(const QGLContext *context):
-    QnGlFunctions(context),
+    QOpenGLFunctions(context->contextHandle()),
     m_shader(QnColorShaderProgram::instance(context)),
     m_initialized(false)
 {
     if(context != QGLContext::currentContext()) {
         qnWarning("Invalid current OpenGL context.");
-        return;
-    }
-
-    if(!(features() & OpenGL2_0)) {
-        qnWarning("OpenGL version 2.0 is required.");
         return;
     }
 
