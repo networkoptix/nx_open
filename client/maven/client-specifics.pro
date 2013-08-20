@@ -1,7 +1,6 @@
 TEMPLATE = app
 QT += core gui network opengl xml sql widgets
 
-
 DEFINES += CL_FORCE_LOGO USE_NX_HTTP
 TRANSLATIONS += ${basedir}/translations/client_en.ts \
 				${basedir}/translations/client_ru.ts \
@@ -30,4 +29,11 @@ mac {
 
 unix: !mac {
   LIBS += -lX11
+  QT += x11extras  
 }
+
+unix: {
+  LIBS += -lGL -lGLU
+}
+
+
