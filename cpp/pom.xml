@@ -488,7 +488,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>qmake</executable>
+									<executable>${environment.dir}/qt5/qtbase-${arch}/bin/qmake</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
 										<commandlineArgs>-spec</commandlineArgs>

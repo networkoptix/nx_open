@@ -32,7 +32,8 @@ CONFIG(debug, debug|release) {
   MOC_DIR = ../${arch}/build/debug/generated
   UI_DIR = ../${arch}/build/debug/generated
   RCC_DIR = ../${arch}/build/debug/generated
-  LIBS = -L${libdir}/build/bin/debug -L${environment.dir}/qt5/qtbase-${arch}/lib
+  LIBS = -L${libdir}/build/bin/debug \
+		-L${environment.dir}/qt5/qtbase-${arch}/lib
 }
 
 CONFIG(release, debug|release) {
@@ -46,7 +47,8 @@ CONFIG(release, debug|release) {
   MOC_DIR = ../${arch}/build/release/generated
   UI_DIR = ../${arch}/build/release/generated
   RCC_DIR = ../${arch}/build/release/generated
-  LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt5/qtbase-${arch}/lib
+  LIBS = -L${libdir}/build/bin/release \
+		-L${environment.dir}/qt5/qtbase-${arch}/lib
 }
 
 !contains(TARGET,common){
@@ -60,12 +62,24 @@ INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include \
 		${environment.dir}/qt5/qtbase-${arch}/include/QtCore \
 		${project.build.sourceDirectory} \
 		${project.build.directory} \
-		${basedir}/../common/src ${libdir}/build/include \
+		${basedir}/../common/src \
+		${libdir}/build/include \
 		${project.build.directory}/build/include \
 		${environment.dir}/qt5/qt-custom \
-		${environment.dir}/qt5/qt-custom/QtCore \
-		${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.0/ \
+		${environment.dir}/qt5/qt-custom/QtCore
+        
+win* {        
+#TODO: port to 5.1.2
+INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.0/ \
 		${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.0/QtCore/
+}
+
+unix {        
+INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.2/ \
+		${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.2/QtCore/
+}
+        
+        
 DEPENDPATH *= $${INCLUDEPATH}
 
 !mac {
