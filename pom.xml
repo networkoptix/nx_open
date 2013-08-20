@@ -227,6 +227,7 @@
                 <qt.dir>${env.QTDIR}</qt.dir>				
                 <platform>linux</platform>
                 <compiler>gcc</compiler>
+                <qt.spec>linux-g++</qt.spec>
             </properties>
         </profile>	
         <profile>
@@ -245,10 +246,12 @@
             <properties>
                 <protobuf.version>2.5.0</protobuf.version>
                 <boost.version>1.54-SNAPSHOT</boost.version>
-                <ffmpeg.version>N-55599-g66f1de6-faac-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.3-SNAPSHOT</ffmpeg.version>
+                <sigar.version>1.7-SNAPSHOT</sigar.version>
 
                 <arch>${cross-arch}</arch>
                 <compiler>2011.09</compiler>
+                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
             </properties>
         </profile>	
         <profile>
@@ -325,6 +328,7 @@
                 <platform>macosx</platform>
                 <compiler>gcc</compiler>
                 <arch>x64</arch>
+                <qt.spec>macx-g++47</qt.spec>
             </properties>
         </profile>	
     </profiles>	

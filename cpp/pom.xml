@@ -492,7 +492,7 @@
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
 										<commandlineArgs>-spec</commandlineArgs>
-										<commandlineArgs>linux-g++</commandlineArgs>
+										<commandlineArgs>${qt.spec}</commandlineArgs>
 										<commandlineArgs>CONFIG+=${build.configuration}</commandlineArgs>
 										<commandlineArgs>-o</commandlineArgs>
 										<commandlineArgs>${project.build.directory}/Makefile.${build.configuration}</commandlineArgs>
@@ -578,7 +578,7 @@
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
 										<commandlineArgs>-spec</commandlineArgs>
-										<commandlineArgs>macx-g++47</commandlineArgs>
+										<commandlineArgs>${qt.spec}</commandlineArgs>
 										<commandlineArgs>CONFIG+=${build.configuration}</commandlineArgs>
 										<commandlineArgs>-o</commandlineArgs>
 										<commandlineArgs>${project.build.directory}/Makefile.${build.configuration}</commandlineArgs>
