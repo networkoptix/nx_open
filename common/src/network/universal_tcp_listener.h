@@ -42,21 +42,22 @@ public:
 
     /* proxy support functions */
 
-    void setProxyReceiverUrl(const QUrl& url);
+    void setProxyParams(const QUrl& proxyServerUrl, const QString& selfId);
     void addProxySenderConnections(int size);
 
-    bool registerProxyReceiverConnection(const QUrl& url, TCPSocket* socket);
-    TCPSocket* getProxySocket(const QUrl& url, int timeout);
+    bool registerProxyReceiverConnection(const QString& url, TCPSocket* socket);
+    TCPSocket* getProxySocket(const QString& guid, int timeout);
     void setProxyPoolSize(int value);
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner);
 private:
     QList<HandlerInfo> m_handlers;
-    QUrl m_backConnectUrl;
+    QUrl m_proxyServerUrl;
+    QString m_selfIdForProxy;
     QMutex m_proxyMutex;
     QWaitCondition m_proxyWaitCond;
-    QMultiMap<QUrl, TCPSocket*> m_awaitingProxyConnections;
-    QSet<QUrl> m_proxyConExists;
+    QMap<QString, TCPSocket*> m_awaitingProxyConnections;
+    QSet<QString> m_proxyConExists;
     int m_proxyPoolSize;
 };
 

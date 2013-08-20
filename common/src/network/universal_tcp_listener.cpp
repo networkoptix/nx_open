@@ -50,9 +50,10 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(TCPSock
     return new QnUniversalRequestProcessor(clientSocket, owner);
 }
 
-void QnUniversalTcpListener::setProxyReceiverUrl(const QUrl& url)
+void QnUniversalTcpListener::setProxyParams(const QUrl& proxyServerUrl, const QString& selfId)
 {
-    m_backConnectUrl = url;
+    m_proxyServerUrl = proxyServerUrl;
+    m_selfIdForProxy = selfId;
 }
 
 void QnUniversalTcpListener::addProxySenderConnections(int size)
@@ -61,27 +62,27 @@ void QnUniversalTcpListener::addProxySenderConnections(int size)
         return;
 
     for (int i = 0; i < size; ++i) {
-        QnProxySenderConnection* connect = new QnProxySenderConnection(m_backConnectUrl, this);
+        QnProxySenderConnection* connect = new QnProxySenderConnection(m_proxyServerUrl, m_selfIdForProxy, this);
         connect->start();
         addOwnership(connect);
     }
 }
 
-TCPSocket* QnUniversalTcpListener::getProxySocket(const QUrl& url, int timeout)
+TCPSocket* QnUniversalTcpListener::getProxySocket(const QString& guid, int timeout)
 {
     QMutexLocker lock(&m_proxyMutex);
-    QMultiMap<QUrl, TCPSocket*>::iterator itr = m_awaitingProxyConnections.find(url);
-    while (itr == m_awaitingProxyConnections.end() && m_proxyConExists.contains(url)) {
+    QMap<QString, TCPSocket*>::iterator itr = m_awaitingProxyConnections.find(guid);
+    while (itr == m_awaitingProxyConnections.end() && m_proxyConExists.contains(guid)) {
         if (!m_proxyWaitCond.wait(&m_proxyMutex, timeout))
             break;
-        itr = m_awaitingProxyConnections.find(url);
+        itr = m_awaitingProxyConnections.find(guid);
     }
 
     if (itr == m_awaitingProxyConnections.end())
         return 0;
-
+    TCPSocket* result = itr.value();
     m_awaitingProxyConnections.erase(itr);
-    return itr.value();
+    return result;
 }
 
 void QnUniversalTcpListener::setProxyPoolSize(int value)
@@ -89,12 +90,12 @@ void QnUniversalTcpListener::setProxyPoolSize(int value)
     m_proxyPoolSize = value;
 }
 
-bool QnUniversalTcpListener::registerProxyReceiverConnection(const QUrl& url, TCPSocket* socket)
+bool QnUniversalTcpListener::registerProxyReceiverConnection(const QString& guid, TCPSocket* socket)
 {
     QMutexLocker lock(&m_proxyMutex);
-    if (m_awaitingProxyConnections.size() < m_proxyPoolSize) {
-        m_awaitingProxyConnections.insert(url, socket);
-        m_proxyConExists << url;
+    if (m_awaitingProxyConnections.size() < m_proxyPoolSize * 2) {
+        m_awaitingProxyConnections.insert(guid, socket);
+        m_proxyConExists << guid;
         return true;
     }
     return false;

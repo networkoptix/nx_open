@@ -9,14 +9,16 @@ static const int SOCKET_TIMEOUT = 1000 * 5;
 class QnProxySenderConnectionPrivate: public QnUniversalRequestProcessorPrivate
 {
 public:
-    QUrl serverUrl;
+    QUrl proxyServerUrl;
+    QString guid;
 };
 
-QnProxySenderConnection::QnProxySenderConnection(const QUrl& serverUrl, QnTcpListener* owner):
+QnProxySenderConnection::QnProxySenderConnection(const QUrl& proxyServerUrl, const QString& guid, QnTcpListener* owner):
     QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate, new TCPSocket(), owner)
 {
     Q_D(QnProxySenderConnection);
-    d->serverUrl = serverUrl;
+    d->proxyServerUrl = proxyServerUrl;
+    d->guid = guid;
     setObjectName( lit("QnProxySenderConnection") );
 }
 
@@ -56,7 +58,7 @@ void QnProxySenderConnection::run()
 
     saveSysThreadID();
 
-    if (!d->socket->connect(d->serverUrl.host(), d->serverUrl.port(), SOCKET_TIMEOUT)) {
+    if (!d->socket->connect(d->proxyServerUrl.host(), d->proxyServerUrl.port(), SOCKET_TIMEOUT)) {
         addNewProxyConnect();
         return;
     }
@@ -64,7 +66,7 @@ void QnProxySenderConnection::run()
     d->socket->setWriteTimeOut(SOCKET_TIMEOUT);
     d->socket->setReadTimeOut(SOCKET_TIMEOUT);
 
-    QByteArray proxyRequest = QString(lit("CONNECT %1 PROXY/1.0\r\n\r\n")).arg(d->socket->getPeerAddress()).toUtf8();
+    QByteArray proxyRequest = QString(lit("CONNECT %1 PROXY/1.0\r\n\r\n")).arg(d->guid).toUtf8();
 
     // send proxy response
     int totalSend = 0;

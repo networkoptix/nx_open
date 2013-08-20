@@ -898,7 +898,6 @@ void QnMain::run()
         if (!needToStop())
             QnSleep::msleep(1000);
     }
-    connectInfo->proxyPort = 7014; // todo: debug only. avoid Vanya bug.
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
     QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
@@ -956,9 +955,9 @@ void QnMain::run()
 
     initTcpListener();
 
-    QUrl backUrl = appServerConnection->url();
-    backUrl.setPort(connectInfo->proxyPort);
-    m_universalTcpListener->setProxyReceiverUrl(backUrl);
+    QUrl proxyServerUrl = appServerConnection->url();
+    proxyServerUrl.setPort(connectInfo->proxyPort);
+    m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid());
     m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
     QHostAddress publicAddress = getPublicAddress();

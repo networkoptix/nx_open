@@ -151,7 +151,7 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
         if (urlStr == QLatin1String("proxy"))
             setPrimaryIF(urlStr);
         else
-            setPrimaryIF(QUrl(urlStr).host());
+            ; //setPrimaryIF(QUrl(urlStr).host());
     }
 
     m_runningIfRequests.remove(responseNum);
