@@ -1,11 +1,13 @@
 #ifndef clabstractvideodecoder_h_2155
 #define clabstractvideodecoder_h_2155
 
-#include <QtOpenGL/QGLContext>
+//#include <QtOpenGL/QGLContext>
 
 #include "core/datapacket/media_data_packet.h"
 #include "utils/media/frame_info.h"
 
+
+class QGLContext;
 
 //!Abstract interface. Every video decoder MUST implement this interface
 /*!

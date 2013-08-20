@@ -1,5 +1,5 @@
 
-#if !defined(_WIN32) && !defined(Q_OS_LINUX)
+#if !defined(_WIN32) && !(defined(Q_OS_LINUX) && !defined(__arm__))
 
 #include "platform_images.h"
 

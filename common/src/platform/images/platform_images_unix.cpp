@@ -1,5 +1,5 @@
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) && !defined(__arm__)
 
 #include "platform_images.h"
 

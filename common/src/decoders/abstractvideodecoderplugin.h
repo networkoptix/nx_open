@@ -5,7 +5,7 @@
 #ifndef ABSTRACTVIDEODECODERPLUGIN_H
 #define ABSTRACTVIDEODECODERPLUGIN_H
 
-#include <QtOpenGL/QGLContext>
+//#include <QtOpenGL/QGLContext>
 #include <QtCore/QList>
 
 extern "C"
@@ -18,6 +18,7 @@ extern "C"
 #include "../plugins/videodecoders/stree/resourcecontainer.h"
 
 
+class QGLContext;
 class QnAbstractVideoDecoder;
 
 //!Base class for video decoder plugins. Such plugin can be system-dependent and can provide hardware-acceleration of decoding

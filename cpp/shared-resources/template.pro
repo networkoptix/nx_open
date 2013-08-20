@@ -68,16 +68,8 @@ INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include \
 		${environment.dir}/qt5/qt-custom \
 		${environment.dir}/qt5/qt-custom/QtCore
         
-win* {        
-#TODO: port to 5.1.2
-INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.0/ \
-		${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.0/QtCore/
-}
-
-unix {        
-INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.2/ \
-		${environment.dir}/qt5/qtbase-${arch}/include/QtCore/5.1.2/QtCore/
-}
+INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include/QtCore/$$QT_VERSION/ \
+               ${environment.dir}/qt5/qtbase-${arch}/include/QtCore/$$QT_VERSION/QtCore/
         
         
 DEPENDPATH *= $${INCLUDEPATH}
@@ -120,7 +112,8 @@ win* {
 unix:!mac {
   LIBS += ${linux.oslibs}
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -msse2 -std=c++0x -fpermissive
+  QMAKE_CXXFLAGS += -std=c++0x -fpermissive
+  
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC = $$QMAKE_MOC -DQ_OS_LINUX

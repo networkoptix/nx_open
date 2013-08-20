@@ -63,7 +63,6 @@ extern "C" {
 
 #include <QAuthenticator>
 #include <QtCore/QBuffer>
-#include <QCheckBox>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QColor>
 #include <QtCore/QDataStream>
@@ -78,11 +77,6 @@ extern "C" {
 #include <QtCore/QFileInfoList>
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
-#include <QGraphicsItem>
-#include <QGraphicsProxyWidget>
-#include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsView>
 #include <QtNetwork/QHostAddress>
 #ifndef USE_NX_HTTP
 #include <QHttp>
@@ -117,7 +111,6 @@ extern "C" {
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QStringListModel>
-#include <QStyleOptionGraphicsItem>
 #include <QtCore/QTextStream>
 #include <QtCore/QThread>
 #include <QtCore/QThreadPool>
@@ -131,8 +124,21 @@ extern "C" {
 #include <QtCore/QtDebug>
 #include <QtGui/QPainter>
 #include <QtGui/QResizeEvent>
-#include <QtOpenGL/QGLWidget>
 #include <QFileSystemWatcher>
 #include <QtCore/QUrlQuery>
 
 #endif
+
+//intrinsic
+#ifdef __i386
+typedef __m128i simd128i;
+typedef __m128 simd128;
+#elif defined(__arm__)
+#include <arm_neon.h>
+
+typedef int32x4_t simd128i;
+typedef uint32x4_t simd128;
+#else
+#error "Target CPU type is not supported"
+#endif
+

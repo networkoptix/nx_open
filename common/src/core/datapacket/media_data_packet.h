@@ -233,7 +233,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     void addMotion(QnMetaDataV1Ptr data);
 
     // remove part of motion info by motion mask
-    void removeMotion(const __m128i* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
+    void removeMotion(const simd128i* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
 
     // ti check if we've got motion at 
     static bool isMotionAt(int x, int y, char* mask);
@@ -265,7 +265,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     //void deserialize(QIODevice* ioDevice);
     void serialize(QIODevice* ioDevice);
 
-    static bool mathImage(const __m128i* data, const __m128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
+    static bool mathImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
 
 
     quint8 m_input;

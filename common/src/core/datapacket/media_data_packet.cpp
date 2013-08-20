@@ -151,6 +151,7 @@ QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData)
     return result;
 }
 
+#ifdef __i386
 inline bool sse4_attribute mathImage_sse41(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
 {
     for (int i = maskStart; i <= maskEnd; ++i)
@@ -171,13 +172,18 @@ inline bool mathImage_sse2(const __m128i* data, const __m128i* mask, int maskSta
     }
     return false;
 }
+#endif	//__i386
 
-bool QnMetaDataV1::mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
+bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
+#ifdef __i386
     if (useSSE41())
         return mathImage_sse41(data, mask, maskStart, maskEnd);
     else 
         return mathImage_sse2(data, mask, maskStart, maskEnd);
+#elif defined(__arm__)
+    //TODO/ARM
+#endif
 }
 
 
@@ -200,8 +206,9 @@ void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
     addMotion((const quint8*) data->data.data(), data->timestamp);
 }
 
-void QnMetaDataV1::removeMotion(const __m128i* image, int startIndex, int endIndex)
+void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIndex)
 {
+#ifdef __i386
     __m128i* dst = (__m128i*) data.data();
     __m128i* src = (__m128i*) image;
     for (int i = startIndex; i <= endIndex; ++i)
@@ -211,8 +218,12 @@ void QnMetaDataV1::removeMotion(const __m128i* image, int startIndex, int endInd
         src++;
 
     }
+#elif defined(__arm__)
+    //TODO/ARM
+#endif
 }
 
+#ifdef __i386
 inline bool metadataIsEmpty_sse2(__m128i* src)
 {
     static const __m128i zerroValue = _mm_setr_epi32(0, 0, 0, 0); /* SSE2. */
@@ -234,13 +245,19 @@ inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
     }
     return true;
 }
+#endif
 
 bool QnMetaDataV1::isEmpty() const
 {
+#ifdef __i386
     if (useSSE41())
         return metadataIsEmpty_sse41((__m128i*) data.data());
     else 
         return metadataIsEmpty_sse2((__m128i*) data.data());
+#elif defined(__arm__)
+    //TODO/ARM
+    return false;
+#endif
 }
 
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
@@ -250,6 +267,7 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
     else 
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);
 
+#ifdef __i386
     __m128i* dst = (__m128i*) data.data();
     __m128i* src = (__m128i*) image;
     for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
@@ -259,6 +277,9 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
         src++;
 
     }
+#elif defined(__arm__)
+    //TODO/ARM
+#endif
 }
 
 bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)

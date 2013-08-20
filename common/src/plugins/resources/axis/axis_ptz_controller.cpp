@@ -110,8 +110,8 @@ void QnAxisPtzController::init(const QnAxisParameterMap &params) {
         maxAngle /= 10.0;
 
         /* We implement E-Flip, so we don't want strange tilt angles. */
-        maxTilt = qMin(maxTilt, 90.0);
-        minTilt = qMax(minTilt, -90.0);
+        maxTilt = qMin<double>(maxTilt, 90.0);
+        minTilt = qMax<double>(minTilt, -90.0);
 
         /* Axis takes care of image rotation automagically, but we still need to adjust tilt limits. */
         qreal rotation = params.value("root.Image.I0.Appearance.Rotation", 0.0);
