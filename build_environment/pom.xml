@@ -63,6 +63,13 @@
 			<type>zip</type>
 			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>
+		<dependency>
+			<groupId>com.sourceforge.cloudcity</groupId>
+			<artifactId>bespin</artifactId>
+			<version>${bespin.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}-${compiler}</classifier>
+		</dependency>  
 	</dependencies>		
 
 	<build>
@@ -325,13 +332,6 @@
 					<classifier>${platform}-${arch}</classifier>
 				</dependency>		
 				<dependency>
-					<groupId>com.sourceforge.cloudcity</groupId>
-					<artifactId>bespin</artifactId>
-					<version>1.1-SNAPSHOT</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>
-				<dependency>
 					<groupId>org</groupId>
 					<artifactId>festival</artifactId>
 					<version>${festival.version}</version>
@@ -429,13 +429,6 @@
 					<type>zip</type>
 					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>
-				<dependency>
-					<groupId>com.sourceforge.cloudcity</groupId>
-					<artifactId>bespin</artifactId>
-					<version>1.1-SNAPSHOT</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>                               	
 				<dependency>
 					<groupId>org</groupId>
 					<artifactId>festival</artifactId>
@@ -670,13 +663,6 @@
 					<type>zip</type>
 					<classifier>${platform}-${arch}</classifier>
 				</dependency>      
-				<dependency>
-					<groupId>com.sourceforge.cloudcity</groupId>
-					<artifactId>bespin</artifactId>
-					<version>1.1-SNAPSHOT</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}-qt484</classifier>
-				</dependency>                               	
 				<dependency>
 					<groupId>org</groupId>
 					<artifactId>festival</artifactId>
