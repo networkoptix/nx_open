@@ -151,7 +151,7 @@ QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData)
     return result;
 }
 
-#ifdef __i386
+#if defined(__i386) || defined(_WIN32)
 inline bool sse4_attribute mathImage_sse41(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
 {
     for (int i = maskStart; i <= maskEnd; ++i)
@@ -176,7 +176,7 @@ inline bool mathImage_sse2(const __m128i* data, const __m128i* mask, int maskSta
 
 bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
-#ifdef __i386
+#if defined(__i386) || defined(_WIN32)
     if (useSSE41())
         return mathImage_sse41(data, mask, maskStart, maskEnd);
     else 
@@ -208,7 +208,7 @@ void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
 
 void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIndex)
 {
-#ifdef __i386
+#if defined(__i386) || defined(_WIN32)
     __m128i* dst = (__m128i*) data.data();
     __m128i* src = (__m128i*) image;
     for (int i = startIndex; i <= endIndex; ++i)
@@ -223,7 +223,7 @@ void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIn
 #endif
 }
 
-#ifdef __i386
+#if defined(__i386) || defined(_WIN32)
 inline bool metadataIsEmpty_sse2(__m128i* src)
 {
     static const __m128i zerroValue = _mm_setr_epi32(0, 0, 0, 0); /* SSE2. */
@@ -249,7 +249,7 @@ inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
 
 bool QnMetaDataV1::isEmpty() const
 {
-#ifdef __i386
+#if defined(__i386) || defined(_WIN32)
     if (useSSE41())
         return metadataIsEmpty_sse41((__m128i*) data.data());
     else 
@@ -267,7 +267,7 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
     else 
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);
 
-#ifdef __i386
+#if defined(__i386) || defined(_WIN32)
     __m128i* dst = (__m128i*) data.data();
     __m128i* src = (__m128i*) image;
     for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
