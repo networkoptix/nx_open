@@ -1,10 +1,9 @@
-
 #include "resource_selection_dialog.h"
+#include "ui_resource_selection_dialog.h"
 
+#include <QtCore/QIdentityProxyModel>
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QPushButton>
-
-#include "ui_resource_selection_dialog.h"
 
 #include <camera/camera_thumbnail_manager.h>
 
@@ -14,7 +13,32 @@
 
 #include <ui/common/palette.h>
 #include <ui/models/resource_pool_model.h>
+#include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
+
+namespace {
+    class QnColoringProxyModel: public QIdentityProxyModel {
+    public:
+        QnColoringProxyModel(QnResourceSelectionDialogDelegate* delegate, QObject *parent = 0):
+            QIdentityProxyModel(parent),
+            m_delegate(delegate)
+        {
+        }
+
+        QVariant data(const QModelIndex &proxyIndex, int role) const override {
+            if (role == Qt::TextColorRole && m_delegate && !m_delegate->isValid(resource(proxyIndex)))
+                return QBrush(QColor(qnGlobals->errorTextColor()));
+            return QIdentityProxyModel::data(proxyIndex, role);
+        }
+
+    private:
+        QnResourcePtr resource(const QModelIndex &proxyIndex) const {
+            return QIdentityProxyModel::data(proxyIndex, Qn::ResourceRole).value<QnResourcePtr>();
+        }
+
+        QnResourceSelectionDialogDelegate* m_delegate;
+    };
+}
 
 // -------------------------------------------------------------------------- //
 // QnResourceSelectionDialog
@@ -61,12 +85,6 @@ void QnResourceSelectionDialog::init(Qn::NodeType rootNodeType) {
     }
 
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
-
-    /*
-    QnColoringProxyModel* proxy = new QnColoringProxyModel(this);
-    proxy->setSourceModel(m_resourceModel);
-    ui->resourcesWidget->setModel(proxy);
-    */
 
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
@@ -164,6 +182,10 @@ void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *d
     m_delegate = delegate;
     if (m_delegate) {
         m_delegate->init(ui->delegateFrame);
+
+        QnColoringProxyModel* proxy = new QnColoringProxyModel(m_delegate, this);
+        proxy->setSourceModel(m_resourceModel);
+        ui->resourcesWidget->setModel(proxy);
     }
     ui->delegateFrame->setVisible(m_delegate && ui->delegateLayout->count() > 0);
     at_resourceModel_dataChanged();

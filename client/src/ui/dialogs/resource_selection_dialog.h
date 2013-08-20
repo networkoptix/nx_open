@@ -2,6 +2,7 @@
 #define SELECT_CAMERAS_DIALOG_H
 
 #include <QtCore/QModelIndex>
+
 #include <QtWidgets/QDialog>
 
 #include <core/resource/resource_fwd.h>
@@ -17,22 +18,6 @@ namespace Ui {
 
 class QnResourcePoolModel;
 class QnCameraThumbnailManager;
-
-// TODO: #GDM enable with QIdentityProxyModel in QT 4.8
-/*class QnColoringProxyModel: public QIdentityProxyModel {
-    Q_OBJECT
-
-public:
-    QnColoringProxyModel(QObject *parent = 0): QIdentityProxyModel(parent){}
-
-    QVariant data(const QModelIndex &proxyIndex, int role) const override {
-        if (role == Qt::TextColorRole)
-            return QBrush(QColor(Qt::red));
-            //todo: use delegate
-        return QIdentityProxyModel::data(proxyIndex, role);
-    }
-
-};*/
 
 class QnResourceSelectionDialog : public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT

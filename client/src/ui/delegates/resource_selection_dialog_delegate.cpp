@@ -37,6 +37,11 @@ bool QnResourceSelectionDialogDelegate::validate(const QnResourceList &selectedR
     return true;
 }
 
+bool QnResourceSelectionDialogDelegate::isValid(const QnResourcePtr &resource) {
+    Q_UNUSED(resource)
+    return true;
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnCheckResourceAndWarnDelegate
@@ -75,6 +80,14 @@ bool QnCheckResourceAndWarnDelegate<ResourceType>::validate(const QnResourceList
     m_warningLabel->setText(getText(invalid, resources.size()));
     m_warningLabel->setVisible(invalid > 0);
     return true;
+}
+
+template<class ResourceType>
+bool QnCheckResourceAndWarnDelegate<ResourceType>::isValid(const QnResourcePtr &resource) {
+    QnSharedResourcePointer<ResourceType> derived = resource.template dynamicCast<ResourceType>();
+
+    // return true for resources of other type - so root elements will not be highlighted
+    return !derived || isResourceValid(derived);
 }
 
 

@@ -27,6 +27,8 @@ public:
      * @return                      True if selection is valid and OK button can be pressed.
      */
     virtual bool validate(const QnResourceList &selectedResources);
+
+    virtual bool isValid(const QnResourcePtr &resource);
 };
 
 
@@ -38,6 +40,7 @@ public:
     ~QnCheckResourceAndWarnDelegate();
     virtual void init(QWidget* parent) override;
     virtual bool validate(const QnResourceList &selected) override;
+    virtual bool isValid(const QnResourcePtr &resource) override;
 
 protected:
     virtual bool isResourceValid(const QnSharedResourcePointer<ResourceType> &resource) const = 0;
