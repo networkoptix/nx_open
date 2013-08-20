@@ -1,6 +1,8 @@
 #ifndef __UNIVERSAL_TCP_LISTENER_H__
 #define __UNIVERSAL_TCP_LISTENER_H__
 
+#include <QMultiMap>
+#include <QWaitCondition>
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"
 
@@ -38,13 +40,24 @@ public:
 
     QnTCPConnectionProcessor* createNativeProcessor(TCPSocket* clientSocket, const QByteArray& protocol, const QString& path);
 
-    void addBackConnectionPool(const QUrl& url, int size);
-    void onBackConnectSpent(QnLongRunnable* processor);
+    /* proxy support functions */
+
+    void setProxyReceiverUrl(const QUrl& url);
+    void addProxySenderConnections(int size);
+
+    bool registerProxyReceiverConnection(const QUrl& url, TCPSocket* socket);
+    TCPSocket* getProxySocket(const QUrl& url, int timeout);
+    void setProxyPoolSize(int value);
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner);
 private:
     QList<HandlerInfo> m_handlers;
     QUrl m_backConnectUrl;
+    QMutex m_proxyMutex;
+    QWaitCondition m_proxyWaitCond;
+    QMultiMap<QUrl, TCPSocket*> m_awaitingProxyConnections;
+    QSet<QUrl> m_proxyConExists;
+    int m_proxyPoolSize;
 };
 
 #endif // __UNIVERSAL_TCP_LISTENER_H__

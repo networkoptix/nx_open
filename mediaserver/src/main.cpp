@@ -117,7 +117,7 @@ void stopServer(int signal);
 static const int DEFAUT_RTSP_PORT = 50000;
 static const int DEFAULT_STREAMING_PORT = 50000;
 
-static const int BACK_CONNECTION_POOL_SIZE = 8;
+static const int PROXY_POOL_SIZE = 8;
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -898,6 +898,7 @@ void QnMain::run()
         if (!needToStop())
             QnSleep::msleep(1000);
     }
+    connectInfo->proxyPort = 7014; // todo: debug only. avoid Vanya bug.
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
     QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
@@ -957,7 +958,8 @@ void QnMain::run()
 
     QUrl backUrl = appServerConnection->url();
     backUrl.setPort(connectInfo->proxyPort);
-    m_universalTcpListener->addBackConnectionPool(backUrl, BACK_CONNECTION_POOL_SIZE);
+    m_universalTcpListener->setProxyReceiverUrl(backUrl);
+    m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
     QHostAddress publicAddress = getPublicAddress();
 
