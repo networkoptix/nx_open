@@ -179,11 +179,11 @@ GraphicsWidget::GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent,
 
 GraphicsWidget::~GraphicsWidget() {
     // TODO: #Elric #Qt5.0 workaround for QTBUG-28321 that is fixed in Qt5.0
-    setFocusProxy(NULL); 
+    //setFocusProxy(NULL); #QT5PORT
 
     // TODO: #Elric #Qt5.0.1 workaround for QTBUG-29684 that is fixed in Qt5.0.1
-    while(!childItems().empty())
-        delete childItems().back();
+    //while(!childItems().empty()) #QT5PORT
+    //    delete childItems().back();
 
     /* This must be the last line of destructor so that this widget is not 
      * added to the list again. */
