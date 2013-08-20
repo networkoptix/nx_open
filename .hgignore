@@ -27,6 +27,7 @@ Debug
 Release
 
 build_environment/python/packages/*/build
+build_environment/python/packages/llutil/llutil.egg-info
 build_environment/target
 build_environment/x86
 build_environment/x64
