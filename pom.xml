@@ -62,7 +62,7 @@
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>sqldrivers</qtplugin2>
-        <qtplugin3>enter its name here...</qtplugin3>	
+        <qtplugin3>platforms</qtplugin3>	
     </properties>
 
     <modules>
@@ -220,6 +220,7 @@
                 <protobuf.version>2.4.1</protobuf.version>
                 <boost.version>1.52-SNAPSHOT</boost.version>
                 <qjson.version>0.7.1-SNAPSHOT</qjson.version>
+                <sigar.version>1.6-SNAPSHOT</sigar.version>
 
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin</python.dir>				
@@ -279,7 +280,7 @@
                 <os>
                     <family>unix</family>
                     <name>linux</name>
-                    <arch>amd64</arch>
+                    <arch>i386</arch>
                 </os>
                 <property>
                     <name>!cross-arch</name>
