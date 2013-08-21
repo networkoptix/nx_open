@@ -509,19 +509,19 @@ void DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
     str.flush();
 }
 
-qint64 DeviceFileCatalog::deleteRecordsBefore(int idx)
+qint64 DeviceFileCatalog::deleteRecordsBefore(int idx, QnStorageResourcePtr srcStorage)
 {
     int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
     qint64 rez = 0;
     for (int i = 0; i < count; ++i)
-        rez += deleteFirstRecord();
+        rez += deleteFirstRecord(true, srcStorage);
     return rez;
 }
 
 void DeviceFileCatalog::clear()
 {
     while(m_firstDeleteCount < m_chunks.size())
-        deleteFirstRecord();
+        deleteFirstRecord(false, QnStorageResourcePtr());
 }
 
 void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
@@ -552,7 +552,7 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 }
 
 
-qint64 DeviceFileCatalog::deleteFirstRecord()
+qint64 DeviceFileCatalog::deleteFirstRecord(bool calcFileSize, QnStorageResourcePtr srcStorage)
 {
 	QnStorageResourcePtr storage;
 	QString delFileName;
@@ -569,7 +569,8 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
 		{
 			storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
 			delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
-            deletedSize = m_chunks[m_firstDeleteCount].getFileSize();
+            if (calcFileSize && srcStorage == storage)
+                deletedSize = m_chunks[m_firstDeleteCount].getFileSize();
 
 			QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
 
@@ -598,7 +599,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
     if (storage) {
 	    if (!delFileName.isEmpty())
 	    {
-            if (deletedSize == 0)
+            if (deletedSize == 0 && calcFileSize && srcStorage == storage)
                 deletedSize = storage->getFileSize(delFileName); // obtain file size from a disk
 		    //storage->addWritedSpace(-deletedSize);
 		    storage->removeFile(delFileName);
@@ -607,7 +608,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
 		    storage->removeDir(motionDirName);
     }
 
-    return deletedSize;
+    return calcFileSize ? deletedSize : 0;
 }
 
 int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) const
