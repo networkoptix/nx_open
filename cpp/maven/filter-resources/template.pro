@@ -19,30 +19,30 @@ isEmpty(BUILDLIB) {
 
 CONFIG(debug, debug|release) {
   isEmpty(BUILDLIB) {
-	DESTDIR = ../../build_environment/${arch}/bin/debug
+	DESTDIR = ${libdir}/${arch}/bin/debug
 #	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
 	} else {
-    DESTDIR = ../../build_environment/${arch}/build/bin/debug
+    DESTDIR = ${libdir}/${arch}/lib/debug
   }  
-  OBJECTS_DIR = ../${arch}/build/debug
-  MOC_DIR = ../${arch}/build/debug/generated
-  UI_DIR = ../${arch}/build/debug/generated
-  RCC_DIR = ../${arch}/build/debug/generated
-  LIBS = -L${libdir}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug
+  OBJECTS_DIR = ${libdir}/${arch}/build/debug
+  MOC_DIR = ${libdir}/${arch}/build/debug/generated
+  UI_DIR = ${libdir}/${arch}/build/debug/generated
+  RCC_DIR = ${libdir}/${arch}/build/debug/generated
+  LIBS = -L${libdir}/${arch}/lib/debug -L${environment.dir}/qt/bin/${arch}/debug
 }
 
 CONFIG(release, debug|release) {
   isEmpty(BUILDLIB) {
-	DESTDIR = ../../build_environment/${arch}/bin/release
-#	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
+	DESTDIR = ${libdir}/${arch}/bin/release
+#	PRE_TARGETDEPS += ${libdir}/${arch}/lib/common.lib
   } else {
-    DESTDIR = ../../build_environment/${arch}/build/bin/release
+    DESTDIR = ${libdir}/${arch}/lib/release
   }  
-  OBJECTS_DIR  = ../${arch}/build/release
-  MOC_DIR = ../${arch}/build/release/generated
-  UI_DIR = ../${arch}/build/release/generated
-  RCC_DIR = ../${arch}/build/release/generated
-  LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
+  OBJECTS_DIR  = ${libdir}/${arch}/build/release
+  MOC_DIR = ${libdir}/${arch}/build/release/generated
+  UI_DIR = ${libdir}/${arch}/build/release/generated
+  RCC_DIR = ${libdir}/${arch}/build/release/generated
+  LIBS = -L${libdir}/${arch}/lib/release -L${environment.dir}/qt/bin/${arch}/release
 }
 
 !contains(TARGET,common){
@@ -57,7 +57,7 @@ QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qt
 !mac {
     include(${environment.dir}/qt-custom/QtCore/private/qtcore.pri)
 }
-INCLUDEPATH += ${environment.dir}/qt/include ${environment.dir}/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/../target/include ${environment.dir}/qt-custom ${environment.dir}/qt-custom/QtCore
+INCLUDEPATH += ${environment.dir}/qt/include ${environment.dir}/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${root.dir}/common/src ${libdir}/include ${environment.dir}/qt-custom ${environment.dir}/qt-custom/QtCore
 DEPENDPATH *= $${INCLUDEPATH}
 
 !mac {

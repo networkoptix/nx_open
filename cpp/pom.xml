@@ -111,7 +111,7 @@
                                 </concat>	
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}</echo>							
 
-                                <dirset id="includes_path" dir="${libdir}/../target/include" includes="*" erroronmissingdir="false"/>
+                                <dirset id="includes_path" dir="${libdir}/include" includes="*" erroronmissingdir="false"/>
                                 <pathconvert pathsep="${line.separator}" property="includes" refid="includes_path">
                                     <map from="" to="INCLUDEPATH += "/>
                                 </pathconvert>								
@@ -123,27 +123,27 @@
                                 </pathconvert>								
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${base_includes}</echo>								
 
-                                <fileset id="debug_libs_path" dir="${libdir}/build/bin/debug" erroronmissingdir="false">
+                                <fileset id="debug_libs_path" dir="${libdir}\${arch}\lib\debug" erroronmissingdir="false">
                                     <include name="**/*.lib" />
                                 </fileset>
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
                                 <pathconvert pathsep="${line.separator}" property="debug_libs" refid="debug_libs_path">
-                                    <map from="${libdir}/build/bin/debug/" to="     LIBS += -l"/>									
+                                    <map from="${libdir}\${arch}\lib\debug\" to="     LIBS += -l"/>									
                                     <regexpmapper from="^(.*)\.lib$$" to="\1"/>
                                 </pathconvert>								
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${debug_libs}${line.separator}}</echo>
 
-                                <fileset id="release_libs_path" dir="${libdir}/build/bin/release" erroronmissingdir="false">
+                                <fileset id="release_libs_path" dir="${libdir}/${arch}/lib/release" erroronmissingdir="false">
                                     <include name="**/*.lib" />
                                 </fileset>
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
                                 <pathconvert pathsep="${line.separator}" property="release_libs" refid="release_libs_path">
-                                    <map from="${libdir}/build/bin/release/" to="    LIBS += -l"/>									
+                                    <map from="${libdir}/${arch}/lib/release/" to="    LIBS += -l"/>									
                                     <regexpmapper from="^(.*)\.lib$$" to="\1"/>
                                 </pathconvert>								
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${release_libs}${line.separator}}</echo>
 
-                                <fileset id="linux_debug_libs_path" dir="${libdir}/build/bin/debug" erroronmissingdir="false">
+                                <fileset id="linux_debug_libs_path" dir="${libdir}/${arch}/lib/debug" erroronmissingdir="false">
                                     <include name="**/*.so" />
                                     <include name="**/*.a" />
                                     <exclude name="**/libcommon.a" />																		
@@ -152,13 +152,13 @@
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}    !mac: LIBS += -Wl,--start-group</echo>
                                 <pathconvert pathsep="${line.separator}" property="linux_debug_libs" refid="linux_debug_libs_path">
-                                    <map from="${libdir}/build/bin/debug/lib" to="    LIBS += -l"/>									
+                                    <map from="${libdir}/${arch}/lib/debug/lib" to="    LIBS += -l"/>									
                                     <regexpmapper from="^(.*)\.(.*)$$" to="\1"/>
                                 </pathconvert>								
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_debug_libs}${line.separator}</echo>
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}    !mac: LIBS += -Wl,--end-group${line.separator}}}</echo>
 
-                                <fileset id="linux_release_libs_path" dir="${libdir}/build/bin/release" erroronmissingdir="false">
+                                <fileset id="linux_release_libs_path" dir="${libdir}/${arch}/lib/release" erroronmissingdir="false">
                                     <include name="**/*.so" />
                                     <include name="**/*.a" />									
                                     <exclude name="**/libcommon.a" />									
@@ -167,7 +167,7 @@
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}    !mac: LIBS += -Wl,--start-group</echo>
                                 <pathconvert pathsep="${line.separator}" property="linux_release_libs" refid="linux_release_libs_path">
-                                    <map from="${libdir}/build/bin/release/lib" to="    LIBS += -l"/>									
+                                    <map from="${libdir}/${arch}/lib/release/lib" to="    LIBS += -l"/>									
                                     <regexpmapper from="^(.*)\.(.*)$$" to="\1"/>
                                 </pathconvert>								
                                 <echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_release_libs}${line.separator}</echo>
