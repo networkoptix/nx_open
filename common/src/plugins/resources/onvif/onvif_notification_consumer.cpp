@@ -87,7 +87,7 @@ void OnvifNotificationConsumer::removeResourceRegistration( QnPlOnvifResource* c
          )
     {
         if( it->second == resource )
-            it = m_notificationProducerAddressToResource.erase( it );
+            m_notificationProducerAddressToResource.erase( it++ );
         else
             ++it;
     }

@@ -12,7 +12,7 @@ namespace stree
     ////////////////////////////////////////////////////////////
     SequenceNode::~SequenceNode()
     {
-        for( std::multimap<int, AbstractNode*>::const_iterator
+        for( std::multimap<int, AbstractNode*>::iterator
             it = m_children.begin();
             it != m_children.end();
              )

@@ -65,6 +65,8 @@
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>sqldrivers</qtplugin2>
         <qtplugin3>platforms</qtplugin3>	
+
+        <toolchain.version></toolchain.version> <!-- defined only for cross compilation -->
     </properties>
 
     <modules>
@@ -250,6 +252,9 @@
                 <sigar.version>1.7-SNAPSHOT</sigar.version>
 
                 <arch>${cross-arch}</arch>
+                <!-- <toolchain.version>2011.09</toolchain.version> -->
+                <toolchain.version>2009q3</toolchain.version>
+                <!-- <compiler>${toolchain.version}</compiler> -->
                 <compiler>2011.09</compiler>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
             </properties>

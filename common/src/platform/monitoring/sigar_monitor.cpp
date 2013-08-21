@@ -1,6 +1,4 @@
 
-#ifndef __arm__
-
 #include "sigar_monitor.h"
 
 #include <cassert>
@@ -352,5 +350,3 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
     INVOKE(sigar_net_interface_list_destroy(d->sigar, &networkInterfaces));
     return result;
 }
-
-#endif

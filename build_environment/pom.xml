@@ -468,7 +468,7 @@
 									<executable>${environment.dir}/get_buildenv.sh</executable>
  									<workingDirectory>${environment.dir}</workingDirectory>		
                                                                         <arguments>
-                                                                                <commandlineArgs>${arch}</commandlineArgs>
+                                                                                <commandlineArgs>${arch} ${toolchain.version}</commandlineArgs>
                                                                         </arguments>
 									<skip>${rsync.skip}</skip>
 								</configuration>
@@ -589,6 +589,7 @@
 									<workingDirectory>${environment.dir}</workingDirectory>		
                                                                         <arguments>
                                                                                 <commandlineArgs>${arch}</commandlineArgs>
+                                                                                <commandlineArgs>${toolchain.version}</commandlineArgs>
                                                                         </arguments>
 									<skip>${rsync.skip}</skip>
 								</configuration>
