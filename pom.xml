@@ -254,8 +254,7 @@
                 <arch>${cross-arch}</arch>
                 <!-- <toolchain.version>2011.09</toolchain.version> -->
                 <toolchain.version>2009q3</toolchain.version>
-                <!-- <compiler>${toolchain.version}</compiler> -->
-                <compiler>2011.09</compiler>
+                <compiler>${toolchain.version}</compiler>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
             </properties>
         </profile>	
