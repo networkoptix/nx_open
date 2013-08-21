@@ -76,7 +76,6 @@
         <module>genericrtspplugin</module>
         <module>mediaserver</module>
         <module>mediaproxy</module>
-        <module>client</module>		
         <module>testcamera</module>
     </modules>
     <build>
@@ -175,6 +174,7 @@
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
                 <module>wixsetup</module>
+       	        <module>client</module>		
             </modules>
             <properties>
                 <protobuf.version>2.5.0</protobuf.version>
@@ -271,6 +271,7 @@
             </properties>
             <modules>
                 <!--<module>xvbadecoder</module>-->
+       	        <module>client</module>		
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/appserver-deb</module>
@@ -293,6 +294,7 @@
             </properties>
             <modules>
                 <!--<module>xvbadecoder</module>-->
+       	        <module>client</module>		
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/appserver-deb</module>
@@ -316,6 +318,7 @@
                 </os> 
             </activation>
             <modules>
+       	        <module>client</module>		
                 <module>ios-client</module>
             </modules>
             <properties>

@@ -1,4 +1,6 @@
 
+#if defined(__i386) || defined(_WIN32)
+
 #include <emmintrin.h>
 
 #include <cstdio>
@@ -415,3 +417,9 @@ void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int wid
         yptr2 += width;
     }
 }
+
+#elif defined(__arm__)
+//TODO/ARM
+#else
+#error "Target CPU type is not supported"
+#endif
