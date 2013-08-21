@@ -3,6 +3,10 @@
 #include <QUrl>
 #include "universal_request_processor.h"
 #include "proxy_sender_connection_processor.h"
+#include "utils/network/socket.h"
+
+
+static const int PROXY_KEEP_ALIVE_INTERVAL = 40 * 1000;
 
 // -------------------------------- QnUniversalListener ---------------------------------
 
@@ -16,6 +20,8 @@ QnUniversalTcpListener::QnUniversalTcpListener(const QHostAddress& address, int 
 QnUniversalTcpListener::~QnUniversalTcpListener()
 {
     stop();
+    for (ProxyList::Iterator itr = m_awaitingProxyConnections.begin(); itr != m_awaitingProxyConnections.end(); ++itr)
+        delete itr.value().socket;
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(TCPSocket* clientSocket, const QByteArray& protocol, const QString& path)
@@ -71,7 +77,7 @@ void QnUniversalTcpListener::addProxySenderConnections(int size)
 TCPSocket* QnUniversalTcpListener::getProxySocket(const QString& guid, int timeout)
 {
     QMutexLocker lock(&m_proxyMutex);
-    QMap<QString, TCPSocket*>::iterator itr = m_awaitingProxyConnections.find(guid);
+    ProxyList::iterator itr = m_awaitingProxyConnections.find(guid);
     while (itr == m_awaitingProxyConnections.end() && m_proxyConExists.contains(guid)) {
         if (!m_proxyWaitCond.wait(&m_proxyMutex, timeout))
             break;
@@ -80,7 +86,8 @@ TCPSocket* QnUniversalTcpListener::getProxySocket(const QString& guid, int timeo
 
     if (itr == m_awaitingProxyConnections.end())
         return 0;
-    TCPSocket* result = itr.value();
+    TCPSocket* result = itr.value().socket;
+    result->setNonBlockingMode(false);
     m_awaitingProxyConnections.erase(itr);
     return result;
 }
@@ -94,10 +101,35 @@ bool QnUniversalTcpListener::registerProxyReceiverConnection(const QString& guid
 {
     QMutexLocker lock(&m_proxyMutex);
     if (m_awaitingProxyConnections.size() < m_proxyPoolSize * 2) {
-        m_awaitingProxyConnections.insert(guid, socket);
+        m_awaitingProxyConnections.insert(guid, AwaitProxyInfo(socket));
+        socket->setNonBlockingMode(true);
         m_proxyConExists << guid;
         m_proxyWaitCond.wakeAll();
         return true;
     }
     return false;
+}
+
+void QnUniversalTcpListener::doPeriodicTasks()
+{
+    QnTcpListener::doPeriodicTasks();
+
+    QMutexLocker lock(&m_proxyMutex);
+
+    for (ProxyList::Iterator itr = m_awaitingProxyConnections.begin(); itr != m_awaitingProxyConnections.end();)
+    {
+        AwaitProxyInfo& info = itr.value();
+        if (info.timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)
+        {
+            info.timer.restart();
+            int sended = info.socket->send(QByteArray("PROXY 200 OK\r\n\r\n"));
+            if (sended < 1)
+            {
+                delete info.socket;
+                itr = m_awaitingProxyConnections.erase(itr);
+                continue;
+            }
+        }
+        ++itr;
+    }
 }

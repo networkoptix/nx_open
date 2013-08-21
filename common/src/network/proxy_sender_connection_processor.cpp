@@ -5,6 +5,7 @@
 #include "universal_tcp_listener.h"
 
 static const int SOCKET_TIMEOUT = 1000 * 5;
+static const int PROXY_KEEP_ALIVE_INTERVAL = 60 * 1000;
 
 class QnProxySenderConnectionPrivate: public QnUniversalRequestProcessorPrivate
 {
@@ -61,7 +62,19 @@ void QnProxySenderConnection::doDelay()
         msleep(100);
     }
 }
+int QnProxySenderConnection::sendRequest(const QByteArray& data)
+{
+    Q_D(QnProxySenderConnection);
 
+    int totalSend = 0;
+    while (!m_needStop && d->socket->isConnected() && totalSend < data.length())
+    {
+        int sended = d->socket->send(data.mid(totalSend));
+        if (sended > 0)
+            totalSend += sended;
+    }
+    return totalSend;
+}
 
 void QnProxySenderConnection::run()
 {
@@ -81,14 +94,8 @@ void QnProxySenderConnection::run()
     QByteArray proxyRequest = QString(lit("CONNECT %1 PROXY/1.0\r\n\r\n")).arg(d->guid).toUtf8();
 
     // send proxy response
-    int totalSend = 0;
-    while (!m_needStop && d->socket->isConnected() && totalSend < proxyRequest.length())
-    {
-        int sended = d->socket->send(proxyRequest.mid(totalSend));
-        if (sended > 0)
-            totalSend += sended;
-    }
-    if (totalSend < proxyRequest.length()) {
+    int sended = sendRequest(proxyRequest);
+    if (sended < proxyRequest.length()) {
         doDelay();
         addNewProxyConnect();
         return;
@@ -105,8 +112,25 @@ void QnProxySenderConnection::run()
 
     // wait main request from remote host
     bool gotRequest = false;
-    while (!m_needStop && d->socket->isConnected() && !gotRequest)
+    QTime timer;
+    timer.restart();
+    int cseq = 0;
+    while (!m_needStop && d->socket->isConnected())
+    {
         gotRequest = readRequest();
+        if (gotRequest)
+        {
+            timer.restart();
+            if (d->clientRequest.startsWith("PROXY"))
+                gotRequest = false; // proxy keep-alive packets
+            else
+                break;
+        }
+        else {
+            if (timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)
+                break;
+        }
+    }
 
     if (!m_needStop) {
         addNewProxyConnect();

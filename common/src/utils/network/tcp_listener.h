@@ -38,7 +38,7 @@ public slots:
 protected:
     virtual void run();
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;
-
+    virtual void doPeriodicTasks();
 private:
     void removeDisconnectedConnections();
     void removeAllConnections();

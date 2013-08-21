@@ -50,13 +50,26 @@ public:
     void setProxyPoolSize(int value);
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner);
+    virtual void doPeriodicTasks() override;
 private:
+    struct AwaitProxyInfo
+    {
+        explicit AwaitProxyInfo(TCPSocket* _socket): socket(_socket) { timer.restart(); }
+        AwaitProxyInfo(): socket(0) { timer.restart(); }
+
+        TCPSocket* socket;
+        QTime timer;
+    };
+
     QList<HandlerInfo> m_handlers;
     QUrl m_proxyServerUrl;
     QString m_selfIdForProxy;
     QMutex m_proxyMutex;
     QWaitCondition m_proxyWaitCond;
-    QMap<QString, TCPSocket*> m_awaitingProxyConnections;
+
+    typedef QMultiMap<QString, AwaitProxyInfo> ProxyList;
+    ProxyList m_awaitingProxyConnections;
+
     QSet<QString> m_proxyConExists;
     int m_proxyPoolSize;
 };

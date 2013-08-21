@@ -20,6 +20,7 @@ private:
     QByteArray readProxyResponse();
     void addNewProxyConnect();
     void doDelay();
+    int sendRequest(const QByteArray& data);
 private:
     Q_DECLARE_PRIVATE(QnProxySenderConnection);
 };
