@@ -34,7 +34,7 @@
                 <version>2.5</version>
                 <executions>
                     <execution>
-                        <id>copy-cpp-resources</id>
+                        <id>copy-common-resources</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -45,7 +45,11 @@
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/resources</directory>
                                     <filtering>true</filtering>
-                                </resource>	                      
+                                </resource>	
+                                <resource>
+                                    <directory>${root.dir}/cpp/maven/bin-resources</directory>
+                                    <filtering>false</filtering>
+                                </resource>                                
                             </resources>              
                             <encoding>UTF-8</encoding>
                         </configuration>            
