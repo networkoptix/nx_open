@@ -128,17 +128,3 @@ extern "C" {
 #include <QtCore/QUrlQuery>
 
 #endif
-
-//intrinsic
-#if defined(__i386) || defined(_WIN32)
-typedef __m128i simd128i;
-typedef __m128 simd128;
-#elif defined(__arm__)
-#include <arm_neon.h>
-
-typedef int32x4_t simd128i;
-typedef uint32x4_t simd128;
-#else
-#error "Target CPU type is not supported"
-#endif
-
