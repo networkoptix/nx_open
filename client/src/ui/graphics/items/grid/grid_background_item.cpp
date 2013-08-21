@@ -275,7 +275,7 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 
 #ifdef USE_YUVA420
     m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), PIX_FMT_YUVA420P );
-    bgra_to_yva12_sse2_intr(
+    bgra_to_yva12_simd_intr(
         alignedImgBuffer,
         requiredImgXStride,
         m_imgAsFrame->data[0],

@@ -2073,7 +2073,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             case PIX_FMT_YUV420P:
                 if (useSSE2())
                 {
-                    yuv420_argb32_sse2_intr(pixels, planes[0], planes[2], planes[1],
+                    yuv420_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * lineSizes[0],
@@ -2087,7 +2087,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             case PIX_FMT_YUV422P:
                 if (useSSE2())
                 {
-                    yuv422_argb32_sse2_intr(pixels, planes[0], planes[2], planes[1],
+                    yuv422_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * lineSizes[0],
@@ -2101,7 +2101,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             case PIX_FMT_YUV444P:
                 if (useSSE2())
                 {
-                    yuv444_argb32_sse2_intr(pixels, planes[0], planes[2], planes[1],
+                    yuv444_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * lineSizes[0],

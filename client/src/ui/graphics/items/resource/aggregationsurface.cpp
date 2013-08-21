@@ -406,7 +406,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             case PIX_FMT_YUV420P:
                 if (useSSE2())
                 {
-                    yuv420_argb32_sse2_intr(pixels, m_buffers[0].buffer.data(), m_buffers[2].buffer.data(), m_buffers[1].buffer.data(),
+                    yuv420_argb32_simd_intr(pixels, m_buffers[0].buffer.data(), m_buffers[2].buffer.data(), m_buffers[1].buffer.data(),
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * m_buffers[0].pitch,
@@ -420,7 +420,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             case PIX_FMT_YUV422P:
                 if (useSSE2())
                 {
-                    yuv422_argb32_sse2_intr(pixels, m_buffers[0].buffer.data(), m_buffers[2].buffer.data(), m_buffers[1].buffer.data(),
+                    yuv422_argb32_simd_intr(pixels, m_buffers[0].buffer.data(), m_buffers[2].buffer.data(), m_buffers[1].buffer.data(),
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * m_buffers[0].pitch,
@@ -434,7 +434,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             case PIX_FMT_YUV444P:
                 if (useSSE2())
                 {
-                    yuv444_argb32_sse2_intr(pixels, m_buffers[0].buffer.data(), m_buffers[2].buffer.data(), m_buffers[1].buffer.data(),
+                    yuv444_argb32_simd_intr(pixels, m_buffers[0].buffer.data(), m_buffers[2].buffer.data(), m_buffers[1].buffer.data(),
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * m_buffers[0].pitch,

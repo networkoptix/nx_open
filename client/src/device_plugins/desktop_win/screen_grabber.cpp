@@ -591,7 +591,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
 #else
         if (useSSE3())
         {
-            bgra_to_yv12_sse2_intr(data, width * 4,
+            bgra_to_yv12_simd_intr(data, width * 4,
                 m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2],
                 m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], roundWidth, height, m_mode == CaptureMode_Application);
         }
@@ -608,7 +608,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
     {
         if (useSSE3())
         {
-            bgra_to_yv12_sse2_intr(data, width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2],
+            bgra_to_yv12_simd_intr(data, width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2],
                              pFrame->linesize[0], pFrame->linesize[1], roundWidth, height, m_mode == CaptureMode_Application);
         }
         else {
