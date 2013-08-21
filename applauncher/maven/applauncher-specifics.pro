@@ -9,10 +9,6 @@ CONFIG(debug, debug|release) {
   CONFIG += console
 }
 
-include(${environment.dir}/qt-custom/qtservice/src/qtservice.pri)
-include(${environment.dir}/qt-custom/qtsingleapplication/src/qtsingleapplication.pri)
-#include(${environment.dir}/qt-custom/qtsingleapplication/src/qtsinglecoreapplication.pri)
-
 QMAKE_RPATHDIR = ""
 
 win32 {
