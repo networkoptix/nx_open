@@ -168,13 +168,13 @@
                 </os>
             </activation>
             <modules>
+                <module>client</module>		
                 <module>quicksyncdecoder</module>	
                 <module>axiscamplugin</module>
                 <module>genericrtspplugin</module>
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
                 <module>wixsetup</module>
-       	        <module>client</module>		
             </modules>
             <properties>
                 <protobuf.version>2.5.0</protobuf.version>
