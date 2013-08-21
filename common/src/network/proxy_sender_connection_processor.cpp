@@ -52,6 +52,17 @@ void QnProxySenderConnection::addNewProxyConnect()
     (dynamic_cast<QnUniversalTcpListener*>(d->owner))->addProxySenderConnections(1);
 }
 
+void QnProxySenderConnection::doDelay()
+{
+    for (int i = 0; i < 100; ++i)
+    {
+        if (m_needStop)
+            break;
+        msleep(100);
+    }
+}
+
+
 void QnProxySenderConnection::run()
 {
     Q_D(QnProxySenderConnection);
@@ -59,6 +70,7 @@ void QnProxySenderConnection::run()
     saveSysThreadID();
 
     if (!d->socket->connect(d->proxyServerUrl.host(), d->proxyServerUrl.port(), SOCKET_TIMEOUT)) {
+        doDelay();
         addNewProxyConnect();
         return;
     }
@@ -77,6 +89,7 @@ void QnProxySenderConnection::run()
             totalSend += sended;
     }
     if (totalSend < proxyRequest.length()) {
+        doDelay();
         addNewProxyConnect();
         return;
     }
@@ -85,6 +98,7 @@ void QnProxySenderConnection::run()
     // read proxy response
     QByteArray response = readProxyResponse();
     if (response.isEmpty() && !response.startsWith("PROXY")) {
+        doDelay();
         addNewProxyConnect();
         return;
     }

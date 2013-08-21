@@ -19,6 +19,7 @@ protected:
 private:
     QByteArray readProxyResponse();
     void addNewProxyConnect();
+    void doDelay();
 private:
     Q_DECLARE_PRIVATE(QnProxySenderConnection);
 };
