@@ -96,6 +96,7 @@ bool QnUniversalTcpListener::registerProxyReceiverConnection(const QString& guid
     if (m_awaitingProxyConnections.size() < m_proxyPoolSize * 2) {
         m_awaitingProxyConnections.insert(guid, socket);
         m_proxyConExists << guid;
+        m_proxyWaitCond.wakeOne();
         return true;
     }
     return false;

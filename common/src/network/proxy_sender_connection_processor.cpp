@@ -104,13 +104,13 @@ void QnProxySenderConnection::run()
     }
 
     // wait main request from remote host
-    while (!m_needStop && d->socket->isConnected())
-    {
-        if (readRequest()) {
-            processRequest();
-            break;
-        }
-    }
+    bool gotRequest = false;
+    while (!m_needStop && d->socket->isConnected() && !gotRequest)
+        gotRequest = readRequest();
 
-    addNewProxyConnect();
+    if (!m_needStop) {
+        addNewProxyConnect();
+        if (gotRequest)
+            processRequest();
+    }
 }
