@@ -25,8 +25,6 @@ def genqrc(qrcname, qrcprefix, path, extensions, exclusion, additions=''):
 
   for root, dirs, files in os.walk(path):
     parent = root[len(path) + 1:]
-    if '.svn' in dirs:
-      dirs.remove('.svn')  # don't visit SVN directories
 
     for f in files:
       for extension in extensions:
@@ -50,4 +48,3 @@ if __name__ == '__main__':
   genqrc('build/${project.artifactId}.qrc',             '/',        '${basedir}/../cpp/shared-resources/icons/${custom.skin}', [''],'.psd')
   genqrc('build/${project.artifactId}-common.qrc',      '/',        '${basedir}/resource/common', [''],'.pdb')
   genqrc('build/${project.artifactId}-generated.qrc',   '/',        '${project.build.directory}/resource', [''],'.pdb')  
-  

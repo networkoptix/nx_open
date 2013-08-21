@@ -139,7 +139,7 @@
                 <version>2.5</version>
                 <executions>
                     <execution>
-                        <id>copy-common-resources</id>
+                        <id>copy-project-resources</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -148,7 +148,7 @@
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>          
                                 <resource>
-                                    <directory>${basedir}/maven/resources</directory>
+                                    <directory>${basedir}/maven/filter-resources</directory>
                                     <filtering>true</filtering>
                                 </resource>	
                                 <resource>

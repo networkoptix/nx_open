@@ -43,7 +43,7 @@
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>          
                                 <resource>
-                                    <directory>${root.dir}/cpp/maven/resources</directory>
+                                    <directory>${root.dir}/cpp/maven/filter-resources</directory>
                                     <filtering>true</filtering>
                                 </resource>	
                                 <resource>
