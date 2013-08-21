@@ -94,8 +94,8 @@ bool deserialize(const QVariant &value, QnScalarSpaceMapper *target) {
     QVariantMap map = value.toMap();
 
     QString extrapolationModeName;
-    QList<qreal> logical, physical;
-    qreal logicalMultiplier = 1.0, physicalMultiplier = 1.0;
+    QList<double> logical, physical;
+    double logicalMultiplier = 1.0, physicalMultiplier = 1.0;
     if(
         !QJson::deserialize(map, "extrapolationMode", &extrapolationModeName) || 
         !QJson::deserialize(map, "logical", &logical) ||
@@ -114,7 +114,7 @@ bool deserialize(const QVariant &value, QnScalarSpaceMapper *target) {
 
     QVector<QPair<qreal, qreal> > logicalToPhysical;
     for(int i = 0; i < logical.size(); i++)
-        logicalToPhysical.push_back(qMakePair(logical[i] * logicalMultiplier, physical[i] * physicalMultiplier));
+        logicalToPhysical.push_back(qMakePair<qreal, qreal>(logical[i] * logicalMultiplier, physical[i] * physicalMultiplier));
 
     *target = QnScalarSpaceMapper(logicalToPhysical, static_cast<Qn::ExtrapolationMode>(extrapolationMode));
     return true;
