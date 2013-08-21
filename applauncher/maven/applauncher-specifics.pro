@@ -1,5 +1,5 @@
 TEMPLATE = app
-QT += core gui network opengl xml sql
+QT += core gui network xml
 
 CONFIG(debug, debug|release) {
   CONFIG += console

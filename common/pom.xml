@@ -26,7 +26,7 @@
 		<global.libs/>      
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
-		<linux.oslibs>-lz -lX11 -lXext -lXfixes</linux.oslibs>
+		<linux.oslibs></linux.oslibs>
 		<mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lsigar-universal64-macosx -lswscale -lavutil -lavformat -lavcodec -lavdevice -lavfilter -lqjson -lswresample -lz ${project.build.directory}/../../build_environment/x64/build/bin/release/libprotobuf.a -framework QtConcurrent</mac.oslibs>
 		<!--Global defines-->
 		<global.defines/>
