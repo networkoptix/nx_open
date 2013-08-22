@@ -378,7 +378,8 @@ void AVPanoramicClientPullSSTFTPStreamreader::updateStreamParamsBasedOnFps()
     QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnFps();
     if (getRole() == QnResource::Role_LiveVideo) {
         QnArecontPanoramicResourcePtr avPanoResource = m_resource.dynamicCast<QnArecontPanoramicResource>();
-        avPanoResource->updateFlipState();
+        if (avPanoResource)
+            avPanoResource->updateFlipState();
     }
 }
 
@@ -388,6 +389,17 @@ void AVPanoramicClientPullSSTFTPStreamreader::updateStreamParamsBasedOnQuality()
     QnArecontPanoramicResourcePtr avPanoResource = m_resource.dynamicCast<QnArecontPanoramicResource>();
     if (getRole() == QnResource::Role_LiveVideo) {
         QnArecontPanoramicResourcePtr avPanoResource = m_resource.dynamicCast<QnArecontPanoramicResource>();
-        avPanoResource->updateFlipState();
+        if (avPanoResource)
+            avPanoResource->updateFlipState();
+    }
+}
+
+void AVPanoramicClientPullSSTFTPStreamreader::beforeRun()
+{
+    QnPlAVClinetPullStreamReader::beforeRun();
+    if (getRole() == QnResource::Role_LiveVideo) {
+        QnArecontPanoramicResourcePtr avPanoResource = m_resource.dynamicCast<QnArecontPanoramicResource>();
+        if (avPanoResource)
+            avPanoResource->updateFlipState();
     }
 }
