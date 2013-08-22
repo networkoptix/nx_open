@@ -33,7 +33,7 @@ mac {
 }
 
 unix: !mac {
-  LIBS += -lX11
+  LIBS += -lX11 -lXfixes
   QT += x11extras  
 }
 
