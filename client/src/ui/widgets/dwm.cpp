@@ -10,8 +10,10 @@
 #include <utils/common/invocation_event.h>
 
 #ifdef QN_HAS_DWM
-#include <QtGui/private/qwidget_p.h>
+#include <QtWidgets/private/qwidget_p.h>
 #include <qt_windows.h>
+#include <utils/qt5port_windows_specific.h>
+
 #define NOMINMAX
 #include <Windows.h>
 #include <WindowsX.h>
@@ -222,7 +224,7 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
     blurBehind.dwFlags = DWM_BB_ENABLE;
     blurBehind.hRgnBlur = NULL;
     
-    status = d->dwmEnableBlurBehindWindow(d->widget->winId(), &blurBehind);
+    status = d->dwmEnableBlurBehindWindow(widToHwnd(d->widget->winId()), &blurBehind);
     
     return SUCCEEDED(status);
 #else
@@ -269,7 +271,7 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
     winMargins.cyBottomHeight   = margins.bottom();
     winMargins.cyTopHeight      = margins.top();
     
-    status = d->dwmExtendFrameIntoClientArea(d->widget->winId(), &winMargins);
+    status = d->dwmExtendFrameIntoClientArea(widToHwnd(d->widget->winId()), &winMargins);
     
     if(SUCCEEDED(status)) {
         /* Make sure that the extended frame is visible by setting the WNDCLASS's
@@ -277,7 +279,7 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
          * This also eliminates artifacts with white (default background color) 
          * fields appearing in client area when the window is resized. */
         HGDIOBJ blackBrush = GetStockObject(BLACK_BRUSH);
-        DWORD result = SetClassLongPtr(d->widget->winId(), GCLP_HBRBACKGROUND, (LONG_PTR) blackBrush);
+        DWORD result = SetClassLongPtr(widToHwnd(d->widget->winId()), GCLP_HBRBACKGROUND, (LONG_PTR) blackBrush);
         if(result == 0) {
             DWORD error = GetLastError();
             if(error != 0)
@@ -339,11 +341,11 @@ QMargins QnDwm::currentFrameMargins() const {
         return errorValue;
 
 #ifdef QN_HAS_DWM
-    HWND hwnd = d->widget->winId();
+    HWND hwnd = widToHwnd(d->widget->winId());
     BOOL status = S_OK;
 
     RECT clientRect;
-    status = GetClientRect(d->widget->winId(), &clientRect);
+    status = GetClientRect(widToHwnd(d->widget->winId()), &clientRect);
     if(!SUCCEEDED(status))
         return errorValue;
 
@@ -373,7 +375,7 @@ bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
         return false;
 
 #ifdef QN_HAS_DWM
-    HWND hwnd = d->widget->winId();
+    HWND hwnd = widToHwnd(d->widget->winId());
     BOOL status = S_OK;
 
     /* Store supplied frame margins. They will be used in WM_NCCALCSIZE handler. */

@@ -6,29 +6,33 @@
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
+#include <utils/qt5port_windows_specific.h>
 
 namespace {
-    QAbstractEventDispatcher::EventFilter qn_sysMenu_oldEventFilter = NULL;
+    //TODO: #Elric #QT5PORT - check correctness please --gdm
+    class QnSystemMenuEventFilter: public QAbstractNativeEventFilter {
 
-    bool qn_sysMenu_eventFilter(void *message) {
-        MSG *msg = static_cast<MSG *>(message);
+        virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) Q_DECL_OVERRIDE {
+            Q_UNUSED(eventType);
+            Q_UNUSED(result);
 
-        if(msg->message == WM_SYSKEYDOWN && msg->wParam == ' ') {
-            bool altPressed = (GetKeyState(VK_LMENU) & 0x80) || (GetKeyState(VK_RMENU) & 0x80);
-            if(altPressed) {
-                QWidget *widget = QWidget::find(msg->hwnd);
-                if(widget)
-                    QCoreApplication::postEvent(widget->window(), new QnSystemMenuEvent());
-                /* It is important not to return true here as it may mess up the QKeyMapper. */
+            MSG *msg = static_cast<MSG *>(message);
+
+            if(msg->message == WM_SYSKEYDOWN && msg->wParam == ' ') {
+                bool altPressed = (GetKeyState(VK_LMENU) & 0x80) || (GetKeyState(VK_RMENU) & 0x80);
+                if(altPressed) {
+                    QWidget *widget = QWidget::find(hwndToWid(msg->hwnd));
+                    if(widget)
+                        QCoreApplication::postEvent(widget->window(), new QnSystemMenuEvent());
+                    /* It is important not to return true here as it may mess up the QKeyMapper. */
+                }
             }
-        }
-
-        if(qn_sysMenu_oldEventFilter) {
-            return qn_sysMenu_oldEventFilter(message);
-        } else {
             return false;
         }
-    }
+
+    };
+
+    QnSystemMenuEventFilter* sysMenu_eventFilter = NULL;
 
 } // anonymous namespace
 #endif // Q_OS_WIN
@@ -36,10 +40,21 @@ namespace {
 
 void QnSystemMenuEvent::initialize() {
 #ifdef Q_OS_WIN
-    if(qn_sysMenu_oldEventFilter)
+    if(sysMenu_eventFilter)
         return;
 
-    qn_sysMenu_oldEventFilter = QAbstractEventDispatcher::instance(qApp->thread())->setEventFilter(&qn_sysMenu_eventFilter);
+    sysMenu_eventFilter = new QnSystemMenuEventFilter();
+    QAbstractEventDispatcher::instance(qApp->thread())->installNativeEventFilter(sysMenu_eventFilter);
 #endif
 }
 
+
+void QnSystemMenuEvent::deinitialize() {
+#ifdef Q_OS_WIN
+    if(sysMenu_eventFilter == NULL)
+        return;
+
+    delete sysMenu_eventFilter;
+    sysMenu_eventFilter = NULL;
+#endif
+}

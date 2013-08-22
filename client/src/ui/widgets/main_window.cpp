@@ -279,6 +279,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 }
 
 QnMainWindow::~QnMainWindow() {
+    QnSystemMenuEvent::deinitialize();
     m_dwm = NULL;
 }
 
@@ -576,14 +577,14 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 #ifdef Q_OS_WIN
-bool QnMainWindow::winEvent(MSG *message, long *result)
-{
+bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {
     /* Note that we may get here from destructor, so check for dwm is needed. */
-    if(m_dwm && m_dwm->widgetWinEvent(message, result))
+    if(m_dwm && m_dwm->widgetWinEvent(static_cast<MSG*>(message), result))
         return true;
 
-    return base_type::winEvent(message, result);
+    return base_type::nativeEvent(eventType, message, result);
 }
+
 #endif
 
 Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {

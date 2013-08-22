@@ -1,5 +1,5 @@
 TEMPLATE = app
-QT += core gui network opengl xml sql widgets
+QT += core gui network opengl xml sql widgets concurrent multimedia
 
 DEFINES += CL_FORCE_LOGO USE_NX_HTTP
 TRANSLATIONS += ${basedir}/translations/client_en.ts \
