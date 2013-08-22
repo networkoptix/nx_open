@@ -266,6 +266,8 @@ public:
     static quint8* prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int channel, int reserve);
 
     bool setTCPReadBufferSize(int value);
+
+    QString getVideoLayout() const;
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -348,6 +350,7 @@ private:
 
     QVector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
     QString m_reasonPhrase;
+    QString m_videoLayout;
 };
 
 #endif //rtp_session_h_1935_h

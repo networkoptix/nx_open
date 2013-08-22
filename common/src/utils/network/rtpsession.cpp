@@ -1197,6 +1197,10 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     if (!tmp.isEmpty())
         parseRangeHeader(tmp);
 
+    tmp = extractRTSPParam(QLatin1String(response), QLatin1String("x-video-layout:"));
+    if (!tmp.isEmpty())
+        m_videoLayout = tmp; // refactor here: add all attributes to list
+
     if (response.startsWith("RTSP/1.0 200"))
     {
         updateTransportHeader(response);
@@ -1908,4 +1912,9 @@ void RTPSession::setUsePredefinedTracks(int numOfVideoChannel)
 bool RTPSession::setTCPReadBufferSize(int value)
 {
     return m_tcpSock.setReadBufferSize(value);
+}
+
+QString RTPSession::getVideoLayout() const
+{
+    return m_videoLayout;
 }
