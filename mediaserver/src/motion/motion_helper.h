@@ -38,9 +38,6 @@ private:
     // create Find mask by region
     void createMask(const QRegion& region);
 
-    // mach one motion image by mask
-    bool mathImage(const __m128i* data);
-
 private:
     typedef QPair<QnNetworkResourcePtr, int> MotionArchiveKey;
     typedef QMap<MotionArchiveKey, QnMotionArchive*> MotionWriters;
