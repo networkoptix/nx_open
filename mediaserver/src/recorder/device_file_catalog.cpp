@@ -569,7 +569,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord(bool calcFileSize, QnStorageResource
 		{
 			storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
 			delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
-            if (calcFileSize && srcStorage == storage)
+            if (calcFileSize && storage && srcStorage && srcStorage->getId() == storage->getId())
                 deletedSize = m_chunks[m_firstDeleteCount].getFileSize();
 
 			QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
@@ -599,7 +599,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord(bool calcFileSize, QnStorageResource
     if (storage) {
 	    if (!delFileName.isEmpty())
 	    {
-            if (deletedSize == 0 && calcFileSize && srcStorage == storage)
+            if (deletedSize == 0 && calcFileSize && srcStorage && srcStorage->getId() == storage->getId())
                 deletedSize = storage->getFileSize(delFileName); // obtain file size from a disk
 		    //storage->addWritedSpace(-deletedSize);
 		    storage->removeFile(delFileName);
