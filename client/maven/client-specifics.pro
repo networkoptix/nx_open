@@ -17,6 +17,11 @@ CONFIG(debug, debug|release) {
   CONFIG += console
 }
 
+win* {
+INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include/QtWidgets/$$QT_VERSION/ \
+               ${environment.dir}/qt5/qtbase-${arch}/include/QtWidgets/$$QT_VERSION/QtWidgets/
+}
+
 win32 {
   QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
   INCLUDEPATH +=  ${environment.dir}/qt/include/QtGui

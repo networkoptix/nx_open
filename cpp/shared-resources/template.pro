@@ -32,8 +32,7 @@ CONFIG(debug, debug|release) {
   MOC_DIR = ../${arch}/build/debug/generated
   UI_DIR = ../${arch}/build/debug/generated
   RCC_DIR = ../${arch}/build/debug/generated
-  LIBS = -L${libdir}/build/bin/debug \
-		-L${environment.dir}/qt5/qtbase-${arch}/lib
+  LIBS = -L${libdir}/build/bin/debug
 }
 
 CONFIG(release, debug|release) {
@@ -47,8 +46,7 @@ CONFIG(release, debug|release) {
   MOC_DIR = ../${arch}/build/release/generated
   UI_DIR = ../${arch}/build/release/generated
   RCC_DIR = ../${arch}/build/release/generated
-  LIBS = -L${libdir}/build/bin/release \
-		-L${environment.dir}/qt5/qtbase-${arch}/lib
+  LIBS = -L${libdir}/build/bin/release
 }
 
 !contains(TARGET,common){
@@ -66,7 +64,6 @@ INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include \
 		${libdir}/build/include \
 		${project.build.directory}/build/include \
 		${environment.dir}/qt5/qt-custom \
-		${environment.dir}/qt5/qt-custom/QtCore
         
 INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include/QtCore/$$QT_VERSION/ \
                ${environment.dir}/qt5/qtbase-${arch}/include/QtCore/$$QT_VERSION/QtCore/
