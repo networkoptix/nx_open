@@ -1732,7 +1732,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
 
 QString RTPSession::extractRTSPParam(const QString& buffer, const QString& paramName)
 {
-    int pos = buffer.indexOf(paramName);
+    int pos = buffer.indexOf(paramName, 0, Qt::CaseInsensitive);
     if (pos > 0)
     {
         QString rez;
