@@ -93,6 +93,11 @@ QnTcpListener::~QnTcpListener()
     delete d_ptr;
 }
 
+void QnTcpListener::doPeriodicTasks()
+{
+    removeDisconnectedConnections();
+}
+
 void QnTcpListener::removeDisconnectedConnections()
 {
     Q_D(QnTcpListener);
@@ -121,6 +126,15 @@ void QnTcpListener::removeOwnership(QnLongRunnable* processor)
         }
     }
 }
+
+void QnTcpListener::addOwnership(QnLongRunnable* processor)
+{
+    Q_D(QnTcpListener);
+
+    QMutexLocker lock(&d->connectionMtx);
+    d->connections << processor;
+}
+
 
 void QnTcpListener::pleaseStop()
 {
@@ -256,7 +270,7 @@ void QnTcpListener::run()
                     d->newPort = d->localPort; // reopen tcp socket
                 }
             }
-            removeDisconnectedConnections();
+            doPeriodicTasks();
         }
         NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Removing all connections before stop").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
         removeAllConnections();

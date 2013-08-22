@@ -89,7 +89,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     /* We want the video server connection to be deleted in its associated thread, 
      * no matter where the reference count reached zero. Hence the custom deleter. */
     if (!m_restConnection && !m_apiUrl.isEmpty())
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(getApiUrl()), &qnDeleteLater);
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this), &qnDeleteLater);
 
     return m_restConnection;
 }
@@ -151,7 +151,7 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
         if (urlStr == QLatin1String("proxy"))
             setPrimaryIF(urlStr);
         else
-            setPrimaryIF(QUrl(urlStr).host());
+            ; //setPrimaryIF(QUrl(urlStr).host());
     }
 
     m_runningIfRequests.remove(responseNum);

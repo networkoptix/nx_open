@@ -1,3 +1,6 @@
+#ifndef __TCP_CONNECTION_PRIV_H__
+#define __TCP_CONNECTION_PRIV_H__
+
 #include <QByteArray>
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
@@ -67,3 +70,5 @@ public:
     SSL* ssl;
 
 };
+
+#endif // __TCP_CONNECTION_PRIV_H__
