@@ -1,3 +1,4 @@
+#include <QtGlobal>
 
 #if defined(Q_OS_LINUX) && !defined(__arm__)
 
