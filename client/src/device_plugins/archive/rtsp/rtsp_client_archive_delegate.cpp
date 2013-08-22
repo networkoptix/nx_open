@@ -45,6 +45,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_forcedEndTime(AV_NOPTS_VALUE),
     m_isMultiserverAllowed(true),
     m_audioLayout(0),
+    m_customVideoLayout(0),
     m_playNowModeAllowed(true),
     m_reader(reader),
     m_frameCnt(0)
@@ -74,6 +75,7 @@ QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
     close();
     delete [] m_rtpDataBuffer;
     delete m_audioLayout;
+    delete m_customVideoLayout;
 }
 
 QnResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime(QnResourcePtr resource, qint64 time)
@@ -212,6 +214,10 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 {
     if (m_opened)
         return true;
+
+    delete m_customVideoLayout;
+    m_customVideoLayout = 0;
+
     updateRtpParam(resource);
     if (m_isMultiserverAllowed)
         resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
@@ -262,6 +268,18 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 
     QList<QByteArray> audioSDP = m_rtspSession.getSdpByType(RTPSession::TT_AUDIO);
     parseAudioSDP(audioSDP);
+
+    if (m_opened) {
+        QString vLayout = m_rtspSession.getVideoLayout();
+        if (!vLayout.isEmpty()) {
+            m_customVideoLayout = QnCustomResourceVideoLayout::fromString(vLayout);
+
+            QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource> (resource);
+            if (mediaRes)
+                mediaRes->setCustomVideoLayout(m_customVideoLayout);
+        }
+    }
+
 
     return m_opened;
 }
@@ -614,8 +632,10 @@ void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
 
 QnResourceVideoLayout* QnRtspClientArchiveDelegate::getVideoLayout()
 {
-    // todo: implement me
-    return &m_defaultVideoLayout;
+    if (m_customVideoLayout)
+        return m_customVideoLayout;
+    else
+        return &m_defaultVideoLayout;
 }
 
 QnResourceAudioLayout* QnRtspClientArchiveDelegate::getAudioLayout()
