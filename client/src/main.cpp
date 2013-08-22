@@ -39,7 +39,7 @@ extern "C"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #ifdef Q_OS_WIN
-    #include "device_plugins/desktop_win/device/desktop_resource_searcher.h"
+    #include "device_plugins/desktop_windows_specific/device/desktop_resource_searcher.h"
 #endif
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
