@@ -14,8 +14,3 @@ DEFINES += USE_NX_HTTP
 mac {
   DEFINES += QN_EXPORT= 
 }
-
-unix: !mac {
-  LIBS += -lX11
-  QT += x11extras  
-}
