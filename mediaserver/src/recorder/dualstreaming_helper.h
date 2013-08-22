@@ -19,7 +19,7 @@ public:
 private:
     QMutex m_mutex;
     qint64 m_lastMotionTime;
-    __m128i *m_motionMaskBinData[CL_MAX_CHANNELS];
+    simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
 };
 
 typedef QSharedPointer<QnDualStreamingHelper> QnDualStreamingHelperPtr;

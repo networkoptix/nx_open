@@ -5,7 +5,7 @@ QnDualStreamingHelper::QnDualStreamingHelper():
     m_lastMotionTime(AV_NOPTS_VALUE)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        m_motionMaskBinData[i] = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
+        m_motionMaskBinData[i] = (simd128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
         memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
     }
 }
