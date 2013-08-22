@@ -1389,7 +1389,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     }
 
     setVideoEncoderOptions(optionsList[0]);
-    if (m_maxChannels == 1)
+    if (m_maxChannels == 1 && !isCameraControlDisabled())
         checkMaxFps(confResponse, optionsList[0].id);
 
     m_mutex.lock();
