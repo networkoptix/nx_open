@@ -8,7 +8,8 @@
 #include <algorithm>
 #include <cstring>
 
-#include <QDateTime>
+#include <QtCore/QDateTime>
+#include <QtCore/QUrlQuery>
 
 #include "axis_camera_manager.h"
 #include "axis_cam_params.h"
@@ -229,7 +230,10 @@ void AxisRelayIOManager::startInputPortMonitoringPriv( int asyncCallID )
 
         //requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );
         requestUrl.setPath( QLatin1String("/axis-cgi/io/port.cgi") );
-        requestUrl.addQueryItem( QLatin1String("monitor"), QString::number(it->second) );
+
+        QUrlQuery requestUrlQuery( requestUrl.query() );
+        requestUrlQuery.addQueryItem( QLatin1String("monitor"), QString::number(it->second) );
+        requestUrl.setQuery( requestUrlQuery );
         requestUrl.setUserName( auth.user() );
         requestUrl.setPassword( auth.password() );
         QNetworkRequest request;

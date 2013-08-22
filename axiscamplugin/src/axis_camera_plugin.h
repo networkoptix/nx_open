@@ -10,8 +10,8 @@
 
 #include <memory>
 
-#include <QNetworkAccessManager>
-#include <QThread>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtCore/QThread>
 
 #include <plugins/plugin_api.h>
 

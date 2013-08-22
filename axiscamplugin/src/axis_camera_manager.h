@@ -9,8 +9,8 @@
 #include <memory>
 #include <vector>
 
-#include <QAuthenticator>
-#include <QString>
+#include <QtNetwork/QAuthenticator>
+#include <QtCore/QString>
 
 #include <plugins/camera_plugin.h>
 

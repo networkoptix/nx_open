@@ -9,8 +9,8 @@
 #include <cstddef>
 #include <cstring>
 
-#include <QAuthenticator>
-#include <QLatin1String>
+#include <QtNetwork/QAuthenticator>
+#include <QtCore/QLatin1String>
 
 #include "axis_cam_params.h"
 #include "axis_camera_manager.h"

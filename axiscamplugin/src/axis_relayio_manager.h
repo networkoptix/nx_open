@@ -10,11 +10,11 @@
 #include <map>
 #include <set>
 
-#include <QAtomicInt>
-#include <QObject>
-#include <QMutex>
-#include <QNetworkReply>
-#include <QWaitCondition>
+#include <QtCore/QAtomicInt>
+#include <QtCore/QObject>
+#include <QtCore/QMutex>
+#include <QtNetwork/QNetworkReply>
+#include <QtCore/QWaitCondition>
 
 #include <plugins/camera_plugin.h>
 

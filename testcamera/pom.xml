@@ -19,7 +19,7 @@
 		<global.libs></global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
-		<linux.oslibs>-lz</linux.oslibs>
+		<linux.oslibs></linux.oslibs>
 		<mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 		<!--Global defines-->
 		<global.defines/>
