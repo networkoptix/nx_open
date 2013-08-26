@@ -16,6 +16,9 @@ public:
     QModelIndex currentIndex() const;
 protected:
     virtual QSize minimumSizeHint() const override;
+
+    virtual void wheelEvent(QWheelEvent *e) override;
+    virtual void keyPressEvent(QKeyEvent *e) override;
 public slots:
     void setCurrentIndex(const QModelIndex &index);
 signals:

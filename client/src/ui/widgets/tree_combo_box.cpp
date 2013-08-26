@@ -3,6 +3,35 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHeaderView>
 
+namespace {
+
+    QModelIndex indexUp(const QModelIndex &idx) {
+        if (idx.row() > 0) {
+            QModelIndex up = idx.sibling(idx.row() - 1, idx.column());
+            if (idx.model()->rowCount(up) > 0)
+                return idx.model()->index(idx.model()->rowCount(up) -  1, idx.column(), up);
+            return up;
+        }
+        return idx.parent();
+    }
+
+    QModelIndex parentDown(const QModelIndex &idx) {
+        if (!idx.isValid())
+            return QModelIndex();
+        QModelIndex parent = idx.parent();
+        if (idx.model()->rowCount(parent) > idx.row() + 1)
+            return idx.sibling(idx.row() + 1, idx.column());
+        return parentDown(idx.parent());
+    }
+
+    QModelIndex indexDown(const QModelIndex &idx) {
+        if (idx.model()->rowCount(idx) > 0)
+            return idx.model()->index(0, idx.column(), idx);
+        return parentDown(idx);
+    }
+
+}
+
 QnTreeComboBox::QnTreeComboBox(QWidget *parent):
     base_type(parent),
     m_treeView(new QTreeView(this))
@@ -45,8 +74,8 @@ void QnTreeComboBox::setCurrentIndex(const QModelIndex& index) {
     }
 
     setRootModelIndex(index.parent());
-    base_type::setCurrentIndex(index.row());
     m_treeView->setCurrentIndex(index);
+    base_type::setCurrentIndex(index.row());
 }
 
 int QnTreeComboBox::getTreeWidth(const QModelIndex& parent, int nestedLevel) const {
@@ -80,6 +109,98 @@ QSize QnTreeComboBox::minimumSizeHint() const {
 
     QSize sz = base_type::sizeHint();
     return QSize(textWidth, sz.height()).expandedTo(QApplication::globalStrut());
+}
+
+void QnTreeComboBox::wheelEvent(QWheelEvent *e) {
+    QModelIndex newIndex;
+    if (e->delta() > 0) {
+        newIndex = indexUp(currentIndex());
+        while(newIndex.isValid() &&
+              (newIndex.model()->flags(newIndex) & (Qt::ItemIsEnabled | Qt::ItemIsSelectable) )
+              != (Qt::ItemIsEnabled | Qt::ItemIsSelectable))
+            newIndex = indexUp(newIndex);
+    } else {
+        newIndex = indexDown(currentIndex());
+        while(newIndex.isValid() &&
+              (newIndex.model()->flags(newIndex) & (Qt::ItemIsEnabled | Qt::ItemIsSelectable) )
+              != (Qt::ItemIsEnabled | Qt::ItemIsSelectable))
+            newIndex = indexDown(newIndex);
+    }
+
+    if (newIndex.isValid() && newIndex != currentIndex()) {
+        setCurrentIndex(newIndex);
+    }
+
+    e->accept();
+}
+
+void QnTreeComboBox::keyPressEvent(QKeyEvent *e) {
+    enum Move { NoMove=0 , MoveUp , MoveDown , MoveFirst , MoveLast};
+
+    Move move = NoMove;
+
+    switch (e->key()) {
+    case Qt::Key_Up:
+    case Qt::Key_PageUp:
+        move = MoveUp;
+        break;
+    case Qt::Key_Down:
+        if (e->modifiers() & Qt::AltModifier) {
+            showPopup();
+            return;
+        }
+        move = MoveDown;
+        break;
+    case Qt::Key_PageDown:
+        move = MoveDown;
+        break;
+    case Qt::Key_Home:
+        move = MoveFirst;
+        break;
+    case Qt::Key_End:
+        move = MoveLast;
+        break;
+
+    default:
+        base_type::keyPressEvent(e);
+        return;
+    }
+
+    if (move == NoMove) {
+        base_type::keyPressEvent(e);
+        return;
+    }
+
+    QModelIndex newIndex;
+
+    e->accept();
+    switch (move) {
+    case MoveFirst:
+    case MoveUp:
+        newIndex = indexUp(currentIndex());
+        while(newIndex.isValid() &&
+              (newIndex.model()->flags(newIndex) & (Qt::ItemIsEnabled | Qt::ItemIsSelectable) )
+              != (Qt::ItemIsEnabled | Qt::ItemIsSelectable))
+            newIndex = indexUp(newIndex);
+        break;
+    case MoveDown:
+    case MoveLast:
+        newIndex = indexDown(currentIndex());
+        while(newIndex.isValid() &&
+              (newIndex.model()->flags(newIndex) & (Qt::ItemIsEnabled | Qt::ItemIsSelectable) )
+              != (Qt::ItemIsEnabled | Qt::ItemIsSelectable))
+            newIndex = indexDown(newIndex);
+        break;
+    default:
+        e->ignore();
+        break;
+    }
+
+    if (newIndex.isValid() && newIndex != currentIndex()) {
+        setCurrentIndex(newIndex);
+    }
+
+
 }
 
 void QnTreeComboBox::at_currentIndexChanged(int index) {
