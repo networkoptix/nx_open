@@ -381,12 +381,16 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent):
     base_type(parent),
     m_proxyPort(0)
 {
-    setUrl(mediaServerApiUrl);
+    setUrl(mserver->getApiUrl());
     setNameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>()));
+
+    QnRequestHeaderList extraHeaders;
+    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getGuid());
+    setExtraHeaders(extraHeaders);
 }
 
 QnMediaServerConnection::~QnMediaServerConnection() {

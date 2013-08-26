@@ -125,6 +125,15 @@ const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractStr
     }
 }
 
+void QnMediaResource::setCustomVideoLayout(const QnCustomResourceVideoLayout* newLayout)
+{
+    if (m_customVideoLayout == 0)
+        m_customVideoLayout = new QnCustomResourceVideoLayout(newLayout->size());
+
+    *m_customVideoLayout = *newLayout;
+    toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
+}
+
 static QnEmptyResourceAudioLayout audioLayout;
 const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
 {

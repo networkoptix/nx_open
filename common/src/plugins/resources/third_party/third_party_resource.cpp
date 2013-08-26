@@ -27,6 +27,13 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_refCounter( 2 )
 {
     setAuth( QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword) );
+    
+    unsigned int caps;
+    if (camManager->getCameraCapabilities(&caps) == 0) 
+    {
+        if( caps & nxcip::BaseCameraManager::shareIpCapability )
+            setCameraCapability( Qn::shareIpCapability, true );
+    }
 }
 
 QnThirdPartyResource::~QnThirdPartyResource()
@@ -222,6 +229,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::RelayInputCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability )
         setCameraCapability( Qn::RelayOutputCapability, true );
+    if( cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability )
+        setCameraCapability( Qn::shareIpCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
         setPtzCapability( Qn::AbsolutePtzCapability, true );

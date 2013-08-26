@@ -24,6 +24,7 @@
 #include "media_server_cameras_data.h"
 
 class QnPtzSpaceMapper;
+class QnMediaServerResource;
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
 typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
@@ -65,7 +66,7 @@ class QnMediaServerConnection: public QnAbstractConnection {
     typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent = NULL);
+    QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
     void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);

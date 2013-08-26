@@ -105,7 +105,7 @@ private:
     QnAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
-    void createPredefinedTracks();
+    void createPredefinedTracks(const QnResourceVideoLayout* videoLayout);
 
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);

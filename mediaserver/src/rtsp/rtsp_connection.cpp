@@ -1000,11 +1000,10 @@ void QnRtspConnectionProcessor::checkQuality()
     }
 }
 
-void QnRtspConnectionProcessor::createPredefinedTracks()
+void QnRtspConnectionProcessor::createPredefinedTracks(const QnResourceVideoLayout* videoLayout)
 {
     Q_D(QnRtspConnectionProcessor);
 
-    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
     int trackNum = 0;
     for (; trackNum < videoLayout->channelCount(); ++trackNum)
     {
@@ -1050,7 +1049,13 @@ int QnRtspConnectionProcessor::composePlay()
         d->sessionTimeOut = 0;
         //d->socket->setReadTimeOut(LARGE_RTSP_TIMEOUT);
         //d->socket->setWriteTimeOut(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
-        createPredefinedTracks();
+        const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+        createPredefinedTracks(videoLayout);
+        if (videoLayout) {
+            QString layoutStr = videoLayout->toString();
+            if (!layoutStr.isEmpty())
+                d->responseHeaders.addValue("x-video-layout", layoutStr);
+        }
     }
 
 #ifdef USE_NX_HTTP
