@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\develop\projects\netoptix_vms\launcher\x86;../../../build_environment/target/include/"
+				AdditionalIncludeDirectories="C:\develop\projects\netoptix_vms\launcher\x86;../../build_environment/target/include/"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -127,7 +127,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../../../build_environment/target/include/"
+				AdditionalIncludeDirectories="../../build_environment/target/include/"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -211,7 +211,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\..\x86\hdwitness.rc"
+				RelativePath="..\x86\hdwitness.rc"
 				>
 			</File>
 		</Filter>

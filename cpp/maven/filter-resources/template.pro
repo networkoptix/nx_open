@@ -2,57 +2,35 @@ NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
+DEFINES += ${global.defines}
+QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
+
+## GLOBAL CONFIGURATIONS
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
-
-CONFIG(release, debug|release) {
-  CONFIG += flat silent
-}
-
-CONFIG -= flat app_bundle
+CONFIG -= flat
 DEFINES += __STDC_CONSTANT_MACROS
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
-isEmpty(BUILDLIB) {
-  ICON = ${project.build.directory}/hdw_logo.ico
-}
-
 CONFIG(debug, debug|release) {
-  isEmpty(BUILDLIB) {
-	DESTDIR = ${libdir}/${arch}/bin/debug
-#	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
-	} else {
-    DESTDIR = ${libdir}/${arch}/lib/debug
-  }  
-  OBJECTS_DIR = ${libdir}/${arch}/build/debug
-  MOC_DIR = ${libdir}/${arch}/build/debug/generated
-  UI_DIR = ${libdir}/${arch}/build/debug/generated
-  RCC_DIR = ${libdir}/${arch}/build/debug/generated
-  LIBS = -L${libdir}/${arch}/lib/debug -L${environment.dir}/qt/bin/${arch}/debug
+  CONFIGURATION=debug
+}
+else {
+  CONFIGURATION=release
 }
 
-CONFIG(release, debug|release) {
-  isEmpty(BUILDLIB) {
-	DESTDIR = ${libdir}/${arch}/bin/release
-#	PRE_TARGETDEPS += ${libdir}/${arch}/lib/common.lib
-  } else {
-    DESTDIR = ${libdir}/${arch}/lib/release
-  }  
-  OBJECTS_DIR  = ${libdir}/${arch}/build/release
-  MOC_DIR = ${libdir}/${arch}/build/release/generated
-  UI_DIR = ${libdir}/${arch}/build/release/generated
-  RCC_DIR = ${libdir}/${arch}/build/release/generated
-  LIBS = -L${libdir}/${arch}/lib/release -L${environment.dir}/qt/bin/${arch}/release
-}
+isEmpty(BUILDLIB) {
+DESTDIR = ${libdir}/${arch}/bin/$$CONFIGURATION
+} else {
+  DESTDIR = ${libdir}/${arch}/lib/$$CONFIGURATION
+}  
 
-!contains(TARGET,common){
-  LIBS += -lcommon	
-}
-
+OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
+MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
+UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
+RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
+LIBS = -L${libdir}/${arch}/lib/$$CONFIGURATION -L${environment.dir}/qt/bin/${arch}/$$CONFIGURATION
 LIBS += ${global.libs}
-DEFINES += ${global.defines}
-
-QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
 
 !mac {
     include(${environment.dir}/qt-custom/QtCore/private/qtcore.pri)
@@ -66,11 +44,8 @@ DEPENDPATH *= $${INCLUDEPATH}
 }
 
 win* {
-  isEmpty(BUILDLIB) {
-    RC_FILE = ${project.build.directory}/hdwitness.rc
-	ICON = ${project.build.directory}/hdw_logo.ico	
-  }
-  
+  RC_FILE = ${project.build.directory}/hdwitness.rc
+  ICON = ${libdir}/icons/hdw_logo.ico	
   CONFIG += ${arch}
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
@@ -84,32 +59,35 @@ win* {
   
   !staticlib {
     DEFINES += QN_EXPORT=Q_DECL_EXPORT
-    LIBS += DbgHelp.lib
   }
-
-  staticlib {
+  else {
     DEFINES += QN_EXPORT=
   }
   
   QMAKE_MOC = $$QMAKE_MOC -DQ_OS_WIN
 }
 
+## BOTH LINUX AND MAC
+unix: {
+  DEFINES += override=
+  DEFINES += QN_EXPORT=  
+}
+
+## LINUX
 unix:!mac {
   LIBS += ${linux.oslibs}
-  DEFINES += QN_EXPORT=
   QMAKE_CXXFLAGS += -msse2 -std=c++0x -fpermissive
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC = $$QMAKE_MOC -DQ_OS_LINUX
-  DEFINES += override=
 }
 
+## MAC OS
 mac {
   QMAKE_CXXFLAGS += -msse4.1 -std=c++0x -fpermissive
   QMAKE_CFLAGS += -msse4.1
-  DEFINES += QN_EXPORT=  
   LIBS += ${mac.oslibs}
-  DEFINES += ${mac.defines} override=
+  DEFINES += ${mac.defines}
   CONFIG -= app_bundle objective_c
   INCLUDEPATH +=  ${environment.dir}/include/glext/
   QMAKE_CFLAGS_PPC_64     -= -arch ppc64 -Xarch_ppc64 -mmacosx-version-min=10.5
@@ -121,7 +99,3 @@ mac {
   QMAKE_LFLAGS_PPC_64     -= -arch ppc64 -Xarch_ppc64 -mmacosx-version-min=10.5
   QMAKE_LFLAGS_X86_64     -= -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5
 }
-
-
-
-
