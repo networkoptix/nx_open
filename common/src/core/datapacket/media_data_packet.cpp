@@ -181,7 +181,9 @@ bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int mas
         return mathImage_sse41(data, mask, maskStart, maskEnd);
     else 
         return mathImage_sse2(data, mask, maskStart, maskEnd);
-#elif defined(__arm__)
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
     //TODO/ARM
 #endif
 }
@@ -218,7 +220,9 @@ void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIn
         src++;
 
     }
-#elif defined(__arm__)
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
     //TODO/ARM
 #endif
 }
@@ -254,9 +258,11 @@ bool QnMetaDataV1::isEmpty() const
         return metadataIsEmpty_sse41((__m128i*) data.data());
     else 
         return metadataIsEmpty_sse2((__m128i*) data.data());
-#elif defined(__arm__)
+#elif __arm__ && __ARM_NEON__
     //TODO/ARM
     return false;
+#else
+    //TODO
 #endif
 }
 
@@ -277,8 +283,10 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
         src++;
 
     }
-#elif defined(__arm__)
+#elif __arm__ && __ARM_NEON__
     //TODO/ARM
+#else
+    //TODO
 #endif
 }
 
