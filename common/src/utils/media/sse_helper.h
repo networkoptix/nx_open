@@ -11,13 +11,13 @@
 typedef __m128i simd128i;
 typedef __m128 simd128;
 
-#elif defined(__arm__)
+#elif __arm__ && __ARM_NEON__
 #include <arm_neon.h>
 
 typedef int32x4_t simd128i;
 typedef uint32x4_t simd128;
 #else
-#error "Target CPU type is not supported"
+#warning "Target CPU type is not supported - using C fallback routines"
 #endif
 
 
@@ -43,7 +43,7 @@ typedef uint32x4_t simd128;
             "movl %%esi, %%ebx   \n\t"                                          \
             :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3])             \
             :"0"(op) : "%esi")
-#   elif defined(__arm__)
+#   elif __arm__ && __ARM_NEON__
 #       define __cpuid(res, op)       //TODO/ARM
 #   else
 #       error __cpuid is not implemented for target CPU
@@ -194,7 +194,7 @@ static inline QString getCPUString()
     }
     return QString();
 }
-#elif defined(__arm__)
+#elif __arm__
 static inline QString getCPUString()
 {
     //TODO/ARM

@@ -198,10 +198,10 @@ inline __m128i advanced_sad(const __m128i src1, const __m128i src2)
     // return sum
     return _mm_sad_epu8(pixelsAbs, zerroConst);
 }
-#elif defined(__arm__)
-            //TODO/ARM
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
 #else
-    #error "Target CPU type is not supported"
+    //TODO
 #endif
 
 void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst)
@@ -250,10 +250,10 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
             dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT*2;
-#elif defined(__arm__)
-            //TODO/ARM
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
 #else
-    #error "Target CPU type is not supported"
+    //TODO
 #endif
         }  
         curLineNum = nextLineNum;
@@ -305,10 +305,10 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
             dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT*2;
-#elif defined(__arm__)
-            //TODO/ARM
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
 #else
-    #error "Target CPU type is not supported"
+    //TODO
 #endif
         }  
         curLineNum = nextLineNum;
@@ -374,10 +374,10 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
             int pixels = rowCnt * 16;
             *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT;
-#elif defined(__arm__)
-            //TODO/ARM
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
 #else
-    #error "Target CPU type is not supported"
+    //TODO
 #endif
         }
         curLineNum = nextLineNum;
@@ -424,10 +424,10 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             int pixels = rowCnt * 16;
             *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT;
-#elif defined(__arm__)
-            //TODO/ARM
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
 #else
-    #error "Target CPU type is not supported"
+    //TODO
 #endif
         }  
         curLineNum = nextLineNum;
@@ -522,10 +522,10 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             if (squareStep == sqWidthSteps)
                 flushData(rowCnt * sqWidth);
             squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)); // SSE2
-#elif defined(__arm__)
-            //TODO/ARM
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
 #else
-    #error "Target CPU type is not supported"
+    //TODO
 #endif
 
 
@@ -596,10 +596,10 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
             squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)); // SSE2
             if (squareStep == sqWidth)
                 flushData();
-#elif defined(__arm__)
-            //TODO/ARM
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
 #else
-    #error "Target CPU type is not supported"
+    //TODO
 #endif
         }
         if (squareStep)
@@ -686,10 +686,10 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
 #if defined(__i386) || defined(_WIN32)
             dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
             dst[1] = _mm_min_epu8(dst[1], src[1]); // SSE2
-#elif defined(__arm__)
-            //TODO/ARM
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
 #else
-    #error "Target CPU type is not supported"
+    //TODO
 #endif
         }
         prevILineNum = iLineNum;

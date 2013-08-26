@@ -55,14 +55,18 @@ static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
     // return
     //return _mm_cvtsi128_si32(out);
 }
-#elif defined(__arm__)
+#elif __arm__ && __ARM_NEON__
 static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
 {
     //TODO/ARM
     return 0;
 }
 #else
-    #error "Target CPU type is not supported"
+static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
+{
+    //TODO
+    return 0;
+}
 #endif
 
 // ------------ QnFisheyeImageFilter ----------------------
@@ -90,10 +94,10 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
 
 #if defined(__i386) || defined(_WIN32)
     _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
-#elif defined(__arm__)
+#elif __arm__ && __ARM_NEON__
     //TODO/ARM
 #else
-    #error "Target CPU type is not supported"
+    //TODO
 #endif
 
     if (imageSize != m_lastImageSize || frame->format != m_lastImageFormat) 

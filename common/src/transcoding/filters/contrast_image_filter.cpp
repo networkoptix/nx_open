@@ -14,10 +14,10 @@ bool QnContrastImageFilter::isFormatSupported(CLVideoDecoderOutput* frame) const
 
 #if defined(__i386) || defined(_WIN32)
 static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0x00000000, 0x00000000);
-#elif defined(__arm__)
-//TODO/ARM
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
 #else
-#error "Target CPU type is not supported"
+    //TODO
 #endif
 
 void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
@@ -117,9 +117,9 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
             srcY += strideCoeff;
         }
     }
-#elif defined(__arm__)
-//TODO/ARM
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
 #else
-#error "Target CPU type is not supported"
+    //TODO
 #endif
 }
