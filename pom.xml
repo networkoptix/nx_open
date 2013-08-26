@@ -326,6 +326,7 @@
                 <module>ios-client</module>
             </modules>
             <properties>
+                <sigar.version>1.6-SNAPSHOT</sigar.version>
                 <boost.version>1.52-SNAPSHOT</boost.version>
                 <protobuf.version>2.5.0</protobuf.version>
 
