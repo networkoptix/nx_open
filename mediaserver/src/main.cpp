@@ -1,3 +1,4 @@
+
 #include <qtsinglecoreapplication.h>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
@@ -449,19 +450,6 @@ int serverMain(int argc, char *argv[])
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
 
-    QDir dataDirectory;
-    dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
-
-    QString logFileName = dataLocation + QLatin1String("/log/log_file");
-    qSettings.setValue("logFile", logFileName);
-
-    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
-    {
-        qApp->quit();
-
-        return 0;
-    }
-
     QString logLevel;
     QString rebuildArchive;
 
@@ -470,7 +458,23 @@ int serverMain(int argc, char *argv[])
     commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "all");
     commandLineParser.parse(argc, argv, stderr);
 
-    QnLog::initLog(logLevel);
+    if( logLevel != QString::fromLatin1("none") )
+    {
+        QDir dataDirectory;
+        dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
+
+        QString logFileName = dataLocation + QLatin1String("/log/log_file");
+        qSettings.setValue("logFile", logFileName);
+        if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+        {
+            qApp->quit();
+
+            return 0;
+        }
+
+        QnLog::initLog(logLevel);
+    }
+
     if (rebuildArchive == "all")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     else if (rebuildArchive == "hq")
@@ -483,7 +487,8 @@ int serverMain(int argc, char *argv[])
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
-    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+    if( logLevel != QString::fromLatin1("none") )
+        defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
     platform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
 
