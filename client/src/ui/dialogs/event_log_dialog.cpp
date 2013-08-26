@@ -395,9 +395,9 @@ void QnEventLogDialog::setEventType(BusinessEventType::Value value)
                 1,
                 Qt::MatchExactly | Qt::MatchRecursive);
     if (found.isEmpty())
-        ui->eventComboBox->setCurrentIndex(0);
+        ui->eventComboBox->setCurrentIndex(QModelIndex());
     else
-        ui->eventComboBox->selectIndex(found.first());
+        ui->eventComboBox->setCurrentIndex(found.first());
 }
 
 QString QnEventLogDialog::getTextForNCameras(int n) const

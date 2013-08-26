@@ -153,7 +153,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QnTreeViewComboBox" name="eventComboBox">
+      <widget class="QnTreeComboBox" name="eventComboBox">
        <property name="maxVisibleItems">
         <number>16</number>
        </property>
@@ -175,7 +175,16 @@
     <widget class="QStackedWidget" name="stackedWidget">
      <widget class="QWidget" name="gridPage">
       <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -283,9 +292,9 @@
    <header location="global">ui/widgets/table_view.h</header>
   </customwidget>
   <customwidget>
-   <class>QnTreeViewComboBox</class>
+   <class>QnTreeComboBox</class>
    <extends>QComboBox</extends>
-   <header>ui/common/tree_combo_box.h</header>
+   <header location="global">ui/widgets/tree_combo_box.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

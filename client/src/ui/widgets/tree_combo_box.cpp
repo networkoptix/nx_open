@@ -3,10 +3,10 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHeaderView>
 
-
-QnTreeViewComboBox::QnTreeViewComboBox(QWidget *parent): QComboBox(parent), m_treeView(NULL) 
+QnTreeComboBox::QnTreeComboBox(QWidget *parent):
+    base_type(parent),
+    m_treeView(new QTreeView(this))
 {
-    m_treeView = new QTreeView(this);
     m_treeView->setFrameShape(QFrame::NoFrame);
     m_treeView->setEditTriggers(QTreeView::NoEditTriggers);
     m_treeView->setAlternatingRowColors(true);
@@ -19,15 +19,15 @@ QnTreeViewComboBox::QnTreeViewComboBox(QWidget *parent): QComboBox(parent), m_tr
     m_treeView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     setView(m_treeView);
+
+    connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(at_currentIndexChanged(int)));
 }
 
-QModelIndex QnTreeViewComboBox::currentIndex()
-{
+QModelIndex QnTreeComboBox::currentIndex() const {
     return m_treeView->currentIndex();
 }
 
-void QnTreeViewComboBox::showPopup() 
-{
+void QnTreeComboBox::showPopup() {
     setRootModelIndex(QModelIndex());
 
     for(int i = 1; i<model()->columnCount(); ++i)
@@ -35,18 +35,21 @@ void QnTreeViewComboBox::showPopup()
 
     m_treeView->expandAll();
     m_treeView->setItemsExpandable(false);
-    QComboBox::showPopup();
+    base_type::showPopup();
 }
 
-void QnTreeViewComboBox::selectIndex(const QModelIndex& index) 
-{
+void QnTreeComboBox::setCurrentIndex(const QModelIndex& index) {
+    if (!index.isValid()) {
+        base_type::setCurrentIndex(0);
+        return;
+    }
+
     setRootModelIndex(index.parent());
-    setCurrentIndex(index.row());
+    base_type::setCurrentIndex(index.row());
     m_treeView->setCurrentIndex(index);
 }
 
-int QnTreeViewComboBox::getTreeWidth(const QModelIndex& parent, int nestedLevel) const
-{
+int QnTreeComboBox::getTreeWidth(const QModelIndex& parent, int nestedLevel) const {
     const QFontMetrics &fm = fontMetrics();
     int textWidth = 7 * fm.width(QLatin1Char('x'));
 
@@ -66,8 +69,7 @@ int QnTreeViewComboBox::getTreeWidth(const QModelIndex& parent, int nestedLevel)
     return textWidth;
 }
 
-QSize QnTreeViewComboBox::minimumSizeHint() const
-{   
+QSize QnTreeComboBox::minimumSizeHint() const {
     int textWidth = getTreeWidth(QModelIndex(), 0);
 
     QStyleOptionComboBox opt;
@@ -76,6 +78,11 @@ QSize QnTreeViewComboBox::minimumSizeHint() const
     tmp = style()->sizeFromContents(QStyle::CT_ComboBox, &opt, tmp, this);
     textWidth = tmp.width();
 
-    QSize sz = QComboBox::sizeHint();
+    QSize sz = base_type::sizeHint();
     return QSize(textWidth, sz.height()).expandedTo(QApplication::globalStrut());
+}
+
+void QnTreeComboBox::at_currentIndexChanged(int index) {
+    Q_UNUSED(index);
+    emit currentIndexChanged(currentIndex());
 }

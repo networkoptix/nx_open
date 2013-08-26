@@ -2,12 +2,14 @@
 #include "ui_login_dialog.h"
 
 #include <QtCore/QEvent>
-#include <QtWidgets/QDataWidgetMapper>
+#include <QtCore/QDir>
+
+#include <QtGui/QStandardItem>
+#include <QtGui/QStandardItemModel>
+
+#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
-#include <QtGui/QStandardItemModel>
-#include <QtWidgets/QDesktopWidget>
-#include <QtCore/QDir>
 
 #include <client/client_connection_data.h>
 
@@ -47,7 +49,13 @@ namespace {
                     widget->setEnabled(enabled);
     }
 
-    static QString space = QLatin1String ("    ");
+    QStandardItem* itemForConnection(QnConnectionData connection) {
+        if (connection == QnConnectionData())
+            return NULL;
+        QStandardItem* result = new QStandardItem(connection.name);
+        result->setData(connection.url, Qn::UrlRole);
+        return result;
+    }
 
 } // anonymous namespace
 
@@ -91,7 +99,16 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_connectionsModel = new QStandardItemModel(this);
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
-    connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_connectionsComboBox_currentIndexChanged(int)));
+    m_lastUsedItem = NULL;
+    m_savedSessionsItem = new QStandardItem(tr("Saved Sessions"));
+    m_savedSessionsItem->setFlags(Qt::ItemIsEnabled);
+    m_autoFoundItem = new QStandardItem(tr("Auto-Discovered ECs"));
+    m_autoFoundItem->setFlags(Qt::ItemIsEnabled);
+
+    m_connectionsModel->appendRow(m_savedSessionsItem);
+    m_connectionsModel->appendRow(m_autoFoundItem);
+
+    connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(QModelIndex)), this,   SLOT(at_connectionsComboBox_currentIndexChanged(QModelIndex)));
     connect(ui->testButton,                 SIGNAL(clicked()),                      this,   SLOT(at_testButton_clicked()));
     connect(ui->saveButton,                 SIGNAL(clicked()),                      this,   SLOT(at_saveButton_clicked()));
     connect(ui->deleteButton,               SIGNAL(clicked()),                      this,   SLOT(at_deleteButton_clicked()));
@@ -101,14 +118,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     connect(ui->portSpinBox,                SIGNAL(valueChanged(int)),              this,   SLOT(updateAcceptibility()));
     connect(ui->buttonBox,                  SIGNAL(accepted()),                     this,   SLOT(accept()));
     connect(ui->buttonBox,                  SIGNAL(rejected()),                     this,   SLOT(reject()));
-
-    m_dataWidgetMapper = new QDataWidgetMapper(this);
-    m_dataWidgetMapper->setModel(m_connectionsModel);
-    m_dataWidgetMapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
-    m_dataWidgetMapper->setOrientation(Qt::Horizontal);
-    m_dataWidgetMapper->addMapping(ui->hostnameLineEdit, 1);
-    m_dataWidgetMapper->addMapping(ui->portSpinBox, 2);
-    m_dataWidgetMapper->addMapping(ui->loginLineEdit, 3);
 
     resetConnectionsModel();
     updateFocus();
@@ -144,10 +153,7 @@ QUrl QnLoginDialog::currentUrl() const {
 }
 
 QString QnLoginDialog::currentName() const {
-    QString itemText = ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
-    if (itemText.startsWith(space))
-        return itemText.remove(0, space.length());
-    return itemText;
+    return ui->connectionsComboBox->currentText();
 }
 
 QnConnectInfoPtr QnLoginDialog::currentInfo() const {
@@ -208,6 +214,8 @@ void QnLoginDialog::showEvent(QShowEvent *event) {
             && !ui->passwordLineEdit->text().isEmpty()
             && currentUrl().isValid())
         accept();
+    else
+        resetConnectionsModel();
 }
 
 void QnLoginDialog::hideEvent(QHideEvent *event)
@@ -217,76 +225,57 @@ void QnLoginDialog::hideEvent(QHideEvent *event)
 }
 
 void QnLoginDialog::resetConnectionsModel() {
-    m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
-
     QnConnectionDataList connections = qnSettings->customConnections();
-    if (connections.isEmpty())
-        connections.append(qnSettings->defaultConnection());
 
-    int selectedIndex = -1;
+    if (m_lastUsedItem != NULL)
+        m_connectionsModel->removeRow(0); //last-used-connection row
 
-    QnConnectionData lastUsed = connections.getByName(QnConnectionDataList::defaultLastUsedNameKey());
-    if (lastUsed != QnConnectionData()) {
-        QList<QStandardItem *> row;
-        row << new QStandardItem(QnConnectionDataList::defaultLastUsedName())
-            << new QStandardItem(lastUsed.url.host())
-            << new QStandardItem(QString::number(lastUsed.url.port()))
-            << new QStandardItem(lastUsed.url.userName());
-        m_connectionsModel->appendRow(row);
-        selectedIndex = 0;
+    QModelIndex selectedIndex;
+    m_lastUsedItem = itemForConnection(connections.getByName(QnConnectionDataList::defaultLastUsedNameKey()));
+    if (m_lastUsedItem != NULL) {
+        m_lastUsedItem->setText(tr("* Last used connection *"));
+        m_connectionsModel->insertRow(0, m_lastUsedItem);
+        selectedIndex = m_connectionsModel->index(0, 0);
     }
 
-    QStandardItem *headerSavedItem = new QStandardItem(tr("Saved Sessions"));
-    headerSavedItem->setFlags(Qt::ItemIsEnabled);
-    m_connectionsModel->appendRow(headerSavedItem);
-
-    foreach (const QnConnectionData &connection, connections) {
-        if (connection.name == QnConnectionDataList::defaultLastUsedNameKey())
-            continue;
-
-        QList<QStandardItem *> row;
-        row << new QStandardItem(space + connection.name)
-            << new QStandardItem(connection.url.host())
-            << new QStandardItem(QString::number(connection.url.port()))
-            << new QStandardItem(connection.url.userName());
-        m_connectionsModel->appendRow(row);
-        if (selectedIndex < 0)
-            selectedIndex = 1; // skip header row
-    }
-
-    QStandardItem* headerFoundItem = new QStandardItem(tr("Auto-Discovered ECs"));
-    headerFoundItem->setFlags(Qt::ItemIsEnabled);
-    m_connectionsModel->appendRow(headerFoundItem);
+    resetSavedSessionsModel();
     resetAutoFoundConnectionsModel();
-    ui->connectionsComboBox->setCurrentIndex(selectedIndex); /* Last used connection if exists, else last saved connection. */
+
+    /* Last used connection if exists, else last saved connection. */
+    if (!selectedIndex.isValid())
+        selectedIndex = m_connectionsModel->index(0, 0, m_savedSessionsItem->index());
+    ui->connectionsComboBox->setCurrentIndex(selectedIndex);
+    at_connectionsComboBox_currentIndexChanged(selectedIndex);
 
     QString password = qnSettings->storedPassword();
     ui->passwordLineEdit->setText(password);
     ui->rememberPasswordCheckBox->setChecked(!password.isEmpty());
 }
 
-void QnLoginDialog::resetAutoFoundConnectionsModel() {
+void QnLoginDialog::resetSavedSessionsModel() {
     QnConnectionDataList connections = qnSettings->customConnections();
+    if (connections.isEmpty())
+        connections.append(qnSettings->defaultConnection());
 
-    int baseCount = qMax(connections.size(), 1); //1 for default auto-created connection
-    baseCount += 2; //headers
+    m_savedSessionsItem->removeRows(0, m_savedSessionsItem->rowCount());
+    foreach (const QnConnectionData &connection, connections) {
+        if (connection.name == QnConnectionDataList::defaultLastUsedNameKey())
+            continue;
+        m_savedSessionsItem->appendRow(itemForConnection(connection));
+    }
+}
 
-    int count = m_connectionsModel->rowCount() - baseCount;
-    if (count > 0)
-        m_connectionsModel->removeRows(baseCount, count);
-
+void QnLoginDialog::resetAutoFoundConnectionsModel() {
+    m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
     if (m_foundEcs.size() == 0) {
-        QStandardItem* noLocalEcs = new QStandardItem(space + tr("<none>"));
+        QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
-        m_connectionsModel->appendRow(noLocalEcs);
+        m_autoFoundItem->appendRow(noLocalEcs);
     } else {
         foreach (QUrl url, m_foundEcs) {
-            QList<QStandardItem *> row;
-            row << new QStandardItem(space + url.host() + QLatin1Char(':') + QString::number(url.port()))
-                << new QStandardItem(url.host())
-                << new QStandardItem(QString::number(url.port()))
-                << new QStandardItem(QString());
-            m_connectionsModel->appendRow(row);
+            QStandardItem* item = new QStandardItem(url.host() + QLatin1Char(':') + QString::number(url.port()));
+            item->setData(url, Qn::UrlRole);
+            m_autoFoundItem->appendRow(item);
         }
     }
 }
@@ -427,9 +416,12 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
     base_type::accept();
 }
 
-void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
-    QModelIndex idx = m_connectionsModel->index(index, 0);
-    m_dataWidgetMapper->setCurrentModelIndex(idx);
+void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex &index) {
+    QStandardItem* item = m_connectionsModel->itemFromIndex(index);
+    QUrl url = item == NULL ? QUrl() : item->data(Qn::UrlRole).toUrl();
+    ui->hostnameLineEdit->setText(url.host());
+    ui->portSpinBox->setValue(url.port());
+    ui->loginLineEdit->setText(url.userName());
     ui->passwordLineEdit->clear();
     ui->rememberPasswordCheckBox->setChecked(false);
     updateFocus();
@@ -501,13 +493,12 @@ void QnLoginDialog::at_saveButton_clicked() {
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
 
-    resetConnectionsModel();
+    resetSavedSessionsModel();
 
-    int idx = 1;
-    if (connections.contains(QnConnectionDataList::defaultLastUsedNameKey()))
-        idx++;
+    QModelIndex idx = m_connectionsModel->index(0, 0, m_savedSessionsItem->index());
     ui->connectionsComboBox->setCurrentIndex(idx);
-    ui->passwordLineEdit->setText(password);
+    at_connectionsComboBox_currentIndexChanged(idx); // call directly in case index change will not work
+    ui->passwordLineEdit->setText(password);         // password is cleared on index change
 
 }
 
