@@ -18,6 +18,18 @@ typedef int32x4_t simd128i;
 typedef uint32x4_t simd128;
 #else
 #warning "Target CPU type is not supported - using C fallback routines"
+
+typedef struct
+{
+    int64_t one;
+    uint64_t two;
+} simd128i;
+
+typedef struct
+{
+    uint64_t one;
+    uint64_t two;
+} simd128;
 #endif
 
 
@@ -43,7 +55,7 @@ typedef uint32x4_t simd128;
             "movl %%esi, %%ebx   \n\t"                                          \
             :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3])             \
             :"0"(op) : "%esi")
-#   elif __arm__ && __ARM_NEON__
+#   elif __arm__
 #       define __cpuid(res, op)       //TODO/ARM
 #   else
 #       error __cpuid is not implemented for target CPU
