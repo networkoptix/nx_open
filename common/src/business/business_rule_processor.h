@@ -4,7 +4,6 @@
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <QtCore/QMultiMap>
-#include <QtGui/QImage>
 
 #include <core/resource/resource_fwd.h>
 

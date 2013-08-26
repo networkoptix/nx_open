@@ -7,7 +7,6 @@
 #include <QHttpRequestHeader>
 #endif
 #include <QtCore/QDebug>
-#include <QtGui/QRegion>
 #include <QtCore/QBuffer>
 
 #include "libavutil/avutil.h"
