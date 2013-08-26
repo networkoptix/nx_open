@@ -27,13 +27,6 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_refCounter( 2 )
 {
     setAuth( QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword) );
-    
-    unsigned int caps;
-    if (camManager->getCameraCapabilities(&caps) == 0) 
-    {
-        if( caps & nxcip::BaseCameraManager::shareIpCapability )
-            setCameraCapability( Qn::shareIpCapability, true );
-    }
 }
 
 QnThirdPartyResource::~QnThirdPartyResource()
