@@ -1054,7 +1054,11 @@ int QnRtspConnectionProcessor::composePlay()
         if (videoLayout) {
             QString layoutStr = videoLayout->toString();
             if (!layoutStr.isEmpty())
+#ifdef USE_NX_HTTP
+                d->response.headers.insert( std::make_pair(nx_http::StringType("x-video-layout"), layoutStr.toLatin1()) );
+#else
                 d->responseHeaders.addValue("x-video-layout", layoutStr);
+#endif
         }
     }
 
