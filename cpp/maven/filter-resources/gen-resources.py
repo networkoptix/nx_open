@@ -11,7 +11,7 @@ output_file='${project.artifactId}.pro'
 translations_dir='${basedir}/translations'
 translations_target_dir='${project.build.directory}/resources/translations'
 
-def genqrc(qrcname, qrcprefix, path, extensions, exclusion, additions=''):
+def genqrc(qrcname, qrcprefix, pathes, extensions, exclusion, additions=''):
     os.path = posixpath
 
     qrcfile = open(qrcname, 'w')
@@ -20,13 +20,14 @@ def genqrc(qrcname, qrcprefix, path, extensions, exclusion, additions=''):
     print >> qrcfile, '<RCC version="1.0">'
     print >> qrcfile, '<qresource prefix="%s">' % (qrcprefix)
 
-    for root, dirs, files in os.walk(path):
-        parent = root[len(path) + 1:]
-    
-        for f in files:
-            for extension in extensions:
-                if f.endswith(extension) and not f.endswith(exclusion):
-                    print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
+    for path in pathes:
+        for root, dirs, files in os.walk(path):
+            parent = root[len(path) + 1:]
+        
+            for f in files:
+                for extension in extensions:
+                    if f.endswith(extension) and not f.endswith(exclusion):
+                        print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
   
     print >> qrcfile, additions
     print >> qrcfile, '</qresource>'
@@ -63,11 +64,7 @@ if __name__ == '__main__':
             if f.endswith('.ts'):
                 os.system('lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
-    genqrc('build/${project.artifactId}.qrc', '/', '${project.build.directory}/resources', [''],'.pdb')  
-    #genqrc('build/${project.artifactId}-translations.qrc', '/', '${project.build.directory}/resources', [''],'.*')  
-    #genqrc('build/${project.artifactId}-generated.qrc', '/', '${project.build.directory}/resources', [''],'.*')  
-    #genqrc('build/${project.artifactId}-custom.qrc', '/', '${project.build.directory}/resources', [''],'.*')  
-    #genqrc('build/${project.artifactId}-common.qrc', '/', '${project.build.directory}/resources', [''],'.*')  
+    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${libdir}/icons'], [''],'vmsclient.png')  
     
     if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):
         f = open(output_file, "w")

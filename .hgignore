@@ -144,6 +144,9 @@ vmaxproxy/mediaproxy.mak*
 vmaxproxy/x86
 vmaxproxy/x64
 
+xvbadecoder/x86
+xvbadecoder/x64
+
 quicksyncdecoder/x86
 quicksyncdecoder/x64
 

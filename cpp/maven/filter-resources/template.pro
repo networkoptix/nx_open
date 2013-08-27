@@ -14,9 +14,18 @@ RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
 CONFIG(debug, debug|release) {
   CONFIGURATION=debug
+  isEmpty(BUILDLIB) {
+    CONFIG += console
+  }
+  win* {
+    LIBS += ${windows.oslibs.debug}
+  }
 }
 else {
   CONFIGURATION=release
+  win* {
+    LIBS += ${windows.oslibs.release}
+  }
 }
 
 isEmpty(BUILDLIB) {
@@ -29,7 +38,7 @@ OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS = -L${libdir}/${arch}/lib/$$CONFIGURATION -L${environment.dir}/qt/bin/${arch}/$$CONFIGURATION
+LIBS += -L${libdir}/${arch}/lib/$$CONFIGURATION -L${environment.dir}/qt/bin/${arch}/$$CONFIGURATION
 LIBS += ${global.libs}
 
 !mac {

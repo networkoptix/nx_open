@@ -23,13 +23,15 @@
     <properties>  
         <product.title>${client.name}</product.title>
         <!--Global libs-->
-        <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -llibprotobuf -lqjson -lcommon -llibFestival -lsigar -llibestbase -llibestools -llibeststring</global.libs>
+        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -llibprotobuf -lqjson -lsigar -llibFestival -llibestbase -llibestools -llibeststring</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -lDxErr -ld3d9 -ld3dx9 -lopenal32 -lssleay32 -llibeay32</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32</windows.oslibs>
+        <windows.oslibs.release></windows.oslibs.release>
+        <windows.oslibs.debug></windows.oslibs.debug>
         <linux.oslibs>-lcrypto -lz -lopenal</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -framework OpenAL -lswscale -lavformat -lavcodec -lavutil -framework QtDesigner</mac.oslibs>
         <!--Global defines-->
-        <global.defines/>
+        <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>
