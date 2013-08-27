@@ -23,7 +23,7 @@
     <properties>
         <product.title>${mediaserver.name}</product.title>  
         <!--Global libs-->		
-        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -llibprotobuf -lqjson -lsigar -lonvif</global.libs>
+        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -llibprotobuf -lqjson -lsigar -lonvif</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
         <linux.oslibs>-lz</linux.oslibs>

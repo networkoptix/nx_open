@@ -23,9 +23,11 @@
 	<properties>
 		<product.title>${applauncher.name}</product.title>  
         <!--Global libs-->		
-		<global.libs></global.libs>
+		<global.libs>-lcommon</global.libs>
 		<!--Specific os libs used-->
-		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
+		<windows.oslibs>DbgHelp.lib</windows.oslibs>
+        <windows.oslibs.release></windows.oslibs.release> 
+        <windows.oslibs.debug></windows.oslibs.debug>        
 		<linux.oslibs></linux.oslibs>
 		<mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
 		<!--Global defines-->
