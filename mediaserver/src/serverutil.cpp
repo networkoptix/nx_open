@@ -55,6 +55,10 @@ QString serverGuid()
 
 QString getDataDirectory()
 {
+    const QString& dataDirFromSettings = qSettings.value( "dataDir" ).toString();
+    if( !dataDirFromSettings.isEmpty() )
+        return dataDirFromSettings;
+
 #ifdef Q_OS_LINUX
     QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(VER_LINUX_ORGANIZATION_NAME);
     QString varDirName = qSettings.value("varDir", defVarDirName).toString();

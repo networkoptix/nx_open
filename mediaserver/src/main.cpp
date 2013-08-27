@@ -445,7 +445,7 @@ int serverMain(int argc, char *argv[])
     QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
     QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
-    QString dataLocation = getDataDirectory();
+    const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
@@ -460,11 +460,10 @@ int serverMain(int argc, char *argv[])
 
     if( logLevel != QString::fromLatin1("none") )
     {
-        QDir dataDirectory;
-        dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
-
-        QString logFileName = dataLocation + QLatin1String("/log/log_file");
-        qSettings.setValue("logFile", logFileName);
+        const QString& logDir = qSettings.value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
+        QDir().mkpath( logDir );
+        const QString& logFileName = logDir + QLatin1String("/log_file");
+        //qSettings.setValue("logFile", logFileName);
         if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
         {
             qApp->quit();
