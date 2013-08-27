@@ -94,7 +94,8 @@ void QnTCPConnectionProcessor::parseRequest()
 #ifdef USE_NX_HTTP
     if( !d->request.parse( d->clientRequest ) )
     {
-        //TODO: #ak ???
+        qWarning() << Q_FUNC_INFO << "Invalid request format.";
+        return;
     }
     QList<QByteArray> versionParts = d->request.requestLine.version.split('/');
     d->protocol = versionParts[0];
@@ -253,7 +254,7 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
         d->response.headers.insert( nx_http::HttpHeader( "Content-Length", QByteArray::number(d->responseBody.length()) ) );
 
     QByteArray response = d->response.toString();
-    response.replace(0,4,transport);    //TODO: #ak looks too bad
+    response.replace(0,4,transport);    //TODO: #ak looks too bad. Add support for any protocol to nx_http (nx_http has to be renamed in this case)
     if (!d->responseBody.isEmpty())
     {
         response += d->responseBody;
