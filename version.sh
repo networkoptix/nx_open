@@ -1,5 +1,5 @@
-export OLD_VERSION=1.5.1-SNAPSHOT
-export NEW_VERSION=1.5.2-SNAPSHOT
+export OLD_VERSION=1.6.0-SNAPSHOT
+export NEW_VERSION=2.0.0-SNAPSHOT
 
 OLD_VERSION=${OLD_VERSION//./\\.}
 
@@ -9,4 +9,4 @@ echo $OLD_VERSION
 
 for f in `find * -name pom.xml`; do sed -i"" -e "s/$OLD_VERSION/$NEW_VERSION/g" $f; done
 
-mvn deploy -N
+#~/buildenv/maven/bin/mvn deploy -N

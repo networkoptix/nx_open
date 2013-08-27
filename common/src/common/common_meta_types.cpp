@@ -11,6 +11,7 @@
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
+#include <api/model/camera_diagnostics_reply.h>
 #include <api/model/kvpair.h>
 #include <api/message.h>
 #include <api/media_server_cameras_data.h>
@@ -124,6 +125,9 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
     qRegisterMetaType<QnTimeReply>();
-    
+    qRegisterMetaType<QnCameraDiagnosticsReply>();
+
+    qRegisterMetaType<DewarpingParams>();
+
     qn_commonMetaTypes_initialized = true;
 }

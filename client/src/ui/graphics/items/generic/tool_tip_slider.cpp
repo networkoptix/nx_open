@@ -7,53 +7,17 @@
 #include <utils/common/checked_cast.h>
 
 #include <ui/animation/opacity_animator.h>
+#include <ui/graphics/items/generic/styled_tooltip_widget.h>
 
 #include "tool_tip_widget.h"
 
 namespace {
-    class QnSliderToolTipItem: public QnToolTipWidget {
-        typedef QnToolTipWidget base_type;
-    public:
-        QnSliderToolTipItem(QGraphicsItem *parent = 0): base_type(parent)
-        {
-            setContentsMargins(5.0, 5.0, 5.0, 5.0);
-            setTailWidth(5.0);
-
-            QPalette palette = this->palette();
-            palette.setColor(QPalette::WindowText, QColor(63, 159, 216));
-            setPalette(palette);
-
-            setWindowBrush(QColor(0, 0, 0, 255));
-            setFrameBrush(QColor(203, 210, 233, 128));
-            setFrameWidth(1.0);
-
-            QFont fixedFont = QApplication::font();
-            fixedFont.setPixelSize(14);
-            setFont(fixedFont);
-
-            updateTailPos();
-        }
-
-    protected:
-        virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override {
-            base_type::resizeEvent(event);
-
-            updateTailPos();
-        }
-
-    private:
-        void updateTailPos() {
-            QRectF rect = this->rect();
-            setTailPos(QPointF((rect.left() + rect.right()) / 2, rect.bottom() + 10.0));
-        }
-    };
-
     const int toolTipHideDelay = 2500;
 
 } // anonymous namespace
 
 /**
- * Note that this is a separate class so that user classes derived from 
+ * Note that this is a separate class so that user classes derived from
  * <tt>QnToolTipSlider</tt> can freely inherit <tt>AnimationTimerListener</tt>
  * without any conflicts.
  */
@@ -112,7 +76,7 @@ void QnToolTipSlider::init() {
     m_animationListener.reset(new QnToolTipSliderAnimationListener(this));
     registerAnimation(m_animationListener.data());
 
-    setToolTipItem(new QnSliderToolTipItem(this));
+    setToolTipItem(new QnStyledTooltipWidget(this));
     setAcceptHoverEvents(true);
 
     setFlag(ItemSendsScenePositionChanges, true);
@@ -141,7 +105,7 @@ void QnToolTipSlider::setToolTipItem(QnToolTipWidget *newToolTipItem) {
         toolTipItem()->setOpacity(opacity);
         toolTipItem()->setAcceptHoverEvents(true);
         toolTipItem()->installEventFilter(this);
-        toolTipItem()->setFlag(ItemIgnoresParentOpacity, true);
+        toolTipItem()->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
         connect(toolTipItem(), SIGNAL(tailPosChanged()), this, SLOT(updateToolTipPosition()));
 
         updateToolTipText();
@@ -215,7 +179,7 @@ void QnToolTipSlider::updateToolTipPosition() {
 
     qreal x = positionFromValue(sliderPosition()).x() + handleRect.width() / 2.0;
     qreal y = handleRect.top();
-    
+
     toolTipItem()->pointTo(toolTipItem()->mapToParent(toolTipItem()->mapFromItem(this, x, y)));
 }
 
@@ -242,10 +206,20 @@ void QnToolTipSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     base_type::paint(painter, option, widget);
 }
 
-QString QnToolTipSlider::toolTipAt(const QPointF &) const {
-    /* Default tooltip is meaningless for this slider, 
+QString QnToolTipSlider::toolTipAt(const QPointF &pos) const {
+    Q_UNUSED(pos)
+    /* Default tooltip is meaningless for this slider,
      * so we don't want it to be shown. */
-    return QString(); 
+    return QString();
+}
+
+bool QnToolTipSlider::showOwnTooltip(const QPointF &pos) {
+    Q_UNUSED(pos)
+    /* Default tooltip is meaningless for this slider,
+     * so we don't want it to be shown.
+     * Displaying is also controlled by the slider itself.
+     */
+    return true;
 }
 
 bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
@@ -344,7 +318,7 @@ void QnToolTipSlider::timerEvent(QTimerEvent *event) {
 void QnToolTipSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverEnterEvent(event);
     m_sliderUnderMouse = true;
-    
+
     updateToolTipVisibility();
 }
 

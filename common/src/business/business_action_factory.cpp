@@ -43,16 +43,19 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnB
 QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters &runtimeParams) {
     switch(actionType)
     {
-        case BusinessActionType::NotDefined:         return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+        case BusinessActionType::NotDefined:
+        case BusinessActionType::Bookmark:
+        case BusinessActionType::Diagnostics:
+        case BusinessActionType::ShowPopup:
+        case BusinessActionType::PlaySound:
+        case BusinessActionType::SayText:
+            return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+
         case BusinessActionType::CameraOutput:       return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
         case BusinessActionType::CameraOutputInstant:return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
-        case BusinessActionType::Bookmark:           return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
         case BusinessActionType::CameraRecording:    return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
         case BusinessActionType::PanicRecording:     return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
         case BusinessActionType::SendMail:           return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
-        case BusinessActionType::Alert:              return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
-        case BusinessActionType::ShowPopup:          return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
-        case BusinessActionType::PlaySound:          return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
     }
     return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
 }

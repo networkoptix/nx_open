@@ -52,14 +52,9 @@ QColor QnStatisticsColors::hddByKey(const QString &key) const {
     return hdds[qMod(id, hdds.size())];
 }
 
-QColor QnStatisticsColors::networkInByKey(const QString &key) const {
+QColor QnStatisticsColors::networkByKey(const QString &key) const {
     int id = asciisum(key);
-    return networkIn[qMod(id, networkIn.size())];
-}
-
-QColor QnStatisticsColors::networkOutByKey(const QString &key) const {
-    int id = asciisum(key);
-    return networkOut[qMod(id, networkOut.size())];
+    return network[qMod(id, network.size())];
 }
 
 void QnStatisticsColors::update(const QByteArray &serializedValue) {
@@ -82,18 +77,11 @@ void QnStatisticsColors::ensureVectors() {
              << QColor(201, 0, 0);
     }
 
-    if (networkIn.isEmpty()) {
-        networkIn   << QColor(255, 52, 52)
+    if (network.isEmpty()) {
+        network   << QColor(255, 52, 52)
                     << QColor(240, 255, 52)
                     << QColor(228, 52, 255)
                     << QColor(255, 52, 132);
-    }
-
-    if (networkOut.isEmpty()) {
-        networkOut  << QColor(52, 94, 255)
-                    << QColor(52, 198, 255)
-                    << QColor(52, 255, 140)
-                    << QColor(194, 255, 52);
     }
 }
 

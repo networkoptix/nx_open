@@ -1,14 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+        <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.5.2-SNAPSHOT</version>
+		<version>2.0.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.5.2-SNAPSHOT</version>
+	<version>2.0.0-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>build_environment</artifactId>
 	<packaging>pom</packaging>
@@ -50,13 +50,6 @@
 			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>		
 		<dependency>
-			<groupId>com.sourceforge.cloudcity</groupId>
-			<artifactId>bespin</artifactId>
-			<version>1.1-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}-${compiler}</classifier>
-		</dependency>                               	
-		<dependency>
 			<groupId>org.hyperic</groupId>
 			<artifactId>sigar</artifactId>
 			<version>${sigar.version}</version>
@@ -70,6 +63,13 @@
 			<type>zip</type>
 			<classifier>${platform}-${arch}</classifier>
 		</dependency>                               	
+		<dependency>
+			<groupId>org.festival</groupId>
+			<artifactId>festival-vox</artifactId>
+			<version>${festival.version}</version>
+			<type>zip</type>
+			<classifier>all-os</classifier>
+		</dependency>                         
 	</dependencies>		
 
 	<build>
@@ -221,24 +221,6 @@
 									</excludes>
 								</resource>
 								
-								<!-- for Linux -->
-								
-								<resource>
-									<targetPaths>
-										<targetPath>${project.build.directory}/bin/debug</targetPath>
-										<targetPath>${project.build.directory}/bin/release</targetPath>
-									</targetPaths>
-									<directory>${environment.dir}/qt/plugins</directory>
-									<preservePath>true</preservePath>
-									<includes>
-										<include>**/${qtplugin1}/**</include>
-										<include>**/${qtplugin2}/**</include>
-										<include>**/${qtplugin3}/**</include>
-									</includes>								
-								</resource>	
-								
-								<!-- for Windows -->
-																										
 								<resource>
 									<targetPath>${project.build.directory}/bin</targetPath>
 									<directory>${environment.dir}/qt/plugins/${arch}</directory>
@@ -248,7 +230,7 @@
 										<include>*/${qtplugin2}/**</include>
 										<include>*/${qtplugin3}/**</include>
 									</includes>										
-								</resource>																		
+								</resource>			 														
 
 								<resource>
 									<targetPaths>
@@ -256,8 +238,8 @@
 										<targetPath>${project.build.directory}/bin/release</targetPath>
 									</targetPaths>
 									<file>${basedir}/../quicksyncdecoder/hw_decoding_conf.xml</file>
-								</resource>								
-							</resources>								
+								</resource>								                             
+							</resources>						
 						</configuration>
 					</execution>
 				</executions>
@@ -288,13 +270,6 @@
 					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>
 				<dependency>
-					<groupId>com.nokia.qt.addons</groupId>
-					<artifactId>qtcolorpicker</artifactId>
-					<version>2.6.1-SNAPSHOT</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}</classifier>
-				</dependency>
-				<dependency>
 					<groupId>com.digitalwatchdog.dvr</groupId>
 					<artifactId>vmax-integration</artifactId>
 					<version>1.0-SNAPSHOT</version>
@@ -308,6 +283,13 @@
 					<type>zip</type>
 					<classifier>${platform}-${arch}</classifier>
 				</dependency>
+				<dependency>                 
+					<groupId>com.nokia.qt.addons</groupId>
+					<artifactId>qtcolorpicker</artifactId>
+					<version>2.6.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>              
 				<dependency>
 					<groupId>com.microsoft.directx</groupId>
 					<artifactId>d3d9</artifactId>
@@ -347,6 +329,13 @@
 					<groupId>net.sourceforge</groupId>
 					<artifactId>qjson</artifactId>
 					<version>0.7.1-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>
+				<dependency>
+					<groupId>com.sourceforge.cloudcity</groupId>
+					<artifactId>bespin</artifactId>
+					<version>1.1-SNAPSHOT</version>
 					<type>zip</type>
 					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>
@@ -416,12 +405,12 @@
 					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>
 				<dependency>
-					<groupId>com.nokia.qt.addons</groupId>
-					<artifactId>qtcolorpicker</artifactId>
-					<version>2.6.1-SNAPSHOT</version>
+					<groupId>com.sourceforge.cloudcity</groupId>
+					<artifactId>bespin</artifactId>
+					<version>1.1-SNAPSHOT</version>
 					<type>zip</type>
-					<classifier>${platform}-${arch}</classifier>
-				</dependency>
+					<classifier>${platform}-${arch}-${compiler}</classifier>
+				</dependency>                               	
 			</dependencies>
 			<build>	
 				<plugins>
@@ -442,6 +431,18 @@
 									<skip>${rsync.skip}</skip>
 								</configuration>
 							</execution>
+							<execution>
+								<id>prepare-deb</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.build.directory}/prepare-package.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+		    							<skip>${assembly-skip}</skip>
+								</configuration>
+							</execution>							
 						</executions>
 					</plugin>				
 					<plugin>
@@ -518,19 +519,51 @@
             				<artifactId>qjson</artifactId>
 		 			<version>0.8.1-SNAPSHOT</version>
 					<type>zip</type>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
+					<classifier>${platform}-${arch}-qt484</classifier>
 				</dependency>
 				<dependency>
-					<groupId>com.nokia.qt.addons</groupId>
-					<artifactId>qtcolorpicker</artifactId>
-					<version>2.6.1-SNAPSHOT</version>
+					<groupId>com.sourceforge.cloudcity</groupId>
+					<artifactId>bespin</artifactId>
+					<version>1.1-SNAPSHOT</version>
 					<type>zip</type>
-					<classifier>${platform}-${arch}</classifier>
-				</dependency>
+					<classifier>${platform}-${arch}-qt484</classifier>
+				</dependency>                               	
 			</dependencies>
 
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>rsync-buildenv</id>
+								<phase>initialize</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${environment.dir}/get_buildenv.sh</executable>
+									<workingDirectory>${environment.dir}</workingDirectory>		
+									<skip>${rsync.skip}</skip>
+								</configuration>
+							</execution>
+							<execution>
+								<id>prepare-deb</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.build.directory}/prepare-package.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+		    							<skip>${assembly-skip}</skip>
+								</configuration>
+							</execution>							
+						</executions>
+					</plugin>				
+
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>

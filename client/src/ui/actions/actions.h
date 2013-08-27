@@ -1,6 +1,8 @@
 #ifndef QN_ACTIONS_H
 #define QN_ACTIONS_H
 
+#include <QMetaType>
+
 #include "action_fwd.h"
 
 #include <client/client_globals.h>
@@ -131,7 +133,7 @@ namespace Qn {
         EscapeHotkeyAction,
 
         /**
-         * Displays messagebox with the text provided.
+         * Displays message box with the text provided.
          *
          * Parameters:
          * <tt>QString TitleRole</tt> --- title for the messagebox.
@@ -140,12 +142,33 @@ namespace Qn {
         MessageBoxAction,
 
         /**
+         * Displays version mismatch dialog, pulling mismatch data from 
+         * <tt>QnWorkbenchVersionMismatchWatcher</tt>. Displays nothing if there
+         * is no mismatches.
+         */
+        VersionMismatchMessageAction,
+
+        /**
          * Opens the provided url in the default browser.
          *
          * Parameters:
          * <tt>QUrl UrlRole</tt> --- target url.
          */
         BrowseUrlAction,
+
+        /**
+         * Opens the Business Events Log dialog.
+         * Supports cameras list in the resources field as a cameras filter.
+         * Parameters:
+         * <tt>BusinessEventType::Value EventTypeRole</tt> --- filter by event type.
+         */
+        OpenBusinessLogAction,
+
+        /**
+         * Opens the Business Rules dialog.
+         * Supports cameras list in the resources field as a cameras filter.
+         */
+        OpenBusinessRulesAction,
 
 
         /* Main menu actions. */
@@ -239,6 +262,11 @@ namespace Qn {
          * Checks for updates.
          */
         CheckForUpdatesAction,
+
+        /**
+         * Open Showcase page in default browser
+         */
+        ShowcaseAction,
 
         /**
          * Closes the client.
@@ -340,7 +368,12 @@ namespace Qn {
         /**
          * Opens selected layouts in a new window.
          */
-        OpenNewWindowLayoutsAction,
+        OpenLayoutsInNewWindowAction,
+
+        /**
+         * Opens current layout in a new window.
+         */
+        OpenCurrentLayoutInNewWindowAction,
 
         /**
          * Saves selected layout.
@@ -435,6 +468,17 @@ namespace Qn {
         CameraIssuesAction,
 
         /**
+         * Opens business rules dialog with filter for current camera(s) rules
+         */
+        CameraBusinessRulesAction,
+
+        /**
+         * Opens camera diagnostics dialog that checks for problems with
+         * selected camera.
+         */
+        CameraDiagnosticsAction,
+
+        /**
          * Opens current layout settings dialog.
          */
         CurrentLayoutSettingsAction,
@@ -480,14 +524,14 @@ namespace Qn {
         ServerAddCameraManuallyAction,
 
         /**
+         * Opens camera list by media server
+         */
+        CameraListByServerAction,
+
+        /**
          * Opens a YouTube upload dialog.
          */
         YouTubeUploadAction,
-
-        /**
-         * Opens tags editing dialog.
-         */
-        EditTagsAction,
 
         /**
          * Opens a folder that contains the file resource.
@@ -889,6 +933,8 @@ namespace Qn {
     };
 
 } // namespace Qn
+
+Q_DECLARE_METATYPE(Qn::ActionId);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionScopes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionParameterTypes);

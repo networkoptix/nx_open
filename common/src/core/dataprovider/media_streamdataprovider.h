@@ -6,6 +6,7 @@
 #include "../resource/media_resource.h"
 #include "abstract_streamdataprovider.h"
 #include "../datapacket/media_data_packet.h"
+#include "utils/camera/camera_diagnostics.h"
 
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
@@ -32,6 +33,13 @@ public:
 
     virtual QnMediaContextPtr getCodecContext() const;
 
+    //!Tests connection to media stream
+    /*!
+        Blocks for media stream open attempt.
+        Default implementation returns notImplemented result
+    */
+    virtual CameraDiagnostics::Result diagnoseMediaStreamConnection();
+
 protected:
     virtual QnAbstractMediaDataPtr getNextData() = 0;
 
@@ -51,7 +59,7 @@ protected:
     int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 
     int mFramesLost;
-    QnMediaResourcePtr m_mediaResource;
+    QnResourcePtr m_mediaResource;
 
 private:
     mutable int m_numberOfchannels;

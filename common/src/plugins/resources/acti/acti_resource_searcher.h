@@ -50,13 +50,12 @@ private:
     QMap<QString, CashedDevInfo> m_cashedDevInfo;
 
     QSet<QString >m_httpInProgress;
-    QNetworkAccessManager *m_manager;
     QMutex m_mutex;
 
     QByteArray getDeviceXml(const QUrl& url);
 
 private slots:
-    void at_replyReceived(QNetworkReply* reply);
+    void at_replyReceived(nx_http::AsyncHttpClient* reply);
 };
 
 #endif // _ACTI_RESOURCE_SEARCHER_H__

@@ -20,6 +20,11 @@ QnCameraInputBusinessEventWidget::~QnCameraInputBusinessEventWidget()
 {
 }
 
+void QnCameraInputBusinessEventWidget::updateTabOrder(QWidget *before, QWidget *after) {
+    setTabOrder(before, ui->relayComboBox);
+    setTabOrder(ui->relayComboBox, after);
+}
+
 void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
     if (!model)
         return;

@@ -37,10 +37,10 @@
 		<condition value="6" resName="cpuModel" matchType="equal">
 			<sequence value="58">
 				<condition resName="framePictureWidth" matchType="greater">
-					<set value="4096" resName="simultaneousStreamCount" resValue="0"/>
+					<set value="2048" resName="simultaneousStreamCount" resValue="0"/>
 				</condition>
 				<condition resName="framePictureHeight" matchType="greater">
-					<set value="3520" resName="simultaneousStreamCount" resValue="0"/>
+					<set value="1760" resName="simultaneousStreamCount" resValue="0"/>
 				</condition>
 			</sequence>
 		</condition>

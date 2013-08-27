@@ -15,7 +15,7 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/common/resource_name.h>
+#include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_item.h>
@@ -367,7 +367,6 @@ public:
     QVariant data(int role, int column) const {
         switch(role) {
         case Qt::DisplayRole:
-        case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
@@ -375,6 +374,8 @@ public:
             if (column == Qn::NameColumn)
                 return m_displayName + (m_modified ? QLatin1String("*") : QString());
             break;
+        case Qt::ToolTipRole:
+            return m_displayName;
         case Qt::DecorationRole:
             if (column == Qn::NameColumn)
                 return m_icon;
@@ -410,6 +411,8 @@ public:
                 return Qn::MainWindow_Tree_Users_Help;
             } else if(m_type == Qn::LocalNode) {
                 return Qn::MainWindow_Tree_Local_Help;
+            } else if(m_type == Qn::RecorderNode) {
+                return Qn::MainWindow_Tree_Recorder_Help;
             } else if(m_flags & QnResource::layout) {
                 if(m_model->context()->snapshotManager()->isFile(m_resource.dynamicCast<QnLayoutResource>())) {
                     return Qn::MainWindow_Tree_MultiVideo_Help;
@@ -748,6 +751,10 @@ void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
     m_rootNodes[m_rootNodeType]->updateRecursive();
 }
 
+Qn::NodeType QnResourcePoolModel::rootNodeType() const {
+    return m_rootNodeType;
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: QAbstractItemModel implementation
@@ -878,7 +885,12 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
-        QnMediaResourceList medias = resources.filtered<QnMediaResource>();
+        QnResourceList medias;   // = resources.filtered<QnMediaResource>();
+        foreach( QnResourcePtr res, resources )
+        {
+            if( res.dynamicCast<QnMediaResource>() )
+                medias.push_back( res );
+        }
 
         menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {

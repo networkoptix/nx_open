@@ -31,7 +31,8 @@ AVLastPacketSize ExtractSize(const unsigned char* arr)
 
 AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader(QnResourcePtr res):
 QnPlAVClinetPullStreamReader(res),
-m_black_white(false)
+m_black_white(false),
+m_prevDataReadResult(CameraDiagnostics::ErrorCode::noError)
 {
     m_timeout = 500;
 
@@ -55,6 +56,11 @@ AVClientPullSSTFTPStreamreader::~AVClientPullSSTFTPStreamreader()
     delete m_tftp_client;
 }
 
+CameraDiagnostics::Result AVClientPullSSTFTPStreamreader::diagnoseMediaStreamConnection()
+{
+    QMutexLocker lk( &m_mutex );
+    return m_prevDataReadResult;
+}
 
 QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
@@ -240,11 +246,13 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     //==========================================
 
     int readed = m_tftp_client->read(request, img);
+    {
+        QMutexLocker lk( &m_mutex );
+        m_prevDataReadResult = m_tftp_client->prevIOResult();
+    }
 
     if (readed == 0) // cannot read data
-    {
         return QnCompressedVideoDataPtr(0);
-    }
 
     img.removeTrailingZeros();
 

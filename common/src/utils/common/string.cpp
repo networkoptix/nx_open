@@ -31,15 +31,15 @@ QString formatFileSize(qint64 size, int precision, int prefixThreshold, Qn::Metr
 
     QString number, suffix;
     if (size == 0) {
-        number = lit("0");
-        suffix = lit("B");
+        number = QLatin1String("0");
+        suffix = QLatin1String("B");
     } else {
         double absSize = std::abs(static_cast<double>(size));
         int power = static_cast<int>(std::log(absSize / prefixThreshold) / std::log(1000.0));
         int unit = qBound(static_cast<int>(minPrefix), power, qMin(static_cast<int>(maxPrefix), static_cast<int>(arraysize(metricSuffixes) - 1)));
 
-        suffix = lit((useBinaryPrefixes ? binarySuffixes : metricSuffixes)[unit]);
-        number = (size < 0 ? lit("-") : QString()) + QString::number(absSize / std::pow(useBinaryPrefixes ? 1024.0 : 1000.0, unit), 'f', precision);
+        suffix = QLatin1String((useBinaryPrefixes ? binarySuffixes : metricSuffixes)[unit]);
+        number = (size < 0 ? QLatin1String("-") : QString()) + QString::number(absSize / std::pow(useBinaryPrefixes ? 1024.0 : 1000.0, unit), 'f', precision);
 
         /* Chop trailing zeros. */
         for(int i = number.size() - 1; ;i--) {

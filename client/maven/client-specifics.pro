@@ -1,13 +1,12 @@
 TEMPLATE = app
 DEFINES += CL_FORCE_LOGO
-DEFINES += QT_QTCOLORPICKER_IMPORT
 TRANSLATIONS += ${basedir}/translations/client_en.ts \
 				${basedir}/translations/client_ru.ts \
 				${basedir}/translations/client_zh-CN.ts \
 				${basedir}/translations/client_fr.ts \
-				${basedir}/translations/qt_ru.ts \
-				${basedir}/translations/qt_zh-CN.ts \
-				${basedir}/translations/qt_fr.ts
+				${basedir}/translations/client_jp.ts \
+				${basedir}/translations/client_ko.ts \
+				${basedir}/translations/client_pt-BR.ts \
 
 include(${environment.dir}/qt-custom/qtsingleapplication/src/qtsingleapplication.pri)
 #include(${environment.dir}/qt-custom/qtsingleapplication/src/qtsinglecoreapplication.pri)
@@ -18,6 +17,7 @@ CONFIG(debug, debug|release) {
 
 win32 {
   QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
+  INCLUDEPATH +=  ${environment.dir}/qt/include/QtGui
 }
 
 mac {

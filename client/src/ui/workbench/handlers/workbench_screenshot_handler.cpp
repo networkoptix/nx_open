@@ -1,4 +1,9 @@
+
 #include "workbench_screenshot_handler.h"
+
+#include <QAction>
+#include <QImageWriter>
+#include <QMessageBox>
 
 #include <utils/common/string.h>
 #include <utils/common/warnings.h>
@@ -12,6 +17,7 @@
 #include <camera/cam_display.h>
 
 #include "file_processor.h"
+#include "ui/workbench/workbench_item.h"
 
 QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent): 
     QObject(parent), 
@@ -32,21 +38,21 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     // TODO: #Elric move out, common code
     QString timeString;
     qint64 time = display->camDisplay()->getCurrentTime() / 1000;
-    if(widget->resource()->flags() & QnResource::utc) {
+    if(widget->resource()->toResource()->flags() & QnResource::utc) {
         timeString = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd_hh.mm.ss"));
     } else {
         timeString = QTime().addMSecs(time).toString(lit("hh.mm.ss"));
     }
 
     if (layout->channelCount() == 0) {
-        qnWarning("No channels in resource '%1' of type '%2'.", widget->resource()->getName(), widget->resource()->metaObject()->className());
+        qnWarning("No channels in resource '%1' of type '%2'.", widget->resource()->toResource()->getName(), widget->resource()->toResource()->metaObject()->className());
         return;
     }
 
     QString fileName = parameters.argument<QString>(Qn::FileNameRole);
     bool withTimestamps = true;
     if(fileName.isEmpty()) {
-        QString suggestion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString;
+        QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString;
 
         QString previousDir = qnSettings->lastScreenshotDir();
         if (previousDir.isEmpty())
@@ -112,11 +118,14 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     QImage screenshot;
     {
         QList<QImage> images;
+        DewarpingParams dewarping;
+        if (widget->resource()->getDewarpingParams().enabled)
+            dewarping = widget->item()->dewarpingParams();
         for (int i = 0; i < layout->channelCount(); ++i)
-            images.push_back(display->camDisplay()->getScreenshot(i));
+            images.push_back(display->camDisplay()->getScreenshot(i, widget->item()->imageEnhancement(), dewarping));
         QSize channelSize = images[0].size();
         QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
-        QRectF zoomRect = widget->zoomRect().isNull() ? QRectF(0, 0, 1, 1) : widget->zoomRect();
+        QRectF zoomRect = (widget->zoomRect().isNull() || dewarping.enabled) ? QRectF(0, 0, 1, 1) : widget->zoomRect();
 
         screenshot = QImage(totalSize.width() * zoomRect.width(), totalSize.height() * zoomRect.height(), QImage::Format_ARGB32);
         screenshot.fill(qRgba(0, 0, 0, 0));
@@ -132,7 +141,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         if (withTimestamps) {
             QString timeStamp;
             qint64 time = display->camDisplay()->getCurrentTime() / 1000;
-            if(widget->resource()->flags() & QnResource::utc) {
+            if(widget->resource()->toResource()->flags() & QnResource::utc) {
                 timeStamp = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd hh:mm:ss"));
             } else {
                 timeStamp = QTime().addMSecs(time).toString(lit("hh:mm:ss"));

@@ -66,7 +66,7 @@ bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
     case QEvent::WhatsThis: {
         QHelpEvent *e = static_cast<QHelpEvent *>(event);
 
-        int topicId = QnHelpTopicAccessor::helpTopicAt(widget, e->pos());
+        int topicId = QnHelpTopicAccessor::helpTopicAt(widget, e->pos(), true);
 
         if(topicId != -1) {
             event->accept();

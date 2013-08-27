@@ -2,6 +2,7 @@
 #define QN_ACTION_PARAMETERS_H
 
 #include <QtCore/QVariant>
+#include <QtCore/QMetaType>
 
 #include <core/resource/resource_fwd.h>
 
@@ -12,7 +13,7 @@ class QGraphicsItem;
 
 /**
  * Parameter pack for an action.
- * 
+ *
  * It always contains a 'default' parameter, accessible via <tt>items()</tt>
  * or <tt>argument(-1)</tt>. This parameter is expected to be of one of
  * the types convertible to <tt>Qn::ResourceType</tt>. It is normally passed
@@ -54,10 +55,12 @@ public:
 
     void setItems(const QVariant &items);
 
+    void setResources(const QnResourceList &resources);
+
     Qn::ActionParameterType type(int key = -1) const;
 
     int size(int key = -1) const;
-    
+
     QnResourceList resources(int key = -1) const;
 
     QnResourcePtr resource(int key = -1) const;
@@ -120,5 +123,7 @@ public:
 private:
     ArgumentHash m_arguments;
 };
+
+Q_DECLARE_METATYPE(QnActionParameters)
 
 #endif // QN_ACTION_PARAMETERS_H

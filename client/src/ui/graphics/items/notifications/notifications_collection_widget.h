@@ -3,23 +3,68 @@
 
 #include <QtGui/QGraphicsItem>
 
+#include <utils/common/connective.h>
+
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
+
 #include <core/resource/resource_fwd.h>
+
 #include <health/system_health.h>
+
 #include <ui/actions/action_parameters.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
-class QnNotificationItem;
+class QnNotificationWidget;
+class QnParticleItem;
+class QnToolTipWidget;
 
-class QnNotificationsCollectionWidget : public GraphicsWidget, public QnWorkbenchContextAware
-{
+/**
+ * An image button widget that displays thumbnail behind the button.
+ */
+class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationTimerListener {
     Q_OBJECT
+    typedef QnImageButtonWidget base_type;
 
-    typedef GraphicsWidget base_type;
+public:
+    QnBlinkingImageButtonWidget(QGraphicsItem *parent = NULL);
+
+public slots:
+    void setNotificationCount(int count);
+    void setColor(const QColor &color);
+
+protected:
+    virtual void tick(int deltaMSecs) override;
+
+private slots:
+    void showBalloon();
+    void hideBalloon();
+
+    void updateParticleGeometry();
+    void updateParticleVisibility();
+    void updateToolTip();
+    void updateBalloonTailPos();
+    void updateBalloonGeometry();
+
+    void at_particle_visibleChanged();
+
+private:
+    QnToolTipWidget *m_balloon;
+    QnParticleItem *m_particle;
+    qint64 m_time;
+    int m_count;
+};
+
+
+class QnNotificationsCollectionWidget: public Connective<GraphicsWidget>, public QnWorkbenchContextAware {
+    Q_OBJECT
+    typedef Connective<GraphicsWidget> base_type;
+
 public:
     explicit QnNotificationsCollectionWidget(QGraphicsItem *parent = 0, Qt::WindowFlags flags = 0, QnWorkbenchContext* context = NULL);
     virtual ~QnNotificationsCollectionWidget();
@@ -32,21 +77,33 @@ public:
 
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
+
+    QnBlinkingImageButtonWidget *blinker() const {
+        return m_blinker.data();
+    }
+    void setBlinker(QnBlinkingImageButtonWidget *blinker);
+
+    Qn::NotificationLevel notificationLevel() const;
+
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
+    void notificationLevelChanged();
 
 private slots:
     void showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideAll();
+    void updateBlinker();
 
     void at_settingsButton_clicked();
+    void at_filterButton_clicked();
     void at_eventLogButton_clicked();
     void at_debugButton_clicked();
-    void at_list_itemRemoved(QnNotificationItem* item);
+    void at_list_itemRemoved(QnNotificationWidget *item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
+
 private:
     /**
      * @brief loadThumbnailForItem          Start async thumbnail loading
@@ -54,14 +111,16 @@ private:
      * @param resource                      Camera resource - thumbnail provider
      * @param usecSinceEpoch                Timestamp for the thumbnail, -1 means latest available
      */
-    void loadThumbnailForItem(QnNotificationItem *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
+    void loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
 
-    QnNotificationItem* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+private:
+    QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
 
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 
-    QMultiHash<QnSystemHealth::MessageType, QnNotificationItem*> m_itemsByMessageType;
+    QMultiHash<QnSystemHealth::MessageType, QnNotificationWidget*> m_itemsByMessageType;
+    QWeakPointer<QnBlinkingImageButtonWidget> m_blinker;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

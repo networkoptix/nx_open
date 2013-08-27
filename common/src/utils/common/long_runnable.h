@@ -50,7 +50,7 @@ protected:
 };
 
 
-class QnLongRunnablePool: public QObject, public QnSingleton<QnLongRunnablePool> {
+class QnLongRunnablePool: public QObject, public Singleton<QnLongRunnablePool> {
     Q_OBJECT
 public:
     QnLongRunnablePool(QObject *parent = NULL);

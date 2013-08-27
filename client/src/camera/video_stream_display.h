@@ -36,8 +36,8 @@ public:
     //!Implementation of QnStoppable::pleaseStop()
     virtual void pleaseStop() override;
 
-    void addRenderer(QnAbstractRenderer* draw);
-    void removeRenderer(QnAbstractRenderer* draw);
+    int addRenderer(QnAbstractRenderer* draw);
+    int removeRenderer(QnAbstractRenderer* draw);
     
     FrameDisplayStatus display(
         QnCompressedVideoDataPtr data,
@@ -51,7 +51,7 @@ public:
     void setMTDecoding(bool value);
 
     void setSpeed(float value);
-    virtual QImage getScreenshot() override;
+    virtual QImage getScreenshot(const ImageCorrectionParams& params, const DewarpingParams& dewarping) override;
     virtual QImage getGrayscaleScreenshot() override; 
     void setCurrentTime(qint64 time);
     void canUseBufferedFrameDisplayer(bool value);
@@ -133,6 +133,7 @@ private:
     int m_prevSrcHeight;
     qint64 m_lastIgnoreTime;
     mutable QMutex m_renderListMtx;
+    bool m_isPaused;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);

@@ -15,24 +15,6 @@ private:
     QnMediaServerResourcePtr m_resource;
 };
 
-
-QnLocalMediaServerResource::QnLocalMediaServerResource(): 
-    QnResource()
-{
-    //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
-    addFlags(QnResource::server | QnResource::local);
-    removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
-
-    setName(QLatin1String("Local"));
-    setStatus(Online);
-}
-
-QString QnLocalMediaServerResource::getUniqueId() const
-{
-    return QLatin1String("LocalServer");
-}
-
-
 QnMediaServerResource::QnMediaServerResource():
     QnResource(),
     m_panicMode(PM_None),
@@ -107,7 +89,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     /* We want the video server connection to be deleted in its associated thread, 
      * no matter where the reference count reached zero. Hence the custom deleter. */
     if (!m_restConnection && !m_apiUrl.isEmpty())
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(getApiUrl()), &qnDeleteLater);
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this), &qnDeleteLater);
 
     return m_restConnection;
 }
@@ -325,12 +307,16 @@ int QnMediaServerResource::getProxyPort()
     return connection ? connection->getProxyPort() : 0;
 }
 
-QString QnMediaServerResource::getVersion() const
+QnSoftwareVersion QnMediaServerResource::getVersion() const
 {
+    QMutexLocker lock(&m_mutex);
+
     return m_version;
 }
 
-void QnMediaServerResource::setVersion(const QString &version)
+void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
 {
+    QMutexLocker lock(&m_mutex);
+
     m_version = version;
 }

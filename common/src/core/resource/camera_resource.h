@@ -3,12 +3,12 @@
 
 #include <QtCore/QMetaType>
 
-#include "network_resource.h"
 #include "security_cam_resource.h"
+#include <deque>
 
 class QnAbstractDTSFactory;
 
-class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virtual public QnSecurityCamResource
+class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
 {
     Q_OBJECT
     Q_FLAGS(Qn::CameraCapabilities)
@@ -52,29 +52,15 @@ public:
     void deserialize(const QnResourceParameters& parameters);
 
     QString toSearchString() const override;
+
+public slots:
+    void issueOccured();
+    void noCameraIssues();
+private slots:
+    void at_saveAsyncFinished(int, const QnResourceList &, int);
 protected:
     void save();
-// -------------------------------------------------------------------------- //
-// Begin QnSecurityCamResource metaobject support
-// -------------------------------------------------------------------------- //
-    /* These are copied from QnSecurityCamResource. For metaobject system to work
-     * correctly, no signals/slots must be declared before these ones. */
-public slots:
-    virtual void inputPortListenerAttached() override { QnSecurityCamResource::inputPortListenerAttached(); }
-    virtual void inputPortListenerDetached() override { QnSecurityCamResource::inputPortListenerDetached(); }
-
-    virtual void recordingEventAttached() override { QnSecurityCamResource::recordingEventAttached(); }
-    virtual void recordingEventDetached() override { QnSecurityCamResource::recordingEventDetached(); }
-
-signals:
-    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
-    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
-
-protected slots:
-    virtual void at_disabledChanged() override { QnSecurityCamResource::at_disabledChanged(); }
-// -------------------------------------------------------------------------- //
-// End QnSecurityCamResource metaobject support
-// -------------------------------------------------------------------------- //
+    int saveAsync(QObject *target, const char *slot);
 
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
@@ -89,13 +75,14 @@ private:
     QString m_firmware;
 
     QnAbstractDTSFactory* m_dtsFactory;
+    std::deque<qint64> m_issueTimes;
 };
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
 const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
-const QSize SECONDARY_STREAM_MAX_RESOLUTION(1280, 720);
+const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
 
-class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResource
+class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource
 {
     Q_OBJECT
 public:
@@ -104,7 +91,7 @@ public:
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
 
-    virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const;
+    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const;
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
@@ -113,7 +100,7 @@ protected:
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList); // find resolution helper function
 private:
-    int m_channelNumer; // video/audio source number
+    int m_channelNumber; // video/audio source number
 };
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);

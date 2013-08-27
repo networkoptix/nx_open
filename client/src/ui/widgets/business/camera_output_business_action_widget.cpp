@@ -7,6 +7,9 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnCameraOutputBusinessActionWidget)
@@ -19,10 +22,18 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *
     connect(ui->autoResetCheckBox, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));
     connect(ui->autoResetSpinBox, SIGNAL(valueChanged(int)), this, SLOT(paramsChanged()));
 
+    setHelpTopic(this, Qn::EventsActions_CameraOutput_Help);
 }
 
 QnCameraOutputBusinessActionWidget::~QnCameraOutputBusinessActionWidget()
 {
+}
+
+void QnCameraOutputBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
+    setTabOrder(before, ui->relayComboBox);
+    setTabOrder(ui->relayComboBox, ui->autoResetCheckBox);
+    setTabOrder(ui->autoResetCheckBox, ui->autoResetSpinBox);
+    setTabOrder(ui->autoResetSpinBox, after);
 }
 
 void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {

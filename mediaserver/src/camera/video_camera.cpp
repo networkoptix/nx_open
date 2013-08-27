@@ -6,8 +6,11 @@
 #include "utils/media/frame_info.h"
 #include "decoders/video/ffmpeg.h"
 #include "utils/common/synctime.h"
+#include <deque>
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
+static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
+static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
 
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
 
@@ -29,6 +32,7 @@ public:
     //QnMediaContextPtr getVideoCodecContext();
     //QnMediaContextPtr getAudioCodecContext();
     QnCompressedVideoDataPtr getLastVideoFrame();
+    QnCompressedVideoDataPtr GetIFrameByTime(qint64 time, bool iFrameAfterTime);
     QnCompressedAudioDataPtr getLastAudioFrame();
     void updateCameraActivity();
 private:
@@ -36,6 +40,7 @@ private:
     int m_lastKeyFrameChannel;
     QnCompressedAudioDataPtr m_lastAudioData;
     QnCompressedVideoDataPtr m_lastKeyFrame;
+    std::deque<QnCompressedVideoDataPtr> m_lastKeyFrames;
     int m_gotIFramesMask;
     int m_allChannelsMask;
     bool m_isSecondaryStream;
@@ -90,13 +95,6 @@ void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr data)
     QMutexLocker lock(&m_queueMtx);
     if (video)
     {
-        /*
-        if (video->flags & AV_PKT_FLAG_KEY) {
-            m_lastKeyFrameChannel = video->channelNumber;
-            m_dataQueue.removeDataByCondition(channelCheckFunctor, video->channelNumber);
-            m_lastKeyFrame = video;
-        }
-        */
         if (video->flags & AV_PKT_FLAG_KEY)
         {
             if (m_gotIFramesMask == m_allChannelsMask)
@@ -106,6 +104,11 @@ void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr data)
             }
             m_gotIFramesMask |= 1 << video->channelNumber;
             m_lastKeyFrame = video;
+            if (m_lastKeyFrames.empty() || m_lastKeyFrames.back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
+                m_lastKeyFrames.push_back(video);
+            qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
+            while (!m_lastKeyFrames.empty() && m_lastKeyFrames.front()->timestamp < removeThreshold)
+                m_lastKeyFrames.pop_front();
         }
 
         if (m_dataQueue.size() < m_dataQueue.maxSize()) {
@@ -143,6 +146,34 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
         rez++;
     }
     return rez;
+}
+
+
+QnCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time, bool iFrameAfterTime)
+{
+    QnCompressedVideoDataPtr result;
+
+    QMutexLocker lock(&m_queueMtx);
+    if (m_lastKeyFrames.empty() || 
+        m_lastKeyFrames.front()->timestamp > time + KEEP_IFRAMES_DISTANCE ||
+        m_lastKeyFrames.back()->timestamp < time - KEEP_IFRAMES_DISTANCE)
+    {
+        return result;
+    }
+
+    for (int i = 0; i < m_lastKeyFrames.size(); ++i)
+    {
+        if (m_lastKeyFrames[i]->timestamp >= time) {
+            if (iFrameAfterTime || m_lastKeyFrames[i]->timestamp == time || i == 0)
+                return m_lastKeyFrames[i];
+            else
+                return m_lastKeyFrames[i-1];
+        }
+    }
+    if (iFrameAfterTime || m_lastKeyFrames.empty())
+        return m_lastKeyFrame;
+    else
+        return m_lastKeyFrames.back();
 }
 
 
@@ -211,16 +242,21 @@ void QnVideoCamera::beforeStop()
         m_secondaryReader->removeDataProcessor(m_primaryGopKeeper);
         m_secondaryReader->pleaseStop();
     }
+}
 
+void QnVideoCamera::stop()
+{
     if (m_primaryReader)
         m_primaryReader->stop();
     if (m_secondaryReader)
         m_secondaryReader->stop();
 }
 
+
 QnVideoCamera::~QnVideoCamera()
 {
     beforeStop();
+    stop();
     delete m_primaryGopKeeper;
     delete m_secondaryGopKeeper;
 }
@@ -290,6 +326,14 @@ QnMediaContextPtr QnVideoCamera::getAudioCodecContext(bool primaryLiveStream)
 }
 */
 
+QnCompressedVideoDataPtr QnVideoCamera::getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime)
+{
+    QnVideoCameraGopKeeper* gopKeeper = primaryLiveStream ? m_primaryGopKeeper : m_secondaryGopKeeper;
+    if (gopKeeper)
+        return gopKeeper->GetIFrameByTime(time, iFrameAfterTime);
+    else
+        return QnCompressedVideoDataPtr();
+}
 
 QnCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(bool primaryLiveStream)
 {

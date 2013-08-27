@@ -141,6 +141,7 @@ public:
     }
 
 signals:
+    // TODO: #Elric this one should not exist.
     /**
      * This signals is emitted whenever animated value changed.
      */

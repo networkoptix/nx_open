@@ -88,8 +88,8 @@ protected slots:
 private:
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
-    QScopedPointer<QGraphicsScene> m_scene;
     QScopedPointer<QnGraphicsView> m_view;
+    QScopedPointer<QGraphicsScene> m_scene;
     QScopedPointer<QnWorkbenchController> m_controller;
     QScopedPointer<QnWorkbenchUi> m_ui;
 

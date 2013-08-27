@@ -40,6 +40,8 @@ public:
 
     explicit QnResourceCriterion(Qn::CameraCapabilities cameraCapabilities, const char *propertyName = QnResourceProperty::cameraCapabilities, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
+    explicit QnResourceCriterion(Qn::PtzCapabilities ptzCapabilities, const char *propertyName = QnResourceProperty::ptzCapabilities, Operation matchOperation = Accept, Operation mismatchOperation = Next);
+
     explicit QnResourceCriterion(const CriterionFunction &function, const QVariant &targetValue, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
     explicit QnResourceCriterion(const QVariant &targetValue, Type type, const char *propertyName, Operation matchOperation = Accept, Operation mismatchOperation = Next);
@@ -199,6 +201,10 @@ namespace QnResourceCriterionExpressions {
     }
 
     inline QnResourceCriterionExpression hasCapabilities(Qn::CameraCapabilities capabilities) {
+        return QnResourceCriterion(capabilities);
+    }
+
+    inline QnResourceCriterionExpression hasPtzCapabilities(Qn::PtzCapabilities capabilities) {
         return QnResourceCriterion(capabilities);
     }
 

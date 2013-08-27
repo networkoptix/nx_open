@@ -18,6 +18,7 @@ static QLatin1String PARAM_NAMES[] =
     QLatin1String("relayAutoResetTimeout"),
     QLatin1String("inputPortId"),
     QLatin1String("paramsKey"),
+    QLatin1String("sayText"),
 };
 
 static const char DELIMITER('$');
@@ -26,7 +27,7 @@ QnBusinessActionParameters::QnBusinessActionParameters()
 {
     m_userGroup = 0;
     m_fps = 10;
-    m_streamQuality = int(QnQualityHighest);
+    m_streamQuality = int(Qn::QualityHighest);
     m_recordingDuration = 0;
     m_before = 0;
     m_after = 0;
@@ -39,6 +40,14 @@ QString QnBusinessActionParameters::getSoundUrl() const {
 
 void QnBusinessActionParameters::setSoundUrl(const QString &value) {
     m_soundUrl = value;
+}
+
+QString QnBusinessActionParameters::getSayText() const {
+    return m_sayText;
+}
+
+void QnBusinessActionParameters::setSayText(const QString &value) {
+    m_sayText = value;
 }
 
 QString QnBusinessActionParameters::getEmailAddress() const {
@@ -66,11 +75,11 @@ void QnBusinessActionParameters::setFps(int value) {
     m_fps = value;
 }
 
-QnStreamQuality QnBusinessActionParameters::getStreamQuality() const {
-    return (QnStreamQuality) m_streamQuality;
+Qn::StreamQuality QnBusinessActionParameters::getStreamQuality() const {
+    return (Qn::StreamQuality) m_streamQuality;
 }
 
-void QnBusinessActionParameters::setStreamQuality(QnStreamQuality value) {
+void QnBusinessActionParameters::setStreamQuality(Qn::StreamQuality value) {
     m_streamQuality = (int) value;
 }
 
@@ -201,6 +210,11 @@ QnBusinessActionParameters QnBusinessActionParameters::deserialize(const QByteAr
             case keyParam:
                 result.m_keyParam = QString::fromUtf8(field.data(), field.size());
                 break;
+            case sayTextParam:
+                result.m_sayText = QString::fromUtf8(field.data(), field.size());
+                break;
+            default:
+                break;
         }
         prevPos = nextPos;
         i++;
@@ -241,6 +255,8 @@ bool QnBusinessActionParameters::equalTo(const QnBusinessActionParameters& other
         return false;
     if (m_keyParam != other.m_keyParam)
         return false;
+    if (m_sayText != other.m_sayText)
+        return false;
 
     return true;
 }
@@ -276,6 +292,7 @@ QByteArray QnBusinessActionParameters::serialize() const
     serializeIntParam(result, m_relayAutoResetTimeout, m_defaultParams.m_relayAutoResetTimeout);
     serializeStringParam(result, m_inputPortId, m_defaultParams.m_inputPortId);
     serializeStringParam(result, m_keyParam, m_defaultParams.m_keyParam);
+    serializeStringParam(result, m_sayText, m_defaultParams.m_sayText);
 
     return result;
 }
@@ -309,6 +326,8 @@ QnBusinessParams QnBusinessActionParameters::toBusinessParams() const
         result.insert(PARAM_NAMES[inputPortIdParam], m_inputPortId);
     if (m_keyParam != m_defaultParams.m_keyParam)
         result.insert(PARAM_NAMES[keyParam], m_keyParam);
+    if (m_sayText != m_defaultParams.m_sayText)
+        result.insert(PARAM_NAMES[sayTextParam], m_sayText);
 
     return result;
 }
@@ -368,6 +387,11 @@ QnBusinessActionParameters QnBusinessActionParameters::fromBusinessParams(const 
             break;
         case keyParam:
             result.m_keyParam = itr.value().toString();
+            break;
+        case sayTextParam:
+            result.m_sayText = itr.value().toString();
+            break;
+        default:
             break;
         }
     }

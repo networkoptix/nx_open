@@ -90,6 +90,7 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
+#include "workbench_ptz_preset_manager.h"
 
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
@@ -154,7 +155,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_screenRecorder(NULL),
     m_countdownCanceled(false),
     m_recordingCountdownLabel(NULL),
-    m_tourModeHintLabel(NULL)
+    m_tourModeHintLabel(NULL),
+    m_menuEnabled(true)
 {
     ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -261,6 +263,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(ptzInstrument,              SIGNAL(doubleClicked(QnMediaResourceWidget *)),                                             this,                           SLOT(at_item_doubleClicked(QnMediaResourceWidget *)));
     connect(m_itemRightClickInstrument, SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
@@ -312,6 +315,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        m_rubberBandInstrument,         SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),         ptzInstrument,                  SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        ptzInstrument,                  SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),         m_motionSelectionInstrument,    SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
 
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                         m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        m_handScrollInstrument,         SLOT(recursiveEnable()));
@@ -336,8 +341,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_moveInstrument,               SLOT(recursiveEnable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_dragInstrument,               SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_dragInstrument,               SLOT(recursiveEnable()));
-    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_resizingInstrument,           SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_resizingInstrument,           SLOT(recursiveEnable()));
+    //connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_resizingInstrument,           SLOT(recursiveDisable()));
+    //connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_resizingInstrument,           SLOT(recursiveEnable()));
 
     connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_handScrollInstrument,         SLOT(recursiveEnable()));
@@ -474,7 +479,7 @@ void QnWorkbenchController::displayWidgetInfo(const QList<QnResourceWidget *> &w
         widget->setOption(QnResourceWidget::DisplayInfo, display);
 }
 
-void QnWorkbenchController::moveCursor(const QPoint &direction) {
+void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis) {
     QnWorkbenchItem *centerItem = m_cursorItem.data();
     if(!centerItem)
         centerItem = workbench()->currentLayout()->item(m_cursorPos);
@@ -483,69 +488,44 @@ void QnWorkbenchController::moveCursor(const QPoint &direction) {
     if(centerItem && !centerItem->geometry().contains(center))
         center = centerItem->geometry().topLeft();
 
-    QRect centerRect;
-    if(centerItem) {
-        centerRect = centerItem->geometry();
-    } else {
-        centerRect = QRect(center, QSize(1, 1));
-    }
-    
-    QPoint aAxis = direction; /* Direction axis (a-axis) */
-    QPoint bAxis = QPoint(-aAxis.y(), aAxis.x()); /* Axis perpendicular to direction (b-axis). */
-
-    int aCenterRectL = dot(centerRect.topLeft(), aAxis);
-    int aCenterRectH = dot(centerRect.bottomRight(), aAxis);
-    int bCenterRectL = dot(centerRect.topLeft(), bAxis);
-    int bCenterRectH = dot(centerRect.bottomRight(), bAxis);
-
     QRect boundingRect = workbench()->currentLayout()->boundingRect();
-    int aBoundingSize = qAbs(dot(toPoint(boundingRect.size()), aAxis)); /* Size of the bounding rect projected to the a-axis. */
-
-    int bestDistance = std::numeric_limits<int>::max();
-    QPoint bestPos = center;
-
-    foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items()) {
-        if(item == centerItem)
-            continue;
-
-        const QRect &geometry = item->geometry();
-        for (int r = geometry.top(); r <= geometry.bottom(); r++) {
-            for (int c = geometry.left(); c <= geometry.right(); c++) {
-                QPoint pos(c, r);
-
-                int arDistance = distance(aCenterRectL, aCenterRectH, dot(pos, aAxis));
-                int brDistance = distance(bCenterRectL, bCenterRectH, dot(pos, bAxis));
-                if(brDistance > arDistance)
-                    continue;
-
-                int aDistance = (dot(pos - center, aAxis) + aBoundingSize) % aBoundingSize;
-                int bDistance = qAbs(dot(pos - center, bAxis));
-
-                int distance = (aDistance << 16) + bDistance;
-                if(distance < bestDistance) {
-                    bestDistance = distance;
-                    bestPos = pos;
-                }
-            }
-        }
-    }
-
-    if(bestPos == center)
+    if(boundingRect.isEmpty())
         return;
+
+    QPoint aReturn = -aAxis * qAbs(dot(toPoint(boundingRect.size()), aAxis) / dot(aAxis, aAxis));
+    QPoint bReturn = -bAxis * qAbs(dot(toPoint(boundingRect.size()), bAxis) / dot(bAxis, bAxis));
+
+    QPoint pos = center;
+    QnWorkbenchItem *item = NULL;
+    while(true) {
+        pos += aAxis;
+        if(!boundingRect.contains(pos))
+            pos += aReturn + bAxis;
+        if(!boundingRect.contains(pos))
+            pos += bReturn;
+        if(pos == center)
+            return; /* No other items on layout. */
+
+        item = workbench()->currentLayout()->item(pos);
+        if(item && item != centerItem)
+            break;
+    }
 
     Qn::ItemRole role = Qn::ZoomedRole;
     if(!workbench()->item(role))
         role = Qn::RaisedRole;
 
-    QnWorkbenchItem *bestItem = workbench()->currentLayout()->item(bestPos);
     display()->scene()->clearSelection();
-    display()->widget(bestItem)->setSelected(true);
-    workbench()->setItem(role, bestItem);
-    m_cursorPos = bestPos;
-    m_cursorItem = bestItem;
+    display()->widget(item)->setSelected(true);
+    workbench()->setItem(role, item);
+    m_cursorPos = pos;
+    m_cursorItem = item;
 }
 
 void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
+    if(!m_menuEnabled)
+        return;
+
     QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
     if(menu->isEmpty())
         return;
@@ -686,47 +666,45 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     switch(e->key()) {
     case Qt::Key_Enter:
     case Qt::Key_Return: {
-        QList<QGraphicsItem *> items = display()->scene()->selectedItems();
-        if(items.size() == 1 && dynamic_cast<QnResourceWidget *>(items[0])) {
-            if(items[0] == display()->widget(Qn::ZoomedRole)) {
-                menu()->trigger(Qn::UnmaximizeItemAction, items);
-            } else {
-                menu()->trigger(Qn::MaximizeItemAction, items);
-            }
+        QnResourceWidget *widget = display()->widget(Qn::CentralRole);
+        if(widget && widget == display()->widget(Qn::ZoomedRole)) {
+            menu()->trigger(Qn::UnmaximizeItemAction, widget);
+        } else {
+            menu()->trigger(Qn::MaximizeItemAction, widget);
         }
-        return;
+        break;
     }
     case Qt::Key_Up:
         if(e->modifiers() == 0)
-            moveCursor(QPoint(0, -1));
+            moveCursor(QPoint(0, -1), QPoint(-1, 0));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, -15));
-        return;
+        break;
     case Qt::Key_Down:
         if(e->modifiers() == 0)
-            moveCursor(QPoint(0, 1));
+            moveCursor(QPoint(0, 1), QPoint(1, 0));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, 15));
-        return;
+        break;
     case Qt::Key_Left:
         if(e->modifiers() == 0)
-            moveCursor(QPoint(-1, 0));
+            moveCursor(QPoint(-1, 0), QPoint(0, -1));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(-15, 0));
-        return;
+        break;
     case Qt::Key_Right:
         if(e->modifiers() == 0)
-            moveCursor(QPoint(1, 0));
+            moveCursor(QPoint(1, 0), QPoint(0, 1));
         if(e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(15, 0));
-        return;
+        break;
     case Qt::Key_Plus:
     case Qt::Key_Equal:
         m_wheelZoomInstrument->emulate(30);
-        return;
+        break;
     case Qt::Key_Minus:
         m_wheelZoomInstrument->emulate(-30);
-        return;
+        break;
     case Qt::Key_PageUp:
     case Qt::Key_PageDown:
         break; /* Don't let the view handle these and scroll. */
@@ -742,6 +720,31 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
             showContextMenuAt(offset + testRect.bottomRight());
         }
         break;
+    }
+    case Qt::Key_0:
+    case Qt::Key_1:
+    case Qt::Key_2:
+    case Qt::Key_3:
+    case Qt::Key_4:
+    case Qt::Key_5:
+    case Qt::Key_6:
+    case Qt::Key_7:
+    case Qt::Key_8:
+    case Qt::Key_9: {
+        QnResourceWidget *widget = display()->widget(Qn::CentralRole);
+        if(!widget)
+            break;
+
+        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+        if(!camera)
+            break;
+
+        int hotkey = e->key() - Qt::Key_0;
+        QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, hotkey);
+        if(preset.isNull())
+            break;
+
+        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, preset.name));
     }
     default:
         event->ignore(); /* Wasn't recognized? Ignore. */
@@ -1011,15 +1014,11 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget
     if(!resourceWidget)
         return; /* We may also get NULL if the widget being rotated gets deleted. */
 
-    resourceWidget->item()->setRotation(widget->rotation());
+    resourceWidget->item()->setRotation(widget->rotation() - (resourceWidget->item()->data<bool>(Qn::ItemFlipRole, false) ? 180.0: 0.0));
 }
 
 void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect) {
     widget->item()->setZoomRect(zoomRect);
-}
-
-void QnWorkbenchController::at_ContrastParamsChanged(QnMediaResourceWidget *widget, const ImageCorrectionParams& params) {
-    widget->item()->setContrastParams(params);
 }
 
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect) {
@@ -1030,14 +1029,17 @@ void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, co
 void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget) {
     QnLayoutItemData data = widget->item()->data();
     data.uuid = QUuid::createUuid();
-    data.resource.id = zoomTargetWidget->resource()->getId().toInt();
-    data.resource.path = zoomTargetWidget->resource()->getUniqueId();
+    data.resource.id = zoomTargetWidget->resource()->toResource()->getId().toInt();
+    data.resource.path = zoomTargetWidget->resource()->toResource()->getUniqueId();
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
+    data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
-
+    
+    QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;
 
     workbench()->currentLayout()->resource()->addItem(data);
+    display()->widget(data.uuid)->setCheckedButtons(buttons);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
@@ -1110,6 +1112,14 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
     if(widget == NULL)
         return;
 
+    at_item_doubleClicked(widget);
+}
+
+void QnWorkbenchController::at_item_doubleClicked(QnMediaResourceWidget *widget) {
+    at_item_doubleClicked(static_cast<QnResourceWidget *>(widget));
+}
+
+void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget) {
     display()->scene()->clearSelection();
     widget->setSelected(true);
 
@@ -1152,15 +1162,12 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
     workbench()->setItem(Qn::RaisedRole, NULL);
 }
 
-void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
+void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info) {
     TRACE("SCENE RCLICKED");
 
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope));
-    if(menu->isEmpty())
-        return;
+    view->scene()->clearSelection(); /* Just to feel safe. */
 
-    /* We don't want the curtain to kick in while menu is open. */
-    menu->exec(info.screenPos());
+    showContextMenuAt(info.screenPos());
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {

@@ -104,6 +104,15 @@ public:
         return m_itemLeftClickInstrument;
     }
 
+    // TODO: #Elric split into menu_controller or smth like that
+    bool isMenuEnabled() const {
+        return m_menuEnabled;
+    }
+
+    void setMenuEnabled(bool menuEnabled) {
+        m_menuEnabled = menuEnabled;
+    }
+
 public slots:
     void startRecording();
     void stopRecording();
@@ -115,7 +124,7 @@ protected:
     void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
     void displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool display);
 
-    void moveCursor(const QPoint &direction);
+    void moveCursor(const QPoint &aAxis, const QPoint &bAxis);
     void showContextMenuAt(const QPoint &pos);
 
 protected slots:
@@ -131,7 +140,6 @@ protected slots:
     void at_rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
     void at_zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect);
-    void at_ContrastParamsChanged(QnMediaResourceWidget *widget, const ImageCorrectionParams& params);
     void at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect);
     void at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget);
 
@@ -144,6 +152,8 @@ protected slots:
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
+    void at_item_doubleClicked(QnMediaResourceWidget *widget);
+    void at_item_doubleClicked(QnResourceWidget *widget);
 
     void at_scene_clicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_leftClicked(QGraphicsView *view, const ClickInfo &info);
@@ -294,6 +304,8 @@ private:
     QnGraphicsMessageBox *m_recordingCountdownLabel;
 
     QnGraphicsMessageBox *m_tourModeHintLabel;
+
+    bool m_menuEnabled;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

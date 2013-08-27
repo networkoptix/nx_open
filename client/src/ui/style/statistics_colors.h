@@ -18,12 +18,10 @@ public:
     QColor ram;
     QColor networkLimit;
     QVector<QColor> hdds;
-    QVector<QColor> networkIn;
-    QVector<QColor> networkOut;
+    QVector<QColor> network;
 
     QColor hddByKey(const QString &key) const;
-    QColor networkInByKey(const QString &key) const;
-    QColor networkOutByKey(const QString &key) const;
+    QColor networkByKey(const QString &key) const;
 
     void update(const QByteArray &serializedValue);
 

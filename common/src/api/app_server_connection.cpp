@@ -21,6 +21,7 @@ namespace {
         ((LicenseObject,            "license"))
         ((BusinessRuleObject,       "businessRule"))
         ((ConnectObject,            "connect"))
+        ((DisconnectObject,         "disconnect"))
         ((TimeObject,               "time"))
         ((EmailObject,              "email"))
         ((StatusObject,             "status"))
@@ -36,6 +37,7 @@ namespace {
         ((PutFileObject,            "putfile"))
         ((DeleteFileObject,         "rmfile"))
         ((ListDirObject,            "listdir"))
+        ((ResetBusinessRulesObject, "resetBusinessRules"))
     );
 
 } // anonymous namespace
@@ -706,11 +708,15 @@ int QnAppServerConnection::sendEmailAsync(const QString &addr, const QString &su
 
 int QnAppServerConnection::sendEmailAsync(const QStringList &to, const QString &subject, const QString &message, int timeout, QObject *target, const char *slot)
 {
+    return sendEmailAsync(to, subject, message, QnEmailAttachmentList(), timeout, target, slot);
+}
+
+int QnAppServerConnection::sendEmailAsync(const QStringList &to, const QString& subject, const QString& message, const QnEmailAttachmentList& attachments, int timeout, QObject *target, const char *slot) {
     if (message.isEmpty())
         return -1;
 
     QByteArray data;
-    m_serializer.serializeEmail(to, subject, message, timeout, data);
+    m_serializer.serializeEmail(to, subject, message, attachments, timeout, data);
 
     return addObjectAsync(EmailObject, data, QN_STRINGIZE_TYPE(bool), target, slot);
 }
@@ -845,6 +851,11 @@ bool QnAppServerConnection::setPanicMode(QnMediaServerResource::PanicMode value)
     return QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(PanicObject), requestHeaders, requestParams, "", response);
 }
 
+void QnAppServerConnection::disconnectSync() {
+    QnHTTPRawResponse response;
+    QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(DisconnectObject), m_requestHeaders, m_requestParams, "", response);
+}
+
 int QnAppServerConnection::dumpDatabaseAsync(QObject *target, const char *slot) {
     return QnSessionManager::instance()->sendAsyncGetRequest(url(), nameMapper()->name(DumpDbObject), m_requestHeaders, m_requestParams, target, slot);
 }
@@ -881,6 +892,9 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
     return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(DisabledObject), requestHeaders, requestParams, "", target, slot);
 }
 
+int QnAppServerConnection::resetBusinessRulesAsync(QObject *target, const char *slot) {
+    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(ResetBusinessRulesObject), m_requestHeaders, m_requestParams, "", target, slot);
+}
 
 // -------------------------------------------------------------------------- //
 // QnAppServerConnectionFactory
@@ -894,10 +908,34 @@ void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
     }
 }
 
-void QnAppServerConnectionFactory::setCurrentVersion(const QString &version)
+void QnAppServerConnectionFactory::setCurrentVersion(const QnSoftwareVersion &version)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_currentVersion = version;
+    }
+}
+
+void QnAppServerConnectionFactory::setSystemName(const QString& systemName)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_systemName = systemName.trimmed();
+    }
+}
+
+QString QnAppServerConnectionFactory::systemName()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        if (!factory->m_systemName.isEmpty())
+            return factory->m_systemName;
+    }
+
+    return QString();
+}
+
+void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_publicUrl.setHost(publicIp);
     }
 }
 
@@ -910,13 +948,13 @@ int QnAppServerConnectionFactory::defaultMediaProxyPort()
     return 0;
 }
 
-QString QnAppServerConnectionFactory::currentVersion()
+QnSoftwareVersion QnAppServerConnectionFactory::currentVersion()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         return factory->m_currentVersion;
     }
 
-    return QString();
+    return QnSoftwareVersion();
 }
 
 QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
@@ -955,6 +993,15 @@ QUrl QnAppServerConnectionFactory::defaultUrl()
     return QUrl();
 }
 
+QUrl QnAppServerConnectionFactory::publicUrl()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        return factory->m_publicUrl;
+    }
+
+    return QUrl();
+}
+
 void QnAppServerConnectionFactory::setAuthKey(const QString &authKey)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -976,6 +1023,7 @@ void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
 
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_defaultUrl = url;
+        factory->m_publicUrl = url;
     }
 }
 

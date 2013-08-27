@@ -5,6 +5,7 @@
 #include <QtGui/QComboBox>
 
 #include <business/business_action_parameters.h>
+#include <business/business_strings_helper.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -14,6 +15,7 @@
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/models/business_rules_view_model.h>
 #include <ui/models/notification_sound_model.h>
+#include <ui/widgets/business/aggregation_widget.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
@@ -55,13 +57,13 @@ void QnSelectResourcesDialogButton::setNodeType(Qn::NodeType nodeType) {
 }
 
 void QnSelectResourcesDialogButton::at_clicked() {
-    QnResourceSelectionDialog dialog(this, m_nodeType); //TODO: #GDM servers dialog?
+    QnResourceSelectionDialog dialog(m_nodeType, this); //TODO: #GDM servers dialog?
     dialog.setSelectedResources(m_resources);
     dialog.setDelegate(m_dialogDelegate);
     int result = dialog.exec();
     if (result != QDialog::Accepted)
         return;
-    m_resources = dialog.getSelectedResources();
+    m_resources = dialog.selectedResources();
     emit commit();
 }
 
@@ -138,6 +140,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                     comboBox->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
                     connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     return comboBox;
+                } else if (actionType == BusinessActionType::SayText) {
+                    return base_type::createEditor(parent, option, index);
                 }
 
                 QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
@@ -160,7 +164,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 QComboBox* comboBox = new QComboBox(parent);
                 for (int i = 0; i < BusinessEventType::Count; i++) {
                     BusinessEventType::Value val = (BusinessEventType::Value)i;
-                    comboBox->addItem(BusinessEventType::toString(val), val);
+                    comboBox->addItem(QnBusinessStringsHelper::eventName(val), val);
                 }
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                 return comboBox;
@@ -177,6 +181,13 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 }
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                 return comboBox;
+            }
+        case QnBusiness::AggregationColumn:
+            {
+                QnAggregationWidget* widget = new QnAggregationWidget(parent);
+                widget->setShort(true);
+                connect(widget, SIGNAL(valueChanged()), this, SLOT(at_editor_commit()));
+                return widget;
             }
         default:
             break;
@@ -217,6 +228,10 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
                     return;
                 }
 
+                if (actionType == BusinessActionType::SayText) {
+                    base_type::setEditorData(editor, index);
+                }
+
 
                 if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
                     btn->setResources(index.data(QnBusiness::ActionResourcesRole).value<QnResourceList>());
@@ -233,6 +248,11 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
         case QnBusiness::ActionColumn:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 comboBox->setCurrentIndex(comboBox->findData(index.data(QnBusiness::ActionTypeRole)));
+            }
+            return;
+        case QnBusiness::AggregationColumn:
+            if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor)) {
+                widget->setValue(index.data(Qt::EditRole).toInt());
             }
             return;
         default:
@@ -262,7 +282,9 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
                         model->setData(index, comboBox->itemData(comboBox->currentIndex()));
                     }
                     return;
-                } else if (actionType == BusinessActionType::PlaySound) {
+                }
+
+                if (actionType == BusinessActionType::PlaySound) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
                         if (!soundModel->loaded())
@@ -270,6 +292,11 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
                         QString filename = soundModel->filenameByRow(comboBox->currentIndex());
                         model->setData(index, filename);
                     }
+                    return;
+                }
+
+                if (actionType == BusinessActionType::SayText) {
+                    base_type::setModelData(editor, model, index);
                     return;
                 }
 
@@ -284,6 +311,11 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
         case QnBusiness::ActionColumn:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 model->setData(index, comboBox->itemData(comboBox->currentIndex()));
+            }
+            return;
+        case QnBusiness::AggregationColumn:
+            if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor)) {
+                model->setData(index, widget->value());
             }
             return;
         default:

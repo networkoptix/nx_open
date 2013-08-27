@@ -22,8 +22,9 @@
 #include "serializer/pb_serializer.h"
 #include "event_log/events_serializer.h"
 
+
 namespace {
-    QN_DEFINE_NAME_MAPPED_ENUM(RequestObject, 
+    QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
         ((StorageStatusObject,      "storageStatus"))
         ((StorageSpaceObject,       "storageSpace"))
         ((TimePeriodsObject,        "RecordedTimePeriods"))
@@ -38,8 +39,9 @@ namespace {
         ((TimeObject,               "gettime"))
         ((CameraSearchObject,       "manualCamera/search"))
         ((CameraAddObject,          "manualCamera/add"))
-        ((eventLogObject,           "events"))
+        ((EventLogObject,           "events"))
         ((ImageObject,              "image"))
+        ((CameraDiagnosticsObject,  "doCameraDiagnosticsStep"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -69,7 +71,7 @@ namespace {
 /**
  * Macro that stringizes the given type name and checks at compile time that
  * the given type is actually defined.
- * 
+ *
  * \param TYPE                          Type to stringize.
  */
 #define QN_REPLY_TYPE(TYPE) (check_reply_type<TYPE>(), BOOST_PP_STRINGIZE(TYPE))
@@ -87,7 +89,7 @@ public:
     QnNetworkProxyFactory()
     {
     }
-    
+
     virtual ~QnNetworkProxyFactory()
     {
     }
@@ -133,7 +135,7 @@ protected:
         QMap<QUrl, ProxyInfo>::const_iterator itr = m_proxyInfo.find(url);
         if (itr == m_proxyInfo.end())
             rez << QNetworkProxy(QNetworkProxy::NoProxy);
-        else 
+        else
             rez << QNetworkProxy(QNetworkProxy::HttpProxy, itr.value().addr, itr.value().port);
         return rez;
     }
@@ -156,7 +158,7 @@ QWeakPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
 
     /* Qt will take ownership of the supplied instance. */
     QNetworkProxyFactory::setApplicationProxyFactory(result); // TODO: #Elric we have a race if this code is run several times from different threads.
-    
+
     return result;
 }
 
@@ -210,15 +212,15 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         if(status == 0) {
             QByteArray cpuBlock = extractXmlBody(data, "cpuinfo");
             reply.statistics.append(QnStatisticsDataItem(
-                QLatin1String("CPU"), 
-                extractXmlBody(cpuBlock, "load").toDouble(), 
+                QLatin1String("CPU"),
+                extractXmlBody(cpuBlock, "load").toDouble(),
                 CPU
             ));
 
             QByteArray memoryBlock = extractXmlBody(data, "memory");
             reply.statistics.append(QnStatisticsDataItem(
-                QLatin1String("RAM"), 
-                extractXmlBody(memoryBlock, "usage").toDouble(), 
+                QLatin1String("RAM"),
+                extractXmlBody(memoryBlock, "usage").toDouble(),
                 RAM
             ));
 
@@ -242,24 +244,22 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
                     interfaceBlock = extractXmlBody(networkBlock, "interface", &from);
                     if (interfaceBlock.length() == 0)
                         break;
+
                     QString interfaceName = QLatin1String(extractXmlBody(interfaceBlock, "name"));
-                    reply.statistics.append(QnStatisticsDataItem(
-                        interfaceName + QChar(0x21e9),
-                        extractXmlBody(interfaceBlock, "in").toDouble() * 8, //converting from bytes to bits
-                        NETWORK_IN
-                    ));
-                    reply.statistics.append(QnStatisticsDataItem(
-                        interfaceName + QChar(0x21e7),
-                        extractXmlBody(interfaceBlock, "out").toDouble() * 8, //converting from bytes to bits
-                        NETWORK_OUT
-                    ));
+                    int interfaceType = extractXmlBody(interfaceBlock, "type").toInt();
+                    qint64 bytesIn = extractXmlBody(interfaceBlock, "in").toLongLong();
+                    qint64 bytesOut = extractXmlBody(interfaceBlock, "out").toLongLong();
+                    qint64 bytesMax = extractXmlBody(interfaceBlock, "max").toLongLong();
+
+                    if(bytesMax != 0)
+                        reply.statistics.push_back(QnStatisticsDataItem(interfaceName, static_cast<qreal>(qMax(bytesIn, bytesOut)) / bytesMax, NETWORK, interfaceType));
                 } while (networkBlock.length() > 0);
             }
 
             QByteArray paramsBlock = extractXmlBody(data, "params");
             reply.updatePeriod = extractXmlBody(paramsBlock, "updatePeriod").toInt();
         }
-        
+
         emitFinished(this, status, reply, handle);
         break;
     }
@@ -286,13 +286,13 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 
         foreach(const QByteArray &line, response.data.split('\n')) {
             int sepPos = line.indexOf('=');
-            if(sepPos == -1) { 
+            if(sepPos == -1) {
                 reply.push_back(qMakePair(QString::fromUtf8(line.constData(), line.size()), QVariant())); /* No value. */
             } else {
                 QByteArray key = line.mid(0, sepPos);
                 QByteArray value = line.mid(sepPos + 1);
                 reply.push_back(qMakePair(
-                    QString::fromUtf8(key.constData(), key.size()), 
+                    QString::fromUtf8(key.constData(), key.size()),
                     QVariant(QString::fromUtf8(value.constData(), value.size()))
                 ));
             }
@@ -306,7 +306,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 
         foreach(const QByteArray &line, response.data.split('\n')) {
             int sepPos = line.indexOf(':');
-            if(sepPos == -1) 
+            if(sepPos == -1)
                 continue; /* Invalid format. */
 
             QByteArray key = line.mid(sepPos+1);
@@ -325,7 +325,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case PtzSetPositionObject:
     case PtzStopObject:
     case PtzMoveObject:
-    case CameraAddObject: 
+    case CameraAddObject:
         emitFinished(this, response.status, handle);
         break;
     case CameraSearchObject: {
@@ -342,7 +342,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
                 QString url = QLatin1String(extractXmlBody(resource, "url"));
                 QString name = QLatin1String(extractXmlBody(resource, "name"));
                 QString manufacture = QLatin1String(extractXmlBody(resource, "manufacturer"));
-                reply.append(QnCamerasFoundInfo(url, name, manufacture));
+                bool exists = QString(QLatin1String(extractXmlBody(resource, "exists"))).toInt();
+                reply.append(QnCamerasFoundInfo(url, name, manufacture, exists));
             } while (resource.length() > 0);
         } else {
             qnWarning("Camera search failed: %1.", extractXmlBody(response.data, "root"));
@@ -351,22 +352,24 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, reply, handle);
         break;
     }
-    case eventLogObject: {
+    case EventLogObject: {
         QnApiPbSerializer serializer;
         QnBusinessActionDataListPtr events(new QnBusinessActionDataList);
         if (response.status == 0)
             QnEventSerializer::deserialize(events, response.data);
         emitFinished(this, response.status, events, handle);
-		break;
+        break;
     }
     case ImageObject: {
-        QnApiPbSerializer serializer;
         QImage image;
         if (response.status == 0)
             image.loadFromData(response.data);
         emitFinished(this, response.status, image, handle);
         break;
     }
+    case CameraDiagnosticsObject:
+        processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
+        break;
     default:
         assert(false); /* We should never get here. */
         break;
@@ -379,12 +382,16 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent):
     base_type(parent),
     m_proxyPort(0)
 {
-    setUrl(mediaServerApiUrl);
+    setUrl(mserver->getApiUrl());
     setNameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>()));
+
+    QnRequestHeaderList extraHeaders;
+    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getGuid());
+    setExtraHeaders(extraHeaders);
 }
 
 QnMediaServerConnection::~QnMediaServerConnection() {
@@ -415,7 +422,7 @@ QnRequestParamList QnMediaServerConnection::createTimePeriodsRequest(const QnNet
     result << QnRequestParam("endTime", QString::number(endTimeUSec));
     result << QnRequestParam("detail", QString::number(detail));
     result << QnRequestParam("format", "bin");
-    
+
     QString regionStr = serializeRegionList(motionRegions);
     if (!regionStr.isEmpty())
         result << QnRequestParam("motionRegions", regionStr);
@@ -424,7 +431,7 @@ QnRequestParamList QnMediaServerConnection::createTimePeriodsRequest(const QnNet
 }
 
 int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const
-                                                QSize& size, const QString& imageFormat, bool precise, QObject *target, const char *slot)
+                                                QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot)
 {
     QnRequestParamList params;
 
@@ -435,8 +442,12 @@ int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camer
     if (size.height() > 0)
         params << QnRequestParam("height", size.height());
     params << QnRequestParam("format", imageFormat);
-    if (precise)
-        params << QnRequestParam("precise", lit("1"));
+    QString methodStr(lit("before"));
+    if (method == Precise)
+        methodStr = lit("precise");
+    else if (method == IFrameAfterTime)
+        methodStr = lit("after");
+    params << QnRequestParam("method", methodStr);
     return sendAsyncGetRequest(ImageObject, params, QN_REPLY_TYPE(QImage), target, slot);
 }
 
@@ -463,7 +474,7 @@ int QnMediaServerConnection::getParamsSync(const QnNetworkResourcePtr &camera, c
 QnRequestParamList QnMediaServerConnection::createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params) {
     QnRequestParamList result;
     result << QnRequestParam("res_id", camera->getPhysicalId());
-    for(QnStringVariantPairList::const_iterator i = params.begin(); i != params.end(); ++i) 
+    for(QnStringVariantPairList::const_iterator i = params.begin(); i != params.end(); ++i)
         result << QnRequestParam(i->first, i->second.toString());
     return result;
 }
@@ -544,6 +555,16 @@ int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_REPLY_TYPE(QnTimeReply), target, slot);
 }
 
+int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
+    const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+    QObject* target, const char* slot )
+{
+    QnRequestParamList params;
+    params << QnRequestParam("res_id",  cameraID);
+    params << QnRequestParam("type", CameraDiagnostics::Step::toString(previousStep));
+    return sendAsyncGetRequest(CameraDiagnosticsObject, params, QN_REPLY_TYPE(QnCameraDiagnosticsReply), target, slot);
+}
+
 int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(StorageSpaceObject, QnRequestParamList(), QN_REPLY_TYPE(QnStorageSpaceReply), target, slot);
 }
@@ -567,11 +588,11 @@ int QnMediaServerConnection::ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &
 }
 
 int QnMediaServerConnection::getEventLogAsync(
-                  qint64 dateFrom, qint64 dateTo, 
+                  qint64 dateFrom, qint64 dateTo,
                   QnResourceList camList,
-                  BusinessEventType::Value eventType, 
+                  BusinessEventType::Value eventType,
                   BusinessActionType::Value actionType,
-                  QnId businessRuleId, 
+                  QnId businessRuleId,
                   QObject *target, const char *slot)
 {
     QnRequestParamList params;
@@ -590,6 +611,6 @@ int QnMediaServerConnection::getEventLogAsync(
     if (actionType != BusinessActionType::NotDefined)
         params << QnRequestParam( "action", (int) actionType);
 
-    return sendAsyncGetRequest(eventLogObject, params, QN_REPLY_TYPE(QnBusinessActionDataListPtr), target, slot);
+    return sendAsyncGetRequest(EventLogObject, params, QN_REPLY_TYPE(QnBusinessActionDataListPtr), target, slot);
 }
 

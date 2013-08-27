@@ -17,7 +17,7 @@ char (&ArraySizeHelper(T (&array)[N]))[N];
  * \param dirName                       Name of the directory to remove.
  * \returns                             Whether the operation completer successfully.
  */
-QN_EXPORT bool removeDir(const QString &dirName);
+bool removeDir(const QString &dirName);
 
 /**
  * Convert path from native to universal.
@@ -25,42 +25,37 @@ QN_EXPORT bool removeDir(const QString &dirName);
  * \param path                          Path to convert.
  * \returns                             Converted path.
  */
-QN_EXPORT QString fromNativePath(QString path);
+QString fromNativePath(const QString &path);
 
 /**
  * \returns                             User movies directory.
  */
-QN_EXPORT QString getMoviesDirectory();
+QString getMoviesDirectory();
+
+/**
+ * \returns                             User backrounds directory.
+ */
+QString getBackgroundsDirectory();
 
 /**
  * \param num                           Number.
  * \returns                             Number of digits in decimal representation of the given number.
  */
-QN_EXPORT int digitsInNumber(unsigned num);
-
-/**
- * Formats position in a time interval using the "HH:MM:SS/HH:MM:SS" format.
- * Hours part is omitted when it is not relevant.
- *
- * \param position                      Current position in seconds.
- * \param total                         Total duration in seconds. 
- *                                      Pass zero to convert position only.
- */
-QN_EXPORT QString formatDuration(unsigned position, unsigned total = 0); // TODO: #Elric move to string.h
+int digitsInNumber(unsigned num);
 
 /**
  * Gets param from string;   for example str= {param1="param_val" sdhksjh}
  * function return param_val
  */
-QN_EXPORT QString getParamFromString(const QString& str, const QString& param);
+QString getParamFromString(const QString &str, const QString &param);
 
-QN_EXPORT QString strPadLeft(const QString &str, int len, char ch);
+QString strPadLeft(const QString &str, int len, char ch);
 
-QN_EXPORT QString closeDirPath(const QString& value);
+QString closeDirPath(const QString &value);
 
-QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
+qint64 getDiskFreeSpace(const QString &root);
 
-QN_EXPORT qint64 getDiskTotalSpace(const QString& root);
+qint64 getDiskTotalSpace(const QString &root);
 
 #define DATETIME_NOW INT64_MAX 
 
@@ -82,24 +77,28 @@ QN_EXPORT qint64 getDiskTotalSpace(const QString& root);
 #define MIN_FRAME_DURATION 16667ll
 #define MAX_AUDIO_FRAME_DURATION 150ll
 
-quint64 QN_EXPORT getUsecTimer();
+quint64 getUsecTimer();
 
 /*
-* Returns current time zone offset in seconds
-*/
+ * \returns                             Current time zone offset in seconds.
+ */
 int currentTimeZone(); // TODO: #Elric move to time.h
 
 
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 
 /**
- * @brief random                        Returns random integer number between min and max parameters.
- *                                      Thread-safe.
- *                                      Correctness of parameters is responsibility of the callee.
- * @return                              Random number in range [min, max).
+ * Returns random integer number between min and max parameters. Thread-safe.
+ * Correctness of parameters is responsibility of the callee.
+ * 
+ * \returns                             Random number in range [min, max).
  */
 int random(int min, int max);
 
+/**
+ * \returns                             Random floating point number in range [0.0, 1.0).
+ */
+qreal frandom();
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

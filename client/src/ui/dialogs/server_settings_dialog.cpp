@@ -27,10 +27,12 @@
 #include <client/client_model_types.h>
 #include <client/client_settings.h>
 
+#include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/noptix_style.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "storage_url_dialog.h"
 
@@ -61,9 +63,10 @@ namespace {
     }
 
     class ArchiveSpaceSlider: public QSlider {
+        Q_DECLARE_TR_FUNCTIONS(ArchiveSpaceSlider)
         typedef QSlider base_type;
     public:
-        ArchiveSpaceSlider(QWidget *parent = NULL): 
+        ArchiveSpaceSlider(QWidget *parent = NULL):
             base_type(parent),
             m_color(Qt::white)
         {
@@ -126,7 +129,7 @@ namespace {
 
         virtual void leaveEvent(QEvent *event) override {
             unsetCursor();
-            
+
             base_type::leaveEvent(event);
         }
 
@@ -139,7 +142,7 @@ namespace {
             if(!isEmpty()) {
                 int x = handlePos();
                 painter.fillRect(QRect(QPoint(0, 0), QPoint(x, rect.bottom())), m_color);
-                
+
                 painter.setPen(withAlpha(m_color.lighter(), 128));
                 painter.drawLine(QPoint(x, 0), QPoint(x, rect.bottom()));
             }
@@ -217,12 +220,13 @@ namespace {
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
     m_hasStorageChanges(false)
 {
     ui->setupUi(this);
-    
+
     ui->storagesTable->resizeColumnsToContents();
     ui->storagesTable->horizontalHeader()->setClickable(false);
     ui->storagesTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
@@ -234,8 +238,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 #else
     ui->storagesTable->setColumnCount(ColumnCount - 1);
 #endif
-
-    setButtonBox(ui->buttonBox);
 
     m_removeAction = new QAction(tr("Remove Storage"), this);
 
@@ -252,6 +254,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
+    connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
 
     updateFromResources();
 }
@@ -266,7 +269,7 @@ void QnServerSettingsDialog::accept() {
 
     bool valid = true;//m_hasStorageChanges ? validateStorages(tableStorages()) : true;
     if (valid) {
-        submitToResources(); 
+        submitToResources();
 
         base_type::accept();
     }
@@ -321,7 +324,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
 
 void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &items) {
     QString bottomLabelText = this->bottomLabelText();
-    
+
     ui->storagesTable->setRowCount(0);
     foreach(const QnStorageSpaceData &item, items)
         addTableItem(item);
@@ -455,7 +458,7 @@ int QnServerSettingsDialog::dataRowCount() const {
     int rowCount = ui->storagesTable->rowCount();
     if(rowCount == 0)
         return rowCount;
-    
+
     if(!m_tableBottomLabel)
         return rowCount;
 
@@ -483,9 +486,9 @@ void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
         return;
     item.isUsedForWriting = true;
     item.isExternal = true;
-    
+
     addTableItem(item);
-    
+
     m_hasStorageChanges = true;
 }
 
@@ -510,6 +513,10 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
         ui->storagesTable->removeRow(row);
         m_hasStorageChanges = true;
     }
+}
+
+void QnServerSettingsDialog::at_pingButton_clicked() {
+    menu()->trigger(Qn::PingAction, QnActionParameters(m_server));
 }
 
 void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceReply &reply, int) {

@@ -11,15 +11,37 @@
 #include <client/client_globals.h>
 
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 
-
 class CLVideoDecoderOutput;
 class ScreenshotInterface;
 class QnHistogramConsumer;
+class QnFisheyePtzController;
+
+class QnGlRendererShaders: public QObject {
+    Q_OBJECT;
+public:
+    QnGlRendererShaders(const QGLContext *context, QObject *parent = NULL);
+    virtual ~QnGlRendererShaders();
+
+    QnYv12ToRgbShaderProgram *yv12ToRgb;
+    QnYv12ToRgbWithGammaShaderProgram *yv12ToRgbWithGamma;
+    
+    QnFisheyeRectilinearProgram* fisheyePtzProgram;
+    QnFisheyeRectilinearProgram* fisheyePtzGammaProgram;
+
+    QnFisheyeEquirectangularHProgram* fisheyePanoHProgram;
+    QnFisheyeEquirectangularHProgram* fisheyePanoHGammaProgram;
+
+    QnFisheyeEquirectangularVProgram* fisheyePanoVProgram;
+    QnFisheyeEquirectangularVProgram* fisheyePanoVGammaProgram;
+
+    QnYv12ToRgbaShaderProgram *yv12ToRgba;
+    QnNv12ToRgbShaderProgram *nv12ToRgb;
+};
+
 
 class QnGLRenderer
 :
@@ -50,6 +72,8 @@ public:
     bool isNV12ToRgbShaderUsed() const;
 
     void setImageCorrectionParams(const ImageCorrectionParams& params) { m_imgCorrectParam = params; }
+    void setFisheyeController(QnFisheyePtzController* controller);
+    bool isFisheyeEnabled() const;
     ImageCorrectionParams getImageCorrectionParams() const { return m_imgCorrectParam; }
     
     void setPaused(bool value) { m_paused = value; }
@@ -57,7 +81,8 @@ public:
     void setScreenshotInterface(ScreenshotInterface* value);
     void setDisplayedRect(const QRectF& rect);
 
-    void setHystogramConsumer(QnHistogramConsumer* value);
+    void setHistogramConsumer(QnHistogramConsumer* value);
+    int panoFactor() const;
 private:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
     ImageCorrectionResult calcImageCorrection();
@@ -71,20 +96,19 @@ private:
     QnMetaDataV1Ptr m_lastDisplayedMetadata; // TODO: #Elric get rid of this
     unsigned m_lastDisplayedFlags;
     unsigned int m_prevFrameSequence;
-    QScopedPointer<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
-    QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
-    QScopedPointer<QnYv12ToRgbaShaderProgram> m_yv12ToRgbaShaderProgram;
-    QScopedPointer<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
+
+
+    QSharedPointer<QnGlRendererShaders> m_shaders;
     bool m_timeChangeEnabled;
     mutable QMutex m_mutex;
-    bool m_imageCorrectionEnabled;
     bool m_paused;
     ScreenshotInterface* m_screenshotInterface;
     ImageCorrectionResult m_imageCorrector;
     ImageCorrectionParams m_imgCorrectParam;
-    QRectF m_displayedRect;
     QnHistogramConsumer* m_histogramConsumer;
-
+    QnFisheyePtzController* m_fisheyeController;
+    QRectF m_displayedRect;
+    
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen
     void drawVideoTextureDirectly(
@@ -98,7 +122,8 @@ private:
     	unsigned int tex0ID,
     	unsigned int tex1ID,
     	unsigned int tex2ID,
-    	const float* v_array );
+    	const float* v_array,
+        bool isStillImage);
     //!Draws YUV420 with alpha channel
     void drawYVA12VideoTexture(
         const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,

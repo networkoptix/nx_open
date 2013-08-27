@@ -50,6 +50,7 @@ signals:
 protected:
     virtual void putData(QnAbstractDataPacketPtr data);
     void beforeDisconnectFromResource();
+
 protected:
     QList<QnAbstractDataReceptor*> m_dataprocessors;
     mutable QMutex m_mutex;

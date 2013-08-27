@@ -140,6 +140,11 @@ namespace nx_http
 
     namespace StatusCode
     {
+        StringType toString( int val )
+        {
+            return toString(Value(val));
+        }
+
         StringType toString( Value val )
         {
             switch( val )
@@ -158,6 +163,8 @@ namespace nx_http
                     return StringType("Bad Request");
                 case forbidden:
                     return StringType("Forbidden");
+                case unauthorized:
+                    return StringType("Unauthorized");
                 case notFound:
                     return StringType("Not Found");
                 case internalServerError:

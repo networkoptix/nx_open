@@ -4,6 +4,7 @@
 #include <QDir>
 
 #include "utils/common/util.h"
+#include <utils/fs/file.h>
 #include "plugins/resources/archive/filetypesupport.h"
 
 
@@ -495,8 +496,7 @@ QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(QnResourcePtr res)
 {
     QString url = res->getUrl();
     url = url.mid(url.lastIndexOf(L'?')+1);
-    QFileInfo fi(url);
-    QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(fi.baseName()), QIODevice::ReadOnly);
+    QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(QnFile::baseName(url)), QIODevice::ReadOnly);
     if (!chunkData)
         return QnTimePeriodList();
     QnTimePeriodList chunks;

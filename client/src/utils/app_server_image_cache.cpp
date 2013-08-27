@@ -25,7 +25,7 @@ QSize QnAppServerImageCache::getMaxImageSize() const {
     return QSize(value, value);
 }
 
-void QnAppServerImageCache::storeImage(const QString &filePath, bool cropImageToMonitorAspectRatio) {
+void QnAppServerImageCache::storeImage(const QString &filePath, const qreal targetAspectRatio) {
     QString uuid = QUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".png");
 
@@ -34,13 +34,12 @@ void QnAppServerImageCache::storeImage(const QString &filePath, bool cropImageTo
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(filePath);
     loader->setSize(getMaxImageSize());
-    loader->setCropToMonitorAspectRatio(cropImageToMonitorAspectRatio);
+    loader->setAspectRatio(targetAspectRatio);
     loader->setOutput(getFullPath(newFilename));
     connect(loader, SIGNAL(finished(QString)), this, SLOT(at_imageConverted(QString)));
     connect(loader, SIGNAL(finished(QString)), loader, SLOT(deleteLater()));
     loader->start();
 }
-
 
 void QnAppServerImageCache::at_imageConverted(const QString &filePath) {
     uploadFile(QFileInfo(filePath).fileName());

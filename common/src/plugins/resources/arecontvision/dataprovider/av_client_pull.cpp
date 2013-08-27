@@ -42,13 +42,19 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 {
     QMutexLocker mtx(&m_mutex);
 
+    QString resolution;
+    if (getRole() == QnResource::Role_LiveVideo)
+        resolution = QLatin1String("full");
+    else
+        resolution = QLatin1String("half");
+
     QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
-    QnStreamQuality q = getQuality();
+    Qn::StreamQuality q = getQuality();
     switch (q)
     {
-    case QnQualityHighest:
+    case Qn::QualityHighest:
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("resolution"), QLatin1String("full"), QnDomainPhysical);
+            avRes->setParamAsync(QLatin1String("resolution"), resolution, QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
@@ -58,9 +64,9 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
             m_streamParam.insert("Quality", 19);
         break;
 
-    case QnQualityHigh:
+    case Qn::QualityHigh:
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("resolution"), QLatin1String("full"), QnDomainPhysical);
+            avRes->setParamAsync(QLatin1String("resolution"), resolution, QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
@@ -70,9 +76,9 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
             m_streamParam.insert("Quality", 16);
         break;
 
-    case QnQualityNormal:
+    case Qn::QualityNormal:
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("resolution"), QLatin1String("full"), QnDomainPhysical);
+            avRes->setParamAsync(QLatin1String("resolution"), resolution, QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
@@ -82,22 +88,22 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
             m_streamParam.insert("Quality", 13);
         break;
 
-    case QnQualityLow:
+    case Qn::QualityLow:
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("resolution"), QLatin1String("half"), QnDomainPhysical);
+            avRes->setParamAsync(QLatin1String("resolution"), resolution, QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("half"));
 
         if (avRes->isPanoramic())
             avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("15"), QnDomainPhysical); // panoramic
         else
-            m_streamParam.insert("Quality", 15);
+            m_streamParam.insert("Quality", 10);
         break;
 
 
-    case QnQualityLowest:
+    case Qn::QualityLowest:
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("resolution"), QLatin1String("half"), QnDomainPhysical);
+            avRes->setParamAsync(QLatin1String("resolution"), resolution, QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("half"));
 

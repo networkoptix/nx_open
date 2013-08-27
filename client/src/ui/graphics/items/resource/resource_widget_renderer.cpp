@@ -46,7 +46,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
 
     Q_ASSERT( m_glContext != NULL );
 
-    for (int i = channelCount; i < m_channelRenderers.size(); ++i)
+    for (int i = channelCount; (uint)i < m_channelRenderers.size(); ++i)
     {
         delete m_channelRenderers[i].renderer;
         delete m_channelRenderers[i].uploader;
@@ -55,7 +55,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     m_channelRenderers.resize( channelCount );
     m_renderingEnabled.resize( channelCount, true );
 
-    for( int i = 0; i < channelCount; ++i )
+    for( int i = 0; (uint)i < channelCount; ++i )
     {
         if (m_channelRenderers[i].uploader == 0) {
             RenderingTools renderingTools;
@@ -70,7 +70,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     }
 }
 
-void QnResourceWidgetRenderer::destroyAsync() 
+void QnResourceWidgetRenderer::destroyAsync()
 {
     emit beforeDestroy();
     QnAbstractRenderer::destroyAsync();
@@ -112,7 +112,7 @@ void QnResourceWidgetRenderer::update() {
     //}
 }
 
-qint64 QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int channel) const { 
+qint64 QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int channel) const {
     const RenderingTools& ctx = m_channelRenderers[channel];
     //return ctx.renderer ? ctx.renderer->lastDisplayedTime() : AV_NOPTS_VALUE;
 
@@ -128,18 +128,18 @@ qint64 QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int channel) co
     return ts;
 }
 
-void QnResourceWidgetRenderer::blockTimeValue(int channelNumber, qint64  timestamp ) const 
+void QnResourceWidgetRenderer::blockTimeValue(int channelNumber, qint64  timestamp ) const
 {
     RenderingTools& ctx = m_channelRenderers[channelNumber];
-    //if (ctx.renderer) 
+    //if (ctx.renderer)
     //    ctx.renderer->blockTimeValue(timestamp);
 
     ctx.timestampBlocked = true;
     ctx.forcedTimestampValue = timestamp;
 }
 
-void QnResourceWidgetRenderer::unblockTimeValue(int channelNumber) const 
-{  
+void QnResourceWidgetRenderer::unblockTimeValue(int channelNumber) const
+{
     RenderingTools& ctx = m_channelRenderers[channelNumber];
     if( !ctx.timestampBlocked )
         return; //TODO/IMPL is nested blocking needed?
@@ -154,7 +154,7 @@ bool QnResourceWidgetRenderer::isTimeBlocked(int channelNumber) const
 }
 
 
-qint64 QnResourceWidgetRenderer::isLowQualityImage(int channel) const { 
+qint64 QnResourceWidgetRenderer::isLowQualityImage(int channel) const {
     const RenderingTools& ctx = m_channelRenderers[channel];
     return ctx.renderer ? ctx.renderer->isLowQualityImage() : 0;
 }
@@ -165,8 +165,8 @@ bool QnResourceWidgetRenderer::isHardwareDecoderUsed(int channel) const
     return ctx.renderer ? ctx.renderer->isHardwareDecoderUsed() : 0;
 }
 
-QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const 
-{ 
+QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
+{
     const RenderingTools& ctx = m_channelRenderers[channel];
     return ctx.renderer ? ctx.renderer->lastFrameMetadata() : QnMetaDataV1Ptr();
 }
@@ -197,14 +197,14 @@ void QnResourceWidgetRenderer::setDisplayedRect(int channel, const QRectF& rect)
 
 void QnResourceWidgetRenderer::setPaused(bool value)
 {
-    for (int i = 0; i < m_channelRenderers.size(); ++i)
+    for (uint i = 0; i < m_channelRenderers.size(); ++i)
         m_channelRenderers[i].renderer->setPaused(value);
 }
 
 void QnResourceWidgetRenderer::setScreenshotInterface(ScreenshotInterface* value)
 {
     m_screenshotInterface = value;
-    for (int i = 0; i < m_channelRenderers.size(); ++i)
+    for (uint i = 0; i < m_channelRenderers.size(); ++i)
         m_channelRenderers[i].renderer->setScreenshotInterface(value);
 }
 
@@ -234,7 +234,7 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
 
         if( !m_renderingEnabled[image->channel] )
             return;
-        
+
         RenderingTools& ctx = m_channelRenderers[image->channel];
         if( !ctx.uploader )
             return;
@@ -244,11 +244,11 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     }
 
     QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
-    if(m_sourceSize == sourceSize) 
+    if(m_sourceSize == sourceSize)
         return;
 
     m_sourceSize = sourceSize;
-    
+
     emit sourceSizeChanged();
 }
 
@@ -278,7 +278,7 @@ void QnResourceWidgetRenderer::finishPostedFramesRender(int channel)
 
 QSize QnResourceWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {
     QMutexLocker locker(&m_mutex);
-    
+
     return m_channelScreenSize;
 }
 
@@ -289,13 +289,21 @@ void QnResourceWidgetRenderer::setChannelScreenSize(const QSize &screenSize) {
 }
 
 bool QnResourceWidgetRenderer::constantDownscaleFactor() const {
-    return false;
+    return !m_channelRenderers.empty() && m_channelRenderers[0].renderer && m_channelRenderers[0].renderer->isFisheyeEnabled();
 }
 
 QSize QnResourceWidgetRenderer::sourceSize() const {
     QMutexLocker locker(&m_mutex);
 
     return m_sourceSize;
+
+    /*
+    int panoFactor = 1;
+    if (!m_channelRenderers.empty() && m_channelRenderers[0].renderer)
+        panoFactor = m_channelRenderers[0].renderer->panoFactor();
+
+    return QSize(m_sourceSize.width() * panoFactor, m_sourceSize.height());
+    */
 }
 
 const QGLContext* QnResourceWidgetRenderer::glContext() const
@@ -313,21 +321,31 @@ bool QnResourceWidgetRenderer::isDisplaying( const QSharedPointer<CLVideoDecoder
 
 void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& params)
 {
-    for (int i = 0; i < m_channelRenderers.size(); ++i){
+    for (uint i = 0; i < m_channelRenderers.size(); ++i){
         RenderingTools& ctx = m_channelRenderers[i];
         if( !ctx.uploader )
             continue;
-        ctx.uploader->setImageCorrection(params); 
+        ctx.uploader->setImageCorrection(params);
         ctx.renderer->setImageCorrectionParams(params);
+    }
+}
+
+void QnResourceWidgetRenderer::setFisheyeController(QnFisheyePtzController* controller)
+{
+    for (uint i = 0; i < m_channelRenderers.size(); ++i){
+        RenderingTools& ctx = m_channelRenderers[i];
+        if( !ctx.uploader )
+            continue;
+        ctx.renderer->setFisheyeController(controller);
     }
 }
 
 void QnResourceWidgetRenderer::setHystogramConsumer(QnHistogramConsumer* value)
 {
-    for (int i = 0; i < m_channelRenderers.size(); ++i)
+    for (uint i = 0; i < m_channelRenderers.size(); ++i)
     {
         RenderingTools& ctx = m_channelRenderers[i];
         if( ctx.renderer )
-            ctx.renderer->setHystogramConsumer(value);
+            ctx.renderer->setHistogramConsumer(value);
     }
 }

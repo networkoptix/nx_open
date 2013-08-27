@@ -2,6 +2,7 @@
 #include "device_file_catalog.h"
 #include "storage_manager.h"
 #include "utils/common/util.h"
+#include <utils/fs/file.h>
 #include "recorder/file_deletor.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "recording/stream_recorder.h"
@@ -76,7 +77,7 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     devTitleFile += QString("title.csv");
     m_file.setFileName(devTitleFile);
     QDir dir;
-    dir.mkpath(QFileInfo(devTitleFile).absolutePath());
+    dir.mkpath(QnFile::absolutePath(devTitleFile));
     if (!m_file.open(QFile::ReadWrite))
     {
         cl_log.log("Can't create title file ", devTitleFile, cl_logERROR);
@@ -288,7 +289,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(QnStorageResourcePtr s
     if (avi->open(res) && avi->findStreams() && avi->endTime() != (qint64)AV_NOPTS_VALUE) {
         qint64 startTimeMs = avi->startTime()/1000;
         qint64 endTimeMs = avi->endTime()/1000;
-        int fileIndex = QFileInfo(fileName).baseName().toInt();
+        int fileIndex = QnFile::baseName(fileName).toInt();
         chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, currentTimeZone()/60);
     }
     delete avi;
@@ -441,7 +442,7 @@ void DeviceFileCatalog::deserializeTitleFile()
     if (needRewriteCatalog)
         rewriteCatalog();
 
-    qWarning() << QString("Check archive for camera %1 for role %2 time: %3 ms").arg(m_macAddress).arg(m_role).arg(t.elapsed());
+    NX_LOG(QString("Check archive for camera %1 for role %2 time: %3 ms").arg(m_macAddress).arg(m_role).arg(t.elapsed()), cl_logINFO);
 }
 
 void DeviceFileCatalog::rewriteCatalog()
@@ -508,19 +509,19 @@ void DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
     str.flush();
 }
 
-qint64 DeviceFileCatalog::deleteRecordsBefore(int idx)
+qint64 DeviceFileCatalog::deleteRecordsBefore(int idx, QnStorageResourcePtr srcStorage)
 {
     int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
     qint64 rez = 0;
     for (int i = 0; i < count; ++i)
-        rez += deleteFirstRecord();
+        rez += deleteFirstRecord(true, srcStorage);
     return rez;
 }
 
 void DeviceFileCatalog::clear()
 {
     while(m_firstDeleteCount < m_chunks.size())
-        deleteFirstRecord();
+        deleteFirstRecord(false, QnStorageResourcePtr());
 }
 
 void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
@@ -551,7 +552,7 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 }
 
 
-qint64 DeviceFileCatalog::deleteFirstRecord()
+qint64 DeviceFileCatalog::deleteFirstRecord(bool calcFileSize, QnStorageResourcePtr srcStorage)
 {
 	QnStorageResourcePtr storage;
 	QString delFileName;
@@ -568,7 +569,8 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
 		{
 			storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
 			delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
-            deletedSize = m_chunks[m_firstDeleteCount].getFileSize();
+            if (calcFileSize && storage && srcStorage && srcStorage->getId() == storage->getId())
+                deletedSize = m_chunks[m_firstDeleteCount].getFileSize();
 
 			QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
 
@@ -597,7 +599,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
     if (storage) {
 	    if (!delFileName.isEmpty())
 	    {
-            if (deletedSize == 0)
+            if (deletedSize == 0 && calcFileSize && srcStorage && srcStorage->getId() == storage->getId())
                 deletedSize = storage->getFileSize(delFileName); // obtain file size from a disk
 		    //storage->addWritedSpace(-deletedSize);
 		    storage->removeFile(delFileName);
@@ -606,7 +608,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
 		    storage->removeDir(motionDirName);
     }
 
-    return deletedSize;
+    return calcFileSize ? deletedSize : 0;
 }
 
 int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) const

@@ -12,6 +12,8 @@
 #include <QFileInfo>
 #include <QHostInfo>
 
+#include "version.h"
+
 
 bool removeDir(const QString &dirName)
 {
@@ -37,14 +39,14 @@ bool removeDir(const QString &dirName)
     return result;
 }
 
-QString fromNativePath(QString path)
+QString fromNativePath(const QString &path)
 {
-    path = QDir::cleanPath(QDir::fromNativeSeparators(path));
+    QString result = QDir::cleanPath(QDir::fromNativeSeparators(path));
 
-    if (!path.isEmpty() && path.endsWith(QLatin1Char('/')))
-        path.chop(1);
+    if (!result.isEmpty() && result.endsWith(QLatin1Char('/')))
+        result.chop(1);
 
-    return path;
+    return result;
 }
 
 QString getMoviesDirectory()
@@ -52,40 +54,17 @@ QString getMoviesDirectory()
     return QDesktopServices::storageLocation(QDesktopServices::MoviesLocation);
 }
 
-QString formatDuration(unsigned position, unsigned total)
-{
-    unsigned hours = position / 3600;
-    unsigned minutes = (position % 3600) / 60;
-    unsigned seconds = position % 60;
+QString getBackgroundsDirectory() {
+    QString baseDir = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
+#ifdef Q_OS_WIN
+    QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(lit(QN_PRODUCT_NAME_LONG)));
+#else
+    QString productDir = QDir::toNativeSeparators(QString(lit("/opt/%1/client/share/pictures/sample-backgrounds")).arg(lit(VER_LINUX_ORGANIZATION_NAME)));
+#endif
 
-    if (total == 0)
-    {
-        if (hours == 0)
-            return QString(QLatin1String("%1:%2")).arg(minutes, 2, 10, QLatin1Char('0')).arg(seconds, 2, 10, QLatin1Char('0'));
-
-        return QString(QLatin1String("%1:%2:%3")).arg(hours).arg(minutes, 2, 10, QLatin1Char('0')).arg(seconds, 2, 10, QLatin1Char('0'));
-    }
-    else
-    {
-        unsigned totalHours = total / 3600;
-        unsigned totalMinutes = (total % 3600) / 60;
-        unsigned totalSeconds = total % 60;
-
-        QString secondsString, totalString;
-
-        if (totalHours == 0)
-        {
-            secondsString = QString(QLatin1String("%1:%2")).arg(minutes, 2, 10, QLatin1Char('0')).arg(seconds, 2, 10, QLatin1Char('0'));
-            totalString = QString(QLatin1String("%1:%2")).arg(totalMinutes, 2, 10, QLatin1Char('0')).arg(totalSeconds, 2, 10, QLatin1Char('0'));
-        }
-        else
-        {
-            secondsString = QString(QLatin1String("%1:%2:%3")).arg(hours).arg(minutes, 2, 10, QLatin1Char('0')).arg(seconds, 2, 10, QLatin1Char('0'));
-            totalString = QString(QLatin1String("%1:%2:%3")).arg(totalHours).arg(totalMinutes, 2, 10, QLatin1Char('0')).arg(totalSeconds, 2, 10, QLatin1Char('0'));
-        }
-
-        return secondsString + QLatin1Char('/') + totalString;
-    }
+    return QDir(productDir).exists()
+            ? productDir
+            : baseDir;
 }
 
 int digitsInNumber(unsigned num)
@@ -248,3 +227,9 @@ int currentTimeZone()
 int random(int min, int max) {
     return min + static_cast<int>(static_cast<qint64>(max - min) * qrand() / (static_cast<qint64>(RAND_MAX) + 1));
 }
+
+qreal frandom() {
+    return qrand() / (RAND_MAX + 1.0);
+}
+
+

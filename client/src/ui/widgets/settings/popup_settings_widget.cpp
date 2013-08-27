@@ -7,6 +7,7 @@
 #include <core/resource/user_resource.h>
 
 #include <business/events/abstract_business_event.h>
+#include <business/business_strings_helper.h>
 
 #include <health/system_health.h>
 
@@ -27,14 +28,14 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QnWorkbenchContext *context, QWidge
 
     for (int i = 0; i < BusinessEventType::Count; i++) {
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(BusinessEventType::toString(BusinessEventType::Value(i)));
+        checkbox->setText(QnBusinessStringsHelper::eventName(BusinessEventType::Value(i)));
         ui->businessEventsLayout->addWidget(checkbox);
         m_businessRulesCheckBoxes << checkbox;
     }
 
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(QnSystemHealth::messageName(QnSystemHealth::MessageType(i)));
+        checkbox->setText(QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType(i)));
         ui->systemHealthLayout->addWidget(checkbox);
         m_systemHealthCheckBoxes << checkbox;
     }

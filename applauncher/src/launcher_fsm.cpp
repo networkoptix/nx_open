@@ -5,6 +5,7 @@
 #include "launcher_fsm.h"
 
 #include <QFinalState>
+#include <QLocalSocket>
 
 #include <api/ipc_pipe_names.h>
 #include <utils/common/log.h>
@@ -23,7 +24,7 @@ LauncherFSM::LauncherFSM( bool quitMode )
     m_taskServer( &m_taskQueue ),
     m_settings( QN_ORGANIZATION_NAME, QN_APPLICATION_NAME ),
     m_bindTriesCount( 0 ),
-    m_previousAddTaskToPipeOperationResult( QLocalSocket::UnknownSocketError ),
+    m_isLocalServerWasNotFound( false ),
     m_taskQueueWatcher( &m_taskQueue )
 {
     initFSM();
@@ -42,9 +43,7 @@ int LauncherFSM::bindTriesCount() const
 
 bool LauncherFSM::isLocalServerWasNotFound() const
 {
-    return m_previousAddTaskToPipeOperationResult == QLocalSocket::ServerNotFoundError
-        || m_previousAddTaskToPipeOperationResult == QLocalSocket::ConnectionRefusedError
-        || m_previousAddTaskToPipeOperationResult == QLocalSocket::PeerClosedError;
+    return m_isLocalServerWasNotFound;
 }
 
 bool LauncherFSM::quitMode() const
@@ -156,6 +155,8 @@ void LauncherFSM::onBindingToLocalAddressEntered()
         emit bindFailed();
 }
 
+static const QLatin1String PREVIOUS_LAUNCHED_VERSION_PARAM_NAME( "previousLaunchedVersion" );
+
 void LauncherFSM::onAddingTaskToNamedPipeEntered()
 {
     NX_LOG( QString::fromLatin1("Entered AddingTaskToNamedPipe"), cl_logDEBUG1 );
@@ -171,6 +172,7 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
             emit failedToAddTaskToThePipe();
             return;
         }
+
         serializedTask = applauncher::api::StartApplicationTask(versionToLaunch, appArgs).serialize();
     }
     else
@@ -178,29 +180,10 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
         serializedTask = applauncher::api::QuitTask().serialize();
     }
 
-    //posting to the pipe 
-    QLocalSocket sock;
-    sock.connectToServer( launcherPipeName );
-    if( !sock.waitForConnected( -1 ) )
-    {
-        m_previousAddTaskToPipeOperationResult = sock.error();
-        NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
+    if( addTaskToThePipe( serializedTask ) )
+        emit taskAddedToThePipe();
+    else
         emit failedToAddTaskToThePipe();
-        return;
-    }
-
-    if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
-    {
-        m_previousAddTaskToPipeOperationResult = sock.error();
-        NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
-        emit failedToAddTaskToThePipe();
-        return;
-    }
-
-    sock.waitForReadyRead(-1);
-    sock.readAll();
-
-    emit taskAddedToThePipe();
 }
 
 bool LauncherFSM::addTaskToTheQueue()
@@ -208,16 +191,16 @@ bool LauncherFSM::addTaskToTheQueue()
     QString versionToLaunch;
     QString appArgs;
     if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
-        return false;   //TODO/IMPL
+        return false;   //TODO/IMPL no single version installed
     m_taskQueue.push( QSharedPointer<applauncher::api::BaseTask>( new applauncher::api::StartApplicationTask(versionToLaunch, appArgs) ) );
     return true;
 }
 
 bool LauncherFSM::getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs )
 {
-    if( m_settings.contains( "previousLaunchedVersion" ) )
+    if( m_settings.contains( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ) )
     {
-        *versionToLaunch = m_settings.value( "previousLaunchedVersion" ).toString();
+        *versionToLaunch = m_settings.value( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ).toString();
         *appArgs = m_settings.value( "previousUsedCmdParams" ).toString();
     }
     else if( m_installationManager.count() > 0 )
@@ -232,4 +215,62 @@ bool LauncherFSM::getVersionToLaunch( QString* const versionToLaunch, QString* c
     }
 
     return true;
+}
+
+static const int MAX_MSG_LEN = 1024;
+
+bool LauncherFSM::addTaskToThePipe( const QByteArray& serializedTask )
+{
+    //posting to the pipe 
+#ifdef _WIN32
+    NamedPipeSocket sock;
+    SystemError::ErrorCode result = sock.connectToServerSync( launcherPipeName );
+    if( result != SystemError::noError )
+    {
+        m_isLocalServerWasNotFound = result == SystemError::fileNotFound;
+        NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(result)), cl_logDEBUG1 );
+        return false;
+    }
+
+    unsigned int bytesWritten = 0;
+    result = sock.write( serializedTask.constData(), serializedTask.size(), &bytesWritten );
+    if( (result != SystemError::noError) || (bytesWritten != serializedTask.size()) )
+    {
+        m_isLocalServerWasNotFound = result == SystemError::fileNotFound;
+        NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(result)), cl_logDEBUG1 );
+        return false;
+    }
+
+    char buf[MAX_MSG_LEN];
+    unsigned int bytesRead = 0;
+    sock.read( buf, sizeof(buf), &bytesRead );  //ignoring return code
+
+    return true;
+#else
+    QLocalSocket sock;
+    sock.connectToServer( launcherPipeName );
+    if( !sock.waitForConnected( -1 ) )
+    {
+        m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
+                                     sock.error() == QLocalSocket::ConnectionRefusedError ||
+                                     sock.error() == QLocalSocket::PeerClosedError;
+        const QString& errStr = sock.errorString();
+        NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
+        return false;
+    }
+
+    if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
+    {
+        m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
+                                     sock.error() == QLocalSocket::ConnectionRefusedError ||
+                                     sock.error() == QLocalSocket::PeerClosedError;
+        NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
+        return false;
+    }
+
+    sock.waitForReadyRead(-1);
+    sock.readAll();
+
+    return true;
+#endif
 }

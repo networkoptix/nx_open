@@ -24,6 +24,12 @@ unsigned int QnAbstractArchiveReader::getCurrentAudioChannel() const
     return 0;
 }
 
+CameraDiagnostics::Result QnAbstractArchiveReader::diagnoseMediaStreamConnection()
+{
+    //TODO/IMPL
+    return CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown );
+}
+
 QStringList QnAbstractArchiveReader::getAudioTracksInfo() const
 {
     return QStringList();
@@ -52,11 +58,6 @@ void QnAbstractArchiveReader::setCycleMode(bool value)
 bool QnAbstractArchiveReader::open()
 {
     return m_delegate && m_delegate->open(m_resource);
-}
-
-bool QnAbstractArchiveReader::isRealTimeSource() const
-{
-    return m_delegate && m_delegate->isRealTimeSource();
 }
 
 void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 usec)

@@ -196,11 +196,11 @@ QnCameraHistoryPool::~QnCameraHistoryPool() {
     return;
 }
 
-Q_GLOBAL_STATIC(QnCameraHistoryPool, inst);
+Q_GLOBAL_STATIC(QnCameraHistoryPool, QnCameraHistoryPool_instance);
 
 QnCameraHistoryPool* QnCameraHistoryPool::instance()
 {
-    return inst();
+    return QnCameraHistoryPool_instance();
 }
 
 QnCameraHistoryPtr QnCameraHistoryPool::getCameraHistory(const QString& physicalId)

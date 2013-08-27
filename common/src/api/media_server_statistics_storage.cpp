@@ -36,12 +36,12 @@ QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServ
     m_timer->start(m_updatePeriod);
 }
 
-void QnMediaServerStatisticsStorage::registerServerWidget(QObject *target, const char *slot) {
+void QnMediaServerStatisticsStorage::registerConsumer(QObject *target, const char *slot) {
     connect(this, SIGNAL(statisticsChanged()), target, slot);
     m_listeners++;
 }
 
-void QnMediaServerStatisticsStorage::unregisterServerWidget(QObject *target) {
+void QnMediaServerStatisticsStorage::unregisterConsumer(QObject *target) {
     disconnect(this, 0, target, 0);
     m_listeners--;
 }
@@ -60,6 +60,10 @@ int QnMediaServerStatisticsStorage::updatePeriod() const {
     return m_updatePeriod;
 }
 
+void QnMediaServerStatisticsStorage::setFlagsFilter(QnStatisticsDeviceType deviceType, int flags) {
+    m_flagsFilter[deviceType] = flags;
+}
+
 void QnMediaServerStatisticsStorage::update() {
     if (!m_listeners || m_alreadyUpdating) {
         m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
@@ -74,7 +78,7 @@ void QnMediaServerStatisticsStorage::update() {
 
     emit statisticsChanged();
 
-    if (m_alreadyUpdating)
+    if (!m_listeners || m_alreadyUpdating)
         return;
 
     m_apiConnection->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
@@ -103,6 +107,10 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
         notUpdated << key;
 
     foreach(const QnStatisticsDataItem &nextData, reply.statistics) {
+        if (m_flagsFilter.contains(nextData.deviceType) &&
+            ((m_flagsFilter[nextData.deviceType] & nextData.deviceFlags) != m_flagsFilter[nextData.deviceType]))
+            continue;
+
         QString id = nextData.description;
         notUpdated.remove(id);
 

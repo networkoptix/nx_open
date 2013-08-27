@@ -3,13 +3,16 @@
 
 #include <QMutexLocker>
 
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include <business/business_event_connector.h>
 
 
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
     m_motionType(Qn::MT_Default),
-    m_recActionCnt(0)
+    m_recActionCnt(0),
+    m_secondaryQuality(Qn::SSQualityMedium),
+    m_cameraControlDisabled(false),
+    m_statusFlags(0)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionMaskList << QnMotionRegion();
@@ -17,13 +20,42 @@ QnSecurityCamResource::QnSecurityCamResource():
     addFlags(live_cam);
 
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
+
+    QnMediaResource::initMediaResource();
+
+    // TODO: #AK this is a wrong place for this connect call.
+    // You should listen to changes in resource pool instead.
+    if(QnBusinessEventConnector::instance()) {
+        connect(
+            this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
+            QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
+    }
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const
 {
     return hasParam(lit("groupplay"));
+}
 
-};
+const QnResource* QnSecurityCamResource::toResource() const
+{
+    return this;
+}
+
+QnResource* QnSecurityCamResource::toResource()
+{
+    return this;
+}
+
+const QnResourcePtr QnSecurityCamResource::toResourcePtr() const
+{
+    return toSharedPointer();
+}
+
+QnResourcePtr QnSecurityCamResource::toResourcePtr()
+{
+    return toSharedPointer();
+}
 
 QnSecurityCamResource::~QnSecurityCamResource()
 {
@@ -31,7 +63,8 @@ QnSecurityCamResource::~QnSecurityCamResource()
 
 void QnSecurityCamResource::updateInner(QnResourcePtr other)
 {
-    base_type::updateInner(other);
+    QnNetworkResource::updateInner(other);
+    QnMediaResource::updateInner(other);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
@@ -47,6 +80,9 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
         m_scheduleTasks = other_casted->m_scheduleTasks;
         m_groupId = other_casted->m_groupId;
         m_groupName = other_casted->m_groupName;
+        m_secondaryQuality = other_casted->m_secondaryQuality;
+        m_cameraControlDisabled = other_casted->m_cameraControlDisabled;
+        m_statusFlags = other_casted->m_statusFlags;
     }
 }
 
@@ -118,25 +154,13 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
         result->setRole(role);
-        /*
-        if (QnLiveStreamProvider* lsp = dynamic_cast<QnLiveStreamProvider*>(result))
-        {
-                lsp->setRole(role);
-        }
-        */
         return result;
 
     }
     else if (role == QnResource::Role_Archive) {
-        
-        QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
-        if (archiveDelegate) {
-            QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
-            archiveReader->setArchiveDelegate(archiveDelegate);
-            if (hasFlags(still_image) || hasFlags(utc))
-                archiveReader->setCycleMode(false);
-            return archiveReader;
-        }
+        QnAbstractStreamDataProvider* result = createArchiveDataProvider();
+        if (result)
+            return result;
     }
 
     if (m_dpFactory)
@@ -146,8 +170,6 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
 void QnSecurityCamResource::initializationDone()
 {
-    QMutexLocker lk( &m_mutex );
-
     if( m_inputPortListenerCount > 0 )
         startInputPortMonitoring();
 }
@@ -332,7 +354,7 @@ bool QnSecurityCamResource::setRelayOutputState(
 
 void QnSecurityCamResource::inputPortListenerAttached()
 {
-    QMutexLocker lk( &m_mutex );
+    QMutexLocker lk( &m_initMutex );
 
     //if camera is not initialized yet, delayed input monitoring will start on initialization completion
     if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
@@ -341,7 +363,7 @@ void QnSecurityCamResource::inputPortListenerAttached()
 
 void QnSecurityCamResource::inputPortListenerDetached()
 {
-    QMutexLocker lk( &m_mutex );
+    QMutexLocker lk( &m_initMutex );
  
     if( m_inputPortListenerCount <= 0 )
         return;
@@ -486,7 +508,7 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 {
     QVariant mediaVariant;
     const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: #Elric const_cast? get rid of it!
-    return Qn::undeprecate(static_cast<Qn::CameraCapabilities>(mediaVariant.toInt()));
+    return static_cast<Qn::CameraCapabilities>(mediaVariant.toInt());
 }
 
 bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const
@@ -503,8 +525,8 @@ void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability,
 }
 
 bool QnSecurityCamResource::setParam(const QString &name, const QVariant &val, QnDomain domain) {
-    bool result = base_type::setParam(name, val, domain);
-    if(result && name == lit("cameraCapabilities"))
+    bool result = QnResource::setParam(name, val, domain);
+    if(result && (name == lit("cameraCapabilities")))
         emit cameraCapabilitiesChanged(::toSharedPointer(this)); // TODO: #Elric we don't check whether they have actually changed. This better be fixed.
     return result;
 }
@@ -546,4 +568,80 @@ void QnSecurityCamResource::setGroupId(const QString& value)
 {
     QMutexLocker lk( &m_mutex );
     m_groupId = value;
+}
+
+void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality  quality)
+{
+    m_secondaryQuality = quality;
+}
+
+Qn::SecondStreamQuality QnSecurityCamResource::secondaryStreamQuality() const
+{
+    return m_secondaryQuality;
+}
+
+void QnSecurityCamResource::setCameraControlDisabled(bool value)
+{
+    m_cameraControlDisabled = value;
+}
+
+bool QnSecurityCamResource::isCameraControlDisabled() const
+{
+    return m_cameraControlDisabled;
+}
+
+int QnSecurityCamResource::desiredSecondStreamFps() const
+{
+    switch (secondaryStreamQuality())
+    {
+    case Qn::SSQualityMedium:
+        return 7;
+    case Qn::SSQualityLow: 
+        return 2;
+    case Qn::SSQualityHigh:
+        return 12;
+    default:
+        break;
+    }
+
+    return 7;
+}
+
+Qn::StreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const
+{
+    if (secondaryStreamQuality() != Qn::SSQualityHigh)
+        return Qn::QualityLowest;
+    else
+        return Qn::QualityNormal;
+}
+
+QnSecurityCamResource::StatusFlags QnSecurityCamResource::statusFlags() const
+{
+    return m_statusFlags;
+}
+
+bool QnSecurityCamResource::hasStatusFlags(StatusFlags value) const
+{
+    return m_statusFlags & value;
+}
+
+void QnSecurityCamResource::setStatusFlags(StatusFlags value)
+{
+    m_statusFlags = value;
+}
+
+void QnSecurityCamResource::addStatusFlags(StatusFlags value)
+{
+    m_statusFlags |= value;
+}
+
+void QnSecurityCamResource::removeStatusFlags(StatusFlags value)
+{
+    m_statusFlags &= ~value;
+}
+
+
+bool QnSecurityCamResource::needCheckIpConflicts() const
+{
+    return getChannel() == 0 && !hasCameraCapabilities(Qn::shareIpCapability);
 }

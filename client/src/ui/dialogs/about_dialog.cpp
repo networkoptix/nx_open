@@ -12,13 +12,15 @@
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentFragment>
 
-#include <ui/graphics/opengl/gl_functions.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-
 #include "api/app_server_connection.h"
 #include "core/resource/resource_type.h"
 #include "core/resource_managment/resource_pool.h"
+
+#include <ui/actions/action_manager.h>
+#include <ui/graphics/opengl/gl_functions.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "openal/qtvaudiodevice.h"
 #include "version.h"
@@ -33,12 +35,20 @@ namespace {
 } // anonymous namespace
 
 QnAboutDialog::QnAboutDialog(QWidget *parent): 
-    QDialog(parent, Qt::MSWindowsFixedSizeDialogHint),
+    base_type(parent, Qt::MSWindowsFixedSizeDialogHint),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::AboutDialog())
 {
     ui->setupUi(this);
 
     setHelpTopic(this, Qn::About_Help);
+
+    if(menu()->canTrigger(Qn::ShowcaseAction)) {
+        QPushButton* showcaseButton = new QPushButton(this);
+        showcaseButton->setText(action(Qn::ShowcaseAction)->text());
+        connect(showcaseButton, SIGNAL(clicked()), action(Qn::ShowcaseAction), SLOT(trigger()));
+        ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
+    }
 
     m_copyButton = new QPushButton(this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
@@ -67,31 +77,29 @@ void QnAboutDialog::retranslateUi()
 
     m_copyButton->setText(tr("Copy to Clipboard"));
 
-    setWindowTitle(tr("About %1").arg(QString::fromLatin1(QN_APPLICATION_NAME)));
+    setWindowTitle(tr("About"));
 
     QString version = 
         tr(
             "<b>%1</b> version %2 (%3).<br/>\n"
-            "Engine version %4.<br/>\n"
             "Built for %5-%6 with %7.<br/>\n"
         ).
         arg(QLatin1String(QN_APPLICATION_NAME)).
         arg(QLatin1String(QN_APPLICATION_VERSION)).
         arg(QLatin1String(QN_APPLICATION_REVISION)).
-        arg(QLatin1String(QN_ENGINE_VERSION)).
         arg(QLatin1String(QN_APPLICATION_PLATFORM)).
         arg(QLatin1String(QN_APPLICATION_ARCH)).
         arg(QLatin1String(QN_APPLICATION_COMPILER));
 
-    QString ecsVersion = QnAppServerConnectionFactory::currentVersion();
+    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
     QUrl ecsUrl = QnAppServerConnectionFactory::defaultUrl();
     QString servers;
 
-    if (ecsVersion.isEmpty()) {
+    if (ecsVersion.isNull()) {
         servers = tr("<b>Enterprise controller</b> not connected.<br>\n");
     } else {
         servers = tr("<b>Enterprise controller</b> version %1 at %2:%3.<br>\n").
-            arg(ecsVersion).
+            arg(ecsVersion.toString()).
             arg(ecsUrl.host()).
             arg(ecsUrl.port());
     }
@@ -101,10 +109,10 @@ void QnAboutDialog::retranslateUi()
         if (server->getStatus() != QnResource::Online)
             continue;
 
-        serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion()).arg(QUrl(server->getUrl()).host()));
+        serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
     }
     
-    if (!ecsVersion.isEmpty() && !serverVersions.isEmpty())
+    if (!ecsVersion.isNull() && !serverVersions.isEmpty())
         servers += serverVersions.join(QLatin1String("<br>\n"));
 
     QString credits = 

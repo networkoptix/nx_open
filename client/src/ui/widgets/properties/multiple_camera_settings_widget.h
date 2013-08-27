@@ -32,6 +32,7 @@ public:
 
     void updateFromResources();
     void submitToResources();
+    void reject();
 
     bool hasDbChanges() const {
         return m_hasDbChanges;

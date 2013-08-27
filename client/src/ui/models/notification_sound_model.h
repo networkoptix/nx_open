@@ -15,7 +15,7 @@ public:
     };
 
     explicit QnNotificationSoundModel(QObject *parent = 0);
-    
+
     int rowByFilename(const QString &filename) const;
     QString filenameByRow(int row) const;
 
@@ -23,7 +23,10 @@ public:
 
     void init();
     void loadList(const QStringList &filenames);
+
+    void addDownloading(const QString &filename, bool silent = false);
     void addUploading(const QString &filename);
+
     void updateTitle(const QString &filename, const QString &title);
 
     bool loaded() const;

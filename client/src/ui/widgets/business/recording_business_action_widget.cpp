@@ -13,8 +13,8 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
 {
     ui->setupUi(this);
 
-    for (int i = QnQualityLowest; i <= QnQualityHighest; i++) {
-        ui->qualityComboBox->addItem(QnStreamQualityToString((QnStreamQuality)i), i);
+    for (int i = Qn::QualityLowest; i <= Qn::QualityHighest; i++) {
+        ui->qualityComboBox->addItem(Qn::toDisplayString((Qn::StreamQuality)i), i);
     }
 
     ui->beforeLabel->setVisible(false);
@@ -32,6 +32,13 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
 
 QnRecordingBusinessActionWidget::~QnRecordingBusinessActionWidget()
 {
+}
+
+void QnRecordingBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
+    setTabOrder(before,                 ui->qualityComboBox);
+    setTabOrder(ui->qualityComboBox,    ui->fpsSpinBox);
+    setTabOrder(ui->fpsSpinBox,         ui->afterSpinBox);
+    setTabOrder(ui->afterSpinBox,       after);
 }
 
 void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
@@ -77,6 +84,6 @@ void QnRecordingBusinessActionWidget::paramsChanged() {
 
     params.setFps(ui->fpsSpinBox->value());
     params.setRecordAfter(ui->afterSpinBox->value());
-    params.setStreamQuality((QnStreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
+    params.setStreamQuality((Qn::StreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
     model()->setActionParams(params);
 }

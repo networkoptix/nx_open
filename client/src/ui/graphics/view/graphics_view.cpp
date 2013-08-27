@@ -84,6 +84,9 @@ void QnGraphicsView::showEvent(QShowEvent *event) {
 }
 
 void QnGraphicsView::paintEvent(QPaintEvent *event) {
+    if(!(m_paintFlags & PaintOnExternalSurfaces) && QPainter::redirected(viewport(), NULL) != viewport())
+        return;
+
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
     qint64 frequency = QnPerformance::currentCpuFrequency();
     qint64 startTime = QDateTime::currentMSecsSinceEpoch();

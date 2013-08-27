@@ -22,6 +22,8 @@
 
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
@@ -175,6 +177,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     rotateButton->setToolTip(tr("Rotate"));
+    setHelpTopic(rotateButton, Qn::MainWindow_MediaItem_Rotate_Help);
     connect(rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
     connect(rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
 
@@ -267,6 +270,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Run handlers. */
     updateTitleText();
     updateButtonsVisibility();
+    updateCursor();
 }
 
 QnResourceWidget::~QnResourceWidget() {
@@ -425,6 +429,17 @@ void QnResourceWidget::updateInfoText() {
     setInfoTextInternal(m_infoTextFormatHasPlaceholder ? m_infoTextFormat.arg(calculateInfoText()) : m_infoTextFormat);
 }
 
+QCursor QnResourceWidget::calculateCursor() const {
+    return Qt::ArrowCursor;
+}
+
+void QnResourceWidget::updateCursor() {
+    QCursor newCursor = calculateCursor();
+    QCursor oldCursor = this->cursor();
+    if(newCursor.shape() != oldCursor.shape() || newCursor.shape() == Qt::BitmapCursor)
+        setCursor(newCursor);
+}
+
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
         return constraint;
@@ -445,7 +460,7 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    QRectF rect = zoomRect().isNull() ? this->rect() : unsubRect(this->rect(), zoomRect());
+    QRectF rect = (m_options & VirtualZoomWindow) || zoomRect().isNull() ? this->rect() : unsubRect(this->rect(), zoomRect());
 
     if (m_channelsLayout->channelCount() == 1)
         return rect;
@@ -536,6 +551,13 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
         result &= ~Qn::SideSections;
 
     return result;
+}
+
+QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const {
+    if(section == Qn::NoSection)
+        return calculateCursor();
+
+    return base_type::windowCursorAt(section);
 }
 
 int QnResourceWidget::helpTopicAt(const QPointF &) const {
@@ -875,7 +897,7 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
          * its frame, cursor must be unset manually. */
         Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
         if(section == Qt::NoSection)
-            unsetCursor();
+            updateCursor();
     }
 
     return result;
@@ -940,7 +962,8 @@ QColor QnResourceWidget::activeFrameColor() const {
 }
 
 QColor QnResourceWidget::selectedFrameColor() const {
-    qreal a = 0.7; //magic const --gdm
-    return linearCombine(1.0 - a, m_frameColor, a, qnGlobals->selectedFrameColor());
+    //qreal a = 0.7;
+    //return linearCombine(1.0 - a, m_frameColor, a, qnGlobals->selectedFrameColor());
+    return qnGlobals->selectedFrameColor();
 }
 

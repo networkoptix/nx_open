@@ -325,6 +325,8 @@ public:
     }
 
     void paintChunk(qint64 length, Qn::TimePeriodContent content) {
+        assert(length >= 0);
+
         if(m_pendingLength > 0 && m_pendingLength + length > m_minChunkLength) {
             qint64 delta = m_minChunkLength - m_pendingLength;
             length -= delta;
@@ -496,6 +498,8 @@ QnTimeSlider::~QnTimeSlider() {
 }
 
 QVector<QnTimeStep> QnTimeSlider::createAbsoluteSteps() {
+    bool ampm = QLocale().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
+
     QVector<QnTimeStep> result;
     result <<
         QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                10,     1000,   tr("ms"),       QString(),          false) <<
@@ -506,11 +510,11 @@ QVector<QnTimeStep> QnTimeSlider::createAbsoluteSteps() {
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             5,      60,     tr("s"),        QString(),          false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             10,     60,     tr("s"),        QString(),          false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             30,     60,     tr("s"),        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        1,      60,     tr("m"),        lit("dd MMMM yyyy hh:mm ap"), false) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        1,      60,     tr("m"),        ampm ? lit("dd MMMM yyyy hh:mm ap") : lit("dd MMMM yyyy hh:mm"), false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        5,      60,     tr("m"),        QString(),          false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        10,     60,     tr("m"),        QString(),          false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        30,     60,     tr("m"),        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   1,      24,     tr("h"),        lit("dd MMMM yyyy h ap"), false) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   1,      24,     tr("h"),        ampm ? lit("dd MMMM yyyy h ap") : lit("dd MMMM yyyy hh:mm"), false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   3,      24,     tr("h"),        QString(),          false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   12,     24,     tr("h"),        QString(),          false) <<
         QnTimeStep(QnTimeStep::Days,            1000ll * 60 * 60 * 24,              1,      31,     lit("dd MMM"),  lit("dd MMMM yyyy"), false) <<
@@ -1569,7 +1573,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
     for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
-         pos[i] = periods[i].findNearestPeriod(minimumValue, false);
+         pos[i] = periods[i].findNearestPeriod(minimumValue, true);
          end[i] = periods[i].findNearestPeriod(maximumValue, true);
          if(end[i] != periods[i].end() && end[i]->contains(maximumValue))
              end[i]++;
@@ -1590,12 +1594,12 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
                 continue;
             
             if(!inside[i]) {
-                nextValue[i] = pos[i]->startTimeMs;
+                nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs);
                 continue;
             }
             
             if(pos[i]->durationMs != -1)
-                nextValue[i] = pos[i]->startTimeMs + pos[i]->durationMs;
+                nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 
         qint64 bestValue = qMin(nextValue[0], nextValue[1]);

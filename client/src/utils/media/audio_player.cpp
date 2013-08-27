@@ -104,7 +104,7 @@ bool AudioPlayer::playFileAsync( const QString& filePath, QObject* target, const
     return true;
 }
 
-bool AudioPlayer::sayTextAsync( const QString& text )
+bool AudioPlayer::sayTextAsync( const QString& text, QObject* target, const char *slot)
 {
 #if (GCC_VERSION >= 40700)
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
@@ -114,6 +114,8 @@ bool AudioPlayer::sayTextAsync( const QString& text )
     if( !audioPlayer->prepareTextPlayback( text ) )
         return false;
 
+    if (target)
+        connect( audioPlayer.get(), SIGNAL(done()), target, slot);
     connect( audioPlayer.get(), SIGNAL(done()), audioPlayer.get(), SLOT(deleteLater()) );
     if( !audioPlayer->playAsync() )
         return false;
@@ -204,6 +206,8 @@ void AudioPlayer::close()
     closeNonSafe();
 }
 
+static const int AUDIO_PRE_BUFFER = AUDIO_BUF_SIZE / 2;
+
 void AudioPlayer::run()
 {
     QMutexLocker lk( &m_mutex );
@@ -223,7 +227,7 @@ void AudioPlayer::run()
             case sSynthesizingAutoPlay:
             {
                 if( !m_synthesizingTarget->open( QIODevice::WriteOnly ) ||
-                    !textToWav( m_textToPlay, m_synthesizingTarget.get() ) )
+                    !TextToWaveServer::instance()->generateSoundSync( m_textToPlay, m_synthesizingTarget.get() ) )
                 {
                     emit done();
                     m_state = sReady;
@@ -334,13 +338,15 @@ bool AudioPlayer::isOpenedNonSafe() const
     return m_state >= sReady || m_mediaFileReader != NULL;
 }
 
+static const int MS_PER_USEC = 1000;
+
 void AudioPlayer::doRealtimeDelay( const QnAbstractDataPacketPtr& media )
 {
     if( m_rtStartTime == (qint64)AV_NOPTS_VALUE )
     {
         m_rtStartTime = media->timestamp;
     }
-    else
+    else if( media->timestamp - m_rtStartTime > AUDIO_PRE_BUFFER*MS_PER_USEC )
     {
         qint64 timeDiff = media->timestamp - m_lastRtTime;
         if( timeDiff <= MAX_FRAME_DURATION*1000 )

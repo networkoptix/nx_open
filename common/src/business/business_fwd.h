@@ -16,6 +16,10 @@ class QnAbstractBusinessAction;
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 typedef QList<QnAbstractBusinessActionPtr> QnAbstractBusinessActionList;
 
+class QnPanicBusinessAction;
+typedef QSharedPointer<QnPanicBusinessAction> QnPanicBusinessActionPtr;
+typedef QList<QnPanicBusinessAction> QnPanicBusinessActionList;
+
 class QnBusinessActionData;
 typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
 typedef QSharedPointer<QnBusinessActionDataList> QnBusinessActionDataListPtr;
@@ -108,15 +112,21 @@ namespace BusinessActionType {
 
         /*!
             parameters:\n
-                - soundSource (int, required)               - enumeration describing source of the sound (resources, EC, TTS)
-                - soundUrl (string, required)               - url of sound, can contain:
-                                                                * path to sound on the EC
-                                                                * path to the resource
-                                                                * text that will be provided to TTS engine
+                - soundUrl (string, required)               - url of sound, contains path to sound on the EC
         */
         PlaySound,
 
-        Alert,              // write a record to the server's log
+        /*!
+            parameters:\n
+                - sayText (string, required)                - text that will be provided to TTS engine
+        */
+        SayText,
+
+        /**
+         *  Write a record to the server's log
+         */
+        Diagnostics,
+
         Bookmark,           // mark part of camera archive as undeleted
 
         // media server based actions
@@ -126,7 +136,7 @@ namespace BusinessActionType {
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = Alert
+        Count = Bookmark
     };
 }
 

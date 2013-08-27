@@ -6,13 +6,12 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/app_server_image_cache.h>
-
 namespace Ui {
     class QnLayoutSettingsDialog;
 }
 
-class QnFramedLabel;
+class QnAppServerImageCache;
+class QnLayoutSettingsDialogPrivate;
 
 class QnLayoutSettingsDialog : public QDialog
 {
@@ -22,19 +21,19 @@ class QnLayoutSettingsDialog : public QDialog
 public:
     explicit QnLayoutSettingsDialog(QWidget *parent = 0);
     ~QnLayoutSettingsDialog();
-    
+
     void readFromResource(const QnLayoutResourcePtr &layout);
     bool submitToResource(const QnLayoutResourcePtr &layout);
 
 protected:
-    virtual void showEvent(QShowEvent *event) override;
-    virtual void resizeEvent(QResizeEvent *event) override;
-
     virtual bool eventFilter(QObject *target, QEvent *event) override;
+
 private slots:
     void at_clearButton_clicked();
     void at_accepted();
     void at_opacitySpinBox_valueChanged(int value);
+    void at_widthSpinBox_valueChanged(int value);
+    void at_heightSpinBox_valueChanged(int value);
 
     void at_imageLoaded(const QString& filename, bool ok);
     void at_imageStored(const QString& filename, bool ok);
@@ -45,24 +44,38 @@ private slots:
     void updateControls();
 
     void viewFile();
+
     void selectFile();
+
 private:
+    /** Aspect ratio of the current screen. */
+    qreal screenAspectRatio() const;
+
+    /** 
+     * Aspect ratio that is optimal for cells to best fit the current image.
+     * Returns negative value if image is not available.
+     */
+    qreal bestAspectRatioForCells() const;
+
+    /** 
+     * Returns true if width and height in cells are already set to values
+     * corresponding to bestAspectRatioForCells()
+     */
+    bool cellsAreBestAspected() const;
+
     bool hasChanges(const QnLayoutResourcePtr &layout);
 
     void loadPreview();
+
+    Q_DECLARE_PRIVATE(QnLayoutSettingsDialog)
+
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
+    QnLayoutSettingsDialogPrivate *const d_ptr;
+
     QnAppServerImageCache *m_cache;
-    QnFramedLabel* imageLabel;
 
-    QString m_cachedFilename;
-    QString m_newFilePath;
-
-    qreal m_cellAspectRatio;
-    bool m_estimatePending;
-
-    /** Should image be cropped to current monitor AR */
-    bool m_cropImage;
+    bool m_isUpdating;
 };
 
 #endif // LAYOUT_SETTINGS_DIALOG_H

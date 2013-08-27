@@ -41,8 +41,8 @@ namespace {
         return button;
     }
 
-    GraphicsLabel* newClockItem(QGraphicsItem *parent = NULL) {
-        GraphicsLabel* label = new GraphicsLabel(parent);
+    GraphicsLabel *newClockItem(QGraphicsItem *parent = NULL) {
+        GraphicsLabel *label = new GraphicsLabel(parent);
 
         QFont font;
         font.setPixelSize(30);
@@ -52,7 +52,7 @@ namespace {
         palette.setColor(QPalette::WindowText, qnGlobals->selectedFrameColor());
         label->setPalette(palette);
 
-        QnClockDataProvider* dp = new QnClockDataProvider(label);
+        QnClockDataProvider *dp = new QnClockDataProvider(label);
         QObject::connect(dp, SIGNAL(timeChanged(QString)), label, SLOT(setText(QString)));
         return label;
     }
@@ -75,7 +75,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     setAutoFillBackground(true);
     setPaletteColor(this, QPalette::Window, Qt::black);
-
 
     /* Create buttons. */
     m_jumpBackwardButton = newActionButton(action(Qn::JumpToStartAction));
@@ -105,22 +104,18 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_liveButton = newActionButton(action(Qn::JumpToLiveAction));
     m_liveButton->setIcon(qnSkin->icon("slider/buttons/live.png"));
     m_liveButton->setPreferredSize(48, 24);
-    setHelpTopic(m_liveButton, Qn::MainWindow_Navigation_Help);
 
     m_syncButton = newActionButton(action(Qn::ToggleSyncAction));
     m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(48, 24);
-    setHelpTopic(m_syncButton, Qn::MainWindow_Sync_Help);
 
     m_thumbnailsButton = newActionButton(action(Qn::ToggleThumbnailsAction));
     m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
     m_thumbnailsButton->setPreferredSize(48, 24);
-    setHelpTopic(m_thumbnailsButton, Qn::MainWindow_Thumbnails_Help);
 
     m_calendarButton = newActionButton(action(Qn::ToggleCalendarAction));
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
     m_calendarButton->setPreferredSize(48, 24);
-    setHelpTopic(m_calendarButton, Qn::MainWindow_Calendar_Help);
 
 
     /* Create sliders. */
@@ -167,7 +162,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     GraphicsWidget *leftWidget = new GraphicsWidget();
     leftWidget->setLayout(leftLayoutV);
-    setHelpTopic(leftWidget, Qn::MainWindow_Playback_Help);
 
     QGraphicsLinearLayout *rightLayoutHU = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHU->setContentsMargins(0, 0, 0, 0);
@@ -286,6 +280,18 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     connect(action(Qn::VolumeUpAction),         SIGNAL(triggered()), m_volumeSlider,        SLOT(stepForward()));
     connect(action(Qn::VolumeDownAction),       SIGNAL(triggered()), m_volumeSlider,        SLOT(stepBackward()));
+
+    /* Set help topics. */
+    setHelpTopic(this,                  Qn::MainWindow_Playback_Help);
+    setHelpTopic(m_timeSlider,          Qn::MainWindow_Slider_Timeline_Help);
+    setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
+    setHelpTopic(m_volumeSlider,        Qn::MainWindow_Slider_Volume_Help);
+    setHelpTopic(m_muteButton,          Qn::MainWindow_Slider_Volume_Help);
+    setHelpTopic(m_liveButton,          Qn::MainWindow_Navigation_Help);
+    setHelpTopic(m_syncButton,          Qn::MainWindow_Sync_Help);
+    setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
+    setHelpTopic(m_calendarButton,      Qn::MainWindow_Calendar_Help);
+
 
     /* Run handlers */
     updateMuteButtonChecked();

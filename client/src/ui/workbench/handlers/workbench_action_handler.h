@@ -112,23 +112,24 @@ protected:
         QPointF position;
         QRectF zoomWindow;
         QUuid zoomUuid;
-        quint64 time;
+        qint64 time;
         QColor frameColor;
         qreal rotation;
         ImageCorrectionParams contrastParams;
+        DewarpingParams dewarpingParams;
 
         AddToLayoutParams():
             usePosition(false),
             position(QPointF()),
             zoomUuid(QUuid()),
-            time(0),
+            time(-1),
             rotation(0)
         {}
     };
 
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, const AddToLayoutParams &params) const;
-    void addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, const AddToLayoutParams &params) const;
+    void addToLayout(const QnLayoutResourcePtr &layout, const QList<QnMediaResourcePtr>& resources, const AddToLayoutParams &params) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, const AddToLayoutParams &params) const;
 
     QnResourceList addToResourcePool(const QString &file) const;
@@ -196,8 +197,8 @@ protected slots:
     void at_workbench_cellSpacingChanged();
     void at_workbench_currentLayoutChanged();
 
-    void at_eventManager_connectionClosed();
-    void at_eventManager_connectionOpened();
+    void at_messageProcessor_connectionClosed();
+    void at_messageProcessor_connectionOpened();
     void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& businessAction);
 
     void at_mainMenuAction_triggered();
@@ -211,11 +212,12 @@ protected slots:
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
-    void at_openNewWindowLayoutsAction_triggered();
     void at_openNewTabAction_triggered();
     void at_openInLayoutAction_triggered();
     void at_openInCurrentLayoutAction_triggered();
     void at_openInNewLayoutAction_triggered();
+    void at_openLayoutsInNewWindowAction_triggered();
+    void at_openCurrentLayoutInNewWindowAction_triggered();
     void at_openInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
     void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
@@ -237,28 +239,36 @@ protected slots:
     void at_openLayoutAction_triggered();
     void at_openFolderAction_triggered();
     void at_checkForUpdatesAction_triggered();
+    void at_showcaseAction_triggered();
     void at_aboutAction_triggered();
-    void at_PreferencesGeneralTabAction_triggered();
     void at_businessEventsAction_triggered();
+    void at_openBusinessRulesAction_triggered();
     void at_businessEventsLogAction_triggered();
+    void at_openBusinessLogAction_triggered();
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
-    void at_PreferencesLicensesTabAction_triggered();
-    void at_PreferencesServerTabAction_triggered();
-    void at_PreferencesNotificationTabAction_triggered();
+    void at_preferencesGeneralTabAction_triggered();
+    void at_preferencesLicensesTabAction_triggered();
+    void at_preferencesServerTabAction_triggered();
+    void at_preferencesNotificationTabAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
+    void at_cameraBusinessRulesAction_triggered();
+    void at_cameraDiagnosticsAction_triggered();
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
     void at_clearCameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
     void at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras);
     void at_cameraSettingsDialog_rejected();
-    void at_cameraSettingsAdvanced_changed();
+    void at_cameraSettingsDialog_advancedSettingChanged();
+    void at_cameraSettingsDialog_cameraOpenRequested();
+    void at_cameraSettingsDialog_cameraIssuesRequested();
+    void at_cameraSettingsDialog_cameraRulesRequested();
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
@@ -266,7 +276,6 @@ protected slots:
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
     void at_youtubeUploadAction_triggered();
-    void at_editTagsAction_triggered();
     void at_thumbnailsSearchAction_triggered();
 
     void at_openInFolderAction_triggered();
@@ -344,6 +353,10 @@ protected slots:
     void at_messageBoxAction_triggered();
 
     void at_browseUrlAction_triggered();
+
+    void at_versionMismatchMessageAction_triggered();
+    void at_versionMismatchWatcher_mismatchDataChanged();
+
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
@@ -351,7 +364,7 @@ private:
     void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
 #ifdef Q_OS_WIN
-    QString binaryFilterName(bool readOnly) const;
+    QString binaryFilterName() const;
 #endif
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
@@ -381,6 +394,7 @@ private:
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 
     QnAdjustVideoDialog* adjustVideoDialog();
+
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 

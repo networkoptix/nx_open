@@ -24,6 +24,12 @@ QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()
 {
 }
 
+void QnSendmailBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
+    setTabOrder(before, ui->emailLineEdit);
+    setTabOrder(ui->emailLineEdit, ui->settingsButton);
+    setTabOrder(ui->settingsButton, after);
+}
+
 void QnSendmailBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
     if (!model)
         return;

@@ -121,21 +121,22 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_fullScreen(false),
     m_prevLQ(-1),
     m_doNotChangeDisplayTime(false),
-    m_firstLivePacket(true)
+    m_firstLivePacket(true),
+    m_multiView(false)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;
 
-    if (resource && resource->hasFlags(QnResource::still_image)) {
+    if (resource && resource->toResource()->hasFlags(QnResource::still_image)) {
         m_isStillImage = true;
 
-        QFileInfo fileInfo(resource->getUrl());
+        QFileInfo fileInfo(resource->toResource()->getUrl());
         if (fileInfo.isReadable())
-            resource->setStatus(QnResource::Online);
+            resource->toResource()->setStatus(QnResource::Online);
         else
-            resource->setStatus(QnResource::Offline);
+            resource->toResource()->setStatus(QnResource::Offline);
     }
 
     m_storedMaxQueueSize = m_dataQueue.maxSize();
@@ -202,21 +203,24 @@ void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bo
     {
         if (!m_display[i])
             m_display[i] = new QnVideoStreamDisplay(canDownscale, i);
-        m_display[i]->addRenderer(vw);
+        int rendersCount = m_display[i]->addRenderer(vw);
+        m_multiView = rendersCount > 1;
     }
 }
 
 void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        if (m_display[i])
-            m_display[i]->removeRenderer(vw);
+        if (m_display[i]) {
+            int rendersCount = m_display[i]->removeRenderer(vw);
+            m_multiView = rendersCount > 1;
+        }
     }
 }
 
-QImage QnCamDisplay::getScreenshot(int channel)
+QImage QnCamDisplay::getScreenshot(int channel, const ImageCorrectionParams& params, const DewarpingParams& dewarping)
 {
-    return m_display[channel]->getScreenshot();
+    return m_display[channel]->getScreenshot(params, dewarping);
 }
 
 QImage QnCamDisplay::getGrayscaleScreenshot(int channel)
@@ -1612,6 +1616,11 @@ QSize QnCamDisplay::getVideoSize() const
         return QSize();
 }
 
+bool QnCamDisplay::isZoomWindow() const
+{
+    return m_multiView;
+}
+
 bool QnCamDisplay::isFullScreen() const
 {
     return m_fullScreen;
@@ -1634,7 +1643,7 @@ bool QnCamDisplay::isBuffering() const
     // for offline resource at LIVE position no any data. Check it
     if (!isRealTimeSource())
         return true; // if archive position then buffering mark should be resetted event for offline resource
-    return m_resource->getStatus() == QnResource::Online || m_resource->getStatus() == QnResource::Recording;
+    return m_resource->toResource()->getStatus() == QnResource::Online || m_resource->toResource()->getStatus() == QnResource::Recording;
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

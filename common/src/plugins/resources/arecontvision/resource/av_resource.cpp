@@ -133,7 +133,7 @@ bool QnPlAreconVisionResource::setHostAddress(const QString& hostAddr, QnDomain 
         int shift = 22;
         memcpy(data,basic_str.data(),shift);
 
-        memcpy(data + shift, getMAC().toBytes(), 6);//     MACsToByte(m_mac, (unsigned char*)data + shift); //memcpy(data + shift, mac, 6);
+        memcpy(data + shift, getMAC().bytes(), 6);//     MACsToByte(m_mac, (unsigned char*)data + shift); //memcpy(data + shift, mac, 6);
 
         quint32 new_ip = htonl(ip.toIPv4Address());
         memcpy(data + shift + 6, &new_ip,4);
@@ -203,20 +203,20 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     return result;
 }
 
-bool QnPlAreconVisionResource::initInternal()
+CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
     QRect rect = getCroping(QnDomainMemory);
     setCropingPhysical(rect);
 
     QVariant val;
     if (!getParam(QLatin1String("Firmware version"), val, QnDomainPhysical))
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("Firmware version"), QLatin1String("unknown"));
 
     if (!getParam(QLatin1String("Image engine"), val, QnDomainPhysical ))
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("Image engine"), QLatin1String("unknown"));
 
     if (!getParam(QLatin1String("Net version"), val, QnDomainPhysical))
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("Net version"), QLatin1String("unknown"));
 
     //if (!getDescription())
     //    return;
@@ -225,12 +225,12 @@ bool QnPlAreconVisionResource::initInternal()
 
 
     if (!setParam(QLatin1String("Enable motion detection"), QLatin1String("on"), QnDomainPhysical)) // enables motion detection;
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("Enable motion detection"), QLatin1String("unknown"));
 
     // check if we've got 1024 zones
     setParam(QLatin1String("TotalZones"), 1024, QnDomainPhysical); // try to set total zones to 64; new cams support it
     if (!getParam(QLatin1String("TotalZones"), val, QnDomainPhysical))
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("TotalZones"), QLatin1String("unknown"));
 
     if (val.toInt() == 1024)
         m_totalMdZones = 1024;
@@ -258,7 +258,7 @@ bool QnPlAreconVisionResource::initInternal()
     setParam(QLatin1String("Zone size"), zone_size, QnDomainPhysical);
     setMotionMaskPhysical(0);
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 QString QnPlAreconVisionResource::getDriverName() const
@@ -282,12 +282,12 @@ bool QnPlAreconVisionResource::updateMACAddress()
     return true;
 }
 
-QnStreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize /*size*/) const
+Qn::StreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize /*size*/) const
 {
-    return QnQualityNormal;
+    return Qn::QualityNormal;
 }
 
-QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQuality /*quality*/)
+QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/)
 {
     return QImage();
 }
@@ -416,7 +416,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
 bool QnPlAreconVisionResource::isPanoramic(const QString &name)
 {
     return name.contains(QLatin1String("8180")) || name.contains(QLatin1String("8185")) || name.contains(QLatin1String("20185")) || name.contains(QLatin1String("20365")) ||
-           name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365")) || name.contains(QLatin1String("12186"));
+           name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365")) || name.contains(QLatin1String("12186")) || name.contains(QLatin1String("40185"));
 }
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()

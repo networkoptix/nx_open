@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>679</width>
-    <height>300</height>
+    <height>303</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -50,8 +50,14 @@
          </item>
          <item row="0" column="1">
           <widget class="QLineEdit" name="cameraIpLineEdit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
-            <string notr="true">127.0.0.1</string>
+            <string notr="true"/>
+           </property>
+           <property name="placeholderText">
+            <string>IP, hostname, RTSP link...</string>
            </property>
           </widget>
          </item>

@@ -13,7 +13,7 @@ public:
     explicit QnRecordingBusinessAction(const QnBusinessEventParameters &runtimeParams);
 
     int getFps() const;
-    QnStreamQuality getStreamQuality() const;
+    Qn::StreamQuality getStreamQuality() const;
     int getRecordDuration() const;
     int getRecordBefore() const;
     int getRecordAfter() const;
@@ -23,6 +23,6 @@ public:
     static int  invalidResourcesCount(const QnResourceList &resources);
 };
 
-typedef QSharedPointer<QnRecordingBusinessAction> QnRecordingBusinessActionPtr;
+typedef QSharedPointer<QnRecordingBusinessAction> QnRecordingBusinessActionPtr; // TODO: #Elric move to fwd header.
 
 #endif // __RECORDING_BUSINESS_ACTION_H__

@@ -93,23 +93,6 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
         dst->width = src->width;
         dst->height = src->height;
         dst->format = src->format;
-
-        /*
-        dst->linesize[0] = src->width;
-        dst->linesize[1] = src->width/2;
-        dst->linesize[2] = src->width/2;
-
-        dst->width = src->width;
-
-        dst->height = src->height;
-        dst->format = src->format;
-
-        int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
-
-        dst-data[0] = (unsigned char*) av_malloc(dst->getCapacity());
-        dst->data[1] = dst-data[0] + dst->linesize[0]*dst->height;
-        dst->data[2] = dst-data[1] + dst->linesize[1]*yu_h;
-        */
     }
 
     int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
@@ -323,4 +306,23 @@ void CLVideoDecoderOutput::saveToFile(const char* filename)
 bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
 {
     return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
+}
+
+void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
+{
+    Q_ASSERT(width == frame->width);
+    Q_ASSERT(height == frame->height);
+    Q_ASSERT(format == frame->format);
+
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+    {
+        int h = height;
+        int w = width;
+        if (i > 0) {
+            h >>= descr->log2_chroma_h;
+            w >>= descr->log2_chroma_w;
+        }
+        copyPlane(data[i], frame->data[i], w, linesize[i], frame->linesize[i], h);
+    }
 }

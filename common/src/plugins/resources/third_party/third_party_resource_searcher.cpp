@@ -43,7 +43,7 @@ ThirdPartyResourceSearcher::~ThirdPartyResourceSearcher()
 
 QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, const QnResourceParameters& parameters )
 {
-    QnNetworkResourcePtr result;
+    QnThirdPartyResourcePtr result;
 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
@@ -100,9 +100,16 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
     if( !camManager )
         return QnThirdPartyResourcePtr();
 
-    result = QnVirtualCameraResourcePtr( new QnThirdPartyResource( cameraInfo, camManager, *discoveryManager ) );
+    result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, camManager, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
     result->setPhysicalId(QString::fromUtf8(cameraInfo.uid));
+
+    unsigned int caps;
+    if (camManager->getCameraCapabilities(&caps) == 0) 
+    {
+        if( caps & nxcip::BaseCameraManager::shareIpCapability )
+            result->setCameraCapability( Qn::shareIpCapability, true );
+    }
 
     NX_LOG( QString::fromLatin1("Created third party resource (manufacturer %1, res type id %2)").
         arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
@@ -282,5 +289,16 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid) );
+    
+    unsigned int caps;
+    if (camManager->getCameraCapabilities(&caps) == 0) 
+    {
+        if( caps & nxcip::BaseCameraManager::shareIpCapability )
+            resource->setCameraCapability( Qn::shareIpCapability, true );
+    }
+
+    QString groupName = QString(lit("%1-%2")).arg(discoveryManager->getVendorName()).arg(resource->getHostAddress());
+    resource->setGroupName(groupName);
+    resource->setGroupId(groupName.toLower().trimmed());
     return resource;
 }

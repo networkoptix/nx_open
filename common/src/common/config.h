@@ -4,14 +4,12 @@
 // -------------------------------------------------------------------------- //
 // Application settings. OK to change.
 // -------------------------------------------------------------------------- //
-#ifndef __APPLE__
 /** 
  * \def QN_HAS_PRIVATE_INCLUDES
  * 
  * Define if Qt private headers are available on your system.
  */
 #define QN_HAS_PRIVATE_INCLUDES
-#endif
 
 
 
@@ -19,12 +17,10 @@
 // Application globals. Do not change.
 // -------------------------------------------------------------------------- //
 
-/* 
- * Media data alignment. We use 32 for compatibility with AVX instruction set */
+/** Media data alignment. We use 32 for compatibility with AVX instruction set */
 #define CL_MEDIA_ALIGNMENT 32
 
-/* 
- * Addition free space at a end of memory block. Some ffmpeg calls requires it */
+/** Additional free space at a end of memory block. Some ffmpeg calls requires it */
 #define CL_MEDIA_EXTRA 8
 
 
@@ -57,9 +53,7 @@
 #if defined(_MSC_VER)
 #   define override override
 #elif defined(__GNUC__)
-#   if (GCC_VERSION >= 40700)
-//#   define override override
-#   else
+#   if (GCC_VERSION < 40700)
 #       define override
 #   endif
 #else
@@ -103,6 +97,7 @@
 #ifdef _MSC_VER
 #   define _CRT_SECURE_NO_WARNINGS /* Don't warn for deprecated 'unsecure' CRT functions. */
 #   define _CRT_NONSTDC_NO_DEPRECATE /* Don't warn for deprecated POSIX functions. */
+#   define _SCL_SECURE_NO_WARNINGS /* Don't warn for 'unsafe' STL functions. */
 #
 #   /* 'Derived' : inherits 'Base::method' via dominance. 
 #    * It is buggy as described here:
@@ -118,6 +113,7 @@
 #   pragma warning(error: 4150) /* deletion of pointer to incomplete type 'X'; no destructor called */
 #   pragma warning(error: 4715) /* not all control paths return a value */
 #   pragma warning(error: 4005) /* macro redefinition */
+#   pragma warning(error: 4806) /* unsafe operation: no value of type 'INTEGRAL' promoted to type 'ENUM' can equal the given constant */
 #endif
 
 

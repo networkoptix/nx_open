@@ -1,10 +1,19 @@
+
 #include "time_image_filter.h"
+
+#include <QDateTime>
+#include <QFontMetrics>
+#include <QImage>
+#include <QPainter>
+
 #include "utils/color_space/yuvconvert.h"
+
 
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
 static const int MIN_TEXT_HEIGHT = 14;
+static const double FPS_EPS = 1e-8;
 
-QnTimeImageFilter::QnTimeImageFilter(OnScreenDatePos datePos, int timeOffsetMs):
+QnTimeImageFilter::QnTimeImageFilter(OnScreenDatePos datePos, qint64 timeOffsetMs):
     m_dateTimeXOffs(0),
     m_dateTimeYOffs(0),
     m_bufXOffs(0),
@@ -69,20 +78,20 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
     switch(m_dateTextPos)
     {
     case Date_LeftTop:
-        if (updateRect.left() != 0 || updateRect.top() != 0)
+        if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
             return;
         break;
     case Date_RightTop:
-        if (updateRect.right() != 1 || updateRect.top() != 0)
+        if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
             return;
         break;
     case Date_RightBottom:
-        if (updateRect.right() != 1 || updateRect.bottom() != 1)
+        if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
             return;
         break;
     case Date_LeftBottom:
     default:
-        if (updateRect.left() != 0 || updateRect.bottom() != 1)
+        if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
             return;
         break;
     }
@@ -90,9 +99,9 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
     QString timeStr;
     qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;
     if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)
-        timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy-MMM-dd hh:mm:ss"));
+        timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
     else
-        timeStr = QTime().addMSecs(displayTime).toString(lit("hh:mm:ss.zzz"));
+        timeStr = QTime().addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
 
     if (m_timeImg == 0)
         initTimeDrawing(frame, timeStr);

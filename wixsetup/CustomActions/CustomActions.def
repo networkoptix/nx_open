@@ -10,5 +10,9 @@ FindFreePorts
 FixClientFolder
 CopyMediaServerProfile
 CopyAppServerProfile
+CopyAppServerNotificationFiles
 IsClientFolderExists
 DeleteDatabaseFile
+BackupDatabaseFile
+RestoreDatabaseFile
+PopulateRestoreVersions

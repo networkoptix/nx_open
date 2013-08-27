@@ -21,12 +21,15 @@ signals:
     void connectionReset();
     void businessRuleChanged(QnBusinessEventRulePtr bEvent);
     void businessRuleDeleted(int id);
+    void businessRuleReset(QnBusinessEventRuleList rules);
     void businessActionReceived(QnAbstractBusinessActionPtr bAction);
+
 public slots:
     void run();
 
 private slots:
-    void at_messageReceived(QnMessage event);
+    void at_messageReceived(QnMessage message);
+    void at_connectionOpened(QnMessage message);
     void at_connectionClosed(QString errorString);
     void at_connectionReset();
 

@@ -5,6 +5,7 @@
 #include <QtGui/QVBoxLayout>
 
 #include <ui/models/resource_list_model.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include "ui_resource_list_dialog.h"
 
@@ -19,8 +20,6 @@ QnResourceListDialog::QnResourceListDialog(QWidget *parent):
     ui->treeView->setModel(m_model);
     ui->topLabel->hide();
     ui->bottomLabel->hide();
-
-    setButtonBox(ui->buttonBox);
 }
 
 QnResourceListDialog::~QnResourceListDialog() {
@@ -78,7 +77,7 @@ void QnResourceListDialog::accept() {
     QDialog::accept();
 }
 
-QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons, bool readOnly) {
+QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, int helpTopicId, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons, bool readOnly) {
     QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(parent));
     dialog->setResources(resources);
     dialog->setWindowTitle(title);
@@ -86,13 +85,21 @@ QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, con
     dialog->setBottomText(bottomText);
     dialog->setStandardButtons(buttons);
     dialog->setReadOnly(readOnly);
+    setHelpTopic(dialog.data(), helpTopicId);
     dialog->exec();
     return dialog->clickedButton();
 }
 
 QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons, bool readOnly) {
-    return exec(parent, resources, title, text, QString(), buttons, readOnly);
+    return exec(parent, resources, -1, title, text, QString(), buttons, readOnly);
 }
 
+QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons, bool readOnly) {
+    return exec(parent, resources, -1, title, text, bottomText, buttons, readOnly);
+}
+
+QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, int helpTopicId, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons, bool readOnly) {
+    return exec(parent, resources, helpTopicId, title, text, QString(), buttons, readOnly);
+}
 
 

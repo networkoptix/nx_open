@@ -18,25 +18,31 @@ void QnNotificationSoundModel::init() {
 void QnNotificationSoundModel::loadList(const QStringList &filenames) {
     clear();
 
+
     QList<QStandardItem *> row;
     row << new QStandardItem(tr("<No Sound>"))
         << new QStandardItem(QString());
     appendRow(row);
 
     m_loaded = true;
-    foreach (QString filename, filenames) {
-        QList<QStandardItem *> row;
-        row << new QStandardItem(tr("<Downloading sound...>"))
-            << new QStandardItem(filename);
-        //TODO: #GDM append columns: duration, date added (?)
-        appendRow(row);
-    }
+    foreach (QString filename, filenames)
+        addDownloading(filename, true);
     emit listLoaded();
+}
+
+void QnNotificationSoundModel::addDownloading(const QString &filename, bool silent) {
+    QList<QStandardItem *> row;
+    row << new QStandardItem(tr("<Downloading sound...>"))
+        << new QStandardItem(filename);
+    //TODO: #GDM append columns: duration, date added (?)
+    appendRow(row);
+    if (!silent)
+        emit itemAdded(filename);
 }
 
 void QnNotificationSoundModel::addUploading(const QString &filename) {
     QList<QStandardItem *> row;
-    row << new QStandardItem(tr("Uploading sound..."))
+    row << new QStandardItem(tr("<Uploading sound...>"))
         << new QStandardItem(filename);
     //TODO: #GDM append columns: duration, date added (?)
     appendRow(row);
@@ -54,6 +60,7 @@ void QnNotificationSoundModel::updateTitle(const QString &filename, const QStrin
     if (!item)
         return;
     item->setText(title);
+    sort(0);
     emit itemChanged(filename);
 }
 

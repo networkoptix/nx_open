@@ -6,10 +6,18 @@
 
 QnPausedPainter::QnPausedPainter(const QGLContext *context):
     QnGlFunctions(context),
-    m_shader(QnColorShaderProgram::instance(context)) 
+    m_shader(QnColorShaderProgram::instance(context)),
+    m_initialized(false)
 {
-    if(context != QGLContext::currentContext())
+    if(context != QGLContext::currentContext()) {
         qnWarning("Invalid current OpenGL context.");
+        return;
+    }
+
+    if(!(features() & OpenGL2_0)) {
+        qnWarning("OpenGL version 2.0 is required.");
+        return;
+    }
 
     QByteArray data;
 
@@ -39,13 +47,19 @@ QnPausedPainter::QnPausedPainter(const QGLContext *context):
     glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
     glBufferData(GL_ARRAY_BUFFER, data.size(), data.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    m_initialized = true;
 }
 
 QnPausedPainter::~QnPausedPainter() {
-    glDeleteBuffers(1, &m_buffer);
+    if(m_initialized)
+        glDeleteBuffers(1, &m_buffer);
 }
 
 void QnPausedPainter::paint(qreal opacity) {
+    if(!m_initialized)
+        return;
+
     m_shader->bind();
     m_shader->setColorMultiplier(QVector4D(1.0, 1.0, 1.0, opacity));
 

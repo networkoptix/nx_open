@@ -33,6 +33,9 @@ QnPlWatchDogResource::~QnPlWatchDogResource()
 
 bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
 {
+    if (m_appStopping)
+        return false;
+
     CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
     if (status == CL_HTTP_SUCCESS) 
@@ -64,17 +67,20 @@ bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
     return true; // ignore other error (for cameras with non standart HTTP port)
 }
 
-bool QnPlWatchDogResource::initInternal() 
+CameraDiagnostics::Result QnPlWatchDogResource::initInternal() 
 {
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false) 
     {
+        if (m_appStopping)
+            return CameraDiagnostics::UnknownErrorResult();
+
         // The camera most likely is going to reset after enabling dual streaming
         enableOnvifSecondStream();
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
         
-    bool result = QnPlOnvifResource::initInternal();
+    const CameraDiagnostics::Result result = QnPlOnvifResource::initInternal();
 
     // TODO: #Elric this code is totally evil. Better write it properly as soon as possible.
     CLSimpleHTTPClient http(getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
@@ -125,12 +131,12 @@ void QnPlWatchDogResource::enableOnvifSecondStream()
     // camera rebooting ....
 }
 
-int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
+int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
 {
-    // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
-    // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
+    // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
 
-    int hiEnd = 1024*11;
+    int hiEnd = 1024*9;
     int lowEnd = 1024*1.8;
 
     float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
@@ -139,7 +145,7 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     float frameRateFactor = fps/30.0;
     frameRateFactor = pow(frameRateFactor, (float)0.4);
 
-    int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
+    int result = lowEnd + (hiEnd - lowEnd) * (q - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(1024,result);
@@ -166,8 +172,8 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
     if (!suffix.isEmpty()) {
         bool hasFocus = suffix.endsWith(QLatin1String("-FOCUS"));
         if(hasFocus) {
-            setCameraCapability(Qn::ContinuousZoomCapability, true);
             m_ptzController.reset(new QnDwZoomPtzController(this));
+            setPtzCapabilities(m_ptzController->getCapabilities());
         }
 
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];
@@ -218,8 +224,8 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 
     //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
-    QDateTime currTime = QDateTime::currentDateTime().addMSecs(-ADVANCED_SETTINGS_VALID_TIME);
-    if (currTime > m_advSettingsLastUpdated) {
+    QDateTime currTime = QDateTime::currentDateTime();
+    if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(currTime) > ADVANCED_SETTINGS_VALID_TIME) {
         foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
         {
             if (!setting->refreshValsFromCamera())
@@ -227,7 +233,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
                 return false;
             }
         }
-        m_advSettingsLastUpdated = QDateTime::currentDateTime();
+        m_advSettingsLastUpdated = currTime;
     }
 
     foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
@@ -250,6 +256,10 @@ bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant
     foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
     {
         //If param is not in list of child, it will return false. Then will try to find it in parent.
+
+        if (m_appStopping)
+            return false;
+
         if (setting->setParamPhysical(param, val))
         {
             return true;

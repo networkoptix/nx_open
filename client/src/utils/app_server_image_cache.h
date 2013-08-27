@@ -12,12 +12,11 @@ class QnAppServerImageCache : public QnAppServerFileCache
     typedef QnAppServerFileCache base_type;
 public:
     explicit QnAppServerImageCache(QObject *parent = 0);
-    ~QnAppServerImageCache();
-    
+    virtual ~QnAppServerImageCache();
+
     QSize getMaxImageSize() const;
 
-
-    void storeImage(const QString &filePath, bool cropImageToMonitorAspectRatio = false);
+    void storeImage(const QString &filePath, const qreal targetAspectRatio = 0.0);
 private slots:
     void at_imageConverted(const QString &filePath);
 

@@ -3,19 +3,37 @@
 #include <cassert>
 
 #include <QtCore/QElapsedTimer>
-#include <QStringList>
+#include <QtCore/QStringList>
 
 #include <utils/common/warnings.h>
+#include <utils/common/util.h>
 
 extern "C"
 {
-    #include <sigar.h>
-    #include <sigar_format.h>
+#include <sigar.h>
+#include <sigar_format.h>
 }
 
 #ifdef _MSC_VER
 #   pragma comment(lib, "sigar.lib")
 #endif
+
+namespace {
+    /**
+     * See http://stackoverflow.com/questions/3062594/differentiate-vmware-network-adapter-from-physical-network-adapters.
+     */
+    const char *virtualMacs[] = {
+        "\x00\x05\x69",     /* vmware1 */
+        "\x00\x0C\x29",     /* vmware2 */
+        "\x00\x50\x56",     /* vmware3 */
+        "\x00\x1C\x42",     /* parallels1 */
+        "\x00\x03\xFF",     /* microsoft virtual pc */
+        "\x00\x0F\x4B",     /* virtual iron 4 */
+        "\x00\x16\x3E",     /* red hat xen , oracle vm , xen source, novell xen */
+        "\x08\x00\x27"      /* virtualbox */
+    };
+
+} // anonymous namespace
 
 #define INVOKE(expression)                                                      \
     (d_func()->checkError(#expression, expression))
@@ -124,6 +142,8 @@ public:
         if (INVOKE(sigar_net_interface_stat_get(sigar, interfaceName.toLatin1().constData(), &current) != SIGAR_OK))
             return result;
 
+        result.bytesPerSecMax = current.speed / 8;
+
         if(!lastNetworkStatByInterfaceName.contains(interfaceName)) { /* Is this the first call? */
             NetworkStat stat;
             stat.stat = current;
@@ -133,17 +153,27 @@ public:
         }
 
         NetworkStat &last = lastNetworkStatByInterfaceName[interfaceName];
-        quint64 elapsed = last.timer.isValid()
-                ? last.timer.elapsed()
-                : 0;
-        result.bytesPerSecIn = elapsed > 0
-                ? qMax(current.rx_bytes - last.stat.rx_bytes, sigar_uint64_t(0)) * 1000 / elapsed
-                : 0;
-        result.bytesPerSecOut = elapsed > 0
-                ? qMax(current.tx_bytes - last.stat.tx_bytes, sigar_uint64_t(0)) * 1000 / elapsed
-                : 0;
+        qint64 elapsed = last.timer.isValid() ? last.timer.elapsed() : 0;
+        if(elapsed <= 0) {
+            result.bytesPerSecIn = result.bytesPerSecOut = 0;
+        } else {
+            qint64 bytesIn = static_cast<qint64>(current.rx_bytes) - static_cast<qint64>(last.stat.rx_bytes);
+            qint64 bytesOut = static_cast<qint64>(current.tx_bytes) - static_cast<qint64>(last.stat.tx_bytes);
+
+#ifdef Q_OS_WIN
+            // TODO: #Elric totally evil workaround for windows, flaw in GetIfTable.
+            if(bytesIn < 0) /* Integer overflow. */
+                bytesIn = bytesIn + std::numeric_limits<unsigned int>::max();
+            if(bytesOut < 0) /* Integer overflow. */
+                bytesOut = bytesOut + std::numeric_limits<unsigned int>::max();
+#endif
+
+            result.bytesPerSecIn = bytesIn * 1000 / elapsed;
+            result.bytesPerSecOut = bytesOut * 1000 / elapsed;
+        }
         last.stat = current;
         last.timer.restart();
+
         return result;
     }
 
@@ -280,24 +310,40 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
     if(INVOKE(sigar_net_interface_list_get(d->sigar, &networkInterfaces)) != SIGAR_OK)
         return result;
 
-    QStringList interfacesNames;
+    QStringList interfaceNames;
     for(uint i = 0; i < networkInterfaces.number; i++) {
         QString interfaceName = QLatin1String(networkInterfaces.data[i]);
         
         // remove duplicating entries
-        if (interfacesNames.contains(interfaceName))
+        if (interfaceNames.contains(interfaceName))
             continue;
-        interfacesNames.append(interfaceName);
+        interfaceNames.append(interfaceName);
 
         sigar_net_interface_config_t config;
         if (INVOKE(sigar_net_interface_config_get(d->sigar, interfaceName.toLatin1().constData(), &config) != SIGAR_OK))
             continue;
         if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) == 0)
             continue;
-        if ((config.flags & SIGAR_IFF_LOOPBACK) > 0)
-            continue;
 
-        result.push_back(d->networkLoad(interfaceName));
+        NetworkLoad load = d->networkLoad(interfaceName);
+        if(config.flags & SIGAR_IFF_LOOPBACK) {
+            load.type = LoopbackInterface;
+        } else if(config.hwaddr.family == sigar_net_address_t::SIGAR_AF_LINK) {
+            load.macAddress = QnMacAddress(config.hwaddr.addr.mac);
+
+            for(int i = 0; i < arraysize(virtualMacs); i++) {
+                if(memcmp(load.macAddress.bytes(), virtualMacs[i], 3) == 0) {
+                    load.type = VirtualInterface;
+                    break;
+                }
+            }
+            if(load.type != VirtualInterface)
+                load.type = PhysicalInterface;
+        } else {
+            load.type = PhysicalInterface;
+        }
+
+        result.push_back(load);
     }
 
     INVOKE(sigar_net_interface_list_destroy(d->sigar, &networkInterfaces));

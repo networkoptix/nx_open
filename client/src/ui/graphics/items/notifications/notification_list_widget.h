@@ -3,11 +3,13 @@
 
 #include <QtCore/QLinkedList>
 
+#include <client/client_globals.h>
+
 #include <ui/animation/animated.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 
-class QnNotificationItem;
+class QnNotificationWidget;
 class HoverFocusProcessor;
 
 class QnNotificationListWidget : public Animated<GraphicsWidget>, public AnimationTimerListener
@@ -17,21 +19,27 @@ class QnNotificationListWidget : public Animated<GraphicsWidget>, public Animati
 
 public:
     explicit QnNotificationListWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags flags = 0);
-    ~QnNotificationListWidget();
+    virtual ~QnNotificationListWidget();
 
-    void addItem(QnNotificationItem *item, bool locked = false);
-    void removeItem(QnNotificationItem *item);
-
+    void addItem(QnNotificationWidget *item, bool locked = false);
+    void removeItem(QnNotificationWidget *item);
     void clear();
 
     QSizeF visibleSize() const;
 
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
+
+    int itemCount() const;
+    Qn::NotificationLevel notificationLevel() const;
+
 signals:
     void visibleSizeChanged();
     void sizeHintChanged();
-    void itemRemoved(QnNotificationItem *item);
+
+    void itemRemoved(QnNotificationWidget *item); // TODO: #GDM symmetry break, where is itemAdded signal?
+    void itemCountChanged();
+    void notificationLevelChanged();
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
@@ -40,8 +48,9 @@ protected:
     virtual void updateGeometry() override;
 
     void updateVisibleSize();
+
 private slots:
-    void at_item_clicked(Qt::MouseButton button);
+    void at_item_closeTriggered();
     void at_item_geometryChanged();
     void at_geometry_changed();
 
@@ -60,12 +69,12 @@ private:
             return state == Displaying || state == Displayed || state == Hiding || state == Collapsing;
         }
 
-        void unlockAndHide() {
+        void unlockAndHide(qreal speedUp) {
             locked = false;
-            hide();
+            hide(speedUp);
         }
 
-        void hide();
+        void hide(qreal speedUp);
 
         void setAnimation(qreal from, qreal to, qreal time);
         void animationTick(qreal deltaMSecs);
@@ -78,7 +87,7 @@ private:
             qreal length;
         } animation;
 
-        QnNotificationItem* item;
+        QnNotificationWidget* item;
         State state;
         bool locked;
         int cachedHeight;
@@ -91,14 +100,16 @@ private:
      *                      (Displayed|Hiding|Hidden)* (Displaying)? (Collapsing)* (Collapsed)*
      *                      Item that is closer to the beginning of the list is displayed earlier.
      */
-    QLinkedList<QnNotificationItem *> m_items;
+    QLinkedList<QnNotificationWidget *> m_items;
 
-    QMap<QnNotificationItem*, ItemData*> m_itemDataByItem;
+    QMap<QnNotificationWidget*, ItemData*> m_itemDataByItem;
 
     ItemData m_collapser;
     bool m_collapsedItemCountChanged;
+    qreal m_speedUp;
     QSizeF m_visibleSize;
     QRectF m_tooltipsEnclosingRect;
+    Qn::NotificationLevel m_itemNotificationLevel;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H

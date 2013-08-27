@@ -60,7 +60,9 @@
 #include "rest/handlers/file_system_handler.h"
 #include "rest/handlers/statistics_handler.h"
 #include "rest/handlers/camera_settings_handler.h"
+#include "rest/handlers/camera_diagnostics_handler.h"
 #include "rest/handlers/manual_camera_addition_handler.h"
+#include "rest/handlers/camera_event_handler.h"
 #include "rest/server/rest_connection_processor.h"
 #include "rtsp/rtsp_connection.h"
 #include "network/default_tcp_connection_processor.h"
@@ -89,11 +91,11 @@
 #include "rest/handlers/favico_handler.h"
 #include "rest/handlers/storage_space_handler.h"
 #include "common/customization.h"
+#include "common/global_settings.h"
 #include "plugins/resources/stardot/stardot_resource_searcher.h"
 #include "plugins/plugin_manager.h"
 #include "core/resource_managment/camera_driver_restriction_list.h"
 #include <utils/network/multicodec_rtp_reader.h>
-
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -115,6 +117,8 @@ void stopServer(int signal);
 
 static const int DEFAUT_RTSP_PORT = 50000;
 static const int DEFAULT_STREAMING_PORT = 50000;
+
+static const int PROXY_POOL_SIZE = 8;
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -437,7 +441,7 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-	//signal(SIGABRT, stopServer);
+    //signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -589,12 +593,15 @@ void QnMain::stopObjects()
 {
     qWarning() << "QnMain::stopObjects() called";
 
+    qnFileDeletor->pleaseStop();
+
     if (m_restServer)
         m_restServer->pleaseStop();
     if (m_progressiveDownloadingServer)
         m_progressiveDownloadingServer->pleaseStop();
     if (m_rtspListener)
         m_rtspListener->pleaseStop();
+    
     if (m_universalTcpListener) {
         m_universalTcpListener->pleaseStop();
         delete m_universalTcpListener;
@@ -617,6 +624,7 @@ void QnMain::stopObjects()
         delete m_rtspListener;
         m_rtspListener = 0;
     }
+
 }
 
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
@@ -733,6 +741,13 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 void QnMain::at_timer()
 {
     qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras()) 
+    {
+        QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
+        if (cam)
+            cam->noCameraIssues(); // decrease issue counter
+    }
+    
 }
 
 void QnMain::at_noStorages()
@@ -758,6 +773,7 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
 void QnMain::initTcpListener()
 {
     int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
+    Qn::GlobalSettings::instance()->setHttpPort(rtspPort);    //required for QnActiResource (which is in libcommon). #todo: make qSettings global???
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
     QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnFileSystemHandler());
@@ -774,6 +790,8 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
     QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
+    QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
+    QnRestConnectionProcessor::registerHandler("api/camera_event", new QnCameraEventHandler());  //used to receive event from acti camera. TODO: remove this from api
     QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
@@ -783,6 +801,7 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     m_universalTcpListener->start();
+
 #else
     int apiPort = qSettings.value("apiPort", DEFAULT_REST_PORT).toInt();
     int streamingPort = qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt();
@@ -892,7 +911,7 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
-
+    QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
@@ -913,7 +932,7 @@ void QnMain::run()
     else
         compatibilityChecker = &localChecker;
 
-    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QN_ENGINE_VERSION, "ECS", connectInfo->version))
+    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QnSoftwareVersion(QN_ENGINE_VERSION), "ECS", connectInfo->version))
     {
         cl_log.log(cl_logERROR, "Incompatible Enterprise Controller version detected! Giving up.");
         return;
@@ -947,6 +966,11 @@ void QnMain::run()
     } while (appserverHost.toIPv4Address() == 0);
 
     initTcpListener();
+
+    QUrl proxyServerUrl = appServerConnection->url();
+    proxyServerUrl.setPort(connectInfo->proxyPort);
+    m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid());
+    m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
     QHostAddress publicAddress = getPublicAddress();
 
@@ -1097,12 +1121,6 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
-    qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
-    if (lastRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(m_mediaServer,
-                                                   lastRunningTime*1000,
-                                                   QnBusiness::MServerIssueStarted);
-
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
@@ -1120,6 +1138,9 @@ void QnMain::run()
 
     delete QnMServerResourceSearcher::instance();
     QnMServerResourceSearcher::initStaticInstance( NULL );
+
+    delete QnVideoCameraPool::instance();
+    QnVideoCameraPool::initStaticInstance( NULL );
 
     QnResourceDiscoveryManager::instance()->stop();
     QnResource::stopAsyncTasks();
@@ -1156,9 +1177,6 @@ void QnMain::run()
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
 
-    delete QnVideoCameraPool::instance();
-    QnVideoCameraPool::initStaticInstance( NULL );
-
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
 
@@ -1168,6 +1186,11 @@ void QnMain::run()
 
     av_lockmgr_register(NULL);
 
+    // First disconnect eventManager from all slots, to not try to reconnect on connection close
+    disconnect(eventManager);
+
+    // This method will set flag on message channel to threat next connection close as normal
+    appServerConnection->disconnectSync();
     qSettings.setValue("lastRunningTime", 0);
 }
 

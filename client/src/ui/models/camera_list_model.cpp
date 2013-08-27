@@ -11,8 +11,10 @@
 QnCameraListModel::QnCameraListModel(QObject *parent, QnWorkbenchContext *context):
     QnResourceListModel(parent),
     QnWorkbenchContextAware(parent, context)
-{
+{}
 
+QnCameraListModel::~QnCameraListModel() {
+    return;
 }
 
 QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
@@ -26,29 +28,38 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
     if(!camera)
         return QVariant();
 
+    Column column = m_columns[index.column()];
+
     switch(role) {
     case Qt::DecorationRole:
-        if (index.column() == RecordingColumn) {
+        switch(column) {
+        case RecordingColumn: {
             int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
-            if(camera->getStatus() == QnResource::Recording)
-                recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), camera);
+            recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), camera);
             result =  QnRecordingStatusHelper::icon(recordingMode);
+            break;
         }
-        else if (index.column() == NameColumn)
+        case NameColumn: {
             result = qnResIconCache->icon(camera->flags(), camera->getStatus());
-        else if (index.column() == ServerColumn) {
+            break;
+        }
+        case ServerColumn: {
             QnResourcePtr server = camera->getParentResource();
             if (server)
                 result = qnResIconCache->icon(server->flags(), server->getStatus());
+            break;
+        }
+        default:
+            result = base_type::data(index, role);
+            break;
         }
         break;
+    case Qn::DisplayHtmlRole:
     case Qt::DisplayRole:
-        switch ((Column) index.column())
-        {
+        switch (column) {
             case RecordingColumn: {
                 int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
-                if(camera->getStatus() == QnResource::Recording)
-                    recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), camera);
+                recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), camera);
                 result =  QnRecordingStatusHelper::shortTooltip(recordingMode);
                 break;
             }
@@ -79,11 +90,11 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
                 break;
             }
             default:
-                result = QnResourceListModel::data(index, role);
+                result = base_type::data(index, role);
         }
         break;
     default:
-        result = QnResourceListModel::data(index, role);
+        result = base_type::data(index, role);
     }
 
     return result;
@@ -94,7 +105,7 @@ QString QnCameraListModel::columnTitle(Column column) const
     switch(column) {
     case RecordingColumn: return tr("Recording");
     case NameColumn:      return tr("Name");
-    case VendorColumn:    return tr("Manufacturer");
+    case VendorColumn:    return tr("Driver");
     case ModelColumn:     return tr("Model");
     case FirmwareColumn:  return tr("Firmware");
     case IPColumn:        return tr("IP/Name");
@@ -106,19 +117,32 @@ QString QnCameraListModel::columnTitle(Column column) const
     }
 }
 
+const QList<QnCameraListModel::Column> &QnCameraListModel::columns() const 
+{
+    return m_columns;
+}
+
 void QnCameraListModel::setColumns(const QList<Column>& columns)
 {
+    if(m_columns == columns)
+        return;
+
+    beginResetModel();
     m_columns = columns;
+    endResetModel();
 }
 
 int QnCameraListModel::columnCount(const QModelIndex &parent) const
 {
-    return m_columns.size();
+    if(!parent.isValid())
+        return m_columns.size();
+
+    return 0;
 }
 
 QVariant QnCameraListModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section >= 0 && section < m_columns.size())
         return columnTitle(m_columns[section]);
     return QnResourceListModel::headerData(section, orientation, role);
 }

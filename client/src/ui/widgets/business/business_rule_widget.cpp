@@ -20,6 +20,9 @@
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/widgets/business/aggregation_widget.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
 #include <ui/widgets/properties/weektime_schedule_widget.h>
@@ -29,7 +32,7 @@
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
 
-// TODO: #GDM 
+// TODO: #GDM
 // Why are you using QFrame as container for subwidgets of QnBusinessRuleWidget?
 // Why don't just use QWidget?
 
@@ -50,17 +53,6 @@ namespace {
         return QString();
     }
 
-    // TODO: #GDM fill aggregationComboBox in cpp file so that
-    // names & numbers are in one place. Store steps in userData.
-
-    // make sure size is equal to ui->aggregationComboBox->count()
-    const int aggregationSteps[] = {
-        1,                    /* 1 second. */
-        60,                   /* 1 minute. */
-        60 * 60,              /* 1 hour. */
-        60 * 60 * 24          /* 1 day. */
-    };
-
 } // namespace
 
 QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *context) :
@@ -73,6 +65,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
     m_updating(false)
 {
     ui->setupUi(this);
+
+    setHelpTopic(ui->scheduleButton, Qn::EventsActions_Schedule_Help);
 
     ui->eventDefinitionGroupBox->installEventFilter(this);
     ui->actionDefinitionGroupBox->installEventFilter(this);
@@ -87,14 +81,9 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
 
     connect(ui->actionTypeComboBox,         SIGNAL(currentIndexChanged(int)),   this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
 
-    connect(ui->aggregationCheckBox,        SIGNAL(toggled(bool)),              this, SLOT(updateModelAggregationPeriod()));
-    connect(ui->aggregationValueSpinBox,    SIGNAL(editingFinished()),          this, SLOT(at_ui_aggregationPeriodChanged()));
-    connect(ui->aggregationPeriodComboBox,  SIGNAL(currentIndexChanged(int)),   this, SLOT(at_ui_aggregationPeriodChanged()));
+    connect(ui->aggregationWidget,          SIGNAL(valueChanged()),             this, SLOT(updateModelAggregationPeriod()));
 
-    connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationValueSpinBox, SLOT(setEnabled(bool)));
-    connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationPeriodComboBox, SLOT(setEnabled(bool)));
-
-    connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
+    connect(ui->commentsLineEdit,           SIGNAL(textChanged(QString)),       this, SLOT(at_commentsLineEdit_textChanged(QString)));
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
@@ -126,6 +115,7 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
         ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
         ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
     }
+    setEnabled(!m_model->system());
 
     connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
             this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
@@ -169,10 +159,11 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         bool isResourceRequired = BusinessActionType::requiresCameraResource(m_model->actionType())
                 || BusinessActionType::requiresUserResource(m_model->actionType());
         ui->actionResourcesFrame->setVisible(isResourceRequired);
+
         ui->actionAtLabel->setText(m_model->actionType() == BusinessActionType::SendMail ? tr("to") : tr("at"));
 
         bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
-        ui->actionAggregationFrame->setVisible(actionIsInstant);
+        ui->aggregationWidget->setVisible(actionIsInstant);
 
         initActionParameters();
     }
@@ -188,18 +179,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
     }
 
     if (fields & QnBusiness::AggregationField) {
-        int msecs = model->aggregationPeriod();
-        ui->aggregationCheckBox->setChecked(msecs > 0);
-        if (msecs > 0) {
-            int idx = 0;
-            while (idx < ui->aggregationPeriodComboBox->count() - 1
-                   && msecs >= aggregationSteps[idx+1]
-                   && msecs % aggregationSteps[idx+1] == 0)
-                idx++;
-
-            ui->aggregationPeriodComboBox->setCurrentIndex(idx);
-            ui->aggregationValueSpinBox->setValue(msecs / aggregationSteps[idx]);
-        }
+        ui->aggregationWidget->setValue(model->aggregationPeriod());
     }
 
     if (fields & QnBusiness::CommentsField) {
@@ -227,8 +207,11 @@ void QnBusinessRuleWidget::initEventParameters() {
     }
     if (m_eventParameters) {
         ui->eventParamsLayout->addWidget(m_eventParameters);
+        m_eventParameters->updateTabOrder(ui->eventResourcesHolder,  ui->scheduleButton);
         m_eventParameters->setVisible(true);
         m_eventParameters->setModel(m_model);
+    } else {
+        setTabOrder(ui->eventResourcesHolder, ui->scheduleButton);
     }
 }
 
@@ -251,8 +234,11 @@ void QnBusinessRuleWidget::initActionParameters() {
 
     if (m_actionParameters) {
         ui->actionParamsLayout->addWidget(m_actionParameters);
+        m_actionParameters->updateTabOrder(ui->aggregationWidget,  ui->commentsLineEdit);
         m_actionParameters->setVisible(true);
         m_actionParameters->setModel(m_model);
+    } else {
+        setTabOrder(ui->aggregationWidget, ui->commentsLineEdit);
     }
 }
 
@@ -301,10 +287,7 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event) {
 void QnBusinessRuleWidget::updateModelAggregationPeriod() {
     if (!m_model || m_updating)
         return;
-
-    int val = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
-    int idx = ui->aggregationPeriodComboBox->currentIndex();
-    m_model->setAggregationPeriod(val * aggregationSteps[idx]);
+    m_model->setAggregationPeriod(ui->aggregationWidget->value());
 }
 
 
@@ -342,13 +325,6 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
     m_model->setActionType(val);
 }
 
-void QnBusinessRuleWidget::at_ui_aggregationPeriodChanged() {
-    if (!m_model || m_updating)
-        return;
-
-    updateModelAggregationPeriod();
-}
-
 void QnBusinessRuleWidget::at_commentsLineEdit_textChanged(const QString &value) {
     if (!m_model || m_updating)
         return;
@@ -371,7 +347,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
 
     if (dialog.exec() != QDialog::Accepted)
         return;
-    m_model->setEventResources(dialog.getSelectedResources());
+    m_model->setEventResources(dialog.selectedResources());
 }
 
 void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
@@ -386,7 +362,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     if (node == Qn::BastardNode)
         return;
 
-    QnResourceSelectionDialog dialog(this, node);
+    QnResourceSelectionDialog dialog(node, this);
 
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)
@@ -399,18 +375,19 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
 
     if (dialog.exec() != QDialog::Accepted)
         return;
-    m_model->setActionResources(dialog.getSelectedResources());
+    m_model->setActionResources(dialog.selectedResources());
 }
 
 void QnBusinessRuleWidget::at_scheduleButton_clicked() {
     if (!m_model)
         return;
 
-    QnWeekTimeScheduleWidget dialog(this);
-    dialog.setScheduleTasks(m_model->schedule());
-    if (dialog.exec() != QDialog::Accepted)
+    QScopedPointer<QnWeekTimeScheduleWidget> dialog(new QnWeekTimeScheduleWidget(this));
+    dialog->setScheduleTasks(m_model->schedule());
+    setHelpTopic(dialog.data(), Qn::EventsActions_Schedule_Help);
+    if (dialog->exec() != QDialog::Accepted)
         return;
-    m_model->setSchedule(dialog.scheduleTasks());
+    m_model->setSchedule(dialog->scheduleTasks());
 }
 
 

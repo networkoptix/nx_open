@@ -512,6 +512,12 @@ bool QnDesktopFileEncoder::init()
         m_lastErrorStr = QLatin1String("Can't allocate output stream for video codec");
         return false;
     }
+
+    if (m_grabber->width() % 8 != 0) {
+        m_lastErrorStr = QLatin1String("Unalignment screen width. Width MUST be multipler of 8");
+        return false;
+    }
+
     m_videoCodecCtx = m_videoOutStream->codec;
     m_videoCodecCtx->codec_id = m_outputCtx->video_codec;
     m_videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO ;
@@ -536,7 +542,6 @@ bool QnDesktopFileEncoder::init()
     if (m_encodeQualuty == 1)
     {
         m_videoCodecCtx->has_b_frames = 1;
-        m_videoCodecCtx->max_b_frames = 2;
         m_videoCodecCtx->level = 50;
         //m_videoCodecCtx->me_threshold = 0;
         //m_videoCodecCtx->intra_dc_precision = 0;

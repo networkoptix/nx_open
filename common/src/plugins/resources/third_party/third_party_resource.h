@@ -33,6 +33,11 @@ public:
     virtual QnAbstractPtzController* getPtzController() override;
     //!Implementation of QnNetworkResource::isResourceAccessible
     virtual bool isResourceAccessible() override;
+    //!Implementation of QnNetworkResource::ping
+    /*!
+        At the moment always returns \a true
+    */
+    virtual bool ping() override;
     //!Implementation of QnSecurityCamResource::manufacture
     virtual QString getDriverName() const override;
     //!Implementation of QnSecurityCamResource::setIframeDistance
@@ -64,23 +69,9 @@ public:
 
     const QList<nxcip::Resolution>& getEncoderResolutionList( int encoderNumber ) const;
 
-signals:
-    //!Emitted on camera input port state has been changed
-    /*!
-        \param resource Smart pointer to \a this
-        \param inputPortID
-        \param value true if input is connected, false otherwise
-        \param timestamp MSecs since epoch, UTC
-    */
-    void cameraInput(
-        QnResourcePtr resource,
-        const QString& inputPortID,
-        bool value,
-        qint64 timestamp );
-
 protected:
     //!Implementation of QnResource::initInternal
-    virtual bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
     //!Implementation of QnSecurityCamResource::startInputPortMonitoring
     virtual bool startInputPortMonitoring() override;
     //!Implementation of QnSecurityCamResource::stopInputPortMonitoring

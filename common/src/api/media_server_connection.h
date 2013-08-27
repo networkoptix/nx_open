@@ -7,11 +7,13 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
+#include <api/model/camera_diagnostics_reply.h>
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
 
+#include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
@@ -22,6 +24,7 @@
 #include "media_server_cameras_data.h"
 
 class QnPtzSpaceMapper;
+class QnMediaServerResource;
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
 typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
@@ -48,6 +51,7 @@ signals:
     void finished(int status, const QnStringVariantPairList &reply, int handle);
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
+    void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
     void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
     void finished(int status, const QImage &reply, int handle);
@@ -62,7 +66,7 @@ class QnMediaServerConnection: public QnAbstractConnection {
     typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent = NULL);
+    QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
     void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
@@ -71,6 +75,8 @@ public:
 
     int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
 
+
+    enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
 	/** 
      * Get \a camera thumbnail for specified time. 
      * 
@@ -82,12 +88,12 @@ public:
      * \param timeUsec                  Requested time in usecs. Can be DATE_TIME_NOW for live video or -1 for request latest available image.
      * \param size                      Can be filled partially: only width or height. In this case other dimension is auto detected.
      * \param imageFormat               Can be 'jpeg', 'tiff', 'png', etc...
-     * \param precise                   If false then get image from nearest I-frame.
+     * \param method                    If parameter is 'before' or 'after' server returns nearest I-frame before or after time.
      * \param target
      * \param slot
      * \returns                         Request handle.
 	 */
-    int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, bool precise, QObject *target, const char *slot);
+    int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot);
 
 	/** 
      * Get \a camera params. 
@@ -164,6 +170,15 @@ public:
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 
     int getTimeAsync(QObject *target, const char *slot);
+
+    //!Request server to run camera \a cameraID diagnostics step following \a previousStep
+    /*!
+        \param slot Slot MUST have signature (int, QnCameraDiagnosticsReply, int)
+        \returns Request handle
+    */
+    int doCameraDiagnosticsStepAsync(
+        const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+        QObject* target, const char* slot );
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

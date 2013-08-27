@@ -14,7 +14,11 @@ QnAppServerFileCache::QnAppServerFileCache(QString folderName, QObject *parent) 
     QObject(parent),
     m_fileListHandle(0),
     m_folderName(folderName)
-{}
+{
+    connect(this, SIGNAL(delayedFileDownloaded(QString,bool)), this, SIGNAL(fileDownloaded(QString,bool)), Qt::QueuedConnection);
+    connect(this, SIGNAL(delayedFileUploaded(QString,bool)), this, SIGNAL(fileUploaded(QString,bool)), Qt::QueuedConnection);
+    connect(this, SIGNAL(delayedFileDeleted(QString,bool)), this, SIGNAL(fileDeleted(QString,bool)), Qt::QueuedConnection);
+}
 
 QnAppServerFileCache::~QnAppServerFileCache(){}
 
@@ -35,6 +39,10 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
 void QnAppServerFileCache::ensureCacheFolder() {
     QString folderPath = getFullPath(QString());
     QDir().mkpath(folderPath);
+}
+
+QString QnAppServerFileCache::folderName() const {
+    return m_folderName;
 }
 
 void QnAppServerFileCache::clearLocalCache() {
@@ -65,18 +73,18 @@ void QnAppServerFileCache::at_fileListReceived(int status, const QStringList &fi
 
 void QnAppServerFileCache::downloadFile(const QString &filename) {
     if (filename.isEmpty()) {
-        emit fileDownloaded(filename, false);
+        emit delayedFileDownloaded(filename, false);
         return;
     }
 
     if (m_deleting.values().contains(filename)) {
-        emit fileDownloaded(filename, false);
+        emit delayedFileDownloaded(filename, false);
         return;
     }
 
     QFileInfo info(getFullPath(filename));
     if (info.exists()) {
-        emit fileDownloaded(filename, true);
+        emit delayedFileDownloaded(filename, true);
         return;
     }
 
@@ -121,17 +129,17 @@ void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int
 
 
 void QnAppServerFileCache::uploadFile(const QString &filename) {
+    if (m_uploading.values().contains(filename))
+        return;
+
     QFile file(getFullPath(filename));
     if(!file.open(QIODevice::ReadOnly)) {
-        emit fileUploaded(filename, false);
+        emit delayedFileUploaded(filename, false);
         return;
     }
 
     QByteArray data = file.readAll();
     file.close();
-
-    if (m_uploading.values().contains(filename))
-        return;
 
     int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
                 m_folderName + QLatin1Char('/') +filename,
@@ -159,7 +167,7 @@ void QnAppServerFileCache::at_fileUploaded(int status, int handle) {
 
 void QnAppServerFileCache::deleteFile(const QString &filename) {
     if (filename.isEmpty()) {
-        emit fileDeleted(filename, false);
+        emit delayedFileDeleted(filename, false);
         return;
     }
 

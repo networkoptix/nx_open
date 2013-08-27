@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 <Fragment>
   <DirectoryRef Id="INSTALLDIR">
-     <Component Id="NovFileAssociation" Guid="" DiskId="1">
+     <Component Id="NovFileAssociation" DiskId="1">
               <RegistryValue Root="HKCR" Type="string" Key="HDW.nov" Value="${product.name} Video (.nov)" KeyPath="yes" />
               <RegistryValue Root="HKCR" Type="string" Key="HDW.nov\shell\open\command" Value="&quot;[#client.exe]&quot; &quot;%1&quot;"/>
               <RegistryValue Root="HKCR" Type="string" Key="HDW.nov\DefaultIcon" Value="&quot;[#client.exe]&quot;" />

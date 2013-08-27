@@ -61,6 +61,7 @@ public:
 
     void updateFromResources();
     void submitToResources();
+    void reject();
 
     Mode mode() const;
 
@@ -68,12 +69,15 @@ public:
     bool isValidMotionRegion();
 
     void setExportScheduleButtonEnabled(bool enabled);
+
 signals:
     void hasChangesChanged();
     void modeChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
+    void resourcesChanged();
+    void fisheyeSettingChanged();
 
 protected slots:
     void at_moreLicensesRequested();

@@ -20,10 +20,7 @@
 QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
     m_updateLayouts(true)
-{
-    localServer = QnResourcePtr(new QnLocalMediaServerResource);
-    addResource(localServer);
-}
+{}
 
 QnResourcePool::~QnResourcePool()
 {
@@ -37,17 +34,17 @@ QnResourcePool::~QnResourcePool()
 
 //Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
-static QnResourcePool* resourcePool = NULL;
+static QnResourcePool* resourcePool_instance = NULL;
 
 void QnResourcePool::initStaticInstance( QnResourcePool* inst )
 {
-    resourcePool = inst;
+    resourcePool_instance = inst;
 }
 
 QnResourcePool* QnResourcePool::instance()
 {
     //return globalResourcePool();
-    return resourcePool;
+    return resourcePool_instance;
 }
 
 bool QnResourcePool::isLayoutsUpdated() const {
@@ -77,14 +74,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         if(resource->resourcePool() != NULL)
             qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
             
-
-        // if resources are local assign localserver as parent
-        if (!resource->getParentId().isValid())
-        {
-            if (resource->hasFlags(QnResource::local))
-                resource->setParentId(localServer->getId());
-        }
-
         if (!resource->getId().isValid())
         {
             // must be just found local resource; => shold not be in the pool already
@@ -180,14 +169,11 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
 
-    QMutexLocker locker(&m_resourcesMtx);
+    m_resourcesMtx.lock();
 
     foreach (const QnResourcePtr &resource, resources)
     {
         if (!resource)
-            continue;
-
-        if (resource == localServer) // special case
             continue;
 
         if(resource->resourcePool() != this)
@@ -223,13 +209,18 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         disconnect(resource.data(), NULL, this, NULL);
 
         if(m_updateLayouts)
-            foreach (const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+            foreach(const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
                 foreach(const QnLayoutItemData &data, layoutResource->getItems())
                     if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
                         layoutResource->removeItem(data);
 
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
+    }
 
+    m_resourcesMtx.unlock();
+
+    /* Remove resources. */
+    foreach (const QnResourcePtr &resource, removedResources) {
         emit resourceRemoved(resource);
     }
 }
@@ -248,7 +239,7 @@ QnResourcePtr QnResourcePool::getResourceById(QnId id, Filter searchFilter) cons
     if( resIter != m_resources.end() )
         return resIter.value();
 
-    if( searchFilter == rfOnlyFriends )
+    if( searchFilter == OnlyFriends )
         return QnResourcePtr(NULL);
 
     //looking through foreign resources
@@ -295,14 +286,18 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnResourceList QnResourcePool::getAllEnabledCameras() const
+QnResourceList QnResourcePool::getAllEnabledCameras(QnResourcePtr mServer) const
 {
+    QnId parentId = mServer ? mServer->getId() : QnId();
     QnResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if (camResource != 0 && !camResource->isDisabled() && !camResource->hasFlags(QnResource::foreigner))
+        {
+            if (!parentId.isValid() || camResource->getParentId() == parentId)
             result << camResource;
+        }
     }
 
     return result;
@@ -451,7 +446,7 @@ QStringList QnResourcePool::allTags() const
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources.values())
-        result << resource->tagList();
+        result << resource->getTags();
 
     return result;
 }
@@ -485,7 +480,6 @@ void QnResourcePool::clear()
 {
     QMutexLocker lk( &m_resourcesMtx );
 
-    localServer.clear();
     m_resources.clear();
     m_foreignResources.clear();
 }

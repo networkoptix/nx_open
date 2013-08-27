@@ -14,6 +14,8 @@ QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
             this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
     connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(int)),
             this, SLOT(at_message_ruleDeleted(int)));
+    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
+            this, SLOT(at_message_ruleReset(QnBusinessEventRuleList)));
 
 }
 
@@ -73,7 +75,16 @@ void QnBusinessRulesActualModel::at_message_ruleDeleted(int id) {
     emit businessRuleDeleted(id);
 }
 
+void QnBusinessRulesActualModel::at_message_ruleReset(QnBusinessEventRuleList rules) {
+    emit beforeModelChanged();
+    clear();
+    foreach (const QnBusinessEventRulePtr &rule, rules)
+        addRule(rule);
+    emit afterModelChanged(RulesLoaded, true);
+}
+
 bool QnBusinessRulesActualModel::isLoaded() const
 {
     return m_isDataLoaded;
 }
+

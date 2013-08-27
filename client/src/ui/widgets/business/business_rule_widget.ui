@@ -155,7 +155,7 @@
            <string>Schedule...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../../../x86/build/client-custom.qrc">
+           <iconset>
             <normaloff>:/skin/tree/servers.png</normaloff>:/skin/tree/servers.png</iconset>
           </property>
          </widget>
@@ -252,93 +252,15 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="actionAggregationFrame">
-          <layout class="QHBoxLayout" name="actionAggregationLayout">
-           <item>
-            <widget class="QCheckBox" name="aggregationCheckBox">
-             <property name="text">
-              <string>no more than once per</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="aggregationValueSpinBox">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="correctionMode">
-              <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
-             </property>
-             <property name="maximum">
-              <number>9999</number>
-             </property>
-             <property name="value">
-              <number>10</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="aggregationPeriodComboBox">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="currentIndex">
-              <number>1</number>
-             </property>
-             <item>
-              <property name="text">
-               <string>sec</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>min</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>hrs</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>days</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+         <widget class="QnAggregationWidget" name="aggregationWidget" native="true"/>
         </item>
         <item>
-         <widget class="QFrame" name="actionParamsFrame">
+         <widget class="QWidget" name="actionParamsWidget" native="true">
           <property name="minimumSize">
            <size>
             <width>0</width>
             <height>30</height>
            </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>0</number>
           </property>
           <layout class="QVBoxLayout" name="actionParamsLayout">
            <property name="spacing">
@@ -390,8 +312,14 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../../x86/build/client-custom.qrc"/>
- </resources>
+ <customwidgets>
+  <customwidget>
+   <class>QnAggregationWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/business/aggregation_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
  <connections/>
 </ui>

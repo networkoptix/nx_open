@@ -11,6 +11,7 @@
 #include <QFileInfo>
 
 #include <core/resource/resource.h>
+#include <utils/fs/file.h>
 
 
 class DummyResource
@@ -63,7 +64,7 @@ bool FileTranscoder::addTag( const QString& name, const QString& value )
 bool FileTranscoder::setVideoCodec(
     CodecID codec,
     QnTranscoder::TranscodeMethod transcodeMethod,
-    QnStreamQuality quality,
+    Qn::StreamQuality quality,
     const QSize& resolution,
     int bitrate,
     QnCodecParams::Value params )
@@ -134,9 +135,9 @@ bool FileTranscoder::setTagValue(
     avformat_close_input(&formatCtx);
 
     //replacing source file with new file
-    if( !srcFileDir.remove(QFileInfo(srcFilePath).fileName()) )
+    if( !srcFileDir.remove(QnFile::fileName(srcFilePath)) )
         return false;
-    return srcFileDir.rename( tempFileName, QFileInfo(srcFilePath).fileName() );
+    return srcFileDir.rename( tempFileName, QnFile::fileName(srcFilePath) );
 }
 
 void FileTranscoder::pleaseStop()

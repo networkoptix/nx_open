@@ -252,7 +252,7 @@ const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo
 {
     if (!faultInfo) {
         qDebug() << "SoapErrorHelper::fetchDescription: fault info is null";
-        return QString();
+        return QString::fromLatin1("unknown_error");
     }
 
     QByteArray result("Fault Info. ");

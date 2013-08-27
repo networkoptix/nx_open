@@ -111,7 +111,7 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         return;
     }
     
-    if (display->isFullScreen())
+    if (display->isFullScreen() || display->isZoomWindow())
         return; // do not go to LQ for full screen items (except of FF/REW play)
 
     if (reader->getQuality() == MEDIA_Quality_Low)
@@ -232,8 +232,17 @@ void QnRedAssController::onTimer()
 {
     QMutexLocker lock(&m_mutex);
 
-    if (m_mode != Qn::AutoResolution)
+    if (m_mode != Qn::AutoResolution) 
+    {
+        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+        {
+            QnCamDisplay* display = itr.key();
+            QnArchiveStreamReader* reader = display->getArchiveReader();
+            if (!display->isFullScreen())
+                reader->setQuality(m_mode == Qn::LowResolution ? MEDIA_Quality_Low : MEDIA_Quality_High, true);
+        }
         return;
+    }
 
     if (++m_timerTicks >= TOHQ_ADDITIONAL_TRY)
     {
@@ -266,7 +275,7 @@ void QnRedAssController::onTimer()
         // switch HQ->LQ if visual item size is small
         QnArchiveStreamReader* reader = display->getArchiveReader();
 
-        if (display->isFullScreen() && !isFFSpeed(display))
+        if ((display->isFullScreen() || display->isZoomWindow()) && !isFFSpeed(display))
             reader->setQuality(MEDIA_Quality_High, true); // todo: remove quality control from workbench display. Set quality here again to prevent race condition
 
         if (itr.value().awaitingLQTime && qnSyncTime->currentMSecsSinceEpoch() - itr.value().awaitingLQTime > QUALITY_SWITCH_INTERVAL)

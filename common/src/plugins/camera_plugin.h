@@ -330,7 +330,8 @@ namespace nxcip
             ptzCapability               = 0x08, //!< if this flag is enabled, \a CameraPTZManager MUST be implemented
             audioCapability             = 0x10, //!< if set, camera supports audio
             shareFpsCapability          = 0x20, //!< if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-            sharePixelsCapability       = 0x40  //!< if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
+            sharePixelsCapability       = 0x40, //!< if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
+            shareIpCapability           = 0x80  //!< allow multiple instances on a same IP address
         };
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
         /*!

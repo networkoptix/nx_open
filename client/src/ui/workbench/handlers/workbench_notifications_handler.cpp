@@ -3,6 +3,8 @@
 #include <client/client_settings.h>
 #include <client_message_processor.h>
 
+#include <business/business_strings_helper.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -42,6 +44,8 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
             this, SLOT(at_eventManager_connectionOpened()));
     connect(QnClientMessageProcessor::instance(), SIGNAL(connectionClosed()),
             this, SLOT(at_eventManager_connectionClosed()));
+
+    connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), SIGNAL(valueChanged(int)), this, SLOT(at_settings_valueChanged(int)));
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
@@ -73,22 +77,21 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     int healthMessage = eventType - BusinessEventType::SystemHealthMessage;
     if (healthMessage >= 0) {
         int resourceId = params.getEventResourceId();
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
-        if (resource) //all incoming systemhealth events should contain source resource
-           addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
+        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
+        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
         return;
     }
 
-    if (!(m_showBusinessEventsHelper->value() & (1 << eventType))) {
-        qDebug() << "popup received, ignoring" << BusinessEventType::toString(eventType);
+    if (!(m_showBusinessEventsHelper->value() & (1ull << eventType))) {
+        qDebug() << "popup received, ignoring" << QnBusinessStringsHelper::eventName(eventType);
         return;
     }
 
     int id = businessAction->getRuntimeParams().getEventResourceId();
-    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::rfAllResources);
+    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::AllResources);
     QString resource = res ? res->getName() : QString();
 
-    qDebug() << "popup received" << eventType << BusinessEventType::toString(eventType) << "from" << resource << "(" << id << ")";
+    qDebug() << "popup received" << eventType << QnBusinessStringsHelper::eventName(eventType) << "from" << resource << "(" << id << ")";
     emit businessActionAdded(businessAction);
 }
 
@@ -97,7 +100,7 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
 }
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource) {
-    if (!(qnSettings->popupSystemHealth() & (1 << message)))
+    if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
     emit systemHealthEventAdded(message, resource);
 }
@@ -157,7 +160,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
     }
 
     /* Checking that we want to see this message */
-    bool canShow = qnSettings->popupSystemHealth() & (1 << message);
+    bool canShow = qnSettings->popupSystemHealth() & (1ull << message);
 
     if (visible && canShow)
         emit systemHealthEventAdded(message, resource);
@@ -166,7 +169,6 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
-    qDebug() << "userChaged" << context()->user();
     m_showBusinessEventsHelper->setResource(context()->user());
 
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
@@ -189,15 +191,25 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
     setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, false);
-    qDebug() << "connectionOPened";
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
     clear();
     setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);
-    qDebug() << "connectionClosed";
 }
 
 void QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged() {
     setSystemHealthEventVisible(QnSystemHealth::NoLicenses, qnLicensePool->isEmpty());
+}
+
+void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
+    if (id != QnClientSettings::POPUP_SYSTEM_HEALTH)
+        return;
+    quint64 visible = qnSettings->popupSystemHealth();
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        if (visible & (1ull << i))
+            continue;
+        QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
+        emit systemHealthEventRemoved(message, QnResourcePtr());
+    }
 }

@@ -6,48 +6,73 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
-    <height>35</height>
+    <width>704</width>
+    <height>56</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <property name="margin">
     <number>0</number>
    </property>
    <item>
-    <widget class="QComboBox" name="pathComboBox"/>
+    <layout class="QHBoxLayout" name="selectLayout" stretch="1,0">
+     <item>
+      <widget class="QComboBox" name="pathComboBox"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="manageButton">
+       <property name="text">
+        <string>Manage...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="playButton">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../../../../x86/build/client-custom.qrc">
-       <normaloff>:/skin/slider/navigation/play.png</normaloff>:/skin/slider/navigation/play.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>16</width>
-       <height>16</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="manageButton">
-     <property name="text">
-      <string>Manage...</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="testLayout">
+     <item>
+      <widget class="QLabel" name="volumeLabel">
+       <property name="text">
+        <string>Volume:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="volumeSlider">
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="testButton">
+       <property name="text">
+        <string>Test...</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../../x86/build/client-custom.qrc"/>
- </resources>
+ <tabstops>
+  <tabstop>pathComboBox</tabstop>
+  <tabstop>manageButton</tabstop>
+  <tabstop>volumeSlider</tabstop>
+  <tabstop>testButton</tabstop>
+ </tabstops>
+ <resources/>
  <connections/>
 </ui>

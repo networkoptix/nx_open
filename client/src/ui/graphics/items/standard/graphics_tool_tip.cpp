@@ -16,6 +16,8 @@
 #include <ui/common/weak_graphics_item_pointer.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 
+#include <utils/math/fuzzy.h>
+
 namespace {
     const qreal toolTipMargin = 5.0;
 }
@@ -29,7 +31,7 @@ class GraphicsToolTipLabel: public QnProxyLabel {
 public:
     GraphicsToolTipLabel(const QString &text, QGraphicsItem *newItem);
     virtual ~GraphicsToolTipLabel();
-    
+
     static GraphicsToolTipLabel *instance;
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
@@ -55,6 +57,7 @@ private:
 private:
     QBasicTimer m_hideTimer, m_expireTimer;
     WeakGraphicsItemPointer m_item;
+    QPointF m_oldParentPos;
 };
 
 GraphicsToolTipLabel *GraphicsToolTipLabel::instance = 0;
@@ -101,6 +104,7 @@ void GraphicsToolTipLabel::reuseTip(const QString &newText, QGraphicsItem *newIt
     }
 
     m_item = newItem;
+    m_oldParentPos = newItem->pos();
 
     setZValue(std::numeric_limits<qreal>::max());
     setText(newText);
@@ -178,7 +182,9 @@ void GraphicsToolTipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
 }
 
 bool GraphicsToolTipLabel::tipChanged(const QString &newText, QGraphicsItem *parent) {
-    return (newText != this->text() || parent != this->item());
+    return (newText != this->text() ||
+            parent != this->item() ||
+            !qFuzzyCompare(parent->pos(), m_oldParentPos));
 }
 
 void GraphicsToolTipLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -221,18 +227,16 @@ void GraphicsToolTip::showText(const QString &text, QGraphicsView *view, QGraphi
 }
 
 void GraphicsToolTip::showText(const QString &text, QGraphicsItem *item, QPointF scenePos, QRectF sceneRect) {
-
     if (GraphicsToolTipLabel::instance && GraphicsToolTipLabel::instance->isVisible()) { /* A tip does already exist. */
         if (text.isEmpty()) { /* Empty text => hide current tip. */
             GraphicsToolTipLabel::instance->hideTip();
             return;
         } else {
             /* If the tip has changed, reuse the one that is being shown (removes flickering). */
-            if (GraphicsToolTipLabel::instance->tipChanged(text, item)){
+            if (GraphicsToolTipLabel::instance->tipChanged(text, item)) {
                 GraphicsToolTipLabel::instance->reuseTip(text, item);
                 GraphicsToolTipLabel::instance->placeTip(scenePos, sceneRect);
             }
-            
             opacityAnimator(GraphicsToolTipLabel::instance, 3.0)->animateTo(1.0);
             return;
         }

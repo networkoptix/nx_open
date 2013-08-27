@@ -76,6 +76,7 @@ QnSessionManager::QnSessionManager(QObject *parent):
     connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(at_aboutToBeStarted()));
 
     m_thread->setObjectName( QLatin1String("QnSessionManagerThread") ); /* Name will be shown in debugger. */
+    Q_ASSERT(parent == 0);
     this->moveToThread(m_thread.data());
     m_thread->start();
 }
@@ -181,7 +182,7 @@ int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QSt
     int handle = s_handle.fetchAndAddAcquire(1);
 
     /* We need to create reply processor here as target could not exist when doAsyncGetRequest gets called. */
-    QnSessionManagerAsyncReplyProcessor* replyProcessor = new QnSessionManagerAsyncReplyProcessor(handle);
+    QnSessionManagerAsyncReplyProcessor *replyProcessor = new QnSessionManagerAsyncReplyProcessor(handle);
     replyProcessor->moveToThread(this->thread());
     connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, connectionType == Qt::AutoConnection ? Qt::QueuedConnection : connectionType);
     connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(at_replyProcessor_finished(QnHTTPRawResponse, int)), Qt::QueuedConnection);

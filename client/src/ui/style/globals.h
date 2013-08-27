@@ -75,6 +75,9 @@ public:
         /** Color of notifications about critical events */
         NOTIFICATION_COLOR_CRITICAL,
 
+        /** Minimum size of the layout background - in cells */
+        LAYOUT_BACKGROUND_MIN_SIZE,
+
         /** Maximum size of the layout background - in cells */
         LAYOUT_BACKGROUND_MAX_SIZE,
 
@@ -138,11 +141,12 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   notificationColorImportant,     NOTIFICATION_COLOR_IMPORTANT,           QColor(237, 200, 66))
         QN_DECLARE_R_PROPERTY(QColor,   notificationColorCritical,      NOTIFICATION_COLOR_CRITICAL,            QColor(255, 131, 48))
 
+        QN_DECLARE_R_PROPERTY(QSize,    layoutBackgroundMinSize,        LAYOUT_BACKGROUND_MIN_SIZE,             QSize(5, 5))
         QN_DECLARE_R_PROPERTY(QSize,    layoutBackgroundMaxSize,        LAYOUT_BACKGROUND_MAX_SIZE,             QSize(64, 64))
         QN_DECLARE_R_PROPERTY(int,      layoutBackgroundRecommendedArea,LAYOUT_BACKGROUND_RECOMMENDED_AREA,     40*40)
 
         QN_DECLARE_R_PROPERTY(QColor,   raisedConeColor,                RAISED_CONE_COLOR,                      QColor(64, 130, 180, 128))
-        QN_DECLARE_R_PROPERTY(qreal,    raisedWigdetOpacity,            RAISED_WIDGET_OPACITY,                  0.7)
+        QN_DECLARE_R_PROPERTY(qreal,    raisedWigdetOpacity,            RAISED_WIDGET_OPACITY,                  0.95)
     QN_END_PROPERTY_STORAGE()
 };
 

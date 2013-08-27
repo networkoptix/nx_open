@@ -9,7 +9,8 @@
 #include <QtCore/QVariant>
 
 #include <client/client_globals.h>
-#include "utils/color_space/image_correction.h"
+#include <utils/color_space/image_correction.h>
+#include <core/resource/dewarping_params.h>
 
 class QnWorkbenchLayout;
 class QnLayoutItemData;
@@ -212,12 +213,22 @@ public:
     void setZoomRect(const QRectF &zoomRect);
 
     /**
-     * \param  New contrast params for this item.
+     * \param                           New image enhancement params for this item.
      */
-    void setContrastParams(const ImageCorrectionParams& params);
+    void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
+
+    /**
+     * \param                           New dewarping enhancement params for this item.
+     */
+    void setDewarpingParams(const DewarpingParams& params);
+
     
-    const ImageCorrectionParams& contrastParams() const {
-        return m_contrastParams;
+    const ImageCorrectionParams &imageEnhancement() const {
+        return m_imageEnhancement;
+    }
+
+    const DewarpingParams &dewarpingParams() const {
+        return m_dewarpingParams;
     }
 
     QnWorkbenchItem *zoomTargetItem() const;
@@ -271,6 +282,11 @@ public:
         }
     }
 
+    template<class T>
+    bool setData(int role, const T &value) {
+        return setData(role, QVariant::fromValue<T>(value));
+    }
+
     /**
      * \param role                      Role to set data for.
      * \param value                     New value for the given data role.
@@ -283,7 +299,8 @@ signals:
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
     void zoomRectChanged();
-    void contrastParamsChanged();
+    void imageEnhancementChanged();
+    void dewarpingParamsChanged();
     void zoomTargetItemChanged();
     void rotationChanged();
     void dataChanged(int role);
@@ -314,8 +331,11 @@ private:
     /** Item-relative rectangle that defines the portion of the item to be shown. */
     QRectF m_zoomRect;
 
-    /** Item contrast params */
-    ImageCorrectionParams m_contrastParams;
+    /** Item image enhancement params. */
+    ImageCorrectionParams m_imageEnhancement;
+
+    /** Fisheye dewarping params. */
+    DewarpingParams m_dewarpingParams;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;

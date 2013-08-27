@@ -72,6 +72,8 @@ public:
      * \returns                         Position of the given channel in a channel matrix.
      */
     virtual QPoint position(int channel) const = 0;
+
+    virtual QString toString() const { return QString(); }
 };
 
 
@@ -124,6 +126,19 @@ public:
         return result;
     }
 
+    virtual QString QnCustomResourceVideoLayout::toString() const override
+    {
+        QString result(lit("width=%1;height=%2;sensors=%3"));
+        QString sensors;
+        for (int i = 0; i < m_channels.size(); ++i) 
+        {
+            if (i > 0)
+                sensors += L',';
+            sensors += QString::number(m_channels[i]);
+        }
+        return result.arg(m_size.width()).arg(m_size.height()).arg(sensors);
+    }
+
     QnCustomResourceVideoLayout(const QSize &size):
         m_size(size)
     {
@@ -161,6 +176,8 @@ public:
         return QPoint();
     }
 
+    QVector<int> getChannels() const            { return m_channels; }
+    void setChannels(const QVector<int>& value) { m_channels = value; }
 protected:
     QVector<int> m_channels;
     QSize m_size;

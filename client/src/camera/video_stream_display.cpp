@@ -13,6 +13,8 @@
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "../client/client_settings.h"
+#include "transcoding/filters/contrast_image_filter.h"
+#include "transcoding/filters/fisheye_image_filter.h"
 
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
@@ -45,7 +47,8 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber)
     m_lastDisplayedFrame(NULL),
     m_prevSrcWidth(0),
     m_prevSrcHeight(0),
-    m_lastIgnoreTime(AV_NOPTS_VALUE)
+    m_lastIgnoreTime(AV_NOPTS_VALUE),
+    m_isPaused(false)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
@@ -76,19 +79,28 @@ void QnVideoStreamDisplay::pleaseStop()
     //    render->pleaseStop();
 }
 
-void QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
+int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 {
+    {
+        QMutexLocker lock(&m_mtx);
+        renderer->setPaused(m_isPaused);
+        if (m_lastDisplayedFrame)
+            renderer->draw(m_lastDisplayedFrame);
+    }
+
     QMutexLocker lock(&m_renderListMtx);
     renderer->setScreenshotInterface(this);
     m_newList << renderer;
     m_renderListModified = true;
+    return m_newList.size();
 }
 
-void QnVideoStreamDisplay::removeRenderer(QnAbstractRenderer* renderer)
+int QnVideoStreamDisplay::removeRenderer(QnAbstractRenderer* renderer)
 {
     QMutexLocker lock(&m_renderListMtx);
     m_newList.remove(renderer);
     m_renderListModified = true;
+    return m_newList.size();
 }
 
 QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::getCurrentDownscaleFactor() const
@@ -471,9 +483,11 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
          scaleFactor != QnFrameScaler::factor_1);
 
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
-    //if (render->isDisplaying(outFrame))
-    foreach(QnAbstractRenderer* render, m_renderList)
-        render->waitForFrameDisplayed(data->channelNumber);
+    
+    foreach(QnAbstractRenderer* render, m_renderList) {
+        if (render->isDisplaying(outFrame))
+            render->waitForFrameDisplayed(data->channelNumber);
+    }
 
     outFrame->channel = data->channelNumber;
     outFrame->flags = 0;
@@ -543,6 +557,14 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
     m_mtx.unlock();
     if (decodeToFrame->width) {
+        /*
+        if (decodeToFrame->width == 2592) {
+            decodeToFrame->width = 1920;
+            decodeToFrame->data[0] += (2592-1920)/2;
+            decodeToFrame->data[1] += (2592-1920)/4;
+            decodeToFrame->data[2] += (2592-1920)/4;
+        }
+        */
         QSize imageSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
         QMutexLocker lock(&m_imageSizeMtx);
         m_imageSize = imageSize;
@@ -728,7 +750,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
                 foreach(QnAbstractRenderer* render, m_renderList)
                     render->draw(outFrame); // send new one
             }
-            m_lastDisplayedFrame = outFrame;
             m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
             m_queueUsed = true;
         }
@@ -738,6 +759,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
             foreach(QnAbstractRenderer* render, m_renderList)
                 render->waitForFrameDisplayed(outFrame->channel);
         }
+        m_lastDisplayedFrame = outFrame;
         return true; //!m_bufferedFrameDisplayer;
     }
     else
@@ -876,6 +898,9 @@ void QnVideoStreamDisplay::setPausedSafe(bool value)
     QMutexLocker lock(&m_renderListMtx);
     foreach(QnAbstractRenderer* render, m_renderList)
         render->setPaused(value);
+    foreach(QnAbstractRenderer* render, m_newList)
+        render->setPaused(value);
+    m_isPaused = value;
 }
 
 void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
@@ -957,7 +982,7 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 }
 
 
-QImage QnVideoStreamDisplay::getScreenshot()
+QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, const DewarpingParams& dewarping)
 {
     if (m_decoder.isEmpty())
         return QImage();
@@ -970,25 +995,56 @@ QImage QnVideoStreamDisplay::getScreenshot()
     if (!lastFrame || !lastFrame->width || !lastFrame->data[0])
         return QImage();
 
+    // copy image
+    QScopedPointer<CLVideoDecoderOutput> srcFrame(new CLVideoDecoderOutput());
+    srcFrame->setUseExternalData(false);
+
+    QSize srcSize(QSize(lastFrame->width, lastFrame->height));
+    QSize frameCopySize = QnFisheyeImageFilter::getOptimalSize(srcSize, dewarping);
+
+    srcFrame->reallocate(frameCopySize.width(), frameCopySize.height(), lastFrame->format);
+
+    if (frameCopySize == srcSize)
+        av_picture_copy((AVPicture*) srcFrame.data(), (AVPicture*) lastFrame, (PixelFormat) lastFrame->format, lastFrame->width, lastFrame->height);
+    else {
+        // resize frame
+        SwsContext* convertor = sws_getContext(
+            lastFrame->width,       lastFrame->height,  (PixelFormat) lastFrame->format,
+            srcFrame->width,        srcFrame->height, (PixelFormat) srcFrame->format,
+            SWS_BILINEAR, NULL, NULL, NULL);
+        if( !convertor )
+            return QImage();
+
+        sws_scale(convertor, lastFrame->data, lastFrame->linesize, 0, lastFrame->height, 
+                             srcFrame->data, srcFrame->linesize);
+        sws_freeContext(convertor);
+    }
+
+    QnContrastImageFilter filter(params);
+    filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+
+    QnFisheyeImageFilter filter2(dewarping);
+    filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+
     // convert colorSpace
-    SwsContext* convertor = sws_getContext(lastFrame->width, lastFrame->height, (PixelFormat) lastFrame->format,
-        lastFrame->width, lastFrame->height, PIX_FMT_BGRA,
+    SwsContext* convertor = sws_getContext(srcFrame->width, srcFrame->height, (PixelFormat) srcFrame->format,
+        srcFrame->width, srcFrame->height, PIX_FMT_BGRA,
         SWS_POINT, NULL, NULL, NULL);
     if( !convertor )
         return QImage();
 
-    int numBytes = avpicture_get_size(PIX_FMT_RGBA, lastFrame->width, lastFrame->height);
+    int numBytes = avpicture_get_size(PIX_FMT_RGBA, srcFrame->width, srcFrame->height);
     AVPicture outPicture; 
-    avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, lastFrame->width, lastFrame->height);
+    avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, srcFrame->width, srcFrame->height);
 
-    sws_scale(convertor, lastFrame->data, lastFrame->linesize, 
-              0, lastFrame->height, 
+    sws_scale(convertor, srcFrame->data, srcFrame->linesize, 
+              0, srcFrame->height, 
               outPicture.data, outPicture.linesize);
     sws_freeContext(convertor);
     // convert to QImage
-    QImage tmp(outPicture.data[0], lastFrame->width, lastFrame->height, outPicture.linesize[0], QImage::Format_ARGB32);
-    QImage rez( lastFrame->width, lastFrame->height, QImage::Format_ARGB32);
-    rez = tmp.copy(0,0, lastFrame->width, lastFrame->height);
+    QImage tmp(outPicture.data[0], srcFrame->width, srcFrame->height, outPicture.linesize[0], QImage::Format_ARGB32);
+    QImage rez( srcFrame->width, srcFrame->height, QImage::Format_ARGB32);
+    rez = tmp.copy(0,0, srcFrame->width, srcFrame->height);
     avpicture_free(&outPicture);
     return rez;
 }

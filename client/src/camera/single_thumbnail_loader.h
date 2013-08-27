@@ -5,20 +5,14 @@
 
 #include <api/media_server_connection.h>
 #include <core/resource/network_resource.h>
+#include <utils/image_provider.h>
 
-class QnSingleThumbnailLoader : public QObject
-{
+class QnSingleThumbnailLoader : public QnImageProvider {
     Q_OBJECT
-public:
-    /**
-     * Constructor.
-     *
-     * \param connection                Video server connection to use.
-     * \param resource                  Network resource representing the camera to work with.
-     * \param parent                    Parent object.
-     */
-    explicit QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent = NULL);
 
+    typedef QnImageProvider base_type;
+
+public:
     /**
      * Creates a new thumbnail loader for the given camera resource. Returns NULL
      * pointer in case loader cannot be created.
@@ -27,9 +21,26 @@ public:
      * \param parent                    Parent object for the loader to create.
      * \returns                         Newly created thumbnail loader.
      */
-    static QnSingleThumbnailLoader *newInstance(QnResourcePtr resource, QObject *parent = NULL);
+    static QnSingleThumbnailLoader *newInstance(QnResourcePtr resource,
+                                                qint64 usecSinceEpoch,
+                                                const QSize &size,
+                                                QObject *parent = NULL);
 
-    void load(qint64 usecSinceEpoch, const QSize& size);
+
+    /**
+     * Constructor.
+     *
+     * \param connection                Video server connection to use.
+     * \param resource                  Network resource representing the camera to work with.
+     * \param parent                    Parent object.
+     */
+    explicit QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection,
+                                     QnNetworkResourcePtr resource,
+                                     qint64 usecSinceEpoch,
+                                     const QSize &size,
+                                     QObject *parent = NULL);
+
+    virtual QImage image() const override;
 signals:
     /**
      * This signal is emitted whenever thumbnail was successfully loaded.
@@ -46,11 +57,12 @@ signals:
     void failed(int status);
 
     void finished();
+
+protected:
+    virtual void doLoadAsync() override;
+
 private slots:
     void at_replyReceived(int status, const QImage& image, int requstHandle);
-
-private:
-    int sendRequest(qint64 usecSinceEpoch, const QSize& size);
 
 private:
     /** Resource that this loader gets thumbnail for. */
@@ -58,6 +70,11 @@ private:
 
     /** Video server connection that this loader uses. */
     QnMediaServerConnectionPtr m_connection;
+
+    QImage m_image;
+
+    qint64 m_usecSinceEpoch;
+    QSize m_size;
 };
 
 #endif // SINGLE_THUMBNAIL_LOADER_H

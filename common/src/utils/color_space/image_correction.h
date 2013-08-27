@@ -1,8 +1,13 @@
 #ifndef __IMAGE_CORRECTION_H__
 #define __IMAGE_CORRECTION_H__
 
-#include <QRectF>
+#include <cstring>
+
+#include <QtGlobal>
 #include <QByteArray>
+#include <QList>
+#include <QRectF>
+#include <QMetaType>
 
 struct ImageCorrectionParams
 {
@@ -45,19 +50,17 @@ Q_DECLARE_METATYPE(ImageCorrectionParams);
 
 struct ImageCorrectionResult
 {
-
     ImageCorrectionResult(): aCoeff(1.0), bCoeff(0.0), gamma(1.0), filled(false) { }
+
     float aCoeff;
     float bCoeff;
     float gamma;
     int hystogram[256];
     bool filled;
 
-    void analizeImage( const quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data, const QRectF& srcRect);
+    void analizeImage( const quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data, const QRectF& srcRect = QRectF(0.0, 0.0, 1.0, 1.0));
 private:
     float calcGamma(int leftPos, int rightPos, int pixels) const;
-private:
-    //mutable QMutex m_mutex;
 };
 
 class QnHistogramConsumer

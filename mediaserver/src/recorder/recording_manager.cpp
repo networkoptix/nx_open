@@ -43,7 +43,8 @@ void QnRecordingManager::start()
 
 void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
 {
-    recorders.recorderHiRes->pleaseStop();
+    if( recorders.recorderHiRes )
+        recorders.recorderHiRes->pleaseStop();
     if (recorders.recorderLowRes)
         recorders.recorderLowRes->pleaseStop();
 }
@@ -148,7 +149,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     return true;
 }
 
-bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
+bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
 {
     updateCamera(camRes); // ensure recorders are created
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);
@@ -224,14 +225,14 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
                 if (!recorderHiRes->isRunning()) {
                     if (!updateCameraHistory(res))
                         return;
-                    cl_log.log("Recording started for camera ", res->getUniqueId(), cl_logINFO);
+                    NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
                 }
                 recorderHiRes->start();
             }
             providerHi->start();
         }
 
-        if (providerLow) {
+        if (providerLow && recorderHiRes) {
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
@@ -240,8 +241,9 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             if (runSecondStream)
             {
                 if (recorderLowRes) {
-                    if (!recorderLowRes->isRunning())
-                        cl_log.log("Recording started (secondary stream) for camera ", res->getUniqueId(), cl_logINFO);
+                    if (!recorderLowRes->isRunning()) {
+                        NX_LOG(QString(lit("Recording started (secondary stream) for camera  %1")).arg(res->getUniqueId()), cl_logINFO);
+                    }
                     recorderLowRes->start();
                 }
                 providerLow->start();
@@ -280,7 +282,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         */
 
         if (needStopHi) {
-            cl_log.log("Recording stopped for camera ", res->getUniqueId(), cl_logINFO);
+            NX_LOG(QString(lit("Recording stopped for camera %1")).arg(res->getUniqueId()), cl_logINFO);
         }
         if(!needStopHi && !needStopLow && res->getStatus() == QnResource::Recording)
             res->setStatus(QnResource::Online); // may be recording thread was not runned, so reset status to online
@@ -356,7 +358,7 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
         if (!camera->isInitialized() && !camera->isDisabled()) {
-            camera->initAsync();
+            camera->initAsync(false);
         }
 
 		QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
@@ -397,12 +399,15 @@ void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
 
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 {
-    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(resource);
+    QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(resource);
     if (camera && !camera->hasFlags(QnResource::foreigner)) 
     {
         QnResource::Status status = camera->getStatus();
         if(status == QnResource::Online || status == QnResource::Recording)
             m_onlineCameras.insert(camera); // TODO: merge into at_camera_statusChanged
+
+        if (!camera->isInitialized() && !camera->isDisabled() && !camera->isScheduleDisabled())
+            camera->initAsync(true);
 
         connect(camera.data(), SIGNAL(statusChanged(const QnResourcePtr &)),            this, SLOT(at_camera_statusChanged(const QnResourcePtr &)));
         connect(camera.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),          this, SLOT(at_camera_resourceChanged(const QnResourcePtr &)));

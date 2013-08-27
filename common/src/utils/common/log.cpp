@@ -41,7 +41,7 @@ public:
 
         m_file.setFileName(currFileName());
 
-        bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+        bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Unbuffered);
         if (rez)
             m_file.write(UTF8_BOM);
         return rez;
@@ -68,13 +68,16 @@ public:
             << " (" << qn_logLevelNames[logLevel] << "): " << msg.toUtf8().data() << "\r\n";
         ostr.flush();
 
-        QMutexLocker mutx(&m_mutex);
-        if (!m_file.isOpen())
-            return;
-        m_file.write(ostr.str().c_str());
-        m_file.flush();
-        if (m_file.size() >= m_maxFileSize)
-            openNextFile();
+        const std::string& str = ostr.str();
+        {
+            QMutexLocker mutx(&m_mutex);
+            if (!m_file.isOpen())
+                return;
+            m_file.write(str.c_str());
+            m_file.flush();
+            if (m_file.size() >= m_maxFileSize)
+                openNextFile();
+        }
     }
 
     QString syncCurrFileName() const

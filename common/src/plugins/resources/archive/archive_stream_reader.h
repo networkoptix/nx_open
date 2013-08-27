@@ -88,6 +88,7 @@ public:
     virtual void pause() override;
     virtual void resume() override;
 
+    virtual bool isRealTimeSource() const override;
 protected:
     virtual bool init();
 

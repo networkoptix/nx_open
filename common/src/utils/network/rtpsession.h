@@ -13,6 +13,7 @@ extern "C"
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrl>
 #include "../common/threadqueue.h"
+#include "utils/camera/camera_diagnostics.h"
 
 //#define DEBUG_TIMINGS
 
@@ -171,8 +172,8 @@ public:
     RTPSession();
     ~RTPSession();
 
-    // returns true if stream was opened, false in case of some error
-    bool open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
+    // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
+    CameraDiagnostics::Result open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
 
     /*
     * Start playing RTSP sessopn.
@@ -265,6 +266,8 @@ public:
     static quint8* prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int channel, int reserve);
 
     bool setTCPReadBufferSize(int value);
+
+    QString getVideoLayout() const;
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -346,6 +349,8 @@ private:
     static QMutex m_guidMutex;
 
     QVector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
+    QString m_reasonPhrase;
+    QString m_videoLayout;
 };
 
 #endif //rtp_session_h_1935_h

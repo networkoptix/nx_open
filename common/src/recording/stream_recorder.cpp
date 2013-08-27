@@ -12,6 +12,7 @@
 #include "transcoding/ffmpeg_video_transcoder.h"
 #include "transcoding/filters/contrast_image_filter.h"
 #include "transcoding/filters/time_image_filter.h"
+#include "transcoding/filters/fisheye_image_filter.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -456,7 +457,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     bool isTranscode = m_role == Role_FileExportWithTime || 
         (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
         !m_srcRect.isEmpty() ||
-        m_contrastParams.enabled;
+        m_contrastParams.enabled ||
+        m_dewarpingParams.enabled;
 
     const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
@@ -466,6 +468,11 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         qint64 startTime = m_startOffset+mediaData->timestamp/1000;
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_startTime, fileExt), QString::number(startTime).toAscii().data(), 0);
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Software, fileExt), "Network Optix", 0);
+        DewarpingParams resDeworping = mediaDev->getDewarpingParams();
+        if (resDeworping.enabled && !m_dewarpingParams.enabled) {
+            // deworping exists in resource and not activated now. Allow deworping for saved file
+            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Dewarping, fileExt), resDeworping.serialize(), 0);
+        }
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature) {
             QByteArray signPattern = QnSignHelper::getSignPattern();
@@ -510,6 +517,16 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
 
+                if (m_dewarpingParams.enabled) {
+                    m_videoTranscoder->addFilter(new QnFisheyeImageFilter(m_dewarpingParams));
+                    if (m_dewarpingParams.panoFactor > 1) 
+                    {
+                        // update image aspect, keep megapixels amount unchanged
+                        m_videoTranscoder->open(mediaData);
+                        QSize res = QnFisheyeImageFilter::getOptimalSize(m_videoTranscoder->getResolution(), m_dewarpingParams);
+                        m_videoTranscoder->setResolution(res);
+                    }
+                }
                 if (m_contrastParams.enabled)
                     m_videoTranscoder->addFilter(new QnContrastImageFilter(m_contrastParams));
                 if (m_role == Role_FileExportWithTime) 
@@ -517,8 +534,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                     m_videoTranscoder->addFilter(new QnTimeImageFilter(QnTimeImageFilter::Date_RightBottom, m_onscreenDateOffset));
                 }
 
-                m_videoTranscoder->setQuality(QnQualityHighest);
-                if (!m_srcRect.isEmpty())
+                m_videoTranscoder->setQuality(Qn::QualityHighest);
+                if (!m_srcRect.isEmpty() && !m_dewarpingParams.enabled)
                     m_videoTranscoder->setSrcRect(m_srcRect);
                 m_videoTranscoder->setVideoLayout(layout);
                 m_videoTranscoder->open(mediaData);
@@ -788,12 +805,12 @@ void QnStreamRecorder::setAudioCodec(CodecID codec)
     m_dstAudioCodec = codec;
 }
 
-void QnStreamRecorder::setOnScreenDateOffset(int timeOffsetMs)
+void QnStreamRecorder::setOnScreenDateOffset(qint64 timeOffsetMs)
 {
     m_onscreenDateOffset = timeOffsetMs;
 }
 
-void QnStreamRecorder::setServerTimeZoneMs(int value)
+void QnStreamRecorder::setServerTimeZoneMs(qint64 value)
 {
     m_serverTimeZoneMs = value;
 }
@@ -806,4 +823,9 @@ void QnStreamRecorder::setSrcRect(const QRectF& srcRect)
 void QnStreamRecorder::setContrastParams(const ImageCorrectionParams& params)
 {
     m_contrastParams = params;
+}
+
+void QnStreamRecorder::setDewarpingParams(const DewarpingParams& params)
+{
+    m_dewarpingParams = params;
 }

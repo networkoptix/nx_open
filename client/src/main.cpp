@@ -77,7 +77,7 @@ extern "C"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
 #include "client_message_processor.h"
-#include "ui/workbench/workbench_translation_manager.h"
+#include "client/client_translation_manager.h"
 
 #ifdef Q_OS_LINUX
     #include "ui/workaround/x11_launcher_workaround.h"
@@ -89,6 +89,7 @@ extern "C"
 
 #ifdef Q_OS_WIN
     #include "ui/workaround/iexplore_url_handler.h"
+    #include "common/systemexcept_win32.h"
 #endif
 
 #include "ui/help/help_handler.h"
@@ -96,6 +97,9 @@ extern "C"
 #include <client/client_connection_data.h>
 #include "platform/platform_abstraction.h"
 #include "utils/common/long_runnable.h"
+
+#include "text_to_wav.h"
+#include "common/common_module.h"
 
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -185,11 +189,11 @@ void addTestData()
     resource->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource));
     */
- 
+
     /*
     QnFakeCameraPtr testCamera(new QnFakeCamera());
     testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00000"));    
+    testCamera->setMAC(QnMacAddress("00000"));
     testCamera->setUrl("00000");
     testCamera->setName("testCamera");
     qnResPool->addResource(QnResourcePtr(testCamera));
@@ -267,6 +271,7 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
+    win32_exception::install_handler();
 #endif
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
@@ -275,8 +280,11 @@ int main(int argc, char **argv)
     QnSessionManager::instance();
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
+    TextToWaveServer::initStaticInstance( new TextToWaveServer() );
+    TextToWaveServer::instance()->start();
+
     int result = 0;
-    {   //do not remove! needed to make QnResourcePool life time controlled 
+    {   //do not remove! needed to make QnResourcePool life time controlled
             //(refactoring to QnResourcePool instanciation was required to make mediaserver exit without segfault)
 
         QTextStream out(stdout);
@@ -291,11 +299,12 @@ int main(int argc, char **argv)
         bool noSingleApplication = false;
         int screen = -1;
         QString authenticationString, delayedDrop, instantDrop, logLevel;
-        QString translationPath = qnSettings->translationPath();
+        QString translationPath;
         bool devBackgroundEditable = false;
         bool skipMediaFolderScan = false;
         bool noFullScreen = false;
-        
+        bool noVersionMismatchCheck = false;
+
         QnCommandLineParser commandLineParser;
         commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
         commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
@@ -308,15 +317,12 @@ int main(int argc, char **argv)
         commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
         commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
         commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
+        commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
         commandLineParser.parse(argc, argv, stderr);
 
         /* Dev mode. */
         if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
             qnSettings->setDevMode(true);
-            qnSettings->setBackgroundEditable(devBackgroundEditable);
-        } else {
-            qnSettings->setBackgroundAnimated(true);
-            qnSettings->setBackgroundColor(qnGlobals->backgroundGradientColor());
         }
 
         /* Set authentication parameters from command line. */
@@ -362,10 +368,9 @@ int main(int argc, char **argv)
         qnSettings->save();
         cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
-        QnWorkbenchTranslationManager::installTranslation(translationPath);
         QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
-        
+
         /* Initialize sound. */
         QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
 
@@ -380,7 +385,6 @@ int main(int argc, char **argv)
 
         QnHelpHandler helpHandler;
         qApp->installEventFilter(&helpHandler);
-
 
         QnLog::initLog(logLevel);
         cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
@@ -449,8 +453,19 @@ int main(int argc, char **argv)
 #endif // Q_OS_WIN
         QnResourceDiscoveryManager::instance()->start();
 
-        // here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+        // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
         qApp->setStyle(qnSkin->style());
+
+        /* Load translation. */
+        QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
+        QnTranslation translation;
+        if(!translationPath.isEmpty()) /* From command line. */
+            translation = translationManager->loadTranslation(translationPath);
+
+        if(translation.isEmpty()) /* By path. */
+            translation = translationManager->loadTranslation(qnSettings->translationPath());
+
+        translationManager->installTranslation(translation);
 
         /* Create workbench context. */
         QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
@@ -473,6 +488,8 @@ int main(int argc, char **argv)
         mainWindow->show();
         if (!noFullScreen)
             context->action(Qn::EffectiveMaximizeAction)->trigger();
+        if(noVersionMismatchCheck)
+            context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
         //initializing plugin manager. TODO supply plugin dir (from settings)
         PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
@@ -547,6 +564,9 @@ int main(int argc, char **argv)
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
+
+    delete TextToWaveServer::instance();
+    TextToWaveServer::initStaticInstance( NULL );
 
 //    qApp->processEvents(); //TODO: #Elric crashes
     return result;

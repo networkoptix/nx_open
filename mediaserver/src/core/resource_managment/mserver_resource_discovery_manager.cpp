@@ -61,7 +61,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     QSet<QString> discoveredResources;
 
     //assemble list of existing ip
-    QMap<quint32, QSet<QString> > ipsList;
+    QMap<quint32, QSet<QnNetworkResourcePtr> > ipsList;
 
 
     //excluding already existing resources
@@ -83,12 +83,13 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             {
                 if (!newNetRes->hasFlags(QnResource::server_live_cam)) // if this is not camera from mediaserver on the client stand alone
                 {
-                    if (newNetRes->getChannel() == 0) 
+                    QnSecurityCamResourcePtr camRes = newNetRes.dynamicCast<QnSecurityCamResource>();
+                    if (camRes && camRes->needCheckIpConflicts())
                     {
                         // do not count 2--N channels of multichannel cameras as conflict
                         quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
                         if (ips)
-                            ipsList[ips].insert(newNetRes->getMAC().toString().toAscii());
+                            ipsList[ips].insert(newNetRes);
                     }
                 }
 
@@ -147,12 +148,20 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
     // ========================= send conflict info =====================
-    for (QMap<quint32, QSet<QString> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
+    for (QMap<quint32, QSet<QnNetworkResourcePtr> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
     {
         if (itr.value().size() > 1) 
         {
             QHostAddress hostAddr(itr.key());
-            emit CameraIPConflict(hostAddr, itr.value().toList());
+            QStringList conflicts;
+            foreach(QnNetworkResourcePtr camRes, itr.value()) 
+            {
+                conflicts << camRes->getPhysicalId();
+                QnVirtualCameraResourcePtr cam = camRes.dynamicCast<QnVirtualCameraResource>();
+                if (cam)
+                    cam->issueOccured();
+            }
+            emit CameraIPConflict(hostAddr, conflicts);
         }
     }
 
@@ -441,13 +450,15 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             {
                 if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)) {
                     if (res->getStatus() == QnResource::Offline && !m_disconnectSended[uniqId]) {
+                        QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
+                        if (cam)
+                            cam->issueOccured();
                         emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
                         m_disconnectSended[uniqId] = true;
                     }
                 } else {
                     res->setStatus(QnResource::Offline);
                     m_resourceDiscoveryCounter[uniqId] = 0;
-                    m_disconnectSended[uniqId] = false;
                 }
             }
         }
@@ -485,14 +496,14 @@ void QnMServerResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res, 
             {
                 if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
                 {
-                    rpNetRes->initAsync();
+                    rpNetRes->initAsync(false);
                     //rpNetRes->setStatus(QnResource::Online);
                 }
 
             }
             else if (!rpNetRes->isInitialized())
             {
-                rpNetRes->initAsync(); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
+                rpNetRes->initAsync(false); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
                 //if (rpNetRes->isInitialized() && rpNetRes->getStatus() == QnResource::Unauthorized)
                 //    rpNetRes->setStatus(QnResource::Online);
             }
@@ -572,7 +583,8 @@ void QnMServerResourceDiscoveryManager::check_if_accessible(QnResourceList& just
     Q_UNUSED(threads);
     foreach(check_if_accessible_STRUCT t, checkLst)
     {
-        qDebug() << "Checking conflicts for " << t.resourceNet->getHostAddress() << "  name = " << t.resourceNet->getName();
+        NX_LOG(QString(lit("Checking conflicts for %1 name = %2")).arg(t.resourceNet->getHostAddress()).arg(t.resourceNet->getName()), cl_logDEBUG1);
+
         t.f();
     }
 #else

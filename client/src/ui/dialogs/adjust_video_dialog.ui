@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Adjust video</string>
+   <string>Image Enhancement</string>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -20,7 +20,7 @@
    <item>
     <widget class="QCheckBox" name="enableAdjustment">
      <property name="text">
-      <string>Enable adjustment</string>
+      <string>Enable enhancement</string>
      </property>
     </widget>
    </item>
@@ -97,7 +97,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Black levels</string>
+         <string>Black level</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -133,7 +133,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>White levels</string>
+         <string>White level</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -182,14 +182,27 @@
     </widget>
    </item>
    <item>
-    <widget class="QnHistogramRenderer" name="histogramRenderer" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
      </property>
-    </widget>
+     <property name="leftMargin">
+      <number>8</number>
+     </property>
+     <property name="rightMargin">
+      <number>8</number>
+     </property>
+     <item>
+      <widget class="QnHistogramWidget" name="histogramWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -208,9 +221,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnHistogramRenderer</class>
+   <class>QnHistogramWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/dialogs/histogram_renderer.h</header>
+   <header location="global">ui/widgets/histogram_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -151,7 +151,6 @@ public:
 
     QUrl url() const;
     void setUrl(const QUrl &url);
-
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) = 0;
 
@@ -190,13 +189,14 @@ protected:
     int sendSyncGetRequest(int object, const QnRequestParamList &params, T *reply) {
         return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
     }
-
+    void setExtraHeaders(const QnRequestHeaderList& headers);
 private:
     static bool connectProcessor(QnAbstractReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
 private:
     QUrl m_url;
     QScopedPointer<QnEnumNameMapper> m_nameMapper;
+    QnRequestHeaderList m_headers;
 };
 
 

@@ -47,8 +47,12 @@ public:
             m_deviceInfo.modelName = ch;
         else if( m_currentElementName == QLatin1String("serialNumber") )
             m_deviceInfo.serialNumber = ch;
-        else if( m_currentElementName == QLatin1String("presentationURL") )
-            m_deviceInfo.presentationUrl = ch;
+        else if( m_currentElementName == QLatin1String("presentationURL") ) {
+            if (ch.endsWith(lit("/")))
+                m_deviceInfo.presentationUrl = ch.left(ch.length()-1);
+            else
+                m_deviceInfo.presentationUrl = ch;
+        }
 
         return true;
     }
@@ -429,9 +433,12 @@ void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpCl
     {
         QMutexLocker lk( &m_mutex );
         std::map<nx_http::AsyncHttpClient*, DiscoveredDeviceInfo>::iterator it = m_httpClients.find( httpClient );
-        Q_ASSERT( it != m_httpClients.end() );
+        if (it == m_httpClients.end())
+            return;
+        //Q_ASSERT( it != m_httpClients.end() );
         ctx = &it->second;
     }
+
 
     if( httpClient->response() && httpClient->response()->statusLine.statusCode == nx_http::StatusCode::ok )
     {
