@@ -23,7 +23,7 @@
 	<properties>
 		<product.title>${quicksyncdecoder.name}</product.title>	
 		<!--Global libs-->
-        <qt.libs>core gui network xml</qt.libs>
+        <qt.libs>core gui network opengl xml multimedia</qt.libs>
 		<global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -llibprotobuf -lqjson</global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs>DbgHelp.lib -lDxErr -ld3d9 -lws2_32 -lIphlpapi -lwinmm -lopengl32 -lssleay32 -llibeay32 -lglu32 -lDxva2 -llibmfxmd</windows.oslibs>
