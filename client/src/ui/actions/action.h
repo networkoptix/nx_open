@@ -2,6 +2,7 @@
 #define QN_ACTION_H
 
 #include <QtCore/QMetaType>
+#include <QtCore/QPointer>
 #include <QtWidgets/QAction>
 
 #include <ui/workbench/workbench_context_aware.h>

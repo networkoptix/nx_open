@@ -11,6 +11,8 @@
 #include <QtGui/QPaintEvent>
 #include <QtGui/QImageReader>
 
+#include <QtWidgets/QDesktopWidget>
+
 #include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
 

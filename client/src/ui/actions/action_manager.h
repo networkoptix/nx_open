@@ -5,6 +5,7 @@
 #include <QHash>
 #include <QtCore/QSet>
 #include <QtCore/QVariant>
+#include <QtCore/QPointer>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <ui/workbench/workbench_context_aware.h>

@@ -1,5 +1,7 @@
 #include "resource_tree_item_delegate.h"
 
+#include <QtWidgets/QApplication>
+
 #include <core/resource/camera_history.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>

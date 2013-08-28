@@ -1,6 +1,7 @@
 #ifndef QN_GRAPHICS_STYLE_H
 #define QN_GRAPHICS_STYLE_H
 
+#include <QtCore/QPointer>
 #include <QtWidgets/QStyle>
 
 class QStyle;

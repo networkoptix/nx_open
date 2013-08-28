@@ -1,5 +1,8 @@
 #include "message_box.h"
 
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QPushButton>
+
 #include <cassert>
 
 #include <ui/help/help_topic_accessor.h>

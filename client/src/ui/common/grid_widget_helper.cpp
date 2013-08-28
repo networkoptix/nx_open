@@ -1,6 +1,11 @@
-#include <QTableView>
-
 #include "grid_widget_helper.h"
+
+#include <QtCore/QMimeData>
+#include <QtGui/QClipboard>
+#include <QtWidgets/QTableView>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QApplication>
+
 #include "client/client_settings.h"
 #include "ui/dialogs/custom_file_dialog.h"
 

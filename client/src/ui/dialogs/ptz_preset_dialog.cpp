@@ -1,6 +1,8 @@
 #include "ptz_preset_dialog.h"
 #include "ui_ptz_preset_dialog.h"
 
+#include <QtWidgets/QPushButton>
+
 #include <utils/common/variant.h>
 
 #include <ui/help/help_topic_accessor.h>

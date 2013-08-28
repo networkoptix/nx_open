@@ -1,5 +1,7 @@
 #include "client_platform_abstraction.h"
 
+#include <QtWidgets/QApplication>
+
 #include <utils/common/warnings.h>
 
 QnClientPlatformAbstraction *QnClientPlatformAbstraction::s_instance = NULL;

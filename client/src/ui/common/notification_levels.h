@@ -1,6 +1,8 @@
 #ifndef QN_NOTIFICATION_LEVELS_H
 #define QN_NOTIFICATION_LEVELS_H
 
+#include <QtGui/QColor>
+
 #include <business/business_fwd.h>
 
 #include <client/client_globals.h>

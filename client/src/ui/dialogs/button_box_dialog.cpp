@@ -1,5 +1,7 @@
 #include "button_box_dialog.h"
 
+#include <QtCore/QEvent>
+
 #include <utils/common/warnings.h>
 
 QnButtonBoxDialog::QnButtonBoxDialog(QWidget *parent, Qt::WindowFlags windowFlags): 

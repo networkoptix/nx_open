@@ -2,6 +2,7 @@
 #define QN_WEAK_GRAPHICS_ITEM_POINTER_H
 
 #include <QtCore/QWeakPointer>
+#include <QtCore/QPointer>
 #include <QtCore/QVector>
 #include <QtCore/QList>
 

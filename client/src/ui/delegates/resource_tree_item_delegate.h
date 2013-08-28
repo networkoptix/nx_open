@@ -1,7 +1,8 @@
 #ifndef QN_RESOURCE_TREE_ITEM_DELEGATE_H
 #define QN_RESOURCE_TREE_ITEM_DELEGATE_H
 
-#include <QStyledItemDelegate>
+#include <QtCore/QPointer>
+#include <QtWidgets/QStyledItemDelegate>
 
 class QnWorkbench;
 

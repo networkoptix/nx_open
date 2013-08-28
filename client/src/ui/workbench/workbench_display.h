@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QUuid>
+#include <QtOpenGL/QGLWidget>
 
 #include <utils/common/connective.h>
 

@@ -2,7 +2,7 @@
 #define QN_DRAG_PROCESSOR_H
 
 #include <QtCore/QObject>
-
+#include <QtCore/QPointer>
 
 #include <ui/common/geometry.h>
 

@@ -1,7 +1,7 @@
 #ifndef QN_FIXED_ROTATION_H
 #define QN_FIXED_ROTATION_H
 
-
+#include <QtCore/QPointer>
 #include <QtWidgets/QGraphicsRotation>
 
 class QGraphicsWidget;
