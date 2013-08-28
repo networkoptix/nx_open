@@ -58,6 +58,7 @@ public:
     static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int IO_BLOCK_SIZE = 32768);
     static void closeFfmpegIOContext(AVIOContext* ioContext);
     static qint64 getFileSizeByIOContext(AVIOContext* ioContext);
+    static void deleteCodecContext(AVCodecContext* ctx);
 };
 
 #endif // __FFMPEG_HELPER_H

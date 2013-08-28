@@ -28,7 +28,7 @@ public:
     void setQuality(MediaQuality q);
     void setGroupId(const QByteArray& groupId);
 protected:
-    virtual QnAbstractMediaDataPtr getNextData() override;
+    virtual QnAbstractMediaDataPtr getNextData();
     virtual void run();
     virtual void afterRun() override;
 private:

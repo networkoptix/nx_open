@@ -108,7 +108,8 @@ public:
 
     virtual void startPaused() = 0;
     virtual void setGroupId(const QByteArray& groupId)  = 0;
-
+protected:
+    virtual QnAbstractMediaDataPtr getNextData() = 0;
 signals:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);

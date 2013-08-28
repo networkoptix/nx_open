@@ -43,7 +43,7 @@ static void toggleAero(bool enable)
 QMutex QnScreenGrabber::m_instanceMutex;
 int QnScreenGrabber::m_aeroInstanceCounter;
 
-QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
+QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
     m_pD3D(0),
     m_pd3dDevice(0),
     m_displayNumber(displayNumber),
@@ -63,14 +63,14 @@ QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, CaptureMode mo
 {
     memset(&m_rect, 0, sizeof(m_rect));
 
-    if (m_mode == CaptureMode_DesktopWithoutAero)
+    if (m_mode == Qn::FullScreenNoAeroMode)
     {
         QMutexLocker locker(&m_instanceMutex);
         if (++m_aeroInstanceCounter == 1)
             toggleAero(false);
     }
-    m_needRescale = captureResolution.width() != 0 || mode == CaptureMode_Application;
-    if (mode == CaptureMode_Application)
+    m_needRescale = captureResolution.width() != 0 || mode == Qn::WindowMode;
+    if (mode == Qn::WindowMode)
         m_displayNumber = 0;
 
     m_initialized = InitD3D(GetDesktopWindow());
@@ -101,7 +101,7 @@ QnScreenGrabber::~QnScreenGrabber()
         m_pD3D->Release();
         m_pD3D=NULL;
     }
-    if (m_mode == CaptureMode_DesktopWithoutAero)
+    if (m_mode == Qn::FullScreenNoAeroMode)
     {
         QMutexLocker locker(&m_instanceMutex);
         if (--m_aeroInstanceCounter == 0)
@@ -157,7 +157,7 @@ HRESULT        QnScreenGrabber::InitD3D(HWND hWnd)
     d3dpp.FullScreen_RefreshRateInHz=D3DPRESENT_RATE_DEFAULT;
 
 
-    if (m_mode != CaptureMode_Application)
+    if (m_mode != Qn::WindowMode)
     {
         if(FAILED(m_pD3D->CreateDevice(m_displayNumber, D3DDEVTYPE_HAL,hWnd,D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &d3dpp,&m_pd3dDevice)))
         {
@@ -265,7 +265,7 @@ QnScreenGrabber::CaptureInfo QnScreenGrabber::captureFrame()
 {
     CaptureInfo rez;
 
-    if (m_mode == CaptureMode_Application)
+    if (m_mode == Qn::WindowMode)
     {
         rez.opaque = m_openGLData[m_currentIndex];
         QGenericReturnArgument ret;
@@ -314,7 +314,7 @@ void QnScreenGrabber::drawLogo(quint8* data, int width, int height)
     if (m_logo.width() == 0)
         return;
     int left = width - m_logo.width() - LOGO_CORNER_OFFSET;
-    int top = m_mode == CaptureMode_Application ? LOGO_CORNER_OFFSET : height - m_logo.height() - LOGO_CORNER_OFFSET;
+    int top = m_mode == Qn::WindowMode ? LOGO_CORNER_OFFSET : height - m_logo.height() - LOGO_CORNER_OFFSET;
     
     QImage buffer(data, width, height, QImage::Format_ARGB32_Premultiplied);
     QPainter painter(&buffer);
@@ -593,7 +593,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
         {
             bgra_to_yv12_sse2_intr(data, width * 4,
                 m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2],
-                m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], roundWidth, height, m_mode == CaptureMode_Application);
+                m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], roundWidth, height, m_mode == Qn::WindowMode);
         }
         else {
             cl_log.log("CPU does not support SSE3!", cl_logERROR);
@@ -609,7 +609,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
         if (useSSE3())
         {
             bgra_to_yv12_sse2_intr(data, width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2],
-                             pFrame->linesize[0], pFrame->linesize[1], roundWidth, height, m_mode == CaptureMode_Application);
+                             pFrame->linesize[0], pFrame->linesize[1], roundWidth, height, m_mode == Qn::WindowMode);
         }
         else {
             cl_log.log("CPU does not support SSE3!", cl_logERROR);
@@ -621,7 +621,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
 bool QnScreenGrabber::capturedDataToFrame(const CaptureInfo& captureInfo, AVFrame* pFrame)
 {
     bool rez = false;
-    if (m_mode == CaptureMode_Application)
+    if (m_mode == Qn::WindowMode)
         rez = dataToFrame((quint8*) captureInfo.opaque, captureInfo.w, captureInfo.h, pFrame);
     else
         rez = direct3DDataToFrame(captureInfo.opaque, pFrame);
@@ -646,7 +646,7 @@ int QnScreenGrabber::height() const
 
 void QnScreenGrabber::setLogo(const QPixmap& logo)
 {
-    if (m_mode == CaptureMode_Application)
+    if (m_mode == Qn::WindowMode)
         m_logo = QPixmap::fromImage(logo.toImage().mirrored(false, true));
     else
         m_logo = logo;

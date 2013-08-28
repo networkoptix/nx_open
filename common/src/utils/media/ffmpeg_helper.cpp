@@ -823,3 +823,17 @@ void QnFfmpegHelper::closeFfmpegIOContext(AVIOContext* ioContext)
         avio_close(ioContext);
     }
 }
+
+void QnFfmpegHelper::deleteCodecContext(AVCodecContext* ctx)
+{
+    if (!ctx)
+        return;
+    if (ctx->codec)
+        avcodec_close(ctx);
+    av_freep(&ctx->rc_override);
+    av_freep(&ctx->intra_matrix);
+    av_freep(&ctx->inter_matrix);
+    av_freep(&ctx->extradata);
+    av_freep(&ctx->rc_eq);
+    av_freep(&ctx);
+}
