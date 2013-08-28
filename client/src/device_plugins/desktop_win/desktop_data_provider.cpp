@@ -590,7 +590,7 @@ int QnDesktopDataProvider::processData(bool flush)
         QnCompressedVideoDataPtr video = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, out_size, m_videoCodecCtxPtr));
         video->data.write((const char*) m_videoBuf, out_size);
         video->compressionType = m_videoCodecCtx->codec_id;
-        video->timestamp = av_rescale_q(m_videoCodecCtx->coded_frame->pts, m_videoCodecCtx->time_base, timeBaseNative) + m_initTime;
+        video->timestamp = av_rescale_q(m_videoCodecCtx->coded_frame->pts-1, m_videoCodecCtx->time_base, timeBaseNative) + m_initTime;
 
         if(m_videoCodecCtx->coded_frame->key_frame)
             video->flags |= AV_PKT_FLAG_KEY;
@@ -672,6 +672,7 @@ int QnDesktopDataProvider::processData(bool flush)
             audio->data.write((const char*) m_encodedAudioBuf, aEncoded);
             audio->compressionType = m_audioCodecCtx->codec_id;
             audio->timestamp = av_rescale_q(audioPts, timeBaseMs, timeBaseNative) + m_initTime;
+            //audio->timestamp = av_rescale_q(m_audioCodecCtx->coded_frame->pts, m_audioCodecCtx->time_base, timeBaseNative) + m_initTime;
             audio->flags |= QnAbstractMediaData::MediaFlags_LIVE;
             putData(audio);
         }
