@@ -109,8 +109,9 @@ if __name__ == '__main__':
         print (' ++++++++++++++++++++++++++++++++generating project file ++++++++++++++++++++++++++++++++')
         if sys.platform == 'win32':
             execute(['qmake', '-tp', 'vc', '-o', '${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj', '${project.build.directory}/${project.artifactId}.pro'])
-            if '${arch}' == 'x64' and not '${force_x86}' == 'true':
+            if '${arch}' == 'x64' and '${force_x86}' == 'false':
                 replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj', 'Win32', '${arch}')
+                replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj', 'Name="VCLibrarianTool"', 'Name="VCLibrarianTool" \n				AdditionalOptions="/MACHINE:x64"')
         elif sys.platform == 'linux2':
             execute(['qmake -spec linux-g++ CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])
         elif sys.platform == 'darwin':
