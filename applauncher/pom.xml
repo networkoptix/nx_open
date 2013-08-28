@@ -23,7 +23,8 @@
 	<properties>
 		<product.title>${applauncher.name}</product.title>  
         <!--Global libs-->		
-		<global.libs>-lcommon</global.libs>
+		<qt.libs>core gui network</qt.libs>
+        <global.libs>-lcommon</global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs>DbgHelp.lib</windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release> 

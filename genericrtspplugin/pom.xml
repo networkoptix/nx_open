@@ -23,6 +23,7 @@
 	<properties>
 		<product.title>${genericrtspplugin.name}</product.title>	
 		<!--Global libs-->
+        <qt.libs>core</qt.libs>
 		<global.libs/>
 		<!--Specific os libs used-->
 		<windows.oslibs></windows.oslibs>

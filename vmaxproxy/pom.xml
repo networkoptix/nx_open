@@ -27,6 +27,7 @@
         <product.title>${vmaxproxy.name}</product.title>	
         <force_x86>true</force_x86>
         <!--Global libs-->
+        <qt.libs>core</qt.libs>
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>

@@ -3,13 +3,13 @@ BUILDLIB = ${buildLib}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
 DEFINES += ${global.defines}
-QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
+QT += ${qt.libs}
 
 ## GLOBAL CONFIGURATIONS
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
 CONFIG -= flat
-DEFINES += __STDC_CONSTANT_MACROS
+DEFINES += __STDC_CONSTANT_MACROS 
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
 CONFIG(debug, debug|release) {
@@ -44,7 +44,7 @@ LIBS += ${global.libs}
 !mac {
     include(${environment.dir}/qt-custom/QtCore/private/qtcore.pri)
 }
-INCLUDEPATH += ${environment.dir}/qt/include ${environment.dir}/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${root.dir}/common/src ${libdir}/include ${environment.dir}/qt-custom ${environment.dir}/qt-custom/QtCore
+INCLUDEPATH += ${environment.dir}/qt/include ${environment.dir}/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory} ${root.dir}/common/src ${libdir}/include ${environment.dir}/qt-custom ${environment.dir}/qt-custom/QtCore
 DEPENDPATH *= $${INCLUDEPATH}
 
 !mac {

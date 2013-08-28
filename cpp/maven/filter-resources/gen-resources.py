@@ -57,6 +57,11 @@ def gentext(file, path, extensions, text):
    
     for root, dirs, files in os.walk(path):
         parent = root[len(path) + 1:]
+        
+        for dir in dirs:
+            if dir.endswith('_specific')and not dir.endswith('${platform}_specific'):
+                dirs.remove(dir)  
+        
         for f in files:
             f_short = os.path.splitext(f)[0]
             for extension in extensions:

@@ -25,6 +25,7 @@
         <!--Global libs-->
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
+        <qt.libs>core gui network</qt.libs>
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lws2_32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>

@@ -18,6 +18,7 @@
         <!--Global libs-->
         <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -llibprotobuf -lqjson</global.libs>
         <!--Specific os libs used-->
+        <qt.libs>core gui network</qt.libs>
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lws2_32 -lssleay32 -llibeay32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>  

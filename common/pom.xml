@@ -23,6 +23,7 @@
 	<properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
 		<!--Global libs-->
+        <qt.libs>core gui network opengl xml multimedia sql</qt.libs>
 		<global.libs/>      
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
