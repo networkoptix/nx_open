@@ -549,7 +549,7 @@ bool QnDesktopDataProvider::init()
         memcpy(m_videoCodecCtxPtr->ctx()->extradata, m_videoCodecCtx->extradata, m_videoCodecCtx->extradata_size);
     }
 
-    if (m_audioCodecCtx->extradata_size)
+    if (m_audioCodecCtx && m_audioCodecCtx->extradata_size)
     {
         m_audioCodecCtxPtr->ctx()->extradata_size = m_audioCodecCtx->extradata_size;
         m_audioCodecCtxPtr->ctx()->extradata = (uint8_t*) av_malloc(m_audioCodecCtx->extradata_size);
