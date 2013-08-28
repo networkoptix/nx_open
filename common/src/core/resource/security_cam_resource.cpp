@@ -640,3 +640,8 @@ void QnSecurityCamResource::removeStatusFlags(StatusFlags value)
     m_statusFlags &= ~value;
 }
 
+
+bool QnSecurityCamResource::needCheckIpConflicts() const
+{
+    return getChannel() == 0 && !hasCameraCapabilities(Qn::shareIpCapability);
+}

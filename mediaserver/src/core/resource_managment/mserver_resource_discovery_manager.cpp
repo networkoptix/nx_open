@@ -83,7 +83,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             {
                 if (!newNetRes->hasFlags(QnResource::server_live_cam)) // if this is not camera from mediaserver on the client stand alone
                 {
-                    if (newNetRes->getChannel() == 0) 
+                    QnSecurityCamResourcePtr camRes = newNetRes.dynamicCast<QnSecurityCamResource>();
+                    if (camRes && camRes->needCheckIpConflicts())
                     {
                         // do not count 2--N channels of multichannel cameras as conflict
                         quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();

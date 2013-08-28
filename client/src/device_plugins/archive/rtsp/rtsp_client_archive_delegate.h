@@ -13,6 +13,7 @@
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
 class QnArchiveStreamReader;
+class QnCustomResourceVideoLayout;
 
 class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate
 {
@@ -107,6 +108,7 @@ private:
     bool m_playNowModeAllowed; // fast open mode without DESCRIBE
     QnArchiveStreamReader* m_reader;
     int m_frameCnt;
+    QnCustomResourceVideoLayout* m_customVideoLayout;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

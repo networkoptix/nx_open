@@ -143,6 +143,7 @@ public:
     void addStatusFlags(StatusFlags value);
     void removeStatusFlags(StatusFlags value);
 
+    bool needCheckIpConflicts() const;
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

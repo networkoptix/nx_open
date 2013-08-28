@@ -25,6 +25,7 @@ GenericRTSPCameraManager::GenericRTSPCameraManager( const nxcip::CameraInfo& inf
     const QStringList& valList = auxiliaryData.split( QLatin1Char('='), QString::SkipEmptyParts );
     if( !valList.isEmpty() && valList[0] == QLatin1String("audio") )
         m_capabilities |= nxcip::BaseCameraManager::audioCapability;
+    m_capabilities |= nxcip::BaseCameraManager::shareIpCapability;
 }
 
 GenericRTSPCameraManager::~GenericRTSPCameraManager()
