@@ -1,5 +1,6 @@
 #include "notifications_collection_widget.h"
 
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 

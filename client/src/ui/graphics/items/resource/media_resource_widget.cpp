@@ -3,6 +3,7 @@
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
 #include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 

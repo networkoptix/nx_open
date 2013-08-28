@@ -2,6 +2,7 @@
 #define QN_INSTRUMENT_PAINT_SYNCER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 #include <ui/animation/animation_timer.h>
 

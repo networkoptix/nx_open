@@ -1,6 +1,7 @@
 #ifndef QN_CACHING_PROXY_WIDGET_H
 #define QN_CACHING_PROXY_WIDGET_H
 
+#include <QtCore/QPointer>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtGui/QImage>
 

@@ -1,7 +1,7 @@
 #ifndef QN_GRID_ITEM_H
 #define QN_GRID_ITEM_H
 
-
+#include <QtCore/QPointer>
 #include <QtWidgets/QGraphicsObject>
 
 #include <utils/common/hash.h> /* For qHash(QPoint). */
