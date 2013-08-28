@@ -39,7 +39,11 @@ int QnAudioStreamDisplay::msInBuffer() const
     //cl_log.log("compressedBufferSize = ", msInQueue(), cl_logALWAYS);
     //cl_log.log("tptalaudio = ", msInQueue() + internalBufferSize, cl_logALWAYS);
 
-    return msInQueue() + internalBufferSize;
+    int rez = msInQueue() + internalBufferSize;
+
+    qDebug() << "msInQueue=" << rez;
+
+    return rez;
 }
 
 void QnAudioStreamDisplay::suspend()

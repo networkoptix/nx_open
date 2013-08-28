@@ -50,7 +50,7 @@ static void updateActivity()
 
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
-#define CL_MAX_DISPLAY_QUEUE_SIZE 15
+#define CL_MAX_DISPLAY_QUEUE_SIZE 20
 #define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 20
 
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
@@ -122,12 +122,17 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_prevLQ(-1),
     m_doNotChangeDisplayTime(false),
     m_firstLivePacket(true),
-    m_multiView(false)
+    m_multiView(false),
+    m_forceMTRealTimeDecode(false)
 {
-    if (resource.dynamicCast<QnVirtualCameraResource>())
+
+    if (resource->toResource()->hasFlags(QnResource::live_cam))
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;
+
+    if (resource->toResource()->hasFlags(QnResource::local_live_cam))
+        m_forceMTRealTimeDecode = true; // not enough speed for desktop camera in single thread mode because of slow rendering
 
     if (resource && resource->toResource()->hasFlags(QnResource::still_image)) {
         m_isStillImage = true;
@@ -919,8 +924,10 @@ void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
 
 bool QnCamDisplay::canAcceptData() const
 {
-    if (m_processedPackets < m_dataQueue.maxSize())
-        return m_dataQueue.size() <= m_processedPackets;
+    if (m_isRealTimeSource)
+        return QnAbstractDataConsumer::canAcceptData();
+    else if (m_processedPackets < m_dataQueue.maxSize())
+        return m_dataQueue.size() <= m_processedPackets; // slowdown slightly to improve a lot of seek perfomance
     else 
         return QnAbstractDataConsumer::canAcceptData();
 }
@@ -1253,8 +1260,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             vd = nextInOutVideodata(incoming, channel);
 
             if (vd) {
-                // New av sync algorithm required MT decoding
-                if (!m_useMtDecoding && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE))
+                if (!m_useMtDecoding && (!m_isRealTimeSource || m_forceMTRealTimeDecode))
                     setMTDecoding(true);
 
                 bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
