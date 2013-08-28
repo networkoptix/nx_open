@@ -1,15 +1,32 @@
-import os, sys, posixpath
+import os, sys, posixpath, platform, subprocess, fileinput, shutil
 from os.path import dirname, join, exists, isfile
 from os import listdir
-import shutil
+
 sys.path.insert(0, '${basedir}/../common')
 #sys.path.insert(0, os.path.join('..', '..', 'common'))
 
 template_file='template.pro'
 specifics_file='${project.artifactId}-specifics.pro'
-output_file='${project.artifactId}.pro'
+output_pro_file='${project.artifactId}.pro'
 translations_dir='${basedir}/translations'
 translations_target_dir='${project.build.directory}/resources/translations'
+
+def execute(command):
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    output = ''
+
+    # Poll process for new output until finished
+    for line in iter(process.stdout.readline, ""):
+        print line,
+        output += line
+
+    process.wait()
+    exitCode = process.returncode
+
+    if (exitCode == 0):
+        return output
+    else:
+        raise Exception(command, exitCode, output)
 
 def genqrc(qrcname, qrcprefix, pathes, extensions, exclusion, additions=''):
     os.path = posixpath
@@ -49,6 +66,12 @@ def gentext(file, path, extensions, text):
                 if f.endswith(extension) and f_short.endswith('${platform}_specific'):
                     print >> file, '\n%s%s/%s' % (text, path, os.path.join(parent, f))
 
+def replace(file,searchExp,replaceExp):
+    for line in fileinput.input(file, inplace=1):
+        if searchExp in line:
+            line = line.replace(searchExp,replaceExp)
+        sys.stdout.write(line)
+
 def gen_includepath(file, path):      
     os.path = posixpath
     for dirs in os.walk(path).next()[1]:
@@ -67,7 +90,7 @@ if __name__ == '__main__':
     genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${libdir}/icons'], [''],'vmsclient.png')  
     
     if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):
-        f = open(output_file, "w")
+        f = open(output_pro_file, "w")
         for file in [template_file, specifics_file]:
             if os.path.exists(file):
                 fo = open(file, "r")
@@ -82,3 +105,13 @@ if __name__ == '__main__':
         gen_includepath(f, '${environment.dir}/include')
         f.close()
     
+    if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
+        print (' ++++++++++++++++++++++++++++++++generating project file ++++++++++++++++++++++++++++++++')
+        if sys.platform == 'win32':
+            execute(['qmake', '-tp', 'vc', '-o', '${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj', '${project.build.directory}/${project.artifactId}.pro'])
+            if '${arch}' == 'x64' and not '${force_x86}' == 'true':
+                replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj', 'Win32', '${arch}')
+        elif sys.platform == 'linux2':
+            execute(['qmake -spec linux-g++ CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])
+        elif sys.platform == 'darwin':
+            execute(['qmake -spec macx-g++47 CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])

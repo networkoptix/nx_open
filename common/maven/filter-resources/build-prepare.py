@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-import shutil, glob, string
-import os, sys, posixpath
-
-import time
+import shutil, glob, string, os, sys, posixpath, time
 
 # os.path = posixpath
 sys.path.insert(0, os.path.join('..'))
@@ -21,4 +18,4 @@ def gen_filetypes_h():
     print >> filetypes_h, '#endif // UNICLIENT_FILETYPES_H_'
 
 if __name__ == '__main__':
-  gen_filetypes_h()
+    gen_filetypes_h()

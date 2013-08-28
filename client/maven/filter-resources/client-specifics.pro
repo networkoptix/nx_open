@@ -9,10 +9,6 @@ TRANSLATIONS += ${basedir}/translations/client_en.ts \
 
 include(${environment.dir}/qt-custom/qtsingleapplication/src/qtsingleapplication.pri)
 
-win32 {
-  QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
- # INCLUDEPATH +=  ${environment.dir}/qt/include/QtGui
-}
 
 mac {
   INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/ /usr/X11/include/

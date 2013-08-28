@@ -192,6 +192,7 @@
                 <python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
                 <compiler>msvc2008</compiler>
                 <arch>x86</arch>
+                <force_x86>false</force_x86>
                 <platform>windows</platform>
             </properties>
         </profile>

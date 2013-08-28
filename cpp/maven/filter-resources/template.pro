@@ -61,9 +61,9 @@ win* {
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
 	# /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
-	QMAKE_CFLAGS_RELEASE += /Zi
-	QMAKE_CXXFLAGS_RELEASE += /Zi
-	QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF
+	QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
+	QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF 
+    QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
   }
   
   !staticlib {

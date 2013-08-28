@@ -2,8 +2,6 @@ TEMPLATE = lib
 
 win32 {
   pb.commands = ${environment.dir}/bin/protoc --proto_path=${project.build.sourceDirectory}/api/pb --cpp_out=$${MOC_DIR} ${project.build.sourceDirectory}/api/pb/${QMAKE_FILE_BASE}.proto
-  LIBS+=winmm.lib
-  LIBS += -ldnsapi
 }
 
 unix {
@@ -13,7 +11,6 @@ unix {
 mac {
   LIBS += -L/usr/X11/lib/
 }
-
 
 pb.name = Generating code from ${QMAKE_FILE_IN} to ${QMAKE_FILE_BASE}
 pb.input = PB_FILES
