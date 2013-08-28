@@ -1,5 +1,5 @@
 
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 
 #include <emmintrin.h>
 

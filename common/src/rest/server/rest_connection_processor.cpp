@@ -2,7 +2,14 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTime>
 #include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
+#include <QtCore/QRegExp>
+
+#ifdef Q_OS_MACX
+#include <zlib.h>
+#else
 #include <QtZlib/zlib.h>
+#endif
 
 #include "rest_connection_processor.h"
 #include "utils/network/tcp_connection_priv.h"

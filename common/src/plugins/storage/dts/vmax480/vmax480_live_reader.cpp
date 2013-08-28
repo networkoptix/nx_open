@@ -6,12 +6,15 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
+#include <QtCore/QUrlQuery>
+
 #include "core/resource/network_resource.h"
 #include "core/datapacket/media_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 
 #include "vmax480_resource.h"
+
 
 
 static const QByteArray GROUP_ID("{347E1C92-4627-405d-99B3-5C7EF78B0055}");

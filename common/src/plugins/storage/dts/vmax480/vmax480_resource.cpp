@@ -5,6 +5,8 @@
 #include "vmax480_chunk_reader.h"
 #include "core/resource_managment/resource_pool.h"
 
+#include <QtCore/QUrlQuery>
+
 QMutex QnPlVmax480Resource::m_chunkReaderMutex;
 QMap<QString, QnVMax480ChunkReader*> QnPlVmax480Resource::m_chunkReaderMap;
 

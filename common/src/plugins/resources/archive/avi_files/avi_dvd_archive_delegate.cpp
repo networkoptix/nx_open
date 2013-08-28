@@ -1,6 +1,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QFileInfo>
 #include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 
 #include "avi_dvd_archive_delegate.h"
 #include "avi_dvd_resource.h"

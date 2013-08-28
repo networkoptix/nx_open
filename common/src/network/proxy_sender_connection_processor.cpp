@@ -4,6 +4,10 @@
 #include "utils/network/tcp_listener.h"
 #include "universal_tcp_listener.h"
 
+#include <QtCore/QTime>
+
+#include <common/common_globals.h>
+
 static const int SOCKET_TIMEOUT = 1000 * 5;
 static const int PROXY_KEEP_ALIVE_INTERVAL = 60 * 1000;
 

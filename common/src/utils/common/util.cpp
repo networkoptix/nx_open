@@ -13,6 +13,7 @@
 #include <QtCore/QFileInfo>
 #include <QtNetwork/QHostInfo>
 
+#include <common/common_globals.h>
 #include "version.h"
 
 

@@ -6,6 +6,8 @@
 #include "utils/network/simple_http_client.h"
 
 #include <QtXml/QXmlDefaultHandler>
+#include <QtCore/QUrlQuery>
+
 #include "core/resource_managment/resource_pool.h"
 #include "../../vmaxproxy/src/vmax480_helper.h"
 

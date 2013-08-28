@@ -5,6 +5,8 @@
 #include "core/resource_managment/resource_pool.h"
 #include "core/dataprovider/live_stream_provider.h"
 
+#include <QtCore/QUrlQuery>
+
 bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 {
     bool rez = false;

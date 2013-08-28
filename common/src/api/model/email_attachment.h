@@ -1,9 +1,10 @@
 #ifndef _API_MODEL_EMAIL_ATTACHMENT_
 #define _API_MODEL_EMAIL_ATTACHMENT_
 
-#include <QString>
-#include <QList>
-#include <QSharedPointer>
+#include <QtCore/QString>
+#include <QtCore/QIODevice>
+#include <QtCore/QList>
+#include <QtCore/QSharedPointer>
 
 struct QnEmailAttachment {
     QnEmailAttachment(const QString &filename_, const QString &contentFilename, const QString &mimetype_);

@@ -1,4 +1,6 @@
-#include "api/model/email_attachment.h"
+#include "email_attachment.h"
+
+#include <QtCore/QFile>
 
 QnEmailAttachment::QnEmailAttachment(const QString &filename_, QIODevice& io_, const QString &mimetype_)
     : filename(filename_),

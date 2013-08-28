@@ -7,8 +7,8 @@
 #include <QtCore/QMutexLocker>
 #include <QtXml/QXmlDefaultHandler>
 
+#include <common/common_globals.h>
 #include <utils/network/aio/aioservice.h>
-
 
 using namespace std;
 

@@ -1,9 +1,14 @@
 #ifndef QN_DEWARPING_PARAMS_H
 #define QN_DEWARPING_PARAMS_H
 
-#include <boost/operators.hpp>
+#include <QtCore/QByteArray>
+#include <QtCore/QtGlobal>
+#include <QtCore/QMetaType>
+#include <QtCore/QList>
 
-class DewarpingParams: public boost::equality_comparable1<DewarpingParams> {
+//#include <boost/operators.hpp>
+
+struct DewarpingParams/*: public boost::equality_comparable1<DewarpingParams> */{
 public:
     enum ViewMode {
         Horizontal,

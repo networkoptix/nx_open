@@ -1,5 +1,7 @@
 #include "business_message_bus.h"
 
+#include <QtCore/QUrlQuery>
+
 Q_GLOBAL_STATIC(QnBusinessMessageBus, QnBusinessMessageBus_instance)
 
 QnBusinessMessageBus* QnBusinessMessageBus::instance()

@@ -3,6 +3,7 @@
 
 #include <QMultiMap>
 #include <QWaitCondition>
+#include <QtCore/QTime>
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"
 

@@ -9,7 +9,7 @@
 #include <QtCore/QSize>
 
 #include <core/datapacket/abstract_data_packet.h>
-
+#include <common/common_globals.h>
 
 class QnResourceLayout {
 public:

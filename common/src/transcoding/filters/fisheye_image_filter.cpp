@@ -14,7 +14,7 @@ extern "C" {
 };
 
 
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 // constant values that will be needed
 static const __m128 CONST_1111 = _mm_set1_ps(1);
 static const __m128 CONST_256 = _mm_set1_ps(256);
@@ -92,7 +92,7 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
 
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
     _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM

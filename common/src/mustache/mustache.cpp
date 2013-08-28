@@ -17,6 +17,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 
+#include <common/common_globals.h>
+
 using namespace Mustache;
 
 QString Mustache::renderTemplate(const QString& templateString, const QVariantHash& args)

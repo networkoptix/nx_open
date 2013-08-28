@@ -4,7 +4,7 @@
 #include <QtCore/QString>
 #include <QtCore/private/qsimd_p.h>
 
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
@@ -46,7 +46,7 @@ typedef struct
             "mov %%rsi, %%rbx    \n\t"                                          \
             :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3])             \
             :"0"(op) : "%rsi")
-#   elif defined(__i386)
+#   elif defined(__i386) || defined(__amd64)
 #       define __cpuid(res, op)                                                 \
             __asm__ volatile(                                                   \
             "movl %%ebx, %%esi   \n\t"                                          \
@@ -65,7 +65,7 @@ typedef struct
 #endif
 
 
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 #if defined(Q_CC_GNU) && !defined(Q_OS_MAC)
 
 /* We cannot include GCC intrinsic headers cause they cause compilation errors.
@@ -173,7 +173,7 @@ static inline bool useSSE42()
 }
 
 // TODO: #vasilenko function too large for inlining. Move to cpp file.
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 static inline QString getCPUString()
 {
     char CPUBrandString[0x40]; 

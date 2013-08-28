@@ -2,6 +2,8 @@
 #include "resource_consumer.h"
 #include "api/app_server_connection.h"
 
+#include <QtCore/QUrlQuery>
+
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
 static const qint64 ISSUE_KEEP_TIMEOUT = 1000000ll * 60;

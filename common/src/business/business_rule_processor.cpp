@@ -21,6 +21,9 @@
 #include "business_strings_helper.h"
 #include "version.h"
 
+#include <QtCore/QBuffer>
+#include <QtGui/QImage>
+
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
 namespace {

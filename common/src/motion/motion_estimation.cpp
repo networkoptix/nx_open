@@ -5,6 +5,7 @@
 #include "utils/media/sse_helper.h"
 
 #include <QtGui/QImage>
+#include <QtGui/QColor>
 #include <QtCore/QTime>
 #include <QtCore/QDebug>
 #include "utils/network/socket.h"
@@ -176,7 +177,7 @@ void saveFrame(quint8* data, int width, int height, int linesize, const QString&
     src.save(fileName);
 }
 
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 static const __m128i sse_0x80_const = _mm_setr_epi32(0x80808080, 0x80808080, 0x80808080, 0x80808080);
 static const __m128i zerroConst = _mm_setr_epi32(0, 0, 0, 0);
 
@@ -228,7 +229,7 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         const simd128i* linePtrPrev = curLinePtrPrev;
         for (int x = 0; x < xSteps; ++x)
         {
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum);
             const __m128i* src = linePtr;
@@ -287,7 +288,7 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
         const simd128i* linePtr = curLinePtr;
         for (int x = 0; x < xSteps; ++x)
         {
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
@@ -354,7 +355,7 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
         const simd128i* linePtr2 = prevLinePtr;
         for (int x = 0; x < xSteps; ++x)
         {
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
@@ -407,7 +408,7 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
         const simd128i* linePtr = curLinePtr;
         for (int x = 0; x < xSteps; ++x)
         {
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
@@ -499,7 +500,7 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         const simd128i* linePtr2 = prevLinePtr;
         for (int x = 0; x < xSteps; ++x)
         {
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
@@ -575,7 +576,7 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
         const simd128i* linePtr = curLinePtr;
         for (int x = 0; x < xSteps; ++x)
         {
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
@@ -683,7 +684,7 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
                 memcpy(dst - i*MD_HEIGHT/sizeof(simd128i) , src, MD_HEIGHT);
         }
         else {
-#if defined(__i386) || defined(_WIN32)
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
             dst[1] = _mm_min_epu8(dst[1], src[1]); // SSE2
 #elif __arm__ && __ARM_NEON__

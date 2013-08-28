@@ -7,6 +7,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QThread>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QUrlQuery>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 

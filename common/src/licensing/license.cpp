@@ -13,8 +13,9 @@
 #include <openssl/err.h>
 
 #include "version.h"
-#include "common/customization.h"
-#include "utils/common/synctime.h"
+#include <common/customization.h>
+#include <common/common_globals.h>
+#include <utils/common/synctime.h>
 
 namespace {
     const char *networkOptixRSAPublicKey = QN_RSA_PUBLIC_KEY;

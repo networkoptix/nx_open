@@ -21,6 +21,9 @@
 #include "serializer/pb_serializer.h"
 #include "event_log/events_serializer.h"
 
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
+#include <QtGui/QImage>
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
