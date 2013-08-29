@@ -3,7 +3,7 @@ from os.path import dirname, join, exists, isfile
 from os import listdir
 
 sys.path.insert(0, '${basedir}/../common')
-#sys.path.insert(0, os.path.join('..', '..', 'common'))
+from gencomp import gencomp_cpp
 
 template_file='template.pro'
 specifics_file='${project.artifactId}-specifics.pro'
@@ -84,6 +84,7 @@ def gen_includepath(file, path):
                     
 if __name__ == '__main__':
     os.system('mkdir build')
+    gencomp_cpp(open('${project.build.sourceDirectory}/compatibility_info.cpp', 'w'))
     if not os.path.exists(translations_target_dir):
         os.makedirs(translations_target_dir) 
 
