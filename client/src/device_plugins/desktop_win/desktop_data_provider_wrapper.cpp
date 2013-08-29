@@ -10,7 +10,7 @@ QnDesktopDataProviderWrapper::QnDesktopDataProviderWrapper(QnResourcePtr res):
 
 QnDesktopDataProviderWrapper::~QnDesktopDataProviderWrapper()
 {
-
+    pleaseStop();
 }
 
 void QnDesktopDataProviderWrapper::putData(QnAbstractDataPacketPtr data)
