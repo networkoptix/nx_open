@@ -3,22 +3,22 @@
 #include "ui/screen_recording/video_recorder_settings.h"
 #include "ui/style/skin.h"
 
-QnDesktopResource::QnDesktopResource(int index, QGLWidget* mainWindow): QnAbstractArchiveResource() 
+QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource() 
 {
     m_mainWidget = mainWindow;
     addFlags(local_live_cam);
 
-    const QString name = QLatin1String("Desktop") + QString::number(index + 1);
+    const QString name = QLatin1String("Desktop");
     setName(name);
     setUrl(name);
     m_desktopDataProvider = 0;
+    setGuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}")); // only one desktop resource is allowed)
 }
 
 QnDesktopResource::~QnDesktopResource()
 {
     delete m_desktopDataProvider;
 }
-
 
 QString QnDesktopResource::toString() const {
     return getUniqueId();
@@ -32,27 +32,9 @@ QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Conn
     if (m_desktopDataProvider == 0)
         return 0;
 
-    QnDesktopDataProviderWrapper* p = new QnDesktopDataProviderWrapper(toSharedPointer());
+    QnDesktopDataProviderWrapper* p = new QnDesktopDataProviderWrapper(toSharedPointer(), m_desktopDataProvider);
     m_desktopDataProvider->addDataProcessor(p);
     return p;
-}
-
-void QnDesktopResource::beforeStartDataProvider(QnDesktopDataProviderWrapper*)
-{
-    QMutexLocker lock(&m_dpMutex);
-    if (m_desktopDataProvider)
-        m_desktopDataProvider->start();
-}
-
-void QnDesktopResource::beforeDestroyDataProvider(QnDesktopDataProviderWrapper* dataProviderWrapper)
-{
-    QMutexLocker lock(&m_dpMutex);
-
-    if (m_desktopDataProvider) {
-        m_desktopDataProvider->removeDataProcessor(dataProviderWrapper);
-        if (m_desktopDataProvider->processorsCount() == 0) 
-            m_desktopDataProvider->pleaseStop();
-    }
 }
 
 void QnDesktopResource::createSharedDataProvider()

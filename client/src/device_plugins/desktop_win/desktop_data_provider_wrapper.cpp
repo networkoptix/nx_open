@@ -1,16 +1,18 @@
 #include "desktop_data_provider_wrapper.h"
 #include "device/desktop_resource.h"
+#include "desktop_data_provider.h"
 
-QnDesktopDataProviderWrapper::QnDesktopDataProviderWrapper(QnResourcePtr res):
+QnDesktopDataProviderWrapper::QnDesktopDataProviderWrapper(QnResourcePtr res, QnDesktopDataProvider* owner):
     QnAbstractMediaStreamDataProvider(res), 
-    QnAbstractDataConsumer(100)
+    QnAbstractDataConsumer(100),
+    m_owner(owner)
 {
 
 }
 
 QnDesktopDataProviderWrapper::~QnDesktopDataProviderWrapper()
 {
-    pleaseStop();
+    m_owner->beforeDestroyDataProvider(this);
 }
 
 void QnDesktopDataProviderWrapper::putData(QnAbstractDataPacketPtr data)
@@ -46,10 +48,15 @@ void QnDesktopDataProviderWrapper::putData(QnAbstractDataPacketPtr data)
 
 void QnDesktopDataProviderWrapper::start(Priority priority)
 {
-    m_resource.dynamicCast<QnDesktopResource>()->beforeStartDataProvider(this);
+    m_owner->start();
 }
 
-void QnDesktopDataProviderWrapper::pleaseStop()
+bool QnDesktopDataProviderWrapper::isInitialized() const
 {
-    m_resource.dynamicCast<QnDesktopResource>()->beforeDestroyDataProvider(this);
+    return m_owner->isInitialized();
+}
+
+QString QnDesktopDataProviderWrapper::lastErrorStr() const
+{
+    return m_owner->lastErrorStr();
 }

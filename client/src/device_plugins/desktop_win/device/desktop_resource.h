@@ -10,20 +10,18 @@ class QnDesktopDataProvider;
 class QnDesktopResource: public QnAbstractArchiveResource {
     Q_OBJECT;
 public:
-    QnDesktopResource(int index, QGLWidget* mainWindow);
+    QnDesktopResource(QGLWidget* mainWindow = 0);
     virtual ~QnDesktopResource();
 
     virtual QString toString() const override;
     bool isRendererSlow() const;
+
 protected:
     virtual QnAbstractStreamDataProvider *createDataProviderInternal(ConnectionRole role) override;
 private:
     void createSharedDataProvider();
 
     friend class QnDesktopDataProviderWrapper;
-
-    void beforeStartDataProvider(QnDesktopDataProviderWrapper*);
-    void beforeDestroyDataProvider(QnDesktopDataProviderWrapper* dataProviderWrapper);
 
 private:
     QGLWidget* m_mainWidget;

@@ -63,7 +63,7 @@ QnResourceList QnDesktopResourceSearcher::findResources() {
         if(FAILED(m_pD3D->GetAdapterDisplayMode(i, &ddm)))
             break;
 
-        QnResourcePtr dev(new QnDesktopResource(i, m_mainWidget));
+        QnResourcePtr dev(new QnDesktopResource(m_mainWidget));
         result.push_back(dev);
     }
     return result;

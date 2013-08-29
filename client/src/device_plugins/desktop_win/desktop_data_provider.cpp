@@ -323,7 +323,8 @@ QnDesktopDataProvider::QnDesktopDataProvider (
     m_encodedAudioBuf(0),
     m_capturingStopped(false),
     m_logo(logo),
-    m_started(false)
+    m_started(false),
+    m_isInitialized(false)
 {
     if (audioDevice || audioDevice2)
     {
@@ -596,7 +597,7 @@ int QnDesktopDataProvider::processData(bool flush)
         if(m_videoCodecCtx->coded_frame->key_frame)
             video->flags |= AV_PKT_FLAG_KEY;
         video->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-
+        video->dataProvider = this;
         putData(video);
     }
 
@@ -675,6 +676,7 @@ int QnDesktopDataProvider::processData(bool flush)
             audio->timestamp = av_rescale_q(audioPts, timeBaseMs, timeBaseNative) + m_initTime;
             //audio->timestamp = av_rescale_q(m_audioCodecCtx->coded_frame->pts, m_audioCodecCtx->time_base, timeBaseNative) + m_initTime;
             audio->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            audio->dataProvider = this;
             putData(audio);
         }
     }
@@ -689,11 +691,17 @@ void QnDesktopDataProvider::start(Priority priority)
         return;
     m_started = true;
 
-    if (!init()) {
+    m_isInitialized = init();
+    if (!m_isInitialized) {
         m_needStop = true;
         return;
     }
     QnLongRunnable::start(priority);
+}
+
+bool QnDesktopDataProvider::isInitialized() const
+{
+    return m_isInitialized;
 }
 
 void QnDesktopDataProvider::run()
@@ -788,6 +796,14 @@ void QnDesktopDataProvider::closeStream()
 qint64 QnDesktopDataProvider::currentTime() const
 {
     return m_grabber->currentTime();
+}
+
+void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractDataConsumer* consumer)
+{
+    QMutexLocker lock(&m_startMutex);
+    removeDataProcessor(consumer);
+    if (processorsCount() == 0) 
+        pleaseStop();
 }
 
 /*

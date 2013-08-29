@@ -5,7 +5,8 @@
 #include <QScopedPointer>
 
 class QGLWidget;
-class QnDesktopFileEncoder;
+class QnDesktopDataProviderWrapper;
+class QnStreamRecorder;
 
 class QnScreenRecorder: public QObject {
     Q_OBJECT;
@@ -49,10 +50,16 @@ signals:
     void recordingStarted();
     void recordingFinished(const QString &recordedFileName);
     void error(const QString &errorMessage);
-
+private slots:
+    void onRecordingFailed(QString msg);
+    void onRecordingFinished(QString);
+private:
+    void cleanupRecorder();
 private:
     bool m_recording;
-    QnDesktopFileEncoder* m_encoder;
+    QnDesktopDataProviderWrapper* m_dataProvider;
+    QnStreamRecorder* m_recorder;
+    //QnDesktopFileEncoder* m_encoder;
 };
 
 #endif // QN_SCREEN_RECORDER_H

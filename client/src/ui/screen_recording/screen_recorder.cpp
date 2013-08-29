@@ -11,11 +11,15 @@
 #include "video_recorder_settings.h"
 #include "utils/common/log.h"
 #include "device_plugins/desktop_win/desktop_file_encoder.h"
+#include "device_plugins/desktop_win/device/desktop_resource.h"
+#include "recording/stream_recorder.h"
+#include "core/resource_managment/resource_pool.h"
 
 QnScreenRecorder::QnScreenRecorder(QObject *parent):
     QObject(parent),
     m_recording(false),
-    m_encoder(NULL)
+    m_dataProvider(0),
+    m_recorder(0)
 {}
 
 QnScreenRecorder::~QnScreenRecorder() {
@@ -69,7 +73,9 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
     QString logoName = QLatin1String("logo_1920_1080.png");
     logo = qnSkin->pixmap(logoName); // hint: comment this line to remove logo
 #endif
-    delete m_encoder;
+    //delete m_encoder;
+
+    /*
     m_encoder = new QnDesktopFileEncoder(
         filePath,
         screen,
@@ -82,23 +88,62 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
         appWidget,
         logo
     );
+    */
 
-    if (!m_encoder->start()) {
-        cl_log.log(m_encoder->lastErrorStr(), cl_logERROR);
-
-        emit error(m_encoder->lastErrorStr());
-
-
-        m_encoder->deleteLater();
-        m_encoder = 0;
+    QnDesktopResourcePtr res = qnResPool->getResourceByGuid(QnDesktopResource().getGuid()).dynamicCast<QnDesktopResource>();
+    if (!res) {
+        emit error(tr("Screen capturing subsystem is not initialized yet. Please try latter"));
         return;
     }
+
+    m_dataProvider = dynamic_cast<QnDesktopDataProviderWrapper*> (res->createDataProvider(QnResource::Role_Default));
+    m_recorder = new QnStreamRecorder(res->toResourcePtr());
+    m_dataProvider->addDataProcessor(m_recorder);
+    m_recorder->setFileName(filePath);
+    m_recorder->setContainer(lit("avi"));
+    m_recorder->setRole(QnStreamRecorder::Role_FileExport);
+
+    connect(m_recorder, SIGNAL(recordingFailed(QString)), this, SLOT(onRecordingFailed(QString)));
+    connect(m_recorder, SIGNAL(recordingFinished(QString)), this, SLOT(onRecordingFinished(QString)));
+
+    m_dataProvider->start();
+
+    if (!m_dataProvider->isInitialized()) {
+        cl_log.log(m_dataProvider->lastErrorStr(), cl_logERROR);
+
+        emit error(m_dataProvider->lastErrorStr());
+        cleanupRecorder();
+        return;
+    }
+
+    m_recorder->start();
+
 
     m_recording = true;
     emit recordingStarted();
 #else
     Q_UNUSED(appWidget)
 #endif
+}
+
+void QnScreenRecorder::cleanupRecorder()
+{
+    if (m_dataProvider && m_recorder)
+        m_dataProvider->removeDataProcessor(m_recorder);
+    delete m_recorder;
+    delete m_dataProvider;
+    m_recorder = 0;
+    m_dataProvider = 0;
+}
+
+void QnScreenRecorder::onRecordingFailed(QString msg)
+{
+    emit error(msg);
+    cleanupRecorder();
+}
+
+void QnScreenRecorder::onRecordingFinished(QString)
+{
 }
 
 void QnScreenRecorder::stopRecording() {
@@ -110,15 +155,18 @@ void QnScreenRecorder::stopRecording() {
     if(!m_recording)
         return; /* Stopping when nothing is being recorded is OK. */
 
-    Q_ASSERT(m_encoder != NULL);
-
 #ifdef Q_OS_WIN
-    QString recordedFileName = m_encoder->fileName();
-    m_encoder->stop();
+    QString recordedFileName = m_recorder->getFileName();
+    
+    m_dataProvider->removeDataProcessor(m_recorder);
+
+    delete m_dataProvider;
+    delete m_recorder;
+
+    m_dataProvider = 0;
+    m_recorder = 0;
 
     m_recording = false;
     emit recordingFinished(recordedFileName);
-    m_encoder->deleteLater();
-    m_encoder = 0;
 #endif
 }

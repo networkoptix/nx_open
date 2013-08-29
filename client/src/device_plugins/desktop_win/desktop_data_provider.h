@@ -20,6 +20,7 @@
 #include "core/dataprovider/live_stream_provider.h"
 
 class CaptureAudioStream;
+class QnAbstractDataConsumer;
 
 class QnDesktopDataProvider: public QnAbstractMediaStreamDataProvider
 {
@@ -43,6 +44,10 @@ public:
     QString lastErrorStr() const { return m_lastErrorStr; }
 
     virtual void start(Priority priority = InheritPriority) override;
+
+    void beforeDestroyDataProvider(QnAbstractDataConsumer* dataProviderWrapper);
+
+    bool isInitialized() const;
 protected:
     // QnLongRunnable runable
     virtual void run();
@@ -124,6 +129,7 @@ private:
     qint64 m_initTime;
     QMutex m_startMutex;
     bool m_started;
+    bool m_isInitialized;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance,  DWORD dwParam1, DWORD dwParam2);
 };
