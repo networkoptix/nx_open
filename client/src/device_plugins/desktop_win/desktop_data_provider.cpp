@@ -404,8 +404,8 @@ bool QnDesktopDataProvider::init()
     m_videoCodecCtx->time_base = m_grabber->getFrameRate();
 
     m_videoCodecCtx->pix_fmt = m_grabber->format();
-    m_videoCodecCtx->width = m_grabber->width();
-    m_videoCodecCtx->height = m_grabber->height();
+    m_videoCodecCtx->coded_width = m_videoCodecCtx->width = m_grabber->width();
+    m_videoCodecCtx->coded_height = m_videoCodecCtx->height = m_grabber->height();
     //m_videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
 
