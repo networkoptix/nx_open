@@ -13,6 +13,7 @@
 #include <CoreServices/CoreServices.h>
 #elif defined(Q_OS_WIN)
 #include <qt_windows.h>
+#include "device_plugins/desktop_win/device/desktop_resource.h"
 #endif
 #include "utils/common/util.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
@@ -123,16 +124,13 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_doNotChangeDisplayTime(false),
     m_firstLivePacket(true),
     m_multiView(false),
-    m_forceMTRealTimeDecode(false)
+    m_forceMtDecoding(false)
 {
 
     if (resource->toResource()->hasFlags(QnResource::live_cam))
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;
-
-    if (resource->toResource()->hasFlags(QnResource::local_live_cam))
-        m_forceMTRealTimeDecode = true; // not enough speed for desktop camera in single thread mode because of slow rendering
 
     if (resource && resource->toResource()->hasFlags(QnResource::still_image)) {
         m_isStillImage = true;
@@ -154,6 +152,12 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
 
     qnRedAssController->registerConsumer(this);
+
+#ifdef Q_OS_WIN
+    QnDesktopResourcePtr desktopResource = resource.dynamicCast<QnDesktopResource>();
+    if (desktopResource && desktopResource->isRendererSlow())
+        m_forceMtDecoding = true; // not enough speed for desktop camera with aero in single thread mode because of slow rendering
+#endif
 }
 
 QnCamDisplay::~QnCamDisplay()
@@ -932,12 +936,25 @@ bool QnCamDisplay::canAcceptData() const
         return QnAbstractDataConsumer::canAcceptData();
 }
 
+bool QnCamDisplay::needBuffering(qint64 vTime) const
+{
+    
+    qint64 aTime = m_audioDisplay->startBufferingTime();
+    if (aTime == AV_NOPTS_VALUE)
+        return false;
+
+    return vTime > aTime;
+    //return m_audioDisplay->isBuffering() && !flushCurrentBuffer;
+}
+
 bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
 
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return true;
+
+    qDebug() << "got data time=" << media->timestamp << "type=" << (media->dataType == QnAbstractMediaData::VIDEO ? "video" : "audio");
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
     if (metadata) {
@@ -1239,8 +1256,9 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (flushCurrentBuffer)
             m_audioDisplay->playCurrentBuffer();
 
+        qint64 vTime = nextVideoImageTime(vd, channel);
         //2) we have audio and it's buffering( not playing yet )
-        if (m_audioDisplay->isBuffering() && !flushCurrentBuffer)
+        if (!flushCurrentBuffer && needBuffering(vTime))
         //if (m_audioDisplay->isBuffering() || m_audioDisplay->msInBuffer() < m_audioBufferSize / 10)
         {
             // audio is not playinf yet; video must not be played as well
@@ -1256,11 +1274,10 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             else {
                 result = false;
             }
-
             vd = nextInOutVideodata(incoming, channel);
 
             if (vd) {
-                if (!m_useMtDecoding && (!m_isRealTimeSource || m_forceMTRealTimeDecode))
+                if (!m_useMtDecoding && (!m_isRealTimeSource || m_forceMtDecoding))
                     setMTDecoding(true);
 
                 bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
@@ -1331,7 +1348,7 @@ void QnCamDisplay::playAudio(bool play)
             m_audioDisplay->resume();
     }
     if (m_isRealTimeSource)
-        setMTDecoding(play && m_useMTRealTimeDecode);
+        setMTDecoding(play && (m_useMTRealTimeDecode || m_forceMtDecoding));
     else
         setMTDecoding(play);
 }

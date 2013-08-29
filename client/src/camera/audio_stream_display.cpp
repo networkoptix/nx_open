@@ -17,7 +17,8 @@ QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
     m_forceDownmix(qnSettings->isAudioDownmixed()),
     m_sampleConvertMethod(SampleConvert_None),
     m_isConvertMethodInitialized(false),
-    m_decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE)
+    m_decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE),
+    m_startBufferingTime(AV_NOPTS_VALUE)
 {}
 
 QnAudioStreamDisplay::~QnAudioStreamDisplay()
@@ -62,9 +63,9 @@ void QnAudioStreamDisplay::resume()
         m_audioSound->resume();
 }
 
-bool QnAudioStreamDisplay::isBuffering() const
+qint64 QnAudioStreamDisplay::startBufferingTime() const
 {
-    return m_tooFewDataDetected;
+    return m_tooFewDataDetected ? m_startBufferingTime : AV_NOPTS_VALUE;
 }
 
 bool QnAudioStreamDisplay::isFormatSupported() const
@@ -174,11 +175,13 @@ void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     if (bufferSize < m_bufferMs / 10)
     {
         m_tooFewDataDetected = true;
+        m_startBufferingTime = data->timestamp - bufferSize;
     }
 
     if (m_tooFewDataDetected && data && data->timestamp < minTime)
     {
         clearAudioBuffer();
+        m_startBufferingTime = data->timestamp;
         return;
     }
 

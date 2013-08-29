@@ -57,3 +57,10 @@ QnAbstractStreamDataProvider *QnDesktopResource::createDataProviderInternal(Conn
     return 0;
 #endif
 }
+
+bool QnDesktopResource::isRendererSlow() const
+{
+    QnVideoRecorderSettings recorderSettings;
+    Qn::CaptureMode captureMode = recorderSettings.captureMode();
+    return captureMode == Qn::FullScreenMode;
+}

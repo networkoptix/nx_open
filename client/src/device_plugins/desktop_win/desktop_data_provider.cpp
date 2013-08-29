@@ -581,16 +581,17 @@ int QnDesktopDataProvider::processData(bool flush)
     timeBaseNative.num = 1;
     timeBaseNative.den = 1000000;
 
+    if (m_initTime == AV_NOPTS_VALUE)
+        m_initTime = qnSyncTime->currentUSecsSinceEpoch();
+
     AVPacket videoPkt;
     if (out_size > 0)
     {
-        if (m_initTime == AV_NOPTS_VALUE)
-            m_initTime = qnSyncTime->currentUSecsSinceEpoch();
 
         QnCompressedVideoDataPtr video = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, out_size, m_videoCodecCtxPtr));
         video->data.write((const char*) m_videoBuf, out_size);
         video->compressionType = m_videoCodecCtx->codec_id;
-        video->timestamp = av_rescale_q(m_videoCodecCtx->coded_frame->pts-1, m_videoCodecCtx->time_base, timeBaseNative) + m_initTime;
+        video->timestamp = av_rescale_q(m_videoCodecCtx->coded_frame->pts, m_videoCodecCtx->time_base, timeBaseNative) + m_initTime;
 
         if(m_videoCodecCtx->coded_frame->key_frame)
             video->flags |= AV_PKT_FLAG_KEY;

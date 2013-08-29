@@ -10,7 +10,7 @@ public:
     QnDesktopResource(int index, QGLWidget* mainWindow);
 
     virtual QString toString() const override;
-
+    bool isRendererSlow() const;
 protected:
     virtual QnAbstractStreamDataProvider *createDataProviderInternal(ConnectionRole role) override;
 private:
