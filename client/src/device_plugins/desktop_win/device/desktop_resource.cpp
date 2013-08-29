@@ -11,13 +11,60 @@ QnDesktopResource::QnDesktopResource(int index, QGLWidget* mainWindow): QnAbstra
     const QString name = QLatin1String("Desktop") + QString::number(index + 1);
     setName(name);
     setUrl(name);
+    m_desktopDataProvider = 0;
 }
+
+QnDesktopResource::~QnDesktopResource()
+{
+    delete m_desktopDataProvider;
+}
+
 
 QString QnDesktopResource::toString() const {
     return getUniqueId();
 }
 
-QnAbstractStreamDataProvider *QnDesktopResource::createDataProviderInternal(ConnectionRole /*role*/) {
+QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(ConnectionRole /*role*/) 
+{
+    QMutexLocker lock(&m_dpMutex);
+
+    createSharedDataProvider();
+    if (m_desktopDataProvider == 0)
+        return 0;
+
+    QnDesktopDataProviderWrapper* p = new QnDesktopDataProviderWrapper(toSharedPointer());
+    m_desktopDataProvider->addDataProcessor(p);
+    return p;
+}
+
+void QnDesktopResource::beforeStartDataProvider(QnDesktopDataProviderWrapper*)
+{
+    QMutexLocker lock(&m_dpMutex);
+    if (m_desktopDataProvider)
+        m_desktopDataProvider->start();
+}
+
+void QnDesktopResource::beforeDestroyDataProvider(QnDesktopDataProviderWrapper* dataProviderWrapper)
+{
+    QMutexLocker lock(&m_dpMutex);
+
+    if (m_desktopDataProvider) {
+        m_desktopDataProvider->removeDataProcessor(dataProviderWrapper);
+        if (m_desktopDataProvider->processorsCount() == 0) 
+            m_desktopDataProvider->pleaseStop();
+    }
+}
+
+void QnDesktopResource::createSharedDataProvider()
+{
+    if (m_desktopDataProvider) 
+    {
+        if (m_desktopDataProvider->needToStop())
+            delete m_desktopDataProvider; // stop and destroy old instance
+        else
+            return; // already exists
+    }
+
 #ifdef Q_OS_WIN
 
     QnVideoRecorderSettings recorderSettings;
@@ -43,18 +90,17 @@ QnAbstractStreamDataProvider *QnDesktopResource::createDataProviderInternal(Conn
     logo = qnSkin->pixmap(logoName); // hint: comment this line to remove logo
 #endif
 
-    return new QnDesktopDataProvider(toSharedPointer(),
-                                    screen,
-                                    audioDevice.isNull() ? 0 : &audioDevice,
-                                    secondAudioDevice.isNull() ? 0 : &secondAudioDevice,
-                                    captureMode,
-                                    captureCursor,
-                                    encodingSize,
-                                    encodingQuality,
-                                    m_mainWidget,
-                                    logo);
+    m_desktopDataProvider = new QnDesktopDataProvider(toSharedPointer(),
+        screen,
+        audioDevice.isNull() ? 0 : &audioDevice,
+        secondAudioDevice.isNull() ? 0 : &secondAudioDevice,
+        captureMode,
+        captureCursor,
+        encodingSize,
+        encodingQuality,
+        m_mainWidget,
+        logo);
 #else
-    return 0;
 #endif
 }
 

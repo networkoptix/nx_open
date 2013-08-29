@@ -103,7 +103,6 @@ QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider*
 QnDesktopDataProvider::EncodedAudioInfo::~EncodedAudioInfo()
 {
     stop();
-
     if (m_speexPreprocess)
         speex_preprocess_state_destroy(m_speexPreprocess);
     m_speexPreprocess = 0;
@@ -323,7 +322,8 @@ QnDesktopDataProvider::QnDesktopDataProvider (
     m_widget(glWidget),
     m_encodedAudioBuf(0),
     m_capturingStopped(false),
-    m_logo(logo)
+    m_logo(logo),
+    m_started(false)
 {
     if (audioDevice || audioDevice2)
     {
@@ -684,8 +684,15 @@ int QnDesktopDataProvider::processData(bool flush)
 
 void QnDesktopDataProvider::start(Priority priority)
 {
-    if (!init())
+    QMutexLocker lock(&m_startMutex);
+    if (m_started)
         return;
+    m_started = true;
+
+    if (!init()) {
+        m_needStop = true;
+        return;
+    }
     QnLongRunnable::start(priority);
 }
 
@@ -783,6 +790,7 @@ qint64 QnDesktopDataProvider::currentTime() const
     return m_grabber->currentTime();
 }
 
+/*
 void QnDesktopDataProvider::putData(QnAbstractDataPacketPtr data)
 {
     QnAbstractMediaDataPtr media  = data.dynamicCast<QnAbstractMediaData>();
@@ -813,6 +821,6 @@ void QnDesktopDataProvider::putData(QnAbstractDataPacketPtr data)
         }
     }
 }
-
+*/
 
 #endif // Q_OS_WIN

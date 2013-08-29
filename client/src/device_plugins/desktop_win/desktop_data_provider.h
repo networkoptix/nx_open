@@ -41,12 +41,11 @@ public:
                        );
     virtual ~QnDesktopDataProvider();
     QString lastErrorStr() const { return m_lastErrorStr; }
+
+    virtual void start(Priority priority = InheritPriority) override;
 protected:
     // QnLongRunnable runable
     virtual void run();
-    virtual void putData(QnAbstractDataPacketPtr data) override;
-
-    virtual void start(Priority priority = InheritPriority) override;
 private:
     bool init();
 private:
@@ -121,8 +120,10 @@ private:
     QString m_lastErrorStr;
     bool m_capturingStopped;
     const QPixmap m_logo;
-    QSet<void*> m_needKeyData;
+    //QSet<void*> m_needKeyData;
     qint64 m_initTime;
+    QMutex m_startMutex;
+    bool m_started;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance,  DWORD dwParam1, DWORD dwParam2);
 };
