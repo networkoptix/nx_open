@@ -42,8 +42,6 @@ int QnAudioStreamDisplay::msInBuffer() const
 
     int rez = msInQueue() + internalBufferSize;
 
-    qDebug() << "msInQueue=" << rez;
-
     return rez;
 }
 

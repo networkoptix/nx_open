@@ -954,8 +954,6 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     if (!media)
         return true;
 
-    qDebug() << "got data time=" << media->timestamp << "type=" << (media->dataType == QnAbstractMediaData::VIDEO ? "video" : "audio");
-
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
     if (metadata) {
         m_lastMetadata[metadata->channelNumber] = metadata;
