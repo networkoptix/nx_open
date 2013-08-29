@@ -5,6 +5,7 @@
 #include <QtGui/QDialogButtonBox>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/dewarping_params.h>
 
 #include <ui/widgets/properties/camera_settings_widget.h>
 
@@ -23,14 +24,18 @@ public:
         return m_settingsWidget;
     }
 
-    void ignoreAcceptOnce(){
-        mIgnoreAccept = true;
+    void ignoreAcceptOnce() {
+        m_ignoreAccept = true;
     }
 
 signals:
     void buttonClicked(QDialogButtonBox::StandardButton button);
     void advancedSettingChanged();
+    void fisheyeSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &cameras);
+    void cameraOpenRequested();
+    void cameraIssuesRequested();
+    void cameraRulesRequested();
 
 private slots:
     void at_buttonBox_clicked(QAbstractButton *button);
@@ -44,8 +49,8 @@ private:
     QWeakPointer<QnWorkbenchContext> m_context;
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
-    QPushButton *m_applyButton, *m_okButton;
-    bool mIgnoreAccept;
+    QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;
+    bool m_ignoreAccept;
 };
 
 

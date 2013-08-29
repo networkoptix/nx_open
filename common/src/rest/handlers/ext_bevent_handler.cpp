@@ -9,11 +9,13 @@
 #include "api/serializer/serializer.h"
 #include "utils/common/synctime.h"
 #include <business/business_event_connector.h>
-#include <business/events/reasoned_business_event.h>
 
 QnExternalBusinessEventHandler::QnExternalBusinessEventHandler()
 {
-
+    QnBusinessEventConnector* connector = qnBusinessRuleConnector;
+    connect(this, SIGNAL(mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason)),
+            connector,
+            SLOT(at_mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason)));
 }
 
 int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
@@ -46,10 +48,15 @@ int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequ
     }
 
     if (errStr.isEmpty()) {
-        if (eventType == QLatin1String("MServerFailure"))
-            qnBusinessRuleConnector->at_mserverFailure(resource,
-                                                       qnSyncTime->currentUSecsSinceEpoch(),
-                                                       QnBusiness::MServerIssueTerminated);
+        if (eventType == QLatin1String("MServerFailure")) 
+        {
+            emit mserverFailure(resource,
+                 qnSyncTime->currentUSecsSinceEpoch(),
+                 QnBusiness::MServerIssueTerminated);
+            //qnBusinessRuleConnector->at_mserverFailure(resource,
+            //                                           qnSyncTime->currentUSecsSinceEpoch(),
+            //                                           QnBusiness::MServerIssueTerminated);
+        }
         //else if (eventType == "UserEvent")
         //    bEvent = new QnUserDefinedBusinessEvent(); // todo: not implemented
         else if (errStr.isEmpty())
@@ -77,7 +84,7 @@ int QnExternalBusinessEventHandler::executePost(const QString& path, const QnReq
     return executeGet(path, params, result, contentType);
 }
 
-QString QnExternalBusinessEventHandler::description(TCPSocket *) const
+QString QnExternalBusinessEventHandler::description() const
 {
     return QLatin1String(
         "Process external business event\n"

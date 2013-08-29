@@ -7,9 +7,12 @@
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
+#include <QMessageBox>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QSpacerItem>
+
+#include <ui/help/help_topic_accessor.h>
 
 class QnCheckableMessageBoxPrivate {
 public:
@@ -173,14 +176,7 @@ void QnCheckableMessageBox::setDefaultButton(QDialogButtonBox::StandardButton s)
 }
 
 QDialogButtonBox::StandardButton
-QnCheckableMessageBox::question(QWidget *parent,
-                              const QString &title,
-                              const QString &question,
-                              const QString &checkBoxText,
-                              bool *checkBoxSetting,
-                              QDialogButtonBox::StandardButtons buttons,
-                              QDialogButtonBox::StandardButton defaultButton)
-{
+QnCheckableMessageBox::question(QWidget *parent, int helpTopicId, const QString &title, const QString &question, const QString &checkBoxText, bool *checkBoxSetting, QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton) {
     QnCheckableMessageBox mb(parent);
     mb.setWindowTitle(title);
     mb.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
@@ -189,8 +185,13 @@ QnCheckableMessageBox::question(QWidget *parent,
     mb.setChecked(*checkBoxSetting);
     mb.setStandardButtons(buttons);
     mb.setDefaultButton(defaultButton);
+    setHelpTopic(&mb, helpTopicId);
     mb.exec();
     *checkBoxSetting = mb.isChecked();
     return mb.clickedStandardButton();
 }
 
+QDialogButtonBox::StandardButton
+QnCheckableMessageBox::question(QWidget *parent, const QString &title, const QString &question, const QString &checkBoxText, bool *checkBoxSetting, QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton) {
+    return QnCheckableMessageBox::question(parent, -1, title, question, checkBoxText, checkBoxSetting, buttons, defaultButton);
+}

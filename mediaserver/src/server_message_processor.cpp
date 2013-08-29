@@ -8,13 +8,15 @@
 #include "server_message_processor.h"
 #include "recorder/recording_manager.h"
 #include "serverutil.h"
-#include <business/business_rule_processor.h>
+#include "settings.h"
+#include "business/business_rule_processor.h"
+#include "business/business_event_connector.h"
 
-Q_GLOBAL_STATIC(QnServerMessageProcessor, static_instance)
+Q_GLOBAL_STATIC(QnServerMessageProcessor, QnServerMessageProcessor_instance)
 
 QnServerMessageProcessor* QnServerMessageProcessor::instance()
 {
-    return static_instance();
+    return QnServerMessageProcessor_instance();
 }
 
 void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, int timeout)
@@ -23,11 +25,13 @@ void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, 
 	m_source->setAuthKey(authKey);
 
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
+    connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
     connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
 
     connect(this, SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)), qnBusinessRuleProcessor, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
     connect(this, SIGNAL(businessRuleDeleted(int)), qnBusinessRuleProcessor, SLOT(at_businessRuleDeleted(int)));
+    connect(this, SIGNAL(businessRuleReset(QnBusinessEventRuleList)), qnBusinessRuleProcessor, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 }
 
 QnServerMessageProcessor::QnServerMessageProcessor()
@@ -49,29 +53,43 @@ void QnServerMessageProcessor::at_connectionReset()
     emit connectionReset();
 }
 
-void QnServerMessageProcessor::at_messageReceived(QnMessage event)
+void QnServerMessageProcessor::at_connectionOpened(QnMessage message)
 {
-    NX_LOG( QString::fromLatin1("Received event message %1, resourceId %2, resource %3").
-        arg(Qn::toString(event.eventType)).arg(event.resourceId.toString()).arg(event.resource ? event.resource->getName() : QString("NULL")), cl_logDEBUG1 );
+    QnAppServerConnectionFactory::setSystemName(message.systemName);
+    QnAppServerConnectionFactory::setPublicIp(message.publicIp);
 
-    if (event.eventType == Qn::Message_Type_License)
+    qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
+    if (lastRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
+                                                   lastRunningTime*1000,
+                                                   QnBusiness::MServerIssueStarted);
+}
+
+void QnServerMessageProcessor::at_messageReceived(QnMessage message)
+{
+    NX_LOG( QString::fromLatin1("Received message %1, resourceId %2, resource %3").
+        arg(Qn::toString(message.messageType)).arg(message.resourceId.toString()).arg(message.resource ? message.resource->getName() : QString("NULL")), cl_logDEBUG1 );
+
+    if (message.messageType == Qn::Message_Type_RuntimeInfoChange)
+    {
+        if (!message.publicIp.isNull())
+            QnAppServerConnectionFactory::setPublicIp(message.publicIp);
+
+        if (!message.systemName.isNull())
+            QnAppServerConnectionFactory::setSystemName(message.systemName);
+    }
+    else if (message.messageType == Qn::Message_Type_License)
     {
         // New license added. LicensePool verifies it.
-        qnLicensePool->addLicense(event.license);
+        qnLicensePool->addLicense(message.license);
     }
-    else if (event.eventType == Qn::Message_Type_CameraServerItem)
+    else if (message.messageType == Qn::Message_Type_CameraServerItem)
     {
-/*        QString mac = event.dict["mac"].toString();
-        QString serverGuid = event.dict["server_guid"].toString();
-        qint64 timestamp_ms = event.dict["timestamp"].toLongLong();
-
-        QnCameraHistoryItem historyItem(mac, timestamp_ms, serverGuid);*/
-
-        QnCameraHistoryPool::instance()->addCameraHistoryItem(*event.cameraServerItem);
+        QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
     }
-    else if (event.eventType == Qn::Message_Type_ResourceChange)
+    else if (message.messageType == Qn::Message_Type_ResourceChange)
     {
-        QnResourcePtr resource = event.resource;
+        QnResourcePtr resource = message.resource;
 
         QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>();
 
@@ -95,7 +113,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         if (isServer)
             resource->setStatus(QnResource::Online);
 
-        QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::rfAllResources);
+        QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::AllResources);
         if (ownResource)
         {
             ownResource->update(resource);
@@ -109,35 +127,39 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         if (isServer)
             syncStoragesToSettings(ownMediaServer);
 
-    } else if (event.eventType == Qn::Message_Type_ResourceDisabledChange)
+    } else if (message.messageType == Qn::Message_Type_ResourceDisabledChange)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
-        //ignoring events for foreign resources
+        QnResourcePtr resource = qnResPool->getResourceById(message.resourceId);
+        //ignoring messages for foreign resources
 
         if (resource)
         {
-            resource->setDisabled(event.resourceDisabled);
-            if (event.resourceDisabled) // we always ignore status changes 
+            resource->setDisabled(message.resourceDisabled);
+            if (message.resourceDisabled) // we always ignore status changes 
                 resource->setStatus(QnResource::Offline); 
         }
-    } else if (event.eventType == Qn::Message_Type_ResourceDelete)
+    } else if (message.messageType == Qn::Message_Type_ResourceDelete)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId, QnResourcePool::rfAllResources);
+        QnResourcePtr resource = qnResPool->getResourceById(message.resourceId, QnResourcePool::AllResources);
 
         if (resource)
         {
             qnResPool->removeResource(resource);
         }
-    } else if (event.eventType == Qn::Message_Type_BusinessRuleInsertOrUpdate)
+    } else if (message.messageType == Qn::Message_Type_BusinessRuleInsertOrUpdate)
     {
-       emit businessRuleChanged(event.businessRule);
+       emit businessRuleChanged(message.businessRule);
 
-    } else if (event.eventType == Qn::Message_Type_BusinessRuleDelete)
+    } else if (message.messageType == Qn::Message_Type_BusinessRuleDelete)
     {
-        emit businessRuleDeleted(event.resourceId.toInt());
-    } else if (event.eventType == Qn::Message_Type_BroadcastBusinessAction)
+        emit businessRuleDeleted(message.resourceId.toInt());
+    } else if (message.messageType == Qn::Message_Type_BusinessRuleReset)
     {
-        emit businessActionReceived(event.businessAction);
+       emit businessRuleReset(message.businessRules);
+
+    } else if (message.messageType == Qn::Message_Type_BroadcastBusinessAction)
+    {
+        emit businessActionReceived(message.businessAction);
     }
 }
 

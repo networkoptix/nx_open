@@ -3,6 +3,7 @@
 
 #include <QtGui/QStyledItemDelegate>
 #include <QtGui/QScrollBar>
+#include <QtGui/QContextMenuEvent>
 
 #include <common/common_meta_types.h>
 
@@ -10,6 +11,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
+#include <ui/delegates/resource_tree_item_delegate.h>
 #include <ui/models/resource_search_proxy_model.h>
 
 #include <ui/style/noptix_style.h>
@@ -19,134 +21,6 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-
-// -------------------------------------------------------------------------- //
-// QnResourceTreeItemDelegate
-// -------------------------------------------------------------------------- //
-class QnResourceTreeItemDelegate: public QStyledItemDelegate {
-    typedef QStyledItemDelegate base_type;
-
-public:
-    explicit QnResourceTreeItemDelegate(QObject *parent = NULL):
-        base_type(parent)
-    {
-        m_recordingIcon = qnSkin->icon("tree/recording.png");
-        m_raisedIcon = qnSkin->icon("tree/raised.png");
-        m_scheduledIcon = qnSkin->icon("tree/scheduled.png");
-    }
-
-    QnWorkbench *workbench() const {
-        return m_workbench.data();
-    }
-
-    void setWorkbench(QnWorkbench *workbench) {
-        m_workbench = workbench;
-    }
-
-protected:
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-        QStyleOptionViewItemV4 optionV4 = option;
-        initStyleOption(&optionV4, index);
-
-        if(optionV4.widget && optionV4.widget->rect().bottom() < optionV4.rect.bottom()
-                && optionV4.widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
-            return;
-
-        if (index.column() == Qn::CheckColumn){
-            base_type::paint(painter, option, index);
-            return;
-        }
-
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
-        QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
-        QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
-
-        /* Bold items of current layout in tree. */
-        if(!resource.isNull() && !currentLayoutResource.isNull()) {
-            bool bold = false;
-            if(resource == currentLayoutResource) {
-                bold = true; /* Bold current layout. */
-            } else if(parentResource == currentLayoutResource) {
-                bold = true; /* Bold items of the current layout. */
-            } else if(uuid.isNull() && workbench() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()) {
-                bold = true; /* Bold items of the current layout in servers. */
-            }
-
-            optionV4.font.setBold(bold);
-        }
-
-        QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
-
-        /* Highlight currently raised/zoomed item. */
-        QnWorkbenchItem *raisedItem = NULL;
-        if(workbench()) {
-            raisedItem = workbench()->item(Qn::RaisedRole);
-            if(!raisedItem)
-                raisedItem = workbench()->item(Qn::ZoomedRole);
-        }
-
-        QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
-
-        if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
-            m_raisedIcon.paint(painter, decorationRect);
-
-            QRect rect = optionV4.rect;
-            QRect skipRect(
-                rect.topLeft(),
-                QPoint(
-                    decorationRect.right() + decorationRect.left() - rect.left(),
-                    rect.bottom()
-                )
-            );
-            rect.setLeft(skipRect.right() + 1);
-
-            optionV4.rect = skipRect;
-            style->drawPrimitive(QStyle::PE_PanelItemViewItem, &optionV4, painter, optionV4.widget);
-            optionV4.rect = rect;
-        }
-
-        /* Draw 'recording' icon. */
-        bool recording = false, scheduled = false;
-        if(resource) {
-            if(!resource->isDisabled()) {
-                if(resource->getStatus() == QnResource::Recording)
-                    recording = true;
-            } else if(QnNetworkResourcePtr camera = resource.dynamicCast<QnNetworkResource>()) {
-                foreach(const QnNetworkResourcePtr &otherCamera, QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera)) {
-                    if(!otherCamera->isDisabled() && otherCamera->getStatus() == QnResource::Recording) {
-                        recording = true;
-                        break;
-                    }
-                }
-            }
-
-            if(!recording)
-                if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-                    scheduled = !camera->isScheduleDisabled();
-        }
-
-        if(recording || scheduled) {
-            QRect iconRect = decorationRect;
-            iconRect.moveLeft(iconRect.left() - iconRect.width() - 2);
-
-            (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, iconRect);
-        }
-
-        /* Draw item. */
-        style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
-    }
-
-    virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
-        base_type::initStyleOption(option, index);
-
-    }
-
-private:
-    QWeakPointer<QnWorkbench> m_workbench;
-    QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon;
-};
-
 
 // -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
@@ -240,7 +114,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     m_resourceProxyModel(0),
     m_checkboxesVisible(true),
     m_graphicsTweaksFlags(0),
-    m_editingEnabled(false)
+    m_editingEnabled(false),
+    m_simpleSelectionEnabled(false)
 {
     ui->setupUi(this);
     ui->filterFrame->setVisible(false);
@@ -252,6 +127,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
     connect(ui->resourcesTreeView,      SIGNAL(spacePressed(QModelIndex)),  this,               SLOT(at_treeView_spacePressed(QModelIndex)));
     connect(ui->resourcesTreeView,      SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
+    connect(ui->resourcesTreeView,      SIGNAL(clicked(QModelIndex)),       this,               SLOT(at_treeView_clicked(QModelIndex)));
 
     connect(this,                       SIGNAL(viewportSizeChanged()),      this,               SLOT(updateColumnsSize()), Qt::QueuedConnection);
 
@@ -260,6 +136,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
 
     connect(ui->clearFilterButton,      SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
 
+    ui->resourcesTreeView->installEventFilter(this);
     ui->resourcesTreeView->verticalScrollBar()->installEventFilter(this);
 }
 
@@ -396,15 +273,41 @@ void QnResourceTreeWidget::setEditingEnabled(bool enabled) {
         return;
 
     m_editingEnabled = enabled;
-    ui->resourcesTreeView->setAcceptDrops(m_editingEnabled);
-    if (enabled)
-        ui->resourcesTreeView->setEditTriggers(QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked);
-    else
+
+    if (m_editingEnabled) {
+        ui->resourcesTreeView->setAcceptDrops(true);
+        ui->resourcesTreeView->setDragDropMode(QAbstractItemView::DragDrop);
+        ui->resourcesTreeView->setEditTriggers(QAbstractItemView::EditKeyPressed | QAbstractItemView::SelectedClicked);
+    } else {
+        ui->resourcesTreeView->setAcceptDrops(false);
+        ui->resourcesTreeView->setDragDropMode(QAbstractItemView::NoDragDrop);
         ui->resourcesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    }
 }
 
 bool QnResourceTreeWidget::isEditingEnabled() const {
     return m_editingEnabled;
+}
+
+void QnResourceTreeWidget::setSimpleSelectionEnabled(bool enabled) {
+    if(m_simpleSelectionEnabled == enabled)
+        return;
+
+    m_simpleSelectionEnabled = enabled;
+
+    if(m_simpleSelectionEnabled) {
+        ui->resourcesTreeView->setSelectionMode(QAbstractItemView::NoSelection);
+    } else {
+        ui->resourcesTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    }
+}
+
+bool QnResourceTreeWidget::isSimpleSelectionEnabled() const {
+    return m_simpleSelectionEnabled;
+}
+
+QAbstractItemView* QnResourceTreeWidget::treeView() const {
+    return ui->resourcesTreeView;
 }
 
 void QnResourceTreeWidget::updateCheckboxesVisibility() {
@@ -445,8 +348,13 @@ void QnResourceTreeWidget::updateFilter() {
 // -------------------------------------------------------------------------- //
 bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
     if (obj == ui->resourcesTreeView->verticalScrollBar() &&
-        (event->type() == QEvent::Show || event->type() == QEvent::Hide)){
+        (event->type() == QEvent::Show || event->type() == QEvent::Hide)) {
             emit viewportSizeChanged();
+    } else if (obj == ui->resourcesTreeView && event->type() == QEvent::ContextMenu) {
+        QContextMenuEvent* me = static_cast<QContextMenuEvent *>(event);
+        if (me->reason() == QContextMenuEvent::Mouse
+                && !ui->resourcesTreeView->indexAt(me->pos()).isValid())
+            selectionModel()->clear();
     }
     return base_type::eventFilter(obj, event);
 }
@@ -454,6 +362,10 @@ bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
 void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
     emit viewportSizeChanged();
     base_type::resizeEvent(event);
+}
+
+void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
+    base_type::mousePressEvent(event);
 }
 
 void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
@@ -481,6 +393,25 @@ void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
         !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
         !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
         emit activated(resource);
+}
+
+void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex &index) {
+    if(!m_simpleSelectionEnabled)
+        return;
+
+    if(index.column() == Qn::CheckColumn)
+        return; /* Will be processed by delegate. */
+
+    QModelIndex checkIndex = index.sibling(index.row(), Qn::CheckColumn);
+    if(QAbstractItemModel *model = ui->resourcesTreeView->model()) {
+        int checkState = model->data(checkIndex, Qt::CheckStateRole).toInt();
+        if(checkState == Qt::Checked) {
+            checkState = Qt::Unchecked;
+        } else {
+            checkState = Qt::Checked;
+        }
+        model->setData(checkIndex, checkState, Qt::CheckStateRole);
+    }
 }
 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end) {

@@ -10,34 +10,18 @@
 #include <business/events/abstract_business_event.h>
 #include <business/business_aggregation_info.h>
 
-namespace BusinessActionParameters {
-    QString getEmailAddress(const QnBusinessParams &params);
-    void setEmailAddress(QnBusinessParams* params, const QString &value);
-}
-
 class QnBusinessAggregationInfo;
 
 class QnSendMailBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    explicit QnSendMailBusinessAction(const QnBusinessParams &runtimeParams);
+    explicit QnSendMailBusinessAction(const QnBusinessEventParameters &runtimeParams);
     ~QnSendMailBusinessAction() {}
 
-    QString getSubject() const;
-
-    //!Convert action to human-readable string (for inserting into email body)
-    QString getMessageBody() const;
-
+    const QnBusinessAggregationInfo &aggregationInfo() const;
     void setAggregationInfo(const QnBusinessAggregationInfo &info);
 private:
-    QString eventTextString(BusinessEventType::Value eventType, const QnBusinessParams &params) const;
-
-    QString resourceString(bool useUrl) const;
-    QString timestampString(const QnBusinessParams &params, int aggregationCount) const;
-    QString reasonString(const QnBusinessParams &params) const;
-    QString conflictString() const;
-
     QnBusinessAggregationInfo m_aggregationInfo;
 };
 

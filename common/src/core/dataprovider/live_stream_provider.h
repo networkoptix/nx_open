@@ -3,15 +3,16 @@
 
 #include <QObject>
 #include "../resource/media_resource.h"
-#include "core/datapacket/media_data_packet.h"
 #include "motion/motion_estimation.h"
 #include "../resource/motion_window.h"
 #include "core/resource/resource_fwd.h"
 #include "media_streamdataprovider.h"
 
-#define META_DATA_DURATION_MS 300
-#define DESIRED_SECOND_STREAM_FPS (7)
-#define MIN_SECOND_STREAM_FPS (2)
+static const int  META_DATA_DURATION_MS = 300;
+static const int MIN_SECOND_STREAM_FPS = 2;
+//#define DESIRED_SECOND_STREAM_FPS (7)
+//#define MIN_SECOND_STREAM_FPS (2)
+
 
 class QnLiveStreamProvider: public QnAbstractMediaStreamDataProvider
 {
@@ -23,8 +24,9 @@ public:
     QnResource::ConnectionRole getRole() const;
 
 
-    virtual void setQuality(QnStreamQuality q);
-    QnStreamQuality getQuality() const;
+    void setSecondaryQuality(Qn::SecondStreamQuality  quality);
+    virtual void setQuality(Qn::StreamQuality q);
+    Qn::StreamQuality getQuality() const;
 
     // for live providers only 
     virtual void setFps(float f);
@@ -41,7 +43,7 @@ public:
     void setUseSoftwareMotion(bool value);
 
     void updateSoftwareMotion();
-    bool canChangeStatus() const { return m_role == QnResource::Role_LiveVideo && m_isPhysicalResource; }
+    bool canChangeStatus() const;
 
     virtual bool secondaryResolutionIsLarge() const { return false; }
 
@@ -60,7 +62,7 @@ protected:
 
 private:
     //int m_NumaberOfVideoChannels;
-    QnStreamQuality m_quality;
+    Qn::StreamQuality m_quality;
     bool m_qualityUpdatedAtLeastOnce;
 
     mutable float m_fps; //used only for live providers
@@ -73,6 +75,7 @@ private:
     const QnResourceVideoLayout* m_layout;
     QnPhysicalCameraResourcePtr m_cameraRes;
     bool m_isPhysicalResource;
+    Qn::SecondStreamQuality  m_secondaryQuality;
 };
 
 #endif //live_strem_provider_h_1508

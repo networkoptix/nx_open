@@ -1,3 +1,6 @@
+#ifndef __TCP_CONNECTION_PRIV_H__
+#define __TCP_CONNECTION_PRIV_H__
+
 #include <QByteArray>
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
@@ -19,8 +22,8 @@ static const QByteArray STATIC_UNAUTHORIZED_HTML("\
 );
 
 
-// TODO: #VASILENKO these are part of a public interface and are used throughout the codebase.
-// Whey they are in a private header???
+// TODO: #vasilenko these are part of a public interface and are used throughout the codebase.
+// Why they are in a private header???
 static const int CODE_OK = 200;
 static const int CODE_AUTH_REQUIRED = 401;
 static const int CODE_NOT_FOUND = 404;
@@ -29,7 +32,7 @@ static const int CODE_UNSPOORTED_TRANSPORT = 461;
 static const int CODE_NOT_IMPLEMETED = 501;
 static const int CODE_INTERNAL_ERROR = 500;
 
-#include "ssl.h"
+#include <openssl/ssl.h>
 
 class QnTCPConnectionProcessorPrivate
 {
@@ -67,3 +70,5 @@ public:
     SSL* ssl;
 
 };
+
+#endif // __TCP_CONNECTION_PRIV_H__

@@ -1,6 +1,12 @@
 #include "layout_storage_resource.h"
+
+#include <QDebug>
+#include <QDir>
+
 #include "utils/common/util.h"
+#include <utils/fs/file.h>
 #include "plugins/resources/archive/filetypesupport.h"
+
 
 class QnLayoutFile: public QIODevice
 {
@@ -319,7 +325,7 @@ qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
 
 bool QnLayoutFileStorageResource::isStorageAvailable()
 {
-    QString tmpDir = closeDirPath(removeProtocolPrefix(getUrl())) + QLatin1String("tmp") + QString::number(rand());
+    QString tmpDir = closeDirPath(removeProtocolPrefix(getUrl())) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
@@ -490,8 +496,7 @@ QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(QnResourcePtr res)
 {
     QString url = res->getUrl();
     url = url.mid(url.lastIndexOf(L'?')+1);
-    QFileInfo fi(url);
-    QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(fi.baseName()), QIODevice::ReadOnly);
+    QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(QnFile::baseName(url)), QIODevice::ReadOnly);
     if (!chunkData)
         return QnTimePeriodList();
     QnTimePeriodList chunks;

@@ -114,7 +114,7 @@ bool QnPlDlinkResource::isResourceAccessible()
     return true;
 }
 
-QString QnPlDlinkResource::manufacture() const
+QString QnPlDlinkResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }
@@ -165,7 +165,7 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
     return s1.width() > s2.width();
 }
 
-bool QnPlDlinkResource::initInternal()
+CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 {
 
     CLHttpStatus status;
@@ -174,12 +174,12 @@ bool QnPlDlinkResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Unauthorized);
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
 
     if (cam_info_file.size()==0)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
 
     QMutexLocker mutexLocker(&m_mutex);
@@ -279,7 +279,7 @@ bool QnPlDlinkResource::initInternal()
 
     //=======remove elements with diff aspect ratio
     if (m_camInfo.resolutions.size() < 2)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
 
     int w_0 = m_camInfo.resolutions.at(0).width();
@@ -311,7 +311,7 @@ bool QnPlDlinkResource::initInternal()
             ++it;
     }
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 
 }
 

@@ -100,7 +100,7 @@ namespace nx_http
         void someMessageBodyAvailable( nx_http::AsyncHttpClient* );
         /*!
             Emmitted when http request is done with any result (successfully executed request and received message body, 
-            received response with error code, connection terminated enexpectedly).
+            received response with error code, connection terminated unexpectedly).
             To get result code use method \a response()
         */
         void done( nx_http::AsyncHttpClient* );
@@ -149,7 +149,7 @@ namespace nx_http
         */
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
-        bool resendRequstWithAuthorization( const nx_http::HttpResponse& response );
+        bool resendRequestWithAuthorization( const nx_http::HttpResponse& response );
         void eventTriggeredPrivate( Socket* sock, PollSet::EventType eventType );
 
         static const char* toString( State state );

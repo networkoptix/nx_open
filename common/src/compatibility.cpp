@@ -1,5 +1,8 @@
 #include "compatibility.h"
 
+#include <QStringList>
+
+
 QString stripVersion(const QString& version)
 {
     QStringList versionList = version.split(QLatin1Char('.'));
@@ -21,6 +24,10 @@ bool QnCompatibilityChecker::isCompatible(const QString& comp1, const QString& v
 
     return m_compatibilityMatrix.contains(QnCompatibilityItem(ver1s, comp1, ver2s)) ||
             m_compatibilityMatrix.contains(QnCompatibilityItem(ver2s, comp2, ver1s));
+}
+
+bool QnCompatibilityChecker::isCompatible(const QString& comp1, const QnSoftwareVersion& ver1, const QString& comp2, const QnSoftwareVersion& ver2) const {
+    return isCompatible(comp1, ver1.toString(), comp2, ver2.toString());
 }
 
 int QnCompatibilityChecker::size() const

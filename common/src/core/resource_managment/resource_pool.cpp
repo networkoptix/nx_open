@@ -1,5 +1,7 @@
 #include "resource_pool.h"
 
+#include <algorithm>
+
 #include <QtCore/QMetaObject>
 
 #include "utils/common/warnings.h"
@@ -18,10 +20,7 @@
 QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
     m_updateLayouts(true)
-{
-    localServer = QnResourcePtr(new QnLocalMediaServerResource);
-    addResource(localServer);
-}
+{}
 
 QnResourcePool::~QnResourcePool()
 {
@@ -35,17 +34,17 @@ QnResourcePool::~QnResourcePool()
 
 //Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
-static QnResourcePool* resourcePool = NULL;
+static QnResourcePool* resourcePool_instance = NULL;
 
 void QnResourcePool::initStaticInstance( QnResourcePool* inst )
 {
-    resourcePool = inst;
+    resourcePool_instance = inst;
 }
 
 QnResourcePool* QnResourcePool::instance()
 {
     //return globalResourcePool();
-    return resourcePool;
+    return resourcePool_instance;
 }
 
 bool QnResourcePool::isLayoutsUpdated() const {
@@ -75,14 +74,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         if(resource->resourcePool() != NULL)
             qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
             
-
-        // if resources are local assign localserver as parent
-        if (!resource->getParentId().isValid())
-        {
-            if (resource->hasFlags(QnResource::local))
-                resource->setParentId(localServer->getId());
-        }
-
         if (!resource->getId().isValid())
         {
             // must be just found local resource; => shold not be in the pool already
@@ -98,38 +89,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
                 resource->setId(QnId::generateSpecialId());
             }
         }
-
-        /* Fix up items that are stored in layout. */
-        /*
-        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
-            foreach(QnLayoutItemData data, layout->getItems()) {
-                if(!data.resource.id.isValid()) {
-                    QnResourcePtr resource = qnResPool->getResourceByUniqId(data.resource.path);
-                    if(!resource) {
-                        if(data.resource.path.isEmpty()) {
-                            qnWarning("Invalid item with empty id and path in layout '%1'.", layout->getName());
-                        } else {
-                            resource = QnResourcePtr(new QnAviResource(data.resource.path));
-                            qnResPool->addResource(resource);
-                        }
-                    }
-
-                    if(resource) {
-                        data.resource.id = resource->getId();
-                        layout->updateItem(data.uuid, data);
-                    }
-                } else if(data.resource.path.isEmpty()) {
-                    QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
-                    if(!resource) {
-                        qnWarning("Invalid resource id '%1'.", data.resource.id.toString());
-                    } else {
-                        data.resource.path = resource->getUniqueId();
-                        layout->updateItem(data.uuid, data);
-                    }
-                }
-            }
-        }
-        */
 
         resource->setResourcePool(this);
     }
@@ -148,6 +107,9 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     m_resourcesMtx.unlock();
 
+    QnResourceList layouts;
+    QnResourceList otherResources;
+
     foreach (const QnResourcePtr &resource, newResources.values())
     {
         connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(statusChanged(const QnResourcePtr &)),     Qt::QueuedConnection);
@@ -161,9 +123,25 @@ void QnResourcePool::addResources(const QnResourceList &resources)
                 resource->init();
         }
 
+        if (resource.dynamicCast<QnLayoutResource>())
+            layouts << resource;
+        else
+            otherResources << resource;
+    }
+
+    // Layouts should be notified first because their children should be instantiated before
+    // 'UserChanged' event occurs
+    foreach (const QnResourcePtr &resource, layouts) {
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
         emit resourceAdded(resource);
     }
+
+    foreach (const QnResourcePtr &resource, otherResources) {
+        TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
+        emit resourceAdded(resource);
+    }
+
+
 }
 
 namespace
@@ -191,14 +169,11 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
 
-    QMutexLocker locker(&m_resourcesMtx);
+    m_resourcesMtx.lock();
 
     foreach (const QnResourcePtr &resource, resources)
     {
         if (!resource)
-            continue;
-
-        if (resource == localServer) // special case
             continue;
 
         if(resource->resourcePool() != this)
@@ -234,13 +209,18 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         disconnect(resource.data(), NULL, this, NULL);
 
         if(m_updateLayouts)
-            foreach (const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: this is way beyond what one may call 'suboptimal'.
+            foreach(const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
                 foreach(const QnLayoutItemData &data, layoutResource->getItems())
                     if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
                         layoutResource->removeItem(data);
 
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
+    }
 
+    m_resourcesMtx.unlock();
+
+    /* Remove resources. */
+    foreach (const QnResourcePtr &resource, removedResources) {
         emit resourceRemoved(resource);
     }
 }
@@ -259,7 +239,7 @@ QnResourcePtr QnResourcePool::getResourceById(QnId id, Filter searchFilter) cons
     if( resIter != m_resources.end() )
         return resIter.value();
 
-    if( searchFilter == rfOnlyFriends )
+    if( searchFilter == OnlyFriends )
         return QnResourcePtr(NULL);
 
     //looking through foreign resources
@@ -306,14 +286,35 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnResourceList QnResourcePool::getAllEnabledCameras() const
+QnResourceList QnResourcePool::getAllEnabledCameras(QnResourcePtr mServer) const
 {
+    QnId parentId = mServer ? mServer->getId() : QnId();
     QnResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if (camResource != 0 && !camResource->isDisabled() && !camResource->hasFlags(QnResource::foreigner))
+        {
+            if (!parentId.isValid() || camResource->getParentId() == parentId)
             result << camResource;
+        }
+    }
+
+    return result;
+}
+
+QnResourceList QnResourcePool::getAllResourceByTypeName(const QString &typeName) const
+{
+    QnResourceList result;
+    
+    const QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(typeName);
+    if (!resType)
+        return result;
+
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        if (resource->getTypeId() == resType->getId())
+            result << resource;
     }
 
     return result;
@@ -407,8 +408,7 @@ QnResourceList QnResourcePool::getResourcesWithParentId(QnId id) const
 {
     QMutexLocker locker(&m_resourcesMtx);
 
-    // TODO:
-    // cache it, but remember that id and parentId of a resource may change
+    // TODO: #Elrik cache it, but remember that id and parentId of a resource may change
     // while it's in the pool.
 
     QnResourceList result;
@@ -446,7 +446,7 @@ QStringList QnResourcePool::allTags() const
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources.values())
-        result << resource->tagList();
+        result << resource->getTags();
 
     return result;
 }
@@ -480,7 +480,6 @@ void QnResourcePool::clear()
 {
     QMutexLocker lk( &m_resourcesMtx );
 
-    localServer.clear();
     m_resources.clear();
     m_foreignResources.clear();
 }

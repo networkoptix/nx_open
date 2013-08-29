@@ -5,19 +5,32 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMetaType>
 
-#include <api/media_server_statistics_data.h>
+#include <api/model/statistics_reply.h>
+
+#include <ui/animation/animated.h>
+#include <ui/animation/animation_timer_listener.h>
 
 #include "resource_widget.h"
 
 class QnRadialGradientPainter;
 class QnMediaServerStatisticsManager;
+class StatisticsOverlayWidget;
+class QnGlFunctions;
 
-class QnServerResourceWidget: public QnResourceWidget {
+
+class QnServerResourceWidget: public Animated<QnResourceWidget>, AnimationTimerListener {
     Q_OBJECT
 
-    typedef QnResourceWidget base_type;
+    typedef Animated<QnResourceWidget> base_type;
 
 public:
+    static const Button PingButton = static_cast<Button>(0x08);
+    static const Button ShowLogButton = static_cast<Button>(0x10);
+    static const Button CheckIssuesButton = static_cast<Button>(0x20);
+#define PingButton PingButton
+#define ShowLogButton ShowLogButton
+#define CheckIssuesButton CheckIssuesButton
+
     /**
      * Constructor.
      *
@@ -39,18 +52,42 @@ public:
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
 
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
 
+    virtual void tick(int deltaMSecs) override;
+
 private slots:
     void at_statistics_received();
+    void at_pingButton_clicked();
+    void at_showLogButton_clicked();
+    void at_checkIssuesButton_clicked();
+    
+    void updateHoverKey();
+    void updateGraphVisibility();
+    void updateInfoOpacity();
 
 private:
-    /** Main painting function. */
-    void drawStatistics(const QRectF &rect, QPainter *painter);
+    enum LegendButtonBar {
+        CommonButtonBar,
+        NetworkButtonBar,
+        ButtonBarCount
+    };
+
+    /** Background painting function. */
+    void drawBackground(const QRectF &rect, QPainter *painter);
+
+    void addOverlays();
+
+    LegendButtonBar buttonBarByDeviceType(const QnStatisticsDeviceType deviceType) const;
+
+    void updateLegend();
 
 private:
+    //TODO: #GDM move all required fields to inner class
+    friend class StatisticsOverlayWidget;
+
     QnMediaServerStatisticsManager *m_manager;
 
     /** Video server resource. */
@@ -75,7 +112,11 @@ private:
     /** Number of successfull responces received, required to smooth scroll. */
     int m_counter;
 
-    int m_storageLimit;
+    /** Number of data points displayed simultaneously. */
+    int m_pointsLimit;
+
+    /** Period of updating data from the server in milliseconds. */
+    qreal m_updatePeriod;
 
     /** Status of the frame. */
     Qn::RenderStatus m_renderStatus;
@@ -85,6 +126,26 @@ private:
 
     /** Helper for the background painting. */
     QSharedPointer<QnRadialGradientPainter> m_backgroundGradientPainter;
+
+    /** Button bars with corresponding buttons */
+    QnImageButtonBar *m_legendButtonBar[ButtonBarCount];
+
+    struct GraphData {
+        GraphData(): bar(NULL), button(NULL), mask(0), visible(false), opacity(1.0) {}
+
+        QnImageButtonBar *bar;
+        QnImageButtonWidget *button;
+        int mask;
+        bool visible;
+        qreal opacity;
+    };
+
+    /** Which buttons are checked on each button bar */
+    QHash<QString, GraphData> m_graphDataByKey;
+
+    QString m_hoveredKey;
+
+    qreal m_infoOpacity;
 };
 
 Q_DECLARE_METATYPE(QnServerResourceWidget *)

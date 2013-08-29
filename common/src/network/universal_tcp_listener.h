@@ -1,6 +1,8 @@
 #ifndef __UNIVERSAL_TCP_LISTENER_H__
 #define __UNIVERSAL_TCP_LISTENER_H__
 
+#include <QMultiMap>
+#include <QWaitCondition>
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"
 
@@ -37,10 +39,39 @@ public:
     }
 
     QnTCPConnectionProcessor* createNativeProcessor(TCPSocket* clientSocket, const QByteArray& protocol, const QString& path);
+
+    /* proxy support functions */
+
+    void setProxyParams(const QUrl& proxyServerUrl, const QString& selfId);
+    void addProxySenderConnections(int size);
+
+    bool registerProxyReceiverConnection(const QString& url, TCPSocket* socket);
+    TCPSocket* getProxySocket(const QString& guid, int timeout);
+    void setProxyPoolSize(int value);
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner);
+    virtual void doPeriodicTasks() override;
 private:
+    struct AwaitProxyInfo
+    {
+        explicit AwaitProxyInfo(TCPSocket* _socket): socket(_socket) { timer.restart(); }
+        AwaitProxyInfo(): socket(0) { timer.restart(); }
+
+        TCPSocket* socket;
+        QTime timer;
+    };
+
     QList<HandlerInfo> m_handlers;
+    QUrl m_proxyServerUrl;
+    QString m_selfIdForProxy;
+    QMutex m_proxyMutex;
+    QWaitCondition m_proxyWaitCond;
+
+    typedef QMultiMap<QString, AwaitProxyInfo> ProxyList;
+    ProxyList m_awaitingProxyConnections;
+
+    QSet<QString> m_proxyConExists;
+    int m_proxyPoolSize;
 };
 
 #endif // __UNIVERSAL_TCP_LISTENER_H__

@@ -1,4 +1,10 @@
+
 #include <QBuffer>
+
+extern "C"
+{
+    #include <libswscale/swscale.h>
+}
 
 #include "image_handler.h"
 #include "utils/network/tcp_connection_priv.h"
@@ -11,7 +17,6 @@
 #include "device_plugins/server_archive/server_archive_delegate.h"
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
-#include "libswscale/swscale.h"
 #include "camera/camera_pool.h"
 
 static const int MAX_GOP_LEN = 100;
@@ -22,16 +27,31 @@ QnImageHandler::QnImageHandler()
 
 }
 
-QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serverDelegate)
+QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serverDelegate, qint64 ceilTime)
 {
     QnCompressedVideoDataPtr video;
     for (int i = 0; i < 20 && !video; ++i) 
     {
         QnAbstractMediaDataPtr media = serverDelegate.getNextData();
-        if (!media || media->dataType == QnAbstractMediaData::EMPTY_DATA)
+        if (!media || media->timestamp == DATETIME_NOW)
             break;
         video = media.dynamicCast<QnCompressedVideoData>();
     }
+
+    // if ceilTime specified try frame with time > requested time (round time to ceil)
+    if (ceilTime != AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
+    {
+        for (int i = 0; i < MAX_GOP_LEN; ++i) 
+        {
+            QnAbstractMediaDataPtr media2 = serverDelegate.getNextData();
+            if (!media2 || media2->timestamp == DATETIME_NOW)
+                break;
+            QnCompressedVideoDataPtr video2 = media2.dynamicCast<QnCompressedVideoData>();
+            if (video2->flags & AV_PKT_FLAG_KEY)
+                return video2;
+        }
+    }
+
     return video;
 }
 
@@ -55,7 +75,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     QString errStr;
     bool resParamFound = false;
     qint64 time = AV_NOPTS_VALUE;
-    bool precise = false;
+    RoundMethod roundMethod = IFrameBeforeTime;
     QByteArray format("jpg");
     QSize dstSize;
 
@@ -74,9 +94,14 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
             else
                 time = parseDateTime(params[i].second.toUtf8());
         }
-        else if (params[i].first == "precise") {
+        else if (params[i].first == "method") {
             QString val = params[i].second.toLower().trimmed(); 
-            precise = (val == "true" || val == "1");
+            if (val == lit("before"))
+                roundMethod = IFrameBeforeTime;
+            else if (val == lit("exact"))
+                roundMethod = Precise;
+            else if (val == lit("after"))
+                roundMethod = IFrameAfterTime;
         }
         else if (params[i].first == "format") {
             format = params[i].second.toUtf8();
@@ -135,14 +160,20 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         if (!video) {
             serverDelegate.open(res);
             serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
-            video = getNextArchiveVideoPacket(serverDelegate);
+            video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
         }
     }
     else {
         // get archive data
         serverDelegate.open(res);
         serverDelegate.seek(time, true);
-        video = getNextArchiveVideoPacket(serverDelegate);
+        video = getNextArchiveVideoPacket(serverDelegate, roundMethod == IFrameAfterTime ? time : AV_NOPTS_VALUE);
+        if (roundMethod != Precise) {
+            if (!video)
+                video = camera->getFrameByTime(useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
+            if (!video)
+                video = camera->getFrameByTime(!useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
+        }
     }
     if (!video) 
         return noVideoError(result, time);
@@ -154,12 +185,13 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         gotFrame = (res->getStatus() == QnResource::Online || res->getStatus() == QnResource::Recording) && decoder.decode(video, &outFrame);
     }
     else {
+        bool precise = roundMethod == Precise;
         for (int i = 0; i < MAX_GOP_LEN && !gotFrame && video; ++i)
         {
             gotFrame = decoder.decode(video, &outFrame) && (!precise || video->timestamp >= time);
             if (gotFrame)
                 break;
-            video = getNextArchiveVideoPacket(serverDelegate);
+            video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
         }
     }
     if (!gotFrame)
@@ -238,7 +270,7 @@ QString QnImageHandler::description() const
         "<BR>Param <b>physicalId</b> - camera physicalId."
         "<BR>Param <b>time</b> - required image time. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected. Also, special values allowed: 'NOW' - live position (no frame is returned if camera is offline). 'LATEST' - last frame from camera (return live position or last frame from archive if camera is offline)"
         "<BR>Param <b>format</b> - Optional. image format. Allowed values: 'jpeg', 'png', 'bmp', 'tiff'. Default value 'jpeg"
-        "<BR>Param <b>precise</b> - Optional. Allowed values: 'true' or 'false'. If parameter is 'false' server returns nearest I-frame instead of exact frame. Default value 'false'. Parameter not used for Motion jpeg video codec"
+        "<BR>Param <b>method</b> - Optional. Allowed values: 'before', 'after', 'exact'. If parameter is 'before' or 'after' server returns nearest I-frame before or after time. Default value 'before'. Parameter not used for Motion jpeg video codec"
         "<BR>Param <b>height</b> - Optional. Required image height."
         "<BR>Param <b>width</b> - Optional. Required image width. If only width or height is specified other parameter is auto detected. Video aspect ratio is not changed"
         "<BR>Returns image";

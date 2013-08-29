@@ -6,8 +6,13 @@
 
 #include "client_globals.h"
 #include "client_model_types.h"
+#include "utils/color_space/image_correction.h"
+#include "ui/workbench/workbench_ptz_preset_manager.h"
+#include "ui/actions/actions.h"
+#include "ui/actions/action_parameters.h"
 
 namespace {
+
     volatile bool qn_clientMetaTypes_initialized = false;
 
     QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode);
@@ -21,9 +26,11 @@ void QnClientMetaTypes::initialize() {
 
     QnCommonMetaTypes::initilize();
 
-    qRegisterMetaType<Qn::ItemRole>();
-    qRegisterMetaType<QnThumbnail>();
     qRegisterMetaType<QVector<QUuid> >();
+    qRegisterMetaType<QVector<QColor> >();
+
+    qRegisterMetaType<Qn::ItemRole>();
+    qRegisterMetaType<QnThumbnail>();    
     qRegisterMetaType<QnWorkbenchState>();
     qRegisterMetaTypeStreamOperators<QnWorkbenchState>();
     qRegisterMetaType<QnWorkbenchStateHash>();
@@ -38,6 +45,10 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnServerStorageStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
+    qRegisterMetaType<ImageCorrectionParams>();
+    qRegisterMetaType<QnPtzPreset>();
+    qRegisterMetaType<Qn::ActionId>();
+    qRegisterMetaType<QnActionParameters>();
 
     qn_clientMetaTypes_initialized = true;
 }

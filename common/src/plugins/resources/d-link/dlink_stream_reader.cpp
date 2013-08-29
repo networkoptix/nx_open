@@ -3,6 +3,7 @@
 #include "dlink_resource.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
+#include "utils/network/http/httptypes.h"
 
 
 
@@ -29,7 +30,7 @@ struct ACS_VideoHeader
 #pragma pack(pop)
 
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
-CLServerPushStreamreader(res),
+CLServerPushStreamReader(res),
 m_rtpReader(res),
 mHttpClient(0),
 m_h264(false),
@@ -44,10 +45,10 @@ PlDlinkStreamReader::~PlDlinkStreamReader()
 }
 
 
-void PlDlinkStreamReader::openStream()
+CameraDiagnostics::Result PlDlinkStreamReader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::NoErrorResult();
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
@@ -63,7 +64,13 @@ void PlDlinkStreamReader::openStream()
     QString prifileStr = composeVideoProfile();
 
     if (prifileStr.length()==0)
-        return;
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
 
     CLHttpStatus status;
     QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth()); // setup video profile
@@ -71,15 +78,29 @@ void PlDlinkStreamReader::openStream()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         getResource()->setStatus(QnResource::Unauthorized);
-        return;
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( prifileStr );
+        return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
     }
 
     if (cam_info_file.length()==0)
-        return;
-
-    if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
     {
-        res->setMotionMaskPhysical(0);
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( prifileStr );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
+
+    if (!res->isCameraControlDisabled()) {
+        if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
+        {
+            res->setMotionMaskPhysical(0);
+        }
     }
 
     //=====requesting a video
@@ -91,18 +112,19 @@ void PlDlinkStreamReader::openStream()
         if (info.videoProfileUrls.size() < 2 && role == QnResource::Role_SecondaryLiveVideo)
         {
             qWarning() << "No dualstreaming for DLink camera " << m_resource->getUrl() << ". Ignore second url request";
-            return;
+            return CameraDiagnostics::NoErrorResult();
         }
 
-        QString url =  getRTPurl(role == QnResource::Role_SecondaryLiveVideo ? 2 : 1);
+        const int dlinkProfile = role == QnResource::Role_SecondaryLiveVideo ? 2 : 1;
+        QString url =  getRTPurl( dlinkProfile );
         if (url.isEmpty())
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting non empty rtsl url.";
-            return;
+            return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), QString::fromLatin1("config/rtspurl.cgi?profileid=%1").arg(dlinkProfile) );
         }
 
         m_rtpReader.setRequest(url);
-        m_rtpReader.openStream();
+        return m_rtpReader.openStream();
     }
     else
     {
@@ -115,7 +137,7 @@ void PlDlinkStreamReader::openStream()
         if (info.videoProfileUrls.size() < 2)
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting video profile URL.";
-            return;
+            return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), QLatin1String("config/stream_info.cgi") );
         }
 
 
@@ -125,10 +147,12 @@ void PlDlinkStreamReader::openStream()
             url = url.mid(1);
 
         mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
-        mHttpClient->doGET(url);
-
+        const CLHttpStatus status = mHttpClient->doGET(url);
+        if( status == CL_HTTP_SUCCESS )
+            return CameraDiagnostics::NoErrorResult();
+        else
+            return CameraDiagnostics::RequestFailedResult(url, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
     }
-
 }
 
 void PlDlinkStreamReader::closeStream()
@@ -210,23 +234,23 @@ QString PlDlinkStreamReader::getQualityString() const
         int q;
         switch (getQuality())
         {
-        case QnQualityHighest:
+        case Qn::QualityHighest:
             q = 90;
             break;
 
-        case QnQualityHigh:
+        case Qn::QualityHigh:
             q = 80;
             break;
 
-        case QnQualityNormal:
+        case Qn::QualityNormal:
             q = 70;
             break;
 
-        case QnQualityLow:
+        case Qn::QualityLow:
             q = 50;
             break;
 
-        case QnQualityLowest:
+        case Qn::QualityLowest:
             q = 40;
             break;
 
@@ -236,7 +260,7 @@ QString PlDlinkStreamReader::getQualityString() const
         }
         return QString::number(q);
     }
-    int qualityIndex = scaleInt((int) getQuality(), QnQualityHighest-QnQualityLowest+1, info.possibleQualities.size());
+    int qualityIndex = scaleInt((int) getQuality(), Qn::QualityHighest-Qn::QualityLowest+1, info.possibleQualities.size());
     if (isTextQualities(info.possibleQualities))
         qualityIndex = info.possibleQualities.size()-1 - qualityIndex; // index 0 is best quality if quality is text
     return info.possibleQualities[qualityIndex];
@@ -271,50 +295,51 @@ QString PlDlinkStreamReader::composeVideoProfile()
     QString result;
     QTextStream t(&result);
 
-    t << "config/video.cgi?profileid=" << profileNum << "&";
-    t << "resolution=" << resolution.width() << "x" << resolution.height() << "&";
-
-    int fps = info.frameRateCloseTo( qMin((int)getFps(), res->getMaxFps()) );
-    t << "framerate=" << fps << "&";
-    t << "codec=";
-
-
-    
-    m_mpeg4 = false;
-    m_h264 = false;
-
-    //bool hasSdp = false; 
-    bool hasSdp = info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains(QLatin1String("sdp")); //look_for_this_comment
-
-    if (!info.hasH264.isEmpty() && !hasSdp)
+    t << "config/video.cgi?profileid=" << profileNum;
+    if (!res->isCameraControlDisabled())
     {
-        t << info.hasH264 << "&";
-        m_h264 = true;
+        t << "&resolution=" << resolution.width() << "x" << resolution.height() << "&";
+
+        int fps = info.frameRateCloseTo( qMin((int)getFps(), res->getMaxFps()) );
+        t << "framerate=" << fps << "&";
+        t << "codec=";
+
+
         
-    }
-    else if (info.hasMPEG4 && !hasSdp)
-    {
-        t << "MPEG4&";
-        m_mpeg4 = true;
-    }
-    else
-    {
-        t << "MJPEG&";
-    }
+        m_mpeg4 = false;
+        m_h264 = false;
 
+        //bool hasSdp = false; 
+        bool hasSdp = info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains(QLatin1String("sdp")); //look_for_this_comment
 
+        if (!info.hasH264.isEmpty() && !hasSdp)
+        {
+            t << info.hasH264 << "&";
+            m_h264 = true;
+            
+        }
+        else if (info.hasMPEG4 && !hasSdp)
+        {
+            t << "MPEG4&";
+            m_mpeg4 = true;
+        }
+        else
+        {
+            t << "MJPEG&";
+        }
 
-    if (m_mpeg4 || m_h264)
-    {
-        // just CBR fo mpeg so far
-        t << "qualitymode=CBR" << "&";
-        t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(getQuality(), resolution, fps));
-    }
-    else
-    {
-        t << "qualitymode=Fixquality" << "&";
-        
-        t << "quality=" << getQualityString();
+        if (m_mpeg4 || m_h264)
+        {
+            // just CBR fo mpeg so far
+            t << "qualitymode=CBR" << "&";
+            t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(getQuality(), resolution, fps));
+        }
+        else
+        {
+            t << "qualitymode=Fixquality" << "&";
+            
+            t << "quality=" << getQualityString();
+        }
     }
 
     t.flush();

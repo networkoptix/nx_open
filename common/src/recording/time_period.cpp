@@ -1,6 +1,7 @@
 #include "time_period.h"
 
 #include <QtCore/QDebug>
+#include <QDateTime>
 
 #include <utils/common/util.h>
 
@@ -63,7 +64,7 @@ QnTimePeriod QnTimePeriod::intersected(const QnTimePeriod &other) const
     if (durationMs == -1 && other.durationMs == -1)
         return QnTimePeriod(qMax(startTimeMs, other.startTimeMs), -1);
 
-    if (durationMs == -1){
+    if (durationMs == -1) {
         if (startTimeMs > other.startTimeMs + other.durationMs)
             return QnTimePeriod();
         if (startTimeMs < other.startTimeMs)
@@ -71,7 +72,7 @@ QnTimePeriod QnTimePeriod::intersected(const QnTimePeriod &other) const
         return QnTimePeriod(startTimeMs, other.durationMs - (startTimeMs - other.startTimeMs));
     }
 
-    if (other.durationMs == -1){
+    if (other.durationMs == -1) {
         if (other.startTimeMs > startTimeMs + durationMs)
             return QnTimePeriod();
         if (other.startTimeMs < startTimeMs)
@@ -85,6 +86,11 @@ QnTimePeriod QnTimePeriod::intersected(const QnTimePeriod &other) const
     qint64 start = qMax(startTimeMs, other.startTimeMs);
     qint64 end = qMin(startTimeMs + durationMs, other.startTimeMs + other.durationMs);
     return QnTimePeriod(start, end - start);
+}
+
+bool QnTimePeriod::intersects(const QnTimePeriod &other) const 
+{
+    return !intersected(other).isEmpty();
 }
 
 QnTimePeriodList QnTimePeriod::aggregateTimePeriods(const QnTimePeriodList &periods, int detailLevelMs)
@@ -116,6 +122,9 @@ QnTimePeriodList QnTimePeriod::aggregateTimePeriods(const QnTimePeriodList &peri
 
 QnTimePeriodList QnTimePeriod::mergeTimePeriods(const QVector<QnTimePeriodList>& periods)
 {
+    if(periods.size() == 1)
+        return periods[0];
+
     QVector<int> minIndexes;
     minIndexes.resize(periods.size());
     QnTimePeriodList result;

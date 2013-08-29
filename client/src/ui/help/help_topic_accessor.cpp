@@ -67,7 +67,8 @@ int QnHelpTopicAccessor::helpTopicAt(QWidget *widget, const QPoint &pos, bool bu
 
         if(QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(widget)) {
             if(QAbstractItemModel *model = view->model()) {
-                topicId = qvariant_cast<int>(model->data(view->indexAt(widgetPos), Qn::HelpTopicIdRole), -1);
+                QPoint viewportPos = view->viewport()->mapFrom(view, widgetPos);
+                topicId = qvariant_cast<int>(model->data(view->indexAt(viewportPos), Qn::HelpTopicIdRole), -1);
                 if(topicId != -1)
                     return topicId;
             }

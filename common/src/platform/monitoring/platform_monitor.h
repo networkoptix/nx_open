@@ -16,11 +16,15 @@ namespace std { typedef __int32 intptr_t; }
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
+#include <utils/network/mac_address.h>
+
 /**
  * Interface for monitoring performance in a platform-independent way.
  */
 class QnPlatformMonitor: public QObject {
     Q_OBJECT
+    Q_FLAGS(PartitionTypes NetworkInterfaceTypes)
+
 public:
     /**
      * Description of an HDD.
@@ -61,21 +65,70 @@ public:
     };
 
     /**
+     * Type of a partition.
+     */
+    enum PartitionType {
+        LocalDiskPartition      = 0x01,
+        RamDiskPartition        = 0x02,
+        OpticalDiskPartition    = 0x04,
+        SwapPartition           = 0x08,
+        NetworkPartition        = 0x10,
+        UnknownPartition        = 0x20,
+    };
+    Q_DECLARE_FLAGS(PartitionTypes, PartitionType)
+
+    /**
      * Partition space entry.
      */
     struct PartitionSpace {
-        PartitionSpace(): freeBytes(0), sizeBytes(0) {}
-        PartitionSpace(const QString &path, quint64 freeBytes, quint64 sizeBytes):
-            path(path), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
+        PartitionSpace(): type(UnknownPartition), freeBytes(0), sizeBytes(0) {}
+        PartitionSpace(const QString &path, qint64 freeBytes, qint64 sizeBytes):
+            path(path), type(UnknownPartition), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
 
         /** Partition's root path. */
         QString path;
 
+        /** Partition's type. */
+        PartitionType type;
+
         /** Free space of this partition in bytes */
-        quint64 freeBytes;
+        qint64 freeBytes;
 
         /** Total size of this partition in bytes */
-        quint64 sizeBytes;
+        qint64 sizeBytes;
+    };
+
+    enum NetworkInterfaceType {
+        PhysicalInterface = 0x1,
+        LoopbackInterface = 0x2,
+        VirtualInterface  = 0x4,
+        UnknownInterface  = 0x8
+    };
+    Q_DECLARE_FLAGS(NetworkInterfaceTypes, NetworkInterfaceType)
+
+    /**
+     * Network load entry
+     */
+    struct NetworkLoad {
+        NetworkLoad(): type(UnknownInterface), bytesPerSecIn(0), bytesPerSecOut(0), bytesPerSecMax(0) {}
+
+        /** Network interface name */
+        QString interfaceName;
+
+        /** Mac address. */
+        QnMacAddress macAddress;
+
+        /** Type of the network interface. */
+        NetworkInterfaceType type;
+
+        /** Current download speed in bytes per second */
+        qint64 bytesPerSecIn;
+
+        /** Current upload speed in bytes per second */
+        qint64 bytesPerSecOut;
+
+        /** Maximal transfer speed of the interface, in bytes per second. */
+        qint64 bytesPerSecMax;
     };
 
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
@@ -106,12 +159,25 @@ public:
      */
     virtual QList<HddLoad> totalHddLoad() = 0;
 
+    /**
+     * \returns                         A list of network load entries for all network interfaces on this PC.
+     */
+    virtual QList<NetworkLoad> totalNetworkLoad() = 0;
 
     /**
-     * @returns                         A list of partition space entries for all partitions on
-     *                                  all HDDs on this PC.
+     * @returns                         A list of network load entries for all network interfaces of the given types on this PC.
+     */
+    QList<NetworkLoad> totalNetworkLoad(NetworkInterfaceTypes types);
+
+    /**
+     * @returns                         A list of partition space entries for all partitions on this PC.
      */
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() = 0;
+
+    /**
+     * @returns                         A list of partition space entries for all partitions of the given types on this PC.
+     */
+    QList<PartitionSpace> totalPartitionSpaceInfo(PartitionTypes types);
 
     /**
      * @brief partitionByPath           Get partition name by path to some folder located on this partition.
@@ -125,5 +191,7 @@ public:
 private:
     Q_DISABLE_COPY(QnPlatformMonitor)
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnPlatformMonitor::PartitionTypes);
 
 #endif // QN_PLATFORM_MONITOR_H

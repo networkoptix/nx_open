@@ -1,5 +1,11 @@
 #include "gl_shortcuts.h"
+
+#ifdef __APPLE__
+#   include <Glu.h>
+#endif
+
 #include <utils/common/warnings.h>
+
 
 int glCheckError(const char *context) {
     int error = glGetError();

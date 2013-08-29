@@ -1,7 +1,9 @@
 #ifndef __VMAX480_STREAM_FETCHER_H__
 #define __VMAX480_STREAM_FETCHER_H__
 
+#include <QProcess>
 #include <QSet>
+#include <QWaitCondition>
 
 #include "core/resource/resource_fwd.h"
 #include "core/datapacket/media_data_packet.h"
@@ -40,6 +42,7 @@ public:
     static void freeInstance(const QByteArray& clientGroupID, QnResource* res, bool isLive);
 
     QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
+    static void pleaseStopAll();
 
 public:
     VMaxStreamFetcher(QnResource* dev, bool isLive);
@@ -78,6 +81,7 @@ private:
     void updatePlaybackMask();
     void initPacketTime();
     void checkEOF(qint64 timestamp);
+    void pleaseStop();
 private:
     static const int OPEN_ALL = 0xffff;
 
@@ -111,6 +115,7 @@ private:
     QnPlaybackMaskHelper m_playbackMaskHelper;
     qint64 m_lastConnectTimeUsec;
     bool m_eofReached;
+    bool m_needStop;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

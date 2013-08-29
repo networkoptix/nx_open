@@ -2,7 +2,7 @@
 
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/common/synctime.h>
 
 #include <ui/workbench/workbench_context.h>
@@ -45,7 +45,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
     QList<QnLicensePtr> licenses;
     bool warn = false;
 
-    foreach(const QnLicensePtr &license, qnLicensePool->getLicenses().licenses()) {
+    foreach(const QnLicensePtr &license, qnLicensePool->getLicenses()) {
         qint64 expirationTime = license->expirationTime();
         if(expirationTime < 0)
             continue;

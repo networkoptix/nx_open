@@ -56,15 +56,18 @@ public:
     void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
     void updateDuration(int durationMs, qint64 fileSize);
-    qint64 deleteFirstRecord(); // return deleted file size
+
+    /** return deleted file size if calcFileSize is true and srcStorage matched with deleted file */
+    qint64 deleteFirstRecord(bool calcFileSize, QnStorageResourcePtr srcStorage); 
     void clear();
-    qint64 deleteRecordsBefore(int idx);
+    qint64 deleteRecordsBefore(int idx, QnStorageResourcePtr srcStorage);
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     void updateChunkDuration(Chunk& chunk);
     QString fullFileName(const Chunk& chunk) const;
     Chunk chunkAt(int index) const;
     bool isLastChunk(qint64 startTimeMs) const;
+    bool containTime(qint64 timeMs, qint64 eps = 5 * 1000) const;
 
     qint64 minTime() const;
     qint64 maxTime() const;

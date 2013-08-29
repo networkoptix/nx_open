@@ -50,6 +50,9 @@ private:
     char m_message[MAX_ERROR_MSG_LENGTH];
 };
 
+
+class SocketImpl;
+
 /**
  *   Base class representing basic communication endpoint
  */
@@ -65,7 +68,7 @@ public:
     /**
      *   Close and deallocate this socket
      */
-    ~Socket();
+    virtual ~Socket();
 
     QString lastError() const;
 
@@ -114,6 +117,22 @@ public:
                                 unsigned short localPort = 0) ;
 
     bool bindToInterface(const QnInterfaceAndAddr& iface);
+    /*!
+        \param ms. New timeout value (in millis). 0 - no timeout
+        \return true. if timeout has been changed
+        By default, there is no timeout
+    */
+    bool setReadTimeOut( unsigned int ms );
+    //!Returns socket read timeout in millis
+    unsigned int getReadTimeOut() const;
+    /*!
+        \param ms. New timeout value (in millis). 0 - no timeout
+        \return true. if timeout has been changed
+        By default, there is no timeout
+    */
+    bool setWriteTimeOut( unsigned int ms );
+    //!Returns socket write/connect timeout in millis
+    unsigned int getWriteTimeOut() const;
 
     /**
      *   If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
@@ -156,6 +175,9 @@ public:
     bool failed() const;
     SystemError::ErrorCode prevErrorCode() const;
 
+    SocketImpl* impl();
+    const SocketImpl* impl() const;
+
 protected:
     int sockDesc;              // Socket descriptor
     QString m_lastError;
@@ -169,9 +191,12 @@ protected:
     void saveErrorInfo();
 
 private:
+    SocketImpl* m_impl;
     bool m_nonBlockingMode;
     unsigned int m_status;
     SystemError::ErrorCode m_prevErrorCode;
+    unsigned int m_readTimeoutMS;
+    unsigned int m_writeTimeoutMS;
 
     // Prevent the user from trying to use value semantics on this object
     Socket(const Socket &sock);
@@ -197,18 +222,6 @@ public:
     bool connect(const QString &foreignAddress, unsigned short foreignPort, int timeoutMs = DEFAULT_TIMEOUT_MILLIS);
     void shutdown();
     virtual void close();
-    /*!
-        \param ms. New timeout value. 0 - no timeout
-        \return true. if timeout has been changed
-        By default, there is no timeout
-    */
-    bool setReadTimeOut( unsigned int ms );
-    /*!
-        \param ms. New timeout value. 0 - no timeout
-        \return true. if timeout has been changed
-        By default, there is no timeout
-    */
-    bool setWriteTimeOut( unsigned int ms );
 
     /**
      *   Write the given buffer to this socket.  Call connect() before
@@ -256,8 +269,6 @@ protected:
     CommunicatingSocket(int newConnSD);
 
 protected:
-    unsigned int m_readTimeoutMS;
-    unsigned int m_writeTimeoutMS;
     bool mConnected;
 };
 

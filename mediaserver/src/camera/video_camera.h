@@ -19,6 +19,7 @@ public:
     //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
     //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);
     QnCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream);
+    QnCompressedVideoDataPtr getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime);
     QnCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream);
 
     void beforeStop();
@@ -28,6 +29,8 @@ public:
     /* stop reading from camera if no active DataConsumers left */
     void stopIfNoActivity();
 
+    void updateActivity();
+
     /* Mark some camera activity (RTSP client connection for example) */
     void inUse(void* user);
 
@@ -35,6 +38,7 @@ public:
     void notInUse(void* user);
 private:
     void createReader(QnResource::ConnectionRole role);
+    void stop();
 private:
     QMutex m_readersMutex;
     QMutex m_getReaderMutex;

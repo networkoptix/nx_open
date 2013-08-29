@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>679</width>
-    <height>300</height>
+    <height>303</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,7 +24,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,1,0">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="spacing">
@@ -50,8 +50,14 @@
          </item>
          <item row="0" column="1">
           <widget class="QLineEdit" name="cameraIpLineEdit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
-            <string notr="true">127.0.0.1</string>
+            <string notr="true"/>
+           </property>
+           <property name="placeholderText">
+            <string>IP, hostname, RTSP link...</string>
            </property>
           </widget>
          </item>
@@ -86,6 +92,12 @@
          </item>
          <item row="0" column="1">
           <widget class="QnIpLineEdit" name="startIPLineEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="inputMethodHints">
             <set>Qt::ImhDigitsOnly</set>
            </property>
@@ -115,6 +127,12 @@
          </item>
          <item row="1" column="1">
           <widget class="QnIpLineEdit" name="endIPLineEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="inputMethodHints">
             <set>Qt::ImhDigitsOnly</set>
            </property>
@@ -272,19 +290,6 @@
         </widget>
        </item>
       </layout>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">

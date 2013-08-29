@@ -7,6 +7,7 @@
 #include "media_resource.h"
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
+#include "network_resource.h"
 
 class QnAbstractArchiveDelegate;
 
@@ -18,12 +19,15 @@ public:
 };
 
 
-class QnSecurityCamResource : virtual public QnMediaResource {
+class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
-    typedef QnMediaResource base_type;
-
 public:
+    enum StatusFlag {
+        HasIssuesFlag = 0x1
+    };
+    Q_DECLARE_FLAGS(StatusFlags, StatusFlag)
+
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     Qn::MotionType getCameraBasedMotionType() const;
@@ -39,9 +43,16 @@ public:
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
 
-    // like arecont or iqinvision
-    virtual QString manufacture() const = 0; // TODO: rename to manufacturer()
-    virtual QString oemName() const;
+    //!Returns driver (built-in or external) name, used to manage camera
+    /*!
+        This can be "axis", "dlink", "onvif", etc.
+    */
+    virtual QString getDriverName() const = 0;
+    //!Returns camera's vendor name
+    /*!
+        For onvif camera it returns real vendor name, not "onvif"
+    */
+    virtual QString getVendorName() const;
 
 
     virtual int getMaxFps(); // in fact this is const function;
@@ -52,7 +63,7 @@ public:
 
     virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
 
-    virtual QRect getCroping(QnDomain domain); // TODO: 'cropping' is spelled with double 'p'. Rename
+    virtual QRect getCroping(QnDomain domain); // TODO: #Elric 'cropping' is spelled with double 'p'. Rename
     virtual void setCroping(QRect croping, QnDomain domain); // sets cropping. rect is in the percents from 0 to 100
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
@@ -68,6 +79,7 @@ public:
     const QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
+
 
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
@@ -90,6 +102,7 @@ public:
 
     /*!
         Change output with id \a ouputID state to \a activate
+        \param ouputID If empty, implementation MUST select any output port
         \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
         \return true in case of success. false, if nothing has been done
     */
@@ -98,6 +111,7 @@ public:
     bool isRecordingEventAttached() const;
 
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
+    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
     virtual QString getGroupName() const;
     virtual void setGroupName(const QString& value);
@@ -106,11 +120,30 @@ public:
 
     bool isGroupPlayOnly() const;
 
-// -------------------------------------------------------------------------- //
-// Begin QnSecurityCamResource signals/slots
-// -------------------------------------------------------------------------- //
-    /* For metaobject system to work correctly, this block must be in sync with
-     * the one in QnVirtualCameraResource. */
+    //!Implementation of QnMediaResource::toResource
+    virtual const QnResource* toResource() const override;
+    //!Implementation of QnMediaResource::toResource
+    virtual QnResource* toResource() override;
+    //!Implementation of QnMediaResource::toResource
+    virtual const QnResourcePtr toResourcePtr() const override;
+    //!Implementation of QnMediaResource::toResource
+    virtual QnResourcePtr toResourcePtr() override;
+    void setSecondaryStreamQuality(Qn::SecondStreamQuality  quality);
+    Qn::SecondStreamQuality  secondaryStreamQuality() const;
+
+    void setCameraControlDisabled(bool value);
+    bool isCameraControlDisabled() const;
+
+    int desiredSecondStreamFps() const;
+    Qn::StreamQuality getSecondaryStreamQuality() const;
+
+    StatusFlags statusFlags() const;
+    bool hasStatusFlags(StatusFlags value) const;
+    void setStatusFlags(StatusFlags value);
+    void addStatusFlags(StatusFlags value);
+    void removeStatusFlags(StatusFlags value);
+
+    bool needCheckIpConflicts() const;
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -119,14 +152,23 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
-    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    //!Emitted on camera input port state has been changed
+    /*!
+        \param resource Smart pointer to \a this
+        \param inputPortID
+        \param value true if input is connected, false otherwise
+        \param timestamp MSecs since epoch, UTC
+    */
+    void cameraInput(
+        QnResourcePtr resource,
+        const QString& inputPortID,
+        bool value,
+        qint64 timestamp );
 
 protected slots:
     virtual void at_disabledChanged();
-// -------------------------------------------------------------------------- //
-// End QnSecurityCamResource signals/slots
-// -------------------------------------------------------------------------- //
 
 protected:
     void updateInner(QnResourcePtr other) override;
@@ -136,7 +178,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
-    virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
+    virtual void setCropingPhysical(QRect croping) = 0; // TODO: #Elric 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
     //!MUST be overridden for camera with input port. Default implementation does noting
     /*!
@@ -163,6 +205,9 @@ private:
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
+    Qn::SecondStreamQuality  m_secondaryQuality;
+    bool m_cameraControlDisabled;
+    StatusFlags m_statusFlags;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

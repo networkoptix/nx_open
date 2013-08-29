@@ -38,6 +38,7 @@ public:
     ~QnCheckResourceAndWarnDelegate();
     virtual void init(QWidget* parent) override;
     virtual bool validate(const QnResourceList &selected) override;
+
 protected:
     virtual bool isResourceValid(const QnSharedResourcePointer<ResourceType> &resource) const = 0;
     virtual QString getText(int invalid, int total) const = 0;
@@ -45,9 +46,6 @@ protected:
 private:
     QLabel* m_warningLabel;
 };
-
-// TODO: #GDM please spend some time reading the sources of QObject::tr() and Q_OBJECT macro.
-// These classes lacked Q_OBJECT macro => tr() calls would have passed invalid context to translate().
 
 class QnMotionEnabledDelegate: public QnCheckResourceAndWarnDelegate<QnVirtualCameraResource> {
     Q_OBJECT

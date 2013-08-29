@@ -18,7 +18,7 @@ void PlDroidStreamReader::setSDPInfo(quint32 ipv4, QByteArray sdpInfo)
 }
 
 PlDroidStreamReader::PlDroidStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res),
+    CLServerPushStreamReader(res),
     m_rtpSession(),
     m_videoIoDevice(0),
     m_audioIoDevice(0),
@@ -64,21 +64,21 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
     return result;
 }
 
-void PlDroidStreamReader::openStream()
+CameraDiagnostics::Result PlDroidStreamReader::openStream()
 {
     m_gotSDP =  false;
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::NoErrorResult();
     
     QString portStr = m_resource->getUrl();
     if (!portStr.startsWith(QLatin1String("raw://")))
-        return;
+        return CameraDiagnostics::UnsupportedProtocolResult(portStr, QUrl(portStr).scheme());
     portStr = portStr.mid(QString(QLatin1String("raw://")).length());
 
     QStringList ports = portStr.split(QLatin1Char(','));
     if (ports.size() < 2) {
         qWarning() << "Invalid droid URL format. Expected at least 4 ports";
-        return;
+        return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), QString() );
     }
 
     if (ports[0].contains(QLatin1Char(':')))
@@ -99,7 +99,7 @@ void PlDroidStreamReader::openStream()
     if (!m_tcpSock.connect(host, m_connectionPort))
     {
         closeStream();
-        return;
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(m_resource->getUrl(), m_connectionPort);
     }
 
     m_videoIoDevice = new RTPIODevice(&m_rtpSession, false);
@@ -119,8 +119,10 @@ void PlDroidStreamReader::openStream()
     {
         qWarning() << "Can't send request to droid device.";
         closeStream();
-        return;
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_resource->getUrl(), m_connectionPort);
     }
+
+    return CameraDiagnostics::NoErrorResult();
 
     /*
     m_incomeTCPData = m_dataSock->accept();

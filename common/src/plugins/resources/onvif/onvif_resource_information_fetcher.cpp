@@ -12,7 +12,7 @@ const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
 
 
 // Add vendor and camera model to ommit ONVIF search (you have to add in case insensitive here)
-static char* ANALOG_CAMERAS[][2] =
+static const char* ANALOG_CAMERAS[][2] =
 {
     {"AXIS", "Q7404"},
 	{"vivo_ironman", "VS8801"},
@@ -20,10 +20,11 @@ static char* ANALOG_CAMERAS[][2] =
 };
 
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
-static char* IGNORE_VENDORS[][2] =
+static const char* IGNORE_VENDORS[][2] =
 {
-    {"*networkcamera*", "dcs-*"}, // DLINK
-    {"*", "*spartan-6*"}          // ArecontVision
+    {"*networkcamera*", "IP*"}, // DLINK
+    {"*", "*spartan-6*"},       // ArecontVision
+    {"acti*", "*"}              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
@@ -84,14 +85,14 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
     }
 }
 
-bool OnvifResourceInformationFetcher::ignoreCamera(const EndpointAdditionalInfo& info) const
+bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name) const
 {
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
         QRegExp rxVendor(QLatin1String(IGNORE_VENDORS[i][0]), Qt::CaseInsensitive, QRegExp::Wildcard);
         QRegExp rxName(QLatin1String(IGNORE_VENDORS[i][1]), Qt::CaseInsensitive, QRegExp::Wildcard);
 
-        if (rxVendor.exactMatch(info.manufacturer) && rxName.exactMatch(info.name))
+        if (rxVendor.exactMatch(manufacturer) && rxName.exactMatch(name))
             return true;
     }
     return false;
@@ -109,7 +110,10 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
     }
 
-    if (ignoreCamera(info))
+    //if (info.name.contains(QLatin1String("netw")) || info.manufacturer.contains(QLatin1String("netw")))
+    //    int n = 0;
+
+    if (ignoreCamera(info.manufacturer, info.name))
         return;
 
     if (camersNamesData.isManufacturerSupported(info.manufacturer) && camersNamesData.isSupported(info.name)) {
@@ -121,7 +125,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QString model = info.name;
     QString firmware;
     QHostAddress sender(QUrl(endpoint).host());
-    //TODO:UTF unuse std::string
+    //TODO: #vasilenko UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string(), 0);
 
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
@@ -164,7 +168,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             if (!response.FirmwareVersion.empty())
                 firmware = QString::fromStdString(response.FirmwareVersion);
 
-            if (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) {
+            if (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString())) ||
+                ignoreCamera(manufacturer, model))
+            {
                 qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << model;
                 return;
             }
@@ -294,7 +300,7 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
 
 QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& response) const
 {
-    //TODO:UTF unuse std::string
+    //TODO: #vasilenko UTF unuse std::string
     return response.HardwareId.empty()
         ? QString()
         : QString::fromStdString(response.HardwareId) + QLatin1String("::") +
@@ -316,6 +322,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
+
+    resource->setVendorName( manufacture );
 
     return resource;
 }

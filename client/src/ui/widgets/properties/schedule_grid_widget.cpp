@@ -2,12 +2,15 @@
 
 #include <cassert>
 
+#include <QtCore/QDate>
 #include <QtGui/QApplication>
 #include <QtGui/QPainter>
+#include <QtGui/QMouseEvent>
 
 #include "ui/style/globals.h"
-#include "utils/settings.h"
+#include "client/client_settings.h"
 #include "utils/math/color_transformations.h"
+#include "core/resource/media_resource.h"
 
 namespace {
 
@@ -25,7 +28,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_enabled = true;
     m_readOnly = false;
     m_defaultParams[FirstParam] = 10;
-    m_defaultParams[SecondParam] = QLatin1String("Me");
+    m_defaultParams[SecondParam] = Qn::QualityNormal;
     m_defaultParams[RecordTypeParam] = Qn::RecordingType_Run;
 
     m_insideColors[Qn::RecordingType_Never] = m_colors[Qn::RecordingType_Never] = qnGlobals->noRecordColor();
@@ -227,15 +230,16 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
                 penClr = toGrayscale(penClr);
 
             p.setPen(penClr);
+            Qn::StreamQuality q = (Qn::StreamQuality) m_gridParams[x][y][SecondParam].toInt();
             if (m_showFirstParam && m_showSecondParam)
             {
                 p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize/2.0, cellSize/2.0)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][FirstParam].toString());
-                p.drawText(QRectF(leftTop+QPointF(cellSize/2.0, cellSize/2.0), rightBottom), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][SecondParam].toString());
+                p.drawText(QRectF(leftTop+QPointF(cellSize/2.0, cellSize/2.0), rightBottom), Qt::AlignCenter | Qt::AlignHCenter, toShortDisplayString(q));
             }
             else if (m_showFirstParam)
                 p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][FirstParam].toString());
             else if (m_showSecondParam)
-                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][SecondParam].toString());
+                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, toShortDisplayString(q));
 
 
             p.setPen(QColor(255, 255, 255));
@@ -488,7 +492,7 @@ void QnScheduleGridWidget::resetCellValues()
 {
     CellParams emptyParams;
     emptyParams[FirstParam] = QLatin1String("-");
-    emptyParams[SecondParam] = QLatin1String("-");
+    emptyParams[SecondParam] = Qn::QualityNotDefined;
     emptyParams[RecordTypeParam] = Qn::RecordingType_Never;
 
     for (int col = 0; col < columnCount(); ++col)

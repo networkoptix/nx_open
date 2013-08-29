@@ -27,6 +27,13 @@ message Camera {
         Preset  = 5;
     }
 
+    enum SecondaryQuality {
+        SecondaryLow        = 0;
+        SecondaryMedium     = 1;
+        SecondaryHigh       = 2;
+        SecondaryDontChange = 3;
+    }
+
     message ScheduleTask {
         required int32   id              = 1;         
         required int32   sourceId        = 2;
@@ -41,18 +48,22 @@ message Camera {
         required int32   fps             = 11;
     }
 
-    optional bool         scheduleDisabled = 1;
-    optional MotionType   motionType       = 2;
-    optional string       region           = 3;
-    optional string       mac              = 4;
-    optional string       login            = 5;
-    optional string       password         = 6;
-    repeated ScheduleTask scheduleTask     = 7;
-    optional bool         audioEnabled     = 8;
-    optional string       physicalId       = 9;
-    optional bool         manuallyAdded    = 10;
-    optional string       model            = 11;
-    optional string       firmware         = 12;
-    optional string       groupId          = 13;
-    optional string       groupName        = 14;
+    optional bool              scheduleDisabled = 1;
+    optional MotionType        motionType       = 2;
+    optional string            region           = 3;
+    optional string            mac              = 4;
+    optional string            login            = 5;
+    optional string            password         = 6;
+    repeated ScheduleTask      scheduleTask     = 7;
+    optional bool              audioEnabled     = 8;
+    optional string            physicalId       = 9;
+    optional bool              manuallyAdded    = 10;
+    optional string            model            = 11;
+    optional string            firmware         = 12;
+    optional string            groupId          = 13;
+    optional string            groupName        = 14;
+    optional SecondaryQuality  secondaryQuality = 15;
+    optional bool              controlDisabled  = 16;
+    optional int32             statusFlags      = 17;
+    optional string            dewarpingParams  = 18;
 }

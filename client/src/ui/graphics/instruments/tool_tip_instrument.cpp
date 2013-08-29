@@ -5,11 +5,11 @@
 #include <QtGui/QGraphicsProxyWidget>
 #include <QtGui/QAbstractItemView>
 
-#include <ui/graphics/items/standard/graphics_tooltip.h>
+#include <ui/graphics/items/standard/graphics_tool_tip.h>
 #include <ui/common/tool_tip_queryable.h>
 
 namespace {
-    QString widgetToolTip(QWidget *widget, const QPoint &pos) { // TODO: implement like in help topic accessor, with bubbleUp.
+    QString widgetToolTip(QWidget *widget, const QPoint &pos) { // TODO: #Elric implement like in help topic accessor, with bubbleUp.
         QWidget *childWidget = widget->childAt(pos);
         if(!childWidget)
             childWidget = widget;
@@ -66,23 +66,36 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     /* Note that tooltip is a rare event, so having a lot of dynamic_casts here is OK. */
 
     QGraphicsItem *targetItem = NULL;
+    ToolTipQueryable* targetAsToolTipQueryable = NULL;
     foreach(QGraphicsItem *item, scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform())) {
-        if(!item->toolTip().isEmpty() || dynamic_cast<ToolTipQueryable *>(item) || dynamic_cast<QGraphicsProxyWidget *>(item)) {
+        if(!item->toolTip().isEmpty() ||
+                dynamic_cast<ToolTipQueryable *>(item) ||
+                dynamic_cast<QGraphicsProxyWidget *>(item)
+                ) {
             targetItem = item;
+            targetAsToolTipQueryable = dynamic_cast<ToolTipQueryable *>(item);
+            QGraphicsProxyWidget* targetAsGraphicsProxy = dynamic_cast<QGraphicsProxyWidget *>(item);
+            if (!targetAsToolTipQueryable && targetAsGraphicsProxy)
+                targetAsToolTipQueryable = dynamic_cast<ToolTipQueryable *>(targetAsGraphicsProxy->widget());
             break;
         }
     }
-
     if(!targetItem) {
         helpEvent->ignore();
         return true; /* Eat it anyway. */
     }
 
-    GraphicsTooltip::showText(
-        itemToolTip(targetItem, targetItem->mapFromScene(scenePos)), 
-        targetItem, 
-        scenePos, 
-        QRectF(view->mapToScene(viewport->geometry().topLeft()), view->mapToScene(viewport->geometry().bottomRight()))
+    if (targetAsToolTipQueryable &&
+            targetAsToolTipQueryable->showOwnTooltip(targetItem->mapFromScene(scenePos))) {
+        helpEvent->accept();
+        return true;
+    }
+
+    GraphicsToolTip::showText(
+        itemToolTip(targetItem, targetItem->mapFromScene(scenePos)),
+        view,
+        targetItem,
+        helpEvent->pos()
     );
 
     helpEvent->accept();

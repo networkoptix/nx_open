@@ -10,8 +10,8 @@
 #include "utils/color_space/yuvconvert.h"
 
 extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
+    #include <libavformat/avformat.h>
+    #include <libavcodec/avcodec.h>
 }
 
 #ifndef DWM_EC_DISABLECOMPOSITION

@@ -31,7 +31,7 @@ public:
 class QnSmtpSettingsWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    
+
 public:
     explicit QnSmtpSettingsWidget(QWidget *parent = 0);
     ~QnSmtpSettingsWidget();
@@ -40,10 +40,12 @@ public:
     void submit();
 
     void updateFocusedElement();
+
 private:
     QnEmail::Settings settings();
     void stopTesting(QString result);
     void loadSettings(QString server, QnEmail::ConnectionType connectionType, int port = 0);
+
 private slots:
     void at_portComboBox_currentIndexChanged(int index);
     void at_testButton_clicked();
@@ -53,12 +55,13 @@ private slots:
 
     void at_timer_timeout();
 
-    void at_settings_received(int status, const QByteArray& errorString, const QnKvPairList& values, int handle);
+    void at_settings_received(int status, const QnKvPairList &values, int handle);
 
-    void at_finishedTestEmailSettings(int status, const QByteArray& errorString, bool result, int handle);
+    void at_finishedTestEmailSettings(int status, bool result, int handle);
 
     void at_advancedCheckBox_toggled(bool toggled);
     void at_simpleEmail_textChanged(const QString &value);
+
 private:
     QScopedPointer<Ui::QnSmtpSettingsWidget> ui;
 

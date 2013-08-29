@@ -1,10 +1,13 @@
 #ifndef QN_LICENSING_LICENSE
 #define QN_LICENSING_LICENSE
 
+#include <QByteArray>
 #include <QCoreApplication>
+#include <QMetaType>
 #include <QSharedPointer>
 #include <QString>
 #include <QList>
+#include <QMap>
 #include <QMutex>
 #include <QSet>
 #include <QTextStream>
@@ -20,16 +23,16 @@ public:
         FreeLicense,
         TrialLicense,
         AnalogLicense,
-        EnterpriseLicense,
+        ProfessionalLicense,
         TypeCount
     };
 
     QnLicense(const QByteArray& licenseBlock);
 
     /**
-     * Check if signature matches other fields
+     * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QByteArray& hardwareId) const;
+    bool isValid(const QByteArray& hardwareId, const QString& brand) const;
 
     /**
      * @returns                         Whether this license is for analog cameras.
@@ -83,23 +86,17 @@ private:
     bool m_isValid2;
 };
 
+typedef QList<QnLicensePtr> QnLicenseList;
+typedef QMap<QByteArray, QnLicensePtr> QnLicenseDict;
 
-// TODO: #Elric make it an STL list. Naming a non-list a list is BAD.
-class QnLicenseList
+class QnLicenseListHelper
 {
 public:
-    void setHardwareId(const QByteArray& hardwareId);
-    QByteArray hardwareId() const;
+    QnLicenseListHelper(const QnLicenseList& licenseList);
 
-    void setOldHardwareId(const QByteArray& oldHardwareId);
-    QByteArray oldHardwareId() const;
-
-    QList<QnLicensePtr> licenses() const;
-	QList<QByteArray> allLicenseKeys() const;
-    void append(QnLicensePtr license);
-    void append(QnLicenseList license);
-    bool isEmpty() const;
-    void clear();
+    QList<QByteArray> allLicenseKeys() const;
+    bool haveLicenseKey(const QByteArray& key) const;
+	QnLicensePtr getLicenseByKey(const QByteArray& key) const;
 
     /**
      * \returns                         Total number of digital cameras allowed.
@@ -115,16 +112,14 @@ public:
         return totalCamerasByClass(true);
     }
 
-    bool haveLicenseKey(const QByteArray& key) const;
-	QnLicensePtr getLicenseByKey(const QByteArray& key) const;
-
 private:
     int totalCamerasByClass(bool analog) const;
 
-    QMap<QByteArray, QnLicensePtr> m_licenses;
-    QByteArray m_hardwareId;
-	QByteArray m_oldHardwareId;
+private:
+    QnLicenseDict m_licenseDict;
 };
+
+Q_DECLARE_METATYPE(QnLicenseList)
 
 
 /**
@@ -137,13 +132,23 @@ class QnLicensePool : public QObject
 public:
     static QnLicensePool* instance();
 
-    const QnLicenseList &getLicenses() const;
+    QnLicenseList getLicenses() const;
+
     void addLicense(const QnLicensePtr &license);
     void addLicenses(const QnLicenseList &licenses);
     void replaceLicenses(const QnLicenseList &licenses);
 
     void reset();
     bool isEmpty() const;
+
+    void setHardwareId1(const QByteArray& hardwareId);
+    QByteArray hardwareId1() const;
+
+    void setOldHardwareId(const QByteArray& oldHardwareId);
+    QByteArray oldHardwareId() const;
+
+    void setHardwareId2(const QByteArray& hardwareId);
+    QByteArray hardwareId2() const;
 
 signals:
     void licensesChanged();
@@ -152,7 +157,21 @@ protected:
     QnLicensePool();
 
 private:
-    QnLicenseList m_licenses;
+    bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
+    bool addLicense_i(const QnLicensePtr &license);
+    bool addLicenses_i(const QnLicenseList &licenses);
+
+private:
+    // The one 1.5 uses
+    QByteArray m_hardwareId1;
+
+    // Pre 1.5
+	QByteArray m_oldHardwareId;
+
+    // The one 1.6 uses
+    QByteArray m_hardwareId2;
+
+    QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
 };
 

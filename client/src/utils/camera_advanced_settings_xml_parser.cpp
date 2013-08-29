@@ -1,5 +1,10 @@
+
 #include "camera_advanced_settings_xml_parser.h"
+
+#include <QDebug>
+
 #include "ui/widgets/properties/camera_advanced_settings_widget.h"
+
 
 const QString CASXP_IMAGING_GROUP_NAME(QLatin1String("%%Imaging"));
 const QString CASXP_MAINTENANCE_GROUP_NAME(QLatin1String("%%Maintenance"));

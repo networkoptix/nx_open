@@ -14,7 +14,7 @@ static const QByteArray STARDOT_MOTION_UUID = QByteArray::fromHex("bed9b7e0f0603
 
 
 QnStardotStreamReader::QnStardotStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res),
+    CLServerPushStreamReader(res),
     m_multiCodec(res)
 {
     m_stardotRes = res.dynamicCast<QnStardotResource>();
@@ -25,32 +25,43 @@ QnStardotStreamReader::~QnStardotStreamReader()
     stop();
 }
 
-void QnStardotStreamReader::openStream()
+CameraDiagnostics::Result QnStardotStreamReader::openStream()
 {
     // configure stream params
 
     // get URL
 
-    QString request(lit("admin.cgi?image&h264_bitrate=%2&h264_framerate=%3"));
-    int bitrate = m_stardotRes->suggestBitrateKbps(getQuality(), m_stardotRes->getResolution(), getFps());
-    request = request.arg(bitrate).arg(getFps());
-
-    CLHttpStatus status;
-    m_stardotRes->makeStardotRequest(request, status);
-    if (status != CL_HTTP_SUCCESS) 
+    if (!m_stardotRes->isCameraControlDisabled())
     {
-        if (status == CL_HTTP_AUTH_REQUIRED) 
-            m_resource->setStatus(QnResource::Unauthorized);
-        return;
+        QString request(lit("admin.cgi?image&h264_bitrate=%2&h264_framerate=%3"));
+        int bitrate = m_stardotRes->suggestBitrateKbps(getQuality(), m_stardotRes->getResolution(), getFps());
+        request = request.arg(bitrate).arg(getFps());
+
+        CLHttpStatus status;
+        m_stardotRes->makeStardotRequest(request, status);
+        if (status != CL_HTTP_SUCCESS) 
+        {
+            if (status == CL_HTTP_AUTH_REQUIRED) 
+            {
+                m_resource->setStatus(QnResource::Unauthorized);
+                QUrl requestedUrl;
+                requestedUrl.setHost( m_stardotRes->getHostAddress() );
+                requestedUrl.setPort( m_stardotRes->httpPort() );
+                requestedUrl.setScheme( QLatin1String("http") );
+                requestedUrl.setPath( request );
+                return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
+            }
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("admin.cgi?image"), QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
+        }
     }
 
     QString streamUrl = m_stardotRes->getRtspUrl();
 
     m_multiCodec.setRequest(streamUrl);
-    m_multiCodec.openStream();
+    const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
         m_resource->setStatus(QnResource::Unauthorized);
-
+    return result;
 }
 
 void QnStardotStreamReader::closeStream()

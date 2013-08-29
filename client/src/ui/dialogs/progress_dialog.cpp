@@ -53,6 +53,8 @@
 #include "qtimer.h"
 #include "qelapsedtimer.h"
 #include <limits.h>
+#include <QPointer>
+
 
 #if defined(QT_SOFTKEYS_ENABLED)
 #include <qaction.h>
@@ -91,7 +93,6 @@ public:
     virtual ~QnProgressDialogPrivate() {}
 
     void init(const QString &labelText, const QString &cancelText, int min, int max);
-    void layout();
     void retranslateStrings();
     void _q_disconnectOnClose();
 
@@ -100,6 +101,9 @@ public:
     QLabel *label;
     QPushButton *cancel;
     QProgressBar *bar;
+    QDialogButtonBox *buttonBox;
+    QVBoxLayout *layout;
+
     QTimer *forceTimer;
     bool shown_once;
     bool cancellation_flag;
@@ -127,81 +131,44 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
                                   int min, int max)
 {
     Q_Q(QnProgressDialog);
-    label = new QLabel(labelText, q);
-    int align = q->style()->styleHint(QStyle::SH_ProgressDialog_TextLabelAlignment, 0, q);
-    label->setAlignment(Qt::Alignment(align));
-    bar = new QProgressBar(q);
-    bar->setRange(min, max);
+
     autoClose = true;
     autoReset = true;
     forceHide = false;
-    QObject::connect(q, SIGNAL(canceled()), q, SLOT(cancel()));
+    
+    label = new QLabel(labelText, q);
+    int align = q->style()->styleHint(QStyle::SH_ProgressDialog_TextLabelAlignment, 0, q);
+    label->setAlignment(Qt::Alignment(align));
+
+    bar = new QProgressBar(q);
+    bar->setRange(min, max);
+
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::NoButton, Qt::Horizontal, q);
+
+    layout = new QVBoxLayout();
+    layout->addWidget(label);
+    layout->addWidget(bar);
+    layout->addWidget(buttonBox);
+    q->setLayout(layout);
+
     forceTimer = new QTimer(q);
     QObject::connect(forceTimer, SIGNAL(timeout()), q, SLOT(forceShow()));
+
     if (useDefaultCancelText) {
         retranslateStrings();
     } else {
         q->setCancelButtonText(cancelText);
     }
-}
-
-void QnProgressDialogPrivate::layout()
-{
-    Q_Q(QnProgressDialog);
-    int sp = q->style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing);
-    int mtb = q->style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
-    int mlr = qMin(q->width() / 10, mtb);
-    const bool centered =
-        bool(q->style()->styleHint(QStyle::SH_ProgressDialog_CenterCancelButton, 0, q));
-
-    int additionalSpacing = 0;
-#ifdef Q_OS_SYMBIAN
-    //In Symbian, we need to have wider margins for dialog borders, as the actual border is some pixels
-    //inside the dialog area (to enable transparent borders)
-    additionalSpacing = mlr;
-#endif
-
-    QSize cs = cancel ? cancel->sizeHint() : QSize(0,0);
-    QSize bh = bar->sizeHint();
-    int cspc;
-    int lh = 0;
-
-    // Find spacing and sizes that fit.  It is important that a progress
-    // dialog can be made very small if the user demands it so.
-    for (int attempt=5; attempt--;) {
-        cspc = cancel ? cs.height() + sp : 0;
-        lh = qMax(0, q->height() - mtb - bh.height() - sp - cspc);
-
-        if (lh < q->height()/4) {
-            // Getting cramped
-            sp /= 2;
-            mtb /= 2;
-            if (cancel) {
-                cs.setHeight(qMax(4,cs.height()-sp-2));
-            }
-            bh.setHeight(qMax(4,bh.height()-sp-1));
-        } else {
-            break;
-        }
-    }
-
-    if (cancel) {
-        cancel->setGeometry(
-            centered ? q->width()/2 - cs.width()/2 : q->width() - mlr - cs.width(),
-            q->height() - mtb - cs.height(),
-            cs.width(), cs.height());
-    }
-
-    if (label)
-        label->setGeometry(mlr, additionalSpacing, q->width() - mlr * 2, lh);
-    bar->setGeometry(mlr, lh + sp + additionalSpacing, q->width() - mlr * 2, bh.height());
+    QObject::connect(q, SIGNAL(canceled()), q, SLOT(cancel()));
 }
 
 void QnProgressDialogPrivate::retranslateStrings()
 {
     Q_Q(QnProgressDialog);
-    if (useDefaultCancelText)
+    if (useDefaultCancelText) {
         q->setCancelButtonText(QnProgressDialog::tr("Cancel"));
+        useDefaultCancelText = true;
+    }
 }
 
 void QnProgressDialogPrivate::_q_disconnectOnClose()
@@ -438,11 +405,9 @@ void QnProgressDialog::setCancelButton(QPushButton *cancelButton)
     delete d->cancel;
     d->cancel = cancelButton;
     if (cancelButton) {
-        if (cancelButton->parentWidget() == this) {
-            cancelButton->hide(); // until we resize
-        } else {
-            cancelButton->setParent(this, 0);
-        }
+        cancelButton->setParent(this, 0);
+        d->buttonBox->addButton(cancelButton, QDialogButtonBox::RejectRole);
+
         connect(d->cancel, SIGNAL(clicked()), this, SIGNAL(canceled()));
 #ifndef QT_NO_SHORTCUT
         d->escapeShortcut = new QShortcut(Qt::Key_Escape, this, SIGNAL(canceled()));
@@ -467,6 +432,12 @@ void QnProgressDialog::setCancelButton(QPushButton *cancelButton)
         addAction(d->cancelAction);
     }
 #endif
+}
+
+void QnProgressDialog::addButton(QPushButton *button, QDialogButtonBox::ButtonRole role) {
+    Q_D(QnProgressDialog);
+
+    d->buttonBox->addButton(button, role);
 }
 
 /*!
@@ -725,54 +696,6 @@ void QnProgressDialog::setValue(int progress)
 }
 
 /*!
-  Returns a size that fits the contents of the progress dialog.
-  The progress dialog resizes itself as required, so you should not
-  need to call this yourself.
-*/
-
-QSize QnProgressDialog::sizeHint() const
-{
-    Q_D(const QnProgressDialog);
-    QSize sh = d->label ? d->label->sizeHint() : QSize(0, 0);
-    QSize bh = d->bar->sizeHint();
-    int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
-    int spacing = style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing);
-    int h = margin * 2 + bh.height() + sh.height() + spacing;
-    if (d->cancel)
-        h += d->cancel->sizeHint().height() + spacing;
-#ifdef Q_WS_S60
-    if (QApplication::desktop()->size().height() > QApplication::desktop()->size().width())
-        return QSize(qMax(QApplication::desktop()->size().width(), sh.width() + 2 * margin), h);
-    else
-        return QSize(qMax(QApplication::desktop()->size().height(), sh.width() + 2 * margin), h);
-#else
-    return QSize(qMax(200, sh.width() + 2 * margin), h);
-#endif
-}
-
-/*!\reimp
-*/
-void QnProgressDialog::resizeEvent(QResizeEvent *)
-{
-    Q_D(QnProgressDialog);
-    d->layout();
-}
-
-/*!
-  \reimp
-*/
-void QnProgressDialog::changeEvent(QEvent *ev)
-{
-    Q_D(QnProgressDialog);
-    if (ev->type() == QEvent::StyleChange) {
-        d->layout();
-    } else if (ev->type() == QEvent::LanguageChange) {
-        d->retranslateStrings();
-    }
-    QDialog::changeEvent(ev);
-}
-
-/*!
     \property QnProgressDialog::minimumDuration
     \brief the time that must pass before the dialog appears
 
@@ -867,6 +790,13 @@ void QnProgressDialog::showEvent(QShowEvent *e)
     int h = qMax(isVisible() ? height() : 0, sizeHint().height());
     resize(w, h);
     d->forceTimer->stop();
+}
+
+void QnProgressDialog::changeEvent(QEvent *event) {
+    QDialog::changeEvent(event);
+
+    if(event->type() == QEvent::LanguageChange)
+        d_func()->retranslateStrings();
 }
 
 /*!

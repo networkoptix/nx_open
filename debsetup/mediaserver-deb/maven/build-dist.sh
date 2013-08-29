@@ -22,6 +22,7 @@ INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
+SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
 SERVER_LIB_PATH=${libdir}/build/bin/${build.configuration}
 	
 . $SERVER_BIN_PATH/env.sh
@@ -36,6 +37,7 @@ mkdir -p $INITDSTAGE
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
+cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
 
 # Strip and remove rpath
 for f in `find $LIBSTAGE -type f`
@@ -48,7 +50,7 @@ find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
 chmod -R 755 $BINSTAGE
 
-# Copy mediaserver binary
+# Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver* $BINSTAGE
 
 # Copy mediaserver startup script

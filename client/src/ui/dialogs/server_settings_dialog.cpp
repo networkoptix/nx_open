@@ -10,6 +10,9 @@
 #include <QtGui/QStyledItemDelegate>
 #include <QtGui/QSlider>
 #include <QtGui/QLabel>
+#include <QPainter>
+#include <QMenu>
+#include <QMouseEvent>
 
 #include <utils/common/counter.h>
 #include <utils/common/string.h>
@@ -22,12 +25,14 @@
 #include <core/resource/media_server_resource.h>
 
 #include <client/client_model_types.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
+#include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/noptix_style.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "storage_url_dialog.h"
 
@@ -58,9 +63,10 @@ namespace {
     }
 
     class ArchiveSpaceSlider: public QSlider {
+        Q_DECLARE_TR_FUNCTIONS(ArchiveSpaceSlider)
         typedef QSlider base_type;
     public:
-        ArchiveSpaceSlider(QWidget *parent = NULL): 
+        ArchiveSpaceSlider(QWidget *parent = NULL):
             base_type(parent),
             m_color(Qt::white)
         {
@@ -123,7 +129,7 @@ namespace {
 
         virtual void leaveEvent(QEvent *event) override {
             unsetCursor();
-            
+
             base_type::leaveEvent(event);
         }
 
@@ -136,7 +142,7 @@ namespace {
             if(!isEmpty()) {
                 int x = handlePos();
                 painter.fillRect(QRect(QPoint(0, 0), QPoint(x, rect.bottom())), m_color);
-                
+
                 painter.setPen(withAlpha(m_color.lighter(), 128));
                 painter.drawLine(QPoint(x, 0), QPoint(x, rect.bottom()));
             }
@@ -214,13 +220,13 @@ namespace {
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
-    m_tableBottomLabel(NULL),
     m_hasStorageChanges(false)
 {
     ui->setupUi(this);
-    
+
     ui->storagesTable->resizeColumnsToContents();
     ui->storagesTable->horizontalHeader()->setClickable(false);
     ui->storagesTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
@@ -232,8 +238,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 #else
     ui->storagesTable->setColumnCount(ColumnCount - 1);
 #endif
-
-    setButtonBox(ui->buttonBox);
 
     m_removeAction = new QAction(tr("Remove Storage"), this);
 
@@ -250,6 +254,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
+    connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
 
     updateFromResources();
 }
@@ -264,7 +269,7 @@ void QnServerSettingsDialog::accept() {
 
     bool valid = true;//m_hasStorageChanges ? validateStorages(tableStorages()) : true;
     if (valid) {
-        submitToResources(); 
+        submitToResources();
 
         base_type::accept();
     }
@@ -278,7 +283,7 @@ void QnServerSettingsDialog::reject() {
 }
 
 void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
-    int row = ui->storagesTable->rowCount() - 1;
+    int row = dataRowCount();
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
@@ -318,21 +323,18 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
 }
 
 void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &items) {
-    ui->storagesTable->setRowCount(0);
-    ui->storagesTable->insertRow(0);
-    ui->storagesTable->setSpan(0, 0, 1, 4);
-    m_tableBottomLabel = new QLabel();
-    m_tableBottomLabel->setAlignment(Qt::AlignCenter);
-    connect(m_tableBottomLabel, SIGNAL(linkActivated(const QString &)), this, SLOT(at_tableBottomLabel_linkActivated()));
-    ui->storagesTable->setCellWidget(0, 0, m_tableBottomLabel);
+    QString bottomLabelText = this->bottomLabelText();
 
+    ui->storagesTable->setRowCount(0);
     foreach(const QnStorageSpaceData &item, items)
         addTableItem(item);
+
+    setBottomLabelText(bottomLabelText);
 }
 
 QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
     QnStorageSpaceData result;
-    if(row < 0 || row >= ui->storagesTable->rowCount() - 1)
+    if(row < 0 || row >= dataRowCount())
         return result;
 
     QTableWidgetItem *checkBoxItem = ui->storagesTable->item(row, CheckBoxColumn);
@@ -360,15 +362,15 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
 QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
     QList<QnStorageSpaceData> result;
-    for(int row = 0; row < ui->storagesTable->rowCount() - 1; row++)
+    for(int row = 0; row < dataRowCount(); row++)
         result.push_back(tableItem(row));
     return result;
 }
 
 void QnServerSettingsDialog::updateFromResources() {
-    m_server->apiConnection()->asyncGetStorageSpace(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
     setTableItems(QList<QnStorageSpaceData>());
-    m_tableBottomLabel->setText(tr("Loading..."));
+    setBottomLabelText(tr("Loading..."));
 
     ui->nameLineEdit->setText(m_server->getName());
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
@@ -416,6 +418,59 @@ void QnServerSettingsDialog::submitToResources() {
     m_server->setName(ui->nameLineEdit->text());
 }
 
+void QnServerSettingsDialog::setBottomLabelText(const QString &text) {
+    bool hasLabel = dataRowCount() != ui->storagesTable->rowCount();
+
+    if(!text.isEmpty()) {
+        if(!hasLabel) {
+            QLabel *tableBottomLabel = new QLabel();
+            tableBottomLabel->setAlignment(Qt::AlignCenter);
+            connect(tableBottomLabel, SIGNAL(linkActivated(const QString &)), this, SLOT(at_tableBottomLabel_linkActivated()));
+
+            int row = ui->storagesTable->rowCount();
+            ui->storagesTable->insertRow(row);
+            ui->storagesTable->setSpan(row, 0, 1, ColumnCount);
+            ui->storagesTable->setCellWidget(row, 0, tableBottomLabel);
+
+            m_tableBottomLabel = tableBottomLabel;
+        }
+
+        m_tableBottomLabel.data()->setText(text);
+    } else {
+        if(!hasLabel)
+            return;
+
+        ui->storagesTable->setRowCount(ui->storagesTable->rowCount() - 1);
+    }
+}
+
+QString QnServerSettingsDialog::bottomLabelText() const {
+    bool hasLabel = dataRowCount() != ui->storagesTable->rowCount();
+
+    if(hasLabel && m_tableBottomLabel) {
+        return m_tableBottomLabel.data()->text();
+    } else {
+        return QString();
+    }
+}
+
+int QnServerSettingsDialog::dataRowCount() const {
+    int rowCount = ui->storagesTable->rowCount();
+    if(rowCount == 0)
+        return rowCount;
+
+    if(!m_tableBottomLabel)
+        return rowCount;
+
+    /* Label could not yet be deleted even if the corresponding row is already removed,
+     * so we have to check that it's there. */
+    QWidget *cellWidget = ui->storagesTable->cellWidget(rowCount - 1, 0);
+    if(cellWidget)
+        return rowCount - 1;
+
+    return rowCount;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -431,9 +486,9 @@ void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
         return;
     item.isUsedForWriting = true;
     item.isExternal = true;
-    
+
     addTableItem(item);
-    
+
     m_hasStorageChanges = true;
 }
 
@@ -460,9 +515,13 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
     }
 }
 
+void QnServerSettingsDialog::at_pingButton_clicked() {
+    menu()->trigger(Qn::PingAction, QnActionParameters(m_server));
+}
+
 void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceReply &reply, int) {
     if(status != 0) {
-        m_tableBottomLabel->setText(tr("Could not load storages from server."));
+        setBottomLabelText(tr("Could not load storages from server."));
         return;
     }
 
@@ -496,7 +555,11 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
     setTableItems(items);
 
     m_storageProtocols = reply.storageProtocols;
-    m_tableBottomLabel->setText(tr("<a href='1'>Add external Storage...</a>"));
+    if(m_storageProtocols.isEmpty()) {
+        setBottomLabelText(QString());
+    } else {
+        setBottomLabelText(tr("<a href='1'>Add external Storage...</a>"));
+    }
 
     m_hasStorageChanges = false;
 }

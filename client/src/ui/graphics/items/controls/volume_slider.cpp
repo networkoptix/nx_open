@@ -2,12 +2,6 @@
 
 #include <openal/qtvaudiodevice.h>
 
-Q_GLOBAL_STATIC(QnVolumeSliderNotifier, qn_volumeSliderNotifier_instance)
-
-QnVolumeSliderNotifier *QnVolumeSliderNotifier::instance() {
-    return qn_volumeSliderNotifier_instance();
-}
-
 QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent): 
     base_type(parent)
 {
@@ -16,9 +10,6 @@ QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent):
 
     /* Update tooltip text. */
     sliderChange(SliderValueChange);
-
-    connect(this, SIGNAL(sliderPressed()), QnVolumeSliderNotifier::instance(), SIGNAL(manipulated()));
-    connect(this, SIGNAL(sliderReleased()), QnVolumeSliderNotifier::instance(), SIGNAL(manipulated()));
 }
 
 QnVolumeSlider::~QnVolumeSlider() {

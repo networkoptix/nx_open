@@ -64,14 +64,14 @@ qint64 QnServerArchiveDelegate::endTime()
     qint64 timeLow = m_catalogLow ? m_catalogLow->maxTime() : AV_NOPTS_VALUE;
 
     qint64 rez;
-    if (timeHi != AV_NOPTS_VALUE && timeLow != AV_NOPTS_VALUE)
+    if (timeHi != (qint64)AV_NOPTS_VALUE && timeLow != (qint64)AV_NOPTS_VALUE)
         rez = qMax(timeHi, timeLow);
-    else if (timeHi != AV_NOPTS_VALUE)
+    else if (timeHi != (qint64)AV_NOPTS_VALUE)
         rez = timeHi;
     else
         rez = timeLow;
 
-    if (rez != AV_NOPTS_VALUE && rez != DATETIME_NOW)
+    if (rez != (qint64)AV_NOPTS_VALUE && rez != DATETIME_NOW)
         rez *= 1000;
     
     return rez;

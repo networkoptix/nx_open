@@ -13,7 +13,7 @@
 class VariantAnimator;
 
 class QnGlFunctions;
-class QnSettings;
+class QnClientSettings;
 class QnRadialGradientPainter;
 
 class QnGradientBackgroundPainter: public QObject, public QnLayerPainter, public QnWorkbenchContextAware {
@@ -34,7 +34,7 @@ public:
 protected:
     virtual void installedNotify() override;
 
-    /** 
+    /**
      * \returns                         Current animation position, a number in
      *                                  range [-1, 1].
      */
@@ -51,8 +51,7 @@ protected slots:
 private:
     QScopedPointer<QnGlFunctions> m_gl;
     QScopedPointer<QnRadialGradientPainter> m_gradientPainter;
-    
-    QWeakPointer<QnSettings> m_settings;
+
     VariantAnimator *m_backgroundColorAnimator;
     QElapsedTimer m_timer;
 

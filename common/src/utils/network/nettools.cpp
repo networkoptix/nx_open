@@ -1,4 +1,12 @@
+
+#include <QCoreApplication>
+#include <QtConcurrentMap>
 #include <QHostInfo>
+#include <QTime>
+#include <QSettings>
+#include <QStringList>
+#include <QThreadPool>
+
 #include "nettools.h"
 #include "ping.h"
 #include "netstate.h"
@@ -60,9 +68,8 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                 static QList<QHostAddress> allowedInterfaces;
                 if (!allowedInterfaceReady)
                 {
-                    for (int j = 1; j < qApp->argc(); ++j)
+                    foreach(QString arg, qApp->arguments()) // TODO: #Elric totally evil! This is NOT a place to access application arguments
                     {
-                        QString arg = QLatin1String(qApp->argv()[j]);
                         arg = arg.toLower();
                         while (arg.startsWith(QLatin1Char('-')))
                             arg = arg.mid(1);
@@ -90,7 +97,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
-                    result.append(QnInterfaceAndAddr(iface.name(), address.ip()));
+                    result.append(QnInterfaceAndAddr(iface.name(), address.ip(), iface));
                     break;
                 }
             }
@@ -111,8 +118,10 @@ QList<QHostAddress> allLocalAddresses()
     // if nothing else works use first enabled hostaddr
     foreach(const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
     {
-        if (!QUdpSocket().bind(iface.address, 0))
+        if (!(iface.netIf.flags() & QNetworkInterface::IsUp))
             continue;
+        //if (!QUdpSocket().bind(iface.address, 0))
+        //    continue;
 
         rez << iface.address;
     }
@@ -547,17 +556,21 @@ bool isIpv4Address(const QString& addr)
     return ip4Addr != 0 && ip4Addr != -1;
 }
 
-QHostAddress resolveAddress(const QString& addr)
+QHostAddress resolveAddress(const QString& addrString)
 {
-    int ip4Addr = inet_addr(addr.toAscii().data());
+    int ip4Addr = inet_addr(addrString.toAscii().data());
     if (ip4Addr != 0 && ip4Addr != -1)
         return QHostAddress(ntohl(ip4Addr));
 
-    QHostInfo hi = QHostInfo::fromName(addr);
-    if (!hi.addresses().isEmpty())
-        return hi.addresses()[0];
-    else
-        return QHostAddress();
+    QHostInfo hi = QHostInfo::fromName(addrString);
+    if (!hi.addresses().isEmpty()) {
+        foreach (const QHostAddress& addr, hi.addresses()) {
+            if (addr.protocol() == QAbstractSocket::IPv4Protocol)
+                return addr;
+        }
+    }
+
+    return QHostAddress();
 }
 
 int strEqualAmount(const char* str1, const char* str2)

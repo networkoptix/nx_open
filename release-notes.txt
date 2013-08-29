@@ -1,3 +1,204 @@
+----------------------------------------------- 2.0 -----------------------------------------------
+
+ANDROID CLIENT:
+ - When a camera archive contained too many recorded fragments, live video would occasionally freeze. Fixed.
+ - When logging in using a combination of caps and lowercase characters (Admin - admin), the camera list did not appear. Fixed.
+ - Panoramic cameras are now supported (1st sensor is displayed).
+ - Added ability to save and restore connection details.
+ 
+iOS Client:
+ - iOS client now works on iOS 5 
+ - A sorted list of cameras is now displayed
+ - A camera name is displayed in the top left corner
+ - Panoramic cameras are now supported (1st sensor is displayed)
+ - The server status was not displayed properly. Fixed.
+ 
+NEW CAMERAS AND RECORDERS SUPPORTED:
+ - Arecont Vision: all newest models
+ - Avigilon: 2.0-H3-D1-IR, 2.0-H3-DO1-IR, 2.0-H3M-DO1, 2.0W-H3-BO1-IR
+ - Axis: all models
+ - Vivotek: SD8362E, FD8372, IP8335H, FD8134, IP8362, MD8562, IP8151, IP8133, FD8135H, FE8172V, CC8130, FD8136 (PTZ), FD8361 (PTZ), FD8362E (PTZ), FD8161 (PTZ)
+ - Dahua: IPC-HFW3200S
+ - ACTi cameras with older firmware versions are now supported (T series < 4.13, K series < 5.08 and A1 series < 6.03). Newest firmware version is also supported. Input/output for ACTi cameras are now supported.
+ - Sony: SNCRH124 (Advanced PTZ)
+ - Any RTSP stream can now be added as a camera by entering the desired RTSP URL into the manual addition form vs. camera’s IP.
+
+NEW FEATURES:
+
+ - Events and actions:
+    - Notifications have been completely redesigned and now reside in the right panel.
+    - New actions have been added: 
+      - "Play Sound" – an ability to play sound when event occurs. Sound can either be selected from an existing library or uploaded by the user.
+      - "Text to Speech" – an ability to speak when event occurs. Extends the "Play Sound" action.
+      - "Instant Output". It was not possible to connect output actions to instant events in previous versions (i.e. motion start).
+
+ - Zoom windows. An ability to create a single or multiple new views from an item by drawing a rectangular over the desired area using the zoom button (located on the item).
+
+ - E-mapping. An ability to map out items on a schematic layout (i.e. building plan). 
+ 
+ - History of events and actions. All events and actions are now displayed for easy data sorting and filtering. Additionally, "Check Server Issues" and "Check Camera Issues” have been added to Media Servers and Cameras Context Menu.
+   
+ - Cameras List is introduced displaying all cameras with an ability to sort and filter data. 
+ 
+ - Video color/gamma correction. This feature is activated by pressing the correction button located on the item. Darker scenes are best to use for showcasing the full capacity of this feature. Use Context Menu to adjust feature settings. It is also possible to export video while retaining this feature.
+   
+ - Ability to adjust the quality of the second stream in camera settings. This feature is generally not recommended, though may be useful in particular scenarios.
+ 
+ - Visual Motion Indication. Motion is visually indicated.
+ 
+ - A motion email notification includes a video link. Opens a camera in a browser once clicked.
+ 
+ - Locked Layouts are introduced disallowing any changes to layouts.
+ 
+ - Compatibility with Windows Server 2012 Family.
+
+ - Compatibility with Ubuntu 13.
+ 
+ - Translatable Tray Tool. Language settings are applied to both Client and Tray Tool.
+ 
+ - Fish-eye cameras are supported (enabling “fish-eye” in camera settings is required). A De-Warping filter can now be applied along with PTZ navigation, zoom windows and other functionalities to de-warped pictures.
+  
+ - Offline cameras diagnostics is implemented. By clicking on Diagnose, the software will report the most probable reason(s) for a particular camera to appear offline and will generate all the necessary support data. This new capability will ease self-diagnostic efforts and assist support in resolving the issue.
+   
+ - Client Only Installer is now available on Windows.
+
+ - The software is translated into French.
+ 
+IMPROVEMENTS:  
+
+ - Client Startup:
+   - Auto-connection can now be activated on the login page. It will use pre-established user name and password to connect to the server automatically.
+   - An ability to run Client when a computer boots up.
+   - When client connects to a system with different versions of server components (i.e EC 1.5.1, MS1 1.5.0 and MS2 1.5.1), a warning message will appear. 
+     
+ - Client UI Main Controls:
+
+   - Scene:
+     - The algorithm applied to item navigation using arrow keys (UP, LEFT, RIGHT, DOWN) has been improved.
+     - The current time appears under the playback buttons.         
+     - The UI tab settings (pinned or hidden tabs) are automatically saved between client launches.     
+     - Whenever resizing video on a scene, text (i.e. Unauthorized, NO SIGNAL etc.) did not scale accordingly. Fixed.
+     - The Screenshot button is added to items on Scene. 
+
+   - Tree: 
+     - If a camera is experiencing technical difficulties (at least three network issues over the last minute), it will be marked with an exclamation mark.
+     - New Context Menu items: Backup/Restore and Alarm/Event Rules ("System").
+     - Thumbnails now appear in Resource Tree when hovering over a camera with a mouse cursor.  
+     - Thumbnails now appear in the “Select Cameras” dialog when hovering over a camera with a mouse cursor while configuring Event Rules or copying Recording Schedule to cameras.
+     - A ping button has been added to the Media Server settings dialog. If the computer is pinging, but Media Server appears to be offline, then it is most likely a software related problem. Otherwise, it is likely to be a hardware problem and a hard reset may be required.    
+   
+ - Screen Recording:
+   - Recorded files are now displayed properly in Windows Media Player even if the initial recording was performed in high quality.
+   - Recorded files are displayed much better when recording in "Application Window" vs. fullscreen.    
+
+ - Camera Settings:   
+   - Previously, the application forced cameras to change their primary stream settings to max resolution and fps/quality from Recording Schedule settings. Secondary stream settings were set automatically. It is now possible to leave settings pre-configured (i.e. set up specific resolution, FPS and quality for the 1st and 2nd streams on a camera's web page and retain for use in the software. Warning: this is an Expert Mode feature and may cause for the system to work unexpectedly if used incorrectly.
+   - The default motion sensitivity level in motion dialog has been changed to 5 (used to be 8).
+   - An "Open Item" button has been added to the “Camera Settings” form opening the current camera in a new tab.
+
+ - Health monitoring:
+   - Added the ability to enable/disable graphs 
+   - Added the ability to outline a specific graph by hovering over the description with a mouse (while all other graphs appear decolorized).
+   - Added Network Usage to Health Monitoring.
+   - Added new buttons to show log and server check issues.  
+
+ - Layout/Multi Videos:   
+   - Improved behavior for all local files that are saved on a layout.
+   - Local files are not allowed in multi-videos.
+ 
+ - Web Client:
+  - Web Client can be opened directly from the Tree Context menu (System) and Main Menu.
+  - Panoramic cameras are now supported (1st sensor is displayed).
+   
+ - Licenses:
+   - An enterprise type license has been renamed to professional.
+   - Free licenses have been discontinued and replaced by four 30-day trial licenses.
+   
+ - PTZ:
+   - When opening a PTZ camera in fullscreen and using a mouse wheel to zoom in, it was not possible to zoom out if PTZ controls were active. It can now be done by double-clicking.
+
+ - Events and Actions:
+   - Notification settings are stored in the database. The login credentials remain the same regardless of the computer in use.
+   - An aggregation column has been added to Event and Action (was previously located in advanced E&A settings).
+   - E-Mail templates are improved.
+   - The filter in the "Event/Actions" dialog is added.
+
+
+ - Manual Camera Addition:
+   - When trying to add an existing camera manually, the application displayed "No Cameras Found" for existing cameras. The application instructs the user that camera is already registered and cannot be added again. 
+
+ - Time Line:
+   - A time selector has been added to Calendar.
+   - A localized date/time format is now used in Time Line (based on regional settings).
+
+- Export:
+   - When exporting a single camera, the default filename is "Camera name+start day+start time" (previously a MAC address).
+   - Added a screenshot timestamp option.
+   - The "Open New Window" button along with a progress bar has been added to the export dialog. It is now possible to open a new Client instance and continue working during export.
+   - All current video streams are purposely paused during export to save bandwidth.
+
+- Installer:
+   - The previous database version can now be backed up during upgrade. In case of failure, the database can be restored to the previous version.
+
+BUGS FIXED:  
+
+ - Client UI Main Controls:
+   - Tooltips appeared in incorrect locations. Fixed.
+   - After logging out and opening a local file in a new window, Client did not connect to EC. Fixed.
+   - The recording icon on video items could be resized. Fixed.
+   - "NO SIGNAL" among other text appeared on panoramic cameras multiple times. Fixed.
+   - When zooming in on an item and then closing the client (ALT + F4), all panels would hide after the restart. Fixed.
+   - Client resulted in occasional freezing if a media folder contained too many files (>100,000 files). The limit is now set to 1,000 files.
+   - When too many cameras with a large number of recording fragments were opened simultaneously, Fixed Client would occasionally crash. Fixed. 
+   
+ - Events/Actions:
+   - Auto-reset for camera output did not function correctly for some camera models.
+   - When selecting “Add” and “Apply” in the Events/Actions dialog, the event rule was occasionally duplicated causing an improper work cycle. Fixed.
+   - It was impossible to change notifications from "All Users" to "For Administrators Only" in the Alarm/Event Rules form (advanced settings only). Fixed.
+   
+ - Recording:  
+   - Panic recording was impossible to stop if recording for all cameras was turned off. Fixed.
+   - Fixed all existing issues with inactive external storages (incorrect recording status).
+   - The storages mounted as local disks did not appear on the storage list (Linux).
+
+ - Playback:  
+   - Double-clicking to stop touring did not prompt for the side panels to reappear. Fixed.
+   - ACTi cameras occasionally displayed grey background. Fixed.
+   - Arecont Vision panoramic sensors appeared misaligned while flipping the videos. Fixed.
+
+   
+ - Time Line:
+   - Thumbnails are now displayed correctly for panoramic cameras (1st sensor is displayed).
+ 
+ - Export:
+   - Audio was not exported properly in AC3 format while running Multi-Video export Fixed.
+
+ - Installer:
+   - Whenever a user uninstalled Enterprise Controller on Windows, its ports remained busy. Once reinstalled, the ports appeared new. Fixed.
+   - When changing installed components and removing EC, the application did not suggest for the deletion of database. Fixed.
+
+ - Camera Addition and Configuration:
+   - The following error was occasionally displayed for manual camera addition: "This server version supports searching by IP address only". Fixed.
+   - A camera’s web page could not be opened if its http-port was not 80. Fixed.
+   - Any changes to camera’s IP address did not automatically reflect in the camera settings form (only in Tree) unless the form was re-opened. Fixed.
+   - If a camera was discovered automatically and was not accessible by multicast, then the camera would not work after the Media Server restart. Fixed.
+   - Occasionally the same camera with same IP address could be added twice via automatic discovery or manual addition. Fixed.
+   - Removed the occasional "FPS value is too high" warning that occurred when opening camera settings.
+   
+ - Compatibility (older version support):
+   - When connecting to a newer EC version (i.e. 1.4 client to 1.5 EC) while still running the previous app version, restart was suggested, but would not run. A warning message now appears.
+   - If an older version was launched in a compatibility mode, an upgrade notification was invoked. Fixed.
+
+ - Miscellaneous:
+   - Screen recording crashed on start if resolution was not a multiple of eight. Fixed.
+   - Whenever a user deleted an offline server in a multi-server environment, all active cameras disappeared and could not be discovered. Now, the cameras are distributed to other servers.
+   - When disconnecting and reconnecting Media Server to EC, a cameras displayed NO SIGNAL. Fixed.
+   - If Media Server's IP was changed during an all-in-one installation, the server's IP address was not automatically updated in the tree unless it was reconnected to EC again. Fixed.
+   - Fixed playback slider’s incorrect position that occurred in preview search.
+   - Web-client. Video did not play if a camera was moved from one server to another. Fixed.
+   - Licenses were removed when database was restored from another server. The recording continued until Media Server’s restart. Fixed.
+   - Camera stream could stick in Client if open the same Camera in Web-Client and click on Pause. Fixed.
+ 
 ----------------------------------------------- 1.5.1 -----------------------------------------------
 
 NEW CAMERAS AND RECORDERS SUPPORTED:

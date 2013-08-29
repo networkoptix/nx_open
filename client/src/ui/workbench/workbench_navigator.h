@@ -25,6 +25,7 @@ class QnAbstractArchiveReader;
 class QnCachingTimePeriodLoader;
 class QnThumbnailsLoader;
 class QnCalendarWidget;
+class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 
 class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider {
@@ -44,7 +45,7 @@ public:
     QnWorkbenchNavigator(QObject *parent = NULL);
     virtual ~QnWorkbenchNavigator();
 
-    // TODO: move time slider & time scrollbar out.
+    // TODO: #Elric move time slider & time scrollbar out.
     QnTimeSlider *timeSlider() const;
     void setTimeSlider(QnTimeSlider *timeSlider);
 
@@ -53,6 +54,9 @@ public:
 
     QnCalendarWidget *calendar() const;
     void setCalendar(QnCalendarWidget *calendar);
+
+    QnDayTimeWidget *dayTimeWidget() const;
+    void setDayTimeWidget(QnDayTimeWidget *dayTimeWidget);
 
     bool isLive() const;
     Q_SLOT bool setLive(bool live);
@@ -77,7 +81,6 @@ public:
     Q_SLOT void stepForward();
 
     virtual Qn::ActionScope currentScope() const override;
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -94,6 +97,8 @@ signals:
     void speedRangeChanged();
 
 protected:
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
+
     enum SliderLine {
         CurrentLine,
         SyncedLine,
@@ -127,9 +132,9 @@ protected slots:
     void updateCalendarFromSlider();
 
     void updateCurrentPeriods();
-    void updateCurrentPeriods(Qn::TimePeriodRole type);
+    void updateCurrentPeriods(Qn::TimePeriodContent type);
     void updateSyncedPeriods();
-    void updateSyncedPeriods(Qn::TimePeriodRole type);
+    void updateSyncedPeriods(Qn::TimePeriodContent type);
     void updateTargetPeriod();
     void updateLines();
     void updateCalendar();
@@ -159,8 +164,8 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodRole type);
-    void at_loader_periodsChanged(Qn::TimePeriodRole type);
+    void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodContent type);
+    void at_loader_periodsChanged(Qn::TimePeriodContent type);
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
@@ -174,10 +179,13 @@ protected slots:
 
     void at_timeScrollBar_sliderPressed();
     void at_timeScrollBar_sliderReleased();
-
     void at_timeScrollBar_destroyed();
+    
     void at_calendar_destroyed();
-    void at_calendar_dateChanged(const QDate &date);
+    void at_calendar_dateClicked(const QDate &date);
+
+    void at_dayTimeWidget_destroyed();
+    void at_dayTimeWidget_timeClicked(const QTime &time);
 
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
@@ -185,6 +193,7 @@ private:
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;
     QnCalendarWidget *m_calendar;
+    QnDayTimeWidget *m_dayTimeWidget;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;

@@ -57,10 +57,10 @@ private:
  * available, and move to another animation timer in case the item's scene is
  * changed.
  */
-template<class Base, bool baseIsAnimated = boost::is_base_of<AnimatedBase, Base>::value >
+template<class Base, bool baseIsAnimated = boost::is_base_of<AnimatedBase, Base>::value>
 class Animated: public Base, public AnimatedBase {
 public:
-    QN_FORWARD_CONSTRUCTOR(Animated, Base, { updateScene(this->scene()); });
+    QN_FORWARD_CONSTRUCTOR(Animated, Base, { AnimatedBase::updateScene(this->scene()); });
 
     using AnimatedBase::registerAnimation;
     using AnimatedBase::unregisterAnimation;
@@ -68,7 +68,7 @@ public:
 protected:
     virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override {
         if(change == QGraphicsItem::ItemSceneHasChanged)
-            updateScene(this->scene());
+            AnimatedBase::updateScene(this->scene());
 
         return Base::itemChange(change, value);
     }

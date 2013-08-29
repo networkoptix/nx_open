@@ -1,7 +1,7 @@
 #ifndef _UNIVERSAL_CLIENT_UTIL_H
 #define _UNIVERSAL_CLIENT_UTIL_H
 
-#include "config.h"
+#include <common/config.h>
 
 #include <QtCore/QString>
 
@@ -17,7 +17,7 @@ char (&ArraySizeHelper(T (&array)[N]))[N];
  * \param dirName                       Name of the directory to remove.
  * \returns                             Whether the operation completer successfully.
  */
-QN_EXPORT bool removeDir(const QString &dirName);
+bool removeDir(const QString &dirName);
 
 /**
  * Convert path from native to universal.
@@ -25,42 +25,37 @@ QN_EXPORT bool removeDir(const QString &dirName);
  * \param path                          Path to convert.
  * \returns                             Converted path.
  */
-QN_EXPORT QString fromNativePath(QString path);
+QString fromNativePath(const QString &path);
 
 /**
  * \returns                             User movies directory.
  */
-QN_EXPORT QString getMoviesDirectory();
+QString getMoviesDirectory();
+
+/**
+ * \returns                             User backrounds directory.
+ */
+QString getBackgroundsDirectory();
 
 /**
  * \param num                           Number.
  * \returns                             Number of digits in decimal representation of the given number.
  */
-QN_EXPORT int digitsInNumber(unsigned num);
-
-/**
- * Formats position in a time interval using the "HH:MM:SS/HH:MM:SS" format.
- * Hours part is omitted when it is not relevant.
- *
- * \param position                      Current position in seconds.
- * \param total                         Total duration in seconds. 
- *                                      Pass zero to convert position only.
- */
-QN_EXPORT QString formatDuration(unsigned position, unsigned total = 0); // TODO: #Elric move to string.h
+int digitsInNumber(unsigned num);
 
 /**
  * Gets param from string;   for example str= {param1="param_val" sdhksjh}
  * function return param_val
  */
-QN_EXPORT QString getParamFromString(const QString& str, const QString& param);
+QString getParamFromString(const QString &str, const QString &param);
 
-QN_EXPORT QString strPadLeft(const QString &str, int len, char ch);
+QString strPadLeft(const QString &str, int len, char ch);
 
-QN_EXPORT QString closeDirPath(const QString& value);
+QString closeDirPath(const QString &value);
 
-QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
+qint64 getDiskFreeSpace(const QString &root);
 
-QN_EXPORT qint64 getDiskTotalSpace(const QString& root);
+qint64 getDiskTotalSpace(const QString &root);
 
 #define DATETIME_NOW INT64_MAX 
 
@@ -82,91 +77,28 @@ QN_EXPORT qint64 getDiskTotalSpace(const QString& root);
 #define MIN_FRAME_DURATION 16667ll
 #define MAX_AUDIO_FRAME_DURATION 150ll
 
-quint64 QN_EXPORT getUsecTimer();
-
-// TODO: #Elric move to separate header
-template <typename T, std::size_t N = CL_MEDIA_ALIGNMENT>
-class AlignmentAllocator {
-public:
-    typedef T value_type;
-    typedef std::size_t size_type;
-    typedef std::ptrdiff_t difference_type;
-
-    typedef T * pointer;
-    typedef const T * const_pointer;
-
-    typedef T & reference;
-    typedef const T & const_reference;
-
-public:
-    inline AlignmentAllocator() noexcept {}
-
-    template <typename T2>
-    inline AlignmentAllocator(const AlignmentAllocator<T2, N> &) noexcept {}
-
-    inline ~AlignmentAllocator() noexcept {}
-
-    inline pointer address(reference r) {
-        return &r;
-    }
-
-    inline const_pointer address(const_reference r) const {
-        return &r;
-    }
-
-    inline pointer allocate(size_type n) {
-        return (pointer) qMallocAligned(n * sizeof(value_type), N);
-    }
-
-    inline void deallocate(pointer p, size_type) {
-        qFreeAligned(p);
-    }
-
-    inline void construct(pointer p, const value_type &wert) {
-        new (p) value_type(wert);
-    }
-
-    /**
-     * C++11 extension member.
-     */
-    inline void construct(pointer p) {
-        new (p) value_type();
-    }
-
-    inline void destroy(pointer p) {
-        (void) p; /* Silence MSVC unused variable warnings. */
-
-        p->~value_type();
-    }
-
-    inline size_type max_size() const noexcept {
-        return size_type(-1) / sizeof(value_type);
-    }
-
-    template <typename T2>
-    struct rebind {
-        typedef AlignmentAllocator<T2, N> other;
-    };
-
-    bool operator!=(const AlignmentAllocator<T, N> &other) const  {
-        return !(*this == other);
-    }
-
-    // Returns true if and only if storage allocated from *this
-    // can be deallocated from other, and vice versa.
-    // Always returns true for stateless allocators.
-    bool operator==(const AlignmentAllocator<T,N>& other) const {
-        return true;
-    }
-};
+quint64 getUsecTimer();
 
 /*
-* Returns current time zone offset in seconds
-*/
+ * \returns                             Current time zone offset in seconds.
+ */
 int currentTimeZone(); // TODO: #Elric move to time.h
 
 
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
+
+/**
+ * Returns random integer number between min and max parameters. Thread-safe.
+ * Correctness of parameters is responsibility of the callee.
+ * 
+ * \returns                             Random number in range [min, max).
+ */
+int random(int min, int max);
+
+/**
+ * \returns                             Random floating point number in range [0.0, 1.0).
+ */
+qreal frandom();
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

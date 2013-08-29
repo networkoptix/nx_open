@@ -9,11 +9,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/common/ui_resource_name.h>
 #include <ui/style/warning_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
-#define PORT_AUTO 0
 
 namespace {
     enum Column {
@@ -22,8 +21,14 @@ namespace {
         NameColumn,
         UrlColumn
     };
+
+    const int portAuto = 0;
 }
 
+
+// -------------------------------------------------------------------------- //
+// QnCheckBoxedHeaderView
+// -------------------------------------------------------------------------- //
 QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(QWidget *parent):
     base_type(Qt::Horizontal, parent),
     m_checkState(Qt::Unchecked)
@@ -99,6 +104,9 @@ void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
 }
 
 
+// -------------------------------------------------------------------------- //
+// QnCameraAdditionDialog
+// -------------------------------------------------------------------------- //
 QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     QDialog(parent),
     ui(new Ui::CameraAdditionDialog),
@@ -150,6 +158,10 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 
     updateSubnetMode();
     clearTable();
+
+    /* Set focus on scan button so that placeholder text is visible in ip/url line edit.  */
+    ui->scanButton->setFocus();
+    ui->cameraIpLineEdit->setText(QString());
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
@@ -162,7 +174,7 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
     m_server = server;
 
     if (server) {
-        setWindowTitle(tr("Add cameras to %1").arg(server->getName()));
+        setWindowTitle(tr("Add cameras to %1").arg(getResourceName(server)));
         ui->validateLabelSearch->setVisible(false);
         ui->scanButton->setEnabled(true);
     } else {
@@ -182,22 +194,38 @@ void QnCameraAdditionDialog::clearTable() {
     ui->camerasTable->setEnabled(false);
 }
 
-void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
+int QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
     clearTable();
 
+    int newCameras = 0;
     foreach(QnCamerasFoundInfo info, cameras){
-        int row = ui->camerasTable->rowCount();
+        bool enabledRow = !info.existInPool;
+        if (enabledRow)
+            newCameras++;
+
+        //insert new cameras to the beginning, old to the end
+        int row = enabledRow ? 0 : ui->camerasTable->rowCount();
         ui->camerasTable->insertRow(row);
 
         QTableWidgetItem *checkItem = new QTableWidgetItem();
         checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
-        checkItem->setCheckState(Qt::Unchecked);
+        if (enabledRow) {
+            checkItem->setCheckState(Qt::Unchecked);
+        } else {
+            checkItem->setFlags(checkItem->flags() | Qt::ItemIsTristate);
+            checkItem->setFlags(checkItem->flags() &~ Qt::ItemIsEnabled);
+            checkItem->setCheckState(Qt::PartiallyChecked);
+        }
 
         QTableWidgetItem *manufItem = new QTableWidgetItem(info.manufacturer);
         manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEditable);
+        if (!enabledRow)
+            manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEnabled);
 
         QTableWidgetItem *nameItem = new QTableWidgetItem(info.name);
         nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEditable);
+        if (!enabledRow)
+            nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEnabled);
 
         QFont font = ui->camerasTable->font();
         font.setUnderline(true);
@@ -212,14 +240,15 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         ui->camerasTable->setItem(row, UrlColumn, urlItem);
     }
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
+    return newCameras;
 }
 
 void QnCameraAdditionDialog::removeAddedCameras() {
     int row = ui->camerasTable->rowCount() - 1;
     while (row >= 0){
         if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked)
-	        ui->camerasTable->removeRow(row);
-		row--;
+            ui->camerasTable->removeRow(row);
+        row--;
     }
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 }
@@ -233,8 +262,9 @@ void QnCameraAdditionDialog::updateSubnetMode() {
     ui->cameraIpLabel->setVisible(!m_subnetMode);
     ui->cameraIpLineEdit->setVisible(!m_subnetMode);
 
-    if (m_subnetMode){
-        QHostAddress startAddr(ui->cameraIpLineEdit->text());
+    if (m_subnetMode) {
+        ui->startIPLineEdit->setText(ui->cameraIpLineEdit->text());
+        QHostAddress startAddr(ui->startIPLineEdit->text());
         if (startAddr.toIPv4Address()) {
             ui->startIPLineEdit->setText(startAddr.toString());
 
@@ -248,13 +278,16 @@ void QnCameraAdditionDialog::updateSubnetMode() {
         } else {
             ui->startIPLineEdit->setFocus();
         }
-    } else
+    } else {
+        ui->cameraIpLineEdit->setText(ui->startIPLineEdit->text());
         ui->cameraIpLineEdit->setFocus();
+    }
 }
 
 bool QnCameraAdditionDialog::ensureServerOnline() {
     if (m_server && m_server->getStatus() != QnResource::Offline)
         return true;
+
 
     QMessageBox::critical(this,
                           tr("Error"),
@@ -262,6 +295,7 @@ bool QnCameraAdditionDialog::ensureServerOnline() {
                              "Camera addition is possible for online servers only."));
     return false;
 }
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -324,10 +358,15 @@ void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column) {
     bool enabled = false;
 
     Qt::CheckState state = Qt::Unchecked;
+    bool firstRow =  true;
     for (int row = 0; row < rowCount; ++row) {
         QTableWidgetItem* item = ui->camerasTable->item(row, CheckBoxColumn);
-        if (row == 0)
+        if (!(item->flags() & Qt::ItemIsEnabled))
+            continue;
+
+        if (firstRow)
             state = item->checkState();
+        firstRow = false;
 
         if (item->checkState() != state)
             state = Qt::PartiallyChecked;
@@ -345,7 +384,11 @@ void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column) {
     if (column != UrlColumn)
         return;
 
-    QUrl url(ui->camerasTable->item(row, column)->text());
+    QString urlText = ui->camerasTable->item(row, column)->text();
+    if (!urlText.contains(QLatin1String("://")))
+        urlText = QLatin1String("http://") + urlText;
+
+    QUrl url(urlText);
     if (url.isEmpty())
         return;
 
@@ -361,13 +404,16 @@ void QnCameraAdditionDialog::at_header_checkStateChanged(Qt::CheckState state) {
         return;
 
     m_inCheckStateChange = true;
-    int rowCount = ui->camerasTable->rowCount();
-    for (int row = 0; row < rowCount; ++row) {
+    int enabledRowCount = 0;
+    for (int row = 0; row < ui->camerasTable->rowCount(); ++row) {
         QTableWidgetItem* item = ui->camerasTable->item(row, CheckBoxColumn);
+        if (!(item->flags() & Qt::ItemIsEnabled))
+            continue;
         item->setCheckState(state);
+        enabledRowCount++;
     }
 
-    ui->addButton->setEnabled(rowCount > 0 && state == Qt::Checked);
+    ui->addButton->setEnabled(enabledRowCount > 0 && state == Qt::Checked);
     m_inCheckStateChange = false;
 }
 
@@ -378,7 +424,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
     int port = ui->portAutoCheckBox->isChecked()
-            ? PORT_AUTO
+            ? portAuto
             : ui->portSpinBox->value();
 
     QString startAddrStr;
@@ -402,19 +448,20 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
             return;
         }
     } else {
-        QUrl url = QUrl::fromUserInput(ui->cameraIpLineEdit->text());
+        const QString& userInput = ui->cameraIpLineEdit->text();
+        QUrl url = QUrl::fromUserInput(userInput);
         if (!url.isValid()) {
-            ui->validateLabelSearch->setText(tr("Camera address field must contain valid url or ip address"));
+            ui->validateLabelSearch->setText(tr("Camera address field must contain valid url, ip address or rtsp link"));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
-        startAddrStr = url.host();
+        //startAddrStr = url.host();
+        startAddrStr = userInput;
         endAddrStr = QString();
     }
 
     clearTable();
     ui->scanButton->setEnabled(false);
-
     ui->startIPLineEdit->setEnabled(false);
     ui->cameraIpLineEdit->setEnabled(false);
     ui->endIPLineEdit->setEnabled(false);
@@ -424,23 +471,20 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     ui->loginLineEdit->setEnabled(false);
     ui->passwordLineEdit->setEnabled(false);
 
-
     ui->validateLabelSearch->setVisible(false);
     ui->scanProgressBar->setVisible(true);
     ui->stopScanButton->setVisible(true);
     ui->stopScanButton->setFocus();
 
-    QScopedPointer<detail::ManualCameraReplyProcessor> processor(new detail::ManualCameraReplyProcessor());
-    connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
-    connect(ui->closeButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
-    connect(this, SIGNAL(serverChanged()), processor.data(), SLOT(cancel()));
+    QnConnectionRequestResult result;
+    m_server->apiConnection()->searchCameraAsync(startAddrStr, endAddrStr, username, password, port, &result, SLOT(processReply(int, const QVariant &, int)));
 
-    QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
-    serverConnection->asyncManualCameraSearch(startAddrStr, endAddrStr, username, password, port,
-                                                 processor.data(),
-                                                 SLOT(processSearchReply(const QnCamerasFoundInfoList &)),
-                                                 SLOT(processSearchError(int, const QString &)));
-    processor->start();
+    QEventLoop loop;
+    connect(&result,            SIGNAL(replyProcessed()),   &loop, SLOT(quit()));
+    connect(ui->stopScanButton, SIGNAL(clicked()),          &loop, SLOT(quit()));
+    connect(ui->closeButton,    SIGNAL(clicked()),          &loop, SLOT(quit()));
+    connect(this,               SIGNAL(serverChanged()),    &loop, SLOT(quit()));
+    loop.exec();
 
     ui->scanButton->setEnabled(m_server);
     ui->startIPLineEdit->setEnabled(true);
@@ -455,40 +499,32 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     ui->stopScanButton->setVisible(false);
     ui->scanProgressBar->setVisible(false);
 
-    switch (processor->state()) {
-    case detail::Init:
-    case detail::Progress:
-        qWarning() << "Incorrect reply processor state";
-        //fall-through
-    case detail::Cancelled:
-        break;
-    case detail::Success:
-        {
-            if (processor->camerasFound().count() > 0) {
-                fillTable(processor->camerasFound());
-                ui->addButton->setFocus();
-            } else
-                QMessageBox::information(this, tr("Finished"), tr("No cameras found"));
-        }
-        break;
-    case detail::Error:
-        {
+    if(result.isFinished()) {
+        if(result.status() == 0) {
+            QnCamerasFoundInfoList cameras = result.reply().value<QnCamerasFoundInfoList>();
+
+            if (cameras.size() > 0) {
+                int newCameras = fillTable(cameras);
+                if (newCameras == 0)
+                    QMessageBox::information(this, tr("Finished"), tr("All cameras are already in the resource tree."));
+                else
+                    ui->addButton->setFocus();
+            } else {
+                QMessageBox::information(this, tr("Finished"), tr("No cameras found."));
+            }
+        } else {
             if (!ensureServerOnline())
                 return;
 
             QString error;
-            QString processorError = processor->getLastError();
-            if (processorError.length() == 0){
-                error = tr("Could not connect to server.\n"\
-                           "Make sure server is available and try again.");
+            if (0) { // TODO: #Elric
+                error = tr("Could not connect to server.\nMake sure the server is available and try again.");
             } else {
-                error = tr("Server returned an error:\n%1").arg(processorError);
+                error = tr("Server returned an error.");
             }
+
             QMessageBox::critical(this, tr("Error"), error);
         }
-        break;
-    default:
-        break;
     }
 
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
@@ -523,46 +559,33 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     ui->scanButton->setEnabled(false);
     ui->camerasTable->setEnabled(false);
 
-    QScopedPointer<detail::ManualCameraReplyProcessor> processor(new detail::ManualCameraReplyProcessor());
+    QnConnectionRequestResult result;
+    m_server->apiConnection()->addCameraAsync(urls, manufacturers, username, password, &result, SLOT(processReply(int, const QVariant &, int)));
 
-    connect(ui->closeButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
-    connect(this, SIGNAL(serverChanged()), processor.data(), SLOT(cancel()));
-
-    QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
-    serverConnection->asyncManualCameraAdd(urls, manufacturers, username, password,
-                                              processor.data(), SLOT(processAddReply(int)));
-    processor->start();
+    QEventLoop loop;
+    connect(&result,            SIGNAL(replyProcessed()),   &loop, SLOT(quit()));
+    connect(ui->closeButton,    SIGNAL(clicked()),          &loop, SLOT(quit()));
+    connect(this,               SIGNAL(serverChanged()),    &loop, SLOT(quit()));
+    loop.exec();
 
     ui->addButton->setEnabled(true);
     ui->scanButton->setEnabled(m_server);
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 
-    switch (processor->state()) {
-    case detail::Init:
-    case detail::Progress:
-        qWarning() << "Incorrect reply processor state";
-        //fall-through
-    case detail::Cancelled:
-        break;
-    case detail::Success:
-        {
+    if(result.isFinished()) {
+        if(result.status() == 0) {
             removeAddedCameras();
-            QMessageBox::information(this,
-                                     tr("Success"),
-                                     tr("%n camera(s) added successfully.\n"\
-                                        "It might take a few moments to populate them in the tree.", "", urls.size()),
-                                     QMessageBox::Ok);
-        }
-        break;
-    case detail::Error:
-        {
+            QMessageBox::information(
+                this,
+                tr("Success"),
+                tr("%n camera(s) added successfully.\nIt might take a few moments to populate them in the tree.", "", urls.size()),
+                QMessageBox::Ok
+            );
+        } else {
             if (!ensureServerOnline())
                 return;
             QMessageBox::critical(this, tr("Error"), tr("Error while adding camera(s)", "", urls.size()));
         }
-        break;
-    default:
-        break;
     }
 }
 

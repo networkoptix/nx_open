@@ -4,6 +4,7 @@
 #include <limits>
 
 #include <QtGui/QPainter>
+#include <QWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -22,21 +23,18 @@ namespace {
     const char *animatorPropertyName = "_qn_itemAnimator";
 }
 
+class QWidget;
+
 QnGridItem::QnGridItem(QGraphicsItem *parent):
-    QGraphicsObject(parent),
+    base_type(parent),
     m_color(QColor(0, 0, 0, 0)),
-    m_lineWidth(0.0),
-    m_opacityAnimator(new VariantAnimator(this))
+    m_lineWidth(0.0)
 {
     qreal d = std::numeric_limits<qreal>::max() / 4;
     m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
 
     setStateColor(ALLOWED, QColor(0, 255, 0, 64));
     setStateColor(DISALLOWED, QColor(255, 0, 0, 64));
-
-    m_opacityAnimator->setTargetObject(this);
-    m_opacityAnimator->setAccessor(new PropertyAccessor("opacity"));
-    m_opacityAnimator->setSpeed(1.0);
 
     setAcceptedMouseButtons(0);
     
@@ -50,38 +48,6 @@ QnGridItem::~QnGridItem() {
 
 void QnGridItem::setMapper(QnWorkbenchGridMapper *mapper) {
     m_mapper = mapper;
-}
-
-void QnGridItem::setAnimationTimer(AnimationTimer *timer) {
-    m_opacityAnimator->setTimer(timer);
-}
-
-void QnGridItem::setAnimationSpeed(qreal speed) {
-    if(m_opacityAnimator->isRunning()) {
-        m_opacityAnimator->pause();
-        m_opacityAnimator->setSpeed(speed);
-        m_opacityAnimator->start();
-    } else {
-        m_opacityAnimator->setSpeed(speed);
-    }
-}
-
-void QnGridItem::setAnimationTimeLimit(int timeLimitMSec) {
-    if(m_opacityAnimator->isRunning()) {
-        m_opacityAnimator->pause();
-        m_opacityAnimator->setTimeLimit(timeLimitMSec);
-        m_opacityAnimator->start();
-    } else {
-        m_opacityAnimator->setTimeLimit(timeLimitMSec);
-    }
-}
-
-void QnGridItem::animatedShow() {
-    m_opacityAnimator->animateTo(1.0);
-}
-
-void QnGridItem::animatedHide() {
-    m_opacityAnimator->animateTo(0.0);
 }
 
 QRectF QnGridItem::boundingRect() const {
@@ -165,12 +131,14 @@ VariantAnimator *QnGridItem::itemAnimator(QnGridHighlightItem *item) {
     if(animator != NULL)
         return animator;
     
+
     animator = new VariantAnimator(item);
     animator->setTargetObject(item);
-    animator->setTimer(m_opacityAnimator->timer());
     animator->setAccessor(new PropertyAccessor("color"));
     animator->setConverter(new QnColorToVectorConverter());
-    animator->setSpeed(m_opacityAnimator->speed());
+    animator->setTimeLimit(300);
+
+    registerAnimation(animator);
     connect(animator, SIGNAL(finished()), this, SLOT(at_itemAnimator_finished()));
     item->setProperty(animatorPropertyName, QVariant::fromValue<VariantAnimator *>(animator));
     return animator;

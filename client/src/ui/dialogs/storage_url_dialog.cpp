@@ -1,4 +1,8 @@
+
 #include "storage_url_dialog.h"
+
+#include <QMessageBox>
+
 #include "ui_storage_url_dialog.h"
 
 #include <core/resource/media_server_resource.h>
@@ -44,8 +48,8 @@ QnStorageSpaceData QnStorageUrlDialog::storage() const {
 }
 
 void QnStorageUrlDialog::accept() {
-    QnMediaServerRequestResult result;
-    m_server->apiConnection()->asyncGetStorageStatus(ui->urlEdit->text(), &result, SLOT(processReply(int, const QVariant &, int)));
+    QnConnectionRequestResult result;
+    m_server->apiConnection()->getStorageStatusAsync(ui->urlEdit->text(), &result, SLOT(processReply(int, const QVariant &, int)));
 
     QEventLoop loop;
     connect(&result, SIGNAL(replyProcessed()), &loop, SLOT(quit()));

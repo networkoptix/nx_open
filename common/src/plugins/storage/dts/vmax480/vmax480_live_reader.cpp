@@ -1,18 +1,25 @@
+
 #include "vmax480_live_reader.h"
+
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
+
 #include "core/resource/network_resource.h"
 #include "core/datapacket/media_data_packet.h"
-#include "libavcodec/avcodec.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 
 #include "vmax480_resource.h"
+
 
 static const QByteArray GROUP_ID("{347E1C92-4627-405d-99B3-5C7EF78B0055}");
 
 // ----------------------------------- QnVMax480LiveProvider -----------------------
 
 QnVMax480LiveProvider::QnVMax480LiveProvider(QnResourcePtr dev ):
-    CLServerPushStreamreader(dev),
+    CLServerPushStreamReader(dev),
     m_maxStream(0),
     m_opened(false)
 {
@@ -68,10 +75,10 @@ bool QnVMax480LiveProvider::canChangeStatus() const
 }
 
 
-void QnVMax480LiveProvider::openStream()
+CameraDiagnostics::Result QnVMax480LiveProvider::openStream()
 {
     if (m_opened)
-        return;
+        return CameraDiagnostics::NoErrorResult();
 
     int channel = QUrl(m_resource->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
     if (channel > 0)
@@ -82,6 +89,8 @@ void QnVMax480LiveProvider::openStream()
         m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, m_resource.data(), true);
     m_opened = m_maxStream->registerConsumer(this); 
     m_lastMediaTimer.restart();
+
+    return CameraDiagnostics::NoErrorResult();
     /*
     vmaxDisconnect();
     vmaxConnect(true, channel);
@@ -108,7 +117,7 @@ bool QnVMax480LiveProvider::isStreamOpened() const
 
 void QnVMax480LiveProvider::beforeRun()
 {
-    CLServerPushStreamreader::beforeRun();
+    CLServerPushStreamReader::beforeRun();
     //msleep(300);
 }
 

@@ -6,10 +6,9 @@
 
 #include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <api/media_server_statistics_data.h>
-#include <api/media_server_statistics_storage.h>
+#include <api/model/statistics_reply.h>
 
-#define STORAGE_LIMIT 60
+class QnMediaServerStatisticsStorage;
 
 /**
   * Class that receives, parses and stores statistics data from all servers.
@@ -26,30 +25,37 @@ public:
     QnMediaServerStatisticsManager(QObject *parent = NULL);
 
     /**
-     *  Register the consumer object (usually widget).
+     *  Register the consumer object.
      *
      * \param resource          Server resource whous history we want to receive.
      * \param target            Object that will be notified about new data.
      * \param slot              Slot that will be called when new data will be received.
      */
-    void registerServerWidget(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
+    void registerConsumer(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
 
     /**
-     *  Unregister the consumer object (usually widget).
+     *  Unregister the consumer object.
      *
      * \param resource          Server resource whous history we do not want to receive anymore.
      * \param target            Object that will not be notified about new data anymore.
      */
-    void unregisterServerWidget(const QnMediaServerResourcePtr &resource, QObject *target);
+    void unregisterConsumer(const QnMediaServerResourcePtr &resource, QObject *target);
 
     QnStatisticsHistory history(const QnMediaServerResourcePtr &resource) const;
     qint64 historyId(const QnMediaServerResourcePtr &resource) const;
 
-    int storageLimit() const {return STORAGE_LIMIT; }
-private slots:
-    void at_timer_timeout();
+    /** Data update period in milliseconds. It is taken from the server's response. */
+    int updatePeriod(const QnMediaServerResourcePtr &resource) const;
+
+    /** Number of data points that are stored simultaneously. */
+    int pointsLimit() const;
+
+    /** Filter statistics items of some deviceType by flags (ignore all replies that do not contain flags provided). */
+    void setFlagsFilter(QnStatisticsDeviceType deviceType, int flags);
+
 private:
     QHash<QString, QnMediaServerStatisticsStorage *> m_statistics;
+    QHash<QnStatisticsDeviceType, int> m_flagsFilter;
 };
 
 #endif // QN_STATISTICS_MANAGER

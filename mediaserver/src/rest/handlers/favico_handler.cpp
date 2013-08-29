@@ -35,7 +35,7 @@ int QnRestFavicoHandler::executePost(const QString& path, const QnRequestParamLi
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRestFavicoHandler::description(TCPSocket *) const
+QString QnRestFavicoHandler::description() const
 {
     return "Returns favico";
 }

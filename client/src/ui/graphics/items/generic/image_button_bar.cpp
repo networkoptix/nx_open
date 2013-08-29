@@ -2,6 +2,7 @@
 
 #include <QtGui/QGraphicsLinearLayout>
 
+#include <utils/math/math.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -9,16 +10,17 @@
 #include "image_button_widget.h"
 
 
-QnImageButtonBar::QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+QnImageButtonBar::QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags windowFlags, Qt::Orientation orientation):
     base_type(parent, windowFlags),
     m_visibleButtons(0),
     m_checkedButtons(0),
+    m_enabledButtons(0),
     m_updating(false),
     m_submitting(false)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-    m_layout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_layout = new QGraphicsLinearLayout(orientation);
     m_layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_layout->setSpacing(0.0);
     setLayout(m_layout);
@@ -34,7 +36,7 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
         return;
     }
 
-    button->setParent(this); /* We're expected to take ownership, even if the button wasn't actually added. */
+    button->setParentItem(this); /* We're expected to take ownership, even if the button wasn't actually added. */
 
     if(!qIsPower2(mask))
         qnWarning("Given mask '%1' is not a power of 2.", mask);
@@ -56,7 +58,10 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
     connect(button, SIGNAL(toggled(bool)),      this, SLOT(at_button_toggled()));
     connect(button, SIGNAL(enabledChanged()),   this, SLOT(at_button_enabledChanged()));
 
-    submitVisibleButtons();
+    setButtonsVisible(mask, button->isVisible());
+    setButtonsEnabled(mask, button->isEnabled());
+    setButtonsChecked(mask, button->isChecked());
+
     submitButtonSize(button);
 }
 
@@ -117,7 +122,7 @@ void QnImageButtonBar::setCheckedButtons(int checkedButtons) {
     int changedButtons = m_checkedButtons ^ checkedButtons;
     m_checkedButtons = checkedButtons;
 
-    // TODO: We have a problem here.
+    // TODO: #Elric We have a problem here.
     // if checked state changes during submit, we won't catch it.
     submitCheckedButtons(changedButtons);
 
@@ -162,6 +167,21 @@ void QnImageButtonBar::setUniformButtonSize(const QSizeF &uniformButtonSize) {
         submitButtonSize(button);
 }
 
+int QnImageButtonBar::unusedMask() const {
+    int usedMask = 0;
+    foreach(int mask, m_maskByButton)
+        usedMask |= mask;
+
+    int mask = 1;
+    for(int i = 0; i < 31; i++) {
+        if(!(usedMask & mask))
+            return mask;
+        mask <<= 1;
+    }
+    
+    return 0;
+}
+
 void QnImageButtonBar::submitVisibleButtons() {
     if(m_updating)
         return;
@@ -203,8 +223,9 @@ void QnImageButtonBar::submitEnabledButtons(int mask) {
 }
 
 void QnImageButtonBar::submitButtonSize(QnImageButtonWidget *button) {
-    button->setMaximumSize(m_uniformButtonSize);
-    button->setMinimumSize(m_uniformButtonSize);
+    if (m_uniformButtonSize.isEmpty())
+        return;
+    button->setFixedSize(m_uniformButtonSize);
 }
 
 

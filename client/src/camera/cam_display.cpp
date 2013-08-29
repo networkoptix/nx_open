@@ -22,7 +22,7 @@
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame delayed for interval, mark stream as slow
-static const int LIVE_MEDIA_LEN_THRESHOLD = 250*1000ll;   // do not sleep in live mode if queue is large
+static const int LIVE_MEDIA_LEN_THRESHOLD = 300*1000ll;   // do not sleep in live mode if queue is large
 
 static void updateActivity()
 {
@@ -97,7 +97,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_jumpTime(DATETIME_NOW),
     m_lightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full),
     m_lastFrameDisplayed(QnVideoStreamDisplay::Status_Displayed),
-    m_realTimeHurryUp(0),
+    m_realTimeHurryUp(false),
     m_delayedFrameCount(0),
     m_extTimeSrc(0),
     m_useMtDecoding(false),
@@ -120,21 +120,23 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_archiveReader(reader),
     m_fullScreen(false),
     m_prevLQ(-1),
-    m_doNotChangeDisplayTime(false)
+    m_doNotChangeDisplayTime(false),
+    m_firstLivePacket(true),
+    m_multiView(false)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;
 
-    if (resource && resource->hasFlags(QnResource::still_image)) {
+    if (resource && resource->toResource()->hasFlags(QnResource::still_image)) {
         m_isStillImage = true;
 
-        QFileInfo fileInfo(resource->getUrl());
+        QFileInfo fileInfo(resource->toResource()->getUrl());
         if (fileInfo.isReadable())
-            resource->setStatus(QnResource::Online);
+            resource->toResource()->setStatus(QnResource::Online);
         else
-            resource->setStatus(QnResource::Offline);
+            resource->toResource()->setStatus(QnResource::Offline);
     }
 
     m_storedMaxQueueSize = m_dataQueue.maxSize();
@@ -193,18 +195,37 @@ void QnCamDisplay::resume()
     QnAbstractDataConsumer::resume();
 }
 
-void QnCamDisplay::addVideoChannel(int index, QnAbstractRenderer* vw, bool canDownscale)
+void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bool canDownscale)
 {
-    Q_ASSERT(index < CL_MAX_CHANNELS);
-
-    delete m_display[index];
-    m_display[index] = new QnVideoStreamDisplay(canDownscale, index);
-    m_display[index]->setDrawer(vw);
+    Q_ASSERT(channelCount <= CL_MAX_CHANNELS);
+    
+    for(int i = 0; i < channelCount; i++)
+    {
+        if (!m_display[i])
+            m_display[i] = new QnVideoStreamDisplay(canDownscale, i);
+        int rendersCount = m_display[i]->addRenderer(vw);
+        m_multiView = rendersCount > 1;
+    }
 }
 
-QImage QnCamDisplay::getScreenshot(int channel)
+void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
 {
-    return m_display[channel]->getScreenshot();
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+        if (m_display[i]) {
+            int rendersCount = m_display[i]->removeRenderer(vw);
+            m_multiView = rendersCount > 1;
+        }
+    }
+}
+
+QImage QnCamDisplay::getScreenshot(int channel, const ImageCorrectionParams& params, const DewarpingParams& dewarping)
+{
+    return m_display[channel]->getScreenshot(params, dewarping);
+}
+
+QImage QnCamDisplay::getGrayscaleScreenshot(int channel)
+{
+    return m_display[channel]->getGrayscaleScreenshot();
 }
 
 QSize QnCamDisplay::getFrameSize(int channel) const {
@@ -379,21 +400,31 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             }
         }
 
+        if (m_firstLivePacket) {
+            m_delay.afterdelay();
+            m_delay.addQuant(LIVE_MEDIA_LEN_THRESHOLD/2); // realtime buffering for more smooth playback
+            m_firstLivePacket = false;
+        }
 
         QnAbstractMediaDataPtr lastFrame = m_dataQueue.last().dynamicCast<QnAbstractMediaData>();
-        if (lastFrame && lastFrame->dataType == QnAbstractMediaData::VIDEO && lastFrame->timestamp - m_lastVideoPacketTime > LIVE_MEDIA_LEN_THRESHOLD) {
-            sleep = false;
-            m_realTimeHurryUp = 5;
-        }
-        else if (m_realTimeHurryUp)
+        if (lastFrame && lastFrame->dataType == QnAbstractMediaData::VIDEO) 
         {
-            m_realTimeHurryUp--;
-            if (m_realTimeHurryUp)
+            qint64 queueLen = lastFrame->timestamp - m_lastVideoPacketTime;
+            //qDebug() << "queueLen" << queueLen/1000 << "ms";
+            if (queueLen > LIVE_MEDIA_LEN_THRESHOLD) {
                 sleep = false;
-            else {
-                m_delay.afterdelay();
-                m_delay.addQuant(-needToSleep);
-                m_realTimeHurryUp = false;
+                m_realTimeHurryUp = true;
+            }
+            else if (m_realTimeHurryUp)
+            {
+                if (queueLen > LIVE_MEDIA_LEN_THRESHOLD/2)
+                    sleep = false;
+                else {
+                    m_realTimeHurryUp = false;
+                    m_delay.afterdelay();
+                    m_delay.addQuant(-needToSleep);
+                    m_realTimeHurryUp = false;
+                }
             }
         }
     }
@@ -531,6 +562,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             }
 
             m_lastFrameDisplayed = m_display[channel]->display(vd, draw, scaleFactor);
+            if (m_isStillImage && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Skipped)
+                m_eofSignalSended = true;
         }
 
         if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
@@ -625,6 +658,16 @@ void QnCamDisplay::blockTimeValue(qint64 time)
     }
 }
 
+void QnCamDisplay::blockTimeValueSafe(qint64 time)
+{
+    if (!m_doNotChangeDisplayTime) {
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+            m_nextReverseTime[i] = AV_NOPTS_VALUE;
+            m_display[i]->blockTimeValueSafe(time);
+        }
+    }
+}
+
 void QnCamDisplay::waitForFramesDisplayed()
 {
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
@@ -646,7 +689,7 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
 
     m_lastDecodedTime = AV_NOPTS_VALUE;
-    blockTimeValue(time);
+    blockTimeValueSafe(time);
     m_doNotChangeDisplayTime = false;
 
     m_emptyPacketCounter = 0;
@@ -688,6 +731,7 @@ void QnCamDisplay::onJumpOccured(qint64 time)
     m_bofReceived = false;
     m_buffering = getBufferingMask();
     m_lastDecodedTime = AV_NOPTS_VALUE;
+    m_firstAfterJumpTime = AV_NOPTS_VALUE;
     
     m_singleShotQuantProcessed = false;
     m_jumpTime = time;
@@ -768,6 +812,8 @@ void QnCamDisplay::setSingleShotMode(bool single)
         emit liveMode(false);
         pauseAudio();
     }
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
+        m_display[i]->setPausedSafe(single);
 }
 
 float QnCamDisplay::getSpeed() const
@@ -1407,7 +1453,7 @@ void QnCamDisplay::setMTDecoding(bool value)
         }
         //if (value)
         //    setSpeed(m_speed); // decoder now faster. reinit speed statistics
-        m_realTimeHurryUp = 5;
+        m_realTimeHurryUp = true;
     }
 }
 
@@ -1417,6 +1463,7 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
         return;
     m_isRealTimeSource = value;
     if (m_isRealTimeSource) {
+        m_firstLivePacket = true;
         QnResourceConsumer* archive = dynamic_cast<QnResourceConsumer*>(sender());
         if (archive) {
             QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(archive->getResource());
@@ -1553,10 +1600,10 @@ bool QnCamDisplay::isLongWaiting() const
     return m_isLongWaiting || m_emptyPacketCounter >= 3;
 }
 
-QSize QnCamDisplay::getScreenSize() const
+QSize QnCamDisplay::getMaxScreenSize() const
 {
     if (m_display[0])
-        return m_display[0]->getScreenSize();
+        return m_display[0]->getMaxScreenSize();
     else
         return QSize();
 }
@@ -1567,6 +1614,11 @@ QSize QnCamDisplay::getVideoSize() const
         return m_display[0]->getImageSize();
     else
         return QSize();
+}
+
+bool QnCamDisplay::isZoomWindow() const
+{
+    return m_multiView;
 }
 
 bool QnCamDisplay::isFullScreen() const
@@ -1591,7 +1643,7 @@ bool QnCamDisplay::isBuffering() const
     // for offline resource at LIVE position no any data. Check it
     if (!isRealTimeSource())
         return true; // if archive position then buffering mark should be resetted event for offline resource
-    return m_resource->getStatus() == QnResource::Online || m_resource->getStatus() == QnResource::Recording;
+    return m_resource->toResource()->getStatus() == QnResource::Online || m_resource->toResource()->getStatus() == QnResource::Recording;
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

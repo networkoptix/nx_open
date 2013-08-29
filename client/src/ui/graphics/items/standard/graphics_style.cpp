@@ -1,7 +1,11 @@
+
 #include "graphics_style.h"
 #include <cassert>
 #include <QtGui/QApplication>
+#include <QGraphicsWidget>
+#include <QWidget>
 #include <utils/common/scoped_value_rollback.h>
+
 
 GraphicsStyle::GraphicsStyle():
     m_graphicsWidget(NULL)

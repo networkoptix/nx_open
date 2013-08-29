@@ -5,22 +5,10 @@
 
 #include <api/media_server_connection.h>
 
+#include <utils/common/software_version.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/abstract_storage_resource.h>
-
-class QnLocalMediaServerResource : public QnResource
-{
-    Q_OBJECT
-
-public:
-    QnLocalMediaServerResource();
-
-    virtual QString getUniqueId() const;
-
-protected:
-
-};
-
 
 class QnMediaServerResource : public QnResource
 {
@@ -67,8 +55,8 @@ public:
     QString getProxyHost();
     int getProxyPort();
 
-    QString getVersion() const;
-    void setVersion(const QString& version);
+    QnSoftwareVersion getVersion() const;
+    void setVersion(const QnSoftwareVersion& version);
 
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
@@ -89,7 +77,7 @@ private:
     bool m_primaryIFSelected;
     bool m_reserve;
     PanicMode m_panicMode;
-    QString m_version;
+    QnSoftwareVersion m_version;
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
 };

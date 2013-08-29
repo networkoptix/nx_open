@@ -6,33 +6,14 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/resource_fwd.h>
 
-namespace BusinessActionParameters {
-
-    int getFps(const QnBusinessParams &params);
-    void setFps(QnBusinessParams* params, int value);
-
-    QnStreamQuality getStreamQuality(const QnBusinessParams &params);
-    void setStreamQuality(QnBusinessParams* params, QnStreamQuality value);
-
-    int getRecordDuration(const QnBusinessParams &params);
-    void setRecordDuration(QnBusinessParams* params, int value);
-
-    int getRecordBefore(const QnBusinessParams &params);
-    void setRecordBefore(QnBusinessParams* params, int value);
-
-    int getRecordAfter(const QnBusinessParams &params);
-    void setRecordAfter(QnBusinessParams* params, int value);
-
-}
-
 class QnRecordingBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    explicit QnRecordingBusinessAction(const QnBusinessParams &runtimeParams);
+    explicit QnRecordingBusinessAction(const QnBusinessEventParameters &runtimeParams);
 
     int getFps() const;
-    QnStreamQuality getStreamQuality() const;
+    Qn::StreamQuality getStreamQuality() const;
     int getRecordDuration() const;
     int getRecordBefore() const;
     int getRecordAfter() const;
@@ -42,6 +23,6 @@ public:
     static int  invalidResourcesCount(const QnResourceList &resources);
 };
 
-typedef QSharedPointer<QnRecordingBusinessAction> QnRecordingBusinessActionPtr;
+typedef QSharedPointer<QnRecordingBusinessAction> QnRecordingBusinessActionPtr; // TODO: #Elric move to fwd header.
 
 #endif // __RECORDING_BUSINESS_ACTION_H__

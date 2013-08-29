@@ -10,26 +10,13 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
-
 #include <utils/math/color_transformations.h>
+
 #include <ui/style/globals.h>
+#include <ui/delegates/calendar_item_delegate.h>
+#include <ui/common/palette.h>
 
 namespace {
-    const QColor selectionColor = withAlpha(qnGlobals->selectionColor(), 192);
-
-    const QColor backgroundColor(24, 24, 24, 0);
-    //const QColor backgroundColor(0, 0, 0, 0);
-
-    const QColor denseRecordingColor(32, 255, 32, 255);
-    const QColor recordingColor(32, 128, 32, 255);
-    //const QColor recordingColor(16, 64, 16, 255);
-
-    const QColor denseMotionColor(255, 0, 0, 255);
-    const QColor motionColor(128, 0, 0, 255);
-    //const QColor motionColor(64, 0, 0, 255);
-
-    const QColor separatorColor(0, 0, 0, 255);
-
     enum {
         DAY = 1000 * 60 * 60 * 24
     };
@@ -37,66 +24,75 @@ namespace {
 } // anonymous namespace
 
 
-QnCalendarWidget::QnCalendarWidget():
-    m_tableView(0),
+QnCalendarWidget::QnCalendarWidget(QWidget *parent):
+    base_type(parent),
+    m_delegate(new QnCalendarItemDelegate(this)),
     m_empty(true),
     m_currentWidgetIsCentral(false),
-    m_currentTime(0)
+    m_currentTime(0),
+    m_localOffset(0)
 {
-    /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
-    QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));
-    if(monthButton)
-        monthButton->setMenu(NULL);
-
-    QWidget *yearEdit = findChild<QWidget *>(QLatin1String("qt_calendar_yearedit"));
-    QnSingleEventEater *contextMenuEater = new QnSingleEventEater(Qn::AcceptEvent, yearEdit);
-    contextMenuEater->setEventType(QEvent::ContextMenu);
-    yearEdit->installEventFilter(contextMenuEater);
-
     setHorizontalHeaderFormat(QCalendarWidget::ShortDayNames);
     setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 
-    m_tableView = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
-    m_tableView->horizontalHeader()->setMinimumSectionSize(18);
-    QObject::connect(m_tableView, SIGNAL(changeDate(const QDate&, bool)), this, SIGNAL(dateClicked(const QDate&)));
+    /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
+    QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));
+    monthButton->setMenu(NULL);
 
-    m_tableView->viewport()->installEventFilter(this);
+    QWidget *yearEdit = findChild<QWidget *>(QLatin1String("qt_calendar_yearedit"));
+    
+    QnSingleEventEater *eater = new QnSingleEventEater(Qn::AcceptEvent, this);
+    eater->setEventType(QEvent::ContextMenu);
+    yearEdit->installEventFilter(eater);
 
-    QPalette palette = m_tableView->palette();
-    palette.setColor(QPalette::Highlight, QColor(0, 0, 0, 255));
-    m_tableView->setPalette(palette);
+    QTableView *tableView = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
+    tableView->horizontalHeader()->setMinimumSectionSize(18);
+    connect(tableView, SIGNAL(changeDate(const QDate &, bool)), this, SIGNAL(dateClicked(const QDate &)));
+    setPaletteColor(tableView, QPalette::Highlight, QColor(0, 0, 0, 255));
 
-    QWidget* navBarBackground = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
-    navBarBackground->setBackgroundRole(QPalette::Window);
+    QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
+    signalizer->setEventType(QEvent::Paint);
+    tableView->viewport()->installEventFilter(signalizer);
+    connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updateCurrentTime()));
+
+    QAbstractItemModel *model = tableView->model();
+    connect(model, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateEnabledPeriod()));
+
+    QWidget *navigationBar = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
+    navigationBar->setBackgroundRole(QPalette::Window);
+
+    updateEnabledPeriod();
+    updateCurrentTime();
+    updateEmpty();
 }
 
-void QnCalendarWidget::setCurrentTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods)
+void QnCalendarWidget::setCurrentTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &periods)
 {
-    m_currentTimeStorage.setPeriods(type, periods);
+    m_currentPeriodStorage.setPeriods(type, periods);
     updateEmpty();
     update();
 }
 
-void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods) {
-    m_syncedTimeStorage.setPeriods(type, periods);
+void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &periods) {
+    m_syncedPeriodStorage.setPeriods(type, periods);
     updateEmpty();
     update();
 }
 
 void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) {
-    m_window = QnTimePeriod(windowStart, windowEnd - windowStart);
+    m_selectedPeriod = QnTimePeriod(windowStart, windowEnd - windowStart);
 
-    if(m_window.startTimeMs >= m_dayWindow.startTimeMs && m_window.startTimeMs < m_dayWindow.startTimeMs + DAY &&
-        m_window.endTimeMs() <= m_dayWindow.endTimeMs() && m_window.endTimeMs() > m_dayWindow.endTimeMs() - DAY)
+    if(m_selectedPeriod.startTimeMs >= m_selectedDaysPeriod.startTimeMs && m_selectedPeriod.startTimeMs < m_selectedDaysPeriod.startTimeMs + DAY &&
+        m_selectedPeriod.endTimeMs() <= m_selectedDaysPeriod.endTimeMs() && m_selectedPeriod.endTimeMs() > m_selectedDaysPeriod.endTimeMs() - DAY)
         return; /* Ok, no update needed. */
 
     qint64 dayWindowStart = QDateTime(QDateTime::fromMSecsSinceEpoch(windowStart).date(), QTime()).toMSecsSinceEpoch();
     qint64 dayWindowEnd = QDateTime(QDateTime::fromMSecsSinceEpoch(windowEnd + DAY - 1).date(), QTime()).toMSecsSinceEpoch();
     QnTimePeriod dayWindow = QnTimePeriod(dayWindowStart, dayWindowEnd - dayWindowStart);
-    if(m_dayWindow == dayWindow)
+    if(m_selectedDaysPeriod == dayWindow)
         return;
 
-    m_dayWindow = dayWindow;
+    m_selectedDaysPeriod = dayWindow;
     update();
 }
 
@@ -112,95 +108,30 @@ bool QnCalendarWidget::isEmpty() {
     return m_empty;
 }
 
-bool QnCalendarWidget::eventFilter(QObject *watched, QEvent *event) {
-    if (event->type() == QEvent::Paint && watched == m_tableView->viewport())
-        m_currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    return base_type::eventFilter(watched, event);
-}
-
 void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const {
     QnTimePeriod period(QDateTime(date).toMSecsSinceEpoch(), DAY); 
     if (period.startTimeMs > m_currentTime)
         period = QnTimePeriod();
 
-    QnScopedPainterBrushRollback brushRollback(painter);
-    Q_UNUSED(brushRollback);
-
-    bool inWindow = !period.intersected(m_window).isEmpty();
-
-    /* Draw background. */
-    {
-        QBrush brush = painter->brush();
-
-        bool containsMotion = m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::MotionRole).intersects(period);
-        bool containsRecording = containsMotion || (m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::RecordingRole).intersects(period));
-
-        QColor bgcolor;
-        if (containsMotion) {
-            bgcolor = motionColor;
-        } else if (containsRecording) {
-            bgcolor = recordingColor;
-        } else {
-            bgcolor = backgroundColor;
-        }
-        brush.setColor(bgcolor);
-        brush.setStyle(Qt::SolidPattern);
-        painter->fillRect(rect, brush);
-
-        if (!containsMotion && m_syncedTimeStorage.periods(Qn::MotionRole).intersects(period)) {
-            brush.setColor(denseMotionColor);
-            brush.setStyle(Qt::Dense6Pattern);
-            painter->fillRect(rect, brush);
-        } else if (!containsRecording && m_syncedTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
-            brush.setColor(denseRecordingColor);
-            brush.setStyle(Qt::Dense6Pattern);
-            painter->fillRect(rect, brush);
-        }
-    }
-
-    QnScopedPainterPenRollback penRollback(painter);
-    Q_UNUSED(penRollback);
-
-    painter->setBrush(Qt::NoBrush);
-
-    /* Selection frame. */
-    if (inWindow) {
-        painter->setPen(QPen(selectionColor, 3, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-        painter->drawRect(rect.adjusted(2, 2, -2, -2));
-    }
-
-    /* Common black frame. */
-    painter->setPen(QPen(separatorColor, 1));
-    painter->drawRect(rect);
-
-    /* Draw text. */
-    {
-        QnScopedPainterFontRollback fontRollback(painter);
-        Q_UNUSED(fontRollback);
-
-        QFont font = painter->font();
-        font.setPixelSize(12);
-
-        QString text = QString::number(date.day());
-        QColor color;
-        if (date < this->minimumDate() || date > this->maximumDate()) {
-            color = palette().color(QPalette::Disabled, QPalette::Text);
-        } else {
-            color = palette().color(QPalette::Active, QPalette::Text);
-            font.setBold(true);
-        }
-
-        painter->setPen(QPen(color, 1));
-        painter->setFont(font);
-        painter->drawText(rect, Qt::AlignCenter, text);
-    }
+    m_delegate->paintCell(
+        painter, 
+        palette(), 
+        rect, 
+        period, 
+        m_localOffset,
+        m_enabledPeriod, 
+        m_selectedPeriod, 
+        m_currentWidgetIsCentral ? m_currentPeriodStorage : m_emptyPeriodStorage, 
+        m_syncedPeriodStorage, 
+        QString::number(date.day())
+    );
 }
 
 void QnCalendarWidget::updateEmpty() {
     bool value = true;
-    for(int type = 0; type < Qn::TimePeriodRoleCount; type++) {
-        if (!m_currentTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty() ||
-            !m_syncedTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty())
+    for(int type = 0; type < Qn::TimePeriodContentCount; type++) {
+        if (!m_currentPeriodStorage.periods(static_cast<Qn::TimePeriodContent>(type)).empty() ||
+            !m_syncedPeriodStorage.periods(static_cast<Qn::TimePeriodContent>(type)).empty())
         {
             value = false;
             break;
@@ -213,6 +144,17 @@ void QnCalendarWidget::updateEmpty() {
     emit emptyChanged();
 }
 
+void QnCalendarWidget::updateEnabledPeriod() {
+    qint64 startMSecs = QDateTime(minimumDate()).toMSecsSinceEpoch();
+    qint64 endMSecs = QDateTime(maximumDate()).addDays(1).toMSecsSinceEpoch();
+
+    m_enabledPeriod = QnTimePeriod(startMSecs, endMSecs - startMSecs);
+}
+
+void QnCalendarWidget::updateCurrentTime() {
+    m_currentTime = qnSyncTime->currentMSecsSinceEpoch();
+}
+
 void QnCalendarWidget::wheelEvent(QWheelEvent *event) {
     event->accept(); /* Do not propagate wheel events past the calendar widget. */
 }
@@ -223,4 +165,17 @@ void QnCalendarWidget::mousePressEvent(QMouseEvent *event) {
 
 void QnCalendarWidget::mouseReleaseEvent(QMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
+}
+
+qint64 QnCalendarWidget::localOffset() const {
+    return m_localOffset;
+}
+
+void QnCalendarWidget::setLocalOffset(qint64 localOffset) {
+    if(m_localOffset == localOffset)
+        return;
+
+    m_localOffset = localOffset;
+
+    update();
 }

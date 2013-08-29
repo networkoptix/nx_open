@@ -9,7 +9,7 @@
 extern QString getValueFromString(const QString& line);
 
 QnISDStreamReader::QnISDStreamReader(QnResourcePtr res):
-    CLServerPushStreamreader(res),
+    CLServerPushStreamReader(res),
     m_rtpStreamParser(res)
 {
     //m_axisRes = getResource().dynamicCast<QnPlAxisResource>();
@@ -21,38 +21,42 @@ QnISDStreamReader::~QnISDStreamReader()
 }
 
 
-void QnISDStreamReader::openStream()
+CameraDiagnostics::Result QnISDStreamReader::openStream()
 {
     if (isStreamOpened())
-        return;
+        return CameraDiagnostics::NoErrorResult();
 
     QnResource::ConnectionRole role = getRole();
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
-
+    CLHttpStatus status;
 
     CLSimpleHTTPClient http (res->getHostAddress(), 80, 3000, res->getAuth());
-    QByteArray request;
-    QString result;
-    QTextStream t(&result);
 
-    if (role == QnResource::Role_SecondaryLiveVideo)
+    if (!res->isCameraControlDisabled())
     {
-        t << "VideoInput.1.h264.2.Resolution=" << res->getSecondaryResolution().width() << "x" << res->getSecondaryResolution().height() << "\r\n";
-        t << "VideoInput.1.h264.2.FrameRate=5" << "\r\n";
-        t << "VideoInput.1.h264.2.BitRate=128" << "\r\n";
-    }
-    else
-    {
-        t << "VideoInput.1.h264.1.Resolution=" << res->getPrimaryResolution().width() << "x" << res->getPrimaryResolution().height() << "\r\n";
-        t << "VideoInput.1.h264.1.FrameRate=" << getFps() << "\r\n";
-        t << "VideoInput.1.h264.1.BitRate=" << res->suggestBitrateKbps(getQuality(), res->getPrimaryResolution(), getFps()) << "\r\n";
-    }
+        QByteArray request;
+        QString result;
+        QTextStream t(&result);
 
+        if (role == QnResource::Role_SecondaryLiveVideo)
+        {
+            t << "VideoInput.1.h264.2.Resolution=" << res->getSecondaryResolution().width() << "x" << res->getSecondaryResolution().height() << "\r\n";
+            t << "VideoInput.1.h264.2.FrameRate=5" << "\r\n";
+            t << "VideoInput.1.h264.2.BitRate=128" << "\r\n";
+        }
+        else
+        {
+            t << "VideoInput.1.h264.1.Resolution=" << res->getPrimaryResolution().width() << "x" << res->getPrimaryResolution().height() << "\r\n";
+            t << "VideoInput.1.h264.1.FrameRate=" << getFps() << "\r\n";
+            t << "VideoInput.1.h264.1.BitRate=" << res->suggestBitrateKbps(getQuality(), res->getPrimaryResolution(), getFps()) << "\r\n";
+        }
+        t.flush();
 
-    
-    request.append(result.toLatin1());
-    CLHttpStatus status = http.doPOST(QByteArray("/api/param.cgi"), QLatin1String(request));
-    QnSleep::msleep(100);
+        
+        request.append(result.toLatin1());
+        status = http.doPOST(QByteArray("/api/param.cgi"), QLatin1String(request));
+        QnSleep::msleep(100);
+    }
 
     QString urlrequest = (role == QnResource::Role_SecondaryLiveVideo)
         ? QLatin1String("api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath")
@@ -62,24 +66,43 @@ void QnISDStreamReader::openStream()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         res->setStatus(QnResource::Unauthorized);
-        return;
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( urlrequest );
+        return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
     }
 
     QString url = getValueFromString(QLatin1String(reslst));
 
     QStringList urlLst = url.split(QLatin1Char('\r'), QString::SkipEmptyParts);
     if(urlLst.size() < 1)
-        return;
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( urlrequest );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
 
     url = urlLst.at(0);
     
 
     if (url.isEmpty())
-        return;
+    {
+        QUrl requestedUrl;
+        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( urlrequest );
+        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+    }
 
 
     m_rtpStreamParser.setRequest(url);
-    m_rtpStreamParser.openStream();
+    return m_rtpStreamParser.openStream();
 }
 
 void QnISDStreamReader::closeStream()

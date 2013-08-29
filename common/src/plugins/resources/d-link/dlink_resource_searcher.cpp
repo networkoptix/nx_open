@@ -113,7 +113,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             const unsigned char* data = (unsigned char*)(datagram.data());
 
             unsigned char mac[6];
-            memcpy(mac,data + 6,6);
+            memcpy(mac, data + 6, 6);
 
             QString smac = MACToString(mac);
 

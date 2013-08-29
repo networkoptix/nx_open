@@ -14,11 +14,12 @@ class QnSendmailBusinessActionWidget : public QnAbstractBusinessParamsWidget, pu
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
-    
+
 public:
-    explicit QnSendmailBusinessActionWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnSendmailBusinessActionWidget(QWidget *parent = 0);
     ~QnSendmailBusinessActionWidget();
-    
+
+    virtual void updateTabOrder(QWidget *before, QWidget *after) override;
 protected slots:
     virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
 

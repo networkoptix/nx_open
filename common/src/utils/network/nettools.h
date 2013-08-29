@@ -13,17 +13,19 @@ typedef QList<quint32> CLIPList;
 
 struct QnInterfaceAndAddr
 {
-    QnInterfaceAndAddr(QString name_, QHostAddress address_)
+    QnInterfaceAndAddr(QString name_, QHostAddress address_, const QNetworkInterface& _netIf)
         : name(name_),
-          address(address_)
+          address(address_),
+          netIf(_netIf)
     {
     }
 
     QString name;
     QHostAddress address;
+    QNetworkInterface netIf;
 };
 
-QN_EXPORT QString MACToString (const unsigned char* mac);
+QN_EXPORT QString MACToString(const unsigned char *mac);
 
 QN_EXPORT unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
 QN_EXPORT unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);

@@ -87,6 +87,7 @@ QnMessageSource::QnMessageSource(QUrl url, int retryTimeout):
 }
 
 QnMessageSource::~QnMessageSource() {
+    // qWarning is issued here: QObject::startTimer: QTimer can only be used with threads started with QThread
     return;
 }
 
@@ -176,30 +177,30 @@ void QnMessageSource::httpReadyRead()
         // Restart timer for any event
         m_eventWaitTimer.restart();
 
-        QnMessage event;
-        if (!event.load(parsed))
+        QnMessage message;
+        if (!message.load(parsed))
             continue;
 
-        if (event.eventType == Qn::Message_Type_Initial)
+        if (message.messageType == Qn::Message_Type_Initial)
         {
             if (m_seqNumber == 0)
             {
                 // No tracking yet. Just initialize seqNumber.
-                m_seqNumber = event.seqNumber;
+                m_seqNumber = message.seqNumber;
             }
-            else if (QnMessage::nextSeqNumber(m_seqNumber) != event.seqNumber)
+            else if (QnMessage::nextSeqNumber(m_seqNumber) != message.seqNumber)
             {
                 qWarning() << "QnMessageSource::httpReadyRead(): One or more event are lost. Emitting connectionReset().";
 
                 // Tracking is on and some events are missed and/or reconnect occured
-                m_seqNumber = event.seqNumber;
+                m_seqNumber = message.seqNumber;
                 emit connectionReset();
             }
 
-            emit connectionOpened(event);
-        } else if (event.eventType != Qn::Message_Type_Ping)
+            emit connectionOpened(message);
+        } else if (message.messageType != Qn::Message_Type_Ping)
         {
-            emit messageReceived(event);
+            emit messageReceived(message);
         }
         // If it's ping event -> just update last event time (m_eventWaitTimer)
     }

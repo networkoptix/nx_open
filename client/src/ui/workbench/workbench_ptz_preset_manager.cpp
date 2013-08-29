@@ -9,26 +9,44 @@
 #include <utils/common/warnings.h>
 #include <utils/common/json.h>
 
-#include <api/app_server_connection.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
+
+#include <utils/kvpair_usage_helper.h>
 
 #include "workbench_context.h"
 
 namespace {
     struct PtzPresetData {
-        PtzPresetData() {}
-        PtzPresetData(const QString &cameraPhysicalId, const QString &name, const QVector3D &logicalPosition): cameraPhysicalId(cameraPhysicalId), name(name), logicalPosition(logicalPosition) {}
+        PtzPresetData(): hotkey(-1) {}
+        PtzPresetData(const QString &cameraPhysicalId, int hotkey, const QString &name, const QVector3D &logicalPosition): 
+            cameraPhysicalId(cameraPhysicalId), hotkey(hotkey), name(name), logicalPosition(logicalPosition) {}
+
+        QnPtzPreset preset() const {
+            return QnPtzPreset(hotkey, name, logicalPosition);
+        }
 
         QString cameraPhysicalId;
+        int hotkey;
         QString name;
         QVector3D logicalPosition;
     };
 
-    struct PtzPresetKeyPredicate {
-        PtzPresetKeyPredicate(const PtzPresetData &data): data(data) {}
+    struct PtzPresetNamePredicate {
+        PtzPresetNamePredicate(const PtzPresetData &data): data(data) {}
 
         bool operator()(const PtzPresetData &value) const {
             return value.cameraPhysicalId == data.cameraPhysicalId && value.name == data.name;
+        }
+
+        PtzPresetData data;
+    };
+
+    struct PtzPresetHotkeyPredicate {
+        PtzPresetHotkeyPredicate(const PtzPresetData &data): data(data) {}
+
+        bool operator()(const PtzPresetData &value) const {
+            return value.cameraPhysicalId == data.cameraPhysicalId && value.hotkey == data.hotkey;
         }
 
         PtzPresetData data;
@@ -79,6 +97,8 @@ inline void serialize(const PtzPresetData &value, QVariant *target) {
     QJson::serialize(value.cameraPhysicalId, "cameraPhysicalId", &result);
     QJson::serialize(value.name, "name", &result);
     QJson::serialize(value.logicalPosition, "logicalPosition", &result);
+    if(value.hotkey != -1)
+        QJson::serialize(value.hotkey, "hotkey", &result);
     *target = result;
 }
 
@@ -94,20 +114,24 @@ inline bool deserialize(const QVariant &value, PtzPresetData *target) {
         !QJson::deserialize(map, "name", &name) ||
         !QJson::deserialize(map, "logicalPosition", &logicalPosition)
     ) {
-            return false;
+        return false;
     }
+    
+    /* Optional field. */
+    int hotkey = -1;
+    QJson::deserialize(map, "hotkey", &hotkey);
 
-    *target = PtzPresetData(cameraPhysicalId, name, logicalPosition);
+    *target = PtzPresetData(cameraPhysicalId, hotkey, name, logicalPosition);
     return true;
 }
 
 
 class QnWorkbenchPtzPresetManagerPrivate {
 public:
-    QnWorkbenchPtzPresetManagerPrivate(): loadHandle(-1), saveHandle(-1) {}
+    QnWorkbenchPtzPresetManagerPrivate() {}
 
     QVector<PtzPresetData> presets;
-    int loadHandle, saveHandle;
+    QnStringKvPairUsageHelper* helper;
 };
 
 QnWorkbenchPtzPresetManager::QnWorkbenchPtzPresetManager(QObject *parent):
@@ -115,7 +139,10 @@ QnWorkbenchPtzPresetManager::QnWorkbenchPtzPresetManager(QObject *parent):
     QnWorkbenchContextAware(parent),
     d(new QnWorkbenchPtzPresetManagerPrivate())
 {
+      //TODO: #Elric provide correct resource
     connect(context(), SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()));
+    d->helper = new QnStringKvPairUsageHelper(context()->user(), lit("ptzPresets"), QString(), this);
+    connect(d->helper, SIGNAL(valueChanged(QString)), this, SLOT(at_presetsLoaded(QString)));
 }
 
 QnWorkbenchPtzPresetManager::~QnWorkbenchPtzPresetManager() {
@@ -126,11 +153,22 @@ QnPtzPreset QnWorkbenchPtzPresetManager::ptzPreset(const QnVirtualCameraResource
     if(!camera || name.isEmpty())
         return QnPtzPreset();
 
-    QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetKeyPredicate(PtzPresetData(camera->getPhysicalId(), name, QVector3D())));
+    QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetNamePredicate(PtzPresetData(camera->getPhysicalId(), -1, name, QVector3D())));
     if(pos == d->presets.end())
         return QnPtzPreset();
 
-    return QnPtzPreset(pos->name, pos->logicalPosition);
+    return pos->preset();
+}
+
+QnPtzPreset QnWorkbenchPtzPresetManager::ptzPreset(const QnVirtualCameraResourcePtr &camera, int hotkey) const {
+    if(!camera || hotkey < 0)
+        return QnPtzPreset();
+
+    QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetHotkeyPredicate(PtzPresetData(camera->getPhysicalId(), hotkey, QString(), QVector3D())));
+    if(pos == d->presets.end())
+        return QnPtzPreset();
+
+    return pos->preset();
 }
 
 QList<QnPtzPreset> QnWorkbenchPtzPresetManager::ptzPresets(const QnVirtualCameraResourcePtr &camera) const {
@@ -141,7 +179,7 @@ QList<QnPtzPreset> QnWorkbenchPtzPresetManager::ptzPresets(const QnVirtualCamera
     QString physicalId = camera->getPhysicalId();
     foreach(const PtzPresetData &data, d->presets)
         if(data.cameraPhysicalId == physicalId)
-            result.push_back(QnPtzPreset(data.name, data.logicalPosition));
+            result.push_back(data.preset());
     return result;
 }
 
@@ -155,24 +193,24 @@ void QnWorkbenchPtzPresetManager::setPtzPresets(const QnVirtualCameraResourcePtr
     
     QString cameraPhysicalId = camera->getPhysicalId();
     foreach(const QnPtzPreset &preset, presets)
-        d->presets.push_back(PtzPresetData(cameraPhysicalId, preset.name, preset.logicalPosition));
+        d->presets.push_back(PtzPresetData(cameraPhysicalId, preset.hotkey, preset.name, preset.logicalPosition));
 
     savePresets();
 }
 
-void QnWorkbenchPtzPresetManager::addPtzPreset(const QnVirtualCameraResourcePtr &camera, const QString &name, const QVector3D &logicalPosition) {
+void QnWorkbenchPtzPresetManager::addPtzPreset(const QnVirtualCameraResourcePtr &camera, const QnPtzPreset &preset) {
     if(!camera) {
         qnNullWarning(camera);
         return;
     }
 
-    if(name.isEmpty()) {
-        qnNullWarning(name);
+    if(preset.isNull()) {
+        qnNullWarning(preset);
         return;
     }
 
-    PtzPresetData data(camera->getPhysicalId(), name, logicalPosition);
-    QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetKeyPredicate(data));
+    PtzPresetData data(camera->getPhysicalId(), preset.hotkey, preset.name, preset.logicalPosition);
+    QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetNamePredicate(data));
     if(pos != d->presets.end()) {
         *pos = data; /* Replace existing. */
     } else {
@@ -193,7 +231,7 @@ void QnWorkbenchPtzPresetManager::removePtzPreset(const QnVirtualCameraResourceP
         return;
     }
 
-    QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetKeyPredicate(PtzPresetData(camera->getPhysicalId(), name, QVector3D())));
+    QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetNamePredicate(PtzPresetData(camera->getPhysicalId(), -1, name, QVector3D())));
     if(pos == d->presets.end())
         return;
 
@@ -202,55 +240,23 @@ void QnWorkbenchPtzPresetManager::removePtzPreset(const QnVirtualCameraResourceP
     savePresets();
 }
 
-void QnWorkbenchPtzPresetManager::loadPresets() {
-    d->loadHandle = QnAppServerConnectionFactory::createConnection()->getKvPairsAsync(this, SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairList &, int)));
-}
-
 void QnWorkbenchPtzPresetManager::savePresets() {
     QByteArray data;
     QJson::serialize(d->presets, &data);
-
-    QnKvPairList kvPairs;
-    kvPairs.push_back(QnKvPair(lit("ptzPresets"), QString::fromUtf8(data)));
-
-    d->saveHandle = QnAppServerConnectionFactory::createConnection()->saveAsync(kvPairs, this, SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairList &, int)));
+    d->helper->setValue(QString::fromUtf8(data));
 }
 
 void QnWorkbenchPtzPresetManager::at_context_userChanged() {
+    //TODO: #Elric provide correct resource
     d->presets.clear();
-
-    if(!context()->user())
-        return;
-
-    loadPresets();
+    d->helper->setResource(context()->user());
 }
 
-void QnWorkbenchPtzPresetManager::at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairList &kvPairs, int handle) {
-    Q_UNUSED(errorString)
-    // TODO: check status
-
-    if(status != 0) {
-        qnWarning("Failed to save/load ptz presets.");
-        return;
-    }
-
-    if(handle == d->loadHandle) {
-        QByteArray data;
-        foreach(const QnKvPair &pair, kvPairs)
-            if(pair.name() == lit("ptzPresets"))
-                data = pair.value().toUtf8();
-        
-        if(data.isEmpty()) {
-            d->presets.clear();
-        } else if(!QJson::deserialize(data, &d->presets)) {
-            qnWarning("Invalid ptz preset format.");
-        }
-
-
-        d->loadHandle = -1;
-    } else if(handle == d->saveHandle) {
-        d->saveHandle = -1;
+void QnWorkbenchPtzPresetManager::at_presetsLoaded(const QString &value) {
+    QByteArray data = value.toUtf8();
+    if(data.isEmpty()) {
+        d->presets.clear();
+    } else if(!QJson::deserialize(data, &d->presets)) {
+        qnWarning("Invalid ptz preset format.");
     }
 }
-
-

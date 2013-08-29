@@ -12,10 +12,9 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
 #include <ui/workbench/workbench_context.h>
-
-//TODO: #GDM use documentation from http://support.google.com/mail/bin/answer.py?hl=en&answer=1074635
-
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
 
 namespace {
     enum WidgetPages {
@@ -87,12 +86,14 @@ void QnSmtpSettingsWidget::update() {
     m_settingsReceived = false;
 
     m_requestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                this, SLOT(at_settings_received(int,QByteArray,QnKvPairList,int)));
+                this, SLOT(at_settings_received(int, const QnKvPairList&, int)));
 }
 
 void QnSmtpSettingsWidget::submit() {
     QnEmail::Settings result = settings();
-    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized());
+    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized(),
+                                                                        context()->instance<QnWorkbenchNotificationsHandler>(),
+                                                                        SLOT(updateSmtpSettings(int, const QnKvPairList&, int)));
 }
 
 void QnSmtpSettingsWidget::updateFocusedElement() {
@@ -118,7 +119,7 @@ QnEmail::Settings QnSmtpSettingsWidget::settings() {
         result.user = ui->simpleEmailLineEdit->text();
         result.password = ui->simplePasswordLineEdit->text();
         result.simple = true;
-        result.signature = ui->simpleSignatureTextEdit->toPlainText();
+        result.signature = ui->simpleSignatureLineEdit->text();
         return result;
     }
 
@@ -134,7 +135,7 @@ QnEmail::Settings QnSmtpSettingsWidget::settings() {
     if (result.port == 0)
         result.port = QnEmail::defaultPort(result.connectionType);
     result.simple = false;
-    result.signature = ui->signatureTextEdit->toPlainText();
+    result.signature = ui->signatureLineEdit->text();
     return result;
 }
 
@@ -222,11 +223,11 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
         }
         ui->userLineEdit->setText(value);
         ui->passwordLineEdit->setText(ui->simplePasswordLineEdit->text());
-        ui->signatureTextEdit->setPlainText(ui->simpleSignatureTextEdit->toPlainText());
+        ui->signatureLineEdit->setText(ui->simpleSignatureLineEdit->text());
     } else {
         ui->simpleEmailLineEdit->setText(ui->userLineEdit->text());
         ui->simplePasswordLineEdit->setText(ui->passwordLineEdit->text());
-        ui->simpleSignatureTextEdit->setPlainText(ui->signatureTextEdit->toPlainText());
+        ui->simpleSignatureLineEdit->setText(ui->signatureLineEdit->text());
     }
     ui->stackedWidget->setCurrentIndex(toggled ? AdvancedPage : SimplePage);
 }
@@ -262,7 +263,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     m_timeoutTimer->start();
 
     m_testHandle = QnAppServerConnectionFactory::createConnection()->testEmailSettingsAsync(result.serialized(),
-                                                                                            this, SLOT(at_finishedTestEmailSettings(int, QByteArray, bool, int)));
+                                                                                            this, SLOT(at_finishedTestEmailSettings(int, bool, int)));
     ui->stackedWidget->setCurrentIndex(TestingPage);
 }
 
@@ -280,7 +281,7 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
     stopTesting(tr("Timeout"));
 }
 
-void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, const QByteArray &errorString, bool result, int handle) {
+void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, bool result, int handle) {
     if (handle != m_testHandle)
         return;
 
@@ -288,7 +289,7 @@ void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, const QByteA
             ? tr("Error while testing settings")
             : result
               ? tr("Success")
-              : tr("Error: ") + QString::fromLatin1(errorString)
+              : tr("Error")
                 );
 }
 
@@ -299,17 +300,17 @@ void QnSmtpSettingsWidget::at_okTestButton_clicked() {
                                        : SimplePage);
 }
 
-void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &errorString, const QnKvPairList &values, int handle) {
-    Q_UNUSED(errorString)
+void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &values, int handle) {
     if (handle != m_requestHandle)
         return;
 
     m_requestHandle = -1;
+    m_settingsReceived = true;
+    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(status, values, handle);
 
     bool success = (status == 0);
     if(!success) {
-        QMessageBox::critical(this, tr("Error while receiving settings"), QString::fromLatin1(errorString));
-        m_settingsReceived = true;
+        QMessageBox::critical(this, tr("Error"), tr("Error while receiving settings"));
         return;
     }
 
@@ -319,12 +320,10 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
     ui->simpleEmailLineEdit->setText(settings.user);
     ui->passwordLineEdit->setText(settings.password);
     ui->simplePasswordLineEdit->setText(settings.password);
-    ui->signatureTextEdit->setPlainText(settings.signature);
-    ui->simpleSignatureTextEdit->setPlainText(settings.signature);
+    ui->signatureLineEdit->setText(settings.signature);
+    ui->simpleSignatureLineEdit->setText(settings.signature);
     ui->advancedCheckBox->setChecked(!settings.simple);
     ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
                                        ? AdvancedPage
                                        : SimplePage);
-
-    m_settingsReceived = true;
 }

@@ -3,9 +3,12 @@
 
 #include <typeinfo>
 
+#include <QtCore/QHash>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <QWidget>
 
+#include <utils/common/instance_storage.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 
@@ -19,13 +22,14 @@ class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
+class QnWorkbenchLayoutWatcher;
 class QnActionManager;
 
 /**
  * This is a class that ties together all objects comprising the global state 
  * and serves as an application context.
  */
-class QnWorkbenchContext: public QObject {
+class QnWorkbenchContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
 public:
     QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent = NULL);
@@ -64,22 +68,19 @@ public:
         return m_navigator.data();
     }
 
+    QWidget *mainWindow() const {
+        return m_mainWindow.data();
+    }
+
+    void setMainWindow(QWidget *mainWindow) {
+        m_mainWindow = mainWindow;
+    }
+
     QAction *action(const Qn::ActionId id) const;
 
     QnUserResourcePtr user() const;
 
     void setUserName(const QString &userName);
-
-    template<class T>
-    T *instance() {
-        QByteArray key(typeid(T).name());
-        QObject *&result = m_instanceByTypeName[key];
-        if(!result) {
-            result = new T(this);
-            m_instances.push_back(result);
-        }
-        return static_cast<T *>(result);
-    }
 
 signals:
     /**
@@ -107,10 +108,11 @@ private:
     QScopedPointer<QnActionManager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
+    
+    QWeakPointer<QWidget> m_mainWindow;
 
     QnWorkbenchUserWatcher *m_userWatcher;
-    QHash<QByteArray, QObject *> m_instanceByTypeName; // TODO: use std::type_index
-    QList<QObject *> m_instances;
+    QnWorkbenchLayoutWatcher *m_layoutWatcher;
 };
 
 

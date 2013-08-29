@@ -1,12 +1,16 @@
 #ifndef QN_WORKBENCH_ITEM_H
 #define QN_WORKBENCH_ITEM_H
 
+#include <QtCore/QHash>
 #include <QtCore/QObject>
 #include <QtCore/QRect>
-#include <QtCore/QUuid>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QUuid>
+#include <QtCore/QVariant>
 
 #include <client/client_globals.h>
+#include <utils/color_space/image_correction.h>
+#include <core/resource/dewarping_params.h>
 
 class QnWorkbenchLayout;
 class QnLayoutItemData;
@@ -194,6 +198,42 @@ public:
     }
 
     /**
+     * \returns                         Zoom rect of this item, in item-relative coordinates.
+     */
+    const QRectF &zoomRect() const {
+        return m_zoomRect;
+    }
+
+    /**
+     * Note that zoom rect will be used only if an appropriate zoom link is 
+     * created for this item in a layout.
+     * 
+     * \param zoomRect                  New zoom rect for this item. 
+     */
+    void setZoomRect(const QRectF &zoomRect);
+
+    /**
+     * \param                           New image enhancement params for this item.
+     */
+    void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
+
+    /**
+     * \param                           New dewarping enhancement params for this item.
+     */
+    void setDewarpingParams(const DewarpingParams& params);
+
+    
+    const ImageCorrectionParams &imageEnhancement() const {
+        return m_imageEnhancement;
+    }
+
+    const DewarpingParams &dewarpingParams() const {
+        return m_dewarpingParams;
+    }
+
+    QnWorkbenchItem *zoomTargetItem() const;
+
+    /**
      * \returns                         Rotation angle of this item, in degrees.
      */
     qreal rotation() const {
@@ -204,6 +244,7 @@ public:
      * \param degrees                   New rotation value for this item, in degrees.
      */
     void setRotation(qreal rotation);
+
 
     /**
      * Marks this item as waiting for geometry adjustment. It will be placed
@@ -241,6 +282,11 @@ public:
         }
     }
 
+    template<class T>
+    bool setData(int role, const T &value) {
+        return setData(role, QVariant::fromValue<T>(value));
+    }
+
     /**
      * \param role                      Role to set data for.
      * \param value                     New value for the given data role.
@@ -252,6 +298,10 @@ signals:
     void geometryChanged();
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
+    void zoomRectChanged();
+    void imageEnhancementChanged();
+    void dewarpingParamsChanged();
+    void zoomTargetItemChanged();
     void rotationChanged();
     void dataChanged(int role);
 
@@ -277,6 +327,15 @@ private:
 
     /** Grid-relative geometry delta of an item, in grid cells. Meaningful for unpinned items only. */
     QRectF m_geometryDelta;
+
+    /** Item-relative rectangle that defines the portion of the item to be shown. */
+    QRectF m_zoomRect;
+
+    /** Item image enhancement params. */
+    ImageCorrectionParams m_imageEnhancement;
+
+    /** Fisheye dewarping params. */
+    DewarpingParams m_dewarpingParams;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;

@@ -10,7 +10,11 @@
 #include <utils/common/warnings.h>
 #include <core/resource/resource.h>
 
-#include "utils/settings.h"
+#include <client/client_settings.h>
+
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+
 #include "version.h"
 
 QnConnectionTestingDialog::QnConnectionTestingDialog(const QUrl &url, QWidget *parent) :
@@ -63,13 +67,12 @@ void QnConnectionTestingDialog::timeout()
     }
 
     m_timeoutTimer.stop();
-    updateUi(false, tr("Request timed out."));
+    updateUi(false, tr("Request timed out."), Qn::Login_Help);
 }
 
-void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle)
+void QnConnectionTestingDialog::testResults(int status, QnConnectInfoPtr connectInfo, int requestHandle)
 {
     Q_UNUSED(requestHandle)
-    Q_UNUSED(errorString)
 
     if (!m_timeoutTimer.isActive())
         return;
@@ -89,47 +92,55 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorS
 
     bool success = true;
     QString detail;
+    int helpTopicId = -1;
 
-    if (status != 0) {
+    bool compatibleProduct = qnSettings->isDevMode() || connectInfo->brand.isEmpty()
+            || connectInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+
+    if (status != 0 || !compatibleProduct) {
         success = false;
         detail = tr("Connection to the Enterprise Controller could not be established.\n"\
                     "Connection details that you have entered are incorrect, please try again.\n\n"\
                     "If this error persists, please contact your VMS administrator.");
-    } else
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
-        QString minSupportedVersion = QLatin1String("1.4");
+        helpTopicId = Qn::Login_Help;
+    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
+        QnSoftwareVersion minSupportedVersion("1.4");
 
-        if (stripVersion(connectInfo->version).compare(minSupportedVersion) < 0) {
+        if (connectInfo->version < minSupportedVersion) {
             detail = tr("Enterprise Controller has a different version:\n"\
                         " - Client version: %1.\n"\
                         " - EC version: %2.\n"\
                         "Compatibility mode for versions lower than %3 is not supported.")
                     .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectInfo->version)
-                    .arg(minSupportedVersion);
+                    .arg(connectInfo->version.toString())
+                    .arg(minSupportedVersion.toString());
             success = false;
+            helpTopicId = Qn::VersionMismatch_Help;
         } else {
             detail = tr("Enterprise Controller has a different version:\n"\
                         " - Client version: %1.\n"\
                         " - EC version: %2.\n"\
                         "You will be asked to restart the client in compatibility mode.")
                     .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectInfo->version);
+                    .arg(connectInfo->version.toString());
+            helpTopicId = Qn::VersionMismatch_Help;
         }
     }
 
-    updateUi(success, detail);
+    updateUi(success, detail, helpTopicId);
 }
 
 void QnConnectionTestingDialog::testSettings()
 {
     m_connection = QnAppServerConnectionFactory::createConnection(m_url);
-    m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QnConnectInfoPtr,int)));
+    m_connection->testConnectionAsync(this, SLOT(testResults(int,QnConnectInfoPtr,int)));
 }
 
-void QnConnectionTestingDialog::updateUi(bool success, const QString &details){
+void QnConnectionTestingDialog::updateUi(bool success, const QString &details, int helpTopicId) {
     ui->statusLabel->setText(success ? tr("Success") : tr("Failed"));
     ui->descriptionLabel->setText(details);
+
+    setHelpTopic(this, helpTopicId);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(true);
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setVisible(false);

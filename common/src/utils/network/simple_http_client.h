@@ -1,8 +1,10 @@
 #ifndef __SIMPLE_HTTP_CLIENT__
 #define __SIMPLE_HTTP_CLIENT__
 
+#include <QAuthenticator>
 #include <QtCore/QHash>
 #include <QString>
+#include <QSharedPointer>
 
 #include "socket.h"
 
@@ -24,7 +26,13 @@ class CLSimpleHTTPClient
     enum { Basic, Digestaccess };
 
 public:
+    /*!
+        \param timeout Timeout in milliseconds to be used as socket's read and write timeout
+    */
     CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
+    /*!
+        \param timeout Timeout in milliseconds to be used as socket's read and write timeout
+    */
     CLSimpleHTTPClient(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
     ~CLSimpleHTTPClient();
 
@@ -60,6 +68,8 @@ public:
     static QString digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url);
     QByteArray getHeaderValue(const QByteArray& key);
 
+    const QString& localAddress() const;
+    unsigned short localPort() const;
 
     QString mRealm;
     QString mNonce;
@@ -97,10 +107,18 @@ private:
     char* m_dataRestPtr;
     int m_dataRestLen;
     QMap<QByteArray,QByteArray> m_additionHeaders;
+    QString m_localAddress;
+    unsigned short m_localPort;
 };
 
+/*!
+    \param timeout Timeout in milliseconds to be used as socket's read and write timeout
+*/
 QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity = 2000);
 
+/*!
+    \param timeout Timeout in milliseconds to be used as socket's read and write timeout
+*/
 bool uploadFile(const QString& fileName, const QString&  content, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
 
 

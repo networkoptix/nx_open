@@ -250,7 +250,7 @@ void QnCameraSettingsHandler::asyncParamSetComplete(const QnResourcePtr &resourc
     asyncParamGetComplete(resource, paramName, paramValue, result);
 }
 
-QString QnSetCameraParamHandler::description( TCPSocket* /*tcpSocket*/ ) const
+QString QnSetCameraParamHandler::description() const
 {
     return
         "Sets values of several camera parameters.<BR>"
@@ -258,7 +258,7 @@ QString QnSetCameraParamHandler::description( TCPSocket* /*tcpSocket*/ ) const
         "Returns OK if all parameters have been set, otherwise returns error 500 (Internal server error) and result of setting every param<BR>";
 }
 
-QString QnGetCameraParamHandler::description( TCPSocket* /*tcpSocket*/ ) const
+QString QnGetCameraParamHandler::description() const
 {
     return
         "Returns list of camera parameters.<BR>"

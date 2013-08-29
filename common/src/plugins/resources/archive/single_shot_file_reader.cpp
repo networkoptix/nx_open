@@ -50,7 +50,12 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
 void QnSingleShotFileStreamreader::run()
 {
     saveSysThreadID();
-    QnAbstractMediaDataPtr data = getNextData();
+    QnAbstractMediaDataPtr data;
+    try {
+        data = getNextData();
+    } catch(...) {
+        qWarning() << "Application out of memory";
+    }
     if (data)
         putData(data);
 }
@@ -58,4 +63,10 @@ void QnSingleShotFileStreamreader::run()
 void QnSingleShotFileStreamreader::setStorage(QnStorageResourcePtr storage)
 {
     m_storage = storage;
+}
+
+CameraDiagnostics::Result QnSingleShotFileStreamreader::diagnoseMediaStreamConnection()
+{
+    //TODO/IMPL
+    return CameraDiagnostics::NotImplementedResult();
 }

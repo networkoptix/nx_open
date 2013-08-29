@@ -21,12 +21,12 @@ public:
     QnPlWatchDogResource();
     ~QnPlWatchDogResource();
 
-    virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;
+    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
     virtual QnAbstractPtzController *getPtzController() override;
 
 protected:
-    bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
     virtual void fetchAndSetCameraSettings() override;
     virtual bool getParamPhysical(const QnParam &param, QVariant &val) override;
     virtual bool setParamPhysical(const QnParam &param, const QVariant& val) override;
@@ -37,7 +37,7 @@ private:
     QString fetchCameraModel();
 
 private:
-    friend class QnWatchDogPtzController; // TODO: remove
+    friend class QnWatchDogPtzController; // TODO: #Elric remove
 
     QScopedPointer<QnAbstractPtzController> m_ptzController;
 

@@ -5,7 +5,7 @@
 #include <QList>
 #include <QTextStream>
 
-#include "utils/common/qnid.h"
+#include "utils/common/id.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "schedule_recording_type.h"
 
@@ -15,7 +15,7 @@ public:
     struct Data
     {
         Data(int dayOfWeek = 1, int startTime = 0, int endTime = 0, Qn::RecordingType recordType = Qn::RecordingType_Never,
-             int beforeThreshold = 0, int afterThreshold = 0, QnStreamQuality streamQuality = QnQualityHighest, int fps = 10, bool doRecordAudio = false)
+             int beforeThreshold = 0, int afterThreshold = 0, Qn::StreamQuality streamQuality = Qn::QualityHighest, int fps = 10, bool doRecordAudio = false)
             : m_dayOfWeek(dayOfWeek),
               m_startTime(startTime),
               m_endTime(endTime),
@@ -43,7 +43,7 @@ public:
 
         int m_afterThreshold;
 
-        QnStreamQuality m_streamQuality;
+        Qn::StreamQuality m_streamQuality;
         int m_fps;
         bool m_doRecordAudio;
     };
@@ -58,7 +58,7 @@ public:
 
     QnScheduleTask(QnId id, QnId resourceId, int dayOfWeek, int startTime, int endTime,
                    Qn::RecordingType recordType =  Qn::RecordingType_Never, int beforeThreshold = 0, int afterThreshold = 0,
-                   QnStreamQuality streamQuality = QnQualityHighest, int fps = 10, bool doRecordAudio = false)
+                   Qn::StreamQuality streamQuality = Qn::QualityHighest, int fps = 10, bool doRecordAudio = false)
         : m_id(id), m_resourceId(resourceId),
           m_data(dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio)
     {}
@@ -83,9 +83,9 @@ public:
     void setBeforeThreshold(int value)  { m_data.m_beforeThreshold = value; }
     int getAfterThreshold() const { return m_data.m_afterThreshold; }
     void setAfterThreshold(int value) { m_data.m_afterThreshold= value; }
-    QnStreamQuality getStreamQuality() const { return m_data.m_streamQuality; }
-    void setStreamQuality(QnStreamQuality value) { m_data.m_streamQuality = value; }
-    
+    Qn::StreamQuality getStreamQuality() const { return m_data.m_streamQuality; }
+    void setStreamQuality(Qn::StreamQuality value) { m_data.m_streamQuality = value; }
+
     int getFps() const { return m_data.m_fps; }
     void setFps(int value) { m_data.m_fps = value; }
     bool getDoRecordAudio() const { return m_data.m_doRecordAudio; }
@@ -112,7 +112,7 @@ private:
 
     Data m_data;
 
-    friend class QnCameraScheduleWidget; // TODO: what the hell?
+    friend class QnCameraScheduleWidget; // TODO: #vasilenko what the hell?
 };
 
 inline bool operator<(qint64 first, const QnScheduleTask &other)
@@ -160,23 +160,25 @@ inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
 
     QString qualityString;
     switch (data.getStreamQuality()) {
-    case QnQualityLowest:
+    case Qn::QualityLowest:
         qualityString = QLatin1String("lowest");
         break;
-    case QnQualityLow:
+    case Qn::QualityLow:
         qualityString = QLatin1String("low");
         break;
-    case QnQualityNormal:
+    case Qn::QualityNormal:
         qualityString = QLatin1String("normal");
         break;
-    case QnQualityHigh:
+    case Qn::QualityHigh:
         qualityString = QLatin1String("high");
         break;
-    case QnQualityHighest:
+    case Qn::QualityHighest:
         qualityString = QLatin1String("highest");
         break;
-    case QnQualityPreSet:
+    case Qn::QualityPreSet:
         qualityString = QLatin1String("preset");
+        break;
+    case Qn::QualityNotDefined:
         break;
     }
 

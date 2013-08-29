@@ -1,5 +1,7 @@
 #include "resource_type.h"
 
+#include <QDebug>
+
 #include "utils/common/log.h"
 
 QnResourceType::QnResourceType()
@@ -113,11 +115,11 @@ const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
 
 // =============================== QnResourceTypePool ========================
 
-Q_GLOBAL_STATIC(QnResourceTypePool, theResourceTypePool)
+Q_GLOBAL_STATIC(QnResourceTypePool, QnResourceTypePool_instance)
 
 QnResourceTypePool *QnResourceTypePool::instance()
 {
-    return theResourceTypePool();
+    return QnResourceTypePool_instance();
 }
 
 QnResourceTypePtr QnResourceTypePool::getResourceTypeByName(const QString& name) const

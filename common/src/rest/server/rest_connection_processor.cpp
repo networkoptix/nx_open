@@ -1,3 +1,5 @@
+
+#include <QElapsedTimer>
 #include <QUrl>
 
 #include "rest_connection_processor.h"
@@ -138,7 +140,7 @@ void QnRestConnectionProcessor::run()
                         d->responseBody.append("<TR><TD>");
                         d->responseBody.append(str.toAscii());
                         d->responseBody.append("<TD>");
-                        d->responseBody.append(itr.value()->description(d->socket));
+                        d->responseBody.append(itr.value()->description());
                         d->responseBody.append("</TD>");
                         d->responseBody.append("</TD></TR>\n");
                     }

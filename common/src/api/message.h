@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/qnid.h>
+#include <utils/common/id.h>
 
 #include <core/resource/resource_type.h>
 #include <core/resource/resource.h>
@@ -30,7 +30,12 @@ namespace Qn {
         Message_Type_CameraServerItem = 7,
         Message_Type_BusinessRuleInsertOrUpdate = 8,
         Message_Type_BusinessRuleDelete = 9,
-        Message_Type_BroadcastBusinessAction = 10
+        Message_Type_BroadcastBusinessAction = 10,
+        Message_Type_FileAdd = 11,
+        Message_Type_FileRemove = 12,
+        Message_Type_FileUpdate = 13,
+        Message_Type_RuntimeInfoChange = 14,
+        Message_Type_BusinessRuleReset = 15
     };
 
     QString toString( Message_Type val );
@@ -38,7 +43,9 @@ namespace Qn {
 
 struct QnMessage
 {
-    Qn::Message_Type eventType;
+    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online) {}
+
+    Qn::Message_Type messageType;
     quint32 seqNumber;
 
     QnResourcePtr resource;
@@ -53,12 +60,21 @@ struct QnMessage
     QnLicensePtr license;
     QnCameraHistoryItemPtr cameraServerItem;
     QnBusinessEventRulePtr businessRule;
+    QnBusinessEventRuleList businessRules;
     QnAbstractBusinessActionPtr businessAction;
 
     QnResourceTypeList resourceTypes;
     QnResourceList resources;
     QnLicenseList licenses;
     QnCameraHistoryList cameraServerItems;
+
+    QString systemName;
+    QByteArray oldHardwareId;
+    QByteArray hardwareId1;
+    QByteArray hardwareId2;
+
+    QString filename;
+    QString publicIp;
 
     bool load(const pb::Message& message);
 

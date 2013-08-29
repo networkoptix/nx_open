@@ -92,20 +92,20 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
 // -------------------------------------------------------------------------- //
 QVariant QnViewportBoundWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
     if(change == ItemSceneHasChanged) {
-        if(!scene()) {
-            if(m_instrument) {
-                disconnect(m_instrument.data(), NULL, this, NULL);
-                m_instrument.clear();
-            }
-        } else {
-            if(InstrumentManager *manager = InstrumentManager::instance(scene())) {
-                TransformListenerInstrument *instrument = manager->instrument<TransformListenerInstrument>();
-                if(!instrument) {
-                    qnWarning("An instance of TransformListenerInstrument must be installed in order for the widget to work correctly.");
-                } else {
-                    m_instrument = instrument;
-                    connect(instrument, SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(updateScale(QGraphicsView *)));
-                }
+        if(m_instrument) {
+            disconnect(m_instrument.data(), NULL, this, NULL);
+            m_instrument.clear();
+        }
+
+        if(InstrumentManager *manager = InstrumentManager::instance(scene())) {
+            TransformListenerInstrument *instrument = manager->instrument<TransformListenerInstrument>();
+            if(!instrument) {
+                qnWarning("An instance of TransformListenerInstrument must be installed in order for the widget to work correctly.");
+            } else {
+                m_instrument = instrument;
+                connect(instrument, SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(updateScale(QGraphicsView *)));
+
+                updateScale();
             }
         }
     }

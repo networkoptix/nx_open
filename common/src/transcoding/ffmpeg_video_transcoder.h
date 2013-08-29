@@ -1,56 +1,52 @@
 #ifndef __FFMPEG_VIDEO_TRANSCODER_H__
 #define __FFMPEG_VIDEO_TRANSCODER_H__
 
+#include <QCoreApplication>
+
 #include "transcoder.h"
+
+extern "C"
+{
+    #include <libswscale/swscale.h>
+}
+
 #include "utils/media/frame_info.h"
 #include "decoders/video/ffmpeg.h"
 
 class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
+    Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
-    enum OnScreenDatePos {Date_None, Date_LeftTop, Date_RightTop, Date_RightBottom, Date_LeftBottom};
-
     QnFfmpegVideoTranscoder(CodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) override;
     virtual bool open(QnCompressedVideoDataPtr video) override;
+    void close();
     AVCodecContext* getCodecContext();
 
     /* Allow multithread transcoding */
     void setMTMode(bool value);
-
-    /* Draw video frames time on the screen */
-    void setDrawDateTime(OnScreenDatePos value);
-
-    void setOnScreenDateOffset(int timeOffsetMs);
-
+    virtual void addFilter(QnAbstractImageFilter* filter) override;
 private:
-    int rescaleFrame();
-    void doDrawOnScreenTime(CLVideoDecoderOutput* frame);
-    void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);
+    int rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch);
 private:
-    CLFFmpegVideoDecoder* m_videoDecoder;
+    QVector<CLFFmpegVideoDecoder*> m_videoDecoders;
     QSharedPointer<CLVideoDecoderOutput> m_decodedVideoFrame;
     CLVideoDecoderOutput m_scaledVideoFrame;
+    CLVideoDecoderOutput m_decodedFrameRect;
+
+    
+
     quint8* m_videoEncodingBuffer;
     AVCodecContext* m_encoderCtx;
-    SwsContext* scaleContext;
-    qint64 m_firstEncodedPts;
-    int m_lastSrcWidth;
-    int m_lastSrcHeight;
-    bool m_mtMode;
-    
-    OnScreenDatePos m_dateTextPos;
-    uchar* m_imageBuffer;
-    QImage* m_timeImg;
-    QFont m_timeFont;
-    int m_dateTimeXOffs;
-    int m_dateTimeYOffs;
-    int m_onscreenDateOffset;
 
-    int m_bufXOffs;
-    int m_bufYOffs;
+    SwsContext* scaleContext[CL_MAX_CHANNELS];
+    int m_lastSrcWidth[CL_MAX_CHANNELS];
+    int m_lastSrcHeight[CL_MAX_CHANNELS];
+
+    qint64 m_firstEncodedPts;
+    bool m_mtMode;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

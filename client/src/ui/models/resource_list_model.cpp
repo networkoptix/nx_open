@@ -8,7 +8,7 @@
 
 QnResourceListModel::QnResourceListModel(QObject *parent): 
     QAbstractListModel(parent),
-    m_readOnly(true)
+    m_readOnly(true) // TODO: #Elric change to false, makes more sense.
 {}
 
 QnResourceListModel::~QnResourceListModel() {
@@ -39,6 +39,36 @@ void QnResourceListModel::setResources(const QnResourceList &resouces) {
         connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
         connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
         connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    }
+
+    endResetModel();
+}
+
+void QnResourceListModel::addResource(const QnResourcePtr &resource) {
+    foreach(const QnResourcePtr &r, m_resources) // TODO: #Elric checking for duplicates does not belong here. Makes no sense!
+        if (r->getId() == resource->getId())
+            return;
+
+    beginResetModel();
+    connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    m_resources << resource;
+    endResetModel();
+}
+
+void QnResourceListModel::removeResource(const QnResourcePtr &resource) {
+    if (!resource)
+        return;
+
+    beginResetModel();
+
+    for (int i = 0; i < m_resources.size(); ++i) {
+        if (m_resources[i]->getId() == resource->getId()) { // TODO: #Elric check by pointer, not id. Makes no sense.
+            disconnect(m_resources[i].data(), NULL, this, NULL);
+            m_resources.removeAt(i);
+            break;
+        }
     }
 
     endResetModel();
@@ -81,15 +111,12 @@ Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const {
     if(!resource)
         return result;
 
-    return base_type::flags(index) | Qt::ItemIsEditable;
+    return result | Qt::ItemIsEditable;
 }
 
 
 QVariant QnResourceListModel::data(const QModelIndex &index, int role) const {
-    if(!index.isValid())
-        return QVariant();
-
-    if(!hasIndex(index.row(), index.column(), index.parent()))
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
     const QnResourcePtr &resource = m_resources[index.row()];

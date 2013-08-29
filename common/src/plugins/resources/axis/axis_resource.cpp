@@ -1,13 +1,13 @@
 
 #include "axis_resource.h"
 
+#include <algorithm>
 #include <functional>
 #include <memory>
 
 #include "api/app_server_connection.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
-#include <business/business_event_connector.h>
 #include <business/business_event_rule.h>
 #include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
@@ -24,9 +24,6 @@ QnPlAxisResource::QnPlAxisResource()
 {
     setAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
-    connect(
-        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
 }
 
 QnPlAxisResource::~QnPlAxisResource()
@@ -39,7 +36,7 @@ bool QnPlAxisResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QString QnPlAxisResource::manufacture() const
+QString QnPlAxisResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }
@@ -262,7 +259,7 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
     return !(square1 < square2);
 }
 
-bool QnPlAxisResource::initInternal()
+CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
 
     //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
@@ -286,7 +283,7 @@ bool QnPlAxisResource::initInternal()
         if (status != CL_HTTP_SUCCESS) {
             if (status == CL_HTTP_AUTH_REQUIRED)
                 setStatus(QnResource::Unauthorized);
-            return false;
+            return CameraDiagnostics::UnknownErrorResult();
         }
     }
 
@@ -298,7 +295,7 @@ bool QnPlAxisResource::initInternal()
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
             setStatus(QnResource::Unauthorized);
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
     
@@ -315,7 +312,7 @@ bool QnPlAxisResource::initInternal()
         if (paramValuePos == -1)
         {
             qWarning() << Q_FUNC_INFO << "Unexpected server answer. Can't read resolution list";
-            return false;
+            return CameraDiagnostics::UnknownErrorResult();
         }
 
         QList<QByteArray> rawResolutionList = body.mid(paramValuePos+1).split(',');
@@ -378,7 +375,7 @@ bool QnPlAxisResource::initInternal()
             qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
     }
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 QnPlAxisResource::AxisResolution QnPlAxisResource::getMaxResolution() const
@@ -919,21 +916,20 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
 
 void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
     Q_UNUSED(http)
-    // TODO: make configurable.
+    // TODO: #Elric make configurable.
     static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL};
 
-    // TODO: use QHash here, +^
+    // TODO: #Elric use QHash here, +^
     QString localModel = getModel();
     for(const char **model = brokenPtzCameras; *model; model++)
         if(localModel == QLatin1String(*model))
             return;
 
     m_ptzController.reset(new QnAxisPtzController(this));
-    Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
-    if(capabilities == Qn::NoCapabilities)
+    Qn::PtzCapabilities ptzCapabilities = m_ptzController->getCapabilities();
+    if(ptzCapabilities == Qn::NoCapabilities)
         m_ptzController.reset();
-
-    setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
+    setPtzCapabilities(ptzCapabilities);
 }
 
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {

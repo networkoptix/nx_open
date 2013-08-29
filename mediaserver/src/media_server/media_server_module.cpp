@@ -15,16 +15,17 @@ QnMediaServerModule::QnMediaServerModule(int &argc, char **argv, QObject *parent
 
     m_common = new QnCommonModule(argc, argv, this);
 
-    loadPtzMappers(lit(":/ptz_mappers.json"));
-    loadPtzMappers(QCoreApplication::applicationDirPath() + lit("/ptz_mappers.json"));
+    QnPtzMapperPool *ptzMapperPool = m_common->instance<QnPtzMapperPool>();
+    loadPtzMappers(ptzMapperPool, QLatin1String(":/ptz_mappers.json"));
+    loadPtzMappers(ptzMapperPool, QCoreApplication::applicationDirPath() + QLatin1String("/ptz_mappers.json"));
 }
 
 QnMediaServerModule::~QnMediaServerModule() {
     return;
 }
 
-void QnMediaServerModule::loadPtzMappers(const QString &fileName) {
+void QnMediaServerModule::loadPtzMappers(QnPtzMapperPool *ptzMapperPool, const QString &fileName) {
     if(QFile::exists(fileName))
-        m_common->ptzMapperPool()->load(fileName);
+        ptzMapperPool->load(fileName);
 }
 

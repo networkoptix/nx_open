@@ -2,6 +2,7 @@
 #define onvif_resource_h
 
 #include <list>
+#include <memory>
 #include <stack>
 
 #include <QDateTime>
@@ -9,6 +10,7 @@
 #include <QMap>
 #include <QPair>
 #include <QSharedPointer>
+#include <QWaitCondition>
 #include <QXmlDefaultHandler>
 
 #include "core/resource/security_cam_resource.h"
@@ -20,8 +22,6 @@
 #include "core/resource/interface/abstract_ptz_controller.h"
 #include "onvif_ptz_controller.h"
 #include "utils/common/timermanager.h"
-#include "utils/common/systemtimer.h"
-
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -79,6 +79,7 @@ public:
         G726,
         G711,
         AAC,
+        AMR,
         SIZE_OF_AUDIO_CODECS
     };
 
@@ -106,7 +107,8 @@ public:
 
 
     virtual bool isResourceAccessible() override;
-    virtual QString manufacture() const override;
+    virtual QString getDriverName() const override;
+    virtual QString getVendorName() const override;
 
     virtual int getMaxFps() override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
@@ -130,7 +132,7 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    int innerQualityToOnvif(QnStreamQuality quality) const;
+    int innerQualityToOnvif(Qn::StreamQuality quality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress()); }
 
     int getGovLength() const;
@@ -189,32 +191,27 @@ public:
 
     bool detectVideoSourceCount();
 
-    int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
+    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool secondaryResolutionIsLarge() const;
-signals:
-    //!Emitted on camera input port state has been changed
-    /*!
-        \param resource Smart pointer to \a this
-        \param inputPortID
-        \param value true if input is connected, false otherwise
-        \param timestamp MSecs since epoch, UTC
-    */
-    void cameraInput(
-        const QnResourcePtr &resource,
-        const QString& inputPortID,
-        bool value,
-        qint64 timestamp);
+    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
+
+    void setVendorName( const QString& vendorName );
+
+    QMutex* getStreamConfMutex();
+    void beforeConfigureStream();
+    void afterConfigureStream();
 
 protected:
+    int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 
-    bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping);
 
-    virtual bool updateResourceCapabilities();
+    virtual CameraDiagnostics::Result updateResourceCapabilities();
 
     virtual bool getParamPhysical(const QnParam &param, QVariant &val);
     virtual bool setParamPhysical(const QnParam &param, const QVariant& val);
@@ -224,17 +221,17 @@ protected:
 private:
     void setMaxFps(int f);
 
-    bool fetchAndSetResourceOptions();
+    CameraDiagnostics::Result fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
-    bool fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
+    CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     void updateSecondaryResolutionList(const VideoOptionsLocal& opts);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
     
-    bool fetchVideoSourceToken();
-    bool fetchAndSetVideoSource();
-    bool fetchAndSetAudioSource();
+    CameraDiagnostics::Result fetchVideoSourceToken();
+    CameraDiagnostics::Result fetchAndSetVideoSource();
+    CameraDiagnostics::Result fetchAndSetAudioSource();
 
     void setVideoEncoderOptions(const VideoOptionsLocal& opts);
     void setVideoEncoderOptionsH264(const VideoOptionsLocal& opts);
@@ -251,7 +248,7 @@ private:
 
 
     void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
-    bool sendVideoSourceToCamera(VideoSource* source) const;
+    CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource* source) const;
 
     QRect getVideoSourceMaxSize(const QString& configToken);
 
@@ -407,7 +404,7 @@ private:
     QString m_ptzUrl;
     int m_timeDrift;
     int m_prevSoapCallResult;
-    onvifXsd__EventCapabilities* m_eventCapabilities;
+    std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
@@ -418,7 +415,13 @@ private:
     quint64 m_renewSubscriptionTaskID;
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
+    QString m_vendorName;
 	
+    QMutex m_streamConfMutex;
+    QWaitCondition m_streamConfCond;
+    int m_streamConfCounter;
+    CameraDiagnostics::Result m_prevOnvifResultCode;
+
     bool createPullPointSubscription();
     bool pullMessages();
     //!Registeres local NotificationConsumer in resource's NotificationProducer
@@ -433,6 +436,7 @@ private:
         const QString& outputID,
         bool active,
         unsigned int autoResetTimeoutMS );
+    CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
 };
 
 #endif //onvif_resource_h

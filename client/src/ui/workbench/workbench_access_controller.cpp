@@ -52,7 +52,7 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
         return result;
 
     result = static_cast<Qn::Permissions>(user->getPermissions());
-    
+
     if(user->isAdmin())
         result |= Qn::GlobalOwnerPermissions;
 
@@ -67,7 +67,7 @@ QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnRe
     if(!m_dataByResource.contains(resource))
         return NULL;
 
-    const PermissionsData &data = m_dataByResource[resource];
+    PermissionsData &data = m_dataByResource[resource];
     if(!data.notifier)
         data.notifier = new QnWorkbenchPermissionsNotifier(const_cast<QnWorkbenchAccessController *>(this));
     return data.notifier;
@@ -113,7 +113,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
 
     if ((user != m_user) && (m_userPermissions & Qn::GlobalEditUsersPermission)) {
         result |= Qn::ReadPermission;
-        
+
         /* Protected users can only be edited by super-user. */
         if ((m_userPermissions & Qn::GlobalEditProtectedUserPermission) || !(globalPermissions(user) & Qn::GlobalProtectedPermission))
             result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
@@ -126,18 +126,24 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
 
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if(permissions.isValid() && permissions.canConvert<int>()) {
-        return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: listen to changes
-    } if(QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
-    } else if(m_userPermissions & Qn::GlobalEditLayoutsPermission) {
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
+        return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: #Elric listen to changes
+    } else if (QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
+        if (layout->locked())
+            return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission;
+    } else if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
+        if (layout->locked())
+            return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
+        return Qn::FullLayoutPermissions;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
-        if(user != m_user) 
+        if(user != m_user)
             return 0; /* Viewer can't view other's layouts. */
 
         if (layout->userCanEdit()) {
-            return Qn::ReadWriteSavePermission| Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify layout with this flag. */
+            if (layout->locked())
+                return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
+            return Qn::FullLayoutPermissions; /* Can structurally modify layout with this flag. */
         } else if(snapshotManager()->isLocal(layout)) {
             return Qn::ReadPermission | Qn::WritePermission | Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify local layouts only. */
         }
@@ -195,7 +201,7 @@ void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr &re
 
     PermissionsData &data = m_dataByResource[resource];
     data.permissions = permissions;
-    
+
     emit permissionsChanged(resource);
     if(data.notifier)
         emit data.notifier->permissionsChanged(resource);
@@ -220,8 +226,9 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
 
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         connect(layout.data(), SIGNAL(userCanEditChanged(const QnLayoutResourcePtr &)), this, SLOT(updatePermissions(const QnLayoutResourcePtr &)));
+        connect(layout.data(), SIGNAL(lockedChanged(const QnLayoutResourcePtr &)), this, SLOT(updatePermissions(const QnLayoutResourcePtr &)));
     }
-    
+
     updatePermissions(resource);
 }
 

@@ -89,9 +89,10 @@ namespace nx_http
                             lk.relock();
                             continue;
 
+                        case PollSet::etTimedOut:
                         case PollSet::etError:
                             cl_log.log( QString::fromLatin1("Failed to connect to %1:%2. %3").arg(m_url.host()).arg(m_url.port()).
-                                arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
+                                arg(SystemError::toString(eventType != PollSet::etTimedOut ? m_socket->prevErrorCode() : SystemError::timedOut)), cl_logWARNING );
                             if( reconnectIfAppropriate() )
                                 break;
                             m_state = sFailed;
@@ -185,6 +186,8 @@ namespace nx_http
                         arg(m_url.toString()).arg(m_httpStreamReader.message().response->statusLine.statusCode).
                         arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG1 );
                     //TODO/IMPL should only call removeFromWatch if startReadMessageBody has not been called from responseReceived connected slot
+                    if (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
+                        break; // wait more data
                     aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
 
                     const HttpResponse* response = m_httpStreamReader.message().response;
@@ -192,7 +195,7 @@ namespace nx_http
                         && !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
                     {
                         //trying authorization
-                        if( resendRequstWithAuthorization( *response ) )
+                        if( resendRequestWithAuthorization( *response ) )
                             return;
                     }
 
@@ -518,7 +521,7 @@ namespace nx_http
         return false;
     }
 
-    bool AsyncHttpClient::resendRequstWithAuthorization( const nx_http::HttpResponse& response )
+    bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::HttpResponse& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
         Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );

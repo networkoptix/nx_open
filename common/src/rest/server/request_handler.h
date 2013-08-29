@@ -12,7 +12,9 @@
 class TCPSocket;
 
 /*
-*  QnRestRequestHandler MUST be thread safe and stateless
+*  QnRestRequestHandler MUST be thread safe (better reenterable, to allow multiple requests to be processed simultaneously) and stateless
+*  
+*  Single handler instance receives all requests (each request in different thread)
 */
 class QnRestRequestHandler: public QObject {
     Q_OBJECT
@@ -27,7 +29,7 @@ public:
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType) = 0;
 
     // incoming connection socket
-    virtual QString description(TCPSocket* tcpSocket) const { Q_UNUSED(tcpSocket); return QString(); }
+    virtual QString description() const { return QString(); }
     
     friend class QnRestConnectionProcessor;
 

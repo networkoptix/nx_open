@@ -3,23 +3,27 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <QVector3D>
 
 #include <api/model/kvpair.h>
 #include <core/resource/resource_fwd.h>
 
 #include "workbench_context_aware.h"
 
+// TODO: move to client model types?
 struct QnPtzPreset {
-    QnPtzPreset() {};
-    QnPtzPreset(const QString &name, const QVector3D &logicalPosition): name(name), logicalPosition(logicalPosition) {}
+    QnPtzPreset(): hotkey(-1) {};
+    QnPtzPreset(int hotkey, const QString &name, const QVector3D &logicalPosition): hotkey(hotkey), name(name), logicalPosition(logicalPosition) {}
 
     bool isNull() const {
         return name.isEmpty();
     }
 
+    int hotkey;
     QString name;
     QVector3D logicalPosition;
 };
+Q_DECLARE_METATYPE(QnPtzPreset);
 
 
 class QnWorkbenchPtzPresetManagerPrivate;
@@ -31,17 +35,17 @@ public:
     virtual ~QnWorkbenchPtzPresetManager();
 
     QnPtzPreset ptzPreset(const QnVirtualCameraResourcePtr &camera, const QString &name) const;
+    QnPtzPreset ptzPreset(const QnVirtualCameraResourcePtr &camera, int hotkey) const;
     QList<QnPtzPreset> ptzPresets(const QnVirtualCameraResourcePtr &camera) const;
     void setPtzPresets(const QnVirtualCameraResourcePtr &camera, const QList<QnPtzPreset> &presets);
 
-    void addPtzPreset(const QnVirtualCameraResourcePtr &camera, const QString &name, const QVector3D &logicalPosition);
+    void addPtzPreset(const QnVirtualCameraResourcePtr &camera, const QnPtzPreset &preset);
     void removePtzPreset(const QnVirtualCameraResourcePtr &camera, const QString &name);
 
 private slots:
     void at_context_userChanged();
-    void at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairList &kvPairs, int handle);
+    void at_presetsLoaded(const QString &value);
 
-    void loadPresets();
     void savePresets();
 
 private:

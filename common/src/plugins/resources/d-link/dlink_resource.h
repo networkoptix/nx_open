@@ -48,7 +48,7 @@ public:
 
     virtual bool isResourceAccessible();
 
-    virtual QString manufacture() const;
+    virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
@@ -58,7 +58,7 @@ public:
     virtual void setMotionMaskPhysical(int channel) override;
 
 protected:
-    bool initInternal() override; // does a lot of physical work 
+    virtual CameraDiagnostics::Result initInternal() override; // does a lot of physical work 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
 

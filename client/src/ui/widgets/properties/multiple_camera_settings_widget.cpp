@@ -5,7 +5,7 @@
 
 #include <QtGui/QMessageBox>
 
-//TODO: #elric #gdm asked: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+//TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
@@ -19,6 +19,8 @@
 #include <ui/widgets/properties/camera_settings_widget_p.h>
 
 #include <utils/license_usage_helper.h>
+#include "ui/help/help_topics.h"
+#include "ui/help/help_topic_accessor.h"
 
 
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
@@ -28,7 +30,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     ui(new Ui::MultipleCameraSettingsWidget),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
-    m_hasControlsChanges(false),
+    m_hasScheduleControlsChanges(false),
     m_readOnly(false),
     m_inUpdateMaxFps(false)
 {
@@ -55,6 +57,13 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
     connect(ui->moreLicensesButton,     SIGNAL(clicked()),                      this,   SIGNAL(moreLicensesRequested()));
+
+    connect(ui->expertSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+
+    /* Set up context help. */
+    setHelpTopic(this,                  Qn::CameraSettings_Multi_Help);
+    setHelpTopic(ui->tabRecording,      Qn::CameraSettings_Recording_Help);
+
 
     updateFromResources();
 }
@@ -85,6 +94,8 @@ Qn::CameraSettingsTab QnMultipleCameraSettingsWidget::currentTab() const {
 
     if(tab == ui->tabRecording) {
         return Qn::RecordingSettingsTab;
+    } else if(tab == ui->expertTab) {
+        return Qn::ExpertCameraSettingsTab;
     } else {
         qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
         return Qn::GeneralSettingsTab;
@@ -100,7 +111,11 @@ void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
         break;
     case Qn::RecordingSettingsTab:
     case Qn::MotionSettingsTab:
+    case Qn::AdvancedCameraSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabRecording);
+        break;
+    case Qn::ExpertCameraSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->expertTab);
         break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
@@ -151,8 +166,14 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         if (m_hasScheduleChanges)
             camera->setScheduleTasks(scheduleTasks);
     }
+    ui->expertSettingsWidget->submitToResources(m_cameras);
 
     setHasDbChanges(false);
+}
+
+void QnMultipleCameraSettingsWidget::reject()
+{
+    updateFromResources();
 }
 
 void QnMultipleCameraSettingsWidget::updateFromResources() {
@@ -177,6 +198,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->checkBoxEnableAudio->setEnabled(true);
     
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
+        ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, true);
         ui->analogGroupBox->setVisible(true);
 
         bool firstCamera = true;
@@ -188,8 +210,10 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             if (!camera->isAudioSupported())
                 ui->checkBoxEnableAudio->setEnabled(false);
 
-            if (camera->isDtsBased())
+            if (camera->isDtsBased()) {
                 ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
+        		ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, false);
+            }
 
             if (camera->isAnalog()) {
                 Qt::CheckState viewState = camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked;
@@ -211,6 +235,8 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             firstCamera = false;
         }
+
+        ui->expertSettingsWidget->updateFromResources(m_cameras);
 
         bool isScheduleEqual = true;
         QList<QnScheduleTask::Data> scheduleTasksData;
@@ -265,7 +291,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
     updateLicenseText();
 
     setHasDbChanges(false);
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 bool QnMultipleCameraSettingsWidget::isReadOnly() const {
@@ -312,7 +338,7 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChange
     at_dbDataChanged();
 
     m_hasScheduleChanges = true;
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
@@ -336,11 +362,11 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChan
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged() {
-    m_hasControlsChanges = true;
+    m_hasScheduleControlsChanges = true;
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied() {
-    m_hasControlsChanges = false;
+    m_hasScheduleControlsChanges = false;
 }
 
 void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked() {

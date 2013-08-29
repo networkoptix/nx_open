@@ -1,17 +1,24 @@
 #ifndef QN_LAYOUT_ITEM_DATA_H
 #define QN_LAYOUT_ITEM_DATA_H
 
+#include <QtCore/QHash>
+#include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QUuid>
-#include <QtCore/QList>
-#include <QtCore/QHash>
+#include <QtCore/QVariant>
+
+#include <core/resource/dewarping_params.h>
 
 #include <utils/math/fuzzy.h>
-#include <utils/common/qnid.h>
+#include <utils/common/id.h>
+#include <utils/color_space/image_correction.h>
 
 class QnLayoutItemData {
 public:
-    QnLayoutItemData(): flags(0), rotation(0) {}
+    QnLayoutItemData():
+        flags(0),
+        rotation(0)
+    {}
 
     struct {
         QnId id;
@@ -21,12 +28,17 @@ public:
     QUuid uuid;
     int flags;
     QRectF combinedGeometry;
+    QUuid zoomTargetUuid;
+    QRectF zoomRect;
     qreal rotation;
+    ImageCorrectionParams contrastParams;
+    DewarpingParams dewarpingParams;
 
     QHash<int, QVariant> dataByRole;
 
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
-        if (l.uuid != r.uuid || l.flags != r.flags || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || !qFuzzyCompare(l.rotation, r.rotation))
+        if (l.uuid != r.uuid || l.flags != r.flags || l.zoomTargetUuid != r.zoomTargetUuid || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || 
+            !qFuzzyCompare(l.zoomRect, r.zoomRect) || !qFuzzyCompare(l.rotation, r.rotation) || !(l.contrastParams == r.contrastParams) || !(l.dewarpingParams == r.dewarpingParams))
             return false;
 
         if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || !l.resource.id.isValid() || !r.resource.id.isValid()))

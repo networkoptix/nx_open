@@ -3,12 +3,15 @@
 
 #include "core/resource_managment/resource_discovery_manager.h"
 
+
 class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager
 {
+    Q_OBJECT
 public:
-    QnMServerResourceDiscoveryManager();
+    QnMServerResourceDiscoveryManager( const CameraDriverRestrictionList& cameraDriverRestrictionList );
     virtual ~QnMServerResourceDiscoveryManager();
-
+signals:
+    void cameraDisconnected(QnResourcePtr camera, qint64 timestamp);
 protected:
     virtual bool processDiscoveredResources(QnResourceList& resources) override;
 
@@ -29,6 +32,7 @@ private:
 private:
     bool m_foundSmth; // minor just to minimize lof output
     QMap<QString, int> m_resourceDiscoveryCounter;
+    QMap<QString, int> m_disconnectSended;
     QTime netStateTime;
     CLNetState netState;
 };

@@ -24,9 +24,15 @@ QnPlVmax480ResourceSearcher::~QnPlVmax480ResourceSearcher()
 {
 }
 
-QnPlVmax480ResourceSearcher& QnPlVmax480ResourceSearcher::instance()
+static QnPlVmax480ResourceSearcher* inst;
+
+void QnPlVmax480ResourceSearcher::initStaticInstance( QnPlVmax480ResourceSearcher* _instance )
 {
-    static QnPlVmax480ResourceSearcher inst;
+    inst = _instance;
+}
+
+QnPlVmax480ResourceSearcher* QnPlVmax480ResourceSearcher::instance()
+{
     return inst;
 }
 
@@ -34,6 +40,7 @@ QnPlVmax480ResourceSearcher& QnPlVmax480ResourceSearcher::instance()
 void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAddr,
                                                 const QString& host, 
                                                 const UpnpDeviceInfo& devInfo,
+                                                const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
     QnMacAddress mac(devInfo.serialNumber);

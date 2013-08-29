@@ -7,7 +7,9 @@ namespace Qn {
         GeneralSettingsTab,
         RecordingSettingsTab,
         MotionSettingsTab,
-        AdvancedSettingsTab
+        FisheyeCameraSettingsTab,
+        AdvancedCameraSettingsTab,
+        ExpertCameraSettingsTab
     };
 
 } // namespace Qn

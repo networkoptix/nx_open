@@ -1,9 +1,9 @@
 #include "recording_business_action_widget.h"
 #include "ui_recording_business_action_widget.h"
 
-#include <core/resource/camera_resource.h>
+#include <business/business_action_parameters.h>
 
-#include <business/actions/recording_business_action.h>
+#include <core/resource/camera_resource.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -13,8 +13,8 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
 {
     ui->setupUi(this);
 
-    for (int i = QnQualityLowest; i <= QnQualityHighest; i++) {
-        ui->qualityComboBox->addItem(QnStreamQualityToString((QnStreamQuality)i), i);
+    for (int i = Qn::QualityLowest; i <= Qn::QualityHighest; i++) {
+        ui->qualityComboBox->addItem(Qn::toDisplayString((Qn::StreamQuality)i), i);
     }
 
     ui->beforeLabel->setVisible(false);
@@ -32,6 +32,13 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
 
 QnRecordingBusinessActionWidget::~QnRecordingBusinessActionWidget()
 {
+}
+
+void QnRecordingBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
+    setTabOrder(before,                 ui->qualityComboBox);
+    setTabOrder(ui->qualityComboBox,    ui->fpsSpinBox);
+    setTabOrder(ui->fpsSpinBox,         ui->afterSpinBox);
+    setTabOrder(ui->afterSpinBox,       after);
 }
 
 void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
@@ -58,16 +65,14 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     if (fields & QnBusiness::ActionParamsField) {
 
-        QnBusinessParams params = model->actionParams();
+        QnBusinessActionParameters params = model->actionParams();
 
-        int quality = ui->qualityComboBox->findData((int) BusinessActionParameters::getStreamQuality(params));
+        int quality = ui->qualityComboBox->findData((int) params.getStreamQuality());
         if (quality >= 0)
             ui->qualityComboBox->setCurrentIndex(quality);
 
-        ui->fpsSpinBox->setValue(BusinessActionParameters::getFps(params));
-//        ui->durationSpinBox->setValue(BusinessActionParameters::getRecordDuration(params));
-//        ui->beforeSpinBox->setValue(BusinessActionParameters::getRecordBefore(params));
-        ui->afterSpinBox->setValue(BusinessActionParameters::getRecordAfter(params));
+        ui->fpsSpinBox->setValue(params.getFps());
+        ui->afterSpinBox->setValue(params.getRecordAfter());
     }
 }
 
@@ -75,13 +80,10 @@ void QnRecordingBusinessActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnBusinessParams params;
+    QnBusinessActionParameters params;
 
-    BusinessActionParameters::setFps(&params, ui->fpsSpinBox->value());
-//    BusinessActionParameters::setRecordDuration(&params, ui->durationSpinBox->value());
-//    BusinessActionParameters::setRecordBefore(&params, ui->beforeSpinBox->value());
-    BusinessActionParameters::setRecordAfter(&params, ui->afterSpinBox->value());
-    BusinessActionParameters::setStreamQuality(&params,
-        (QnStreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
+    params.setFps(ui->fpsSpinBox->value());
+    params.setRecordAfter(ui->afterSpinBox->value());
+    params.setStreamQuality((Qn::StreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
     model()->setActionParams(params);
 }

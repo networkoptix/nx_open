@@ -3,7 +3,9 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
 #include <QtCore/QDir>
+#include <QtCore/QUrl>
 #include <QtGui/QMessageBox>
+#include <QtGui/QDesktopServices>
 
 QString QnEnvironment::searchInPath(QString executable) {
     if (executable.isEmpty())
@@ -72,9 +74,8 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
     QProcess::execute("/usr/bin/osascript", scriptArgs);
 #else
     Q_UNUSED(parent)
-    Q_UNUSED(path)
-    /* We cannot select a file here, because no file browser really supports it... */
-    // TODO: implement as in Qt Creator.
+    QDesktopServices::openUrl(QUrl(QLatin1String("file:///") + QFileInfo(path).path(), QUrl::TolerantMode));
+    // TODO: #Elric implement as in Qt Creator.
 #endif
 }
 

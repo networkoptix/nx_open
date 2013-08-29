@@ -5,18 +5,23 @@
 
 class CLSimpleHTTPClient;
 
-class QnPlVmax480ResourceSearcher : public QnUpnpResourceSearcher
+class QnPlVmax480ResourceSearcher : public QnUpnpResourceSearcherAsync
 {
-    QnPlVmax480ResourceSearcher();
-
 public:
 
+    QnPlVmax480ResourceSearcher();
     ~QnPlVmax480ResourceSearcher();
 
-    static QnPlVmax480ResourceSearcher& instance();
+    static void initStaticInstance( QnPlVmax480ResourceSearcher* _instance );
+    static QnPlVmax480ResourceSearcher* instance();
 
 
-    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result) override;
+    virtual void processPacket(
+        const QHostAddress& discoveryAddr,
+        const QString& host,
+        const UpnpDeviceInfo& devInfo,
+        const QByteArray& xmlDevInfo,
+        QnResourceList& result ) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 protected:

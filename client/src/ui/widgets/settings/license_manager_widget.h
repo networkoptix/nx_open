@@ -2,6 +2,7 @@
 #define QN_LICENSE_MANAGER_WIDGET_H
 
 #include <QtGui/QWidget>
+#include <QtCore/QModelIndex>
 
 #include "licensing/license.h"
 #include "api/app_server_connection.h"
@@ -21,20 +22,25 @@ public:
     explicit QnLicenseManagerWidget(QWidget *parent = 0);
     virtual ~QnLicenseManagerWidget();
 
+signals:
+    void showMessageLater(const QString &title, const QString &message, bool warning);
+
 private slots:
     void updateLicenses();
 
     void at_downloadError();
     void at_downloadFinished();
-    void at_licensesReceived(int status, const QByteArray &errorString, QnLicenseList licenses, int handle);
+    void at_licensesReceived(int status, QnLicenseList licenses, int handle);
 
     void at_licenseDetailsButton_clicked();
     void at_gridLicenses_currentChanged();
     void at_gridLicenses_doubleClicked(const QModelIndex &index);
     void at_licenseWidget_stateChanged();
 
+    void showMessage(const QString &title, const QString &message, bool warning);
+
 private:
-    void updateFromServer(const QByteArray &licenseKey, const QString &hardwareId, const QString &oldHardwareId);
+    void updateFromServer(const QByteArray &licenseKey, const QString &hardwareId, const QString &oldHardwareId, const QString &hardwareId2);
     void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses);
     void showLicenseDetails(const QnLicensePtr &license);
 

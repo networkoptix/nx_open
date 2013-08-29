@@ -30,10 +30,10 @@ namespace
 };
 
 QnStardotResource::QnStardotResource():
-    m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
-    m_maxFps(30),
     m_resolutionNum(-1),
+    m_maxFps(30),
+    m_rtspPort(DEFAULT_RTSP_PORT),
     m_rtspTransport(lit("tcp")),
     m_motionMaskBinData(0)
 {
@@ -45,7 +45,7 @@ QnStardotResource::~QnStardotResource()
     qFreeAligned(m_motionMaskBinData);
 }
 
-QString QnStardotResource::manufacture() const
+QString QnStardotResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }
@@ -136,31 +136,31 @@ void QnStardotResource::parseInfo(const QByteArray& info)
             QList<QByteArray> data = portInfo.split('/');
             m_rtspPort = data[0].toInt();
             if (data.size() > 1)
-                m_rtspTransport = lit((const char*)data[1]);
+                m_rtspTransport = lit(data[1]);
         }
     }
 }
 
-bool QnStardotResource::initInternal()
+CameraDiagnostics::Result QnStardotResource::initInternal()
 {
     CLHttpStatus status;
        
     QByteArray resList = makeStardotRequest(lit("info.cgi?resolutions&api=2"), status);
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     detectMaxResolutionAndFps(resList);
     if (m_resolution.isEmpty() || m_maxFps < 1)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
 
     QByteArray info = makeStardotRequest(lit("info.cgi"), status);
     if (status != CL_HTTP_SUCCESS)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     parseInfo(info);
     if (m_rtspPort == 0) 
     {
         qWarning() << "No H.264 RTSP port found for Stardot camera" << getHostAddress() << "Please update camera firmware";
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
     //setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
@@ -169,7 +169,7 @@ bool QnStardotResource::initInternal()
     save();
 
     setMotionMaskPhysical(0);
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool QnStardotResource::isResourceAccessible()
@@ -219,8 +219,6 @@ bool QnStardotResource::hasDualStreaming() const
 {
     return false;
 }
-
-static const QString motionData();
 
 void QnStardotResource::setMotionMaskPhysical(int channel)
 {

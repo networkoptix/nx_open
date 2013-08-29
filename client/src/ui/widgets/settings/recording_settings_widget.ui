@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
-    <height>442</height>
+    <width>487</width>
+    <height>509</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -166,7 +166,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Quater Native</string>
+          <string>Quarter Native</string>
          </property>
         </item>
         <item>
@@ -238,7 +238,7 @@
    <item>
     <widget class="QGroupBox" name="audioGroupBox">
      <property name="title">
-      <string>Audio Grabbing</string>
+      <string>Audio Grabber</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,1">
       <item row="0" column="0">
@@ -357,7 +357,7 @@
    <item>
     <widget class="QLabel" name="recordingWarningLabel">
      <property name="text">
-      <string/>
+      <string>Very powerful machine is required for Best quality and high resolution.</string>
      </property>
     </widget>
    </item>

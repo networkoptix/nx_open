@@ -18,6 +18,9 @@ public:
 
     void stop();
 
+    /*!
+        \return Object belongs to this pool
+    */
     QnVideoCamera* getVideoCamera(QnResourcePtr res);
     void removeVideoCamera(QnResourcePtr res);
 

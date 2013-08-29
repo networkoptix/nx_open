@@ -1,7 +1,11 @@
 #include "avi_resource.h"
+
+#include <QDir>
+
 #include "avi_archive_delegate.h"
 
 #include <core/resource/storage_resource.h>
+#include <utils/fs/file.h>
 
 #include "../archive_stream_reader.h"
 #include "../filetypesupport.h"
@@ -32,7 +36,7 @@ void QnAviResource::deserialize(const QnResourceParameters& parameters)
     {
         QString file = parameters[QLatin1String("file")];
         setUrl(QDir::cleanPath(file));
-        setName(QFileInfo(file).fileName());
+        setName(QnFile::fileName(file));
     }
 }
 

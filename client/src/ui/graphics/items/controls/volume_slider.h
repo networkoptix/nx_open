@@ -3,19 +3,6 @@
 
 #include <ui/graphics/items/generic/tool_tip_slider.h>
 
-class QnVolumeSliderNotifier: public QObject {
-    Q_OBJECT;
-public:
-    static QnVolumeSliderNotifier *instance();
-
-signals:
-    void manipulated();
-
-private:
-    friend class QnVolumeSlider;
-};
-
-
 class QnVolumeSlider : public QnToolTipSlider {
     Q_OBJECT;
     Q_PROPERTY(bool muted READ isMute WRITE setMute);

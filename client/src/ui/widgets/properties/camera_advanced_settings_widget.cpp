@@ -1,6 +1,7 @@
 #include "camera_advanced_settings_widget.h"
 
 #include <QtGui/QApplication>
+#include <QtGui/QLabel>
 #include <QtGui/QStyle>
 #include <QtGui/QStyleFactory>
 #include <QtGui/QVBoxLayout>
@@ -256,7 +257,7 @@ QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSet
     m_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     m_layout->addWidget(btn);
     m_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    m_layout->addWidget(new QWidget()); // TODO: hueta
+    m_layout->addWidget(new QWidget()); // TODO: #Elric hueta
 
     QObject::connect(btn, SIGNAL(released()), this, SLOT(onClicked()));
 

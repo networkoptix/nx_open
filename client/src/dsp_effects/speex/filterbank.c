@@ -206,7 +206,6 @@ void filterbank_psy_smooth(FilterBank *bank, float *ps, float *mask)
    /* Low freq slope: 14 dB/Bark*/
    /* High freq slope: 9 dB/Bark*/
    /* Noise vs tone: 5 dB difference */
-   /* FIXME: Temporary kludge */
    float bark[100];
    int i;
    /* Assumes 1/3 Bark resolution */

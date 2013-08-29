@@ -1,11 +1,12 @@
-#ifndef __ABSTRACT_BUSINESS_EVENT_RULE_H__
-#define __ABSTRACT_BUSINESS_EVENT_RULE_H__
+#ifndef QN_BUSINESS_EVENT_RULE_H
+#define QN_BUSINESS_EVENT_RULE_H
 
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
-#include <business/business_logic_common.h>
+#include <business/business_fwd.h>
 
 #include <core/resource/resource_fwd.h>
+#include "business_action_parameters.h"
 
 /**
 * This class define relation between business event and action
@@ -29,11 +30,11 @@ public:
     QnResourceList eventResources() const;
     void setEventResources(const QnResourceList &value);
 
-    QnBusinessParams eventParams() const;
-    void setEventParams(const QnBusinessParams& params);
+    QnBusinessEventParameters eventParams() const;
+    void setEventParams(const QnBusinessEventParameters& params);
 
-    ToggleState::Value eventState() const;
-    void setEventState(ToggleState::Value state);
+    Qn::ToggleState eventState() const;
+    void setEventState(Qn::ToggleState state);
 
     BusinessActionType::Value actionType() const;
     void setActionType(const BusinessActionType::Value value);
@@ -41,8 +42,8 @@ public:
     QnResourceList actionResources() const;
     void setActionResources(const QnResourceList &value);
 
-    QnBusinessParams actionParams() const;
-    void setActionParams(const QnBusinessParams& params);
+    QnBusinessActionParameters actionParams() const;
+    void setActionParams(const QnBusinessActionParameters& params);
 
     /* action aggregation period in seconds */
     int aggregationPeriod() const;
@@ -57,21 +58,22 @@ public:
     QString comments() const;
     void setComments(const QString value);
 
+    bool system() const;
+    void setSystem(bool value);
+
     /* Check if current time allowed in schedule */
     bool isScheduleMatchTime(const QDateTime& datetime) const;
 private:
-    //TODO: instant action + prolonged event: expose action when event starts or finishes
-    //TODO: schedule
     int m_id;
 
     BusinessEventType::Value m_eventType;
     QnResourceList m_eventResources;
-    QnBusinessParams m_eventParams;
-    ToggleState::Value m_eventState;
+    QnBusinessEventParameters m_eventParams;
+    Qn::ToggleState m_eventState;
 
     BusinessActionType::Value m_actionType;
     QnResourceList m_actionResources;
-    QnBusinessParams m_actionParams;
+    QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;
     bool m_disabled;
@@ -79,11 +81,14 @@ private:
     QString m_schedule;
     QByteArray m_binSchedule;
     QString m_comments;
+
+    bool m_system;
 };
 
 typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
-typedef QList<QnBusinessEventRulePtr> QnBusinessEventRules; // TODO: #Elric QnBusinessEventRuleList
+typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
 
 Q_DECLARE_METATYPE(QnBusinessEventRulePtr)
+Q_DECLARE_METATYPE(QnBusinessEventRuleList)
 
-#endif // __ABSTRACT_BUSINESS_EVENT_RULE_H__
+#endif // QN_BUSINESS_EVENT_RULE_H

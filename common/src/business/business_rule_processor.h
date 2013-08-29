@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QThread>
 #include <QMultiMap>
+#include <QImage>
 
 #include <core/resource/resource_fwd.h>
 
@@ -15,8 +16,6 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/camera_output_business_action.h>
-#include <business/actions/popup_business_action.h>
-
 
 class QnProcessorAggregationInfo {
 public:
@@ -46,7 +45,7 @@ public:
         m_info.clear();
     }
 
-    void append(const QnBusinessParams& runtimeParams) {
+    void append(const QnBusinessEventParameters& runtimeParams) {
         m_info.append(runtimeParams);
     }
 
@@ -101,7 +100,7 @@ public:
 
     virtual QString getGuid() const { return QString(); }
 
-    bool showPopup(QnPopupBusinessActionPtr action);
+    bool broadcastBusinessAction(QnAbstractBusinessActionPtr action);
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it
@@ -121,14 +120,15 @@ public slots:
 
     void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
     void at_businessRuleDeleted(int id);
+    void at_businessRuleReset(QnBusinessEventRuleList rules);
 protected slots:
     /*
     * Execute action physically. Return true if action success executed
     */
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 private slots:
-    void at_sendPopupFinished(QnHTTPRawResponse response, int handle);
-    void at_sendEmailFinished(int status, const QByteArray& errorString, bool result, int handle);
+    void at_broadcastBusinessActionFinished(QnHTTPRawResponse response, int handle);
+    void at_sendEmailFinished(int status, bool result, int handle);
     void at_actionDelivered(QnAbstractBusinessActionPtr action);
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
 
@@ -136,8 +136,10 @@ private slots:
 
 
 protected:
+    virtual QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const;
+    
     bool containResource(QnResourceList resList, const QnId& resId) const;
-    QList <QnAbstractBusinessActionPtr> matchActions(QnAbstractBusinessEventPtr bEvent);
+    QnAbstractBusinessActionList matchActions(QnAbstractBusinessEventPtr bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
     /*
@@ -148,15 +150,19 @@ protected:
     void terminateRunningRule(QnBusinessEventRulePtr rule);
 
 private:
-    QList<QnBusinessEventRulePtr> m_rules;
-    //QnBusinessMessageBus m_messageBus;
-    static QnBusinessRuleProcessor* m_instance;
+    void at_businessRuleChanged_i(QnBusinessEventRulePtr bRule);
 
-    bool sendMail( const QnSendMailBusinessActionPtr& action );
+    bool sendMail(const QnSendMailBusinessActionPtr& action );
 
     QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     bool checkRuleCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
+    QString formatEmailList(const QStringList& value);
+
+private:
+    QList<QnBusinessEventRulePtr> m_rules;
+    //QnBusinessMessageBus m_messageBus;
+    static QnBusinessRuleProcessor* m_instance;
 
     struct RunningRuleInfo
     {

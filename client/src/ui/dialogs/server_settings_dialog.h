@@ -1,9 +1,12 @@
 #ifndef SERVER_SETTINGS_DIALOG_H
 #define SERVER_SETTINGS_DIALOG_H
 
+#include <QtCore/QWeakPointer>
 #include <QtGui/QDialog>
 
 #include <core/resource/resource_fwd.h>
+
+#include <ui/workbench/workbench_context_aware.h>
 
 #include "button_box_dialog.h"
 
@@ -16,7 +19,7 @@ namespace Ui {
     class ServerSettingsDialog;
 }
 
-class QnServerSettingsDialog: public QnButtonBoxDialog {
+class QnServerSettingsDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware {
     Q_OBJECT;
 
     typedef QnButtonBoxDialog base_type;
@@ -38,10 +41,15 @@ private:
     QnStorageSpaceData tableItem(int row) const;
     QList<QnStorageSpaceData> tableItems() const;
 
-private slots: 
+    void setBottomLabelText(const QString &text);
+    QString bottomLabelText() const;
+    int dataRowCount() const;
+
+private slots:
     void at_tableBottomLabel_linkActivated();
     void at_storagesTable_cellChanged(int row, int column);
     void at_storagesTable_contextMenuEvent(QObject *watched, QEvent *event);
+    void at_pingButton_clicked();
 
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
 
@@ -49,7 +57,7 @@ private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
     QList<QString> m_storageProtocols;
-    QLabel *m_tableBottomLabel;
+    QWeakPointer<QLabel> m_tableBottomLabel;
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;

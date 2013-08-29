@@ -2,7 +2,10 @@
 #define __SIGN_INGO_H__
 
 #include <QLabel>
+#include <QTimer>
 #include "export/sign_helper.h"
+
+// TODO: #Elric not a dialog, a label! move to widgets!
 
 class QnSignInfo: public QLabel
 {

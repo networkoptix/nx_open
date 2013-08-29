@@ -1,8 +1,16 @@
+
 #include "rtsp_client_archive_delegate.h"
+
+#include <QBuffer>
+
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
+
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource_managment/resource_pool.h"
 #include "utils/network/rtp_stream_parser.h"
-#include "libavcodec/avcodec.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/common/util.h"
@@ -11,6 +19,7 @@
 #include "core/resource/camera_history.h"
 #include "core/resource/media_server_resource.h"
 #include "redass/redass_controller.h"
+#include "device_plugins/server_camera/server_camera.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -36,6 +45,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_forcedEndTime(AV_NOPTS_VALUE),
     m_isMultiserverAllowed(true),
     m_audioLayout(0),
+    m_customVideoLayout(0),
     m_playNowModeAllowed(true),
     m_reader(reader),
     m_frameCnt(0)
@@ -65,6 +75,7 @@ QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
     close();
     delete [] m_rtpDataBuffer;
     delete m_audioLayout;
+    delete m_customVideoLayout;
 }
 
 QnResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime(QnResourcePtr resource, qint64 time)
@@ -143,7 +154,8 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
             if (server && server->getStatus() != QnResource::Offline)
             {
                 otherRtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
-                if (otherRtspSession.open(getUrl(otherCamera))) {
+                otherRtspSession.setAdditionAttribute("x-server-guid", server->getGuid().toUtf8());
+                if (otherRtspSession.open(getUrl(otherCamera)).errorCode == CameraDiagnostics::ErrorCode::noError) {
                     if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
                     {
                         minTime = qMin(minTime, otherRtspSession.startTime());
@@ -160,19 +172,15 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
 
 QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64 time)
 {
-    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (!netRes)
+    QnServerCameraPtr camRes = qSharedPointerDynamicCast<QnServerCamera>(resource);
+    if (!camRes)
         return resource;
-    QString physicalId = netRes->getPhysicalId();
+    QString physicalId = camRes->getPhysicalId();
 
     if (time == DATETIME_NOW)
     {
-        QnNetworkResourceList cameraList = qnResPool->getAllNetResourceByPhysicalId(physicalId);
-        foreach(QnNetworkResourcePtr camera, cameraList) {
-            if (!camera->isDisabled())
-                return camera;
-        }
-        return resource;
+        QnServerCameraPtr activeCam = camRes->findEnabledSubling();
+        return activeCam ? activeCam : camRes;
     }
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
@@ -206,6 +214,10 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 {
     if (m_opened)
         return true;
+
+    delete m_customVideoLayout;
+    m_customVideoLayout = 0;
+
     updateRtpParam(resource);
     if (m_isMultiserverAllowed)
         resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
@@ -221,6 +233,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     m_rtspSession.setTransport(QLatin1String("TCP"));
 
     m_rtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
+    m_rtspSession.setAdditionAttribute("x-server-guid", server->getGuid().toUtf8());
     m_rtpData = 0;
 
     bool globalTimeBlocked = false;
@@ -229,7 +242,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
         globalTimeBlocked = true;
     }
     
-    bool isOpened = m_rtspSession.open(getUrl(resource), m_lastSeekTime);
+    const bool isOpened = m_rtspSession.open(getUrl(resource), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
         qint64 endTime = m_position;
@@ -255,6 +268,18 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 
     QList<QByteArray> audioSDP = m_rtspSession.getSdpByType(RTPSession::TT_AUDIO);
     parseAudioSDP(audioSDP);
+
+    if (m_opened) {
+        QString vLayout = m_rtspSession.getVideoLayout();
+        if (!vLayout.isEmpty()) {
+            m_customVideoLayout = QnCustomResourceVideoLayout::fromString(vLayout);
+
+            QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource> (resource);
+            if (mediaRes)
+                mediaRes->setCustomVideoLayout(m_customVideoLayout);
+        }
+    }
+
 
     return m_opened;
 }
@@ -607,8 +632,10 @@ void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
 
 QnResourceVideoLayout* QnRtspClientArchiveDelegate::getVideoLayout()
 {
-    // todo: implement me
-    return &m_defaultVideoLayout;
+    if (m_customVideoLayout)
+        return m_customVideoLayout;
+    else
+        return &m_defaultVideoLayout;
 }
 
 QnResourceAudioLayout* QnRtspClientArchiveDelegate::getAudioLayout()
@@ -918,7 +945,7 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
     if (mediaRes) {
         const QnResourceVideoLayout* videoLayout = mediaRes->getVideoLayout(0);
         if (videoLayout)
-            numOfVideoChannels = videoLayout->numberOfChannels();
+            numOfVideoChannels = videoLayout->channelCount();
     }
     m_rtspSession.setUsePredefinedTracks(numOfVideoChannels); // ommit DESCRIBE and SETUP requests
 }

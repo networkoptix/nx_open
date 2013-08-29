@@ -2,8 +2,10 @@
 #include "ui_database_management_widget.h"
 
 #include <QMessageBox>
+#include <QtGui/QFileDialog>
+#include <QtCore/QFileInfo>
 
-#include "utils/settings.h"
+#include "client/client_settings.h"
 #include "api/app_server_connection.h"
 
 #include <ui/actions/actions.h>
@@ -53,7 +55,7 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     QScopedPointer<QnDatabaseManagementWidgetReplyProcessor> processor(new QnDatabaseManagementWidgetReplyProcessor());
     connect(processor, SIGNAL(activated()), dialog, SLOT(reset()));
     
-    QnAppServerConnectionFactory::createConnection()->dumpDatabase(processor.data(), SLOT(activate(const QnHTTPRawResponse &, int)));
+    QnAppServerConnectionFactory::createConnection()->dumpDatabaseAsync(processor.data(), SLOT(activate(const QnHTTPRawResponse &, int)));
     dialog->exec();
     if(dialog->wasCanceled())
         return;
@@ -96,7 +98,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     QScopedPointer<QnDatabaseManagementWidgetReplyProcessor> processor(new QnDatabaseManagementWidgetReplyProcessor());
     connect(processor, SIGNAL(activated()), dialog, SLOT(reset()));
 
-    QnAppServerConnectionFactory::createConnection()->restoreDatabase(data, processor.data(), SLOT(activate(const QnHTTPRawResponse &, int)));
+    QnAppServerConnectionFactory::createConnection()->restoreDatabaseAsync(data, processor.data(), SLOT(activate(const QnHTTPRawResponse &, int)));
     dialog->exec();
     if(dialog->wasCanceled())
         return; // TODO: #Elric make non-cancellable.

@@ -10,7 +10,7 @@
 
 class QnBusinessActionWidgetFactory {
 public:
-    static QnAbstractBusinessParamsWidget* createWidget(BusinessActionType::Value actionType, QWidget* parent = 0, QnWorkbenchContext *context = NULL);
+    static QnAbstractBusinessParamsWidget* createWidget(BusinessActionType::Value actionType, QWidget* parent = 0);
 };
 
 #endif // BUSINESS_ACTION_WIDGET_FACTORY_H

@@ -18,10 +18,9 @@ public:
 
 protected:
     bool canChangeStatus() const;
-
+    virtual void beforeRun() override;
 private:
     void run(); // in a loop: takes images from camera and put into queue
-    virtual void beforeRun() override;
 
     QnAdaptiveSleep m_fpsSleep;
 };

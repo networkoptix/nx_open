@@ -33,9 +33,14 @@ QnRenderingWidget::QnRenderingWidget(QWidget *parent, Qt::WindowFlags f):
     timer->start(1000 / 60);
 }
 
-QnRenderingWidget::~QnRenderingWidget() {
-    if( m_display )
+QnRenderingWidget::~QnRenderingWidget() 
+{
+    if( m_display ) {
+        m_display->removeRenderer(m_renderer);
+        m_renderer->destroyAsync();
         m_display->beforeDestroy();
+        delete m_display;
+    }
 }
 
 QnMediaResourcePtr QnRenderingWidget::resource() const {
@@ -51,11 +56,27 @@ void QnRenderingWidget::setResource(const QnMediaResourcePtr &resource) {
     m_resource = resource;
 }
 
+void QnRenderingWidget::stopPlayback()
+{
+    if( !m_display )
+        return;
+
+    m_display->removeRenderer( m_renderer );
+    m_renderer->destroyAsync();
+    m_renderer = NULL;
+
+    m_display->beforeDestroy();
+    delete m_display;
+    m_display = NULL;
+
+    m_channelScreenSize = QSize();
+}
+
 void QnRenderingWidget::updateChannelScreenSize() {
     if(!m_renderer) {
         m_channelScreenSize = QSize();
     } else {
-        QSize channelScreenSize = QSizeF(width() / m_display->videoLayout()->width(), height() / m_display->videoLayout()->height()).toSize();
+        QSize channelScreenSize = QnGeometry::cwiseDiv(size(), m_display->videoLayout()->size()).toSize();
         if(channelScreenSize != m_channelScreenSize) {
             m_channelScreenSize = channelScreenSize;
             m_renderer->setChannelScreenSize(m_channelScreenSize);
@@ -75,11 +96,11 @@ void QnRenderingWidget::ensureDisplay() {
     if(m_display || !m_resource)
         return;
 
-    m_display = new QnResourceDisplay(m_resource, this);
-    m_renderer = new QnResourceWidgetRenderer(1, NULL, context());
+    m_display = new QnResourceDisplay(m_resource->toResourcePtr(), this);
+    m_renderer = new QnResourceWidgetRenderer(NULL, context());
     updateChannelScreenSize();
 
-    m_display->addRenderer(m_renderer); /* Ownership of the renderer is transferred to the display. */
+    m_display->addRenderer(m_renderer);
     m_display->start();
 
     if(m_display->archiveReader())
@@ -124,6 +145,7 @@ void QnRenderingWidget::paintGL() {
         glLoadIdentity();
         m_renderer->paint(
             0,
+            QRectF(0.0, 0.0, 1.0, 1.0),
             QnGeometry::expanded(QnGeometry::aspectRatio(sourceSize), rect(), Qt::KeepAspectRatio, Qt::AlignCenter),
             1.0
         );

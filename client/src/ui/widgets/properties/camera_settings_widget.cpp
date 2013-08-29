@@ -34,6 +34,7 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchConte
     connect(m_multiWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(advancedSettingChanged()), this, SLOT(at_advancedSettingChanged()));
+    connect(m_singleWidget, SIGNAL(fisheyeSettingChanged()), this, SIGNAL(fisheyeSettingChanged()));
     connect(m_singleWidget, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(m_multiWidget,  SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
 
@@ -88,6 +89,8 @@ void QnCameraSettingsWidget::setResources(const QnResourceList &resources) {
             break;
         }
     }
+
+    emit resourcesChanged();
 }
 
 Qn::CameraSettingsTab QnCameraSettingsWidget::currentTab() const {
@@ -165,11 +168,42 @@ bool QnCameraSettingsWidget::hasAnyCameraChanges() const {
     }
 }
 
-bool QnCameraSettingsWidget::hasControlsChanges() const {
+bool QnCameraSettingsWidget::hasScheduleControlsChanges() const {
     switch(mode()) {
-    case SingleMode: return m_singleWidget->hasControlsChanges();
-    case MultiMode: return m_multiWidget->hasControlsChanges();
+    case SingleMode: return m_singleWidget->hasScheduleControlsChanges();
+    case MultiMode: return m_multiWidget->hasScheduleControlsChanges();
     default: return false;
+    }
+}
+
+void QnCameraSettingsWidget::clearScheduleControlsChanges() {
+    switch(mode()) {
+    case SingleMode:
+        m_singleWidget->clearScheduleControlsChanges();
+        break;
+    case MultiMode:
+        m_multiWidget->clearScheduleControlsChanges();
+        break;
+    default:
+        break;
+    }
+}
+
+bool QnCameraSettingsWidget::hasMotionControlsChanges() const {
+    switch(mode()) {
+    case SingleMode: return m_singleWidget->hasMotionControlsChanges();
+    case MultiMode: return false;
+    default: return false;
+    }
+}
+
+void QnCameraSettingsWidget::clearMotionControlsChanges() {
+    switch(mode()) {
+    case SingleMode:
+        m_singleWidget->clearMotionControlsChanges();
+        break;
+    default:
+        break;
     }
 }
 
@@ -207,6 +241,20 @@ void QnCameraSettingsWidget::updateFromResources() {
         break;
     case MultiMode:
         m_multiWidget->updateFromResources();
+        break;
+    default:
+        break;
+    }
+}
+
+void QnCameraSettingsWidget::reject()
+{
+    switch(mode()) {
+    case SingleMode:
+        m_singleWidget->reject();
+        break;
+    case MultiMode:
+        m_multiWidget->reject();
         break;
     default:
         break;
@@ -263,7 +311,7 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
 }
 
 void QnCameraSettingsWidget::at_moreLicensesRequested() {
-    menu()->trigger(Qn::GetMoreLicensesAction);
+    menu()->trigger(Qn::PreferencesLicensesTabAction);
 }
 
 void QnCameraSettingsWidget::at_advancedSettingChanged() {

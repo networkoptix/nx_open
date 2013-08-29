@@ -19,8 +19,12 @@ void QnBusinessAggregationInfo::clear() {
     m_details.clear();
 }
 
-void QnBusinessAggregationInfo::append(const QnBusinessParams &runtimeParams) {
-    QString key = QnBusinessEventRuntime::getParamsKey(runtimeParams);
+bool QnBusinessAggregationInfo::isEmpty() const {
+    return m_details.isEmpty();
+}
+
+void QnBusinessAggregationInfo::append(const QnBusinessEventParameters &runtimeParams) {
+    QString key = runtimeParams.getParamsKey();
     QnInfoDetail& info = m_details[key];
     if (info.count == 0) //not initialized
         info.runtimeParams = runtimeParams; //timestamp of first event is stored here

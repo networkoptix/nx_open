@@ -27,7 +27,7 @@ bool QnServerCamera::updateMACAddress()
     return true;
 }
 
-QString QnServerCamera::manufacture() const
+QString QnServerCamera::getDriverName() const
 {
     return QLatin1String("Server camera"); //all other manufacture are also untranslated and should not be translated
 }
@@ -71,6 +71,37 @@ QString QnServerCamera::getUniqueId() const
 {
     return getPhysicalId() + getParentId().toString();
 }
+
+QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
+{
+    return getPhysicalId() + mServer->getId().toString();
+}
+
+QnServerCameraPtr QnServerCamera::findEnabledSubling()
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (!isDisabled())
+        return toSharedPointer().dynamicCast<QnServerCamera>();
+
+    if (m_activeCamera && !m_activeCamera->isDisabled())
+        return m_activeCamera;
+
+    QnNetworkResourceList resList = qnResPool->getAllNetResourceByPhysicalId(getPhysicalId());
+    foreach(const QnNetworkResourcePtr& netRes, resList)
+    {
+        if (!netRes->isDisabled()) {
+            QnServerCameraPtr cam = netRes.dynamicCast<QnServerCamera>();
+            if (cam) {
+                m_activeCamera = cam;
+                return m_activeCamera;
+            }
+        }
+    }
+
+    return QnServerCameraPtr();
+}
+
 
 // --------------------------- QnServerCameraFactory -----------------------------
 

@@ -1,7 +1,16 @@
+
 #include "camera_history.h"
+
+extern "C"
+{
+    #include <libavutil/avutil.h>
+}
+
 #include "core/resource_managment/resource_pool.h"
 #include "media_server_resource.h"
 #include "utils/common/warnings.h"
+#include "utils/common/util.h"
+
 
 QnId QnCameraTimePeriod::getServerId() const
 {
@@ -187,11 +196,11 @@ QnCameraHistoryPool::~QnCameraHistoryPool() {
     return;
 }
 
-Q_GLOBAL_STATIC(QnCameraHistoryPool, inst);
+Q_GLOBAL_STATIC(QnCameraHistoryPool, QnCameraHistoryPool_instance);
 
 QnCameraHistoryPool* QnCameraHistoryPool::instance()
 {
-    return inst();
+    return QnCameraHistoryPool_instance();
 }
 
 QnCameraHistoryPtr QnCameraHistoryPool::getCameraHistory(const QString& physicalId)

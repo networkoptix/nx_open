@@ -3,6 +3,7 @@
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QObject>
+#include <QVariant>
 
 template<class T, class Object, class Setter, class Getter>
 class QnGenericScopedValueRollback {

@@ -1,29 +1,13 @@
 #ifndef QN_ACTIONS_H
 #define QN_ACTIONS_H
 
+#include <QMetaType>
+
 #include "action_fwd.h"
 
+#include <client/client_globals.h>
+
 namespace Qn {
-
-    inline QLatin1String fromLatin1(const char *s) {
-        return QLatin1String(s);
-    }
-
-#define GridPositionParameter               fromLatin1("_qn_gridPosition")
-#define UserParameter                       fromLatin1("_qn_user")
-#define NameParameter                       fromLatin1("_qn_name")
-#define ServerParameter                     fromLatin1("_qn_server")
-#define LayoutParameter                     fromLatin1("_qn_layoutParameter")
-#define CurrentLayoutParameter              fromLatin1("_qn_currentLayoutParameter")
-#define CurrentLayoutMediaItemsParameter    fromLatin1("_qn_currentLayoutMediaItemsParameter")
-#define CurrentUserParameter                fromLatin1("_qn_currentUserParameter")
-#define AllMediaServersParameter            fromLatin1("_qn_allMediaServers")
-#define SerializedResourcesParameter        fromLatin1("_qn_serializedResourcesParameter")
-#define TimePeriodParameter                 fromLatin1("_qn_timePeriodParameter")
-#define TimePeriodsParameter                fromLatin1("_qn_timePeriodsParameter")
-#define AllTimePeriodsParameter             fromLatin1("_qn_allTimePeriodsParameter")
-#define ConnectInfoParameter                fromLatin1("_qn_connectInfoParameter")
-
     /**
      * Enum of all menu actions.
      */
@@ -38,25 +22,24 @@ namespace Qn {
         /**
          * Opens licenses preferences tab.
          */
-        GetMoreLicensesAction,
-
+        PreferencesLicensesTabAction,
 
         /**
          * Opens server settings preferences tab.
          */
-        OpenServerSettingsAction,
+        PreferencesServerTabAction,
 
         /**
-         * Opens popup settings preferences tab.
+         * Opens notifications settings preferences tab.
          */
-        OpenPopupSettingsAction,
+        PreferencesNotificationTabAction,
 
         /**
          * Reconnects to the Enterprise Controller using the last used URL
          * set in <tt>QnSettings</tt>.
-         * 
+         *
          * Parameters.
-         * <tt>QnConnectInfoPtr ConnectInfoParameter</tt> --- a connection info
+         * <tt>QnConnectInfoPtr ConnectionInfoRole</tt> --- a connection info
          * to use. If not provided, action handler will try to send a connect
          * request first.
          */
@@ -80,18 +63,18 @@ namespace Qn {
         /**
          * Drops provided resources on the workbench, opening them in a new
          * layout if necessary.
-         */ 
+         */
         DropResourcesIntoNewLayoutAction,
 
         /**
-         * Drops provided serialized resources on the current layout after 
+         * Drops provided serialized resources on the current layout after
          * connection to Enterprise Controller was established.
-         * 
+         *
          * Parameters:
-         * 
-         * <tt>QByteArray SerializedResourcesParameter</tt> --- a serialized
+         *
+         * <tt>QByteArray SerializedDataRole</tt> --- a serialized
          * QnMimeData representation of a set of resources.
-         */ 
+         */
         DelayedDropResourcesAction,
 
         /**
@@ -99,17 +82,17 @@ namespace Qn {
          *
          * Parameters:
          *
-         * <tt>QByteArray SerializedResourcesParameter</tt> --- a serialized
+         * <tt>QByteArray SerializedDataRole</tt> --- a serialized
          * QnMimeData representation of a set of resources.
          */
         InstantDropResourcesAction,
 
         /**
          * Moves cameras from one server to another.
-         * 
+         *
          * Parameters.
-         * 
-         * <tt>QnMediaServerResourcePtr ServerParameter</tt> --- video server to
+         *
+         * <tt>QnMediaServerResourcePtr MediaServerResourceRole</tt> --- video server to
          * move cameras to.
          */
         MoveCameraAction,
@@ -139,11 +122,10 @@ namespace Qn {
          */
         WhatsThisAction,
 
-
         /**
-         * Checks system health: licences, storages, email settings, etc.
+         * Clears application cache folders (layout backgrounds, sounds)
          */
-        CheckSystemHealthAction,
+        ClearCacheAction,
 
         /**
          * Cancels Tour Mode if it is started, otherwise works as FullScreenAction.
@@ -151,9 +133,42 @@ namespace Qn {
         EscapeHotkeyAction,
 
         /**
-         * Toggles visibility of popup windows.
+         * Displays message box with the text provided.
+         *
+         * Parameters:
+         * <tt>QString TitleRole</tt> --- title for the messagebox.
+         * <tt>QString TextRole</tt> --- displayed text. If not provided, title will be used.
          */
-        TogglePopupsAction,
+        MessageBoxAction,
+
+        /**
+         * Displays version mismatch dialog, pulling mismatch data from 
+         * <tt>QnWorkbenchVersionMismatchWatcher</tt>. Displays nothing if there
+         * is no mismatches.
+         */
+        VersionMismatchMessageAction,
+
+        /**
+         * Opens the provided url in the default browser.
+         *
+         * Parameters:
+         * <tt>QUrl UrlRole</tt> --- target url.
+         */
+        BrowseUrlAction,
+
+        /**
+         * Opens the Business Events Log dialog.
+         * Supports cameras list in the resources field as a cameras filter.
+         * Parameters:
+         * <tt>BusinessEventType::Value EventTypeRole</tt> --- filter by event type.
+         */
+        OpenBusinessLogAction,
+
+        /**
+         * Opens the Business Rules dialog.
+         * Supports cameras list in the resources field as a cameras filter.
+         */
+        OpenBusinessRulesAction,
 
 
         /* Main menu actions. */
@@ -196,7 +211,7 @@ namespace Qn {
         OpenFileAction,
 
         /**
-         * Opens a file dialog and adds all files from selected folder 
+         * Opens a file dialog and adds all files from selected folder
          * to the current layout.
          */
         OpenFolderAction,
@@ -208,7 +223,7 @@ namespace Qn {
 
         /**
          * Maximizes/restores client's main window.
-         */ 
+         */
         MaximizeAction,
 
         /**
@@ -217,7 +232,7 @@ namespace Qn {
         FullscreenAction,
 
         /**
-         * Action to be invoked to toggle fullscreen/maximized state. 
+         * Action to be invoked to toggle fullscreen/maximized state.
          * Actual action that will be invoked is platform-dependent.
          */
         EffectiveMaximizeAction,
@@ -229,18 +244,14 @@ namespace Qn {
 
         /**
          * Minimizes client's main window.
-         */ 
+         */
         MinimizeAction,
 
         /**
          * Opens system settings dialog.
          */
-        SystemSettingsAction,
+        PreferencesGeneralTabAction,
 
-        /**
-         * Opens business events editing dialog.
-         */
-        BusinessEventsAction,
 
         /**
          * Opens about dialog.
@@ -253,10 +264,39 @@ namespace Qn {
         CheckForUpdatesAction,
 
         /**
+         * Open Showcase page in default browser
+         */
+        ShowcaseAction,
+
+        /**
          * Closes the client.
          */
         ExitAction,
 
+
+        /* Tree Root Nodes actions */
+
+        /**
+         * Opens web client in the default browser.
+         */
+        WebClientAction,
+
+        /**
+         * Opens business events editing dialog.
+         */
+        BusinessEventsAction,
+
+        /**
+         * Opens business events log dialog.
+         */
+        BusinessEventsLogAction,
+
+        /**
+         * Opens camera list dialog.
+         */
+        CameraListAction,
+
+        //ShowMediaServerLogs,
 
 
         /* Tab bar actions. */
@@ -276,23 +316,23 @@ namespace Qn {
 
         /**
          * Opens selected resources in provided layout.
-         * 
+         *
          * Parameters:
-         * 
-         * <tt>QPointF GridPositionParameter</tt> --- drop position, in grid coordinates. 
+         *
+         * <tt>QPointF ItemPositionRole</tt> --- drop position, in grid coordinates.
          * If not provided, Items will be dropped at the center of the layout.
-         * <tt>QnLayoutResourcePtr LayoutParameter</tt> --- layout to drop at.
-         */ 
+         * <tt>QnLayoutResourcePtr LayoutResourceRole</tt> --- layout to drop at.
+         */
         OpenInLayoutAction,
 
         /**
          * Opens selected resources in current layout.
-         * 
+         *
          * Parameters:
-         * 
-         * <tt>QPointF GridPositionParameter</tt> --- drop position, in grid coordinates. 
+         *
+         * <tt>QPointF ItemPositionRole</tt> --- drop position, in grid coordinates.
          * If not provided, Items will be dropped at the center of the layout.
-         */ 
+         */
         OpenInCurrentLayoutAction,
 
         /**
@@ -328,7 +368,12 @@ namespace Qn {
         /**
          * Opens selected layouts in a new window.
          */
-        OpenNewWindowLayoutsAction,
+        OpenLayoutsInNewWindowAction,
+
+        /**
+         * Opens current layout in a new window.
+         */
+        OpenCurrentLayoutInNewWindowAction,
 
         /**
          * Saves selected layout.
@@ -337,19 +382,18 @@ namespace Qn {
 
         /**
          * Saves selected layout under another name.
-         * 
+         *
          * Parameters:
-         * 
-         * <tt>QnUserResourcePtr UserParameter</tt> --- user to assign layout to.
-         * <tt>QString NameParameter</tt> --- name for the new layout.
+         * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to assign layout to.
+         * <tt>QString ResourceNameRole</tt> --- name for the new layout.
          */
         SaveLayoutAsAction,
 
         /**
          * Saves selected layout under another name in current user's layouts list.
-         * 
+         *
          * Parameters:
-         * <tt>QString NameParameter</tt> --- name for the new layout.
+         * <tt>QString ResourceNameRole</tt> --- name for the new layout.
          */
         SaveLayoutForCurrentUserAsAction,
 
@@ -395,8 +439,18 @@ namespace Qn {
 
         /**
          * Takes screenshot of an item.
+         *
+         * Parameters:
+         * <tt>QString FileNameRole</tt> --- name for the screenshot. If not provided,
+         * a file selection dialog will pop up.
          */
         TakeScreenshotAction,
+
+        /**
+         * Change video contrast
+         *
+         */
+        AdjustVideoAction,
 
         /**
          * Opens user settings dialog.
@@ -407,6 +461,22 @@ namespace Qn {
          * Opens camera settings dialog.
          */
         CameraSettingsAction,
+
+        /**
+         * Opens event log dialog with filter for current camera(s) issues
+         */
+        CameraIssuesAction,
+
+        /**
+         * Opens business rules dialog with filter for current camera(s) rules
+         */
+        CameraBusinessRulesAction,
+
+        /**
+         * Opens camera diagnostics dialog that checks for problems with
+         * selected camera.
+         */
+        CameraDiagnosticsAction,
 
         /**
          * Opens current layout settings dialog.
@@ -434,9 +504,29 @@ namespace Qn {
         ServerSettingsAction,
 
         /**
+         * Opens a console with ping process for the selected resource.
+         */
+        PingAction,
+
+        /**
+         * Opens server logs in the default web browser.
+         */
+        ServerLogsAction,
+
+        /**
+         * Opens event log dialog with filter for current server(s) issues.
+         */
+        ServerIssuesAction,
+
+        /**
          * Opens manual camera addition dialog.
          */
         ServerAddCameraManuallyAction,
+
+        /**
+         * Opens camera list by media server
+         */
+        CameraListByServerAction,
 
         /**
          * Opens a YouTube upload dialog.
@@ -444,14 +534,14 @@ namespace Qn {
         YouTubeUploadAction,
 
         /**
-         * Opens tags editing dialog.
-         */
-        EditTagsAction,
-
-        /**
          * Opens a folder that contains the file resource.
          */
         OpenInFolderAction,
+
+        /**
+         * Creates a zoom window for the given item.
+         */
+        CreateZoomWindowAction,
 
         /**
          * Rotates item to normal orientation
@@ -520,9 +610,9 @@ namespace Qn {
 
         /**
          * Moves camera to the given PTZ preset.
-         * 
+         *
          * Parameters:
-         * <tt>QString NameParameter</tt> --- name of the PTZ preset.
+         * <tt>QString ResourceNameRole</tt> --- name of the PTZ preset.
          */
         PtzGoToPresetAction,
 
@@ -531,6 +621,10 @@ namespace Qn {
          */
         PtzManagePresetsAction,
 
+        /**
+         * Sets the current picture as a layout background.
+         */
+        SetAsBackgroundAction,
 
 
         /* Layout actions. */
@@ -552,10 +646,10 @@ namespace Qn {
 
         /**
          * Changes resource name.
-         * 
+         *
          * Parameters:
-         * 
-         * <tt>QString NameParameter</tt> --- new name for the resource. If not
+         *
+         * <tt>QString ResourceNameRole</tt> --- new name for the resource. If not
          * supplied, name dialog will pop up.
          */
         RenameAction,
@@ -644,10 +738,10 @@ namespace Qn {
 
         /**
          * Opens new layout for Quick Search.
-         * 
+         *
          * Parameters:
-         * 
-         * <tt>QnTimePeriod TimePeriodParameter</tt> --- time period for quick search.
+         *
+         * <tt>QnTimePeriod TimePeriodRole</tt> --- time period for quick search.
          */
         ThumbnailsSearchAction,
 
@@ -661,7 +755,7 @@ namespace Qn {
          */
         ToggleCalendarAction,
 
-        /** 
+        /**
          * Shows/hides title bar.
          */
         ToggleTitleBarAction,
@@ -681,6 +775,8 @@ namespace Qn {
          */
         ToggleSliderAction,
 
+
+        PinNotificationsAction,
 
         /* Playback actions. */
         PlayPauseAction,
@@ -710,9 +806,14 @@ namespace Qn {
         DebugDecrementCounterAction,
 
         /**
-         * Show resource pool.
+         * Shows resource pool.
          */
         DebugShowResourcePoolAction,
+
+        /**
+         * Generates PTZ calibration screenshots.
+         */
+        DebugCalibratePtzAction,
 
 
         ActionCount,
@@ -722,9 +823,9 @@ namespace Qn {
 
     /**
      * Scope of an action.
-     * 
+     *
      * Scope defines the menus in which an action can appear, and target
-     * for getting the action's parameters in case it was triggered with a 
+     * for getting the action's parameters in case it was triggered with a
      * hotkey.
      */
     enum ActionScope {
@@ -734,18 +835,19 @@ namespace Qn {
         TreeScope               = 0x00000004,           /**< Action appears in tree context menu. */
         SliderScope             = 0x00000008,           /**< Action appears in slider context menu. */
         TitleBarScope           = 0x00000010,           /**< Action appears title bar context menu. */
+        NotificationsScope      = 0x00000020,
         ScopeMask               = 0x000000FF
     };
     Q_DECLARE_FLAGS(ActionScopes, ActionScope);
 
     /**
      * Type of an action parameter.
-     * 
-     * Note that some of these types are convertible to other types. 
+     *
+     * Note that some of these types are convertible to other types.
      */
     enum ActionParameterType {
         ResourceType            = 0x00000100,           /**< Resource, <tt>QnResourcePtr</tt>. */
-        LayoutItemType          = 0x00000200,           /**< Layout item, <tt>QnLayoutItemIndex</tt>. Convertible to resource. */    
+        LayoutItemType          = 0x00000200,           /**< Layout item, <tt>QnLayoutItemIndex</tt>. Convertible to resource. */
         WidgetType              = 0x00000400,           /**< Resource widget, <tt>QnResourceWidget *</tt>. Convertible to layout item and resource. */
         LayoutType              = 0x00000800,           /**< Workbench layout, <tt>QnWorkbenchLayout *</tt>. Convertible to resource. */
         OtherType               = 0x00001000,           /**< Some other type. */
@@ -755,35 +857,35 @@ namespace Qn {
 
     enum ActionFlag {
         /** Action can be applied when there are no targets. */
-        NoTarget                = 0x00010000,           
+        NoTarget                = 0x00010000,
 
         /** Action can be applied to a single target. */
-        SingleTarget            = 0x00020000,           
+        SingleTarget            = 0x00020000,
 
         /** Action can be applied to multiple targets. */
-        MultiTarget             = 0x00040000,           
+        MultiTarget             = 0x00040000,
 
         /** Action accepts resources as target. */
-        ResourceTarget          = ResourceType,   
+        ResourceTarget          = ResourceType,
 
         /** Action accepts layout items as target. */
-        LayoutItemTarget        = LayoutItemType, 
+        LayoutItemTarget        = LayoutItemType,
 
         /** Action accepts resource widgets as target. */
-        WidgetTarget            = WidgetType,     
+        WidgetTarget            = WidgetType,
 
         /** Action accepts workbench layouts as target. */
-        LayoutTarget            = LayoutType,     
+        LayoutTarget            = LayoutType,
 
 
-        /** Action has a hotkey that is intentionally ambiguous. 
-         * It is up to the user to ensure that proper action conditions make it 
+        /** Action has a hotkey that is intentionally ambiguous.
+         * It is up to the user to ensure that proper action conditions make it
          * impossible for several actions to be triggered by this hotkey. */
-        IntentionallyAmbiguous  = 0x00100000,          
+        IntentionallyAmbiguous  = 0x00100000,
 
-        /** When the action is activated via hotkey, its scope should not be compared to the current one. 
+        /** When the action is activated via hotkey, its scope should not be compared to the current one.
          * Action can be executed from any scope, and its target will be taken from its scope. */
-        ScopelessHotkey         = 0x00200000,       
+        ScopelessHotkey         = 0x00200000,
 
         /** Action can be pulled into enclosing menu if it is the only one in
          * its submenu. It may have different text in this case. */
@@ -800,23 +902,25 @@ namespace Qn {
 
 
         /** Action can appear in main menu. */
-        Main                    = Qn::MainScope | NoTarget,                     
+        Main                    = Qn::MainScope | NoTarget,
 
         /** Action can appear in scene context menu. */
-        Scene                   = Qn::SceneScope | WidgetTarget,                      
+        Scene                   = Qn::SceneScope | WidgetTarget,
 
         /** Action can appear in tree context menu. */
-        Tree                    = Qn::TreeScope,                                
+        Tree                    = Qn::TreeScope,
 
         /** Action can appear in slider context menu. */
-        Slider                  = Qn::SliderScope | WidgetTarget,    
+        Slider                  = Qn::SliderScope | WidgetTarget,
 
         /** Action can appear in title bar context menu. */
-        TitleBar                = Qn::TitleBarScope | LayoutTarget,      
+        TitleBar                = Qn::TitleBarScope | LayoutTarget,
+
+        Notifications           = Qn::NotificationsScope | WidgetTarget
     };
 
-    Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
-    
+    Q_DECLARE_FLAGS(ActionFlags, ActionFlag)
+
     enum ActionVisibility {
         /** Action is not in the menu. */
         InvisibleAction,
@@ -829,6 +933,8 @@ namespace Qn {
     };
 
 } // namespace Qn
+
+Q_DECLARE_METATYPE(Qn::ActionId);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionScopes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionParameterTypes);

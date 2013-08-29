@@ -31,7 +31,7 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
     qint64 timeDistance = chunk.distanceToTime(time);
 
     if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && chunk.endTimeMs() <= time)
-        timeDistance = INT_MAX; // actually chunk not found
+        timeDistance = INT64_MAX; // actually chunk not found
     if (timeDistance > 0)
     {
         // chunk not found. check in alternate quality
@@ -39,7 +39,7 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
         DeviceFileCatalog::Chunk altChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(time, findMethod));
         qint64 timeDistanceAlt = altChunk.distanceToTime(time);
         if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs() <= time)
-            timeDistanceAlt = INT_MAX; // actually chunk not found
+            timeDistanceAlt = INT64_MAX; // actually chunk not found
 
         int findEps = m_quality == MEDIA_Quality_Low ? FIRST_STREAM_FIND_EPS : SECOND_STREAM_FIND_EPS;
         if (timeDistance - timeDistanceAlt > findEps || (timeDistance > timeDistanceAlt && usePreciseFind))

@@ -1,24 +1,29 @@
 #define QT_NO_CAST_FROM_ASCII
 
-#include "utils/common/config.h"
+#include <common/config.h>
+#ifdef __cplusplus
+    #include <common/common_globals.h>
+#endif
 
+/* Windows headers. */
 #ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <iphlpapi.h>
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#   include <iphlpapi.h>
 
-// DXVA headers (should be included before ffmpeg headers)
-#ifdef _USE_DXVA
-#include <d3d9.h>
-#include <dxva2api.h>
-#include <windows.h>
-#include <windowsx.h>
-#include <ole2.h>
-#include <commctrl.h>
-#include <shlwapi.h>
-#include <Strsafe.h>
+/* DXVA headers (should be included before ffmpeg headers). */
+#   ifdef _USE_DXVA
+#       include <d3d9.h>
+#       include <dxva2api.h>
+#       include <windows.h>
+#       include <windowsx.h>
+#       include <ole2.h>
+#       include <commctrl.h>
+#       include <shlwapi.h>
+#       include <Strsafe.h>
+#   endif
 #endif
-#endif
+
 
 // ffmpeg headers
 #ifdef __cplusplus

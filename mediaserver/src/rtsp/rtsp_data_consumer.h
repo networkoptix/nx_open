@@ -58,6 +58,7 @@ public:
     // put data without mutex. Used for RTSP connection after lockDataQueue
     void addData(QnAbstractMediaDataPtr data);
     void setUseRealTimeStreamingMode(bool value);
+    void setMultiChannelVideo(bool value);
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
 protected:
@@ -107,6 +108,7 @@ private:
     static QSet<QnRtspDataConsumer*> m_allConsumers;
     static QMutex m_allConsumersMutex;
     bool m_realtimeMode;
+    bool m_multiChannelVideo;
     QnAdaptiveSleep m_adaptiveSleep;
     bool m_useUTCTime; // use absolute UTC file for RTP (used for proprietary format)
     int m_fastChannelZappingSize;

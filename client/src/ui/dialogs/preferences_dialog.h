@@ -8,7 +8,7 @@
 
 
 class QnWorkbenchContext;
-class QnSettings;
+class QnClientSettings;
 
 class QnConnectionsSettingsWidget;
 class QnLicenseManagerWidget;
@@ -37,16 +37,15 @@ public:
 
     virtual void accept() override;
 
+    bool restartPending() const;
+
 private:
     void updateFromSettings();
     void submitToSettings();
 
-    void initColorPicker();
-    void initLanguages();
+    void initTranslations();
 
 private slots:
-    void at_animateBackgroundCheckBox_stateChanged(int state);
-    void at_backgroundColorPicker_colorChanged(const QColor &color);
     void at_browseMainMediaFolderButton_clicked();
     void at_addExtraMediaFolderButton_clicked();
     void at_removeExtraMediaFolderButton_clicked();
@@ -54,6 +53,8 @@ private slots:
     void at_context_userChanged();
     void at_timeModeComboBox_activated();
     void at_onDecoderPluginsListChanged();
+    void at_downmixAudioCheckBox_toggled(bool checked);
+    void at_languageComboBox_currentIndexChanged(int index);
 
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
@@ -65,7 +66,7 @@ private:
     QnLicenseManagerWidget *m_licenseManagerWidget;
     QnServerSettingsWidget *m_serverSettingsWidget;
 
-    QnSettings *m_settings;
+    QnClientSettings *m_settings;
 
     /** Index of "Licenses" tab to open it from outside. */
     int m_licenseTabIndex;
@@ -74,6 +75,11 @@ private:
     int m_serverSettingsTabIndex;
 
     int m_popupSettingsTabIndex;
+
+    bool m_oldDownmix;
+    int m_oldLanguage;
+    bool m_restartPending;
+    bool m_oldHardwareAcceleration;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H

@@ -6,17 +6,21 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 
+#include <translation/translation_list_model.h>
+
 #include <core/resource/resource_directory_browser.h>
 #include <decoders/abstractvideodecoderplugin.h>
-#include <plugins/pluginmanager.h>
+#include <plugins/plugin_manager.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
-#include <utils/settings.h>
+#include <utils/applauncher_utils.h>
+#include <client/client_settings.h>
+#include <client/client_translation_manager.h>
+#include <common/common_module.h>
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
-#include "ui/workbench/workbench_translation_manager.h"
 #include "ui/workbench/workbench_access_controller.h"
 #include "ui/screen_recording/screen_recorder.h"
 
@@ -27,38 +31,25 @@
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <ui/widgets/settings/popup_settings_widget.h>
 #include <ui/widgets/settings/server_settings_widget.h>
+#include <ui/workbench/workbench_auto_starter.h>
 
-#include <youtube/youtubesettingswidget.h>
 
-
-QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
+QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent):
     QDialog(parent),
     QnWorkbenchContextAware(context),
     ui(new Ui::PreferencesDialog()),
-    m_recordingSettingsWidget(NULL), 
-    m_youTubeSettingsWidget(NULL), 
+    m_recordingSettingsWidget(NULL),
+    m_youTubeSettingsWidget(NULL),
     m_popupSettingsWidget(NULL),
     m_licenseManagerWidget(NULL),
     m_serverSettingsWidget(NULL),
     m_settings(qnSettings),
     m_licenseTabIndex(0),
     m_serverSettingsTabIndex(0),
-    m_popupSettingsTabIndex(0)
+    m_popupSettingsTabIndex(0),
+    m_restartPending(false)
 {
     ui->setupUi(this);
-
-    ui->maxVideoItemsLabel->hide();
-    ui->maxVideoItemsSpinBox->hide(); // TODO: Cannot edit max number of items on the scene.
-
-    if(m_settings->isBackgroundEditable()) {
-        ui->backgroundColorPicker->setAutoFillBackground(false);
-        initColorPicker();
-    } else {
-        ui->animateBackgroundLabel->hide();
-        ui->animateBackgroundCheckBox->hide();
-        ui->backgroundColorLabel->hide();
-        ui->backgroundColorWidget->hide();
-    }
 
     ui->timeModeComboBox->addItem(tr("Server Time"), Qn::ServerTimeMode);
     ui->timeModeComboBox->addItem(tr("Client Time"), Qn::ClientTimeMode);
@@ -68,7 +59,12 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
 
-    m_popupSettingsWidget = new QnPopupSettingsWidget(this);
+    if(!context->instance<QnWorkbenchAutoStarter>()->isSupported()) {
+        ui->autoStartCheckBox->hide();
+        ui->autoStartLabel->hide();
+    }
+
+    m_popupSettingsWidget = new QnPopupSettingsWidget(context, this);
     m_popupSettingsTabIndex = ui->tabWidget->addTab(m_popupSettingsWidget, tr("Notifications"));
 
 #if 0
@@ -83,7 +79,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     m_serverSettingsWidget = new QnServerSettingsWidget(this);
     m_serverSettingsTabIndex = ui->tabWidget->addTab(m_serverSettingsWidget, tr("Server"));
-
     resize(1, 1); // set widget size to minimal possible
 
     /* Set up context help. */
@@ -92,6 +87,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
     setHelpTopic(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
+    setHelpTopic(ui->hardwareDecodingLabel,   ui->hardwareDecodingCheckBox,   Qn::SystemSettings_General_HWAcceleration_Help);
     if(m_recordingSettingsWidget)
         setHelpTopic(m_recordingSettingsWidget,                               Qn::SystemSettings_ScreenRecording_Help);
     if(m_licenseManagerWidget)
@@ -99,38 +95,44 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     at_onDecoderPluginsListChanged();
 
+    setWarningStyle(ui->hwAccelerationWarningLabel);
+    setWarningStyle(ui->downmixWarningLabel);
+    setWarningStyle(ui->languageWarningLabel);
+    ui->hwAccelerationWarningLabel->setVisible(false);
+    ui->languageWarningLabel->setVisible(false);
+    ui->downmixWarningLabel->setVisible(false);
+
     connect( PluginManager::instance(), SIGNAL(pluginLoaded()), this, SLOT(at_onDecoderPluginsListChanged()) );
-    connect( PluginManager::instance(), SIGNAL(pluginUnloaded()), this, SLOT(at_onDecoderPluginsListChanged()) );
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
     connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
     connect(ui->removeExtraMediaFolderButton,           SIGNAL(clicked()),                                          this,   SLOT(at_removeExtraMediaFolderButton_clicked()));
     connect(ui->extraMediaFoldersList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),   this,   SLOT(at_extraMediaFoldersList_selectionChanged()));
-    connect(ui->animateBackgroundCheckBox,              SIGNAL(stateChanged(int)),                                  this,   SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
-    connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this,   SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
     connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this,   SLOT(accept()));
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this,   SLOT(reject()));
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
     connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
+    connect(ui->clearCacheButton,                       SIGNAL(clicked()),                                          action(Qn::ClearCacheAction), SLOT(trigger()));
+    connect(ui->hardwareDecodingCheckBox,               SIGNAL(toggled(bool)),                                      ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
 
-    initLanguages();
+    initTranslations();
     updateFromSettings();
     at_context_userChanged();
 
+    connect(ui->downmixAudioCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_downmixAudioCheckBox_toggled(bool)));
+    connect(ui->languageComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_languageComboBox_currentIndexChanged(int)));
+
     if (m_settings->isWritable()) {
         ui->readOnlyWarningLabel->hide();
-    }
-    else {
+    } else {
         setWarningStyle(ui->readOnlyWarningLabel);
         ui->readOnlyWarningLabel->setText(
-                     #ifdef Q_OS_LINUX
-                             tr("Settings file is read-only. Please contact your system administrator.\n" \
-                                "All changes will be lost after program exit.")
-                     #else
-                             tr("Settings cannot be saved. Please contact your system administrator.\n" \
-                                "All changes will be lost after program exit.")
-                     #endif
-                             );
+#ifdef Q_OS_LINUX
+            tr("Settings file is read-only. Please contact your system administrator.\nAll changes will be lost after program exit.")
+#else
+            tr("Settings cannot be saved. Please contact your system administrator.\nAll changes will be lost after program exit.")
+#endif
+        );
     }
 }
 
@@ -138,61 +140,71 @@ QnPreferencesDialog::~QnPreferencesDialog() {
     return;
 }
 
-void QnPreferencesDialog::initColorPicker() {
-    QtColorPicker *w = ui->backgroundColorPicker;
-
-    /* No black here. */
-    w->insertColor(Qt::white,         tr("White"));
-    w->insertColor(Qt::red,           tr("Red"));
-    w->insertColor(Qt::darkRed,       tr("Dark red"));
-    w->insertColor(Qt::green,         tr("Green"));
-    w->insertColor(Qt::darkGreen,     tr("Dark green"));
-    w->insertColor(Qt::blue,          tr("Blue"));
-    w->insertColor(Qt::darkBlue,      tr("Dark blue"));
-    w->insertColor(Qt::cyan,          tr("Cyan"));
-    w->insertColor(Qt::darkCyan,      tr("Dark cyan"));
-    w->insertColor(Qt::magenta,       tr("Magenta"));
-    w->insertColor(Qt::darkMagenta,   tr("Dark magenta"));
-    w->insertColor(Qt::yellow,        tr("Yellow"));
-    w->insertColor(Qt::darkYellow,    tr("Dark yellow"));
-    w->insertColor(Qt::gray,          tr("Gray"));
-    w->insertColor(Qt::darkGray,      tr("Dark gray"));
-    w->insertColor(Qt::lightGray,     tr("Light gray"));
-}
-
-void QnPreferencesDialog::initLanguages() {
-    QnWorkbenchTranslationManager *translationManager = context()->instance<QnWorkbenchTranslationManager>();
-
-    foreach(const QnTranslationInfo &translation, translationManager->translations()){
-        QIcon icon(QString(QLatin1String(":/flags/%1.png")).arg(translation.localeCode));
-        ui->languageComboBox->addItem(icon, translation.languageName, translation.translationPath);
-    }
+void QnPreferencesDialog::initTranslations() {
+    QnTranslationListModel *model = new QnTranslationListModel(this);
+    model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
+    ui->languageComboBox->setModel(model);
 }
 
 void QnPreferencesDialog::accept() {
-    QString oldLanguage = m_settings->translationPath();
-    submitToSettings();
-    if (oldLanguage != m_settings->translationPath()) {
-        QMessageBox::StandardButton button =
-            QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart. Press OK to close application now."),
-                                     QMessageBox::Ok, QMessageBox::Cancel);
-        if (button == QMessageBox::Ok)
-            qApp->exit();
+    QMessageBox::StandardButton button = QMessageBox::Yes;
+
+    bool newHardwareAcceleration = ui->hardwareDecodingCheckBox->isChecked();
+    if(newHardwareAcceleration && m_oldHardwareAcceleration != newHardwareAcceleration) {
+        button = QMessageBox::warning(
+            this,
+            tr("Warning"),
+            tr("Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?"),
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+            QMessageBox::No
+        );
+        if(button == QMessageBox::Cancel)
+            return;
+        if(button == QMessageBox::No)
+            ui->hardwareDecodingCheckBox->setCheckState(Qt::Unchecked);
     }
-    //m_youTubeSettingsWidget->accept();
+
+    if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
+        m_oldLanguage != ui->languageComboBox->currentIndex()) {
+        button = QMessageBox::information(
+                    this,
+                    tr("Information"),
+                    tr("Some changes will take effect only after application restart. Press OK to restart the application now."),
+                    QMessageBox::Ok | QMessageBox::Cancel,
+                    QMessageBox::Ok
+        );
+        if (button == QMessageBox::Ok) {
+            m_restartPending = restartClient();
+            if (!m_restartPending) {
+                QMessageBox::critical(
+                            this,
+                            tr("Launcher process is not found"),
+                            tr("Cannot restart the client.\n"
+                               "Please close the application and start it again using the shortcut in the start menu.")
+                            );
+            }
+        }
+    }
+    
+    if (button == QMessageBox::Cancel)
+        return;
+
+    submitToSettings();
     base_type::accept();
 }
 
+bool QnPreferencesDialog::restartPending() const {
+    return m_restartPending;
+}
+
 void QnPreferencesDialog::submitToSettings() {
-    m_settings->setBackgroundAnimated(ui->animateBackgroundCheckBox->isChecked());
-    m_settings->setBackgroundColor(ui->backgroundColorPicker->currentColor());
     m_settings->setMediaFolder(ui->mainMediaFolderLabel->text());
-    m_settings->setMaxVideoItems(ui->maxVideoItemsSpinBox->value());
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     m_settings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
     m_settings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
-    m_settings->setUseHardwareDecoding(ui->isHardwareDecodingCheckBox->isChecked());
+    m_settings->setUseHardwareDecoding(ui->hardwareDecodingCheckBox->isChecked());
     m_settings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
+    m_settings->setAutoStart(ui->autoStartCheckBox->isChecked());
 
     QStringList extraMediaFolders;
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
@@ -201,30 +213,35 @@ void QnPreferencesDialog::submitToSettings() {
 
     QStringList checkLst(m_settings->extraMediaFolders());
     checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
-    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: re-check if it is needed here.
+    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: #Elric re-check if it is needed here.
 
-    m_settings->setLanguage(ui->languageComboBox->itemData(ui->languageComboBox->currentIndex()).toString());
+    QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
+    if(!translation.isEmpty()) {
+        if(!translation.filePaths().isEmpty()) {
+            QString currentTranslationPath = m_settings->translationPath();
+            if(!translation.filePaths().contains(currentTranslationPath))
+                m_settings->setTranslationPath(translation.filePaths()[0]);
+        }
+    }
 
     if (m_recordingSettingsWidget)
         m_recordingSettingsWidget->submitToSettings();
     if (m_serverSettingsWidget)
         m_serverSettingsWidget->submit();
     if (m_popupSettingsWidget)
-        m_popupSettingsWidget->submitToSettings(m_settings);
+        m_popupSettingsWidget->submit();
 
     m_settings->save();
 }
 
 void QnPreferencesDialog::updateFromSettings() {
-    ui->animateBackgroundCheckBox->setChecked(m_settings->isBackgroundAnimated());
-    ui->backgroundColorPicker->setCurrentColor(m_settings->backgroundColor());
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(m_settings->mediaFolder()));
-    ui->maxVideoItemsSpinBox->setValue(m_settings->maxVideoItems());
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
     ui->tourCycleTimeSpinBox->setValue(m_settings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(m_settings->isIpShownInTree());
-    ui->isHardwareDecodingCheckBox->setChecked( m_settings->isHardwareDecodingUsed() );
+    ui->hardwareDecodingCheckBox->setChecked(m_settings->isHardwareDecodingUsed());
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(m_settings->timeMode()));
+    ui->autoStartCheckBox->setChecked(m_settings->autoStart());
 
     ui->extraMediaFoldersList->clear();
     foreach (const QString &extraMediaFolder, m_settings->extraMediaFolders())
@@ -237,12 +254,18 @@ void QnPreferencesDialog::updateFromSettings() {
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
 
-    if (m_popupSettingsWidget)
-        m_popupSettingsWidget->updateFromSettings(m_settings);
+    QString translationPath = m_settings->translationPath();
+    for(int i = 0; i < ui->languageComboBox->count(); i++) {
+        QnTranslation translation = ui->languageComboBox->itemData(i, Qn::TranslationRole).value<QnTranslation>();
+        if(translation.filePaths().contains(translationPath)) {
+            ui->languageComboBox->setCurrentIndex(i);
+            break;
+        }
+    }
 
-    int id = ui->languageComboBox->findData(m_settings->translationPath());
-    if (id >= 0)
-        ui->languageComboBox->setCurrentIndex(id);
+    m_oldDownmix = ui->downmixAudioCheckBox->isChecked();
+    m_oldLanguage = ui->languageComboBox->currentIndex();
+    m_oldHardwareAcceleration = ui->hardwareDecodingCheckBox->isChecked();
 }
 
 void QnPreferencesDialog::openLicensesPage() {
@@ -278,7 +301,7 @@ void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
 
 void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
     QFileDialog fileDialog(this);
-    //TODO: call setDirectory
+    //TODO: #Elric call setDirectory
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
         return;
@@ -302,20 +325,6 @@ void QnPreferencesDialog::at_removeExtraMediaFolderButton_clicked() {
 
 void QnPreferencesDialog::at_extraMediaFoldersList_selectionChanged() {
     ui->removeExtraMediaFolderButton->setEnabled(!ui->extraMediaFoldersList->selectedItems().isEmpty());
-}
-
-void QnPreferencesDialog::at_animateBackgroundCheckBox_stateChanged(int state) {
-    bool enabled = state == Qt::Checked;
-
-    ui->backgroundColorLabel->setEnabled(enabled);
-    ui->backgroundColorPicker->setEnabled(enabled);
-}
-
-void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &color) {
-    if(color == Qt::black) {
-        ui->backgroundColorPicker->setCurrentColor(Qt::white);
-        ui->animateBackgroundCheckBox->setChecked(false);
-    }
 }
 
 void QnPreferencesDialog::at_context_userChanged() {
@@ -342,10 +351,19 @@ void QnPreferencesDialog::at_onDecoderPluginsListChanged()
     {
         if( plugin->isHardwareAccelerated() )
         {
-            ui->isHardwareDecodingCheckBox->show();
+            ui->hardwareDecodingCheckBox->show();
             return;
         }
     }
 
-    ui->isHardwareDecodingCheckBox->hide();
+    ui->hardwareDecodingCheckBox->hide();
+    ui->hardwareDecodingLabel->hide();
+}
+
+void QnPreferencesDialog::at_downmixAudioCheckBox_toggled(bool checked) {
+    ui->downmixWarningLabel->setVisible(m_oldDownmix != checked);
+}
+
+void QnPreferencesDialog::at_languageComboBox_currentIndexChanged(int index) {
+    ui->languageWarningLabel->setVisible(m_oldLanguage != index);
 }

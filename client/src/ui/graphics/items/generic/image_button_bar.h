@@ -16,7 +16,7 @@ class QnImageButtonBar: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 
 public:
-    QnImageButtonBar(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnImageButtonBar(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0, Qt::Orientation orientation = Qt::Horizontal);
     virtual ~QnImageButtonBar();
 
     void addButton(int mask, QnImageButtonWidget *button);
@@ -37,6 +37,8 @@ public:
 
     const QSizeF &uniformButtonSize() const;
     void setUniformButtonSize(const QSizeF &uniformButtonSize);
+
+    int unusedMask() const;
 
 signals:
     void visibleButtonsChanged();

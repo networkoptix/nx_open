@@ -4,6 +4,11 @@
 #include <QSharedPointer>
 #include "../abstract_archive_delegate.h"
 
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
 class QnAviAudioLayout;
@@ -13,7 +18,7 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
-    enum Tag {Tag_startTime, Tag_endTime, Tag_LayoutInfo, Tag_Software, Tag_Signature};
+    enum Tag {Tag_startTime, Tag_endTime, Tag_LayoutInfo, Tag_Software, Tag_Signature, Tag_Dewarping};
 
     /*
     * Some containers supports only predefined tag names. So, I've introduce this function
@@ -45,6 +50,9 @@ public:
     
     //void setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel);
     virtual bool findStreams();
+
+    const char* getTagValue( const char* tagName );
+
 protected:
     void packetTimestamp(QnCompressedAudioData* audio, const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
@@ -79,7 +87,6 @@ private:
     QMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
     bool m_fastStreamFind;
-
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

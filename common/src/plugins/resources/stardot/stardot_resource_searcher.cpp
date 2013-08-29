@@ -102,10 +102,10 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 resource->setTypeId(typeId);
 
                 resource->setHostAddress(sender.toString(), QnDomainMemory);
-                resource->setMAC(lit((const char*)mac));
+                resource->setMAC(lit(mac));
                 resource->setDiscoveryAddr(iface.address);
-                resource->setModel(lit((const char*)model));
-                resource->setName(lit((const char*)model));
+                resource->setModel(lit(model));
+                resource->setName(lit(model));
                 
                 int delimPos = model.indexOf('/');
                 if (delimPos >= 0)
@@ -113,10 +113,10 @@ QnResourceList QnStardotResourceSearcher::findResources()
                     QByteArray shortModel = model.mid(delimPos+1);
                     if (shortModel.startsWith("NetCam"))
                         shortModel = shortModel .mid(6);
-                    resource->setName(QString(lit("Stardot-%1")).arg(lit((const char*)shortModel)));
+                    resource->setName(QString(lit("Stardot-%1")).arg(lit(shortModel)));
                 }
                 
-                resource->setFirmware(lit((const char*)firmware));
+                resource->setFirmware(lit(firmware));
 
 
                 bool need_to_continue = false;

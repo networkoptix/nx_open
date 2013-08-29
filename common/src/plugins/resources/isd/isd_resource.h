@@ -23,7 +23,7 @@ public:
     QSize getPrimaryResolution() const;
     QSize getSecondaryResolution() const;
 
-    virtual QString manufacture() const;
+    virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
@@ -32,14 +32,12 @@ public:
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 protected:
-    bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
     virtual void setCropingPhysical(QRect croping);
 
 private:
     void setMaxFps(int f);
-    void save();
-
 protected:
     QSize m_resolution1;
     QSize m_resolution2;

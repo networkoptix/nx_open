@@ -2,9 +2,15 @@
 #define VC1_PARSER_H
 
 #include <QString>
+
+extern "C"
+{
+    #include <libavutil/rational.h>
+}
+
 #include "bitStream.h"
 #include "memory.h"
-#include "libavutil/rational.h"
+
 
 static const int NOT_ENOUGHT_BUFFER = -1;
 
@@ -30,7 +36,7 @@ enum VC1Code{
 enum Profile {
     PROFILE_SIMPLE,
     PROFILE_MAIN,
-    PROFILE_COMPLEX, ///< TODO: WMV9 specific
+    PROFILE_COMPLEX, ///< TODO #vasilenko WMV9 specific
     PROFILE_ADVANCED
 };
 //@}

@@ -4,11 +4,8 @@
 #include <QtCore/QWeakPointer>
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
-#include <QtGui/QStaticText>
 
 #include <core/resource/resource_fwd.h>
-
-#include <camera/render_status.h>
 
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
@@ -25,18 +22,17 @@ class QGraphicsLinearLayout;
 class QnViewportBoundWidget;
 class QnResourceVideoLayout;
 class QnWorkbenchItem;
-
-class QnLoadingProgressPainter;
-class QnPausedPainter;
+class QnStatusOverlayWidget;
 class QnImageButtonWidget;
 class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry, public HelpTopicQueryable {
+class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
+    Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor NOTIFY frameColorChanged)
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio)
@@ -47,14 +43,17 @@ class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnW
 
 public:
     enum Option {
-        DisplayActivityOverlay      = 0x1,  /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelectionOverlay     = 0x2,  /**< Whether selected / not selected state should be displayed. */
-        DisplayMotion               = 0x4,  /**< Whether motion is to be displayed. */                              // TODO: this flag also handles smart search, separate!
-        DisplayButtons              = 0x8,  /**< Whether item buttons are to be displayed. */
-        DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
-        DisplayCrosshair            = 0x20, // TODO
-        ControlPtz                  = 0x40, // TODO
-        DisplayInfo                 = 0x80  /** Whether info panel is to be displayed. */
+        DisplayActivity             = 0x001,    /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelection            = 0x002,    /**< Whether selected / not selected state should be displayed. */
+        DisplayMotion               = 0x004,    /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
+        DisplayButtons              = 0x008,    /**< Whether item buttons are to be displayed. */
+        DisplayMotionSensitivity    = 0x010,    /**< Whether a grid with motion region sensitivity is to be displayed. */
+        DisplayCrosshair            = 0x020,    /**< Whether PTZ crosshair is to be displayed. */
+        DisplayInfo                 = 0x040,    /** Whether info panel is to be displayed. */
+
+        ControlPtz                  = 0x100,    /**< Whether PTZ state can be controlled with mouse. */
+        ControlZoomWindow           = 0x200,    /**< Whether zoom windows can be created by dragging the mouse. */
+        VirtualZoomWindow           = 0x400,    /**< Whether zoom windows is fisheye shader. */
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -65,11 +64,12 @@ public:
     };
     Q_DECLARE_FLAGS(Buttons, Button)
 
-    // TODO: Refactoring needed.
+    // TODO: #Elric Refactoring needed.
     enum OverlayVisibility {
         Invisible,
-        UserVisible,
+        Visible,
         AutoVisible,
+        UserVisible,
     };
 
     /**
@@ -98,10 +98,17 @@ public:
         return m_item.data();
     }
 
+    /**
+     * \returns                         Layout of channels in this widget. Never returns NULL.
+     */
     const QnResourceVideoLayout *channelLayout() const {
         return m_channelsLayout;
     }
     
+    const QRectF &zoomRect() const;
+    void setZoomRect(const QRectF &zoomRect);
+    QnResourceWidget *zoomTargetWidget() const;
+
     /**
      * \returns                         Frame opacity of this widget.
      */
@@ -110,7 +117,7 @@ public:
     }
 
     /**
-     * \param frameColor                New frame opacity for this widget.
+     * \param frameOpacity              New frame opacity for this widget.
      */
     void setFrameOpacity(qreal frameOpacity) {
         m_frameOpacity = frameOpacity;
@@ -127,6 +134,18 @@ public:
      * \param frameWidth                New frame width for this widget.
      */
     void setFrameWidth(qreal frameWidth);
+
+    /**
+     * \returns                         Frame color of this widget.
+     */
+    QColor frameColor() const {
+        return m_frameColor;
+    }
+
+    /**
+     * \param frameColor                New frame color for this widget.
+     */
+    void setFrameColor(const QColor &frameColor);
 
     virtual void setGeometry(const QRectF &geometry) override;
 
@@ -197,9 +216,7 @@ public:
     /**
      * \returns                         Status of the last rendering operation.
      */
-    Qn::RenderStatus currentRenderStatus() const {
-        return m_channelState[0].renderStatus;
-    }
+    Qn::RenderStatus renderStatus() const;
 
     /**
      * \returns                         Text of this window's title.
@@ -254,7 +271,7 @@ public:
     bool isOverlayVisible() const;
     Q_SLOT void setOverlayVisible(bool visible = true, bool animate = true);
 
-    void addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility = UserVisible, bool autoRotate = false, bool bindToViewport = false);
+    void addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility = UserVisible, bool autoRotate = false, bool bindToViewport = false, bool placeOverControls = false);
     void removeOverlayWidget(QGraphicsWidget *widget);
     OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
     void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility);
@@ -262,25 +279,19 @@ public:
     using base_type::mapRectToScene;
 
 signals:
+    void painted();
     void aspectRatioChanged();
     void aboutToBeDestroyed();
     void optionsChanged();
+    void zoomRectChanged();
+    void zoomTargetWidgetChanged();
+    void frameColorChanged();
     void rotationStartRequested();
     void rotationStopRequested();
 
 protected:
-    enum Overlay {
-        EmptyOverlay,
-        PausedOverlay,
-        LoadingOverlay,
-        NoDataOverlay,
-        OfflineOverlay,
-        UnauthorizedOverlay,
-        AnalogWithoutLicenseOverlay
-    };
-
-    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
+    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual bool windowFrameEvent(QEvent *event) override;
@@ -291,12 +302,10 @@ protected:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) = 0;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) = 0;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
-    virtual void paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay);
     
     void paintSelection(QPainter *painter, const QRectF &rect);
-    void paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
 
     virtual QSizeF constrainedSize(const QSizeF constraint) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
@@ -305,11 +314,11 @@ protected:
     void setChannelScreenSize(const QSize &size);
     virtual void channelScreenSizeChangedNotify() {}
 
-    Overlay channelOverlay(int channel) const;
-    void setChannelOverlay(int channel, Overlay overlay);
-    Overlay calculateChannelOverlay(int channel, int resourceStatus) const;
-    virtual Overlay calculateChannelOverlay(int channel) const;
-    Q_SLOT void updateChannelOverlay(int channel);
+    Qn::ResourceStatusOverlay statusOverlay() const;
+    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay);
+    Qn::ResourceStatusOverlay calculateStatusOverlay(int resourceStatus) const;
+    virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const;
+    Q_SLOT void updateStatusOverlay();
 
     virtual QString calculateTitleText() const;
     Q_SLOT void updateTitleText();
@@ -317,6 +326,10 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
+    virtual QCursor calculateCursor() const;
+    Q_SLOT void updateCursor();
+
+    int overlayWidgetIndex(QGraphicsWidget *widget) const;
     void updateOverlayWidgetsGeometry();
     void updateOverlayWidgetsVisibility(bool animate = true);
 
@@ -326,6 +339,14 @@ protected:
 
     QnImageButtonWidget *iconButton() const {
         return m_iconButton;
+    }
+
+    QnViewportBoundWidget* headerOverlayWidget() const {
+        return m_headerOverlayWidget;
+    }
+
+    QnStatusOverlayWidget *statusOverlayWidget() const {
+        return m_statusOverlayWidget;
     }
 
     virtual Buttons calculateButtonsVisibility() const;
@@ -338,9 +359,12 @@ protected:
 
     int channelCount() const;
     QRectF channelRect(int channel) const;
-    Qn::RenderStatus channelRenderStatus(int channel) const;
+    QRectF exposedRect(int channel, bool accountForViewport = true, bool accountForVisibility = true, bool useRelativeCoordinates = false);
 
     void ensureAboutToBeDestroyedEmitted();
+
+    QColor activeFrameColor() const;
+    QColor selectedFrameColor() const;
 
 private:
     void setTitleTextInternal(const QString &titleText);
@@ -349,38 +373,16 @@ private:
     Q_SLOT void at_iconButton_visibleChanged();
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
-    struct ChannelState {
-        ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
-
-        /** Current overlay. */
-        Overlay overlay;
-
-        /** Time when the last icon change has occurred, in milliseconds since epoch. */
-        qint64 changeTimeMSec;
-
-        /** Whether the icon should fade in on change. */
-        bool fadeInNeeded;
-
-        /** Last time when new frame was rendered, in milliseconds since epoch. */
-        qint64 lastNewFrameTimeMSec;
-
-        /** Last render status. */
-        Qn::RenderStatus renderStatus;
-    };
-
     struct OverlayWidget {
         OverlayVisibility visibility;
         QGraphicsWidget *widget;
+        QGraphicsWidget *childWidget;
         QnViewportBoundWidget *boundWidget;
         QnFixedRotationTransform *rotationTransform;
     };
 
 private:
-    /** Paused painter. */
-    QSharedPointer<QnPausedPainter> m_pausedPainter;
-
-    /** Loading progress painter. */
-    QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
+    friend class QnWorkbenchDisplay;
 
     /** Layout item. */
     QWeakPointer<QnWorkbenchItem> m_item;
@@ -412,6 +414,9 @@ private:
     /** Frame width. */
     qreal m_frameWidth;
 
+    /** Base frame color */
+    QColor m_frameColor;
+
     QString m_titleTextFormat, m_infoTextFormat;
     bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;
 
@@ -433,24 +438,27 @@ private:
     GraphicsLabel *m_footerLeftLabel;
     GraphicsLabel *m_footerRightLabel;
 
+    QnStatusOverlayWidget *m_statusOverlayWidget;
+
+
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
-
-    /** Additional per-channel state. */
-    QVector<ChannelState> m_channelState;
-
-    QStaticText m_noDataStaticText;
-    QStaticText m_offlineStaticText;
-    QStaticText m_unauthorizedStaticText;
-    QStaticText m_unauthorizedStaticText2;
-    QStaticText m_loadingStaticText;
-    QStaticText m_analogLicenseStaticText;
 
     /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
     bool m_mouseInWidget;
 
     /** Fixed rotation angle in degrees. Used to rotate static text and images. */
     Qn::FixedRotation m_overlayRotation;
+
+    QRectF m_zoomRect;
+
+    /** Current overlay. */
+    Qn::ResourceStatusOverlay m_statusOverlay;
+
+    Qn::RenderStatus m_renderStatus;
+
+    qint64 m_lastNewFrameTimeMSec;
+
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

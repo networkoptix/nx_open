@@ -1,6 +1,8 @@
 #include "onvif_resource_settings.h"
 #include "onvif/soapImagingBindingProxy.h"
 
+#include <QDebug>
+
 enum onvifXsd__WideDynamicMode;
 
 //
@@ -40,10 +42,10 @@ bool OnvifCameraSettingsResp::isEmpty() const
     return !m_rangesResponse->ImagingOptions || !m_valsResponse->ImagingSettings;
 }
 
-bool OnvifCameraSettingsResp::makeGetRequest()
+CameraDiagnostics::Result OnvifCameraSettingsResp::makeGetRequest()
 {
     if (!m_rangesSoapWrapper || !m_valsSoapWrapper) {
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
     ImagingOptionsReq rangesRequest;
@@ -54,7 +56,7 @@ bool OnvifCameraSettingsResp::makeGetRequest()
         qWarning() << "OnvifCameraSettingsResp::makeGetRequest: can't fetch imaging options. UniqId: " << m_uniqId
             << ". Reason: SOAP to endpoint " << m_rangesSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
             << soapRes << ". " << m_rangesSoapWrapper->getLastError();
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getOptions"), m_rangesSoapWrapper->getLastError());
     }
 
     ImagingSettingsReq valsRequest;
@@ -65,10 +67,10 @@ bool OnvifCameraSettingsResp::makeGetRequest()
         qWarning() << "OnvifCameraSettingsResp::makeGetRequest: can't fetch imaging settings. UniqId: " << m_uniqId
             << ". Reason: SOAP to endpoint " << m_valsSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
             << soapRes << ". " << m_valsSoapWrapper->getLastError();
-        return false;
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getImagingSettings"), m_valsSoapWrapper->getLastError());
     }
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool OnvifCameraSettingsResp::makeSetRequest()

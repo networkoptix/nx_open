@@ -8,6 +8,7 @@
 #include <utils/math/linear_combination.h>
 #include <ui/common/color_to_vector_converter.h>
 #include <ui/animation/variant_animator.h>
+#include <ui/style/globals.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
@@ -15,17 +16,13 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
-#include "utils/settings.h"
-
 
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_settings(qnSettings),
     m_backgroundColorAnimator(NULL),
     m_cycleIntervalSecs(cycleIntervalSecs)
 {
-    connect(qnSettings->notifier(QnSettings::BACKGROUND_COLOR), SIGNAL(valueChanged(int)),  this,   SLOT(updateBackgroundColor()));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this,   SLOT(updateBackgroundColor()));
 
     updateBackgroundColor(false);
@@ -60,10 +57,10 @@ VariantAnimator *QnGradientBackgroundPainter::backgroundColorAnimator() {
 qreal QnGradientBackgroundPainter::position() {
     qreal t = std::fmod(m_timer.elapsed() / 1000.0, m_cycleIntervalSecs) / m_cycleIntervalSecs;
 
-    /* t interval    | Position change 
-     * [0, 0.25]     | 0 ->  1        
-     * [0.25, 0.75]  | 1 -> -1        
-     * [0.75, 1]     |-1 ->  0        
+    /* t interval    | Position change
+     * [0, 0.25]     | 0 ->  1
+     * [0.25, 0.75]  | 1 -> -1
+     * [0.75, 1]     |-1 ->  0
      */
 
     if(t < 0.25)
@@ -94,10 +91,8 @@ void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
 
     if(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode()) {
         backgroundColor = QColor(255, 0, 0, 255);
-    } else if(m_settings) {
-        backgroundColor = m_settings.data()->backgroundColor();
     } else {
-        backgroundColor = QColor(0, 0, 0, 0);
+        backgroundColor = qnGlobals->backgroundGradientColor();
     }
 
     if(animate) {
@@ -108,7 +103,7 @@ void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
 }
 
 void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect) {
-    if(!m_gl) 
+    if(!m_gl)
         m_gl.reset(new QnGlFunctions(QGLContext::currentContext()));
     if(!(m_gl->features() & QnGlFunctions::ArbPrograms))
         return; /* Don't draw anything on old OpenGL versions. */

@@ -7,12 +7,14 @@
 
 #include "abstract_business_action.h"
 
-// TODO: #Elric what is the purpose of this class?
+/*!
+    Initiallly, this class has been created so that code like "new QnAbstractBusinessAction" never appears in project
+*/
 class QnCommonBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    explicit QnCommonBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams &runtimeParams);
+    explicit QnCommonBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters &runtimeParams);
 };
 
 #endif  //COMMON_BUSINESS_ACTION_H

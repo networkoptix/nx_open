@@ -1,6 +1,8 @@
 #include "workbench_context_aware.h"
 
 #include <QtCore/QObject>
+#include <QtGui/QGraphicsItem>
+#include <QtGui/QGraphicsScene>
 
 #include <utils/common/warnings.h>
 #include <core/resource_managment/resource_pool.h>
@@ -48,7 +50,15 @@ void QnWorkbenchContextAware::init(QObject *parent) {
             return;
         }
 
-        parent = parent->parent();
+        if(parent->parent()) {
+            parent = parent->parent();
+        } else {
+            if(QGraphicsItem *parentItem = dynamic_cast<QGraphicsItem *>(parent)) {
+                parent = parentItem->scene();
+            } else {
+                parent = NULL;
+            }
+        }
     }
 }
 
@@ -98,4 +108,6 @@ QnWorkbenchNavigator *QnWorkbenchContextAware::navigator() const {
     return context()->navigator();
 }
 
-
+QWidget *QnWorkbenchContextAware::mainWindow() const {
+    return context()->mainWindow();
+}

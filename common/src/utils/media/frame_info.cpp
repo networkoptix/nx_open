@@ -10,7 +10,7 @@ extern "C" {
 #ifdef WIN32
 #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
-#include "libavutil/pixdesc.h"
+#include <libavutil/pixdesc.h>
 #ifdef WIN32
 #undef AVPixFmtDescriptor
 #endif
@@ -83,30 +83,16 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
     if (src->width != dst->width || src->height != dst->height || src->format != dst->format)
     {
         // need to reallocate dst memory
+        //rounding width and height to 32 and 16 bytes respectively
+        const int roundedWidth = (src->width & 0x1f) != 0 ? ((src->width & 0xffffffe0) + 0x20) : src->width;
+        const int roundedHeight = (src->height & 0x0f) != 0 ? ((src->height & 0xfffffff0) + 0x10) : src->height;
         dst->setUseExternalData(false);
-        int numBytes = avpicture_get_size((PixelFormat) src->format, src->width, src->height);
-        avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, src->width, src->height);
+        int numBytes = avpicture_get_size((PixelFormat) src->format, roundedWidth, roundedHeight);
+        avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, roundedWidth, roundedHeight);
 
         dst->width = src->width;
         dst->height = src->height;
         dst->format = src->format;
-
-        /*
-        dst->linesize[0] = src->width;
-        dst->linesize[1] = src->width/2;
-        dst->linesize[2] = src->width/2;
-
-        dst->width = src->width;
-
-        dst->height = src->height;
-        dst->format = src->format;
-
-        int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
-
-        dst-data[0] = (unsigned char*) av_malloc(dst->getCapacity());
-        dst->data[1] = dst-data[0] + dst->linesize[0]*dst->height;
-        dst->data[2] = dst-data[1] + dst->linesize[1]*yu_h;
-        */
     }
 
     int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
@@ -136,7 +122,6 @@ int CLVideoDecoderOutput::getCapacity()
 
 void CLVideoDecoderOutput::copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride,  int src_stride, int height)
 {
-
     for (int i = 0; i < height; ++i)
     {
         memcpy(dst, src, width);
@@ -169,6 +154,23 @@ void CLVideoDecoderOutput::fillRightEdge()
             w >>= descr->log2_chroma_w;
             h >>= descr->log2_chroma_h;
         }
+    }
+}
+
+void CLVideoDecoderOutput::memZerro()
+{
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    quint8 filler = 0;
+    for (int i = 0; i < descr->nb_components && data[i]; ++i)
+    {
+        int w = linesize[i];
+        int h = height;
+        if (i > 0)
+            h >>= descr->log2_chroma_h;
+
+        int bpp = descr->comp[i].step_minus1 + 1;
+        int fillLen = h*w*bpp;
+        memset(data[i], i == 0 ? 0 : 0x80, fillLen);
     }
 }
 
@@ -304,4 +306,23 @@ void CLVideoDecoderOutput::saveToFile(const char* filename)
 bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
 {
     return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
+}
+
+void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
+{
+    Q_ASSERT(width == frame->width);
+    Q_ASSERT(height == frame->height);
+    Q_ASSERT(format == frame->format);
+
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+    {
+        int h = height;
+        int w = width;
+        if (i > 0) {
+            h >>= descr->log2_chroma_h;
+            w >>= descr->log2_chroma_w;
+        }
+        copyPlane(data[i], frame->data[i], w, linesize[i], frame->linesize[i], h);
+    }
 }

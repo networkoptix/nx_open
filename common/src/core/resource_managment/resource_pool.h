@@ -32,10 +32,10 @@ class QN_EXPORT QnResourcePool : public QObject
 public:
     enum Filter
     {
-        //!do not check resources, omwned by another entites
-        rfOnlyFriends,
-        //!check all resources
-        rfAllResources
+        /** Do not check resources owned by another entites. */
+        OnlyFriends,
+        /** Check all resources. */
+        AllResources
     };
 
     QnResourcePool();
@@ -57,7 +57,7 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QnId id, Filter searchFilter = rfOnlyFriends) const;
+    QnResourcePtr getResourceById(QnId id, Filter searchFilter = OnlyFriends) const;
     QnResourcePtr getResourceByGuid(QString guid) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
@@ -70,11 +70,13 @@ public:
     QnNetworkResourcePtr getNetResourceByPhysicalId(const QString &physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString &mac) const;
 
+    QnResourceList getAllResourceByTypeName(const QString &typeName) const;
+
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
-    QnResourceList getAllEnabledCameras() const;
+    QnResourceList getAllEnabledCameras(QnResourcePtr mServer = QnResourcePtr()) const;
     QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
 
     // returns list of resources with such flag
@@ -97,7 +99,7 @@ public:
         return activeCamerasByClass(true);
     }
 
-    // TODO #gdm: this is a hack. Fix.
+    // TODO #GDM: this is a hack. Fix.
     bool isLayoutsUpdated() const;
     void setLayoutsUpdated(bool updateLayouts);
 
@@ -115,7 +117,6 @@ signals:
 private:
     mutable QMutex m_resourcesMtx;
     bool m_updateLayouts;
-    QnResourcePtr localServer;
     QHash<QString, QnResourcePtr> m_resources;
     //!Resources with flag \a QnResource::foreign set
     /*!

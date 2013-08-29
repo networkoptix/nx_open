@@ -29,6 +29,10 @@ void QnAbstractBusinessParamsWidget::setModel(QnBusinessRuleViewModel *model) {
     at_model_dataChanged(model, QnBusiness::AllFieldsMask);
 }
 
+void QnAbstractBusinessParamsWidget::updateTabOrder(QWidget *before, QWidget *after) {
+    setTabOrder(before, after);
+}
+
 void QnAbstractBusinessParamsWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
     Q_UNUSED(model)
     Q_UNUSED(fields)

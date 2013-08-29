@@ -4,6 +4,7 @@
 extern "C" {
 #include <libavutil/opt.h>
 #include <libavutil/base64.h>
+#include <libavutil/avstring.h>
 }
 
 static const int  RTP_PT_PRIVATE = 96;
@@ -589,7 +590,7 @@ static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c,
 }
 
 
-QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, CodecID transcodeToCodec, const QSize& videoSize):
+QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, CodecID transcodeToCodec, const QSize& videoSize, const QnResourceVideoLayout* vLayout):
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
     m_outputPos(0),
     packetIndex(0),
@@ -607,10 +608,13 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, Codec
     else
         method = media->compressionType == transcodeToCodec ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode;
 
-    if (media->dataType == QnAbstractMediaData::VIDEO)
-        m_transcoder.setVideoCodec(m_codec, method, QnQualityNormal, videoSize);
-    else
+    if (media->dataType == QnAbstractMediaData::VIDEO) {
+        m_transcoder.setVideoLayout(vLayout);
+        m_transcoder.setVideoCodec(m_codec, method, Qn::QualityNormal, videoSize);
+    }
+    else {
         m_transcoder.setAudioCodec(m_codec, method);
+    }
     if (m_isVideo)
         m_isOpened = m_transcoder.open(media.dynamicCast<QnCompressedVideoData>(), QnCompressedAudioDataPtr()) == 0;
     else

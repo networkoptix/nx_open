@@ -4,12 +4,15 @@
 #include <iostream>
 #include <memory>
 
-#include <libavcodec/avcodec.h>
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
 
 #include "ffmpeg.h"
 #include "ipp_h264_decoder.h"
 #include "../abstractvideodecoderplugin.h"
-#include "../../plugins/pluginmanager.h"
+#include "../../plugins/plugin_manager.h"
 
 
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = AUTO;

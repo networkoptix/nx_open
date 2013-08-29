@@ -4,6 +4,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 
+#include <client/client_globals.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource_managment/resource_criterion.h>
 
@@ -239,6 +241,16 @@ public:
 
 
 /**
+ * Condition for adjust video dialog of a resource widget.
+ */
+class QnAdjustVideoActionCondition: public QnActionCondition {
+public:
+    QnAdjustVideoActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
+/**
  * Condition that is based on the type of the time period provided as one
  * of the arguments of the parameters pack.
  */
@@ -316,18 +328,81 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
-class QnDisconnectActionCondition: public QnActionCondition {
-public:
-    QnDisconnectActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
-
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-};
-
 class QnOpenInFolderActionCondition: public QnActionCondition {
 public:
     QnOpenInFolderActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+};
+
+class QnLayoutSettingsActionCondition: public QnActionCondition {
+public:
+    QnLayoutSettingsActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnCreateZoomWindowActionCondition: public QnActionCondition {
+public:
+    QnCreateZoomWindowActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
+class QnTreeNodeTypeCondition: public QnActionCondition {
+public:
+    QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent = NULL): QnActionCondition(parent), m_nodeType(nodeType) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    Qn::NodeType m_nodeType;
+};
+
+class QnOpenInCurrentLayoutActionCondition: public QnActionCondition {
+public:
+    QnOpenInCurrentLayoutActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnOpenInNewEntityActionCondition: public QnActionCondition {
+public: 
+    QnOpenInNewEntityActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+};
+
+class QnSetAsBackgroundActionCondition: public QnActionCondition {
+public:
+    QnSetAsBackgroundActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+};
+
+/** Display action only if user is logged in. */
+class QnLoggedInCondition: public QnActionCondition {
+public:
+    QnLoggedInCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnCheckForUpdatesActionCondition: public QnActionCondition {
+public:
+    QnCheckForUpdatesActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnShowcaseActionCondition: public QnActionCondition {
+public:
+    QnShowcaseActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 #endif // QN_ACTION_CONDITIONS_H

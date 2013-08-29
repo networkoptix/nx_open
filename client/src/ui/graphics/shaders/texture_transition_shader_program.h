@@ -4,7 +4,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 class QnTextureTransitionShaderProgram: public QGLShaderProgram {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnTextureTransitionShaderProgram(const QGLContext *context, QObject *parent = NULL);
 

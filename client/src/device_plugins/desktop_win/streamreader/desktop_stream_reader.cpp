@@ -2,8 +2,6 @@
 
 #ifdef Q_OS_WIN
 
-//extern QMutex global_ffmpeg_mutex;
-
 struct FffmpegLog
 {
     static void av_log_default_callback_impl(void* ptr, int level, const char* fmt, va_list vl)
@@ -26,7 +24,7 @@ struct FffmpegLog
 
 
 QnDesktopStreamreader::QnDesktopStreamreader(QnResourcePtr dev):
-    CLServerPushStreamreader(dev),
+    CLServerPushStreamReader(dev),
     m_videoBuf(0),
     m_videoBufSize(0),
     m_videoCodecCtx(0),
@@ -49,8 +47,6 @@ QnDesktopStreamreader::~QnDesktopStreamreader()
 
 bool QnDesktopStreamreader::init()
 {
-    //QMutexLocker mutex(&global_ffmpeg_mutex);
-
     av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
 
@@ -124,18 +120,23 @@ QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
     return QnAbstractMediaDataPtr();
 }
 
-void QnDesktopStreamreader::openStream()
+CameraDiagnostics::Result QnDesktopStreamreader::openStream()
 {
     if (init())
+    {
         m_initialized = true;
+        return CameraDiagnostics::NoErrorResult();
+    }
+    else
+    {
+        return CameraDiagnostics::Result(CameraDiagnostics::ErrorCode::unknown);
+    }
 }
 
 void QnDesktopStreamreader::closeStream()
 {
     delete m_grabber;
     m_grabber = 0;
-
-    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     if (m_videoCodecCtx)
         avcodec_close(m_videoCodecCtx);

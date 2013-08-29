@@ -112,7 +112,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#ifdef HAVE_UNISTD_H
+#ifndef _WIN32
 #   include <unistd.h>
 #endif
 
@@ -129,6 +129,8 @@
 #include "libdvdcss.h"
 #include "ioctl.h"
 #include "dvd_device.h"
+
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 
 /**
  * \brief Symbol for version checks.

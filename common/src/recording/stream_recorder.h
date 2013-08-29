@@ -4,6 +4,11 @@
 #include <QBuffer>
 #include <QtGui/QImage>
 
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
 #include <utils/common/cryptographic_hash.h>
 
 #include <core/dataconsumer/abstract_data_consumer.h>
@@ -11,6 +16,8 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/dewarping_params.h>
+#include "utils/color_space/image_correction.h"
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
@@ -79,13 +86,18 @@ public:
     /*
     * Time difference between client and server time zone. Used for onScreen timestamp drawing
     */
-    void setOnScreenDateOffset(int timeOffsetMs);
+    void setOnScreenDateOffset(qint64 timeOffsetMs);
+
+    void setContrastParams(const ImageCorrectionParams& params);
+
+    void setDewarpingParams(const DewarpingParams& params);
 
     /*
     * Server time zone. Used for export to avi/mkv files
     */
-    void setServerTimeZoneMs(int value);
+    void setServerTimeZoneMs(qint64 value);
 
+    void setSrcRect(const QRectF& srcRect);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -160,15 +172,18 @@ private:
     QnCompressedVideoDataPtr m_lastIFrame;
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     QnFfmpegAudioTranscoder* m_audioTranscoder;
-    QnFfmpegVideoTranscoder* m_videoTranscoder[CL_MAX_CHANNELS];
+    QnFfmpegVideoTranscoder* m_videoTranscoder;
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
-    int m_onscreenDateOffset;
+    qint64 m_onscreenDateOffset;
     Role m_role;
     qint64 m_serverTimeZoneMs;
 
     qint64 m_nextIFrameTime;
     qint64 m_truncateIntervalEps;
+    QRectF m_srcRect;
+    ImageCorrectionParams m_contrastParams;
+    DewarpingParams m_dewarpingParams;
 };
 
 #endif // _STREAM_RECORDER_H__

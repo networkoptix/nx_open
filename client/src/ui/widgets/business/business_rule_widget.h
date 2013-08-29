@@ -3,8 +3,8 @@
 
 #include <QWidget>
 
+#include <business/business_fwd.h>
 #include <business/business_event_rule.h>
-#include <business/business_logic_common.h>
 #include <business/events/abstract_business_event.h>
 
 #include <ui/models/business_rules_view_model.h>
@@ -50,7 +50,6 @@ private slots:
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
-    void at_ui_aggregationPeriodChanged();
     void at_commentsLineEdit_textChanged(const QString &value);
 
     void at_eventResourcesHolder_clicked();

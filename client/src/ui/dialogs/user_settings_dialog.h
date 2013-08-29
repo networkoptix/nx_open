@@ -2,7 +2,9 @@
 #define QN_NEW_USER_DIALOG_H
 
 #include <QDialog>
+#include <QHash>
 #include <QScopedPointer>
+#include <QString>
 
 #include <core/resource/resource_fwd.h>
 
@@ -74,6 +76,7 @@ protected slots:
     void updateDependantPermissions();
 
     void updateAll();
+    void updateSizeLimits();
     void setHasChanges(bool hasChanges = true);
 
     void at_accessRights_changed();

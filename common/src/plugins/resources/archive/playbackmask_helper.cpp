@@ -1,5 +1,12 @@
 #include "playbackmask_helper.h"
+
+extern "C"
+{
+    #include <libavutil/avutil.h>
+}
+
 #include "utils/common/util.h"
+
 
 QnPlaybackMaskHelper::QnPlaybackMaskHelper()
 {

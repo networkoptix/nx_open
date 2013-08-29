@@ -1,5 +1,11 @@
 #include "camera_settings.h"
 
+#include <cmath>
+
+#include <QDebug>
+#include <QFile>
+#include <QStringList>
+
 //
 // CameraSettingValue
 //

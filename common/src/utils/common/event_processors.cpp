@@ -5,6 +5,9 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 
+#include <common/config.h>
+
+
 // -------------------------------------------------------------------------- //
 // QnEventSignalEmitter
 // -------------------------------------------------------------------------- //

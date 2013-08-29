@@ -29,6 +29,13 @@ message Message {
         BusinessRuleDelete      = 9;
 
         BroadcastBusinessAction = 10;
+
+        FileAdd                 = 11;
+        FileRemove              = 12;
+        FileUpdate              = 13;
+        
+        RuntimeInfoChange       = 14;
+        BusinessRuleReset       = 15;
     }
 
     required Type type = 1;
@@ -80,10 +87,54 @@ message InitialMessage {
         required InitialMessage message = 105;
     }
 
-    repeated ResourceType resourceType = 1;
-    repeated Resource resource = 2;
-    repeated License license = 3;
+    repeated ResourceType resourceType         = 1;
+    repeated Resource resource                 = 2;
+    repeated License license                   = 3;
     repeated CameraServerItem cameraServerItem = 4;
-    optional string hardwareId = 5;
-    optional string oldHardwareId = 6;
+    optional string hardwareId1                = 5;
+    optional string oldHardwareId              = 6;
+    optional string hardwareId2                = 7;
+    optional string publicIp                   = 8;
+    optional string systemName                 = 9;
+}
+
+message FileAddMessage {
+    extend Message {
+        required FileAddMessage message = 106;
+    }
+
+    required string path = 1;
+}
+
+message FileRemoveMessage {
+    extend Message {
+        required FileRemoveMessage message = 107;
+    }
+
+    required string path = 1;
+}
+
+message FileUpdateMessage {
+    extend Message {
+        required FileUpdateMessage message = 108;
+    }
+
+    required string path = 1;
+}
+
+message RuntimeInfoChangeMessage {
+    extend Message {
+        required RuntimeInfoChangeMessage message = 109;
+    }
+
+    optional string publicIp = 1;
+    optional string systemName = 2;
+}
+
+message BusinessRuleResetMessage {
+    extend Message {
+        required BusinessRuleResetMessage message = 110;
+    }
+
+    repeated BusinessRule businessRule = 1;
 }

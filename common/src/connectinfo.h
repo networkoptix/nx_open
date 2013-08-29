@@ -4,16 +4,20 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QMetaType>
 
+#include <utils/common/software_version.h>
+
 #include "compatibility.h"
 
-struct QnConnectInfo
-{
-    QString version;
+struct QnConnectInfo {
+    QnSoftwareVersion version;
     QList<QnCompatibilityItem> compatibilityItems;
     int proxyPort;
     QString ecsGuid;
+    QString publicIp;
+    QString brand;
 };
 
+// TODO: #Elric remove shared pointer.
 typedef QSharedPointer<QnConnectInfo> QnConnectInfoPtr;
 
 Q_DECLARE_TYPEINFO(QnConnectInfoPtr, Q_MOVABLE_TYPE);

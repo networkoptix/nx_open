@@ -184,7 +184,6 @@ struct SpeexEchoState_ {
    spx_word16_t notch_radius;
    spx_mem_t *notch_mem;
 
-   /* NOTE: If you only use speex_echo_cancel() and want to save some memory, remove this */
    spx_int16_t *play_buf;
    int play_buf_pos;
    int play_buf_started;
@@ -729,7 +728,6 @@ EXPORT void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, c
       for (i=0;i<st->frame_size;i++)
       {
          spx_word32_t tmp32;
-         /* FIXME: This core has changed a bit, need to merge properly */
          tmp32 = SUB32(EXTEND32(st->input[chan*st->frame_size+i]), EXTEND32(MULT16_16_P15(st->preemph, st->memD[chan])));
 #ifdef FIXED_POINT
          if (tmp32 > 32767)
@@ -808,7 +806,6 @@ EXPORT void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, c
    }
    
    /* Adjust proportional adaption rate */
-   /* FIXME: Adjust that for C, K*/
    if (st->adapted)
       mdf_adjust_prop (st->W, N, M, C*K, st->prop);
    /* Compute weight gradient */
@@ -830,7 +827,6 @@ EXPORT void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, c
       st->saturated--;
    }
    
-   /* FIXME: MC conversion required */ 
    /* Update weight to prevent circular convolution (MDF / AUMDF) */
    for (chan = 0; chan < C; chan++)
    {
@@ -998,7 +994,6 @@ EXPORT void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, c
       }
       
       /* Compute a bunch of correlations */
-      /* FIXME: bad merge */
       Sey += mdf_inner_prod(st->e+chan*N+st->frame_size, st->y+chan*N+st->frame_size, st->frame_size);
       Syy += mdf_inner_prod(st->y+chan*N+st->frame_size, st->y+chan*N+st->frame_size, st->frame_size);
       Sdd += mdf_inner_prod(st->input+chan*st->frame_size, st->input+chan*st->frame_size, st->frame_size);
@@ -1177,7 +1172,6 @@ EXPORT void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, c
       st->sum_adapt = ADD32(st->sum_adapt,adapt_rate);
    }
 
-   /* FIXME: MC conversion required */ 
       for (i=0;i<st->frame_size;i++)
          st->last_y[i] = st->last_y[st->frame_size+i];
    if (st->adapted)
@@ -1257,7 +1251,6 @@ EXPORT int speex_echo_ctl(SpeexEchoState *st, int request, void *ptr)
          (*(int*)ptr) = st->sampling_rate;
          break;
       case SPEEX_ECHO_GET_IMPULSE_RESPONSE_SIZE:
-         /*FIXME: Implement this for multiple channels */
          *((spx_int32_t *)ptr) = st->M * st->frame_size;
          break;
       case SPEEX_ECHO_GET_IMPULSE_RESPONSE:
@@ -1266,7 +1259,6 @@ EXPORT int speex_echo_ctl(SpeexEchoState *st, int request, void *ptr)
          spx_int32_t *filt = (spx_int32_t *) ptr;
          for(j=0;j<M;j++)
          {
-            /*FIXME: Implement this for multiple channels */
 #ifdef FIXED_POINT
             for (i=0;i<N;i++)
                st->wtmp2[i] = EXTRACT16(PSHR32(st->W[j*N+i],16+NORMALIZE_SCALEDOWN));

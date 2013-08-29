@@ -1,6 +1,10 @@
-#include <QDir>
+
 #include "storage_manager.h"
+
+#include <QDir>
+
 #include "utils/common/util.h"
+#include <utils/fs/file.h>
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/resource.h"
 #include "server_stream_recorder.h"
@@ -12,7 +16,7 @@
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 
-Q_GLOBAL_STATIC(QnStorageManager, inst)
+Q_GLOBAL_STATIC(QnStorageManager, QnStorageManager_inst)
 
 class TestStorageThread: public QnLongRunnable
 {
@@ -48,8 +52,8 @@ QnStorageManager::QnStorageManager():
     m_storagesStatisticsReady(false),
     m_catalogLoaded(false),
     m_warnSended(false),
-    m_isWritableStorageAvail(false),
-    m_bigStorageExists(false)
+    m_isWritableStorageAvail(false)
+
 {
     m_lastTestTime.restart();
     m_storageWarnTimer.restart();
@@ -248,7 +252,7 @@ QnStorageManager::~QnStorageManager()
 
 QnStorageManager* QnStorageManager::instance()
 {
-    return inst();
+    return QnStorageManager_inst();
 }
 
 QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone)
@@ -286,6 +290,17 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras,
         }
     }
 }
+
+bool QnStorageManager::isArchiveTimeExists(const QString& physicalId, qint64 timeMs)
+{
+    DeviceFileCatalogPtr catalog = getFileCatalog(physicalId, QnResource::Role_LiveVideo);
+    if (catalog && catalog->containTime(timeMs))
+        return true;
+
+    catalog = getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo);
+    return catalog && catalog->containTime(timeMs);
+}
+
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
@@ -367,7 +382,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         }
         if (catalog != 0) 
         {
-            qint64 fileSize = catalog->deleteFirstRecord();
+            qint64 fileSize = catalog->deleteFirstRecord(true, storage);
             if (fileSize > 0)
                 toDelete -= fileSize;
             DeviceFileCatalogPtr catalogLowRes = getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo);
@@ -377,7 +392,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
                 if (minTime != (qint64)AV_NOPTS_VALUE) {
                     int idx = catalogLowRes->findFileIndex(minTime, DeviceFileCatalog::OnRecordHole_NextChunk);
                     if (idx != -1)
-                        toDelete -= catalogLowRes->deleteRecordsBefore(idx);
+                        toDelete -= catalogLowRes->deleteRecordsBefore(idx, storage);
                 }
                 else {
                     catalogLowRes->clear();
@@ -403,27 +418,28 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 }
 
-qint64 QnStorageManager::minSpaceForWritting() const
-{
-    return m_bigStorageExists ? BIG_STORAGE_THRESHOLD : 0;
-}
-
 QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 {
     QSet<QnStorageResourcePtr> result;
+    QSet<QnStorageResourcePtr> smallStorages;
 
-    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    QnStorageManager::StorageMap storageRoots = getAllStorages();
+    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
         if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-            if (available > minSpaceForWritting())
+            if (available > BIG_STORAGE_THRESHOLD)
                 result << fileStorage;
+            else
+                smallStorages << fileStorage;
         }
     }
-
-    return result;
+    if (result.isEmpty())
+        return smallStorages; // try small storages if no big storages
+    else
+        return result;
 }
 
 void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status)
@@ -464,13 +480,11 @@ void QnStorageManager::updateStorageStatistics()
     double totalSpace = 0;
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
     m_isWritableStorageAvail = !storages.isEmpty();
-    m_bigStorageExists = false;
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
-        m_bigStorageExists |= storageSpace > BIG_STORAGE_THRESHOLD;
     }
 
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
@@ -682,12 +696,6 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
         return false;
-    catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QFileInfo(fileName).baseName().toInt(), -1, (qint16) timeZone));
+    catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QnFile::baseName(fileName).toInt(), -1, (qint16) timeZone));
     return true;
-}
-
-qint64 QnStorageManager::isBigStorageExists() const 
-{
-    QMutexLocker lock(&m_mutexStorages);
-    return m_bigStorageExists; 
 }

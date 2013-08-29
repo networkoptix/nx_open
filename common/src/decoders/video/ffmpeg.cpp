@@ -1,4 +1,7 @@
 #include "ffmpeg.h"
+
+#include <QThread>
+
 #include "utils/media/nalUnits.h"
 
 #ifdef _USE_DXVA
@@ -6,8 +9,6 @@
 #endif
 #include "utils/math/math.h"
 
-
-//extern QMutex global_ffmpeg_mutex;
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
@@ -58,13 +59,11 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedV
 {
     m_mtDecoding = mtDecoding;
 
-    //QMutexLocker mutex(&global_ffmpeg_mutex);
     if (data->context)
     {
         m_passedContext = avcodec_alloc_context3(0);
         avcodec_copy_context(m_passedContext, data->context->ctx());
     }
-    
 
     // XXX Debug, should be passed in constructor
     m_tryHardwareAcceleration = false; //hwcounter % 2;
@@ -77,13 +76,18 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedV
 
 CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
-    //QMutexLocker mutex(&global_ffmpeg_mutex);
-
     closeDecoder();
 
-    if (m_passedContext && m_passedContext->codec)
+    if( m_passedContext )
     {
-        avcodec_close(m_passedContext);
+        if( m_passedContext->codec )
+            avcodec_close(m_passedContext);
+        av_freep(&m_passedContext->rc_override);
+        av_freep(&m_passedContext->intra_matrix);
+        av_freep(&m_passedContext->inter_matrix);
+        av_freep(&m_passedContext->extradata);
+        av_freep(&m_passedContext->rc_eq);
+        av_freep(&m_passedContext);
     }
 
     if( m_swDecoderCount )
@@ -105,7 +109,6 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 {
     AVCodec* codec = 0;
 
-    // CodecID codecId = internalCodecIdToFfmpeg(internalCodecId);
     if (codecId != CODEC_ID_NONE)
         codec = avcodec_find_decoder(codecId);
 
@@ -121,10 +124,17 @@ void CLFFmpegVideoDecoder::closeDecoder()
 #endif
 
     av_free(m_frame);
+    m_frame = 0;
     if (m_deinterlaceBuffer)
         av_free(m_deinterlaceBuffer);
     av_free(m_deinterlacedFrame);
-    av_free(m_context);
+    av_freep(&m_context->rc_override);
+    av_freep(&m_context->intra_matrix);
+    av_freep(&m_context->inter_matrix);
+    av_freep(&m_context->extradata);
+    av_freep(&m_context->rc_eq);
+    av_freep(&m_context);
+
     delete m_frameTypeExtractor;
     m_motionMap.clear();
 }
@@ -214,7 +224,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 
 
     cl_log.log(QLatin1String("Creating ") + QLatin1String(m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
-    // TODO: check return value
+    // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
         m_codec = 0;
@@ -227,8 +237,6 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 
 void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
 {
-    //QMutexLocker mutex(&global_ffmpeg_mutex);
-
     //closeDecoder();
     //openDecoder();
     //return;
@@ -237,7 +245,12 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
     if (m_context->codec)
         avcodec_close(m_context);
 
-    av_free(m_context);
+    av_freep(&m_context->rc_override);
+    av_freep(&m_context->intra_matrix);
+    av_freep(&m_context->inter_matrix);
+    av_freep(&m_context->extradata);
+    av_freep(&m_context->rc_eq);
+    av_freep(&m_context);
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
     if (m_passedContext) {
@@ -254,6 +267,7 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
     //m_context->debug |= FF_DEBUG_THREADS;
     //m_context->flags2 |= CODEC_FLAG2_FAST;
     m_motionMap.clear();
+    m_frame->data[0] = 0;
 }
 
 void CLFFmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
@@ -556,7 +570,7 @@ double CLFFmpegVideoDecoder::getSampleAspectRatio() const
     if (qAbs(result)< 1e-7) 
     {
         result = 1.0;
-        if (m_context->width == 720) { // TODO: add a table!
+        if (m_context->width == 720) { // TODO: #vasilenko add a table!
             if (m_context->height == 480)
                 result = (4.0/3.0) / (720.0/480.0);
             else if (m_context->height == 576)

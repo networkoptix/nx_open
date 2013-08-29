@@ -19,7 +19,7 @@ public:
 
     virtual int getMaxFps() override; 
     virtual bool isResourceAccessible() override;
-    virtual QString manufacture() const override;
+    virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
     virtual bool setHostAddress(const QString &ip, QnDomain domain) override;
@@ -42,13 +42,14 @@ public:
     virtual void setStatus(Status newStatus, bool silenceMode = false);
 
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
+    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     QnTimePeriodList getChunks();
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping) override;
-    virtual bool initInternal() override;
+    virtual CameraDiagnostics::Result initInternal() override;
     void setChunks(const QnTimePeriodList& chunks);
     QnPhysicalCameraResourcePtr getOtherResource(int channel);
 private slots:
@@ -57,11 +58,15 @@ private:
     qint64 m_startTime;
     qint64 m_endTime;
     QnVMax480ChunkReader* m_chunkReader;
+    QString m_chunkReaderKey;
     QnTimePeriodList m_chunks;
     
     QMutex m_mutexChunks;
     //QWaitCondition m_chunksCond;
     bool m_chunksReady;
+
+    static QMutex m_chunkReaderMutex;
+    static QMap<QString, QnVMax480ChunkReader*> m_chunkReaderMap;
 };
 
 typedef QnSharedResourcePointer<QnPlVmax480Resource> QnPlVmax480ResourcePtr;

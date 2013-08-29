@@ -13,67 +13,11 @@ namespace Qn {
         LocalNode,
         ServersNode,
         UsersNode,
-
-        /** Node that represents a resource. */
-        ResourceNode,
-
-        /** Node that represents a layout item. */
-        ItemNode,
-
-        /** Node that contains hidden resources. */
-        BastardNode,
-
-        /** Node that represents a recorder (VMAX, etc). */
-        RecorderNode,
-
+        ResourceNode,   /**< Node that represents a resource. */
+        ItemNode,       /**< Node that represents a layout item. */
+        BastardNode,    /**< Node that contains hidden resources. */
+        RecorderNode,   /**< Node that represents a recorder (VMAX, etc). */
         NodeTypeCount
-    };
-
-
-    /**
-     * Generic enumeration holding different data roles used in Qn classes.
-     */
-    enum ItemDataRole {
-        FirstItemDataRole   = Qt::UserRole,
-
-        /* Tree-based. */
-        NodeTypeRole        = FirstItemDataRole,    /**< Role for node type, see <tt>Qn::NodeType</tt>. */
-
-        /* Resource-based. */
-        ResourceRole,                               /**< Role for QnResourcePtr. */
-        ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
-        ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (QnResource::Flags). */
-        ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
-        ResourceStatusRole,                         /**< Role for resource status. Value of type int (QnResource::Status). */
-        ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
-
-        /* Layout-based. */
-        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
-        LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
-        LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
-        LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
-        LayoutSearchStateRole,                      /**< */
-        LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
-        LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
-        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QUuid>. */
-
-        /* Item-based. */
-        ItemUuidRole,                               /**< Role for item's UUID. Value of type QUuid. */
-        ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
-        ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
-        ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
-        ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
-        ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
-
-        ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. */
-        ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
-        ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
-        ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
-        ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
-        ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
-
-        /* Others. */
-        HelpTopicIdRole                             /**< Role for item's help topic. Value of type int. */
     };
 
 
@@ -116,31 +60,21 @@ namespace Qn {
      * displayed on top of those from the layers with lower numbers.
      */
     enum ItemLayer {
+        EMappingLayer,              /**< Layer for E-Mapping background. */
         BackLayer,                  /**< Back layer. */
+        RaisedConeBgLayer,          /**< Layer for origin cone when item is not raised anymore. */
         PinnedLayer,                /**< Layer for pinned items. */
+        RaisedConeLayer,            /**< Layer for origin cone for raised items. */
         PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
         UnpinnedLayer,              /**< Layer for unpinned items. */
         UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
         ZoomedLayer,                /**< Layer for zoomed items. */
         FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
         EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer                     /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
+        UiLayer,                    /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
+        MessageBoxLayer,            /**< Layer for graphics text messages. */
+        LayerCount
     };
-
-
-    /**
-     * Generic enumeration describing borders of a rectangle.
-     */
-    enum Border {
-        NoBorders = 0,
-        LeftBorder = 0x1,
-        RightBorder = 0x2,
-        TopBorder = 0x4,
-        BottomBorder = 0x8,
-        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
-    };
-    Q_DECLARE_FLAGS(Borders, Border)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
 
 
     /**
@@ -190,6 +124,8 @@ namespace Qn {
 
         /* Layout-specific permissions. */
         AddRemoveItemsPermission                = 0x00100000,   /**< Permission to add or remove items from a layout. */
+        EditLayoutSettingsPermission            = 0x00200000,   /**< Permission to setup layout background or set locked flag. */
+        FullLayoutPermissions                   = ReadWriteSavePermission | WriteNamePermission | Qn::RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
         
         /* User-specific permissions. */
         WritePasswordPermission                 = 0x02000000,   /**< Permission to edit associated password. */
@@ -215,6 +151,7 @@ namespace Qn {
         GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
         GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
         GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
+        GlobalPanicPermission                   = 0x00001000,   /**< Can trigger panic recording. */
         
         /* Deprecated permissions. */
         DeprecatedEditCamerasPermission         = 0x00000010,   /**< Can edit camera settings and change camera's PTZ state. */
@@ -224,7 +161,7 @@ namespace Qn {
         GlobalLiveViewerPermissions             = GlobalViewLivePermission,
         GlobalViewerPermissions                 = GlobalLiveViewerPermissions       | GlobalViewArchivePermission | GlobalExportPermission,
         GlobalAdvancedViewerPermissions         = GlobalViewerPermissions           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
+        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions | GlobalPanicPermission,
         GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
             
         AllPermissions                          = 0xFFFFFFFF
@@ -250,6 +187,9 @@ namespace Qn {
             result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
         }
 
+        if(result & Qn::GlobalProtectedPermission)
+            result |= Qn::GlobalPanicPermission;
+
         return result;
     }
 
@@ -262,7 +202,6 @@ namespace Qn {
         ClientTimeMode  
     };
 
-    // TODO: #GDM this enum belongs to resource tree model as it's not used outside its context.
     /**
      * Columns in the resource tree model.
      */
@@ -271,6 +210,33 @@ namespace Qn {
         CheckColumn,
         ColumnCount
     };
+
+    /**
+     * Overlay for resource widgets.
+     */
+    enum ResourceStatusOverlay {
+        EmptyOverlay,
+        PausedOverlay,
+        LoadingOverlay,
+        NoDataOverlay,
+        UnauthorizedOverlay,
+        OfflineOverlay,
+        AnalogWithoutLicenseOverlay
+    };
+
+    /**
+     * Result of a frame rendering operation. 
+     * 
+     * Note that the order is important here --- higher values are prioritized
+     * when calculating cumulative status of several rendering operations.
+     */
+    enum RenderStatus {
+        NothingRendered,    /**< No frames to render, so nothing was rendered. */
+        CannotRender,       /**< Something went wrong. */
+        OldFrameRendered,   /**< No new frames available, old frame was rendered. */
+        NewFrameRendered    /**< New frame was rendered. */
+    };
+
 
     /**
      * Video resolution adjustment mode for RADASS.
@@ -282,6 +248,17 @@ namespace Qn {
         ResolutionModeCount
     };
 
+    /**
+     * Importance level of a notification. 
+     */
+    enum NotificationLevel {
+        NoNotification,
+        OtherNotification,
+        CommonNotification,
+        ImportantNotification,
+        CriticalNotification,
+        SystemNotification,
+    };
 
 } // namespace Qn
 

@@ -1,4 +1,7 @@
 #include "avi_bluray_archive_delegate.h"
+
+#include <QDir>
+
 #include "avi_bluray_resource.h"
 #include "utils/media/bluray_reader/bluray_helper.h"
 

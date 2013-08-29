@@ -1,20 +1,12 @@
-#ifndef QN_HARDWARE_CHECK_EVENT_FILTER_H
-#define QN_HARDWARE_CHECK_EVENT_FILTER_H
+#ifndef QN_GL_HARDWARE_CHECKER_H
+#define QN_GL_HARDWARE_CHECKER_H
 
-#include <QtCore/QObject>
+#include <QtCore/QCoreApplication>
 
-class QGLContext;
-class QGLWidget;
-
-class QnGlHardwareChecker: public QObject {
+class QnGlHardwareChecker {
+    Q_DECLARE_TR_FUNCTIONS(QnGlHardwareChecker)
 public:
-    QnGlHardwareChecker(QGLWidget *parent);
-    virtual ~QnGlHardwareChecker();
-
-    virtual bool eventFilter(QObject *watched, QEvent *event) override;
-
-private:
-    const QGLContext* m_context;
+    static bool checkCurrentContext(bool displayWarnings);
 };
 
-#endif // QN_HARDWARE_CHECK_EVENT_FILTER_H
+#endif // QN_GL_HARDWARE_CHECKER_H

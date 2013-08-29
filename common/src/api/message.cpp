@@ -14,9 +14,10 @@ namespace {
 }
 
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
-void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& hardwareId, const QByteArray& oldHardwareId);
+void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& oldHardwareId);
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
+void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules);
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
 
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
@@ -52,6 +53,12 @@ namespace Qn
                 return QLatin1String("BusinessRuleDelete");
             case Message_Type_BroadcastBusinessAction:
                 return QLatin1String("BroadcastBusinessAction");
+            case Message_Type_FileAdd:
+                return QLatin1String("FileAdd");
+            case Message_Type_FileRemove:
+                return QLatin1String("FileRemove");
+            case Message_Type_FileUpdate:
+                return QLatin1String("FileUpdate");
             default:
                 return QString::fromAscii("Unknown %1").arg((int)val);
         }
@@ -60,7 +67,7 @@ namespace Qn
 
 bool QnMessage::load(const pb::Message &message)
 {
-    eventType = (Qn::Message_Type)message.type();
+    messageType = (Qn::Message_Type)message.type();
     pb::Message_Type msgType = message.type();
     seqNumber = message.seqnumber();
 
@@ -98,7 +105,7 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_License:
         {
             const pb::LicenseMessage& licenseMessage = message.GetExtension(pb::LicenseMessage::message);
-			parseLicense(license, licenseMessage.license(), qnLicensePool->getLicenses().hardwareId(), qnLicensePool->getLicenses().oldHardwareId());
+			parseLicense(license, licenseMessage.license(), qnLicensePool->oldHardwareId());
             break;
         }
         case pb::Message_Type_CameraServerItem:
@@ -110,8 +117,12 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_Initial:
         {
             const pb::InitialMessage& initialMessage = message.GetExtension(pb::InitialMessage::message);
-            licenses.setHardwareId(initialMessage.hardwareid().c_str());
-			licenses.setOldHardwareId(initialMessage.oldhardwareid().c_str());
+            systemName = QString::fromUtf8(initialMessage.systemname().c_str());
+            oldHardwareId = initialMessage.oldhardwareid().c_str();
+            hardwareId1 = initialMessage.hardwareid1().c_str();
+            hardwareId2 = initialMessage.hardwareid2().c_str();
+            publicIp = QString::fromStdString(initialMessage.publicip());
+
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());
             qnResTypePool->replaceResourceTypeList(resourceTypes);
 
@@ -140,6 +151,42 @@ bool QnMessage::load(const pb::Message &message)
             parseBusinessAction(businessAction, businessActionMessage.businessaction());
             break;
         }
+        case pb::Message_Type_FileAdd:
+        {
+            const pb::FileAddMessage& fileAddMessage = message.GetExtension(pb::FileAddMessage::message);
+            filename = QString::fromStdString(fileAddMessage.path());
+            break;
+        }
+        case pb::Message_Type_FileRemove:
+        {
+            const pb::FileRemoveMessage& fileRemoveMessage = message.GetExtension(pb::FileRemoveMessage::message);
+            filename = QString::fromStdString(fileRemoveMessage.path());
+            break;
+        }
+        case pb::Message_Type_FileUpdate:
+        {
+            const pb::FileUpdateMessage& fileUpdateMessage = message.GetExtension(pb::FileUpdateMessage::message);
+            filename = QString::fromStdString(fileUpdateMessage.path());
+            break;
+        }
+        case pb::Message_Type_RuntimeInfoChange:
+        {
+            const pb::RuntimeInfoChangeMessage& runtimeInfoChangeMessage = message.GetExtension(pb::RuntimeInfoChangeMessage::message);
+            if (runtimeInfoChangeMessage.has_publicip())
+                publicIp = QString::fromStdString(runtimeInfoChangeMessage.publicip());
+            if (runtimeInfoChangeMessage.has_systemname())
+                systemName = QString::fromStdString(runtimeInfoChangeMessage.systemname());
+            break;
+        }
+        case pb::Message_Type_BusinessRuleReset:
+        {
+            const pb::BusinessRuleResetMessage& businessRuleResetMessage = message.GetExtension(pb::BusinessRuleResetMessage::message);
+            parseBusinessRules(businessRules, businessRuleResetMessage.businessrule());
+            break;
+        }
+
+    default:
+        break;
     }
 
     return true;

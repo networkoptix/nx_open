@@ -1,6 +1,7 @@
 #ifndef QN_SCHEDULE_GRID_WIDGET_H
 #define QN_SCHEDULE_GRID_WIDGET_H
 
+#include <QtCore/QVariant>
 #include <QtGui/QWidget>
 #include <core/misc/schedule_recording_type.h>
 
@@ -24,8 +25,8 @@ public:
         SecondParam,
         RecordTypeParam,
         DiffersFlagParam,
-
-        ParamType_Count };
+        ParamType_Count 
+    };
 
     void setDefaultParam(ParamType number, const QVariant& value);
     void setShowFirstParam(bool value);

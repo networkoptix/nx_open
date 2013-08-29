@@ -3,9 +3,15 @@
 
 #include <QString>
 #include <QSharedPointer>
-#include "libavcodec/avcodec.h"
+
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
+
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/media_resource.h"
+#include "filters/abstract_filter.h"
 
 
 /*!
@@ -61,14 +67,17 @@ public:
     */
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) = 0;
     QString getLastError() const;
-    virtual void setQuality( QnStreamQuality quality );
-
+    virtual void setQuality( Qn::StreamQuality quality );
+    void setSrcRect(const QRectF& srcRect);
+protected:
+    QRect roundRect(const QRect& srcRect) const;
 protected:
     QString m_lastErrMessage;
     QnCodecParams::Value m_params;
     int m_bitrate;
     CodecID m_codecId;
-    QnStreamQuality m_quality;
+    Qn::StreamQuality m_quality;
+    QRectF m_srcRectF;
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 
@@ -77,6 +86,7 @@ class QnVideoTranscoder: public QnCodecTranscoder
 {
 public:
     QnVideoTranscoder(CodecID codecId);
+    virtual ~QnVideoTranscoder();
 
     //!Set picture size (in pixels) of output video stream
     /*!
@@ -87,10 +97,20 @@ public:
     virtual void setResolution( const QSize& value );
     //!Returns picture size (in pixels) of output video stream
     QSize getResolution() const;
+    void setVideoLayout(const QnResourceVideoLayout* layout);
 
     virtual bool open(QnCompressedVideoDataPtr video);
+
+    virtual void addFilter(QnAbstractImageFilter* filter);
+protected:
+    static const int WIDTH_ALIGN = 32;
+    static const int HEIGHT_ALIGN = 2;
+        
+    void processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect);
 protected:
     QSize m_resolution;
+    const QnResourceVideoLayout* m_layout;
+    QList<QnAbstractImageFilter*> m_filters;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 
@@ -123,6 +143,8 @@ public:
     */
     virtual int setContainer(const QString& value) = 0;
 
+    void setVideoLayout(const QnResourceVideoLayout* layout);
+
     /*
     * Set ffmpeg video codec and params
     * @return Returns 0 if no error or error code
@@ -135,7 +157,7 @@ public:
     virtual int setVideoCodec(
         CodecID codec,
         TranscodeMethod method,
-        QnStreamQuality quality,
+        Qn::StreamQuality quality,
         const QSize& resolution = QSize(1024,768),
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value());
@@ -157,6 +179,12 @@ public:
     * @return Returns 0 if no error or error code
     */
     int transcodePacket(QnAbstractMediaDataPtr media, QnByteArray* const result);
+    //!Adds tag to the file. Maximum langth of tags and allowed names are format dependent
+    /*!
+        This implementation always returns \a false
+        \return true on success
+    */
+    virtual bool addTag( const QString& name, const QString& value );
 
     /*
     * Return description of the last error code
@@ -178,7 +206,7 @@ public:
     static int suggestMediaStreamParams(
         CodecID codec,
         QSize resolution,
-        QnStreamQuality quality,
+        Qn::StreamQuality quality,
         QnCodecParams::Value* const params = NULL );
 
 protected:
@@ -203,7 +231,7 @@ protected:
 
 protected:
     bool m_initialized;
-
+    const QnResourceVideoLayout* m_vLayout;
 private:
     QString m_lastErrMessage;
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;

@@ -41,7 +41,7 @@ qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaResourcePtr &resourc
     if(QnAviResourcePtr fileResource = resource.dynamicCast<QnAviResource>()) {
         qint64 result = fileResource->timeZoneOffset();
         return result == Qn::InvalidUtcOffset ? defaultValue : result;
-    } else if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(resource->getParentId()).dynamicCast<QnMediaServerResource>()) {
+    } else if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(resource->toResource()->getParentId()).dynamicCast<QnMediaServerResource>()) {
         return utcOffset(server, defaultValue);
     } else {
         return defaultValue;
@@ -49,7 +49,7 @@ qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaResourcePtr &resourc
 }
 
 qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue) const {
-    // TODO: duplicate code.
+    // TODO: #Elric duplicate code.
     qint64 utcOffset = this->utcOffset(server, Qn::InvalidUtcOffset);
     if(utcOffset == Qn::InvalidUtcOffset)
         return defaultValue;
@@ -80,7 +80,7 @@ void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &s
     if(server->getPrimaryIF().isNull())
         return;
 
-    int handle = server->apiConnection()->asyncGetTime(this, SLOT(at_replyReceived(int, const QDateTime &, int, int)));
+    int handle = server->apiConnection()->getTimeAsync(this, SLOT(at_replyReceived(int, const QnTimeReply &, int)));
     m_resourceByHandle[handle] = server;
 }
 
@@ -125,15 +125,14 @@ void QnWorkbenchServerTimeWatcher::at_resource_statusChanged(const QnResourcePtr
         sendRequest(server);
 }
 
-void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QDateTime &dateTime, int utcOffset, int handle) {
+void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QnTimeReply &reply, int handle) {
     Q_UNUSED(status);
-    Q_UNUSED(dateTime);
 
     QnMediaServerResourcePtr server = m_resourceByHandle.value(handle);
     m_resourceByHandle.remove(handle);
 
-    if(dateTime.isValid()) {
-        m_utcOffsetByResource[server] = utcOffset * 1000ll; /* Convert seconds to milliseconds. */
+    if(status == 0) {
+        m_utcOffsetByResource[server] = reply.timeZoneOffset;
         emit offsetsChanged();
     }
 }

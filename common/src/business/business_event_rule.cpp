@@ -8,10 +8,11 @@ QnBusinessEventRule::QnBusinessEventRule()
 :
     m_id(0),
     m_eventType(BusinessEventType::NotDefined),
-    m_eventState(ToggleState::On), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
+    m_eventState(Qn::OnState), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
     m_actionType(BusinessActionType::NotDefined),
     m_aggregationPeriod(0),
-    m_disabled(false)
+    m_disabled(false),
+    m_system(false)
 {
 }
 
@@ -44,20 +45,20 @@ void QnBusinessEventRule::setEventResources(const QnResourceList &value) {
     m_eventResources = value;
 }
 
-QnBusinessParams QnBusinessEventRule::eventParams() const {
+QnBusinessEventParameters QnBusinessEventRule::eventParams() const {
     return m_eventParams;
 }
 
-void QnBusinessEventRule::setEventParams(const QnBusinessParams &params)
+void QnBusinessEventRule::setEventParams(const QnBusinessEventParameters &params)
 {
     m_eventParams = params;
 }
 
-ToggleState::Value QnBusinessEventRule::eventState() const {
+Qn::ToggleState QnBusinessEventRule::eventState() const {
     return m_eventState;
 }
 
-void QnBusinessEventRule::setEventState(ToggleState::Value state) {
+void QnBusinessEventRule::setEventState(Qn::ToggleState state) {
     m_eventState = state;
 }
 
@@ -67,7 +68,7 @@ BusinessActionType::Value QnBusinessEventRule::actionType() const {
 
 void QnBusinessEventRule::setActionType(const BusinessActionType::Value value) {
     m_actionType = value;
-    //TODO: #gdm fill action params with default values? filter action resources?
+    //TODO: #GDM fill action params with default values? filter action resources?
 }
 
 QnResourceList QnBusinessEventRule::actionResources() const {
@@ -78,12 +79,12 @@ void QnBusinessEventRule::setActionResources(const QnResourceList &value) {
     m_actionResources = value;
 }
 
-QnBusinessParams QnBusinessEventRule::actionParams() const
+QnBusinessActionParameters QnBusinessEventRule::actionParams() const
 {
     return m_actionParams;
 }
 
-void QnBusinessEventRule::setActionParams(const QnBusinessParams &params)
+void QnBusinessEventRule::setActionParams(const QnBusinessActionParameters &params)
 {
     m_actionParams = params;
 }
@@ -119,6 +120,14 @@ QString QnBusinessEventRule::schedule() const {
 void QnBusinessEventRule::setSchedule(const QString value) {
     m_schedule = value;
     m_binSchedule = QByteArray::fromHex(m_schedule.toUtf8());
+}
+
+bool QnBusinessEventRule::system() const {
+    return m_system;
+}
+
+void QnBusinessEventRule::setSystem(bool value) {
+    m_system = value;
 }
 
 QString QnBusinessEventRule::getUniqueId() const

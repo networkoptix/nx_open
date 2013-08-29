@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>712</width>
-    <height>591</height>
+    <height>632</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
           <widget class="QLineEdit" name="nameEdit"/>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_7">
+          <widget class="QLabel" name="modelLabel">
            <property name="text">
             <string>Model:</string>
            </property>
@@ -61,7 +61,7 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QLabel" name="label_firmware">
+          <widget class="QLabel" name="firmwareLabel">
            <property name="text">
             <string>Firmware:</string>
            </property>
@@ -275,6 +275,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBoxDewarping">
+         <property name="text">
+          <string>This is a fish-eye lens camera</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -350,7 +357,7 @@
             <item>
              <widget class="QRadioButton" name="softwareMotionButton">
               <property name="text">
-               <string>Software (On media server, max fps may be slightly decreased)</string>
+               <string>Software (Max fps may be slightly decreased on media server)</string>
               </property>
               <property name="checked">
                <bool>false</bool>
@@ -490,10 +497,30 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="fisheyeTab">
+      <attribute name="title">
+       <string>Dewarping</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <widget class="QnFisheyeSettingsWidget" name="fisheyeSettingsWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="advancedTab">
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
+     </widget>
+     <widget class="QWidget" name="expertTab">
+      <attribute name="title">
+       <string>Expert</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QnAdvancedSettingsWidget" name="expertSettingsWidget" native="true"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -507,9 +534,21 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>QnAdvancedSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/properties/expert_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QnTextTickSlider</class>
    <extends>QSlider</extends>
    <header>ui/widgets/properties/text_tick_slider.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnFisheyeSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/properties/fisheye_settings_widget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

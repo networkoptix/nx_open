@@ -27,13 +27,6 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
     return s1.width() > s2.width();
 }
 
-static float getResolutionAspectRatio(QSize s)
-{
-    if (s.height()==0)
-        return 0;
-
-    return float(s.width()) / s.height();
-}
 //==================================================================
 
 
@@ -48,7 +41,7 @@ bool QnPlIsdResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QString QnPlIsdResource::manufacture() const
+QString QnPlIsdResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }
@@ -57,7 +50,7 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-bool QnPlIsdResource::initInternal()
+CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
     CLHttpStatus status;
     QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), 80, 3000, getAuth());
@@ -65,7 +58,7 @@ bool QnPlIsdResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Unauthorized);
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
     }
 
     QStringList vals = getValues(QLatin1String(reslst));
@@ -83,7 +76,7 @@ bool QnPlIsdResource::initInternal()
     }
 
     if (resolutions.size() < 1 )
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
 
 
@@ -160,7 +153,12 @@ bool QnPlIsdResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Unauthorized);
-        return false;
+        QUrl requestedUrl;
+        requestedUrl.setHost( getHostAddress() );
+        requestedUrl.setPort( 80 );
+        requestedUrl.setScheme( QLatin1String("http") );
+        requestedUrl.setPath( QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList") );
+        return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
     }
 
     /**/
@@ -177,7 +175,7 @@ bool QnPlIsdResource::initInternal()
     qSort(fpsList.begin(),fpsList.end(), qGreater<int>());
 
     if (fpsList.size()<1)
-        return false;
+        return CameraDiagnostics::UnknownErrorResult();
 
     {
         
@@ -186,7 +184,7 @@ bool QnPlIsdResource::initInternal()
 
     save();
 
-    return true;
+    return CameraDiagnostics::NoErrorResult();
 
 }
 
@@ -245,13 +243,4 @@ int QnPlIsdResource::getMaxFps()
 
     this_casted->getParam(MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
     return mediaVariant.toInt();
-}
-
-void QnPlIsdResource::save()
-{
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
-        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
-            << getPhysicalId() << ". Description: " << conn->getLastError();
-    }
 }

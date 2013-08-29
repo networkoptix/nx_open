@@ -1,14 +1,19 @@
 #include "sign_helper.h"
+
+#include <QProcess>
+#include <QTemporaryFile>
+
 #include "utils/common/util.h"
 #include "licensing/license.h"
 #include "utils/common/scoped_painter_rollback.h"
 #include "utils/math/math.h"
 
 extern "C" {
+#include <libswscale/swscale.h>
 #ifdef WIN32
 #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
-#include "libavutil/pixdesc.h"
+#include <libavutil/pixdesc.h>
 #ifdef WIN32
 #undef AVPixFmtDescriptor
 #endif
@@ -55,11 +60,11 @@ QnSignHelper::QnSignHelper():
     m_signBackground = Qt::white;
 
     m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
-    m_hwIdStr = QLatin1String(qnLicensePool->getLicenses().hardwareId());
+    m_hwIdStr = QLatin1String(qnLicensePool->hardwareId2());
     if (m_hwIdStr.isEmpty())
         m_hwIdStr = tr("Unknown");
 
-    QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
+    QList<QnLicensePtr> list = qnLicensePool->getLicenses();
     m_licensedToStr = QString(tr("FREE license"));
     foreach (QnLicensePtr license, list)
     {
@@ -540,8 +545,8 @@ int QnSignHelper::runX264Process(AVFrame* frame, QString optionStr, quint8* rezB
     file.write((const char*) frame->data[1], frame->linesize[1]*frame->height/(1 << descr->log2_chroma_h));
     file.write((const char*) frame->data[2], frame->linesize[2]*frame->height/(1 << descr->log2_chroma_h));
     file.close();
-
-    QString executableName = closeDirPath(QFileInfo(QLatin1String(qApp->argv()[0])).absolutePath()) + QLatin1String("x264");
+                                                        
+    QString executableName = closeDirPath(qApp->applicationDirPath()) + QLatin1String("x264");
     QString command(QLatin1String("\"%1\" %2 -o \"%3\" --input-res %4x%5 \"%6\""));
     QString outFileName(tempName + QLatin1String(".264"));
     command = command.arg(executableName).arg(optionStr).arg(outFileName).arg(frame->width).arg(frame->height).arg(tempName);
@@ -700,12 +705,12 @@ QByteArray QnSignHelper::getSignPattern()
 
     result.append(qApp->applicationName().toUtf8()).append(" v").append(qApp->applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QString hid = QLatin1String(qnLicensePool->getLicenses().hardwareId());
+    QString hid = QLatin1String(qnLicensePool->hardwareId2());
     if (hid.isEmpty())
         hid = tr("Unknown");
     result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
+    QList<QnLicensePtr> list = qnLicensePool->getLicenses();
     QString licenseName(tr("FREE license"));
     foreach (QnLicensePtr license, list)
     {

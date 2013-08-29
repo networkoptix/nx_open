@@ -4,6 +4,7 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 
 class QGraphicsScale;
+class QGraphicsView;
 
 class Instrument;
 
@@ -37,7 +38,7 @@ protected:
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-protected slots:
+private slots:
     void updateScale(QGraphicsView *view = NULL);
 
 private:

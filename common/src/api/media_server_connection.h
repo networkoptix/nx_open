@@ -7,179 +7,24 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
-#include <utils/common/request_param.h>
-#include <utils/common/util.h>
-
+#include <api/model/camera_diagnostics_reply.h>
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
+#include <api/model/statistics_reply.h>
+#include <api/model/time_reply.h>
 
+#include <utils/camera/camera_diagnostics.h>
+#include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
-
+#include <business/business_fwd.h>
 #include <recording/time_period_list.h>
 
 #include "api_fwd.h"
-#include "media_server_statistics_data.h"
+#include "abstract_connection.h"
 #include "media_server_cameras_data.h"
 
-
 class QnPtzSpaceMapper;
-class QnEnumNameMapper;
-
-class QnMediaServerReplyProcessor: public QObject {
-    Q_OBJECT
-
-    typedef QObject base_type;
-
-public:
-    QnMediaServerReplyProcessor(int object);
-    virtual ~QnMediaServerReplyProcessor();
-
-    int object() const { return m_object; }
-
-public slots:
-    void processReply(const QnHTTPRawResponse &response, int handle);
-
-signals:
-    void finished(int status, int handle);
-    void finished(int status, const QVariant &reply, int handle);
-    void finished(int status, const QnStorageStatusReply &reply, int handle);
-    void finished(int status, const QnStorageSpaceReply &reply, int handle);
-    void finished(int status, const QnTimePeriodList &reply, int handle);
-    void finished(int status, const QnStatisticsDataList &reply, int handle);
-    void finished(int status, const QnPtzSpaceMapper &reply, int handle);
-    void finished(int status, const QVector3D &reply, int handle);
-
-protected:
-    virtual void connectNotify(const char *signal) override;
-
-private:
-    template<class T>
-    void emitFinished(int status, const T &reply, int handle) {
-        if(m_emitDefault)
-            emit finished(status, reply, handle);
-        if(m_emitVariant)
-            emit finished(status, QVariant::fromValue<T>(reply), handle);
-    }
-
-    void emitFinished(int status, int handle) {
-        if(m_emitDefault)
-            emit finished(status, handle);
-        if(m_emitVariant)
-            emit finished(status, QVariant(), handle);
-    }
-
-private:
-    int m_object;
-    bool m_emitVariant, m_emitDefault;
-};
-
-
-class QnMediaServerRequestResult: public QObject {
-    Q_OBJECT
-public:
-    int status() const { return m_status; }
-    int handle() const { return m_handle; }
-    const QVariant &reply() const { return m_reply; }
-
-signals:
-    void replyProcessed();
-
-public slots:
-    void processReply(int status, const QVariant &reply, int handle) {
-        m_status = status;
-        m_reply = reply;
-        m_handle = handle;
-
-        emit replyProcessed();
-    }
-
-private:
-    int m_status;
-    int m_handle;
-    QVariant m_reply;
-};
-
-
-namespace detail {
-    class QnMediaServerManualCameraReplyProcessor: public QObject
-    {
-        Q_OBJECT
-    public:
-        QnMediaServerManualCameraReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_searchReplyReceived(const QnHTTPRawResponse& response, int handle);
-        void at_addReplyReceived(const QnHTTPRawResponse& response, int handle);
-
-    signals:
-        void finishedSearch(const QnCamerasFoundInfoList &);
-        void searchError(int, const QString &);
-        void finishedAdd(int);
-    };
-
-    class QnMediaServerGetTimeReplyProcessor: public QObject
-    {
-        Q_OBJECT
-    public:
-        QnMediaServerGetTimeReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
-
-    signals:
-        void finished(int status, const QDateTime &dateTime, int utcOffset, int handle);
-    };
-
-    //!Handles response on GetParam request
-    class QnMediaServerGetParamReplyProcessor: public QObject
-    {
-        Q_OBJECT
-
-    public:
-        //!Return value is actual only after response has been handled
-        const QList< QPair< QString, QVariant> > &receivedParams() const;
-
-        //!Parses response mesasge body and fills \a m_receivedParams
-        void parseResponse(const QByteArray& responseMssageBody);
-
-    public slots:
-        /*!
-            \note calls \a deleteLater after parsing response response
-        */
-        void at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/);
-
-    signals:
-        void finished(int status, const QList< QPair< QString, QVariant> > &params);
-
-    private:
-        QList< QPair< QString, QVariant> > m_receivedParams;
-    };
-
-    //!Handles response on SetParam request
-    class QnMediaServerSetParamReplyProcessor: public QObject
-    {
-        Q_OBJECT
-
-    public:
-        //!QList<QPair<paramName, operation result> >. Return value is actual only after response has been handled
-        const QList<QPair<QString, bool> > &operationResult() const;
-        //!Parses response mesasge body and fills \a m_receivedParams
-        void parseResponse(const QByteArray &responseMssageBody);
-
-    public slots:
-        /*!
-            \note calls \a deleteLater after handling response
-        */
-        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
-
-    signals:
-        void finished(int status, const QList<QPair<QString, bool> > &operationResult);
-
-    private:
-         QList<QPair<QString, bool> > m_operationResult;
-    };
-
-} // namespace detail
+class QnMediaServerResource;
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
 typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
@@ -188,23 +33,67 @@ Q_DECLARE_METATYPE(QnStringBoolPairList);
 Q_DECLARE_METATYPE(QnStringVariantPairList);
 
 
-class QN_EXPORT QnMediaServerConnection: public QObject
-{
+class QnMediaServerReplyProcessor: public QnAbstractReplyProcessor {
     Q_OBJECT
 
-    typedef QObject base_type;
+public:
+    QnMediaServerReplyProcessor(int object): QnAbstractReplyProcessor(object) {}
+
+    virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
+
+signals:
+    void finished(int status, const QnStorageStatusReply &reply, int handle);
+    void finished(int status, const QnStorageSpaceReply &reply, int handle);
+    void finished(int status, const QnTimePeriodList &reply, int handle);
+    void finished(int status, const QnStatisticsReply &reply, int handle);
+    void finished(int status, const QnPtzSpaceMapper &reply, int handle);
+    void finished(int status, const QVector3D &reply, int handle);
+    void finished(int status, const QnStringVariantPairList &reply, int handle);
+    void finished(int status, const QnStringBoolPairList &reply, int handle);
+    void finished(int status, const QnTimeReply &reply, int handle);
+    void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
+    void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
+    void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
+    void finished(int status, const QImage &reply, int handle);
+
+private:
+    friend class QnAbstractReplyProcessor;
+};
+
+
+class QnMediaServerConnection: public QnAbstractConnection {
+    Q_OBJECT
+    typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent = NULL);
+    QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
-    void setProxyAddr(const QUrl& apiUrl, const QString &addr, int port);
+    void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
     int getProxyPort() { return m_proxyPort; }
     QString getProxyHost() { return m_proxyAddr; }
 
-    QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs = 0, qint64 endTimeMs = INT64_MAX, qint64 detail = 1, const QList<QRegion> &motionRegions = QList<QRegion>());
+    int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
 
-    int asyncRecordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
+
+    enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
+	/** 
+     * Get \a camera thumbnail for specified time. 
+     * 
+     * Returns immediately. On request completion \a slot of object \a target 
+     * is called with signature <tt>(int status, QImage reply, int handle)</tt>.
+     * Status is 0 in case of success, in other cases it holds error code.
+     * 
+     * \param camera
+     * \param timeUsec                  Requested time in usecs. Can be DATE_TIME_NOW for live video or -1 for request latest available image.
+     * \param size                      Can be filled partially: only width or height. In this case other dimension is auto detected.
+     * \param imageFormat               Can be 'jpeg', 'tiff', 'png', etc...
+     * \param method                    If parameter is 'before' or 'after' server returns nearest I-frame before or after time.
+     * \param target
+     * \param slot
+     * \returns                         Request handle.
+	 */
+    int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot);
 
 	/** 
      * Get \a camera params. 
@@ -215,12 +104,36 @@ public:
      * 
      * \returns                         Request handle.
 	 */
-    int asyncGetParamList(const QnNetworkResourcePtr &camera, const QStringList &params, QObject *target, const char *slot);
+    int getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot);
+
+	/** 
+     * Get \a event log. 
+     * 
+     * Returns immediately. On request completion \a slot of object \a target 
+     * is called with signature <tt>(int handle, int httpStatusCode, const QList<QnAbstractBusinessAction> &events)</tt>.
+     * \a status is 0 in case of success, in other cases it holds error code 
+     * 
+     * \param dateFrom                  Start timestamp in msec.
+     * \param dateTo                    End timestamp in msec. Can be <tt>DATETIME_NOW</tt>.
+     * \param cameras                   Filter events by camera. Optional.
+     * \param businessRuleId            Filter events by specified business rule. Optional.
+     * 
+     * \returns                         Request handle.
+	 */
+    int getEventLogAsync(
+        qint64 dateFrom, 
+        qint64 dateTo, 
+        QnResourceList cameras,
+        BusinessEventType::Value eventType, 
+        BusinessActionType::Value actionType,
+        QnId businessRuleId, 
+        QObject *target, 
+        const char *slot);
 
     /**
      * \returns                         Http response status (200 in case of success).
      */
-    int getParamList(const QnNetworkResourcePtr &camera, const QStringList &params, QList<QPair<QString, QVariant> > *paramValues);
+    int getParamsSync(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply);
 
 	/** 
 	 * Set \a camera params.
@@ -231,54 +144,50 @@ public:
 	 * 
      * \returns                         Request handle.
 	 */
-    int asyncSetParam(const QnNetworkResourcePtr &camera, const QList<QPair<QString, QVariant> > &params, QObject *target, const char *slot);
+    int setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot);
 
     /**
      * \returns                         Http response status (200 in case of success).
      */
-    int setParamList(const QnNetworkResourcePtr &camera, const QList<QPair<QString, QVariant> > &params, QList<QPair<QString, bool> > *operationResult);
+    int setParamsSync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply);
 
     /** 
      * \returns                         Request handle. 
      */
-    int asyncGetStatistics(QObject *target, const char *slot);
+    int getStatisticsAsync(QObject *target, const char *slot);
 
-    // TODO: #GDM consistency! All other methods accept a single SLOT with signature (status, DATA, handle). Use a single slot here too!
-    int asyncManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
-                                   QObject *target, const char *slotSuccess, const char *slotError); 
+    int searchCameraAsync(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot); 
+    int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot);
 
-    int asyncManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
-                                QObject *target, const char *slot);
+    int ptzMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzStopAsync(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzMoveToAsync(const QnNetworkResourcePtr &camera, const QVector3D &pos, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzGetPosAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
-    int asyncPtzMove(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int asyncPtzStop(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int asyncPtzMoveTo(const QnNetworkResourcePtr &camera, const QVector3D &pos, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int asyncPtzGetPos(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
-    int asyncPtzGetSpaceMapper(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int getStorageSpaceAsync(QObject *target, const char *slot);
 
-    int asyncGetStorageSpace(QObject *target, const char *slot);
+    int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 
-    int asyncGetStorageStatus(const QString &storageUrl, QObject *target, const char *slot);
+    int getTimeAsync(QObject *target, const char *slot);
 
-    int asyncGetTime(QObject *target, const char *slot);
-
-    QString getUrl() const { return m_url.toString(); }
-
-    using base_type::connect;
-    static bool connect(QnMediaServerReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
+    //!Request server to run camera \a cameraID diagnostics step following \a previousStep
+    /*!
+        \param slot Slot MUST have signature (int, QnCameraDiagnosticsReply, int)
+        \returns Request handle
+    */
+    int doCameraDiagnosticsStepAsync(
+        const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+        QObject* target, const char* slot );
 
 protected:
-    QnRequestParamList createParamList(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
+    virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
+
+    static QnRequestParamList createTimePeriodsRequest(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
+    static QnRequestParamList createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params);
+    static QnRequestParamList createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params);
 
 private:
-    int recordedTimePeriods(const QnRequestParamList &params, QnTimePeriodList &timePeriodList, QByteArray &errorString);
-    int asyncRecordedTimePeriods(const QnRequestParamList &params, QObject *target, const char *slot);
-
-    int sendAsyncRequest(QnMediaServerReplyProcessor *processor, const QnRequestParamList &params = QnRequestParamList(), const QnRequestHeaderList &headers = QnRequestHeaderList());
-
-private:
-    QScopedPointer<QnEnumNameMapper> m_nameMapper;
-    QUrl m_url;
     QString m_proxyAddr;
     int m_proxyPort;
 };

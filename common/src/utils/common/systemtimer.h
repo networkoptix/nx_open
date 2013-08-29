@@ -52,14 +52,14 @@ class SystemTimer
 public:
     SystemTimer()
     :
-        m_handler( NULL )
+        m_handler( 0 )
     {
     }
 
     virtual ~SystemTimer()
     {
         delete m_handler;
-        m_handler = NULL;
+        m_handler = 0;
     }
 
     /*!
@@ -88,6 +88,8 @@ private:
     class AbstractTimerHandler
     {
     public:
+        AbstractTimerHandler() {}
+        virtual ~AbstractTimerHandler() {}
         virtual void onTimer() = 0;
     };
 

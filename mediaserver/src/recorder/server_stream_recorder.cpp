@@ -42,7 +42,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     scheduleData.m_startTime = 0;
     scheduleData.m_endTime = 24*3600*7;
     scheduleData.m_recordType = Qn::RecordingType_Run;
-    scheduleData.m_streamQuality = QnQualityHighest;
+    scheduleData.m_streamQuality = Qn::QualityHighest;
     scheduleData.m_fps = getFpsForValue(0);
 
     m_panicSchedileRecord.setData(scheduleData);
@@ -130,19 +130,21 @@ QnScheduleTask QnServerStreamRecorder::currentScheduleTask() const
 
 void QnServerStreamRecorder::updateStreamParams()
 {
-    if (m_mediaProvider && m_role == QnResource::Role_LiveVideo)
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
+    if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-
-        if (m_currentScheduleTask.getRecordingType() != Qn::RecordingType_Never) {
-            liveProvider->setFps(m_currentScheduleTask.getFps());
-            liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
-        }
-        else {
-            QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-            Q_ASSERT(camera);
-            liveProvider->setFps(camera->getMaxFps()-5);
-            liveProvider->setQuality(QnQualityHighest);
+        if (m_role == QnResource::Role_LiveVideo) {
+            if (m_currentScheduleTask.getRecordingType() != Qn::RecordingType_Never) {
+                liveProvider->setFps(m_currentScheduleTask.getFps());
+                liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
+            }
+            else {
+                Q_ASSERT(camera);
+                liveProvider->setFps(camera->getMaxFps()-5);
+                liveProvider->setQuality(Qn::QualityHighest);
+            }
+            liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
         }
     }
 }
@@ -259,18 +261,18 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
         if (m_role == QnResource::Role_LiveVideo)
             return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;
         else
-            return fps ? qMax(2, qMin(DESIRED_SECOND_STREAM_FPS, camera->getMaxFps()-fps)) : 2;
+            return fps ? qMax(2, qMin(camera->desiredSecondStreamFps(), camera->getMaxFps()-fps)) : 2;
     }
     else
     {
         if (m_role == QnResource::Role_LiveVideo)
             return fps ? fps : camera->getMaxFps();
         else
-            return DESIRED_SECOND_STREAM_FPS;
+            return camera->desiredSecondStreamFps();
     }
 }
 
-void QnServerStreamRecorder::startForcedRecording(QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
+void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
 {
     Q_UNUSED(beforeThreshold)
 
@@ -332,7 +334,7 @@ void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
 
 
     // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
-    //CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
+    //CLServerPushStreamReader* sPushProvider = dynamic_cast<CLServerPushStreamReader*> (m_mediaProvider);
     bool doNotChangeParams = false; //sPushProvider && sPushProvider->isStreamOpened() && m_currentScheduleTask->getFps() >= m_panicSchedileRecord.getFps()*0.75;
     updateRecordingType(task);
     if (!doNotChangeParams)

@@ -1,6 +1,13 @@
 #ifndef coldstore_connection_pool_h1931
 #define coldstore_connection_pool_h1931
+
 #include "coldstore_api/sfs-client.h"
+
+#include <QHash>
+#include <QIODevice>
+#include <QTime>
+#include <QMutex>
+
 
 #define CS_ACTUAL_DATA_CHANNEL 0
 #define CS_META_DATA_CHANNEL 1

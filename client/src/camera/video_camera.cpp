@@ -13,10 +13,11 @@ QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamD
     m_isVisible(true),
     m_exportRecorder(0),
     m_exportReader(0),
-    m_progressOffset(0)
+    m_progressOffset(0),
+    m_displayStarted(false)
 {
     if (m_resource)
-        cl_log.log(QLatin1String("Creating camera for "), m_resource->toString(), cl_logDEBUG1);
+        cl_log.log(QLatin1String("Creating camera for "), m_resource->toResource()->toString(), cl_logDEBUG1);
     if (m_reader) {
         m_reader->addDataProcessor(&m_camdispay);
         if (dynamic_cast<QnAbstractArchiveReader*>(m_reader)) {
@@ -38,7 +39,7 @@ QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamD
 QnVideoCamera::~QnVideoCamera()
 {
     if (m_resource)
-        cl_log.log(QLatin1String("Destroy camera for "), m_resource->toString(), cl_logDEBUG1);
+        cl_log.log(QLatin1String("Destroy camera for "), m_resource->toResource()->toString(), cl_logDEBUG1);
 
     stopDisplay();
     delete m_reader;
@@ -65,18 +66,19 @@ void QnVideoCamera::streamJump(qint64 time)
 
 void QnVideoCamera::startDisplay()
 {
-    CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::startDisplay "), m_resource->getUniqueId(), cl_logDEBUG1);
+    CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::startDisplay "), m_resource->toResource()->getUniqueId(), cl_logDEBUG1);
 
     m_camdispay.start();
     //m_reader->start(QThread::HighestPriority);
     m_reader->start(QThread::HighPriority);
+    m_displayStarted = true;
 }
 
 void QnVideoCamera::stopDisplay()
 {
     //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay"), m_resource->getUniqueId(), cl_logDEBUG1);
     //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
-
+    m_displayStarted = false;
     m_reader->stop();
     m_camdispay.stop();
     m_camdispay.clearUnprocessedData();
@@ -90,7 +92,7 @@ void QnVideoCamera::beforeStopDisplay()
 
 QnResourcePtr QnVideoCamera::getDevice() const
 {
-    return m_resource;
+    return m_resource->toResourcePtr();
 }
 
 QnAbstractStreamDataProvider* QnVideoCamera::getStreamreader()
@@ -113,15 +115,21 @@ void QnVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
     m_camdispay.setLightCPUMode(val);
 }
 
-void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage, 
-                                            QnStreamRecorder::Role role, int timeOffsetMs, int serverTimeZoneMs)
+void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const 
+                                            QString& fileName, const QString& format, 
+                                            QnStorageResourcePtr storage, 
+                                            QnStreamRecorder::Role role, 
+                                            qint64 timeOffsetMs, qint64 serverTimeZoneMs,
+                                            QRectF srcRect,
+                                            const ImageCorrectionParams& contrastParams,
+                                            const DewarpingParams& dewarpingParams)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
 
     if (m_exportRecorder == 0)
     {
-        QnAbstractStreamDataProvider* tmpReader = m_resource->createDataProvider(QnResource::Role_Default);
+        QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(QnResource::Role_Default);
         m_exportReader = dynamic_cast<QnAbstractArchiveReader*> (tmpReader);
         if (m_exportReader == 0)
         {
@@ -134,16 +142,19 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
         if (rtspClient) {
             // 'slow' open mode. send DESCRIBE and SETUP to server.
             // it is required for av_streams in output file - we should know all codec context imediatly
-            rtspClient->setResource(m_resource);
+            rtspClient->setResource(m_resource->toResourcePtr());
             rtspClient->setPlayNowModeAllowed(false); 
         }
         if (role == QnStreamRecorder::Role_FileExport)
             m_exportReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
-        m_exportRecorder = new QnStreamRecorder(m_resource);
+        m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
         m_exportRecorder->disconnect(this);
         if (storage)
             m_exportRecorder->setStorage(storage);
+        m_exportRecorder->setSrcRect(srcRect);
+        m_exportRecorder->setContrastParams(contrastParams);
+        m_exportRecorder->setDewarpingParams(dewarpingParams);
         connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SLOT(onExportFailed(QString)));
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
         connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SLOT(at_exportProgress(int)));

@@ -4,7 +4,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 class QnNv12ToRgbShaderProgram: public QGLShaderProgram {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     enum Colorspace {
         YuvEbu,

@@ -1,8 +1,9 @@
 #ifndef QN_SELECTION_OVERLAY_HACK_INSTRUMENT_H
 #define QN_SELECTION_OVERLAY_HACK_INSTRUMENT_H
 
+#include <QtCore/QWeakPointer>
+
 #include "instrument.h"
-#include <QWeakPointer>
 
 class QnResourceWidget;
 
@@ -15,6 +16,8 @@ class QnResourceWidget;
  */
 class SelectionOverlayHackInstrument: public Instrument {
     Q_OBJECT;
+    typedef Instrument base_type;
+
 public:
     SelectionOverlayHackInstrument(QObject *parent = NULL);
 
@@ -28,6 +31,8 @@ protected:
     virtual void aboutToBeUninstalledNotify() override;
     virtual void enabledNotify() override;
     virtual void aboutToBeDisabledNotify() override;
+    virtual bool registeredNotify(QGraphicsItem *item) override;
+    virtual void unregisteredNotify(QGraphicsItem *item) override;
 
     QnResourceWidget *singleSelectedWidget() {
         return m_singleSelectedWidget.data();

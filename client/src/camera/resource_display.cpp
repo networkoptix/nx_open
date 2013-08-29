@@ -10,10 +10,7 @@
 #include <camera/abstract_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/counter.h>
-
-detail::QnRendererGuard::~QnRendererGuard() {
-    delete m_renderer;
-}
+#include <utils/common/util.h>
 
 QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
     QObject(parent),
@@ -22,7 +19,8 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
     m_mediaProvider(NULL),
     m_archiveReader(NULL),
     m_camera(NULL),
-    m_started(false)
+    m_started(false),
+    m_counter(0)
 {
     assert(!resource.isNull());
 
@@ -38,14 +36,14 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
             /* Camera will free media provider in its destructor. */
             m_camera = new QnVideoCamera(m_mediaResource, m_mediaProvider);
 
-            connect(this,                           SIGNAL(destroyed()),    m_camera,   SLOT(beforeStopDisplay()));
+            connect(this,                           SIGNAL(destroyed()),    m_camera,       SLOT(beforeStopDisplay()));
 
-            QnCounter *counter = new QnCounter(2);
-            connect(m_camera->getCamDisplay(),      SIGNAL(finished()),     counter,    SLOT(decrement()));
-            connect(m_camera->getStreamreader(),    SIGNAL(finished()),     counter,    SLOT(decrement()));
+            m_counter = new QnCounter(2);
+            connect(m_camera->getCamDisplay(),      SIGNAL(finished()),     m_counter,      SLOT(decrement()));
+            connect(m_camera->getStreamreader(),    SIGNAL(finished()),     m_counter,      SLOT(decrement()));
 
-            connect(counter,                        SIGNAL(reachedZero()),  counter,    SLOT(deleteLater()));
-            connect(counter,                        SIGNAL(reachedZero()),  m_camera,   SLOT(deleteLater()));
+            connect(m_counter,                      SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));
+            connect(m_counter,                      SIGNAL(reachedZero()),  m_camera,       SLOT(deleteLater()));
         } else {
             m_camera = NULL;
 
@@ -55,15 +53,21 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
     }
 }
 
-QnResourceDisplay::~QnResourceDisplay() {
+QnResourceDisplay::~QnResourceDisplay() 
+{
+    if (m_camera && !m_camera->isDisplayStarted())
+    {
+		if (m_counter)
+        	m_counter->deleteLater();
+        m_camera->deleteLater();
+    }
+
     beforeDisconnectFromResource();
     disconnectFromResource();
 }
 
 void QnResourceDisplay::beforeDestroy()
 {
-    foreach(detail::QnRendererGuard *guard, m_guards)
-        guard->renderer()->beforeDestroy();
 }
 
 void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
@@ -104,12 +108,6 @@ void QnResourceDisplay::disconnectFromResource() {
     cleanUp(m_dataProvider);
     if(m_camera != NULL)
         m_camera->beforeStopDisplay();
-
-#if 0
-    if(!m_started)
-        foreach(detail::QnRendererGuard *guard, m_guards)
-            delete guard;
-#endif
 
     m_mediaResource.clear();
     m_dataProvider = NULL;
@@ -182,16 +180,14 @@ bool QnResourceDisplay::isStillImage() const {
 }
 
 void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {
-    if(m_camera == NULL) {
-        delete renderer;
-        return;
-    }
-
-    int channelCount = videoLayout()->numberOfChannels();
-    for(int i = 0; i < channelCount; i++)
-        m_camera->getCamDisplay()->addVideoChannel(i, renderer, true);
-
-    m_guards.push_back(new detail::QnRendererGuard(renderer));
-    connect(m_camera->getCamDisplay(), SIGNAL(destroyed()), m_guards.back(), SLOT(deleteLater()));
+    if (m_camera)
+        m_camera->getCamDisplay()->addVideoRenderer(videoLayout()->channelCount(), renderer, true);
 }
 
+void QnResourceDisplay::removeRenderer(QnAbstractRenderer *renderer) {
+    int channelCount = videoLayout()->channelCount();
+    if (m_camera) {
+        for(int i = 0; i < channelCount; i++)
+            m_camera->getCamDisplay()->removeVideoRenderer(renderer);
+    }
+}

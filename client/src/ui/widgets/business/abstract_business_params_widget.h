@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include <business/business_logic_common.h>
+#include <business/business_fwd.h>
 #include <ui/models/business_rules_view_model.h>
 
 class QnAbstractBusinessParamsWidget : public QWidget
@@ -15,6 +15,7 @@ public:
     virtual ~QnAbstractBusinessParamsWidget();
 
     void setModel(QnBusinessRuleViewModel* model);
+    virtual void updateTabOrder(QWidget* before, QWidget* after);
 protected slots:
     virtual void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
 

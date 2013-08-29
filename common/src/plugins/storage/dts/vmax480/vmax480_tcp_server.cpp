@@ -1,4 +1,8 @@
 #include "vmax480_tcp_server.h"
+
+#include <QElapsedTimer>
+#include <QUuid>
+
 #include "vmax480_stream_fetcher.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
@@ -346,12 +350,12 @@ void QnVMax480ConnectionProcessor::run()
 
 // ---------------------------- QnVMax480Server -------------------------
 
-Q_GLOBAL_STATIC(QnVMax480Server, inst)
+Q_GLOBAL_STATIC(QnVMax480Server, QnVMax480Server_instance)
 
 
 QnVMax480Server* QnVMax480Server::instance()
 {
-    return inst();
+    return QnVMax480Server_instance();
 }
 
 QnVMax480Server::QnVMax480Server(): QnTcpListener(QHostAddress(QLatin1String("127.0.0.1")), 0)

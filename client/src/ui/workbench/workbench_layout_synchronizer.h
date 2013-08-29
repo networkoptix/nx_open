@@ -2,8 +2,9 @@
 #define QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
 
 #include <QtCore/QObject>
-#include <QtCore/QSet>
 #include <QtCore/QMetaType>
+#include <QtCore/QSet>
+#include <QtCore/QUuid>
 
 #include <core/resource/resource_fwd.h>
 
@@ -84,6 +85,7 @@ protected slots:
     void at_resource_itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &itemData);
     void at_resource_cellAspectRatioChanged();
     void at_resource_cellSpacingChanged();
+    void at_resource_lockedChanged();
 
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);

@@ -59,7 +59,7 @@ void QnWorkbenchPtzMapperWatcher::sendRequest(const QnMediaServerResourcePtr &se
     //if(m_requests.contains(camera)) // TODO: #Elric remove once TODO above is resolved.
         //return; /* No duplicate requests. */
 
-    int handle = server->apiConnection()->asyncPtzGetSpaceMapper(camera, this, SLOT(at_replyReceived(int, const QnPtzSpaceMapper &, int)));
+    int handle = server->apiConnection()->ptzGetSpaceMapperAsync(camera, this, SLOT(at_replyReceived(int, const QnPtzSpaceMapper &, int)));
     m_requests.insert(camera);
     m_resourceByHandle.insert(handle, camera);
 }
@@ -75,8 +75,6 @@ void QnWorkbenchPtzMapperWatcher::at_ptzWatcher_ptzCameraAdded(const QnVirtualCa
     if(QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>()) {
         connect(server, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
         connect(server, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_server_statusChanged(const QnResourcePtr &)));
-    } else {
-        qnWarning("Total fuck up in resource tree: no server for camera '%1'.", camera->getName()); // TODO: #Elric remove once the bug is tracked down.
     }
 
     at_resource_statusChanged(camera);

@@ -1,21 +1,24 @@
 #include "media_data_packet.h"
 
-#include "libavformat/avformat.h"
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/sse_helper.h"
 #include "utils/common/synctime.h"
+
+#include <QRegion>
 
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif
 #include "utils/math/math.h"
 
-//extern QMutex global_ffmpeg_mutex;
-
 
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
 {
-    //QMutexLocker mutex(&global_ffmpeg_mutex);
     m_ctx = avcodec_alloc_context3(NULL);
     avcodec_copy_context(m_ctx, ctx);
 }
@@ -24,7 +27,6 @@ QnMediaContext::QnMediaContext(CodecID codecId)
 {
     if (codecId != CODEC_ID_NONE)
     {
-        //QMutexLocker mutex(&global_ffmpeg_mutex);
         AVCodec* codec = avcodec_find_decoder(codecId);
         m_ctx = avcodec_alloc_context3(codec);
         avcodec_open2(m_ctx, codec, NULL);
@@ -39,18 +41,21 @@ QnMediaContext::QnMediaContext(const QByteArray& payload)
 }
 
 QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
-
 {
     m_ctx = QnFfmpegHelper::deserializeCodecContext((const char*) payload, dataSize);
 }
 
 QnMediaContext::~QnMediaContext()
 {
-    //QMutexLocker mutex(&global_ffmpeg_mutex);
     if (m_ctx) {
         if (m_ctx->codec)
             avcodec_close(m_ctx);
-        av_free(m_ctx);
+        av_freep(&m_ctx->rc_override);
+        av_freep(&m_ctx->intra_matrix);
+        av_freep(&m_ctx->inter_matrix);
+        av_freep(&m_ctx->extradata);
+        av_freep(&m_ctx->rc_eq);
+        av_freep(&m_ctx);
     }
 }
 
@@ -68,6 +73,10 @@ QString QnMediaContext::codecName() const
 bool QnMediaContext::equalTo(QnMediaContext *other) const
 {
     // I've add new condition bits_per_coded_sample for G726 audio codec
+    if( m_ctx == NULL && other->m_ctx == NULL )
+        return true;
+    if( m_ctx == NULL || other->m_ctx == NULL )
+        return false;
     return m_ctx->codec_id == other->m_ctx->codec_id && m_ctx->bits_per_coded_sample == other->m_ctx->bits_per_coded_sample;
 }
 

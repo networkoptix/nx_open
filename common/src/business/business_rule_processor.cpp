@@ -7,15 +7,34 @@
 #include <business/business_action_factory.h>
 #include <business/business_event_rule.h>
 #include <business/actions/system_health_business_action.h>
+#include <business/business_action_parameters.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include "mustache/mustache_helper.h"
+#include "mustache/partial_info.h"
+
 #include "utils/common/synctime.h"
 #include <utils/common/email.h>
+#include "business_strings_helper.h"
+#include "version.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
+
+namespace {
+    const QString tpProductLogoFilename(lit("productLogoFilename"));
+    const QString tpEventLogoFilename(lit("eventLogoFilename"));
+    const QString tpProductLogo(lit("productLogo.png"));
+    const QString tpCompanyName(lit("companyName"));
+    const QString tpCompanyUrl(lit("companyUrl"));
+    const QString tpSupportEmail(lit("supportEmail"));
+    const QString tpSystemName(lit("systemName"));
+    const QString tpImageMimeType(lit("image/png"));
+    const QString tpScreenshotFilename(lit("screenshot"));
+    const QString tpScreenshot(lit("screenshot.jpeg"));
+};
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -39,7 +58,7 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (action->actionType() == BusinessActionType::SendMail || action->actionType() == BusinessActionType::Alert)
+    if (action->actionType() == BusinessActionType::SendMail || action->actionType() == BusinessActionType::Diagnostics)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
@@ -48,7 +67,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
-    QnResourceList resList = action->getResources().filtered<QnVirtualCameraResource>();
+    QnResourceList resList = action->getResources().filtered<QnNetworkResource>();
     if (resList.isEmpty()) {
         executeActionInternal(action, QnResourcePtr());
     }
@@ -90,12 +109,12 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
 
-        if (action->getToggleState() == ToggleState::On)
+        if (action->getToggleState() == Qn::OnState)
         {
             if (++m_actionInProgress[actionKey] > 1)
                 return true; // ignore duplicated start
         }
-        else if (action->getToggleState() == ToggleState::Off)
+        else if (action->getToggleState() == Qn::OffState)
         {
             if (--m_actionInProgress[actionKey] > 0)
                 return true; // ignore duplicated stop
@@ -105,17 +124,19 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     switch( action->actionType() )
     {
-        case BusinessActionType::SendMail:
-            return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
+    case BusinessActionType::SendMail:
+        return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
 
-        case BusinessActionType::Alert:
-            break;
+    case BusinessActionType::Diagnostics:
+        return true;
 
-        case BusinessActionType::ShowPopup:
-            return showPopup( action.dynamicCast<QnPopupBusinessAction>() );
+    case BusinessActionType::ShowPopup:
+    case BusinessActionType::PlaySound:
+    case BusinessActionType::SayText:
+        return broadcastBusinessAction(action);
 
-        default:
-            break;
+    default:
+        break;
     }
 
     return false;
@@ -161,7 +182,7 @@ void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bE
 {
     QMutexLocker lock(&m_mutex);
 
-    QList<QnAbstractBusinessActionPtr> actions = matchActions(bEvent);
+    QnAbstractBusinessActionList actions = matchActions(bEvent);
     foreach(QnAbstractBusinessActionPtr action, actions)
     {
         executeAction(action);
@@ -187,6 +208,17 @@ bool QnBusinessRuleProcessor::checkRuleCondition(QnAbstractBusinessEventPtr bEve
     return true;
 }
 
+QString QnBusinessRuleProcessor::formatEmailList(const QStringList &value) {
+    QString result;
+    for (int i = 0; i < value.size(); ++i)
+    {
+        if (i > 0)
+            result.append(L' ');
+        result.append(QString(QLatin1String("%1")).arg(value[i].trimmed()));
+    }
+    return result;
+}
+
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
     bool condOK = checkRuleCondition(bEvent, rule);
@@ -194,7 +226,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
 
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
 
-    if (bEvent->getToggleState() == ToggleState::Off && !runtimeRule.resources.isEmpty())
+    if (bEvent->getToggleState() == Qn::OffState && !runtimeRule.resources.isEmpty())
         return QnAbstractBusinessActionPtr(); // ignore 'Off' event if some event resources still running
 
     if (!runtimeRule.isActionRunning.isEmpty())
@@ -202,15 +234,15 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
         // Toggle event repeated with some interval with state 'on'.
         // if toggled action is used and condition is no longer valid - stop action
         // Or toggle event goes to 'off'. stop action
-        if (!condOK || bEvent->getToggleState() == ToggleState::Off)
-            action = QnBusinessActionFactory::instantiateAction(rule, bEvent, ToggleState::Off);
+        if (!condOK || bEvent->getToggleState() == Qn::OffState)
+            action = QnBusinessActionFactory::instantiateAction(rule, bEvent, Qn::OffState);
         else
             return QnAbstractBusinessActionPtr(); // ignore repeating 'On' event
     }
     else if (condOK)
         action = QnBusinessActionFactory::instantiateAction(rule, bEvent);
 
-    bool isActionRunning = action && action->getToggleState() == ToggleState::On;
+    bool isActionRunning = action && action->getToggleState() == Qn::OnState;
     if (isActionRunning)
         runtimeRule.isActionRunning.insert(QnId());
     else
@@ -229,7 +261,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
         RunningRuleInfo& runtimeRule = itr.value();
         QnId resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnId();
 
-        if (condOK && bEvent->getToggleState() == ToggleState::On) {
+        if (condOK && bEvent->getToggleState() == Qn::OnState) {
             if (runtimeRule.isActionRunning.contains(resId))
                 return QnAbstractBusinessActionPtr(); // action by rule already was ran. Allow separate action for each resource of source event but ingore repeated 'on' state
             else
@@ -242,7 +274,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     if (!condOK)
         return QnAbstractBusinessActionPtr();
 
-    if (rule->eventState() != ToggleState::NotDefined && rule->eventState() != bEvent->getToggleState())
+    if (rule->eventState() != Qn::UndefinedState && rule->eventState() != bEvent->getToggleState())
         return QnAbstractBusinessActionPtr();
 
 
@@ -306,7 +338,7 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
     // for continue event put information to m_eventsInProgress
     QnId resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnId();
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
-    if (bEvent->getToggleState() == ToggleState::On)
+    if (bEvent->getToggleState() == Qn::OnState)
         runtimeRule.resources[resId] = bEvent;
     else 
         runtimeRule.resources.remove(resId);
@@ -314,9 +346,9 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
     return true;
 }
 
-QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
+QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
 {
-    QList<QnAbstractBusinessActionPtr> result;
+    QnAbstractBusinessActionList result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
         if (rule->disabled() || rule->eventType() != bEvent->getEventType())
@@ -345,16 +377,23 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
 void QnBusinessRuleProcessor::at_actionDelivered(QnAbstractBusinessActionPtr action)
 {
     Q_UNUSED(action)
-    //TODO: implement me
+    //TODO: #vasilenko implement me
 }
 
 void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action)
 {
     Q_UNUSED(action)
-    //TODO: implement me
+    //TODO: #vasilenko implement me
 }
 
-bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& action )
+QImage QnBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const
+{
+    Q_UNUSED(params);
+    Q_UNUSED(dstSize);
+
+    return QImage();
+}
+bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
 {
     Q_ASSERT( action );
 
@@ -367,7 +406,7 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
             recipients << email;
     }
 
-    QStringList additional = BusinessActionParameters::getEmailAddress(action->getParams()).split(QLatin1Char(';'), QString::SkipEmptyParts);
+    QStringList additional = action->getParams().getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
     foreach(const QString &email, additional) {
         log << email;
         QString trimmed = email.trimmed();
@@ -388,52 +427,86 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
 
+    QVariantHash contextMap = QnBusinessStringsHelper::eventDescriptionMap(action, action->aggregationInfo(), true);
+    QnPartialInfo partialInfo(action->getRuntimeParams().getEventType());
+
+    assert(!partialInfo.attrName.isEmpty());
+    contextMap[partialInfo.attrName] = lit("true");
+
+    QnEmailAttachmentList attachments;
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(partialInfo.eventLogoFilename, lit(":/skin/email_attachments/") + partialInfo.eventLogoFilename, tpImageMimeType)));
+    contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
+    contextMap[tpEventLogoFilename] = lit("cid:") + partialInfo.eventLogoFilename;
+    contextMap[tpCompanyName] = lit(QN_ORGANIZATION_NAME);
+    contextMap[tpCompanyUrl] = lit(QN_COMPANY_URL);
+    contextMap[tpSupportEmail] = lit(QN_SUPPORT_MAIL_ADDRESS);
+    contextMap[tpSystemName] = QnAppServerConnectionFactory::systemName();
+    attachments.append(partialInfo.attachments);
+
+    QImage screenshot = this->getEventScreenshot(action->getRuntimeParams(), QSize(640, 480));
+    if (!screenshot.isNull()) {
+        QByteArray screenshotData;
+        QBuffer screenshotStream(&screenshotData);
+        if (screenshot.save(&screenshotStream, "JPEG")) {
+            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
+            contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+        }
+    }
+
+    QString messageBody = renderTemplateFromFile(lit(":/email_templates"), lit("container.mustache"), contextMap);
+
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
-    appServerConnection->sendEmailAsync(
+    if (appServerConnection->sendEmailAsync(
                 recipients,
-                action->getSubject(),
-                action->getMessageBody(),
+                QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
+                messageBody,
+                attachments,
                 EMAIL_SEND_TIMEOUT,
                 this,
-                SLOT(at_sendEmailFinished(int,QByteArray,bool,int)));
+                SLOT(at_sendEmailFinished(int,bool,int))) == -1)
+        return false;
 
+    /*
+     * This action instance is not used anymore but storing into the Events Log db.
+     * Therefore we are storing all used emails in order to not recalculate them in
+     * the event log processing methods. --rvasilenko
+     */
+    action->getParams().setEmailAddress(formatEmailList(recipients));
     return true;
 }
 
-void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray &errorString, bool result, int handle)
+void QnBusinessRuleProcessor::at_sendEmailFinished(int status, bool result, int handle)
 {
     Q_UNUSED(status)
     Q_UNUSED(handle)
     if (result)
         return;
 
-    QnPopupBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
+    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
 
-    showPopup(action);
+    broadcastBusinessAction(action);
 
-    cl_log.log( QString::fromLatin1("Error processing action SendMail: %2").
-                arg(QString::fromUtf8(errorString)), cl_logWARNING );
-
+    cl_log.log(QString::fromLatin1("Error processing action SendMail."), cl_logWARNING);
 }
 
-void QnBusinessRuleProcessor::at_sendPopupFinished(QnHTTPRawResponse response, int handle)
+void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(QnHTTPRawResponse response, int handle)
 {
     if (response.status == 0)
         return;
 
-    qWarning() << "error delivering popup message #" << handle << "error:" << response.errorString;
+    qWarning() << "error delivering broadcast action message #" << handle << "error:" << response.errorString;
 }
 
-bool QnBusinessRuleProcessor::showPopup(QnPopupBusinessActionPtr action)
+bool QnBusinessRuleProcessor::broadcastBusinessAction(QnAbstractBusinessActionPtr action)
 {
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    appServerConnection->broadcastBusinessAction(action, this, SLOT(at_sendPopupFinished(QnHTTPRawResponse, int)));
+    appServerConnection->broadcastBusinessAction(action, this, SLOT(at_broadcastBusinessActionFinished(QnHTTPRawResponse, int)));
     return true;
 }
 
-void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRule)
+void QnBusinessRuleProcessor::at_businessRuleChanged_i(QnBusinessEventRulePtr bRule)
 {
-    QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_rules.size(); ++i)
     {
         if (m_rules[i]->id() == bRule->id())
@@ -454,6 +527,30 @@ void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRul
         notifyResourcesAboutEventIfNeccessary( bRule, true );
 }
 
+void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRule)
+{
+    QMutexLocker lock(&m_mutex);
+    at_businessRuleChanged_i(bRule);
+}
+
+void QnBusinessRuleProcessor::at_businessRuleReset(QnBusinessEventRuleList rules)
+{
+    QMutexLocker lock(&m_mutex);
+
+    // Remove all rules
+    for (int i = 0; i < m_rules.size(); ++i)
+    {
+        if( !m_rules[i]->disabled() )
+            notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
+        terminateRunningRule(m_rules[i]);
+    }
+    m_rules.clear();
+
+    foreach(QnBusinessEventRulePtr rule, rules) {
+        at_businessRuleChanged_i(rule);
+    }
+}
+
 void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
 {
     QString ruleId = rule->getUniqueId();
@@ -470,7 +567,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
             else
                 bEvent = runtimeRule.resources.begin().value(); // for continues action resourceID is not specified and only one record is used
             if (bEvent) {
-                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(rule, bEvent, ToggleState::Off);
+                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(rule, bEvent, Qn::OffState);
                 if (action)
                     executeAction(action);
             }
@@ -491,6 +588,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
 void QnBusinessRuleProcessor::at_businessRuleDeleted(int id)
 {
     QMutexLocker lock(&m_mutex);
+
     for (int i = 0; i < m_rules.size(); ++i)
     {
         if (m_rules[i]->id() == id)

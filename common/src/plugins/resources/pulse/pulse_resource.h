@@ -15,7 +15,7 @@ public:
 
     virtual bool isResourceAccessible();
 
-    virtual QString manufacture() const;
+    virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 

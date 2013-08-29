@@ -6,27 +6,40 @@
 #include "utils/network/socket.h"
 #include <QAtomicInt>
 
-class CLSimpleHTTPClient;
+#include "upnp_device_searcher.h"
 
-struct UpnpDeviceInfo
-{
-    QString friendlyName;
-    QString manufacturer;
-    QString modelName;
-    QString serialNumber;
-    QString presentationUrl;
-};
 
-class QnUpnpResourceSearcher : public QnAbstractNetworkResourceSearcher
+//struct UpnpDeviceInfo
+//{
+//    QString friendlyName;
+//    QString manufacturer;
+//    QString modelName;
+//    QString serialNumber;
+//    QString presentationUrl;
+//};
+
+class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
 {
 public:
     QnUpnpResourceSearcher();
     ~QnUpnpResourceSearcher();
-    QnResourceList findResources(void);
 
     void setSendRequests(bool value);
+
 protected:
-    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result) = 0;
+    virtual QnResourceList findResources() override;
+    /*!
+        \param discoveryAddr Local interface address, device has been discovered on
+        \param host Discovered device address
+        \param devInfo Parameters, received by parsing \a xmlDevInfo
+        \param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
+    */
+    virtual void processPacket(
+        const QHostAddress& discoveryAddr,
+        const QString& host,
+        const UpnpDeviceInfo& devInfo,
+        const QByteArray& xmlDevInfo,
+        QnResourceList& result) = 0;
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
     QHostAddress findBestIface(const QString& host);
@@ -41,6 +54,44 @@ private:
     QMap<QByteArray, QByteArray> m_deviceXmlCache;
     QTime m_cacheLivetime;
     UDPSocket* m_receiveSocket;
+};
+
+
+//!\a QnUpnpResourceSearcher-compatible wrapper for \a UPNPSearchHandler
+class QnUpnpResourceSearcherAsync
+:
+    virtual public QnAbstractNetworkResourceSearcher,
+    public UPNPSearchHandler
+{
+public:
+    QnUpnpResourceSearcherAsync();
+    virtual ~QnUpnpResourceSearcherAsync();
+
+    //!Implementation of QnAbstractNetworkResourceSearcher::findResources
+    virtual QnResourceList findResources() override;
+    //!Implementation of UPNPSearchHandler::processPacket
+    virtual bool processPacket(
+        const QHostAddress& localInterfaceAddress,
+        const QString& discoveredDevAddress,
+        const UpnpDeviceInfo& devInfo,
+        const QByteArray& xmlDevInfo ) override;
+
+protected:
+    /*!
+        \param discoveryAddr Local interface address, device has been discovered on
+        \param host Discovered device address
+        \param devInfo Parameters, received by parsing \a xmlDevInfo
+        \param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
+    */
+    virtual void processPacket(
+        const QHostAddress& discoveryAddr,
+        const QString& host,
+        const UpnpDeviceInfo& devInfo,
+        const QByteArray& xmlDevInfo,
+        QnResourceList& result ) = 0;
+
+private:
+    QnResourceList m_resList;
 };
 
 #endif // upnp_resource_searcher_h_1806
