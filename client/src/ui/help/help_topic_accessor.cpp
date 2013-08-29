@@ -13,6 +13,7 @@
 
 #include <ui/common/help_topic_queryable.h>
 #include <client/client_globals.h>
+#include <common/common_globals.h>
 
 namespace {
     const char *qn_helpTopicPropertyName = "_qn_contextHelpId";

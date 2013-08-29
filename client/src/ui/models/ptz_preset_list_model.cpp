@@ -1,5 +1,7 @@
 #include "ptz_preset_list_model.h"
 
+#include <common/common_globals.h>
+
 QnPtzPresetListModel::QnPtzPresetListModel(QObject *parent):
     base_type(parent),
     m_readOnly(false),

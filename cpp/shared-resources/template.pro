@@ -71,10 +71,8 @@ INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include/QtCore/$$QT_VERSION
         
 DEPENDPATH *= $${INCLUDEPATH}
 
-!mac {
-  PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
-  PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
-}
+PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
+PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
 win* {
   isEmpty(BUILDLIB) {

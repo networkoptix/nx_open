@@ -1,16 +1,16 @@
 
-#ifdef __APPLE__
-#include <GL/gl.h>
-#define GL_GLEXT_PROTOTYPES /* We want typedefs, not function declarations. */
-#include <GL/glext.h> /* Pull in all non-standard OpenGL defines. */
-#endif
+//#ifdef __APPLE__
+//#include <GL/gl.h>
+//#define GL_GLEXT_PROTOTYPES /* We want typedefs, not function declarations. */
+//#include <GL/glext.h> /* Pull in all non-standard OpenGL defines. */
+//#endif
 
 #include "gl_functions.h"
 
-#ifndef __APPLE__
+//#ifndef __APPLE__
 #define GL_GLEXT_PROTOTYPES /* We want typedefs, not function declarations. */
 #include <GL/glext.h>
-#endif
+//#endif
 
 #include <boost/preprocessor/stringize.hpp>
 
